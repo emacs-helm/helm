@@ -112,10 +112,7 @@
                            (add-to-list 'entries (propertize (match-string 1))))
                          (kill-buffer info-parsing-buffer)
                          (sort entries 'string-lessp)))))
-    (action . (lambda (node)
-                (message "Doing action")
-                (message "node = %s" node)
-                (info node)))
+    (action . info)
     (requires-pattern . 2)))
 
 ;;;; Complex command history
