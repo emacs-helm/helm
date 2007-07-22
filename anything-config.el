@@ -200,6 +200,8 @@ The code is ripped out of `eshell-complete-commands-list'."
 
 (defvar anything-actions-file
   '(file . (("Find File" . find-file)
+            ("Find File other Window" . find-file-other-window)
+            ("Find File other Frame" . find-file-other-frame)
             ("Delete File" . (lambda (file)
                                (if (y-or-n-p (format "Really delete file %s? "
                                                      file))
