@@ -2,9 +2,12 @@
 
 ;; Copyright (C) 2007 Tamas Patrovics
 
-;; Authors:
+;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
+
+;; Authors & Contributors:
 ;;     Tamas Patrovics
 ;;     Tassilo Horn <tassilo@member.fsf.org>
+;;     Vagn Johansen <gonz808@hotmail.com>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -285,4 +288,4 @@ buffers associated with that file, too."
 
 (provide 'anything-config)
 
-;;; anything-config.el.el ends here
+;;; anything-config.el ends here
