@@ -96,23 +96,33 @@
 ;;;; Info pages
 
 (defvar anything-source-info-pages
-  ;; FIXME: Info nodes with more than one word (e.g. "Emacs Lisp Intro") will
-  ;; be inserted with only the first word (e.g. "Emacs").
   `((name . "Info Pages")
     (candidates . ,(save-window-excursion
                      (save-excursion
                        (require 'info)
                        (Info-find-node "dir" "top")
-                       (let ((info-parsing-buffer " anything info parsing")
-                             entries)
-                         (copy-to-buffer info-parsing-buffer (point-min) (point-max))
-                         (set-buffer info-parsing-buffer)
-                         (set-text-properties (point-min) (point-max) nil)
-                         (while (re-search-forward "^\\* \\([[:alpha:]]+\\)\\>" nil t)
-                           (add-to-list 'entries (propertize (match-string 1))))
-                         (kill-buffer info-parsing-buffer)
-                         (sort entries 'string-lessp)))))
-    (action . info)
+                       (goto-char (point-min))
+                       (let (topics)
+                         (while (not (eobp))
+                           (let ((face (get-text-property (point) 'font-lock-face))
+                                 (next-change
+                                  (or (next-property-change (point) (current-buffer))
+                                      (point-max))))
+                             (when (or (eq face 'info-xref)
+                                       (eq face 'info-xref-visited))
+                               ;; Add items in the form "Title ==> (node)subtopic"
+                               (add-to-list 'topics
+                                            (concat
+                                             (buffer-substring-no-properties (point)
+                                                                             next-change)
+                                             " ==> "
+                                             (substring (get-text-property (point)
+                                                                           'help-echo)
+                                                        15))))
+                             (goto-char next-change)))
+                         topics))))
+    (action . (lambda (node-str)
+                (info (replace-regexp-in-string "^.*==> " "" node-str))))
     (requires-pattern . 2)))
 
 ;;;; Complex command history
