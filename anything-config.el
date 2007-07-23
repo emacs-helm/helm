@@ -165,6 +165,18 @@
   "Source for retrieving files matching the current input pattern
 with the tracker desktop search.")
 
+;;;; Spotlight (MacOS X desktop search)
+
+(defvar anything-source-mac-spotlight
+  '((name . "mdfind")
+    (candidates . (lambda ()
+                    (start-process "mdfind-process" nil
+                                   "mdfind" anything-pattern)))
+    (type . file)
+    (requires-pattern . 3))
+  "Source for retrieving files via Spotlight's command line
+utility mdfind.")
+
 ;;; Predefined Type Actions
 
 ;;;; Buffers
