@@ -4,10 +4,11 @@
 
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 
-;; Authors & Contributors:
+;; Contributors:
 ;;     Tamas Patrovics
 ;;     Tassilo Horn <tassilo@member.fsf.org>
 ;;     Vagn Johansen <gonz808@hotmail.com>
+;;     Mathias Dahl
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -54,7 +55,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-23 Mon 20:52>"
+(defvar anything-config-version "<2007-07-23 Mon 21:11>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -182,6 +183,13 @@ To get non-interactive functions listed, use
     (type . function)
     (requires-pattern . 2))
   "Source for completing Emacs functions.")
+
+;;;; Bookmarks
+
+(defvar anything-source-bookmarks
+  '((name . "Bookmarks")
+    (candidates . bookmark-all-names)
+    (action . bookmark-jump)))
 
 ;;;; Locate
 
