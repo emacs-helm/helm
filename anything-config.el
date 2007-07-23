@@ -40,6 +40,7 @@
 ;;   (setq anything-type-actions (list anything-actions-buffer
 ;;                                     anything-actions-file
 ;;                                     anything-actions-command
+;;                                     anything-actions-function
 ;;                                     anything-actions-sexp ...))
 ;;
 
@@ -53,7 +54,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-23 Mon 20:40>"
+(defvar anything-config-version "<2007-07-23 Mon 20:52>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -150,7 +151,7 @@ last change.")
 ;;;; Emacs commands
 
 (defvar anything-source-emacs-commands
-  `((name . "Emacs Commands")
+  '((name . "Emacs Commands")
     (candidates . (lambda ()
                     (let (commands)
                       (mapatoms (lambda (a)
@@ -170,7 +171,7 @@ To get non-interactive functions listed, use
 ;;;; Emacs functions
 
 (defvar anything-source-emacs-functions
-  `((name . "Emacs Functions")
+  '((name . "Emacs Functions")
     (candidates . (lambda ()
                     (let (commands)
                       (mapatoms (lambda (a)
