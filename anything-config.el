@@ -33,11 +33,14 @@
 ;;
 ;;   (require 'anything-config) ; loads anything.el too
 ;;
-;;   (setq anything-sources (list anything-source-emacs-commands
-;;                                anything-source-locate ...)
+;;   (setq anything-sources (list anything-source-buffers
+;;                                anything-source-emacs-commands
+;;                                anything-source-locate ...))
 ;;
 ;;   (setq anything-type-actions (list anything-actions-buffer
-;;                                     anything-actions-file ...)
+;;                                     anything-actions-file
+;;                                     anything-actions-function
+;;                                     anything-actions-sexp ...))
 ;;
 
 ;;; Startup
@@ -136,21 +139,21 @@
     (candidates . (lambda ()
                     (mapcar 'prin1-to-string
                             command-history)))
-    (action . (lambda (c)
-                (eval (read c))))))
+    (type . sexp)))
 
 ;;;; Emacs commands
 
 (defvar anything-source-emacs-commands
   `((name . "Emacs Commands")
-    (candidates . ,(let (commands)
-                     (mapatoms (lambda (a)
-                                 (if (commandp a)
-                                     (push (symbol-name a)
-                                           commands))))
-                     (sort commands 'string-lessp)))
-    (action . (lambda (command-name)
-                (call-interactively (intern command-name)))))
+    (candidates . (lambda ()
+                    (let (commands)
+                      (mapatoms (lambda (a)
+                                  (if (commandp a)
+                                      (push (symbol-name a)
+                                            commands))))
+                      (sort commands 'string-lessp))))
+    (type . function)
+    (requires-pattern . 2)
   "Source for completing and invoking Emacs commands.")
 
 ;;;; Locate
@@ -162,9 +165,10 @@
                                    "locate" "-i" "-r"
                                    anything-pattern)))
     (type . file)
-    (requires-pattern . 3))
+    (requires-pattern . 3)
+    (delayed))
   "Source for retrieving files matching the current input pattern
-  with locate.")
+with locate.")
 
 ;;;; Tracker desktop search
 
@@ -175,7 +179,8 @@
                                    "tracker-search"
                                    anything-pattern)))
     (type . file)
-    (requires-pattern . 3))
+    (requires-pattern . 3)
+    (delayed))
   "Source for retrieving files matching the current input pattern
 with the tracker desktop search.")
 
@@ -187,7 +192,8 @@ with the tracker desktop search.")
                     (start-process "mdfind-process" nil
                                    "mdfind" anything-pattern)))
     (type . file)
-    (requires-pattern . 3))
+    (requires-pattern . 3)
+    (delayed))
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
@@ -213,7 +219,7 @@ automatically.")
   "Returns a list of all external commands the user can execute.
 
 If `anything-external-commands-list' is non-nil it will return
-its contents. Else it calculates all external commands and sets
+its contents.  Else it calculates all external commands and sets
 `anything-external-commands-list'.
 
 The code is ripped out of `eshell-complete-commands-list'."
@@ -284,6 +290,22 @@ buffers associated with that file, too."
                               (completing-read "Program: "
                                                (anything-external-commands-list-1))
                               file))))))
+
+;;;; Functions
+
+(defvar anything-actions-function
+  '(function . (("Call Interactively" . (lambda (command-name)
+                                          (call-interactively (intern command-name))))
+                ("Describe Function" . (lambda (command-name)
+                                         (describe-function (intern command-name))))
+                ("Add Function to the Kill Ring" . kill-new))))
+
+;;;; S-Expressions
+
+(defvar anything-actions-sexp
+  '(sexp . (("Eval S-Expression" . (lambda (c)
+                                     (eval (read c))))
+            ("Add S-Expression to the Kill Ring" . kill-new))))
 
 ;;; Provide anything-config
 
