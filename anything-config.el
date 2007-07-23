@@ -114,14 +114,15 @@
                              (when (or (eq face 'info-xref)
                                        (eq face 'info-xref-visited))
                                ;; Add items in the form "Title ==> (node)subtopic"
-                               (add-to-list 'topics
-                                            (concat
-                                             (buffer-substring-no-properties (point)
-                                                                             next-change)
-                                             " ==> "
-                                             (substring (get-text-property (point)
-                                                                           'help-echo)
-                                                        15))))
+                               (add-to-list
+                                'topics
+                                (concat
+                                 (buffer-substring-no-properties (point)
+                                                                 next-change)
+                                 " ==> "
+                                 (Info-get-token (point)
+                                                 "\\* +"
+                                                 "\\* +[^(]+\\(([^)]*)[^.]*\\)\\."))))
                              (goto-char next-change)))
                          topics))))
     (action . (lambda (node-str)
