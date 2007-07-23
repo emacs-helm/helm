@@ -39,7 +39,7 @@
 ;;
 ;;   (setq anything-type-actions (list anything-actions-buffer
 ;;                                     anything-actions-file
-;;                                     anything-actions-function
+;;                                     anything-actions-command
 ;;                                     anything-actions-sexp ...))
 ;;
 
@@ -50,6 +50,12 @@
 (eval-after-load
     (buffer-file-name)
     (require 'anything))
+
+;;; Version
+
+(defvar anything-config-version "<2007-07-23 Mon 20:40>"
+  "The version of anything-config.el, or better the date of the
+last change.")
 
 ;;; Predefined Sources
 
@@ -152,9 +158,29 @@
                                       (push (symbol-name a)
                                             commands))))
                       (sort commands 'string-lessp))))
+    (type . command)
+    (requires-pattern . 2))
+  "Source for completing and invoking Emacs commands. A command
+is a function with interactive spec that can be invoked with
+`M-x'.
+
+To get non-interactive functions listed, use
+`anything-source-emacs-functions'.")
+
+;;;; Emacs functions
+
+(defvar anything-source-emacs-functions
+  `((name . "Emacs Functions")
+    (candidates . (lambda ()
+                    (let (commands)
+                      (mapatoms (lambda (a)
+                                  (if (functionp a)
+                                      (push (symbol-name a)
+                                            commands))))
+                      (sort commands 'string-lessp))))
     (type . function)
     (requires-pattern . 2))
-  "Source for completing and invoking Emacs commands.")
+  "Source for completing Emacs functions.")
 
 ;;;; Locate
 
@@ -291,14 +317,21 @@ buffers associated with that file, too."
                                                (anything-external-commands-list-1))
                               file))))))
 
+;;;; Commands
+
+(defvar anything-actions-command
+  '(command . (("Call Interactively" . (lambda (command-name)
+                                         (call-interactively (intern command-name))))
+               ("Describe Command" . (lambda (command-name)
+                                       (describe-function (intern command-name))))
+               ("Add Command to the Kill Ring" . kill-new))))
+
 ;;;; Functions
 
 (defvar anything-actions-function
-  '(function . (("Call Interactively" . (lambda (command-name)
-                                          (call-interactively (intern command-name))))
-                ("Describe Function" . (lambda (command-name)
-                                         (describe-function (intern command-name))))
-                ("Add Function to the Kill Ring" . kill-new))))
+  '(function . (("Describe Command" . (lambda (function-name)
+                                        (describe-function (intern function-name))))
+                ("Add Command to the Kill Ring" . kill-new))))
 
 ;;;; S-Expressions
 
