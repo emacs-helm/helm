@@ -232,14 +232,37 @@ The code is ripped out of `eshell-complete-commands-list'."
               (setq paths (cdr paths)))
             completions))))
 
+(defun anything-file-buffers (filename)
+  "Returns a list of those buffer names which correspond to the
+file given by FILENAME."
+  (let (name ret)
+    (dolist (buf (buffer-list) ret)
+      (let ((bfn (buffer-file-name buf)))
+        (when (and bfn
+                   (string= filename bfn))
+          (push (buffer-name buf) ret)))
+    ret)))
+
+(defun anything-delete-file (file)
+  "Deletes the given file after querying the user. Asks to kill
+buffers associated with that file, too."
+  (if (y-or-n-p (format "Really delete file %s? " file))
+      (progn
+        (let ((buffers (anything-file-buffers file)))
+          (delete-file file)
+          (dolist (buf buffers)
+            (when (y-or-n-p (format "Kill buffer %s, too? " buf))
+              (kill-buffer buf)))))
+    (message "Nothing deleted.")))
+
 (defvar anything-actions-file
   '(file . (("Find File" . find-file)
             ("Find File other Window" . find-file-other-window)
             ("Find File other Frame" . find-file-other-frame)
-            ("Delete File" . (lambda (file)
-                               (if (y-or-n-p (format "Really delete file %s? "
-                                                     file))
-                                   (delete-file file))))
+            ("Open Dired in File's Directory" . (lambda (filename)
+                                                  (dired (file-name-directory filename))
+                                                  (dired-goto-file filename)))
+            ("Delete File" . anything-delete-file)
             ("Open File with external Tool" .
              (lambda (file)
                (start-process "anything-open-file-externally"
