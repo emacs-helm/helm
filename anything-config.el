@@ -153,7 +153,7 @@
                                             commands))))
                       (sort commands 'string-lessp))))
     (type . function)
-    (requires-pattern . 2)
+    (requires-pattern . 2))
   "Source for completing and invoking Emacs commands.")
 
 ;;;; Locate
