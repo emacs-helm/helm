@@ -55,13 +55,24 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-24 Tue 18:10>"
+(defvar anything-config-version "<2007-07-24 Tue 21:05>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
 ;;; Predefined Sources
 
 ;;;; Buffers
+
+(defun anything-buffer-list ()
+  "Return the list of names of buffers with the `anything-buffer'
+and hidden buffers filtered out. The first buffer in the list
+will be the last recently used buffer that is not the current
+buffer."
+  (let ((buffers (remove-if (lambda (name)
+                              (or (equal name anything-buffer)
+                                  (eq ?\  (aref name 0))))
+                            (mapcar 'buffer-name (buffer-list)))))
+     (append (cdr buffers) (list (car buffers)))))
 
 (defvar anything-source-buffers
   '((name . "Buffers")
