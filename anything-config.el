@@ -55,7 +55,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-23 Mon 21:11>"
+(defvar anything-config-version "<2007-07-24 Tue 10:32>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
