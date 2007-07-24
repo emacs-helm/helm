@@ -55,7 +55,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-24 Tue 13:03>"
+(defvar anything-config-version "<2007-07-24 Tue 18:10>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -223,7 +223,8 @@ utility mdfind.")
 
 (defvar anything-actions-buffer
   '(buffer . (("Switch to Buffer" . switch-to-buffer)
-              ("Pop to Buffer"    . pop-to-buffer)
+              ("Switch to Buffer other Window" . switch-to-buffer-other-window)
+              ("Switch to Buffer other Frame" . switch-to-buffer-other-frame)
               ("Display Buffer"   . display-buffer)
               ("Kill Buffer"      . kill-buffer)))
   "Actions for type `buffer'.")
