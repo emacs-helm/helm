@@ -116,28 +116,13 @@ last change.")
                        (require 'info)
                        (Info-find-node "dir" "top")
                        (goto-char (point-min))
-                       (let (topics)
-                         (while (not (eobp))
-                           (let ((face (get-text-property (point) 'font-lock-face))
-                                 (next-change
-                                  (or (next-property-change (point) (current-buffer))
-                                      (point-max))))
-                             (when (or (eq face 'info-xref)
-                                       (eq face 'info-xref-visited))
-                               ;; Add items in the form "Title ==> (node)subtopic"
-                               (add-to-list
-                                'topics
-                                (concat
-                                 (buffer-substring-no-properties (point)
-                                                                 next-change)
-                                 " ==> "
-                                 (Info-get-token (point)
-                                                 "\\* +"
-                                                 "\\* +[^(]+\\(([^)]*)[^.]*\\)\\."))))
-                             (goto-char next-change)))
+                       (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+                             topics)
+                         (while (re-search-forward info-topic-regexp nil t)
+                           (add-to-list 'topics (match-string-no-properties 1)))
                          topics))))
     (action . (lambda (node-str)
-                (info (replace-regexp-in-string "^.*==> " "" node-str))))
+                (info (replace-regexp-in-string "^[^:]+: " "" node-str))))
     (requires-pattern . 2)))
 
 ;;;; Complex command history
