@@ -230,6 +230,7 @@ with the tracker desktop search.")
 utility mdfind.")
 
 ;;; Predefined Type Actions
+
 ;;;; Macros for extending default actions
 
 (defmacro anything-add-to-actions (action-var action)
