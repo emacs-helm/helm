@@ -55,7 +55,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-24 Tue 21:05>"
+(defvar anything-config-version "<2007-07-25 Wed 08:19>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -337,11 +337,19 @@ buffers associated with that file, too."
 ;;;; Functions
 
 (defvar anything-actions-function
-  '(function . (("Describe Command" . (lambda (function-name)
-                                        (describe-function (intern function-name))))
-                ("Add Command to the Kill Ring" . kill-new)
-                ("Go to the Function's Definition" . (lambda (function-name)
-                                                       (find-function (intern function-name)))))))
+  '(function
+    . (;; Call it if it's an interactive function.
+       ("Maybe Call Interactively" . (lambda (function-name)
+                                       (let ((function (intern function-name)))
+                                         (if (commandp function)
+                                             (call-interactively function)
+                                           (message "%s is no interactive function."
+                                                    function-name)))))
+       ("Describe Command" . (lambda (function-name)
+                               (describe-function (intern function-name))))
+       ("Add Command to the Kill Ring" . kill-new)
+       ("Go to the Function's Definition" . (lambda (function-name)
+                                              (find-function (intern function-name)))))))
 
 ;;;; S-Expressions
 
