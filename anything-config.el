@@ -45,6 +45,10 @@
 ;;                                     anything-actions-function
 ;;                                     anything-actions-sexp ...))
 ;;
+;;   (setq anything-action-transformers
+;;         '((file . anything-transform-file-actions)
+;;           (function . anything-transform-function-actions)))
+;;
 
 ;;; Startup
 
@@ -56,11 +60,11 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-25 Wed 11:02>"
+(defvar anything-config-version "<2007-07-25 Wed 15:32>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
-;;; Predefined Sources
+;;; Sources
 
 ;;;; Buffers
 
@@ -229,9 +233,11 @@ with the tracker desktop search.")
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
-;;; Predefined Type Actions
+;;; Types
 
-;;;; Macros for extending default actions
+;;;; Type Actions
+
+;;;;; Macros for extending default actions
 
 (defmacro anything-add-to-actions (action-var action)
   "Adds the given ACTION to the given ACTION-VAR. Here's an
@@ -252,7 +258,7 @@ because they're specific to a platform or a user."
                  (append (cdr ,action-var)
                          (list ',action))))))
 
-;;;; Buffers
+;;;;; Buffers
 
 (defvar anything-actions-buffer
   '(buffer . (("Switch to Buffer" . switch-to-buffer)
@@ -262,7 +268,7 @@ because they're specific to a platform or a user."
               ("Kill Buffer"      . kill-buffer)))
   "Actions for type `buffer'.")
 
-;;;; Files
+;;;;; Files
 
 (defvar anything-external-commands-list nil
   "A list of all external commands the user can execute. If this
@@ -345,7 +351,7 @@ buffers associated with that file, too."
                                                (anything-external-commands-list-1))
                               file))))))
 
-;;;; Commands
+;;;;; Commands
 
 (defvar anything-actions-command
   '(command . (("Call Interactively" . (lambda (command-name)
@@ -356,32 +362,58 @@ buffers associated with that file, too."
                ("Go to the Command's Definition" . (lambda (command-name)
                                                      (find-function (intern command-name)))))))
 
-;;;; Functions
+;;;;; Functions
 
 (defvar anything-actions-function
-  '(function
-    . (;; Call it if it's an interactive function.
-       ("Maybe Call Interactively" . (lambda (function-name)
-                                       (let ((function (intern function-name)))
-                                         (if (commandp function)
-                                             (call-interactively function)
-                                           (message "%s is no interactive function."
-                                                    function-name)))))
-       ("Describe Command" . (lambda (function-name)
-                               (describe-function (intern function-name))))
-       ("Add Command to the Kill Ring" . kill-new)
-       ("Go to the Function's Definition" . (lambda (function-name)
-                                              (find-function (intern function-name)))))))
+  '(function . (("Describe Command" . (lambda (function-name)
+                                        (describe-function (intern function-name))))
+                ("Add Command to the Kill Ring" . kill-new)
+                ("Go to the Function's Definition" . (lambda (function-name)
+                                                       (find-function
+                                                        (intern function-name)))))))
 
-;;;; S-Expressions
+;;;;; S-Expressions
 
 (defvar anything-actions-sexp
   '(sexp . (("Eval S-Expression" . (lambda (c)
                                      (eval (read c))))
             ("Add S-Expression to the Kill Ring" . kill-new))))
 
+
+;;;; Action Transformers
+
+;;;;; File
+
+(defun anything-transform-file-actions (actions candidate)
+  "Append useful actions to the list of actions.
+
+Currently a \"Load Emacs Lisp File\" will be appended if the file
+is an emacs lisp file."
+  (if (and (listp actions)
+           (or (string= (file-name-extension candidate) "el")
+               (string= (file-name-extension candidate) "elc")))
+      (append actions '(("Load Emacs Lisp File" . load-file)))
+    actions))
+
+;;;;; Function
+
+(defun anything-transform-function-actions (actions candidate)
+  "Append useful actions to the list of actions.
+
+Currently a \"Call Interactively\" action will be appended if the
+function is indeed a command."
+  (if (and (listp actions)
+           (commandp (intern candidate)))
+      (append actions '(("Call Interactively" . (lambda (c)
+                                                  (call-interactively (intern c))))))
+    actions))
+
 ;;; Provide anything-config
 
 (provide 'anything-config)
+
+;; Local Variables:
+;; mode: outline-minor
+;; End:
 
 ;;; anything-config.el ends here
