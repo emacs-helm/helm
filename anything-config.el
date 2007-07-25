@@ -120,7 +120,7 @@ buffer."
                        (sort (mapcar 'car
                                      woman-topic-all-completions)
                              'string-lessp))))
-    (action . woman)
+    (action . (("Show with Woman" . woman)))
     (requires-pattern . 2)))
 
 ;;;; Info pages
@@ -137,8 +137,10 @@ buffer."
                          (while (re-search-forward info-topic-regexp nil t)
                            (add-to-list 'topics (match-string-no-properties 1)))
                          topics))))
-    (action . (lambda (node-str)
-                (info (replace-regexp-in-string "^[^:]+: " "" node-str))))
+    (action . (("Show with Info" .(lambda (node-str)
+                                   (info (replace-regexp-in-string "^[^:]+: "
+                                                                   ""
+                                                                   node-str))))))
     (requires-pattern . 2)))
 
 ;;;; Complex command history
@@ -190,7 +192,7 @@ To get non-interactive functions listed, use
 (defvar anything-source-bookmarks
   '((name . "Bookmarks")
     (candidates . bookmark-all-names)
-    (action . bookmark-jump)))
+    (action . (("Jump to Bookmark" . bookmark-jump)))))
 
 ;;;; Locate
 
