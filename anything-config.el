@@ -9,6 +9,7 @@
 ;;     Tassilo Horn <tassilo@member.fsf.org>
 ;;     Vagn Johansen <gonz808@hotmail.com>
 ;;     Mathias Dahl
+;;     Bill Clementson <billclem@gmail.com>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -55,7 +56,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-25 Wed 08:19>"
+(defvar anything-config-version "<2007-07-25 Wed 11:02>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -229,6 +230,26 @@ with the tracker desktop search.")
 utility mdfind.")
 
 ;;; Predefined Type Actions
+;;;; Macros for extending default actions
+
+(defmacro anything-add-to-actions (action-var action)
+  "Adds the given ACTION to the given ACTION-VAR. Here's an
+example, which adds an action to copy the file's path to the kill
+ring:
+
+    (anything-add-to-actions anything-actions-file
+                             (\"Put Path on Kill Ring\" . kill-new))
+
+This must be done *before* you set `anything-type-actions'.
+
+The purpose of this function is to allow users to extend type
+actions with actions that won't go into anything-config.el,
+because they're specific to a platform or a user."
+  `(unless (member ',action (cdr ,action-var))
+     (setq ,action-var
+           (cons (car ,action-var)
+                 (append (cdr ,action-var)
+                         (list ',action))))))
 
 ;;;; Buffers
 
