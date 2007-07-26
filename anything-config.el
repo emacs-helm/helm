@@ -10,6 +10,7 @@
 ;;     Vagn Johansen <gonz808@hotmail.com>
 ;;     Mathias Dahl
 ;;     Bill Clementson <billclem@gmail.com>
+;;     Stefan Kamphausen <ska@skamphausen.de>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -60,7 +61,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-25 Wed 15:32>"
+(defvar anything-config-version "<2007-07-26 Thu 08:48>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -96,7 +97,8 @@ buffer."
 (defvar anything-source-recentf
   '((name . "Recentf")
     (candidates . recentf-list)
-    (type . file)))
+    (type . file))
+  "See (info \"(emacs)File Conveniences\").")
 
 ;;;; Files in current dir
 
@@ -136,6 +138,7 @@ buffer."
                              topics)
                          (while (re-search-forward info-topic-regexp nil t)
                            (add-to-list 'topics (match-string-no-properties 1)))
+                         (goto-char (point-min))
                          topics))))
     (action . (("Show with Info" .(lambda (node-str)
                                    (info (replace-regexp-in-string "^[^:]+: "
@@ -192,7 +195,17 @@ To get non-interactive functions listed, use
 (defvar anything-source-bookmarks
   '((name . "Bookmarks")
     (candidates . bookmark-all-names)
-    (action . (("Jump to Bookmark" . bookmark-jump)))))
+    (action . (("Jump to Bookmark" . bookmark-jump))))
+  "See (info \"(emacs)Bookmarks\").")
+
+
+;;;; Picklist
+
+(defvar anything-source-picklist
+  '((name . "Picklist")
+    (candidates . (lambda ()
+                    (mapcar 'car picklist-list)))
+      (type . file)))
 
 ;;;; Locate
 
