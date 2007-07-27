@@ -8,7 +8,7 @@
 ;;     Tamas Patrovics
 ;;     Tassilo Horn <tassilo@member.fsf.org>
 ;;     Vagn Johansen <gonz808@hotmail.com>
-;;     Mathias Dahl
+;;     Mathias Dahl <mathias.dahl@gmail.com>
 ;;     Bill Clementson <billclem@gmail.com>
 ;;     Stefan Kamphausen <ska@skamphausen.de>
 
@@ -61,7 +61,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-26 Thu 08:48>"
+(defvar anything-config-version "<2007-07-27 Fri 02:12>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -252,26 +252,50 @@ utility mdfind.")
 
 ;;;; Type Actions
 
-;;;;; Macros for extending default actions
+;;;;; Extension macros and functions
 
-(defmacro anything-add-to-actions (action-var action)
-  "Adds the given ACTION to the given ACTION-VAR. Here's an
-example, which adds an action to copy the file's path to the kill
-ring:
+(defun anything-source-p (source)
+  "Return non-nil if SOURCE is a valid anything-source."
+  (and (assq 'name       source)
+       (assq 'candidates source)
+       (or (assq 'action source)
+           (assq 'type   source))))
 
+(defmacro anything-add-to-actions (var action)
+  "Add the given ACTION to the list of actions defined in the
+given VAR, which has to be an anything-source-FOO or
+anything-actions-TYPE. Here're two examples:
+
+    ;; Add an action which puts the selected file's path onto the
+    ;; kill ring to the default actions for type file.
     (anything-add-to-actions anything-actions-file
                              (\"Put Path on Kill Ring\" . kill-new))
 
-This must be done *before* you set `anything-type-actions'.
+    ;; Add an action which opens the selected manual page with the
+    ;; `man' command to the actions defined in the source for manual
+    ;; pages.
+    (anything-add-to-actions anything-source-man-pages
+                             (\"Open with man\" . man))
 
-The purpose of this function is to allow users to extend type
-actions with actions that won't go into anything-config.el,
-because they're specific to a platform or a user."
-  `(unless (member ',action (cdr ,action-var))
-     (setq ,action-var
-           (cons (car ,action-var)
-                 (append (cdr ,action-var)
-                         (list ',action))))))
+This must be done *before* you set `anything-type-actions' or
+`anything-sources' in your ~/.emacs.
+
+The purpose of this function is to allow users to extend the list
+of type actions or source actions with actions that won't go into
+anything-config.el, because they're specific to a platform or a
+user."
+  (if (anything-source-p (symbol-value var))
+      ;; Add action to a anything-source-FOO
+      (let ((action-list (cdr (assq 'action (symbol-value var)))))
+        `(unless (member ',action ',action-list)
+           (setq ,var (delete (assq 'action ,var) ,var))
+           (push (cons 'action (append ',action-list (list ',action))) ,var)))
+    ;; Add action to a anything-actions-FOO variable
+    `(unless (member ',action (cdr ,var))
+       (setq ,var
+             (cons (car ,var)
+                   (append (cdr ,var)
+                           (list ',action)))))))
 
 ;;;;; Buffers
 
