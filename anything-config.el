@@ -455,7 +455,7 @@ file. Else return ACTIONS unmodified."
       (append actions '(("Browse with Browser" . browse-url)))
     actions))
 
-(defparameter anything-action-transformers-file
+(defvar anything-action-transformers-file
   '(anything-transform-file-load-el
     anything-transform-file-browse-url
     anything-transform-file-open-system-specific)
