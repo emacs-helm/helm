@@ -421,31 +421,94 @@ buffers associated with that file, too."
 
 ;;;; Action Transformers
 
-;;;;; File
+;;;;; Files
 
-(defun anything-transform-file-actions (actions candidate)
-  "Append useful actions to the list of actions.
+(defun anything-transform-file-open-system-specific (actions candidate)
+  "Add action to open the file CANDIDATE with the default
+application on that platform, e.g. `open' on Macs and `xdg-open'
+on GNU/Linux systems."
+  (let (tool)
+    (cond ((eq system-type 'gnu/linux)
+           (setq tool "xdg-open"))
+          ((or (eq system-type 'darwin)  ;; Mac OS X
+               (eq system-type 'macos))  ;; Mac OS 9
+           (setq tool "open")))
+    (append actions '(("Open with platform-specific default tool"
+                       .
+                       (lambda (file)
+                         (start-process "anything-open-file-with-default-tool"
+                              nil tool file)))))))
 
-Currently a \"Load Emacs Lisp File\" will be appended if the file
-is an emacs lisp file."
-  (if (and (listp actions)
-           (or (string= (file-name-extension candidate) "el")
-               (string= (file-name-extension candidate) "elc")))
+(defun anything-transform-file-load-el (actions candidate)
+  "Add action to load the file CANDIDATE if it is an emacs lisp
+file. Else return ACTIONS unmodified."
+  (if (or (string= (file-name-extension candidate) "el")
+          (string= (file-name-extension candidate) "elc"))
       (append actions '(("Load Emacs Lisp File" . load-file)))
     actions))
 
+(defun anything-transform-file-browse-url (actions candidate)
+  "Add an action to browse the file CANDIDATE if it in a html
+file. Else return ACTIONS unmodified."
+  (if (or (string= (file-name-extension candidate) "htm")
+          (string= (file-name-extension candidate) "html"))
+      (append actions '(("Browse with Browser" . browse-url)))
+    actions))
+
+(defparameter anything-action-transformers-file
+  '(anything-transform-file-load-el
+    anything-transform-file-browse-url
+    anything-transform-file-open-system-specific)
+  "A List of transformer functions for files. See
+`anything-transform-file-actions' for details.")
+
+(defun anything-transform-file-actions (actions candidate)
+  "Calls any function in `anything-action-transformers-file' with
+the current list of ACTIONS and the file CANDIDATE modifying the
+list of actions for this file dynamically."
+  (dolist (trans anything-action-transformers-file)
+    (setq actions (funcall trans actions candidate)))
+  actions)
+
 ;;;;; Function
 
-(defun anything-transform-function-actions (actions candidate)
-  "Append useful actions to the list of actions.
-
-Currently a \"Call Interactively\" action will be appended if the
-function is indeed a command."
-  (if (and (listp actions)
-           (commandp (intern candidate)))
-      (append actions '(("Call Interactively" . (lambda (c)
-                                                  (call-interactively (intern c))))))
+(defun anything-transform-function-call-interactively (actions candidate)
+  "Add an action to call the function CANDIDATE interactively if
+it is a command. Else return ACTIONS unmodified."
+  (if (commandp (intern candidate))
+      (append actions '(("Call Interactively"
+                         .
+                         (lambda (c)
+                           (call-interactively (intern c))))))
     actions))
+
+(defvar anything-action-transformers-function
+  '(anything-transform-function-call-interactively)
+  "A List of transformer functions for functions. See
+`anything-transform-function-actions' for details.")
+
+(defun anything-transform-function-actions (actions candidate)
+  "Calls any function in `anything-action-transformers-function'
+with the current list of ACTIONS and the function CANDIDATE
+modifying the list of actions for this function dynamically."
+  (dolist (trans anything-action-transformers-function)
+    (setq actions (funcall trans actions candidate)))
+  actions)
+
+;;;;; Buffers
+
+(defvar anything-action-transformers-buffer
+  nil
+  "A List of transformer functions for buffers. See
+`anything-transform-buffer-actions' for details.")
+
+(defun anything-transform-buffer-actions (actions candidate)
+  "Calls any function in `anything-action-transformers-buffer'
+with the current list of ACTIONS and the function CANDIDATE
+modifying the list of actions for this function dynamically."
+  (dolist (trans anything-action-transformers-function)
+    (setq actions (funcall trans actions candidate)))
+  actions)
 
 ;;; Provide anything-config
 
