@@ -47,8 +47,9 @@
 ;;                                     anything-actions-sexp ...))
 ;;
 ;;   (setq anything-action-transformers
-;;         '((file . anything-transform-file-actions)
-;;           (function . anything-transform-function-actions)))
+;;         '((file     . anything-transform-file-actions)
+;;           (function . anything-transform-function-actions)
+;;           (buffer   . anything-transform-buffer-actions)))
 ;;
 
 ;;; Startup
