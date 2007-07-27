@@ -210,6 +210,21 @@ To get non-interactive functions listed, use
                     (mapcar 'car picklist-list)))
       (type . file)))
 
+;;;; Imenu
+
+(defparameter anything-source-imenu
+  '((name . "IMenu")
+    (init-func . (lambda ()
+                   (setq anything-imenu-source-buffer (current-buffer))))
+    (candidates . (lambda ()
+                    (set-buffer anything-imenu-source-buffer)
+                    ;; TODO: Here with my current CVS emacs this list has a
+                    ;; different form, but it seems to work for rubykitch's
+                    ;; emacs...
+                    (mapcar 'car (imenu--make-index-alist))))
+    (action . (lambda (c)
+                (goto-char (marker-position c))))))
+
 ;;;; Locate
 
 (defvar anything-source-locate
