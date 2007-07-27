@@ -47,9 +47,11 @@
 ;;                                     anything-actions-sexp ...))
 ;;
 ;;   (setq anything-action-transformers
-;;         '((file     . anything-transform-file-actions)
+;;         '((buffer   . anything-transform-buffer-actions)
+;;           (file     . anything-transform-file-actions)
+;;           (command  . anything-transform-command-actions)
 ;;           (function . anything-transform-function-actions)
-;;           (buffer   . anything-transform-buffer-actions)))
+;;           (sexp     . anything-transform-sexp-actions)))
 ;;
 
 ;;; Startup
@@ -448,11 +450,11 @@ on GNU/Linux systems."
           ((or (eq system-type 'darwin)  ;; Mac OS X
                (eq system-type 'macos))  ;; Mac OS 9
            (setq tool "open")))
-    (append actions '(("Open with platform-specific default tool"
+    (append actions `(("Open with platform-specific default tool"
                        .
                        (lambda (file)
                          (start-process "anything-open-file-with-default-tool"
-                              nil tool file)))))))
+                              nil ,tool file)))))))
 
 (defun anything-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
