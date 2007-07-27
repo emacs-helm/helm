@@ -64,7 +64,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-27 Fri 02:12>"
+(defvar anything-config-version "<2007-07-27 Fri 14:14>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -227,12 +227,21 @@ To get non-interactive functions listed, use
 
 ;;;; Locate
 
+(defvar anything-locate-db-file nil
+  "If non-nil it should be the path to the locate database file
+that should be used.")
+
 (defvar anything-source-locate
   '((name . "Locate")
     (candidates . (lambda ()
-                    (start-process "locate-process" nil
-                                   "locate" "-i" "-r"
-                                   anything-pattern)))
+                    (if anything-locate-db-file
+                        (start-process "locate-process" nil
+                                       "locate" "-i"
+                                       "-d" anything-locate-db-file
+                                       "-r" anything-pattern)
+                      (start-process "locate-process" nil
+                                     "locate" "-i"
+                                     "-r" anything-pattern))))
     (type . file)
     (requires-pattern . 3)
     (delayed))
