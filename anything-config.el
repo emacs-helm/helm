@@ -528,7 +528,21 @@ modifying the list of actions for this function dynamically."
 
 ;;;;; S-Expressions
 
-(defvar anything-action-transformers-sexp nil
+(defun anything-transform-sexp-eval-command-sexp (actions candidate)
+  "If CANDIDATE's `car' in a command, then add an action to
+evaluate it and put it onto the `command-history'."
+  (if (commandp (car (read candidate)))
+      ;; Make it first entry
+      (cons '("Eval and put onto command-history" . (lambda (sexp)
+                                                      (let ((sym (read sexp)))
+                                                        (eval sym)
+                                                        (setq command-history
+                                                              (cons sym command-history)))))
+            actions)
+    actions))
+
+(defvar anything-action-transformers-sexp
+  '(anything-transform-sexp-eval-command-sexp)
   "A List of transformer functions for sexps. See
 `anything-transform-sexp-actions' for details.")
 
