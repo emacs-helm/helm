@@ -422,6 +422,20 @@ buffers associated with that file, too."
 
 ;;;; Action Transformers
 
+;;;;; Buffers
+
+(defvar anything-action-transformers-buffer nil
+  "A List of transformer functions for buffers. See
+`anything-transform-buffer-actions' for details.")
+
+(defun anything-transform-buffer-actions (actions candidate)
+  "Calls any function in `anything-action-transformers-buffer'
+with the current list of ACTIONS and the function CANDIDATE
+modifying the list of actions for this function dynamically."
+  (dolist (trans anything-action-transformers-function)
+    (setq actions (funcall trans actions candidate)))
+  actions)
+
 ;;;;; Files
 
 (defun anything-transform-file-open-system-specific (actions candidate)
@@ -471,6 +485,20 @@ list of actions for this file dynamically."
     (setq actions (funcall trans actions candidate)))
   actions)
 
+;;;;; Commands
+
+(defvar anything-action-transformers-command nil
+  "A List of transformer functions for commands. See
+`anything-transform-command-actions' for details.")
+
+(defun anything-transform-command-actions (actions candidate)
+  "Calls any function in `anything-action-transformers-command'
+with the current list of ACTIONS and the command CANDIDATE
+modifying the list of actions for this command dynamically."
+  (dolist (trans anything-action-transformers-command)
+    (setq actions (funcall trans actions candidate)))
+  actions)
+
 ;;;;; Function
 
 (defun anything-transform-function-call-interactively (actions candidate)
@@ -496,18 +524,17 @@ modifying the list of actions for this function dynamically."
     (setq actions (funcall trans actions candidate)))
   actions)
 
-;;;;; Buffers
+;;;;; S-Expressions
 
-(defvar anything-action-transformers-buffer
-  nil
-  "A List of transformer functions for buffers. See
-`anything-transform-buffer-actions' for details.")
+(defvar anything-action-transformers-sexp nil
+  "A List of transformer functions for sexps. See
+`anything-transform-sexp-actions' for details.")
 
-(defun anything-transform-buffer-actions (actions candidate)
-  "Calls any function in `anything-action-transformers-buffer'
-with the current list of ACTIONS and the function CANDIDATE
-modifying the list of actions for this function dynamically."
-  (dolist (trans anything-action-transformers-function)
+(defun anything-transform-sexp-actions (actions candidate)
+  "Calls any function in `anything-action-transformers-sexp' with
+the current list of ACTIONS and the sexp CANDIDATE modifying the
+list of actions for this sexp dynamically."
+  (dolist (trans anything-action-transformers-sexp)
     (setq actions (funcall trans actions candidate)))
   actions)
 
