@@ -1,6 +1,6 @@
 ;;; anything-config.el --- predefined configurations for anything
 
-;; Copyright (C) 2007 Tamas Patrovics
+;; Copyright (C) 2007 Tassilo Horn
 
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 
