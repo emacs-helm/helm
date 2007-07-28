@@ -253,21 +253,17 @@ To get non-interactive functions listed, use
 
 ;;;; Locate
 
-(defvar anything-locate-db-file nil
-  "If non-nil it should be the path to the locate database file
-that should be used.")
+(defparameter anything-locate-options '("locate" "-i " "-r")
+  "A list where the `car' is the name of the locat program
+followed by options. The search pattern will be appended, so the
+\"-r\" option should be the last option.")
 
-(defvar anything-source-locate
+(defparameter anything-source-locate
   '((name . "Locate")
     (candidates . (lambda ()
-                    (if anything-locate-db-file
-                        (start-process "locate-process" nil
-                                       "locate" "-i"
-                                       "-d" anything-locate-db-file
-                                       "-r" anything-pattern)
-                      (start-process "locate-process" nil
-                                     "locate" "-i"
-                                     "-r" anything-pattern))))
+                    (apply 'start-process "locate-process" nil
+                           (append anything-locate-options
+                                   (list anything-pattern)))))
     (type . file)
     (requires-pattern . 3)
     (delayed))
