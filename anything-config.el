@@ -208,7 +208,7 @@ To get non-interactive functions listed, use
   '((name . "Picklist")
     (candidates . (lambda ()
                     (mapcar 'car picklist-list)))
-      (type . file)))
+    (type . file)))
 
 ;;;; Imenu
 
@@ -226,9 +226,30 @@ To get non-interactive functions listed, use
                                   ;; simplicity (could be more sophisticated)
                                   (remove-if-not (lambda (x)
                                                    (markerp (cdr x)))
-                                                     (imenu--make-index-alist))))
+                                                 (imenu--make-index-alist))))
                       (error nil))))
     (action . imenu)))
+
+;;;; File Cache
+
+(defvar anything-source-file-cache-initialized nil)
+
+(defvar file-cache-files nil)
+
+(defvar anything-source-file-cache
+  '((name . "File Cache")
+    (init-func . (lambda ()
+                   (unless anything-source-file-cache-initialized
+                     (setq file-cache-files
+                           (loop for item in file-cache-alist append
+                                 (destructuring-bind (base &rest dirs) item
+                                   (loop for dir in dirs collect
+                                         (concat dir base)))))
+                     (defadvice file-cache-add-file (after file-cache-list activate)
+                       (add-to-list 'file-cache-files (expand-file-name file)))
+                     (setq anything-source-file-cache-initialized t))))
+    (candidates . file-cache-files)
+    (type . file)))
 
 ;;;; Locate
 
