@@ -212,18 +212,23 @@ To get non-interactive functions listed, use
 
 ;;;; Imenu
 
-(defparameter anything-source-imenu
-  '((name . "IMenu")
+(defvar anything-source-imenu
+  '((name . "Imenu")
     (init-func . (lambda ()
-                   (setq anything-imenu-source-buffer (current-buffer))))
+                   (setq anything-imenu-current-buffer
+                         (current-buffer))))
     (candidates . (lambda ()
-                    (set-buffer anything-imenu-source-buffer)
-                    ;; TODO: Here with my current CVS emacs this list has a
-                    ;; different form, but it seems to work for rubykitch's
-                    ;; emacs...
-                    (mapcar 'car (imenu--make-index-alist))))
-    (action . (lambda (c)
-                (goto-char (marker-position c))))))
+                    (condition-case nil
+                        (with-current-buffer anything-imenu-current-buffer
+                          (mapcar (lambda (x)
+                                    (cons (car x) x))
+                                  ;; leave only top level completions for
+                                  ;; simplicity (could be more sophisticated)
+                                  (remove-if-not (lambda (x)
+                                                   (markerp (cdr x)))
+                                                     (imenu--make-index-alist))))
+                      (error nil))))
+    (action . imenu)))
 
 ;;;; Locate
 
