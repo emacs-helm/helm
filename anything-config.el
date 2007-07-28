@@ -64,7 +64,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-27 Fri 14:14>"
+(defvar anything-config-version "<2007-07-28 Sat 18:06>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -253,12 +253,12 @@ To get non-interactive functions listed, use
 
 ;;;; Locate
 
-(defparameter anything-locate-options '("locate" "-i " "-r")
+(defvar anything-locate-options '("locate" "-i " "-r")
   "A list where the `car' is the name of the locat program
 followed by options. The search pattern will be appended, so the
 \"-r\" option should be the last option.")
 
-(defparameter anything-source-locate
+(defvar anything-source-locate
   '((name . "Locate")
     (candidates . (lambda ()
                     (apply 'start-process "locate-process" nil
