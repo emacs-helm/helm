@@ -71,11 +71,25 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-31 Tue 17:29>"
+(defvar anything-config-version "<2007-07-31 Tue 18:28>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
 ;;; Sources
+
+;;;; Match functions
+
+(defun match-on-file-name (candidate)
+  "Return non-nil if `anything-pattern' matches the
+filename (without directory part) of CANDIDATE."
+  (string-match anything-pattern (file-name-nondirectory candidate)))
+
+(defun match-on-directory-name (candidate)
+  "Return non-nil if `anything-pattern' matches the directory
+part of CANDIDATE (a file)."
+  (let ((dir (file-name-directory candidate)))
+    (when dir
+      (string-match anything-pattern dir))))
 
 ;;;; Buffers
 
@@ -100,6 +114,8 @@ buffer."
 (defvar anything-source-file-name-history
   '((name . "File Name History")
     (candidates . file-name-history)
+    (match . (match-on-file-name
+              match-on-directory-name))
     (type . file)))
 
 ;;;; Recentf files
@@ -107,6 +123,8 @@ buffer."
 (defvar anything-source-recentf
   '((name . "Recentf")
     (candidates . recentf-list)
+    (match . (match-on-file-name
+              match-on-directory-name))
     (type . file))
   "See (info \"(emacs)File Conveniences\").")
 
@@ -256,6 +274,8 @@ To get non-interactive functions listed, use
                        (add-to-list 'file-cache-files (expand-file-name file)))
                      (setq anything-source-file-cache-initialized t))))
     (candidates . file-cache-files)
+    (match . (match-on-file-name
+              match-on-directory-name))
     (type . file)))
 
 ;;;; Locate
