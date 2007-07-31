@@ -64,7 +64,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-07-28 Sat 23:09>"
+(defvar anything-config-version "<2007-07-31 Tue 17:29>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -601,6 +601,64 @@ list of actions for this sexp dynamically."
   (dolist (trans anything-action-transformers-sexp)
     (setq actions (funcall trans actions candidate)))
   actions)
+
+;;;; Candidate Transformers
+
+;;;;; Files
+
+(defvar anything-boring-file-regexp
+  (rx "/" (or ".svn/" "CVS/" "_darcs/" ".git/"))
+  "File candidates matching this regular expression will be
+filtered from the list of candidates if the
+`anything-skip-boring-files' candidate transformer is used, or
+they will be displayed with face `file-name-shadow' if
+`anything-shadow-boring-files' is used.")
+
+(defun anything-shadow-boring-files (files)
+  "Files matching `anything-boring-file-regexp' will be displayed
+with the `file-name-shadow' face if available."
+  (mapcar (lambda (file)
+            ;; Add shadow face property to boring files.
+            (let ((face (if (facep 'file-name-shadow)
+                            'file-name-shadow
+                          ;; fall back to default on XEmacs
+                          'default)))
+              (if (string-match anything-boring-file-regexp file)
+                  (setq file (propertize file 'face face))))
+            file)
+          files))
+
+(defun anything-skip-boring-files (files)
+  "Files matching `anything-boring-file-regexp' will be skipped."
+  (let ((filtered-files nil))
+    (loop for file in files
+          do (if (string-match anything-boring-file-regexp file)
+                 nil
+               (setq filtered-files (append (list file) filtered-files)))
+          finally (return filtered-files))))
+
+(defun anything-shorten-home-path (files)
+  "Replaces /home/user with <home>."
+  (mapcar (lambda (file)
+            ;; replace path of HOME directory in paths with the string <home>
+            (let ((home (replace-regexp-in-string "\\\\" "/" ; stupid Windows...
+                                                  (getenv "HOME"))))
+              (if (string-match home file)
+                  (cons (replace-match "$HOME" nil nil file) file)
+                file)))
+          files))
+
+(defvar anything-candidate-transformers-file
+  '(anything-shadow-boring-files
+    anything-shorten-home-path)
+  "A List of transformer functions for files.")
+
+(defun anything-transform-files (files)
+  "Calls any function in `anything-candidate-transformers-file'
+with the current list FILES modifying it dynamically."
+  (dolist (trans anything-candidate-transformers-file)
+    (setq files (funcall trans files)))
+  files)
 
 ;;; Provide anything-config
 
