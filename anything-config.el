@@ -53,6 +53,13 @@
 ;;           (function . anything-transform-function-actions)
 ;;           (sexp     . anything-transform-sexp-actions)))
 ;;
+;;   (setq anything-candidate-transformers
+;;         '((buffer   . anything-transform-buffers)
+;;           (file     . anything-transform-files)
+;;           (command  . anything-transform-commands)
+;;           (function . anything-transform-functions)
+;;           (sexp     . anything-transform-sexps)))
+;;
 
 ;;; Startup
 
@@ -604,6 +611,18 @@ list of actions for this sexp dynamically."
 
 ;;;; Candidate Transformers
 
+;;;;; Buffers
+
+(defvar anything-candidate-transformers-buffer nil
+  "A list of candidate transformer functions for buffers.")
+
+(defun anything-transform-buffers (buffers)
+  "Calls any function in `anything-candidate-transformers-buffer'
+with the current list BUFFERS modifying it dynamically."
+  (dolist (trans anything-candidate-transformers-buffer)
+    (setq buffers (funcall trans buffers)))
+  buffers)
+
 ;;;;; Files
 
 (defvar anything-boring-file-regexp
@@ -632,8 +651,7 @@ with the `file-name-shadow' face if available."
   "Files matching `anything-boring-file-regexp' will be skipped."
   (let ((filtered-files nil))
     (loop for file in files
-          do (if (string-match anything-boring-file-regexp file)
-                 nil
+          do (when (not (string-match anything-boring-file-regexp file))
                (setq filtered-files (append (list file) filtered-files)))
           finally (return filtered-files))))
 
@@ -651,7 +669,7 @@ with the `file-name-shadow' face if available."
 (defvar anything-candidate-transformers-file
   '(anything-shadow-boring-files
     anything-shorten-home-path)
-  "A List of transformer functions for files.")
+  "A list of candidate transformer functions for files.")
 
 (defun anything-transform-files (files)
   "Calls any function in `anything-candidate-transformers-file'
@@ -659,6 +677,42 @@ with the current list FILES modifying it dynamically."
   (dolist (trans anything-candidate-transformers-file)
     (setq files (funcall trans files)))
   files)
+
+;;;;; Commands
+
+(defvar anything-candidate-transformers-command nil
+  "A list of candidate transformer functions for commands.")
+
+(defun anything-transform-commands (commands)
+  "Calls any function in `anything-candidate-transformers-command'
+with the current list COMMANDS modifying it dynamically."
+  (dolist (trans anything-candidate-transformers-command)
+    (setq commands (funcall trans commands)))
+  commands)
+
+;;;;; Functions
+
+(defvar anything-candidate-transformers-function nil
+  "A list of candidate transformer functions for functions.")
+
+(defun anything-transform-functions (functions)
+  "Calls any function in `anything-candidate-transformers-function'
+with the current list FUNCTIONS modifying it dynamically."
+  (dolist (trans anything-candidate-transformers-function)
+    (setq functions (funcall trans functions)))
+  functions)
+
+;;;;; S-Expressions
+
+(defvar anything-candidate-transformers-sexp nil
+  "A list of candidate transformer functions for sexps.")
+
+(defun anything-transform-sexps (sexps)
+  "Calls any function in `anything-candidate-transformers-sexp'
+with the current list SEXPS modifying it dynamically."
+  (dolist (trans anything-candidate-transformers-sexp)
+    (setq sexps (funcall trans sexps)))
+  sexps)
 
 ;;; Provide anything-config
 
