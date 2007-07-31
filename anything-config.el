@@ -652,8 +652,8 @@ with the `file-name-shadow' face if available."
   (let ((filtered-files nil))
     (loop for file in files
           do (when (not (string-match anything-boring-file-regexp file))
-               (setq filtered-files (append (list file) filtered-files)))
-          finally (return filtered-files))))
+               (push file filtered-files))
+          finally (return (nreverse filtered-files)))))
 
 (defun anything-shorten-home-path (files)
   "Replaces /home/user with <home>."
