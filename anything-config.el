@@ -63,7 +63,7 @@
 
 ;;; Version
 
-(defvar anything-config-version "<2007-08-02 Thu 18:05>"
+(defvar anything-config-version "<2007-08-02 Thu 19:54>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -86,6 +86,8 @@ anything-config.")
     (let ((map (copy-keymap minibuffer-local-map)))
       (define-key map (kbd "<down>")  'anything-next-line)
       (define-key map (kbd "<up>")    'anything-previous-line)
+      (define-key map (kbd "C-n")     'anything-next-line)
+      (define-key map (kbd "C-p")     'anything-previous-line)
       (define-key map (kbd "<prior>") 'anything-previous-page)
       (define-key map (kbd "<next>")  'anything-next-page)
       (define-key map (kbd "M-v")     'anything-previous-page)
