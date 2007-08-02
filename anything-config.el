@@ -61,19 +61,70 @@
 ;;           (sexp     . anything-transform-sexps)))
 ;;
 
-;;; Startup
-
-;; Require anything after this file has been loaded. This allows overwriting
-;; defvars of anything.el here.
-(eval-after-load
-    (buffer-file-name)
-    (require 'anything))
-
 ;;; Version
 
-(defvar anything-config-version "<2007-07-31 Tue 18:28>"
+(defvar anything-config-version "<2007-08-02 Thu 18:05>"
   "The version of anything-config.el, or better the date of the
 last change.")
+
+;;; Keymaps
+
+(defvar anything-use-standard-keys t
+  "If non-nil the keybindings of anything will be the standard
+bindings used in most parts of emacs, e.g. M-p/M-n for minibuffer
+history, C-s for isearch, etc.
+
+If it's nil anything uses some bindings that don't conflict with
+`iswitchb', e.g. C-p/C-n for the minibuffer history. If you use
+`iswitchb' you probably should say nil here.
+
+This variable has to be set _before_ you require
+anything-config.")
+
+(when anything-use-standard-keys
+  (defvar anything-map
+    (let ((map (copy-keymap minibuffer-local-map)))
+      (define-key map (kbd "<down>")  'anything-next-line)
+      (define-key map (kbd "<up>")    'anything-previous-line)
+      (define-key map (kbd "<prior>") 'anything-previous-page)
+      (define-key map (kbd "<next>")  'anything-next-page)
+      (define-key map (kbd "M-v")     'anything-previous-page)
+      (define-key map (kbd "C-v")     'anything-next-page)
+      (define-key map (kbd "<right>") 'anything-next-source)
+      (define-key map (kbd "<left>")  'anything-previous-source)
+      (define-key map (kbd "<RET>")   'anything-exit-minibuffer)
+      (define-key map (kbd "C-1")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-2")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-3")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-4")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-5")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-6")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-7")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-8")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "C-9")     'anything-select-with-digit-shortcut)
+      (define-key map (kbd "<tab>")   'anything-select-action)
+      (defalias 'anything-next-history-element     'next-history-element)
+      (defalias 'anything-previous-history-element 'previous-history-element)
+      (define-key map (kbd "M-p")     'anything-previous-history-element)
+      (define-key map (kbd "M-n")     'anything-next-history-element)
+      (define-key map (kbd "C-s")     'anything-isearch)
+      map)
+    "Keymap for anything.")
+
+  (defvar anything-isearch-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "<return>")    'anything-isearch-default-action)
+      (define-key map (kbd "<tab>")       'anything-isearch-select-action)
+      (define-key map (kbd "C-g")         'anything-isearch-cancel)
+      (define-key map (kbd "C-s")         'anything-isearch-again)
+      (define-key map (kbd "<backspace>") 'anything-isearch-delete)
+      ;; add printing chars
+      (let ((i ?\s))
+        (while (< i 256)
+          (define-key map (vector i) 'anything-isearch-printing-char)
+          (setq i (1+ i))))
+      map)
+    "Keymap for anything incremental search."))
 
 ;;; Sources
 
@@ -737,6 +788,10 @@ with the current list SEXPS modifying it dynamically."
 ;;; Provide anything-config
 
 (provide 'anything-config)
+
+;;; Load anything
+
+(require 'anything)
 
 ;; Local Variables:
 ;; mode: outline-minor
