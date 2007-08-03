@@ -61,9 +61,14 @@
 ;;           (sexp     . anything-transform-sexps)))
 ;;
 
+;;; Startup
+
+(eval-after-load 'anything-config
+  '(require 'anything))
+
 ;;; Version
 
-(defvar anything-config-version "<2007-08-02 Thu 19:54>"
+(defvar anything-config-version "<2007-08-03 Fri 16:26>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -790,10 +795,6 @@ with the current list SEXPS modifying it dynamically."
 ;;; Provide anything-config
 
 (provide 'anything-config)
-
-;;; Load anything
-
-(require 'anything)
 
 ;; Local Variables:
 ;; mode: outline-minor
