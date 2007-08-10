@@ -30,45 +30,26 @@
 ;;; Commentary:
 
 ;;
-;; This package provides predefined configurations for anything.el
-;; You can pick the ones you like and use in your own configuration
-;; like this:
+;; This package provides predefined configurations for anything.el.  To enable
+;; it, put this into your `user-init-file'.
 ;;
 ;;   (require 'anything-config) ; loads anything.el too
 ;;
-;;   (setq anything-sources (list anything-c-source-buffers
-;;                                anything-c-source-emacs-commands
-;;                                anything-c-source-locate ...))
+;; To configure anything you should tweak the variables `anything-sources' and
+;; `anything-type-attributes'.  See the default configuration at the bottom of
+;; this file.  Copy and modify it to your needs.
 ;;
-;;   (setq anything-type-actions (list anything-c-actions-buffer
-;;                                     anything-c-actions-file
-;;                                     anything-c-actions-command
-;;                                     anything-c-actions-function
-;;                                     anything-c-actions-sexp ...))
-;;
-;;   (setq anything-action-transformers
-;;         '((buffer   . anything-c-transform-buffer-actions)
-;;           (file     . anything-c-transform-file-actions)
-;;           (command  . anything-c-transform-command-actions)
-;;           (function . anything-c-transform-function-actions)
-;;           (sexp     . anything-c-transform-sexp-actions)))
-;;
-;;   (setq anything-candidate-transformers
-;;         '((buffer   . anything-c-transform-buffers)
-;;           (file     . anything-c-transform-files)
-;;           (command  . anything-c-transform-commands)
-;;           (function . anything-c-transform-functions)
-;;           (sexp     . anything-c-transform-sexps)))
+;;   (setq anything-sources ...)
+;;   (setq anything-type-attributes ...)
 ;;
 
 ;;; Startup
 
-(eval-after-load 'anything-config
-  '(require 'anything))
+(require 'anything)
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-05 Sun 18:06>"
+(defvar anything-c-version "<2007-08-10 Fri 19:04>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -81,57 +62,52 @@ history, C-s for isearch, etc.
 
 If it's nil anything uses some bindings that don't conflict with
 `iswitchb', e.g. C-p/C-n for the minibuffer history.  If you use
-`iswitchb' you probably should say nil here.
-
-This variable has to be set _before_ you require
-anything-config.")
+`iswitchb' you probably should say nil here.")
 
 (when anything-c-use-standard-keys
-  (defvar anything-map
-    (let ((map (copy-keymap minibuffer-local-map)))
-      (define-key map (kbd "<down>")  'anything-next-line)
-      (define-key map (kbd "<up>")    'anything-previous-line)
-      (define-key map (kbd "C-n")     'anything-next-line)
-      (define-key map (kbd "C-p")     'anything-previous-line)
-      (define-key map (kbd "<prior>") 'anything-previous-page)
-      (define-key map (kbd "<next>")  'anything-next-page)
-      (define-key map (kbd "M-v")     'anything-previous-page)
-      (define-key map (kbd "C-v")     'anything-next-page)
-      (define-key map (kbd "<right>") 'anything-next-source)
-      (define-key map (kbd "<left>")  'anything-previous-source)
-      (define-key map (kbd "<RET>")   'anything-exit-minibuffer)
-      (define-key map (kbd "C-1")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-2")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-3")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-4")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-5")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-6")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-7")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-8")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "C-9")     'anything-select-with-digit-shortcut)
-      (define-key map (kbd "<tab>")   'anything-select-action)
-      (defalias 'anything-next-history-element     'next-history-element)
-      (defalias 'anything-previous-history-element 'previous-history-element)
-      (define-key map (kbd "M-p")     'anything-previous-history-element)
-      (define-key map (kbd "M-n")     'anything-next-history-element)
-      (define-key map (kbd "C-s")     'anything-isearch)
-      map)
-    "Keymap for anything.")
+  (setq anything-map
+        (let ((map (copy-keymap minibuffer-local-map)))
+          (define-key map (kbd "<down>")  'anything-next-line)
+          (define-key map (kbd "<up>")    'anything-previous-line)
+          (define-key map (kbd "C-n")     'anything-next-line)
+          (define-key map (kbd "C-p")     'anything-previous-line)
+          (define-key map (kbd "<prior>") 'anything-previous-page)
+          (define-key map (kbd "<next>")  'anything-next-page)
+          (define-key map (kbd "M-v")     'anything-previous-page)
+          (define-key map (kbd "C-v")     'anything-next-page)
+          (define-key map (kbd "<right>") 'anything-next-source)
+          (define-key map (kbd "<left>")  'anything-previous-source)
+          (define-key map (kbd "<RET>")   'anything-exit-minibuffer)
+          (define-key map (kbd "C-1")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-2")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-3")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-4")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-5")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-6")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-7")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-8")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "C-9")     'anything-select-with-digit-shortcut)
+          (define-key map (kbd "<tab>")   'anything-select-action)
+          (defalias 'anything-next-history-element     'next-history-element)
+          (defalias 'anything-previous-history-element 'previous-history-element)
+          (define-key map (kbd "M-p")     'anything-previous-history-element)
+          (define-key map (kbd "M-n")     'anything-next-history-element)
+          (define-key map (kbd "C-s")     'anything-isearch)
+          map))
 
-  (defvar anything-isearch-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "<return>")    'anything-isearch-default-action)
-      (define-key map (kbd "<tab>")       'anything-isearch-select-action)
-      (define-key map (kbd "C-g")         'anything-isearch-cancel)
-      (define-key map (kbd "C-s")         'anything-isearch-again)
-      (define-key map (kbd "<backspace>") 'anything-isearch-delete)
-      ;; add printing chars
-      (let ((i ?\s))
-        (while (< i 256)
-          (define-key map (vector i) 'anything-isearch-printing-char)
-          (setq i (1+ i))))
-      map)
-    "Keymap for anything incremental search."))
+  (setq anything-isearch-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "<return>")    'anything-isearch-default-action)
+          (define-key map (kbd "<tab>")       'anything-isearch-select-action)
+          (define-key map (kbd "C-g")         'anything-isearch-cancel)
+          (define-key map (kbd "C-s")         'anything-isearch-again)
+          (define-key map (kbd "<backspace>") 'anything-isearch-delete)
+          ;; add printing chars
+          (let ((i ?\s))
+            (while (< i 256)
+              (define-key map (vector i) 'anything-isearch-printing-char)
+              (setq i (1+ i))))
+          map)))
 
 ;;; Sources
 
@@ -285,6 +261,8 @@ To get non-interactive functions listed, use
 
 ;;;;; With abbrev expansion similar to my exec-abbrev-cmd.el
 
+;; See http://www.tsdh.de/repos/darcs/elisp/exec-abbrev-cmd.el
+
 (defvar anything-c-function-abbrev-regexp nil
   "Regexp built from the current `anything-pattern' interpreting
 it as abbreviation.  Only for internal use.")
@@ -355,21 +333,21 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 
 (defvar anything-c-source-file-cache-initialized nil)
 
-(defvar file-cache-files nil)
+(defvar anything-c-file-cache-files nil)
 
 (defvar anything-c-source-file-cache
   '((name . "File Cache")
     (init-func . (lambda ()
                    (unless anything-c-source-file-cache-initialized
-                     (setq file-cache-files
+                     (setq anything-c-file-cache-files
                            (loop for item in file-cache-alist append
                                  (destructuring-bind (base &rest dirs) item
                                    (loop for dir in dirs collect
                                          (concat dir base)))))
                      (defadvice file-cache-add-file (after file-cache-list activate)
-                       (add-to-list 'file-cache-files (expand-file-name file)))
+                       (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
                      (setq anything-c-source-file-cache-initialized t))))
-    (candidates . file-cache-files)
+    (candidates . anything-c-file-cache-files)
     (match . (anything-c-match-on-file-name
               anything-c-match-on-directory-name))
     (type . file)))
@@ -422,66 +400,9 @@ with the tracker desktop search.")
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
-;;; Types
+;;; Type Action helpers
 
-;;;; Type Actions
-
-;;;;; Extension macros and functions
-
-(defun anything-c-source-p (source)
-  "Return non-nil if SOURCE is a valid anything-source."
-  (and (assq 'name       source)
-       (assq 'candidates source)
-       (or (assq 'action source)
-           (assq 'type   source))))
-
-(defmacro anything-c-add-to-actions (var action)
-  "Add the given ACTION to the list of actions defined in the
-given VAR, which has to be an anything-c-source-FOO or
-anything-c-actions-TYPE.  Here're two examples:
-
-    ;; Add an action which puts the selected file's path onto the
-    ;; kill ring to the default actions for type file.
-    (anything-c-add-to-actions anything-c-actions-file
-                                    (\"Put Path on Kill Ring\" . kill-new))
-
-    ;; Add an action which opens the selected manual page with the
-    ;; `man' command to the actions defined in the source for manual
-    ;; pages.
-    (anything-c-add-to-actions anything-c-source-man-pages
-                                    (\"Open with man\" . man))
-
-This must be done *before* you set `anything-type-actions' or
-`anything-sources' in your ~/.emacs.
-
-The purpose of this function is to allow users to extend the list
-of type actions or source actions with actions that won't go into
-anything-config.el, because they're specific to a platform or a
-user."
-  (if (anything-c-source-p (symbol-value var))
-      ;; Add action to a anything-c-source-FOO
-      (let ((action-list (cdr (assq 'action (symbol-value var)))))
-        `(unless (member ',action ',action-list)
-           (setq ,var (delete (assq 'action ,var) ,var))
-           (push (cons 'action (append ',action-list (list ',action))) ,var)))
-    ;; Add action to a anything-c-actions-FOO variable
-    `(unless (member ',action (cdr ,var))
-       (setq ,var
-             (cons (car ,var)
-                   (append (cdr ,var)
-                           (list ',action)))))))
-
-;;;;; Buffers
-
-(defvar anything-c-actions-buffer
-  '(buffer . (("Switch to Buffer" . switch-to-buffer)
-              ("Switch to Buffer other Window" . switch-to-buffer-other-window)
-              ("Switch to Buffer other Frame" . switch-to-buffer-other-frame)
-              ("Display Buffer"   . display-buffer)
-              ("Kill Buffer"      . kill-buffer)))
-  "Actions for type `buffer'.")
-
-;;;;; Files
+;;;; Files
 
 (defvar anything-c-external-commands-list nil
   "A list of all external commands the user can execute.  If this
@@ -537,7 +458,7 @@ file given by FILENAME."
       ret)))
 
 (defun anything-c-delete-file (file)
-  "Deletes the given file after querying the user.  Asks to kill
+  "Delete the given file after querying the user.  Ask to kill
 buffers associated with that file, too."
   (if (y-or-n-p (format "Really delete file %s? " file))
       (progn
@@ -548,84 +469,37 @@ buffers associated with that file, too."
               (kill-buffer buf)))))
     (message "Nothing deleted.")))
 
-(defvar anything-c-actions-file
-  '(file . (("Find File" . find-file)
-            ("Find File other Window" . find-file-other-window)
-            ("Find File other Frame" . find-file-other-frame)
-            ("Open Dired in File's Directory" . (lambda (filename)
-                                                  (dired (file-name-directory filename))
-                                                  (dired-goto-file filename)))
-            ("Delete File" . anything-c-delete-file)
-            ("Open File with external Tool" .
-             (lambda (file)
-               (start-process "anything-c-open-file-externally"
-                              nil
-                              (completing-read "Program: "
-                                               (anything-c-external-commands-list-1))
-                              file))))))
+(defun anything-c-open-file-externally (file)
+  "Open FILE with an external tool.  Query the user which tool to
+use."
+  (start-process "anything-c-open-file-externally"
+                 nil
+                 (completing-read "Program: "
+                                  (anything-c-external-commands-list-1))
+                 file))
 
-;;;;; Commands
+(defun anything-c-open-with-default-tool (file)
+  "Open FILE with the default tool on this platform."
+  (start-process "anything-c-open-file-with-default-tool"
+                 nil
+                 (cond ((eq system-type 'gnu/linux)
+                        "xdg-open")
+                       ((or (eq system-type 'darwin)  ;; Mac OS X
+                            (eq system-type 'macos))  ;; Mac OS 9
+                        "open"))
+                 file))
 
-(defvar anything-c-actions-command
-  '(command . (("Call Interactively" . (lambda (command-name)
-                                         (call-interactively (intern command-name))))
-               ("Describe Command" . (lambda (command-name)
-                                       (describe-function (intern command-name))))
-               ("Add Command to the Kill Ring" . kill-new)
-               ("Go to the Command's Definition" . (lambda (command-name)
-                                                     (find-function (intern command-name)))))))
+(defun anything-c-open-dired (file)
+  "Opens a dired buffer in FILE's directory.  If FILE is a
+directory, open this directory."
+  (if (file-directory-p file)
+      (dired file)
+    (dired (file-name-directory file))
+    (dired-goto-file file)))
 
-;;;;; Functions
+;;; Action Transformers
 
-(defvar anything-c-actions-function
-  '(function . (("Describe Command" . (lambda (function-name)
-                                        (describe-function (intern function-name))))
-                ("Add Command to the Kill Ring" . kill-new)
-                ("Go to the Function's Definition" . (lambda (function-name)
-                                                       (find-function
-                                                        (intern function-name)))))))
-
-;;;;; S-Expressions
-
-(defvar anything-c-actions-sexp
-  '(sexp . (("Eval S-Expression" . (lambda (c)
-                                     (eval (read c))))
-            ("Add S-Expression to the Kill Ring" . kill-new))))
-
-;;;; Action Transformers
-
-;;;;; Buffers
-
-(defvar anything-c-action-transformers-buffer nil
-  "A List of transformer functions for buffers.  See
-`anything-c-transform-buffer-actions' for details.")
-
-(defun anything-c-transform-buffer-actions (actions candidate)
-  "Calls any function in
-`anything-c-action-transformers-buffer' with the current
-list of ACTIONS and the function CANDIDATE modifying the list of
-actions for this function dynamically."
-  (dolist (trans anything-c-action-transformers-function)
-    (setq actions (funcall trans actions candidate)))
-  actions)
-
-;;;;; Files
-
-(defun anything-c-transform-file-open-system-specific (actions candidate)
-  "Add action to open the file CANDIDATE with the default
-application on that platform, e.g. `open' on Macs and `xdg-open'
-on GNU/Linux systems."
-  (let (tool)
-    (cond ((eq system-type 'gnu/linux)
-           (setq tool "xdg-open"))
-          ((or (eq system-type 'darwin)  ;; Mac OS X
-               (eq system-type 'macos))  ;; Mac OS 9
-           (setq tool "open")))
-    (append actions `(("Open with platform-specific default tool"
-                       .
-                       (lambda (file)
-                         (start-process "anything-c-open-file-with-default-tool"
-                                        nil ,tool file)))))))
+;;;; Files
 
 (defun anything-c-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
@@ -643,38 +517,7 @@ file.  Else return ACTIONS unmodified."
       (append actions '(("Browse with Browser" . browse-url)))
     actions))
 
-(defvar anything-c-action-transformers-file
-  '(anything-c-transform-file-load-el
-    anything-c-transform-file-browse-url
-    anything-c-transform-file-open-system-specific)
-  "A List of transformer functions for files.  See
-`anything-c-transform-file-actions' for details.")
-
-(defun anything-c-transform-file-actions (actions candidate)
-  "Calls any function in
-`anything-c-action-transformers-file' with the current list
-of ACTIONS and the file CANDIDATE modifying the list of actions
-for this file dynamically."
-  (dolist (trans anything-c-action-transformers-file)
-    (setq actions (funcall trans actions candidate)))
-  actions)
-
-;;;;; Commands
-
-(defvar anything-c-action-transformers-command nil
-  "A List of transformer functions for commands. See
-`anything-c-transform-command-actions' for details.")
-
-(defun anything-c-transform-command-actions (actions candidate)
-  "Calls any function in
-`anything-c-action-transformers-command' with the current
-list of ACTIONS and the command CANDIDATE modifying the list of
-actions for this command dynamically."
-  (dolist (trans anything-c-action-transformers-command)
-    (setq actions (funcall trans actions candidate)))
-  actions)
-
-;;;;; Function
+;;;; Function
 
 (defun anything-c-transform-function-call-interactively (actions candidate)
   "Add an action to call the function CANDIDATE interactively if
@@ -686,72 +529,32 @@ it is a command.  Else return ACTIONS unmodified."
                            (call-interactively (intern c))))))
     actions))
 
-(defvar anything-c-action-transformers-function
-  '(anything-c-transform-function-call-interactively)
-  "A List of transformer functions for functions. See
-`anything-c-transform-function-actions' for details.")
-
-(defun anything-c-transform-function-actions (actions candidate)
-  "Calls any function in
-`anything-c-action-transformers-function' with the current
-list of ACTIONS and the function CANDIDATE modifying the list of
-actions for this function dynamically."
-  (dolist (trans anything-c-action-transformers-function)
-    (setq actions (funcall trans actions candidate)))
-  actions)
-
-;;;;; S-Expressions
+;;;; S-Expressions
 
 (defun anything-c-transform-sexp-eval-command-sexp (actions candidate)
-  "If CANDIDATE's `car' in a command, then add an action to
+  "If CANDIDATE's `car' is a command, then add an action to
 evaluate it and put it onto the `command-history'."
   (if (commandp (car (read candidate)))
       ;; Make it first entry
-      (cons '("Eval and put onto command-history" . (lambda (sexp)
-                                                      (let ((sym (read sexp)))
-                                                        (eval sym)
-                                                        (setq command-history
-                                                              (cons sym command-history)))))
+      (cons '("Eval and put onto command-history" .
+              (lambda (sexp)
+                (let ((sym (read sexp)))
+                  (eval sym)
+                  (setq command-history
+                        (cons sym command-history)))))
             actions)
     actions))
 
-(defvar anything-c-action-transformers-sexp
-  '(anything-c-transform-sexp-eval-command-sexp)
-  "A List of transformer functions for sexps.  See
-`anything-c-transform-sexp-actions' for details.")
+;;; Candidate Transformers
 
-(defun anything-c-transform-sexp-actions (actions candidate)
-  "Calls any function in
-`anything-c-action-transformers-sexp' with the current list
-of ACTIONS and the sexp CANDIDATE modifying the list of actions
-for this sexp dynamically."
-  (dolist (trans anything-c-action-transformers-sexp)
-    (setq actions (funcall trans actions candidate)))
-  actions)
-
-;;;; Candidate Transformers
-
-;;;;; Buffers
-
-(defvar anything-c-candidate-transformers-buffer nil
-  "A list of candidate transformer functions for buffers.")
-
-(defun anything-c-transform-buffers (buffers)
-  "Calls any function in
-`anything-c-candidate-transformers-buffer' with the current
-list BUFFERS modifying it dynamically."
-  (dolist (trans anything-c-candidate-transformers-buffer)
-    (setq buffers (funcall trans buffers)))
-  buffers)
-
-;;;;; Files
+;;;; Files
 
 (defvar anything-c-boring-file-regexp
   (rx "/" (or ".svn/" "CVS/" "_darcs/" ".git/"))
   "File candidates matching this regular expression will be
 filtered from the list of candidates if the
-`anything-c-skip-boring-files' candidate transformer is
-used, or they will be displayed with face `file-name-shadow' if
+`anything-c-skip-boring-files' candidate transformer is used, or
+they will be displayed with face `file-name-shadow' if
 `anything-c-shadow-boring-files' is used.")
 
 (defun anything-c-shadow-boring-files (files)
@@ -788,57 +591,80 @@ skipped."
                 file)))
           files))
 
-(defvar anything-c-candidate-transformers-file
-  '(anything-c-shadow-boring-files
-    anything-c-shorten-home-path)
-  "A list of candidate transformer functions for files.")
+;;; Default Configuration
 
-(defun anything-c-transform-files (files)
-  "Calls any function in
-`anything-c-candidate-transformers-file' with the current
-list FILES modifying it dynamically."
-  (dolist (trans anything-c-candidate-transformers-file)
-    (setq files (funcall trans files)))
-  files)
+;;;; Helper Functions
 
-;;;;; Commands
+(defun anything-c-compose (arg-lst func-lst)
+  "Call each function in FUNC-LST with the arguments specified in
+ARG-LST.  The result of each function will be the new `car' of
+ARG-LST.
 
-(defvar anything-c-candidate-transformers-command nil
-  "A list of candidate transformer functions for commands.")
+This function allows easy sequencing of transformer functions."
+  (dolist (func func-lst)
+    (setcar arg-lst (apply func arg-lst)))
+  (car arg-lst))
 
-(defun anything-c-transform-commands (commands)
-  "Calls any function in
-`anything-c-candidate-transformers-command' with the current
-list COMMANDS modifying it dynamically."
-  (dolist (trans anything-c-candidate-transformers-command)
-    (setq commands (funcall trans commands)))
-  commands)
+;;;; Sources
 
-;;;;; Functions
+(setq anything-sources
+      (list anything-c-source-buffers
+            anything-c-source-file-name-history
+            anything-c-source-info-pages
+            anything-c-source-man-pages
+            anything-c-source-locate
+            anything-c-source-emacs-commands))
 
-(defvar anything-c-candidate-transformers-function nil
-  "A list of candidate transformer functions for functions.")
+;;;; Type Attributes
 
-(defun anything-c-transform-functions (functions)
-  "Calls any function in
-`anything-c-candidate-transformers-function' with the
-current list FUNCTIONS modifying it dynamically."
-  (dolist (trans anything-c-candidate-transformers-function)
-    (setq functions (funcall trans functions)))
-  functions)
-
-;;;;; S-Expressions
-
-(defvar anything-c-candidate-transformers-sexp nil
-  "A list of candidate transformer functions for sexps.")
-
-(defun anything-c-transform-sexps (sexps)
-  "Calls any function in
-`anything-c-candidate-transformers-sexp' with the current
-list SEXPS modifying it dynamically."
-  (dolist (trans anything-c-candidate-transformers-sexp)
-    (setq sexps (funcall trans sexps)))
-  sexps)
+(setq anything-type-attributes
+      '((buffer (action ("Switch to buffer" . switch-to-buffer)
+                        ("Switch to buffer other window" . switch-to-buffer-other-window)
+                        ("Switch to buffer other frame" . switch-to-buffer-other-frame)
+                        ("Display buffer"   . display-buffer)
+                        ("Kill buffer"      . kill-buffer)))
+        (file (action ("Find file" . find-file)
+                      ("Find file other window" . find-file-other-window)
+                      ("Find file other frame" . find-file-other-frame)
+                      ("Open dired in file's directory" . anything-c-open-dired)
+                      ("Delete file" . anything-c-delete-file)
+                      ("Open file externally" . anything-c-open-file-externally)
+                      ("Open file with default tool" . anything-c-open-file-with-default-tool)
+              (action-transformer . (lambda (actions candidate)
+                                      (anything-c-compose
+                                      (list actions candidate)
+                                      '(anything-c-transform-file-load-el
+                                        anything-c-transform-file-browse-url))))
+              (candidate-transformer . (lambda (candidates)
+                                         (anything-c-compose
+                                          (list candidates)
+                                          '(anything-c-shadow-boring-files
+                                            anything-c-shorten-home-path)))))
+        (command (action ("Call Interactively" . (lambda (command-name)
+                                                   (call-interactively (intern command-name))))
+                         ("Describe Command" . (lambda (command-name)
+                                                 (describe-function (intern command-name))))
+                         ("Add Command to the Kill Ring" . kill-new)
+                         ("Go to the Command's Definition" . (lambda (command-name)
+                                                               (find-function
+                                                                (intern command-name))))))
+        (function (action ("Describe Command" . (lambda (function-name)
+                                                  (describe-function (intern function-name))))
+                          ("Add Command to the Kill Ring" . kill-new)
+                          ("Go to the Function's Definition" . (lambda (function-name)
+                                                                 (find-function
+                                                                  (intern function-name)))))
+                 (action-transformer . (lambda (actions candidate)
+                                         (anything-c-compose
+                                          (list actions candidate)
+                                          '(anything-c-transform-function-call-interactively)))))
+        (sexp (action ("Eval S-Expression" . (lambda (c)
+                                               (eval (read c))))
+                      ("Add S-Expression to the Kill Ring" . kill-new))
+              (action-transformer . (lambda (actions candidate)
+                                      (anything-c-compose
+                                       (list actions candidate)
+                                       '(anything-c-transform-sexp-eval-command-sexp))))))
 
 ;;; Provide anything-config
 
