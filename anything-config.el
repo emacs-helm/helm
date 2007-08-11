@@ -413,23 +413,24 @@ utility mdfind.")
 ;;;; BBDB
 
 (defun anything-c-bbdb-candidates ()
-  "Return a list of all entries in the database.  Each entry has
-the format (DISPLAY . REAL) where DISPLAY is the person's first
-name followed by the person's last name."
+  "Return a list of all names in the bbdb database.  The format
+is \"Firstname Lastname\"."
   (mapcar (lambda (bbdb-record)
-            (cons
-             (concat (aref bbdb-record 0) " " (aref bbdb-record 1))
-             bbdb-record))
+            (concat (aref bbdb-record 0) " " (aref bbdb-record 1)))
           (bbdb-records)))
 
 (defparameter anything-c-source-bbdb
   '((name . "BBDB")
     (candidates . anything-c-bbdb-candidates)
     (action ("View person's data" . (lambda (candidate)
-                                      (bbdb ".*" nil)
-                                      (bbdb-redisplay-one-record candidate)))
+                                      (bbdb candidate nil)
+                                      (bbdb-redisplay-one-record (bbdb-current-record))))
             ("Send a mail" . (lambda (candidate)
-                               (bbdb-send-mail candidate))))))
+                               (let ((rec (progn
+                                            (bbdb candidate nil)
+                                            (set-buffer "*BBDB*")
+                                            (bbdb-current-record))))
+                                 (bbdb-send-mail rec)))))))
 
 ;;; Type Action helpers
 
