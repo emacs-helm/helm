@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-11 Sat 10:03>"
+(defvar anything-c-version "<2007-08-11 Sat 20:43>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -419,7 +419,7 @@ is \"Firstname Lastname\"."
             (concat (aref bbdb-record 0) " " (aref bbdb-record 1)))
           (bbdb-records)))
 
-(defparameter anything-c-source-bbdb
+(defvar anything-c-source-bbdb
   '((name . "BBDB")
     (candidates . anything-c-bbdb-candidates)
     (action ("View person's data" . (lambda (candidate)
