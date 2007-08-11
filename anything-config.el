@@ -639,32 +639,32 @@ This function allows easy sequencing of transformer functions."
                                          (anything-c-compose
                                           (list candidates)
                                           '(anything-c-shadow-boring-files
-                                            anything-c-shorten-home-path)))))
-        (command (action ("Call Interactively" . (lambda (command-name)
+                                            anything-c-shorten-home-path))))))
+        (command (action ("Call interactively" . (lambda (command-name)
                                                    (call-interactively (intern command-name))))
-                         ("Describe Command" . (lambda (command-name)
+                         ("Describe command" . (lambda (command-name)
                                                  (describe-function (intern command-name))))
-                         ("Add Command to the Kill Ring" . kill-new)
-                         ("Go to the Command's Definition" . (lambda (command-name)
-                                                               (find-function
-                                                                (intern command-name))))))
-        (function (action ("Describe Command" . (lambda (function-name)
-                                                  (describe-function (intern function-name))))
-                          ("Add Command to the Kill Ring" . kill-new)
-                          ("Go to the Function's Definition" . (lambda (function-name)
-                                                                 (find-function
-                                                                  (intern function-name)))))
-                 (action-transformer . (lambda (actions candidate)
-                                         (anything-c-compose
-                                          (list actions candidate)
-                                          '(anything-c-transform-function-call-interactively)))))
-        (sexp (action ("Eval S-Expression" . (lambda (c)
+                         ("Add command to kill ring" . kill-new)
+                         ("Go to command's definition" . (lambda (command-name)
+                                                           (find-function
+                                                            (intern command-name))))))
+        (function (action ("Describe function" . (lambda (function-name)
+                                                   (describe-function (intern function-name))))
+                          ("Add function to kill ring" . kill-new)
+                          ("Go to function's definition" . (lambda (function-name)
+                                                             (find-function
+                                                              (intern function-name)))))
+                  (action-transformer . (lambda (actions candidate)
+                                          (anything-c-compose
+                                           (list actions candidate)
+                                           '(anything-c-transform-function-call-interactively)))))
+        (sexp (action ("Eval s-expression" . (lambda (c)
                                                (eval (read c))))
-                      ("Add S-Expression to the Kill Ring" . kill-new))
+                      ("Add s-expression to kill ring" . kill-new))
               (action-transformer . (lambda (actions candidate)
                                       (anything-c-compose
                                        (list actions candidate)
-                                       '(anything-c-transform-sexp-eval-command-sexp))))))))
+                                       '(anything-c-transform-sexp-eval-command-sexp)))))))
 
 ;;; Provide anything-config
 
