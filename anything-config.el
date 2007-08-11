@@ -664,7 +664,7 @@ This function allows easy sequencing of transformer functions."
               (action-transformer . (lambda (actions candidate)
                                       (anything-c-compose
                                        (list actions candidate)
-                                       '(anything-c-transform-sexp-eval-command-sexp))))))
+                                       '(anything-c-transform-sexp-eval-command-sexp))))))))
 
 ;;; Provide anything-config
 
