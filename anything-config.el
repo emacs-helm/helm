@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-11 Sat 20:43>"
+(defvar anything-c-version "<2007-08-13 Mon 08:24>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -181,9 +181,9 @@ buffer."
 
 (defvar anything-c-source-files-in-current-dir
   '((name . "Files from Current Directory")
-    (init-func . (lambda ()
-                   (setq anything-c-default-directory
-                         default-directory)))
+    (init . (lambda ()
+              (setq anything-c-default-directory
+                    default-directory)))
     (candidates . (lambda ()
                     (directory-files
                      anything-c-default-directory)))
@@ -290,17 +290,15 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   (append anything-c-source-emacs-functions
           '((match . (anything-c-match-function-by-abbrev
                       anything-c-string-match)))
-          '((init-func
-             .
-             (lambda ()
-               (defadvice anything-update
-                 (before anything-c-update-function-abbrev-regexp activate)
-                 (let ((char-list (append anything-pattern nil))
-                       (str "^"))
-                   (dolist (c char-list)
-                     (setq str (concat str (list c) "[^-]*-")))
-                   (setq str (concat (substring str 0 (1- (length str))) "$"))
-                   (setq anything-c-function-abbrev-regexp str))))))))
+          '((init . (lambda ()
+                      (defadvice anything-update
+                        (before anything-c-update-function-abbrev-regexp activate)
+                        (let ((char-list (append anything-pattern nil))
+                              (str "^"))
+                          (dolist (c char-list)
+                            (setq str (concat str (list c) "[^-]*-")))
+                          (setq str (concat (substring str 0 (1- (length str))) "$"))
+                          (setq anything-c-function-abbrev-regexp str))))))))
 
 ;;;; Bookmarks
 
@@ -323,7 +321,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 
 (defvar anything-c-source-imenu
   '((name . "Imenu")
-    (init-func . (lambda ()
+    (init . (lambda ()
                    (setq anything-c-imenu-current-buffer
                          (current-buffer))))
     (candidates . (lambda ()
@@ -347,16 +345,16 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 
 (defvar anything-c-source-file-cache
   '((name . "File Cache")
-    (init-func . (lambda ()
-                   (unless anything-c-source-file-cache-initialized
-                     (setq anything-c-file-cache-files
-                           (loop for item in file-cache-alist append
-                                 (destructuring-bind (base &rest dirs) item
-                                   (loop for dir in dirs collect
-                                         (concat dir base)))))
-                     (defadvice file-cache-add-file (after file-cache-list activate)
-                       (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
-                     (setq anything-c-source-file-cache-initialized t))))
+    (init . (lambda ()
+              (unless anything-c-source-file-cache-initialized
+                (setq anything-c-file-cache-files
+                      (loop for item in file-cache-alist append
+                            (destructuring-bind (base &rest dirs) item
+                              (loop for dir in dirs collect
+                                    (concat dir base)))))
+                (defadvice file-cache-add-file (after file-cache-list activate)
+                  (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
+                (setq anything-c-source-file-cache-initialized t))))
     (candidates . anything-c-file-cache-files)
     (match . (anything-c-match-on-file-name
               anything-c-match-on-directory-name))
