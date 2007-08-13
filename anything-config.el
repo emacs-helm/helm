@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-13 Mon 08:24>"
+(defvar anything-c-version "<2007-08-13 Mon 15:23>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -429,6 +429,37 @@ is \"Firstname Lastname\"."
                                             (set-buffer "*BBDB*")
                                             (bbdb-current-record))))
                                  (bbdb-send-mail rec)))))))
+
+;;;; Evaluation Result
+
+(defvar anything-c-source-evaluation-result
+  '((name . "Evaluation Result")
+    (requires-pattern)
+    (match (lambda (candidate) t))
+    (candidates  "dummy")
+    (filtered-candidate-transformer
+     . (lambda (candidates source)
+         (list
+          (condition-case nil
+              (prin1-to-string
+               (eval (read anything-pattern)))
+            (error "error")))))
+    (action ("Do Nothing" . ignore))))
+
+;;;; Calculation Result
+
+(defvar anything-c-source-calculation-result
+  '((name . "Calculation Result")
+    (requires-pattern)
+    (match (lambda (candidate) t))
+    (candidates  "dummy")
+    (filtered-candidate-transformer
+     . (lambda (candidates source)
+         (list
+          (condition-case nil
+              (calc-eval anything-pattern)
+            (error "error")))))
+    (action ("Do Nothing" . ignore))))
 
 ;;; Type Action helpers
 

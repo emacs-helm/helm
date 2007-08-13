@@ -1,0 +1,6 @@
+2007-08-13  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el
+	(anything-c-source-evaluation-result): New source.
+	(anything-c-source-calculation-result): New source.
+
