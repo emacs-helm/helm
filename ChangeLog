@@ -1,3 +1,13 @@
+2007-08-19  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el (anything-c-source-bbdb): Set current buffer
+	to *BBDB* before selecting the current record.  Thanks to Bill
+	Clementson for reporting this bug.
+	(anything-c-boring-file-regexp): Add some boring file extensions
+	like .class, .o, .la.
+	(anything-type-attributes): Fix paren bug that prevented the
+	candidate-transformer of files to be run.
+
 2007-08-13  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el
