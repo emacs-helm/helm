@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-13 Mon 15:23>"
+(defvar anything-c-version "<2007-08-19 Sun 11:43>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -422,6 +422,7 @@ is \"Firstname Lastname\"."
     (candidates . anything-c-bbdb-candidates)
     (action ("View person's data" . (lambda (candidate)
                                       (bbdb candidate nil)
+                                      (set-buffer "*BBDB*")
                                       (bbdb-redisplay-one-record (bbdb-current-record))))
             ("Send a mail" . (lambda (candidate)
                                (let ((rec (progn
