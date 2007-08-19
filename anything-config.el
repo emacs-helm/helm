@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-19 Sun 20:13>"
+(defvar anything-c-version "<2007-08-19 Sun 21:06>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -446,8 +446,9 @@ removed."
                                             (bbdb-current-record))))
                                  (bbdb-send-mail rec)))))
     (filtered-candidate-transformer . (lambda (candidates source)
-                                        (when (not candidates)
-                                          (list "*Add to contacts*"))))
+                                        (if (not candidates)
+                                            (list "*Add to contacts*")
+                                          candidates)))
     (action-transformer . (lambda (actions candidate)
                             (anything-c-bbdb-create-contact actions candidate)))))
 
