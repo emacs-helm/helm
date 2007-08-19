@@ -611,7 +611,11 @@ evaluate it and put it onto the `command-history'."
 ;;;; Files
 
 (defvar anything-c-boring-file-regexp
-  (rx "/" (or ".svn/" "CVS/" "_darcs/" ".git/"))
+  (rx (or
+       ;; Boring directories
+       (and "/" (or ".svn" "CVS" "_darcs" ".git") (or "/" eol))
+       ;; Boring files
+       (and (or ".class" ".la" ".o") eol)))
   "File candidates matching this regular expression will be
 filtered from the list of candidates if the
 `anything-c-skip-boring-files' candidate transformer is used, or
@@ -635,7 +639,7 @@ displayed with the `file-name-shadow' face if available."
 (defun anything-c-skip-boring-files (files)
   "Files matching `anything-c-boring-file-regexp' will be
 skipped."
-  (let ((filtered-files nil))
+  (let (filtered-files)
     (loop for file in files
           do (when (not (string-match anything-c-boring-file-regexp file))
                (push file filtered-files))
@@ -859,17 +863,17 @@ This function allows easy sequencing of transformer functions."
                       ("Open dired in file's directory" . anything-c-open-dired)
                       ("Delete file" . anything-c-delete-file)
                       ("Open file externally" . anything-c-open-file-externally)
-                      ("Open file with default tool" . anything-c-open-file-with-default-tool)
+                      ("Open file with default tool" . anything-c-open-file-with-default-tool))
               (action-transformer . (lambda (actions candidate)
                                       (anything-c-compose
-                                      (list actions candidate)
-                                      '(anything-c-transform-file-load-el
-                                        anything-c-transform-file-browse-url))))
+                                       (list actions candidate)
+                                       '(anything-c-transform-file-load-el
+                                         anything-c-transform-file-browse-url))))
               (candidate-transformer . (lambda (candidates)
                                          (anything-c-compose
                                           (list candidates)
                                           '(anything-c-shadow-boring-files
-                                            anything-c-shorten-home-path))))))
+                                            anything-c-shorten-home-path)))))
         (command (action ("Call interactively" . (lambda (command-name)
                                                    (call-interactively (intern command-name))))
                          ("Describe command" . (lambda (command-name)
