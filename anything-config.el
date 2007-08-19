@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-19 Sun 11:43>"
+(defvar anything-c-version "<2007-08-19 Sun 20:13>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -417,6 +417,21 @@ is \"Firstname Lastname\"."
             (concat (aref bbdb-record 0) " " (aref bbdb-record 1)))
           (bbdb-records)))
 
+(defun anything-c-bbdb-create-contact (actions candidate)
+  "Action transformer that returns only an entry to add the
+current `anything-pattern' as new contact.  All other actions are
+removed."
+  (when (string= candidate "*Add to contacts*")
+    '(("Add to contacts"
+       . (lambda (actions)
+           (bbdb-create-internal
+            anything-pattern
+            (read-from-minibuffer "Company: ")
+            (read-from-minibuffer "Email: ")
+            nil
+            nil
+            (read-from-minibuffer "Note: ")))))))
+
 (defvar anything-c-source-bbdb
   '((name . "BBDB")
     (candidates . anything-c-bbdb-candidates)
@@ -429,7 +444,12 @@ is \"Firstname Lastname\"."
                                             (bbdb candidate nil)
                                             (set-buffer "*BBDB*")
                                             (bbdb-current-record))))
-                                 (bbdb-send-mail rec)))))))
+                                 (bbdb-send-mail rec)))))
+    (filtered-candidate-transformer . (lambda (candidates source)
+                                        (when (not candidates)
+                                          (list "*Add to contacts*"))))
+    (action-transformer . (lambda (actions candidate)
+                            (anything-c-bbdb-create-contact actions candidate)))))
 
 ;;;; Evaluation Result
 

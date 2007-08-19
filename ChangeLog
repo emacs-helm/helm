@@ -7,6 +7,11 @@
 	like .class, .o, .la.
 	(anything-type-attributes): Fix paren bug that prevented the
 	candidate-transformer of files to be run.
+	(anything-c-source-bbdb): If no contacts match the pattern, add a
+	"*Add to contacts*" entry that adds the current pattern as a new
+	contact.
+	(anything-c-bbdb-create-contact): Add a new contact whose name is
+	given by `anything-pattern'.
 
 2007-08-13  Tassilo Horn  <tassilo@member.fsf.org>
 
