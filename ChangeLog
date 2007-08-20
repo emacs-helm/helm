@@ -1,3 +1,10 @@
+2007-08-20  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el (anything-c-bbdb-name): New variable.  Holds
+	the current anything-pattern, so that it doesn't get lost on TAB.
+	(anything-c-bbdb-create-contact): Return actions unmodified, when
+	the special "*Add to contacts*" entry is not selected.
+
 2007-08-19  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-source-bbdb): Set current buffer
