@@ -1,3 +1,12 @@
+2007-08-23  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el (anything-c-source-google-suggest): Added new
+	source: Google Suggestions.
+	(anything-c-google-suggest-url): likewise.
+	(anything-c-google-suggest-search-url): likewise.
+	(anything-c-google-suggest-fetch): likewise.
+	(anything-c-google-suggest-get-items): likewise.
+
 2007-08-20  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-bbdb-name): New variable.  Holds
