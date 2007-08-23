@@ -271,7 +271,7 @@ To get non-interactive functions listed, use
 
 ;;;;; With abbrev expansion similar to my exec-abbrev-cmd.el
 
-;; See http://www.tsdh.de/repos/darcs/elisp/exec-abbrev-cmd.el
+;; See http://www.tsdh.de/cgi-bin/wiki.pl/exec-abbrev-cmd.el
 
 (defvar anything-c-function-abbrev-regexp nil
   "Regexp built from the current `anything-pattern' interpreting
