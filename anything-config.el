@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-23 Thu 20:46>"
+(defvar anything-c-version "<2007-08-24 Fri 10:49>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -156,6 +156,7 @@ buffer."
 (defvar anything-c-source-buffers
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
+    (volatile)
     (type . buffer)))
 
 ;;;; File name history
@@ -187,6 +188,7 @@ buffer."
     (candidates . (lambda ()
                     (directory-files
                      anything-c-default-directory)))
+    (volatile)
     (type . file)))
 
 ;;;; Man Pages
@@ -194,11 +196,15 @@ buffer."
 (defvar anything-c-source-man-pages
   `((name . "Manual Pages")
     (candidates . ,(progn
-                     (when (require 'woman nil t)
-                       (woman-file-name "")
-                       (sort (mapcar 'car
-                                     woman-topic-all-completions)
-                             'string-lessp))))
+                     ;; XEmacs doesn't have a woman :)
+                     (condition-case nil
+                         (progn
+                           (require 'woman)
+                           (woman-file-name "")
+                           (sort (mapcar 'car
+                                         woman-topic-all-completions)
+                                 'string-lessp))
+                       (error nil))))
     (action . (("Show with Woman" . woman)))
     (requires-pattern . 2)))
 
@@ -230,6 +236,7 @@ buffer."
     (candidates . (lambda ()
                     (mapcar 'prin1-to-string
                             command-history)))
+    (volatile)
     (type . sexp)))
 
 ;;;; Emacs commands
@@ -243,6 +250,7 @@ buffer."
                                       (push (symbol-name a)
                                             commands))))
                       (sort commands 'string-lessp))))
+    (volatile)
     (type . command)
     (requires-pattern . 2))
   "Source for completing and invoking Emacs commands.  A command
@@ -265,6 +273,7 @@ To get non-interactive functions listed, use
                                       (push (symbol-name a)
                                             commands))))
                       (sort commands 'string-lessp))))
+    (volatile)
     (type . function)
     (requires-pattern . 2))
   "Source for completing Emacs functions.")
@@ -305,6 +314,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 (defvar anything-c-source-bookmarks
   '((name . "Bookmarks")
     (candidates . bookmark-all-names)
+    (volatile)
     (action . (("Jump to Bookmark" . bookmark-jump))))
   "See (info \"(emacs)Bookmarks\").")
 
@@ -315,6 +325,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   '((name . "Picklist")
     (candidates . (lambda ()
                     (mapcar 'car picklist-list)))
+    (volatile)
     (type . file)))
 
 ;;;; Imenu
@@ -335,6 +346,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
                                                    (markerp (cdr x)))
                                                  (imenu--make-index-alist))))
                       (error nil))))
+    (volatile)
     (action . imenu)))
 
 ;;;; File Cache
@@ -439,6 +451,7 @@ removed."
 (defvar anything-c-source-bbdb
   '((name . "BBDB")
     (candidates . anything-c-bbdb-candidates)
+    (volatile)
     (action ("View person's data" . (lambda (candidate)
                                       (bbdb candidate nil)
                                       (set-buffer "*BBDB*")
@@ -471,6 +484,7 @@ removed."
               (prin1-to-string
                (eval (read anything-pattern)))
             (error "error")))))
+    (volatile)
     (action ("Do Nothing" . ignore))))
 
 ;;;; Calculation Result
@@ -486,6 +500,7 @@ removed."
           (condition-case nil
               (calc-eval anything-pattern)
             (error "error")))))
+    (volatile)
     (action ("Do Nothing" . ignore))))
 
 ;;;; Google Suggestions

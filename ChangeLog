@@ -1,3 +1,10 @@
+2007-08-24  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el (anything-c-source-man-pages): Added
+	condition-case for XEmacs which doesn't have `woman'.
+	Added (volatile) to all sources, that assemble the list of
+	candidates dynamically.
+
 2007-08-23  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-source-google-suggest): Added new
