@@ -59,7 +59,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-24 Fri 10:49>"
+(defvar anything-c-version "<2007-08-24 Fri 18:24>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -193,36 +193,54 @@ buffer."
 
 ;;;; Man Pages
 
+(defvar anything-c-man-pages nil
+  "All man pages on system.
+Will be calculated the first time you invoke anything with this
+source.")
+
 (defvar anything-c-source-man-pages
   `((name . "Manual Pages")
-    (candidates . ,(progn
-                     ;; XEmacs doesn't have a woman :)
-                     (condition-case nil
-                         (progn
-                           (require 'woman)
-                           (woman-file-name "")
-                           (sort (mapcar 'car
-                                         woman-topic-all-completions)
-                                 'string-lessp))
-                       (error nil))))
+    (candidates . (lambda ()
+                    (if anything-c-man-pages
+                        anything-c-man-pages
+                      ;; XEmacs doesn't have a woman :)
+                      (setq anything-c-man-pages
+                            (condition-case nil
+                                (progn
+                                  (require 'woman)
+                                  (woman-file-name "")
+                                  (sort (mapcar 'car
+                                                woman-topic-all-completions)
+                                        'string-lessp))
+                              (error nil))))))
     (action . (("Show with Woman" . woman)))
     (requires-pattern . 2)))
 
 ;;;; Info pages
 
+(defvar anything-c-info-pages nil
+  "All info pages on system.
+Will be calculated the first time you invoke anything with this
+source.")
+
 (defvar anything-c-source-info-pages
   `((name . "Info Pages")
-    (candidates . ,(save-window-excursion
-                     (save-excursion
-                       (require 'info)
-                       (Info-find-node "dir" "top")
+    (candidates
+     . (lambda ()
+         (if anything-c-info-pages
+             anything-c-info-pages
+           (setq anything-c-info-pages
+                 (save-window-excursion
+                   (save-excursion
+                     (require 'info)
+                     (Info-find-node "dir" "top")
+                     (goto-char (point-min))
+                     (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+                           topics)
+                       (while (re-search-forward info-topic-regexp nil t)
+                         (add-to-list 'topics (match-string-no-properties 1)))
                        (goto-char (point-min))
-                       (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-                             topics)
-                         (while (re-search-forward info-topic-regexp nil t)
-                           (add-to-list 'topics (match-string-no-properties 1)))
-                         (goto-char (point-min))
-                         topics))))
+                       topics)))))))
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string "^[^:]+: "
                                                                     ""

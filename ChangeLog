@@ -4,6 +4,8 @@
 	condition-case for XEmacs which doesn't have `woman'.
 	Added (volatile) to all sources, that assemble the list of
 	candidates dynamically.
+	Candidate man and info pages are only calculated once if that
+	source really is used.  Thanks to Bill Clementson for the hint.
 
 2007-08-23  Tassilo Horn  <tassilo@member.fsf.org>
 
