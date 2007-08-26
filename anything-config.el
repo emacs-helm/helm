@@ -11,6 +11,7 @@
 ;;     Mathias Dahl <mathias.dahl@gmail.com>
 ;;     Bill Clementson <billclem@gmail.com>
 ;;     Stefan Kamphausen <ska@skamphausen.de>
+;;     Drew Adams <drew.adams@oracle.com>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -59,7 +60,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-24 Fri 18:24>"
+(defvar anything-c-version "<2007-08-26 Sun 12:52>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -103,14 +104,16 @@ If it's nil anything uses some bindings that don't conflict with
           (define-key map (kbd "M-p")     'anything-previous-history-element)
           (define-key map (kbd "M-n")     'anything-next-history-element)
           (define-key map (kbd "C-s")     'anything-isearch)
+          (define-key map (kbd "C-r")     'undefined)
           map))
 
   (setq anything-isearch-map
-        (let ((map (make-sparse-keymap)))
+        (let ((map (copy-keymap (current-global-map))))
           (define-key map (kbd "<return>")    'anything-isearch-default-action)
           (define-key map (kbd "<tab>")       'anything-isearch-select-action)
           (define-key map (kbd "C-g")         'anything-isearch-cancel)
           (define-key map (kbd "C-s")         'anything-isearch-again)
+          (define-key map (kbd "C-r")         'undefined)
           (define-key map (kbd "<backspace>") 'anything-isearch-delete)
           ;; add printing chars
           (let ((i ?\s))
@@ -230,17 +233,18 @@ source.")
          (if anything-c-info-pages
              anything-c-info-pages
            (setq anything-c-info-pages
-                 (save-window-excursion
-                   (save-excursion
-                     (require 'info)
-                     (Info-find-node "dir" "top")
-                     (goto-char (point-min))
-                     (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-                           topics)
-                       (while (re-search-forward info-topic-regexp nil t)
-                         (add-to-list 'topics (match-string-no-properties 1)))
+                 (let ((pop-up-frames nil))
+                   (save-window-excursion
+                     (save-excursion
+                       (require 'info)
+                       (Info-find-node "dir" "top")
                        (goto-char (point-min))
-                       topics)))))))
+                       (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+                             topics)
+                         (while (re-search-forward info-topic-regexp nil t)
+                           (add-to-list 'topics (match-string-no-properties 1)))
+                         (goto-char (point-min))
+                         topics))))))))
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string "^[^:]+: "
                                                                     ""

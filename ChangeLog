@@ -3,6 +3,11 @@
 	* anything-config.el (anything-c-source-bookmarks): Require
 	bookmark in init.
 
+	Fix bug in info source that popped up another frame with
+	pop-up-frames bound to t.
+
+	Unbound C-r in anything-[isearch-]map.
+	
 2007-08-24  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-source-man-pages): Added
