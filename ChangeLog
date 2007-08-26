@@ -1,3 +1,8 @@
+2007-08-26  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el (anything-c-source-bookmarks): Require
+	bookmark in init.
+
 2007-08-24  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-source-man-pages): Added

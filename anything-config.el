@@ -330,12 +330,12 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 ;;;; Bookmarks
 
 (defvar anything-c-source-bookmarks
-  '((name . "Bookmarks")
-    (candidates . bookmark-all-names)
-    (volatile)
-    (action . (("Jump to Bookmark" . bookmark-jump))))
-  "See (info \"(emacs)Bookmarks\").")
-
+   '((name . "Bookmarks")
+     (init . (lambda ()
+               (require 'bookmark)))
+     (candidates . bookmark-all-names)
+     (action . (("Jump to Bookmark" . bookmark-jump))))
+   "See (info \"(emacs)Bookmarks\").")
 
 ;;;; Picklist
 
