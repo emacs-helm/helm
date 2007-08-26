@@ -7,7 +7,10 @@
 	pop-up-frames bound to t.
 
 	Unbound C-r in anything-[isearch-]map.
-	
+
+	(anything-type-attributes): Other actions when pop-up-frames it t.
+	Thanks to Drew Adams for the patch.
+
 2007-08-24  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-source-man-pages): Added

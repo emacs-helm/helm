@@ -60,7 +60,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-26 Sun 12:52>"
+(defvar anything-c-version "<2007-08-26 Sun 18:39>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -233,18 +233,17 @@ source.")
          (if anything-c-info-pages
              anything-c-info-pages
            (setq anything-c-info-pages
-                 (let ((pop-up-frames nil))
-                   (save-window-excursion
-                     (save-excursion
-                       (require 'info)
-                       (Info-find-node "dir" "top")
+                 (save-window-excursion
+                   (save-excursion
+                     (require 'info)
+                     (Info-find-node "dir" "top")
+                     (goto-char (point-min))
+                     (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+                           topics)
+                       (while (re-search-forward info-topic-regexp nil t)
+                         (add-to-list 'topics (match-string-no-properties 1)))
                        (goto-char (point-min))
-                       (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-                             topics)
-                         (while (re-search-forward info-topic-regexp nil t)
-                           (add-to-list 'topics (match-string-no-properties 1)))
-                         (goto-char (point-min))
-                         topics))))))))
+                       topics)))))))
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string "^[^:]+: "
                                                                     ""
@@ -334,12 +333,12 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 ;;;; Bookmarks
 
 (defvar anything-c-source-bookmarks
-   '((name . "Bookmarks")
-     (init . (lambda ()
-               (require 'bookmark)))
-     (candidates . bookmark-all-names)
-     (action . (("Jump to Bookmark" . bookmark-jump))))
-   "See (info \"(emacs)Bookmarks\").")
+  '((name . "Bookmarks")
+    (init . (lambda ()
+              (require 'bookmark)))
+    (candidates . bookmark-all-names)
+    (action . (("Jump to Bookmark" . bookmark-jump))))
+  "See (info \"(emacs)Bookmarks\").")
 
 ;;;; Picklist
 
@@ -355,8 +354,8 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 (defvar anything-c-source-imenu
   '((name . "Imenu")
     (init . (lambda ()
-                   (setq anything-c-imenu-current-buffer
-                         (current-buffer))))
+              (setq anything-c-imenu-current-buffer
+                    (current-buffer))))
     (candidates . (lambda ()
                     (condition-case nil
                         (with-current-buffer anything-c-imenu-current-buffer
@@ -990,28 +989,38 @@ This function allows easy sequencing of transformer functions."
 ;;;; Type Attributes
 
 (setq anything-type-attributes
-      '((buffer (action ("Switch to buffer" . switch-to-buffer)
-                        ("Switch to buffer other window" . switch-to-buffer-other-window)
-                        ("Switch to buffer other frame" . switch-to-buffer-other-frame)
-                        ("Display buffer"   . display-buffer)
-                        ("Kill buffer"      . kill-buffer)))
-        (file (action ("Find file" . find-file)
-                      ("Find file other window" . find-file-other-window)
-                      ("Find file other frame" . find-file-other-frame)
-                      ("Open dired in file's directory" . anything-c-open-dired)
-                      ("Delete file" . anything-c-delete-file)
-                      ("Open file externally" . anything-c-open-file-externally)
-                      ("Open file with default tool" . anything-c-open-file-with-default-tool))
-              (action-transformer . (lambda (actions candidate)
-                                      (anything-c-compose
-                                       (list actions candidate)
-                                       '(anything-c-transform-file-load-el
-                                         anything-c-transform-file-browse-url))))
-              (candidate-transformer . (lambda (candidates)
-                                         (anything-c-compose
-                                          (list candidates)
-                                          '(anything-c-shadow-boring-files
-                                            anything-c-shorten-home-path)))))
+      `((buffer
+         (action
+          ,@(if pop-up-frames
+                '(("Switch to buffer other window" . switch-to-buffer-other-window)
+                  ("Switch to buffer" . switch-to-buffer))
+              '(("Switch to buffer" . switch-to-buffer)
+                ("Switch to buffer other window" . switch-to-buffer-other-window)
+                ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
+          ("Display buffer"   . display-buffer)
+          ("Kill buffer"      . kill-buffer)))
+        (file
+         (action
+          ,@(if pop-up-frames
+                '(("Find file other window" . find-file-other-window)
+                  ("Find file" . find-file))
+              '(("Find file" . find-file)
+                ("Find file other window" . find-file-other-window)
+                ("Find file other frame" . find-file-other-frame)))
+          ("Open dired in file's directory" . anything-c-open-dired)
+          ("Delete file" . anything-c-delete-file)
+          ("Open file externally" . anything-c-open-file-externally)
+          ("Open file with default tool" . anything-c-open-file-with-default-tool))
+         (action-transformer . (lambda (actions candidate)
+                                 (anything-c-compose
+                                  (list actions candidate)
+                                  '(anything-c-transform-file-load-el
+                                    anything-c-transform-file-browse-url))))
+         (candidate-transformer . (lambda (candidates)
+                                    (anything-c-compose
+                                     (list candidates)
+                                     '(anything-c-shadow-boring-files
+                                       anything-c-shorten-home-path)))))
         (command (action ("Call interactively" . (lambda (command-name)
                                                    (call-interactively (intern command-name))))
                          ("Describe command" . (lambda (command-name)
