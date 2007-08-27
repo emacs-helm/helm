@@ -60,7 +60,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-26 Sun 18:39>"
+(defvar anything-c-version "<2007-08-27 Mon 21:59>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -243,6 +243,7 @@ source.")
                        (while (re-search-forward info-topic-regexp nil t)
                          (add-to-list 'topics (match-string-no-properties 1)))
                        (goto-char (point-min))
+                       (Info-exit)
                        topics)))))))
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string "^[^:]+: "

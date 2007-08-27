@@ -1,3 +1,8 @@
+2007-08-27  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* anything-config.el (anything-c-source-info-pages): Close info
+	after getting candidates.
+
 2007-08-26  Tassilo Horn  <tassilo@member.fsf.org>
 
 	* anything-config.el (anything-c-source-bookmarks): Require
