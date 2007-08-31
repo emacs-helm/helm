@@ -60,7 +60,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-27 Mon 21:59>"
+(defvar anything-c-version "<2007-08-31 Fri 17:03>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -398,7 +398,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 
 (defvar anything-c-locate-options (if (eq system-type 'darwin)
                                       '("locate")
-                                    '("locate" "-i " "-r"))
+                                    '("locate" "-i" "-r"))
   "A list where the `car' is the name of the locat program
 followed by options.  The search pattern will be appended, so the
 \"-r\" option should be the last option.")
