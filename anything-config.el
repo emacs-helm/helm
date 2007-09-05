@@ -60,7 +60,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-08-31 Fri 17:03>"
+(defvar anything-c-version "<2007-09-05 Wed 21:04>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -598,6 +598,30 @@ removed."
       (push (match-string 1 str) items)
       (setq start (1+ (match-end 1))))
     items))
+
+;;;; Jabber Contacts (jabber.el)
+
+(defun anything-c-jabber-online-contacts ()
+  "List online Jabber contacts."
+  (let (jids)
+    (dolist (item (jabber-concat-rosters) jids)
+      (when (get item 'connected)
+        (push (if (get item 'name)
+                  (cons (get item 'name) item)
+                (cons (symbol-name item) item)) jids)))))
+
+(defvar anything-c-source-jabber-contacts
+  '((name . "Jabber Contacts")
+    (init . (lambda () (require 'jabber)))
+    (candidates . (lambda ()
+                    (mapcar
+                     'car
+                     (anything-c-jabber-online-contacts))))
+    (action . (lambda (x)
+                (jabber-chat-with
+                 (jabber-read-account)
+                 (symbol-name
+                  (cdr (assoc x (anything-c-jabber-online-contacts)))))))))
 
 ;;; Type Action helpers
 
