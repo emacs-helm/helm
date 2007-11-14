@@ -808,13 +808,12 @@ skipped."
           finally (return (nreverse filtered-files)))))
 
 (defun anything-c-shorten-home-path (files)
-  "Replaces /home/user with $HOME."
+  "Replaces /home/user with ~."
   (mapcar (lambda (file)
-            ;; replace path of HOME directory in paths with the string <home>
             (let ((home (replace-regexp-in-string "\\\\" "/" ; stupid Windows...
                                                   (getenv "HOME"))))
               (if (string-match home file)
-                  (cons (replace-match "$HOME" nil nil file) file)
+                  (cons (replace-match "~" nil nil file) file)
                 file)))
           files))
 
