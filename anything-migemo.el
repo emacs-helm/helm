@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo extension for anything
-;; $Id: anything-migemo.el,v 1.1 2007-12-25 12:03:25 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.2 2007-12-25 13:05:46 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -43,7 +43,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.1  2007-12-25 12:03:25  rubikitch
+;; Revision 1.2  2007-12-25 13:05:46  rubikitch
+;; speed up by memoization
+;;
+;; Revision 1.1  2007/12/25 12:03:25  rubikitch
 ;; Initial revision
 ;;
 
@@ -57,9 +60,14 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
   (interactive "P")
   (let ((anything-use-migemo with-migemo))
     (anything)))
+
+(defvar anything-previous-migemo-info '("" . "")
+  "[Internal] Previous migemo query for anything-migemo.")
 (defun anything-string-match-with-migemo (re str)
   "Migemo version of `string-match'."
-  (string-match (migemo-get-pattern re) str))
+  (unless (string= re (car anything-previous-migemo-info))
+    (setq anything-previous-migemo-info (cons re (migemo-get-pattern re))))
+  (string-match (cdr anything-previous-migemo-info) str))
 
 (defadvice anything-process-source (around anything-migemo activate)
   "Anything search refinement using `anything-string-match-with-migemo' when `anything' is migemo-ized."
