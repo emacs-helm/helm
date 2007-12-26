@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo extension for anything
-;; $Id: anything-migemo.el,v 1.3 2007-12-25 19:55:59 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.4 2007-12-26 08:36:01 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -38,7 +38,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.3  2007-12-25 19:55:59  rubikitch
+;; Revision 1.4  2007-12-26 08:36:01  rubikitch
+;; changed match priority
+;;
+;; Revision 1.3  2007/12/25 19:55:59  rubikitch
 ;; patch is not needed anymore.
 ;;
 ;; Revision 1.2  2007/12/25 13:05:46  rubikitch
@@ -73,9 +76,9 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
       ad-do-it
     (setq ad-return-value
           (mapcar (lambda (source)
-                    `((match . (anything-string-match-with-migemo))
-                      (delayed)
-                      ,@source))
+                    `((delayed)
+                      ,@source
+                      (match . (anything-string-match-with-migemo))))
                   ad-do-it))))
 
 
