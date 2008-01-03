@@ -1072,7 +1072,8 @@ This function allows easy sequencing of transformer functions."
                                       (anything-c-compose
                                        (list actions candidate)
                                        '(anything-c-transform-sexp-eval-command-sexp)))))
-        (bookmark (action ("Jump to bookmark" . bookmark-jump)))))
+        (bookmark (action ("Jump to bookmark" . bookmark-jump)
+                          ("Delete bookmark" . bookmark-delete)))))
 
 ;;; Provide anything-config
 
