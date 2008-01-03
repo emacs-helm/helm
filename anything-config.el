@@ -338,7 +338,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
     (init . (lambda ()
               (require 'bookmark)))
     (candidates . bookmark-all-names)
-    (action . (("Jump to Bookmark" . bookmark-jump))))
+    (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
 ;;;; Picklist
@@ -1071,7 +1071,8 @@ This function allows easy sequencing of transformer functions."
               (action-transformer . (lambda (actions candidate)
                                       (anything-c-compose
                                        (list actions candidate)
-                                       '(anything-c-transform-sexp-eval-command-sexp)))))))
+                                       '(anything-c-transform-sexp-eval-command-sexp)))))
+        (bookmark (action ("Jump to bookmark" . bookmark-jump)))))
 
 ;;; Provide anything-config
 
