@@ -60,7 +60,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2007-09-05 Wed 21:04>"
+(defvar anything-c-version "<2008-02-18 Mon 21:05>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
@@ -817,6 +817,18 @@ skipped."
                 file)))
           files))
 
+;;;; Functions
+
+(defun anything-c-mark-interactive-functions (functions)
+  "Mark interactive functions (commands) with (i) after the function name."
+  (let (list)
+    (loop for function in functions
+          do (push (cons (concat function
+                                 (when (commandp (intern function)) " (i)"))
+                         function)
+                   list)
+          finally (return (nreverse list)))))
+
 ;;; Filtered Candidate Transformers
 
 ;;;; Adaptive Sorting of Candidates
@@ -1064,7 +1076,11 @@ This function allows easy sequencing of transformer functions."
                   (action-transformer . (lambda (actions candidate)
                                           (anything-c-compose
                                            (list actions candidate)
-                                           '(anything-c-transform-function-call-interactively)))))
+                                           '(anything-c-transform-function-call-interactively))))
+                  (candidate-transformer . (lambda (candidates)
+                                             (anything-c-compose
+                                              (list candidates)
+                                              '(anything-c-mark-interactive-functions)))))
         (sexp (action ("Eval s-expression" . (lambda (c)
                                                (eval (read c))))
                       ("Add s-expression to kill ring" . kill-new))
