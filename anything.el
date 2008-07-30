@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.2 2008-07-30 13:37:16 rubikitch Exp $
+;; $Id: anything.el,v 1.3 2008-07-30 14:38:04 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.2  2008-07-30 13:37:16  rubikitch
+;; Revision 1.3  2008-07-30 14:38:04  rubikitch
+;; Implemented persistent action.
+;;
+;; Revision 1.2  2008/07/30 13:37:16  rubikitch
 ;; Update doc.
 ;;
 ;; Revision 1.1  2008/07/30 13:22:06  rubikitch
@@ -299,7 +302,15 @@ Attributes:
   If present matches from the source are shown only if the
   pattern is not empty. Optionally, it can have an integer
   parameter specifying the required length of input which is
-  useful in case of sources with lots of candidates.")
+  useful in case of sources with lots of candidates.
+
+- persistent-action (optional)
+
+  Function called with one parameter; the selected candidate.
+
+  An action performed by `anything-execute-persistent-action'.
+  If none, use the default action.
+")
 
 
 ;; This value is only provided as an example. Customize it to your own
@@ -1184,6 +1195,29 @@ Cache the candidates if there is not yet a cached value."
         `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
           (top . 0)))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
 
+;;---------------------------------------------------------------------
+;; Persistent Action
+;;----------------------------------------------------------------------
+(defun anything-execute-persistent-action ()
+  "If a candidate is selected then perform the associated action without quitting anything."
+  (interactive)
+  (save-selected-window
+    (select-window (get-buffer-window anything-buffer))
+    (select-window (setq minibuffer-scroll-window
+                         (if (one-window-p t) (split-window) (next-window (selected-window) 1))))
+    (let ((anything-window (get-buffer-window anything-buffer))
+          ;;(same-window-regexps '("."))
+          (selection (if anything-saved-sources
+                         ;; the action list is shown
+                         anything-saved-selection
+                       (anything-get-selection)))
+          (action (or (assoc-default 'persistent-action (anything-get-current-source))
+                      (anything-get-action))))
+      (if (and (listp action)
+               (not (functionp action))) ; lambda
+          ;; select the default action
+          (setq action (cdar action)))
+      (and action selection (funcall action selection)))))
 
 ;;---------------------------------------------------------------------
 ;; Incremental search within results
