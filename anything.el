@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.5 2008-07-30 15:06:32 rubikitch Exp $
+;; $Id: anything.el,v 1.6 2008-07-30 15:12:36 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.5  2008-07-30 15:06:32  rubikitch
+;; Revision 1.6  2008-07-30 15:12:36  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.5  2008/07/30 15:06:32  rubikitch
 ;; `anything-select-2nd-action', `anything-select-3rd-action', `anything-select-4th-action':
 ;; Select other than default action without pressing Tab.
 ;;
@@ -574,6 +577,8 @@ anything completions with \.")
   "Cons of (point) and (window-start) when `anything' is invoked.
 It is needed because restoring position when `anything' is keyboard-quitted.")
 
+(defvar anything-saved-action nil
+  "Saved value of the currently selected action by key.")
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -779,16 +784,17 @@ action."
                         ;; the action list is shown
                         anything-saved-selection
                       (anything-get-selection)))
-         (action (if anything-saved-sources
-                     ;; the action list is shown
-                     (anything-get-selection)
-                   (anything-get-action))))
+         (action (or anything-saved-action
+                     (if anything-saved-sources
+                         ;; the action list is shown
+                         (anything-get-selection)
+                       (anything-get-action)))))
 
     (if (and (listp action)
-             (not (functionp action)))  ; lambda
-        ;; select the default action
+             (not (functionp action))) ; lambda
+        ;;select the default action
         (setq action (cdar action)))
-
+    (setq anything-saved-action nil)
     (if (and selection action)
         (funcall action selection))))
 
