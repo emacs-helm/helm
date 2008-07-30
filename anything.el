@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.4 2008-07-30 14:58:27 rubikitch Exp $
+;; $Id: anything.el,v 1.5 2008-07-30 15:06:32 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.4  2008-07-30 14:58:27  rubikitch
+;; Revision 1.5  2008-07-30 15:06:32  rubikitch
+;; `anything-select-2nd-action', `anything-select-3rd-action', `anything-select-4th-action':
+;; Select other than default action without pressing Tab.
+;;
+;; Revision 1.4  2008/07/30 14:58:27  rubikitch
 ;; `anything-current-buffer': Store current buffer when `anything' is invoked.
 ;; `anything-current-position': Restore position when keyboard-quitted.
 ;;
@@ -837,6 +841,28 @@ action."
                                         ; previous one
     (anything-check-minibuffer-input)))
 
+(defun anything-select-nth-action (n)
+  "Select the nth action for the currently selected candidate."
+  (setq anything-saved-selection (anything-get-selection))
+  (unless anything-saved-selection
+    (error "Nothing is selected."))
+  (setq anything-saved-action (cdr (elt (anything-get-action) n)))
+  (anything-exit-minibuffer))
+
+(defun anything-select-2nd-action ()
+  "Select the 2nd action for the currently selected candidate."
+  (interactive)
+  (anything-select-nth-action 1))
+
+(defun anything-select-3rd-action ()
+  "Select the 3rd action for the currently selected candidate."
+  (interactive)
+  (anything-select-nth-action 2))
+
+(defun anything-select-4th-action ()
+  "Select the 4th action for the currently selected candidate."
+  (interactive)
+  (anything-select-nth-action 3))
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
