@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.3 2008-07-30 14:38:04 rubikitch Exp $
+;; $Id: anything.el,v 1.4 2008-07-30 14:58:27 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.3  2008-07-30 14:38:04  rubikitch
+;; Revision 1.4  2008-07-30 14:58:27  rubikitch
+;; `anything-current-buffer': Store current buffer when `anything' is invoked.
+;; `anything-current-position': Restore position when keyboard-quitted.
+;;
+;; Revision 1.3  2008/07/30 14:38:04  rubikitch
 ;; Implemented persistent action.
 ;;
 ;; Revision 1.2  2008/07/30 13:37:16  rubikitch
@@ -559,6 +563,13 @@ anything completions with \.")
 (defvar anything-original-source-filter nil
   "Original value of `anything-source-filter' before Anything was started.")
 
+(defvar anything-current-buffer nil
+  "Current buffer when `anything' is invoked.")
+
+(defvar anything-current-position nil
+  "Cons of (point) and (window-start) when `anything' is invoked.
+It is needed because restoring position when `anything' is keyboard-quitted.")
+
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -732,28 +743,30 @@ the real value in a text property."
 (defun anything ()
   "Select anything."
   (interactive)
-  (let ((frameconfig (current-frame-configuration)))
-    (add-hook 'post-command-hook 'anything-check-minibuffer-input)
+  (condition-case v
+      (let ((frameconfig (current-frame-configuration)))
+        (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
-    (anything-initialize)
+        (anything-initialize)
 
-    (if anything-samewindow
-        (switch-to-buffer anything-buffer)
-      (pop-to-buffer anything-buffer))
+        (if anything-samewindow
+            (switch-to-buffer anything-buffer)
+          (pop-to-buffer anything-buffer))
 
-    (unwind-protect
-        (progn
-          (anything-update)
-          (select-frame-set-input-focus (window-frame (minibuffer-window)))
-          (let ((minibuffer-local-map anything-map))
-            (read-string "pattern: ")))
+        (unwind-protect
+            (progn
+              (anything-update)
+              (select-frame-set-input-focus (window-frame (minibuffer-window)))
+              (let ((minibuffer-local-map anything-map))
+                (read-string "pattern: ")))
 
-      (anything-cleanup)
-      (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
-      (set-frame-configuration frameconfig)))
-
-  (anything-execute-selection-action))
-
+          (anything-cleanup)
+          (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
+          (set-frame-configuration frameconfig))
+        (anything-execute-selection-action))
+    (quit
+     (goto-char (car anything-current-position))
+     (set-window-start (selected-window) (cdr anything-current-position)))))
 
 (defun anything-execute-selection-action ()
   "If a candidate was selected then perform the associated
@@ -833,6 +846,8 @@ action."
       (if init
           (funcall init))))
 
+  (setq anything-current-buffer (current-buffer))
+  (setq anything-current-position (cons (point) (window-start)))
   (setq anything-pattern "")
   (setq anything-input "")
   (setq anything-candidate-cache nil)
