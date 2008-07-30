@@ -1,7 +1,14 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
+;; $Id: anything.el,v 1.2 2008-07-30 13:37:16 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
+
+;; Author: Tamas Patrovics
+;; Maintainer: rubikitch <rubikitch@ruby-lang.org>
+;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
+;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,8 +36,11 @@
 ;; Note that anything.el provides only the framework and some example
 ;; configurations for demonstration purposes. See anything-config.el
 ;; for practical, polished, easy to use configurations which can be
-;; used to assemble a custom personalized configuration.
+;; used to assemble a custom personalized configuration. And many
+;; other configurations are in EmacsWiki.
 ;; 
+;; http://www.emacswiki.org/cgi-bin/wiki/download/anything-config.el
+;; http://www.emacswiki.org/cgi-bin/emacs/AnythingSources
 ;;
 ;; Tested on Emacs 22.
 ;;
@@ -40,7 +50,6 @@
 ;; Thanks to Tassilo Horn for fixes.
 ;; Thanks to Drew Adams for various fixes (frame, isearch, customization, etc.)
 ;;
-
 
 ;; TODO:
 ;;
@@ -56,8 +65,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.1  2008-07-30 13:22:06  rubikitch
-;; Initial revision
+;; Revision 1.2  2008-07-30 13:37:16  rubikitch
+;; Update doc.
+;;
+;; Revision 1.1  2008/07/30 13:22:06  rubikitch
+;; New maintainer.
 ;;
 
 (require 'cl)
