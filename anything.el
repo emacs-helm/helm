@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.8 2008-07-30 15:38:51 rubikitch Exp $
+;; $Id: anything.el,v 1.9 2008-07-30 15:44:49 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.8  2008-07-30 15:38:51  rubikitch
+;; Revision 1.9  2008-07-30 15:44:49  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.8  2008/07/30 15:38:51  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.7  2008/07/30 15:21:48  rubikitch
@@ -1716,4 +1719,6 @@ The current buffer must be a minibuffer."
 
 
 (provide 'anything)
+;; How to save (DO NOT REMOVE!!)
+;; (emacswiki-post "anything.el")
 ;;; anything.el ends here
