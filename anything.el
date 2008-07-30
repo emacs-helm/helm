@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.6 2008-07-30 15:12:36 rubikitch Exp $
+;; $Id: anything.el,v 1.7 2008-07-30 15:21:48 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.6  2008-07-30 15:12:36  rubikitch
+;; Revision 1.7  2008-07-30 15:21:48  rubikitch
+;; `anything-scroll-other-window', `anything-scroll-other-window-down':
+;; Scroll other window (for persistent action).
+;;
+;; Revision 1.6  2008/07/30 15:12:36  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.5  2008/07/30 15:06:32  rubikitch
@@ -1265,6 +1269,21 @@ Cache the candidates if there is not yet a cached value."
           ;; select the default action
           (setq action (cdar action)))
       (and action selection (funcall action selection)))))
+
+;; scroll-other-window(-down)? for persistent-action
+(defun anything-scroll-other-window-base (command)
+  (save-selected-window
+    (other-window 2)
+    (call-interactively command)))
+
+(defun anything-scroll-other-window ()
+  "Scroll other window (not *Anything* window) upward."
+  (interactive)
+  (anything-scroll-other-window-base 'scroll-other-window))
+(defun anything-scroll-other-window-down ()
+  "Scroll other window (not *Anything* window) downward."
+  (interactive)
+  (anything-scroll-other-window-base 'scroll-other-window-down))
 
 ;;---------------------------------------------------------------------
 ;; Incremental search within results
