@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.7 2008-07-30 15:21:48 rubikitch Exp $
+;; $Id: anything.el,v 1.8 2008-07-30 15:38:51 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.7  2008-07-30 15:21:48  rubikitch
+;; Revision 1.8  2008-07-30 15:38:51  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.7  2008/07/30 15:21:48  rubikitch
 ;; `anything-scroll-other-window', `anything-scroll-other-window-down':
 ;; Scroll other window (for persistent action).
 ;;
@@ -876,14 +879,14 @@ action."
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
+  (setq anything-current-buffer (current-buffer))
+  (setq anything-current-position (cons (point) (window-start)))
   ;; Call the init function for sources where appropriate
   (dolist (source (anything-get-sources))
     (let ((init (assoc-default 'init source)))
       (if init
           (funcall init))))
 
-  (setq anything-current-buffer (current-buffer))
-  (setq anything-current-position (cons (point) (window-start)))
   (setq anything-pattern "")
   (setq anything-input "")
   (setq anything-candidate-cache nil)
