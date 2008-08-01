@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.9 2008-07-30 15:44:49 rubikitch Exp $
+;; $Id: anything.el,v 1.10 2008-08-01 19:44:01 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.9  2008-07-30 15:44:49  rubikitch
+;; Revision 1.10  2008-08-01 19:44:01  rubikitch
+;; `anything-resume': resurrct previously invoked `anything'.
+;;
+;; Revision 1.9  2008/07/30 15:44:49  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.8  2008/07/30 15:38:51  rubikitch
@@ -759,14 +762,14 @@ the real value in a text property."
         (anything-maybe-fit-frame))))
 
 
-(defun anything ()
+(defun anything (&optional resume)
   "Select anything."
   (interactive)
   (condition-case v
       (let ((frameconfig (current-frame-configuration)))
         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
-        (anything-initialize)
+        (unless resume (anything-initialize))
 
         (if anything-samewindow
             (switch-to-buffer anything-buffer)
@@ -774,10 +777,10 @@ the real value in a text property."
 
         (unwind-protect
             (progn
-              (anything-update)
+              (unless resume (anything-update))
               (select-frame-set-input-focus (window-frame (minibuffer-window)))
               (let ((minibuffer-local-map anything-map))
-                (read-string "pattern: ")))
+                (read-string "pattern: " (if resume anything-pattern))))
 
           (anything-cleanup)
           (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
@@ -786,6 +789,11 @@ the real value in a text property."
     (quit
      (goto-char (car anything-current-position))
      (set-window-start (selected-window) (cdr anything-current-position)))))
+
+(defun anything-resume ()
+  "Resurrect previously invoked `anything'."
+  (interactive)
+  (anything t))
 
 (defun anything-execute-selection-action ()
   "If a candidate was selected then perform the associated
