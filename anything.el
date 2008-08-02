@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.10 2008-08-01 19:44:01 rubikitch Exp $
+;; $Id: anything.el,v 1.11 2008-08-02 10:20:36 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.10  2008-08-01 19:44:01  rubikitch
+;; Revision 1.11  2008-08-02 10:20:36  rubikitch
+;; `anything-resume' is usable with other (let-binded) `anything-sources'.
+;;
+;; Revision 1.10  2008/08/01 19:44:01  rubikitch
 ;; `anything-resume': resurrct previously invoked `anything'.
 ;;
 ;; Revision 1.9  2008/07/30 15:44:49  rubikitch
@@ -593,6 +596,9 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-saved-action nil
   "Saved value of the currently selected action by key.")
 
+(defvar anything-last-sources nil
+  "Sources of previously invoked `anything'.")
+
 (put 'anything 'timid-completion 'disabled)
 
 
@@ -793,7 +799,8 @@ the real value in a text property."
 (defun anything-resume ()
   "Resurrect previously invoked `anything'."
   (interactive)
-  (anything t))
+  (let ((anything-sources (or anything-last-sources anything-sources)))
+    (anything t)))
 
 (defun anything-execute-selection-action ()
   "If a candidate was selected then perform the associated
@@ -903,6 +910,7 @@ action."
   (setq anything-candidate-cache nil)
   (setq anything-saved-sources nil)
   (setq anything-original-source-filter anything-source-filter)
+  (setq anything-last-sources anything-sources)
 
   (with-current-buffer (get-buffer-create anything-buffer)
     (setq cursor-type nil)
