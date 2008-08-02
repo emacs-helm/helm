@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.13 2008-08-02 15:08:14 rubikitch Exp $
+;; $Id: anything.el,v 1.14 2008-08-02 16:48:29 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.13  2008-08-02 15:08:14  rubikitch
+;; Revision 1.14  2008-08-02 16:48:29  rubikitch
+;; Refactored to testable code.
+;; Added many candidate tests with `anything-test-candidates'.
+;;
+;; Revision 1.13  2008/08/02 15:08:14  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.12  2008/08/02 14:29:31  rubikitch
@@ -611,6 +615,9 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 
 (put 'anything 'timid-completion 'disabled)
 
+;; internal variables
+(defvar anything-test-candidate-list nil)
+(defvar anything-test-mode nil)
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -664,13 +671,15 @@ the current pattern."
 
       (anything-maybe-fit-frame)
 
-      (run-with-idle-timer (if (featurep 'xemacs)
-                               0.1
-                             0)
-                           nil
-                           'anything-process-delayed-sources
-                           delayed-sources))))
-
+      (if anything-test-mode
+          (dolist (source delayed-sources)
+            (anything-process-source source))
+        (run-with-idle-timer (if (featurep 'xemacs)
+                                 0.1
+                               0)
+                             nil
+                             'anything-process-delayed-sources
+                             delayed-sources)))))
 
 (defun anything-get-sources ()
   "Return `anything-sources' with the attributes from
@@ -736,18 +745,22 @@ the current pattern."
   "Display matches from SOURCE according to its settings."
   (let ((matches (anything-compute-matches source)))
     (when matches
-      (anything-insert-header (assoc-default 'name source))
+      (if anything-test-mode
+          (setq anything-test-candidate-list
+                `(,@anything-test-candidate-list
+                  (,(assoc-default 'name source)
+                   ,matches)))
+        (anything-insert-header (assoc-default 'name source))
+        (dolist (match matches)
+          (when (and anything-enable-digit-shortcuts
+                     (not (eq anything-digit-shortcut-count 9)))
+            (move-overlay (nth anything-digit-shortcut-count
+                               anything-digit-overlays)
+                          (line-beginning-position)
+                          (line-beginning-position))
+            (incf anything-digit-shortcut-count))
 
-      (dolist (match matches)
-        (when (and anything-enable-digit-shortcuts
-                   (not (eq anything-digit-shortcut-count 9)))
-          (move-overlay (nth anything-digit-shortcut-count
-                             anything-digit-overlays)
-                        (line-beginning-position)
-                        (line-beginning-position))
-          (incf anything-digit-shortcut-count))
-
-        (anything-insert-match match 'insert)))))
+          (anything-insert-match match 'insert))))))
 
 
 (defun anything-insert-match (match insert-function)
@@ -911,15 +924,18 @@ action."
   (interactive)
   (anything-select-nth-action 3))
 
+(defun anything-funcall-inits ()
+  (dolist (source (anything-get-sources))
+    (let ((init (assoc-default 'init source)))
+      (if init
+          (funcall init)))))
+
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
   (setq anything-current-buffer (current-buffer))
   (setq anything-current-position (cons (point) (window-start)))
   ;; Call the init function for sources where appropriate
-  (dolist (source (anything-get-sources))
-    (let ((init (assoc-default 'init source)))
-      (if init
-          (funcall init))))
+  (anything-funcall-inits)
 
   (setq anything-pattern "")
   (setq anything-input "")
@@ -1752,6 +1768,24 @@ The current buffer must be a minibuffer."
 ;;----------------------------------------------------------------------
 ;; Unit Tests
 ;;----------------------------------------------------------------------
+
+(defun anything-test-candidates (sources input)
+  "Test helper function for anything.
+Given pseudo `anything-sources' and `anything-pattern', returns list like
+  ((\"source name1\" (\"candidate1\" \"candidate2\"))
+   (\"source name2\" (\"candidate3\" \"candidate4\")))
+"
+  (let ((anything-test-mode t)
+        (anything-sources
+         (mapcar (lambda (source) (cons '(volatile) source)) sources))
+        (anything-input input)
+        (anything-pattern input)
+        anything-update-hook
+        anything-test-candidate-list)
+    (anything-funcall-inits)
+    (anything-update)
+    anything-test-candidate-list))
+
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
@@ -1768,12 +1802,87 @@ The current buffer must be a minibuffer."
                                  (type . test))))
             (anything-type-attributes '((test (action . identity)))))
         (anything-get-sources)))
-
     ;; anything-sources accepts symbols
     (expect '(((name . "foo")))
       (let* ((foo '((name . "foo")))
              (anything-sources '(foo)))
         (anything-get-sources)))
+    (desc "anything-get-candidates")
+    (expect '("foo" "bar")
+      (anything-get-candidates '((name . "foo") (candidates "foo" "bar"))))
+    (expect '("FOO" "BAR")
+      (anything-get-candidates '((name . "foo") (candidates "foo" "bar")
+                                 (candidate-transformer
+                                  . (lambda (cands) (mapcar 'upcase cands))))))
+    (expect '("foo" "bar")
+      (anything-get-candidates '((name . "foo")
+                                 (candidates . (lambda () '("foo" "bar"))))))
+    (desc "anything-compute-matches")
+    (expect '("foo" "bar")
+      (let ((anything-pattern ""))
+        (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+    (expect '("foo")
+      (let ((anything-pattern "oo"))
+        (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+    (expect '("bar")
+      (let ((anything-pattern "^b"))
+        (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+    (desc "anything-test-candidates")
+    (expect '(("FOO" ("foo" "bar")))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) ""))
+    (expect '(("FOO" ("bar")))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) "ar"))
+    (expect '(("T1" ("hoge" "aiue"))
+              ("T2" ("test" "boke")))
+      (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
+                                  ((name . "T2") (candidates "test" "boke"))) ""))
+    (expect '(("T1" ("hoge"))
+              ("T2" ("boke")))
+      (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
+                                  ((name . "T2") (candidates "test" "boke"))) "o"))
+    (desc "requires-pattern")
+    (expect nil
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar") (requires-pattern . 1))) ""))
+    (expect '(("FOO" ("bar")))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar") (requires-pattern . 1))) "b"))
+    (desc "delayed (for test)")
+    (expect '(("T2" ("boke"))
+              ("T1" ("hoge")))
+      (anything-test-candidates
+       '(((name . "T1") (candidates "hoge" "aiue") (delayed))
+         ((name . "T2") (candidates "test" "boke")))
+       "o"))
+    (desc "match (prefix search)")
+    (expect '(("FOO" ("bar")))
+      (anything-test-candidates
+       '(((name . "FOO") (candidates "foo" "bar")
+          (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
+       "ba"))
+    (expect nil
+      (anything-test-candidates
+       '(((name . "FOO") (candidates "foo" "bar")
+          (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
+       "ar"))
+    (desc "init")
+    (expect '(("FOO" ("bar")))
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO") (init . (lambda () (setq v '("foo" "bar"))))
+            (candidates . v)))
+         "ar")))
+    (desc "candidate-transformer")
+    (expect '(("FOO" ("BAR")))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                   (candidate-transformer
+                                    . (lambda (cands) (mapcar 'upcase cands)))))
+                                "ar"))
+    (desc "filtered-candidate-transformer")
+    ;; needs more tests
+    (expect '(("FOO" ("BAR")))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                   (filtered-candidate-transformer
+                                    . (lambda (cands src) (mapcar 'upcase cands)))))
+                                "ar"))
     ))
 
 
