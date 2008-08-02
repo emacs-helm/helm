@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.15 2008-08-02 16:53:40 rubikitch Exp $
+;; $Id: anything.el,v 1.16 2008-08-02 20:32:54 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.15  2008-08-02 16:53:40  rubikitch
+;; Revision 1.16  2008-08-02 20:32:54  rubikitch
+;; Extended `anything' optional arguments.
+;;
+;; Revision 1.15  2008/08/02 16:53:40  rubikitch
 ;; Fixed a small bug of `anything-test-candidates'.
 ;;
 ;; Revision 1.14  2008/08/02 16:48:29  rubikitch
@@ -800,11 +803,13 @@ the real value in a text property."
         (anything-maybe-fit-frame))))
 
 
-(defun anything (&optional resume)
+(defun anything (&optional sources input resume)
   "Select anything."
+  ;; TODO more document
   (interactive)
   (condition-case v
-      (let ((frameconfig (current-frame-configuration)))
+      (let ((frameconfig (current-frame-configuration))
+            (anything-sources (or sources anything-sources)))
         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
         (unless resume (anything-initialize))
@@ -818,7 +823,7 @@ the real value in a text property."
               (unless resume (anything-update))
               (select-frame-set-input-focus (window-frame (minibuffer-window)))
               (let ((minibuffer-local-map anything-map))
-                (read-string "pattern: " (if resume anything-pattern))))
+                (read-string "pattern: " (if resume anything-pattern input))))
 
           (anything-cleanup)
           (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
@@ -831,8 +836,7 @@ the real value in a text property."
 (defun anything-resume ()
   "Resurrect previously invoked `anything'."
   (interactive)
-  (let ((anything-sources (or anything-last-sources anything-sources)))
-    (anything t)))
+  (anything (or anything-last-sources anything-sources) nil t))
 
 (defun anything-execute-selection-action ()
   "If a candidate was selected then perform the associated
@@ -1730,7 +1734,6 @@ shown yet and bind anything commands in iswitchb."
     (dolist (binding anything-iswitchb-saved-keys)
       (define-key (current-local-map) (car binding) (cdr binding)))
     (anything-iswitchb-minibuffer-exit)))
-
 
 ;;----------------------------------------------------------------------
 ;; XEmacs compatibility
