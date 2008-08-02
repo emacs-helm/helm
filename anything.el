@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.11 2008-08-02 10:20:36 rubikitch Exp $
+;; $Id: anything.el,v 1.12 2008-08-02 14:29:31 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.11  2008-08-02 10:20:36  rubikitch
+;; Revision 1.12  2008-08-02 14:29:31  rubikitch
+;; `anything-sources' accepts symbols. (patched by Sugawara)
+;;
+;; Revision 1.11  2008/08/02 10:20:36  rubikitch
 ;; `anything-resume' is usable with other (let-binded) `anything-sources'.
 ;;
 ;; Revision 1.10  2008/08/01 19:44:01  rubikitch
@@ -163,6 +166,10 @@
                                           (eval (read c))))))
                             (delayed)))
   "The source of candidates for anything.
+It accepts symbols:
+ (setq anything-sources (list anything-c-foo anything-c-bar))
+can be written as
+ (setq anything-sources '(anything-c-foo anything-c-bar))
 
 Attributes:
 
@@ -666,12 +673,14 @@ the current pattern."
   "Return `anything-sources' with the attributes from
   `anything-type-attributes' merged in."
   (mapcar (lambda (source)
-            (let ((type (assoc-default 'type source)))
+            (let* ((source (if (listp source)
+                               source
+                             (symbol-value source)))
+                   (type (assoc-default 'type source)))
               (if type
                   (append source (assoc-default type anything-type-attributes) nil)
                 source)))
           anything-sources))
-
 
 (defun anything-process-source (source)
   "Display matches from SOURCE according to its settings."
@@ -1732,6 +1741,33 @@ The current buffer must be a minibuffer."
     "Delete all user input in a minibuffer.
 The current buffer must be a minibuffer."
     (delete-field (point-max))))
+
+;;----------------------------------------------------------------------
+;; Unit Tests
+;;----------------------------------------------------------------------
+;;;; unit test
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
+(when (fboundp 'expectations)
+  (expectations
+    (desc "anything-get-sources")
+    (expect '(((name . "foo")))
+      (let ((anything-sources '(((name . "foo")))))
+        (anything-get-sources)))
+    (expect '(((name . "foo")
+               (type . test)
+               (action . identity)))
+      (let ((anything-sources '(((name . "foo")
+                                 (type . test))))
+            (anything-type-attributes '((test (action . identity)))))
+        (anything-get-sources)))
+
+    ;; anything-sources accepts symbols
+    (expect '(((name . "foo")))
+      (let* ((foo '((name . "foo")))
+             (anything-sources '(foo)))
+        (anything-get-sources)))
+    ))
 
 
 (provide 'anything)
