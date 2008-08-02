@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.12 2008-08-02 14:29:31 rubikitch Exp $
+;; $Id: anything.el,v 1.13 2008-08-02 15:08:14 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.12  2008-08-02 14:29:31  rubikitch
+;; Revision 1.13  2008-08-02 15:08:14  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.12  2008/08/02 14:29:31  rubikitch
 ;; `anything-sources' accepts symbols. (patched by Sugawara)
 ;;
 ;; Revision 1.11  2008/08/02 10:20:36  rubikitch
@@ -682,8 +685,8 @@ the current pattern."
                 source)))
           anything-sources))
 
-(defun anything-process-source (source)
-  "Display matches from SOURCE according to its settings."
+(defun anything-compute-matches (source)
+  "Compute matches from SOURCE according to its settings."
   (let (matches)
     (if (equal anything-pattern "")
         (progn
@@ -727,7 +730,11 @@ the current pattern."
     (let* ((transformer (assoc-default 'filtered-candidate-transformer source)))
       (if transformer
           (setq matches (funcall transformer matches source))))
+    matches))
 
+(defun anything-process-source (source)
+  "Display matches from SOURCE according to its settings."
+  (let ((matches (anything-compute-matches source)))
     (when matches
       (anything-insert-header (assoc-default 'name source))
 
