@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.16 2008-08-02 20:32:54 rubikitch Exp $
+;; $Id: anything.el,v 1.17 2008-08-02 21:31:29 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.16  2008-08-02 20:32:54  rubikitch
+;; Revision 1.17  2008-08-02 21:31:29  rubikitch
+;; Extended `anything' optional arguments.
+;; `anything-completing-read': experimental implementation.
+;;
+;; Revision 1.16  2008/08/02 20:32:54  rubikitch
 ;; Extended `anything' optional arguments.
 ;;
 ;; Revision 1.15  2008/08/02 16:53:40  rubikitch
@@ -803,7 +807,7 @@ the real value in a text property."
         (anything-maybe-fit-frame))))
 
 
-(defun anything (&optional sources input resume)
+(defun anything (&optional sources input prompt resume)
   "Select anything."
   ;; TODO more document
   (interactive)
@@ -823,7 +827,7 @@ the real value in a text property."
               (unless resume (anything-update))
               (select-frame-set-input-focus (window-frame (minibuffer-window)))
               (let ((minibuffer-local-map anything-map))
-                (read-string "pattern: " (if resume anything-pattern input))))
+                (read-string (or prompt "pattern: ") (if resume anything-pattern input))))
 
           (anything-cleanup)
           (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
@@ -836,7 +840,7 @@ the real value in a text property."
 (defun anything-resume ()
   "Resurrect previously invoked `anything'."
   (interactive)
-  (anything (or anything-last-sources anything-sources) nil t))
+  (anything (or anything-last-sources anything-sources) nil nil t))
 
 (defun anything-execute-selection-action ()
   "If a candidate was selected then perform the associated
@@ -1735,6 +1739,73 @@ shown yet and bind anything commands in iswitchb."
       (define-key (current-local-map) (car binding) (cdr binding)))
     (anything-iswitchb-minibuffer-exit)))
 
+
+;;----------------------------------------------------------------------
+;; dummy source
+;;----------------------------------------------------------------------
+(defun anything-define-dummy-source (name func &rest other-attrib)
+  `((name . ,name)
+    (candidates "dummy")
+    ,@other-attrib
+    (filtered-candidate-transformer
+     . (lambda (candidates source)
+         (funcall ',func)))
+    (requires-pattern . 1)
+    (volatile)))
+
+(defun anything-dummy-candidate ()
+  ;; `source' is defined in filtered-candidate-transformer
+  (list (cons (concat (assoc-default 'name source) 
+                      " '" anything-pattern "'")
+              anything-pattern))) 
+
+;;----------------------------------------------------------------------
+;; `completing-read' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
+  (let ((result (anything (anything-completing-read-sources
+                          prompt collection predicate require-match initial
+                          hist default inherit-input-method)
+                         initial prompt)))
+    (prog1 result
+      (add-to-list (or hist 'minibuffer-history) result))))
+
+
+(defun anything-completing-read-sources (prompt collection &optional predicate require-match initial hist default inherit-input-method)
+  "`anything' replacement for `completing-read'."
+  (let ((transformer-func
+         (if predicate
+             `(candidate-transformer
+               . (lambda (cands)
+                   (remove-if-not (lambda (c) (,predicate (car c))) cands)))))
+        (new-input-source (unless require-match
+                            (anything-define-dummy-source
+                             prompt #'anything-dummy-candidate '(action . identity))))
+        (history-source (unless require-match
+                          `((name . "History")
+                            (candidates . ,(or hist 'minibuffer-history))
+                            (action . identity))))
+        (default-source (when default
+                          `((name . "Default")
+                            (candidates  ,default)
+                            (filtered-candidate-transformer
+                             . (lambda (cands source)
+                                 (if (string= anything-pattern "")  cands nil)))
+                            (action . identity)))))
+  `(,default-source
+    ((name . "completing-read")
+     (candidates . ,collection)
+     (action . identity)
+     ,transformer-func)
+    ,history-source
+    ,new-input-source)))
+
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
+;; (anything-completing-read "Test: " '("hoge" "foo" "bar"))
+;; (anything-completing-read-sources "Test: " '(("hoge")("foo")("bar")))
+;; (anything-completing-read-sources "Test: " '(("hoge")("foo")("bar")) nil t)
 ;;----------------------------------------------------------------------
 ;; XEmacs compatibility
 ;;----------------------------------------------------------------------
