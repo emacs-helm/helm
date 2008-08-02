@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.14 2008-08-02 16:48:29 rubikitch Exp $
+;; $Id: anything.el,v 1.15 2008-08-02 16:53:40 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.14  2008-08-02 16:48:29  rubikitch
+;; Revision 1.15  2008-08-02 16:53:40  rubikitch
+;; Fixed a small bug of `anything-test-candidates'.
+;;
+;; Revision 1.14  2008/08/02 16:48:29  rubikitch
 ;; Refactored to testable code.
 ;; Added many candidate tests with `anything-test-candidates'.
 ;;
@@ -1782,6 +1785,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-pattern input)
         anything-update-hook
         anything-test-candidate-list)
+    (get-buffer-create anything-buffer)
     (anything-funcall-inits)
     (anything-update)
     anything-test-candidate-list))
