@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.17 2008-08-02 21:31:29 rubikitch Exp $
+;; $Id: anything.el,v 1.18 2008-08-03 05:55:01 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.17  2008-08-02 21:31:29  rubikitch
+;; Revision 1.18  2008-08-03 05:55:01  rubikitch
+;; `anything-candidates-in-buffer': extract candidates in a buffer for speed.
+;;
+;; Revision 1.17  2008/08/02 21:31:29  rubikitch
 ;; Extended `anything' optional arguments.
 ;; `anything-completing-read': experimental implementation.
 ;;
@@ -1203,6 +1206,30 @@ Cache the candidates if there is not yet a cached value."
 
     candidates))
 
+(defun* anything-candidates-in-buffer (buffer &optional (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
+  "Get candidates in BUFFER. Especially fast for many (1000+) candidates.
+This function should be used in `candidates' of `anything-sources'.
+
+eg.
+ '((name . \"many candidates\")
+   (candidates . (lambda () (anything-candidates-in-buffer candidate-buffer)))
+   (volatile)
+   (match identity))
+
+
+GET-LINE-FN (default: buffer-substring-no-properties) specifies a function
+called with two arguments:point of line-beginning and point of line-end. 
+
+SEARCH-FN (default: re-search-forward) specifies a search function:
+re-search-forward or search-forward.
+"
+  (set-buffer buffer)
+  (goto-char (point-min))
+  (loop while (funcall search-fn anything-pattern nil t)
+        for i from 1 to anything-candidate-number-limit
+        unless (eobp)
+        collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+        do (forward-line 1)))
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -1905,6 +1932,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (expect '("bar")
       (let ((anything-pattern "^b"))
         (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+    ;; using anything-test-candidate-list
     (desc "anything-test-candidates")
     (expect '(("FOO" ("foo" "bar")))
       (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) ""))
@@ -1961,7 +1989,65 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                    (filtered-candidate-transformer
                                     . (lambda (cands src) (mapcar 'upcase cands)))))
                                 "ar"))
-    ))
+    (desc "anything-candidates-in-buffer")
+    (expect '("foo+" "bar+" "baz+")
+      (with-temp-buffer
+        (insert "foo+\nbar+\nbaz+\n")
+        (let ((anything-pattern "")
+              (anything-candidate-number-limit 5))
+          (anything-candidates-in-buffer (current-buffer)))))
+    (expect '("foo+" "bar+")
+      (with-temp-buffer
+        (insert "foo+\nbar+\nbaz+\n")
+        (let ((anything-pattern "")
+              (anything-candidate-number-limit 2))
+          (anything-candidates-in-buffer (current-buffer)))))
+    (expect '("foo+")
+      (with-temp-buffer
+        (insert "foo+\nbar+\nbaz+\n")
+        (let ((anything-pattern "oo\\+"))
+          (anything-candidates-in-buffer (current-buffer)))))
+    (expect '("foo+")
+      (with-temp-buffer
+        (insert "foo+\nbar+\nbaz+\n")
+        (let ((anything-pattern "oo+"))
+          (anything-candidates-in-buffer
+           (current-buffer) #'buffer-substring-no-properties #'search-forward))))
+    (expect '(("foo+" "FOO+"))
+      (with-temp-buffer
+        (insert "foo+\nbar+\nbaz+\n")
+        (let ((anything-pattern "oo\\+"))
+          (anything-candidates-in-buffer
+           (current-buffer)
+           (lambda (s e)
+             (let ((l (buffer-substring-no-properties s e)))
+               (list l (upcase l))))))))
+    (expect '(("TEST" ("foo+" "bar+" "baz+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (candidates
+           . (lambda ()
+               (with-temp-buffer
+                 (insert "foo+\nbar+\nbaz+\n")
+                 (let ((anything-pattern ""))
+                   (anything-candidates-in-buffer (current-buffer))))))
+          (match identity)
+          (volatile)))
+       "oo\\+"))
+    (expect '(("TEST" ("foo+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (candidates
+           . (lambda ()
+               (with-temp-buffer
+                 (insert "foo+\nbar+\nbaz+\n")
+                 (let ((anything-pattern "oo\\+"))
+                   (anything-candidates-in-buffer (current-buffer))))))
+          (match identity)
+          (volatile)))
+       "oo\\+"))
+
+   ))
 
 
 (provide 'anything)
