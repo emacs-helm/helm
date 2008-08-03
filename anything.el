@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.20 2008-08-03 20:47:56 rubikitch Exp $
+;; $Id: anything.el,v 1.21 2008-08-03 22:05:08 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.20  2008-08-03 20:47:56  rubikitch
+;; Revision 1.21  2008-08-03 22:05:08  rubikitch
+;; `anything-candidates-buffer': Return a buffer containing candidates of current source.
+;;
+;; Revision 1.20  2008/08/03 20:47:56  rubikitch
 ;; `anything-current-buffer-is-modified': modify checker
 ;;
 ;; Revision 1.19  2008/08/03 19:06:18  rubikitch
@@ -639,6 +642,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-test-mode nil)
 (defvar anything-buffer-chars-modified-tick 0)
 (make-variable-buffer-local 'anything-buffer-chars-modified-tick)
+(defvar anything-source-name nil)
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -759,7 +763,9 @@ the current pattern."
 
     (let* ((transformer (assoc-default 'filtered-candidate-transformer source)))
       (if transformer
-          (setq matches (funcall transformer matches source))))
+          (setq matches
+                (let ((anything-source-name (assoc-default 'name source)))
+                  (funcall transformer matches source)))))
     matches))
 
 (defun anything-process-source (source)
@@ -949,8 +955,9 @@ action."
 (defun anything-funcall-inits ()
   (dolist (source (anything-get-sources))
     (let ((init (assoc-default 'init source)))
-      (if init
-          (funcall init)))))
+      (when init
+        (let ((anything-source-name (assoc-default 'name source)))
+          (funcall init))))))
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
@@ -1168,7 +1175,8 @@ SOURCE."
   (let* ((candidate-source (assoc-default 'candidates source))
          (candidates
           (if (functionp candidate-source)
-              (funcall candidate-source)
+              (let ((anything-source-name (assoc-default 'name source)))
+                (funcall candidate-source))
             (if (listp candidate-source)
                 candidate-source
               (if (and (symbolp candidate-source)
@@ -1186,7 +1194,8 @@ SOURCE."
   "Transform CANDIDATES according to candidate transformers."
   (let* ((transformer (assoc-default 'candidate-transformer source)))
     (if transformer
-        (funcall transformer candidates)
+        (let ((anything-source-name (assoc-default 'name source)))
+          (funcall transformer candidates))
       candidates)))
 
 
@@ -1248,6 +1257,19 @@ re-search-forward or search-forward.
   (with-current-buffer anything-current-buffer
     (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
 
+(defun anything-candidates-buffer (&optional buffer-local op)
+  "Return a buffer containing candidates of current source."
+  (with-current-buffer (get-buffer-create
+                        (format " *anything candidates:%s*%s" anything-source-name
+                                (if buffer-local
+                                    (buffer-name anything-current-buffer)
+                                  "")))
+    (when (eq op 'create)
+      (buffer-disable-undo)
+      (erase-buffer)
+      (font-lock-mode -1))
+    (current-buffer)))
+      
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -2101,6 +2123,75 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (insert "1")
           (anything-test-candidates sources "")
           (anything-test-candidates sources ""))))
+    (desc "anything-source-name")
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda () (setq v anything-source-name)))
+                                     (candidates "ok")))
+                                  "")
+        v))
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates
+                                      . (lambda ()
+                                          (setq v anything-source-name)
+                                          '("ok")))))
+                                  "")
+        v))
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates "ok")
+                                     (candidate-transformer
+                                      . (lambda (c) (setq v anything-source-name)))))
+                                  "")
+        v))
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates "ok")
+                                     (filtered-candidate-transformer
+                                      . (lambda (c s) (setq v anything-source-name)))))
+                                  "")
+        v))
+    (desc "anything-candidates-buffer")
+    (expect '(("FOO" (" *anything candidates:FOO*")))
+      (anything-test-candidates
+       '(((name . "FOO")
+          (candidates
+           . (lambda ()
+               (let ((buf (anything-candidates-buffer)))
+                 (prog1
+                     (list (buffer-name buf))
+                   (kill-buffer buf)))))))
+       ""))
+    (expect '(("FOO" (" *anything candidates:FOO*aTestBuffer")))
+      (with-current-buffer (get-buffer-create "aTestBuffer")
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates
+             . (lambda ()
+                 (let ((buf (anything-candidates-buffer t)))
+                   (prog1
+                       (list (buffer-name buf))
+                     (kill-buffer buf)))))))
+         "")))
+    (expect '(("FOO" ("0")))
+      (with-current-buffer (get-buffer-create "aTestBuffer")
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates
+             . (lambda ()
+                 (with-current-buffer (anything-candidates-buffer)
+                   (insert "1"))
+                 (with-current-buffer (anything-candidates-buffer nil 'create)
+                     (prog1
+                         (list (int-to-string (buffer-size (current-buffer))))
+                       (kill-buffer (current-buffer))))))))
+           "")))
 
     ))
 
