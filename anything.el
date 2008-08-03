@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.19 2008-08-03 19:06:18 rubikitch Exp $
+;; $Id: anything.el,v 1.20 2008-08-03 20:47:56 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.19  2008-08-03 19:06:18  rubikitch
+;; Revision 1.20  2008-08-03 20:47:56  rubikitch
+;; `anything-current-buffer-is-modified': modify checker
+;;
+;; Revision 1.19  2008/08/03 19:06:18  rubikitch
 ;; `anything-candidates-in-buffer': use `with-current-buffer' instead.
 ;;
 ;; Revision 1.18  2008/08/03 05:55:01  rubikitch
@@ -634,6 +637,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 ;; internal variables
 (defvar anything-test-candidate-list nil)
 (defvar anything-test-mode nil)
+(defvar anything-buffer-chars-modified-tick 0)
+(make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -951,6 +956,7 @@ action."
   "Initialize anything settings and set up the anything buffer."
   (setq anything-current-buffer (current-buffer))
   (setq anything-current-position (cons (point) (window-start)))
+
   ;; Call the init function for sources where appropriate
   (anything-funcall-inits)
 
@@ -965,30 +971,31 @@ action."
     (setq cursor-type nil)
     (setq mode-name "Anything"))
 
-  (if anything-selection-overlay
-      ;; make sure the overlay belongs to the anything buffer if
-      ;; it's newly created
-      (move-overlay anything-selection-overlay (point-min) (point-min)
-                    (get-buffer anything-buffer))
+  (unless anything-test-mode
+    (if anything-selection-overlay
+        ;; make sure the overlay belongs to the anything buffer if
+        ;; it's newly created
+        (move-overlay anything-selection-overlay (point-min) (point-min)
+                      (get-buffer anything-buffer))
 
-    (setq anything-selection-overlay 
-          (make-overlay (point-min) (point-min) (get-buffer anything-buffer)))
-    (overlay-put anything-selection-overlay 'face 'highlight))
+      (setq anything-selection-overlay 
+            (make-overlay (point-min) (point-min) (get-buffer anything-buffer)))
+      (overlay-put anything-selection-overlay 'face 'highlight))
 
-  (if anything-enable-digit-shortcuts
-      (unless anything-digit-overlays
-        (dotimes (i 9)
-          (push (make-overlay (point-min) (point-min)
-                              (get-buffer anything-buffer))
-                anything-digit-overlays)
-          (overlay-put (car anything-digit-overlays)
-                       'before-string (concat (int-to-string (1+ i)) " - ")))
-        (setq anything-digit-overlays (nreverse anything-digit-overlays)))
+    (if anything-enable-digit-shortcuts
+        (unless anything-digit-overlays
+          (dotimes (i 9)
+            (push (make-overlay (point-min) (point-min)
+                                (get-buffer anything-buffer))
+                  anything-digit-overlays)
+            (overlay-put (car anything-digit-overlays)
+                         'before-string (concat (int-to-string (1+ i)) " - ")))
+          (setq anything-digit-overlays (nreverse anything-digit-overlays)))
 
-    (when anything-digit-overlays
-      (dolist (overlay anything-digit-overlays)
-        (delete-overlay overlay))
-      (setq anything-digit-overlays nil))))
+      (when anything-digit-overlays
+        (dolist (overlay anything-digit-overlays)
+          (delete-overlay overlay))
+        (setq anything-digit-overlays nil)))))
 
 
 (defun anything-cleanup ()
@@ -998,6 +1005,8 @@ action."
       (setq anything-sources anything-saved-sources))
   (with-current-buffer anything-buffer
     (setq cursor-type t))
+  (with-current-buffer anything-current-buffer
+    (setq anything-buffer-chars-modified-tick (buffer-chars-modified-tick)))
   (bury-buffer anything-buffer)
   (anything-kill-async-processes))
 
@@ -1233,6 +1242,12 @@ re-search-forward or search-forward.
           unless (eobp)
           collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
           do (forward-line 1))))
+
+(defun anything-current-buffer-is-modified ()
+  "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
+  (with-current-buffer anything-current-buffer
+    (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
+
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -1885,14 +1900,16 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
   (let ((anything-test-mode t)
         (anything-sources
          (mapcar (lambda (source) (cons '(volatile) source)) sources))
-        (anything-input input)
-        (anything-pattern input)
         anything-update-hook
         anything-test-candidate-list)
+    (anything-initialize)
+    (setq anything-input input anything-pattern input)
     (get-buffer-create anything-buffer)
     (anything-funcall-inits)
     (anything-update)
-    anything-test-candidate-list))
+    (prog1
+        anything-test-candidate-list
+      (anything-cleanup))))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
@@ -2049,8 +2066,43 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (match identity)
           (volatile)))
        "oo\\+"))
+    (desc "anything-current-buffer-is-modified")
+    (expect nil
+      (with-temp-buffer
+        (insert "1")
+        (setq anything-current-buffer (current-buffer))
+        (anything-cleanup)
+        (anything-current-buffer-is-modified)))
+    (expect t
+      (with-temp-buffer
+        (insert "1")
+        (setq anything-current-buffer (current-buffer))
+        (anything-cleanup)
+        (insert "2")
+        (anything-current-buffer-is-modified)))
+    (expect '(("FOO" ("modified")))
+      (let ((sources '(((name . "FOO")
+                        (candidates
+                         . (lambda ()
+                             (if (anything-current-buffer-is-modified)
+                                 '("modified")
+                               '("unmodified"))))))))
+        (with-temp-buffer
+          (insert "1")
+          (anything-test-candidates sources ""))))
+    (expect '(("FOO" ("unmodified")))
+      (let ((sources '(((name . "FOO")
+                        (candidates
+                         . (lambda ()
+                             (if (anything-current-buffer-is-modified)
+                                 '("modified")
+                               '("unmodified"))))))))
+        (with-temp-buffer
+          (insert "1")
+          (anything-test-candidates sources "")
+          (anything-test-candidates sources ""))))
 
-   ))
+    ))
 
 
 (provide 'anything)
