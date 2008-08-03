@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.18 2008-08-03 05:55:01 rubikitch Exp $
+;; $Id: anything.el,v 1.19 2008-08-03 19:06:18 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.18  2008-08-03 05:55:01  rubikitch
+;; Revision 1.19  2008-08-03 19:06:18  rubikitch
+;; `anything-candidates-in-buffer': use `with-current-buffer' instead.
+;;
+;; Revision 1.18  2008/08/03 05:55:01  rubikitch
 ;; `anything-candidates-in-buffer': extract candidates in a buffer for speed.
 ;;
 ;; Revision 1.17  2008/08/02 21:31:29  rubikitch
@@ -1223,13 +1226,13 @@ called with two arguments:point of line-beginning and point of line-end.
 SEARCH-FN (default: re-search-forward) specifies a search function:
 re-search-forward or search-forward.
 "
-  (set-buffer buffer)
-  (goto-char (point-min))
-  (loop while (funcall search-fn anything-pattern nil t)
-        for i from 1 to anything-candidate-number-limit
-        unless (eobp)
-        collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-        do (forward-line 1)))
+  (with-current-buffer buffer
+    (goto-char (point-min))
+    (loop while (funcall search-fn anything-pattern nil t)
+          for i from 1 to anything-candidate-number-limit
+          unless (eobp)
+          collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+          do (forward-line 1))))
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
