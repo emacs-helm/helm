@@ -701,16 +701,24 @@ use."
                                   (anything-c-external-commands-list-1))
                  file))
 
-(defun anything-c-open-with-default-tool (file)
+(defun w32-shell-execute-open-file (file)
+  (interactive "fOpen file:")
+  (w32-shell-execute "open" (replace-regexp-in-string ;for UNC paths
+                             "/" "\\"
+                             (replace-regexp-in-string ; strip cygdrive paths
+                              "/cygdrive/\\(.\\)" "\\1:" file nil nil) nil t)))
+(defun anything-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
-  (start-process "anything-c-open-file-with-default-tool"
-                 nil
-                 (cond ((eq system-type 'gnu/linux)
-                        "xdg-open")
-                       ((or (eq system-type 'darwin)  ;; Mac OS X
-                            (eq system-type 'macos))  ;; Mac OS 9
-                        "open"))
-                 file))
+  (if (eq system-type 'windows-nt)
+      (w32-shell-execute-open-file file)
+    (start-process "anything-c-open-file-with-default-tool"
+                   nil
+                   (cond ((eq system-type 'gnu/linux)
+                          "xdg-open")
+                         ((or (eq system-type 'darwin)  ;; Mac OS X
+                              (eq system-type 'macos))  ;; Mac OS 9
+                          "open"))
+                   file)))
 
 (defun anything-c-open-dired (file)
   "Opens a dired buffer in FILE's directory.  If FILE is a
