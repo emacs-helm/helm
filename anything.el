@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.21 2008-08-03 22:05:08 rubikitch Exp $
+;; $Id: anything.el,v 1.22 2008-08-04 00:10:13 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.21  2008-08-03 22:05:08  rubikitch
+;; Revision 1.22  2008-08-04 00:10:13  rubikitch
+;; `anything-candidates-buffer': new API
+;;
+;; Revision 1.21  2008/08/03 22:05:08  rubikitch
 ;; `anything-candidates-buffer': Return a buffer containing candidates of current source.
 ;;
 ;; Revision 1.20  2008/08/03 20:47:56  rubikitch
@@ -101,7 +104,7 @@
 ;; `anything-resume' is usable with other (let-binded) `anything-sources'.
 ;;
 ;; Revision 1.10  2008/08/01 19:44:01  rubikitch
-;; `anything-resume': resurrct previously invoked `anything'.
+;; `anything-resume': resurrect previously invoked `anything'.
 ;;
 ;; Revision 1.9  2008/07/30 15:44:49  rubikitch
 ;; *** empty log message ***
@@ -1227,13 +1230,15 @@ Cache the candidates if there is not yet a cached value."
 
     candidates))
 
-(defun* anything-candidates-in-buffer (buffer &optional (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
+(defun* anything-candidates-in-buffer (&optional (buffer (anything-candidates-buffer)) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
   "Get candidates in BUFFER. Especially fast for many (1000+) candidates.
 This function should be used in `candidates' of `anything-sources'.
 
 eg.
  '((name . \"many candidates\")
-   (candidates . (lambda () (anything-candidates-in-buffer candidate-buffer)))
+   (init . (lambda () (with-current-buffer (anything-candidates-buffer t)
+                        (insert-many-text))))
+   (candidates . anything-candidates-in-buffer)
    (volatile)
    (match identity))
 
@@ -1244,31 +1249,38 @@ called with two arguments:point of line-beginning and point of line-end.
 SEARCH-FN (default: re-search-forward) specifies a search function:
 re-search-forward or search-forward.
 "
-  (with-current-buffer buffer
-    (goto-char (point-min))
-    (loop while (funcall search-fn anything-pattern nil t)
-          for i from 1 to anything-candidate-number-limit
-          unless (eobp)
-          collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-          do (forward-line 1))))
+  ;; buffer == nil when candidates buffer does not exist.
+  (when buffer
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (loop while (funcall search-fn anything-pattern nil t)
+            for i from 1 to anything-candidate-number-limit
+            unless (eobp)
+            collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+            do (forward-line 1)))))
 
 (defun anything-current-buffer-is-modified ()
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
   (with-current-buffer anything-current-buffer
     (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
 
-(defun anything-candidates-buffer (&optional buffer-local op)
-  "Return a buffer containing candidates of current source."
-  (with-current-buffer (get-buffer-create
-                        (format " *anything candidates:%s*%s" anything-source-name
-                                (if buffer-local
-                                    (buffer-name anything-current-buffer)
-                                  "")))
-    (when (eq op 'create)
-      (buffer-disable-undo)
-      (erase-buffer)
-      (font-lock-mode -1))
-    (current-buffer)))
+(defun anything-candidates-buffer (&optional create)
+  "Return a buffer containing candidates of current source.
+`anything-candidates-buffer' searches buffer-local candidates buffer first,
+then global candidates buffer.
+
+If CREATE is non-nil, create a new candidates buffer:
+If CREATE is 'local, create a buffer-local candidates buffer, otherwise global one."
+  (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
+         (lbufname (concat gbufname (buffer-name anything-current-buffer))))
+    (when create
+      (with-current-buffer (get-buffer-create
+                            (if (eq create 'local) lbufname gbufname))
+        (buffer-disable-undo)
+        (erase-buffer)
+        (font-lock-mode -1)))
+    (or (get-buffer lbufname)
+        (get-buffer gbufname))))
       
 
 (defun anything-output-filter (process string)
@@ -2032,6 +2044,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                     . (lambda (cands src) (mapcar 'upcase cands)))))
                                 "ar"))
     (desc "anything-candidates-in-buffer")
+    (expect nil
+      (anything-candidates-in-buffer nil))
     (expect '("foo+" "bar+" "baz+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
@@ -2157,42 +2171,42 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                       . (lambda (c s) (setq v anything-source-name)))))
                                   "")
         v))
-    (desc "anything-candidates-buffer")
-    (expect '(("FOO" (" *anything candidates:FOO*")))
-      (anything-test-candidates
-       '(((name . "FOO")
-          (candidates
-           . (lambda ()
-               (let ((buf (anything-candidates-buffer)))
-                 (prog1
-                     (list (buffer-name buf))
-                   (kill-buffer buf)))))))
-       ""))
-    (expect '(("FOO" (" *anything candidates:FOO*aTestBuffer")))
-      (with-current-buffer (get-buffer-create "aTestBuffer")
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates
-             . (lambda ()
-                 (let ((buf (anything-candidates-buffer t)))
-                   (prog1
-                       (list (buffer-name buf))
-                     (kill-buffer buf)))))))
-         "")))
-    (expect '(("FOO" ("0")))
-      (with-current-buffer (get-buffer-create "aTestBuffer")
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates
-             . (lambda ()
-                 (with-current-buffer (anything-candidates-buffer)
-                   (insert "1"))
-                 (with-current-buffer (anything-candidates-buffer nil 'create)
-                     (prog1
-                         (list (int-to-string (buffer-size (current-buffer))))
-                       (kill-buffer (current-buffer))))))))
-           "")))
-
+    (desc "anything-candidates-buffer create")
+    (expect " *anything candidates:FOO*"
+      (let* ((anything-source-name "FOO")
+             (buf (anything-candidates-buffer t)))
+        (prog1 (buffer-name buf)
+          (kill-buffer buf))))
+    (expect " *anything candidates:FOO*aTestBuffer"
+      (let* ((anything-source-name "FOO")
+             (anything-current-buffer (get-buffer-create "aTestBuffer"))
+             (buf (anything-candidates-buffer 'local)))
+        (prog1 (buffer-name buf)
+          (kill-buffer anything-current-buffer)
+          (kill-buffer buf))))
+    (expect 0
+      (let ((anything-source-name "FOO") buf)
+        (with-current-buffer  (anything-candidates-buffer t)
+          (insert "1"))
+        (setq buf  (anything-candidates-buffer t))
+        (prog1 (buffer-size buf)
+          (kill-buffer buf))))
+    (desc "anything-candidates-buffer get-buffer")
+    (expect " *anything candidates:FOO*"
+      (let* ((anything-source-name "FOO")
+             (buf (anything-candidates-buffer t)))
+        (prog1 (buffer-name (anything-candidates-buffer))
+          (kill-buffer buf))))
+    (expect " *anything candidates:FOO*aTestBuffer"
+      (let* ((anything-source-name "FOO")
+             (anything-current-buffer (get-buffer-create "aTestBuffer"))
+             (buf (anything-candidates-buffer 'local)))
+        (prog1 (buffer-name (anything-candidates-buffer))
+          (kill-buffer anything-current-buffer)
+          (kill-buffer buf))))
+    (expect nil
+      (let* ((anything-source-name "NOP__"))
+        (anything-candidates-buffer)))
     ))
 
 
