@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.23 2008-08-04 05:29:46 rubikitch Exp $
+;; $Id: anything.el,v 1.24 2008-08-04 12:05:41 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -51,6 +51,40 @@
 ;; Thanks to Drew Adams for various fixes (frame, isearch, customization, etc.)
 ;;
 
+;;; Tips:
+
+;;
+;; Using `anything-candidates-buffer' and
+;; `anything-candidates-in-buffer' gets much speed than old-fashioned
+;; `candidates' and `match' way. See docstring of them.
+
+;; [EVAL IT] (describe-function 'anything-candidates-buffer)
+;; [EVAL IT] (describe-function 'anything-candidates-in-buffer)
+
+;;
+;; `anything-current-buffer' and `anything-buffer-file-name' stores
+;; `(current-buffer)' and `buffer-file-name' in the buffer `anything'
+;; is invoked. Use them freely.
+
+;; [EVAL IT] (describe-variable 'anything-current-buffer)
+;; [EVAL IT] (describe-variable 'anything-buffer-file-name)
+
+;;
+;; Use `anything-test-candidates' to test your handmade anything
+;; sources. It simulates contents of *anything* buffer with pseudo
+;; `anything-sources' and `anything-pattern', without side-effect. So
+;; you can unit-test your anything sources! Let's TDD!
+
+;; [EVAL IT] (describe-function 'anything-test-candidates)
+
+;; There are many unit-testing framework in Emacs Lisp. See the EmacsWiki.
+;; http://www.emacswiki.org/cgi-bin/emacs/UnitTesting
+
+;; There is an unit-test by Emacs Lisp Expectations at the tail of this file.
+;; http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el
+;; http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el
+
+
 ;; TODO:
 ;;
 ;;   - process status indication
@@ -65,7 +99,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.23  2008-08-04 05:29:46  rubikitch
+;; Revision 1.24  2008-08-04 12:05:41  rubikitch
+;; Wrote Tips and some docstrings.
+;; `anything-candidates-buffer': buffer-local by default
+;;
+;; Revision 1.23  2008/08/04 05:29:46  rubikitch
 ;; `anything-buffer-file-name': `buffer-file-name' when `anything' is invoked.
 ;;
 ;; Revision 1.22  2008/08/04 00:10:13  rubikitch
@@ -1238,8 +1276,11 @@ Cache the candidates if there is not yet a cached value."
     candidates))
 
 (defun* anything-candidates-in-buffer (&optional (buffer (anything-candidates-buffer)) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
-  "Get candidates in BUFFER. Especially fast for many (1000+) candidates.
-This function should be used in `candidates' of `anything-sources'.
+  "Get candidates in BUFFER according to `anything-pattern'.
+BUFFER is `anything-candidates-buffer' by default.
+Each candidate must be placed in one line.
+This function is meant to be used in `candidates' of an anything source.
+Especially fast for many (1000+) candidates.
 
 eg.
  '((name . \"many candidates\")
@@ -1255,6 +1296,35 @@ called with two arguments:point of line-beginning and point of line-end.
 
 SEARCH-FN (default: re-search-forward) specifies a search function:
 re-search-forward or search-forward.
+
++===============================================================+
+| The new way of making and narrowing candidates: Using buffers |
++===============================================================+
+By default, `anything' makes candidates by evaluating a function
+specified by `candidates' attribute in an anything source, then
+narrows them by `string-match' for each candidate.
+
+But this way is very slow for many candidates. The new way is
+storing all candidates in a buffer and narrowing them by
+`re-search-forward'. The important point is that buffer processing
+is MUCH FASTER than string list processing and is the Emacs-ish way.
+
+The `init' function writes all candidates in a newly-created candidate buffer.
+The candidates buffer is created by `anything-candidates-buffer'.
+Candidates are stored in a line.
+
+The `candidates' function narrows candidates. It is the task of
+`anything-candidates-in-buffer'.
+If `anything-candidates-buffer' is used, normally 
+`(candidates . anything-candidates-in-buffer)' is sufficient.
+
+Be sure to specify `(volatile)' to an anything source!
+The `volatile' attribute is needed because `anything-candidates-in-buffer'
+creates candidates dynamically and need to be called everytime
+`anything-pattern' changes.
+
+Because `anything-candidates-in-buffer' plays the role of `match' attribute
+function, specifying `(match identity)' makes the source slightly faster.
 "
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
@@ -1277,12 +1347,12 @@ re-search-forward or search-forward.
 then global candidates buffer.
 
 If CREATE is non-nil, create a new candidates buffer:
-If CREATE is 'local, create a buffer-local candidates buffer, otherwise global one."
+If CREATE is 'global, create a global candidates buffer, otherwise buffer-local one."
   (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
          (lbufname (concat gbufname (buffer-name anything-current-buffer))))
     (when create
       (with-current-buffer (get-buffer-create
-                            (if (eq create 'local) lbufname gbufname))
+                            (if (eq create 'global) gbufname lbufname))
         (buffer-disable-undo)
         (erase-buffer)
         (font-lock-mode -1)))
@@ -2195,7 +2265,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (desc "anything-candidates-buffer create")
     (expect " *anything candidates:FOO*"
       (let* ((anything-source-name "FOO")
-             (buf (anything-candidates-buffer t)))
+             (buf (anything-candidates-buffer 'global)))
         (prog1 (buffer-name buf)
           (kill-buffer buf))))
     (expect " *anything candidates:FOO*aTestBuffer"
@@ -2207,15 +2277,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (kill-buffer buf))))
     (expect 0
       (let ((anything-source-name "FOO") buf)
-        (with-current-buffer  (anything-candidates-buffer t)
+        (with-current-buffer  (anything-candidates-buffer 'global)
           (insert "1"))
-        (setq buf  (anything-candidates-buffer t))
+        (setq buf  (anything-candidates-buffer 'global))
         (prog1 (buffer-size buf)
           (kill-buffer buf))))
     (desc "anything-candidates-buffer get-buffer")
     (expect " *anything candidates:FOO*"
       (let* ((anything-source-name "FOO")
-             (buf (anything-candidates-buffer t)))
+             (buf (anything-candidates-buffer 'global)))
         (prog1 (buffer-name (anything-candidates-buffer))
           (kill-buffer buf))))
     (expect " *anything candidates:FOO*aTestBuffer"
