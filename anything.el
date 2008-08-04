@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.22 2008-08-04 00:10:13 rubikitch Exp $
+;; $Id: anything.el,v 1.23 2008-08-04 05:29:46 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -65,7 +65,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.22  2008-08-04 00:10:13  rubikitch
+;; Revision 1.23  2008-08-04 05:29:46  rubikitch
+;; `anything-buffer-file-name': `buffer-file-name' when `anything' is invoked.
+;;
+;; Revision 1.22  2008/08/04 00:10:13  rubikitch
 ;; `anything-candidates-buffer': new API
 ;;
 ;; Revision 1.21  2008/08/03 22:05:08  rubikitch
@@ -628,6 +631,9 @@ anything completions with \.")
 (defvar anything-current-buffer nil
   "Current buffer when `anything' is invoked.")
 
+(defvar anything-buffer-file-name nil
+  "`buffer-file-name' when `anything' is invoked.")
+
 (defvar anything-current-position nil
   "Cons of (point) and (window-start) when `anything' is invoked.
 It is needed because restoring position when `anything' is keyboard-quitted.")
@@ -965,6 +971,7 @@ action."
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
   (setq anything-current-buffer (current-buffer))
+  (setq anything-buffer-file-name buffer-file-name)
   (setq anything-current-position (cons (point) (window-start)))
 
   ;; Call the init function for sources where appropriate
@@ -1950,6 +1957,20 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
 (when (fboundp 'expectations)
   (expectations
+    (desc "anything-current-buffer")
+    (expect "__a_buffer"
+      (with-current-buffer (get-buffer-create "__a_buffer")
+        (anything-test-candidates nil "")
+        (prog1
+            (buffer-name anything-current-buffer)
+          (kill-buffer (current-buffer)))))
+    (desc "anything-buffer-file-name")
+    (expect (regexp "/__a_file__")
+      (with-current-buffer (find-file-noselect "__a_file__")
+        (anything-test-candidates nil "")
+        (prog1
+            anything-buffer-file-name
+          (kill-buffer (current-buffer)))))
     (desc "anything-get-sources")
     (expect '(((name . "foo")))
       (let ((anything-sources '(((name . "foo")))))
@@ -2207,6 +2228,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (expect nil
       (let* ((anything-source-name "NOP__"))
         (anything-candidates-buffer)))
+
     ))
 
 
