@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.26 2008-08-05 08:35:45 rubikitch Exp $
+;; $Id: anything.el,v 1.27 2008-08-05 17:29:40 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.26  2008-08-05 08:35:45  rubikitch
+;; Revision 1.27  2008-08-05 17:29:40  rubikitch
+;; update doc
+;;
+;; Revision 1.26  2008/08/05 08:35:45  rubikitch
 ;; `anything-completing-read': accept obarray
 ;;
 ;; Revision 1.25  2008/08/05 07:26:17  rubikitch
@@ -1306,23 +1309,25 @@ re-search-forward or search-forward.
 +===============================================================+
 | The new way of making and narrowing candidates: Using buffers |
 +===============================================================+
-By default, `anything' makes candidates by evaluating a function
-specified by `candidates' attribute in an anything source, then
-narrows them by `string-match' for each candidate.
+
+By default, `anything' makes candidates by evaluating the
+ candidates function, then narrows them by `string-match' for
+ each candidate.
 
 But this way is very slow for many candidates. The new way is
 storing all candidates in a buffer and narrowing them by
 `re-search-forward'. The important point is that buffer processing
 is MUCH FASTER than string list processing and is the Emacs-ish way.
 
-The `init' function writes all candidates in a newly-created candidate buffer.
-The candidates buffer is created by `anything-candidates-buffer'.
-Candidates are stored in a line.
+The init function writes all candidates in a newly-created
+candidate buffer.  The candidates buffer is created by
+`anything-candidates-buffer'.  Candidates are stored in a line.
 
-The `candidates' function narrows candidates. It is the task of
-`anything-candidates-in-buffer'.
-If `anything-candidates-buffer' is used, normally 
-`(candidates . anything-candidates-in-buffer)' is sufficient.
+The candidates function narrows all candidates, IOW creates
+subset of candidates dynamically. It is the task of
+`anything-candidates-in-buffer'.  If `anything-candidates-buffer'
+is used, normally `(candidates . anything-candidates-in-buffer)'
+is sufficient.
 
 Be sure to specify `(volatile)' to an anything source!
 The `volatile' attribute is needed because `anything-candidates-in-buffer'
