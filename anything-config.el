@@ -162,6 +162,30 @@ buffer."
     (volatile)
     (type . buffer)))
 
+(defun anything-c-define-dummy-source (name func &rest other-attrib)
+  `((name . ,name)
+    (candidates "dummy")
+    ,@other-attrib
+    (filtered-candidate-transformer
+     . (lambda (candidates source)
+         (funcall ',func)))
+    (requires-pattern . 1)
+    (volatile)
+    (category create)))
+
+(defun anything-c-dummy-candidate ()
+  ;; `source' is defined in filtered-candidate-transformer
+  (list (cons (concat (assoc-default 'name source) 
+                      " '" anything-input "'")
+              anything-input)))
+
+(defvar anything-c-source-buffer-not-found
+  (anything-c-define-dummy-source
+   "Create buffer"
+   (lambda () (unless (get-buffer anything-input)
+                (anything-c-dummy-candidate)))
+   '(type . buffer)))
+
 ;;;; File name history
 
 (defvar anything-c-source-file-name-history
@@ -1034,6 +1058,7 @@ This function allows easy sequencing of transformer functions."
 
 (setq anything-sources
       (list anything-c-source-buffers
+            anything-c-source-buffer-not-found
             anything-c-source-file-name-history
             anything-c-source-info-pages
             anything-c-source-man-pages
