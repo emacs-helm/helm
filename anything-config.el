@@ -783,9 +783,9 @@ evaluate it and put it onto the `command-history'."
 (defvar anything-c-boring-file-regexp
   (rx (or
        ;; Boring directories
-       (and "/" (or ".svn" "CVS" "_darcs" ".git") (or "/" eol))
+       (and "/" (or ".svn" "CVS" "_darcs" ".git" ".hg") (or "/" eol))
        ;; Boring files
-       (and (or ".class" ".la" ".o") eol)))
+       (and (or ".class" ".la" ".o" "~") eol)))
   "File candidates matching this regular expression will be
 filtered from the list of candidates if the
 `anything-c-skip-boring-files' candidate transformer is used, or
@@ -814,6 +814,16 @@ skipped."
           do (when (not (string-match anything-c-boring-file-regexp file))
                (push file filtered-files))
           finally (return (nreverse filtered-files)))))
+
+(defun anything-c-windows-pathname-transformer (args)
+  "Change undesirable features of windows pathnames to ones more acceptable to
+other candidate transformers."
+  (if (eq system-type 'windows-nt)
+          (mapcar (lambda (x)
+                    (replace-regexp-in-string "/cygdrive/\\(.\\)" "\\1:" x))
+                  (mapcar (lambda (y)
+                            (replace-regexp-in-string "\\\\" "/" y)) args))))
+            
 
 (defun anything-c-shorten-home-path (files)
   "Replaces /home/user with ~."
@@ -1063,7 +1073,8 @@ This function allows easy sequencing of transformer functions."
          (candidate-transformer . (lambda (candidates)
                                     (anything-c-compose
                                      (list candidates)
-                                     '(anything-c-shadow-boring-files
+                                     '(anything-c-windows-pathname-transformer
+                                       anything-c-skip-boring-files
                                        anything-c-shorten-home-path)))))
         (command (action ("Call interactively" . (lambda (command-name)
                                                    (call-interactively (intern command-name))))
