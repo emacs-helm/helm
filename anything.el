@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.24 2008-08-04 12:05:41 rubikitch Exp $
+;; $Id: anything.el,v 1.25 2008-08-05 07:26:17 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.24  2008-08-04 12:05:41  rubikitch
+;; Revision 1.25  2008-08-05 07:26:17  rubikitch
+;; `anything-completing-read': guard from non-string return value
+;;
+;; Revision 1.24  2008/08/04 12:05:41  rubikitch
 ;; Wrote Tips and some docstrings.
 ;; `anything-candidates-buffer': buffer-local by default
 ;;
@@ -1911,8 +1914,7 @@ shown yet and bind anything commands in iswitchb."
 
 (defun anything-dummy-candidate ()
   ;; `source' is defined in filtered-candidate-transformer
-  (list (cons (concat (assoc-default 'name source) 
-                      " '" anything-pattern "'")
+  (list (cons (concat "New input: " anything-pattern)
               anything-pattern))) 
 
 ;;----------------------------------------------------------------------
@@ -1923,11 +1925,11 @@ shown yet and bind anything commands in iswitchb."
                           prompt collection predicate require-match initial
                           hist default inherit-input-method)
                          initial prompt)))
-    (prog1 result
-      (add-to-list (or hist 'minibuffer-history) result))))
+    (when (stringp result)
+      (prog1 result
+        (add-to-list (or hist 'minibuffer-history) result)))))
 
-
-(defun anything-completing-read-sources (prompt collection &optional predicate require-match initial hist default inherit-input-method)
+(defun anything-completing-read-sources (prompt collection predicate require-match initial hist default inherit-input-method)
   "`anything' replacement for `completing-read'."
   (let ((transformer-func
          (if predicate
@@ -1949,15 +1951,16 @@ shown yet and bind anything commands in iswitchb."
                                  (if (string= anything-pattern "")  cands nil)))
                             (action . identity)))))
   `(,default-source
-    ((name . "completing-read")
+    ((name . "Completions")
      (candidates . ,collection)
      (action . identity)
      ,transformer-func)
     ,history-source
     ,new-input-source)))
-
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
+;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil)
+;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
 ;; (anything-completing-read "Test: " '("hoge" "foo" "bar"))
 ;; (anything-completing-read-sources "Test: " '(("hoge")("foo")("bar")))
