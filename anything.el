@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.32 2008-08-05 21:42:15 rubikitch Exp $
+;; $Id: anything.el,v 1.33 2008-08-05 23:14:20 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.32  2008-08-05 21:42:15  rubikitch
+;; Revision 1.33  2008-08-05 23:14:20  rubikitch
+;; `anything-candidates-buffer': bugfix
+;;
+;; Revision 1.32  2008/08/05 21:42:15  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.31  2008/08/05 21:06:23  rubikitch
@@ -1075,7 +1078,6 @@ action."
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
   (setq anything-current-position (cons (point) (window-start)))
-  (setq anything-candidates-buffer-alist nil)
   (setq anything-compiled-sources nil)
   (setq anything-saved-sources nil)
   ;; Call the init function for sources where appropriate
@@ -1435,20 +1437,21 @@ Acceptable values of CREATE-OR-BUFFER:
   Create a new global candidates buffer,
   named \" *anything candidates:SOURCE*ANYTHING-CURRENT-BUFFER\".
 "
-  (when create-or-buffer
-    (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
-           (lbufname (concat gbufname (buffer-name anything-current-buffer)))
-           (buf (if (bufferp create-or-buffer)
-                    create-or-buffer
-                  (with-current-buffer
-                      (get-buffer-create
-                       (if (eq create-or-buffer 'global) gbufname lbufname))
-                    (buffer-disable-undo)
-                    (erase-buffer)
-                    (font-lock-mode -1)
-                    (current-buffer)))))
-      (add-to-list 'anything-candidates-buffer-alist (cons anything-source-name buf))))
-    (assoc-default anything-source-name anything-candidates-buffer-alist))
+  (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
+         (lbufname (concat gbufname (buffer-name anything-current-buffer)))
+         buf)
+    (when create-or-buffer
+      (if (bufferp create-or-buffer)
+          (add-to-list 'anything-candidates-buffer-alist
+                       (cons anything-source-name create-or-buffer))
+        (with-current-buffer
+            (get-buffer-create (if (eq create-or-buffer 'global) gbufname lbufname))
+          (buffer-disable-undo)
+          (erase-buffer)
+          (font-lock-mode -1))))
+    (or (get-buffer lbufname)
+        (get-buffer gbufname)
+        (assoc-default anything-source-name anything-candidates-buffer-alist))))
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
