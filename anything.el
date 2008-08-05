@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.27 2008-08-05 17:29:40 rubikitch Exp $
+;; $Id: anything.el,v 1.28 2008-08-05 17:46:04 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.27  2008-08-05 17:29:40  rubikitch
+;; Revision 1.28  2008-08-05 17:46:04  rubikitch
+;; memoized `anything-get-sources'
+;;
+;; Revision 1.27  2008/08/05 17:29:40  rubikitch
 ;; update doc
 ;;
 ;; Revision 1.26  2008/08/05 08:35:45  rubikitch
@@ -699,6 +702,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-buffer-chars-modified-tick 0)
 (make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 (defvar anything-source-name nil)
+(defvar anything-compiled-sources nil)
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -765,15 +769,22 @@ the current pattern."
 (defun anything-get-sources ()
   "Return `anything-sources' with the attributes from
   `anything-type-attributes' merged in."
-  (mapcar (lambda (source)
-            (let* ((source (if (listp source)
-                               source
-                             (symbol-value source)))
-                   (type (assoc-default 'type source)))
-              (if type
-                  (append source (assoc-default type anything-type-attributes) nil)
-                source)))
-          anything-sources))
+  (cond ;; action
+        (anything-saved-sources
+         anything-sources)
+        ;; memoized
+        (anything-compiled-sources)
+        (t
+         (setq anything-compiled-sources
+               (mapcar (lambda (source)
+                         (let* ((source (if (listp source)
+                                            source
+                                          (symbol-value source)))
+                                (type (assoc-default 'type source)))
+                           (if type
+                               (append source (assoc-default type anything-type-attributes) nil)
+                             source)))
+                       anything-sources)))))
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
@@ -1020,14 +1031,14 @@ action."
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
   (setq anything-current-position (cons (point) (window-start)))
-
+  (setq anything-compiled-sources nil)
+  (setq anything-saved-sources nil)
   ;; Call the init function for sources where appropriate
   (anything-funcall-inits)
 
   (setq anything-pattern "")
   (setq anything-input "")
   (setq anything-candidate-cache nil)
-  (setq anything-saved-sources nil)
   (setq anything-original-source-filter anything-source-filter)
   (setq anything-last-sources anything-sources)
 
@@ -2060,12 +2071,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (kill-buffer (current-buffer)))))
     (desc "anything-get-sources")
     (expect '(((name . "foo")))
-      (let ((anything-sources '(((name . "foo")))))
+      (let (anything-compiled-sources
+            (anything-sources '(((name . "foo")))))
         (anything-get-sources)))
     (expect '(((name . "foo")
                (type . test)
                (action . identity)))
-      (let ((anything-sources '(((name . "foo")
+      (let (anything-compiled-sources
+            (anything-sources '(((name . "foo")
                                  (type . test))))
             (anything-type-attributes '((test (action . identity)))))
         (anything-get-sources)))
