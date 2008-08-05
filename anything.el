@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.31 2008-08-05 21:06:23 rubikitch Exp $
+;; $Id: anything.el,v 1.32 2008-08-05 21:42:15 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.31  2008-08-05 21:06:23  rubikitch
+;; Revision 1.32  2008-08-05 21:42:15  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.31  2008/08/05 21:06:23  rubikitch
 ;; `anything-candidates-buffer': candidates buffer registration
 ;;
 ;; Revision 1.30  2008/08/05 19:46:36  rubikitch
@@ -1072,9 +1075,9 @@ action."
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
   (setq anything-current-position (cons (point) (window-start)))
+  (setq anything-candidates-buffer-alist nil)
   (setq anything-compiled-sources nil)
   (setq anything-saved-sources nil)
-  (setq anything-candidates-buffer-alist nil)
   ;; Call the init function for sources where appropriate
   (anything-funcall-inits)
 
