@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.29 2008-08-05 17:58:31 rubikitch Exp $
+;; $Id: anything.el,v 1.30 2008-08-05 19:46:36 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -54,9 +54,9 @@
 ;;; Tips:
 
 ;;
-;; Using `anything-candidates-buffer' and
-;; `anything-candidates-in-buffer' gets much speed than old-fashioned
-;; `candidates' and `match' way. See docstring of them.
+;; Using `anything-candidates-buffer' and the candidates-in-buffer
+;; attribute is much faster than old-fashioned "candidates and match"
+;; way. See docstring of them.
 
 ;; [EVAL IT] (describe-function 'anything-candidates-buffer)
 ;; [EVAL IT] (describe-function 'anything-candidates-in-buffer)
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.29  2008-08-05 17:58:31  rubikitch
+;; Revision 1.30  2008-08-05 19:46:36  rubikitch
+;; New `anything-sources' attribute: candidates-in-buffer
+;;
+;; Revision 1.29  2008/08/05 17:58:31  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.28  2008/08/05 17:46:04  rubikitch
@@ -266,7 +269,7 @@ Attributes:
   The name of the source. It is also the heading which appears
   above the list of matches from the source. Must be unique.
 
-- candidates (mandatory)
+- candidates (mandatory if candidates-in-buffer attribute is not provided)
 
   Specifies how to retrieve candidates from the source. It can
   either be a variable name, a function called with no parameters
@@ -432,6 +435,24 @@ Attributes:
 
   An action performed by `anything-execute-persistent-action'.
   If none, use the default action.
+
+- candidates-in-buffer (optional)
+
+  Shortcut attribute for making and narrowing candidates using
+  buffers.  This newly-introduced attribute prevents us from
+  forgetting to add volatile and match attributes.
+
+  See docstring of `anything-candidates-in-buffer'.
+
+  (candidates-in-buffer) is equivalent of three attributes:
+    (candidates . anything-candidates-in-buffer)
+    (volatile)
+    (match identity)
+
+  (candidates-in-buffer . candidates-function) is equivalent of:
+    (candidates . candidates-function)
+    (volatile)
+    (match identity)
 ")
 
 
@@ -770,24 +791,37 @@ the current pattern."
                              delayed-sources)))))
 
 (defun anything-get-sources ()
-  "Return `anything-sources' with the attributes from
-  `anything-type-attributes' merged in."
-  (cond ;; action
-        (anything-saved-sources
-         anything-sources)
-        ;; memoized
-        (anything-compiled-sources)
-        (t
-         (setq anything-compiled-sources
-               (mapcar (lambda (source)
-                         (let* ((source (if (listp source)
-                                            source
-                                          (symbol-value source)))
-                                (type (assoc-default 'type source)))
-                           (if type
-                               (append source (assoc-default type anything-type-attributes) nil)
-                             source)))
-                       anything-sources)))))
+  "Return compiled `anything-sources', which is memoized.
+
+Attributes:
+
+- type
+  `anything-type-attributes' are merged in.
+- candidates-buffer
+  candidates, volatile and match attrubute are created.
+"
+  (cond
+   ;; action
+   (anything-saved-sources
+    anything-sources)
+   ;; memoized
+   (anything-compiled-sources)
+   ;; first time
+   (t
+    (setq anything-compiled-sources
+          (mapcar
+           (lambda (source)
+             (let* ((source (if (listp source) source (symbol-value source)))
+                    (type (assoc-default 'type source))
+                    (cib (assoc 'candidates-in-buffer source)))
+               (if type
+                   (setq source (append source (assoc-default type anything-type-attributes) nil)))
+               (if cib
+                   (setq source
+                         (append source `((candidates . ,(or (cdr cib) 'anything-candidates-in-buffer))
+                                          (volatile) (match identity)))))
+               source))
+           anything-sources)))))
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
@@ -1300,19 +1334,18 @@ Cache the candidates if there is not yet a cached value."
 
 (defun* anything-candidates-in-buffer (&optional (buffer (anything-candidates-buffer)) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
   "Get candidates in BUFFER according to `anything-pattern'.
-BUFFER is `anything-candidates-buffer' by default.
-Each candidate must be placed in one line.
-This function is meant to be used in `candidates' of an anything source.
-Especially fast for many (1000+) candidates.
+
+BUFFER is `anything-candidates-buffer' by default.  Each
+candidate must be placed in one line.  This function is meant to
+be used in candidates-in-buffer or candidates attribute of an
+anything source.  Especially fast for many (1000+) candidates.
 
 eg.
- '((name . \"many candidates\")
-   (init . (lambda () (with-current-buffer (anything-candidates-buffer t)
-                        (insert-many-text))))
-   (candidates . anything-candidates-in-buffer)
-   (volatile)
-   (match identity))
-
+ '((name . \"many files\")
+   (init . (lambda () (with-current-buffer (anything-candidates-buffer 'local)
+                        (insert-many-filenames))))
+   (candidates-in-buffer)
+   (type . file))
 
 GET-LINE-FN (default: buffer-substring-no-properties) specifies a function
 called with two arguments:point of line-beginning and point of line-end. 
@@ -1325,26 +1358,36 @@ re-search-forward or search-forward.
 +===============================================================+
 
 By default, `anything' makes candidates by evaluating the
- candidates function, then narrows them by `string-match' for
- each candidate.
+candidates function, then narrows them by `string-match' for each
+candidate.
 
 But this way is very slow for many candidates. The new way is
 storing all candidates in a buffer and narrowing them by
-`re-search-forward'. The important point is that buffer processing
-is MUCH FASTER than string list processing and is the Emacs-ish way.
+`re-search-forward'. The important point is that buffer
+processing is MUCH FASTER than string list processing and is the
+Emacs way.
 
-The init function writes all candidates in a newly-created
+The init function writes all candidates to a newly-created
 candidate buffer.  The candidates buffer is created by
 `anything-candidates-buffer'.  Candidates are stored in a line.
 
-The candidates function narrows all candidates, IOW creates
+The candidates function narrows all candidates, IOW creates a
 subset of candidates dynamically. It is the task of
 `anything-candidates-in-buffer'.  If `anything-candidates-buffer'
-is used, normally `(candidates . anything-candidates-in-buffer)'
-is sufficient.
+is used, normally `(candidates-in-buffer)' is sufficient.
 
-Be sure to specify `(volatile)' to an anything source!
-The `volatile' attribute is needed because `anything-candidates-in-buffer'
+Note that `(candidates-in-buffer)' is shortcut of three attributes:
+  (candidates . anything-candidates-in-buffer)
+  (volatile)
+  (match identity)
+And `(candidates-in-buffer . func)' is shortcut of three attributes:
+  (candidates . func)
+  (volatile)
+  (match identity)
+The expansion is performed in `anything-get-sources'.
+
+The candidates-in-buffer attribute implies the volatile attribute.
+The volatile attribute is needed because `anything-candidates-in-buffer'
 creates candidates dynamically and need to be called everytime
 `anything-pattern' changes.
 
@@ -2079,21 +2122,52 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-get-sources)))
     (expect '(((name . "foo") (type . test) (action . identity)))
       (let (anything-compiled-sources
-            (anything-sources '(((name . "foo")
-                                 (type . test))))
+            (anything-sources '(((name . "foo") (type . test))))
             (anything-type-attributes '((test (action . identity)))))
         (anything-get-sources)))
-    ;; anything-sources accepts symbols
+    (desc "anything-sources accepts symbols")
     (expect '(((name . "foo")))
       (let* (anything-compiled-sources
              (foo '((name . "foo")))
              (anything-sources '(foo)))
         (anything-get-sources)))
-    ;; actions (anything-saved-sources)
+    (desc "anything-get-sources action")
     (expect '(((name . "Actions") (candidates . actions)))
       (let (anything-compiled-sources
             (anything-saved-sources '(((name . "dummy"))))
             (anything-sources '(((name . "Actions") (candidates . actions)))))
+        (anything-get-sources)))
+    (desc "get-buffer-create candidates-buffer")
+    (expect '(((name . "many") (init . many-init)
+               (candidates-in-buffer . anything-candidates-in-buffer)
+               (candidates . anything-candidates-in-buffer)
+               (volatile) (match identity)))
+      (let (anything-compiled-sources
+            (anything-sources 
+             '(((name . "many") (init . many-init)
+                (candidates-in-buffer . anything-candidates-in-buffer)))))
+        (anything-get-sources)))
+    (expect '(((name . "many") (init . many-init)
+               (candidates-in-buffer)
+               (candidates . anything-candidates-in-buffer)
+               (volatile) (match identity)))
+      (let (anything-compiled-sources
+            (anything-sources 
+             '(((name . "many") (init . many-init)
+                (candidates-in-buffer)))))
+        (anything-get-sources)))
+    (expect '(((name . "many") (init . many-init)
+               (candidates-in-buffer)
+               (type . test)
+               (action . identity)
+               (candidates . anything-candidates-in-buffer)
+               (volatile) (match identity)))
+      (let (anything-compiled-sources
+            (anything-type-attributes '((test (action . identity))))
+            (anything-sources 
+             '(((name . "many") (init . many-init)
+                (candidates-in-buffer)
+                (type . test)))))
         (anything-get-sources)))
 
     (desc "anything-get-candidates")
