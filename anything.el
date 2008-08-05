@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.30 2008-08-05 19:46:36 rubikitch Exp $
+;; $Id: anything.el,v 1.31 2008-08-05 21:06:23 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.30  2008-08-05 19:46:36  rubikitch
+;; Revision 1.31  2008-08-05 21:06:23  rubikitch
+;; `anything-candidates-buffer': candidates buffer registration
+;;
+;; Revision 1.30  2008/08/05 19:46:36  rubikitch
 ;; New `anything-sources' attribute: candidates-in-buffer
 ;;
 ;; Revision 1.29  2008/08/05 17:58:31  rubikitch
@@ -727,6 +730,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 (defvar anything-source-name nil)
 (defvar anything-compiled-sources nil)
+(defvar anything-candidates-buffer-alist nil)
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -1070,6 +1074,7 @@ action."
   (setq anything-current-position (cons (point) (window-start)))
   (setq anything-compiled-sources nil)
   (setq anything-saved-sources nil)
+  (setq anything-candidates-buffer-alist nil)
   ;; Call the init function for sources where appropriate
   (anything-funcall-inits)
 
@@ -1409,24 +1414,38 @@ function, specifying `(match identity)' makes the source slightly faster.
   (with-current-buffer anything-current-buffer
     (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
 
-(defun anything-candidates-buffer (&optional create)
+(defun anything-candidates-buffer (&optional create-or-buffer)
   "Return a buffer containing candidates of current source.
 `anything-candidates-buffer' searches buffer-local candidates buffer first,
 then global candidates buffer.
 
-If CREATE is non-nil, create a new candidates buffer:
-If CREATE is 'global, create a global candidates buffer, otherwise buffer-local one."
-  (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
-         (lbufname (concat gbufname (buffer-name anything-current-buffer))))
-    (when create
-      (with-current-buffer (get-buffer-create
-                            (if (eq create 'global) gbufname lbufname))
-        (buffer-disable-undo)
-        (erase-buffer)
-        (font-lock-mode -1)))
-    (or (get-buffer lbufname)
-        (get-buffer gbufname))))
-      
+Acceptable values of CREATE-OR-BUFFER:
+
+- nil (omit)
+  Only return the candidates buffer.
+- a buffer
+  Register a buffer as a candidates buffer.
+- 'global
+  Create a new global candidates buffer,
+  named \" *anything candidates:SOURCE*\".
+- other non-nil value
+  Create a new global candidates buffer,
+  named \" *anything candidates:SOURCE*ANYTHING-CURRENT-BUFFER\".
+"
+  (when create-or-buffer
+    (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
+           (lbufname (concat gbufname (buffer-name anything-current-buffer)))
+           (buf (if (bufferp create-or-buffer)
+                    create-or-buffer
+                  (with-current-buffer
+                      (get-buffer-create
+                       (if (eq create-or-buffer 'global) gbufname lbufname))
+                    (buffer-disable-undo)
+                    (erase-buffer)
+                    (font-lock-mode -1)
+                    (current-buffer)))))
+      (add-to-list 'anything-candidates-buffer-alist (cons anything-source-name buf))))
+    (assoc-default anything-source-name anything-candidates-buffer-alist))
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -2377,19 +2396,22 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         v))
     (desc "anything-candidates-buffer create")
     (expect " *anything candidates:FOO*"
-      (let* ((anything-source-name "FOO")
+      (let* (anything-candidates-buffer-alist
+             (anything-source-name "FOO")
              (buf (anything-candidates-buffer 'global)))
         (prog1 (buffer-name buf)
           (kill-buffer buf))))
     (expect " *anything candidates:FOO*aTestBuffer"
-      (let* ((anything-source-name "FOO")
+      (let* (anything-candidates-buffer-alist
+             (anything-source-name "FOO")
              (anything-current-buffer (get-buffer-create "aTestBuffer"))
              (buf (anything-candidates-buffer 'local)))
         (prog1 (buffer-name buf)
           (kill-buffer anything-current-buffer)
           (kill-buffer buf))))
     (expect 0
-      (let ((anything-source-name "FOO") buf)
+      (let (anything-candidates-buffer-alist
+            (anything-source-name "FOO") buf)
         (with-current-buffer  (anything-candidates-buffer 'global)
           (insert "1"))
         (setq buf  (anything-candidates-buffer 'global))
@@ -2397,21 +2419,48 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (kill-buffer buf))))
     (desc "anything-candidates-buffer get-buffer")
     (expect " *anything candidates:FOO*"
-      (let* ((anything-source-name "FOO")
+      (let* (anything-candidates-buffer-alist
+             (anything-source-name "FOO")
              (buf (anything-candidates-buffer 'global)))
         (prog1 (buffer-name (anything-candidates-buffer))
           (kill-buffer buf))))
     (expect " *anything candidates:FOO*aTestBuffer"
-      (let* ((anything-source-name "FOO")
+      (let* (anything-candidates-buffer-alist
+             (anything-source-name "FOO")
              (anything-current-buffer (get-buffer-create "aTestBuffer"))
              (buf (anything-candidates-buffer 'local)))
         (prog1 (buffer-name (anything-candidates-buffer))
           (kill-buffer anything-current-buffer)
           (kill-buffer buf))))
     (expect nil
-      (let* ((anything-source-name "NOP__"))
+      (let* (anything-candidates-buffer-alist
+             (anything-source-name "NOP__"))
         (anything-candidates-buffer)))
-
+    (desc "anything-candidates-buffer register-buffer")
+    (expect " *anything test candidates*"
+      (let (anything-candidates-buffer-alist
+            (buf (get-buffer-create " *anything test candidates*")))
+        (with-current-buffer buf
+          (insert "1\n2\n")
+          (prog1 (buffer-name (anything-candidates-buffer buf))
+            (kill-buffer (current-buffer))))))
+    (expect " *anything test candidates*"
+      (let (anything-candidates-buffer-alist
+            (buf (get-buffer-create " *anything test candidates*")))
+        (with-current-buffer buf
+          (insert "1\n2\n")
+          (anything-candidates-buffer buf)
+          (prog1 (buffer-name (anything-candidates-buffer))
+            (kill-buffer (current-buffer))))))
+    (expect "1\n2\n"
+      (let (anything-candidates-buffer-alist
+            (buf (get-buffer-create " *anything test candidates*")))
+        (with-current-buffer buf
+          (insert "1\n2\n")
+          (anything-candidates-buffer buf)
+          (prog1 (buffer-string)
+            (kill-buffer (current-buffer))))))
+    
     ))
 
 
