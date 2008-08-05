@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.25 2008-08-05 07:26:17 rubikitch Exp $
+;; $Id: anything.el,v 1.26 2008-08-05 08:35:45 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.25  2008-08-05 07:26:17  rubikitch
+;; Revision 1.26  2008-08-05 08:35:45  rubikitch
+;; `anything-completing-read': accept obarray
+;;
+;; Revision 1.25  2008/08/05 07:26:17  rubikitch
 ;; `anything-completing-read': guard from non-string return value
 ;;
 ;; Revision 1.24  2008/08/04 12:05:41  rubikitch
@@ -1922,7 +1925,11 @@ shown yet and bind anything commands in iswitchb."
 ;;----------------------------------------------------------------------
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
   (let ((result (anything (anything-completing-read-sources
-                          prompt collection predicate require-match initial
+                           prompt
+                           (if (arrayp collection)
+                               (all-completions "" collection)
+                             collection)
+                           predicate require-match initial
                           hist default inherit-input-method)
                          initial prompt)))
     (when (stringp result)
@@ -1935,7 +1942,8 @@ shown yet and bind anything commands in iswitchb."
          (if predicate
              `(candidate-transformer
                . (lambda (cands)
-                   (remove-if-not (lambda (c) (,predicate (car c))) cands)))))
+                   (remove-if-not (lambda (c) (,predicate
+                                               (if (listp c) (car c) c))) cands)))))
         (new-input-source (unless require-match
                             (anything-define-dummy-source
                              prompt #'anything-dummy-candidate '(action . identity))))
@@ -1957,6 +1965,7 @@ shown yet and bind anything commands in iswitchb."
      ,transformer-func)
     ,history-source
     ,new-input-source)))
+;; (anything-completing-read "Command: " obarray 'commandp t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil)
