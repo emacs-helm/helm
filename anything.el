@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.28 2008-08-05 17:46:04 rubikitch Exp $
+;; $Id: anything.el,v 1.29 2008-08-05 17:58:31 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.28  2008-08-05 17:46:04  rubikitch
+;; Revision 1.29  2008-08-05 17:58:31  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.28  2008/08/05 17:46:04  rubikitch
 ;; memoized `anything-get-sources'
 ;;
 ;; Revision 1.27  2008/08/05 17:29:40  rubikitch
@@ -2074,9 +2077,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (let (anything-compiled-sources
             (anything-sources '(((name . "foo")))))
         (anything-get-sources)))
-    (expect '(((name . "foo")
-               (type . test)
-               (action . identity)))
+    (expect '(((name . "foo") (type . test) (action . identity)))
       (let (anything-compiled-sources
             (anything-sources '(((name . "foo")
                                  (type . test))))
@@ -2084,9 +2085,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-get-sources)))
     ;; anything-sources accepts symbols
     (expect '(((name . "foo")))
-      (let* ((foo '((name . "foo")))
+      (let* (anything-compiled-sources
+             (foo '((name . "foo")))
              (anything-sources '(foo)))
         (anything-get-sources)))
+    ;; actions (anything-saved-sources)
+    (expect '(((name . "Actions") (candidates . actions)))
+      (let (anything-compiled-sources
+            (anything-saved-sources '(((name . "dummy"))))
+            (anything-sources '(((name . "Actions") (candidates . actions)))))
+        (anything-get-sources)))
+
     (desc "anything-get-candidates")
     (expect '("foo" "bar")
       (anything-get-candidates '((name . "foo") (candidates "foo" "bar"))))
