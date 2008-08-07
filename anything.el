@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.33 2008-08-05 23:14:20 rubikitch Exp $
+;; $Id: anything.el,v 1.34 2008-08-07 13:15:44 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -55,7 +55,7 @@
 
 ;;
 ;; Using `anything-candidates-buffer' and the candidates-in-buffer
-;; attribute is much faster than old-fashioned "candidates and match"
+;; attribute is much faster than traditional "candidates and match"
 ;; way. See docstring of them.
 
 ;; [EVAL IT] (describe-function 'anything-candidates-buffer)
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.33  2008-08-05 23:14:20  rubikitch
+;; Revision 1.34  2008-08-07 13:15:44  rubikitch
+;; New `anything-sources' attribute: search
+;;
+;; Revision 1.33  2008/08/05 23:14:20  rubikitch
 ;; `anything-candidates-buffer': bugfix
 ;;
 ;; Revision 1.32  2008/08/05 21:42:15  rubikitch
@@ -462,6 +465,15 @@ Attributes:
     (candidates . candidates-function)
     (volatile)
     (match identity)
+
+- search (optional)
+
+  Function like `re-search-forward' or `search-forward'.
+  Buffer search function used by `anything-candidates-in-buffer'.
+  By default, `anything-candidates-in-buffer' uses `re-search-forward'.
+  This attribute is meant to be used with
+  (candidates . anything-candidates-in-buffer) or
+  (candidates-in-buffer) in short.
 ")
 
 
@@ -1342,8 +1354,8 @@ Cache the candidates if there is not yet a cached value."
 
     candidates))
 
-(defun* anything-candidates-in-buffer (&optional (buffer (anything-candidates-buffer)) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
-  "Get candidates in BUFFER according to `anything-pattern'.
+(defun* anything-candidates-in-buffer (&optional (get-line-fn 'buffer-substring-no-properties))
+  "Get candidates from the candidates buffer according to `anything-pattern'.
 
 BUFFER is `anything-candidates-buffer' by default.  Each
 candidate must be placed in one line.  This function is meant to
@@ -1354,14 +1366,13 @@ eg.
  '((name . \"many files\")
    (init . (lambda () (with-current-buffer (anything-candidates-buffer 'local)
                         (insert-many-filenames))))
+   (search . re-search-forward)  ; optional
    (candidates-in-buffer)
    (type . file))
 
 GET-LINE-FN (default: buffer-substring-no-properties) specifies a function
 called with two arguments:point of line-beginning and point of line-end. 
-
-SEARCH-FN (default: re-search-forward) specifies a search function:
-re-search-forward or search-forward.
+This function creates a candidate.
 
 +===============================================================+
 | The new way of making and narrowing candidates: Using buffers |
@@ -1373,18 +1384,19 @@ candidate.
 
 But this way is very slow for many candidates. The new way is
 storing all candidates in a buffer and narrowing them by
-`re-search-forward'. The important point is that buffer
-processing is MUCH FASTER than string list processing and is the
-Emacs way.
+`re-search-forward'. Search function is customizable by search
+attribute. The important point is that buffer processing is MUCH
+FASTER than string list processing and is the Emacs way.
 
 The init function writes all candidates to a newly-created
-candidate buffer.  The candidates buffer is created by
-`anything-candidates-buffer'.  Candidates are stored in a line.
+candidate buffer.  The candidates buffer is created or specified
+by `anything-candidates-buffer'.  Candidates are stored in a line.
 
 The candidates function narrows all candidates, IOW creates a
 subset of candidates dynamically. It is the task of
-`anything-candidates-in-buffer'.  If `anything-candidates-buffer'
-is used, normally `(candidates-in-buffer)' is sufficient.
+`anything-candidates-in-buffer'.  As long as
+`anything-candidates-buffer' is used,`(candidates-in-buffer)' is
+sufficient in most cases.
 
 Note that `(candidates-in-buffer)' is shortcut of three attributes:
   (candidates . anything-candidates-in-buffer)
@@ -1403,7 +1415,16 @@ creates candidates dynamically and need to be called everytime
 
 Because `anything-candidates-in-buffer' plays the role of `match' attribute
 function, specifying `(match identity)' makes the source slightly faster.
+
+See also `anything-sources' docstring.
+
 "
+  (anything-candidates-in-buffer-1 (anything-candidates-buffer) get-line-fn
+                                   ;; use external variable `source'.
+                                   (or (assoc-default 'search source)
+                                       #'re-search-forward)))
+
+(defun* anything-candidates-in-buffer-1 (buffer &optional (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
@@ -1420,7 +1441,7 @@ function, specifying `(match identity)' makes the source slightly faster.
     (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
 
 (defun anything-candidates-buffer (&optional create-or-buffer)
-  "Return a buffer containing candidates of current source.
+  "Register and return a buffer containing candidates of current source.
 `anything-candidates-buffer' searches buffer-local candidates buffer first,
 then global candidates buffer.
 
@@ -2272,65 +2293,89 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                    (filtered-candidate-transformer
                                     . (lambda (cands src) (mapcar 'upcase cands)))))
                                 "ar"))
-    (desc "anything-candidates-in-buffer")
+    (desc "anything-candidates-in-buffer-1")
     (expect nil
-      (anything-candidates-in-buffer nil))
+      (anything-candidates-in-buffer-1 nil))
     (expect '("foo+" "bar+" "baz+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
         (let ((anything-pattern "")
               (anything-candidate-number-limit 5))
-          (anything-candidates-in-buffer (current-buffer)))))
+          (anything-candidates-in-buffer-1 (current-buffer)))))
     (expect '("foo+" "bar+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
         (let ((anything-pattern "")
               (anything-candidate-number-limit 2))
-          (anything-candidates-in-buffer (current-buffer)))))
+          (anything-candidates-in-buffer-1 (current-buffer)))))
     (expect '("foo+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
         (let ((anything-pattern "oo\\+"))
-          (anything-candidates-in-buffer (current-buffer)))))
+          (anything-candidates-in-buffer-1 (current-buffer)))))
     (expect '("foo+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
         (let ((anything-pattern "oo+"))
-          (anything-candidates-in-buffer
+          (anything-candidates-in-buffer-1
            (current-buffer) #'buffer-substring-no-properties #'search-forward))))
     (expect '(("foo+" "FOO+"))
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
         (let ((anything-pattern "oo\\+"))
-          (anything-candidates-in-buffer
+          (anything-candidates-in-buffer-1
            (current-buffer)
            (lambda (s e)
              (let ((l (buffer-substring-no-properties s e)))
                (list l (upcase l))))))))
+    (desc "anything-candidates-in-buffer")
     (expect '(("TEST" ("foo+" "bar+" "baz+")))
       (anything-test-candidates
        '(((name . "TEST")
-          (candidates
-           . (lambda ()
-               (with-temp-buffer
-                 (insert "foo+\nbar+\nbaz+\n")
-                 (let ((anything-pattern ""))
-                   (anything-candidates-in-buffer (current-buffer))))))
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\n"))))
+          (candidates . anything-candidates-in-buffer)
           (match identity)
           (volatile)))
-       "oo\\+"))
+       ""))
     (expect '(("TEST" ("foo+")))
       (anything-test-candidates
        '(((name . "TEST")
-          (candidates
-           . (lambda ()
-               (with-temp-buffer
-                 (insert "foo+\nbar+\nbaz+\n")
-                 (let ((anything-pattern "oo\\+"))
-                   (anything-candidates-in-buffer (current-buffer))))))
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\n"))))
+          (candidates . anything-candidates-in-buffer)
           (match identity)
           (volatile)))
        "oo\\+"))
+    (expect '(("TEST" (("foo+" "FOO+"))))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\n"))))
+          (candidates
+           . (lambda ()
+               (anything-candidates-in-buffer
+                (lambda (s e)
+                  (let ((l (buffer-substring-no-properties s e)))
+                    (list l (upcase l)))))))
+          (match identity)
+          (volatile)))
+       "oo\\+"))
+    (desc "search attribute")
+    (expect '(("TEST" ("foo+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\nooo\n"))))
+          (search . search-forward)
+          (candidates . anything-candidates-in-buffer)
+          (match identity)
+          (volatile)))
+       "oo+"))
     (desc "anything-current-buffer-is-modified")
     (expect nil
       (with-temp-buffer
