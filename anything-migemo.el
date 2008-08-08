@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo extension for anything
-;; $Id: anything-migemo.el,v 1.4 2007-12-26 08:36:01 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.5 2008-08-08 03:38:34 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -38,7 +38,11 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.4  2007-12-26 08:36:01  rubikitch
+;; Revision 1.5  2008-08-08 03:38:34  rubikitch
+;; add search attribute
+;; unit tests
+;;
+;; Revision 1.4  2007/12/26 08:36:01  rubikitch
 ;; changed match priority
 ;;
 ;; Revision 1.3  2007/12/25 19:55:59  rubikitch
@@ -77,10 +81,34 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
     (setq ad-return-value
           (mapcar (lambda (source)
                     `((delayed)
+                      (search . migemo-forward)
                       ,@source
-                      (match . (anything-string-match-with-migemo))))
+                      (match anything-string-match-with-migemo)))
                   ad-do-it))))
 
+;;;; unit test
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
+(when (fboundp 'expectations)
+  (expectations
+    (desc "match")
+    (expect '(("TEST" ("日本語")))
+      (let ((anything-use-migemo t))
+        (anything-test-candidates
+       '(((name . "TEST")
+          (candidates "日本語")))
+       "nihongo")))
+    (desc "candidates buffer")
+    (expect '(("TEST" ("日本語")))
+      (let ((anything-use-migemo t))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                            (insert "日本語\n"))))
+            (candidates-in-buffer)))
+         "nihongo")))
+    ))
 
 (provide 'anything-migemo)
 
