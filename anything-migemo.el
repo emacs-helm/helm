@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo extension for anything
-;; $Id: anything-migemo.el,v 1.5 2008-08-08 03:38:34 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.6 2008-08-08 03:40:51 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -38,7 +38,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.5  2008-08-08 03:38:34  rubikitch
+;; Revision 1.6  2008-08-08 03:40:51  rubikitch
+;; require migemo
+;;
+;; Revision 1.5  2008/08/08 03:38:34  rubikitch
 ;; add search attribute
 ;; unit tests
 ;;
@@ -57,6 +60,7 @@
 
 ;;; Code:
 
+(require 'migemo)
 (defvar anything-use-migemo nil
   "[Internal] If non-nil, `anything' is migemo-ized.")
 (defun anything-migemo (with-migemo)
