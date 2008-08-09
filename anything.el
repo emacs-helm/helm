@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.34 2008-08-07 13:15:44 rubikitch Exp $
+;; $Id: anything.el,v 1.35 2008-08-09 10:43:08 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.34  2008-08-07 13:15:44  rubikitch
+;; Revision 1.35  2008-08-09 10:43:08  rubikitch
+;; New `anything-sources' attribute: display-to-real
+;;
+;; Revision 1.34  2008/08/07 13:15:44  rubikitch
 ;; New `anything-sources' attribute: search
 ;;
 ;; Revision 1.33  2008/08/05 23:14:20  rubikitch
@@ -474,6 +477,21 @@ Attributes:
   This attribute is meant to be used with
   (candidates . anything-candidates-in-buffer) or
   (candidates-in-buffer) in short.
+
+- display-to-real (optional)
+
+  Function called with one parameter; the selected candidate.
+
+  The function transforms the selected candidate, and the result
+  is passed to the action function.  The display-to-real
+  attribute provides another way to pass other string than one
+  shown in Anything buffer.
+
+  Traditionally, it is possible to make candidates,
+  candidate-transformer or filtered-candidate-transformer
+  function return a list with (DISPLAY . REAL) pairs. But if REAL
+  can be generated from DISPLAY, display-to-real is more
+  convenient and faster.
 ")
 
 
@@ -739,6 +757,10 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-last-sources nil
   "Sources of previously invoked `anything'.")
 
+(defvar anything-saved-current-source nil
+  "Saved value of the original (anything-get-current-source) when the action
+  list is shown.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; internal variables
@@ -985,26 +1007,33 @@ the real value in a text property."
   (interactive)
   (anything (or anything-last-sources anything-sources) nil nil t))
 
-(defun anything-execute-selection-action ()
+(defun anything-execute-selection-action (&optional selection action clear-saved-action display-to-real)
   "If a candidate was selected then perform the associated
 action."
-  (let* ((selection (if anything-saved-sources
-                        ;; the action list is shown
-                        anything-saved-selection
-                      (anything-get-selection)))
-         (action (or anything-saved-action
-                     (if anything-saved-sources
-                         ;; the action list is shown
-                         (anything-get-selection)
-                       (anything-get-action)))))
-
-    (if (and (listp action)
-             (not (functionp action))) ; lambda
-        ;;select the default action
-        (setq action (cdar action)))
-    (setq anything-saved-action nil)
-    (if (and selection action)
-        (funcall action selection))))
+  (setq selection (or selection
+                      (if anything-saved-sources
+                          ;; the action list is shown
+                          anything-saved-selection
+                        (anything-get-selection))))
+  (setq action (or action
+                   anything-saved-action
+                   (if anything-saved-sources
+                       ;; the action list is shown
+                       (anything-get-selection)
+                     (anything-get-action))))
+  (setq display-to-real
+        (or display-to-real
+            (assoc-default 'display-to-real
+                           (or anything-saved-current-source
+                               (anything-get-current-source)))
+            #'identity))
+  (if (and (listp action)
+           (not (functionp action)))    ; lambda
+      ;;select the default action
+      (setq action (cdar action)))
+  (unless clear-saved-action (setq anything-saved-action nil))
+  (if (and selection action)
+      (funcall action (funcall display-to-real selection))))
 
 
 (defun anything-get-selection ()
@@ -1033,7 +1062,6 @@ action."
             (funcall transformer actions (anything-get-selection))
           actions)))))
 
-
 (defun anything-select-action ()
   "Select an action for the currently selected candidate."
   (interactive)
@@ -1043,7 +1071,7 @@ action."
   (setq anything-saved-selection (anything-get-selection))
   (unless anything-saved-selection
     (error "Nothing is selected."))
-
+  (setq anything-saved-current-source (anything-get-current-source))
   (let ((actions (anything-get-action)))
     (setq anything-source-filter nil)
     (setq anything-saved-sources anything-sources)
@@ -1092,6 +1120,7 @@ action."
   (setq anything-current-position (cons (point) (window-start)))
   (setq anything-compiled-sources nil)
   (setq anything-saved-sources nil)
+  (setq anything-saved-current-source nil)
   ;; Call the init function for sources where appropriate
   (anything-funcall-inits)
 
@@ -1590,20 +1619,13 @@ Acceptable values of CREATE-OR-BUFFER:
   (save-selected-window
     (select-window (get-buffer-window anything-buffer))
     (select-window (setq minibuffer-scroll-window
-                         (if (one-window-p t) (split-window) (next-window (selected-window) 1))))
-    (let ((anything-window (get-buffer-window anything-buffer))
-          ;;(same-window-regexps '("."))
-          (selection (if anything-saved-sources
-                         ;; the action list is shown
-                         anything-saved-selection
-                       (anything-get-selection)))
-          (action (or (assoc-default 'persistent-action (anything-get-current-source))
-                      (anything-get-action))))
-      (if (and (listp action)
-               (not (functionp action))) ; lambda
-          ;; select the default action
-          (setq action (cdar action)))
-      (and action selection (funcall action selection)))))
+                         (if (one-window-p t) (split-window)
+                           (next-window (selected-window) 1))))
+    (anything-execute-selection-action
+     nil
+     (or (assoc-default 'persistent-action (anything-get-current-source))
+         (anything-get-action))
+     t)))
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun anything-scroll-other-window-base (command)
@@ -2511,7 +2533,21 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-candidates-buffer buf)
           (prog1 (buffer-string)
             (kill-buffer (current-buffer))))))
-    
+    (desc "anything-execute-selection-action")
+    (expect "FOO"
+      (anything-execute-selection-action
+       "foo" '(("upcase" . upcase))  nil #'identity))
+    (expect "FOO"
+      (anything-execute-selection-action
+       "foo" '(("upcase" . (lambda (c) (upcase c)))) nil #'identity))
+    (desc "display-to-real attribute")
+    (expect "FOO"
+      (anything-execute-selection-action
+       "foo"
+       '(("identity" . identity))
+       nil
+       #'upcase
+       ))
     ))
 
 
