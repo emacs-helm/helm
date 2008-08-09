@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.37 2008-08-09 17:54:25 rubikitch Exp $
+;; $Id: anything.el,v 1.38 2008-08-09 21:38:25 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.37  2008-08-09 17:54:25  rubikitch
+;; Revision 1.38  2008-08-09 21:38:25  rubikitch
+;; `anything-read-file-name: experimental implementation.
+;;
+;; Revision 1.37  2008/08/09 17:54:25  rubikitch
 ;; action test
 ;;
 ;; Revision 1.36  2008/08/09 17:13:00  rubikitch
@@ -767,6 +770,10 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   "Saved value of the original (anything-get-current-source) when the action
   list is shown.")
 
+(defvar anything-compiled-sources nil
+  "Compiled version of `anything-sources'.
+If you change `anything-sources' dynamically, set this variables to nil.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; internal variables
@@ -775,7 +782,6 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-buffer-chars-modified-tick 0)
 (make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 (defvar anything-source-name nil)
-(defvar anything-compiled-sources nil)
 (defvar anything-candidates-buffer-alist nil)
 
 (defun anything-check-minibuffer-input ()
@@ -2058,7 +2064,7 @@ shown yet and bind anything commands in iswitchb."
 ;; `completing-read' compatible read function (experimental)
 ;;----------------------------------------------------------------------
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
-  (let ((result (anything (anything-completing-read-sources
+  (let ((result (anything (acr-sources
                            prompt
                            (if (arrayp collection)
                                (all-completions "" collection)
@@ -2070,7 +2076,7 @@ shown yet and bind anything commands in iswitchb."
       (prog1 result
         (add-to-list (or hist 'minibuffer-history) result)))))
 
-(defun anything-completing-read-sources (prompt collection predicate require-match initial hist default inherit-input-method)
+(defun acr-sources (prompt collection predicate require-match initial hist default inherit-input-method)
   "`anything' replacement for `completing-read'."
   (let ((transformer-func
          (if predicate
@@ -2106,8 +2112,82 @@ shown yet and bind anything commands in iswitchb."
 ;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
 ;; (anything-completing-read "Test: " '("hoge" "foo" "bar"))
-;; (anything-completing-read-sources "Test: " '(("hoge")("foo")("bar")))
-;; (anything-completing-read-sources "Test: " '(("hoge")("foo")("bar")) nil t)
+
+;;----------------------------------------------------------------------
+;; `read-file-name' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defvar anything-read-file-name-map (copy-keymap anything-map))
+(define-key anything-read-file-name-map "/" 'anything-read-file-name-follow-directory)
+
+(defun anything-read-file-name-follow-directory ()
+  (interactive)
+  (let* ((sel (anything-get-selection))
+         (f (expand-file-name sel dir)))
+    (cond ((and (file-directory-p f) (not (string-match "/\\.$" sel)))
+           (with-selected-window (minibuffer-window) (delete-minibuffer-contents))
+           (setq anything-pattern "")
+           (setq dir f)
+           (setq anything-compiled-sources nil
+                 anything-sources
+                 (arfn-sources
+                  prompt f default-filename require-match nil predicate))
+           (anything-update))
+          (t
+           (insert "/")))))
+
+(defun anything-read-file-name (prompt &optional dir default-filename require-match initial-input predicate)
+  "`anything' replacement for `read-file-name'."
+  (let* ((anything-map anything-read-file-name-map)
+         (result (anything (arfn-sources
+                           prompt dir default-filename require-match
+                           initial-input predicate)
+                          initial-input prompt)))
+    (when (stringp result)
+      (prog1 result
+        (add-to-list 'minibuffer-history result)))))
+
+(defun arfn-candidates (dir)
+  (loop for (f _ _ _ _ _ _ _ _ perm _ _ _) in (directory-files-and-attributes dir t)
+        for basename = (file-name-nondirectory f)
+        when (string= "d" (substring perm 0 1))
+        collect (cons (concat basename "/") f)
+        else collect (cons basename f)))
+
+(defun arfn-sources (prompt dir default-filename require-match initial-input predicate)
+  (let* ((dir (or dir default-directory))
+         (transformer-func
+          (if predicate
+              `(candidate-transformer
+                . (lambda (cands)
+                    (remove-if-not
+                     (lambda (c) (,predicate (if (listp c) (car c) c))) cands)))))
+         (new-input-source (unless require-match
+                             (anything-define-dummy-source
+                              prompt #'anything-dummy-candidate
+                              '(action . identity))))
+         (history-source (unless require-match
+                           `((name . "History")
+                             (candidates . minibuffer-history)
+                             (action . identity))))
+         (d2r `(display-to-real . (lambda (f) (expand-file-name f ,dir))))
+         (default-source (when default-filename
+                           `((name . "Default")
+                             (candidates  ,default-filename)
+                             (filtered-candidate-transformer
+                              . (lambda (cands source)
+                                  (if (string= anything-pattern "")  cands nil)))
+                             ,d2r
+                             (action . identity)))))
+    `(,default-source
+       ((name . ,dir)
+        (candidates . (lambda () (arfn-candidates dir)))
+        (action . identity)
+        ,transformer-func)
+       ,new-input-source
+       ,history-source)))
+;; (anything-read-file-name "file: " "~" ".emacs")
+;; (anything-read-file-name "file: " "/tmp")
+
 ;;----------------------------------------------------------------------
 ;; XEmacs compatibility
 ;;----------------------------------------------------------------------
