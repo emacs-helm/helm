@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.36 2008-08-09 17:13:00 rubikitch Exp $
+;; $Id: anything.el,v 1.37 2008-08-09 17:54:25 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.36  2008-08-09 17:13:00  rubikitch
+;; Revision 1.37  2008-08-09 17:54:25  rubikitch
+;; action test
+;;
+;; Revision 1.36  2008/08/09 17:13:00  rubikitch
 ;; fixed test
 ;;
 ;; Revision 1.35  2008/08/09 10:43:08  rubikitch
@@ -2145,7 +2148,7 @@ The current buffer must be a minibuffer."
 ;; Unit Tests
 ;;----------------------------------------------------------------------
 
-(defun anything-test-candidates (sources input)
+(defun* anything-test-candidates (sources &optional (input ""))
   "Test helper function for anything.
 Given pseudo `anything-sources' and `anything-pattern', returns list like
   ((\"source name1\" (\"candidate1\" \"candidate2\"))
@@ -2157,11 +2160,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-sources sources)
         anything-update-hook
         anything-test-candidate-list)
+    (get-buffer-create anything-buffer)
+
     (anything-initialize)
     (setq anything-input input anything-pattern input)
-    (get-buffer-create anything-buffer)
-    (anything-funcall-inits)
     (anything-update)
+    ;; test-mode spec: select 1st candidate!
+    (with-current-buffer anything-buffer
+      (forward-line 1)
+      (anything-mark-current-line))
     (prog1
         anything-test-candidate-list
       (anything-cleanup))))
@@ -2263,30 +2270,32 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     ;; using anything-test-candidate-list
     (desc "anything-test-candidates")
     (expect '(("FOO" ("foo" "bar")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) ""))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")))))
     (expect '(("FOO" ("bar")))
       (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) "ar"))
     (expect '(("T1" ("hoge" "aiue"))
               ("T2" ("test" "boke")))
       (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
-                                  ((name . "T2") (candidates "test" "boke"))) ""))
+                                  ((name . "T2") (candidates "test" "boke")))))
     (expect '(("T1" ("hoge"))
               ("T2" ("boke")))
       (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
                                   ((name . "T2") (candidates "test" "boke"))) "o"))
-    (desc "requires-pattern")
+    (desc "requires-pattern attribute")
     (expect nil
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar") (requires-pattern . 1))) ""))
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                   (requires-pattern . 1)))))
     (expect '(("FOO" ("bar")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar") (requires-pattern . 1))) "b"))
-    (desc "delayed (for test)")
+      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                   (requires-pattern . 1))) "b"))
+    (desc "delayed attribute(for test)")
     (expect '(("T2" ("boke"))
               ("T1" ("hoge")))
       (anything-test-candidates
        '(((name . "T1") (candidates "hoge" "aiue") (delayed))
          ((name . "T2") (candidates "test" "boke")))
        "o"))
-    (desc "match (prefix search)")
+    (desc "match attribute(prefix search)")
     (expect '(("FOO" ("bar")))
       (anything-test-candidates
        '(((name . "FOO") (candidates "foo" "bar")
@@ -2297,20 +2306,20 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
        '(((name . "FOO") (candidates "foo" "bar")
           (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
        "ar"))
-    (desc "init")
+    (desc "init attribute")
     (expect '(("FOO" ("bar")))
       (let (v)
         (anything-test-candidates
          '(((name . "FOO") (init . (lambda () (setq v '("foo" "bar"))))
             (candidates . v)))
          "ar")))
-    (desc "candidate-transformer")
+    (desc "candidate-transformer attribute")
     (expect '(("FOO" ("BAR")))
       (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
                                    (candidate-transformer
                                     . (lambda (cands) (mapcar 'upcase cands)))))
                                 "ar"))
-    (desc "filtered-candidate-transformer")
+    (desc "filtered-candidate-transformer attribute")
     ;; needs more tests
     (expect '(("FOO" ("BAR")))
       (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
@@ -2361,8 +2370,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                           (insert "foo+\nbar+\nbaz+\n"))))
           (candidates . anything-candidates-in-buffer)
           (match identity)
-          (volatile)))
-       ""))
+          (volatile)))))
     (expect '(("TEST" ("foo+")))
       (anything-test-candidates
        '(((name . "TEST")
@@ -2423,7 +2431,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                '("unmodified"))))))))
         (with-temp-buffer
           (insert "1")
-          (anything-test-candidates sources ""))))
+          (anything-test-candidates sources))))
     (expect '(("FOO" ("unmodified")))
       (let ((sources '(((name . "FOO")
                         (candidates
@@ -2433,16 +2441,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                '("unmodified"))))))))
         (with-temp-buffer
           (insert "1")
-          (anything-test-candidates sources "")
-          (anything-test-candidates sources ""))))
+          (anything-test-candidates sources)
+          (anything-test-candidates sources))))
     (desc "anything-source-name")
     (expect "FOO"
       (let (v)
         (anything-test-candidates '(((name . "FOO")
                                      (init
                                       . (lambda () (setq v anything-source-name)))
-                                     (candidates "ok")))
-                                  "")
+                                     (candidates "ok"))))
         v))
     (expect "FOO"
       (let (v)
@@ -2450,8 +2457,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (candidates
                                       . (lambda ()
                                           (setq v anything-source-name)
-                                          '("ok")))))
-                                  "")
+                                          '("ok"))))))
         v))
     (expect "FOO"
       (let (v)
@@ -2460,8 +2466,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (candidate-transformer
                                       . (lambda (c)
                                           (setq v anything-source-name)
-                                          c))))
-                                  "")
+                                          c)))))
         v))
     (expect "FOO"
       (let (v)
@@ -2470,8 +2475,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (filtered-candidate-transformer
                                       . (lambda (c s)
                                           (setq v anything-source-name)
-                                          c))))
-                                  "")
+                                          c)))))
         v))
     (desc "anything-candidates-buffer create")
     (expect " *anything candidates:FOO*"
@@ -2539,6 +2543,19 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-candidates-buffer buf)
           (prog1 (buffer-string)
             (kill-buffer (current-buffer))))))
+    (desc "action attribute")
+    (expect "foo"
+      (anything-test-candidates
+       '(((name . "TEST")
+          (candidates "foo")
+          (action ("identity" . identity)))))
+      (anything-execute-selection-action))
+    (expect "foo"
+      (anything-test-candidates
+       '(((name . "TEST")
+          (candidates "foo")
+          (action ("identity" . (lambda (c) (identity c)))))))
+      (anything-execute-selection-action))
     (desc "anything-execute-selection-action")
     (expect "FOO"
       (anything-execute-selection-action
@@ -2554,6 +2571,13 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
        nil
        #'upcase
        ))
+    (expect "FOO"
+      (anything-test-candidates
+       '(((name . "TEST")
+          (candidates "foo")
+          (display-to-real . upcase)
+          (action ("identity" . identity)))))
+      (anything-execute-selection-action))
     ))
 
 
