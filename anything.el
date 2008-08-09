@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.35 2008-08-09 10:43:08 rubikitch Exp $
+;; $Id: anything.el,v 1.36 2008-08-09 17:13:00 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.35  2008-08-09 10:43:08  rubikitch
+;; Revision 1.36  2008-08-09 17:13:00  rubikitch
+;; fixed test
+;;
+;; Revision 1.35  2008/08/09 10:43:08  rubikitch
 ;; New `anything-sources' attribute: display-to-real
 ;;
 ;; Revision 1.34  2008/08/07 13:15:44  rubikitch
@@ -822,11 +825,11 @@ the current pattern."
       (run-hooks 'anything-update-hook)
       (anything-next-line)
 
-      (anything-maybe-fit-frame)
 
       (if anything-test-mode
           (dolist (source delayed-sources)
             (anything-process-source source))
+        (anything-maybe-fit-frame)
         (run-with-idle-timer (if (featurep 'xemacs)
                                  0.1
                                0)
@@ -920,23 +923,22 @@ Attributes:
   "Display matches from SOURCE according to its settings."
   (let ((matches (anything-compute-matches source)))
     (when matches
-      (if anything-test-mode
+      (when anything-test-mode
           (setq anything-test-candidate-list
                 `(,@anything-test-candidate-list
                   (,(assoc-default 'name source)
-                   ,matches)))
-        (anything-insert-header (assoc-default 'name source))
-        (dolist (match matches)
-          (when (and anything-enable-digit-shortcuts
-                     (not (eq anything-digit-shortcut-count 9)))
-            (move-overlay (nth anything-digit-shortcut-count
-                               anything-digit-overlays)
-                          (line-beginning-position)
-                          (line-beginning-position))
-            (incf anything-digit-shortcut-count))
+                   ,matches))))
+      (anything-insert-header (assoc-default 'name source))
+      (dolist (match matches)
+        (when (and anything-enable-digit-shortcuts
+                   (not (eq anything-digit-shortcut-count 9)))
+          (move-overlay (nth anything-digit-shortcut-count
+                             anything-digit-overlays)
+                        (line-beginning-position)
+                        (line-beginning-position))
+          (incf anything-digit-shortcut-count))
 
-          (anything-insert-match match 'insert))))))
-
+        (anything-insert-match match 'insert)))))
 
 (defun anything-insert-match (match insert-function)
   "Insert MATCH into the anything buffer. If MATCH is a list then
@@ -1134,31 +1136,30 @@ action."
     (setq cursor-type nil)
     (setq mode-name "Anything"))
 
-  (unless anything-test-mode
-    (if anything-selection-overlay
-        ;; make sure the overlay belongs to the anything buffer if
-        ;; it's newly created
-        (move-overlay anything-selection-overlay (point-min) (point-min)
-                      (get-buffer anything-buffer))
+  (if anything-selection-overlay
+      ;; make sure the overlay belongs to the anything buffer if
+      ;; it's newly created
+      (move-overlay anything-selection-overlay (point-min) (point-min)
+                    (get-buffer anything-buffer))
 
-      (setq anything-selection-overlay 
-            (make-overlay (point-min) (point-min) (get-buffer anything-buffer)))
-      (overlay-put anything-selection-overlay 'face 'highlight))
+    (setq anything-selection-overlay 
+          (make-overlay (point-min) (point-min) (get-buffer anything-buffer)))
+    (overlay-put anything-selection-overlay 'face 'highlight))
 
-    (if anything-enable-digit-shortcuts
-        (unless anything-digit-overlays
-          (dotimes (i 9)
-            (push (make-overlay (point-min) (point-min)
-                                (get-buffer anything-buffer))
-                  anything-digit-overlays)
-            (overlay-put (car anything-digit-overlays)
-                         'before-string (concat (int-to-string (1+ i)) " - ")))
-          (setq anything-digit-overlays (nreverse anything-digit-overlays)))
+  (if anything-enable-digit-shortcuts
+      (unless anything-digit-overlays
+        (dotimes (i 9)
+          (push (make-overlay (point-min) (point-min)
+                              (get-buffer anything-buffer))
+                anything-digit-overlays)
+          (overlay-put (car anything-digit-overlays)
+                       'before-string (concat (int-to-string (1+ i)) " - ")))
+        (setq anything-digit-overlays (nreverse anything-digit-overlays)))
 
-      (when anything-digit-overlays
-        (dolist (overlay anything-digit-overlays)
-          (delete-overlay overlay))
-        (setq anything-digit-overlays nil)))))
+    (when anything-digit-overlays
+      (dolist (overlay anything-digit-overlays)
+        (delete-overlay overlay))
+      (setq anything-digit-overlays nil))))
 
 
 (defun anything-cleanup ()
@@ -2151,8 +2152,9 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
    (\"source name2\" (\"candidate3\" \"candidate4\")))
 "
   (let ((anything-test-mode t)
-        (anything-sources
-         (mapcar (lambda (source) (cons '(volatile) source)) sources))
+        anything-enable-digit-shortcuts
+        anything-candidate-cache
+        (anything-sources sources)
         anything-update-hook
         anything-test-candidate-list)
     (anything-initialize)
@@ -2456,7 +2458,9 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates '(((name . "FOO")
                                      (candidates "ok")
                                      (candidate-transformer
-                                      . (lambda (c) (setq v anything-source-name)))))
+                                      . (lambda (c)
+                                          (setq v anything-source-name)
+                                          c))))
                                   "")
         v))
     (expect "FOO"
@@ -2464,7 +2468,9 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates '(((name . "FOO")
                                      (candidates "ok")
                                      (filtered-candidate-transformer
-                                      . (lambda (c s) (setq v anything-source-name)))))
+                                      . (lambda (c s)
+                                          (setq v anything-source-name)
+                                          c))))
                                   "")
         v))
     (desc "anything-candidates-buffer create")
