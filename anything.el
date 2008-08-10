@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.38 2008-08-09 21:38:25 rubikitch Exp $
+;; $Id: anything.el,v 1.39 2008-08-10 22:46:01 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.38  2008-08-09 21:38:25  rubikitch
+;; Revision 1.39  2008-08-10 22:46:01  rubikitch
+;; `anything-move-selection': avoid infinite loop
+;;
+;; Revision 1.38  2008/08/09 21:38:25  rubikitch
 ;; `anything-read-file-name: experimental implementation.
 ;;
 ;; Revision 1.37  2008/08/09 17:54:25  rubikitch
@@ -1259,13 +1262,14 @@ UNIT and DIRECTION."
 
         (t (error "Invalid unit.")))
 
-      (while (anything-pos-header-line-p)
+      (while (and (not (bobp)) (anything-pos-header-line-p))
         (forward-line (if (and (eq direction 'previous)
                                (not (eq (line-beginning-position)
                                         (point-min))))
                           -1
                         1)))
-
+      (if (bobp)
+          (forward-line 1))
       (if (eobp)
           (forward-line -1))
 
