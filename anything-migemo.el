@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo extension for anything
-;; $Id: anything-migemo.el,v 1.6 2008-08-08 03:40:51 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.7 2008-08-10 22:45:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -35,10 +35,19 @@
 ;; (require 'anything-migemo)
 ;; (define-key global-map [(control ?:)] 'anything-migemo)
 
+;;; Bug:
+
+;; Simultaneous use of (candidates-in-buffer), (search
+;; . migemo-forward) and (delayed) scrambles *anything* buffer. Maybe
+;; because of collision of `migemo-process' and `run-with-idle-timer'
+
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.6  2008-08-08 03:40:51  rubikitch
+;; Revision 1.7  2008-08-10 22:45:02  rubikitch
+;; Bug info
+;;
+;; Revision 1.6  2008/08/08 03:40:51  rubikitch
 ;; require migemo
 ;;
 ;; Revision 1.5  2008/08/08 03:38:34  rubikitch
