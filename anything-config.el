@@ -12,6 +12,7 @@
 ;;     Bill Clementson <billclem@gmail.com>
 ;;     Stefan Kamphausen <ska@skamphausen.de>
 ;;     Drew Adams <drew.adams@oracle.com>
+;;     Jason McBrayer <jmcbray@carcosa.net>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -60,7 +61,7 @@
 
 ;;; Version
 
-(defvar anything-c-version "<2008-02-18 Mon 21:05>"
+(defvar anything-c-version "<2008-08-13 Wed 14:49>"
   "The version of anything-config.el, or better the date of the
 last change.")
 
