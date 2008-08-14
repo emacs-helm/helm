@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.40 2008-08-14 10:34:04 rubikitch Exp $
+;; $Id: anything.el,v 1.41 2008-08-14 20:51:28 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.40  2008-08-14 10:34:04  rubikitch
+;; Revision 1.41  2008-08-14 20:51:28  rubikitch
+;; New `anything-sources' attribute: cleanup
+;;
+;; Revision 1.40  2008/08/14 10:34:04  rubikitch
 ;; `anything': SOURCES: accept symbols
 ;;
 ;; Revision 1.39  2008/08/10 22:46:01  rubikitch
@@ -507,6 +510,11 @@ Attributes:
   function return a list with (DISPLAY . REAL) pairs. But if REAL
   can be generated from DISPLAY, display-to-real is more
   convenient and faster.
+
+- cleanup (optional)
+
+  Function called with no parameters when *anything* buffer is closed. It
+  is useful for killing unneeded candidates buffer.
 ")
 
 
@@ -1125,12 +1133,13 @@ action."
   (interactive)
   (anything-select-nth-action 3))
 
-(defun anything-funcall-inits ()
+(defun anything-funcall-foreach (sym)
+  "Call the sym function for each source if any."
   (dolist (source (anything-get-sources))
-    (let ((init (assoc-default 'init source)))
-      (when init
+    (let ((func (assoc-default sym source)))
+      (when func
         (let ((anything-source-name (assoc-default 'name source)))
-          (funcall init))))))
+          (funcall func))))))
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
@@ -1141,7 +1150,7 @@ action."
   (setq anything-saved-sources nil)
   (setq anything-saved-current-source nil)
   ;; Call the init function for sources where appropriate
-  (anything-funcall-inits)
+  (anything-funcall-foreach 'init)
 
   (setq anything-pattern "")
   (setq anything-input "")
@@ -1189,6 +1198,7 @@ action."
   (with-current-buffer anything-current-buffer
     (setq anything-buffer-chars-modified-tick (buffer-chars-modified-tick)))
   (bury-buffer anything-buffer)
+  (anything-funcall-foreach 'cleanup)
   (anything-kill-async-processes))
 
 
@@ -2667,6 +2677,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (display-to-real . upcase)
           (action ("identity" . identity)))))
       (anything-execute-selection-action))
+    (desc "cleanup test")
+    (expect 'cleaned
+      (let (v)
+        (anything-test-candidates
+         '(((name . "TEST")
+            (cleanup . (lambda () (setq v 'cleaned))))))
+        v))
+
     ))
 
 
