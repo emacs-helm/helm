@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.1 2008-08-13 14:17:41 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.2 2008-08-14 20:47:14 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.1  2008-08-13 14:17:41  rubikitch
+;; Revision 1.2  2008-08-14 20:47:14  rubikitch
+;; ag-hijack-gtags-select-mode: cleanup
+;;
+;; Revision 1.1  2008/08/13 14:17:41  rubikitch
 ;; Initial revision
 ;;
 
@@ -90,7 +93,8 @@
                  (action
                   ("Goto the location"
                    . (lambda (c) (aggs-select-it c t))))
-                 (persistent-action . aggs-select-it))))))
+                 (persistent-action . aggs-select-it)
+                 (cleanup . (lambda () (kill-buffer buffer))))))))
 
 (defun aggs-select-it (candidate &optional delete)
   (with-temp-buffer
