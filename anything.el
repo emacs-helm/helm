@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.39 2008-08-10 22:46:01 rubikitch Exp $
+;; $Id: anything.el,v 1.40 2008-08-14 10:34:04 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,7 +99,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.39  2008-08-10 22:46:01  rubikitch
+;; Revision 1.40  2008-08-14 10:34:04  rubikitch
+;; `anything': SOURCES: accept symbols
+;;
+;; Revision 1.39  2008/08/10 22:46:01  rubikitch
 ;; `anything-move-selection': avoid infinite loop
 ;;
 ;; Revision 1.38  2008/08/09 21:38:25  rubikitch
@@ -992,7 +995,9 @@ the real value in a text property."
   (interactive)
   (condition-case v
       (let ((frameconfig (current-frame-configuration))
-            (anything-sources (or sources anything-sources)))
+            (anything-sources (cond ((and sources (symbolp sources)) (list sources))
+                                    (sources)
+                                    (t anything-sources))))
         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
         (unless resume (anything-initialize))
