@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.42 2008-08-15 11:03:20 rubikitch Exp $
+;; $Id: anything.el,v 1.43 2008-08-15 11:44:28 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -110,6 +110,11 @@
 ;; [EVAL IT] (describe-variable 'anything-buffer-file-name)
 
 ;;
+;; `anything-completing-read' and `anything-read-file-name' are
+;; experimental implementation. If you are curious, type M-x
+;; anything-read-string-mode. It is a minor mode and toggles on/off.
+
+;;
 ;; Use `anything-test-candidates' to test your handmade anything
 ;; sources. It simulates contents of *anything* buffer with pseudo
 ;; `anything-sources' and `anything-pattern', without side-effect. So
@@ -140,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.42  2008-08-15 11:03:20  rubikitch
+;; Revision 1.43  2008-08-15 11:44:28  rubikitch
+;; `anything-read-string-mode': minor mode for `anything' version of read functions. (experimental)
+;;
+;; Revision 1.42  2008/08/15 11:03:20  rubikitch
 ;; update docs
 ;;
 ;; Revision 1.41  2008/08/14 20:51:28  rubikitch
@@ -2249,7 +2257,30 @@ shown yet and bind anything commands in iswitchb."
        ,new-input-source
        ,history-source)))
 ;; (anything-read-file-name "file: " "~" ".emacs")
-;; (anything-read-file-name "file: " "/tmp")
+;; (read-file-name "file: " "/tmp")
+
+(defvar anything-read-string-mode nil)
+(unless anything-read-string-mode
+  (defalias 'anything-old-completing-read (symbol-function 'completing-read))
+  (defalias 'anything-old-read-file-name (symbol-function 'read-file-name)))
+  
+;; (anything-read-string-mode -1)
+;; (anything-read-string-mode 1)
+;; (anything-read-string-mode 0)
+(defun anything-read-string-mode (arg)
+  "If this minor mode is on, use `anything' version of `completing-read' and `read-file-name'."
+  (interactive "P")
+  (setq anything-read-string-mode (if arg (> (prefix-numeric-value arg) 0) (not anything-read-string-mode)))
+  (cond (anything-read-string-mode
+         ;; redefine to anything version
+         (defalias 'completing-read (symbol-function 'anything-completing-read))
+         (defalias 'read-file-name (symbol-function 'anything-read-file-name))
+         (message "Installed anything version of read functions."))
+        (t
+         ;; restore to original version
+         (defalias 'completing-read (symbol-function 'anything-old-completing-read))
+         (defalias 'read-file-name (symbol-function 'anything-old-read-file-name))
+         (message "Uninstalled anything version of read functions."))))
 
 ;;----------------------------------------------------------------------
 ;; XEmacs compatibility
