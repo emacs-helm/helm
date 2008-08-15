@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.41 2008-08-14 20:51:28 rubikitch Exp $
+;; $Id: anything.el,v 1.42 2008-08-15 11:03:20 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -37,10 +37,14 @@
 ;; configurations for demonstration purposes. See anything-config.el
 ;; for practical, polished, easy to use configurations which can be
 ;; used to assemble a custom personalized configuration. And many
-;; other configurations are in EmacsWiki.
+;; other configurations are in the EmacsWiki.
 ;; 
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/anything-config.el
 ;; http://www.emacswiki.org/cgi-bin/emacs/AnythingSources
+;;
+;; Maintainer's configuration is in the EmacsWiki.
+;;
+;; http://www.emacswiki.org/cgi-bin/emacs/RubikitchAnythingConfiguration
 ;;
 ;; Tested on Emacs 22.
 ;;
@@ -49,23 +53,59 @@
 ;; Thanks to Stefan Kamphausen for fixes and XEmacs support.
 ;; Thanks to Tassilo Horn for fixes.
 ;; Thanks to Drew Adams for various fixes (frame, isearch, customization, etc.)
+;; Thanks to IMAKADO for candidates-in-buffer idea.
 ;;
 
 ;;; Tips:
 
 ;;
+;; `anything-sources' accepts many attributes to make your life easier.
+;; Now `anything-sources' accepts a list of symbols.
+;;
+;; [EVAL IT] (describe-variable 'anything-sources)
+
+;;
+;; `anything' has optional arguments. Now you do not have to let-bind
+;; `anything-sources'.
+;;
+;; [EVAL IT] (describe-function 'anything)
+
+;;
+;; `anything-resume' resumes last `anything' session. Now you do not
+;; have to retype pattern.
+;;
+;; [EVAL IT] (describe-function 'anything-resume)
+
+;;
+;; `anything-execute-persistent-action' executes action without
+;; quitting `anything'. When popping up a buffer in other window by
+;; persistent action, you can scroll with `anything-scroll-other-window' and
+;; `anything-scroll-other-window-down'. See also `anything-sources' docstring.
+;;
+;; [EVAL IT] (describe-function 'anything-execute-persistent-action)
+;; [EVAL IT] (describe-variable 'anything-sources)
+
+;;
+;; `anything-select-2nd-action', `anything-select-3rd-action' and
+;; `anything-select-4th-action' select other than default action
+;; without pressing Tab.
+
+;;
 ;; Using `anything-candidates-buffer' and the candidates-in-buffer
 ;; attribute is much faster than traditional "candidates and match"
-;; way. See docstring of them.
-
+;; way. And `anything-current-buffer-is-modified' avoids to
+;; recalculate candidates for unmodified buffer. See docstring of
+;; them.
+;;
 ;; [EVAL IT] (describe-function 'anything-candidates-buffer)
 ;; [EVAL IT] (describe-function 'anything-candidates-in-buffer)
+;; [EVAL IT] (describe-function 'anything-current-buffer-is-modified)
 
 ;;
 ;; `anything-current-buffer' and `anything-buffer-file-name' stores
 ;; `(current-buffer)' and `buffer-file-name' in the buffer `anything'
 ;; is invoked. Use them freely.
-
+;;
 ;; [EVAL IT] (describe-variable 'anything-current-buffer)
 ;; [EVAL IT] (describe-variable 'anything-buffer-file-name)
 
@@ -74,12 +114,12 @@
 ;; sources. It simulates contents of *anything* buffer with pseudo
 ;; `anything-sources' and `anything-pattern', without side-effect. So
 ;; you can unit-test your anything sources! Let's TDD!
-
+;;
 ;; [EVAL IT] (describe-function 'anything-test-candidates)
-
+;;
 ;; There are many unit-testing framework in Emacs Lisp. See the EmacsWiki.
 ;; http://www.emacswiki.org/cgi-bin/emacs/UnitTesting
-
+;;
 ;; There is an unit-test by Emacs Lisp Expectations at the tail of this file.
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el
@@ -96,10 +136,14 @@
 ;;
 ;;   - anything-candidate-number-limit can't be nil everywhere
 ;;
+;;   - support multi line candidates
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.41  2008-08-14 20:51:28  rubikitch
+;; Revision 1.42  2008-08-15 11:03:20  rubikitch
+;; update docs
+;;
+;; Revision 1.41  2008/08/14 20:51:28  rubikitch
 ;; New `anything-sources' attribute: cleanup
 ;;
 ;; Revision 1.40  2008/08/14 10:34:04  rubikitch
@@ -109,7 +153,7 @@
 ;; `anything-move-selection': avoid infinite loop
 ;;
 ;; Revision 1.38  2008/08/09 21:38:25  rubikitch
-;; `anything-read-file-name: experimental implementation.
+;; `anything-read-file-name': experimental implementation.
 ;;
 ;; Revision 1.37  2008/08/09 17:54:25  rubikitch
 ;; action test
