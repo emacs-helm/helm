@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.44 2008-08-16 09:38:15 rubikitch Exp $
+;; $Id: anything.el,v 1.45 2008-08-16 11:27:59 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,12 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.44  2008-08-16 09:38:15  rubikitch
+;; Revision 1.45  2008-08-16 11:27:59  rubikitch
+;; refactoring
+;;  `anything-aif': Anaphoric if.
+;;  `anything-compile-source-functions': make `anything-get-sources' customizable.
+;;
+;; Revision 1.44  2008/08/16 09:38:15  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.43  2008/08/15 11:44:28  rubikitch
@@ -853,6 +858,12 @@ If you change `anything-sources' dynamically, set this variables to nil.")
 (defvar anything-source-name nil)
 (defvar anything-candidates-buffer-alist nil)
 
+(defmacro anything-aif (test-form then-form &optional else-form)
+  "Anaphoric if."
+  `(let ((it ,test-form))
+     (if it ,then-form ,else-form)))  
+(put 'anything-aif 'lisp-indent-function 2)
+
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
 to be handled."
@@ -915,6 +926,9 @@ the current pattern."
                              'anything-process-delayed-sources
                              delayed-sources)))))
 
+(defvar anything-compile-source-functions
+  '(anything-compile-source--type anything-compile-source--candidates-in-buffer)
+  "Functions to compile elements of `anything-sources'.")
 (defun anything-get-sources ()
   "Return compiled `anything-sources', which is memoized.
 
@@ -936,17 +950,23 @@ Attributes:
     (setq anything-compiled-sources
           (mapcar
            (lambda (source)
-             (let* ((source (if (listp source) source (symbol-value source)))
-                    (type (assoc-default 'type source))
-                    (cib (assoc 'candidates-in-buffer source)))
-               (if type
-                   (setq source (append source (assoc-default type anything-type-attributes) nil)))
-               (if cib
-                   (setq source
-                         (append source `((candidates . ,(or (cdr cib) 'anything-candidates-in-buffer))
-                                          (volatile) (match identity)))))
-               source))
+             (loop with source = (if (listp source) source (symbol-value source))
+                   for f in anything-compile-source-functions
+                   do (setq source (funcall f source))
+                   finally (return source)))
            anything-sources)))))
+
+(defun anything-compile-source--type (source)
+  (anything-aif (assoc-default 'type source)
+      (append source (assoc-default it anything-type-attributes) nil)
+    source))
+    
+(defun anything-compile-source--candidates-in-buffer (source)
+  (anything-aif (assoc 'candidates-in-buffer source)
+      (append source `((candidates . ,(or (cdr it) 'anything-candidates-in-buffer))
+                       (volatile) (match identity)))
+    source))
+  
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
@@ -990,11 +1010,10 @@ Attributes:
 
         (invalid-regexp (setq matches nil))))
 
-    (let* ((transformer (assoc-default 'filtered-candidate-transformer source)))
-      (if transformer
-          (setq matches
-                (let ((anything-source-name (assoc-default 'name source)))
-                  (funcall transformer matches source)))))
+    (anything-aif (assoc-default 'filtered-candidate-transformer source)
+        (setq matches
+              (let ((anything-source-name (assoc-default 'name source)))
+                (funcall it matches source))))
     matches))
 
 (defun anything-process-source (source)
@@ -1139,10 +1158,9 @@ action."
     (let* ((source (anything-get-current-source))
            (actions (assoc-default 'action source)))
 
-      (let* ((transformer (assoc-default 'action-transformer source)))
-        (if transformer
-            (funcall transformer actions (anything-get-selection))
-          actions)))))
+      (anything-aif (assoc-default 'action-transformer source)
+          (funcall it actions (anything-get-selection))
+        actions))))
 
 (defun anything-select-action ()
   "Select an action for the currently selected candidate."
@@ -1191,10 +1209,9 @@ action."
 (defun anything-funcall-foreach (sym)
   "Call the sym function for each source if any."
   (dolist (source (anything-get-sources))
-    (let ((func (assoc-default sym source)))
-      (when func
+    (anything-aif (assoc-default sym source)
         (let ((anything-source-name (assoc-default 'name source)))
-          (funcall func))))))
+          (funcall it)))))
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
@@ -1432,11 +1449,10 @@ SOURCE."
 
 (defun anything-transform-candidates (candidates source)
   "Transform CANDIDATES according to candidate transformers."
-  (let* ((transformer (assoc-default 'candidate-transformer source)))
-    (if transformer
-        (let ((anything-source-name (assoc-default 'name source)))
-          (funcall transformer candidates))
-      candidates)))
+  (anything-aif (assoc-default 'candidate-transformer source)
+      (let ((anything-source-name (assoc-default 'name source)))
+        (funcall it candidates))
+    candidates))
 
 
 (defun anything-get-cached-candidates (source)
