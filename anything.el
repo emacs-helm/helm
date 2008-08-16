@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.46 2008-08-16 14:51:27 rubikitch Exp $
+;; $Id: anything.el,v 1.47 2008-08-16 16:35:24 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.46  2008-08-16 14:51:27  rubikitch
+;; Revision 1.47  2008-08-16 16:35:24  rubikitch
+;; silence byte compiler
+;;
+;; Revision 1.46  2008/08/16 14:51:27  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.45  2008/08/16 11:27:59  rubikitch
@@ -333,6 +336,8 @@
                            ((name . "Manual Pages")
                             (candidates . ,(progn
                                              ;; XEmacs doesn't have a woman :)
+                                             (declare (special woman-file-name
+                                                               woman-topic-all-completions))
                                              (condition-case nil
                                                  (progn
                                                    (require 'woman)
@@ -1393,6 +1398,7 @@ UNIT and DIRECTION."
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
   (interactive)
+  (declare (special anything-iswitchb-candidate-selected))
   (setq anything-iswitchb-candidate-selected (anything-get-selection))
   (exit-minibuffer))
 
@@ -1555,6 +1561,7 @@ function, specifying `(match identity)' makes the source slightly faster.
 See also `anything-sources' docstring.
 
 "
+  (declare (special source))
   (anything-candidates-in-buffer-1 (anything-candidates-buffer)
                                    anything-pattern get-line-fn
                                    ;; use external variable `source'.
@@ -1703,20 +1710,21 @@ Acceptable values of CREATE-OR-BUFFER:
 
 
 (defun anything-maybe-fit-frame ()
-   "Fit anything frame to its buffer, and put it at top right of display.
+  "Fit anything frame to its buffer, and put it at top right of display.
  To inhibit fitting, set `fit-frame-inhibit-fitting-flag' to t.
  You can set user options `fit-frame-max-width-percent' and
  `fit-frame-max-height-percent' to control max frame size."
-   (when (and (require 'fit-frame nil t)
-              (boundp 'fit-frame-inhibit-fitting-flag)
-              (not fit-frame-inhibit-fitting-flag)
-              (get-buffer-window anything-buffer 'visible))
-     (with-selected-window (get-buffer-window anything-buffer 'visible)
-       (fit-frame nil nil nil t)
-       (modify-frame-parameters
-        (selected-frame)
-        `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
-          (top . 0)))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
+  (declare (warn (unresolved 0)))
+  (when (and (require 'fit-frame nil t)
+             (boundp 'fit-frame-inhibit-fitting-flag)
+             (not fit-frame-inhibit-fitting-flag)
+             (get-buffer-window anything-buffer 'visible))
+    (with-selected-window (get-buffer-window anything-buffer 'visible)
+      (fit-frame nil nil nil t)
+      (modify-frame-parameters
+       (selected-frame)
+       `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
+         (top . 0)))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
 
 ;;---------------------------------------------------------------------
 ;; Persistent Action
@@ -2067,6 +2075,7 @@ ESC cancels anything completion and returns to normal iswitchb."
 
 (defun anything-iswitchb-check-input ()
   "Extract iswitchb input and check if it needs to be handled."
+  (declare (special iswitchb-text))
   (if (or anything-iswitchb-frame-configuration
           (sit-for anything-iswitchb-idle-delay))
       (anything-check-new-input iswitchb-text)))
@@ -2219,6 +2228,7 @@ shown yet and bind anything commands in iswitchb."
 
 (defun anything-read-file-name-follow-directory ()
   (interactive)
+  (declare (special dir prompt default-filename require-match predicate))
   (let* ((sel (anything-get-selection))
          (f (expand-file-name sel dir)))
     (cond ((and (file-directory-p f) (not (string-match "/\\.$" sel)))
