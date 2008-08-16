@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.2 2008-08-14 20:47:14 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.3 2008-08-16 10:26:56 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.2  2008-08-14 20:47:14  rubikitch
+;; Revision 1.3  2008-08-16 10:26:56  rubikitch
+;; adjust to argument change of `anything-candidates-in-buffer-1'
+;;
+;; Revision 1.2  2008/08/14 20:47:14  rubikitch
 ;; ag-hijack-gtags-select-mode: cleanup
 ;;
 ;; Revision 1.1  2008/08/13 14:17:41  rubikitch
@@ -64,7 +67,7 @@
   ;; 16 = length of symbol
   (buffer-substring-no-properties (+ s 16) e))
 (defun ag-hijack-gtags-select-mode ()
-  ;; `buffer' is defined at `gtags-goto-tag'.
+  ;; `save' and `buffer' are defined at `gtags-goto-tag'.
   (let ((anything-candidate-number-limit 9999) pwd)
     (anything '(((name . "GTAGS SELECT")
                  (init
@@ -82,11 +85,12 @@
                   . (lambda (c s)
                       (if (string= anything-pattern "")
                           (let ((anything-pattern
-                                 (substring (with-current-buffer gtags-current-buffer
+                                 (substring (with-current-buffer save
                                               buffer-file-name)
                                             (length pwd))))
                             (anything-candidates-in-buffer-1
                              (anything-candidates-buffer)
+                             anything-pattern
                              #'aggs-candidate-display
                              #'search-forward))
                         c)))
