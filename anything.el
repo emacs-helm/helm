@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.45 2008-08-16 11:27:59 rubikitch Exp $
+;; $Id: anything.el,v 1.46 2008-08-16 14:51:27 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.45  2008-08-16 11:27:59  rubikitch
+;; Revision 1.46  2008-08-16 14:51:27  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.45  2008/08/16 11:27:59  rubikitch
 ;; refactoring
 ;;  `anything-aif': Anaphoric if.
 ;;  `anything-compile-source-functions': make `anything-get-sources' customizable.
@@ -948,13 +951,17 @@ Attributes:
    ;; first time
    (t
     (setq anything-compiled-sources
-          (mapcar
-           (lambda (source)
-             (loop with source = (if (listp source) source (symbol-value source))
-                   for f in anything-compile-source-functions
-                   do (setq source (funcall f source))
-                   finally (return source)))
-           anything-sources)))))
+          (anything-compile-sources anything-sources anything-compile-source-functions)))))
+
+(defun anything-compile-sources (sources funcs)
+  (mapcar
+   (lambda (source)
+     (loop with source = (if (listp source) source (symbol-value source))
+           for f in funcs
+           do (setq source (funcall f source))
+           finally (return source)))
+   sources))  
+
 
 (defun anything-compile-source--type (source)
   (anything-aif (assoc-default 'type source)
@@ -2386,22 +2393,18 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (prog1
             anything-buffer-file-name
           (kill-buffer (current-buffer)))))
-    (desc "anything-get-sources")
+    (desc "anything-compile-sources")
     (expect '(((name . "foo")))
-      (let (anything-compiled-sources
-            (anything-sources '(((name . "foo")))))
-        (anything-get-sources)))
+      (anything-compile-sources '(((name . "foo"))) nil)
+      )
     (expect '(((name . "foo") (type . test) (action . identity)))
-      (let (anything-compiled-sources
-            (anything-sources '(((name . "foo") (type . test))))
-            (anything-type-attributes '((test (action . identity)))))
-        (anything-get-sources)))
+      (let ((anything-type-attributes '((test (action . identity)))))
+        (anything-compile-sources '(((name . "foo") (type . test)))
+                                  '(anything-compile-source--type))))
     (desc "anything-sources accepts symbols")
     (expect '(((name . "foo")))
-      (let* (anything-compiled-sources
-             (foo '((name . "foo")))
-             (anything-sources '(foo)))
-        (anything-get-sources)))
+      (let* ((foo '((name . "foo"))))
+        (anything-compile-sources '(foo) nil)))
     (desc "anything-get-sources action")
     (expect '(((name . "Actions") (candidates . actions)))
       (let (anything-compiled-sources
@@ -2413,33 +2416,31 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                (candidates-in-buffer . anything-candidates-in-buffer)
                (candidates . anything-candidates-in-buffer)
                (volatile) (match identity)))
-      (let (anything-compiled-sources
-            (anything-sources 
-             '(((name . "many") (init . many-init)
-                (candidates-in-buffer . anything-candidates-in-buffer)))))
-        (anything-get-sources)))
+      (anything-compile-sources
+       '(((name . "many") (init . many-init)
+          (candidates-in-buffer . anything-candidates-in-buffer)))
+       '(anything-compile-source--candidates-in-buffer)))
     (expect '(((name . "many") (init . many-init)
                (candidates-in-buffer)
                (candidates . anything-candidates-in-buffer)
                (volatile) (match identity)))
-      (let (anything-compiled-sources
-            (anything-sources 
-             '(((name . "many") (init . many-init)
-                (candidates-in-buffer)))))
-        (anything-get-sources)))
+      (anything-compile-sources
+       '(((name . "many") (init . many-init)
+          (candidates-in-buffer)))
+       '(anything-compile-source--candidates-in-buffer)))
     (expect '(((name . "many") (init . many-init)
                (candidates-in-buffer)
                (type . test)
                (action . identity)
                (candidates . anything-candidates-in-buffer)
                (volatile) (match identity)))
-      (let (anything-compiled-sources
-            (anything-type-attributes '((test (action . identity))))
-            (anything-sources 
-             '(((name . "many") (init . many-init)
-                (candidates-in-buffer)
-                (type . test)))))
-        (anything-get-sources)))
+      (let ((anything-type-attributes '((test (action . identity)))))
+        (anything-compile-sources
+         '(((name . "many") (init . many-init)
+            (candidates-in-buffer)
+            (type . test)))
+         '(anything-compile-source--type
+           anything-compile-source--candidates-in-buffer))))
 
     (desc "anything-get-candidates")
     (expect '("foo" "bar")
