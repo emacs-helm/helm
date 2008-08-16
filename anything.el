@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.43 2008-08-15 11:44:28 rubikitch Exp $
+;; $Id: anything.el,v 1.44 2008-08-16 09:38:15 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.43  2008-08-15 11:44:28  rubikitch
+;; Revision 1.44  2008-08-16 09:38:15  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.43  2008/08/15 11:44:28  rubikitch
 ;; `anything-read-string-mode': minor mode for `anything' version of read functions. (experimental)
 ;;
 ;; Revision 1.42  2008/08/15 11:03:20  rubikitch
@@ -1529,17 +1532,18 @@ function, specifying `(match identity)' makes the source slightly faster.
 See also `anything-sources' docstring.
 
 "
-  (anything-candidates-in-buffer-1 (anything-candidates-buffer) get-line-fn
+  (anything-candidates-in-buffer-1 (anything-candidates-buffer)
+                                   anything-pattern get-line-fn
                                    ;; use external variable `source'.
                                    (or (assoc-default 'search source)
                                        #'re-search-forward)))
 
-(defun* anything-candidates-in-buffer-1 (buffer &optional (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
+(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
       (goto-char (point-min))
-      (loop while (funcall search-fn anything-pattern nil t)
+      (loop while (funcall search-fn pattern nil t)
             for i from 1 to anything-candidate-number-limit
             unless (eobp)
             collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
@@ -2506,35 +2510,31 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (expect '("foo+" "bar+" "baz+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-pattern "")
-              (anything-candidate-number-limit 5))
-          (anything-candidates-in-buffer-1 (current-buffer)))))
+        (let ((anything-candidate-number-limit 5))
+          (anything-candidates-in-buffer-1 (current-buffer) ""))))
     (expect '("foo+" "bar+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-pattern "")
-              (anything-candidate-number-limit 2))
-          (anything-candidates-in-buffer-1 (current-buffer)))))
+        (let ((anything-candidate-number-limit 2))
+          (anything-candidates-in-buffer-1 (current-buffer) ""))))
     (expect '("foo+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-pattern "oo\\+"))
-          (anything-candidates-in-buffer-1 (current-buffer)))))
+        (anything-candidates-in-buffer-1 (current-buffer) "oo\\+")))
     (expect '("foo+")
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-pattern "oo+"))
-          (anything-candidates-in-buffer-1
-           (current-buffer) #'buffer-substring-no-properties #'search-forward))))
+        (anything-candidates-in-buffer-1 
+           (current-buffer) "oo+"
+           #'buffer-substring-no-properties #'search-forward)))
     (expect '(("foo+" "FOO+"))
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-pattern "oo\\+"))
-          (anything-candidates-in-buffer-1
-           (current-buffer)
-           (lambda (s e)
-             (let ((l (buffer-substring-no-properties s e)))
-               (list l (upcase l))))))))
+        (anything-candidates-in-buffer-1
+         (current-buffer) "oo\\+"
+         (lambda (s e)
+           (let ((l (buffer-substring-no-properties s e)))
+             (list l (upcase l)))))))
     (desc "anything-candidates-in-buffer")
     (expect '(("TEST" ("foo+" "bar+" "baz+")))
       (anything-test-candidates
