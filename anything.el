@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.48 2008-08-16 17:03:02 rubikitch Exp $
+;; $Id: anything.el,v 1.49 2008-08-16 19:46:11 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.48  2008-08-16 17:03:02  rubikitch
+;; Revision 1.49  2008-08-16 19:46:11  rubikitch
+;; New function: `anything-action-list-is-shown'
+;;
+;; Revision 1.48  2008/08/16 17:03:02  rubikitch
 ;; bugfix: cleanup
 ;;
 ;; Revision 1.47  2008/08/16 16:35:24  rubikitch
@@ -887,7 +890,7 @@ to be handled."
 necessary."
   (unless (equal input anything-pattern)
     (setq anything-pattern input)
-    (unless anything-saved-sources
+    (unless (anything-action-list-is-shown)
       (setq anything-input anything-pattern))
     (anything-update)))
 
@@ -952,7 +955,7 @@ Attributes:
 "
   (cond
    ;; action
-   (anything-saved-sources
+   ((anything-action-list-is-shown)
     anything-sources)
    ;; memoized
    (anything-compiled-sources)
@@ -1127,13 +1130,13 @@ the real value in a text property."
   "If a candidate was selected then perform the associated
 action."
   (setq selection (or selection
-                      (if anything-saved-sources
+                      (if (anything-action-list-is-shown)
                           ;; the action list is shown
                           anything-saved-selection
                         (anything-get-selection))))
   (setq action (or action
                    anything-saved-action
-                   (if anything-saved-sources
+                   (if (anything-action-list-is-shown)
                        ;; the action list is shown
                        (anything-get-selection)
                      (anything-get-action))))
@@ -1177,10 +1180,13 @@ action."
           (funcall it actions (anything-get-selection))
         actions))))
 
+(defun anything-action-list-is-shown ()
+  (consp anything-saved-sources))
+
 (defun anything-select-action ()
   "Select an action for the currently selected candidate."
   (interactive)
-  (if anything-saved-sources
+  (if (anything-action-list-is-shown)
       (error "Already showing the action list"))
 
   (setq anything-saved-selection (anything-get-selection))
@@ -1280,7 +1286,7 @@ action."
 (defun anything-cleanup ()
   "Clean up the mess."
   (setq anything-source-filter anything-original-source-filter)
-  (if anything-saved-sources
+  (if (anything-action-list-is-shown)
       (setq anything-sources anything-saved-sources))
   (with-current-buffer anything-buffer
     (setq cursor-type t))
