@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.47 2008-08-16 16:35:24 rubikitch Exp $
+;; $Id: anything.el,v 1.48 2008-08-16 17:03:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.47  2008-08-16 16:35:24  rubikitch
+;; Revision 1.48  2008-08-16 17:03:02  rubikitch
+;; bugfix: cleanup
+;;
+;; Revision 1.47  2008/08/16 16:35:24  rubikitch
 ;; silence byte compiler
 ;;
 ;; Revision 1.46  2008/08/16 14:51:27  rubikitch
@@ -1221,6 +1224,8 @@ action."
 (defun anything-funcall-foreach (sym)
   "Call the sym function for each source if any."
   (dolist (source (anything-get-sources))
+    (when (symbolp source)
+      (setq source (symbol-value source)))
     (anything-aif (assoc-default sym source)
         (let ((anything-source-name (assoc-default 'name source)))
           (funcall it)))))
