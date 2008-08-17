@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.51 2008-08-17 12:45:30 rubikitch Exp $
+;; $Id: anything.el,v 1.52 2008-08-17 15:21:27 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.51  2008-08-17 12:45:30  rubikitch
+;; Revision 1.52  2008-08-17 15:21:27  rubikitch
+;; `anything-test-candidates': accept a symbol for source
+;; New variable: `anything-input-idle-delay'
+;;
+;; Revision 1.51  2008/08/17 12:45:30  rubikitch
 ;; (buffer-disable-undo) in anything-buffer
 ;;
 ;; Revision 1.50  2008/08/16 22:21:37  rubikitch
@@ -647,6 +651,12 @@ Attributes:
   character typed, only if the user hesitates a bit.")
 
 
+(defvar anything-input-idle-delay nil
+  "The user has to be idle for this many seconds, before ALL candidates are collected.
+Unlink `anything-input-idle', it is also effective for non-delayed sources.
+If nil, candidates are collected immediately. ")
+
+
 (defvar anything-samewindow nil
   "If t then Anything doesn't pop up a new window, it uses the
 current window to show the candidates.")
@@ -895,13 +905,22 @@ If you change `anything-sources' dynamically, set this variables to nil.")
       anything-action-buffer
     anything-buffer))
 
+(defvar anything-check-minibuffer-input-timer nil)
+
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
 to be handled."
-   (with-selected-window (minibuffer-window)
-     (anything-check-new-input (minibuffer-contents))))
+  (if (not anything-input-idle-delay)
+      (anything-check-minibuffer-input-1)
+    (if anything-check-minibuffer-input-timer
+        (cancel-timer anything-check-minibuffer-input-timer))
+    (setq anything-check-minibuffer-input-timer
+          (run-with-idle-timer anything-input-idle-delay nil
+                               'anything-check-minibuffer-input-1))))
 
-
+(defun anything-check-minibuffer-input-1 ()
+  (with-selected-window (minibuffer-window)
+    (anything-check-new-input (minibuffer-contents))))  
 (defun anything-check-new-input (input)
   "Check input string and update the anything buffer if
 necessary."
@@ -1105,15 +1124,18 @@ the real value in a text property."
 
         (anything-maybe-fit-frame))))
 
+(defun anything-normalize-sources (sources)
+  (cond ((and sources (symbolp sources)) (list sources))
+        (sources)
+        (t anything-sources)))  
+
 (defun anything (&optional sources input prompt resume)
   "Select anything."
   ;; TODO more document
   (interactive)
   (condition-case v
       (let ((frameconfig (current-frame-configuration))
-            (anything-sources (cond ((and sources (symbolp sources)) (list sources))
-                                    (sources)
-                                    (t anything-sources))))
+            (anything-sources (anything-normalize-sources sources)))
         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
         (unless resume (anything-initialize))
@@ -2401,7 +2423,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
   (let ((anything-test-mode t)
         anything-enable-digit-shortcuts
         anything-candidate-cache
-        (anything-sources sources)
+        (anything-sources (anything-normalize-sources sources))
         anything-update-hook
         anything-test-candidate-list)
     (get-buffer-create anything-buffer)
