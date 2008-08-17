@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.50 2008-08-16 22:21:37 rubikitch Exp $
+;; $Id: anything.el,v 1.51 2008-08-17 12:45:30 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.50  2008-08-16 22:21:37  rubikitch
+;; Revision 1.51  2008-08-17 12:45:30  rubikitch
+;; (buffer-disable-undo) in anything-buffer
+;;
+;; Revision 1.50  2008/08/16 22:21:37  rubikitch
 ;; `anything-saved-sources': removed
 ;; `anything-action-buffer': action selection buffer
 ;; `anything-select-action': toggle actions <=> candidates
@@ -1271,6 +1274,7 @@ If action buffer is selected, back to the anything buffer."
   (setq anything-last-sources anything-sources)
 
   (with-current-buffer (get-buffer-create anything-buffer)
+    (buffer-disable-undo)
     (setq cursor-type nil)
     (setq mode-name "Anything"))
 
