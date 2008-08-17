@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.52 2008-08-17 15:21:27 rubikitch Exp $
+;; $Id: anything.el,v 1.53 2008-08-17 23:15:38 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.52  2008-08-17 15:21:27  rubikitch
+;; Revision 1.53  2008-08-17 23:15:38  rubikitch
+;; bind `anything-source-name' when executing action to enable to use `anything-candidates-buffer' in action.
+;;
+;; Revision 1.52  2008/08/17 15:21:27  rubikitch
 ;; `anything-test-candidates': accept a symbol for source
 ;; New variable: `anything-input-idle-delay'
 ;;
@@ -1176,19 +1179,18 @@ action."
                    (if (get-buffer anything-action-buffer)
                        (anything-get-selection anything-action-buffer)
                      (anything-get-action))))
-  (setq display-to-real
-        (or display-to-real
-            (assoc-default 'display-to-real
-                           (or anything-saved-current-source
-                               (anything-get-current-source)))
-            #'identity))
-  (if (and (listp action)
-           (not (functionp action)))    ; lambda
-      ;;select the default action
-      (setq action (cdar action)))
-  (unless clear-saved-action (setq anything-saved-action nil))
-  (if (and selection action)
-      (funcall action (funcall display-to-real selection))))
+  (let ((source (or anything-saved-current-source (anything-get-current-source))))
+    (setq display-to-real
+          (or display-to-real (assoc-default 'display-to-real source)
+              #'identity))
+    (if (and (listp action)
+             (not (functionp action)))  ; lambda
+        ;;select the default action
+        (setq action (cdar action)))
+    (unless clear-saved-action (setq anything-saved-action nil))
+    (if (and selection action)
+        (let ((anything-source-name (assoc-default 'name source)))
+          (funcall action (funcall display-to-real selection))))))
 
 
 (defun* anything-get-selection (&optional (buffer anything-buffer))
