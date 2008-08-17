@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.53 2008-08-17 23:15:38 rubikitch Exp $
+;; $Id: anything.el,v 1.54 2008-08-17 23:22:24 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.53  2008-08-17 23:15:38  rubikitch
+;; Revision 1.54  2008-08-17 23:22:24  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.53  2008/08/17 23:15:38  rubikitch
 ;; bind `anything-source-name' when executing action to enable to use `anything-candidates-buffer' in action.
 ;;
 ;; Revision 1.52  2008/08/17 15:21:27  rubikitch
@@ -1024,6 +1027,9 @@ Attributes:
                        (volatile) (match identity)))
     source))
   
+(defun anything-funcall-with-source (source func &rest args)
+  (let ((anything-source-name (assoc-default 'name source)))
+    (apply func args)))
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
@@ -1069,8 +1075,7 @@ Attributes:
 
     (anything-aif (assoc-default 'filtered-candidate-transformer source)
         (setq matches
-              (let ((anything-source-name (assoc-default 'name source)))
-                (funcall it matches source))))
+              (anything-funcall-with-source source it matches source)))
     matches))
 
 (defun anything-process-source (source)
@@ -1189,8 +1194,7 @@ action."
         (setq action (cdar action)))
     (unless clear-saved-action (setq anything-saved-action nil))
     (if (and selection action)
-        (let ((anything-source-name (assoc-default 'name source)))
-          (funcall action (funcall display-to-real selection))))))
+        (anything-funcall-with-source source  action (funcall display-to-real selection)))))
 
 
 (defun* anything-get-selection (&optional (buffer anything-buffer))
@@ -1278,8 +1282,7 @@ If action buffer is selected, back to the anything buffer."
     (when (symbolp source)
       (setq source (symbol-value source)))
     (anything-aif (assoc-default sym source)
-        (let ((anything-source-name (assoc-default 'name source)))
-          (funcall it)))))
+        (anything-funcall-with-source source it))))
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
@@ -1502,8 +1505,7 @@ SOURCE."
   (let* ((candidate-source (assoc-default 'candidates source))
          (candidates
           (if (functionp candidate-source)
-              (let ((anything-source-name (assoc-default 'name source)))
-                (funcall candidate-source))
+                (anything-funcall-with-source source candidate-source)
             (if (listp candidate-source)
                 candidate-source
               (if (and (symbolp candidate-source)
@@ -1520,8 +1522,7 @@ SOURCE."
 (defun anything-transform-candidates (candidates source)
   "Transform CANDIDATES according to candidate transformers."
   (anything-aif (assoc-default 'candidate-transformer source)
-      (let ((anything-source-name (assoc-default 'name source)))
-        (funcall it candidates))
+      (anything-funcall-with-source source it candidates)
     candidates))
 
 
