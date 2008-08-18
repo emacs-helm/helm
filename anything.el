@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.55 2008-08-18 06:35:00 rubikitch Exp $
+;; $Id: anything.el,v 1.56 2008-08-18 06:37:51 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.55  2008-08-18 06:35:00  rubikitch
+;; Revision 1.56  2008-08-18 06:37:51  rubikitch
+;; Make `anything-input-idle-delay' ineffective when the action list is shown.
+;;
+;; Revision 1.55  2008/08/18 06:35:00  rubikitch
 ;; New variable: `anything-show-exact-match-first'
 ;;
 ;; Revision 1.54  2008/08/17 23:22:24  rubikitch
@@ -922,7 +925,7 @@ If you change `anything-sources' dynamically, set this variables to nil.")
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
 to be handled."
-  (if (not anything-input-idle-delay)
+  (if (or (not anything-input-idle-delay) (anything-action-list-is-shown))
       (anything-check-minibuffer-input-1)
     (if anything-check-minibuffer-input-timer
         (cancel-timer anything-check-minibuffer-input-timer))
