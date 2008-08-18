@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.3 2008-08-16 10:26:56 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.4 2008-08-18 17:20:23 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,11 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.3  2008-08-16 10:26:56  rubikitch
+;; Revision 1.4  2008-08-18 17:20:23  rubikitch
+;; save c source buffer's position
+;; silence byte compiler
+;;
+;; Revision 1.3  2008/08/16 10:26:56  rubikitch
 ;; adjust to argument change of `anything-candidates-in-buffer-1'
 ;;
 ;; Revision 1.2  2008/08/14 20:47:14  rubikitch
@@ -67,41 +71,50 @@
   ;; 16 = length of symbol
   (buffer-substring-no-properties (+ s 16) e))
 (defun ag-hijack-gtags-select-mode ()
-  ;; `save' and `buffer' are defined at `gtags-goto-tag'.
+  ;; `save': C source file / `buffer': gtags-select-mode buffer
+  ;; They are defined at `gtags-goto-tag'.
+  (declare (special save buffer))
   (let ((anything-candidate-number-limit 9999) pwd)
-    (anything '(((name . "GTAGS SELECT")
-                 (init
-                  . (lambda ()
-                      (setq pwd (with-current-buffer buffer
-                                  (expand-file-name default-directory)))
-                      (anything-candidates-buffer buffer)))
-                 (candidates-in-buffer
-                  . (lambda ()
-                      (anything-candidates-in-buffer
-                       #'aggs-candidate-display)))
-                 (display-to-real
-                  . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
-                 (filtered-candidate-transformer
-                  . (lambda (c s)
-                      (if (string= anything-pattern "")
-                          (let ((anything-pattern
-                                 (substring (with-current-buffer save
-                                              buffer-file-name)
-                                            (length pwd))))
-                            (anything-candidates-in-buffer-1
-                             (anything-candidates-buffer)
-                             anything-pattern
-                             #'aggs-candidate-display
-                             #'search-forward))
-                        c)))
-                 (action
-                  ("Goto the location"
-                   . (lambda (c) (aggs-select-it c t))))
-                 (persistent-action . aggs-select-it)
-                 (cleanup . (lambda () (kill-buffer buffer))))))))
+    (anything
+     '(((name . "GTAGS SELECT")
+        (init
+         . (lambda ()
+             ;; It's needed because `anything' saves
+             ;; *GTAGS SELECT* buffer's position,
+             (save-window-excursion
+               (switch-to-buffer save)
+               (setq anything-current-position (cons (point) (window-start))))
+             (with-current-buffer buffer
+               (setq pwd (expand-file-name default-directory)))
+             (anything-candidates-buffer buffer)))
+        (candidates-in-buffer
+         . (lambda ()
+             (anything-candidates-in-buffer
+              #'aggs-candidate-display)))
+        (display-to-real
+         . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
+        (filtered-candidate-transformer
+         . (lambda (c s)
+             (if (string= anything-pattern "")
+                 (let ((anything-pattern
+                        (substring (with-current-buffer save
+                                     buffer-file-name)
+                                   (length pwd))))
+                   (anything-candidates-in-buffer-1
+                    (anything-candidates-buffer)
+                    anything-pattern
+                    #'aggs-candidate-display
+                    #'search-forward))
+               c)))
+        (action
+         ("Goto the location"
+          . (lambda (c) (aggs-select-it c t))))
+        (persistent-action . aggs-select-it)
+        (cleanup . (lambda () (kill-buffer buffer))))))))
 
 (defun aggs-select-it (candidate &optional delete)
   (with-temp-buffer
+    (declare (special pwd buffer))
     ;; `pwd' is defined at `ag-hijack-gtags-select-mode'.
     (setq default-directory pwd)
     (insert candidate "\n")
