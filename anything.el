@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.57 2008-08-19 03:43:57 rubikitch Exp $
+;; $Id: anything.el,v 1.58 2008-08-19 13:40:52 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.57  2008-08-19 03:43:57  rubikitch
+;; Revision 1.58  2008-08-19 13:40:52  rubikitch
+;; `anything-get-current-source': This function can be used in
+;;  init/candidates/action/candidate-transformer/filtered-candidate-transformer function.
+;;
+;; Revision 1.57  2008/08/19 03:43:57  rubikitch
 ;; `anything-process-delayed-sources': delay = anything-idle-delay - anything-input-idle-delay
 ;;
 ;; Revision 1.56  2008/08/18 06:37:51  rubikitch
@@ -1481,8 +1485,12 @@ UNIT and DIRECTION."
 
 
 (defun anything-get-current-source ()
-  "Return the source for the current selection."
-  (with-current-buffer (anything-buffer-get)
+  "Return the source for the current selection / in init/candidates/action/candidate-transformer/filtered-candidate-transformer function."
+  (declare (special source))
+  ;; The name `anything-get-current-source' should be used in init function etc.
+  (if (and (boundp 'anything-source-name) (stringp anything-source-name))
+      source
+    (with-current-buffer (anything-buffer-get)
       ;; This goto-char shouldn't be necessary, but point is moved to
       ;; point-min somewhere else which shouldn't happen.
       (goto-char (overlay-start anything-selection-overlay))
@@ -1497,7 +1505,7 @@ UNIT and DIRECTION."
                 (if (equal (assoc-default 'name source)
                            source-name)
                     source))
-              (anything-get-sources)))))
+              (anything-get-sources))))))
 
 
 (defun anything-get-next-header-pos ()
@@ -2875,7 +2883,24 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
          '(((name . "TEST")
             (cleanup . (lambda () (setq v 'cleaned))))))
         v))
-
+    (desc "anything-get-current-source")
+    ;; in init/candidates/action/candidate-transformer/filtered-candidate-transformer  function
+    (expect "FOO"
+      (assoc-default
+       'name
+       (anything-funcall-with-source '((name . "FOO")) 'anything-get-current-source)))
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (init . (lambda () (setq v (anything-get-current-source)))))))
+        (assoc-default 'name v)))
+    (expect "TEST"
+      (anything-test-candidates
+       '(((name . "TEST")
+          (candidates "foo")
+          (action ("identity" . identity)))))
+      (assoc-default 'name (anything-get-current-source)))
     ))
 
 
