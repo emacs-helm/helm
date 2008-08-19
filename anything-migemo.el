@@ -1,5 +1,5 @@
-;;; anything-migemo.el --- Migemo extension for anything
-;; $Id: anything-migemo.el,v 1.7 2008-08-10 22:45:02 rubikitch Exp $
+;;; anything-migemo.el --- Migemo plug-in for anything
+;; $Id: anything-migemo.el,v 1.8 2008-08-19 21:30:29 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -44,7 +44,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.7  2008-08-10 22:45:02  rubikitch
+;; Revision 1.8  2008-08-19 21:30:29  rubikitch
+;; plug-in
+;;
+;; Revision 1.7  2008/08/10 22:45:02  rubikitch
 ;; Bug info
 ;;
 ;; Revision 1.6  2008/08/08 03:40:51  rubikitch
@@ -69,6 +72,8 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'anything))
+(require 'anything-match-plugin nil t)
 (require 'migemo)
 (defvar anything-use-migemo nil
   "[Internal] If non-nil, `anything' is migemo-ized.")
@@ -87,17 +92,14 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
     (setq anything-previous-migemo-info (cons anything-pattern (migemo-get-pattern anything-pattern))))
   (string-match (cdr anything-previous-migemo-info) str))
 
-(defadvice anything-get-sources (around anything-migemo activate)
-  "All the `anything-sources' is delayed when `anything' is migemo-ized."
-  (if (not anything-use-migemo)
-      ad-do-it
-    (setq ad-return-value
-          (mapcar (lambda (source)
-                    `((delayed)
-                      (search . migemo-forward)
-                      ,@source
-                      (match anything-string-match-with-migemo)))
-                  ad-do-it))))
+(defun anything-compile-source--migemo (source)
+  (if anything-use-migemo
+      `((delayed)
+        (search migemo-forward ,@(assoc-default 'search source))
+        ,@source
+        (match anything-string-match-with-migemo))
+    source))
+(add-to-list 'anything-compile-source-functions 'anything-compile-source--migemo t)
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
@@ -108,9 +110,10 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
     (expect '(("TEST" ("日本語")))
       (let ((anything-use-migemo t))
         (anything-test-candidates
-       '(((name . "TEST")
-          (candidates "日本語")))
-       "nihongo")))
+         '(((name . "TEST")
+            (candidates "日本語")))
+         "nihongo"
+         '(anything-compile-source--migemo))))
     (desc "candidates buffer")
     (expect '(("TEST" ("日本語")))
       (let ((anything-use-migemo t))
@@ -120,7 +123,9 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
              . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
                             (insert "日本語\n"))))
             (candidates-in-buffer)))
-         "nihongo")))
+         "nihongo"
+         '(anything-compile-source--candidates-in-buffer
+           anything-compile-source--migemo))))
     ))
 
 (provide 'anything-migemo)
