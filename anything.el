@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.65 2008-08-19 23:18:47 rubikitch Exp $
+;; $Id: anything.el,v 1.66 2008-08-19 23:31:52 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.65  2008-08-19 23:18:47  rubikitch
+;; Revision 1.66  2008-08-19 23:31:52  rubikitch
+;; Removed `anything-show-exact-match-first' because it should be provided as a plug-in.
+;;
+;; Revision 1.65  2008/08/19 23:18:47  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.64  2008/08/19 23:15:43  rubikitch
@@ -943,9 +946,6 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   "Compiled version of `anything-sources'.
 If you change `anything-sources' dynamically, set this variables to nil.")
 
-(defvar anything-show-exact-match-first t
-  "If non-nil, show the exact candidate first.")
-
 (put 'anything 'timid-completion 'disabled)
 
 ;; internal variables
@@ -1136,9 +1136,6 @@ Anything plug-ins are realized by this function."
     (anything-aif (assoc-default 'filtered-candidate-transformer source)
         (setq matches
               (anything-funcall-with-source source it matches source)))
-    (when (and anything-show-exact-match-first
-               (member anything-pattern matches))
-      (setq matches (cons anything-pattern (delete anything-pattern matches))))
     matches))
 
 (defun anything-process-source (source)
@@ -2630,20 +2627,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (expect '("bar")
       (let ((anything-pattern "^b"))
         (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
-    (expect '("find-file-noselect" "find-file")
-      (let (anything-show-exact-match-first
-            (anything-pattern "find-file"))
-        (anything-compute-matches
-         '((name . "FOO")
-           (candidates "test" "find-file-noselect" "find-file")
-           (volatile)))))
-    (expect '("find-file" "find-file-noselect")
-      (let ((anything-show-exact-match-first t)
-            (anything-pattern "find-file"))
-        (anything-compute-matches
-         '((name . "FOO")
-           (candidates "test" "find-file-noselect" "find-file")
-           (volatile)))))        
+        
     ;; using anything-test-candidate-list
     (desc "anything-test-candidates")
     (expect '(("FOO" ("foo" "bar")))
