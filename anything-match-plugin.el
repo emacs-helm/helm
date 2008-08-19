@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.1 2008-08-19 19:45:11 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.2 2008-08-19 23:02:29 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.1  2008-08-19 19:45:11  rubikitch
+;; Revision 1.2  2008-08-19 23:02:29  rubikitch
+;; candidates-in-buffer hack
+;;
+;; Revision 1.1  2008/08/19 19:45:11  rubikitch
 ;; Initial revision
 ;;
 
@@ -88,7 +91,8 @@
 (defvar anything-default-search-functions
   '(anything-prefix-search anything-multiple-pattern-search))
 (defun anything-compile-source--match-plugin (source)
-  `((match ,@anything-default-match-functions
+  `(,(if (assoc 'candidates-in-buffer source) '(match identity))
+    (match ,@anything-default-match-functions
            ,@(assoc-default 'match source))
      (search ,@anything-default-search-functions
              ,@(assoc-default 'search source))
@@ -147,6 +151,15 @@
     (expect nil
       (anything-prefix-match "xfobar" "fo"))
     
+    (desc "with candidates-in-buffer")
+    (expect '(identity)
+      (assoc-default 'match
+                     (car (anything-compile-sources
+                           '(((name . "FOO")
+                              (candidates-in-buffer)))
+                           '(anything-compile-source--candidates-in-buffer
+                             anything-compile-source--match-plugin)))))
+          
     (desc "functional")
     (expect '(("FOO" ("thunder")))
       (anything-test-candidates '(((name . "FOO")
