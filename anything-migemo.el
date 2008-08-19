@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.8 2008-08-19 21:30:29 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.9 2008-08-19 21:38:09 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -44,7 +44,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.8  2008-08-19 21:30:29  rubikitch
+;; Revision 1.9  2008-08-19 21:38:09  rubikitch
+;; match attribute bug fix
+;;
+;; Revision 1.8  2008/08/19 21:30:29  rubikitch
 ;; plug-in
 ;;
 ;; Revision 1.7  2008/08/10 22:45:02  rubikitch
@@ -96,8 +99,8 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
   (if anything-use-migemo
       `((delayed)
         (search migemo-forward ,@(assoc-default 'search source))
-        ,@source
-        (match anything-string-match-with-migemo))
+        (match anything-string-match-with-migemo ,@(assoc-default 'match source))
+        ,@source)
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--migemo t)
 
