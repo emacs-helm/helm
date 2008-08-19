@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.64 2008-08-19 23:15:43 rubikitch Exp $
+;; $Id: anything.el,v 1.65 2008-08-19 23:18:47 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.64  2008-08-19 23:15:43  rubikitch
+;; Revision 1.65  2008-08-19 23:18:47  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.64  2008/08/19 23:15:43  rubikitch
 ;; `anything-compute-matches': short-cut when match == '(identity)
 ;;
 ;; Revision 1.63  2008/08/19 23:06:42  rubikitch
@@ -1832,9 +1835,9 @@ See also `anything-sources' docstring.
                 (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
                   (unless (gethash cand anything-cib-hash)
                     (puthash cand t anything-cib-hash)
+                    (incf i)
                     (push cand newmatches)))
-                (forward-line 1)
-                (incf i))
+                (forward-line 1))
           (setq matches (append matches (nreverse newmatches)))
           (if exit (return)))
         matches))))
