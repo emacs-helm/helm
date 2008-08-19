@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.61 2008-08-19 18:13:39 rubikitch Exp $
+;; $Id: anything.el,v 1.62 2008-08-19 22:40:57 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.61  2008-08-19 18:13:39  rubikitch
+;; Revision 1.62  2008-08-19 22:40:57  rubikitch
+;; `anything-test-candidates': additional optonal argument
+;;
+;; Revision 1.61  2008/08/19 18:13:39  rubikitch
 ;; search attribute: multiple search functions
 ;;
 ;; Revision 1.60  2008/08/19 15:07:39  rubikitch
@@ -2498,7 +2501,7 @@ The current buffer must be a minibuffer."
 ;; Unit Tests
 ;;----------------------------------------------------------------------
 
-(defun* anything-test-candidates (sources &optional (input ""))
+(defun* anything-test-candidates (sources &optional (input "") (compile-source-functions '(anything-compile-source--type anything-compile-source--candidates-in-buffer)))
   "Test helper function for anything.
 Given pseudo `anything-sources' and `anything-pattern', returns list like
   ((\"source name1\" (\"candidate1\" \"candidate2\"))
@@ -2508,6 +2511,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         anything-enable-digit-shortcuts
         anything-candidate-cache
         (anything-sources (anything-normalize-sources sources))
+        (anything-compile-source-functions compile-source-functions)
         anything-update-hook
         anything-test-candidate-list)
     (get-buffer-create anything-buffer)
