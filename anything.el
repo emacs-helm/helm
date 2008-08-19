@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.62 2008-08-19 22:40:57 rubikitch Exp $
+;; $Id: anything.el,v 1.63 2008-08-19 23:06:42 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.62  2008-08-19 22:40:57  rubikitch
+;; Revision 1.63  2008-08-19 23:06:42  rubikitch
+;; Use hash table to speed uniquify candidates.
+;;
+;; Revision 1.62  2008/08/19 22:40:57  rubikitch
 ;; `anything-test-candidates': additional optonal argument
 ;;
 ;; Revision 1.61  2008/08/19 18:13:39  rubikitch
@@ -947,6 +950,8 @@ If you change `anything-sources' dynamically, set this variables to nil.")
 (defvar anything-source-name nil)
 (defvar anything-candidates-buffer-alist nil)
 (defvar anything-check-minibuffer-input-timer nil)
+(defvar anything-match-hash (make-hash-table :test 'equal))
+(defvar anything-cib-hash (make-hash-table :test 'equal))
 
 (defmacro anything-aif (test-form then-form &optional else-form)
   "Anaphoric if. Temporary variable `it' is the result of test-form."
@@ -1098,13 +1103,15 @@ Anything plug-ins are realized by this function."
                     (list (lambda (candidate)
                             (string-match anything-pattern candidate)))))
 
+            (clrhash anything-match-hash)
             (dolist (function functions)
               (let (newmatches)
                 (dolist (candidate (anything-get-cached-candidates source))
-                  (when (and (not (member candidate matches))
+                  (when (and (not (gethash candidate anything-match-hash))
                              (funcall function (if (listp candidate)
                                                    (car candidate)
                                                  candidate)))
+                    (puthash candidate t anything-match-hash)
                     (push candidate newmatches)
 
                     (when anything-candidate-number-limit
@@ -1811,6 +1818,7 @@ See also `anything-sources' docstring.
   (when buffer
     (with-current-buffer buffer
       (let ((i 1) matches exit newmatches)
+        (clrhash anything-cib-hash)
         (dolist (searcher search-fns)
           (goto-char (point-min))
           (setq newmatches nil)
@@ -1819,7 +1827,8 @@ See also `anything-sources' docstring.
                 do (setq exit t) (return)
                 else do
                 (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                  (unless (member cand matches)
+                  (unless (gethash cand anything-cib-hash)
+                    (puthash cand t anything-cib-hash)
                     (push cand newmatches)))
                 (forward-line 1)
                 (incf i))
