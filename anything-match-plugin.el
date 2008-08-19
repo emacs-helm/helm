@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.2 2008-08-19 23:02:29 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.3 2008-08-19 23:30:39 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.2  2008-08-19 23:02:29  rubikitch
+;; Revision 1.3  2008-08-19 23:30:39  rubikitch
+;; exact match support
+;;
+;; Revision 1.2  2008/08/19 23:02:29  rubikitch
 ;; candidates-in-buffer hack
 ;;
 ;; Revision 1.1  2008/08/19 19:45:11  rubikitch
@@ -85,11 +88,25 @@
 (defun* anything-prefix-search (pattern &rest ignore)
   (re-search-forward (amp-prefix-get-regexp pattern) nil t))
 
+;;;; exact match
+(defvar amp-exact-pattern-info nil)
+(defun amp-exact-get-regexp (pattern)
+  (unless (equal pattern (car amp-exact-pattern-info))
+    (setq amp-exact-pattern-info
+          (cons pattern (concat "^" (regexp-quote pattern) "$"))))
+  (cdr amp-exact-pattern-info))
+
+(defun* anything-exact-match (str &optional (pattern anything-pattern))
+  (string-match (amp-exact-get-regexp pattern) str))
+(defun* anything-exact-search (pattern &rest ignore)
+  (re-search-forward (amp-exact-get-regexp pattern) nil t))
+
+
 ;;;; source compier
 (defvar anything-default-match-functions
-  '(anything-prefix-match anything-multiple-pattern-match))
+  '(anything-exact-match anything-prefix-match anything-multiple-pattern-match))
 (defvar anything-default-search-functions
-  '(anything-prefix-search anything-multiple-pattern-search))
+  '(anything-exact-search anything-prefix-search anything-multiple-pattern-search))
 (defun anything-compile-source--match-plugin (source)
   `(,(if (assoc 'candidates-in-buffer source) '(match identity))
     (match ,@anything-default-match-functions
@@ -179,6 +196,21 @@
                                           (insert "fire\nthunder\nthanks\n"))))
                                    (candidates-in-buffer)))
                                 "th+ r"
+                                '(anything-compile-source--candidates-in-buffer
+                                  anything-compile-source--match-plugin)))
+    (expect '(("FOO" ("foo" "foobar")))
+      (anything-test-candidates '(((name . "FOO")
+                                   (candidates "foobar" "foo")))
+                                "foo"
+                                '(anything-compile-source--match-plugin)))
+    (expect '(("FOO" ("foo" "foobar")))
+      (anything-test-candidates '(((name . "FOO")
+                                   (init
+                                    . (lambda ()
+                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                          (insert "foobar\nfoo\n"))))
+                                   (candidates-in-buffer)))
+                                "foo"
                                 '(anything-compile-source--candidates-in-buffer
                                   anything-compile-source--match-plugin)))
     ))
