@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.63 2008-08-19 23:06:42 rubikitch Exp $
+;; $Id: anything.el,v 1.64 2008-08-19 23:15:43 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.63  2008-08-19 23:06:42  rubikitch
+;; Revision 1.64  2008-08-19 23:15:43  rubikitch
+;; `anything-compute-matches': short-cut when match == '(identity)
+;;
+;; Revision 1.63  2008/08/19 23:06:42  rubikitch
 ;; Use hash table to speed uniquify candidates.
 ;;
 ;; Revision 1.62  2008/08/19 22:40:57  rubikitch
@@ -1085,8 +1088,9 @@ Anything plug-ins are realized by this function."
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
-  (let (matches)
-    (if (equal anything-pattern "")
+  (let ((functions (assoc-default 'match source))
+        matches)
+    (if (or (equal anything-pattern "") (equal functions '(identity)))
         (progn
           (setq matches (anything-get-cached-candidates source))
           (if (> (length matches) anything-candidate-number-limit)
@@ -1094,8 +1098,7 @@ Anything plug-ins are realized by this function."
                     (subseq matches 0 anything-candidate-number-limit))))
 
       (condition-case nil
-          (let ((item-count 0)
-                (functions (assoc-default 'match source))
+          (let ((item-count 0) 
                 exit)
 
             (unless functions
