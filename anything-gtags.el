@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.4 2008-08-18 17:20:23 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.5 2008-08-19 21:50:00 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.4  2008-08-18 17:20:23  rubikitch
+;; Revision 1.5  2008-08-19 21:50:00  rubikitch
+;; adjust to new `search' spec.
+;;
+;; Revision 1.4  2008/08/18 17:20:23  rubikitch
 ;; save c source buffer's position
 ;; silence byte compiler
 ;;
@@ -104,7 +107,7 @@
                     (anything-candidates-buffer)
                     anything-pattern
                     #'aggs-candidate-display
-                    #'search-forward))
+                    '(search-forward)))
                c)))
         (action
          ("Goto the location"
