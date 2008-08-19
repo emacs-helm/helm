@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.60 2008-08-19 15:07:39 rubikitch Exp $
+;; $Id: anything.el,v 1.61 2008-08-19 18:13:39 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.60  2008-08-19 15:07:39  rubikitch
+;; Revision 1.61  2008-08-19 18:13:39  rubikitch
+;; search attribute: multiple search functions
+;;
+;; Revision 1.60  2008/08/19 15:07:39  rubikitch
 ;; New function: `anything-attr'
 ;;
 ;; Revision 1.59  2008/08/19 15:01:59  rubikitch
@@ -622,7 +625,7 @@ Attributes:
 
 - search (optional)
 
-  Function like `re-search-forward' or `search-forward'.
+  List of functions like `re-search-forward' or `search-forward'.
   Buffer search function used by `anything-candidates-in-buffer'.
   By default, `anything-candidates-in-buffer' uses `re-search-forward'.
   This attribute is meant to be used with
@@ -1740,7 +1743,7 @@ eg.
  '((name . \"many files\")
    (init . (lambda () (with-current-buffer (anything-candidates-buffer 'local)
                         (insert-many-filenames))))
-   (search . re-search-forward)  ; optional
+   (search re-search-forward)  ; optional
    (candidates-in-buffer)
    (type . file))
 
@@ -1798,18 +1801,29 @@ See also `anything-sources' docstring.
                                    anything-pattern get-line-fn
                                    ;; use external variable `source'.
                                    (or (assoc-default 'search source)
-                                       #'re-search-forward)))
+                                       '(re-search-forward))))
 
-(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
+(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)))
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
-      (goto-char (point-min))
-      (loop while (funcall search-fn pattern nil t)
-            for i from 1 to anything-candidate-number-limit
-            unless (eobp)
-            collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-            do (forward-line 1)))))
+      (let ((i 1) matches exit newmatches)
+        (dolist (searcher search-fns)
+          (goto-char (point-min))
+          (setq newmatches nil)
+          (loop while (funcall searcher pattern nil t)
+                if (or (eobp) (< anything-candidate-number-limit i))
+                do (setq exit t) (return)
+                else do
+                (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
+                  (unless (member cand matches)
+                    (push cand newmatches)))
+                (forward-line 1)
+                (incf i))
+          (setq matches (append matches (nreverse newmatches)))
+          (if exit (return)))
+        matches))))
+
 
 (defun anything-candidates-buffer (&optional create-or-buffer)
   "Register and return a buffer containing candidates of current source.
@@ -2517,14 +2531,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (desc "anything-current-buffer")
     (expect "__a_buffer"
       (with-current-buffer (get-buffer-create "__a_buffer")
-        (anything-test-candidates nil "")
+        (anything-test-candidates '(((name . "FOO"))) "")
         (prog1
             (buffer-name anything-current-buffer)
           (kill-buffer (current-buffer)))))
     (desc "anything-buffer-file-name")
     (expect (regexp "/__a_file__")
       (with-current-buffer (find-file-noselect "__a_file__")
-        (anything-test-candidates nil "")
+        (anything-test-candidates '(((name . "FOO"))) "")
         (prog1
             anything-buffer-file-name
           (kill-buffer (current-buffer)))))
@@ -2692,7 +2706,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (insert "foo+\nbar+\nbaz+\n")
         (anything-candidates-in-buffer-1 
            (current-buffer) "oo+"
-           #'buffer-substring-no-properties #'search-forward)))
+           #'buffer-substring-no-properties '(search-forward))))
     (expect '(("foo+" "FOO+"))
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
@@ -2743,7 +2757,40 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (init
            . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\nooo\n"))))
-          (search . search-forward)
+          (search search-forward)
+          (candidates . anything-candidates-in-buffer)
+          (match identity)
+          (volatile)))
+       "oo+"))
+    (expect '(("TEST" ("foo+" "ooo")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\nooo\n"))))
+          (search search-forward re-search-forward)
+          (candidates . anything-candidates-in-buffer)
+          (match identity)
+          (volatile)))
+       "oo+"))
+    (expect '(("TEST" ("foo+" "ooo")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\nooo\n"))))
+          (search re-search-forward search-forward)
+          (candidates . anything-candidates-in-buffer)
+          (match identity)
+          (volatile)))
+       "oo+"))
+    (expect '(("TEST" ("ooo" "foo+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "bar+\nbaz+\nooo\nfoo+\n"))))
+          (search re-search-forward search-forward)
           (candidates . anything-candidates-in-buffer)
           (match identity)
           (volatile)))
