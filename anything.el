@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.58 2008-08-19 13:40:52 rubikitch Exp $
+;; $Id: anything.el,v 1.59 2008-08-19 15:01:59 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -42,10 +42,29 @@
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/anything-config.el
 ;; http://www.emacswiki.org/cgi-bin/emacs/AnythingSources
 ;;
-;; Maintainer's configuration is in the EmacsWiki.
+;; Maintainer's configuration is in the EmacsWiki. It would tell you
+;; many tips to write smart sources!
 ;;
 ;; http://www.emacswiki.org/cgi-bin/emacs/RubikitchAnythingConfiguration
+
+;; You can extend `anything' by writing plug-ins. As soon as
+;; `anything' is invoked, `anything-sources' is compiled into basic
+;; attributes, then compiled one is used during invocation.
 ;;
+;; The oldest built-in plug-in is `type' attribute: appends
+;; appropriate element of `anything-type-attributes'. Second built-in
+;; plug-in is `candidates-in-buffer': selecting a line from candidates
+;; buffer.
+;;
+;; To write a plug-in:
+;; 1. Define a compiler: anything-compile-source--*
+;; 2. Add compier function to `anything-compile-source-functions'.
+;; 3. (optional) Write helper functions.
+;;
+;; Anything plug-ins are found in the EmacsWiki.
+;;
+;; http://www.emacswiki.org/cgi-bin/emacs/AnythingPlugins
+
 ;; Tested on Emacs 22.
 ;;
 ;;
@@ -145,9 +164,15 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.58  2008-08-19 13:40:52  rubikitch
+;; Revision 1.59  2008-08-19 15:01:59  rubikitch
+;; arranged code
+;; added unit tests
+;; update doc
+;;
+;; Revision 1.58  2008/08/19 13:40:52  rubikitch
 ;; `anything-get-current-source': This function can be used in
-;;  init/candidates/action/candidate-transformer/filtered-candidate-transformer function.
+;;  init/candidates/action/candidate-transformer/filtered-candidate-transformer
+;;  display-to-real/cleanup function.
 ;;
 ;; Revision 1.57  2008/08/19 03:43:57  rubikitch
 ;; `anything-process-delayed-sources': delay = anything-idle-delay - anything-input-idle-delay
@@ -914,15 +939,17 @@ If you change `anything-sources' dynamically, set this variables to nil.")
 (defvar anything-candidates-buffer-alist nil)
 
 (defmacro anything-aif (test-form then-form &optional else-form)
-  "Anaphoric if."
+  "Anaphoric if. Temporary variable `it' is the result of test-form."
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))  
 (put 'anything-aif 'lisp-indent-function 2)
 
 (defun anything-action-list-is-shown ()
+  "Return non-nil when *anything action* buffer is displayed."
   (get-buffer-window anything-action-buffer 'visible))
 
 (defun anything-buffer-get ()
+  "If *anything action* buffer is shown, return `anything-action-buffer', otherwise `anything-buffer'."
   (if (anything-action-list-is-shown)
       anything-action-buffer
     anything-buffer))
@@ -1023,6 +1050,8 @@ Attributes:
           (anything-compile-sources anything-sources anything-compile-source-functions)))))
 
 (defun anything-compile-sources (sources funcs)
+  "Compile sources (`anything-sources') with funcs (`anything-compile-source-functions').
+Anything plug-ins are realized by this function."
   (mapcar
    (lambda (source)
      (loop with source = (if (listp source) source (symbol-value source))
@@ -1032,17 +1061,6 @@ Attributes:
    sources))  
 
 
-(defun anything-compile-source--type (source)
-  (anything-aif (assoc-default 'type source)
-      (append source (assoc-default it anything-type-attributes) nil)
-    source))
-    
-(defun anything-compile-source--candidates-in-buffer (source)
-  (anything-aif (assoc 'candidates-in-buffer source)
-      (append source `((candidates . ,(or (cdr it) 'anything-candidates-in-buffer))
-                       (volatile) (match identity)))
-    source))
-  
 (defun anything-funcall-with-source (source func &rest args)
   (let ((anything-source-name (assoc-default 'name source)))
     (apply func args)))
@@ -1579,127 +1597,10 @@ Cache the candidates if there is not yet a cached value."
 
     candidates))
 
-(defun* anything-candidates-in-buffer (&optional (get-line-fn 'buffer-substring-no-properties))
-  "Get candidates from the candidates buffer according to `anything-pattern'.
-
-BUFFER is `anything-candidates-buffer' by default.  Each
-candidate must be placed in one line.  This function is meant to
-be used in candidates-in-buffer or candidates attribute of an
-anything source.  Especially fast for many (1000+) candidates.
-
-eg.
- '((name . \"many files\")
-   (init . (lambda () (with-current-buffer (anything-candidates-buffer 'local)
-                        (insert-many-filenames))))
-   (search . re-search-forward)  ; optional
-   (candidates-in-buffer)
-   (type . file))
-
-GET-LINE-FN (default: buffer-substring-no-properties) specifies a function
-called with two arguments:point of line-beginning and point of line-end. 
-This function creates a candidate.
-
-+===============================================================+
-| The new way of making and narrowing candidates: Using buffers |
-+===============================================================+
-
-By default, `anything' makes candidates by evaluating the
-candidates function, then narrows them by `string-match' for each
-candidate.
-
-But this way is very slow for many candidates. The new way is
-storing all candidates in a buffer and narrowing them by
-`re-search-forward'. Search function is customizable by search
-attribute. The important point is that buffer processing is MUCH
-FASTER than string list processing and is the Emacs way.
-
-The init function writes all candidates to a newly-created
-candidate buffer.  The candidates buffer is created or specified
-by `anything-candidates-buffer'.  Candidates are stored in a line.
-
-The candidates function narrows all candidates, IOW creates a
-subset of candidates dynamically. It is the task of
-`anything-candidates-in-buffer'.  As long as
-`anything-candidates-buffer' is used,`(candidates-in-buffer)' is
-sufficient in most cases.
-
-Note that `(candidates-in-buffer)' is shortcut of three attributes:
-  (candidates . anything-candidates-in-buffer)
-  (volatile)
-  (match identity)
-And `(candidates-in-buffer . func)' is shortcut of three attributes:
-  (candidates . func)
-  (volatile)
-  (match identity)
-The expansion is performed in `anything-get-sources'.
-
-The candidates-in-buffer attribute implies the volatile attribute.
-The volatile attribute is needed because `anything-candidates-in-buffer'
-creates candidates dynamically and need to be called everytime
-`anything-pattern' changes.
-
-Because `anything-candidates-in-buffer' plays the role of `match' attribute
-function, specifying `(match identity)' makes the source slightly faster.
-
-See also `anything-sources' docstring.
-
-"
-  (declare (special source))
-  (anything-candidates-in-buffer-1 (anything-candidates-buffer)
-                                   anything-pattern get-line-fn
-                                   ;; use external variable `source'.
-                                   (or (assoc-default 'search source)
-                                       #'re-search-forward)))
-
-(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
-  ;; buffer == nil when candidates buffer does not exist.
-  (when buffer
-    (with-current-buffer buffer
-      (goto-char (point-min))
-      (loop while (funcall search-fn pattern nil t)
-            for i from 1 to anything-candidate-number-limit
-            unless (eobp)
-            collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-            do (forward-line 1)))))
-
 (defun anything-current-buffer-is-modified ()
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
   (with-current-buffer anything-current-buffer
     (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
-
-(defun anything-candidates-buffer (&optional create-or-buffer)
-  "Register and return a buffer containing candidates of current source.
-`anything-candidates-buffer' searches buffer-local candidates buffer first,
-then global candidates buffer.
-
-Acceptable values of CREATE-OR-BUFFER:
-
-- nil (omit)
-  Only return the candidates buffer.
-- a buffer
-  Register a buffer as a candidates buffer.
-- 'global
-  Create a new global candidates buffer,
-  named \" *anything candidates:SOURCE*\".
-- other non-nil value
-  Create a new global candidates buffer,
-  named \" *anything candidates:SOURCE*ANYTHING-CURRENT-BUFFER\".
-"
-  (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
-         (lbufname (concat gbufname (buffer-name anything-current-buffer)))
-         buf)
-    (when create-or-buffer
-      (if (bufferp create-or-buffer)
-          (add-to-list 'anything-candidates-buffer-alist
-                       (cons anything-source-name create-or-buffer))
-        (with-current-buffer
-            (get-buffer-create (if (eq create-or-buffer 'global) gbufname lbufname))
-          (buffer-disable-undo)
-          (erase-buffer)
-          (font-lock-mode -1))))
-    (or (get-buffer lbufname)
-        (get-buffer gbufname)
-        (assoc-default anything-source-name anything-candidates-buffer-alist))))
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -1808,6 +1709,140 @@ Acceptable values of CREATE-OR-BUFFER:
        (selected-frame)
        `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
          (top . 0)))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
+
+;;---------------------------------------------------------------------
+;; The smallest plug-in: type (built-in)
+;;----------------------------------------------------------------------
+(defun anything-compile-source--type (source)
+  (anything-aif (assoc-default 'type source)
+      (append source (assoc-default it anything-type-attributes) nil)
+    source))
+
+;;---------------------------------------------------------------------
+;; candidates-in-buffer plug-in (built-in)
+;;----------------------------------------------------------------------
+(defun* anything-candidates-in-buffer (&optional (get-line-fn 'buffer-substring-no-properties))
+  "Get candidates from the candidates buffer according to `anything-pattern'.
+
+BUFFER is `anything-candidates-buffer' by default.  Each
+candidate must be placed in one line.  This function is meant to
+be used in candidates-in-buffer or candidates attribute of an
+anything source.  Especially fast for many (1000+) candidates.
+
+eg.
+ '((name . \"many files\")
+   (init . (lambda () (with-current-buffer (anything-candidates-buffer 'local)
+                        (insert-many-filenames))))
+   (search . re-search-forward)  ; optional
+   (candidates-in-buffer)
+   (type . file))
+
+GET-LINE-FN (default: buffer-substring-no-properties) specifies a function
+called with two arguments:point of line-beginning and point of line-end. 
+This function creates a candidate.
+
++===============================================================+
+| The new way of making and narrowing candidates: Using buffers |
++===============================================================+
+
+By default, `anything' makes candidates by evaluating the
+candidates function, then narrows them by `string-match' for each
+candidate.
+
+But this way is very slow for many candidates. The new way is
+storing all candidates in a buffer and narrowing them by
+`re-search-forward'. Search function is customizable by search
+attribute. The important point is that buffer processing is MUCH
+FASTER than string list processing and is the Emacs way.
+
+The init function writes all candidates to a newly-created
+candidate buffer.  The candidates buffer is created or specified
+by `anything-candidates-buffer'.  Candidates are stored in a line.
+
+The candidates function narrows all candidates, IOW creates a
+subset of candidates dynamically. It is the task of
+`anything-candidates-in-buffer'.  As long as
+`anything-candidates-buffer' is used,`(candidates-in-buffer)' is
+sufficient in most cases.
+
+Note that `(candidates-in-buffer)' is shortcut of three attributes:
+  (candidates . anything-candidates-in-buffer)
+  (volatile)
+  (match identity)
+And `(candidates-in-buffer . func)' is shortcut of three attributes:
+  (candidates . func)
+  (volatile)
+  (match identity)
+The expansion is performed in `anything-get-sources'.
+
+The candidates-in-buffer attribute implies the volatile attribute.
+The volatile attribute is needed because `anything-candidates-in-buffer'
+creates candidates dynamically and need to be called everytime
+`anything-pattern' changes.
+
+Because `anything-candidates-in-buffer' plays the role of `match' attribute
+function, specifying `(match identity)' makes the source slightly faster.
+
+See also `anything-sources' docstring.
+
+"
+  (declare (special source))
+  (anything-candidates-in-buffer-1 (anything-candidates-buffer)
+                                   anything-pattern get-line-fn
+                                   ;; use external variable `source'.
+                                   (or (assoc-default 'search source)
+                                       #'re-search-forward)))
+
+(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fn 're-search-forward))
+  ;; buffer == nil when candidates buffer does not exist.
+  (when buffer
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (loop while (funcall search-fn pattern nil t)
+            for i from 1 to anything-candidate-number-limit
+            unless (eobp)
+            collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+            do (forward-line 1)))))
+
+(defun anything-candidates-buffer (&optional create-or-buffer)
+  "Register and return a buffer containing candidates of current source.
+`anything-candidates-buffer' searches buffer-local candidates buffer first,
+then global candidates buffer.
+
+Acceptable values of CREATE-OR-BUFFER:
+
+- nil (omit)
+  Only return the candidates buffer.
+- a buffer
+  Register a buffer as a candidates buffer.
+- 'global
+  Create a new global candidates buffer,
+  named \" *anything candidates:SOURCE*\".
+- other non-nil value
+  Create a new global candidates buffer,
+  named \" *anything candidates:SOURCE*ANYTHING-CURRENT-BUFFER\".
+"
+  (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
+         (lbufname (concat gbufname (buffer-name anything-current-buffer)))
+         buf)
+    (when create-or-buffer
+      (if (bufferp create-or-buffer)
+          (add-to-list 'anything-candidates-buffer-alist
+                       (cons anything-source-name create-or-buffer))
+        (with-current-buffer
+            (get-buffer-create (if (eq create-or-buffer 'global) gbufname lbufname))
+          (buffer-disable-undo)
+          (erase-buffer)
+          (font-lock-mode -1))))
+    (or (get-buffer lbufname)
+        (get-buffer gbufname)
+        (assoc-default anything-source-name anything-candidates-buffer-alist))))
+
+(defun anything-compile-source--candidates-in-buffer (source)
+  (anything-aif (assoc 'candidates-in-buffer source)
+      (append source `((candidates . ,(or (cdr it) 'anything-candidates-in-buffer))
+                       (volatile) (match identity)))
+    source))
 
 ;;---------------------------------------------------------------------
 ;; Persistent Action
@@ -2884,17 +2919,88 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (cleanup . (lambda () (setq v 'cleaned))))))
         v))
     (desc "anything-get-current-source")
-    ;; in init/candidates/action/candidate-transformer/filtered-candidate-transformer  function
+    ;; in init/candidates/action/candidate-transformer/filtered-candidate-transformer
+    ;; display-to-real/cleanup function
     (expect "FOO"
       (assoc-default
        'name
        (anything-funcall-with-source '((name . "FOO")) 'anything-get-current-source)))
+    ;; init
     (expect "FOO"
       (let (v)
         (anything-test-candidates
          '(((name . "FOO")
             (init . (lambda () (setq v (anything-get-current-source)))))))
         (assoc-default 'name v)))
+    ;; candidates
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates . (lambda () (setq v (anything-get-current-source)) '("a"))))))
+        (assoc-default 'name v)))
+    ;; action
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates "a")
+            (action
+             . (lambda (c) (setq v (anything-get-current-source)) c)))))
+        (anything-execute-selection-action)
+        (assoc-default 'name v)))
+    ;; candidate-transformer
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates "a")
+            (candidate-transformer
+             . (lambda (c) (setq v (anything-get-current-source)) c)))))
+        (assoc-default 'name v)))
+    ;; filtered-candidate-transformer
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates "a")
+            (filtered-candidate-transformer
+             . (lambda (c s) (setq v (anything-get-current-source)) c)))))
+        (assoc-default 'name v)))
+    ;; action-transformer
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates "a")
+            (action-transformer
+             . (lambda (a c) (setq v (anything-get-current-source)) a))
+            (action . identity))))
+        (anything-execute-selection-action)
+        (assoc-default 'name v)))
+    ;; display-to-real
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (init . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                                 (insert "a\n"))))
+            (candidates-in-buffer)
+            (display-to-real
+             . (lambda (c) (setq v (anything-get-current-source)) c))
+            (action . identity))))
+        (anything-execute-selection-action)
+        (assoc-default 'name v)))
+    ;; cleanup
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (candidates "a")
+            (cleanup
+             . (lambda () (setq v (anything-get-current-source)))))))
+        (assoc-default 'name v)))
+    ;; candidates are displayed
     (expect "TEST"
       (anything-test-candidates
        '(((name . "TEST")
