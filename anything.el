@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.59 2008-08-19 15:01:59 rubikitch Exp $
+;; $Id: anything.el,v 1.60 2008-08-19 15:07:39 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.59  2008-08-19 15:01:59  rubikitch
+;; Revision 1.60  2008-08-19 15:07:39  rubikitch
+;; New function: `anything-attr'
+;;
+;; Revision 1.59  2008/08/19 15:01:59  rubikitch
 ;; arranged code
 ;; added unit tests
 ;; update doc
@@ -937,6 +940,7 @@ If you change `anything-sources' dynamically, set this variables to nil.")
 (make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 (defvar anything-source-name nil)
 (defvar anything-candidates-buffer-alist nil)
+(defvar anything-check-minibuffer-input-timer nil)
 
 (defmacro anything-aif (test-form then-form &optional else-form)
   "Anaphoric if. Temporary variable `it' is the result of test-form."
@@ -954,7 +958,10 @@ If you change `anything-sources' dynamically, set this variables to nil.")
       anything-action-buffer
     anything-buffer))
 
-(defvar anything-check-minibuffer-input-timer nil)
+(defun anything-attr (attribute-name)
+  "Get the value of ATTRIBUTE-NAME of current source.
+It is useful to write your sources."
+  (assoc-default attribute-name (anything-get-current-source)))
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -3007,6 +3014,21 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (candidates "foo")
           (action ("identity" . identity)))))
       (assoc-default 'name (anything-get-current-source)))
+    (desc "anything-attr")
+    (expect "FOO"
+       (anything-funcall-with-source
+        '((name . "FOO"))
+        (lambda ()
+          (anything-attr 'name))))
+    (expect 'fuga
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (hoge . fuga)
+            (init . (lambda () (setq v (anything-attr 'hoge))))
+            (candidates "a"))))
+        v))
+    
     ))
 
 
