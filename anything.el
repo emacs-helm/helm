@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.56 2008-08-18 06:37:51 rubikitch Exp $
+;; $Id: anything.el,v 1.57 2008-08-19 03:43:57 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -145,7 +145,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.56  2008-08-18 06:37:51  rubikitch
+;; Revision 1.57  2008-08-19 03:43:57  rubikitch
+;; `anything-process-delayed-sources': delay = anything-idle-delay - anything-input-idle-delay
+;;
+;; Revision 1.56  2008/08/18 06:37:51  rubikitch
 ;; Make `anything-input-idle-delay' ineffective when the action list is shown.
 ;;
 ;; Revision 1.55  2008/08/18 06:35:00  rubikitch
@@ -1127,7 +1130,9 @@ the real value in a text property."
 (defun anything-process-delayed-sources (delayed-sources)
   "Process delayed sources if the user is idle for
 `anything-idle-delay' seconds."
-  (if (sit-for anything-idle-delay)
+  (if (sit-for (if anything-input-idle-delay
+                   (max 0 (- anything-idle-delay anything-input-idle-delay))
+                 anything-idle-delay))
       (with-current-buffer anything-buffer        
         (save-excursion
           (goto-char (point-max))
