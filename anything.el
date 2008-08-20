@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.66 2008-08-19 23:31:52 rubikitch Exp $
+;; $Id: anything.el,v 1.67 2008-08-20 00:08:28 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.66  2008-08-19 23:31:52  rubikitch
+;; Revision 1.67  2008-08-20 00:08:28  rubikitch
+;; `anything-candidates-in-buffer-1': add code when pattern == ""
+;;
+;; Revision 1.66  2008/08/19 23:31:52  rubikitch
 ;; Removed `anything-show-exact-match-first' because it should be provided as a plug-in.
 ;;
 ;; Revision 1.65  2008/08/19 23:18:47  rubikitch
@@ -1820,24 +1823,30 @@ See also `anything-sources' docstring.
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
-      (let ((i 1) matches exit newmatches)
-        (clrhash anything-cib-hash)
-        (dolist (searcher search-fns)
-          (goto-char (point-min))
-          (setq newmatches nil)
-          (loop while (funcall searcher pattern nil t)
-                if (or (eobp) (< anything-candidate-number-limit i))
-                do (setq exit t) (return)
-                else do
-                (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                  (unless (gethash cand anything-cib-hash)
-                    (puthash cand t anything-cib-hash)
-                    (incf i)
-                    (push cand newmatches)))
-                (forward-line 1))
-          (setq matches (append matches (nreverse newmatches)))
-          (if exit (return)))
-        matches))))
+      (goto-char (point-min))
+      (if (string= pattern "")
+          (loop for i from 1 to anything-candidate-number-limit
+                unless (eobp)
+                collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+                do (forward-line 1))
+        (let ((i 1) matches exit newmatches)
+          (clrhash anything-cib-hash)
+          (dolist (searcher search-fns)
+            (goto-char (point-min))
+            (setq newmatches nil)
+            (loop while (funcall searcher pattern nil t)
+                  if (or (eobp) (< anything-candidate-number-limit i))
+                  do (setq exit t) (return)
+                  else do
+                  (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
+                    (unless (gethash cand anything-cib-hash)
+                      (puthash cand t anything-cib-hash)
+                      (incf i)
+                      (push cand newmatches)))
+                  (forward-line 1))
+            (setq matches (append matches (nreverse newmatches)))
+            (if exit (return)))
+          matches)))))
 
 
 (defun anything-candidates-buffer (&optional create-or-buffer)
