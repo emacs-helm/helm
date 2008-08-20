@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.71 2008-08-20 21:45:42 rubikitch Exp $
+;; $Id: anything.el,v 1.72 2008-08-20 22:51:53 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.71  2008-08-20 21:45:42  rubikitch
+;; Revision 1.72  2008-08-20 22:51:53  rubikitch
+;; New `anything-sources' attribute: candidate-number-limit
+;;
+;; Revision 1.71  2008/08/20 21:45:42  rubikitch
 ;; added many tests.
 ;;
 ;; Revision 1.70  2008/08/20 18:51:45  rubikitch
@@ -687,6 +690,10 @@ Attributes:
 
   Function called with no parameters when *anything* buffer is closed. It
   is useful for killing unneeded candidates buffer.
+
+- candidate-number-limit (optional)
+
+  Override `anything-candidate-number-limit' only for this source.
 ")
 
 
@@ -1124,16 +1131,23 @@ Anything plug-ins are realized by this function."
   (let ((anything-source-name (assoc-default 'name source)))
     (apply func args)))
 
+(defun anything-candidate-number-limit (source)
+  "`anything-candidate-number-limit' variable may be overridden by SOURCE."
+  (or (assoc-default 'candidate-number-limit source)
+      anything-candidate-number-limit
+      99999999))
+
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
   (let ((functions (assoc-default 'match source))
+        (limit (anything-candidate-number-limit source))
         matches)
     (if (or (equal anything-pattern "") (equal functions '(identity)))
         (progn
           (setq matches (anything-get-cached-candidates source))
-          (if (> (length matches) anything-candidate-number-limit)
+          (if (> (length matches) limit)
               (setq matches 
-                    (subseq matches 0 anything-candidate-number-limit))))
+                    (subseq matches 0 limit))))
 
       (condition-case nil
           (let ((item-count 0) 
@@ -1155,9 +1169,9 @@ Anything plug-ins are realized by this function."
                     (puthash candidate t anything-match-hash)
                     (push candidate newmatches)
 
-                    (when anything-candidate-number-limit
+                    (when limit
                       (incf item-count)
-                      (when (= item-count anything-candidate-number-limit)
+                      (when (= item-count limit)
                         (setq exit t)
                         (return)))))
 
@@ -1893,16 +1907,17 @@ See also `anything-sources' docstring.
                                    anything-pattern get-line-fn
                                    ;; use external variable `source'.
                                    (or (assoc-default 'search source)
-                                       '(re-search-forward))))
+                                       '(re-search-forward))
+                                   (anything-candidate-number-limit source)))
 
-(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)))
+(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)) (limit anything-candidate-number-limit))
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
       (goto-char (point-min))
       (if (string= pattern "")
-          (loop for i from 1 to anything-candidate-number-limit
-                unless (eobp)
+          (loop until (eobp)
+                for i from 1 to limit
                 collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
                 do (forward-line 1))
         (let ((i 1) matches exit newmatches)
@@ -1911,7 +1926,7 @@ See also `anything-sources' docstring.
             (goto-char (point-min))
             (setq newmatches nil)
             (loop while (funcall searcher pattern nil t)
-                  if (or (eobp) (< anything-candidate-number-limit i))
+                  if (or (eobp) (< limit i))
                   do (setq exit t) (return)
                   else do
                   (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
@@ -2712,7 +2727,22 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     (expect '("bar")
       (let ((anything-pattern "^b"))
         (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
-        
+    (expect '("a" "b")
+      (let ((anything-pattern "")
+            (anything-candidate-number-limit 2))
+        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+    (expect '("a" "b")
+      (let ((anything-pattern ".")
+            (anything-candidate-number-limit 2))
+        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+    (expect '("a" "b" "c")
+      (let ((anything-pattern "")
+            anything-candidate-number-limit)
+        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+    (expect '("a" "b" "c")
+      (let ((anything-pattern "[abc]")
+            anything-candidate-number-limit)
+        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
     ;; using anything-test-candidate-list
     (desc "anything-test-candidates")
     (expect '(("FOO" ("foo" "bar")))
@@ -2813,6 +2843,16 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (candidates . anything-candidates-in-buffer)
           (match identity)
           (volatile)))))
+    (expect '(("TEST" ("foo+" "bar+" "baz+")))
+      (let (anything-candidate-number-limit)
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\n"))))
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile))))))
     (expect '(("TEST" ("foo+")))
       (anything-test-candidates
        '(((name . "TEST")
@@ -3330,6 +3370,41 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         anything-candidate-cache))
     ;; TODO when candidates == process
     ;; TODO anything-output-filter
+    (desc "candidate-number-limit attribute")
+    (expect '("a" "b")
+      (let ((anything-pattern "")
+            (anything-candidate-number-limit 20))
+        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
+                                    (candidate-number-limit . 2) (volatile)))))
+    (expect '("a" "b")
+      (let ((anything-pattern "[abc]")
+            (anything-candidate-number-limit 20))
+        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
+                                    (candidate-number-limit . 2) (volatile)))))
+    (expect '(("TEST" ("a" "b" "c")))
+      (let ((anything-candidate-number-limit 2))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                            (insert "a\nb\nc\nd\n"))))
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (candidate-number-limit . 3)
+            (volatile))))))
+    (expect '(("TEST" ("a" "b" "c")))
+      (let ((anything-candidate-number-limit 2))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                            (insert "a\nb\nc\nd\n"))))
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (candidate-number-limit . 3)
+            (volatile)))
+         ".")))
+
     ))
 
 
