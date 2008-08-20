@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.3 2008-08-19 23:30:39 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.4 2008-08-20 00:10:15 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.3  2008-08-19 23:30:39  rubikitch
+;; Revision 1.4  2008-08-20 00:10:15  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.3  2008/08/19 23:30:39  rubikitch
 ;; exact match support
 ;;
 ;; Revision 1.2  2008/08/19 23:02:29  rubikitch
@@ -108,11 +111,12 @@
 (defvar anything-default-search-functions
   '(anything-exact-search anything-prefix-search anything-multiple-pattern-search))
 (defun anything-compile-source--match-plugin (source)
-  `(,(if (assoc 'candidates-in-buffer source) '(match identity))
-    (match ,@anything-default-match-functions
-           ,@(assoc-default 'match source))
-     (search ,@anything-default-search-functions
-             ,@(assoc-default 'search source))
+  `(,(if (assoc 'candidates-in-buffer source)
+         '(match identity)
+       `(match ,@anything-default-match-functions
+               ,@(assoc-default 'match source)))
+    (search ,@anything-default-search-functions
+            ,@(assoc-default 'search source))
     ,@source))
 
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--match-plugin t)
@@ -211,6 +215,16 @@
                                           (insert "foobar\nfoo\n"))))
                                    (candidates-in-buffer)))
                                 "foo"
+                                '(anything-compile-source--candidates-in-buffer
+                                  anything-compile-source--match-plugin)))
+    (expect '(("FOO" ("foobar" "foo")))
+      (anything-test-candidates '(((name . "FOO")
+                                   (init
+                                    . (lambda ()
+                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                          (insert "foobar\nfoo\n"))))
+                                   (candidates-in-buffer)))
+                                ""
                                 '(anything-compile-source--candidates-in-buffer
                                   anything-compile-source--match-plugin)))
     ))
