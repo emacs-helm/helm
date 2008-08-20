@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.69 2008-08-20 17:57:51 rubikitch Exp $
+;; $Id: anything.el,v 1.70 2008-08-20 18:51:45 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.69  2008-08-20 17:57:51  rubikitch
+;; Revision 1.70  2008-08-20 18:51:45  rubikitch
+;; `anything-preselect' bug fix.
+;; refactoring.
+;;
+;; Revision 1.69  2008/08/20 17:57:51  rubikitch
 ;; Extended `anything' optional arguments: preselect
 ;;
 ;; Revision 1.68  2008/08/20 16:39:07  rubikitch
@@ -979,15 +983,29 @@ If you change `anything-sources' dynamically, set this variables to nil.")
      (if it ,then-form ,else-form)))  
 (put 'anything-aif 'lisp-indent-function 2)
 
-(defun anything-action-list-is-shown ()
-  "Return non-nil when *anything action* buffer is displayed."
-  (get-buffer-window anything-action-buffer 'visible))
-
 (defun anything-buffer-get ()
   "If *anything action* buffer is shown, return `anything-action-buffer', otherwise `anything-buffer'."
   (if (anything-action-list-is-shown)
       anything-action-buffer
     anything-buffer))
+
+(defun anything-window ()
+  "Window of `anything-buffer'."
+  (get-buffer-window (anything-buffer-get) 'visible))
+
+(defun anything-action-window ()
+  "Window of `anything-action-buffer'."
+  (get-buffer-window anything-action-buffer 'visible))
+
+
+(defmacro with-anything-window (&rest body)
+  `(let ((--tmpfunc-- (lambda () ,@body)))
+     (if anything-test-mode
+         (with-current-buffer (anything-buffer-get)
+           (funcall --tmpfunc--))
+       (with-selected-window (anything-window)
+         (funcall --tmpfunc--)))))
+(put 'with-anything-window 'lisp-indent-function 0)
 
 (defun anything-attr (attribute-name)
   "Get the value of ATTRIBUTE-NAME of current source.
@@ -997,7 +1015,7 @@ It is useful to write your sources."
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
 to be handled."
-  (if (or (not anything-input-idle-delay) (anything-action-list-is-shown))
+  (if (or (not anything-input-idle-delay) (anything-action-window))
       (anything-check-minibuffer-input-1)
     (if anything-check-minibuffer-input-timer
         (cancel-timer anything-check-minibuffer-input-timer))
@@ -1013,7 +1031,7 @@ to be handled."
 necessary."
   (unless (equal input anything-pattern)
     (setq anything-pattern input)
-    (unless (anything-action-list-is-shown)
+    (unless (anything-action-window)
       (setq anything-input anything-pattern))
     (anything-update)))
 
@@ -1078,7 +1096,7 @@ Attributes:
 "
   (cond
    ;; action
-   ((anything-action-list-is-shown)
+   ((anything-action-window)
     anything-sources)
    ;; memoized
    (anything-compiled-sources)
@@ -1495,9 +1513,9 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   "Move the selection marker to a new position determined by
 UNIT and DIRECTION."
   (unless (or (zerop (buffer-size (get-buffer (anything-buffer-get))))
-              (not (get-buffer-window (anything-buffer-get) 'visible)))
+              (not (anything-window)))
     (save-selected-window
-      (select-window (get-buffer-window (anything-buffer-get) 'visible))
+      (select-window (anything-window))
 
       (case unit
         (line (forward-line (case direction
@@ -1555,7 +1573,7 @@ UNIT and DIRECTION."
   (interactive)
   (if anything-enable-digit-shortcuts
       (save-selected-window
-        (select-window (get-buffer-window (anything-buffer-get) 'visible))          
+        (select-window (anything-window))          
         (let* ((index (- (event-basic-type (elt (this-command-keys-vector) 0)) ?1))
                (overlay (nth index anything-digit-overlays)))
           (when (overlay-buffer overlay)
@@ -1772,8 +1790,8 @@ Cache the candidates if there is not yet a cached value."
   (when (and (require 'fit-frame nil t)
              (boundp 'fit-frame-inhibit-fitting-flag)
              (not fit-frame-inhibit-fitting-flag)
-             (get-buffer-window (anything-buffer-get) 'visible))
-    (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)
+             (anything-window))
+    (with-anything-window
       (fit-frame nil nil nil t)
       (modify-frame-parameters
        (selected-frame)
@@ -1782,7 +1800,7 @@ Cache the candidates if there is not yet a cached value."
 
 (defun anything-preselect (candidate-or-regexp)
   (when candidate-or-regexp
-    (with-current-buffer (anything-buffer-get)
+    (with-anything-window
       (goto-char (point-min))
       ;; go to first candidate of first source
       (forward-line 1)
@@ -2037,7 +2055,7 @@ occurrence of the current pattern.")
     (condition-case nil
         (progn
           (setq anything-isearch-original-window (selected-window))
-          (select-window (get-buffer-window (anything-buffer-get) 'visible))
+          (select-window (anything-window))
           (setq cursor-type t)
 
           (setq anything-isearch-original-post-command-hook
@@ -2079,8 +2097,8 @@ occurrence of the current pattern.")
 (defun anything-isearch-post-command ()
   "Print the current pattern after every command."
   (anything-isearch-message)
-  (when (get-buffer-window (anything-buffer-get) 'visible)
-    (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)
+  (when (anything-window)
+    (with-anything-window
       (move-overlay anything-isearch-overlay anything-isearch-match-start (point)
                     (get-buffer (anything-buffer-get))))))
 
@@ -2091,7 +2109,7 @@ occurrence of the current pattern.")
   (let ((char (char-to-string last-command-char)))
     (setq anything-isearch-pattern (concat anything-isearch-pattern char))
 
-    (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)
+    (with-anything-window
       (if (looking-at char)
           (progn
             (push (list 'event 'char
@@ -2127,7 +2145,7 @@ occurrence of the current pattern.")
   (if (equal anything-isearch-pattern "")
       (setq anything-isearch-message-suffix "no pattern yet")
 
-    (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)
+    (with-anything-window
       (let ((start (point)))
         (while (and (re-search-forward anything-isearch-pattern nil t)
                     (anything-pos-header-line-p)))
@@ -2157,7 +2175,7 @@ occurrence of the current pattern.")
         (setq anything-isearch-pattern
               (substring anything-isearch-pattern 0 -1)))
 
-      (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)      
+      (with-anything-window      
         (goto-char (plist-get last 'pos))
         (setq anything-isearch-match-start (plist-get last 'start))
         (anything-mark-current-line)))))
@@ -2174,7 +2192,7 @@ occurrence of the current pattern.")
   "Choose an action for the selected candidate."
   (interactive)
   (anything-isearch-cleanup)
-  (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)
+  (with-anything-window
     (anything-select-action)))
 
 
@@ -2182,8 +2200,8 @@ occurrence of the current pattern.")
   "Cancel Anything isearch."
   (interactive)
   (anything-isearch-cleanup)
-  (when (get-buffer-window (anything-buffer-get) 'visible)
-    (with-selected-window (get-buffer-window (anything-buffer-get) 'visible)
+  (when (anything-window)
+    (with-anything-window
       (goto-char anything-isearch-original-point)
       (anything-mark-current-line))))
 
@@ -2638,7 +2656,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-compile-sources '(foo) nil)))
     (desc "anything-get-sources action")
     (expect '(((name . "Actions") (candidates . actions)))
-      (stub anything-action-list-is-shown => t)
+      (stub anything-action-window => t)
       (let (anything-compiled-sources
             (anything-sources '(((name . "Actions") (candidates . actions)))))
         (anything-get-sources)))
@@ -3148,7 +3166,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     ;; entire candidate
     (expect "foo"
       (with-current-buffer (anything-create-anything-buffer t)
-        (let ((anything-pattern ""))
+        (let ((anything-pattern "")
+              (anything-test-mode t))
           (anything-process-source '((name . "test")
                                      (candidates "hoge" "foo" "bar")))
           (anything-preselect "foo")
@@ -3156,7 +3175,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     ;; regexp
     (expect "foo"
       (with-current-buffer (anything-create-anything-buffer t)
-        (let ((anything-pattern ""))
+        (let ((anything-pattern "")
+              (anything-test-mode t))
           (anything-process-source '((name . "test")
                                      (candidates "hoge" "foo" "bar")))
           (anything-preselect "fo+")
@@ -3164,7 +3184,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
     ;; no match -> first entry
     (expect "hoge"
       (with-current-buffer (anything-create-anything-buffer t)
-        (let ((anything-pattern ""))
+        (let ((anything-pattern "")
+              (anything-test-mode t))
           (anything-process-source '((name . "test")
                                      (candidates "hoge" "foo" "bar")))
           (anything-preselect "not found")
