@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.5 2008-08-19 21:50:00 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.6 2008-08-20 18:58:42 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.5  2008-08-19 21:50:00  rubikitch
+;; Revision 1.6  2008-08-20 18:58:42  rubikitch
+;; preselect entry of current line of source code.
+;;
+;; Revision 1.5  2008/08/19 21:50:00  rubikitch
 ;; adjust to new `search' spec.
 ;;
 ;; Revision 1.4  2008/08/18 17:20:23  rubikitch
@@ -77,7 +80,14 @@
   ;; `save': C source file / `buffer': gtags-select-mode buffer
   ;; They are defined at `gtags-goto-tag'.
   (declare (special save buffer))
-  (let ((anything-candidate-number-limit 9999) pwd)
+  (let* ((anything-candidate-number-limit 9999)
+         (pwd (with-current-buffer buffer (expand-file-name default-directory)))
+         (basename (substring (with-current-buffer save buffer-file-name)
+                              (length pwd)))
+         (lineno (with-current-buffer save
+                   (save-restriction
+                     (widen)
+                     (line-number-at-pos)))))
     (anything
      '(((name . "GTAGS SELECT")
         (init
@@ -87,8 +97,6 @@
              (save-window-excursion
                (switch-to-buffer save)
                (setq anything-current-position (cons (point) (window-start))))
-             (with-current-buffer buffer
-               (setq pwd (expand-file-name default-directory)))
              (anything-candidates-buffer buffer)))
         (candidates-in-buffer
          . (lambda ()
@@ -96,24 +104,12 @@
               #'aggs-candidate-display)))
         (display-to-real
          . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
-        (filtered-candidate-transformer
-         . (lambda (c s)
-             (if (string= anything-pattern "")
-                 (let ((anything-pattern
-                        (substring (with-current-buffer save
-                                     buffer-file-name)
-                                   (length pwd))))
-                   (anything-candidates-in-buffer-1
-                    (anything-candidates-buffer)
-                    anything-pattern
-                    #'aggs-candidate-display
-                    '(search-forward)))
-               c)))
         (action
          ("Goto the location"
           . (lambda (c) (aggs-select-it c t))))
         (persistent-action . aggs-select-it)
-        (cleanup . (lambda () (kill-buffer buffer))))))))
+        (cleanup . (lambda () (kill-buffer buffer)))))
+     nil nil nil (p (format "\\(\\(%d\\) +%s\\)" lineno (regexp-quote basename) )))))
 
 (defun aggs-select-it (candidate &optional delete)
   (with-temp-buffer
