@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.68 2008-08-20 16:39:07 rubikitch Exp $
+;; $Id: anything.el,v 1.69 2008-08-20 17:57:51 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.68  2008-08-20 16:39:07  rubikitch
+;; Revision 1.69  2008-08-20 17:57:51  rubikitch
+;; Extended `anything' optional arguments: preselect
+;;
+;; Revision 1.68  2008/08/20 16:39:07  rubikitch
 ;; Nested `anything' invocation support, ie. `anything' can be invoked by anything action.
 ;;
 ;; (anything '(((name . "nested anything invocation test")
@@ -1210,8 +1213,30 @@ the real value in a text property."
         (sources)
         (t anything-sources)))  
 
-(defun anything (&optional sources input prompt resume)
-  "Select anything."
+(defun anything (&optional sources input prompt resume preselect)
+  "Select anything. In Lisp program, some optional arguments can be used.
+
+- SOURCES
+
+  Temporary value of `anything-sources'. SOURCES accepts a
+  symbol, interpreted as a variable of an anything source.
+
+- INPUT
+
+  Temporary value of `anything-pattern', ie. initial input of minibuffer.
+
+- PROMPT
+
+  Prompt other than \"pattern: \".
+
+- RESUME
+
+  Resurrect previously instance of `anything'. Skip the initialization.
+
+- PRESELECT
+
+  Initially selected candidate. Specified by exact candidate or a regexp.
+"
   ;; TODO more document
   (interactive)
   (condition-case v
@@ -1232,6 +1257,7 @@ the real value in a text property."
             (progn
               (unless resume (anything-update))
               (select-frame-set-input-focus (window-frame (minibuffer-window)))
+              (anything-preselect preselect)
               (let ((minibuffer-local-map anything-map))
                 (read-string (or prompt "pattern: ") (if resume anything-pattern input))))
 
@@ -1376,13 +1402,20 @@ If action buffer is selected, back to the anything buffer."
   (setq anything-original-source-filter anything-source-filter)
   (setq anything-last-sources anything-sources)
 
+  (anything-create-anything-buffer))
+
+(defun anything-create-anything-buffer (&optional test-mode)
+  "Create newly created `anything-buffer'.
+If TEST-MODE is non-nil, clear `anything-candidate-cache'."
+  (when test-mode
+    (setq anything-candidate-cache nil))
   (with-current-buffer (get-buffer-create anything-buffer)
     (buffer-disable-undo)
+    (erase-buffer)
     (setq cursor-type nil)
     (setq mode-name "Anything"))
-
   (anything-initialize-overlays anything-buffer)
-)
+  (get-buffer anything-buffer))
 
 (defun anything-initialize-overlays (buffer)
   (if anything-selection-overlay
@@ -1746,6 +1779,19 @@ Cache the candidates if there is not yet a cached value."
        (selected-frame)
        `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
          (top . 0)))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
+
+(defun anything-preselect (candidate-or-regexp)
+  (when candidate-or-regexp
+    (with-current-buffer (anything-buffer-get)
+      (goto-char (point-min))
+      ;; go to first candidate of first source
+      (forward-line 1)
+      (let ((start (point)))
+        (unless (or (re-search-forward (concat "^" (regexp-quote candidate-or-regexp) "$") nil t)
+                (progn (goto-char start)
+                       (re-search-forward candidate-or-regexp nil t)))
+          (goto-char start))
+        (anything-mark-current-line)))))
 
 ;;---------------------------------------------------------------------
 ;; The smallest plug-in: type (built-in)
@@ -3098,7 +3144,31 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (init . (lambda () (setq v (anything-attr 'hoge))))
             (candidates "a"))))
         v))
-    
+    (desc "anything-preselect")
+    ;; entire candidate
+    (expect "foo"
+      (with-current-buffer (anything-create-anything-buffer t)
+        (let ((anything-pattern ""))
+          (anything-process-source '((name . "test")
+                                     (candidates "hoge" "foo" "bar")))
+          (anything-preselect "foo")
+          (anything-get-selection))))
+    ;; regexp
+    (expect "foo"
+      (with-current-buffer (anything-create-anything-buffer t)
+        (let ((anything-pattern ""))
+          (anything-process-source '((name . "test")
+                                     (candidates "hoge" "foo" "bar")))
+          (anything-preselect "fo+")
+          (anything-get-selection))))
+    ;; no match -> first entry
+    (expect "hoge"
+      (with-current-buffer (anything-create-anything-buffer t)
+        (let ((anything-pattern ""))
+          (anything-process-source '((name . "test")
+                                     (candidates "hoge" "foo" "bar")))
+          (anything-preselect "not found")
+          (anything-get-selection))))
     ))
 
 
