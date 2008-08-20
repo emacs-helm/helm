@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.70 2008-08-20 18:51:45 rubikitch Exp $
+;; $Id: anything.el,v 1.71 2008-08-20 21:45:42 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.70  2008-08-20 18:51:45  rubikitch
+;; Revision 1.71  2008-08-20 21:45:42  rubikitch
+;; added many tests.
+;;
+;; Revision 1.70  2008/08/20 18:51:45  rubikitch
 ;; `anything-preselect' bug fix.
 ;; refactoring.
 ;;
@@ -985,7 +988,7 @@ If you change `anything-sources' dynamically, set this variables to nil.")
 
 (defun anything-buffer-get ()
   "If *anything action* buffer is shown, return `anything-action-buffer', otherwise `anything-buffer'."
-  (if (anything-action-list-is-shown)
+  (if (anything-action-window)
       anything-action-buffer
     anything-buffer))
 
@@ -1514,9 +1517,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 UNIT and DIRECTION."
   (unless (or (zerop (buffer-size (get-buffer (anything-buffer-get))))
               (not (anything-window)))
-    (save-selected-window
-      (select-window (anything-window))
-
+    (with-anything-window
       (case unit
         (line (forward-line (case direction
                               (next 1)
@@ -2792,8 +2793,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
         (anything-candidates-in-buffer-1 
-           (current-buffer) "oo+"
-           #'buffer-substring-no-properties '(search-forward))))
+         (current-buffer) "oo+"
+         #'buffer-substring-no-properties '(search-forward))))
     (expect '(("foo+" "FOO+"))
       (with-temp-buffer
         (insert "foo+\nbar+\nbaz+\n")
@@ -3150,10 +3151,10 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (assoc-default 'name (anything-get-current-source)))
     (desc "anything-attr")
     (expect "FOO"
-       (anything-funcall-with-source
-        '((name . "FOO"))
-        (lambda ()
-          (anything-attr 'name))))
+      (anything-funcall-with-source
+       '((name . "FOO"))
+       (lambda ()
+         (anything-attr 'name))))
     (expect 'fuga
       (let (v)
         (anything-test-candidates
@@ -3190,6 +3191,145 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (candidates "hoge" "foo" "bar")))
           (anything-preselect "not found")
           (anything-get-selection))))
+    (desc "anything-check-new-input")
+    (expect "newpattern"
+      (stub anything-update)
+      (stub anything-action-window)
+      (let ((anything-pattern "pattern"))
+        (anything-check-new-input "newpattern")
+        anything-pattern))
+    ;; anything-input == nil when action window is available
+    (expect nil
+      (stub anything-update)
+      (stub anything-action-window => t)
+      (let ((anything-pattern "pattern")
+            anything-input)
+        (anything-check-new-input "newpattern")
+        anything-input))
+    ;; anything-input == anything-pattern unless action window is available
+    (expect "newpattern"
+      (stub anything-update)
+      (stub anything-action-window => nil)
+      (let ((anything-pattern "pattern")
+            anything-input)
+        (anything-check-new-input "newpattern")
+        anything-input))
+    (expect (mock (anything-update))
+      (stub anything-action-window)
+      (let (anything-pattern)
+        (anything-check-new-input "foo")))
+    (desc "anything-update")
+    (expect (mock (anything-process-source '((name . "1"))))
+      (stub anything-get-sources => '(((name . "1"))))
+      (stub run-hooks)
+      (stub anything-maybe-fit-frame)
+      (stub run-with-idle-timer)
+      (anything-update))
+    ;; (find-function 'anything-update)
+    ;; TODO el-mock.el should express 2nd call of function.
+    ;; TODO el-mock.el should express no call of function.
+    ;;     (expect (mock (anything-process-source '((name . "2"))))
+    ;;       (stub anything-get-sources => '(((name . "1")) ((name . "2"))))
+    ;;       (stub run-hooks)
+    ;;       (stub anything-maybe-fit-frame)
+    ;;       (stub run-with-idle-timer)
+    ;;       (anything-update))
+    (expect (mock (run-with-idle-timer * nil 'anything-process-delayed-sources
+                                       '(((name . "2") (delayed)))))
+      (stub anything-get-sources => '(((name . "1"))
+                                      ((name . "2") (delayed))))
+      (stub run-hooks)
+      (stub anything-maybe-fit-frame)
+      (let ((anything-pattern "") anything-test-mode)
+        (anything-update)))
+    ;; TODO requires-pattern test
+    (desc "delay")
+    (expect (mock (sit-for 0.25))
+      (stub with-current-buffer)
+      (let ((anything-idle-delay 1.0)
+            (anything-input-idle-delay 0.75))
+        (anything-process-delayed-sources t)))
+    (expect (mock (sit-for 0.0))
+      (stub with-current-buffer)
+      (let ((anything-idle-delay 0.2)
+            (anything-input-idle-delay 0.5))
+        (anything-process-delayed-sources t)))    
+    (expect (mock (sit-for 0.5))
+      (stub with-current-buffer)
+      (let ((anything-idle-delay 0.5)
+            (anything-input-idle-delay nil))
+        (anything-process-delayed-sources t)))
+    (desc "anything-normalize-sources")
+    (expect '(anything-c-source-test)
+      (anything-normalize-sources 'anything-c-source-test))
+    (expect '(anything-c-source-test)
+      (anything-normalize-sources '(anything-c-source-test)))
+    (expect '(anything-c-source-test)
+      (let ((anything-sources '(anything-c-source-test)))
+        (anything-normalize-sources nil)))
+    (desc "anything-get-action")
+    (expect '(("identity" . identity))
+      (stub buffer-size => 1)
+      (stub anything-get-current-source => '((name . "test")
+                                             (action ("identity" . identity))))
+      (anything-get-action))
+    (expect '((("identity" . identity)) "action-transformer is called")
+      (stub buffer-size => 1)
+      (stub anything-get-current-source
+            => '((name . "test")
+                 (action ("identity" . identity))
+                 (action-transformer
+                  . (lambda (actions selection)
+                      (list actions selection)))))
+      (stub anything-get-selection => "action-transformer is called")
+      (anything-get-action))
+    (desc "anything-select-nth-action")
+    (expect "selection"
+      (stub anything-get-selection => "selection")
+      (stub anything-exit-minibuffer)
+      (let (anything-saved-selection)
+        (anything-select-nth-action 1)
+        anything-saved-selection))
+    (expect 'cadr
+      (stub anything-get-action => '(("0" . car) ("1" . cdr) ("2" . cadr)))
+      (stub anything-exit-minibuffer)
+      (stub anything-get-selection => "selection")
+      (let (anything-saved-action)
+        (anything-select-nth-action 2)
+        anything-saved-action))
+    (desc "anything-funcall-foreach")
+    (expect (mock (upcase "foo"))
+      (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))))
+      (anything-funcall-foreach 'init))
+    (expect (mock (downcase "bar"))
+      (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))
+                                      ((init . (lambda () (downcase "bar"))))))
+      (anything-funcall-foreach 'init))
+    ;; TODO when symbol is not specified
+    ;; TODO anything-select-with-digit-shortcut test
+    (desc "anything-get-cached-candidates")
+    (expect '("cached" "version")
+      (let ((anything-candidate-cache '(("test" "cached" "version"))))
+        (anything-get-cached-candidates '((name . "test")
+                                          (candidates "new")))))
+    (expect '("new")
+      (let ((anything-candidate-cache '(("other" "cached" "version"))))
+        (anything-get-cached-candidates '((name . "test")
+                                          (candidates "new")))))
+    (expect '(("test" "new")
+              ("other" "cached" "version"))
+      (let ((anything-candidate-cache '(("other" "cached" "version"))))
+        (anything-get-cached-candidates '((name . "test")
+                                          (candidates "new")))
+        anything-candidate-cache))
+    (expect '(("other" "cached" "version"))
+      (let ((anything-candidate-cache '(("other" "cached" "version"))))
+        (anything-get-cached-candidates '((name . "test")
+                                          (candidates "new")
+                                          (volatile)))
+        anything-candidate-cache))
+    ;; TODO when candidates == process
+    ;; TODO anything-output-filter
     ))
 
 
