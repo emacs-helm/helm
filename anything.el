@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.67 2008-08-20 00:08:28 rubikitch Exp $
+;; $Id: anything.el,v 1.68 2008-08-20 16:39:07 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,15 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.67  2008-08-20 00:08:28  rubikitch
+;; Revision 1.68  2008-08-20 16:39:07  rubikitch
+;; Nested `anything' invocation support, ie. `anything' can be invoked by anything action.
+;;
+;; (anything '(((name . "nested anything invocation test")
+;;              (candidates "anything-c-source-buffers" "anything-c-source-man-pages")
+;;              (display-to-real . intern)
+;;              (action . anything))))
+;;
+;; Revision 1.67  2008/08/20 00:08:28  rubikitch
 ;; `anything-candidates-in-buffer-1': add code when pattern == ""
 ;;
 ;; Revision 1.66  2008/08/19 23:31:52  rubikitch
@@ -1208,6 +1216,9 @@ the real value in a text property."
   (interactive)
   (condition-case v
       (let ((frameconfig (current-frame-configuration))
+            ;; It is needed because `anything-source-name' is non-nil
+            ;; when `anything' is invoked by action. Awful global scope.
+            anything-source-name
             (anything-sources (anything-normalize-sources sources)))
         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
