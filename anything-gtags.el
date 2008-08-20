@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.6 2008-08-20 18:58:42 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.7 2008-08-20 19:00:36 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.6  2008-08-20 18:58:42  rubikitch
+;; Revision 1.7  2008-08-20 19:00:36  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.6  2008/08/20 18:58:42  rubikitch
 ;; preselect entry of current line of source code.
 ;;
 ;; Revision 1.5  2008/08/19 21:50:00  rubikitch
@@ -109,7 +112,7 @@
           . (lambda (c) (aggs-select-it c t))))
         (persistent-action . aggs-select-it)
         (cleanup . (lambda () (kill-buffer buffer)))))
-     nil nil nil (p (format "\\(\\(%d\\) +%s\\)" lineno (regexp-quote basename) )))))
+     nil nil nil (format "\\(\\(%d\\) +%s\\)" lineno (regexp-quote basename) ))))
 
 (defun aggs-select-it (candidate &optional delete)
   (with-temp-buffer
