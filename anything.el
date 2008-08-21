@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.76 2008-08-21 12:25:02 rubikitch Exp $
+;; $Id: anything.el,v 1.77 2008-08-21 17:40:40 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.76  2008-08-21 12:25:02  rubikitch
+;; Revision 1.77  2008-08-21 17:40:40  rubikitch
+;; New function: `anything-set-sources'
+;;
+;; Revision 1.76  2008/08/21 12:25:02  rubikitch
 ;; New variable: `anything-version'
 ;;
 ;; Revision 1.75  2008/08/21 12:13:46  rubikitch
@@ -414,7 +417,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.76 2008-08-21 12:25:02 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.77 2008-08-21 17:40:40 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -482,6 +485,11 @@ It accepts symbols:
  (setq anything-sources (list anything-c-foo anything-c-bar))
 can be written as
  (setq anything-sources '(anything-c-foo anything-c-bar))
+The latter is recommended because if you change anything-c-* variable,
+you do not have to update `anything-sources'.
+
+If you want to change `anything-sources' during `anything' invocation,
+use `anything-set-sources', never use `setq'.
 
 Attributes:
 
@@ -984,8 +992,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   list is shown.")
 
 (defvar anything-compiled-sources nil
-  "Compiled version of `anything-sources'.
-If you change `anything-sources' dynamically, set this variables to nil.")
+  "Compiled version of `anything-sources'. ")
 
 (defvar anything-in-persistent-action nil
   "Flag whether in persistent-action or not.")
@@ -1847,6 +1854,11 @@ Cache the candidates if there is not yet a cached value."
           (goto-char start))
         (anything-mark-current-line)))))
 
+(defun anything-set-sources (sources)
+  "Set `anything-sources' during `anything' invocation."
+  (setq anything-compiled-sources nil
+        anything-sources sources))
+
 ;;---------------------------------------------------------------------
 ;; The smallest plug-in: type (built-in)
 ;;----------------------------------------------------------------------
@@ -2511,10 +2523,9 @@ shown yet and bind anything commands in iswitchb."
            (with-selected-window (minibuffer-window) (delete-minibuffer-contents))
            (setq anything-pattern "")
            (setq dir f)
-           (setq anything-compiled-sources nil
-                 anything-sources
-                 (arfn-sources
-                  prompt f default-filename require-match nil predicate))
+           (anything-set-sources
+            (arfn-sources
+             prompt f default-filename require-match nil predicate))
            (anything-update))
           (t
            (insert "/")))))
