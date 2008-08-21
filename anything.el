@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.75 2008-08-21 12:13:46 rubikitch Exp $
+;; $Id: anything.el,v 1.76 2008-08-21 12:25:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.75  2008-08-21 12:13:46  rubikitch
+;; Revision 1.76  2008-08-21 12:25:02  rubikitch
+;; New variable: `anything-version'
+;;
+;; Revision 1.75  2008/08/21 12:13:46  rubikitch
 ;; New variable: `anything-in-persistent-action'
 ;;
 ;; Revision 1.74  2008/08/21 10:34:22  rubikitch
@@ -411,6 +414,7 @@
 ;; New maintainer.
 ;;
 
+(defvar anything-version "$Id: anything.el,v 1.76 2008-08-21 12:25:02 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
