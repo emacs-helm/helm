@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.77 2008-08-21 17:40:40 rubikitch Exp $
+;; $Id: anything.el,v 1.78 2008-08-21 18:37:03 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.77  2008-08-21 17:40:40  rubikitch
+;; Revision 1.78  2008-08-21 18:37:03  rubikitch
+;; Implemented dummy sources as plug-in.
+;;
+;; Revision 1.77  2008/08/21 17:40:40  rubikitch
 ;; New function: `anything-set-sources'
 ;;
 ;; Revision 1.76  2008/08/21 12:25:02  rubikitch
@@ -417,7 +420,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.77 2008-08-21 17:40:40 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.78 2008-08-21 18:37:03 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -537,6 +540,8 @@ Attributes:
 
   Merge attributes not specified in the source itself from
   `anything-type-attributes'.
+
+  This attribute is implemented by plug-in.
 
 - init (optional)
 
@@ -683,6 +688,8 @@ Attributes:
     (volatile)
     (match identity)
 
+  This attribute is implemented by plug-in.
+
 - search (optional)
 
   List of functions like `re-search-forward' or `search-forward'.
@@ -715,6 +722,15 @@ Attributes:
 - candidate-number-limit (optional)
 
   Override `anything-candidate-number-limit' only for this source.
+
+- dummy (optional)
+
+  Set `anything-pattern' to candidate. If this attribute is
+  specified, The candidates attribute is ignored.
+
+  This attribute is implemented by plug-in.
+
+
 ")
 
 
@@ -1119,8 +1135,10 @@ the current pattern."
                              delayed-sources)))))
 
 (defvar anything-compile-source-functions
-  '(anything-compile-source--type anything-compile-source--candidates-in-buffer)
-  "Functions to compile elements of `anything-sources'.")
+  '(anything-compile-source--type anything-compile-source--dummy anything-compile-source--candidates-in-buffer)
+  "Functions to compile elements of `anything-sources' (plug-in).")
+(defvar anything-compile-source-functions-default anything-compile-source-functions
+  "Plug-ins this file provides.")
 (defun anything-get-sources ()
   "Return compiled `anything-sources', which is memoized.
 
@@ -1867,6 +1885,22 @@ Cache the candidates if there is not yet a cached value."
       (append source (assoc-default it anything-type-attributes) nil)
     source))
 
+;;----------------------------------------------------------------------
+;; dummy plug-in (built-in)
+;;----------------------------------------------------------------------
+(defun anything-dummy-candidate (candidate source)
+  ;; `source' is defined in filtered-candidate-transformer
+  (list anything-pattern))  
+
+(defun anything-compile-source--dummy (source)
+  (if (assoc 'dummy source)
+      (append '((candidates "dummy")
+                (match identity)
+                (filtered-candidate-transformer . anything-dummy-candidate)
+                (volatile))
+              source)
+    source))
+
 ;;---------------------------------------------------------------------
 ;; candidates-in-buffer plug-in (built-in)
 ;;----------------------------------------------------------------------
@@ -2438,24 +2472,6 @@ shown yet and bind anything commands in iswitchb."
 
 
 ;;----------------------------------------------------------------------
-;; dummy source
-;;----------------------------------------------------------------------
-(defun anything-define-dummy-source (name func &rest other-attrib)
-  `((name . ,name)
-    (candidates "dummy")
-    ,@other-attrib
-    (filtered-candidate-transformer
-     . (lambda (candidates source)
-         (funcall ',func)))
-    (requires-pattern . 1)
-    (volatile)))
-
-(defun anything-dummy-candidate ()
-  ;; `source' is defined in filtered-candidate-transformer
-  (list (cons (concat "New input: " anything-pattern)
-              anything-pattern))) 
-
-;;----------------------------------------------------------------------
 ;; `completing-read' compatible read function (experimental)
 ;;----------------------------------------------------------------------
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
@@ -2480,8 +2496,7 @@ shown yet and bind anything commands in iswitchb."
                    (remove-if-not (lambda (c) (,predicate
                                                (if (listp c) (car c) c))) cands)))))
         (new-input-source (unless require-match
-                            (anything-define-dummy-source
-                             prompt #'anything-dummy-candidate '(action . identity))))
+                            `((name . prompt) (dummy) (action . identity))))
         (history-source (unless require-match
                           `((name . "History")
                             (candidates . ,(or hist 'minibuffer-history))
@@ -2557,9 +2572,7 @@ shown yet and bind anything commands in iswitchb."
                     (remove-if-not
                      (lambda (c) (,predicate (if (listp c) (car c) c))) cands)))))
          (new-input-source (unless require-match
-                             (anything-define-dummy-source
-                              prompt #'anything-dummy-candidate
-                              '(action . identity))))
+                             `((name . ,prompt) (dummy) '(action . identity))))
          (history-source (unless require-match
                            `((name . "History")
                              (candidates . minibuffer-history)
@@ -2646,7 +2659,7 @@ The current buffer must be a minibuffer."
 ;; Unit Tests
 ;;----------------------------------------------------------------------
 
-(defun* anything-test-candidates (sources &optional (input "") (compile-source-functions '(anything-compile-source--type anything-compile-source--candidates-in-buffer)))
+(defun* anything-test-candidates (sources &optional (input "") (compile-source-functions anything-compile-source-functions-default))
   "Test helper function for anything.
 Given pseudo `anything-sources' and `anything-pattern', returns list like
   ((\"source name1\" (\"candidate1\" \"candidate2\"))
