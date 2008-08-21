@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.73 2008-08-21 09:41:38 rubikitch Exp $
+;; $Id: anything.el,v 1.74 2008-08-21 10:34:22 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.73  2008-08-21 09:41:38  rubikitch
+;; Revision 1.74  2008-08-21 10:34:22  rubikitch
+;; New function `anything-mklist'
+;;
+;; Revision 1.73  2008/08/21 09:41:38  rubikitch
 ;; accept multiple init/cleanup functions so that plug-ins can add new function.
 ;;
 ;; Revision 1.72  2008/08/20 22:51:53  rubikitch
@@ -995,6 +998,10 @@ If you change `anything-sources' dynamically, set this variables to nil.")
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))  
 (put 'anything-aif 'lisp-indent-function 2)
+
+(defun anything-mklist (obj)
+  "If OBJ is a list, return itself, otherwise make a list with one element."
+  (if (listp obj) obj (list obj)))
 
 (defun anything-buffer-get ()
   "If *anything action* buffer is shown, return `anything-action-buffer', otherwise `anything-buffer'."
@@ -3430,6 +3437,11 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (cleanup (lambda () (setq a 1))
                      (lambda () (setq b 2))))))
         (cons a b)))
+    (desc "anything-mklist")
+    (expect '(1)
+      (anything-mklist 1))
+    (expect '(2)
+      (anything-mklist '(2)))
     ))
 
 
