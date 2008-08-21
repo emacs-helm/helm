@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.74 2008-08-21 10:34:22 rubikitch Exp $
+;; $Id: anything.el,v 1.75 2008-08-21 12:13:46 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.74  2008-08-21 10:34:22  rubikitch
+;; Revision 1.75  2008-08-21 12:13:46  rubikitch
+;; New variable: `anything-in-persistent-action'
+;;
+;; Revision 1.74  2008/08/21 10:34:22  rubikitch
 ;; New function `anything-mklist'
 ;;
 ;; Revision 1.73  2008/08/21 09:41:38  rubikitch
@@ -980,6 +983,9 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   "Compiled version of `anything-sources'.
 If you change `anything-sources' dynamically, set this variables to nil.")
 
+(defvar anything-in-persistent-action nil
+  "Flag whether in persistent-action or not.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; internal variables
@@ -1288,7 +1294,7 @@ the real value in a text property."
       (let ((frameconfig (current-frame-configuration))
             ;; It is needed because `anything-source-name' is non-nil
             ;; when `anything' is invoked by action. Awful global scope.
-            anything-source-name
+            anything-source-name anything-in-persistent-action
             (anything-sources (anything-normalize-sources sources)))
         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
@@ -2002,11 +2008,12 @@ Acceptable values of CREATE-OR-BUFFER:
     (select-window (setq minibuffer-scroll-window
                          (if (one-window-p t) (split-window)
                            (next-window (selected-window) 1))))
-    (anything-execute-selection-action
-     nil
-     (or (assoc-default 'persistent-action (anything-get-current-source))
-         (anything-get-action))
-     t)))
+    (let ((anything-in-persistent-action t))
+      (anything-execute-selection-action
+       nil
+       (or (assoc-default 'persistent-action (anything-get-current-source))
+           (anything-get-action))
+       t))))
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun anything-scroll-other-window-base (command)
