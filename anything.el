@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.72 2008-08-20 22:51:53 rubikitch Exp $
+;; $Id: anything.el,v 1.73 2008-08-21 09:41:38 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.72  2008-08-20 22:51:53  rubikitch
+;; Revision 1.73  2008-08-21 09:41:38  rubikitch
+;; accept multiple init/cleanup functions so that plug-ins can add new function.
+;;
+;; Revision 1.72  2008/08/20 22:51:53  rubikitch
 ;; New `anything-sources' attribute: candidate-number-limit
 ;;
 ;; Revision 1.71  2008/08/20 21:45:42  rubikitch
@@ -1414,12 +1417,13 @@ If action buffer is selected, back to the anything buffer."
   (anything-select-nth-action 3))
 
 (defun anything-funcall-foreach (sym)
-  "Call the sym function for each source if any."
+  "Call the sym function(s) for each source if any."
   (dolist (source (anything-get-sources))
     (when (symbolp source)
       (setq source (symbol-value source)))
     (anything-aif (assoc-default sym source)
-        (anything-funcall-with-source source it))))
+        (dolist (func (if (functionp it) (list it) it))
+          (anything-funcall-with-source source func)))))
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
@@ -3404,7 +3408,28 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (candidate-number-limit . 3)
             (volatile)))
          ".")))
-
+    (desc "multiple init")
+    (expect '(1 . 2)
+      (let (a b)
+        (anything-test-candidates
+         '(((name . "test")
+            (init (lambda () (setq a 1))
+                  (lambda () (setq b 2))))))
+        (cons a b)))
+    (expect 1
+      (let (a)
+        (anything-test-candidates
+         '(((name . "test")
+            (init (lambda () (setq a 1))))))
+        a))
+    (desc "multiple cleanup")
+    (expect '(1 . 2)
+      (let (a b)
+        (anything-test-candidates
+         '(((name . "test")
+            (cleanup (lambda () (setq a 1))
+                     (lambda () (setq b 2))))))
+        (cons a b)))
     ))
 
 
