@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.79 2008-08-22 17:11:00 rubikitch Exp $
+;; $Id: anything.el,v 1.80 2008-08-22 21:25:05 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,12 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.79  2008-08-22 17:11:00  rubikitch
+;; Revision 1.80  2008-08-22 21:25:05  rubikitch
+;; anything-candidates-in-buffer-1:
+;; Open a line at the BOB to make use of `search-forward' for faster exact/prefix match.
+;; Of course, restore the buffer contents after search.
+;;
+;; Revision 1.79  2008/08/22 17:11:00  rubikitch
 ;; New hook: `anything-before-initialize-hook', `anything-after-initialize-hook'
 ;;
 ;; Revision 1.78  2008/08/21 18:37:03  rubikitch
@@ -423,7 +428,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.79 2008-08-22 17:11:00 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.80 2008-08-22 21:25:05 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1990,6 +1995,18 @@ See also `anything-sources' docstring.
                                        '(re-search-forward))
                                    (anything-candidate-number-limit source)))
 
+(defmacro anything-with-open-first-line (&rest body)
+  `(progn
+     (goto-char (point-min))
+     (let (buffer-read-only)
+       (insert "\n")
+       (forward-line -1)
+       ,@body
+       (goto-char (point-min))
+       (delete-char 1)
+       (set-buffer-modified-p nil))))
+(put 'anything-with-open-first-line 'lisp-indent-function 0)
+
 (defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)) (limit anything-candidate-number-limit))
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
@@ -2001,22 +2018,23 @@ See also `anything-sources' docstring.
                 collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
                 do (forward-line 1))
         (let ((i 1) matches exit newmatches)
-          (clrhash anything-cib-hash)
-          (dolist (searcher search-fns)
-            (goto-char (point-min))
-            (setq newmatches nil)
-            (loop while (funcall searcher pattern nil t)
-                  if (or (eobp) (< limit i))
-                  do (setq exit t) (return)
-                  else do
-                  (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                    (unless (gethash cand anything-cib-hash)
-                      (puthash cand t anything-cib-hash)
-                      (incf i)
-                      (push cand newmatches)))
-                  (forward-line 1))
-            (setq matches (append matches (nreverse newmatches)))
-            (if exit (return)))
+          (anything-with-open-first-line
+            (clrhash anything-cib-hash)
+            (dolist (searcher search-fns)
+              (goto-char (point-min))
+              (setq newmatches nil)
+              (loop while (funcall searcher pattern nil t)
+                    if (or (eobp) (< limit i))
+                    do (setq exit t) (return)
+                    else do
+                    (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
+                      (unless (gethash cand anything-cib-hash)
+                        (puthash cand t anything-cib-hash)
+                        (incf i)
+                        (push cand newmatches)))
+                    (forward-line 1))
+              (setq matches (append matches (nreverse newmatches)))
+              (if exit (return))))
           matches)))))
 
 
@@ -2984,6 +3002,33 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (match identity)
           (volatile)))
        "oo+"))
+    ;; faster exact match
+    (expect '(("TEST" ("bar+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "bar+\nbaz+\nooo\nfoo+\n"))))
+          (search (lambda (pattern &rest _)
+                    (and (search-forward (concat "\n" pattern "\n") nil t)
+                         (forward-line -1))))
+          (candidates . anything-candidates-in-buffer)
+          (match identity)
+          (volatile)))
+       "bar+"))
+    ;; faster prefix match
+    (expect '(("TEST" ("bar+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "bar+\nbaz+\nooo\nfoo+\n"))))
+          (search (lambda (pattern &rest _)
+                    (search-forward (concat "\n" pattern) nil t)))
+          (candidates . anything-candidates-in-buffer)
+          (match identity)
+          (volatile)))
+       "ba"))
     (desc "anything-current-buffer-is-modified")
     (expect nil
       (with-temp-buffer
