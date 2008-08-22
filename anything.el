@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.78 2008-08-21 18:37:03 rubikitch Exp $
+;; $Id: anything.el,v 1.79 2008-08-22 17:11:00 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.78  2008-08-21 18:37:03  rubikitch
+;; Revision 1.79  2008-08-22 17:11:00  rubikitch
+;; New hook: `anything-before-initialize-hook', `anything-after-initialize-hook'
+;;
+;; Revision 1.78  2008/08/21 18:37:03  rubikitch
 ;; Implemented dummy sources as plug-in.
 ;;
 ;; Revision 1.77  2008/08/21 17:40:40  rubikitch
@@ -420,7 +423,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.78 2008-08-21 18:37:03 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.79 2008-08-22 17:11:00 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -974,8 +977,16 @@ anything completions with \.")
 (defvar anything-digit-shortcut-count 0
   "Number of digit shortcuts shown in the anything buffer.")
 
+(defvar anything-before-initialize-hook nil
+  "Run before anything initialization")
+
+(defvar anything-after-initialize-hook nil
+  "Run after anything initialization.
+Global variables are initialized and the anything buffer is created.
+But the anything buffer has no contents. ")
+
 (defvar anything-update-hook nil
-  "Run after the aything buffer was updated according the new
+  "Run after the anything buffer was updated according the new
   input pattern.")
 
 ;; `anything-saved-sources' is removed
@@ -1469,6 +1480,7 @@ If action buffer is selected, back to the anything buffer."
 
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
+  (run-hooks 'anything-before-initialize-hook)
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
   (setq anything-current-position (cons (point) (window-start)))
@@ -1483,7 +1495,8 @@ If action buffer is selected, back to the anything buffer."
   (setq anything-original-source-filter anything-source-filter)
   (setq anything-last-sources anything-sources)
 
-  (anything-create-anything-buffer))
+  (anything-create-anything-buffer)
+  (run-hooks 'anything-after-initialize-hook))
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
@@ -2670,6 +2683,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         anything-candidate-cache
         (anything-sources (anything-normalize-sources sources))
         (anything-compile-source-functions compile-source-functions)
+        anything-before-initialize-hook
+        anything-after-initialize-hook
         anything-update-hook
         anything-test-candidate-list)
     (get-buffer-create anything-buffer)
@@ -3477,6 +3492,27 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-mklist 1))
     (expect '(2)
       (anything-mklist '(2)))
+    (desc "anything-before-initialize-hook")
+    (expect 'called
+      (let ((anything-before-initialize-hook '((lambda () (setq v 'called))))
+            v)
+        (anything-initialize)
+        v))
+    (desc "anything-after-initialize-hook")
+    (expect '(b a)
+      (let ((anything-before-initialize-hook
+             '((lambda () (setq v '(a)))))
+            (anything-after-initialize-hook
+             '((lambda () (setq v (cons 'b v)))))
+            v)
+        (anything-initialize)
+        v))
+    (expect 0
+      (let ((anything-after-initialize-hook
+             '((lambda () (setq v (buffer-size (get-buffer anything-buffer))))))
+            v)
+        (anything-initialize)
+        v))
     ))
 
 
