@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.5 2008-08-22 19:04:53 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.6 2008-08-22 19:40:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.5  2008-08-22 19:04:53  rubikitch
+;; Revision 1.6  2008-08-22 19:40:22  rubikitch
+;; exact -> prefix -> mp-3 by default because of speed
+;;
+;; Revision 1.5  2008/08/22 19:04:53  rubikitch
 ;; reimplemented
 ;;
 ;; Revision 1.4  2008/08/20 00:10:15  rubikitch
@@ -97,21 +100,19 @@
 (amp-define "anything-mp-1-" (concat "^" (amp-mp-1-make-regexp pattern)))
 ;; multiple regexp patterns 2 (order is preserved / partial)
 (amp-define "anything-mp-2-" (concat "^.+" (amp-mp-1-make-regexp pattern)))
-;; multiple regexp patterns 3 (permutation / not in order)
+;; multiple regexp patterns 3 (permutation)
 (amp-define "anything-mp-3-"
             (mapconcat (lambda (regexps)
                          (concat "\\(" (mapconcat #'identity regexps ".*") "\\)"))
-                       (cdr (amp-permute (amp-mp-make-regexps pattern)))
+                       (amp-permute (amp-mp-make-regexps pattern))
                        "\\|"))
 
                          
 ;;;; source compier
 (defvar anything-default-match-functions
-  '(anything-exact-match anything-prefix-match anything-mp-1-match
-                         anything-mp-2-match anything-mp-3-match))
+  '(anything-exact-match anything-prefix-match  anything-mp-3-match))
 (defvar anything-default-search-functions
-  '(anything-exact-search anything-prefix-search anything-mp-1-search
-                          anything-mp-2-search anything-mp-3-search))
+  '(anything-exact-search anything-prefix-search anything-mp-3-search))
 
 (defun anything-compile-source--match-plugin (source)
   `(,(if (or (assoc 'candidates-in-buffer source)
@@ -169,12 +170,12 @@
         (goto-char 1)
         (anything-mp-2-search "th+ r" nil t)))
     (desc "anything-mp-3-search")
-    (expect nil
+    (expect (type integer)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
         (anything-mp-3-search "h+ r" nil t)))
-    (expect nil
+    (expect (type integer)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
@@ -203,9 +204,9 @@
     (expect nil
       (anything-mp-2-match "thunder" "th+ r"))
     (desc "anything-mp-3-match")
-    (expect nil
+    (expect (type integer)
       (anything-mp-3-match "thunder" "h+ r"))
-    (expect nil
+    (expect (type integer)
       (anything-mp-3-match "thunder" "th+ r"))
     (expect (type integer)
       (anything-mp-3-match "thunder" "r th+"))
