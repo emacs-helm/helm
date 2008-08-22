@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.6 2008-08-22 19:40:22 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.7 2008-08-22 21:17:58 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.6  2008-08-22 19:40:22  rubikitch
+;; Revision 1.7  2008-08-22 21:17:58  rubikitch
+;; exact, prefix match: faster
+;;
+;; Revision 1.6  2008/08/22 19:40:22  rubikitch
 ;; exact -> prefix -> mp-3 by default because of speed
 ;;
 ;; Revision 1.5  2008/08/22 19:04:53  rubikitch
@@ -89,13 +92,26 @@
          ,pattern-regexp)
        (defun* ,match (str &optional (pattern anything-pattern))
          (string-match (,get-regexp pattern) str))
-       (defun* ,search (pattern &rest ignore)
+       (defun ,search (pattern &rest ignore)
          (re-search-forward (,get-regexp pattern) nil t)))))
   
 ;; exact match
-(amp-define "anything-exact-" (concat (anything-prefix-get-regexp pattern) "$"))
+;(amp-define "anything-exact-" (concat (anything-prefix-get-regexp pattern) "$"))
+(defun anything-exact-match (str &optional pattern)
+  (string= str (or pattern anything-pattern)))
+(defun anything-exact-search (pattern &rest ignore)
+  (and (search-forward (concat "\n" pattern "\n") nil t)
+       (forward-line -1)))
 ;; prefix match
-(amp-define "anything-prefix-" (concat "^" (regexp-quote pattern)))
+;;(amp-define "anything-prefix-" (concat "^" (regexp-quote pattern)))
+(defun anything-prefix-match (str &optional pattern)
+  (setq pattern (or pattern anything-pattern))
+  (let ((len (length pattern)))
+    (and (<= len (length str))
+         (string= (substring str 0 len) pattern ))))
+(defun anything-prefix-search (pattern &rest ignore)
+  (and (search-forward (concat "\n" pattern) nil t)
+       ))
 ;; multiple regexp patterns 1 (order is preserved / prefix)
 (amp-define "anything-mp-1-" (concat "^" (amp-mp-1-make-regexp pattern)))
 ;; multiple regexp patterns 2 (order is preserved / partial)
@@ -143,6 +159,22 @@
       (amp-mp-make-regexps " foo bar "))
     (expect '("foo bar" "baz")
       (amp-mp-make-regexps "foo\\ bar baz"))
+    (desc "anything-exact-match")
+    (expect (non-nil)
+      (anything-exact-match "thunder" "thunder"))
+    (expect nil
+      (anything-exact-match "thunder" "fire"))
+    (desc "anything-exact-search")
+    (expect (non-nil)
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-exact-search "thunder" nil t)))
+    (expect (non-nil)
+      (with-temp-buffer
+        (insert "\nfire\nthunder\n")
+        (goto-char 1)
+        (anything-exact-search "fire" nil t)))
     (desc "amp-mp-1-make-regexp")
     (expect "a.*b"
       (amp-mp-1-make-regexp "a b"))
@@ -153,13 +185,13 @@
     (expect ""
       (amp-mp-1-make-regexp ""))
     (desc "anything-mp-1-search")
-    (expect (type integer)
+    (expect (non-nil)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
         (anything-mp-1-search "th+ r" nil t)))
     (desc "anything-mp-2-search")
-    (expect (type integer)
+    (expect (non-nil)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
@@ -170,17 +202,17 @@
         (goto-char 1)
         (anything-mp-2-search "th+ r" nil t)))
     (desc "anything-mp-3-search")
-    (expect (type integer)
+    (expect (non-nil)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
         (anything-mp-3-search "h+ r" nil t)))
-    (expect (type integer)
+    (expect (non-nil)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
         (anything-mp-3-search "th+ r" nil t)))
-    (expect (type integer)
+    (expect (non-nil)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
@@ -190,32 +222,32 @@
         (insert "fire\nthunder\n")
         (goto-char 1)
         (anything-mp-3-search "under hue" nil t)))
-    (expect (type integer)
+    (expect (non-nil)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
         (anything-mp-3-search "r th+ n" nil t)))
     (desc "anything-mp-1-match")
-    (expect (type integer)
+    (expect (non-nil)
       (anything-mp-1-match "thunder" "th+ r"))
     (desc "anything-mp-2-match")
-    (expect (type integer)
+    (expect (non-nil)
       (anything-mp-2-match "thunder" "h+ r"))
     (expect nil
       (anything-mp-2-match "thunder" "th+ r"))
     (desc "anything-mp-3-match")
-    (expect (type integer)
+    (expect (non-nil)
       (anything-mp-3-match "thunder" "h+ r"))
-    (expect (type integer)
+    (expect (non-nil)
       (anything-mp-3-match "thunder" "th+ r"))
-    (expect (type integer)
+    (expect (non-nil)
       (anything-mp-3-match "thunder" "r th+"))
     (expect nil
       (anything-mp-3-match "thunder" "under hue"))
-    (expect (type integer)
+    (expect (non-nil)
       (anything-mp-3-match "thunder" "r th+ n"))
     (desc "anything-prefix-match")
-    (expect (type integer)
+    (expect (non-nil)
       (anything-prefix-match "fobar" "fo"))
     (expect nil
       (anything-prefix-match "xfobar" "fo"))
@@ -266,6 +298,26 @@
                                     . (lambda ()
                                         (with-current-buffer (anything-candidates-buffer 'global)
                                           (insert "foobar\nfoo\n"))))
+                                   (candidates-in-buffer)))
+                                "foo"
+                                '(anything-compile-source--candidates-in-buffer
+                                  anything-compile-source--match-plugin)))
+    (expect '(("FOO" ("foo")))
+      (anything-test-candidates '(((name . "FOO")
+                                   (init
+                                    . (lambda ()
+                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                          (insert "foo\n"))))
+                                   (candidates-in-buffer)))
+                                "foo"
+                                '(anything-compile-source--candidates-in-buffer
+                                  anything-compile-source--match-plugin)))
+    (expect '(("FOO" ("foo")))
+      (anything-test-candidates '(((name . "FOO")
+                                   (init
+                                    . (lambda ()
+                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                          (insert "bar\nfoo\ntest\n"))))
                                    (candidates-in-buffer)))
                                 "foo"
                                 '(anything-compile-source--candidates-in-buffer
