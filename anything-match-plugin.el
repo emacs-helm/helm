@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.4 2008-08-20 00:10:15 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.5 2008-08-22 19:04:53 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.4  2008-08-20 00:10:15  rubikitch
+;; Revision 1.5  2008-08-22 19:04:53  rubikitch
+;; reimplemented
+;;
+;; Revision 1.4  2008/08/20 00:10:15  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.3  2008/08/19 23:30:39  rubikitch
@@ -45,73 +48,74 @@
 ;;; Code:
 
 (require 'anything)
+(require 'cl)
 
 ;;;; multiple patterns
 (defvar anything-use-multiple-patterns t
   "If non-nil, enable anything-use-multiple-patterns.")
 
-(defvar amp-mp-pattern-info nil)
+(defun amp-permute (list)
+  (if (null list)
+      (list nil)
+    (mapcan (lambda (first)
+              (mapcar (lambda (rest)
+                        (cons first rest))
+                      (amp-permute (remove* first list :count 1 :test #'equal))))
+            list)))
 (defun amp-mp-make-regexps (pattern)
   (if (string= pattern "") '("")
     (loop for s in (split-string (replace-regexp-in-string "\\\\ " "\000\000" pattern) " " t)
         collect (replace-regexp-in-string "\000\000" " " s))))
-(defun amp-mp-get-regexps (pattern)
-  (unless (equal pattern (car amp-mp-pattern-info))
-    (setq amp-mp-pattern-info (cons pattern (amp-mp-make-regexps pattern))))
-  (cdr amp-mp-pattern-info))
 
-(defun anything-multiple-pattern-search (pattern &rest ignore)
-  "search function of anything-multiple-patterns."
-  (loop with patterns = (amp-mp-get-regexps pattern)
-        with first = (car patterns)
-        with rest = (cdr patterns)
-        while (re-search-forward first nil t)
-        when (loop for re in rest
-                   always (progn
-                            (goto-char (point-at-bol))
-                            (re-search-forward re (point-at-eol) t)))
-        do (return t)
-        else
-        do (forward-line 1)))
-(defun* anything-multiple-pattern-match (str &optional (regexps (amp-mp-get-regexps anything-pattern)))
-  "match function of anything-multiple-patterns."
-  (loop for re in regexps
-        always (string-match re str)))
+(defun amp-mp-1-make-regexp (pattern)
+  (mapconcat 'identity (amp-mp-make-regexps pattern) ".*"))
 
-;;;; prefix match
-(defvar amp-prefix-pattern-info nil)
-(defun amp-prefix-get-regexp (pattern)
-  (unless (equal pattern (car amp-prefix-pattern-info))
-    (setq amp-prefix-pattern-info
-          (cons pattern (concat "^" (regexp-quote pattern)))))
-  (cdr amp-prefix-pattern-info))
+(defmacro amp-define (prefix regexp-expr)
+  (let ((pattern-str (intern (concat prefix "pattern-str")))
+        (pattern-regexp (intern (concat prefix "pattern-regexp")))
+        (get-regexp (intern (concat prefix "get-regexp"))) 
+        (match (intern (concat prefix "match")))
+        (search (intern (concat prefix "search"))))
+    `(progn
+       (defvar ,pattern-str nil)
+       (defvar ,pattern-regexp nil)
+       (defsubst ,get-regexp (pattern)
+         (unless (equal pattern ,pattern-str)
+           (setq ,pattern-str pattern
+                 ,pattern-regexp ,regexp-expr))
+         ,pattern-regexp)
+       (defun* ,match (str &optional (pattern anything-pattern))
+         (string-match (,get-regexp pattern) str))
+       (defun* ,search (pattern &rest ignore)
+         (re-search-forward (,get-regexp pattern) nil t)))))
+  
+;; exact match
+(amp-define "anything-exact-" (concat (anything-prefix-get-regexp pattern) "$"))
+;; prefix match
+(amp-define "anything-prefix-" (concat "^" (regexp-quote pattern)))
+;; multiple regexp patterns 1 (order is preserved / prefix)
+(amp-define "anything-mp-1-" (concat "^" (amp-mp-1-make-regexp pattern)))
+;; multiple regexp patterns 2 (order is preserved / partial)
+(amp-define "anything-mp-2-" (concat "^.+" (amp-mp-1-make-regexp pattern)))
+;; multiple regexp patterns 3 (permutation / not in order)
+(amp-define "anything-mp-3-"
+            (mapconcat (lambda (regexps)
+                         (concat "\\(" (mapconcat #'identity regexps ".*") "\\)"))
+                       (cdr (amp-permute (amp-mp-make-regexps pattern)))
+                       "\\|"))
 
-(defun* anything-prefix-match (str &optional (pattern anything-pattern))
-  (string-match (amp-prefix-get-regexp pattern) str))
-(defun* anything-prefix-search (pattern &rest ignore)
-  (re-search-forward (amp-prefix-get-regexp pattern) nil t))
-
-;;;; exact match
-(defvar amp-exact-pattern-info nil)
-(defun amp-exact-get-regexp (pattern)
-  (unless (equal pattern (car amp-exact-pattern-info))
-    (setq amp-exact-pattern-info
-          (cons pattern (concat "^" (regexp-quote pattern) "$"))))
-  (cdr amp-exact-pattern-info))
-
-(defun* anything-exact-match (str &optional (pattern anything-pattern))
-  (string-match (amp-exact-get-regexp pattern) str))
-(defun* anything-exact-search (pattern &rest ignore)
-  (re-search-forward (amp-exact-get-regexp pattern) nil t))
-
-
+                         
 ;;;; source compier
 (defvar anything-default-match-functions
-  '(anything-exact-match anything-prefix-match anything-multiple-pattern-match))
+  '(anything-exact-match anything-prefix-match anything-mp-1-match
+                         anything-mp-2-match anything-mp-3-match))
 (defvar anything-default-search-functions
-  '(anything-exact-search anything-prefix-search anything-multiple-pattern-search))
+  '(anything-exact-search anything-prefix-search anything-mp-1-search
+                          anything-mp-2-search anything-mp-3-search))
+
 (defun anything-compile-source--match-plugin (source)
-  `(,(if (assoc 'candidates-in-buffer source)
+  `(,(if (or (assoc 'candidates-in-buffer source)
+             (equal '(identity) (assoc-default 'match source)))
          '(match identity)
        `(match ,@anything-default-match-functions
                ,@(assoc-default 'match source)))
@@ -138,41 +142,84 @@
       (amp-mp-make-regexps " foo bar "))
     (expect '("foo bar" "baz")
       (amp-mp-make-regexps "foo\\ bar baz"))
-    (desc "anything-multiple-pattern-search")
-    (expect t
+    (desc "amp-mp-1-make-regexp")
+    (expect "a.*b"
+      (amp-mp-1-make-regexp "a b"))
+    (expect "a b"
+      (amp-mp-1-make-regexp "a\\ b"))
+    (expect "a.*b c"
+      (amp-mp-1-make-regexp "a b\\ c"))
+    (expect ""
+      (amp-mp-1-make-regexp ""))
+    (desc "anything-mp-1-search")
+    (expect (type integer)
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
-        (anything-multiple-pattern-search "under hu" nil t)))
+        (anything-mp-1-search "th+ r" nil t)))
+    (desc "anything-mp-2-search")
+    (expect (type integer)
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-mp-2-search "h+ r" nil t)))
     (expect nil
       (with-temp-buffer
         (insert "fire\nthunder\n")
         (goto-char 1)
-        (anything-multiple-pattern-search "under hue" nil t)))
-    (expect t
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-multiple-pattern-search "th+ r" nil t)))
-    (expect t
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-multiple-pattern-search "r th+" nil t)))
-    (desc "anything-multiple-pattern-match")
-    (expect t
-      (anything-multiple-pattern-match "thunder" '("th+" "r")))
-    (expect t
-      (anything-multiple-pattern-match "thunder" '("r" "th+")))
+        (anything-mp-2-search "th+ r" nil t)))
+    (desc "anything-mp-3-search")
     (expect nil
-      (anything-multiple-pattern-match "thunder" '("under" "hue")))
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-mp-3-search "h+ r" nil t)))
+    (expect nil
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-mp-3-search "th+ r" nil t)))
+    (expect (type integer)
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-mp-3-search "r th+" nil t)))
+    (expect nil
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-mp-3-search "under hue" nil t)))
+    (expect (type integer)
+      (with-temp-buffer
+        (insert "fire\nthunder\n")
+        (goto-char 1)
+        (anything-mp-3-search "r th+ n" nil t)))
+    (desc "anything-mp-1-match")
+    (expect (type integer)
+      (anything-mp-1-match "thunder" "th+ r"))
+    (desc "anything-mp-2-match")
+    (expect (type integer)
+      (anything-mp-2-match "thunder" "h+ r"))
+    (expect nil
+      (anything-mp-2-match "thunder" "th+ r"))
+    (desc "anything-mp-3-match")
+    (expect nil
+      (anything-mp-3-match "thunder" "h+ r"))
+    (expect nil
+      (anything-mp-3-match "thunder" "th+ r"))
+    (expect (type integer)
+      (anything-mp-3-match "thunder" "r th+"))
+    (expect nil
+      (anything-mp-3-match "thunder" "under hue"))
+    (expect (type integer)
+      (anything-mp-3-match "thunder" "r th+ n"))
     (desc "anything-prefix-match")
     (expect (type integer)
       (anything-prefix-match "fobar" "fo"))
     (expect nil
       (anything-prefix-match "xfobar" "fo"))
     
-    (desc "with candidates-in-buffer")
+    (desc "with identity match")
     (expect '(identity)
       (assoc-default 'match
                      (car (anything-compile-sources
@@ -180,7 +227,12 @@
                               (candidates-in-buffer)))
                            '(anything-compile-source--candidates-in-buffer
                              anything-compile-source--match-plugin)))))
-          
+    (expect '(identity)
+      (assoc-default 'match
+                     (car (anything-compile-sources
+                           '(((name . "FOO")
+                              (match identity)))
+                           '(anything-compile-source--match-plugin)))))
     (desc "functional")
     (expect '(("FOO" ("thunder")))
       (anything-test-candidates '(((name . "FOO")
