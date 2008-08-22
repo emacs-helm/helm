@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.7 2008-08-22 21:17:58 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.8 2008-08-22 21:25:44 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.7  2008-08-22 21:17:58  rubikitch
+;; Revision 1.8  2008-08-22 21:25:44  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.7  2008/08/22 21:17:58  rubikitch
 ;; exact, prefix match: faster
 ;;
 ;; Revision 1.6  2008/08/22 19:40:22  rubikitch
@@ -110,8 +113,7 @@
     (and (<= len (length str))
          (string= (substring str 0 len) pattern ))))
 (defun anything-prefix-search (pattern &rest ignore)
-  (and (search-forward (concat "\n" pattern) nil t)
-       ))
+  (search-forward (concat "\n" pattern) nil t))
 ;; multiple regexp patterns 1 (order is preserved / prefix)
 (amp-define "anything-mp-1-" (concat "^" (amp-mp-1-make-regexp pattern)))
 ;; multiple regexp patterns 2 (order is preserved / partial)
