@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.83 2008-08-23 20:44:20 rubikitch Exp $
+;; $Id: anything.el,v 1.84 2008-08-23 21:18:33 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.83  2008-08-23 20:44:20  rubikitch
+;; Revision 1.84  2008-08-23 21:18:33  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.83  2008/08/23 20:44:20  rubikitch
 ;; `anything-execute-persistent-action': display-to-real bug fix
 ;;
 ;; Revision 1.82  2008/08/23 20:19:12  rubikitch
@@ -437,7 +440,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.83 2008-08-23 20:44:20 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.84 2008-08-23 21:18:33 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2031,10 +2034,10 @@ and get-line attributes. See also `anything-sources' docstring.
     (with-current-buffer buffer
       (goto-char (point-min))
       (if (string= pattern "")
-          (loop until (eobp)
-                for i from 1 to limit
-                collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-                do (forward-line 1))
+          (delq nil (loop until (eobp)
+                          for i from 1 to limit
+                          collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+                          do (forward-line 1)))
         (let ((i 1) matches exit newmatches)
           (anything-with-open-first-line
             (clrhash anything-cib-hash)
@@ -2053,7 +2056,7 @@ and get-line attributes. See also `anything-sources' docstring.
                     (forward-line 1))
               (setq matches (append matches (nreverse newmatches)))
               (if exit (return))))
-          matches)))))
+          (delq nil matches))))))
 
 
 (defun anything-candidates-buffer (&optional create-or-buffer)
