@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.85 2008-08-23 21:23:21 rubikitch Exp $
+;; $Id: anything.el,v 1.86 2008-08-23 22:05:42 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.85  2008-08-23 21:23:21  rubikitch
+;; Revision 1.86  2008-08-23 22:05:42  rubikitch
+;; `anything-original-source-filter' is removed.
+;; Now use `anything-restored-variables' and `with-anything-restore-variables'.
+;;
+;; Revision 1.85  2008/08/23 21:23:21  rubikitch
 ;; inhibit-read-only = t in anything-buffer
 ;;
 ;; Revision 1.84  2008/08/23 21:18:33  rubikitch
@@ -443,7 +447,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.85 2008-08-23 21:23:21 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.86 2008-08-23 22:05:42 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1017,14 +1021,18 @@ But the anything buffer has no contents. ")
   "Run after the anything buffer was updated according the new
   input pattern.")
 
+(defvar anything-restored-variables
+  "Variables which are restored after `anything' invocation."
+  '( anything-candidate-number-limit
+     anything-source-filter
+     ))
 ;; `anything-saved-sources' is removed
 
 (defvar anything-saved-selection nil
   "Saved value of the currently selected object when the action
   list is shown.")
 
-(defvar anything-original-source-filter nil
-  "Original value of `anything-source-filter' before Anything was started.")
+;; `anything-original-source-filter' is removed
 
 (defvar anything-current-buffer nil
   "Current buffer when `anything' is invoked.")
@@ -1098,6 +1106,11 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
        (with-selected-window (anything-window)
          (funcall --tmpfunc--)))))
 (put 'with-anything-window 'lisp-indent-function 0)
+
+(defmacro with-anything-restore-variables(&rest body)
+  "Restore variables specified by `anything-restored-variables' after executing BODY ."
+  `(let ,(mapcar (lambda (v) (list v v)) anything-restored-variables)
+     ,@body))
 
 (defun anything-attr (attribute-name)
   "Get the value of ATTRIBUTE-NAME of current source.
@@ -1360,34 +1373,36 @@ the real value in a text property."
   ;; TODO more document
   (interactive)
   (condition-case v
-      (let ((frameconfig (current-frame-configuration))
-            ;; It is needed because `anything-source-name' is non-nil
-            ;; when `anything' is invoked by action. Awful global scope.
-            anything-source-name anything-in-persistent-action
-            (anything-sources (anything-normalize-sources sources)))
-        (add-hook 'post-command-hook 'anything-check-minibuffer-input)
+      (with-anything-restore-variables
+       (let ((frameconfig (current-frame-configuration))
+             ;; It is needed because `anything-source-name' is non-nil
+             ;; when `anything' is invoked by action. Awful global scope.
+             anything-source-name anything-in-persistent-action
+             ;; restored variables
+             (anything-sources (anything-normalize-sources sources)))
+         (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
-        (unless resume (anything-initialize))
+         (unless resume (anything-initialize))
 
-        (if anything-samewindow
-            (switch-to-buffer anything-buffer)
-          (pop-to-buffer anything-buffer))        
+         (if anything-samewindow
+             (switch-to-buffer anything-buffer)
+           (pop-to-buffer anything-buffer))        
 
-        (unwind-protect
-            (progn
-              (unless resume (anything-update))
-              (select-frame-set-input-focus (window-frame (minibuffer-window)))
-              (anything-preselect preselect)
-              (let ((minibuffer-local-map anything-map))
-                (read-string (or prompt "pattern: ") (if resume anything-pattern input))))
+         (unwind-protect
+             (progn
+               (unless resume (anything-update))
+               (select-frame-set-input-focus (window-frame (minibuffer-window)))
+               (anything-preselect preselect)
+               (let ((minibuffer-local-map anything-map))
+                 (read-string (or prompt "pattern: ") (if resume anything-pattern input))))
 
-          (anything-cleanup)
-          (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
-          (set-frame-configuration frameconfig))
-        (unwind-protect
-            (anything-execute-selection-action)
-          (anything-aif (get-buffer anything-action-buffer)
-              (kill-buffer it))))
+           (anything-cleanup)
+           (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
+           (set-frame-configuration frameconfig))
+         (unwind-protect
+             (anything-execute-selection-action)
+           (anything-aif (get-buffer anything-action-buffer)
+               (kill-buffer it)))))
     (quit
      (goto-char (car anything-current-position))
      (set-window-start (selected-window) (cdr anything-current-position)))))
@@ -1523,7 +1538,6 @@ If action buffer is selected, back to the anything buffer."
   (setq anything-pattern "")
   (setq anything-input "")
   (setq anything-candidate-cache nil)
-  (setq anything-original-source-filter anything-source-filter)
   (setq anything-last-sources anything-sources)
 
   (anything-create-anything-buffer)
@@ -1571,7 +1585,6 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 
 (defun anything-cleanup ()
   "Clean up the mess."
-  (setq anything-source-filter anything-original-source-filter)
   (with-current-buffer anything-buffer
     (setq cursor-type t))
   (with-current-buffer anything-current-buffer
@@ -3597,6 +3610,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (candidates-in-buffer)
           (get-line . (lambda (s e) (upcase (buffer-substring-no-properties s e))))))
        "oo\\+"))
+    (desc "with-anything-restore-variables")
+    (expect 9999
+      (let ((a 9999)
+            (anything-restored-variables '(a)))
+        (with-anything-restore-variables
+         (setq a 0))
+        a))
+
     ))
 
 
