@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.82 2008-08-23 20:19:12 rubikitch Exp $
+;; $Id: anything.el,v 1.83 2008-08-23 20:44:20 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.82  2008-08-23 20:19:12  rubikitch
+;; Revision 1.83  2008-08-23 20:44:20  rubikitch
+;; `anything-execute-persistent-action': display-to-real bug fix
+;;
+;; Revision 1.82  2008/08/23 20:19:12  rubikitch
 ;; New `anything-sources' attribute: get-line
 ;;
 ;; Revision 1.81  2008/08/23 19:32:14  rubikitch
@@ -434,7 +437,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.82 2008-08-23 20:19:12 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.83 2008-08-23 20:44:20 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1407,7 +1410,9 @@ action."
         (setq action (cdar action)))
     (unless clear-saved-action (setq anything-saved-action nil))
     (if (and selection action)
-        (anything-funcall-with-source source  action (funcall display-to-real selection)))))
+        (anything-funcall-with-source
+         source  action
+         (anything-funcall-with-source source display-to-real selection)))))
 
 
 (defun* anything-get-selection (&optional (buffer anything-buffer))
@@ -3095,6 +3100,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                       . (lambda (c s)
                                           (setq v anything-source-name)
                                           c)))))
+        v))
+    (expect "FOO"
+      (let (v)
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates "ok")
+                                     (display-to-real
+                                      . (lambda (c)
+                                          (setq v anything-source-name)
+                                          c))
+                                     (action . identity))))
+        (anything-execute-selection-action)
         v))
     (desc "anything-candidates-buffer create")
     (expect " *anything candidates:FOO*"
