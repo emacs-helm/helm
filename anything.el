@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.81 2008-08-23 19:32:14 rubikitch Exp $
+;; $Id: anything.el,v 1.82 2008-08-23 20:19:12 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.81  2008-08-23 19:32:14  rubikitch
+;; Revision 1.82  2008-08-23 20:19:12  rubikitch
+;; New `anything-sources' attribute: get-line
+;;
+;; Revision 1.81  2008/08/23 19:32:14  rubikitch
 ;; `anything-attr': Return t in (attribute-name) case.
 ;;
 ;; Revision 1.80  2008/08/22 21:25:05  rubikitch
@@ -431,7 +434,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.81 2008-08-23 19:32:14 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.82 2008-08-23 20:19:12 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -709,6 +712,14 @@ Attributes:
   This attribute is meant to be used with
   (candidates . anything-candidates-in-buffer) or
   (candidates-in-buffer) in short.
+
+- get-line (optional)
+
+  A function like `buffer-substring-no-properties' or `buffer-substring'.
+  This function converts point of line-beginning and point of line-end,
+  which represents a candidate computed by `anything-candidates-in-buffer'.
+  By default, `anything-candidates-in-buffer' uses
+  `buffer-substring-no-properties'.
 
 - display-to-real (optional)
 
@@ -1926,7 +1937,7 @@ Cache the candidates if there is not yet a cached value."
 ;;---------------------------------------------------------------------
 ;; candidates-in-buffer plug-in (built-in)
 ;;----------------------------------------------------------------------
-(defun* anything-candidates-in-buffer (&optional (get-line-fn 'buffer-substring-no-properties))
+(defun anything-candidates-in-buffer ()
   "Get candidates from the candidates buffer according to `anything-pattern'.
 
 BUFFER is `anything-candidates-buffer' by default.  Each
@@ -1941,10 +1952,6 @@ eg.
    (search re-search-forward)  ; optional
    (candidates-in-buffer)
    (type . file))
-
-GET-LINE-FN (default: buffer-substring-no-properties) specifies a function
-called with two arguments:point of line-beginning and point of line-end. 
-This function creates a candidate.
 
 +===============================================================+
 | The new way of making and narrowing candidates: Using buffers |
@@ -1988,12 +1995,14 @@ creates candidates dynamically and need to be called everytime
 Because `anything-candidates-in-buffer' plays the role of `match' attribute
 function, specifying `(match identity)' makes the source slightly faster.
 
-See also `anything-sources' docstring.
-
+To customize `anything-candidates-in-buffer' behavior, use search
+and get-line attributes. See also `anything-sources' docstring.
 "
   (declare (special source))
   (anything-candidates-in-buffer-1 (anything-candidates-buffer)
-                                   anything-pattern get-line-fn
+                                   anything-pattern
+                                   (or (assoc-default 'get-line source)
+                                       #'buffer-substring-no-properties)
                                    ;; use external variable `source'.
                                    (or (assoc-default 'search source)
                                        '(re-search-forward))
@@ -2946,21 +2955,6 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (match identity)
           (volatile)))
        "oo\\+"))
-    (expect '(("TEST" (("foo+" "FOO+"))))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\n"))))
-          (candidates
-           . (lambda ()
-               (anything-candidates-in-buffer
-                (lambda (s e)
-                  (let ((l (buffer-substring-no-properties s e)))
-                    (list l (upcase l)))))))
-          (match identity)
-          (volatile)))
-       "oo\\+"))
     (desc "search attribute")
     (expect '(("TEST" ("foo+")))
       (anything-test-candidates
@@ -3570,6 +3564,16 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             v)
         (anything-initialize)
         v))
+    (desc "get-line attribute")
+    (expect '(("TEST" ("FOO+")))
+      (anything-test-candidates
+       '(((name . "TEST")
+          (init
+           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                          (insert "foo+\nbar+\nbaz+\n"))))
+          (candidates-in-buffer)
+          (get-line . (lambda (s e) (upcase (buffer-substring-no-properties s e))))))
+       "oo\\+"))
     ))
 
 
