@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.84 2008-08-23 21:18:33 rubikitch Exp $
+;; $Id: anything.el,v 1.85 2008-08-23 21:23:21 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.84  2008-08-23 21:18:33  rubikitch
+;; Revision 1.85  2008-08-23 21:23:21  rubikitch
+;; inhibit-read-only = t in anything-buffer
+;;
+;; Revision 1.84  2008/08/23 21:18:33  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.83  2008/08/23 20:44:20  rubikitch
@@ -440,7 +443,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.84 2008-08-23 21:18:33 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.85 2008-08-23 21:23:21 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1534,6 +1537,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (with-current-buffer (get-buffer-create anything-buffer)
     (buffer-disable-undo)
     (erase-buffer)
+    (set (make-local-variable  'inhibit-read-only) t)
     (setq cursor-type nil)
     (setq mode-name "Anything"))
   (anything-initialize-overlays anything-buffer)
