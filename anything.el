@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.86 2008-08-23 22:05:42 rubikitch Exp $
+;; $Id: anything.el,v 1.87 2008-08-23 22:27:04 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.86  2008-08-23 22:05:42  rubikitch
+;; Revision 1.87  2008-08-23 22:27:04  rubikitch
+;; New hook: `anything-cleanup-hook'
+;;
+;; Revision 1.86  2008/08/23 22:05:42  rubikitch
 ;; `anything-original-source-filter' is removed.
 ;; Now use `anything-restored-variables' and `with-anything-restore-variables'.
 ;;
@@ -447,7 +450,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.86 2008-08-23 22:05:42 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.87 2008-08-23 22:27:04 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1010,7 +1013,8 @@ anything completions with \.")
   "Number of digit shortcuts shown in the anything buffer.")
 
 (defvar anything-before-initialize-hook nil
-  "Run before anything initialization")
+  "Run before anything initialization.
+This hook is run before init functions in `anything-sources'.")
 
 (defvar anything-after-initialize-hook nil
   "Run after anything initialization.
@@ -1020,6 +1024,9 @@ But the anything buffer has no contents. ")
 (defvar anything-update-hook nil
   "Run after the anything buffer was updated according the new
   input pattern.")
+
+(defvar anything-cleanup-hook nil
+  "Run after anything invocation.")
 
 (defvar anything-restored-variables
   "Variables which are restored after `anything' invocation."
@@ -1591,7 +1598,8 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (setq anything-buffer-chars-modified-tick (buffer-chars-modified-tick)))
   (bury-buffer anything-buffer)
   (anything-funcall-foreach 'cleanup)
-  (anything-kill-async-processes))
+  (anything-kill-async-processes)
+  (run-hooks 'anything-cleanup-hook))
 
 
 (defun anything-previous-line ()
@@ -3617,7 +3625,13 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (with-anything-restore-variables
          (setq a 0))
         a))
-
+    (desc "anything-cleanup-hook")
+    (expect 'called
+      (let ((anything-cleanup-hook
+             '((lambda () (setq v 'called))))
+            v)
+        (anything-cleanup)
+        v))
     ))
 
 
