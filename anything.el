@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.80 2008-08-22 21:25:05 rubikitch Exp $
+;; $Id: anything.el,v 1.81 2008-08-23 19:32:14 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.80  2008-08-22 21:25:05  rubikitch
+;; Revision 1.81  2008-08-23 19:32:14  rubikitch
+;; `anything-attr': Return t in (attribute-name) case.
+;;
+;; Revision 1.80  2008/08/22 21:25:05  rubikitch
 ;; anything-candidates-in-buffer-1:
 ;; Open a line at the BOB to make use of `search-forward' for faster exact/prefix match.
 ;; Of course, restore the buffer contents after search.
@@ -428,7 +431,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.80 2008-08-22 21:25:05 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.81 2008-08-23 19:32:14 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1079,7 +1082,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defun anything-attr (attribute-name)
   "Get the value of ATTRIBUTE-NAME of current source.
 It is useful to write your sources."
-  (assoc-default attribute-name (anything-get-current-source)))
+  (anything-aif (assoc attribute-name (anything-get-current-source))
+      (anything-aif (cdr it) it t)))    ;second it == (cdr it)
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -3306,6 +3310,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates
          '(((name . "FOO")
             (hoge . fuga)
+            (init . (lambda () (setq v (anything-attr 'hoge))))
+            (candidates "a"))))
+        v))
+    (expect t
+      (let (v)
+        (anything-test-candidates
+         '(((name . "FOO")
+            (hoge)
             (init . (lambda () (setq v (anything-attr 'hoge))))
             (candidates "a"))))
         v))
