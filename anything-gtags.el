@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.7 2008-08-20 19:00:36 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.8 2008-08-23 23:01:53 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.7  2008-08-20 19:00:36  rubikitch
+;; Revision 1.8  2008-08-23 23:01:53  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.7  2008/08/20 19:00:36  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.6  2008/08/20 18:58:42  rubikitch
@@ -101,10 +104,8 @@
                (switch-to-buffer save)
                (setq anything-current-position (cons (point) (window-start))))
              (anything-candidates-buffer buffer)))
-        (candidates-in-buffer
-         . (lambda ()
-             (anything-candidates-in-buffer
-              #'aggs-candidate-display)))
+        (candidates-in-buffer)
+        (get-line . aggs-candidate-display)
         (display-to-real
          . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
         (action
