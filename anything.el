@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.88 2008-08-24 08:22:19 rubikitch Exp $
+;; $Id: anything.el,v 1.89 2008-08-24 08:35:27 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.88  2008-08-24 08:22:19  rubikitch
+;; Revision 1.89  2008-08-24 08:35:27  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.88  2008/08/24 08:22:19  rubikitch
 ;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
 ;;
 ;; Revision 1.87  2008/08/23 22:27:04  rubikitch
@@ -453,7 +456,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.88 2008-08-24 08:22:19 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.89 2008-08-24 08:35:27 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1032,10 +1035,9 @@ But the anything buffer has no contents. ")
   "Run after anything invocation.")
 
 (defvar anything-restored-variables
-  "Variables which are restored after `anything' invocation."
   '( anything-candidate-number-limit
-     anything-source-filter
-     ))
+     anything-source-filter)
+  "Variables which are restored after `anything' invocation.")
 ;; `anything-saved-sources' is removed
 
 (defvar anything-saved-selection nil
