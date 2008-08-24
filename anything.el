@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.89 2008-08-24 08:35:27 rubikitch Exp $
+;; $Id: anything.el,v 1.90 2008-08-24 20:33:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.89  2008-08-24 08:35:27  rubikitch
+;; Revision 1.90  2008-08-24 20:33:02  rubikitch
+;; prevent the unit test from byte-compiled.
+;; macro bug fix.
+;;
+;; Revision 1.89  2008/08/24 08:35:27  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.88  2008/08/24 08:22:19  rubikitch
@@ -456,7 +460,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.89 2008-08-24 08:35:27 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.90 2008-08-24 20:33:02 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1034,10 +1038,11 @@ But the anything buffer has no contents. ")
 (defvar anything-cleanup-hook nil
   "Run after anything invocation.")
 
+(eval-when-compile
 (defvar anything-restored-variables
   '( anything-candidate-number-limit
      anything-source-filter)
-  "Variables which are restored after `anything' invocation.")
+  "Variables which are restored after `anything' invocation."))
 ;; `anything-saved-sources' is removed
 
 (defvar anything-saved-selection nil
@@ -2772,209 +2777,200 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
-(when (fboundp 'expectations)
-  (expectations
-    (desc "anything-current-buffer")
-    (expect "__a_buffer"
-      (with-current-buffer (get-buffer-create "__a_buffer")
-        (anything-test-candidates '(((name . "FOO"))) "")
-        (prog1
-            (buffer-name anything-current-buffer)
-          (kill-buffer (current-buffer)))))
-    (desc "anything-buffer-file-name")
-    (expect (regexp "/__a_file__")
-      (with-current-buffer (find-file-noselect "__a_file__")
-        (anything-test-candidates '(((name . "FOO"))) "")
-        (prog1
-            anything-buffer-file-name
-          (kill-buffer (current-buffer)))))
-    (desc "anything-compile-sources")
-    (expect '(((name . "foo")))
-      (anything-compile-sources '(((name . "foo"))) nil)
-      )
-    (expect '(((name . "foo") (type . test) (action . identity)))
-      (let ((anything-type-attributes '((test (action . identity)))))
-        (anything-compile-sources '(((name . "foo") (type . test)))
-                                  '(anything-compile-source--type))))
-    (desc "anything-sources accepts symbols")
-    (expect '(((name . "foo")))
-      (let* ((foo '((name . "foo"))))
-        (anything-compile-sources '(foo) nil)))
-    (desc "anything-get-sources action")
-    (expect '(((name . "Actions") (candidates . actions)))
-      (stub anything-action-window => t)
-      (let (anything-compiled-sources
-            (anything-sources '(((name . "Actions") (candidates . actions)))))
-        (anything-get-sources)))
-    (desc "get-buffer-create candidates-buffer")
-    (expect '(((name . "many") (init . many-init)
-               (candidates-in-buffer . anything-candidates-in-buffer)
-               (candidates . anything-candidates-in-buffer)
-               (volatile) (match identity)))
-      (anything-compile-sources
-       '(((name . "many") (init . many-init)
-          (candidates-in-buffer . anything-candidates-in-buffer)))
-       '(anything-compile-source--candidates-in-buffer)))
-    (expect '(((name . "many") (init . many-init)
-               (candidates-in-buffer)
-               (candidates . anything-candidates-in-buffer)
-               (volatile) (match identity)))
-      (anything-compile-sources
-       '(((name . "many") (init . many-init)
-          (candidates-in-buffer)))
-       '(anything-compile-source--candidates-in-buffer)))
-    (expect '(((name . "many") (init . many-init)
-               (candidates-in-buffer)
-               (type . test)
-               (action . identity)
-               (candidates . anything-candidates-in-buffer)
-               (volatile) (match identity)))
-      (let ((anything-type-attributes '((test (action . identity)))))
+(dont-compile
+  (when (fboundp 'expectations)
+    (expectations
+      (desc "anything-current-buffer")
+      (expect "__a_buffer"
+        (with-current-buffer (get-buffer-create "__a_buffer")
+          (anything-test-candidates '(((name . "FOO"))) "")
+          (prog1
+              (buffer-name anything-current-buffer)
+            (kill-buffer (current-buffer)))))
+      (desc "anything-buffer-file-name")
+      (expect (regexp "/__a_file__")
+        (with-current-buffer (find-file-noselect "__a_file__")
+          (anything-test-candidates '(((name . "FOO"))) "")
+          (prog1
+              anything-buffer-file-name
+            (kill-buffer (current-buffer)))))
+      (desc "anything-compile-sources")
+      (expect '(((name . "foo")))
+        (anything-compile-sources '(((name . "foo"))) nil)
+        )
+      (expect '(((name . "foo") (type . test) (action . identity)))
+        (let ((anything-type-attributes '((test (action . identity)))))
+          (anything-compile-sources '(((name . "foo") (type . test)))
+                                    '(anything-compile-source--type))))
+      (desc "anything-sources accepts symbols")
+      (expect '(((name . "foo")))
+        (let* ((foo '((name . "foo"))))
+          (anything-compile-sources '(foo) nil)))
+      (desc "anything-get-sources action")
+      (expect '(((name . "Actions") (candidates . actions)))
+        (stub anything-action-window => t)
+        (let (anything-compiled-sources
+              (anything-sources '(((name . "Actions") (candidates . actions)))))
+          (anything-get-sources)))
+      (desc "get-buffer-create candidates-buffer")
+      (expect '(((name . "many") (init . many-init)
+                 (candidates-in-buffer . anything-candidates-in-buffer)
+                 (candidates . anything-candidates-in-buffer)
+                 (volatile) (match identity)))
         (anything-compile-sources
          '(((name . "many") (init . many-init)
-            (candidates-in-buffer)
-            (type . test)))
-         '(anything-compile-source--type
-           anything-compile-source--candidates-in-buffer))))
+            (candidates-in-buffer . anything-candidates-in-buffer)))
+         '(anything-compile-source--candidates-in-buffer)))
+      (expect '(((name . "many") (init . many-init)
+                 (candidates-in-buffer)
+                 (candidates . anything-candidates-in-buffer)
+                 (volatile) (match identity)))
+        (anything-compile-sources
+         '(((name . "many") (init . many-init)
+            (candidates-in-buffer)))
+         '(anything-compile-source--candidates-in-buffer)))
+      (expect '(((name . "many") (init . many-init)
+                 (candidates-in-buffer)
+                 (type . test)
+                 (action . identity)
+                 (candidates . anything-candidates-in-buffer)
+                 (volatile) (match identity)))
+        (let ((anything-type-attributes '((test (action . identity)))))
+          (anything-compile-sources
+           '(((name . "many") (init . many-init)
+              (candidates-in-buffer)
+              (type . test)))
+           '(anything-compile-source--type
+             anything-compile-source--candidates-in-buffer))))
 
-    (desc "anything-get-candidates")
-    (expect '("foo" "bar")
-      (anything-get-candidates '((name . "foo") (candidates "foo" "bar"))))
-    (expect '("FOO" "BAR")
-      (anything-get-candidates '((name . "foo") (candidates "foo" "bar")
-                                 (candidate-transformer
-                                  . (lambda (cands) (mapcar 'upcase cands))))))
-    (expect '("foo" "bar")
-      (anything-get-candidates '((name . "foo")
-                                 (candidates . (lambda () '("foo" "bar"))))))
-    (desc "anything-compute-matches")
-    (expect '("foo" "bar")
-      (let ((anything-pattern ""))
-        (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
-    (expect '("foo")
-      (let ((anything-pattern "oo"))
-        (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
-    (expect '("bar")
-      (let ((anything-pattern "^b"))
-        (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
-    (expect '("a" "b")
-      (let ((anything-pattern "")
-            (anything-candidate-number-limit 2))
-        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
-    (expect '("a" "b")
-      (let ((anything-pattern ".")
-            (anything-candidate-number-limit 2))
-        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
-    (expect '("a" "b" "c")
-      (let ((anything-pattern "")
-            anything-candidate-number-limit)
-        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
-    (expect '("a" "b" "c")
-      (let ((anything-pattern "[abc]")
-            anything-candidate-number-limit)
-        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
-    ;; using anything-test-candidate-list
-    (desc "anything-test-candidates")
-    (expect '(("FOO" ("foo" "bar")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")))))
-    (expect '(("FOO" ("bar")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) "ar"))
-    (expect '(("T1" ("hoge" "aiue"))
-              ("T2" ("test" "boke")))
-      (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
-                                  ((name . "T2") (candidates "test" "boke")))))
-    (expect '(("T1" ("hoge"))
-              ("T2" ("boke")))
-      (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
-                                  ((name . "T2") (candidates "test" "boke"))) "o"))
-    (desc "requires-pattern attribute")
-    (expect nil
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
-                                   (requires-pattern . 1)))))
-    (expect '(("FOO" ("bar")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
-                                   (requires-pattern . 1))) "b"))
-    (desc "delayed attribute(for test)")
-    (expect '(("T2" ("boke"))
-              ("T1" ("hoge")))
-      (anything-test-candidates
-       '(((name . "T1") (candidates "hoge" "aiue") (delayed))
-         ((name . "T2") (candidates "test" "boke")))
-       "o"))
-    (desc "match attribute(prefix search)")
-    (expect '(("FOO" ("bar")))
-      (anything-test-candidates
-       '(((name . "FOO") (candidates "foo" "bar")
-          (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
-       "ba"))
-    (expect nil
-      (anything-test-candidates
-       '(((name . "FOO") (candidates "foo" "bar")
-          (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
-       "ar"))
-    (desc "init attribute")
-    (expect '(("FOO" ("bar")))
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO") (init . (lambda () (setq v '("foo" "bar"))))
-            (candidates . v)))
-         "ar")))
-    (desc "candidate-transformer attribute")
-    (expect '(("FOO" ("BAR")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+      (desc "anything-get-candidates")
+      (expect '("foo" "bar")
+        (anything-get-candidates '((name . "foo") (candidates "foo" "bar"))))
+      (expect '("FOO" "BAR")
+        (anything-get-candidates '((name . "foo") (candidates "foo" "bar")
                                    (candidate-transformer
-                                    . (lambda (cands) (mapcar 'upcase cands)))))
-                                "ar"))
-    (desc "filtered-candidate-transformer attribute")
-    ;; needs more tests
-    (expect '(("FOO" ("BAR")))
-      (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
-                                   (filtered-candidate-transformer
-                                    . (lambda (cands src) (mapcar 'upcase cands)))))
-                                "ar"))
-    (desc "anything-candidates-in-buffer-1")
-    (expect nil
-      (anything-candidates-in-buffer-1 nil))
-    (expect '("foo+" "bar+" "baz+")
-      (with-temp-buffer
-        (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-candidate-number-limit 5))
-          (anything-candidates-in-buffer-1 (current-buffer) ""))))
-    (expect '("foo+" "bar+")
-      (with-temp-buffer
-        (insert "foo+\nbar+\nbaz+\n")
-        (let ((anything-candidate-number-limit 2))
-          (anything-candidates-in-buffer-1 (current-buffer) ""))))
-    (expect '("foo+")
-      (with-temp-buffer
-        (insert "foo+\nbar+\nbaz+\n")
-        (anything-candidates-in-buffer-1 (current-buffer) "oo\\+")))
-    (expect '("foo+")
-      (with-temp-buffer
-        (insert "foo+\nbar+\nbaz+\n")
-        (anything-candidates-in-buffer-1 
-         (current-buffer) "oo+"
-         #'buffer-substring-no-properties '(search-forward))))
-    (expect '(("foo+" "FOO+"))
-      (with-temp-buffer
-        (insert "foo+\nbar+\nbaz+\n")
-        (anything-candidates-in-buffer-1
-         (current-buffer) "oo\\+"
-         (lambda (s e)
-           (let ((l (buffer-substring-no-properties s e)))
-             (list l (upcase l)))))))
-    (desc "anything-candidates-in-buffer")
-    (expect '(("TEST" ("foo+" "bar+" "baz+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\n"))))
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))))
-    (expect '(("TEST" ("foo+" "bar+" "baz+")))
-      (let (anything-candidate-number-limit)
+                                    . (lambda (cands) (mapcar 'upcase cands))))))
+      (expect '("foo" "bar")
+        (anything-get-candidates '((name . "foo")
+                                   (candidates . (lambda () '("foo" "bar"))))))
+      (desc "anything-compute-matches")
+      (expect '("foo" "bar")
+        (let ((anything-pattern ""))
+          (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+      (expect '("foo")
+        (let ((anything-pattern "oo"))
+          (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+      (expect '("bar")
+        (let ((anything-pattern "^b"))
+          (anything-compute-matches '((name . "FOO") (candidates "foo" "bar") (volatile)))))
+      (expect '("a" "b")
+        (let ((anything-pattern "")
+              (anything-candidate-number-limit 2))
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+      (expect '("a" "b")
+        (let ((anything-pattern ".")
+              (anything-candidate-number-limit 2))
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+      (expect '("a" "b" "c")
+        (let ((anything-pattern "")
+              anything-candidate-number-limit)
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+      (expect '("a" "b" "c")
+        (let ((anything-pattern "[abc]")
+              anything-candidate-number-limit)
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c") (volatile)))))
+      ;; using anything-test-candidate-list
+      (desc "anything-test-candidates")
+      (expect '(("FOO" ("foo" "bar")))
+        (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")))))
+      (expect '(("FOO" ("bar")))
+        (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar"))) "ar"))
+      (expect '(("T1" ("hoge" "aiue"))
+                ("T2" ("test" "boke")))
+        (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
+                                    ((name . "T2") (candidates "test" "boke")))))
+      (expect '(("T1" ("hoge"))
+                ("T2" ("boke")))
+        (anything-test-candidates '(((name . "T1") (candidates "hoge" "aiue"))
+                                    ((name . "T2") (candidates "test" "boke"))) "o"))
+      (desc "requires-pattern attribute")
+      (expect nil
+        (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                     (requires-pattern . 1)))))
+      (expect '(("FOO" ("bar")))
+        (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                     (requires-pattern . 1))) "b"))
+      (desc "delayed attribute(for test)")
+      (expect '(("T2" ("boke"))
+                ("T1" ("hoge")))
+        (anything-test-candidates
+         '(((name . "T1") (candidates "hoge" "aiue") (delayed))
+           ((name . "T2") (candidates "test" "boke")))
+         "o"))
+      (desc "match attribute(prefix search)")
+      (expect '(("FOO" ("bar")))
+        (anything-test-candidates
+         '(((name . "FOO") (candidates "foo" "bar")
+            (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
+         "ba"))
+      (expect nil
+        (anything-test-candidates
+         '(((name . "FOO") (candidates "foo" "bar")
+            (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
+         "ar"))
+      (desc "init attribute")
+      (expect '(("FOO" ("bar")))
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO") (init . (lambda () (setq v '("foo" "bar"))))
+              (candidates . v)))
+           "ar")))
+      (desc "candidate-transformer attribute")
+      (expect '(("FOO" ("BAR")))
+        (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                     (candidate-transformer
+                                      . (lambda (cands) (mapcar 'upcase cands)))))
+                                  "ar"))
+      (desc "filtered-candidate-transformer attribute")
+      ;; needs more tests
+      (expect '(("FOO" ("BAR")))
+        (anything-test-candidates '(((name . "FOO") (candidates "foo" "bar")
+                                     (filtered-candidate-transformer
+                                      . (lambda (cands src) (mapcar 'upcase cands)))))
+                                  "ar"))
+      (desc "anything-candidates-in-buffer-1")
+      (expect nil
+        (anything-candidates-in-buffer-1 nil))
+      (expect '("foo+" "bar+" "baz+")
+        (with-temp-buffer
+          (insert "foo+\nbar+\nbaz+\n")
+          (let ((anything-candidate-number-limit 5))
+            (anything-candidates-in-buffer-1 (current-buffer) ""))))
+      (expect '("foo+" "bar+")
+        (with-temp-buffer
+          (insert "foo+\nbar+\nbaz+\n")
+          (let ((anything-candidate-number-limit 2))
+            (anything-candidates-in-buffer-1 (current-buffer) ""))))
+      (expect '("foo+")
+        (with-temp-buffer
+          (insert "foo+\nbar+\nbaz+\n")
+          (anything-candidates-in-buffer-1 (current-buffer) "oo\\+")))
+      (expect '("foo+")
+        (with-temp-buffer
+          (insert "foo+\nbar+\nbaz+\n")
+          (anything-candidates-in-buffer-1 
+           (current-buffer) "oo+"
+           #'buffer-substring-no-properties '(search-forward))))
+      (expect '(("foo+" "FOO+"))
+        (with-temp-buffer
+          (insert "foo+\nbar+\nbaz+\n")
+          (anything-candidates-in-buffer-1
+           (current-buffer) "oo\\+"
+           (lambda (s e)
+             (let ((l (buffer-substring-no-properties s e)))
+               (list l (upcase l)))))))
+      (desc "anything-candidates-in-buffer")
+      (expect '(("TEST" ("foo+" "bar+" "baz+")))
         (anything-test-candidates
          '(((name . "TEST")
             (init
@@ -2982,662 +2978,672 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                             (insert "foo+\nbar+\nbaz+\n"))))
             (candidates . anything-candidates-in-buffer)
             (match identity)
-            (volatile))))))
-    (expect '(("TEST" ("foo+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\n"))))
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "oo\\+"))
-    (desc "search attribute")
-    (expect '(("TEST" ("foo+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\nooo\n"))))
-          (search search-forward)
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "oo+"))
-    (expect '(("TEST" ("foo+" "ooo")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\nooo\n"))))
-          (search search-forward re-search-forward)
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "oo+"))
-    (expect '(("TEST" ("foo+" "ooo")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\nooo\n"))))
-          (search re-search-forward search-forward)
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "oo+"))
-    (expect '(("TEST" ("ooo" "foo+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "bar+\nbaz+\nooo\nfoo+\n"))))
-          (search re-search-forward search-forward)
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "oo+"))
-    ;; faster exact match
-    (expect '(("TEST" ("bar+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "bar+\nbaz+\nooo\nfoo+\n"))))
-          (search (lambda (pattern &rest _)
-                    (and (search-forward (concat "\n" pattern "\n") nil t)
-                         (forward-line -1))))
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "bar+"))
-    ;; faster prefix match
-    (expect '(("TEST" ("bar+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "bar+\nbaz+\nooo\nfoo+\n"))))
-          (search (lambda (pattern &rest _)
-                    (search-forward (concat "\n" pattern) nil t)))
-          (candidates . anything-candidates-in-buffer)
-          (match identity)
-          (volatile)))
-       "ba"))
-    (desc "anything-current-buffer-is-modified")
-    (expect nil
-      (with-temp-buffer
-        (insert "1")
-        (setq anything-current-buffer (current-buffer))
-        (anything-cleanup)
-        (anything-current-buffer-is-modified)))
-    (expect t
-      (with-temp-buffer
-        (insert "1")
-        (setq anything-current-buffer (current-buffer))
-        (anything-cleanup)
-        (insert "2")
-        (anything-current-buffer-is-modified)))
-    (expect '(("FOO" ("modified")))
-      (let ((sources '(((name . "FOO")
-                        (candidates
-                         . (lambda ()
-                             (if (anything-current-buffer-is-modified)
-                                 '("modified")
-                               '("unmodified"))))))))
-        (with-temp-buffer
-          (insert "1")
-          (anything-test-candidates sources))))
-    (expect '(("FOO" ("unmodified")))
-      (let ((sources '(((name . "FOO")
-                        (candidates
-                         . (lambda ()
-                             (if (anything-current-buffer-is-modified)
-                                 '("modified")
-                               '("unmodified"))))))))
-        (with-temp-buffer
-          (insert "1")
-          (anything-test-candidates sources)
-          (anything-test-candidates sources))))
-    (desc "anything-source-name")
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates '(((name . "FOO")
-                                     (init
-                                      . (lambda () (setq v anything-source-name)))
-                                     (candidates "ok"))))
-        v))
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates '(((name . "FOO")
-                                     (candidates
-                                      . (lambda ()
-                                          (setq v anything-source-name)
-                                          '("ok"))))))
-        v))
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates '(((name . "FOO")
-                                     (candidates "ok")
-                                     (candidate-transformer
-                                      . (lambda (c)
-                                          (setq v anything-source-name)
-                                          c)))))
-        v))
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates '(((name . "FOO")
-                                     (candidates "ok")
-                                     (filtered-candidate-transformer
-                                      . (lambda (c s)
-                                          (setq v anything-source-name)
-                                          c)))))
-        v))
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates '(((name . "FOO")
-                                     (candidates "ok")
-                                     (display-to-real
-                                      . (lambda (c)
-                                          (setq v anything-source-name)
-                                          c))
-                                     (action . identity))))
-        (anything-execute-selection-action)
-        v))
-    (desc "anything-candidate-buffer create")
-    (expect " *anything candidates:FOO*"
-      (let* (anything-candidate-buffer-alist
-             (anything-source-name "FOO")
-             (buf (anything-candidate-buffer 'global)))
-        (prog1 (buffer-name buf)
-          (kill-buffer buf))))
-    (expect " *anything candidates:FOO*aTestBuffer"
-      (let* (anything-candidate-buffer-alist
-             (anything-source-name "FOO")
-             (anything-current-buffer (get-buffer-create "aTestBuffer"))
-             (buf (anything-candidate-buffer 'local)))
-        (prog1 (buffer-name buf)
-          (kill-buffer anything-current-buffer)
-          (kill-buffer buf))))
-    (expect 0
-      (let (anything-candidate-buffer-alist
-            (anything-source-name "FOO") buf)
-        (with-current-buffer  (anything-candidate-buffer 'global)
-          (insert "1"))
-        (setq buf  (anything-candidate-buffer 'global))
-        (prog1 (buffer-size buf)
-          (kill-buffer buf))))
-    (desc "anything-candidate-buffer get-buffer")
-    (expect " *anything candidates:FOO*"
-      (let* (anything-candidate-buffer-alist
-             (anything-source-name "FOO")
-             (buf (anything-candidate-buffer 'global)))
-        (prog1 (buffer-name (anything-candidate-buffer))
-          (kill-buffer buf))))
-    (expect " *anything candidates:FOO*aTestBuffer"
-      (let* (anything-candidate-buffer-alist
-             (anything-source-name "FOO")
-             (anything-current-buffer (get-buffer-create "aTestBuffer"))
-             (buf (anything-candidate-buffer 'local)))
-        (prog1 (buffer-name (anything-candidate-buffer))
-          (kill-buffer anything-current-buffer)
-          (kill-buffer buf))))
-    (expect nil
-      (let* (anything-candidate-buffer-alist
-             (anything-source-name "NOP__"))
-        (anything-candidate-buffer)))
-    (desc "anything-candidate-buffer register-buffer")
-    (expect " *anything test candidates*"
-      (let (anything-candidate-buffer-alist
-            (buf (get-buffer-create " *anything test candidates*")))
-        (with-current-buffer buf
-          (insert "1\n2\n")
-          (prog1 (buffer-name (anything-candidate-buffer buf))
-            (kill-buffer (current-buffer))))))
-    (expect " *anything test candidates*"
-      (let (anything-candidate-buffer-alist
-            (buf (get-buffer-create " *anything test candidates*")))
-        (with-current-buffer buf
-          (insert "1\n2\n")
-          (anything-candidate-buffer buf)
-          (prog1 (buffer-name (anything-candidate-buffer))
-            (kill-buffer (current-buffer))))))
-    (expect "1\n2\n"
-      (let (anything-candidate-buffer-alist
-            (buf (get-buffer-create " *anything test candidates*")))
-        (with-current-buffer buf
-          (insert "1\n2\n")
-          (anything-candidate-buffer buf)
-          (prog1 (buffer-string)
-            (kill-buffer (current-buffer))))))
-    (desc "action attribute")
-    (expect "foo"
-      (anything-test-candidates
-       '(((name . "TEST")
-          (candidates "foo")
-          (action ("identity" . identity)))))
-      (anything-execute-selection-action))
-    (expect "foo"
-      (anything-test-candidates
-       '(((name . "TEST")
-          (candidates "foo")
-          (action ("identity" . (lambda (c) (identity c)))))))
-      (anything-execute-selection-action))
-    (desc "anything-execute-selection-action")
-    (expect "FOO"
-      (anything-execute-selection-action
-       "foo" '(("upcase" . upcase))  nil #'identity))
-    (expect "FOO"
-      (anything-execute-selection-action
-       "foo" '(("upcase" . (lambda (c) (upcase c)))) nil #'identity))
-    (desc "display-to-real attribute")
-    (expect "FOO"
-      (anything-execute-selection-action
-       "foo"
-       '(("identity" . identity))
-       nil
-       #'upcase
-       ))
-    (expect "FOO"
-      (anything-test-candidates
-       '(((name . "TEST")
-          (candidates "foo")
-          (display-to-real . upcase)
-          (action ("identity" . identity)))))
-      (anything-execute-selection-action))
-    (desc "cleanup test")
-    (expect 'cleaned
-      (let (v)
-        (anything-test-candidates
-         '(((name . "TEST")
-            (cleanup . (lambda () (setq v 'cleaned))))))
-        v))
-    (desc "anything-get-current-source")
-    ;; in init/candidates/action/candidate-transformer/filtered-candidate-transformer
-    ;; display-to-real/cleanup function
-    (expect "FOO"
-      (assoc-default
-       'name
-       (anything-funcall-with-source '((name . "FOO")) 'anything-get-current-source)))
-    ;; init
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (init . (lambda () (setq v (anything-get-current-source)))))))
-        (assoc-default 'name v)))
-    ;; candidates
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates . (lambda () (setq v (anything-get-current-source)) '("a"))))))
-        (assoc-default 'name v)))
-    ;; action
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates "a")
-            (action
-             . (lambda (c) (setq v (anything-get-current-source)) c)))))
-        (anything-execute-selection-action)
-        (assoc-default 'name v)))
-    ;; candidate-transformer
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates "a")
-            (candidate-transformer
-             . (lambda (c) (setq v (anything-get-current-source)) c)))))
-        (assoc-default 'name v)))
-    ;; filtered-candidate-transformer
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates "a")
-            (filtered-candidate-transformer
-             . (lambda (c s) (setq v (anything-get-current-source)) c)))))
-        (assoc-default 'name v)))
-    ;; action-transformer
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates "a")
-            (action-transformer
-             . (lambda (a c) (setq v (anything-get-current-source)) a))
-            (action . identity))))
-        (anything-execute-selection-action)
-        (assoc-default 'name v)))
-    ;; display-to-real
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (init . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                                 (insert "a\n"))))
-            (candidates-in-buffer)
-            (display-to-real
-             . (lambda (c) (setq v (anything-get-current-source)) c))
-            (action . identity))))
-        (anything-execute-selection-action)
-        (assoc-default 'name v)))
-    ;; cleanup
-    (expect "FOO"
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (candidates "a")
-            (cleanup
-             . (lambda () (setq v (anything-get-current-source)))))))
-        (assoc-default 'name v)))
-    ;; candidates are displayed
-    (expect "TEST"
-      (anything-test-candidates
-       '(((name . "TEST")
-          (candidates "foo")
-          (action ("identity" . identity)))))
-      (assoc-default 'name (anything-get-current-source)))
-    (desc "anything-attr")
-    (expect "FOO"
-      (anything-funcall-with-source
-       '((name . "FOO"))
-       (lambda ()
-         (anything-attr 'name))))
-    (expect 'fuga
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (hoge . fuga)
-            (init . (lambda () (setq v (anything-attr 'hoge))))
-            (candidates "a"))))
-        v))
-    (expect t
-      (let (v)
-        (anything-test-candidates
-         '(((name . "FOO")
-            (hoge)
-            (init . (lambda () (setq v (anything-attr 'hoge))))
-            (candidates "a"))))
-        v))
-    (desc "anything-preselect")
-    ;; entire candidate
-    (expect "foo"
-      (with-current-buffer (anything-create-anything-buffer t)
-        (let ((anything-pattern "")
-              (anything-test-mode t))
-          (anything-process-source '((name . "test")
-                                     (candidates "hoge" "foo" "bar")))
-          (anything-preselect "foo")
-          (anything-get-selection))))
-    ;; regexp
-    (expect "foo"
-      (with-current-buffer (anything-create-anything-buffer t)
-        (let ((anything-pattern "")
-              (anything-test-mode t))
-          (anything-process-source '((name . "test")
-                                     (candidates "hoge" "foo" "bar")))
-          (anything-preselect "fo+")
-          (anything-get-selection))))
-    ;; no match -> first entry
-    (expect "hoge"
-      (with-current-buffer (anything-create-anything-buffer t)
-        (let ((anything-pattern "")
-              (anything-test-mode t))
-          (anything-process-source '((name . "test")
-                                     (candidates "hoge" "foo" "bar")))
-          (anything-preselect "not found")
-          (anything-get-selection))))
-    (desc "anything-check-new-input")
-    (expect "newpattern"
-      (stub anything-update)
-      (stub anything-action-window)
-      (let ((anything-pattern "pattern"))
-        (anything-check-new-input "newpattern")
-        anything-pattern))
-    ;; anything-input == nil when action window is available
-    (expect nil
-      (stub anything-update)
-      (stub anything-action-window => t)
-      (let ((anything-pattern "pattern")
-            anything-input)
-        (anything-check-new-input "newpattern")
-        anything-input))
-    ;; anything-input == anything-pattern unless action window is available
-    (expect "newpattern"
-      (stub anything-update)
-      (stub anything-action-window => nil)
-      (let ((anything-pattern "pattern")
-            anything-input)
-        (anything-check-new-input "newpattern")
-        anything-input))
-    (expect (mock (anything-update))
-      (stub anything-action-window)
-      (let (anything-pattern)
-        (anything-check-new-input "foo")))
-    (desc "anything-update")
-    (expect (mock (anything-process-source '((name . "1"))))
-      (stub anything-get-sources => '(((name . "1"))))
-      (stub run-hooks)
-      (stub anything-maybe-fit-frame)
-      (stub run-with-idle-timer)
-      (anything-update))
-    ;; (find-function 'anything-update)
-    ;; TODO el-mock.el should express 2nd call of function.
-    ;; TODO el-mock.el should express no call of function.
-    ;;     (expect (mock (anything-process-source '((name . "2"))))
-    ;;       (stub anything-get-sources => '(((name . "1")) ((name . "2"))))
-    ;;       (stub run-hooks)
-    ;;       (stub anything-maybe-fit-frame)
-    ;;       (stub run-with-idle-timer)
-    ;;       (anything-update))
-    (expect (mock (run-with-idle-timer * nil 'anything-process-delayed-sources
-                                       '(((name . "2") (delayed)))))
-      (stub anything-get-sources => '(((name . "1"))
-                                      ((name . "2") (delayed))))
-      (stub run-hooks)
-      (stub anything-maybe-fit-frame)
-      (let ((anything-pattern "") anything-test-mode)
-        (anything-update)))
-    ;; TODO requires-pattern test
-    (desc "delay")
-    (expect (mock (sit-for 0.25))
-      (stub with-current-buffer)
-      (let ((anything-idle-delay 1.0)
-            (anything-input-idle-delay 0.75))
-        (anything-process-delayed-sources t)))
-    (expect (mock (sit-for 0.0))
-      (stub with-current-buffer)
-      (let ((anything-idle-delay 0.2)
-            (anything-input-idle-delay 0.5))
-        (anything-process-delayed-sources t)))    
-    (expect (mock (sit-for 0.5))
-      (stub with-current-buffer)
-      (let ((anything-idle-delay 0.5)
-            (anything-input-idle-delay nil))
-        (anything-process-delayed-sources t)))
-    (desc "anything-normalize-sources")
-    (expect '(anything-c-source-test)
-      (anything-normalize-sources 'anything-c-source-test))
-    (expect '(anything-c-source-test)
-      (anything-normalize-sources '(anything-c-source-test)))
-    (expect '(anything-c-source-test)
-      (let ((anything-sources '(anything-c-source-test)))
-        (anything-normalize-sources nil)))
-    (desc "anything-get-action")
-    (expect '(("identity" . identity))
-      (stub buffer-size => 1)
-      (stub anything-get-current-source => '((name . "test")
-                                             (action ("identity" . identity))))
-      (anything-get-action))
-    (expect '((("identity" . identity)) "action-transformer is called")
-      (stub buffer-size => 1)
-      (stub anything-get-current-source
-            => '((name . "test")
-                 (action ("identity" . identity))
-                 (action-transformer
-                  . (lambda (actions selection)
-                      (list actions selection)))))
-      (stub anything-get-selection => "action-transformer is called")
-      (anything-get-action))
-    (desc "anything-select-nth-action")
-    (expect "selection"
-      (stub anything-get-selection => "selection")
-      (stub anything-exit-minibuffer)
-      (let (anything-saved-selection)
-        (anything-select-nth-action 1)
-        anything-saved-selection))
-    (expect 'cadr
-      (stub anything-get-action => '(("0" . car) ("1" . cdr) ("2" . cadr)))
-      (stub anything-exit-minibuffer)
-      (stub anything-get-selection => "selection")
-      (let (anything-saved-action)
-        (anything-select-nth-action 2)
-        anything-saved-action))
-    (desc "anything-funcall-foreach")
-    (expect (mock (upcase "foo"))
-      (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))))
-      (anything-funcall-foreach 'init))
-    (expect (mock (downcase "bar"))
-      (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))
-                                      ((init . (lambda () (downcase "bar"))))))
-      (anything-funcall-foreach 'init))
-    ;; TODO when symbol is not specified
-    ;; TODO anything-select-with-digit-shortcut test
-    (desc "anything-get-cached-candidates")
-    (expect '("cached" "version")
-      (let ((anything-candidate-cache '(("test" "cached" "version"))))
-        (anything-get-cached-candidates '((name . "test")
-                                          (candidates "new")))))
-    (expect '("new")
-      (let ((anything-candidate-cache '(("other" "cached" "version"))))
-        (anything-get-cached-candidates '((name . "test")
-                                          (candidates "new")))))
-    (expect '(("test" "new")
-              ("other" "cached" "version"))
-      (let ((anything-candidate-cache '(("other" "cached" "version"))))
-        (anything-get-cached-candidates '((name . "test")
-                                          (candidates "new")))
-        anything-candidate-cache))
-    (expect '(("other" "cached" "version"))
-      (let ((anything-candidate-cache '(("other" "cached" "version"))))
-        (anything-get-cached-candidates '((name . "test")
-                                          (candidates "new")
-                                          (volatile)))
-        anything-candidate-cache))
-    ;; TODO when candidates == process
-    ;; TODO anything-output-filter
-    (desc "candidate-number-limit attribute")
-    (expect '("a" "b")
-      (let ((anything-pattern "")
-            (anything-candidate-number-limit 20))
-        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
-                                    (candidate-number-limit . 2) (volatile)))))
-    (expect '("a" "b")
-      (let ((anything-pattern "[abc]")
-            (anything-candidate-number-limit 20))
-        (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
-                                    (candidate-number-limit . 2) (volatile)))))
-    (expect '(("TEST" ("a" "b" "c")))
-      (let ((anything-candidate-number-limit 2))
+            (volatile)))))
+      (expect '(("TEST" ("foo+" "bar+" "baz+")))
+        (let (anything-candidate-number-limit)
+          (anything-test-candidates
+           '(((name . "TEST")
+              (init
+               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                              (insert "foo+\nbar+\nbaz+\n"))))
+              (candidates . anything-candidates-in-buffer)
+              (match identity)
+              (volatile))))))
+      (expect '(("TEST" ("foo+")))
         (anything-test-candidates
          '(((name . "TEST")
             (init
              . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                            (insert "a\nb\nc\nd\n"))))
+                            (insert "foo+\nbar+\nbaz+\n"))))
             (candidates . anything-candidates-in-buffer)
             (match identity)
-            (candidate-number-limit . 3)
-            (volatile))))))
-    (expect '(("TEST" ("a" "b" "c")))
-      (let ((anything-candidate-number-limit 2))
-        (anything-test-candidates
-         '(((name . "TEST")
-            (init
-             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                            (insert "a\nb\nc\nd\n"))))
-            (candidates . anything-candidates-in-buffer)
-            (match identity)
-            (candidate-number-limit . 3)
             (volatile)))
-         ".")))
-    (desc "multiple init")
-    (expect '(1 . 2)
-      (let (a b)
+         "oo\\+"))
+      (desc "search attribute")
+      (expect '(("TEST" ("foo+")))
         (anything-test-candidates
-         '(((name . "test")
-            (init (lambda () (setq a 1))
-                  (lambda () (setq b 2))))))
-        (cons a b)))
-    (expect 1
-      (let (a)
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\nooo\n"))))
+            (search search-forward)
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile)))
+         "oo+"))
+      (expect '(("TEST" ("foo+" "ooo")))
         (anything-test-candidates
-         '(((name . "test")
-            (init (lambda () (setq a 1))))))
-        a))
-    (desc "multiple cleanup")
-    (expect '(1 . 2)
-      (let (a b)
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\nooo\n"))))
+            (search search-forward re-search-forward)
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile)))
+         "oo+"))
+      (expect '(("TEST" ("foo+" "ooo")))
         (anything-test-candidates
-         '(((name . "test")
-            (cleanup (lambda () (setq a 1))
-                     (lambda () (setq b 2))))))
-        (cons a b)))
-    (desc "anything-mklist")
-    (expect '(1)
-      (anything-mklist 1))
-    (expect '(2)
-      (anything-mklist '(2)))
-    (desc "anything-before-initialize-hook")
-    (expect 'called
-      (let ((anything-before-initialize-hook '((lambda () (setq v 'called))))
-            v)
-        (anything-initialize)
-        v))
-    (desc "anything-after-initialize-hook")
-    (expect '(b a)
-      (let ((anything-before-initialize-hook
-             '((lambda () (setq v '(a)))))
-            (anything-after-initialize-hook
-             '((lambda () (setq v (cons 'b v)))))
-            v)
-        (anything-initialize)
-        v))
-    (expect 0
-      (let ((anything-after-initialize-hook
-             '((lambda () (setq v (buffer-size (get-buffer anything-buffer))))))
-            v)
-        (anything-initialize)
-        v))
-    (desc "get-line attribute")
-    (expect '(("TEST" ("FOO+")))
-      (anything-test-candidates
-       '(((name . "TEST")
-          (init
-           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                          (insert "foo+\nbar+\nbaz+\n"))))
-          (candidates-in-buffer)
-          (get-line . (lambda (s e) (upcase (buffer-substring-no-properties s e))))))
-       "oo\\+"))
-    (desc "with-anything-restore-variables")
-    (expect 9999
-      (let ((a 9999)
-            (anything-restored-variables '(a)))
-        (with-anything-restore-variables
-         (setq a 0))
-        a))
-    (desc "anything-cleanup-hook")
-    (expect 'called
-      (let ((anything-cleanup-hook
-             '((lambda () (setq v 'called))))
-            v)
-        (anything-cleanup)
-        v))
-    ))
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\nooo\n"))))
+            (search re-search-forward search-forward)
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile)))
+         "oo+"))
+      (expect '(("TEST" ("ooo" "foo+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "bar+\nbaz+\nooo\nfoo+\n"))))
+            (search re-search-forward search-forward)
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile)))
+         "oo+"))
+      ;; faster exact match
+      (expect '(("TEST" ("bar+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "bar+\nbaz+\nooo\nfoo+\n"))))
+            (search (lambda (pattern &rest _)
+                      (and (search-forward (concat "\n" pattern "\n") nil t)
+                           (forward-line -1))))
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile)))
+         "bar+"))
+      ;; faster prefix match
+      (expect '(("TEST" ("bar+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "bar+\nbaz+\nooo\nfoo+\n"))))
+            (search (lambda (pattern &rest _)
+                      (search-forward (concat "\n" pattern) nil t)))
+            (candidates . anything-candidates-in-buffer)
+            (match identity)
+            (volatile)))
+         "ba"))
+      (desc "anything-current-buffer-is-modified")
+      (expect nil
+        (with-temp-buffer
+          (insert "1")
+          (setq anything-current-buffer (current-buffer))
+          (anything-cleanup)
+          (anything-current-buffer-is-modified)))
+      (expect t
+        (with-temp-buffer
+          (insert "1")
+          (setq anything-current-buffer (current-buffer))
+          (anything-cleanup)
+          (insert "2")
+          (anything-current-buffer-is-modified)))
+      (expect '(("FOO" ("modified")))
+        (let ((sources '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (insert "1")
+            (anything-test-candidates sources))))
+      (expect '(("FOO" ("unmodified")))
+        (let ((sources '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (insert "1")
+            (anything-test-candidates sources)
+            (anything-test-candidates sources))))
+      (desc "anything-source-name")
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates '(((name . "FOO")
+                                       (init
+                                        . (lambda () (setq v anything-source-name)))
+                                       (candidates "ok"))))
+          v))
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates '(((name . "FOO")
+                                       (candidates
+                                        . (lambda ()
+                                            (setq v anything-source-name)
+                                            '("ok"))))))
+          v))
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates '(((name . "FOO")
+                                       (candidates "ok")
+                                       (candidate-transformer
+                                        . (lambda (c)
+                                            (setq v anything-source-name)
+                                            c)))))
+          v))
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates '(((name . "FOO")
+                                       (candidates "ok")
+                                       (filtered-candidate-transformer
+                                        . (lambda (c s)
+                                            (setq v anything-source-name)
+                                            c)))))
+          v))
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates '(((name . "FOO")
+                                       (candidates "ok")
+                                       (display-to-real
+                                        . (lambda (c)
+                                            (setq v anything-source-name)
+                                            c))
+                                       (action . identity))))
+          (anything-execute-selection-action)
+          v))
+      (desc "anything-candidate-buffer create")
+      (expect " *anything candidates:FOO*"
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "FOO")
+               (buf (anything-candidate-buffer 'global)))
+          (prog1 (buffer-name buf)
+            (kill-buffer buf))))
+      (expect " *anything candidates:FOO*aTestBuffer"
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "FOO")
+               (anything-current-buffer (get-buffer-create "aTestBuffer"))
+               (buf (anything-candidate-buffer 'local)))
+          (prog1 (buffer-name buf)
+            (kill-buffer anything-current-buffer)
+            (kill-buffer buf))))
+      (expect 0
+        (let (anything-candidate-buffer-alist
+              (anything-source-name "FOO") buf)
+          (with-current-buffer  (anything-candidate-buffer 'global)
+            (insert "1"))
+          (setq buf  (anything-candidate-buffer 'global))
+          (prog1 (buffer-size buf)
+            (kill-buffer buf))))
+      (desc "anything-candidate-buffer get-buffer")
+      (expect " *anything candidates:FOO*"
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "FOO")
+               (buf (anything-candidate-buffer 'global)))
+          (prog1 (buffer-name (anything-candidate-buffer))
+            (kill-buffer buf))))
+      (expect " *anything candidates:FOO*aTestBuffer"
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "FOO")
+               (anything-current-buffer (get-buffer-create "aTestBuffer"))
+               (buf (anything-candidate-buffer 'local)))
+          (prog1 (buffer-name (anything-candidate-buffer))
+            (kill-buffer anything-current-buffer)
+            (kill-buffer buf))))
+      (expect nil
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "NOP__"))
+          (anything-candidate-buffer)))
+      (desc "anything-candidate-buffer register-buffer")
+      (expect " *anything test candidates*"
+        (let (anything-candidate-buffer-alist
+              (buf (get-buffer-create " *anything test candidates*")))
+          (with-current-buffer buf
+            (insert "1\n2\n")
+            (prog1 (buffer-name (anything-candidate-buffer buf))
+              (kill-buffer (current-buffer))))))
+      (expect " *anything test candidates*"
+        (let (anything-candidate-buffer-alist
+              (buf (get-buffer-create " *anything test candidates*")))
+          (with-current-buffer buf
+            (insert "1\n2\n")
+            (anything-candidate-buffer buf)
+            (prog1 (buffer-name (anything-candidate-buffer))
+              (kill-buffer (current-buffer))))))
+      (expect "1\n2\n"
+        (let (anything-candidate-buffer-alist
+              (buf (get-buffer-create " *anything test candidates*")))
+          (with-current-buffer buf
+            (insert "1\n2\n")
+            (anything-candidate-buffer buf)
+            (prog1 (buffer-string)
+              (kill-buffer (current-buffer))))))
+      (desc "action attribute")
+      (expect "foo"
+        (anything-test-candidates
+         '(((name . "TEST")
+            (candidates "foo")
+            (action ("identity" . identity)))))
+        (anything-execute-selection-action))
+      (expect "foo"
+        (anything-test-candidates
+         '(((name . "TEST")
+            (candidates "foo")
+            (action ("identity" . (lambda (c) (identity c)))))))
+        (anything-execute-selection-action))
+      (desc "anything-execute-selection-action")
+      (expect "FOO"
+        (anything-execute-selection-action
+         "foo" '(("upcase" . upcase))  nil #'identity))
+      (expect "FOO"
+        (anything-execute-selection-action
+         "foo" '(("upcase" . (lambda (c) (upcase c)))) nil #'identity))
+      (desc "display-to-real attribute")
+      (expect "FOO"
+        (anything-execute-selection-action
+         "foo"
+         '(("identity" . identity))
+         nil
+         #'upcase
+         ))
+      (expect "FOO"
+        (anything-test-candidates
+         '(((name . "TEST")
+            (candidates "foo")
+            (display-to-real . upcase)
+            (action ("identity" . identity)))))
+        (anything-execute-selection-action))
+      (desc "cleanup test")
+      (expect 'cleaned
+        (let (v)
+          (anything-test-candidates
+           '(((name . "TEST")
+              (cleanup . (lambda () (setq v 'cleaned))))))
+          v))
+      (desc "anything-get-current-source")
+      ;; in init/candidates/action/candidate-transformer/filtered-candidate-transformer
+      ;; display-to-real/cleanup function
+      (expect "FOO"
+        (assoc-default
+         'name
+         (anything-funcall-with-source '((name . "FOO")) 'anything-get-current-source)))
+      ;; init
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init . (lambda () (setq v (anything-get-current-source)))))))
+          (assoc-default 'name v)))
+      ;; candidates
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (candidates . (lambda () (setq v (anything-get-current-source)) '("a"))))))
+          (assoc-default 'name v)))
+      ;; action
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (candidates "a")
+              (action
+               . (lambda (c) (setq v (anything-get-current-source)) c)))))
+          (anything-execute-selection-action)
+          (assoc-default 'name v)))
+      ;; candidate-transformer
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (candidates "a")
+              (candidate-transformer
+               . (lambda (c) (setq v (anything-get-current-source)) c)))))
+          (assoc-default 'name v)))
+      ;; filtered-candidate-transformer
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (candidates "a")
+              (filtered-candidate-transformer
+               . (lambda (c s) (setq v (anything-get-current-source)) c)))))
+          (assoc-default 'name v)))
+      ;; action-transformer
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (candidates "a")
+              (action-transformer
+               . (lambda (a c) (setq v (anything-get-current-source)) a))
+              (action . identity))))
+          (anything-execute-selection-action)
+          (assoc-default 'name v)))
+      ;; display-to-real
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                                   (insert "a\n"))))
+              (candidates-in-buffer)
+              (display-to-real
+               . (lambda (c) (setq v (anything-get-current-source)) c))
+              (action . identity))))
+          (anything-execute-selection-action)
+          (assoc-default 'name v)))
+      ;; cleanup
+      (expect "FOO"
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (candidates "a")
+              (cleanup
+               . (lambda () (setq v (anything-get-current-source)))))))
+          (assoc-default 'name v)))
+      ;; candidates are displayed
+      (expect "TEST"
+        (anything-test-candidates
+         '(((name . "TEST")
+            (candidates "foo")
+            (action ("identity" . identity)))))
+        (assoc-default 'name (anything-get-current-source)))
+      (desc "anything-attr")
+      (expect "FOO"
+        (anything-funcall-with-source
+         '((name . "FOO"))
+         (lambda ()
+           (anything-attr 'name))))
+      (expect 'fuga
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (hoge . fuga)
+              (init . (lambda () (setq v (anything-attr 'hoge))))
+              (candidates "a"))))
+          v))
+      (expect t
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (hoge)
+              (init . (lambda () (setq v (anything-attr 'hoge))))
+              (candidates "a"))))
+          v))
+      (desc "anything-preselect")
+      ;; entire candidate
+      (expect "foo"
+        (with-current-buffer (anything-create-anything-buffer t)
+          (let ((anything-pattern "")
+                (anything-test-mode t))
+            (anything-process-source '((name . "test")
+                                       (candidates "hoge" "foo" "bar")))
+            (anything-preselect "foo")
+            (anything-get-selection))))
+      ;; regexp
+      (expect "foo"
+        (with-current-buffer (anything-create-anything-buffer t)
+          (let ((anything-pattern "")
+                (anything-test-mode t))
+            (anything-process-source '((name . "test")
+                                       (candidates "hoge" "foo" "bar")))
+            (anything-preselect "fo+")
+            (anything-get-selection))))
+      ;; no match -> first entry
+      (expect "hoge"
+        (with-current-buffer (anything-create-anything-buffer t)
+          (let ((anything-pattern "")
+                (anything-test-mode t))
+            (anything-process-source '((name . "test")
+                                       (candidates "hoge" "foo" "bar")))
+            (anything-preselect "not found")
+            (anything-get-selection))))
+      (desc "anything-check-new-input")
+      (expect "newpattern"
+        (stub anything-update)
+        (stub anything-action-window)
+        (let ((anything-pattern "pattern"))
+          (anything-check-new-input "newpattern")
+          anything-pattern))
+      ;; anything-input == nil when action window is available
+      (expect nil
+        (stub anything-update)
+        (stub anything-action-window => t)
+        (let ((anything-pattern "pattern")
+              anything-input)
+          (anything-check-new-input "newpattern")
+          anything-input))
+      ;; anything-input == anything-pattern unless action window is available
+      (expect "newpattern"
+        (stub anything-update)
+        (stub anything-action-window => nil)
+        (let ((anything-pattern "pattern")
+              anything-input)
+          (anything-check-new-input "newpattern")
+          anything-input))
+      (expect (mock (anything-update))
+        (stub anything-action-window)
+        (let (anything-pattern)
+          (anything-check-new-input "foo")))
+      (desc "anything-update")
+      (expect (mock (anything-process-source '((name . "1"))))
+        (stub anything-get-sources => '(((name . "1"))))
+        (stub run-hooks)
+        (stub anything-maybe-fit-frame)
+        (stub run-with-idle-timer)
+        (anything-update))
+      ;; (find-function 'anything-update)
+      ;; TODO el-mock.el should express 2nd call of function.
+      ;; TODO el-mock.el should express no call of function.
+      ;;     (expect (mock (anything-process-source '((name . "2"))))
+      ;;       (stub anything-get-sources => '(((name . "1")) ((name . "2"))))
+      ;;       (stub run-hooks)
+      ;;       (stub anything-maybe-fit-frame)
+      ;;       (stub run-with-idle-timer)
+      ;;       (anything-update))
+      (expect (mock (run-with-idle-timer * nil 'anything-process-delayed-sources
+                                         '(((name . "2") (delayed)))))
+        (stub anything-get-sources => '(((name . "1"))
+                                        ((name . "2") (delayed))))
+        (stub run-hooks)
+        (stub anything-maybe-fit-frame)
+        (let ((anything-pattern "") anything-test-mode)
+          (anything-update)))
+      ;; TODO requires-pattern test
+      (desc "delay")
+      (expect (mock (sit-for 0.25))
+        (stub with-current-buffer)
+        (let ((anything-idle-delay 1.0)
+              (anything-input-idle-delay 0.75))
+          (anything-process-delayed-sources t)))
+      (expect (mock (sit-for 0.0))
+        (stub with-current-buffer)
+        (let ((anything-idle-delay 0.2)
+              (anything-input-idle-delay 0.5))
+          (anything-process-delayed-sources t)))    
+      (expect (mock (sit-for 0.5))
+        (stub with-current-buffer)
+        (let ((anything-idle-delay 0.5)
+              (anything-input-idle-delay nil))
+          (anything-process-delayed-sources t)))
+      (desc "anything-normalize-sources")
+      (expect '(anything-c-source-test)
+        (anything-normalize-sources 'anything-c-source-test))
+      (expect '(anything-c-source-test)
+        (anything-normalize-sources '(anything-c-source-test)))
+      (expect '(anything-c-source-test)
+        (let ((anything-sources '(anything-c-source-test)))
+          (anything-normalize-sources nil)))
+      (desc "anything-get-action")
+      (expect '(("identity" . identity))
+        (stub buffer-size => 1)
+        (stub anything-get-current-source => '((name . "test")
+                                               (action ("identity" . identity))))
+        (anything-get-action))
+      (expect '((("identity" . identity)) "action-transformer is called")
+        (stub buffer-size => 1)
+        (stub anything-get-current-source
+              => '((name . "test")
+                   (action ("identity" . identity))
+                   (action-transformer
+                    . (lambda (actions selection)
+                        (list actions selection)))))
+        (stub anything-get-selection => "action-transformer is called")
+        (anything-get-action))
+      (desc "anything-select-nth-action")
+      (expect "selection"
+        (stub anything-get-selection => "selection")
+        (stub anything-exit-minibuffer)
+        (let (anything-saved-selection)
+          (anything-select-nth-action 1)
+          anything-saved-selection))
+      (expect 'cadr
+        (stub anything-get-action => '(("0" . car) ("1" . cdr) ("2" . cadr)))
+        (stub anything-exit-minibuffer)
+        (stub anything-get-selection => "selection")
+        (let (anything-saved-action)
+          (anything-select-nth-action 2)
+          anything-saved-action))
+      (desc "anything-funcall-foreach")
+      (expect (mock (upcase "foo"))
+        (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))))
+        (anything-funcall-foreach 'init))
+      (expect (mock (downcase "bar"))
+        (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))
+                                        ((init . (lambda () (downcase "bar"))))))
+        (anything-funcall-foreach 'init))
+      ;; TODO when symbol is not specified
+      ;; TODO anything-select-with-digit-shortcut test
+      (desc "anything-get-cached-candidates")
+      (expect '("cached" "version")
+        (let ((anything-candidate-cache '(("test" "cached" "version"))))
+          (anything-get-cached-candidates '((name . "test")
+                                            (candidates "new")))))
+      (expect '("new")
+        (let ((anything-candidate-cache '(("other" "cached" "version"))))
+          (anything-get-cached-candidates '((name . "test")
+                                            (candidates "new")))))
+      (expect '(("test" "new")
+                ("other" "cached" "version"))
+        (let ((anything-candidate-cache '(("other" "cached" "version"))))
+          (anything-get-cached-candidates '((name . "test")
+                                            (candidates "new")))
+          anything-candidate-cache))
+      (expect '(("other" "cached" "version"))
+        (let ((anything-candidate-cache '(("other" "cached" "version"))))
+          (anything-get-cached-candidates '((name . "test")
+                                            (candidates "new")
+                                            (volatile)))
+          anything-candidate-cache))
+      ;; TODO when candidates == process
+      ;; TODO anything-output-filter
+      (desc "candidate-number-limit attribute")
+      (expect '("a" "b")
+        (let ((anything-pattern "")
+              (anything-candidate-number-limit 20))
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
+                                      (candidate-number-limit . 2) (volatile)))))
+      (expect '("a" "b")
+        (let ((anything-pattern "[abc]")
+              (anything-candidate-number-limit 20))
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
+                                      (candidate-number-limit . 2) (volatile)))))
+      (expect '(("TEST" ("a" "b" "c")))
+        (let ((anything-candidate-number-limit 2))
+          (anything-test-candidates
+           '(((name . "TEST")
+              (init
+               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                              (insert "a\nb\nc\nd\n"))))
+              (candidates . anything-candidates-in-buffer)
+              (match identity)
+              (candidate-number-limit . 3)
+              (volatile))))))
+      (expect '(("TEST" ("a" "b" "c")))
+        (let ((anything-candidate-number-limit 2))
+          (anything-test-candidates
+           '(((name . "TEST")
+              (init
+               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                              (insert "a\nb\nc\nd\n"))))
+              (candidates . anything-candidates-in-buffer)
+              (match identity)
+              (candidate-number-limit . 3)
+              (volatile)))
+           ".")))
+      (desc "multiple init")
+      (expect '(1 . 2)
+        (let (a b)
+          (anything-test-candidates
+           '(((name . "test")
+              (init (lambda () (setq a 1))
+                    (lambda () (setq b 2))))))
+          (cons a b)))
+      (expect 1
+        (let (a)
+          (anything-test-candidates
+           '(((name . "test")
+              (init (lambda () (setq a 1))))))
+          a))
+      (desc "multiple cleanup")
+      (expect '(1 . 2)
+        (let (a b)
+          (anything-test-candidates
+           '(((name . "test")
+              (cleanup (lambda () (setq a 1))
+                       (lambda () (setq b 2))))))
+          (cons a b)))
+      (desc "anything-mklist")
+      (expect '(1)
+        (anything-mklist 1))
+      (expect '(2)
+        (anything-mklist '(2)))
+      (desc "anything-before-initialize-hook")
+      (expect 'called
+        (let ((anything-before-initialize-hook '((lambda () (setq v 'called))))
+              v)
+          (anything-initialize)
+          v))
+      (desc "anything-after-initialize-hook")
+      (expect '(b a)
+        (let ((anything-before-initialize-hook
+               '((lambda () (setq v '(a)))))
+              (anything-after-initialize-hook
+               '((lambda () (setq v (cons 'b v)))))
+              v)
+          (anything-initialize)
+          v))
+      (expect 0
+        (let ((anything-after-initialize-hook
+               '((lambda () (setq v (buffer-size (get-buffer anything-buffer))))))
+              v)
+          (anything-initialize)
+          v))
+      (desc "get-line attribute")
+      (expect '(("TEST" ("FOO+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\n"))))
+            (candidates-in-buffer)
+            (get-line . (lambda (s e) (upcase (buffer-substring-no-properties s e))))))
+         "oo\\+"))
+      (desc "with-anything-restore-variables")
+      (expect 9999
+        (let ((a 9999)
+              (anything-restored-variables '(a)))
+          (with-anything-restore-variables
+           (setq a 0))
+          a))
+      (desc "anything-cleanup-hook")
+      (expect 'called
+        (let ((anything-cleanup-hook
+               '((lambda () (setq v 'called))))
+              v)
+          (anything-cleanup)
+          v))
+      )))
 
 
 (provide 'anything)
