@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.11 2008-08-24 08:23:30 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.12 2008-08-24 18:01:25 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -29,6 +29,10 @@
 ;; `anything' is migemo-ized. This means that pattern matching of
 ;; `anything' candidates is done by migemo-expanded `anything-pattern'.
 
+;; If you want to use migemo search source-locally, add (migemo) to
+;; the source. It sets match and search attribute appropriately for
+;; migemo.
+
 ;;; Setting:
 
 ;; (require 'anything-config)
@@ -44,7 +48,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.11  2008-08-24 08:23:30  rubikitch
+;; Revision 1.12  2008-08-24 18:01:25  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.11  2008/08/24 08:23:30  rubikitch
 ;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
 ;;
 ;; Revision 1.10  2008/08/24 01:54:21  rubikitch
