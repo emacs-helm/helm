@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.9 2008-08-19 21:38:09 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.10 2008-08-24 01:54:21 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -44,7 +44,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.9  2008-08-19 21:38:09  rubikitch
+;; Revision 1.10  2008-08-24 01:54:21  rubikitch
+;; match attribute
+;;
+;; Revision 1.9  2008/08/19 21:38:09  rubikitch
 ;; match attribute bug fix
 ;;
 ;; Revision 1.8  2008/08/19 21:30:29  rubikitch
@@ -96,12 +99,24 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
   (string-match (cdr anything-previous-migemo-info) str))
 
 (defun anything-compile-source--migemo (source)
-  (if anything-use-migemo
-      `((delayed)
-        (search migemo-forward ,@(assoc-default 'search source))
-        (match anything-string-match-with-migemo ,@(assoc-default 'match source))
-        ,@source)
-    source))
+  (flet ((match-identity-p ()
+                           (or (assoc 'candidates-in-buffer source)
+                               (equal '(identity) (assoc-default 'match source)))))
+    (cond (anything-use-migemo
+           `((delayed)
+             (search ,@(assoc-default 'search source) migemo-forward)
+             ,(if (match-identity-p)
+                  '(match identity)
+                `(match anything-string-match-with-migemo
+                        ,@(assoc-default 'match source)))
+             ,@source))
+          ((assoc 'migemo source)
+           `((search migemo-forward)
+             ,(if (match-identity-p)
+                  '(match identity)
+                `(match anything-string-match-with-migemo))
+             ,@source))
+          (t source))))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--migemo t)
 
 ;;;; unit test
@@ -126,6 +141,27 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
              . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
                             (insert "日本語\n"))))
             (candidates-in-buffer)))
+         "nihongo"
+         '(anything-compile-source--candidates-in-buffer
+           anything-compile-source--migemo))))
+    (desc "migemo attribute")
+    (expect '(("TEST" ("日本語")))
+      (let ((anything-use-migemo nil))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (candidates "日本語")
+            (migemo)))
+         "nihongo"
+         '(anything-compile-source--migemo))))
+    (expect '(("TEST" ("日本語")))
+      (let ((anything-use-migemo nil))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+                            (insert "日本語\n"))))
+            (candidates-in-buffer)
+            (migemo)))
          "nihongo"
          '(anything-compile-source--candidates-in-buffer
            anything-compile-source--migemo))))
