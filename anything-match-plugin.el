@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.10 2008-08-24 17:48:53 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.11 2008-08-24 20:40:27 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -33,7 +33,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.10  2008-08-24 17:48:53  rubikitch
+;; Revision 1.11  2008-08-24 20:40:27  rubikitch
+;; prevent the unit test from being byte-compiled.
+;;
+;; Revision 1.10  2008/08/24 17:48:53  rubikitch
 ;; Add commentary
 ;;
 ;; Revision 1.9  2008/08/24 08:23:16  rubikitch
@@ -157,197 +160,194 @@
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
-(declare (warn (unresolved 0)))
-(when (fboundp 'expectations)
-  (expectations
-    (desc "amp-mp-make-regexps")
-    (expect '("")
-      (amp-mp-make-regexps ""))
-    (expect '("foo" "bar")
-      (amp-mp-make-regexps "foo bar"))
-    (expect '("foo" "bar")
-      (amp-mp-make-regexps " foo bar"))
-    (expect '("foo" "bar")
-      (amp-mp-make-regexps " foo bar "))
-    (expect '("foo bar" "baz")
-      (amp-mp-make-regexps "foo\\ bar baz"))
-    (desc "anything-exact-match")
-    (expect (non-nil)
-      (anything-exact-match "thunder" "thunder"))
-    (expect nil
-      (anything-exact-match "thunder" "fire"))
-    (desc "anything-exact-search")
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-exact-search "thunder" nil t)))
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "\nfire\nthunder\n")
-        (goto-char 1)
-        (anything-exact-search "fire" nil t)))
-    (desc "amp-mp-1-make-regexp")
-    (expect "a.*b"
-      (amp-mp-1-make-regexp "a b"))
-    (expect "a b"
-      (amp-mp-1-make-regexp "a\\ b"))
-    (expect "a.*b c"
-      (amp-mp-1-make-regexp "a b\\ c"))
-    (expect ""
-      (amp-mp-1-make-regexp ""))
-    (desc "anything-mp-1-search")
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-1-search "th+ r" nil t)))
-    (desc "anything-mp-2-search")
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-2-search "h+ r" nil t)))
-    (expect nil
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-2-search "th+ r" nil t)))
-    (desc "anything-mp-3-search")
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-3-search "h+ r" nil t)))
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-3-search "th+ r" nil t)))
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-3-search "r th+" nil t)))
-    (expect nil
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-3-search "under hue" nil t)))
-    (expect (non-nil)
-      (with-temp-buffer
-        (insert "fire\nthunder\n")
-        (goto-char 1)
-        (anything-mp-3-search "r th+ n" nil t)))
-    (desc "anything-mp-1-match")
-    (expect (non-nil)
-      (anything-mp-1-match "thunder" "th+ r"))
-    (desc "anything-mp-2-match")
-    (expect (non-nil)
-      (anything-mp-2-match "thunder" "h+ r"))
-    (expect nil
-      (anything-mp-2-match "thunder" "th+ r"))
-    (desc "anything-mp-3-match")
-    (expect (non-nil)
-      (anything-mp-3-match "thunder" "h+ r"))
-    (expect (non-nil)
-      (anything-mp-3-match "thunder" "th+ r"))
-    (expect (non-nil)
-      (anything-mp-3-match "thunder" "r th+"))
-    (expect nil
-      (anything-mp-3-match "thunder" "under hue"))
-    (expect (non-nil)
-      (anything-mp-3-match "thunder" "r th+ n"))
-    (desc "anything-prefix-match")
-    (expect (non-nil)
-      (anything-prefix-match "fobar" "fo"))
-    (expect nil
-      (anything-prefix-match "xfobar" "fo"))
-    
-    (desc "with identity match")
-    (expect '(identity)
-      (assoc-default 'match
-                     (car (anything-compile-sources
-                           '(((name . "FOO")
-                              (candidates-in-buffer)))
-                           '(anything-compile-source--candidates-in-buffer
-                             anything-compile-source--match-plugin)))))
-    (expect '(identity)
-      (assoc-default 'match
-                     (car (anything-compile-sources
-                           '(((name . "FOO")
-                              (match identity)))
-                           '(anything-compile-source--match-plugin)))))
-    (desc "functional")
-    (expect '(("FOO" ("thunder")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (candidates "fire" "thunder")))
-                                "th+ r"
-                                '(anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("one two")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (candidates "one two" "three four")))
-                                "e\\ t"
-                                '(anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("thunder")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (init
-                                    . (lambda ()
-                                        (with-current-buffer (anything-candidate-buffer 'global)
-                                          (insert "fire\nthunder\nthanks\n"))))
-                                   (candidates-in-buffer)))
-                                "th+ r"
-                                '(anything-compile-source--candidates-in-buffer
-                                  anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("foo" "foobar")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (candidates "foobar" "foo")))
-                                "foo"
-                                '(anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("foo" "foobar")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (init
-                                    . (lambda ()
-                                        (with-current-buffer (anything-candidate-buffer 'global)
-                                          (insert "foobar\nfoo\n"))))
-                                   (candidates-in-buffer)))
-                                "foo"
-                                '(anything-compile-source--candidates-in-buffer
-                                  anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("foo")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (init
-                                    . (lambda ()
-                                        (with-current-buffer (anything-candidate-buffer 'global)
-                                          (insert "foo\n"))))
-                                   (candidates-in-buffer)))
-                                "foo"
-                                '(anything-compile-source--candidates-in-buffer
-                                  anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("foo")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (init
-                                    . (lambda ()
-                                        (with-current-buffer (anything-candidate-buffer 'global)
-                                          (insert "bar\nfoo\ntest\n"))))
-                                   (candidates-in-buffer)))
-                                "foo"
-                                '(anything-compile-source--candidates-in-buffer
-                                  anything-compile-source--match-plugin)))
-    (expect '(("FOO" ("foobar" "foo")))
-      (anything-test-candidates '(((name . "FOO")
-                                   (init
-                                    . (lambda ()
-                                        (with-current-buffer (anything-candidate-buffer 'global)
-                                          (insert "foobar\nfoo\n"))))
-                                   (candidates-in-buffer)))
-                                ""
-                                '(anything-compile-source--candidates-in-buffer
-                                  anything-compile-source--match-plugin)))
-    ))
+(dont-compile
+  (when (fboundp 'expectations)
+    (expectations
+      (desc "amp-mp-make-regexps")
+      (expect '("")
+        (amp-mp-make-regexps ""))
+      (expect '("foo" "bar")
+        (amp-mp-make-regexps "foo bar"))
+      (expect '("foo" "bar")
+        (amp-mp-make-regexps " foo bar"))
+      (expect '("foo" "bar")
+        (amp-mp-make-regexps " foo bar "))
+      (expect '("foo bar" "baz")
+        (amp-mp-make-regexps "foo\\ bar baz"))
+      (desc "anything-exact-match")
+      (expect (non-nil)
+        (anything-exact-match "thunder" "thunder"))
+      (expect nil
+        (anything-exact-match "thunder" "fire"))
+      (desc "anything-exact-search")
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-exact-search "thunder" nil t)))
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "\nfire\nthunder\n")
+          (goto-char 1)
+          (anything-exact-search "fire" nil t)))
+      (desc "amp-mp-1-make-regexp")
+      (expect "a.*b"
+        (amp-mp-1-make-regexp "a b"))
+      (expect "a b"
+        (amp-mp-1-make-regexp "a\\ b"))
+      (expect "a.*b c"
+        (amp-mp-1-make-regexp "a b\\ c"))
+      (expect ""
+        (amp-mp-1-make-regexp ""))
+      (desc "anything-mp-1-search")
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-1-search "th+ r" nil t)))
+      (desc "anything-mp-2-search")
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-2-search "h+ r" nil t)))
+      (expect nil
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-2-search "th+ r" nil t)))
+      (desc "anything-mp-3-search")
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "h+ r" nil t)))
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "th+ r" nil t)))
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "r th+" nil t)))
+      (expect nil
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "under hue" nil t)))
+      (expect (non-nil)
+        (with-temp-buffer
+          (insert "fire\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "r th+ n" nil t)))
+      (desc "anything-mp-1-match")
+      (expect (non-nil)
+        (anything-mp-1-match "thunder" "th+ r"))
+      (desc "anything-mp-2-match")
+      (expect (non-nil)
+        (anything-mp-2-match "thunder" "h+ r"))
+      (expect nil
+        (anything-mp-2-match "thunder" "th+ r"))
+      (desc "anything-mp-3-match")
+      (expect (non-nil)
+        (anything-mp-3-match "thunder" "h+ r"))
+      (expect (non-nil)
+        (anything-mp-3-match "thunder" "th+ r"))
+      (expect (non-nil)
+        (anything-mp-3-match "thunder" "r th+"))
+      (expect nil
+        (anything-mp-3-match "thunder" "under hue"))
+      (expect (non-nil)
+        (anything-mp-3-match "thunder" "r th+ n"))
+      (desc "anything-prefix-match")
+      (expect (non-nil)
+        (anything-prefix-match "fobar" "fo"))
+      (expect nil
+        (anything-prefix-match "xfobar" "fo"))
 
-
-
+      (desc "with identity match")
+      (expect '(identity)
+        (assoc-default 'match
+                       (car (anything-compile-sources
+                             '(((name . "FOO")
+                                (candidates-in-buffer)))
+                             '(anything-compile-source--candidates-in-buffer
+                               anything-compile-source--match-plugin)))))
+      (expect '(identity)
+        (assoc-default 'match
+                       (car (anything-compile-sources
+                             '(((name . "FOO")
+                                (match identity)))
+                             '(anything-compile-source--match-plugin)))))
+      (desc "functional")
+      (expect '(("FOO" ("thunder")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates "fire" "thunder")))
+                                  "th+ r"
+                                  '(anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("one two")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates "one two" "three four")))
+                                  "e\\ t"
+                                  '(anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("thunder")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "fire\nthunder\nthanks\n"))))
+                                     (candidates-in-buffer)))
+                                  "th+ r"
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("foo" "foobar")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (candidates "foobar" "foo")))
+                                  "foo"
+                                  '(anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("foo" "foobar")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "foobar\nfoo\n"))))
+                                     (candidates-in-buffer)))
+                                  "foo"
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("foo")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "foo\n"))))
+                                     (candidates-in-buffer)))
+                                  "foo"
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("foo")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "bar\nfoo\ntest\n"))))
+                                     (candidates-in-buffer)))
+                                  "foo"
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("foobar" "foo")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "foobar\nfoo\n"))))
+                                     (candidates-in-buffer)))
+                                  ""
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      )))
 
 (provide 'anything-match-plugin)
 

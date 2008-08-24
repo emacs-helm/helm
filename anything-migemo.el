@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.12 2008-08-24 18:01:25 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.13 2008-08-24 20:39:53 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -48,7 +48,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.12  2008-08-24 18:01:25  rubikitch
+;; Revision 1.13  2008-08-24 20:39:53  rubikitch
+;; prevent the unit test from being byte-compiled.
+;;
+;; Revision 1.12  2008/08/24 18:01:25  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.11  2008/08/24 08:23:30  rubikitch
@@ -132,50 +135,51 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
-(when (fboundp 'expectations)
-  (expectations
-    (desc "match")
-    (expect '(("TEST" ("日本語")))
-      (let ((anything-use-migemo t))
-        (anything-test-candidates
-         '(((name . "TEST")
-            (candidates "日本語")))
-         "nihongo"
-         '(anything-compile-source--migemo))))
-    (desc "candidates buffer")
-    (expect '(("TEST" ("日本語")))
-      (let ((anything-use-migemo t))
-        (anything-test-candidates
-         '(((name . "TEST")
-            (init
-             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                            (insert "日本語\n"))))
-            (candidates-in-buffer)))
-         "nihongo"
-         '(anything-compile-source--candidates-in-buffer
-           anything-compile-source--migemo))))
-    (desc "migemo attribute")
-    (expect '(("TEST" ("日本語")))
-      (let ((anything-use-migemo nil))
-        (anything-test-candidates
-         '(((name . "TEST")
-            (candidates "日本語")
-            (migemo)))
-         "nihongo"
-         '(anything-compile-source--migemo))))
-    (expect '(("TEST" ("日本語")))
-      (let ((anything-use-migemo nil))
-        (anything-test-candidates
-         '(((name . "TEST")
-            (init
-             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                            (insert "日本語\n"))))
-            (candidates-in-buffer)
-            (migemo)))
-         "nihongo"
-         '(anything-compile-source--candidates-in-buffer
-           anything-compile-source--migemo))))
-    ))
+(dont-compile
+  (when (fboundp 'expectations)
+    (expectations
+      (desc "match")
+      (expect '(("TEST" ("日本語")))
+        (let ((anything-use-migemo t))
+          (anything-test-candidates
+           '(((name . "TEST")
+              (candidates "日本語")))
+           "nihongo"
+           '(anything-compile-source--migemo))))
+      (desc "candidates buffer")
+      (expect '(("TEST" ("日本語")))
+        (let ((anything-use-migemo t))
+          (anything-test-candidates
+           '(((name . "TEST")
+              (init
+               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                              (insert "日本語\n"))))
+              (candidates-in-buffer)))
+           "nihongo"
+           '(anything-compile-source--candidates-in-buffer
+             anything-compile-source--migemo))))
+      (desc "migemo attribute")
+      (expect '(("TEST" ("日本語")))
+        (let ((anything-use-migemo nil))
+          (anything-test-candidates
+           '(((name . "TEST")
+              (candidates "日本語")
+              (migemo)))
+           "nihongo"
+           '(anything-compile-source--migemo))))
+      (expect '(("TEST" ("日本語")))
+        (let ((anything-use-migemo nil))
+          (anything-test-candidates
+           '(((name . "TEST")
+              (init
+               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                              (insert "日本語\n"))))
+              (candidates-in-buffer)
+              (migemo)))
+           "nihongo"
+           '(anything-compile-source--candidates-in-buffer
+             anything-compile-source--migemo))))
+      )))
 
 (provide 'anything-migemo)
 
