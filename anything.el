@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.90 2008-08-24 20:33:02 rubikitch Exp $
+;; $Id: anything.el,v 1.91 2008-08-24 21:34:35 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.90  2008-08-24 20:33:02  rubikitch
+;; Revision 1.91  2008-08-24 21:34:35  rubikitch
+;; rewrite `with-anything-restore-variables'
+;;
+;; Revision 1.90  2008/08/24 20:33:02  rubikitch
 ;; prevent the unit test from byte-compiled.
 ;; macro bug fix.
 ;;
@@ -460,7 +463,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.90 2008-08-24 20:33:02 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.91 2008-08-24 21:34:35 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1038,11 +1041,10 @@ But the anything buffer has no contents. ")
 (defvar anything-cleanup-hook nil
   "Run after anything invocation.")
 
-(eval-when-compile
 (defvar anything-restored-variables
   '( anything-candidate-number-limit
      anything-source-filter)
-  "Variables which are restored after `anything' invocation."))
+  "Variables which are restored after `anything' invocation.")
 ;; `anything-saved-sources' is removed
 
 (defvar anything-saved-selection nil
@@ -1126,8 +1128,11 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 
 (defmacro with-anything-restore-variables(&rest body)
   "Restore variables specified by `anything-restored-variables' after executing BODY ."
-  `(let ,(mapcar (lambda (v) (list v v)) anything-restored-variables)
-     ,@body))
+  `(let ((orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables)))
+     (unwind-protect (progn ,@body)
+       (loop for (var . value) in orig-vars
+             do (set var value)))))
+(put 'with-anything-restore-variables 'lisp-indent-function 0)
 
 (defun anything-attr (attribute-name)
   "Get the value of ATTRIBUTE-NAME of current source.
@@ -3630,12 +3635,12 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (get-line . (lambda (s e) (upcase (buffer-substring-no-properties s e))))))
          "oo\\+"))
       (desc "with-anything-restore-variables")
-      (expect 9999
-        (let ((a 9999)
-              (anything-restored-variables '(a)))
+      (expect '(7 8)
+        (let ((a 7) (b 8)
+              (anything-restored-variables '(a b)))
           (with-anything-restore-variables
-           (setq a 0))
-          a))
+            (setq a 0 b 0))
+          (list a b)))
       (desc "anything-cleanup-hook")
       (expect 'called
         (let ((anything-cleanup-hook
