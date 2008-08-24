@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.9 2008-08-24 08:22:48 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.10 2008-08-24 20:45:07 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.9  2008-08-24 08:22:48  rubikitch
+;; Revision 1.10  2008-08-24 20:45:07  rubikitch
+;; silence byte compiler
+;;
+;; Revision 1.9  2008/08/24 08:22:48  rubikitch
 ;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
 ;;
 ;; Revision 1.8  2008/08/23 23:01:53  rubikitch
@@ -61,6 +64,9 @@
 ;;
 
 ;;; Code:
+
+(require 'anything)
+(require 'gtags)
 
 (defvar anything-c-source-gtags-select
   '((name . "GTAGS")
