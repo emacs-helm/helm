@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.8 2008-08-22 21:25:44 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.9 2008-08-24 08:23:16 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.8  2008-08-22 21:25:44  rubikitch
+;; Revision 1.9  2008-08-24 08:23:16  rubikitch
+;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
+;;
+;; Revision 1.8  2008/08/22 21:25:44  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.7  2008/08/22 21:17:58  rubikitch
@@ -283,7 +286,7 @@
       (anything-test-candidates '(((name . "FOO")
                                    (init
                                     . (lambda ()
-                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                        (with-current-buffer (anything-candidate-buffer 'global)
                                           (insert "fire\nthunder\nthanks\n"))))
                                    (candidates-in-buffer)))
                                 "th+ r"
@@ -298,7 +301,7 @@
       (anything-test-candidates '(((name . "FOO")
                                    (init
                                     . (lambda ()
-                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                        (with-current-buffer (anything-candidate-buffer 'global)
                                           (insert "foobar\nfoo\n"))))
                                    (candidates-in-buffer)))
                                 "foo"
@@ -308,7 +311,7 @@
       (anything-test-candidates '(((name . "FOO")
                                    (init
                                     . (lambda ()
-                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                        (with-current-buffer (anything-candidate-buffer 'global)
                                           (insert "foo\n"))))
                                    (candidates-in-buffer)))
                                 "foo"
@@ -318,7 +321,7 @@
       (anything-test-candidates '(((name . "FOO")
                                    (init
                                     . (lambda ()
-                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                        (with-current-buffer (anything-candidate-buffer 'global)
                                           (insert "bar\nfoo\ntest\n"))))
                                    (candidates-in-buffer)))
                                 "foo"
@@ -328,7 +331,7 @@
       (anything-test-candidates '(((name . "FOO")
                                    (init
                                     . (lambda ()
-                                        (with-current-buffer (anything-candidates-buffer 'global)
+                                        (with-current-buffer (anything-candidate-buffer 'global)
                                           (insert "foobar\nfoo\n"))))
                                    (candidates-in-buffer)))
                                 ""

@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.8 2008-08-23 23:01:53 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.9 2008-08-24 08:22:48 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.8  2008-08-23 23:01:53  rubikitch
+;; Revision 1.9  2008-08-24 08:22:48  rubikitch
+;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
+;;
+;; Revision 1.8  2008/08/23 23:01:53  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.7  2008/08/20 19:00:36  rubikitch
@@ -64,7 +67,7 @@
     (init
      . (lambda ()
          (call-process-shell-command
-          "global -c" nil (anything-candidates-buffer 'global))))
+          "global -c" nil (anything-candidate-buffer 'global))))
     (candidates-in-buffer)
     (action
      ("Goto the location" . (lambda (candidate)
@@ -103,7 +106,7 @@
              (save-window-excursion
                (switch-to-buffer save)
                (setq anything-current-position (cons (point) (window-start))))
-             (anything-candidates-buffer buffer)))
+             (anything-candidate-buffer buffer)))
         (candidates-in-buffer)
         (get-line . aggs-candidate-display)
         (display-to-real

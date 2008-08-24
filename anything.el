@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.87 2008-08-23 22:27:04 rubikitch Exp $
+;; $Id: anything.el,v 1.88 2008-08-24 08:22:19 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -110,13 +110,13 @@
 ;; without pressing Tab.
 
 ;;
-;; Using `anything-candidates-buffer' and the candidates-in-buffer
+;; Using `anything-candidate-buffer' and the candidates-in-buffer
 ;; attribute is much faster than traditional "candidates and match"
 ;; way. And `anything-current-buffer-is-modified' avoids to
 ;; recalculate candidates for unmodified buffer. See docstring of
 ;; them.
 ;;
-;; [EVAL IT] (describe-function 'anything-candidates-buffer)
+;; [EVAL IT] (describe-function 'anything-candidate-buffer)
 ;; [EVAL IT] (describe-function 'anything-candidates-in-buffer)
 ;; [EVAL IT] (describe-function 'anything-current-buffer-is-modified)
 
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.87  2008-08-23 22:27:04  rubikitch
+;; Revision 1.88  2008-08-24 08:22:19  rubikitch
+;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
+;;
+;; Revision 1.87  2008/08/23 22:27:04  rubikitch
 ;; New hook: `anything-cleanup-hook'
 ;;
 ;; Revision 1.86  2008/08/23 22:05:42  rubikitch
@@ -280,7 +283,7 @@
 ;; *** empty log message ***
 ;;
 ;; Revision 1.53  2008/08/17 23:15:38  rubikitch
-;; bind `anything-source-name' when executing action to enable to use `anything-candidates-buffer' in action.
+;; bind `anything-source-name' when executing action to enable to use `anything-candidate-buffer' in action.
 ;;
 ;; Revision 1.52  2008/08/17 15:21:27  rubikitch
 ;; `anything-test-candidates': accept a symbol for source
@@ -345,13 +348,13 @@
 ;; New `anything-sources' attribute: search
 ;;
 ;; Revision 1.33  2008/08/05 23:14:20  rubikitch
-;; `anything-candidates-buffer': bugfix
+;; `anything-candidate-buffer': bugfix
 ;;
 ;; Revision 1.32  2008/08/05 21:42:15  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.31  2008/08/05 21:06:23  rubikitch
-;; `anything-candidates-buffer': candidates buffer registration
+;; `anything-candidate-buffer': candidates buffer registration
 ;;
 ;; Revision 1.30  2008/08/05 19:46:36  rubikitch
 ;; New `anything-sources' attribute: candidates-in-buffer
@@ -373,16 +376,16 @@
 ;;
 ;; Revision 1.24  2008/08/04 12:05:41  rubikitch
 ;; Wrote Tips and some docstrings.
-;; `anything-candidates-buffer': buffer-local by default
+;; `anything-candidate-buffer': buffer-local by default
 ;;
 ;; Revision 1.23  2008/08/04 05:29:46  rubikitch
 ;; `anything-buffer-file-name': `buffer-file-name' when `anything' is invoked.
 ;;
 ;; Revision 1.22  2008/08/04 00:10:13  rubikitch
-;; `anything-candidates-buffer': new API
+;; `anything-candidate-buffer': new API
 ;;
 ;; Revision 1.21  2008/08/03 22:05:08  rubikitch
-;; `anything-candidates-buffer': Return a buffer containing candidates of current source.
+;; `anything-candidate-buffer': Return a buffer containing candidates of current source.
 ;;
 ;; Revision 1.20  2008/08/03 20:47:56  rubikitch
 ;; `anything-current-buffer-is-modified': modify checker
@@ -450,7 +453,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.87 2008-08-23 22:27:04 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.88 2008-08-24 08:22:19 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1075,7 +1078,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-buffer-chars-modified-tick 0)
 (make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 (defvar anything-source-name nil)
-(defvar anything-candidates-buffer-alist nil)
+(defvar anything-candidate-buffer-alist nil)
 (defvar anything-check-minibuffer-input-timer nil)
 (defvar anything-match-hash (make-hash-table :test 'equal))
 (defvar anything-cib-hash (make-hash-table :test 'equal))
@@ -1973,14 +1976,14 @@ Cache the candidates if there is not yet a cached value."
 (defun anything-candidates-in-buffer ()
   "Get candidates from the candidates buffer according to `anything-pattern'.
 
-BUFFER is `anything-candidates-buffer' by default.  Each
+BUFFER is `anything-candidate-buffer' by default.  Each
 candidate must be placed in one line.  This function is meant to
 be used in candidates-in-buffer or candidates attribute of an
 anything source.  Especially fast for many (1000+) candidates.
 
 eg.
  '((name . \"many files\")
-   (init . (lambda () (with-current-buffer (anything-candidates-buffer 'local)
+   (init . (lambda () (with-current-buffer (anything-candidate-buffer 'local)
                         (insert-many-filenames))))
    (search re-search-forward)  ; optional
    (candidates-in-buffer)
@@ -2002,12 +2005,12 @@ FASTER than string list processing and is the Emacs way.
 
 The init function writes all candidates to a newly-created
 candidate buffer.  The candidates buffer is created or specified
-by `anything-candidates-buffer'.  Candidates are stored in a line.
+by `anything-candidate-buffer'.  Candidates are stored in a line.
 
 The candidates function narrows all candidates, IOW creates a
 subset of candidates dynamically. It is the task of
 `anything-candidates-in-buffer'.  As long as
-`anything-candidates-buffer' is used,`(candidates-in-buffer)' is
+`anything-candidate-buffer' is used,`(candidates-in-buffer)' is
 sufficient in most cases.
 
 Note that `(candidates-in-buffer)' is shortcut of three attributes:
@@ -2032,7 +2035,7 @@ To customize `anything-candidates-in-buffer' behavior, use search
 and get-line attributes. See also `anything-sources' docstring.
 "
   (declare (special source))
-  (anything-candidates-in-buffer-1 (anything-candidates-buffer)
+  (anything-candidates-in-buffer-1 (anything-candidate-buffer)
                                    anything-pattern
                                    (or (assoc-default 'get-line source)
                                        #'buffer-substring-no-properties)
@@ -2084,9 +2087,9 @@ and get-line attributes. See also `anything-sources' docstring.
           (delq nil matches))))))
 
 
-(defun anything-candidates-buffer (&optional create-or-buffer)
+(defun anything-candidate-buffer (&optional create-or-buffer)
   "Register and return a buffer containing candidates of current source.
-`anything-candidates-buffer' searches buffer-local candidates buffer first,
+`anything-candidate-buffer' searches buffer-local candidates buffer first,
 then global candidates buffer.
 
 Acceptable values of CREATE-OR-BUFFER:
@@ -2107,7 +2110,7 @@ Acceptable values of CREATE-OR-BUFFER:
          buf)
     (when create-or-buffer
       (if (bufferp create-or-buffer)
-          (add-to-list 'anything-candidates-buffer-alist
+          (add-to-list 'anything-candidate-buffer-alist
                        (cons anything-source-name create-or-buffer))
         (with-current-buffer
             (get-buffer-create (if (eq create-or-buffer 'global) gbufname lbufname))
@@ -2116,7 +2119,7 @@ Acceptable values of CREATE-OR-BUFFER:
           (font-lock-mode -1))))
     (or (get-buffer lbufname)
         (get-buffer gbufname)
-        (assoc-default anything-source-name anything-candidates-buffer-alist))))
+        (assoc-default anything-source-name anything-candidate-buffer-alist))))
 
 (defun anything-compile-source--candidates-in-buffer (source)
   (anything-aif (assoc 'candidates-in-buffer source)
@@ -2963,7 +2966,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\n"))))
           (candidates . anything-candidates-in-buffer)
           (match identity)
@@ -2973,7 +2976,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates
          '(((name . "TEST")
             (init
-             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                             (insert "foo+\nbar+\nbaz+\n"))))
             (candidates . anything-candidates-in-buffer)
             (match identity)
@@ -2982,7 +2985,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\n"))))
           (candidates . anything-candidates-in-buffer)
           (match identity)
@@ -2993,7 +2996,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\nooo\n"))))
           (search search-forward)
           (candidates . anything-candidates-in-buffer)
@@ -3004,7 +3007,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\nooo\n"))))
           (search search-forward re-search-forward)
           (candidates . anything-candidates-in-buffer)
@@ -3015,7 +3018,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\nooo\n"))))
           (search re-search-forward search-forward)
           (candidates . anything-candidates-in-buffer)
@@ -3026,7 +3029,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "bar+\nbaz+\nooo\nfoo+\n"))))
           (search re-search-forward search-forward)
           (candidates . anything-candidates-in-buffer)
@@ -3038,7 +3041,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "bar+\nbaz+\nooo\nfoo+\n"))))
           (search (lambda (pattern &rest _)
                     (and (search-forward (concat "\n" pattern "\n") nil t)
@@ -3052,7 +3055,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "bar+\nbaz+\nooo\nfoo+\n"))))
           (search (lambda (pattern &rest _)
                     (search-forward (concat "\n" pattern) nil t)))
@@ -3140,70 +3143,70 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (action . identity))))
         (anything-execute-selection-action)
         v))
-    (desc "anything-candidates-buffer create")
+    (desc "anything-candidate-buffer create")
     (expect " *anything candidates:FOO*"
-      (let* (anything-candidates-buffer-alist
+      (let* (anything-candidate-buffer-alist
              (anything-source-name "FOO")
-             (buf (anything-candidates-buffer 'global)))
+             (buf (anything-candidate-buffer 'global)))
         (prog1 (buffer-name buf)
           (kill-buffer buf))))
     (expect " *anything candidates:FOO*aTestBuffer"
-      (let* (anything-candidates-buffer-alist
+      (let* (anything-candidate-buffer-alist
              (anything-source-name "FOO")
              (anything-current-buffer (get-buffer-create "aTestBuffer"))
-             (buf (anything-candidates-buffer 'local)))
+             (buf (anything-candidate-buffer 'local)))
         (prog1 (buffer-name buf)
           (kill-buffer anything-current-buffer)
           (kill-buffer buf))))
     (expect 0
-      (let (anything-candidates-buffer-alist
+      (let (anything-candidate-buffer-alist
             (anything-source-name "FOO") buf)
-        (with-current-buffer  (anything-candidates-buffer 'global)
+        (with-current-buffer  (anything-candidate-buffer 'global)
           (insert "1"))
-        (setq buf  (anything-candidates-buffer 'global))
+        (setq buf  (anything-candidate-buffer 'global))
         (prog1 (buffer-size buf)
           (kill-buffer buf))))
-    (desc "anything-candidates-buffer get-buffer")
+    (desc "anything-candidate-buffer get-buffer")
     (expect " *anything candidates:FOO*"
-      (let* (anything-candidates-buffer-alist
+      (let* (anything-candidate-buffer-alist
              (anything-source-name "FOO")
-             (buf (anything-candidates-buffer 'global)))
-        (prog1 (buffer-name (anything-candidates-buffer))
+             (buf (anything-candidate-buffer 'global)))
+        (prog1 (buffer-name (anything-candidate-buffer))
           (kill-buffer buf))))
     (expect " *anything candidates:FOO*aTestBuffer"
-      (let* (anything-candidates-buffer-alist
+      (let* (anything-candidate-buffer-alist
              (anything-source-name "FOO")
              (anything-current-buffer (get-buffer-create "aTestBuffer"))
-             (buf (anything-candidates-buffer 'local)))
-        (prog1 (buffer-name (anything-candidates-buffer))
+             (buf (anything-candidate-buffer 'local)))
+        (prog1 (buffer-name (anything-candidate-buffer))
           (kill-buffer anything-current-buffer)
           (kill-buffer buf))))
     (expect nil
-      (let* (anything-candidates-buffer-alist
+      (let* (anything-candidate-buffer-alist
              (anything-source-name "NOP__"))
-        (anything-candidates-buffer)))
-    (desc "anything-candidates-buffer register-buffer")
+        (anything-candidate-buffer)))
+    (desc "anything-candidate-buffer register-buffer")
     (expect " *anything test candidates*"
-      (let (anything-candidates-buffer-alist
+      (let (anything-candidate-buffer-alist
             (buf (get-buffer-create " *anything test candidates*")))
         (with-current-buffer buf
           (insert "1\n2\n")
-          (prog1 (buffer-name (anything-candidates-buffer buf))
+          (prog1 (buffer-name (anything-candidate-buffer buf))
             (kill-buffer (current-buffer))))))
     (expect " *anything test candidates*"
-      (let (anything-candidates-buffer-alist
+      (let (anything-candidate-buffer-alist
             (buf (get-buffer-create " *anything test candidates*")))
         (with-current-buffer buf
           (insert "1\n2\n")
-          (anything-candidates-buffer buf)
-          (prog1 (buffer-name (anything-candidates-buffer))
+          (anything-candidate-buffer buf)
+          (prog1 (buffer-name (anything-candidate-buffer))
             (kill-buffer (current-buffer))))))
     (expect "1\n2\n"
-      (let (anything-candidates-buffer-alist
+      (let (anything-candidate-buffer-alist
             (buf (get-buffer-create " *anything test candidates*")))
         (with-current-buffer buf
           (insert "1\n2\n")
-          (anything-candidates-buffer buf)
+          (anything-candidate-buffer buf)
           (prog1 (buffer-string)
             (kill-buffer (current-buffer))))))
     (desc "action attribute")
@@ -3313,7 +3316,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (let (v)
         (anything-test-candidates
          '(((name . "FOO")
-            (init . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+            (init . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                                  (insert "a\n"))))
             (candidates-in-buffer)
             (display-to-real
@@ -3542,7 +3545,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates
          '(((name . "TEST")
             (init
-             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                             (insert "a\nb\nc\nd\n"))))
             (candidates . anything-candidates-in-buffer)
             (match identity)
@@ -3553,7 +3556,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates
          '(((name . "TEST")
             (init
-             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                             (insert "a\nb\nc\nd\n"))))
             (candidates . anything-candidates-in-buffer)
             (match identity)
@@ -3613,7 +3616,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (anything-test-candidates
        '(((name . "TEST")
           (init
-           . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+           . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                           (insert "foo+\nbar+\nbaz+\n"))))
           (candidates-in-buffer)
           (get-line . (lambda (s e) (upcase (buffer-substring-no-properties s e))))))

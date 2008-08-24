@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.10 2008-08-24 01:54:21 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.11 2008-08-24 08:23:30 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -44,8 +44,11 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.10  2008-08-24 01:54:21  rubikitch
-;; match attribute
+;; Revision 1.11  2008-08-24 08:23:30  rubikitch
+;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
+;;
+;; Revision 1.10  2008/08/24 01:54:21  rubikitch
+;; migemo attribute
 ;;
 ;; Revision 1.9  2008/08/19 21:38:09  rubikitch
 ;; match attribute bug fix
@@ -138,7 +141,7 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
         (anything-test-candidates
          '(((name . "TEST")
             (init
-             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                             (insert "日本語\n"))))
             (candidates-in-buffer)))
          "nihongo"
@@ -158,7 +161,7 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
         (anything-test-candidates
          '(((name . "TEST")
             (init
-             . (lambda () (with-current-buffer (anything-candidates-buffer 'global)
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
                             (insert "日本語\n"))))
             (candidates-in-buffer)
             (migemo)))
