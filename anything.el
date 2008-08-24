@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.91 2008-08-24 21:34:35 rubikitch Exp $
+;; $Id: anything.el,v 1.92 2008-08-24 22:38:46 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.91  2008-08-24 21:34:35  rubikitch
+;; Revision 1.92  2008-08-24 22:38:46  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.91  2008/08/24 21:34:35  rubikitch
 ;; rewrite `with-anything-restore-variables'
 ;;
 ;; Revision 1.90  2008/08/24 20:33:02  rubikitch
@@ -463,7 +466,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.91 2008-08-24 21:34:35 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.92 2008-08-24 22:38:46 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1128,9 +1131,9 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 
 (defmacro with-anything-restore-variables(&rest body)
   "Restore variables specified by `anything-restored-variables' after executing BODY ."
-  `(let ((orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables)))
+  `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables)))
      (unwind-protect (progn ,@body)
-       (loop for (var . value) in orig-vars
+       (loop for (var . value) in --orig-vars
              do (set var value)))))
 (put 'with-anything-restore-variables 'lisp-indent-function 0)
 
