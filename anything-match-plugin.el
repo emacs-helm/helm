@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.9 2008-08-24 08:23:16 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.10 2008-08-24 17:48:53 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -24,12 +24,19 @@
 
 ;;; Commentary:
 
-;; 
+;; Change anything.el matching algorithm humanely.
+;; It gives anything.el search refinement functionality.
+;; exact match -> prefix match -> multiple regexps match
+
+;; Just require it to use.
 
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.9  2008-08-24 08:23:16  rubikitch
+;; Revision 1.10  2008-08-24 17:48:53  rubikitch
+;; Add commentary
+;;
+;; Revision 1.9  2008/08/24 08:23:16  rubikitch
 ;; Rename `anything-candidates-buffer' -> `anything-candidate-buffer'
 ;;
 ;; Revision 1.8  2008/08/22 21:25:44  rubikitch
