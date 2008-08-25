@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.92 2008-08-24 22:38:46 rubikitch Exp $
+;; $Id: anything.el,v 1.93 2008-08-25 20:18:46 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.92  2008-08-24 22:38:46  rubikitch
+;; Revision 1.93  2008-08-25 20:18:46  rubikitch
+;; `anything': set `anything-input' and `anything-pattern' before `anything-update'
+;;
+;; Revision 1.92  2008/08/24 22:38:46  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.91  2008/08/24 21:34:35  rubikitch
@@ -466,7 +469,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.92 2008-08-24 22:38:46 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.93 2008-08-25 20:18:46 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1403,12 +1406,11 @@ the real value in a text property."
              ;; It is needed because `anything-source-name' is non-nil
              ;; when `anything' is invoked by action. Awful global scope.
              anything-source-name anything-in-persistent-action
-             ;; restored variables
              (anything-sources (anything-normalize-sources sources)))
          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
          (unless resume (anything-initialize))
-
+         (when input (setq anything-input input anything-pattern input))
          (if anything-samewindow
              (switch-to-buffer anything-buffer)
            (pop-to-buffer anything-buffer))        
