@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.13 2008-08-24 20:39:53 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.14 2008-08-25 08:29:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -48,7 +48,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.13  2008-08-24 20:39:53  rubikitch
+;; Revision 1.14  2008-08-25 08:29:02  rubikitch
+;; `anything-migemo': anything-args
+;;
+;; Revision 1.13  2008/08/24 20:39:53  rubikitch
 ;; prevent the unit test from being byte-compiled.
 ;;
 ;; Revision 1.12  2008/08/24 18:01:25  rubikitch
@@ -96,12 +99,12 @@
 (require 'migemo)
 (defvar anything-use-migemo nil
   "[Internal] If non-nil, `anything' is migemo-ized.")
-(defun anything-migemo (with-migemo)
+(defun anything-migemo (with-migemo &rest anything-args)
   "`anything' with migemo extension.
 With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anything'."
   (interactive "P")
   (let ((anything-use-migemo with-migemo))
-    (anything)))
+    (apply 'anything anything-args)))
 
 (defvar anything-previous-migemo-info '("" . "")
   "[Internal] Previous migemo query for anything-migemo.")
