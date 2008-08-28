@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.93 2008-08-25 20:18:46 rubikitch Exp $
+;; $Id: anything.el,v 1.94 2008-08-28 20:18:03 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.93  2008-08-25 20:18:46  rubikitch
+;; Revision 1.94  2008-08-28 20:18:03  rubikitch
+;; added some tests
+;;
+;; Revision 1.93  2008/08/25 20:18:46  rubikitch
 ;; `anything': set `anything-input' and `anything-pattern' before `anything-update'
 ;;
 ;; Revision 1.92  2008/08/24 22:38:46  rubikitch
@@ -469,7 +472,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.93 2008-08-25 20:18:46 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.94 2008-08-28 20:18:03 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -3444,7 +3447,6 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-update))
       ;; (find-function 'anything-update)
       ;; TODO el-mock.el should express 2nd call of function.
-      ;; TODO el-mock.el should express no call of function.
       ;;     (expect (mock (anything-process-source '((name . "2"))))
       ;;       (stub anything-get-sources => '(((name . "1")) ((name . "2"))))
       ;;       (stub run-hooks)
@@ -3459,7 +3461,33 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (stub anything-maybe-fit-frame)
         (let ((anything-pattern "") anything-test-mode)
           (anything-update)))
-      ;; TODO requires-pattern test
+
+      (expect (mock (run-with-idle-timer * nil 'anything-process-delayed-sources nil))
+        (stub anything-get-sources => '(((name . "1"))
+                                        ((name . "2"))))
+        (stub run-hooks)
+        (stub anything-maybe-fit-frame)
+        (let ((anything-pattern "") anything-test-mode)
+          (anything-update)))
+
+
+      (desc "requires-pattern attribute")
+      (expect (not-called anything-process-source)
+        (stub anything-get-sources => '(((name . "1")
+                                         (requires-pattern))))
+        (stub run-hooks)
+        (stub anything-maybe-fit-frame)
+        (stub run-with-idle-timer)
+        (anything-update))
+      (expect (not-called anything-process-source)
+        (stub anything-get-sources => '(((name . "1")
+                                         (requires-pattern . 3))))
+        (stub run-hooks)
+        (stub anything-maybe-fit-frame)
+        (stub run-with-idle-timer)
+        (let ((anything-pattern "xx"))
+          (anything-update)))
+
       (desc "delay")
       (expect (mock (sit-for 0.25))
         (stub with-current-buffer)
@@ -3522,7 +3550,9 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))
                                         ((init . (lambda () (downcase "bar"))))))
         (anything-funcall-foreach 'init))
-      ;; TODO when symbol is not specified
+      (expect (not-called anything-funcall-with-source)
+        (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))))
+        (anything-funcall-foreach 'not-found))
       ;; TODO anything-select-with-digit-shortcut test
       (desc "anything-get-cached-candidates")
       (expect '("cached" "version")
