@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.94 2008-08-28 20:18:03 rubikitch Exp $
+;; $Id: anything.el,v 1.95 2008-08-30 04:55:51 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.94  2008-08-28 20:18:03  rubikitch
+;; Revision 1.95  2008-08-30 04:55:51  rubikitch
+;; fixed a bug of `anything-completing-read'
+;;
+;; Revision 1.94  2008/08/28 20:18:03  rubikitch
 ;; added some tests
 ;;
 ;; Revision 1.93  2008/08/25 20:18:46  rubikitch
@@ -472,7 +475,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.94 2008-08-28 20:18:03 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.95 2008-08-30 04:55:51 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2596,7 +2599,7 @@ shown yet and bind anything commands in iswitchb."
                    (remove-if-not (lambda (c) (,predicate
                                                (if (listp c) (car c) c))) cands)))))
         (new-input-source (unless require-match
-                            `((name . prompt) (dummy) (action . identity))))
+                            `((name . ,prompt) (dummy) (action . identity))))
         (history-source (unless require-match
                           `((name . "History")
                             (candidates . ,(or hist 'minibuffer-history))
