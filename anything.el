@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.95 2008-08-30 04:55:51 rubikitch Exp $
+;; $Id: anything.el,v 1.96 2008-08-31 20:55:20 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.95  2008-08-30 04:55:51  rubikitch
+;; Revision 1.96  2008-08-31 20:55:20  rubikitch
+;; define `buffer-modified-tick' for older emacs.
+;;
+;; Revision 1.95  2008/08/30 04:55:51  rubikitch
 ;; fixed a bug of `anything-completing-read'
 ;;
 ;; Revision 1.94  2008/08/28 20:18:03  rubikitch
@@ -475,7 +478,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.95 2008-08-30 04:55:51 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.96 2008-08-31 20:55:20 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2723,7 +2726,7 @@ shown yet and bind anything commands in iswitchb."
          (message "Uninstalled anything version of read functions."))))
 
 ;;----------------------------------------------------------------------
-;; XEmacs compatibility
+;; compatibility
 ;;----------------------------------------------------------------------
 
 ;; Copied assoc-default from XEmacs version 21.5.12
@@ -2757,6 +2760,23 @@ The current buffer must be a minibuffer."
     "Delete all user input in a minibuffer.
 The current buffer must be a minibuffer."
     (delete-field (point-max))))
+
+;; Function not available in older Emacs (<= 22.1).
+(unless (fboundp 'buffer-chars-modified-tick)
+  (defun buffer-chars-modified-tick (&optional buffer)
+    "Return BUFFER's character-change tick counter.
+Each buffer has a character-change tick counter, which is set to the
+value of the buffer's tick counter (see `buffer-modified-tick'), each
+time text in that buffer is inserted or deleted.  By comparing the
+values returned by two individual calls of `buffer-chars-modified-tick',
+you can tell whether a character change occurred in that buffer in
+between these calls.  No argument or nil as argument means use current
+buffer as BUFFER."
+    (with-current-buffer (or buffer (current-buffer))
+      (if (listp buffer-undo-list)
+          (length buffer-undo-list)
+        (buffer-modified-tick)))))
+
 
 ;;----------------------------------------------------------------------
 ;; Unit Tests
