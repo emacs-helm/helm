@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.1 2008-09-01 22:23:55 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.2 2008-09-01 22:27:45 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,13 +29,16 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.1  2008-09-01 22:23:55  rubikitch
+;; Revision 1.2  2008-09-01 22:27:45  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.1  2008/09/01 22:23:55  rubikitch
 ;; Initial revision
 ;;
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.1 2008-09-01 22:23:55 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.2 2008-09-01 22:27:45 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything-match-plugin)
 
@@ -75,7 +78,6 @@
                          (set (make-local-variable 'zsh-p) (shell-history-zsh-extended-history-p)))))
     (get-line . acsh-get-line)
     (search-from-end)
-    (delayed)
     (requires-pattern)
     ))
 (defun acsh-get-line (s e)
@@ -111,7 +113,7 @@
 ; TODO anything-candidates-in-buffer from bottom
 ;;makepkg
 ;;;: 1123867258:0;cat <<EOR > Rakefile\
-;;;# $Id: anything-complete.el,v 1.1 2008-09-01 22:23:55 rubikitch Exp $\
+;;;# $Id: anything-complete.el,v 1.2 2008-09-01 22:27:45 rubikitch Exp $\
 ;;;require 'rake/makepkg'\
 ;;;EOR
 
