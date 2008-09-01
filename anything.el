@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.98 2008-09-01 11:23:38 rubikitch Exp $
+;; $Id: anything.el,v 1.99 2008-09-01 13:45:55 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.98  2008-09-01 11:23:38  rubikitch
+;; Revision 1.99  2008-09-01 13:45:55  rubikitch
+;; bug fix of search-from-end
+;;
+;; Revision 1.98  2008/09/01 11:23:38  rubikitch
 ;; New `anything-sources' attribute: search-from-end
 ;;
 ;; Revision 1.97  2008/09/01 00:44:34  rubikitch
@@ -484,7 +487,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.98 2008-09-01 11:23:38 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.99 2008-09-01 13:45:55 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2085,18 +2088,6 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                                    (anything-candidate-number-limit source)
                                    (assoc 'search-from-end source)))
 
-(defmacro anything-with-open-first-line (&rest body)
-  `(progn
-     (goto-char (point-min))
-     (let (buffer-read-only)
-       (insert "\n")
-       (forward-line -1)
-       ,@body
-       (goto-char (point-min))
-       (delete-char 1)
-       (set-buffer-modified-p nil))))
-(put 'anything-with-open-first-line 'lisp-indent-function 0)
-
 (defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)) (limit anything-candidate-number-limit) search-from-end)
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
@@ -2113,24 +2104,38 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                                     collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
                                     do (funcall next-line-fn 1)))
                     
-          (let ((i 1) matches exit newmatches)
-            (anything-with-open-first-line
+          (let ((i 1)
+                buffer-read-only
+                matches exit newmatches)
+            (progn
+              (goto-char (point-min))
+              (insert "\n")
+              (goto-char (point-max))
+              (insert "\n")
+              (setq start-point (if search-from-end (point-max) (point-min)))
               (clrhash anything-cib-hash)
-              (dolist (searcher search-fns)
-                (goto-char start-point)
-                (setq newmatches nil)
-                (loop while (funcall searcher pattern nil t)
-                      if (or (funcall endp) (< limit i))
-                      do (setq exit t) (return)
-                      else do
-                      (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                        (unless (gethash cand anything-cib-hash)
-                          (puthash cand t anything-cib-hash)
-                          (incf i)
-                          (push cand newmatches)))
-                      (funcall next-line-fn 1))
-                (setq matches (append matches (nreverse newmatches)))
-                (if exit (return))))
+              (unwind-protect
+                  (dolist (searcher search-fns)
+                    (goto-char start-point)
+                    (setq newmatches nil)
+                    (loop while (funcall searcher pattern nil t)
+                          if (or (funcall endp) (< limit i))
+                          do (setq exit t) (return)
+                          else do
+                          (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
+                            (unless (gethash cand anything-cib-hash)
+                              (puthash cand t anything-cib-hash)
+                              (incf i)
+                              (push cand newmatches)))
+                          (funcall next-line-fn 1))
+                    (setq matches (append matches (nreverse newmatches)))
+                    (if exit (return)))
+                (goto-char (point-min))
+                (delete-char 1)
+                (goto-char (1- (point-max)))
+                (delete-char 1)
+                           
+                (set-buffer-modified-p nil)))
             (delq nil matches)))))))
 
 
