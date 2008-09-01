@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.11 2008-08-24 20:40:27 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.12 2008-09-01 13:41:57 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -33,7 +33,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.11  2008-08-24 20:40:27  rubikitch
+;; Revision 1.12  2008-09-01 13:41:57  rubikitch
+;; search functions for search-from-end
+;;
+;; Revision 1.11  2008/08/24 20:40:27  rubikitch
 ;; prevent the unit test from being byte-compiled.
 ;;
 ;; Revision 1.10  2008/08/24 17:48:53  rubikitch
@@ -97,7 +100,8 @@
         (pattern-regexp (intern (concat prefix "pattern-regexp")))
         (get-regexp (intern (concat prefix "get-regexp"))) 
         (match (intern (concat prefix "match")))
-        (search (intern (concat prefix "search"))))
+        (search (intern (concat prefix "search")))
+        (search-backward (intern (concat prefix "search-backward"))))
     `(progn
        (defvar ,pattern-str nil)
        (defvar ,pattern-regexp nil)
@@ -109,7 +113,9 @@
        (defun* ,match (str &optional (pattern anything-pattern))
          (string-match (,get-regexp pattern) str))
        (defun ,search (pattern &rest ignore)
-         (re-search-forward (,get-regexp pattern) nil t)))))
+         (re-search-forward (,get-regexp pattern) nil t))
+       (defun ,search-backward (pattern &rest ignore)
+         (re-search-backward (,get-regexp pattern) nil t)))))
   
 ;; exact match
 ;(amp-define "anything-exact-" (concat (anything-prefix-get-regexp pattern) "$"))
@@ -118,6 +124,9 @@
 (defun anything-exact-search (pattern &rest ignore)
   (and (search-forward (concat "\n" pattern "\n") nil t)
        (forward-line -1)))
+(defun anything-exact-search-backward (pattern &rest ignore)
+  (and (search-backward (concat "\n" pattern "\n") nil t)
+       (forward-line 1)))
 ;; prefix match
 ;;(amp-define "anything-prefix-" (concat "^" (regexp-quote pattern)))
 (defun anything-prefix-match (str &optional pattern)
@@ -127,6 +136,8 @@
          (string= (substring str 0 len) pattern ))))
 (defun anything-prefix-search (pattern &rest ignore)
   (search-forward (concat "\n" pattern) nil t))
+(defun anything-prefix-search-backward (pattern &rest ignore)
+  (search-backward (concat "\n" pattern) nil t))
 ;; multiple regexp patterns 1 (order is preserved / prefix)
 (amp-define "anything-mp-1-" (concat "^" (amp-mp-1-make-regexp pattern)))
 ;; multiple regexp patterns 2 (order is preserved / partial)
@@ -144,16 +155,20 @@
   '(anything-exact-match anything-prefix-match  anything-mp-3-match))
 (defvar anything-default-search-functions
   '(anything-exact-search anything-prefix-search anything-mp-3-search))
-
+(defvar anything-default-search-backward-functions
+  '(anything-exact-search-backward anything-prefix-search-backward anything-mp-3-search-backward))
 (defun anything-compile-source--match-plugin (source)
-  `(,(if (or (assoc 'candidates-in-buffer source)
-             (equal '(identity) (assoc-default 'match source)))
-         '(match identity)
-       `(match ,@anything-default-match-functions
-               ,@(assoc-default 'match source)))
-    (search ,@anything-default-search-functions
-            ,@(assoc-default 'search source))
-    ,@source))
+  (let ((searchers (if (assoc 'search-from-end source)
+                       anything-default-search-backward-functions
+                     anything-default-search-functions)))
+    `(,(if (or (assoc 'candidates-in-buffer source)
+               (equal '(identity) (assoc-default 'match source)))
+           '(match identity)
+         `(match ,@anything-default-match-functions
+                 ,@(assoc-default 'match source)))
+      (search ,@searchers
+              ,@(assoc-default 'search source))
+      ,@source)))
 
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--match-plugin t)
 
@@ -345,6 +360,28 @@
                                             (insert "foobar\nfoo\n"))))
                                      (candidates-in-buffer)))
                                   ""
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("foo" "foobar")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "foobar\nfoo\n"))))
+                                     (candidates-in-buffer)
+                                     (search-from-end)))
+                                  "foo"
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      (expect '(("FOO" ("elisp" "elp")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "elp\nelisp\n"))))
+                                     (candidates-in-buffer)
+                                     (search-from-end)))
+                                  "el p"
                                   '(anything-compile-source--candidates-in-buffer
                                     anything-compile-source--match-plugin)))
       )))
