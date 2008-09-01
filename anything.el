@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.96 2008-08-31 20:55:20 rubikitch Exp $
+;; $Id: anything.el,v 1.97 2008-09-01 00:44:34 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.96  2008-08-31 20:55:20  rubikitch
+;; Revision 1.97  2008-09-01 00:44:34  rubikitch
+;; Make sure to display the other window when persistent action.
+;;
+;; Revision 1.96  2008/08/31 20:55:20  rubikitch
 ;; define `buffer-modified-tick' for older emacs.
 ;;
 ;; Revision 1.95  2008/08/30 04:55:51  rubikitch
@@ -478,7 +481,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.96 2008-08-31 20:55:20 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.97 2008-09-01 00:44:34 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2165,11 +2168,20 @@ Acceptable values of CREATE-OR-BUFFER:
                          (if (one-window-p t) (split-window)
                            (next-window (selected-window) 1))))
     (let ((anything-in-persistent-action t))
-      (anything-execute-selection-action
-       nil
-       (or (assoc-default 'persistent-action (anything-get-current-source))
-           (anything-get-action))
-       t))))
+      (with-anything-display-same-window
+        (anything-execute-selection-action
+         nil
+         (or (assoc-default 'persistent-action (anything-get-current-source))
+             (anything-get-action))
+         t)))))
+
+(defmacro with-anything-display-same-window (&rest body)
+  "Make `pop-to-buffer' and `display-buffer' display in the same window."
+  `(let ((same-window-regexps '("."))
+         (pop-up-windows nil)
+         (display-buffer-function nil))
+     ,@body))
+(put 'with-anything-display-same-window 'lisp-indent-function 0)
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun anything-scroll-other-window-base (command)
@@ -3706,6 +3718,54 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
               v)
           (anything-cleanup)
           v))
+      (desc "with-anything-display-same-window")
+      (expect (non-nil)
+        (save-window-excursion
+          (delete-other-windows)
+          (split-window)
+          
+          (let ((buf (get-buffer-create " tmp"))
+                (win (selected-window)))
+            (with-anything-display-same-window
+              (display-buffer buf)
+              (eq win (get-buffer-window buf))))))
+      (expect (non-nil)
+        (save-window-excursion
+          (delete-other-windows)
+          (split-window)
+          
+          (let ((buf (get-buffer-create " tmp"))
+                (win (selected-window)))
+            (with-anything-display-same-window
+              (pop-to-buffer buf)
+              (eq win (get-buffer-window buf))))))
+      (expect (non-nil)
+        (save-window-excursion
+          (delete-other-windows)
+          (split-window)
+          
+          (let ((buf (get-buffer-create " tmp"))
+                (win (selected-window)))
+            (with-anything-display-same-window
+              (switch-to-buffer buf)
+              (eq win (get-buffer-window buf))))))
+      (expect (non-nil)
+        (save-window-excursion
+          (delete-other-windows)
+          (let ((buf (get-buffer-create " tmp"))
+                (win (selected-window)))
+            (with-anything-display-same-window
+              (display-buffer buf)
+              (eq win (get-buffer-window buf))))))
+      (expect (non-nil)
+        (save-window-excursion
+          (delete-other-windows)
+          (let ((buf (get-buffer-create " tmp"))
+                (win (selected-window)))
+            (with-anything-display-same-window
+              (pop-to-buffer buf)
+              (eq win (get-buffer-window buf))))))
+        
       )))
 
 
