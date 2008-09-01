@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.99 2008-09-01 13:45:55 rubikitch Exp $
+;; $Id: anything.el,v 1.100 2008-09-01 23:11:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.99  2008-09-01 13:45:55  rubikitch
+;; Revision 1.100  2008-09-01 23:11:02  rubikitch
+;; bug fix of search-from-end
+;;
+;; Revision 1.99  2008/09/01 13:45:55  rubikitch
 ;; bug fix of search-from-end
 ;;
 ;; Revision 1.98  2008/09/01 11:23:38  rubikitch
@@ -487,7 +490,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.99 2008-09-01 13:45:55 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.100 2008-09-01 23:11:02 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2105,6 +2108,9 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                                     do (funcall next-line-fn 1)))
                     
           (let ((i 1)
+                (next-line-fn (if search-from-end
+                                  (lambda (x) (goto-char (max (point-at-bol) 1)))
+                                #'forward-line))
                 buffer-read-only
                 matches exit newmatches)
             (progn
