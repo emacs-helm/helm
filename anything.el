@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.97 2008-09-01 00:44:34 rubikitch Exp $
+;; $Id: anything.el,v 1.98 2008-09-01 11:23:38 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.97  2008-09-01 00:44:34  rubikitch
+;; Revision 1.98  2008-09-01 11:23:38  rubikitch
+;; New `anything-sources' attribute: search-from-end
+;;
+;; Revision 1.97  2008/09/01 00:44:34  rubikitch
 ;; Make sure to display the other window when persistent action.
 ;;
 ;; Revision 1.96  2008/08/31 20:55:20  rubikitch
@@ -481,7 +484,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.97 2008-09-01 00:44:34 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.98 2008-09-01 11:23:38 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -759,6 +762,12 @@ Attributes:
   This attribute is meant to be used with
   (candidates . anything-candidates-in-buffer) or
   (candidates-in-buffer) in short.
+
+- search-from-end (optional)
+
+  Make `anything-candidates-in-buffer' search from the end of buffer.
+  If this attribute is specified, `anything-candidates-in-buffer' uses
+  `re-search-backward' instead.
 
 - get-line (optional)
 
@@ -2060,8 +2069,8 @@ creates candidates dynamically and need to be called everytime
 Because `anything-candidates-in-buffer' plays the role of `match' attribute
 function, specifying `(match identity)' makes the source slightly faster.
 
-To customize `anything-candidates-in-buffer' behavior, use search
-and get-line attributes. See also `anything-sources' docstring.
+To customize `anything-candidates-in-buffer' behavior, use search,
+get-line and search-from-end attributes. See also `anything-sources' docstring.
 "
   (declare (special source))
   (anything-candidates-in-buffer-1 (anything-candidate-buffer)
@@ -2070,8 +2079,11 @@ and get-line attributes. See also `anything-sources' docstring.
                                        #'buffer-substring-no-properties)
                                    ;; use external variable `source'.
                                    (or (assoc-default 'search source)
-                                       '(re-search-forward))
-                                   (anything-candidate-number-limit source)))
+                                       (if (assoc 'search-from-end source)
+                                           '(re-search-backward)
+                                         '(re-search-forward)))
+                                   (anything-candidate-number-limit source)
+                                   (assoc 'search-from-end source)))
 
 (defmacro anything-with-open-first-line (&rest body)
   `(progn
@@ -2085,35 +2097,41 @@ and get-line attributes. See also `anything-sources' docstring.
        (set-buffer-modified-p nil))))
 (put 'anything-with-open-first-line 'lisp-indent-function 0)
 
-(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)) (limit anything-candidate-number-limit))
+(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)) (limit anything-candidate-number-limit) search-from-end)
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
-      (goto-char (point-min))
-      (if (string= pattern "")
-          (delq nil (loop until (eobp)
-                          for i from 1 to limit
-                          collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-                          do (forward-line 1)))
-        (let ((i 1) matches exit newmatches)
-          (anything-with-open-first-line
-            (clrhash anything-cib-hash)
-            (dolist (searcher search-fns)
-              (goto-char (point-min))
-              (setq newmatches nil)
-              (loop while (funcall searcher pattern nil t)
-                    if (or (eobp) (< limit i))
-                    do (setq exit t) (return)
-                    else do
-                    (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                      (unless (gethash cand anything-cib-hash)
-                        (puthash cand t anything-cib-hash)
-                        (incf i)
-                        (push cand newmatches)))
-                    (forward-line 1))
-              (setq matches (append matches (nreverse newmatches)))
-              (if exit (return))))
-          (delq nil matches))))))
+      (let ((start-point (if search-from-end (point-max) (point-min)))
+            (next-line-fn (if search-from-end
+                              (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
+                            #'forward-line))
+            (endp (if search-from-end #'bobp #'eobp)))
+        (goto-char (1- start-point))
+        (if (string= pattern "")
+            (delq nil (loop until (funcall endp)
+                                    for i from 1 to limit
+                                    collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+                                    do (funcall next-line-fn 1)))
+                    
+          (let ((i 1) matches exit newmatches)
+            (anything-with-open-first-line
+              (clrhash anything-cib-hash)
+              (dolist (searcher search-fns)
+                (goto-char start-point)
+                (setq newmatches nil)
+                (loop while (funcall searcher pattern nil t)
+                      if (or (funcall endp) (< limit i))
+                      do (setq exit t) (return)
+                      else do
+                      (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
+                        (unless (gethash cand anything-cib-hash)
+                          (puthash cand t anything-cib-hash)
+                          (incf i)
+                          (push cand newmatches)))
+                      (funcall next-line-fn 1))
+                (setq matches (append matches (nreverse newmatches)))
+                (if exit (return))))
+            (delq nil matches)))))))
 
 
 (defun anything-candidate-buffer (&optional create-or-buffer)
@@ -2834,14 +2852,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-test-candidates '(((name . "FOO"))) "")
           (prog1
               (buffer-name anything-current-buffer)
-            (kill-buffer (current-buffer)))))
+            (kill-buffer "__a_buffer")
+            )))
       (desc "anything-buffer-file-name")
       (expect (regexp "/__a_file__")
-        (with-current-buffer (find-file-noselect "__a_file__")
+        (with-current-buffer (get-buffer-create "__a_file__")
+          (setq buffer-file-name "/__a_file__")
           (anything-test-candidates '(((name . "FOO"))) "")
           (prog1
               anything-buffer-file-name
-            (kill-buffer (current-buffer)))))
+            ;;(kill-buffer "__a_file__")
+            )))
       (desc "anything-compile-sources")
       (expect '(((name . "foo")))
         (anything-compile-sources '(((name . "foo"))) nil)
@@ -3765,6 +3786,43 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (with-anything-display-same-window
               (pop-to-buffer buf)
               (eq win (get-buffer-window buf))))))
+      (desc "search-from-end attribute")
+      (expect '(("TEST" ("baz+" "bar+" "foo+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\n"))))
+            (candidates-in-buffer)
+            (search-from-end)))))
+      (expect '(("TEST" ("baz+" "bar+" "foo+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\n"))))
+            (candidates-in-buffer)
+            (search-from-end)))
+         "\\+"))
+      (expect '(("TEST" ("baz+" "bar+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\n"))))
+            (candidates-in-buffer)
+            (search-from-end)
+            (candidate-number-limit . 2)))))
+      (expect '(("TEST" ("baz+" "bar+")))
+        (anything-test-candidates
+         '(((name . "TEST")
+            (init
+             . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
+                            (insert "foo+\nbar+\nbaz+\n"))))
+            (candidates-in-buffer)
+            (search-from-end)
+            (candidate-number-limit . 2)))
+         "\\+"))
         
       )))
 
