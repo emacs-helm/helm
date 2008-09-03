@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.101 2008-09-03 11:15:13 rubikitch Exp $
+;; $Id: anything.el,v 1.102 2008-09-03 11:25:19 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.101  2008-09-03 11:15:13  rubikitch
+;; Revision 1.102  2008-09-03 11:25:19  rubikitch
+;; Extended `anything' optional arguments: buffer
+;;
+;; Revision 1.101  2008/09/03 11:15:13  rubikitch
 ;; `anything': return nil when keybord-quitted
 ;;
 ;; Revision 1.100  2008/09/01 23:11:02  rubikitch
@@ -493,7 +496,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.101 2008-09-03 11:15:13 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.102 2008-09-03 11:25:19 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1404,7 +1407,7 @@ the real value in a text property."
         (sources)
         (t anything-sources)))  
 
-(defun anything (&optional sources input prompt resume preselect)
+(defun anything (&optional sources input prompt resume preselect buffer)
   "Select anything. In Lisp program, some optional arguments can be used.
 
 - SOURCES
@@ -1427,6 +1430,10 @@ the real value in a text property."
 - PRESELECT
 
   Initially selected candidate. Specified by exact candidate or a regexp.
+
+- BUFFER
+
+  `anything-buffer' instead of *anything*.
 "
   ;; TODO more document
   (interactive)
@@ -1437,6 +1444,7 @@ the real value in a text property."
              ;; when `anything' is invoked by action. Awful global scope.
              anything-source-name anything-in-persistent-action
              (anything-sources (anything-normalize-sources sources)))
+         (setq anything-buffer (or buffer anything-buffer))
          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
          (unless resume (anything-initialize))
