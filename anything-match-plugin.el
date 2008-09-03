@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.13 2008-09-02 10:56:50 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.14 2008-09-03 03:33:09 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -33,7 +33,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.13  2008-09-02 10:56:50  rubikitch
+;; Revision 1.14  2008-09-03 03:33:09  rubikitch
+;; anything-exact-*, anything-prefix-*: memoize
+;;
+;; Revision 1.13  2008/09/02 10:56:50  rubikitch
 ;; anything-mp-3-*: MUCH MUCH FASTER
 ;;   changed algorithm
 ;;
@@ -91,49 +94,56 @@
 (defun amp-mp-1-make-regexp (pattern)
   (mapconcat 'identity (amp-mp-make-regexps pattern) ".*"))
 
-(defmacro amp-define (prefix regexp-expr)
+(defmacro amp-define-memoizer (prefix pattern-expr)
   (let ((pattern-str (intern (concat prefix "pattern-str")))
-        (pattern-regexp (intern (concat prefix "pattern-regexp")))
-        (get-regexp (intern (concat prefix "get-regexp"))) 
+        (pattern-real (intern (concat prefix "pattern-real")))
+        (get-pattern (intern (concat prefix "get-pattern"))))
+    `(progn
+       (defvar ,pattern-str nil)
+       (defvar ,pattern-real nil)
+       (defsubst ,get-pattern (pattern)
+         (unless (equal pattern ,pattern-str)
+           (setq ,pattern-str pattern
+                 ,pattern-real ,pattern-expr))
+         ,pattern-real))))
+
+(defmacro amp-define (prefix pattern-expr)
+  (let ((get-pattern (intern (concat prefix "get-pattern"))) 
         (match (intern (concat prefix "match")))
         (search (intern (concat prefix "search")))
         (search-backward (intern (concat prefix "search-backward"))))
     `(progn
-       (defvar ,pattern-str nil)
-       (defvar ,pattern-regexp nil)
-       (defsubst ,get-regexp (pattern)
-         (unless (equal pattern ,pattern-str)
-           (setq ,pattern-str pattern
-                 ,pattern-regexp ,regexp-expr))
-         ,pattern-regexp)
+       (amp-define-memoizer ,prefix ,pattern-expr)
        (defun* ,match (str &optional (pattern anything-pattern))
-         (string-match (,get-regexp pattern) str))
+         (string-match (,get-pattern pattern) str))
        (defun ,search (pattern &rest ignore)
-         (re-search-forward (,get-regexp pattern) nil t))
+         (re-search-forward (,get-pattern pattern) nil t))
        (defun ,search-backward (pattern &rest ignore)
-         (re-search-backward (,get-regexp pattern) nil t)))))
+         (re-search-backward (,get-pattern pattern) nil t)))))
   
 ;; exact match
-;(amp-define "anything-exact-" (concat (anything-prefix-get-regexp pattern) "$"))
+;(amp-define "anything-exact-" (concat (anything-prefix-get-pattern pattern) "$"))
+(amp-define-memoizer "anything-exact-" (concat "\n" pattern "\n"))
 (defun anything-exact-match (str &optional pattern)
   (string= str (or pattern anything-pattern)))
 (defun anything-exact-search (pattern &rest ignore)
-  (and (search-forward (concat "\n" pattern "\n") nil t)
+  (and (search-forward (anything-exact-get-pattern pattern) nil t)
        (forward-line -1)))
 (defun anything-exact-search-backward (pattern &rest ignore)
-  (and (search-backward (concat "\n" pattern "\n") nil t)
+  (and (search-backward (anything-exact-get-pattern pattern) nil t)
        (forward-line 1)))
 ;; prefix match
 ;;(amp-define "anything-prefix-" (concat "^" (regexp-quote pattern)))
+(amp-define-memoizer "anything-prefix-" (concat "\n" pattern))
 (defun anything-prefix-match (str &optional pattern)
   (setq pattern (or pattern anything-pattern))
   (let ((len (length pattern)))
     (and (<= len (length str))
          (string= (substring str 0 len) pattern ))))
 (defun anything-prefix-search (pattern &rest ignore)
-  (search-forward (concat "\n" pattern) nil t))
+  (search-forward (anything-prefix-get-pattern pattern) nil t))
 (defun anything-prefix-search-backward (pattern &rest ignore)
-  (search-backward (concat "\n" pattern) nil t))
+  (search-backward (anything-prefix-get-pattern pattern) nil t))
 ;; multiple regexp patterns 1 (order is preserved / prefix)
 (amp-define "anything-mp-1-" (concat "^" (amp-mp-1-make-regexp pattern)))
 ;; multiple regexp patterns 2 (order is preserved / partial)
@@ -178,7 +188,7 @@
           else do
           (goto-char bol)
           finally (return nil)))
-    )
+  )
 
                          
 ;;;; source compier
