@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.100 2008-09-01 23:11:02 rubikitch Exp $
+;; $Id: anything.el,v 1.101 2008-09-03 11:15:13 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.100  2008-09-01 23:11:02  rubikitch
+;; Revision 1.101  2008-09-03 11:15:13  rubikitch
+;; `anything': return nil when keybord-quitted
+;;
+;; Revision 1.100  2008/09/01 23:11:02  rubikitch
 ;; bug fix of search-from-end
 ;;
 ;; Revision 1.99  2008/09/01 13:45:55  rubikitch
@@ -490,7 +493,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.100 2008-09-01 23:11:02 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.101 2008-09-03 11:15:13 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1459,7 +1462,8 @@ the real value in a text property."
                (kill-buffer it)))))
     (quit
      (goto-char (car anything-current-position))
-     (set-window-start (selected-window) (cdr anything-current-position)))))
+     (set-window-start (selected-window) (cdr anything-current-position))
+     nil)))
 
 (defun anything-resume ()
   "Resurrect previously invoked `anything'."
