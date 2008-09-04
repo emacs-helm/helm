@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.3 2008-09-03 04:13:23 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.4 2008-09-04 07:36:23 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.3  2008-09-03 04:13:23  rubikitch
+;; Revision 1.4  2008-09-04 07:36:23  rubikitch
+;; Use type plug-in instead.
+;;
+;; Revision 1.3  2008/09/03 04:13:23  rubikitch
 ;; `anything-c-source-complete-shell-history': deleted requires-pattern
 ;;
 ;; Revision 1.2  2008/09/01 22:27:45  rubikitch
@@ -41,33 +44,46 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.3 2008-09-03 04:13:23 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.4 2008-09-04 07:36:23 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything-match-plugin)
 
-(defun anything-compile-source--complete (source)
-  (if (assoc 'complete source)
-      (append source
-              `((candidates-in-buffer
-                 . (lambda ()
-                     (let ((anything-pattern
-                            (if (equal "" anything-complete-target)
-                                anything-pattern
-                              (concat anything-complete-target " " anything-pattern))))
-                       (anything-candidates-in-buffer))))
-                (action . anything-complete-insert)))
-    source))
-(add-to-list 'anything-compile-source-functions 'anything-compile-source--complete)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;  core                                                              ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun ac-candidates-in-buffer ()
+  (let ((anything-pattern
+         (if (equal "" anything-complete-target)
+             anything-pattern
+           (concat anything-complete-target " " anything-pattern))))
+    (anything-candidates-in-buffer)))
 
-(defun anything-complete-insert (candidate)
+(defun ac-insert (candidate)
   (let ((pt (point)))
     (when (and (search-backward anything-complete-target nil t)
                (string= (buffer-substring (point) pt) anything-complete-target))
       (delete-region (point) pt)))
   (insert candidate))
 
+(add-to-list 'anything-type-attributes
+             '(complete
+               (candidates-in-buffer . ac-candidates-in-buffer)
+               (action . ac-insert)))
+
+(defun anything-complete (sources target &optional limit idle-delay input-idle-delay)
+  "Basic completion interface using `anything'."
+  (let ((anything-candidate-number-limit (or limit anything-candidate-number-limit))
+        (anything-idle-delay (or idle-delay anything-idle-delay))
+        (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
+        (anything-complete-target target))
+    (anything sources)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;  shell history                                                     ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'thingatpt)
 (defun anything-complete-shell-history ()
+  "Select a command from shell history and insert it."
   (interactive)
   (anything-complete 'anything-c-source-complete-shell-history
                      (or (word-at-point) "")
@@ -75,12 +91,12 @@
 
 (defvar anything-c-source-complete-shell-history
   '((name . "Shell History")
-    (complete)
     (init . (lambda () (with-current-buffer (anything-candidate-buffer (shell-history-buffer))
                          (revert-buffer t t)
                          (set (make-local-variable 'zsh-p) (shell-history-zsh-extended-history-p)))))
     (get-line . acsh-get-line)
-    (search-from-end)))
+    (search-from-end)
+    (type . complete)))
 
 (defun acsh-get-line (s e)
   (let ((extended-history (string= (buffer-substring s (+ s 2)) ": "))
@@ -109,26 +125,6 @@
                      "\\\\\n" ";" (buffer-substring s2 e2))
                (goto-char s2)))))))
 
-
-;(with-current-buffer "test" (ff 123 146))
-;
-; TODO anything-candidates-in-buffer from bottom
-;;makepkg
-;;;: 1123867258:0;cat <<EOR > Rakefile\
-;;;# $Id: anything-complete.el,v 1.3 2008-09-03 04:13:23 rubikitch Exp $\
-;;;require 'rake/makepkg'\
-;;;EOR
-
-
-;; (anything-test-candidates 'anything-c-source-complete-shell-history "byte-compile")
-;;(with-current-buffer (shell-history-buffer) (shell-history-zsh-extended-history-p))
-;; (anything-compile-sources (list anything-c-source-complete-shell-history) '(anything-compile-source--complete))
-(defun anything-complete (sources target &optional limit idle-delay input-idle-delay)
-  (let ((anything-candidate-number-limit (or limit anything-candidate-number-limit))
-        (anything-idle-delay (or idle-delay anything-idle-delay))
-        (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
-        (anything-complete-target target))
-    (anything sources)))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
