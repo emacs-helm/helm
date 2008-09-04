@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.6 2008-09-04 08:29:40 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.7 2008-09-04 08:36:08 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.6  2008-09-04 08:29:40  rubikitch
+;; Revision 1.7  2008-09-04 08:36:08  rubikitch
+;; fixed a bug when `symbol-at-point' is nil.
+;;
+;; Revision 1.6  2008/09/04 08:29:40  rubikitch
 ;; remove unneeded code.
 ;;
 ;; Revision 1.5  2008/09/04 08:12:05  rubikitch
@@ -94,7 +97,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.6 2008-09-04 08:29:40 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.7 2008-09-04 08:36:08 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -176,7 +179,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
         (if (loop for src in (anything-get-sources)
                   thereis (string-match "^dabbrev" (assoc-default 'name src)))
             anything-dabbrev-last-target
-          (symbol-name (symbol-at-point))))
+          (anything-aif (symbol-at-point) (symbol-name it) "")))
   (anything-candidate-buffer (get-buffer bufname)))
 
 (defun alcs-sort (candidates source)
