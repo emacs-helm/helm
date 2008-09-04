@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.102 2008-09-03 11:25:19 rubikitch Exp $
+;; $Id: anything.el,v 1.103 2008-09-04 09:16:28 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.102  2008-09-03 11:25:19  rubikitch
+;; Revision 1.103  2008-09-04 09:16:28  rubikitch
+;; fixed a bug of `anything-read-file-name'.
+;;
+;; Revision 1.102  2008/09/03 11:25:19  rubikitch
 ;; Extended `anything' optional arguments: buffer
 ;;
 ;; Revision 1.101  2008/09/03 11:15:13  rubikitch
@@ -496,7 +499,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.102 2008-09-03 11:25:19 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.103 2008-09-04 09:16:28 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2685,8 +2688,13 @@ shown yet and bind anything commands in iswitchb."
 ;;----------------------------------------------------------------------
 ;; `read-file-name' compatible read function (experimental)
 ;;----------------------------------------------------------------------
-(defvar anything-read-file-name-map (copy-keymap anything-map))
-(define-key anything-read-file-name-map "/" 'anything-read-file-name-follow-directory)
+(defvar anything-read-file-name-map nil)
+(defun anything-read-file-name-map ()
+  "Lazy initialization of `anything-read-file-name-map'."
+  (unless anything-read-file-name-map
+    (setq anything-read-file-name-map (copy-keymap anything-map))
+    (define-key anything-read-file-name-map "/" 'anything-read-file-name-follow-directory))
+  anything-read-file-name-map)
 
 (defun anything-read-file-name-follow-directory ()
   (interactive)
@@ -2706,7 +2714,7 @@ shown yet and bind anything commands in iswitchb."
 
 (defun anything-read-file-name (prompt &optional dir default-filename require-match initial-input predicate)
   "`anything' replacement for `read-file-name'."
-  (let* ((anything-map anything-read-file-name-map)
+  (let* ((anything-map (anything-read-file-name-map))
          (result (anything (arfn-sources
                            prompt dir default-filename require-match
                            initial-input predicate)
@@ -2747,7 +2755,7 @@ shown yet and bind anything commands in iswitchb."
                              (action . identity)))))
     `(,default-source
        ((name . ,dir)
-        (candidates . (lambda () (arfn-candidates dir)))
+        (candidates . (lambda () (arfn-candidates ,dir)))
         (action . identity)
         ,transformer-func)
        ,new-input-source
