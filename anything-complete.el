@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.7 2008-09-04 08:36:08 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.8 2008-09-04 16:54:59 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -24,12 +24,34 @@
 
 ;;; Commentary:
 
-;; 
+;; Completion with Anything interface.
+
+;; * `anything-lisp-complete-symbol', `anything-lisp-complete-symbol-partial-match':
+;;     `lisp-complete-symbol' with `anything'
+;; * `anything-apropos': `apropos' with `anything'
+;; * `anything-complete-shell-history': complete from .*sh_history
+;; * Many anything sources:
+;;     [EVAL IT] (occur "defvar anything-c-source")
+
+;;; Installation:
+
+;; Install anything-match-plugin.el
+;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/anything-match-plugin.el
+;;
+;; shell-history.el would help you.
+;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/shell-history.el
+
+;; (require 'anything-complete)
+;; ;; Automatically collect symbols by 150 secs
+;; (anything-lisp-complete-symbol-set-timer 150)
 
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.7  2008-09-04 08:36:08  rubikitch
+;; Revision 1.8  2008-09-04 16:54:59  rubikitch
+;; add commentary
+;;
+;; Revision 1.7  2008/09/04 08:36:08  rubikitch
 ;; fixed a bug when `symbol-at-point' is nil.
 ;;
 ;; Revision 1.6  2008/09/04 08:29:40  rubikitch
@@ -97,7 +119,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.7 2008-09-04 08:36:08 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.8 2008-09-04 16:54:59 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -338,7 +360,6 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  shell history                                                     ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'thingatpt)
 (defun anything-complete-shell-history ()
   "Select a command from shell history and insert it."
   (interactive)
