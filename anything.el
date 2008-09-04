@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.103 2008-09-04 09:16:28 rubikitch Exp $
+;; $Id: anything.el,v 1.104 2008-09-04 12:27:05 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.103  2008-09-04 09:16:28  rubikitch
+;; Revision 1.104  2008-09-04 12:27:05  rubikitch
+;; `anything': prefixed optional arguments
+;;
+;; Revision 1.103  2008/09/04 09:16:28  rubikitch
 ;; fixed a bug of `anything-read-file-name'.
 ;;
 ;; Revision 1.102  2008/09/03 11:25:19  rubikitch
@@ -499,7 +502,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.103 2008-09-04 09:16:28 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.104 2008-09-04 12:27:05 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1410,31 +1413,35 @@ the real value in a text property."
         (sources)
         (t anything-sources)))  
 
-(defun anything (&optional sources input prompt resume preselect buffer)
+(defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   "Select anything. In Lisp program, some optional arguments can be used.
 
-- SOURCES
+Note that all the optional arguments are prefixed because of
+dynamic scope problem, IOW argument variables may eat
+already-bound variables. Yuck!
 
-  Temporary value of `anything-sources'. SOURCES accepts a
+- ANY-SOURCES
+
+  Temporary value of `anything-sources'. ANY-SOURCES accepts a
   symbol, interpreted as a variable of an anything source.
 
-- INPUT
+- ANY-INPUT
 
   Temporary value of `anything-pattern', ie. initial input of minibuffer.
 
-- PROMPT
+- ANY-PROMPT
 
   Prompt other than \"pattern: \".
 
-- RESUME
+- ANY-RESUME
 
   Resurrect previously instance of `anything'. Skip the initialization.
 
-- PRESELECT
+- ANY-PRESELECT
 
   Initially selected candidate. Specified by exact candidate or a regexp.
 
-- BUFFER
+- ANY-BUFFER
 
   `anything-buffer' instead of *anything*.
 "
@@ -1446,23 +1453,23 @@ the real value in a text property."
              ;; It is needed because `anything-source-name' is non-nil
              ;; when `anything' is invoked by action. Awful global scope.
              anything-source-name anything-in-persistent-action
-             (anything-sources (anything-normalize-sources sources)))
-         (setq anything-buffer (or buffer anything-buffer))
+             (anything-sources (anything-normalize-sources any-sources)))
+         (setq anything-buffer (or any-buffer anything-buffer))
          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
-         (unless resume (anything-initialize))
-         (when input (setq anything-input input anything-pattern input))
+         (unless any-resume (anything-initialize))
+         (when any-input (setq anything-input any-input anything-pattern any-input))
          (if anything-samewindow
              (switch-to-buffer anything-buffer)
            (pop-to-buffer anything-buffer))        
 
          (unwind-protect
              (progn
-               (unless resume (anything-update))
+               (unless any-resume (anything-update))
                (select-frame-set-input-focus (window-frame (minibuffer-window)))
-               (anything-preselect preselect)
+               (anything-preselect any-preselect)
                (let ((minibuffer-local-map anything-map))
-                 (read-string (or prompt "pattern: ") (if resume anything-pattern input))))
+                 (read-string (or any-prompt "pattern: ") (if any-resume anything-pattern any-input))))
 
            (anything-cleanup)
            (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
