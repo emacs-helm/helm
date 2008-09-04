@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.104 2008-09-04 12:27:05 rubikitch Exp $
+;; $Id: anything.el,v 1.105 2008-09-04 12:45:06 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.104  2008-09-04 12:27:05  rubikitch
+;; Revision 1.105  2008-09-04 12:45:06  rubikitch
+;; New hook: `anything-after-persistent-action-hook'
+;;
+;; Revision 1.104  2008/09/04 12:27:05  rubikitch
 ;; `anything': prefixed optional arguments
 ;;
 ;; Revision 1.103  2008/09/04 09:16:28  rubikitch
@@ -502,7 +505,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.104 2008-09-04 12:27:05 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.105 2008-09-04 12:45:06 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1085,6 +1088,9 @@ But the anything buffer has no contents. ")
 
 (defvar anything-cleanup-hook nil
   "Run after anything invocation.")
+
+(defvar anything-after-persistent-action-hook nil
+  "Run after executing persistent action.")
 
 (defvar anything-restored-variables
   '( anything-candidate-number-limit
@@ -2224,7 +2230,8 @@ Acceptable values of CREATE-OR-BUFFER:
          nil
          (or (assoc-default 'persistent-action (anything-get-current-source))
              (anything-get-action))
-         t)))))
+         t)
+        (run-hooks 'anything-after-persistent-action-hook)))))
 
 (defmacro with-anything-display-same-window (&rest body)
   "Make `pop-to-buffer' and `display-buffer' display in the same window."
