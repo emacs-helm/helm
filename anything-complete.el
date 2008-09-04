@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.4 2008-09-04 07:36:23 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.5 2008-09-04 08:12:05 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.4  2008-09-04 07:36:23  rubikitch
+;; Revision 1.5  2008-09-04 08:12:05  rubikitch
+;; absorb anything-lisp-complete-symbol.el v1.13.
+;;
+;; Revision 1.4  2008/09/04 07:36:23  rubikitch
 ;; Use type plug-in instead.
 ;;
 ;; Revision 1.3  2008/09/03 04:13:23  rubikitch
@@ -42,11 +45,55 @@
 ;; Initial revision
 ;;
 
+;;; History of anything-lisp-complete-symbol.el
+
+;; Revision 1.13  2008/09/04 08:07:18  rubikitch
+;; use `anything-complete-target' rather than `alcs-target'.
+;;
+;; Revision 1.12  2008/09/04 07:50:34  rubikitch
+;; add docstrings
+;;
+;; Revision 1.11  2008/09/04 07:35:02  rubikitch
+;; use `add-to-list' to add `anything-type-attributes' entry.
+;;
+;; Revision 1.10  2008/09/04 01:19:56  rubikitch
+;; New source: `anything-c-source-emacs-function-at-point'
+;; New source: `anything-c-source-emacs-variable-at-point'
+;;
+;; Revision 1.9  2008/09/04 00:48:22  rubikitch
+;; New action: find-function, find-variable
+;;
+;; Revision 1.8  2008/09/03 11:02:51  rubikitch
+;; do `alcs-make-candidates' after load this file.
+;;
+;; Revision 1.7  2008/08/29 09:32:46  rubikitch
+;; make `alcs-make-candidates' faster
+;;
+;; Revision 1.6  2008/08/29 09:22:02  rubikitch
+;; add command sources.
+;; New command: `anything-apropos'
+;;
+;; Revision 1.5  2008/08/29 02:38:42  rubikitch
+;; New command: `anything-lisp-complete-symbol-partial-match'
+;;
+;; Revision 1.4  2008/08/26 10:42:54  rubikitch
+;; integration with `anything-dabbrev-expand'
+;;
+;; Revision 1.3  2008/08/25 20:45:45  rubikitch
+;; export variables
+;;
+;; Revision 1.2  2008/08/25 20:29:48  rubikitch
+;; add requires
+;;
+;; Revision 1.1  2008/08/25 20:26:09  rubikitch
+;; Initial revision
+;;
+
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.4 2008-09-04 07:36:23 rubikitch Exp $")
-(eval-when-compile (require 'cl))
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.5 2008-09-04 08:12:05 rubikitch Exp $")
 (require 'anything-match-plugin)
+(require 'thingatpt)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  core                                                              ;;;;
@@ -55,7 +102,8 @@
   (let ((anything-pattern
          (if (equal "" anything-complete-target)
              anything-pattern
-           (concat anything-complete-target " " anything-pattern))))
+           (concat (if (anything-attr 'prefix-match) "^" "")
+                   anything-complete-target " " anything-pattern))))
     (anything-candidates-in-buffer)))
 
 (defun ac-insert (candidate)
@@ -77,6 +125,215 @@
         (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
         (anything-complete-target target))
     (anything sources)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;  `lisp-complete-symbol' and `apropos' replacement                  ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar anything-lisp-complete-symbol-input-idle-delay nil
+  "`anything-input-idle-delay' for `anything-lisp-complete-symbol',
+`anything-lisp-complete-symbol-partial-match' and `anything-apropos'.")
+
+(defun alcs-create-buffer (name)
+  (let ((b (get-buffer-create name)))
+    (with-current-buffer b
+      (buffer-disable-undo)
+      (erase-buffer)
+      b)))
+
+(defvar alcs-variables-buffer " *variable symbols*")
+(defvar alcs-functions-buffer " *function symbols*")
+(defvar alcs-commands-buffer " *command symbols*")
+(defvar alcs-symbol-buffer " *other symbols*")
+
+(defun alcs-make-candidates ()
+  (message "Collecting symbols...")
+  (alcs-create-buffer alcs-variables-buffer)
+  (alcs-create-buffer alcs-functions-buffer)
+  (alcs-create-buffer alcs-commands-buffer)
+  (alcs-create-buffer alcs-symbol-buffer)
+  (mapatoms
+   (lambda (sym)
+     (let ((name (symbol-name sym))
+           (fbp (fboundp sym)))
+       (cond ((commandp sym) (set-buffer alcs-commands-buffer) (insert name "\n"))
+             (fbp (set-buffer alcs-functions-buffer) (insert name "\n")))
+       (cond ((boundp sym) (set-buffer alcs-variables-buffer) (insert name "\n"))
+             ((not fbp) (set-buffer alcs-symbol-buffer) (insert name "\n"))))))
+  (message "Collecting symbols...done"))
+
+(defun anything-lisp-complete-symbol-set-timer (update-period)
+  "Update Emacs symbols list when Emacs is idle,
+used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
+  (run-with-idle-timer update-period t 'alcs-make-candidates))
+
+(defvar anything-lisp-complete-use-with-dabbrev nil)
+
+(defun alcs-init (bufname)
+  (setq anything-complete-target
+        (if (and anything-lisp-complete-use-with-dabbrev
+                 (loop for src in (anything-get-sources)
+                       thereis (string-match "^dabbrev" (assoc-default 'name src))))
+            anything-dabbrev-last-target
+          (symbol-name (symbol-at-point))))
+  (anything-candidate-buffer (get-buffer bufname)))
+
+(defun alcs-sort (candidates source)
+  (sort candidates #'string<))
+
+(defun alcs-describe-function (name)
+  (describe-function (intern name)))
+(defun alcs-describe-variable (name)
+  (describe-variable (intern name)))
+(defun alcs-find-function (name)
+  (find-function (intern name)))
+(defun alcs-find-variable (name)
+  (find-variable (intern name)))
+
+(defun alcs-insert-completion (name)
+  (interactive)
+  (backward-delete-char (length anything-complete-target))
+  (insert name))
+
+(defvar anything-c-source-complete-emacs-functions
+  '((name . "Functions")
+    (init . (lambda () (alcs-init alcs-functions-buffer)))
+    (prefix-match)
+    (candidates-in-buffer . ac-candidates-in-buffer)
+    (type . complete-function)))
+(defvar anything-c-source-complete-emacs-commands
+  '((name . "Commands")
+    (init . (lambda () (alcs-init alcs-commands-buffer)))
+    (prefix-match)
+    (candidates-in-buffer . ac-candidates-in-buffer)
+    (type . complete-function)))
+(defvar anything-c-source-complete-emacs-variables
+  '((name . "Variables")
+    (init . (lambda () (alcs-init alcs-variables-buffer)))
+    (prefix-match)
+    (candidates-in-buffer . ac-candidates-in-buffer)
+    (type . complete-variable)))
+(defvar anything-c-source-complete-emacs-other-symbols
+  '((name . "Other Symbols")
+    (init . (lambda () (alcs-init alcs-symbol-buffer)))
+    (prefix-match)
+    (candidates-in-buffer . ac-candidates-in-buffer)
+    (filtered-candidate-transformer . alcs-sort)
+    (action . alcs-insert-completion)))
+
+(defvar anything-c-source-complete-emacs-functions-partial-match
+  '((name . "Functions")
+    (init . (lambda () (alcs-init alcs-functions-buffer)))
+    (candidates-in-buffer)
+    (type . complete-function)))
+(defvar anything-c-source-complete-emacs-commands-partial-match
+  '((name . "Commands")
+    (init . (lambda () (alcs-init alcs-commands-buffer)))
+    (candidates-in-buffer)
+    (type . complete-function)))
+(defvar anything-c-source-complete-emacs-variables-partial-match
+  '((name . "Variables")
+    (init . (lambda () (alcs-init alcs-variables-buffer)))
+    (candidates-in-buffer)
+    (type . complete-variable)))
+
+(defvar anything-c-source-apropos-emacs-functions
+  '((name . "Apropos Functions")
+    (init . (lambda () (alcs-init alcs-functions-buffer)))
+    (candidates-in-buffer)
+    (requires-pattern . 3)
+    (type . apropos-function)))
+(defvar anything-c-source-apropos-emacs-commands
+  '((name . "Apropos Commands")
+    (init . (lambda () (alcs-init alcs-commands-buffer)))
+    (candidates-in-buffer)
+    (requires-pattern . 3)
+    (type . apropos-function)))
+(defvar anything-c-source-apropos-emacs-variables
+  '((name . "Apropos Variables")
+    (init . (lambda () (alcs-init alcs-variables-buffer)))
+    (candidates-in-buffer)
+    (requires-pattern . 3)
+    (type . apropos-variable)))
+
+(defvar anything-c-source-emacs-function-at-point
+  '((name . "Function at point")
+    (candidates
+     . (lambda () (with-current-buffer anything-current-buffer
+                    (anything-aif (function-called-at-point)
+                        (list (symbol-name it))))))
+    (type . apropos-function)))
+
+(defvar anything-c-source-emacs-variable-at-point
+  '((name . "Variable at point")
+    (candidates
+     . (lambda () (with-current-buffer anything-current-buffer
+                    (anything-aif (variable-at-point)
+                        (unless (equal 0 it) (list (symbol-name it)))))))
+    (type . apropos-variable)))
+
+(defvar anything-lisp-complete-symbol-sources
+  '(anything-c-source-complete-emacs-commands
+    anything-c-source-complete-emacs-functions
+    anything-c-source-complete-emacs-variables))
+
+(defvar anything-lisp-complete-symbol-partial-match-sources
+  '(anything-c-source-complete-emacs-commands-partial-match
+    anything-c-source-complete-emacs-functions-partial-match
+    anything-c-source-complete-emacs-variables-partial-match))
+
+(defvar anything-apropos-sources
+  '(anything-c-source-apropos-emacs-commands
+    anything-c-source-apropos-emacs-functions
+    anything-c-source-apropos-emacs-variables))
+
+(add-to-list 'anything-type-attributes
+             '(apropos-function
+               (filtered-candidate-transformer . alcs-sort)
+               (persistent-action . alcs-describe-function)
+               (action
+                ("Describe Function" . alcs-describe-function)
+                ("Find Function" . alcs-find-function))))
+(add-to-list 'anything-type-attributes
+             '(apropos-variable
+               (filtered-candidate-transformer . alcs-sort)
+               (persistent-action . alcs-describe-variable)
+               (action
+                ("Describe Variable" . alcs-describe-variable)
+                ("Find Variable" . alcs-find-variable))))
+(add-to-list 'anything-type-attributes
+             '(complete-function
+               (filtered-candidate-transformer . alcs-sort)
+               (action . alcs-insert-completion)
+               (persistent-action . alcs-describe-function)))
+(add-to-list 'anything-type-attributes
+             '(complete-variable
+               (filtered-candidate-transformer . alcs-sort)
+               (action . alcs-insert-completion)
+               (persistent-action . alcs-describe-variable)))
+
+(defun anything-lisp-complete-symbol-1 (update sources input)
+  (when (or update (null (get-buffer alcs-variables-buffer)))
+    (alcs-make-candidates))
+  (let ((anything-lisp-complete-symbol-input-idle-delay anything-input-idle-delay))
+    (anything sources input)))
+
+(defun anything-lisp-complete-symbol (update)
+  "`lisp-complete-symbol' replacement using `anything'."
+  (interactive "P")
+  (anything-lisp-complete-symbol-1 update anything-lisp-complete-symbol-sources nil))
+(defun anything-lisp-complete-symbol-partial-match (update)
+  "`lisp-complete-symbol' replacement using `anything' (partial match)."
+  (interactive "P")
+  (anything-lisp-complete-symbol-1 update anything-lisp-complete-symbol-partial-match-sources
+                                   (anything-aif (symbol-at-point)
+                                       (symbol-name it)
+                                     "")))
+(defun anything-apropos (update)
+  "`apropos' replacement using `anything'."
+  (interactive "P")
+  (anything-lisp-complete-symbol-1 update anything-apropos-sources nil))
+
+(alcs-make-candidates)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  shell history                                                     ;;;;
