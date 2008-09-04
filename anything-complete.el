@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.5 2008-09-04 08:12:05 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.6 2008-09-04 08:29:40 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.5  2008-09-04 08:12:05  rubikitch
+;; Revision 1.6  2008-09-04 08:29:40  rubikitch
+;; remove unneeded code.
+;;
+;; Revision 1.5  2008/09/04 08:12:05  rubikitch
 ;; absorb anything-lisp-complete-symbol.el v1.13.
 ;;
 ;; Revision 1.4  2008/09/04 07:36:23  rubikitch
@@ -91,13 +94,14 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.5 2008-09-04 08:12:05 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.6 2008-09-04 08:29:40 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  core                                                              ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar anything-complete-target "")
 (defun ac-candidates-in-buffer ()
   (let ((anything-pattern
          (if (equal "" anything-complete-target)
@@ -166,13 +170,11 @@
 used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (run-with-idle-timer update-period t 'alcs-make-candidates))
 
-(defvar anything-lisp-complete-use-with-dabbrev nil)
-
 (defun alcs-init (bufname)
+  (declare (special anything-dabbrev-last-target))
   (setq anything-complete-target
-        (if (and anything-lisp-complete-use-with-dabbrev
-                 (loop for src in (anything-get-sources)
-                       thereis (string-match "^dabbrev" (assoc-default 'name src))))
+        (if (loop for src in (anything-get-sources)
+                  thereis (string-match "^dabbrev" (assoc-default 'name src)))
             anything-dabbrev-last-target
           (symbol-name (symbol-at-point))))
   (anything-candidate-buffer (get-buffer bufname)))
@@ -188,11 +190,6 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (find-function (intern name)))
 (defun alcs-find-variable (name)
   (find-variable (intern name)))
-
-(defun alcs-insert-completion (name)
-  (interactive)
-  (backward-delete-char (length anything-complete-target))
-  (insert name))
 
 (defvar anything-c-source-complete-emacs-functions
   '((name . "Functions")
@@ -218,7 +215,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (prefix-match)
     (candidates-in-buffer . ac-candidates-in-buffer)
     (filtered-candidate-transformer . alcs-sort)
-    (action . alcs-insert-completion)))
+    (action . ac-insert)))
 
 (defvar anything-c-source-complete-emacs-functions-partial-match
   '((name . "Functions")
@@ -303,12 +300,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (add-to-list 'anything-type-attributes
              '(complete-function
                (filtered-candidate-transformer . alcs-sort)
-               (action . alcs-insert-completion)
+               (action . ac-insert)
                (persistent-action . alcs-describe-function)))
 (add-to-list 'anything-type-attributes
              '(complete-variable
                (filtered-candidate-transformer . alcs-sort)
-               (action . alcs-insert-completion)
+               (action . ac-insert)
                (persistent-action . alcs-describe-variable)))
 
 (defun anything-lisp-complete-symbol-1 (update sources input)
@@ -345,7 +342,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (anything-complete 'anything-c-source-complete-shell-history
                      (or (word-at-point) "")
                      20))
-
+(defvar zsh-p nil)
 (defvar anything-c-source-complete-shell-history
   '((name . "Shell History")
     (init . (lambda () (with-current-buffer (anything-candidate-buffer (shell-history-buffer))
