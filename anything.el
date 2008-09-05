@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.106 2008-09-05 00:11:05 rubikitch Exp $
+;; $Id: anything.el,v 1.107 2008-09-05 03:14:35 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.106  2008-09-05 00:11:05  rubikitch
+;; Revision 1.107  2008-09-05 03:14:35  rubikitch
+;; reimplement `anything-current-buffer-is-modified' in the right way
+;;
+;; Revision 1.106  2008/09/05 00:11:05  rubikitch
 ;; Moved `anything-read-string-mode' and read functions to anything-complete.el.
 ;;
 ;; Revision 1.105  2008/09/04 12:45:06  rubikitch
@@ -508,7 +511,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.106 2008-09-05 00:11:05 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.107 2008-09-05 03:14:35 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1138,8 +1141,6 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 ;; internal variables
 (defvar anything-test-candidate-list nil)
 (defvar anything-test-mode nil)
-(defvar anything-buffer-chars-modified-tick 0)
-(make-variable-buffer-local 'anything-buffer-chars-modified-tick)
 (defvar anything-source-name nil)
 (defvar anything-candidate-buffer-alist nil)
 (defvar anything-check-minibuffer-input-timer nil)
@@ -1672,8 +1673,6 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   "Clean up the mess."
   (with-current-buffer anything-buffer
     (setq cursor-type t))
-  (with-current-buffer anything-current-buffer
-    (setq anything-buffer-chars-modified-tick (buffer-chars-modified-tick)))
   (bury-buffer anything-buffer)
   (anything-funcall-foreach 'cleanup)
   (anything-kill-async-processes)
@@ -1890,10 +1889,16 @@ Cache the candidates if there is not yet a cached value."
 
     candidates))
 
+(defvar anything-tick-hash (make-hash-table :test 'equal))
 (defun anything-current-buffer-is-modified ()
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
-  (with-current-buffer anything-current-buffer
-    (/= anything-buffer-chars-modified-tick (buffer-chars-modified-tick))))
+  (let* ((key (concat (buffer-name anything-current-buffer)
+                     "/"
+                     (anything-attr 'name)))
+         (source-tick (or (gethash key anything-tick-hash) 0))
+         (buffer-tick (buffer-chars-modified-tick anything-current-buffer)))
+    (prog1 (/= source-tick buffer-tick)
+      (puthash key buffer-tick anything-tick-hash))))
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -3035,19 +3040,6 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (volatile)))
          "ba"))
       (desc "anything-current-buffer-is-modified")
-      (expect nil
-        (with-temp-buffer
-          (insert "1")
-          (setq anything-current-buffer (current-buffer))
-          (anything-cleanup)
-          (anything-current-buffer-is-modified)))
-      (expect t
-        (with-temp-buffer
-          (insert "1")
-          (setq anything-current-buffer (current-buffer))
-          (anything-cleanup)
-          (insert "2")
-          (anything-current-buffer-is-modified)))
       (expect '(("FOO" ("modified")))
         (let ((sources '(((name . "FOO")
                           (candidates
@@ -3056,6 +3048,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                    '("modified")
                                  '("unmodified"))))))))
           (with-temp-buffer
+            (clrhash anything-tick-hash)
             (insert "1")
             (anything-test-candidates sources))))
       (expect '(("FOO" ("unmodified")))
@@ -3066,9 +3059,99 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                    '("modified")
                                  '("unmodified"))))))))
           (with-temp-buffer
+            (clrhash anything-tick-hash)
             (insert "1")
             (anything-test-candidates sources)
             (anything-test-candidates sources))))
+      (expect '(("FOO" ("modified")))
+        (let ((sources '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (clrhash anything-tick-hash)
+            (insert "1")
+            (anything-test-candidates sources)
+            (insert "2")
+            (anything-test-candidates sources))))
+      (expect '(("BAR" ("modified")))
+        (let ((sources1 '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified")))))))
+              (sources2 '(((name . "BAR")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (clrhash anything-tick-hash)
+            (insert "1")
+            (anything-test-candidates sources1)
+            (anything-test-candidates sources2))))
+      (expect '(("FOO" ("unmodified")))
+        (let ((sources1 '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified")))))))
+              (sources2 '(((name . "BAR")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (clrhash anything-tick-hash)
+            (insert "1")
+            (anything-test-candidates sources1)
+            (anything-test-candidates sources2)
+            (anything-test-candidates sources1))))
+      (expect '(("BAR" ("unmodified")))
+        (let ((sources1 '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified")))))))
+              (sources2 '(((name . "BAR")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (clrhash anything-tick-hash)
+            (insert "1")
+            (anything-test-candidates sources1)
+            (anything-test-candidates sources2)
+            (anything-test-candidates sources2))))
+      (expect '(("BAR" ("modified")))
+        (let ((sources1 '(((name . "FOO")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified")))))))
+              (sources2 '(((name . "BAR")
+                          (candidates
+                           . (lambda ()
+                               (if (anything-current-buffer-is-modified)
+                                   '("modified")
+                                 '("unmodified"))))))))
+          (with-temp-buffer
+            (clrhash anything-tick-hash)
+            (insert "1")
+            (anything-test-candidates sources1)
+            (anything-test-candidates sources2)
+            (with-temp-buffer
+              (anything-test-candidates sources2)))))
       (desc "anything-source-name")
       (expect "FOO"
         (let (v)
