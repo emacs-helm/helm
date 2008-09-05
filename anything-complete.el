@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.9 2008-09-05 00:09:46 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.10 2008-09-05 01:49:56 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.9  2008-09-05 00:09:46  rubikitch
+;; Revision 1.10  2008-09-05 01:49:56  rubikitch
+;; `anything-completing-read' supports list collection only.
+;;
+;; Revision 1.9  2008/09/05 00:09:46  rubikitch
 ;; New functions: moved from anything.el
 ;;   `anything-completing-read', `anything-read-file-name', `anything-read-buffer',
 ;;   `anything-read-variable', `anything-read-command', `anything-read-string-mode'.
@@ -128,7 +131,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.9 2008-09-05 00:09:46 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.10 2008-09-05 01:49:56 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -394,17 +397,18 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; `completing-read' compatible read function (experimental)
 ;;----------------------------------------------------------------------
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
-  (let ((result (anything (acr-sources
-                           prompt
-                           (if (arrayp collection)
-                               (all-completions "" collection)
-                             collection)
-                           predicate require-match initial
-                          hist default inherit-input-method)
-                         initial prompt)))
-    (when (stringp result)
-      (prog1 result
-        (add-to-list (or hist 'minibuffer-history) result)))))
+  (if (or (arrayp collection) (functionp collection))
+      (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
+    ;; support only collection list.
+    (let ((result (anything (acr-sources
+                             prompt
+                             collection
+                             predicate require-match initial
+                             hist default inherit-input-method)
+                            initial prompt)))
+      (when (stringp result)
+        (prog1 result
+          (add-to-list (or hist 'minibuffer-history) result))))))
 
 ;; TODO obarray/predicate hacks: command/variable/symbol
 
