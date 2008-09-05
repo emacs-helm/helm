@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.12 2008-09-05 12:46:27 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.13 2008-09-05 13:50:14 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,12 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.12  2008-09-05 12:46:27  rubikitch
+;; Revision 1.13  2008-09-05 13:50:14  rubikitch
+;; * Use `keyboard-quit' when anything-read-* is quit.
+;; * Change keybinding of `anything-read-file-name-follow-directory' to Tab
+;; * `anything-read-file-name-follow-directory': smarter behavior
+;;
+;; Revision 1.12  2008/09/05 12:46:27  rubikitch
 ;; bugfix
 ;;
 ;; Revision 1.11  2008/09/05 03:15:26  rubikitch
@@ -137,7 +142,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.12 2008-09-05 12:46:27 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.13 2008-09-05 13:50:14 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -405,12 +410,13 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (if (or (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
     ;; support only collection list.
-    (let ((result (anything (acr-sources
-                             prompt
-                             collection
-                             predicate require-match initial
-                             hist default inherit-input-method)
-                            initial prompt)))
+    (let ((result (or (anything (acr-sources
+                                 prompt
+                                 collection
+                                 predicate require-match initial
+                                 hist default inherit-input-method)
+                                initial prompt)
+                      (keyboard-quit))))
       (when (stringp result)
         (prog1 result
           (add-to-list (or hist 'minibuffer-history) result))))))
@@ -450,16 +456,18 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; `read-file-name' compatible read function (experimental)
 ;;----------------------------------------------------------------------
 (defvar anything-read-file-name-map nil)
+(defvar arfn-followed nil)
 (defun anything-read-file-name-map ()
   "Lazy initialization of `anything-read-file-name-map'."
   (unless anything-read-file-name-map
     (setq anything-read-file-name-map (copy-keymap anything-map))
-    (define-key anything-read-file-name-map "/" 'anything-read-file-name-follow-directory))
+    (define-key anything-read-file-name-map "\C-i" 'anything-read-file-name-follow-directory))
   anything-read-file-name-map)
 
 (defun anything-read-file-name-follow-directory ()
   (interactive)
   (declare (special dir prompt default-filename require-match predicate))
+  (setq arfn-followed t)
   (let* ((sel (anything-get-selection))
          (f (expand-file-name sel dir)))
     (cond ((and (file-directory-p f) (not (string-match "/\\.$" sel)))
@@ -470,16 +478,28 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
             (arfn-sources
              prompt f default-filename require-match nil predicate))
            (anything-update))
-          (t
-           (insert "/")))))
+          ((string-match "^\\(.+\\)/\\([^/]+\\)$" sel)
+           (with-selected-window (minibuffer-window)
+             (delete-minibuffer-contents)
+             (insert (match-string 2 sel)))
+           (anything-set-sources
+            (arfn-sources
+             prompt (expand-file-name (match-string 1 sel) dir) nil require-match (match-string 2 sel) predicate))
+           (anything-update)))))
 
 (defun anything-read-file-name (prompt &optional dir default-filename require-match initial-input predicate)
   "`anything' replacement for `read-file-name'."
+  (setq arfn-followed nil)
   (let* ((anything-map (anything-read-file-name-map))
-         (result (anything (arfn-sources
-                           prompt dir default-filename require-match
-                           initial-input predicate)
-                          initial-input prompt)))
+         (result (or (anything (arfn-sources
+                                prompt dir default-filename require-match
+                                initial-input predicate)
+                               initial-input prompt)
+                     (keyboard-quit))))
+    (when (and require-match
+               (not (and (file-exists-p result)
+                         (funcall (or predicate 'identity) result))))
+      (error "anything-read-file-name: file `%s' is not matched" result))
     (when (stringp result)
       (prog1 result
         (add-to-list 'minibuffer-history result)))))
@@ -499,14 +519,20 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                 . (lambda (cands)
                     (remove-if-not
                      (lambda (c) (,predicate (if (listp c) (car c) c))) cands)))))
-         (new-input-source (ac-new-input-source prompt require-match))
+         (new-input-source (ac-new-input-source prompt nil))
          (history-source (unless require-match
                            `((name . "History")
                              (candidates . minibuffer-history)
                              (action . identity))))
          (d2r `(display-to-real . (lambda (f) (expand-file-name f ,dir))))
          (default-source (ac-default-source default-filename d2r)))
-    `(,default-source
+    `(((name . "Default")
+       (candidates ,default-filename)
+       (display-to-real . (lambda (f) (expand-file-name f ,dir)))
+       (filtered-candidate-transformer
+        . (lambda (cands source)
+            (if (and (not arfn-followed) (string= anything-pattern "")) cands nil)))
+       (action . identity))
        ((name . ,dir)
         (candidates . (lambda () (arfn-candidates ,dir)))
         (action . identity)
@@ -543,13 +569,14 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (read-variable "variable: " )
 (defun anything-read-symbol-1 (prompt buffer default-value)
   (let (anything-input-idle-delay)
-    (intern (anything `(,(ac-default-source
-                          (if default-value (format "%s" default-value)))
-                        ((name . ,prompt)
-                         (init . (lambda () (alcs-init ,buffer)))
-                         (candidates-in-buffer)
-                         (action . identity)))
-                      nil prompt))))
+    (intern (or (anything `(,(ac-default-source
+                              (if default-value (format "%s" default-value)))
+                            ((name . ,prompt)
+                             (init . (lambda () (alcs-init ,buffer)))
+                             (candidates-in-buffer)
+                             (action . identity)))
+                          nil prompt)
+                (keyboard-quit)))))
 
 ;;----------------------------------------------------------------------
 ;; `read-variable' compatible read function (experimental)
