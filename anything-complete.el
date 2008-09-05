@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.8 2008-09-04 16:54:59 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.9 2008-09-05 00:09:46 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -30,6 +30,10 @@
 ;;     `lisp-complete-symbol' with `anything'
 ;; * `anything-apropos': `apropos' with `anything'
 ;; * `anything-complete-shell-history': complete from .*sh_history
+;; * Many read functions:
+;;     `anything-read-file-name', `anything-read-buffer', `anything-read-variable',
+;;     `anything-read-command', `anything-completing-read'
+;; * `anything-read-string-mode' replaces default read functions with anything ones.
 ;; * Many anything sources:
 ;;     [EVAL IT] (occur "defvar anything-c-source")
 
@@ -48,7 +52,12 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.8  2008-09-04 16:54:59  rubikitch
+;; Revision 1.9  2008-09-05 00:09:46  rubikitch
+;; New functions: moved from anything.el
+;;   `anything-completing-read', `anything-read-file-name', `anything-read-buffer',
+;;   `anything-read-variable', `anything-read-command', `anything-read-string-mode'.
+;;
+;; Revision 1.8  2008/09/04 16:54:59  rubikitch
 ;; add commentary
 ;;
 ;; Revision 1.7  2008/09/04 08:36:08  rubikitch
@@ -119,7 +128,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.8 2008-09-04 16:54:59 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.9 2008-09-05 00:09:46 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -356,6 +365,232 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (anything-lisp-complete-symbol-1 update anything-apropos-sources nil))
 
 (alcs-make-candidates)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;  anything-read-string-mode / read-* compatibility functions        ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; moved from anything.el
+(defun anything-compile-source--default-value (source)
+  (anything-aif (assoc-default 'default-value source)
+      (append source
+              `((candidates ,it)
+                (filtered-candidate-transformer
+                 . (lambda (cands source)
+                     (if (string= anything-pattern "") cands nil)))))
+    source))
+(add-to-list 'anything-compile-source-functions 'anything-compile-source--default-value)
+
+(defun ac-new-input-source (prompt require-match)
+  (unless require-match
+    `((name . ,prompt) (dummy) (action . identity))))
+(defun ac-default-source (default &rest additional-attrs)
+  (when default
+    `((name . "Default")
+      (default-value . ,default)
+      (action . identity)
+      ,@additional-attrs)))
+
+;;----------------------------------------------------------------------
+;; `completing-read' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
+  (let ((result (anything (acr-sources
+                           prompt
+                           (if (arrayp collection)
+                               (all-completions "" collection)
+                             collection)
+                           predicate require-match initial
+                          hist default inherit-input-method)
+                         initial prompt)))
+    (when (stringp result)
+      (prog1 result
+        (add-to-list (or hist 'minibuffer-history) result)))))
+
+;; TODO obarray/predicate hacks: command/variable/symbol
+
+(defun acr-sources (prompt collection predicate require-match initial hist default inherit-input-method)
+  "`anything' replacement for `completing-read'."
+  (let ((transformer-func
+         (if predicate
+             `(candidate-transformer
+               . (lambda (cands)
+                   (remove-if-not (lambda (c) (,predicate
+                                               (if (listp c) (car c) c))) cands)))))
+        (new-input-source (ac-new-input-source prompt require-match))
+        (history-source (unless require-match
+                          `((name . "History")
+                            (candidates . ,(or hist 'minibuffer-history))
+                            (action . identity))))
+        (default-source (ac-default-source default)))
+  `(,default-source
+    ((name . "Completions")
+     (candidates . ,collection)
+     (action . identity)
+     ,transformer-func)
+    ,history-source
+    ,new-input-source)))
+;; (anything-completing-read "Command: " obarray 'commandp t)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
+;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil)
+;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil nil t)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
+;; (anything-completing-read "Test: " '("hoge" "foo" "bar"))
+
+;;----------------------------------------------------------------------
+;; `read-file-name' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defvar anything-read-file-name-map nil)
+(defun anything-read-file-name-map ()
+  "Lazy initialization of `anything-read-file-name-map'."
+  (unless anything-read-file-name-map
+    (setq anything-read-file-name-map (copy-keymap anything-map))
+    (define-key anything-read-file-name-map "/" 'anything-read-file-name-follow-directory))
+  anything-read-file-name-map)
+
+(defun anything-read-file-name-follow-directory ()
+  (interactive)
+  (declare (special dir prompt default-filename require-match predicate))
+  (let* ((sel (anything-get-selection))
+         (f (expand-file-name sel dir)))
+    (cond ((and (file-directory-p f) (not (string-match "/\\.$" sel)))
+           (with-selected-window (minibuffer-window) (delete-minibuffer-contents))
+           (setq anything-pattern "")
+           (setq dir f)
+           (anything-set-sources
+            (arfn-sources
+             prompt f default-filename require-match nil predicate))
+           (anything-update))
+          (t
+           (insert "/")))))
+
+(defun anything-read-file-name (prompt &optional dir default-filename require-match initial-input predicate)
+  "`anything' replacement for `read-file-name'."
+  (let* ((anything-map (anything-read-file-name-map))
+         (result (anything (arfn-sources
+                           prompt dir default-filename require-match
+                           initial-input predicate)
+                          initial-input prompt)))
+    (when (stringp result)
+      (prog1 result
+        (add-to-list 'minibuffer-history result)))))
+
+(defun arfn-candidates (dir)
+  (loop for (f _ _ _ _ _ _ _ _ perm _ _ _) in (directory-files-and-attributes dir t)
+        for basename = (file-name-nondirectory f)
+        when (string= "d" (substring perm 0 1))
+        collect (cons (concat basename "/") f)
+        else collect (cons basename f)))
+
+(defun arfn-sources (prompt dir default-filename require-match initial-input predicate)
+  (let* ((dir (or dir default-directory))
+         (transformer-func
+          (if predicate
+              `(candidate-transformer
+                . (lambda (cands)
+                    (remove-if-not
+                     (lambda (c) (,predicate (if (listp c) (car c) c))) cands)))))
+         (new-input-source (ac-new-input-source prompt require-match))
+         (history-source (unless require-match
+                           `((name . "History")
+                             (candidates . minibuffer-history)
+                             (action . identity))))
+         (d2r `(display-to-real . (lambda (f) (expand-file-name f ,dir))))
+         (default-source (ac-default-source default-filename d2r)))
+    `(,default-source
+       ((name . ,dir)
+        (candidates . (lambda () (arfn-candidates ,dir)))
+        (action . identity)
+        ,transformer-func)
+       ,new-input-source
+       ,history-source)))
+;; (anything-read-file-name "file: " "~" ".emacs")
+;; (read-file-name "file: " "/tmp")
+
+;;----------------------------------------------------------------------
+;; `read-buffer' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defun anything-read-buffer (prompt &optional default require-match start matches-set)
+  "`anything' replacement for `read-buffer'."
+  (let (anything-input-idle-delay)
+    (anything (arb-sources prompt
+                           (if (bufferp default) (buffer-name default) default)
+                           require-match start matches-set)
+              start prompt)))
+
+(defun arb-sources (prompt default require-match start matches-set)
+  `(,(ac-default-source default)
+    ((name . ,prompt)
+     (candidates . (lambda () (mapcar 'buffer-name (buffer-list))))
+     (action . identity))
+    ,(ac-new-input-source prompt require-match)))
+
+;; (anything-read-buffer "test: " "*scratch*" t)
+;; (anything-read-buffer "test: " "*scratch*" t "*")
+
+;; (read-variable "variable: " "find-file-hooks")
+(defun anything-read-symbol-1 (prompt buffer default-value)
+  (let (anything-input-idle-delay)
+    (intern (anything `(,(ac-default-source (format "%s" default-value))
+                        ((name . ,prompt)
+                         (init . (lambda () (alcs-init ,buffer)))
+                         (candidates-in-buffer)
+                         (action . identity)))
+                      nil prompt))))
+
+;;----------------------------------------------------------------------
+;; `read-variable' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defun anything-read-variable (prompt &optional default-value)
+  (anything-read-symbol-1 prompt alcs-variables-buffer default-value))
+;; (anything-read-variable "variable: " 'find-file-hooks)
+
+;;----------------------------------------------------------------------
+;; `read-command' compatible read function (experimental)
+;;----------------------------------------------------------------------
+(defun anything-read-command (prompt &optional default-value)
+  (anything-read-symbol-1 prompt alcs-commands-buffer default-value))
+;; (anything-read-variable "command: " 'find-file)
+
+
+;;----------------------------------------------------------------------
+;; `anything-read-string-mode' initialization
+;;----------------------------------------------------------------------
+(defvar anything-read-string-mode nil)
+(unless anything-read-string-mode
+  (defalias 'anything-old-completing-read (symbol-function 'completing-read))
+  (defalias 'anything-old-read-file-name (symbol-function 'read-file-name))
+  (defalias 'anything-old-read-buffer (symbol-function 'read-buffer))
+  (defalias 'anything-old-read-variable (symbol-function 'read-variable))
+  (defalias 'anything-old-read-command (symbol-function 'read-command))
+  (put 'anything-read-string-mode 'orig-read-buffer-function read-buffer-function))
+  
+;; (anything-read-string-mode -1)
+;; (anything-read-string-mode 1)
+;; (anything-read-string-mode 0)
+(defun anything-read-string-mode (arg)
+  "If this minor mode is on, use `anything' version of `completing-read' and `read-file-name'."
+  (interactive "P")
+  (setq anything-read-string-mode (if arg (> (prefix-numeric-value arg) 0) (not anything-read-string-mode)))
+  (cond (anything-read-string-mode
+         ;; redefine to anything version
+         (defalias 'completing-read (symbol-function 'anything-completing-read))
+         (defalias 'read-file-name (symbol-function 'anything-read-file-name))
+         (setq read-buffer-function 'anything-read-buffer)
+         (defalias 'read-buffer (symbol-function 'anything-read-buffer))
+         (defalias 'read-variable (symbol-function 'anything-read-variable))
+         (defalias 'read-command (symbol-function 'anything-read-command))
+         (message "Installed anything version of read functions."))
+        (t
+         ;; restore to original version
+         (defalias 'completing-read (symbol-function 'anything-old-completing-read))
+         (defalias 'read-file-name (symbol-function 'anything-old-read-file-name))
+         (setq read-buffer-function (get 'anything-read-string-mode 'orig-read-buffer-function))
+         (defalias 'read-buffer (symbol-function 'anything-old-read-buffer))
+         (defalias 'read-variable (symbol-function 'anything-old-read-variable))
+         (defalias 'read-command (symbol-function 'anything-old-read-command))
+         (message "Uninstalled anything version of read functions."))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  shell history                                                     ;;;;
