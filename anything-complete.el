@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.10 2008-09-05 01:49:56 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.11 2008-09-05 03:15:26 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.10  2008-09-05 01:49:56  rubikitch
+;; Revision 1.11  2008-09-05 03:15:26  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.10  2008/09/05 01:49:56  rubikitch
 ;; `anything-completing-read' supports list collection only.
 ;;
 ;; Revision 1.9  2008/09/05 00:09:46  rubikitch
@@ -131,7 +134,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.10 2008-09-05 01:49:56 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.11 2008-09-05 03:15:26 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -387,11 +390,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (unless require-match
     `((name . ,prompt) (dummy) (action . identity))))
 (defun ac-default-source (default &rest additional-attrs)
-  (when default
-    `((name . "Default")
-      (default-value . ,default)
-      (action . identity)
-      ,@additional-attrs)))
+  `((name . "Default")
+    (default-value . ,default)
+    (action . identity)
+    ,@additional-attrs))
 
 ;;----------------------------------------------------------------------
 ;; `completing-read' compatible read function (experimental)
@@ -529,13 +531,17 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
      (action . identity))
     ,(ac-new-input-source prompt require-match)))
 
+;; (anything-read-buffer "test: "  nil)
 ;; (anything-read-buffer "test: " "*scratch*" t)
 ;; (anything-read-buffer "test: " "*scratch*" t "*")
 
 ;; (read-variable "variable: " "find-file-hooks")
+;; (read-variable "variable: " 'find-file-hooks)
+;; (read-variable "variable: " )
 (defun anything-read-symbol-1 (prompt buffer default-value)
   (let (anything-input-idle-delay)
-    (intern (anything `(,(ac-default-source (format "%s" default-value))
+    (intern (anything `(,(ac-default-source
+                          (if default-value (format "%s" default-value)))
                         ((name . ,prompt)
                          (init . (lambda () (alcs-init ,buffer)))
                          (candidates-in-buffer)
@@ -554,7 +560,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;;----------------------------------------------------------------------
 (defun anything-read-command (prompt &optional default-value)
   (anything-read-symbol-1 prompt alcs-commands-buffer default-value))
-;; (anything-read-variable "command: " 'find-file)
+;; (anything-read-variable "command: ")
 
 
 ;;----------------------------------------------------------------------
