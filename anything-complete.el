@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.13 2008-09-05 13:50:14 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.14 2008-09-05 13:59:39 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.13  2008-09-05 13:50:14  rubikitch
+;; Revision 1.14  2008-09-05 13:59:39  rubikitch
+;; bugfix
+;;
+;; Revision 1.13  2008/09/05 13:50:14  rubikitch
 ;; * Use `keyboard-quit' when anything-read-* is quit.
 ;; * Change keybinding of `anything-read-file-name-follow-directory' to Tab
 ;; * `anything-read-file-name-follow-directory': smarter behavior
@@ -142,7 +145,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.13 2008-09-05 13:50:14 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.14 2008-09-05 13:59:39 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -523,16 +526,13 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
          (history-source (unless require-match
                            `((name . "History")
                              (candidates . minibuffer-history)
-                             (action . identity))))
-         (d2r `(display-to-real . (lambda (f) (expand-file-name f ,dir))))
-         (default-source (ac-default-source default-filename d2r)))
+                             (action . identity)))))
     `(((name . "Default")
-       (candidates ,default-filename)
-       (display-to-real . (lambda (f) (expand-file-name f ,dir)))
+       (candidates . ,default-filename))
        (filtered-candidate-transformer
         . (lambda (cands source)
             (if (and (not arfn-followed) (string= anything-pattern "")) cands nil)))
-       (action . identity))
+       (action . (lambda (f) (expand-file-name f ,dir)))
        ((name . ,dir)
         (candidates . (lambda () (arfn-candidates ,dir)))
         (action . identity)
@@ -540,6 +540,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
        ,new-input-source
        ,history-source)))
 ;; (anything-read-file-name "file: " "~" ".emacs")
+;; (anything-read-file-name "file: " "~" )
+;; (anything-read-file-name "file: ")
 ;; (read-file-name "file: " "/tmp")
 
 ;;----------------------------------------------------------------------
