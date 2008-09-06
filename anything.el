@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.107 2008-09-05 03:14:35 rubikitch Exp $
+;; $Id: anything.el,v 1.108 2008-09-06 06:07:56 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.107  2008-09-05 03:14:35  rubikitch
+;; Revision 1.108  2008-09-06 06:07:56  rubikitch
+;; Extended `anything-set-sources' optional arguments.
+;;
+;; Revision 1.107  2008/09/05 03:14:35  rubikitch
 ;; reimplement `anything-current-buffer-is-modified' in the right way
 ;;
 ;; Revision 1.106  2008/09/05 00:11:05  rubikitch
@@ -511,7 +514,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.107 2008-09-05 03:14:35 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.108 2008-09-06 06:07:56 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -2021,10 +2024,14 @@ Cache the candidates if there is not yet a cached value."
           (goto-char start))
         (anything-mark-current-line)))))
 
-(defun anything-set-sources (sources)
-  "Set `anything-sources' during `anything' invocation."
+(defun anything-set-sources (sources &optional no-init no-update)
+  "Set `anything-sources' during `anything' invocation.
+If NO-INIT is non-nil, skip executing init functions of SOURCES.
+If NO-UPDATE is non-nil, skip executing `anything-update'."
   (setq anything-compiled-sources nil
-        anything-sources sources))
+        anything-sources sources)
+  (unless no-init (anything-funcall-foreach 'init))
+  (unless no-update (anything-update)))
 
 ;;---------------------------------------------------------------------
 ;; The smallest plug-in: type (built-in)
