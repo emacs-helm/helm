@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.10 2008-08-24 20:45:07 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.11 2008-09-06 06:01:07 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,11 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.10  2008-08-24 20:45:07  rubikitch
+;; Revision 1.11  2008-09-06 06:01:07  rubikitch
+;; Classify candidates by file name using meta source.
+;; If `anything-gtags-classify' is non-nil, classification is enabled.
+;;
+;; Revision 1.10  2008/08/24 20:45:07  rubikitch
 ;; silence byte compiler
 ;;
 ;; Revision 1.9  2008/08/24 08:22:48  rubikitch
@@ -87,10 +91,29 @@
 
 ;;;; `gtags-select-mode' replacement
 (defvar anything-gtags-hijack-gtags-select-mode t
-    "Use `anything' instead of `gtags-select-mode'.")
+  "Use `anything' instead of `gtags-select-mode'.")
+(defvar anything-gtags-classify nil)
+(defvar aggs-base-source
+  '((candidates-in-buffer)
+    (get-line . aggs-candidate-display)
+    (display-to-real
+     . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
+    (action
+     ("Goto the location"
+      . (lambda (c) (aggs-select-it c t))))
+    (persistent-action . aggs-select-it)
+    (cleanup . (lambda () (kill-buffer buffer)))))
+
 (defun aggs-candidate-display (s e)
   ;; 16 = length of symbol
   (buffer-substring-no-properties (+ s 16) e))
+(defun aggs-set-anything-current-position ()
+  ;; It's needed because `anything' saves
+  ;; *GTAGS SELECT* buffer's position,
+  (save-window-excursion
+    (switch-to-buffer save)
+    (setq anything-current-position (cons (point) (window-start)))))
+
 (defun ag-hijack-gtags-select-mode ()
   ;; `save': C source file / `buffer': gtags-select-mode buffer
   ;; They are defined at `gtags-goto-tag'.
@@ -102,27 +125,50 @@
          (lineno (with-current-buffer save
                    (save-restriction
                      (widen)
-                     (line-number-at-pos)))))
+                     (line-number-at-pos))))
+         (sources (if anything-gtags-classify
+                      '(((name . "GTAGS SELECT meta source")
+                         (init . aggs-meta-source-init)))
+                    `(((name . "GTAGS SELECT")
+                       (init
+                        . (lambda ()
+                            (aggs-set-anything-current-position)
+                            (anything-candidate-buffer buffer)))
+                       ,@aggs-base-source)))))
     (anything
-     '(((name . "GTAGS SELECT")
-        (init
-         . (lambda ()
-             ;; It's needed because `anything' saves
-             ;; *GTAGS SELECT* buffer's position,
-             (save-window-excursion
-               (switch-to-buffer save)
-               (setq anything-current-position (cons (point) (window-start))))
-             (anything-candidate-buffer buffer)))
-        (candidates-in-buffer)
-        (get-line . aggs-candidate-display)
-        (display-to-real
-         . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
-        (action
-         ("Goto the location"
-          . (lambda (c) (aggs-select-it c t))))
-        (persistent-action . aggs-select-it)
-        (cleanup . (lambda () (kill-buffer buffer)))))
+     sources
      nil nil nil (format "\\(\\(%d\\) +%s\\)" lineno (regexp-quote basename) ))))
+
+(defun aggs-candidate-buffer-by-filename (filename)
+  (get-buffer-create (concat "*anything gtags*" filename)))
+(defun aggs-meta-source-init ()
+  (aggs-set-anything-current-position)
+  (with-current-buffer buffer
+    (goto-char (point-min))
+    (let (files prev-filename)
+      (loop 
+       while (re-search-forward " [0-9]+ \\([^ ]+\\) " (point-at-eol) t)
+       for filename = (match-string 1)
+       for bol = (point-at-bol)
+       for eol = (point-at-eol)
+       do
+       (with-current-buffer (aggs-candidate-buffer-by-filename filename)
+         (unless (equal prev-filename filename)
+           (setq files (cons filename files))
+           (erase-buffer))
+         (insert-buffer-substring buffer bol eol)
+         (insert "\n"))
+       (forward-line 1)
+       (setq prev-filename filename))
+      (anything-set-sources
+       (loop for file in (nreverse files) collect
+             (append `((name . ,file)
+                       (init . (lambda ()
+                                 (anything-candidate-buffer
+                                  ,(aggs-candidate-buffer-by-filename file)))))
+                     aggs-base-source)))
+      (anything-funcall-foreach 'init))))
+           
 
 (defun aggs-select-it (candidate &optional delete)
   (with-temp-buffer
