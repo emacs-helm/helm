@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.16 2008-09-07 06:58:11 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.17 2008-09-07 07:48:12 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -28,12 +28,22 @@
 ;; It gives anything.el search refinement functionality.
 ;; exact match -> prefix match -> multiple regexp match
 
+;; A query of multiple regexp match is space-delimited string.
+;; Anything displays candidates which matches all the regexps.
+;; A regexp with "!" prefix means not matching the regexp.
+;; To include spaces to a regexp, prefix "\" before space,
+;; it is controlled by `anything-mp-space-regexp' variable.
+
 ;; Just require it to use.
 
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.16  2008-09-07 06:58:11  rubikitch
+;; Revision 1.17  2008-09-07 07:48:12  rubikitch
+;; Append commentary.
+;; Multiple regexp match with regexp negation.
+;;
+;; Revision 1.16  2008/09/07 06:58:11  rubikitch
 ;; Added mp-3p match: permutation with prefix match
 ;;
 ;; Revision 1.15  2008/09/07 05:23:07  rubikitch
@@ -164,21 +174,25 @@
 (defsubst anything-mp-3-get-patterns (pattern)
   (unless (equal pattern anything-mp-3-pattern-str)
     (setq anything-mp-3-pattern-str pattern
-          anything-mp-3-pattern-list (amp-mp-make-regexps pattern)))
+          anything-mp-3-pattern-list
+          (loop for pat in (amp-mp-make-regexps pattern)
+                collect (if (string= "!" (substring pat 0 1))
+                            (cons 'not (substring pat 1))
+                          (cons 'identity pat)))))
   anything-mp-3-pattern-list)
 (defun* anything-mp-3-match (str &optional (pattern anything-pattern))
-  (loop for re in (anything-mp-3-get-patterns pattern)
-        always (string-match re str)))
+  (loop for (pred . re) in (anything-mp-3-get-patterns pattern)
+        always (funcall pred (string-match re str))))
 
 (defmacro anything-mp-3-search-base (searchfn1 searchfn2 b e)
   `(loop with pat = (anything-mp-3-get-patterns pattern)
-         while (,searchfn1 (car pat) nil t)
+         while (,searchfn1 (cdar pat) nil t)
          for bol = (point-at-bol)
          for eol = (point-at-eol)
          if (loop 
-             for s in (cdr pat)
+             for (pred . s) in (cdr pat)
              always (progn (goto-char ,b)
-                           (,searchfn2 s ,e t)))
+                           (funcall pred (,searchfn2 s ,e t))))
          do (goto-char ,e) (return t)
          else do
          (goto-char ,e)
@@ -191,11 +205,11 @@
 
 ;; mp-3p- (multiple regexp pattern 3 with prefix search)
 (defun* anything-mp-3p-match (str &optional (pattern anything-pattern))
-  (destructuring-bind (first . rest)
+  (destructuring-bind ((first-pred . first-re) . rest)
       (anything-mp-3-get-patterns pattern)
-    (and (anything-prefix-match str first)
-         (loop for re in rest
-               always (string-match re str)))))
+    (and (funcall first-pred (anything-prefix-match str first-re))
+         (loop for (pred . re) in rest
+               always (funcall pred (string-match re str))))))
 (defun anything-mp-3p-search (pattern &rest ignore)
   (anything-mp-3-search-base anything-prefix-search re-search-forward bol eol))
 
@@ -347,6 +361,17 @@
           (insert "fire\nthunder\n")
           (goto-char 1)
           (anything-mp-3-search "th ders" nil t)))
+      (desc "anything-mp-3-search not")
+      (expect t
+        (with-temp-buffer
+          (insert "threshold\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "h !der" nil t)))
+      (expect t
+        (with-temp-buffer
+          (insert "threshold\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3-search "th !der" nil t)))
       (desc "anything-mp-3p-search")
       (expect (non-nil)
         (with-temp-buffer
@@ -358,6 +383,17 @@
           (insert "fire\nthunder\n")
           (goto-char 1)
           (anything-mp-3p-search "h ders" nil t)))
+      (desc "anything-mp-3p-search not")
+      (expect t
+        (with-temp-buffer
+          (insert "\nthreshold\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3p-search "th !der" nil t)))
+      (expect nil
+        (with-temp-buffer
+          (insert "threshold\nthunder\n")
+          (goto-char 1)
+          (anything-mp-3p-search "h !der" nil t)))
       (desc "anything-mp-3-search-backward")
       (expect (non-nil)
         (with-temp-buffer
@@ -369,6 +405,17 @@
           (insert "fire\nthunder\n")
           (goto-char (point-max))
           (anything-mp-3-search-backward "th ders" nil t)))
+      (desc "anything-mp-3-search-backward not")
+      (expect t
+        (with-temp-buffer
+          (insert "threshold\nthunder\n")
+          (goto-char (point-max))
+          (anything-mp-3-search-backward "h !der" nil t)))
+      (expect t
+        (with-temp-buffer
+          (insert "threshold\nthunder\n")
+          (goto-char (point-max))
+          (anything-mp-3-search-backward "th !der" nil t)))
       (desc "anything-mp-3p-search-backward")
       (expect (non-nil)
         (with-temp-buffer
@@ -380,6 +427,17 @@
           (insert "fire\nthunder\n")
           (goto-char (point-max))
           (anything-mp-3p-search-backward "h der" nil t)))
+      (desc "anything-mp-3p-search-backward not")
+      (expect t
+        (with-temp-buffer
+          (insert "\nthreshold\nthunder\n")
+          (goto-char (point-max))
+          (anything-mp-3p-search-backward "th !der" nil t)))
+      (expect nil
+        (with-temp-buffer
+          (insert "threshold\nthunder\n")
+          (goto-char (point-max))
+          (anything-mp-3p-search-backward "h !der" nil t)))
       (desc "anything-mp-1-match")
       (expect (non-nil)
         (anything-mp-1-match "thunder" "th+ r"))
@@ -399,6 +457,9 @@
         (anything-mp-3-match "thunder" "under hue"))
       (expect (non-nil)
         (anything-mp-3-match "thunder" "r th+ n"))
+      (desc "anything-mp-3-match not")
+      (expect (non-nil)
+        (anything-mp-3-match "threshold" "th !der"))
       (desc "anything-prefix-match")
       (expect (non-nil)
         (anything-prefix-match "fobar" "fo"))
@@ -415,6 +476,11 @@
         (anything-mp-3p-match "thunder" "th der"))
       (expect nil
         (anything-mp-3p-match "thunder" "h der"))
+      (desc "anything-mp-3p-match not")
+      (expect (non-nil)
+        (anything-mp-3p-match "threshold" "th !der"))
+      (expect nil
+        (anything-mp-3p-match "threshold" "h !der"))
       (desc "with identity match")
       (expect '(identity)
         (assoc-default 'match
@@ -545,6 +611,18 @@
                                      (candidates-in-buffer)
                                      ))
                                   "el info"
+                                  '(anything-compile-source--candidates-in-buffer
+                                    anything-compile-source--match-plugin)))
+      ;; multi not
+      (expect '(("FOO" ("info.el")))
+        (anything-test-candidates '(((name . "FOO")
+                                     (init
+                                      . (lambda ()
+                                          (with-current-buffer (anything-candidate-buffer 'global)
+                                            (insert "info.el\nelisp-info\n"))))
+                                     (candidates-in-buffer)
+                                     ))
+                                  "info !elisp"
                                   '(anything-compile-source--candidates-in-buffer
                                     anything-compile-source--match-plugin)))
       )))
