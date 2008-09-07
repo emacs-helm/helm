@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.17 2008-09-07 07:48:12 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.18 2008-09-07 12:09:01 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -39,7 +39,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.17  2008-09-07 07:48:12  rubikitch
+;; Revision 1.18  2008-09-07 12:09:01  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.17  2008/09/07 07:48:12  rubikitch
 ;; Append commentary.
 ;; Multiple regexp match with regexp negation.
 ;;
@@ -186,7 +189,7 @@
 
 (defmacro anything-mp-3-search-base (searchfn1 searchfn2 b e)
   `(loop with pat = (anything-mp-3-get-patterns pattern)
-         while (,searchfn1 (cdar pat) nil t)
+         while (,searchfn1 (or (cdar pat) "") nil t)
          for bol = (point-at-bol)
          for eol = (point-at-eol)
          if (loop 
@@ -220,11 +223,11 @@
                          
 ;;;; source compier
 (defvar anything-default-match-functions
-  '(anything-exact-match anything-prefix-match anything-mp-3p-match anything-mp-3-match))
+  '(anything-exact-match anything-mp-3p-match anything-mp-3-match))
 (defvar anything-default-search-functions
-  '(anything-exact-search anything-prefix-search anything-mp-3p-search anything-mp-3-search))
+  '(anything-exact-search anything-mp-3p-search anything-mp-3-search))
 (defvar anything-default-search-backward-functions
-  '(anything-exact-search-backward anything-prefix-search-backward anything-mp-3p-search-backward anything-mp-3-search-backward))
+  '(anything-exact-search-backward anything-mp-3p-search-backward anything-mp-3-search-backward))
 (defun anything-compile-source--match-plugin (source)
   (let ((searchers (if (assoc 'search-from-end source)
                        anything-default-search-backward-functions
