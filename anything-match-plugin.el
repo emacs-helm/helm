@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.14 2008-09-03 03:33:09 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.15 2008-09-07 05:23:07 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -33,7 +33,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.14  2008-09-03 03:33:09  rubikitch
+;; Revision 1.15  2008-09-07 05:23:07  rubikitch
+;; New variable: `anything-mp-space-regexp'
+;;
+;; Revision 1.14  2008/09/03 03:33:09  rubikitch
 ;; anything-exact-*, anything-prefix-*: memoize
 ;;
 ;; Revision 1.13  2008/09/02 10:56:50  rubikitch
@@ -85,10 +88,12 @@
 ;;;; multiple patterns
 (defvar anything-use-multiple-patterns t
   "If non-nil, enable anything-use-multiple-patterns.")
+(defvar anything-mp-space-regexp "\\\\ "
+  "Regexp to represent space itself in multiple regexp match.")
 
 (defun amp-mp-make-regexps (pattern)
   (if (string= pattern "") '("")
-    (loop for s in (split-string (replace-regexp-in-string "\\\\ " "\000\000" pattern) " " t)
+    (loop for s in (split-string (replace-regexp-in-string anything-mp-space-regexp "\000\000" pattern) " " t)
         collect (replace-regexp-in-string "\000\000" " " s))))
 
 (defun amp-mp-1-make-regexp (pattern)
@@ -229,7 +234,8 @@
       (expect '("foo" "bar")
         (amp-mp-make-regexps " foo bar "))
       (expect '("foo bar" "baz")
-        (amp-mp-make-regexps "foo\\ bar baz"))
+        (let ((anything-mp-space-regexp "\\\\ "))
+          (amp-mp-make-regexps "foo\\ bar baz")))
       (desc "anything-exact-match")
       (expect (non-nil)
         (anything-exact-match "thunder" "thunder"))
@@ -250,9 +256,11 @@
       (expect "a.*b"
         (amp-mp-1-make-regexp "a b"))
       (expect "a b"
-        (amp-mp-1-make-regexp "a\\ b"))
+        (let ((anything-mp-space-regexp "\\\\ "))
+          (amp-mp-1-make-regexp "a\\ b")))
       (expect "a.*b c"
-        (amp-mp-1-make-regexp "a b\\ c"))
+        (let ((anything-mp-space-regexp "\\\\ "))
+          (amp-mp-1-make-regexp "a b\\ c")))
       (expect ""
         (amp-mp-1-make-regexp ""))
       (desc "anything-mp-1-search")
@@ -371,10 +379,17 @@
                                   "th r"
                                   '(anything-compile-source--match-plugin)))
       (expect '(("FOO" ("one two")))
-        (anything-test-candidates '(((name . "FOO")
-                                     (candidates "one two" "three four")))
-                                  "e\\ t"
-                                  '(anything-compile-source--match-plugin)))
+        (let ((anything-mp-space-regexp "\\\\ "))
+          (anything-test-candidates '(((name . "FOO")
+                                       (candidates "one two" "three four")))
+                                    "e\\ t"
+                                    '(anything-compile-source--match-plugin))))
+      (expect '(("FOO" ("one two")))
+        (let ((anything-mp-space-regexp "  "))
+          (anything-test-candidates '(((name . "FOO")
+                                       (candidates "one two" "three four")))
+                                    "e  t"
+                                    '(anything-compile-source--match-plugin))))
       (expect '(("FOO" ("thunder")))
         (anything-test-candidates '(((name . "FOO")
                                      (init
