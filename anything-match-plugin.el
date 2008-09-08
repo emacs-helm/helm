@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.18 2008-09-07 12:09:01 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.19 2008-09-08 06:58:59 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -39,7 +39,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.18  2008-09-07 12:09:01  rubikitch
+;; Revision 1.19  2008-09-08 06:58:59  rubikitch
+;; changed default `anything-mp-space-regexp' to "[\\ ] "
+;;
+;; Revision 1.18  2008/09/07 12:09:01  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.17  2008/09/07 07:48:12  rubikitch
@@ -104,7 +107,7 @@
 ;;;; multiple patterns
 (defvar anything-use-multiple-patterns t
   "If non-nil, enable anything-use-multiple-patterns.")
-(defvar anything-mp-space-regexp "\\\\ "
+(defvar anything-mp-space-regexp "[\\ ] "
   "Regexp to represent space itself in multiple regexp match.")
 
 (defun amp-mp-make-regexps (pattern)
