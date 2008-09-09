@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.14 2008-09-05 13:59:39 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.15 2008-09-09 01:19:49 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.14  2008-09-05 13:59:39  rubikitch
+;; Revision 1.15  2008-09-09 01:19:49  rubikitch
+;; add (require 'shell-history)
+;;
+;; Revision 1.14  2008/09/05 13:59:39  rubikitch
 ;; bugfix
 ;;
 ;; Revision 1.13  2008/09/05 13:50:14  rubikitch
@@ -145,7 +148,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.14 2008-09-05 13:59:39 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.15 2008-09-09 01:19:49 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -646,9 +649,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defvar zsh-p nil)
 (defvar anything-c-source-complete-shell-history
   '((name . "Shell History")
-    (init . (lambda () (with-current-buffer (anything-candidate-buffer (shell-history-buffer))
-                         (revert-buffer t t)
-                         (set (make-local-variable 'zsh-p) (shell-history-zsh-extended-history-p)))))
+    (init . (lambda ()
+              (with-current-buffer (anything-candidate-buffer (shell-history-buffer))
+                (revert-buffer t t)
+                (require 'shell-history)
+                (set (make-local-variable 'zsh-p)
+                     (shell-history-zsh-extended-history-p)))))
     (get-line . acsh-get-line)
     (search-from-end)
     (type . complete)))
