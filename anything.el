@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.108 2008-09-06 06:07:56 rubikitch Exp $
+;; $Id: anything.el,v 1.109 2008-09-10 21:12:26 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.108  2008-09-06 06:07:56  rubikitch
+;; Revision 1.109  2008-09-10 21:12:26  rubikitch
+;; New hook: `anything-after-action-hook'
+;;
+;; Revision 1.108  2008/09/06 06:07:56  rubikitch
 ;; Extended `anything-set-sources' optional arguments.
 ;;
 ;; Revision 1.107  2008/09/05 03:14:35  rubikitch
@@ -514,7 +517,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.108 2008-09-06 06:07:56 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.109 2008-09-10 21:12:26 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -827,6 +830,8 @@ Attributes:
   Function called with no parameters when *anything* buffer is closed. It
   is useful for killing unneeded candidates buffer.
 
+  Note that the function is executed BEFORE performing action.
+
 - candidate-number-limit (optional)
 
   Override `anything-candidate-number-limit' only for this source.
@@ -1096,7 +1101,10 @@ But the anything buffer has no contents. ")
   input pattern.")
 
 (defvar anything-cleanup-hook nil
-  "Run after anything invocation.")
+  "Run after anything minibuffer is closed, IOW this hook is executed BEFORE performing action. ")
+
+(defvar anything-after-action-hook nil
+  "Run after executing action.")
 
 (defvar anything-after-persistent-action-hook nil
   "Run after executing persistent action.")
@@ -1490,7 +1498,8 @@ already-bound variables. Yuck!
          (unwind-protect
              (anything-execute-selection-action)
            (anything-aif (get-buffer anything-action-buffer)
-               (kill-buffer it)))))
+               (kill-buffer it))
+           (run-hooks 'anything-after-action-hook))))
     (quit
      (goto-char (car anything-current-position))
      (set-window-start (selected-window) (cdr anything-current-position))
