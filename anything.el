@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.109 2008-09-10 21:12:26 rubikitch Exp $
+;; $Id: anything.el,v 1.110 2008-09-10 22:17:11 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.109  2008-09-10 21:12:26  rubikitch
+;; Revision 1.110  2008-09-10 22:17:11  rubikitch
+;; New `anything-sources' attribute: header-name
+;;
+;; Revision 1.109  2008/09/10 21:12:26  rubikitch
 ;; New hook: `anything-after-action-hook'
 ;;
 ;; Revision 1.108  2008/09/06 06:07:56  rubikitch
@@ -517,7 +520,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.109 2008-09-10 21:12:26 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.110 2008-09-10 22:17:11 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -597,6 +600,12 @@ Attributes:
 
   The name of the source. It is also the heading which appears
   above the list of matches from the source. Must be unique.
+
+- header-name (optional)
+
+  A function returning the display string of the header. Its
+  argument is the name of the source. This attribute is useful to
+  add an additional information with the source name.
 
 - candidates (mandatory if candidates-in-buffer attribute is not provided)
 
@@ -1382,7 +1391,7 @@ Anything plug-ins are realized by this function."
                 `(,@anything-test-candidate-list
                   (,(assoc-default 'name source)
                    ,matches))))
-      (anything-insert-header (assoc-default 'name source))
+      (anything-insert-header-from-source source)
       (dolist (match matches)
         (when (and anything-enable-digit-shortcuts
                    (not (eq anything-digit-shortcut-count 9)))
@@ -1926,7 +1935,7 @@ Cache the candidates if there is not yet a cached value."
             (goto-char insertion-marker)
         
           (goto-char (point-max))
-          (anything-insert-header (assoc-default 'name process-info))
+          (anything-insert-header-from-source process-info)
           (setcdr process-assoc
                   (append process-info `((insertion-marker . ,(point-marker))))))
 
@@ -1982,7 +1991,13 @@ Cache the candidates if there is not yet a cached value."
   (delete-process process))
   
 
-(defun anything-insert-header (name)
+(defun anything-insert-header-from-source (source)
+  (let ((name (assoc-default 'name source)))
+    (anything-insert-header name
+                            (anything-aif (assoc-default 'header-name source)
+                                (funcall it name)))))
+
+(defun anything-insert-header (name &optional display-string)
   "Insert header of source NAME into the anything buffer."
   (unless (bobp)
     (let ((start (point)))
@@ -1993,6 +2008,9 @@ Cache the candidates if there is not yet a cached value."
     (insert name)
     (put-text-property (line-beginning-position)
                        (line-end-position) 'anything-header t)
+    (when display-string
+      (overlay-put (make-overlay (line-beginning-position) (line-end-position))
+                   'display display-string))
     (insert "\n")
     (put-text-property start (point) 'face anything-header-face)))
 
@@ -3816,6 +3834,22 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (search-from-end)
             (candidate-number-limit . 2)))
          "\\+"))
+
+      (desc "header-name attribute")
+      (expect "original is transformed"
+        (stub anything-get-sources => '(((name . "original")
+                                         (candidates "1")
+                                         (header-name
+                                          . (lambda (name)
+                                              (format "%s is transformed" name))))))
+        (stub run-hooks)
+        (stub anything-maybe-fit-frame)
+        (stub run-with-idle-timer)
+        (let ((anything-pattern ""))
+          (anything-update))
+        (with-current-buffer (anything-buffer-get)
+          (buffer-string)
+          (overlay-get (car (overlays-at (1+(point-min)))) 'display)))
         
       )))
 
