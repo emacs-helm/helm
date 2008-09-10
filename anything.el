@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.110 2008-09-10 22:17:11 rubikitch Exp $
+;; $Id: anything.el,v 1.111 2008-09-10 22:53:11 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.110  2008-09-10 22:17:11  rubikitch
+;; Revision 1.111  2008-09-10 22:53:11  rubikitch
+;; anything: bug fix of `anything-buffer'
+;; New macro: `anything-test-update'
+;;
+;; Revision 1.110  2008/09/10 22:17:11  rubikitch
 ;; New `anything-sources' attribute: header-name
 ;;
 ;; Revision 1.109  2008/09/10 21:12:26  rubikitch
@@ -520,7 +524,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.110 2008-09-10 22:17:11 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.111 2008-09-10 22:53:11 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1483,8 +1487,9 @@ already-bound variables. Yuck!
              ;; It is needed because `anything-source-name' is non-nil
              ;; when `anything' is invoked by action. Awful global scope.
              anything-source-name anything-in-persistent-action
+             (anything-buffer (or any-buffer anything-buffer))
              (anything-sources (anything-normalize-sources any-sources)))
-         (setq anything-buffer (or any-buffer anything-buffer))
+         
          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
          (unless any-resume (anything-initialize))
@@ -2773,6 +2778,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         anything-test-candidate-list
       (anything-cleanup))))
 
+(defmacro anything-test-update (sources pattern)
+  "Test helper macro for anything. It is meant for testing *anything* buffer contents."
+  `(progn (stub anything-get-sources => ,sources)
+          (stub run-hooks => nil)
+          (stub anything-maybe-fit-frame => nil)
+          (stub run-with-idle-timer => nil)
+          (let (anything-test-mode (anything-pattern ,pattern)) (anything-update))))
+
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
@@ -3507,11 +3520,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-check-new-input "foo")))
       (desc "anything-update")
       (expect (mock (anything-process-source '((name . "1"))))
-        (stub anything-get-sources => '(((name . "1"))))
-        (stub run-hooks)
-        (stub anything-maybe-fit-frame)
-        (stub run-with-idle-timer)
-        (anything-update))
+        (anything-test-update '(((name . "1"))) ""))
       ;; (find-function 'anything-update)
       ;; TODO el-mock.el should express 2nd call of function.
       ;;     (expect (mock (anything-process-source '((name . "2"))))
@@ -3540,20 +3549,9 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 
       (desc "requires-pattern attribute")
       (expect (not-called anything-process-source)
-        (stub anything-get-sources => '(((name . "1")
-                                         (requires-pattern))))
-        (stub run-hooks)
-        (stub anything-maybe-fit-frame)
-        (stub run-with-idle-timer)
-        (anything-update))
+        (anything-test-update '(((name . "1") (requires-pattern))) ""))
       (expect (not-called anything-process-source)
-        (stub anything-get-sources => '(((name . "1")
-                                         (requires-pattern . 3))))
-        (stub run-hooks)
-        (stub anything-maybe-fit-frame)
-        (stub run-with-idle-timer)
-        (let ((anything-pattern "xx"))
-          (anything-update)))
+        (anything-test-update '(((name . "1") (requires-pattern . 3))) "xx"))
 
       (desc "delay")
       (expect (mock (sit-for 0.25))
@@ -3837,16 +3835,12 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 
       (desc "header-name attribute")
       (expect "original is transformed"
-        (stub anything-get-sources => '(((name . "original")
+        (anything-test-update '(((name . "original")
                                          (candidates "1")
                                          (header-name
                                           . (lambda (name)
-                                              (format "%s is transformed" name))))))
-        (stub run-hooks)
-        (stub anything-maybe-fit-frame)
-        (stub run-with-idle-timer)
-        (let ((anything-pattern ""))
-          (anything-update))
+                                              (format "%s is transformed" name)))))
+                              "")
         (with-current-buffer (anything-buffer-get)
           (buffer-string)
           (overlay-get (car (overlays-at (1+(point-min)))) 'display)))
