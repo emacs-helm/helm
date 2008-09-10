@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.17 2008-09-10 09:59:22 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.18 2008-09-10 23:27:09 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.17  2008-09-10 09:59:22  rubikitch
+;; Revision 1.18  2008-09-10 23:27:09  rubikitch
+;; Use *anything complete* buffer instead
+;;
+;; Revision 1.17  2008/09/10 09:59:22  rubikitch
 ;; arfn-sources: bug fix
 ;;
 ;; Revision 1.16  2008/09/10 09:40:31  rubikitch
@@ -154,7 +157,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.17 2008-09-10 09:59:22 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.18 2008-09-10 23:27:09 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -188,7 +191,8 @@
         (anything-idle-delay (or idle-delay anything-idle-delay))
         (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
         (anything-complete-target target))
-    (anything sources)))
+    (anything sources nil nil nil nil "*anything complete*")))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  `lisp-complete-symbol' and `apropos' replacement                  ;;;;
@@ -371,8 +375,9 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-lisp-complete-symbol-1 (update sources input)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
-  (let ((anything-lisp-complete-symbol-input-idle-delay anything-input-idle-delay))
-    (anything sources input)))
+  (let ((anything-lisp-complete-symbol-input-idle-delay anything-input-idle-delay)
+        anything-last-sources)
+    (anything sources input nil nil nil "*anything complete*")))
 
 (defun anything-lisp-complete-symbol (update)
   "`lisp-complete-symbol' replacement using `anything'."
@@ -427,7 +432,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                                  collection
                                  predicate require-match initial
                                  hist default inherit-input-method)
-                                initial prompt)
+                                initial prompt nil nil "*anything complete*")
                       (keyboard-quit))))
       (when (stringp result)
         (prog1 result
@@ -506,7 +511,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
          (result (or (anything (arfn-sources
                                 prompt dir default-filename require-match
                                 initial-input predicate)
-                               initial-input prompt)
+                               initial-input prompt nil nil "*anything complete*")
                      (keyboard-quit))))
     (when (and require-match
                (not (and (file-exists-p result)
@@ -562,7 +567,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (anything (arb-sources prompt
                            (if (bufferp default) (buffer-name default) default)
                            require-match start matches-set)
-              start prompt)))
+              start prompt nil nil "*anything complete*")))
 
 (defun arb-sources (prompt default require-match start matches-set)
   `(,(ac-default-source default)
@@ -586,7 +591,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                              (init . (lambda () (alcs-init ,buffer)))
                              (candidates-in-buffer)
                              (action . identity)))
-                          nil prompt)
+                          nil prompt nil nil "*anything complete*")
                 (keyboard-quit)))))
 
 ;;----------------------------------------------------------------------
