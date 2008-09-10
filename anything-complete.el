@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.15 2008-09-09 01:19:49 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.16 2008-09-10 09:40:31 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.15  2008-09-09 01:19:49  rubikitch
+;; Revision 1.16  2008-09-10 09:40:31  rubikitch
+;; arfn-sources: paren bug fix
+;;
+;; Revision 1.15  2008/09/09 01:19:49  rubikitch
 ;; add (require 'shell-history)
 ;;
 ;; Revision 1.14  2008/09/05 13:59:39  rubikitch
@@ -148,7 +151,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.15 2008-09-09 01:19:49 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.16 2008-09-10 09:40:31 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -531,17 +534,17 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                              (candidates . minibuffer-history)
                              (action . identity)))))
     `(((name . "Default")
-       (candidates . ,default-filename))
+       (candidates ,default-filename)
        (filtered-candidate-transformer
         . (lambda (cands source)
             (if (and (not arfn-followed) (string= anything-pattern "")) cands nil)))
-       (action . (lambda (f) (expand-file-name f ,dir)))
-       ((name . ,dir)
-        (candidates . (lambda () (arfn-candidates ,dir)))
-        (action . identity)
-        ,transformer-func)
-       ,new-input-source
-       ,history-source)))
+       (action . (lambda (f) (expand-file-name f ,dir))))
+      ((name . ,dir)
+       (candidates . (lambda () (arfn-candidates ,dir)))
+       (action . identity)
+       ,transformer-func)
+      ,new-input-source
+      ,history-source)))
 ;; (anything-read-file-name "file: " "~" ".emacs")
 ;; (anything-read-file-name "file: " "~" )
 ;; (anything-read-file-name "file: ")
