@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.16 2008-09-10 09:40:31 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.17 2008-09-10 09:59:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.16  2008-09-10 09:40:31  rubikitch
+;; Revision 1.17  2008-09-10 09:59:22  rubikitch
+;; arfn-sources: bug fix
+;;
+;; Revision 1.16  2008/09/10 09:40:31  rubikitch
 ;; arfn-sources: paren bug fix
 ;;
 ;; Revision 1.15  2008/09/09 01:19:49  rubikitch
@@ -151,7 +154,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.16 2008-09-10 09:40:31 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.17 2008-09-10 09:59:22 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -527,14 +530,14 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
               `(candidate-transformer
                 . (lambda (cands)
                     (remove-if-not
-                     (lambda (c) (,predicate (if (listp c) (car c) c))) cands)))))
+                     (lambda (c) (,predicate (if (consp c) (cdr c) c))) cands)))))
          (new-input-source (ac-new-input-source prompt nil))
          (history-source (unless require-match
                            `((name . "History")
                              (candidates . minibuffer-history)
                              (action . identity)))))
     `(((name . "Default")
-       (candidates ,default-filename)
+       (candidates . ,(if default-filename (list default-filename)))
        (filtered-candidate-transformer
         . (lambda (cands source)
             (if (and (not arfn-followed) (string= anything-pattern "")) cands nil)))
