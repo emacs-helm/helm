@@ -840,14 +840,15 @@ skipped."
                (push file filtered-files))
           finally (return (nreverse filtered-files)))))
 
-(defun anything-c-windows-pathname-transformer (args)
+(defun anything-c-w32-pathname-transformer (args)
   "Change undesirable features of windows pathnames to ones more acceptable to
 other candidate transformers."
   (if (eq system-type 'windows-nt)
           (mapcar (lambda (x)
                     (replace-regexp-in-string "/cygdrive/\\(.\\)" "\\1:" x))
                   (mapcar (lambda (y)
-                            (replace-regexp-in-string "\\\\" "/" y)) args))))
+                            (replace-regexp-in-string "\\\\" "/" y)) args))
+    args))
             
 
 (defun anything-c-shorten-home-path (files)
@@ -1099,7 +1100,7 @@ This function allows easy sequencing of transformer functions."
          (candidate-transformer . (lambda (candidates)
                                     (anything-c-compose
                                      (list candidates)
-                                     '(anything-c-windows-pathname-transformer
+                                     '(anything-c-w32-pathname-transformer
                                        anything-c-skip-boring-files
                                        anything-c-shorten-home-path)))))
         (command (action ("Call interactively" . (lambda (command-name)
