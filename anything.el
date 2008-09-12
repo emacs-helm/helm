@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.111 2008-09-10 22:53:11 rubikitch Exp $
+;; $Id: anything.el,v 1.112 2008-09-12 01:57:17 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.111  2008-09-10 22:53:11  rubikitch
+;; Revision 1.112  2008-09-12 01:57:17  rubikitch
+;; When resuming anything, reinitialize overlays.
+;;
+;; Revision 1.111  2008/09/10 22:53:11  rubikitch
 ;; anything: bug fix of `anything-buffer'
 ;; New macro: `anything-test-update'
 ;;
@@ -524,7 +527,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.111 2008-09-10 22:53:11 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.112 2008-09-12 01:57:17 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1492,7 +1495,9 @@ already-bound variables. Yuck!
          
          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
-         (unless any-resume (anything-initialize))
+         (if any-resume
+             (anything-initialize-overlays (anything-buffer-get))
+           (anything-initialize))
          (when any-input (setq anything-input any-input anything-pattern any-input))
          (if anything-samewindow
              (switch-to-buffer anything-buffer)
