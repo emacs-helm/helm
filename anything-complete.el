@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.18 2008-09-10 23:27:09 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.19 2008-09-12 02:56:33 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,12 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.18  2008-09-10 23:27:09  rubikitch
+;; Revision 1.19  2008-09-12 02:56:33  rubikitch
+;; Complete functions using `anything' restore `anything-last-sources'
+;; and `anything-compiled-sources' now, because resuming
+;; `anything'-complete session is useless.
+;;
+;; Revision 1.18  2008/09/10 23:27:09  rubikitch
 ;; Use *anything complete* buffer instead
 ;;
 ;; Revision 1.17  2008/09/10 09:59:22  rubikitch
@@ -157,7 +162,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.18 2008-09-10 23:27:09 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.19 2008-09-12 02:56:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -185,13 +190,18 @@
                (candidates-in-buffer . ac-candidates-in-buffer)
                (action . ac-insert)))
 
+;; Warning: I'll change this function's interface. DON'T USE IN YOUR PROGRAM!
+(defun anything-noresume (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
+  (let (anything-last-sources anything-compiled-sources)
+    (anything any-sources any-input any-prompt any-resume any-preselect any-buffer)))
+
 (defun anything-complete (sources target &optional limit idle-delay input-idle-delay)
   "Basic completion interface using `anything'."
   (let ((anything-candidate-number-limit (or limit anything-candidate-number-limit))
         (anything-idle-delay (or idle-delay anything-idle-delay))
         (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
         (anything-complete-target target))
-    (anything sources nil nil nil nil "*anything complete*")))
+    (anything-noresume sources nil nil nil nil "*anything complete*")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -375,9 +385,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-lisp-complete-symbol-1 (update sources input)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
-  (let ((anything-lisp-complete-symbol-input-idle-delay anything-input-idle-delay)
-        anything-last-sources)
-    (anything sources input nil nil nil "*anything complete*")))
+  (let ((anything-lisp-complete-symbol-input-idle-delay anything-input-idle-delay))
+    (anything-noresume sources input nil nil nil "*anything complete*")))
 
 (defun anything-lisp-complete-symbol (update)
   "`lisp-complete-symbol' replacement using `anything'."
@@ -427,12 +436,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (if (or (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
     ;; support only collection list.
-    (let ((result (or (anything (acr-sources
-                                 prompt
-                                 collection
-                                 predicate require-match initial
-                                 hist default inherit-input-method)
-                                initial prompt nil nil "*anything complete*")
+    (let ((result (or (anything-noresume (acr-sources
+                                          prompt
+                                          collection
+                                          predicate require-match initial
+                                          hist default inherit-input-method)
+                                         initial prompt nil nil "*anything complete*")
                       (keyboard-quit))))
       (when (stringp result)
         (prog1 result
@@ -508,10 +517,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   "`anything' replacement for `read-file-name'."
   (setq arfn-followed nil)
   (let* ((anything-map (anything-read-file-name-map))
-         (result (or (anything (arfn-sources
-                                prompt dir default-filename require-match
-                                initial-input predicate)
-                               initial-input prompt nil nil "*anything complete*")
+         (result (or (anything-noresume (arfn-sources
+                                         prompt dir default-filename require-match
+                                         initial-input predicate)
+                                        initial-input prompt nil nil "*anything complete*")
                      (keyboard-quit))))
     (when (and require-match
                (not (and (file-exists-p result)
@@ -564,10 +573,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-read-buffer (prompt &optional default require-match start matches-set)
   "`anything' replacement for `read-buffer'."
   (let (anything-input-idle-delay)
-    (anything (arb-sources prompt
-                           (if (bufferp default) (buffer-name default) default)
-                           require-match start matches-set)
-              start prompt nil nil "*anything complete*")))
+    (anything-noresume (arb-sources prompt
+                                    (if (bufferp default) (buffer-name default) default)
+                                    require-match start matches-set)
+                       start prompt nil nil "*anything complete*")))
 
 (defun arb-sources (prompt default require-match start matches-set)
   `(,(ac-default-source default)
@@ -585,13 +594,13 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (read-variable "variable: " )
 (defun anything-read-symbol-1 (prompt buffer default-value)
   (let (anything-input-idle-delay)
-    (intern (or (anything `(,(ac-default-source
-                              (if default-value (format "%s" default-value)))
-                            ((name . ,prompt)
-                             (init . (lambda () (alcs-init ,buffer)))
-                             (candidates-in-buffer)
-                             (action . identity)))
-                          nil prompt nil nil "*anything complete*")
+    (intern (or (anything-noresume `(,(ac-default-source
+                                       (if default-value (format "%s" default-value)))
+                                     ((name . ,prompt)
+                                      (init . (lambda () (alcs-init ,buffer)))
+                                      (candidates-in-buffer)
+                                      (action . identity)))
+                                   nil prompt nil nil "*anything complete*")
                 (keyboard-quit)))))
 
 ;;----------------------------------------------------------------------
