@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.112 2008-09-12 01:57:17 rubikitch Exp $
+;; $Id: anything.el,v 1.113 2008-09-14 15:15:32 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -164,7 +164,10 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.112  2008-09-12 01:57:17  rubikitch
+;; Revision 1.113  2008-09-14 15:15:32  rubikitch
+;; bugfix: volatile and match attribute / process and match attribute
+;;
+;; Revision 1.112  2008/09/12 01:57:17  rubikitch
 ;; When resuming anything, reinitialize overlays.
 ;;
 ;; Revision 1.111  2008/09/10 22:53:11  rubikitch
@@ -527,7 +530,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.112 2008-09-12 01:57:17 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.113 2008-09-14 15:15:32 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1352,7 +1355,8 @@ Anything plug-ins are realized by this function."
                     (subseq matches 0 limit))))
 
       (condition-case nil
-          (let ((item-count 0) 
+          (let ((item-count 0)
+                (cands (anything-get-cached-candidates source))
                 exit)
 
             (unless functions
@@ -1363,7 +1367,7 @@ Anything plug-ins are realized by this function."
             (clrhash anything-match-hash)
             (dolist (function functions)
               (let (newmatches)
-                (dolist (candidate (anything-get-cached-candidates source))
+                (dolist (candidate cands)
                   (when (and (not (gethash candidate anything-match-hash))
                              (funcall function (if (listp candidate)
                                                    (car candidate)
@@ -3849,6 +3853,16 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (with-current-buffer (anything-buffer-get)
           (buffer-string)
           (overlay-get (car (overlays-at (1+(point-min)))) 'display)))
+      (desc "volatile and match attribute")
+      ;; candidates function is called once per `anything-process-delayed-sources'
+      (expect 1
+        (let ((v 0))
+          (anything-test-candidates '(((name . "test")
+                                       (candidates . (lambda () (incf v) '("ok")))
+                                       (volatile)
+                                       (match identity identity identity)))
+                                    "o")
+          v))
         
       )))
 
