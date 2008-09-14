@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.19 2008-09-12 02:56:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.20 2008-09-14 15:20:12 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.19  2008-09-12 02:56:33  rubikitch
+;; Revision 1.20  2008-09-14 15:20:12  rubikitch
+;; set `anything-input-idle-delay'.
+;;
+;; Revision 1.19  2008/09/12 02:56:33  rubikitch
 ;; Complete functions using `anything' restore `anything-last-sources'
 ;; and `anything-compiled-sources' now, because resuming
 ;; `anything'-complete session is useless.
@@ -162,7 +165,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.19 2008-09-12 02:56:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.20 2008-09-14 15:20:12 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -207,7 +210,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;  `lisp-complete-symbol' and `apropos' replacement                  ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar anything-lisp-complete-symbol-input-idle-delay nil
+(defvar anything-lisp-complete-symbol-input-idle-delay 0.1
   "`anything-input-idle-delay' for `anything-lisp-complete-symbol',
 `anything-lisp-complete-symbol-partial-match' and `anything-apropos'.")
 
@@ -385,7 +388,9 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-lisp-complete-symbol-1 (update sources input)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
-  (let ((anything-lisp-complete-symbol-input-idle-delay anything-input-idle-delay))
+  (let ((anything-lisp-complete-symbol-input-idle-delay
+         (or anything-lisp-complete-symbol-input-idle-delay
+             anything-input-idle-delay)))
     (anything-noresume sources input nil nil nil "*anything complete*")))
 
 (defun anything-lisp-complete-symbol (update)
@@ -517,6 +522,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   "`anything' replacement for `read-file-name'."
   (setq arfn-followed nil)
   (let* ((anything-map (anything-read-file-name-map))
+         anything-input-idle-delay
          (result (or (anything-noresume (arfn-sources
                                          prompt dir default-filename require-match
                                          initial-input predicate)
