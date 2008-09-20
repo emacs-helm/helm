@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.114 2008-09-20 20:09:57 rubikitch Exp $
+;; $Id: anything.el,v 1.115 2008-09-20 20:21:11 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -18,6 +18,7 @@
 ;; This file is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
@@ -75,7 +76,17 @@
 ;; Thanks to IMAKADO for candidates-in-buffer idea.
 ;;
 
-;;; !!INCOMPATIBLE CHANGES!!
+;;; (@* "Index")
+
+;;  If you have library `linkd.el', load
+;;  `linkd.el' and turn on `linkd-mode' now.  It lets you easily
+;;  navigate around the sections  Linkd mode will
+;;  highlight this Index.  You can get `linkd.el' here:
+;;  http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el
+;;
+
+
+;;; (@* "INCOMPATIBLE CHANGES")
 
 ;; v1.114
 ;;
@@ -84,7 +95,7 @@
 ;;   `anything-attr-defined' when testing whether the attribute is
 ;;   defined.
 
-;;; Tips:
+;;; (@* "Tips")
 
 ;;
 ;; `anything-attr' gets the attribute. `anything-attrset' sets the
@@ -167,7 +178,7 @@
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el
 
 
-;; TODO:
+;; (@* "TODO")
 ;;
 ;;   - process status indication
 ;;
@@ -180,9 +191,12 @@
 ;;
 ;;   - support multi line candidates
 
-;; HISTORY:
+;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.114  2008-09-20 20:09:57  rubikitch
+;; Revision 1.115  2008-09-20 20:21:11  rubikitch
+;; added linkd index. (no code change)
+;;
+;; Revision 1.114  2008/09/20 20:09:57  rubikitch
 ;; INCOMPATIBLE CHANGES: `anything-attr'
 ;; New functions: `anything-attrset', `anything-attr-defined'
 ;;
@@ -552,10 +566,10 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.114 2008-09-20 20:09:57 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.115 2008-09-20 20:21:11 rubikitch Exp $")
 (require 'cl)
 
-;; User Configuration 
+;; (@* "User Configuration")
 
 ;; This is only an example. Customize it to your own taste!
 (defvar anything-sources `(((name . "Buffers")
@@ -1053,9 +1067,7 @@ under iswitchb. For example, I bind the character \ to
 keyboard. This way I can switch buffers with Enter and choose
 anything completions with \.")
 
-;;----------------------------------------------------------------------
-;; Public functions
-;;----------------------------------------------------------------------
+;; (@* "Public functions")
 ;;
 ;; These functions are the public API of Anything. See their
 ;; documentation for more information.
@@ -2101,17 +2113,13 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
   (unless no-init (anything-funcall-foreach 'init))
   (unless no-update (anything-update)))
 
-;;---------------------------------------------------------------------
-;; The smallest plug-in: type (built-in)
-;;----------------------------------------------------------------------
+;; (@* "The smallest plug-in: type (built-in)")
 (defun anything-compile-source--type (source)
   (anything-aif (assoc-default 'type source)
       (append source (assoc-default it anything-type-attributes) nil)
     source))
 
-;;----------------------------------------------------------------------
-;; dummy plug-in (built-in)
-;;----------------------------------------------------------------------
+;; (@* "dummy plug-in (built-in)")
 (defun anything-dummy-candidate (candidate source)
   ;; `source' is defined in filtered-candidate-transformer
   (list anything-pattern))  
@@ -2125,9 +2133,7 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
               source)
     source))
 
-;;---------------------------------------------------------------------
-;; candidates-in-buffer plug-in (built-in)
-;;----------------------------------------------------------------------
+;; (@* "candidates-in-buffer plug-in (built-in)")
 (defun anything-candidates-in-buffer ()
   "Get candidates from the candidates buffer according to `anything-pattern'.
 
@@ -2296,9 +2302,7 @@ Acceptable values of CREATE-OR-BUFFER:
                        (volatile) (match identity)))
     source))
 
-;;---------------------------------------------------------------------
-;; Persistent Action
-;;----------------------------------------------------------------------
+;; (@* "Persistent Action")
 (defun anything-execute-persistent-action ()
   "If a candidate is selected then perform the associated action without quitting anything."
   (interactive)
@@ -2339,9 +2343,7 @@ Acceptable values of CREATE-OR-BUFFER:
   (interactive)
   (anything-scroll-other-window-base 'scroll-other-window-down))
 
-;;---------------------------------------------------------------------
-;; Incremental search within results
-;;----------------------------------------------------------------------
+;; (@* "Incremental search within results")
 
 (defvar anything-isearch-original-global-map nil
   "Original global map before Anything isearch is started.")
@@ -2584,9 +2586,7 @@ occurrence of the current pattern.")
   (setq anything-isearch-message-suffix ""))
 
 
-;;---------------------------------------------------------------------
-;; Iswitchb integration
-;;----------------------------------------------------------------------
+;; (@* "Iswitchb integration")
 
 (defvar anything-iswitchb-candidate-selected nil
   "Indicates whether an anything candidate is selected from iswitchb.")
@@ -2729,9 +2729,7 @@ shown yet and bind anything commands in iswitchb."
       (define-key (current-local-map) (car binding) (cdr binding)))
     (anything-iswitchb-minibuffer-exit)))
 
-;;----------------------------------------------------------------------
-;; compatibility
-;;----------------------------------------------------------------------
+;; (@* "compatibility")
 
 ;; Copied assoc-default from XEmacs version 21.5.12
 (unless (fboundp 'assoc-default)
@@ -2782,9 +2780,7 @@ buffer as BUFFER."
         (buffer-modified-tick)))))
 
 
-;;----------------------------------------------------------------------
-;; Unit Tests
-;;----------------------------------------------------------------------
+;; (@* "Unit Tests")
 
 (defun* anything-test-candidates (sources &optional (input "") (compile-source-functions anything-compile-source-functions-default))
   "Test helper function for anything.
