@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.21 2008-09-15 17:31:34 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.22 2008-09-20 20:27:46 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.21  2008-09-15 17:31:34  rubikitch
+;; Revision 1.22  2008-09-20 20:27:46  rubikitch
+;; s/anything-attr/anything-attr-defined/ because of `anything-attr' change
+;;
+;; Revision 1.21  2008/09/15 17:31:34  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.20  2008/09/14 15:20:12  rubikitch
@@ -168,7 +171,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.21 2008-09-15 17:31:34 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.22 2008-09-20 20:27:46 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -180,7 +183,7 @@
   (let ((anything-pattern
          (if (equal "" anything-complete-target)
              anything-pattern
-           (concat (if (anything-attr 'prefix-match) "^" "")
+           (concat (if (anything-attr-defined 'prefix-match) "^" "")
                    anything-complete-target " " anything-pattern))))
     (anything-candidates-in-buffer)))
 
