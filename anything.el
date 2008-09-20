@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.113 2008-09-14 15:15:32 rubikitch Exp $
+;; $Id: anything.el,v 1.114 2008-09-20 20:09:57 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -75,7 +75,25 @@
 ;; Thanks to IMAKADO for candidates-in-buffer idea.
 ;;
 
+;;; !!INCOMPATIBLE CHANGES!!
+
+;; v1.114
+;;
+;;   `anything-attr' returns nil when the source attribute is defined
+;;   but the value of attribute is nil, eg. (volatile) cell. Use
+;;   `anything-attr-defined' when testing whether the attribute is
+;;   defined.
+
 ;;; Tips:
+
+;;
+;; `anything-attr' gets the attribute. `anything-attrset' sets the
+;; attribute. `anything-attr-defined' tests whether the attribute is
+;; defined. They handles source-local variables.
+;;
+;; [EVAL IT] (describe-function 'anything-attr)
+;; [EVAL IT] (describe-function 'anything-attrset)
+;; [EVAL IT] (describe-function 'anything-attr-defined)
 
 ;;
 ;; `anything-sources' accepts many attributes to make your life easier.
@@ -164,7 +182,11 @@
 
 ;; HISTORY:
 ;; $Log: anything.el,v $
-;; Revision 1.113  2008-09-14 15:15:32  rubikitch
+;; Revision 1.114  2008-09-20 20:09:57  rubikitch
+;; INCOMPATIBLE CHANGES: `anything-attr'
+;; New functions: `anything-attrset', `anything-attr-defined'
+;;
+;; Revision 1.113  2008/09/14 15:15:32  rubikitch
 ;; bugfix: volatile and match attribute / process and match attribute
 ;;
 ;; Revision 1.112  2008/09/12 01:57:17  rubikitch
@@ -530,7 +552,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.113 2008-09-14 15:15:32 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.114 2008-09-20 20:09:57 rubikitch Exp $")
 (require 'cl)
 
 ;; User Configuration 
@@ -1219,22 +1241,27 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
              do (set var value)))))
 (put 'with-anything-restore-variables 'lisp-indent-function 0)
 
-(defun anything-attr (attribute-name)
-  "Get the value of ATTRIBUTE-NAME of current source.
+(defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
+  "Get the value of ATTRIBUTE-NAME of SRC (source).
+if SRC is omitted, use current source.
 It is useful to write your sources."
-  (anything-aif (assoc attribute-name (anything-get-current-source))
-      (anything-aif (cdr it) it t)))    ;second it == (cdr it)
+  (anything-aif (assq attribute-name src)
+      (cdr it)))
 
-(defun anything-check-minibuffer-input ()
-  "Extract input string from the minibuffer and check if it needs
-to be handled."
-  (if (or (not anything-input-idle-delay) (anything-action-window))
-      (anything-check-minibuffer-input-1)
-    (if anything-check-minibuffer-input-timer
-        (cancel-timer anything-check-minibuffer-input-timer))
-    (setq anything-check-minibuffer-input-timer
-          (run-with-idle-timer anything-input-idle-delay nil
-                               'anything-check-minibuffer-input-1))))
+(defun* anything-attr-defined (attribute-name &optional (src (anything-get-current-source)))
+  "Return non-nil if ATTRIBUTE-NAME of SRC (source)  is defined.
+if SRC is omitted, use current source.
+It is useful to write your sources."
+  (and (assq attribute-name src) t))
+
+(defun* anything-attrset (attribute-name value &optional (src (anything-get-current-source)))
+  "Set the value of ATTRIBUTE-NAME of SRC (source) to VALUE.
+if SRC is omitted, use current source.
+It is useful to write your sources."
+  (anything-aif (assq attribute-name src)
+      (setcdr it value)
+    (setcdr src (cons (cons attribute-name value) (cdr src))))
+  value)
 
 (defun anything-check-minibuffer-input-1 ()
   (with-selected-window (minibuffer-window)
@@ -3464,14 +3491,56 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
               (init . (lambda () (setq v (anything-attr 'hoge))))
               (candidates "a"))))
           v))
-      (expect t
+      (expect nil
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init . (lambda () (setq v (anything-attr 'hoge))))
+              (candidates "a"))))
+          v))
+      (expect nil
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (hoge)                    ;INCOMPATIBLE!
+              (init . (lambda () (setq v (anything-attr 'hoge))))
+              (candidates "a"))))
+          v))
+      (desc "anything-attr-defined")
+      (expect (non-nil)
         (let (v)
           (anything-test-candidates
            '(((name . "FOO")
               (hoge)
-              (init . (lambda () (setq v (anything-attr 'hoge))))
+              (init . (lambda () (setq v (anything-attr-defined 'hoge))))
               (candidates "a"))))
-          v))
+          v))      
+      (expect nil
+        (let (v)
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init . (lambda () (setq v (anything-attr-defined 'hoge))))
+              (candidates "a"))))
+          v))      
+      (desc "anything-attrset")
+      (expect '((name . "FOO") (hoge . 77))
+        (let ((src '((name . "FOO") (hoge))))
+          (anything-attrset 'hoge 77 src)
+          src))
+      (expect 77
+        (anything-attrset 'hoge 77 '((name . "FOO") (hoge))))
+
+      (expect '((name . "FOO") (hoge . 77))
+        (let ((src '((name . "FOO") (hoge . 1))))
+          (anything-attrset 'hoge 77 src)
+          src))
+
+      (expect '((name . "FOO") (hoge . 77) (x))
+        (let ((src '((name . "FOO") (x))))
+          (anything-attrset 'hoge 77 src)
+          src))
+      (expect 77
+        (anything-attrset 'hoge 77 '((name . "FOO"))))
       (desc "anything-preselect")
       ;; entire candidate
       (expect "foo"
