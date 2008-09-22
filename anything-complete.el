@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.22 2008-09-20 20:27:46 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.23 2008-09-22 09:12:42 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.22  2008-09-20 20:27:46  rubikitch
+;; Revision 1.23  2008-09-22 09:12:42  rubikitch
+;; set `anything-input-idle-delay'.
+;;
+;; Revision 1.22  2008/09/20 20:27:46  rubikitch
 ;; s/anything-attr/anything-attr-defined/ because of `anything-attr' change
 ;;
 ;; Revision 1.21  2008/09/15 17:31:34  rubikitch
@@ -171,7 +174,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.22 2008-09-20 20:27:46 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.23 2008-09-22 09:12:42 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -447,13 +450,14 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (if (or (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
     ;; support only collection list.
-    (let ((result (or (anything-noresume (acr-sources
-                                          prompt
-                                          collection
-                                          predicate require-match initial
-                                          hist default inherit-input-method)
-                                         initial prompt nil nil "*anything complete*")
-                      (keyboard-quit))))
+    (let* (anything-input-idle-delay
+           (result (or (anything-noresume (acr-sources
+                                           prompt
+                                           collection
+                                           predicate require-match initial
+                                           hist default inherit-input-method)
+                                          initial prompt nil nil "*anything complete*")
+                       (keyboard-quit))))
       (when (stringp result)
         (prog1 result
           (add-to-list (or hist 'minibuffer-history) result))))))
