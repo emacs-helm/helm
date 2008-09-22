@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.115 2008-09-20 20:21:11 rubikitch Exp $
+;; $Id: anything.el,v 1.116 2008-09-22 11:27:29 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.115  2008-09-20 20:21:11  rubikitch
+;; Revision 1.116  2008-09-22 11:27:29  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.115  2008/09/20 20:21:11  rubikitch
 ;; added linkd index. (no code change)
 ;;
 ;; Revision 1.114  2008/09/20 20:09:57  rubikitch
@@ -566,7 +569,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.115 2008-09-20 20:21:11 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.116 2008-09-22 11:27:29 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1274,6 +1277,17 @@ It is useful to write your sources."
       (setcdr it value)
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
+
+(defun anything-check-minibuffer-input ()
+  "Extract input string from the minibuffer and check if it needs
+to be handled."
+  (if (or (not anything-input-idle-delay) (anything-action-window))
+      (anything-check-minibuffer-input-1)
+    (if anything-check-minibuffer-input-timer
+        (cancel-timer anything-check-minibuffer-input-timer))
+    (setq anything-check-minibuffer-input-timer
+          (run-with-idle-timer anything-input-idle-delay nil
+                               'anything-check-minibuffer-input-1))))
 
 (defun anything-check-minibuffer-input-1 ()
   (with-selected-window (minibuffer-window)
