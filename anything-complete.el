@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.23 2008-09-22 09:12:42 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.24 2008-09-22 09:15:03 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.23  2008-09-22 09:12:42  rubikitch
+;; Revision 1.24  2008-09-22 09:15:03  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.23  2008/09/22 09:12:42  rubikitch
 ;; set `anything-input-idle-delay'.
 ;;
 ;; Revision 1.22  2008/09/20 20:27:46  rubikitch
@@ -174,7 +177,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.23 2008-09-22 09:12:42 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.24 2008-09-22 09:15:03 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -397,7 +400,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-lisp-complete-symbol-1 (update sources input)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
-  (let ((anything-lisp-complete-symbol-input-idle-delay
+  (let ((anything-input-idle-delay
          (or anything-lisp-complete-symbol-input-idle-delay
              anything-input-idle-delay)))
     (anything-noresume sources input nil nil nil "*anything complete*")))
