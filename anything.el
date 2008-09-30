@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.117 2008-09-30 21:59:10 rubikitch Exp $
+;; $Id: anything.el,v 1.118 2008-09-30 22:21:28 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.117  2008-09-30 21:59:10  rubikitch
+;; Revision 1.118  2008-09-30 22:21:28  rubikitch
+;; New `anything-sources' attribute: accept-empty
+;; dummy: include accept-empty
+;;
+;; Revision 1.117  2008/09/30 21:59:10  rubikitch
 ;; New function: `anything-buffer-is-modified'
 ;;
 ;; Revision 1.116  2008/09/22 11:27:29  rubikitch
@@ -572,7 +576,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.117 2008-09-30 21:59:10 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.118 2008-09-30 22:21:28 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -896,6 +900,10 @@ Attributes:
 - candidate-number-limit (optional)
 
   Override `anything-candidate-number-limit' only for this source.
+
+- accept-empty (optional)
+
+  Pass empty string \"\" to action function.
 
 - dummy (optional)
 
@@ -1599,6 +1607,8 @@ action."
                        (anything-get-selection anything-action-buffer)
                      (anything-get-action))))
   (let ((source (or anything-saved-current-source (anything-get-current-source))))
+    (if (and (not selection) (assoc 'accept-empty source))
+        (setq selection ""))
     (setq display-to-real
           (or display-to-real (assoc-default 'display-to-real source)
               #'identity))
@@ -2149,6 +2159,7 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
 (defun anything-compile-source--dummy (source)
   (if (assoc 'dummy source)
       (append '((candidates "dummy")
+                (accept-empty)
                 (match identity)
                 (filtered-candidate-transformer . anything-dummy-candidate)
                 (volatile))
@@ -3950,7 +3961,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                        (match identity identity identity)))
                                     "o")
           v))
-        
+      (desc "accept-empty attribute")
+      (expect nil
+        (anything-test-candidates
+         '(((name . "test") (candidates "") (action . identity))))
+        (anything-execute-selection-action))
+      (expect ""
+        (anything-test-candidates
+         '(((name . "test") (candidates "") (action . identity) (accept-empty))))
+        (anything-execute-selection-action))
       )))
 
 
