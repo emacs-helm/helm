@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.116 2008-09-22 11:27:29 rubikitch Exp $
+;; $Id: anything.el,v 1.117 2008-09-30 21:59:10 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.116  2008-09-22 11:27:29  rubikitch
+;; Revision 1.117  2008-09-30 21:59:10  rubikitch
+;; New function: `anything-buffer-is-modified'
+;;
+;; Revision 1.116  2008/09/22 11:27:29  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.115  2008/09/20 20:21:11  rubikitch
@@ -569,7 +572,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.116 2008-09-22 11:27:29 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.117 2008-09-30 21:59:10 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1978,15 +1981,20 @@ Cache the candidates if there is not yet a cached value."
     candidates))
 
 (defvar anything-tick-hash (make-hash-table :test 'equal))
-(defun anything-current-buffer-is-modified ()
-  "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
-  (let* ((key (concat (buffer-name anything-current-buffer)
+(defun anything-buffer-is-modified (buffer)
+  "Return non-nil when BUFFER is modified since `anything' was invoked."
+  (let* ((b (get-buffer buffer))
+         (key (concat (buffer-name b)
                      "/"
                      (anything-attr 'name)))
          (source-tick (or (gethash key anything-tick-hash) 0))
-         (buffer-tick (buffer-chars-modified-tick anything-current-buffer)))
+         (buffer-tick (buffer-chars-modified-tick b)))
     (prog1 (/= source-tick buffer-tick)
       (puthash key buffer-tick anything-tick-hash))))
+(defun anything-current-buffer-is-modified ()
+  "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
+  (anything-buffer-is-modified anything-current-buffer))
+
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
