@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.24 2008-09-22 09:15:03 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.25 2008-09-30 22:49:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.24  2008-09-22 09:15:03  rubikitch
+;; Revision 1.25  2008-09-30 22:49:22  rubikitch
+;; `anything-completing-read': handle empty input.
+;;
+;; Revision 1.24  2008/09/22 09:15:03  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.23  2008/09/22 09:12:42  rubikitch
@@ -177,7 +180,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.24 2008-09-22 09:15:03 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.25 2008-09-30 22:49:22 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -440,12 +443,15 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun ac-new-input-source (prompt require-match)
   (unless require-match
     `((name . ,prompt) (dummy) (action . identity))))
-(defun ac-default-source (default &rest additional-attrs)
+(defun ac-default-source (default &optional accept-empty)
   `((name . "Default")
-    (default-value . ,default)
+    (default-value . ,(or default (and accept-empty "")))
     (action . identity)
-    ,@additional-attrs))
-
+    ,(if accept-empty '(accept-empty))))
+;; (ac-default-source "a")
+;; (ac-default-source "a" t)
+;; (ac-default-source nil t)
+;; (ac-default-source nil)
 ;;----------------------------------------------------------------------
 ;; `completing-read' compatible read function (experimental)
 ;;----------------------------------------------------------------------
@@ -480,7 +486,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                           `((name . "History")
                             (candidates . ,(or hist 'minibuffer-history))
                             (action . identity))))
-        (default-source (ac-default-source default)))
+        (default-source (ac-default-source default t)))
   `(,default-source
     ((name . "Completions")
      (candidates . ,(mapcar #'car collection))
@@ -490,7 +496,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     ,new-input-source)))
 ;; (anything-completing-read "Command: " obarray 'commandp t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
-;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
+;; (anything-old-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil)
 ;; (completing-read "Test: " '(("hoge")("foo")("bar")) nil nil "f" nil nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
