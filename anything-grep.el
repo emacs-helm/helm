@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.2 2008-10-01 17:17:59 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.3 2008-10-01 17:18:59 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.2  2008-10-01 17:17:59  rubikitch
+;; Revision 1.3  2008-10-01 17:18:59  rubikitch
+;; silence byte compiler
+;;
+;; Revision 1.2  2008/10/01 17:17:59  rubikitch
 ;; many bug fix
 ;; New command: `anything-grep-by-name'
 ;;
@@ -39,7 +42,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.2 2008-10-01 17:17:59 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.3 2008-10-01 17:18:59 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -149,7 +152,8 @@
         (anything-grep-base (mapcar 'agbn-source it)))
     (error "no such name %s" name)))
 
-(defun agbn-source  (args)
+(defun agbn-source (args)
+  (declare (special query))
   (destructuring-bind (files dir &optional grep) args
     (agrep-source (format "zargs -- %s -- %s %s"
                           files (or grep grep-command) (shell-quote-argument query))
