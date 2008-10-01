@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.1 2008-10-01 10:58:59 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.2 2008-10-01 17:17:59 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,51 +29,37 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.1  2008-10-01 10:58:59  rubikitch
+;; Revision 1.2  2008-10-01 17:17:59  rubikitch
+;; many bug fix
+;; New command: `anything-grep-by-name'
+;;
+;; Revision 1.1  2008/10/01 10:58:59  rubikitch
 ;; Initial revision
 ;;
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.1 2008-10-01 10:58:59 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.2 2008-10-01 17:17:59 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
-(defun anything-grep (command pwd)
-  (interactive
-   (progn
-     (grep-compute-defaults)
-     (let ((default (grep-default-command)))
-       (list (read-from-minibuffer "Run grep (like this): "
-				   (if current-prefix-arg
-				       default grep-command)
-				   nil nil 'grep-history
-				   (if current-prefix-arg nil default))
-             (read-directory-name "Directory: " default-directory default-directory t)
-             ))))
-  (let ((name (format "%s [%s]" command pwd)))
-    (anything
-     `(((name . ,name)
-        (init . (lambda ()
-                  (anything-candidate-buffer (agrep-create-buffer command pwd))))
-        (candidates-in-buffer)
-        (action . agrep-goto)
-        ;; to inherit faces
-        (get-line . buffer-substring))))))
+;; (@* "core")
+(defun anything-grep-base (sources)
+  (save-some-buffers (not compilation-ask-about-save) nil)
+  (anything sources nil nil nil nil))
 
+;; (anything (list (agrep-source "grep -Hin agrep anything-grep.el" default-directory) (agrep-source "grep -Hin pwd anything-grep.el" default-directory)))
 
-;; (anything-grep "grep -Hin agrep anything-grep.el" default-directory)
-
-(defvar agrep-goto-hook nil)
-(defun agrep-goto  (file-line-content)
-  (declare (special pwd))
-  (string-match ":\\([0-9]+\\):" file-line-content)
-  (save-match-data
-    (find-file (expand-file-name (substring file-line-content
-                                            0 (match-beginning 0))
-                                 pwd)))
-  (goto-line (string-to-number (match-string 1 file-line-content)))
-  (run-hooks 'agrep-goto-hook))
+(defun agrep-source (command pwd)
+  `((name . ,(format "%s [%s]" command pwd))
+    (command . ,command)
+    (pwd . ,pwd)
+    (init . agrep-init)
+    (candidates-in-buffer)
+    (action . agrep-goto)
+    (migemo)
+    ;; to inherit faces
+    (get-line . buffer-substring)))
 
 (defvar agrep-font-lock-keywords
   '(;; Highlight grep matches and delete markers
@@ -93,8 +79,12 @@
       ((lambda (bound))
        (replace-match "" t t nil 1)))))  
 
+(defun agrep-init ()
+  (agrep-create-buffer (anything-attr 'command)  (anything-attr 'pwd)))
+
 (defun agrep-create-buffer (command pwd)
-  (with-current-buffer (get-buffer-create (format " *anything grep:%s*" command))
+  (with-current-buffer (anything-candidate-buffer 'global)
+    (setq default-directory pwd)
     (erase-buffer)
     (buffer-disable-undo)
     (font-lock-add-keywords nil agrep-font-lock-keywords 'set)
@@ -103,18 +93,67 @@
 
     (let ((process-environment process-environment))
       (when (eq grep-highlight-matches t)
-        ;; Modify `process-environment' locally bound in `compilation-start'
+        ;; Modify `process-environment' locally bound in `call-process-shell-command'.
         (setenv "GREP_OPTIONS" (concat (getenv "GREP_OPTIONS") " --color=always"))
         ;; for GNU grep 2.5.1
         (setenv "GREP_COLOR" "01;31")
         ;; for GNU grep 2.5.1-cvs
         (setenv "GREP_COLORS" "mt=01;31:fn=:ln=:bn=:se=:ml=:cx=:ne"))
-      (call-process-shell-command command nil (current-buffer)))
+      (call-process "zsh" nil (current-buffer) nil
+                    "-c" (format "autoload zargs; cd %s; %s"
+                                 pwd command)))
     (font-lock-mode 1)
     (font-lock-fontify-buffer)
     (current-buffer)))
 ;; (display-buffer (agrep-create-buffer "grep --color=always -Hin agrep anything-grep.el" default-directory))
 ;; (anything '(((name . "test") (init . (lambda () (anything-candidate-buffer (get-buffer " *anything grep:grep --color=always -Hin agrep anything-grep.el*")) )) (candidates-in-buffer) (get-line . buffer-substring))))
+
+(defvar agrep-goto-hook nil)
+(defun agrep-goto  (file-line-content)
+  (string-match ":\\([0-9]+\\):" file-line-content)
+  (save-match-data
+    (find-file (expand-file-name (substring file-line-content
+                                            0 (match-beginning 0))
+                                 (anything-attr 'pwd))))
+  (goto-line (string-to-number (match-string 1 file-line-content)))
+  (run-hooks 'agrep-goto-hook))
+
+;; (@* "simple grep interface")
+(defun anything-grep (command pwd)
+  (interactive
+   (progn
+     (grep-compute-defaults)
+     (let ((default (grep-default-command)))
+       (list (read-from-minibuffer "Run grep (like this): "
+				   (if current-prefix-arg
+				       default grep-command)
+				   nil nil 'grep-history
+				   (if current-prefix-arg nil default))
+             (read-directory-name "Directory: " default-directory default-directory t)))))
+  (anything-grep-base (list (agrep-source command pwd))))
+;; (anything-grep "grep -Hin agrep anything-grep.el" default-directory)
+
+;; (@* "grep in predefined files")
+(defvar agbn-last-name nil)
+(defvar anything-grep-alist
+  '(("memo" ("**/*" "~/memo"))
+    ("PostgreSQL" ("*.txt" "~/doc/postgresql-74/"))
+    ("~/bin and ~/ruby" ("**/*.rb" "~/ruby") ("**/*" "~/bin"))))
+(defun anything-grep-by-name (name query)
+  (interactive (list (setq agbn-last-name
+                           (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name))
+                     (read-string "Grep query: ")))
+  (anything-aif (assoc-default name anything-grep-alist)
+      (progn
+        (grep-compute-defaults)
+        (anything-grep-base (mapcar 'agbn-source it)))
+    (error "no such name %s" name)))
+
+(defun agbn-source  (args)
+  (destructuring-bind (files dir &optional grep) args
+    (agrep-source (format "zargs -- %s -- %s %s"
+                          files (or grep grep-command) (shell-quote-argument query))
+                  dir)))
 
 (provide 'anything-grep)
 
