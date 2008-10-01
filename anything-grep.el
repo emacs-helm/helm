@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.3 2008-10-01 17:18:59 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.4 2008-10-01 18:18:18 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.3  2008-10-01 17:18:59  rubikitch
+;; Revision 1.4  2008-10-01 18:18:18  rubikitch
+;; use ack-grep command to select files for search.
+;;
+;; Revision 1.3  2008/10/01 17:18:59  rubikitch
 ;; silence byte compiler
 ;;
 ;; Revision 1.2  2008/10/01 17:17:59  rubikitch
@@ -42,7 +45,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.3 2008-10-01 17:18:59 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.4 2008-10-01 18:18:18 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -60,6 +63,7 @@
     (init . agrep-init)
     (candidates-in-buffer)
     (action . agrep-goto)
+    (candidate-number-limit . 9999)
     (migemo)
     ;; to inherit faces
     (get-line . buffer-substring)))
@@ -88,8 +92,6 @@
 (defun agrep-create-buffer (command pwd)
   (with-current-buffer (anything-candidate-buffer 'global)
     (setq default-directory pwd)
-    (erase-buffer)
-    (buffer-disable-undo)
     (font-lock-add-keywords nil agrep-font-lock-keywords 'set)
     (set (make-local-variable 'font-lock-support-mode) nil)
     (set (make-local-variable 'font-lock-maximum-size) nil)
@@ -102,9 +104,8 @@
         (setenv "GREP_COLOR" "01;31")
         ;; for GNU grep 2.5.1-cvs
         (setenv "GREP_COLORS" "mt=01;31:fn=:ln=:bn=:se=:ml=:cx=:ne"))
-      (call-process "zsh" nil (current-buffer) nil
-                    "-c" (format "autoload zargs; cd %s; %s"
-                                 pwd command)))
+      (call-process-shell-command (format "cd %s; %s" pwd command)
+                                  nil (current-buffer)))
     (font-lock-mode 1)
     (font-lock-fontify-buffer)
     (current-buffer)))
@@ -139,9 +140,9 @@
 ;; (@* "grep in predefined files")
 (defvar agbn-last-name nil)
 (defvar anything-grep-alist
-  '(("memo" ("**/*" "~/memo"))
-    ("PostgreSQL" ("*.txt" "~/doc/postgresql-74/"))
-    ("~/bin and ~/ruby" ("**/*.rb" "~/ruby") ("**/*" "~/bin"))))
+  '(("memo" ("." "~/memo"))
+    ("PostgreSQL" ("txt$" "~/doc/postgresql-74/"))
+    ("~/bin and ~/ruby" (".rb$" "~/ruby") ("." "~/bin"))))
 (defun anything-grep-by-name (name query)
   (interactive (list (setq agbn-last-name
                            (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name))
@@ -152,11 +153,14 @@
         (anything-grep-base (mapcar 'agbn-source it)))
     (error "no such name %s" name)))
 
+(defvar ack-grep-command "ack-grep ")
 (defun agbn-source (args)
   (declare (special query))
-  (destructuring-bind (files dir &optional grep) args
-    (agrep-source (format "zargs -- %s -- %s %s"
-                          files (or grep grep-command) (shell-quote-argument query))
+  (destructuring-bind (files-re dir &optional grep) args
+;; - (format "zargs -- %s -- %s %s" files (or grep grep-command) (shell-quote-argument query))
+    (agrep-source (format "%s -afG %s | xargs %s %s"
+                          ack-grep-command (shell-quote-argument files-re)
+                          (or grep grep-command) (shell-quote-argument query))
                   dir)))
 
 (provide 'anything-grep)
