@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.4 2008-10-01 18:18:18 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.5 2008-10-02 18:27:55 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,11 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.4  2008-10-01 18:18:18  rubikitch
+;; Revision 1.5  2008-10-02 18:27:55  rubikitch
+;; Use original fontify code instead of font-lock.
+;; New variable: `agrep-find-file-function'
+;;
+;; Revision 1.4  2008/10/01 18:18:18  rubikitch
 ;; use ack-grep command to select files for search.
 ;;
 ;; Revision 1.3  2008/10/01 17:18:59  rubikitch
@@ -45,7 +49,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.4 2008-10-01 18:18:18 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.5 2008-10-02 18:27:55 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -68,57 +72,51 @@
     ;; to inherit faces
     (get-line . buffer-substring)))
 
-(defvar agrep-font-lock-keywords
-  '(;; Highlight grep matches and delete markers
-     ("\\(\033\\[01;31m\\)\\(.*?\\)\\(\033\\[[0-9]*m\\)"
-      ;; Refontification does not work after the markers have been
-      ;; deleted.  So we use the font-lock-face property here as Font
-      ;; Lock does not clear that.
-      (2 (list 'face  grep-match-face 'font-lock-face grep-match-face))
-      ((lambda (bound))
-       (progn
-	 ;; Delete markers with `replace-match' because it updates
-	 ;; the match-data, whereas `delete-region' would render it obsolete.
-	 (replace-match "" t t nil 3)
-	 (replace-match "" t t nil 1))))
-     ("\\(\033\\[[0-9;]*[mK]\\)"
-      ;; Delete all remaining escape sequences
-      ((lambda (bound))
-       (replace-match "" t t nil 1)))))  
-
 (defun agrep-init ()
   (agrep-create-buffer (anything-attr 'command)  (anything-attr 'pwd)))
+
+(defun agrep-do-grep (command pwd)
+  (let ((process-environment process-environment))
+    (when (eq grep-highlight-matches t)
+      ;; Modify `process-environment' locally bound in `call-process-shell-command'.
+      (setenv "GREP_OPTIONS" (concat (getenv "GREP_OPTIONS") " --color=always"))
+      ;; for GNU grep 2.5.1
+      (setenv "GREP_COLOR" "01;31")
+      ;; for GNU grep 2.5.1-cvs
+      (setenv "GREP_COLORS" "mt=01;31:fn=:ln=:bn=:se=:ml=:cx=:ne"))
+    (call-process-shell-command (format "cd %s; %s" pwd command)
+                                nil (current-buffer))))
+
+(defun agrep-fontify ()
+    ;; Color matches.
+    (goto-char 1)
+    (while (re-search-forward "\\(\033\\[01;31m\\)\\(.*?\\)\\(\033\\[[0-9]*m\\)" nil t)
+      (put-text-property (match-beginning 2) (match-end 2) 'face  grep-match-face)
+      (replace-match "" t t nil 1)
+      (replace-match "" t t nil 3))
+    ;; Delete other escape sequences.
+    (goto-char 1)
+    (while (re-search-forward "\\(\033\\[[0-9;]*[mK]\\)" nil t)
+      (replace-match "" t t nil 0)))
 
 (defun agrep-create-buffer (command pwd)
   (with-current-buffer (anything-candidate-buffer 'global)
     (setq default-directory pwd)
-    (font-lock-add-keywords nil agrep-font-lock-keywords 'set)
-    (set (make-local-variable 'font-lock-support-mode) nil)
-    (set (make-local-variable 'font-lock-maximum-size) nil)
-
-    (let ((process-environment process-environment))
-      (when (eq grep-highlight-matches t)
-        ;; Modify `process-environment' locally bound in `call-process-shell-command'.
-        (setenv "GREP_OPTIONS" (concat (getenv "GREP_OPTIONS") " --color=always"))
-        ;; for GNU grep 2.5.1
-        (setenv "GREP_COLOR" "01;31")
-        ;; for GNU grep 2.5.1-cvs
-        (setenv "GREP_COLORS" "mt=01;31:fn=:ln=:bn=:se=:ml=:cx=:ne"))
-      (call-process-shell-command (format "cd %s; %s" pwd command)
-                                  nil (current-buffer)))
-    (font-lock-mode 1)
-    (font-lock-fontify-buffer)
+    (agrep-do-grep command pwd)
+    (agrep-fontify)
     (current-buffer)))
 ;; (display-buffer (agrep-create-buffer "grep --color=always -Hin agrep anything-grep.el" default-directory))
 ;; (anything '(((name . "test") (init . (lambda () (anything-candidate-buffer (get-buffer " *anything grep:grep --color=always -Hin agrep anything-grep.el*")) )) (candidates-in-buffer) (get-line . buffer-substring))))
 
 (defvar agrep-goto-hook nil)
+(defvar agrep-find-file-function 'find-file)
 (defun agrep-goto  (file-line-content)
   (string-match ":\\([0-9]+\\):" file-line-content)
   (save-match-data
-    (find-file (expand-file-name (substring file-line-content
-                                            0 (match-beginning 0))
-                                 (anything-attr 'pwd))))
+    (funcall agrep-find-file-function
+             (expand-file-name (substring file-line-content
+                                          0 (match-beginning 0))
+                               (anything-attr 'pwd))))
   (goto-line (string-to-number (match-string 1 file-line-content)))
   (run-hooks 'agrep-goto-hook))
 
