@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.14 2008-08-25 08:29:02 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.15 2008-10-03 20:01:46 rubikitch Exp $
 
 ;; Copyright (C) 2007  rubikitch
 
@@ -48,7 +48,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.14  2008-08-25 08:29:02  rubikitch
+;; Revision 1.15  2008-10-03 20:01:46  rubikitch
+;; refactoring
+;;
+;; Revision 1.14  2008/08/25 08:29:02  rubikitch
 ;; `anything-migemo': anything-args
 ;;
 ;; Revision 1.13  2008/08/24 20:39:53  rubikitch
@@ -115,20 +118,20 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
   (string-match (cdr anything-previous-migemo-info) str))
 
 (defun anything-compile-source--migemo (source)
-  (flet ((match-identity-p ()
-                           (or (assoc 'candidates-in-buffer source)
-                               (equal '(identity) (assoc-default 'match source)))))
+  (let ((match-identity-p 
+         (or (assoc 'candidates-in-buffer source)
+             (equal '(identity) (assoc-default 'match source)))))
     (cond (anything-use-migemo
            `((delayed)
              (search ,@(assoc-default 'search source) migemo-forward)
-             ,(if (match-identity-p)
+             ,(if match-identity-p
                   '(match identity)
                 `(match anything-string-match-with-migemo
                         ,@(assoc-default 'match source)))
              ,@source))
           ((assoc 'migemo source)
            `((search migemo-forward)
-             ,(if (match-identity-p)
+             ,(if match-identity-p
                   '(match identity)
                 `(match anything-string-match-with-migemo))
              ,@source))
