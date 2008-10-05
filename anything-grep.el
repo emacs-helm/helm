@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.5 2008-10-02 18:27:55 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.6 2008-10-05 15:43:09 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.5  2008-10-02 18:27:55  rubikitch
+;; Revision 1.6  2008-10-05 15:43:09  rubikitch
+;; changed spec: `anything-grep-alist'
+;;
+;; Revision 1.5  2008/10/02 18:27:55  rubikitch
 ;; Use original fontify code instead of font-lock.
 ;; New variable: `agrep-find-file-function'
 ;;
@@ -49,7 +52,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.5 2008-10-02 18:27:55 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.6 2008-10-05 15:43:09 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -138,9 +141,11 @@
 ;; (@* "grep in predefined files")
 (defvar agbn-last-name nil)
 (defvar anything-grep-alist
-  '(("memo" ("." "~/memo"))
-    ("PostgreSQL" ("txt$" "~/doc/postgresql-74/"))
-    ("~/bin and ~/ruby" (".rb$" "~/ruby") ("." "~/bin"))))
+  '(("memo" ("ack-grep -af | xargs egrep -Hin %s" "~/memo"))
+    ("PostgreSQL" ("egrep -Hin %s *.txt" "~/doc/postgresql-74/"))
+    ("~/bin and ~/ruby"
+     ("ack-grep -afG 'rb$' | xargs egrep -Hin %s" "~/ruby")
+     ("ack-grep -af | xargs egrep -Hin %s" "~/bin"))))
 (defun anything-grep-by-name (name query)
   (interactive (list (setq agbn-last-name
                            (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name))
@@ -154,12 +159,8 @@
 (defvar ack-grep-command "ack-grep ")
 (defun agbn-source (args)
   (declare (special query))
-  (destructuring-bind (files-re dir &optional grep) args
-;; - (format "zargs -- %s -- %s %s" files (or grep grep-command) (shell-quote-argument query))
-    (agrep-source (format "%s -afG %s | xargs %s %s"
-                          ack-grep-command (shell-quote-argument files-re)
-                          (or grep grep-command) (shell-quote-argument query))
-                  dir)))
+  (destructuring-bind (cmd dir) args
+    (agrep-source (format cmd (shell-quote-argument query)) dir)))
 
 (provide 'anything-grep)
 
