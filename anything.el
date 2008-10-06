@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.118 2008-09-30 22:21:28 rubikitch Exp $
+;; $Id: anything.el,v 1.119 2008-10-06 06:43:29 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.118  2008-09-30 22:21:28  rubikitch
+;; Revision 1.119  2008-10-06 06:43:29  rubikitch
+;; `anything-candidate-buffer': return nil when the buffer is dead
+;;
+;; Revision 1.118  2008/09/30 22:21:28  rubikitch
 ;; New `anything-sources' attribute: accept-empty
 ;; dummy: include accept-empty
 ;;
@@ -576,7 +579,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.118 2008-09-30 22:21:28 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.119 2008-10-06 06:43:29 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2327,7 +2330,8 @@ Acceptable values of CREATE-OR-BUFFER:
           (font-lock-mode -1))))
     (or (get-buffer lbufname)
         (get-buffer gbufname)
-        (assoc-default anything-source-name anything-candidate-buffer-alist))))
+        (anything-aif (assoc-default anything-source-name anything-candidate-buffer-alist)
+            (and (buffer-live-p it) it)))))
 
 (defun anything-compile-source--candidates-in-buffer (source)
   (anything-aif (assoc 'candidates-in-buffer source)
