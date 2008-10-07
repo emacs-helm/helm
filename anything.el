@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.119 2008-10-06 06:43:29 rubikitch Exp $
+;; $Id: anything.el,v 1.120 2008-10-07 14:12:02 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.119  2008-10-06 06:43:29  rubikitch
+;; Revision 1.120  2008-10-07 14:12:02  rubikitch
+;; `anything-execute-persistent-action': optional arg
+;;
+;; Revision 1.119  2008/10/06 06:43:29  rubikitch
 ;; `anything-candidate-buffer': return nil when the buffer is dead
 ;;
 ;; Revision 1.118  2008/09/30 22:21:28  rubikitch
@@ -579,7 +582,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.119 2008-10-06 06:43:29 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.120 2008-10-07 14:12:02 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2340,7 +2343,7 @@ Acceptable values of CREATE-OR-BUFFER:
     source))
 
 ;; (@* "Persistent Action")
-(defun anything-execute-persistent-action ()
+(defun* anything-execute-persistent-action (&optional (attr 'persistent-action))
   "If a candidate is selected then perform the associated action without quitting anything."
   (interactive)
   (save-selected-window
@@ -2352,7 +2355,7 @@ Acceptable values of CREATE-OR-BUFFER:
       (with-anything-display-same-window
         (anything-execute-selection-action
          nil
-         (or (assoc-default 'persistent-action (anything-get-current-source))
+         (or (assoc-default attr (anything-get-current-source))
              (anything-get-action))
          t)
         (run-hooks 'anything-after-persistent-action-hook)))))
