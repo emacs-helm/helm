@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.6 2008-10-05 15:43:09 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.7 2008-10-09 00:26:00 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.6  2008-10-05 15:43:09  rubikitch
+;; Revision 1.7  2008-10-09 00:26:00  rubikitch
+;; `anything-grep-by-name': nil argument
+;;
+;; Revision 1.6  2008/10/05 15:43:09  rubikitch
 ;; changed spec: `anything-grep-alist'
 ;;
 ;; Revision 1.5  2008/10/02 18:27:55  rubikitch
@@ -52,7 +55,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.6 2008-10-05 15:43:09 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.7 2008-10-09 00:26:00 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -146,10 +149,12 @@
     ("~/bin and ~/ruby"
      ("ack-grep -afG 'rb$' | xargs egrep -Hin %s" "~/ruby")
      ("ack-grep -af | xargs egrep -Hin %s" "~/bin"))))
-(defun anything-grep-by-name (name query)
-  (interactive (list (setq agbn-last-name
-                           (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name))
-                     (read-string "Grep query: ")))
+(defun anything-grep-by-name (&optional name query)
+  (interactive)
+  (setq name (or name
+                 (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name)))
+  (setq agbn-last-name name)
+  (setq query (or query (read-string "Grep query: ")))
   (anything-aif (assoc-default name anything-grep-alist)
       (progn
         (grep-compute-defaults)
