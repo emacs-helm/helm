@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.7 2008-10-09 00:26:00 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.8 2008-10-09 00:33:40 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.7  2008-10-09 00:26:00  rubikitch
+;; Revision 1.8  2008-10-09 00:33:40  rubikitch
+;; New variable: `anything-grep-save-buffers-before-grep'
+;;
+;; Revision 1.7  2008/10/09 00:26:00  rubikitch
 ;; `anything-grep-by-name': nil argument
 ;;
 ;; Revision 1.6  2008/10/05 15:43:09  rubikitch
@@ -55,13 +58,17 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.7 2008-10-09 00:26:00 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.8 2008-10-09 00:33:40 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
+(defvar anything-grep-save-buffers-before-grep nil
+  "Do `save-some-buffers' before performing `anything-grep'.")
+
 ;; (@* "core")
 (defun anything-grep-base (sources)
-  (save-some-buffers (not compilation-ask-about-save) nil)
+  (and anything-grep-save-buffers-before-grep
+       (save-some-buffers (not compilation-ask-about-save) nil))
   (anything sources nil nil nil nil))
 
 ;; (anything (list (agrep-source "grep -Hin agrep anything-grep.el" default-directory) (agrep-source "grep -Hin pwd anything-grep.el" default-directory)))
