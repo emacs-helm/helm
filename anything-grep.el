@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.8 2008-10-09 00:33:40 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.9 2008-10-12 17:17:23 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.8  2008-10-09 00:33:40  rubikitch
+;; Revision 1.9  2008-10-12 17:17:23  rubikitch
+;; `anything-grep-by-name': swapped query order
+;;
+;; Revision 1.8  2008/10/09 00:33:40  rubikitch
 ;; New variable: `anything-grep-save-buffers-before-grep'
 ;;
 ;; Revision 1.7  2008/10/09 00:26:00  rubikitch
@@ -58,7 +61,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.8 2008-10-09 00:33:40 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.9 2008-10-12 17:17:23 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -158,10 +161,10 @@
      ("ack-grep -af | xargs egrep -Hin %s" "~/bin"))))
 (defun anything-grep-by-name (&optional name query)
   (interactive)
+  (setq query (or query (read-string "Grep query: ")))
   (setq name (or name
                  (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name)))
   (setq agbn-last-name name)
-  (setq query (or query (read-string "Grep query: ")))
   (anything-aif (assoc-default name anything-grep-alist)
       (progn
         (grep-compute-defaults)
