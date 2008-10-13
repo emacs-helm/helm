@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.121 2008-10-13 03:08:08 rubikitch Exp $
+;; $Id: anything.el,v 1.122 2008-10-13 03:10:07 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.121  2008-10-13 03:08:08  rubikitch
+;; Revision 1.122  2008-10-13 03:10:07  rubikitch
+;; `anything': do `anything-mark-current-line' when resuming
+;;
+;; Revision 1.121  2008/10/13 03:08:08  rubikitch
 ;; always set `anything-current-position'
 ;;
 ;; Revision 1.120  2008/10/07 14:12:02  rubikitch
@@ -585,7 +588,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.121 2008-10-13 03:08:08 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.122 2008-10-13 03:10:07 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1583,7 +1586,7 @@ already-bound variables. Yuck!
 
          (unwind-protect
              (progn
-               (unless any-resume (anything-update))
+               (if any-resume (anything-mark-current-line) (anything-update))
                (select-frame-set-input-focus (window-frame (minibuffer-window)))
                (anything-preselect any-preselect)
                (let ((minibuffer-local-map anything-map))
