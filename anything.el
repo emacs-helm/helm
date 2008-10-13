@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.120 2008-10-07 14:12:02 rubikitch Exp $
+;; $Id: anything.el,v 1.121 2008-10-13 03:08:08 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -193,7 +193,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.120  2008-10-07 14:12:02  rubikitch
+;; Revision 1.121  2008-10-13 03:08:08  rubikitch
+;; always set `anything-current-position'
+;;
+;; Revision 1.120  2008/10/07 14:12:02  rubikitch
 ;; `anything-execute-persistent-action': optional arg
 ;;
 ;; Revision 1.119  2008/10/06 06:43:29  rubikitch
@@ -582,7 +585,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.120 2008-10-07 14:12:02 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.121 2008-10-13 03:08:08 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1569,6 +1572,7 @@ already-bound variables. Yuck!
          
          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
 
+         (setq anything-current-position (cons (point) (window-start)))
          (if any-resume
              (anything-initialize-overlays (anything-buffer-get))
            (anything-initialize))
@@ -1722,7 +1726,6 @@ If action buffer is selected, back to the anything buffer."
   (run-hooks 'anything-before-initialize-hook)
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
-  (setq anything-current-position (cons (point) (window-start)))
   (setq anything-compiled-sources nil)
   (setq anything-saved-current-source nil)
   ;; Call the init function for sources where appropriate
