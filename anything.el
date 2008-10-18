@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.123 2008-10-18 10:23:36 rubikitch Exp $
+;; $Id: anything.el,v 1.124 2008-10-18 13:04:20 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.123  2008-10-18 10:23:36  rubikitch
+;; Revision 1.124  2008-10-18 13:04:20  rubikitch
+;; Remove tick entry from `anything-tick-hash' when killing a buffer.
+;;
+;; Revision 1.123  2008/10/18 10:23:36  rubikitch
 ;; multiline patch by Tomohiro MATSUYAMA.
 ;;
 ;; Revision 1.122  2008/10/13 03:10:07  rubikitch
@@ -592,7 +595,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.123 2008-10-18 10:23:36 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.124 2008-10-18 13:04:20 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2090,7 +2093,12 @@ Cache the candidates if there is not yet a cached value."
 (defun anything-current-buffer-is-modified ()
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
   (anything-buffer-is-modified anything-current-buffer))
-
+(defun anything-kill-buffer-hook ()
+  "Remove tick entry from `anything-tick-hash' when killing a buffer."
+  (loop for key being the hash-keys in anything-tick-hash
+        if (string-match (format "^%s/" (regexp-quote (buffer-name))) key)
+        do (remhash key anything-tick-hash)))
+(add-hook 'kill-buffer-hook 'anything-kill-buffer-hook)
 
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
@@ -4065,6 +4073,12 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-candidates
          '(((name . "test") (candidates "") (action . identity) (accept-empty))))
         (anything-execute-selection-action))
+      (desc "anything-tick-hash")
+      (expect nil
+        (with-current-buffer (get-buffer-create " *00create+*")
+          (puthash " *00create+*/xxx" 1 anything-tick-hash)
+          (kill-buffer (current-buffer)))
+        (gethash " *00create+*/xxx" anything-tick-hash))
       )))
 
 
