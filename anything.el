@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.122 2008-10-13 03:10:07 rubikitch Exp $
+;; $Id: anything.el,v 1.123 2008-10-18 10:23:36 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -74,6 +74,7 @@
 ;; Thanks to Tassilo Horn for fixes.
 ;; Thanks to Drew Adams for various fixes (frame, isearch, customization, etc.)
 ;; Thanks to IMAKADO for candidates-in-buffer idea.
+;; Thanks to Tomohiro MATSUYAMA for multiline patch.
 ;;
 
 ;;; (@* "Index")
@@ -193,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.122  2008-10-13 03:10:07  rubikitch
+;; Revision 1.123  2008-10-18 10:23:36  rubikitch
+;; multiline patch by Tomohiro MATSUYAMA.
+;;
+;; Revision 1.122  2008/10/13 03:10:07  rubikitch
 ;; `anything': do `anything-mark-current-line' when resuming
 ;;
 ;; Revision 1.121  2008/10/13 03:08:08  rubikitch
@@ -588,7 +592,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.122 2008-10-13 03:10:07 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.123 2008-10-18 10:23:36 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -924,7 +928,9 @@ Attributes:
 
   This attribute is implemented by plug-in.
 
+- multiline (optional)
 
+  Enable to selection multiline candidates.
 ")
 
 
@@ -1199,6 +1205,10 @@ But the anything buffer has no contents. ")
   list is shown.")
 
 ;; `anything-original-source-filter' is removed
+
+(defvar anything-candidate-separator
+  "--------------------"
+  "Candidates separator of `multiline' source.")
 
 (defvar anything-current-buffer nil
   "Current buffer when `anything' is invoked.")
@@ -1478,28 +1488,37 @@ Anything plug-ins are realized by this function."
                 `(,@anything-test-candidate-list
                   (,(assoc-default 'name source)
                    ,matches))))
-      (anything-insert-header-from-source source)
-      (dolist (match matches)
-        (when (and anything-enable-digit-shortcuts
-                   (not (eq anything-digit-shortcut-count 9)))
-          (move-overlay (nth anything-digit-shortcut-count
-                             anything-digit-overlays)
-                        (line-beginning-position)
-                        (line-beginning-position))
-          (incf anything-digit-shortcut-count))
+      (let ((multiline (assoc 'multiline source))
+            (start (point))
+            separate)
+        (anything-insert-header-from-source source)
+        (dolist (match matches)
+          (when (and anything-enable-digit-shortcuts
+                     (not (eq anything-digit-shortcut-count 9)))
+            (move-overlay (nth anything-digit-shortcut-count
+                               anything-digit-overlays)
+                          (line-beginning-position)
+                          (line-beginning-position))
+            (incf anything-digit-shortcut-count))
 
-        (anything-insert-match match 'insert)))))
+          (if (and multiline separate)
+              (anything-insert-candidate-separator)
+            (setq separate t))
+          (anything-insert-match match 'insert))
+        
+        (if multiline
+            (put-text-property start (point) 'anything-multiline t))))))
 
 (defun anything-insert-match (match insert-function)
   "Insert MATCH into the anything buffer. If MATCH is a list then
 insert the string inteneded to appear on the display and store
 the real value in a text property."
-  (if (not (listp match))
-      (funcall insert-function match)
-
-    (funcall insert-function (car match))
-    (put-text-property (line-beginning-position) (line-end-position) 
-                       'anything-realvalue (cdr match)))
+   (let ((start (line-beginning-position (point)))
+         (string (if (listp match) (car match) match))
+         (realvalue (if (listp match) (cdr match) match)))
+     (funcall insert-function string)
+     (put-text-property start (line-end-position)
+                        'anything-realvalue realvalue))
   (funcall insert-function "\n"))
 
 
@@ -1835,10 +1854,36 @@ UNIT and DIRECTION."
               (not (anything-window)))
     (with-anything-window
       (case unit
-        (line (forward-line (case direction
-                              (next 1)
-                              (previous -1)
-                              (t (error "Invalid direction.")))))
+        (line (case direction
+                (next (if (not (anything-pos-multiline-p))
+                          (forward-line 1)
+                        (let ((header-pos (anything-get-next-header-pos))
+                              (candidate-pos (anything-get-next-candidate-separator-pos)))
+                          (if (and candidate-pos
+                                   (or (null header-pos)
+                                       (< candidate-pos header-pos)))
+                              (goto-char candidate-pos)
+                            (if header-pos
+                                (goto-char header-pos)))
+                          (if candidate-pos
+                              (forward-line 1)))))
+                
+                (previous (progn
+                            (forward-line -1)
+                            (when (anything-pos-multiline-p)
+                              (if (or (anything-pos-header-line-p)
+                                      (anything-pos-candidate-separator-p))
+                                  (forward-line -1)
+                                (forward-line 1))
+                              (let ((header-pos (anything-get-previous-header-pos))
+                                    (candidate-pos (anything-get-previous-candidate-separator-pos)))
+                                (when header-pos
+                                  (if (or (null candidate-pos) (< candidate-pos header-pos))
+                                      (goto-char header-pos)
+                                    (goto-char candidate-pos))
+                                  (forward-line 1))))))
+                
+                (t (error "Invalid direction."))))
 
         (page (case direction
                 (next (condition-case nil
@@ -1865,7 +1910,9 @@ UNIT and DIRECTION."
 
         (t (error "Invalid unit.")))
 
-      (while (and (not (bobp)) (anything-pos-header-line-p))
+      (while (and (not (bobp))
+                  (or (anything-pos-header-line-p)
+                      (anything-pos-candidate-separator-p)))
         (forward-line (if (and (eq direction 'previous)
                                (not (eq (line-beginning-position)
                                         (point-min))))
@@ -1883,7 +1930,14 @@ UNIT and DIRECTION."
   "Move selection overlay to current line."
   (move-overlay anything-selection-overlay
                 (line-beginning-position)
-                (1+ (line-end-position))))
+                (if (anything-pos-multiline-p)
+                    (let ((header-pos (anything-get-next-header-pos))
+                          (candidate-pos (anything-get-next-candidate-separator-pos)))
+                      (or (and (null header-pos) candidate-pos candidate-pos)
+                          (and header-pos candidate-pos (< candidate-pos header-pos) candidate-pos)
+                          header-pos
+                          (point-max)))
+                  (1+ (line-end-position)))))
 
 
 (defun anything-select-with-digit-shortcut ()
@@ -1941,10 +1995,30 @@ UNIT and DIRECTION."
   (previous-single-property-change (point) 'anything-header))
 
 
+(defun anything-pos-multiline-p ()
+  "Return non-nil if the current position is in the multiline source region."
+  (get-text-property (point) 'anything-multiline))
+
+
+(defun anything-get-next-candidate-separator-pos ()
+  "Return the position of the next candidate separator from point."
+  (next-single-property-change (point) 'anything-candidate-separator))
+
+
+(defun anything-get-previous-candidate-separator-pos ()
+  "Return the position of the previous candidate separator from point."
+  (previous-single-property-change (point) 'anything-candidate-separator))
+
+
 (defun anything-pos-header-line-p ()
   "Return t if the current line is a header line."
   (or (get-text-property (line-beginning-position) 'anything-header)
       (get-text-property (line-beginning-position) 'anything-header-separator)))
+
+
+(defun anything-pos-candidate-separator-p ()
+  "Return t if the current line is a candidate separator."
+  (get-text-property (line-beginning-position) 'anything-candidate-separator))
 
 
 (defun anything-get-candidates (source)
@@ -2110,6 +2184,14 @@ Cache the candidates if there is not yet a cached value."
                    'display display-string))
     (insert "\n")
     (put-text-property start (point) 'face anything-header-face)))
+
+
+(defun anything-insert-candidate-separator ()
+  "Insert separator of candidates into the anything buffer."
+  (insert anything-candidate-separator)
+  (put-text-property (line-beginning-position)
+                     (line-end-position) 'anything-candidate-separator t)
+  (insert "\n"))
 
 
 (defun anything-set-source-filter (sources)
