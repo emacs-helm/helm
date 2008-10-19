@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.124 2008-10-18 13:04:20 rubikitch Exp $
+;; $Id: anything.el,v 1.125 2008-10-19 00:29:54 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.124  2008-10-18 13:04:20  rubikitch
+;; Revision 1.125  2008-10-19 00:29:54  rubikitch
+;; kill buffer-local candidate buffers when creating global candidate buffers.
+;;
+;; Revision 1.124  2008/10/18 13:04:20  rubikitch
 ;; Remove tick entry from `anything-tick-hash' when killing a buffer.
 ;;
 ;; Revision 1.123  2008/10/18 10:23:36  rubikitch
@@ -595,7 +598,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.124 2008-10-18 13:04:20 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.125 2008-10-19 00:29:54 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2422,6 +2425,10 @@ Acceptable values of CREATE-OR-BUFFER:
       (if (bufferp create-or-buffer)
           (add-to-list 'anything-candidate-buffer-alist
                        (cons anything-source-name create-or-buffer))
+        (when (eq create-or-buffer 'global)
+          (loop for b in (buffer-list)
+                if (string-match (format "^%s" (regexp-quote gbufname)) (buffer-name b))
+                do (kill-buffer b)))
         (with-current-buffer
             (get-buffer-create (if (eq create-or-buffer 'global) gbufname lbufname))
           (buffer-disable-undo)
@@ -3450,6 +3457,23 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (prog1 (buffer-name (anything-candidate-buffer))
             (kill-buffer anything-current-buffer)
             (kill-buffer buf))))
+      (expect " *anything candidates:FOO*"
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "FOO")
+               (buf-local (anything-candidate-buffer 'local))
+               (buf-global (anything-candidate-buffer 'global)))
+          (prog1 (buffer-name (anything-candidate-buffer))
+            (kill-buffer buf-local)
+            (kill-buffer buf-global))))
+      (expect " *anything candidates:FOO*aTestBuffer"
+        (let* (anything-candidate-buffer-alist
+               (anything-source-name "FOO")
+               (anything-current-buffer (get-buffer-create "aTestBuffer"))
+               (buf-global (anything-candidate-buffer 'global))
+               (buf-local (anything-candidate-buffer 'local)))
+          (prog1 (buffer-name (anything-candidate-buffer))
+            (kill-buffer buf-local)
+            (kill-buffer buf-global))))
       (expect nil
         (let* (anything-candidate-buffer-alist
                (anything-source-name "NOP__"))
