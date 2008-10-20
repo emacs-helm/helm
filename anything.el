@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.127 2008-10-20 05:47:49 rubikitch Exp $
+;; $Id: anything.el,v 1.128 2008-10-20 06:27:54 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.127  2008-10-20 05:47:49  rubikitch
+;; Revision 1.128  2008-10-20 06:27:54  rubikitch
+;; `anything-quick-update': new user option
+;;
+;; Revision 1.127  2008/10/20 05:47:49  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.126  2008/10/20 03:47:58  rubikitch
@@ -604,7 +607,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.127 2008-10-20 05:47:49 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.128 2008-10-20 06:27:54 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1248,6 +1251,11 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defvar anything-in-persistent-action nil
   "Flag whether in persistent-action or not.")
 
+(defvar anything-quick-update nil
+  "If non-nil, suppress displaying sources which are out of screen at first.
+They are treated as delayed sources at this input.
+This flag makes `anything' a bit faster with many sources.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; internal variables
@@ -1367,7 +1375,10 @@ the current pattern."
                        (anything-aif (assoc 'requires-pattern source)
                            (or (cdr it) 1)
                          0)))
-          (if (assoc 'delayed source)
+          (if (or (assoc 'delayed source)
+                  (and anything-quick-update
+                       (< (window-height (get-buffer-window (current-buffer)))
+                          (line-number-at-pos (point-max)))))
               (push source delayed-sources)
             (anything-process-source source))))
 
