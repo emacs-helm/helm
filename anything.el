@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.126 2008-10-20 03:47:58 rubikitch Exp $
+;; $Id: anything.el,v 1.127 2008-10-20 05:47:49 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.126  2008-10-20 03:47:58  rubikitch
+;; Revision 1.127  2008-10-20 05:47:49  rubikitch
+;; refactoring
+;;
+;; Revision 1.126  2008/10/20 03:47:58  rubikitch
 ;; `anything-update': reversed order of delayed sources
 ;;
 ;; Revision 1.125  2008/10/19 00:29:54  rubikitch
@@ -601,7 +604,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.126 2008-10-20 03:47:58 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.127 2008-10-20 05:47:49 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1358,20 +1361,15 @@ the current pattern."
 
     (let (delayed-sources)
       (dolist (source (anything-get-sources))
-        (if (or (not anything-source-filter)
-                (member (assoc-default 'name source) anything-source-filter))
-          (if (equal anything-pattern "")
-              (unless (assoc 'requires-pattern source)
-                (if (assoc 'delayed source)
-                    (push source delayed-sources)
-                  (anything-process-source source)))
-
-            (let ((min-pattern-length (assoc-default 'requires-pattern source)))
-              (unless (and min-pattern-length
-                           (< (length anything-pattern) min-pattern-length))
-                (if (assoc 'delayed source)
-                    (push source delayed-sources)
-                  (anything-process-source source)))))))
+        (when (and (or (not anything-source-filter)
+                       (member (assoc-default 'name source) anything-source-filter))
+                   (>= (length anything-pattern)
+                       (anything-aif (assoc 'requires-pattern source)
+                           (or (cdr it) 1)
+                         0)))
+          (if (assoc 'delayed source)
+              (push source delayed-sources)
+            (anything-process-source source))))
 
       (goto-char (point-min))
       (run-hooks 'anything-update-hook)
