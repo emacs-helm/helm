@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.125 2008-10-19 00:29:54 rubikitch Exp $
+;; $Id: anything.el,v 1.126 2008-10-20 03:47:58 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.125  2008-10-19 00:29:54  rubikitch
+;; Revision 1.126  2008-10-20 03:47:58  rubikitch
+;; `anything-update': reversed order of delayed sources
+;;
+;; Revision 1.125  2008/10/19 00:29:54  rubikitch
 ;; kill buffer-local candidate buffers when creating global candidate buffers.
 ;;
 ;; Revision 1.124  2008/10/18 13:04:20  rubikitch
@@ -598,7 +601,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.125 2008-10-19 00:29:54 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.126 2008-10-20 03:47:58 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1374,7 +1377,7 @@ the current pattern."
       (run-hooks 'anything-update-hook)
       (anything-next-line)
 
-
+      (setq delayed-sources (nreverse delayed-sources))
       (if anything-test-mode
           (dolist (source delayed-sources)
             (anything-process-source source))
