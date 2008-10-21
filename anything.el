@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.128 2008-10-20 06:27:54 rubikitch Exp $
+;; $Id: anything.el,v 1.129 2008-10-21 17:01:37 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.128  2008-10-20 06:27:54  rubikitch
+;; Revision 1.129  2008-10-21 17:01:37  rubikitch
+;; `anything-resume' per buffer.
+;; `anything-last-sources': obsolete
+;;
+;; Revision 1.128  2008/10/20 06:27:54  rubikitch
 ;; `anything-quick-update': new user option
 ;;
 ;; Revision 1.127  2008/10/20 05:47:49  rubikitch
@@ -607,7 +611,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.128 2008-10-20 06:27:54 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.129 2008-10-21 17:01:37 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1239,7 +1243,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   "Saved value of the currently selected action by key.")
 
 (defvar anything-last-sources nil
-  "Sources of previously invoked `anything'.")
+  "OBSOLETE!! Sources of previously invoked `anything'.")
 
 (defvar anything-saved-current-source nil
   "Saved value of the original (anything-get-current-source) when the action
@@ -1255,6 +1259,11 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   "If non-nil, suppress displaying sources which are out of screen at first.
 They are treated as delayed sources at this input.
 This flag makes `anything' a bit faster with many sources.")
+
+(defvar anything-last-sources-local nil
+  "Buffer local value of `anything-sources'.")
+(defvar anything-last-buffer nil
+  "`anything-buffer' of previously `anything' session.")
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -1616,6 +1625,7 @@ already-bound variables. Yuck!
          (if any-resume
              (anything-initialize-overlays (anything-buffer-get))
            (anything-initialize))
+         (setq anything-last-buffer anything-buffer)
          (when any-input (setq anything-input any-input anything-pattern any-input))
          (if anything-samewindow
              (switch-to-buffer anything-buffer)
@@ -1642,10 +1652,23 @@ already-bound variables. Yuck!
      (set-window-start (selected-window) (cdr anything-current-position))
      nil)))
 
-(defun anything-resume ()
+(defun* anything-resume (&optional (any-buffer anything-last-buffer))
   "Resurrect previously invoked `anything'."
   (interactive)
-  (anything (or anything-last-sources anything-sources) nil nil t))
+  (when current-prefix-arg
+    (setq any-buffer
+          (completing-read
+           "Resume anything buffer: "
+           (delq nil
+                 (mapcar (lambda (b)
+                           (when (buffer-local-value 'anything-last-sources-local b)
+                             (list (buffer-name b)))) (buffer-list)))
+           nil t nil nil anything-buffer)))
+  (setq anything-compiled-sources nil)
+  (anything
+   (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
+       anything-last-sources anything-sources)
+   nil nil t nil any-buffer))
 
 (defun anything-execute-selection-action (&optional selection action clear-saved-action display-to-real)
   "If a candidate was selected then perform the associated
@@ -1788,6 +1811,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (buffer-disable-undo)
     (erase-buffer)
     (set (make-local-variable  'inhibit-read-only) t)
+    (set (make-local-variable 'anything-last-sources-local) anything-sources)
     (setq cursor-type nil)
     (setq mode-name "Anything"))
   (anything-initialize-overlays anything-buffer)
