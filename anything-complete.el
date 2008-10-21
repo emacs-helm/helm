@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.26 2008-10-03 09:55:45 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.27 2008-10-21 18:02:39 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.26  2008-10-03 09:55:45  rubikitch
+;; Revision 1.27  2008-10-21 18:02:39  rubikitch
+;; `anything-noresume': restore `anything-last-buffer'
+;;
+;; Revision 1.26  2008/10/03 09:55:45  rubikitch
 ;; anything-read-file-name bug fix
 ;;
 ;; Revision 1.25  2008/09/30 22:49:22  rubikitch
@@ -183,7 +186,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.26 2008-10-03 09:55:45 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.27 2008-10-21 18:02:39 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -213,7 +216,7 @@
 
 ;; Warning: I'll change this function's interface. DON'T USE IN YOUR PROGRAM!
 (defun anything-noresume (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
-  (let (anything-last-sources anything-compiled-sources)
+  (let (anything-last-sources anything-compiled-sources anything-last-buffer)
     (anything any-sources any-input any-prompt any-resume any-preselect any-buffer)))
 
 (defun anything-complete (sources target &optional limit idle-delay input-idle-delay)
