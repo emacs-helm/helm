@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.9 2008-10-12 17:17:23 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.10 2008-10-21 18:02:02 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.9  2008-10-12 17:17:23  rubikitch
+;; Revision 1.10  2008-10-21 18:02:02  rubikitch
+;; use *anything grep* buffer instead.
+;;
+;; Revision 1.9  2008/10/12 17:17:23  rubikitch
 ;; `anything-grep-by-name': swapped query order
 ;;
 ;; Revision 1.8  2008/10/09 00:33:40  rubikitch
@@ -61,7 +64,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.9 2008-10-12 17:17:23 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.10 2008-10-21 18:02:02 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -72,7 +75,7 @@
 (defun anything-grep-base (sources)
   (and anything-grep-save-buffers-before-grep
        (save-some-buffers (not compilation-ask-about-save) nil))
-  (anything sources nil nil nil nil))
+  (anything sources nil nil nil nil "*anything grep*"))
 
 ;; (anything (list (agrep-source "grep -Hin agrep anything-grep.el" default-directory) (agrep-source "grep -Hin pwd anything-grep.el" default-directory)))
 
