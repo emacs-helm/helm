@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.129 2008-10-21 17:01:37 rubikitch Exp $
+;; $Id: anything.el,v 1.130 2008-10-22 10:41:09 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -194,7 +194,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.129  2008-10-21 17:01:37  rubikitch
+;; Revision 1.130  2008-10-22 10:41:09  rubikitch
+;; `anything-insert-match': do not override 'anything-realvalue property
+;;
+;; Revision 1.129  2008/10/21 17:01:37  rubikitch
 ;; `anything-resume' per buffer.
 ;; `anything-last-sources': obsolete
 ;;
@@ -611,7 +614,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.129 2008-10-21 17:01:37 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.130 2008-10-22 10:41:09 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1544,8 +1547,11 @@ the real value in a text property."
          (string (if (listp match) (car match) match))
          (realvalue (if (listp match) (cdr match) match)))
      (funcall insert-function string)
-     (put-text-property start (line-end-position)
-                        'anything-realvalue realvalue))
+     ;; Some sources with candidates-in-buffer have already added
+     ;; 'anything-realvalue property when creating candidate buffer.
+     (unless (get-text-property start 'anything-realvalue)
+       (put-text-property start (line-end-position)
+                          'anything-realvalue realvalue)))
   (funcall insert-function "\n"))
 
 
