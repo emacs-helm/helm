@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.11 2008-09-06 06:01:07 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.12 2008-10-24 07:14:14 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.11  2008-09-06 06:01:07  rubikitch
+;; Revision 1.12  2008-10-24 07:14:14  rubikitch
+;; use `ad-get-arg'
+;;
+;; Revision 1.11  2008/09/06 06:01:07  rubikitch
 ;; Classify candidates by file name using meta source.
 ;; If `anything-gtags-classify' is non-nil, classification is enabled.
 ;;
@@ -186,7 +189,9 @@
   "Use `anything' instead of `gtags-select-mode' when `anything-gtags-hijack-gtags-select-mode' is non-nil."
   (unless (and anything-gtags-hijack-gtags-select-mode
            (string-match "*GTAGS SELECT*"
-                         (if (bufferp buffer) (buffer-name buffer) buffer)))
+                         (if (bufferp (ad-get-arg 0))
+                             (buffer-name (ad-get-arg 0))
+                           (ad-get-arg 0))))
     ad-do-it))
 ;; (progn (ad-disable-advice 'switch-to-buffer 'around 'anything-gtags) (ad-update 'switch-to-buffer)) 
 
