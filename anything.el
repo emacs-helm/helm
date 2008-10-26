@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.130 2008-10-22 10:41:09 rubikitch Exp $
+;; $Id: anything.el,v 1.131 2008-10-26 21:44:43 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -99,6 +99,13 @@
 ;;; (@* "Tips")
 
 ;;
+;; `anything-delete-current-selection' deletes the current line.
+;; It is useful when deleting a candidate in persistent action.
+;; eg. `kill-buffer'.
+;;
+;; [EVAL IT] (describe-function 'anything-delete-current-selection)
+
+;;
 ;; `anything-attr' gets the attribute. `anything-attrset' sets the
 ;; attribute. `anything-attr-defined' tests whether the attribute is
 ;; defined. They handles source-local variables.
@@ -194,7 +201,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.130  2008-10-22 10:41:09  rubikitch
+;; Revision 1.131  2008-10-26 21:44:43  rubikitch
+;; New command: `anything-delete-current-selection'
+;;
+;; Revision 1.130  2008/10/22 10:41:09  rubikitch
 ;; `anything-insert-match': do not override 'anything-realvalue property
 ;;
 ;; Revision 1.129  2008/10/21 17:01:37  rubikitch
@@ -614,7 +624,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.130 2008-10-22 10:41:09 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.131 2008-10-26 21:44:43 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2291,6 +2301,14 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
         anything-sources sources)
   (unless no-init (anything-funcall-foreach 'init))
   (unless no-update (anything-update)))
+
+(defun anything-delete-current-selection ()
+  "Delete the currently selected item."
+  (interactive)
+  (with-anything-window
+    (delete-region (point-at-bol) (1+ (point-at-eol)))
+    (when (eobp) (forward-line -1))
+    (anything-mark-current-line)))
 
 ;; (@* "The smallest plug-in: type (built-in)")
 (defun anything-compile-source--type (source)
