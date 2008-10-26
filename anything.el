@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.131 2008-10-26 21:44:43 rubikitch Exp $
+;; $Id: anything.el,v 1.132 2008-10-26 22:34:59 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -201,7 +201,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.131  2008-10-26 21:44:43  rubikitch
+;; Revision 1.132  2008-10-26 22:34:59  rubikitch
+;; `anything-delete-current-selection' with multiline
+;;
+;; Revision 1.131  2008/10/26 21:44:43  rubikitch
 ;; New command: `anything-delete-current-selection'
 ;;
 ;; Revision 1.130  2008/10/22 10:41:09  rubikitch
@@ -624,7 +627,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.131 2008-10-26 21:44:43 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.132 2008-10-26 22:34:59 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1289,10 +1292,10 @@ This flag makes `anything' a bit faster with many sources.")
 (defvar anything-match-hash (make-hash-table :test 'equal))
 (defvar anything-cib-hash (make-hash-table :test 'equal))
 
-(defmacro anything-aif (test-form then-form &optional else-form)
+(defmacro anything-aif (test-form then-form &rest else-forms)
   "Anaphoric if. Temporary variable `it' is the result of test-form."
   `(let ((it ,test-form))
-     (if it ,then-form ,else-form)))  
+     (if it ,then-form ,@else-forms)))  
 (put 'anything-aif 'lisp-indent-function 2)
 
 (defun anything-mklist (obj)
@@ -2306,8 +2309,20 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
   "Delete the currently selected item."
   (interactive)
   (with-anything-window
-    (delete-region (point-at-bol) (1+ (point-at-eol)))
-    (when (eobp) (forward-line -1))
+    (cond ((anything-pos-multiline-p)
+           (anything-aif (anything-get-next-candidate-separator-pos)
+               (delete-region (point-at-bol)
+                              (1+ (progn (goto-char it) (point-at-eol))))
+             ;; last candidate
+             (goto-char (anything-get-previous-candidate-separator-pos))
+             (delete-region (point-at-bol) (point-max)))
+           (when (eobp)
+             (goto-char (or (anything-get-previous-candidate-separator-pos)
+                            (point-min)))
+             (forward-line 1)))
+          (t
+           (delete-region (point-at-bol) (1+ (point-at-eol)))
+           (when (eobp) (forward-line -1))))
     (anything-mark-current-line)))
 
 ;; (@* "The smallest plug-in: type (built-in)")
