@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.27 2008-10-21 18:02:39 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.28 2008-10-27 10:41:33 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.27  2008-10-21 18:02:39  rubikitch
+;; Revision 1.28  2008-10-27 10:41:33  rubikitch
+;; use linkd tag (no code change)
+;;
+;; Revision 1.27  2008/10/21 18:02:39  rubikitch
 ;; `anything-noresume': restore `anything-last-buffer'
 ;;
 ;; Revision 1.26  2008/10/03 09:55:45  rubikitch
@@ -186,13 +189,11 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.27 2008-10-21 18:02:39 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.28 2008-10-27 10:41:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;  core                                                              ;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (@* "core")
 (defvar anything-complete-target "")
 (defun ac-candidates-in-buffer ()
   (let ((anything-pattern
@@ -228,9 +229,7 @@
     (anything-noresume sources nil nil nil nil "*anything complete*")))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;  `lisp-complete-symbol' and `apropos' replacement                  ;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (@* "`lisp-complete-symbol' and `apropos' replacement")
 (defvar anything-lisp-complete-symbol-input-idle-delay 0.1
   "`anything-input-idle-delay' for `anything-lisp-complete-symbol',
 `anything-lisp-complete-symbol-partial-match' and `anything-apropos'.")
@@ -432,9 +431,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 (alcs-make-candidates)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;  anything-read-string-mode / read-* compatibility functions        ;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (@* "anything-read-string-mode / read-* compatibility functions")
 ;; moved from anything.el
 (defun anything-compile-source--default-value (source)
   (anything-aif (assoc-default 'default-value source)
@@ -458,9 +455,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (ac-default-source "a" t)
 ;; (ac-default-source nil t)
 ;; (ac-default-source nil)
-;;----------------------------------------------------------------------
-;; `completing-read' compatible read function (experimental)
-;;----------------------------------------------------------------------
+
+;; (@* "`completing-read' compatible read function (experimental)")
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
   (if (or (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
@@ -508,9 +504,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
 ;; (anything-completing-read "Test: " '("hoge" "foo" "bar"))
 
-;;----------------------------------------------------------------------
-;; `read-file-name' compatible read function (experimental)
-;;----------------------------------------------------------------------
+;; (@* "`read-file-name' compatible read function (experimental)")
 (defvar anything-read-file-name-map nil)
 (defvar arfn-followed nil)
 (defvar arfn-dir nil)
@@ -604,9 +598,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (anything-read-file-name "file: ")
 ;; (read-file-name "file: " "/tmp")
 
-;;----------------------------------------------------------------------
-;; `read-buffer' compatible read function (experimental)
-;;----------------------------------------------------------------------
+;; (@* "`read-buffer' compatible read function (experimental)")
 (defun anything-read-buffer (prompt &optional default require-match start matches-set)
   "`anything' replacement for `read-buffer'."
   (let (anything-input-idle-delay)
@@ -640,24 +632,18 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                                    nil prompt nil nil "*anything complete*")
                 (keyboard-quit)))))
 
-;;----------------------------------------------------------------------
-;; `read-variable' compatible read function (experimental)
-;;----------------------------------------------------------------------
+;; (@* "`read-variable' compatible read function (experimental)")
 (defun anything-read-variable (prompt &optional default-value)
   (anything-read-symbol-1 prompt alcs-variables-buffer default-value))
 ;; (anything-read-variable "variable: " 'find-file-hooks)
 
-;;----------------------------------------------------------------------
-;; `read-command' compatible read function (experimental)
-;;----------------------------------------------------------------------
+;; (@* "`read-command' compatible read function (experimental)")
 (defun anything-read-command (prompt &optional default-value)
   (anything-read-symbol-1 prompt alcs-commands-buffer default-value))
 ;; (anything-read-variable "command: ")
 
 
-;;----------------------------------------------------------------------
-;; `anything-read-string-mode' initialization
-;;----------------------------------------------------------------------
+;; (@* "`anything-read-string-mode' initialization")
 (defvar anything-read-string-mode nil)
 (unless anything-read-string-mode
   (defalias 'anything-old-completing-read (symbol-function 'completing-read))
@@ -694,9 +680,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
          (message "Uninstalled anything version of read functions."))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;  shell history                                                     ;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (@* " shell history")
 (defun anything-complete-shell-history ()
   "Select a command from shell history and insert it."
   (interactive)
