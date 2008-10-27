@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.133 2008-10-27 11:16:13 rubikitch Exp $
+;; $Id: anything.el,v 1.134 2008-10-27 15:02:25 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -100,7 +100,9 @@
 
 ;;
 ;; `set-frame-configuration' arises flickering. If you hate
-;; flickering, eval (setq anything-save-configuration-type 'window)
+;; flickering, eval:
+;; (setq anything-save-configuration-functions
+;;    '(set-window-configuration . current-window-configuration))
 ;; at the cost of restoring frame configuration (only window configuration).
 
 ;;
@@ -206,7 +208,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.133  2008-10-27 11:16:13  rubikitch
+;; Revision 1.134  2008-10-27 15:02:25  rubikitch
+;; New variable: `anything-save-configuration-functions'
+;; Delete variable: `anything-save-configuration-type'
+;;
+;; Revision 1.133  2008/10/27 11:16:13  rubikitch
 ;; New variable: `anything-save-configuration-type'
 ;;
 ;; Revision 1.132  2008/10/26 22:34:59  rubikitch
@@ -635,7 +641,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.133 2008-10-27 11:16:13 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.134 2008-10-27 15:02:25 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1289,8 +1295,11 @@ This flag makes `anything' a bit faster with many sources.")
 (defvar anything-last-buffer nil
   "`anything-buffer' of previously `anything' session.")
 
-(defvar anything-save-configuration-type 'frame
-  "If you hate flickering, set this variable to 'window.")
+(defvar anything-save-configuration-functions
+  '(set-frame-configuration . current-frame-configuration)
+  "If you hate flickering, set this variable to
+ '(set-window-configuration . current-window-configuration)
+")
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -1368,14 +1377,10 @@ It is useful to write your sources."
   value)
 
 (defun anything-current-frame/window-configuration ()
-  (funcall (if (eq anything-save-configuration-type 'frame)
-               'current-frame-configuration
-             'current-window-configuration)))
+  (funcall (cdr anything-save-configuration-functions)))
 
 (defun anything-set-frame/window-configuration (conf)
-  (funcall (if (eq anything-save-configuration-type 'frame)
-               'set-frame-configuration
-             'set-window-configuration) conf))
+  (funcall (car anything-save-configuration-functions) conf))
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
