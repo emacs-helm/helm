@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.135 2008-10-27 17:04:25 rubikitch Exp $
+;; $Id: anything.el,v 1.136 2008-10-27 17:41:27 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.135  2008-10-27 17:04:25  rubikitch
+;; Revision 1.136  2008-10-27 17:41:27  rubikitch
+;; `anything-process-delayed-sources', `anything-check-minibuffer-input-1': quittable
+;;
+;; Revision 1.135  2008/10/27 17:04:25  rubikitch
 ;; arranged source, added more linkd tags (no code change)
 ;;
 ;; Revision 1.134  2008/10/27 15:02:25  rubikitch
@@ -644,7 +647,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.135 2008-10-27 17:04:25 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.136 2008-10-27 17:41:27 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1672,8 +1675,9 @@ to be handled."
                                'anything-check-minibuffer-input-1))))
 
 (defun anything-check-minibuffer-input-1 ()
-  (with-selected-window (minibuffer-window)
-    (anything-check-new-input (minibuffer-contents))))  
+  (let (inhibit-quit)
+    (with-selected-window (minibuffer-window)
+      (anything-check-new-input (minibuffer-contents)))))
 (defun anything-check-new-input (input)
   "Check input string and update the anything buffer if
 necessary."
@@ -1847,24 +1851,25 @@ Cache the candidates if there is not yet a cached value."
 (defun anything-process-delayed-sources (delayed-sources)
   "Process delayed sources if the user is idle for
 `anything-idle-delay' seconds."
-  (if (sit-for (if anything-input-idle-delay
-                   (max 0 (- anything-idle-delay anything-input-idle-delay))
-                 anything-idle-delay))
-      (with-current-buffer anything-buffer        
-        (save-excursion
-          (goto-char (point-max))
-          (dolist (source delayed-sources)
-            (anything-process-source source))
+  (let (inhibit-quit)
+    (if (sit-for (if anything-input-idle-delay
+                     (max 0 (- anything-idle-delay anything-input-idle-delay))
+                   anything-idle-delay))
+        (with-current-buffer anything-buffer        
+          (save-excursion
+            (goto-char (point-max))
+            (dolist (source delayed-sources)
+              (anything-process-source source))
 
-          (when (and (not (equal (buffer-size) 0))
-                     ;; no selection yet
-                     (= (overlay-start anything-selection-overlay)
-                        (overlay-end anything-selection-overlay)))
-            (goto-char (point-min))
-            (run-hooks 'anything-update-hook)
-            (anything-next-line)))
+            (when (and (not (equal (buffer-size) 0))
+                       ;; no selection yet
+                       (= (overlay-start anything-selection-overlay)
+                          (overlay-end anything-selection-overlay)))
+              (goto-char (point-min))
+              (run-hooks 'anything-update-hook)
+              (anything-next-line)))
 
-        (anything-maybe-fit-frame))))
+          (anything-maybe-fit-frame)))))
 
 ;; (@* "Core: *anything* buffer contents")
 (defun anything-update ()
