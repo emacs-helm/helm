@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.132 2008-10-26 22:34:59 rubikitch Exp $
+;; $Id: anything.el,v 1.133 2008-10-27 11:16:13 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -97,6 +97,11 @@
 ;;   defined.
 
 ;;; (@* "Tips")
+
+;;
+;; `set-frame-configuration' arises flickering. If you hate
+;; flickering, eval (setq anything-save-configuration-type 'window)
+;; at the cost of restoring frame configuration (only window configuration).
 
 ;;
 ;; `anything-delete-current-selection' deletes the current line.
@@ -201,7 +206,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.132  2008-10-26 22:34:59  rubikitch
+;; Revision 1.133  2008-10-27 11:16:13  rubikitch
+;; New variable: `anything-save-configuration-type'
+;;
+;; Revision 1.132  2008/10/26 22:34:59  rubikitch
 ;; `anything-delete-current-selection' with multiline
 ;;
 ;; Revision 1.131  2008/10/26 21:44:43  rubikitch
@@ -627,7 +635,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.132 2008-10-26 22:34:59 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.133 2008-10-27 11:16:13 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1281,6 +1289,9 @@ This flag makes `anything' a bit faster with many sources.")
 (defvar anything-last-buffer nil
   "`anything-buffer' of previously `anything' session.")
 
+(defvar anything-save-configuration-type 'frame
+  "If you hate flickering, set this variable to 'window.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; internal variables
@@ -1355,6 +1366,16 @@ It is useful to write your sources."
       (setcdr it value)
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
+
+(defun anything-current-frame/window-configuration ()
+  (funcall (if (eq anything-save-configuration-type 'frame)
+               'current-frame-configuration
+             'current-window-configuration)))
+
+(defun anything-set-frame/window-configuration (conf)
+  (funcall (if (eq anything-save-configuration-type 'frame)
+               'set-frame-configuration
+             'set-window-configuration) conf))
 
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
@@ -1631,7 +1652,7 @@ already-bound variables. Yuck!
   (interactive)
   (condition-case v
       (with-anything-restore-variables
-       (let ((frameconfig (current-frame-configuration))
+       (let ((frameconfig (anything-current-frame/window-configuration))
              ;; It is needed because `anything-source-name' is non-nil
              ;; when `anything' is invoked by action. Awful global scope.
              anything-source-name anything-in-persistent-action
@@ -1660,7 +1681,7 @@ already-bound variables. Yuck!
 
            (anything-cleanup)
            (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
-           (set-frame-configuration frameconfig))
+           (anything-set-frame/window-configuration frameconfig))
          (unwind-protect
              (anything-execute-selection-action)
            (anything-aif (get-buffer anything-action-buffer)
@@ -2868,7 +2889,7 @@ ESC cancels anything completion and returns to normal iswitchb."
   (anything-cleanup)
 
   (when anything-iswitchb-frame-configuration
-    (set-frame-configuration anything-iswitchb-frame-configuration)
+    (anything-set-frame/window-configuration anything-iswitchb-frame-configuration)
     (setq anything-iswitchb-frame-configuration nil)))
 
 
@@ -2885,7 +2906,7 @@ ESC cancels anything completion and returns to normal iswitchb."
 shown yet and bind anything commands in iswitchb."
   (unless (or (equal (buffer-size (get-buffer anything-buffer)) 0)
               anything-iswitchb-frame-configuration)
-    (setq anything-iswitchb-frame-configuration (current-frame-configuration))
+    (setq anything-iswitchb-frame-configuration (anything-current-frame/window-configuration))
 
     (save-selected-window 
       (if (not anything-samewindow)
