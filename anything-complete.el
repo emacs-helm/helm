@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.33 2008-10-30 16:39:17 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.34 2008-10-30 18:45:27 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.33  2008-10-30 16:39:17  rubikitch
+;; Revision 1.34  2008-10-30 18:45:27  rubikitch
+;; `arfn-sources': use `file-name-history' instead
+;;
+;; Revision 1.33  2008/10/30 16:39:17  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.32  2008/10/30 11:09:17  rubikitch
@@ -204,7 +207,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.33 2008-10-30 16:39:17 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.34 2008-10-30 18:45:27 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -569,7 +572,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
       (error "anything-read-file-name: file `%s' is not matched" result))
     (when (stringp result)
       (prog1 result
-        (add-to-list 'minibuffer-history result)))))
+        (add-to-list 'file-name-history result)))))
 
 (defun arfn-candidates (dir)
   (loop for (f _ _ _ _ _ _ _ _ perm _ _ _) in (directory-files-and-attributes dir t)
@@ -593,7 +596,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                                     additional-attrs)))
          (history-source (unless require-match
                            `((name . "History")
-                             (candidates . minibuffer-history)
+                             (candidates . file-name-history)
                              ,@additional-attrs))))
     `(((name . "Default")
        (candidates . ,(if default-filename (list default-filename)))
