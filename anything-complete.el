@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.31 2008-10-30 10:29:56 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.32 2008-10-30 11:09:17 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.31  2008-10-30 10:29:56  rubikitch
+;; Revision 1.32  2008-10-30 11:09:17  rubikitch
+;; New command: `anything-find-file'
+;;
+;; Revision 1.31  2008/10/30 10:29:56  rubikitch
 ;; `ac-new-input-source', `ac-default-source', `acr-sources', `arfn-sources', `arb-sources': changed args
 ;;
 ;; Revision 1.30  2008/10/30 09:33:50  rubikitch
@@ -198,7 +201,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.31 2008-10-30 10:29:56 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.32 2008-10-30 11:09:17 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -527,7 +530,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 (defun anything-read-file-name-follow-directory ()
   (interactive)
-  (declare (special prompt default-filename require-match predicate))
+  ;; These variables are bound by `arfn-sources' or `anything-find-file'.
+  (declare (special prompt default-filename require-match predicate additional-attrs))
   (setq arfn-followed t)
   (let* ((sel (anything-get-selection))
          (f (expand-file-name sel arfn-dir)))
@@ -537,7 +541,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
            ;;(setq arfn-dir f)
            (anything-set-sources
             (arfn-sources
-             prompt f default-filename require-match nil predicate))
+             prompt f default-filename require-match nil predicate additional-attrs))
            (anything-update))
           ((string-match "^\\(.+\\)/\\([^/]+\\)$" sel)
            (with-selected-window (minibuffer-window)
@@ -545,17 +549,17 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
              (insert (match-string 2 sel)))
            (anything-set-sources
             (arfn-sources
-             prompt (expand-file-name (match-string 1 sel) arfn-dir) nil require-match (match-string 2 sel) predicate))
+             prompt (expand-file-name (match-string 1 sel) arfn-dir) nil require-match (match-string 2 sel) predicate additional-attrs))
            (anything-update)))))
 
-(defun anything-read-file-name (prompt &optional dir default-filename require-match initial-input predicate)
+(defun* anything-read-file-name (prompt &optional dir default-filename require-match initial-input predicate (additional-attrs '((action . identity))))
   "`anything' replacement for `read-file-name'."
   (setq arfn-followed nil)
   (let* ((anything-map (anything-read-file-name-map))
          anything-input-idle-delay
          (result (or (anything-noresume (arfn-sources
                                          prompt dir default-filename require-match
-                                         initial-input predicate)
+                                         initial-input predicate additional-attrs)
                                         initial-input prompt nil nil "*anything complete*")
                      (keyboard-quit))))
     (when (and require-match
@@ -680,6 +684,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
          (defalias 'read-variable (symbol-function 'anything-read-variable))
          (defalias 'read-command (symbol-function 'anything-read-command))
          (substitute-key-definition 'execute-extended-command 'anything-execute-extended-command global-map)
+         (substitute-key-definition 'find-file 'anything-find-file global-map)
          (message "Installed anything version of read functions."))
         (t
          ;; restore to original version
@@ -690,6 +695,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
          (defalias 'read-variable (symbol-function 'anything-old-read-variable))
          (defalias 'read-command (symbol-function 'anything-old-read-command))
          (substitute-key-definition 'anything-execute-extended-command 'execute-extended-command global-map)
+         (substitute-key-definition 'anything-find-file 'find-file global-map)
          (message "Uninstalled anything version of read functions."))))
 
 
@@ -753,6 +759,22 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (when cmd
       (setq extended-command-history (cons cmd (delete cmd extended-command-history)))
       (call-interactively (intern cmd)))))
+
+(defvar anything-find-file-additional-sources nil)
+(defun anything-find-file ()
+  (interactive)
+  (let ((anything-map (anything-read-file-name-map))
+        ;; anything-read-file-name-follow-directory uses these variables
+        default-filename require-match predicate
+        (additional-attrs '(;; because anything-c-skip-boring-files cannot
+                            ;; handle (display . real) candidates
+                            (candidate-transformer)
+                            (type . file))))
+    (anything-complete (append (arfn-sources "Find File: " default-directory
+                                             nil nil nil nil additional-attrs)
+                               anything-find-file-additional-sources)
+                       "" )))
+;;(anything-find-file)
       
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
