@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.32 2008-10-30 11:09:17 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.33 2008-10-30 16:39:17 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.32  2008-10-30 11:09:17  rubikitch
+;; Revision 1.33  2008-10-30 16:39:17  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.32  2008/10/30 11:09:17  rubikitch
 ;; New command: `anything-find-file'
 ;;
 ;; Revision 1.31  2008/10/30 10:29:56  rubikitch
@@ -201,7 +204,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.32 2008-10-30 11:09:17 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.33 2008-10-30 16:39:17 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -440,8 +443,6 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   "`apropos' replacement using `anything'."
   (interactive "P")
   (anything-lisp-complete-symbol-1 update anything-apropos-sources nil))
-
-(alcs-make-candidates)
 
 ;; (@* "anything-read-string-mode / read-* compatibility functions")
 ;; moved from anything.el
@@ -775,6 +776,9 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                                anything-find-file-additional-sources)
                        "" )))
 ;;(anything-find-file)
+
+(add-hook 'after-init-hook 'alcs-make-candidates)
+
       
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
