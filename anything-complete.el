@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.29 2008-10-27 10:55:55 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.30 2008-10-30 09:33:50 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.29  2008-10-27 10:55:55  rubikitch
+;; Revision 1.30  2008-10-30 09:33:50  rubikitch
+;; `anything-execute-extended-command': fixed a bug
+;;
+;; Revision 1.29  2008/10/27 10:55:55  rubikitch
 ;; New command: `anything-execute-extended-command'
 ;;
 ;; Revision 1.28  2008/10/27 10:41:33  rubikitch
@@ -192,7 +195,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.29 2008-10-27 10:55:55 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.30 2008-10-30 09:33:50 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -738,7 +741,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                           (candidates . extended-command-history)
                           (action . identity))
                          ((name . "Commands")
-                          (init . (lambda () (alcs-init alcs-commands-buffer)))
+                          (init . (lambda () (anything-candidate-buffer
+                                              (get-buffer alcs-commands-buffer))))
                           (candidates-in-buffer . ac-candidates-in-buffer)
                           (action . identity))))))
     (when cmd
