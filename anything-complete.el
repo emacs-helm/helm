@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.30 2008-10-30 09:33:50 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.31 2008-10-30 10:29:56 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.30  2008-10-30 09:33:50  rubikitch
+;; Revision 1.31  2008-10-30 10:29:56  rubikitch
+;; `ac-new-input-source', `ac-default-source', `acr-sources', `arfn-sources', `arb-sources': changed args
+;;
+;; Revision 1.30  2008/10/30 09:33:50  rubikitch
 ;; `anything-execute-extended-command': fixed a bug
 ;;
 ;; Revision 1.29  2008/10/27 10:55:55  rubikitch
@@ -195,7 +198,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.30 2008-10-30 09:33:50 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.31 2008-10-30 10:29:56 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -449,13 +452,13 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--default-value)
 
-(defun* ac-new-input-source (prompt require-match &optional (action 'identity))
+(defun ac-new-input-source (prompt require-match &optional additional-attrs)
   (unless require-match
-    `((name . ,prompt) (dummy) (action . ,action))))
-(defun ac-default-source (default &optional accept-empty)
+    `((name . ,prompt) (dummy) ,@additional-attrs)))
+(defun* ac-default-source (default &optional accept-empty (additional-attrs '((action . identity))))
   `((name . "Default")
     (default-value . ,(or default (and accept-empty "")))
-    (action . identity)
+    ,@additional-attrs
     ,(if accept-empty '(accept-empty))))
 ;; (ac-default-source "a")
 ;; (ac-default-source "a" t)
@@ -481,7 +484,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 ;; TODO obarray/predicate hacks: command/variable/symbol
 
-(defun acr-sources (prompt collection predicate require-match initial hist default inherit-input-method)
+(defun* acr-sources (prompt collection predicate require-match initial hist default inherit-input-method &optional (additional-attrs '((action . identity))))
   "`anything' replacement for `completing-read'."
   (let ((transformer-func
          (if predicate
@@ -489,16 +492,16 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                . (lambda (cands)
                    (remove-if-not (lambda (c) (,predicate
                                                (if (listp c) (car c) c))) cands)))))
-        (new-input-source (ac-new-input-source prompt require-match))
+        (new-input-source (ac-new-input-source prompt require-match additional-attrs))
         (history-source (unless require-match
                           `((name . "History")
                             (candidates . ,(or hist 'minibuffer-history))
-                            (action . identity))))
+                            ,@additional-attrs)))
         (default-source (ac-default-source default t)))
   `(,default-source
     ((name . "Completions")
      (candidates . ,(mapcar #'car collection))
-     (action . identity)
+     ,@additional-attrs
      ,transformer-func)
     ,history-source
     ,new-input-source)))
@@ -570,7 +573,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
         collect (cons (concat basename "/") f)
         else collect (cons basename f)))
 
-(defun arfn-sources (prompt dir default-filename require-match initial-input predicate)
+(defun* arfn-sources (prompt dir default-filename require-match initial-input predicate &optional (additional-attrs '((action . identity))))
   (setq arfn-dir dir)
   (let* ((dir (or dir default-directory))
          (transformer-func
@@ -581,20 +584,22 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                      (lambda (c) (,predicate (if (consp c) (cdr c) c))) cands)))))
          (new-input-source (ac-new-input-source
                             prompt nil
-                            (lambda (f) (expand-file-name f arfn-dir))))
+                            (append '((display-to-real . (lambda (f) (expand-file-name f arfn-dir))))
+                                    additional-attrs)))
          (history-source (unless require-match
                            `((name . "History")
                              (candidates . minibuffer-history)
-                             (action . identity)))))
+                             ,@additional-attrs))))
     `(((name . "Default")
        (candidates . ,(if default-filename (list default-filename)))
        (filtered-candidate-transformer
         . (lambda (cands source)
             (if (and (not arfn-followed) (string= anything-pattern "")) cands nil)))
-       (action . (lambda (f) (expand-file-name f ,dir))))
+       (display-to-real . (lambda (f) (expand-file-name f ,dir)))
+       ,@additional-attrs)
       ((name . ,dir)
        (candidates . (lambda () (arfn-candidates ,dir)))
-       (action . identity)
+       ,@additional-attrs
        ,transformer-func)
       ,new-input-source
       ,history-source)))
@@ -613,12 +618,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                                     require-match start matches-set)
                        start prompt nil nil "*anything complete*")))
 
-(defun arb-sources (prompt default require-match start matches-set)
+(defun* arb-sources (prompt default require-match start matches-set &optional (additional-attrs '((action . identity))))
   `(,(ac-default-source default)
     ((name . ,prompt)
      (candidates . (lambda () (mapcar 'buffer-name (buffer-list))))
-     (action . identity))
-    ,(ac-new-input-source prompt require-match)))
+     ,@additional-attrs)
+    ,(ac-new-input-source prompt require-match additional-attrs)))
 
 ;; (anything-read-buffer "test: "  nil)
 ;; (anything-read-buffer "test: " "*scratch*" t)
