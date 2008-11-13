@@ -10,7 +10,7 @@
 ;;     Vagn Johansen <gonz808@hotmail.com>
 ;;     Mathias Dahl <mathias.dahl@gmail.com>
 ;;     Bill Clementson <billclem@gmail.com>
-;;     Stefan Kamphausen <ska@skamphausen.de>
+;;     Stefan Kamphausen (see http://www.skamphausen.de for more informations)
 ;;     Drew Adams <drew.adams@oracle.com>
 ;;     Jason McBrayer <jmcbray@carcosa.net>
 
