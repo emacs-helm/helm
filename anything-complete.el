@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.35 2008-11-02 06:30:06 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.36 2008-11-27 08:12:36 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.35  2008-11-02 06:30:06  rubikitch
+;; Revision 1.36  2008-11-27 08:12:36  rubikitch
+;; `anything-read-buffer': accept empty buffer name
+;;
+;; Revision 1.35  2008/11/02 06:30:06  rubikitch
 ;; `anything-execute-extended-command': fixed a bug
 ;;
 ;; Revision 1.34  2008/10/30 18:45:27  rubikitch
@@ -210,7 +213,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.35 2008-11-02 06:30:06 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.36 2008-11-27 08:12:36 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -630,7 +633,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                        start prompt nil nil "*anything complete*")))
 
 (defun* arb-sources (prompt default require-match start matches-set &optional (additional-attrs '((action . identity))))
-  `(,(ac-default-source default)
+  `(,(ac-default-source default t)
     ((name . ,prompt)
      (candidates . (lambda () (mapcar 'buffer-name (buffer-list))))
      ,@additional-attrs)
