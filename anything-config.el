@@ -13,6 +13,7 @@
 ;;     Stefan Kamphausen (see http://www.skamphausen.de for more informations)
 ;;     Drew Adams <drew.adams@oracle.com>
 ;;     Jason McBrayer <jmcbray@carcosa.net>
+;;     Scott Vokes <vokes.s@gmail.com>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -421,9 +422,11 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 
 ;;;; Locate
 
-(defvar anything-c-locate-options (if (eq system-type 'darwin)
-                                      '("locate")
-                                    '("locate" "-i" "-r"))
+(defvar anything-c-locate-options 
+  (cond 
+   ((eq system-type 'darwin) '("locate"))
+   ((eq system-type 'berkeley-unix) '("locate" "-i"))
+   (t '("locate" "-i" "-r")))
   "A list where the `car' is the name of the locat program
 followed by options.  The search pattern will be appended, so the
 \"-r\" option should be the last option.")
