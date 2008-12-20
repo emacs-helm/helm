@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.12 2008-10-24 07:14:14 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.13 2008-12-20 22:11:04 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.12  2008-10-24 07:14:14  rubikitch
+;; Revision 1.13  2008-12-20 22:11:04  rubikitch
+;; Fixed an error in Emacs23 by Andy Stewart. Thanks.
+;;
+;; Revision 1.12  2008/10/24 07:14:14  rubikitch
 ;; use `ad-get-arg'
 ;;
 ;; Revision 1.11  2008/09/06 06:01:07  rubikitch
@@ -191,7 +194,7 @@
            (string-match "*GTAGS SELECT*"
                          (if (bufferp (ad-get-arg 0))
                              (buffer-name (ad-get-arg 0))
-                           (ad-get-arg 0))))
+                               (or (ad-get-arg 0) ""))))
     ad-do-it))
 ;; (progn (ad-disable-advice 'switch-to-buffer 'around 'anything-gtags) (ad-update 'switch-to-buffer)) 
 
