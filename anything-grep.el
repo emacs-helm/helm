@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.12 2008-12-29 09:40:23 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.13 2008-12-29 09:43:59 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -46,7 +46,12 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.12  2008-12-29 09:40:23  rubikitch
+;; Revision 1.13  2008-12-29 09:43:59  rubikitch
+;; Rename variables:
+;;  `agrep-goto-hook' => `anything-grep-goto-hook'
+;;  `agrep-find-file-function' => `anything-grep-find-file-function'
+;;
+;; Revision 1.12  2008/12/29 09:40:23  rubikitch
 ;; document
 ;;
 ;; Revision 1.11  2008/12/29 07:58:37  rubikitch
@@ -87,17 +92,17 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.12 2008-12-29 09:40:23 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.13 2008-12-29 09:43:59 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
 (defvar anything-grep-save-buffers-before-grep nil
   "Do `save-some-buffers' before performing `anything-grep'.")
 
-(defvar agrep-goto-hook nil
+(defvar anything-grep-goto-hook nil
   "List of functions to be called after `agrep-goto' opens file.")
 
-(defvar agrep-find-file-function 'find-file
+(defvar anything-grep-find-file-function 'find-file
   "Function to visit a file with.
 It takes one argument, a file name to visit.")
 
@@ -195,12 +200,12 @@ Its contents is fontified grep result."
   "Visit the source for the grep result at point."
   (string-match ":\\([0-9]+\\):" file-line-content)
   (save-match-data
-    (funcall agrep-find-file-function
+    (funcall anything-grep-find-file-function
              (expand-file-name (substring file-line-content
                                           0 (match-beginning 0))
                                (anything-attr 'pwd))))
   (goto-line (string-to-number (match-string 1 file-line-content)))
-  (run-hooks 'agrep-goto-hook))
+  (run-hooks 'anything-grep-goto-hook))
 
 ;; (@* "simple grep interface")
 (defun anything-grep (command pwd)
