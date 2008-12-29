@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.11 2008-12-29 07:58:37 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.12 2008-12-29 09:40:23 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -24,12 +24,32 @@
 
 ;;; Commentary:
 
-;; 
+;; Do grep in anything buffer. When we search information with grep,
+;; we often narrow the candidates. Let's use `anything' to do it.
 
+;; `anything-grep' is simple interface to grep a query. It asks
+;; directory to grep. The grep process is synchronous process. You may
+;; have to wait when you grep the target for the first time. But once
+;; the target is on the disk cache, queries are grepped at lightning
+;; speed. Even if older Pentium4 computer, grepping from 180MB takes
+;; only 0.2s! GNU grep is amazingly fast.
+
+;; `anything-grep-by-name' asks query and predefined location. It is
+;; good idea to have ack (ack-grep), grep implemented in Perl, to
+;; exclude unneeded files. Such as RCS, .svn and so on.
+
+;; ack -- better than grep, a power search tool for programmers
+;;  http://petdance.com/ack/
+
+
+   
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.11  2008-12-29 07:58:37  rubikitch
+;; Revision 1.12  2008-12-29 09:40:23  rubikitch
+;; document
+;;
+;; Revision 1.11  2008/12/29 07:58:37  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.10  2008/10/21 18:02:02  rubikitch
@@ -67,15 +87,50 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.11 2008-12-29 07:58:37 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.12 2008-12-29 09:40:23 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
 (defvar anything-grep-save-buffers-before-grep nil
   "Do `save-some-buffers' before performing `anything-grep'.")
 
+(defvar agrep-goto-hook nil
+  "List of functions to be called after `agrep-goto' opens file.")
+
+(defvar agrep-find-file-function 'find-file
+  "Function to visit a file with.
+It takes one argument, a file name to visit.")
+
+(defvar anything-grep-alist
+  "Mapping of location and command/pwd used by `anything-grep-by-name'.
+The command is grep command line. Note that %s is replaced by query.
+The command is typically \"ack-grep -af | xargs egrep -Hin %s\", which means
+regexp/case-insensitive search for all files (including subdirectories)
+except unneeded files.
+
+The pwd is current directory to grep.
+
+The format is:
+
+  ((LOCATION1
+     (COMMAND1-1 PWD1-1)
+     (COMMAND1-2 PWD1-2)
+     ...)
+   (LOCATION2
+     (COMMAND2-1 PWD2-1)
+     (COMMAND2-2 PWD2-2)
+     ...)
+   ...)
+"
+  '(("memo" ("ack-grep -af | xargs egrep -Hin %s" "~/memo"))
+    ("PostgreSQL" ("egrep -Hin %s *.txt" "~/doc/postgresql-74/"))
+    ("~/bin and ~/ruby"
+     ("ack-grep -afG 'rb$' | xargs egrep -Hin %s" "~/ruby")
+     ("ack-grep -af | xargs egrep -Hin %s" "~/bin"))))
+
 ;; (@* "core")
 (defun anything-grep-base (sources)
+  "Invoke `anything' for `anything-grep'."
   (and anything-grep-save-buffers-before-grep
        (save-some-buffers (not compilation-ask-about-save) nil))
   (anything sources nil nil nil nil "*anything grep*"))
@@ -83,6 +138,7 @@
 ;; (anything (list (agrep-source "grep -Hin agrep anything-grep.el" default-directory) (agrep-source "grep -Hin pwd anything-grep.el" default-directory)))
 
 (defun agrep-source (command pwd)
+  "Anything Source of `anything-grep'."
   `((name . ,(format "%s [%s]" command pwd))
     (command . ,command)
     (pwd . ,pwd)
@@ -98,6 +154,8 @@
   (agrep-create-buffer (anything-attr 'command)  (anything-attr 'pwd)))
 
 (defun agrep-do-grep (command pwd)
+  "Insert result of COMMAND. The current directory is PWD.
+GNU grep is expected for COMMAND. The grep result is colorized."
   (let ((process-environment process-environment))
     (when (eq grep-highlight-matches t)
       ;; Modify `process-environment' locally bound in `call-process-shell-command'.
@@ -110,6 +168,7 @@
                                 nil (current-buffer))))
 
 (defun agrep-fontify ()
+  "Fontify the result of `agrep-do-grep'."
   ;; Color matches.
   (goto-char 1)
   (while (re-search-forward "\\(\033\\[01;31m\\)\\(.*?\\)\\(\033\\[[0-9]*m\\)" nil t)
@@ -122,6 +181,8 @@
     (replace-match "" t t nil 0)))
 
 (defun agrep-create-buffer (command pwd)
+  "Create candidate buffer for `anything-grep'.
+Its contents is fontified grep result."
   (with-current-buffer (anything-candidate-buffer 'global)
     (setq default-directory pwd)
     (agrep-do-grep command pwd)
@@ -130,9 +191,8 @@
 ;; (display-buffer (agrep-create-buffer "grep --color=always -Hin agrep anything-grep.el" default-directory))
 ;; (anything '(((name . "test") (init . (lambda () (anything-candidate-buffer (get-buffer " *anything grep:grep --color=always -Hin agrep anything-grep.el*")) )) (candidates-in-buffer) (get-line . buffer-substring))))
 
-(defvar agrep-goto-hook nil)
-(defvar agrep-find-file-function 'find-file)
 (defun agrep-goto  (file-line-content)
+  "Visit the source for the grep result at point."
   (string-match ":\\([0-9]+\\):" file-line-content)
   (save-match-data
     (funcall agrep-find-file-function
@@ -144,6 +204,8 @@
 
 ;; (@* "simple grep interface")
 (defun anything-grep (command pwd)
+  "Run grep in `anything' buffer to narrow results.
+It asks COMMAND for grep command line and PWD for current directory."
   (interactive
    (progn
      (grep-compute-defaults)
@@ -158,14 +220,12 @@
 ;; (anything-grep "grep -Hin agrep anything-grep.el" default-directory)
 
 ;; (@* "grep in predefined files")
-(defvar agbn-last-name nil)
-(defvar anything-grep-alist
-  '(("memo" ("ack-grep -af | xargs egrep -Hin %s" "~/memo"))
-    ("PostgreSQL" ("egrep -Hin %s *.txt" "~/doc/postgresql-74/"))
-    ("~/bin and ~/ruby"
-     ("ack-grep -afG 'rb$' | xargs egrep -Hin %s" "~/ruby")
-     ("ack-grep -af | xargs egrep -Hin %s" "~/bin"))))
+(defvar agbn-last-name nil
+  "The last used name by `anything-grep-by-name'.")
+
 (defun anything-grep-by-name (&optional name query)
+  "Do `anything-grep' from predefined location.
+It asks NAME for location name and QUERY."
   (interactive)
   (setq query (or query (read-string "Grep query: ")))
   (setq name (or name
