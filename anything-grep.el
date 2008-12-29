@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.10 2008-10-21 18:02:02 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.11 2008-12-29 07:58:37 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -29,7 +29,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.10  2008-10-21 18:02:02  rubikitch
+;; Revision 1.11  2008-12-29 07:58:37  rubikitch
+;; refactoring
+;;
+;; Revision 1.10  2008/10/21 18:02:02  rubikitch
 ;; use *anything grep* buffer instead.
 ;;
 ;; Revision 1.9  2008/10/12 17:17:23  rubikitch
@@ -64,7 +67,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.10 2008-10-21 18:02:02 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.11 2008-12-29 07:58:37 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -107,16 +110,16 @@
                                 nil (current-buffer))))
 
 (defun agrep-fontify ()
-    ;; Color matches.
-    (goto-char 1)
-    (while (re-search-forward "\\(\033\\[01;31m\\)\\(.*?\\)\\(\033\\[[0-9]*m\\)" nil t)
-      (put-text-property (match-beginning 2) (match-end 2) 'face  grep-match-face)
-      (replace-match "" t t nil 1)
-      (replace-match "" t t nil 3))
-    ;; Delete other escape sequences.
-    (goto-char 1)
-    (while (re-search-forward "\\(\033\\[[0-9;]*[mK]\\)" nil t)
-      (replace-match "" t t nil 0)))
+  ;; Color matches.
+  (goto-char 1)
+  (while (re-search-forward "\\(\033\\[01;31m\\)\\(.*?\\)\\(\033\\[[0-9]*m\\)" nil t)
+    (put-text-property (match-beginning 2) (match-end 2) 'face  grep-match-face)
+    (replace-match "" t t nil 1)
+    (replace-match "" t t nil 3))
+  ;; Delete other escape sequences.
+  (goto-char 1)
+  (while (re-search-forward "\\(\033\\[[0-9;]*[mK]\\)" nil t)
+    (replace-match "" t t nil 0)))
 
 (defun agrep-create-buffer (command pwd)
   (with-current-buffer (anything-candidate-buffer 'global)
@@ -171,14 +174,12 @@
   (anything-aif (assoc-default name anything-grep-alist)
       (progn
         (grep-compute-defaults)
-        (anything-grep-base (mapcar 'agbn-source it)))
+        (anything-grep-base
+         (mapcar (lambda (args)
+                   (destructuring-bind (cmd dir) args
+                     (agrep-source (format cmd (shell-quote-argument query)) dir)))
+                 it)))
     (error "no such name %s" name)))
-
-(defvar ack-grep-command "ack-grep ")
-(defun agbn-source (args)
-  (declare (special query))
-  (destructuring-bind (cmd dir) args
-    (agrep-source (format cmd (shell-quote-argument query)) dir)))
 
 (provide 'anything-grep)
 
