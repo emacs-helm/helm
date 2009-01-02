@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.36 2008-11-27 08:12:36 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.37 2009-01-02 15:08:03 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.36  2008-11-27 08:12:36  rubikitch
+;; Revision 1.37  2009-01-02 15:08:03  rubikitch
+;; `anything-execute-extended-command': show commands which are not collected.
+;;
+;; Revision 1.36  2008/11/27 08:12:36  rubikitch
 ;; `anything-read-buffer': accept empty buffer name
 ;;
 ;; Revision 1.35  2008/11/02 06:30:06  rubikitch
@@ -213,7 +216,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.36 2008-11-27 08:12:36 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.37 2009-01-02 15:08:03 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -765,6 +768,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                           (init . (lambda () (anything-candidate-buffer
                                               (get-buffer alcs-commands-buffer))))
                           (candidates-in-buffer)
+                          (action . identity))
+                         ((name . "Commands (by prefix)")
+                          (candidates
+                           . (lambda ()
+                               (all-completions anything-pattern obarray 'commandp)))
+                          (volatile)
                           (action . identity))))))
     (when cmd
       (setq extended-command-history (cons cmd (delete cmd extended-command-history)))
