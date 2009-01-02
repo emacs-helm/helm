@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.13 2008-12-29 09:43:59 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.14 2009-01-02 16:00:07 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -46,7 +46,12 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.13  2008-12-29 09:43:59  rubikitch
+;; Revision 1.14  2009-01-02 16:00:07  rubikitch
+;; * Fixed invalid value of `anything-grep-alist'.
+;; * Implemented functionality to search all buffers with `buffer-file-name'.
+;;   See `anything-grep-alist'.
+;;
+;; Revision 1.13  2008/12/29 09:43:59  rubikitch
 ;; Rename variables:
 ;;  `agrep-goto-hook' => `anything-grep-goto-hook'
 ;;  `agrep-find-file-function' => `anything-grep-find-file-function'
@@ -92,7 +97,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.13 2008-12-29 09:43:59 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.14 2009-01-02 16:00:07 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -107,11 +112,19 @@
 It takes one argument, a file name to visit.")
 
 (defvar anything-grep-alist
+  '(("buffers" ("egrep -Hin %s $buffers" "/"))
+    ("memo" ("ack-grep -af | xargs egrep -Hin %s" "~/memo"))
+    ("PostgreSQL" ("egrep -Hin %s *.txt" "~/doc/postgresql-74/"))
+    ("~/bin and ~/ruby"
+     ("ack-grep -afG 'rb$' | xargs egrep -Hin %s" "~/ruby")
+     ("ack-grep -af | xargs egrep -Hin %s" "~/bin")))
   "Mapping of location and command/pwd used by `anything-grep-by-name'.
 The command is grep command line. Note that %s is replaced by query.
 The command is typically \"ack-grep -af | xargs egrep -Hin %s\", which means
 regexp/case-insensitive search for all files (including subdirectories)
 except unneeded files.
+The occurrence of $file in command is replaced with `buffer-file-name' of
+all buffers.
 
 The pwd is current directory to grep.
 
@@ -126,12 +139,7 @@ The format is:
      (COMMAND2-2 PWD2-2)
      ...)
    ...)
-"
-  '(("memo" ("ack-grep -af | xargs egrep -Hin %s" "~/memo"))
-    ("PostgreSQL" ("egrep -Hin %s *.txt" "~/doc/postgresql-74/"))
-    ("~/bin and ~/ruby"
-     ("ack-grep -afG 'rb$' | xargs egrep -Hin %s" "~/ruby")
-     ("ack-grep -af | xargs egrep -Hin %s" "~/bin"))))
+")
 
 ;; (@* "core")
 (defun anything-grep-base (sources)
@@ -221,8 +229,20 @@ It asks COMMAND for grep command line and PWD for current directory."
 				   nil nil 'grep-history
 				   (if current-prefix-arg nil default))
              (read-directory-name "Directory: " default-directory default-directory t)))))
-  (anything-grep-base (list (agrep-source command pwd))))
+  (anything-grep-base (list (agrep-source (agrep-preprocess-command command) pwd))))
 ;; (anything-grep "grep -Hin agrep anything-grep.el" default-directory)
+
+(defun agrep-preprocess-command (command)
+  (with-temp-buffer
+    (insert command)
+    (goto-char 1)
+    (when (search-forward "$buffers" nil t)
+      (delete-region (match-beginning 0) (match-end 0))
+      (insert (mapconcat 'shell-quote-argument
+                         (delq nil (mapcar 'buffer-file-name (buffer-list))) " ")))
+    (buffer-string)))
+
+;; (substring (agrep-preprocess-command "echo $buffers ee") 0 100)
 
 ;; (@* "grep in predefined files")
 (defvar agbn-last-name nil
@@ -242,7 +262,8 @@ It asks NAME for location name and QUERY."
         (anything-grep-base
          (mapcar (lambda (args)
                    (destructuring-bind (cmd dir) args
-                     (agrep-source (format cmd (shell-quote-argument query)) dir)))
+                     (agrep-source (format (agrep-preprocess-command cmd)
+                                           (shell-quote-argument query)) dir)))
                  it)))
     (error "no such name %s" name)))
 
