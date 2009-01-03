@@ -1,7 +1,7 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.14 2009-01-02 16:00:07 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.15 2009-01-03 07:04:30 rubikitch Exp $
 
-;; Copyright (C) 2008  rubikitch
+;; Copyright (C) 2008, 2009  rubikitch
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: convenience, unix
@@ -46,7 +46,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.14  2009-01-02 16:00:07  rubikitch
+;; Revision 1.15  2009-01-03 07:04:30  rubikitch
+;; copyright
+;;
+;; Revision 1.14  2009/01/02 16:00:07  rubikitch
 ;; * Fixed invalid value of `anything-grep-alist'.
 ;; * Implemented functionality to search all buffers with `buffer-file-name'.
 ;;   See `anything-grep-alist'.
@@ -97,7 +100,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.14 2009-01-02 16:00:07 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.15 2009-01-03 07:04:30 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
