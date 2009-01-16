@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.139 2009-01-05 20:15:53 rubikitch Exp $
+;; $Id: anything.el,v 1.140 2009-01-16 16:36:25 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.139  2009-01-05 20:15:53  rubikitch
+;; Revision 1.140  2009-01-16 16:36:25  rubikitch
+;; New variable: `anything-persistent-action-use-special-display'.
+;;
+;; Revision 1.139  2009/01/05 20:15:53  rubikitch
 ;; Fixed a bug of anything action buffer.
 ;; The action source should not be cached.
 ;;
@@ -658,7 +661,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.139 2009-01-05 20:15:53 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.140 2009-01-16 16:36:25 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1277,6 +1280,9 @@ This flag makes `anything' a bit faster with many sources.")
   "If you hate flickering, set this variable to
  '(set-window-configuration . current-window-configuration)
 ")
+
+(defvar anything-persistent-action-use-special-display nil
+  "If non-nil, use `special-display-function' in persistent action.")
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -2604,11 +2610,26 @@ Acceptable values of CREATE-OR-BUFFER:
 
 (defmacro with-anything-display-same-window (&rest body)
   "Make `pop-to-buffer' and `display-buffer' display in the same window."
-  `(let ((same-window-regexps '("."))
-         (pop-up-windows nil)
-         (display-buffer-function nil))
+  `(let ((display-buffer-function 'anything-persistent-action-display-buffer))
      ,@body))
 (put 'with-anything-display-same-window 'lisp-indent-function 0)
+
+(defun anything-persistent-action-display-buffer (buf &optional not-this-window)
+  "Make `pop-to-buffer' and `display-buffer' display in the same window in persistent action.
+If `anything-persistent-action-use-special-display' is non-nil and
+BUF is to be displayed by `special-display-function', use it.
+Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
+  (let* ((name (buffer-name buf))
+         display-buffer-function pop-up-windows
+         (same-window-regexps
+          (unless (and anything-persistent-action-use-special-display
+                       (or (member name
+                                   (mapcar (lambda (x) (or (car-safe x) x)) special-display-buffer-names))
+                           (remove-if-not
+                            (lambda (re) (string-match (or (car-safe x) x) name))
+                            special-display-regexps)))
+            '("."))))
+    (display-buffer buf not-this-window)))
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun anything-scroll-other-window-base (command)
