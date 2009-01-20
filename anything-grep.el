@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.15 2009-01-03 07:04:30 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.16 2009-01-20 09:56:19 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -46,7 +46,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.15  2009-01-03 07:04:30  rubikitch
+;; Revision 1.16  2009-01-20 09:56:19  rubikitch
+;; New variable: `anything-grep-filter-command'
+;;
+;; Revision 1.15  2009/01/03 07:04:30  rubikitch
 ;; copyright
 ;;
 ;; Revision 1.14  2009/01/02 16:00:07  rubikitch
@@ -100,7 +103,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.15 2009-01-03 07:04:30 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.16 2009-01-20 09:56:19 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -143,6 +146,14 @@ The format is:
      ...)
    ...)
 ")
+
+(defvar anything-grep-filter-command nil
+  "If non-nil, filter the result of grep command.
+
+For example, normalizing many Japanese encodings to EUC-JP,
+set this variable to \"ruby -rkconv -pe '$_.replace $_.toeuc'\".
+The command is converting standard input to EUC-JP line by line. ")
+
 
 ;; (@* "core")
 (defun anything-grep-base (sources)
@@ -243,6 +254,9 @@ It asks COMMAND for grep command line and PWD for current directory."
       (delete-region (match-beginning 0) (match-end 0))
       (insert (mapconcat 'shell-quote-argument
                          (delq nil (mapcar 'buffer-file-name (buffer-list))) " ")))
+    (when anything-grep-filter-command
+      (goto-char (point-max))
+      (insert "|" anything-grep-filter-command))
     (buffer-string)))
 
 ;; (substring (agrep-preprocess-command "echo $buffers ee") 0 100)
