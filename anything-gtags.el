@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.13 2008-12-20 22:11:04 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.14 2009-01-27 09:51:34 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -31,7 +31,11 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.13  2008-12-20 22:11:04  rubikitch
+;; Revision 1.14  2009-01-27 09:51:34  rubikitch
+;; * Push context when jumping with `anything-gtags-select'.
+;; * New variable: `anything-gtags-enable-initial-pattern'.
+;;
+;; Revision 1.13  2008/12/20 22:11:04  rubikitch
 ;; Fixed an error in Emacs23 by Andy Stewart. Thanks.
 ;;
 ;; Revision 1.12  2008/10/24 07:14:14  rubikitch
@@ -78,6 +82,9 @@
 (require 'anything)
 (require 'gtags)
 
+(defvar anything-gtags-enable-initial-pattern nil
+  "If non-nil, initial input of `anything-gtags-select' is current symbol.")
+
 (defvar anything-c-source-gtags-select
   '((name . "GTAGS")
     (init
@@ -87,13 +94,17 @@
     (candidates-in-buffer)
     (action
      ("Goto the location" . (lambda (candidate)
+                              (gtags-push-context)
                               (gtags-goto-tag candidate ""))))))
 ;; (setq anything-sources (list anything-c-source-gtags-select))
 
 (defun anything-gtags-select ()
   "Tag jump using gtags and `anything'."
   (interactive)
-  (anything '(anything-c-source-gtags-select) nil "Find Tag: "))
+  (let* ((initial-pattern (regexp-quote (or (thing-at-point 'symbol) ""))))
+    (anything '(anything-c-source-gtags-select)
+              (if anything-gtags-enable-initial-pattern initial-pattern)
+              "Find Tag: " nil)))
 
 ;;;; `gtags-select-mode' replacement
 (defvar anything-gtags-hijack-gtags-select-mode t
