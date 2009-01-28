@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.38 2009-01-08 19:28:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.39 2009-01-28 20:33:31 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.38  2009-01-08 19:28:33  rubikitch
+;; Revision 1.39  2009-01-28 20:33:31  rubikitch
+;; add persistent-action for `anything-read-file-name' and `anything-read-buffer'.
+;;
+;; Revision 1.38  2009/01/08 19:28:33  rubikitch
 ;; `anything-completing-read': fixed a bug when COLLECTION is a non-nested list.
 ;;
 ;; Revision 1.37  2009/01/02 15:08:03  rubikitch
@@ -219,7 +222,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.38 2009-01-08 19:28:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.39 2009-01-28 20:33:31 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -609,9 +612,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
          (history-source (unless require-match
                            `((name . "History")
                              (candidates . file-name-history)
+                             (persistent-action . find-file)
                              ,@additional-attrs))))
     `(((name . "Default")
        (candidates . ,(if default-filename (list default-filename)))
+       (persistent-action . find-file)
        (filtered-candidate-transformer
         . (lambda (cands source)
             (if (and (not arfn-followed) (string= anything-pattern "")) cands nil)))
@@ -619,6 +624,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
        ,@additional-attrs)
       ((name . ,dir)
        (candidates . (lambda () (arfn-candidates ,dir)))
+       (persistent-action . find-file)
        ,@additional-attrs
        ,transformer-func)
       ,new-input-source
@@ -641,6 +647,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun* arb-sources (prompt default require-match start matches-set &optional (additional-attrs '((action . identity))))
   `(,(ac-default-source default t)
     ((name . ,prompt)
+     (persistent-action . switch-to-buffer)
      (candidates . (lambda () (mapcar 'buffer-name (buffer-list))))
      ,@additional-attrs)
     ,(ac-new-input-source prompt require-match additional-attrs)))
