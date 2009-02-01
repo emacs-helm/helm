@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.142 2009-02-01 19:12:34 rubikitch Exp $
+;; $Id: anything.el,v 1.143 2009-02-01 19:23:32 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.142  2009-02-01 19:12:34  rubikitch
+;; Revision 1.143  2009-02-01 19:23:32  rubikitch
+;; New variable: `anything-execute-action-at-once-if-one'
+;;
+;; Revision 1.142  2009/02/01 19:12:34  rubikitch
 ;; `anything-persistent-action-display-buffer': bug fix
 ;;
 ;; Revision 1.141  2009/02/01 18:25:25  rubikitch
@@ -668,7 +671,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.142 2009-02-01 19:12:34 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.143 2009-02-01 19:23:32 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1293,6 +1296,10 @@ This flag makes `anything' a bit faster with many sources.")
 (defvar anything-persistent-action-use-special-display nil
   "If non-nil, use `special-display-function' in persistent action.")
 
+(defvar anything-execute-action-at-once-if-one nil
+  "If non-nil and there is one candidate, execute the first action without selection.
+It is useful for `anything' applications.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; (@* "Internal Variables")
@@ -1523,6 +1530,12 @@ Attributes:
         (sources)
         (t anything-sources)))  
 
+(defun anything-approximate-candidate-number ()
+  "Approximate Number of candidates.
+It is used to check if candidate number is 0 or 1."
+  (with-current-buffer anything-buffer
+    (1- (line-number-at-pos (1- (point-max))))))
+
 (defvar anything-quit nil)
 (defmacro with-anything-quittable (&rest body)
   `(let (inhibit-quit)
@@ -1588,16 +1601,22 @@ already-bound variables. Yuck!
           (when any-input (setq anything-input any-input anything-pattern any-input))
           (if anything-samewindow
               (switch-to-buffer anything-buffer)
-            (pop-to-buffer anything-buffer))        
+            (pop-to-buffer anything-buffer))                  
 
           (unwind-protect
               (progn
                 (if any-resume (anything-mark-current-line) (anything-update))
+                
                 (select-frame-set-input-focus (window-frame (minibuffer-window)))
                 (anything-preselect any-preselect)
-                (let ((minibuffer-local-map anything-map))
-                  (read-string (or any-prompt "pattern: ") (if any-resume anything-pattern any-input))))
-
+                (let ((ncandidate (anything-approximate-candidate-number))
+                      (minibuffer-local-map anything-map))
+                  (cond ((and anything-execute-action-at-once-if-once
+                              (= ncandidate 1))
+                         (anything-execute-selection-action))
+                        (t
+                         (read-string (or any-prompt "pattern: ")
+                                      (if any-resume anything-pattern any-input))))))
             (anything-cleanup)
             (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
             (anything-set-frame/window-configuration frameconfig))
@@ -4272,6 +4291,25 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (puthash " *00create+*/xxx" 1 anything-tick-hash)
           (kill-buffer (current-buffer)))
         (gethash " *00create+*/xxx" anything-tick-hash))
+      (desc "anything-execute-action-at-once-if-once")
+      (expect "HOGE"
+        (let ((anything-execute-action-at-once-if-once t))
+          (anything '(((name . "one test1")
+                       (candidates "hoge")
+                       (action . upcase))))))
+      (expect "ANY"
+        (let ((anything-execute-action-at-once-if-once t))
+          (anything '(((name . "one test2")
+                       (candidates "hoge" "any")
+                       (action . upcase)))
+                    "an")))
+      ;; candidates > 1
+      (expect (mock (read-string "word: " nil))
+        (let ((anything-execute-action-at-once-if-once t))
+          (anything '(((name . "one test")
+                       (candidates "hoge" "foo" "bar")
+                       (action . identity)))
+                    nil "word: ")))
       )))
 
 
