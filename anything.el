@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.143 2009-02-01 19:23:32 rubikitch Exp $
+;; $Id: anything.el,v 1.144 2009-02-01 19:31:47 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.143  2009-02-01 19:23:32  rubikitch
+;; Revision 1.144  2009-02-01 19:31:47  rubikitch
+;; fixed a typo
+;;
+;; Revision 1.143  2009/02/01 19:23:32  rubikitch
 ;; New variable: `anything-execute-action-at-once-if-one'
 ;;
 ;; Revision 1.142  2009/02/01 19:12:34  rubikitch
@@ -671,7 +674,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.143 2009-02-01 19:23:32 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.144 2009-02-01 19:31:47 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1611,7 +1614,7 @@ already-bound variables. Yuck!
                 (anything-preselect any-preselect)
                 (let ((ncandidate (anything-approximate-candidate-number))
                       (minibuffer-local-map anything-map))
-                  (cond ((and anything-execute-action-at-once-if-once
+                  (cond ((and anything-execute-action-at-once-if-one
                               (= ncandidate 1))
                          (anything-execute-selection-action))
                         (t
@@ -4293,19 +4296,19 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (gethash " *00create+*/xxx" anything-tick-hash))
       (desc "anything-execute-action-at-once-if-once")
       (expect "HOGE"
-        (let ((anything-execute-action-at-once-if-once t))
+        (let ((anything-execute-action-at-once-if-one t))
           (anything '(((name . "one test1")
                        (candidates "hoge")
                        (action . upcase))))))
       (expect "ANY"
-        (let ((anything-execute-action-at-once-if-once t))
+        (let ((anything-execute-action-at-once-if-one t))
           (anything '(((name . "one test2")
                        (candidates "hoge" "any")
                        (action . upcase)))
                     "an")))
       ;; candidates > 1
       (expect (mock (read-string "word: " nil))
-        (let ((anything-execute-action-at-once-if-once t))
+        (let ((anything-execute-action-at-once-if-one t))
           (anything '(((name . "one test")
                        (candidates "hoge" "foo" "bar")
                        (action . identity)))
