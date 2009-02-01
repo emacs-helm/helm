@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.144 2009-02-01 19:31:47 rubikitch Exp $
+;; $Id: anything.el,v 1.145 2009-02-01 19:45:53 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.144  2009-02-01 19:31:47  rubikitch
+;; Revision 1.145  2009-02-01 19:45:53  rubikitch
+;; New variable: `anything-quit-if-no-candidate'
+;;
+;; Revision 1.144  2009/02/01 19:31:47  rubikitch
 ;; fixed a typo
 ;;
 ;; Revision 1.143  2009/02/01 19:23:32  rubikitch
@@ -674,7 +677,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.144 2009-02-01 19:31:47 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.145 2009-02-01 19:45:53 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1303,6 +1306,13 @@ This flag makes `anything' a bit faster with many sources.")
   "If non-nil and there is one candidate, execute the first action without selection.
 It is useful for `anything' applications.")
 
+(defvar anything-quit-if-no-candidate nil
+  "if non-nil and there is no candidate, do not display *anything* buffer and quit.
+This variable accepts a function, which is executed if no candidate.
+
+It is useful for `anything' applications.")
+
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; (@* "Internal Variables")
@@ -1616,7 +1626,11 @@ already-bound variables. Yuck!
                       (minibuffer-local-map anything-map))
                   (cond ((and anything-execute-action-at-once-if-one
                               (= ncandidate 1))
-                         (anything-execute-selection-action))
+                         (ignore))
+                        ((and anything-quit-if-no-candidate (= ncandidate 0))
+                         (setq anything-quit t)
+                         (and (functionp anything-quit-if-no-candidate)
+                              (funcall anything-quit-if-no-candidate)))
                         (t
                          (read-string (or any-prompt "pattern: ")
                                       (if any-resume anything-pattern any-input))))))
@@ -4309,10 +4323,18 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       ;; candidates > 1
       (expect (mock (read-string "word: " nil))
         (let ((anything-execute-action-at-once-if-one t))
-          (anything '(((name . "one test")
+          (anything '(((name . "one test3")
                        (candidates "hoge" "foo" "bar")
                        (action . identity)))
                     nil "word: ")))
+      (desc "anything-quit-if-no-candidate")
+      (expect nil
+        (let ((anything-quit-if-no-candidate t))
+          (anything '(((name . "zero test1") (candidates) (action . upcase))))))
+      (expect 'called
+        (let (v (anything-quit-if-no-candidate (lambda () (setq v 'called))))
+          (anything '(((name . "zero test2") (candidates) (action . upcase))))
+          v))
       )))
 
 
