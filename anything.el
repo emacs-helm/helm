@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.140 2009-01-16 16:36:25 rubikitch Exp $
+;; $Id: anything.el,v 1.141 2009-02-01 18:25:25 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.140  2009-01-16 16:36:25  rubikitch
+;; Revision 1.141  2009-02-01 18:25:25  rubikitch
+;; * fix docstring
+;; * New variable: `anything-selection-face'
+;;
+;; Revision 1.140  2009/01/16 16:36:25  rubikitch
 ;; New variable: `anything-persistent-action-use-special-display'.
 ;;
 ;; Revision 1.139  2009/01/05 20:15:53  rubikitch
@@ -661,7 +665,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.140 2009-01-16 16:36:25 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.141 2009-02-01 18:25:25 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1149,6 +1153,9 @@ See also `anything-set-source-filter'.")
 (defvar anything-isearch-match-face 'anything-isearch-match
   "Face for matches during incremental search.")
 
+(defvar anything-selection-face 'highlight
+  "Face for currently selected item.")
+
 (defvar anything-iswitchb-idle-delay 1
   "Show anything completions if the user is idle that many
   seconds after typing.")
@@ -1168,7 +1175,6 @@ under iswitchb. For example, I bind the character \ to
 keyboard. This way I can switch buffers with Enter and choose
 anything completions with \.")
 
-
 ;;----------------------------------------------------------------------
 
 (defvar anything-buffer "*anything*"
@@ -1178,7 +1184,7 @@ anything completions with \.")
   "Buffer showing actions.")
 
 (defvar anything-selection-overlay nil
-  "Overlay used to highlight the currently selected file.")
+  "Overlay used to highlight the currently selected item.")
 
 (defvar anything-isearch-overlay nil
   "Overlay used to highlight the current match during isearch.")
@@ -1664,7 +1670,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 
     (setq anything-selection-overlay 
           (make-overlay (point-min) (point-min) (get-buffer buffer)))
-    (overlay-put anything-selection-overlay 'face 'highlight))
+    (overlay-put anything-selection-overlay 'face anything-selection-face))
 
   (if anything-enable-digit-shortcuts
       (unless anything-digit-overlays
