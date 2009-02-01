@@ -1,8 +1,8 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.145 2009-02-01 19:45:53 rubikitch Exp $
+;; $Id: anything.el,v 1.146 2009-02-01 20:01:00 rubikitch Exp $
 
-;; Copyright (C) 2007  Tamas Patrovics
-;;               2008  rubikitch <rubikitch@ruby-lang.org>
+;; Copyright (C) 2007        Tamas Patrovics
+;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
 
 ;; Author: Tamas Patrovics
 ;; Maintainer: rubikitch <rubikitch@ruby-lang.org>
@@ -97,6 +97,24 @@
 ;;   defined.
 
 ;;; (@* "Tips")
+
+;;
+;; There are many `anything' applications, using `anything' for
+;; selecting candidate. In this case, if there is one candidate or no
+;; candidate, popping up *anything* buffer is irritating. If one
+;; candidate, you want to select it at once. If no candidate, you want
+;; to quit `anything'. Set `anything-execute-action-at-once-if-one'
+;; and `anything-quit-if-no-candidate' to non-nil to remedy it. Note
+;; that setting these variables GLOBALLY is bad idea because of
+;; delayed sources. These are meant to be let-binded.
+;; See anything-etags.el for example.
+;;
+;; [EVAL IT] (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/anything-etags.el")
+;;
+;; ex.
+;; (let ((anything-execute-action-at-once-if-one t)
+;;       (anything-quit-if-no-candidate (lambda () (message "No candidate"))))
+;;    (anything temporary-sources input))
 
 ;;
 ;; `set-frame-configuration' arises flickering. If you hate
@@ -208,7 +226,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.145  2009-02-01 19:45:53  rubikitch
+;; Revision 1.146  2009-02-01 20:01:00  rubikitch
+;; Update Tips
+;;
+;; Revision 1.145  2009/02/01 19:45:53  rubikitch
 ;; New variable: `anything-quit-if-no-candidate'
 ;;
 ;; Revision 1.144  2009/02/01 19:31:47  rubikitch
@@ -677,7 +698,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.145 2009-02-01 19:45:53 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.146 2009-02-01 20:01:00 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
