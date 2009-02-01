@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.141 2009-02-01 18:25:25 rubikitch Exp $
+;; $Id: anything.el,v 1.142 2009-02-01 19:12:34 rubikitch Exp $
 
 ;; Copyright (C) 2007  Tamas Patrovics
 ;;               2008  rubikitch <rubikitch@ruby-lang.org>
@@ -208,7 +208,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.141  2009-02-01 18:25:25  rubikitch
+;; Revision 1.142  2009-02-01 19:12:34  rubikitch
+;; `anything-persistent-action-display-buffer': bug fix
+;;
+;; Revision 1.141  2009/02/01 18:25:25  rubikitch
 ;; * fix docstring
 ;; * New variable: `anything-selection-face'
 ;;
@@ -665,7 +668,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.141 2009-02-01 18:25:25 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.142 2009-02-01 19:12:34 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2632,7 +2635,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
                        (or (member name
                                    (mapcar (lambda (x) (or (car-safe x) x)) special-display-buffer-names))
                            (remove-if-not
-                            (lambda (re) (string-match (or (car-safe x) x) name))
+                            (lambda (x) (string-match (or (car-safe x) x) name))
                             special-display-regexps)))
             '("."))))
     (display-buffer buf not-this-window)))
