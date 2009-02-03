@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.16 2009-01-20 09:56:19 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.17 2009-02-03 20:35:03 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -46,7 +46,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.16  2009-01-20 09:56:19  rubikitch
+;; Revision 1.17  2009-02-03 20:35:03  rubikitch
+;; Use `anything-quit-if-no-candidate' not to open *anything* buffer when no matches found.
+;;
+;; Revision 1.16  2009/01/20 09:56:19  rubikitch
 ;; New variable: `anything-grep-filter-command'
 ;;
 ;; Revision 1.15  2009/01/03 07:04:30  rubikitch
@@ -103,7 +106,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.16 2009-01-20 09:56:19 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.17 2009-02-03 20:35:03 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -160,7 +163,8 @@ The command is converting standard input to EUC-JP line by line. ")
   "Invoke `anything' for `anything-grep'."
   (and anything-grep-save-buffers-before-grep
        (save-some-buffers (not compilation-ask-about-save) nil))
-  (anything sources nil nil nil nil "*anything grep*"))
+  (let ((anything-quit-if-no-candidate (lambda () (message "No matches"))))
+    (anything sources nil nil nil nil "*anything grep*")))
 
 ;; (anything (list (agrep-source "grep -Hin agrep anything-grep.el" default-directory) (agrep-source "grep -Hin pwd anything-grep.el" default-directory)))
 
