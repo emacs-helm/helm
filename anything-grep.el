@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.18 2009-02-03 20:48:12 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.19 2009-02-03 21:06:49 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -46,7 +46,11 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.18  2009-02-03 20:48:12  rubikitch
+;; Revision 1.19  2009-02-03 21:06:49  rubikitch
+;; fontify file name and line number.
+;; New variable: `anything-grep-fontify-file-name'
+;;
+;; Revision 1.18  2009/02/03 20:48:12  rubikitch
 ;; multi-line support.
 ;; New variable: `anything-grep-multiline'
 ;;
@@ -110,7 +114,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.18 2009-02-03 20:48:12 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.19 2009-02-03 21:06:49 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -127,6 +131,9 @@ It takes one argument, a file name to visit.")
 (defvar anything-grep-multiline t
   "If non-nil, use multi-line display. It is prettier.
 Use anything.el v1.147 or newer.")
+
+(defvar anything-grep-fontify-file-name t
+  "If non-nil, fontify file name and line number of matches.")
 
 (defvar anything-grep-alist
   '(("buffers" ("egrep -Hin %s $buffers" "/"))
@@ -216,7 +223,6 @@ GNU grep is expected for COMMAND. The grep result is colorized."
       (setenv "GREP_COLORS" "mt=01;31:fn=:ln=:bn=:se=:ml=:cx=:ne"))
     (call-process-shell-command (format "cd %s; %s" pwd command)
                                 nil (current-buffer))))
-
 (defun agrep-fontify ()
   "Fontify the result of `agrep-do-grep'."
   ;; Color matches.
@@ -228,7 +234,14 @@ GNU grep is expected for COMMAND. The grep result is colorized."
   ;; Delete other escape sequences.
   (goto-char 1)
   (while (re-search-forward "\\(\033\\[[0-9;]*[mK]\\)" nil t)
-    (replace-match "" t t nil 0)))
+    (replace-match "" t t nil 0))
+  (when anything-grep-fontify-file-name
+    (goto-char 1)
+    (while (re-search-forward ":\\([0-9]+\\):" nil t)
+      (put-text-property (point-at-bol) (match-beginning 0) 'face compilation-info-face)
+      (put-text-property (match-beginning 1) (match-end 1) 'face compilation-line-face)
+      (forward-line 1))))
+;; (anything-grep "grep -n grep *.el" "~/emacs/init.d")
 
 (defun agrep-create-buffer (command pwd)
   "Create candidate buffer for `anything-grep'.
@@ -281,8 +294,6 @@ It asks COMMAND for grep command line and PWD for current directory."
       (goto-char (point-max))
       (insert "|" anything-grep-filter-command))
     (buffer-string)))
-
-;; (substring (agrep-preprocess-command "echo $buffers ee") 0 100)
 
 ;; (@* "grep in predefined files")
 (defvar agbn-last-name nil
