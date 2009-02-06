@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.39 2009-01-28 20:33:31 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.40 2009-02-06 09:19:08 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -52,7 +52,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.39  2009-01-28 20:33:31  rubikitch
+;; Revision 1.40  2009-02-06 09:19:08  rubikitch
+;; Fix a bug when 2nd argument of `anything-read-file-name' (DIR) is not a directory.
+;;
+;; Revision 1.39  2009/01/28 20:33:31  rubikitch
 ;; add persistent-action for `anything-read-file-name' and `anything-read-buffer'.
 ;;
 ;; Revision 1.38  2009/01/08 19:28:33  rubikitch
@@ -222,7 +225,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.39 2009-01-28 20:33:31 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.40 2009-02-06 09:19:08 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -590,11 +593,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
         (add-to-list 'file-name-history result)))))
 
 (defun arfn-candidates (dir)
-  (loop for (f _ _ _ _ _ _ _ _ perm _ _ _) in (directory-files-and-attributes dir t)
-        for basename = (file-name-nondirectory f)
-        when (string= "d" (substring perm 0 1))
-        collect (cons (concat basename "/") f)
-        else collect (cons basename f)))
+  (if (file-directory-p dir)
+      (loop for (f _ _ _ _ _ _ _ _ perm _ _ _) in (directory-files-and-attributes dir t)
+            for basename = (file-name-nondirectory f)
+            when (string= "d" (substring perm 0 1))
+            collect (cons (concat basename "/") f)
+            else collect (cons basename f))))
 
 (defun* arfn-sources (prompt dir default-filename require-match initial-input predicate &optional (additional-attrs '((action . identity))))
   (setq arfn-dir dir)
