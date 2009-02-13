@@ -1,5 +1,5 @@
 ;;; anything-ipa.el --- Anything interface of In Place Annotation
-;; $Id: anything-ipa.el,v 1.2 2009-02-13 00:46:16 rubikitch Exp $
+;; $Id: anything-ipa.el,v 1.3 2009-02-13 00:48:08 rubikitch Exp $
 
 ;; Copyright (C) 2009  rubikitch
 
@@ -45,7 +45,10 @@
 ;;; History:
 
 ;; $Log: anything-ipa.el,v $
-;; Revision 1.2  2009-02-13 00:46:16  rubikitch
+;; Revision 1.3  2009-02-13 00:48:08  rubikitch
+;; `anything-c-source-ipa': format change
+;;
+;; Revision 1.2  2009/02/13 00:46:16  rubikitch
 ;; New variable: `anything-c-source-ipa-global'
 ;; New command: `anything-ipa-global'
 ;;
@@ -55,7 +58,7 @@
 
 ;;; Code:
 
-(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.2 2009-02-13 00:46:16 rubikitch Exp $")
+(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.3 2009-02-13 00:48:08 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything)
 (require 'ipa)
@@ -64,8 +67,7 @@
 (defvar anything-c-source-ipa
   '((name . "In Place Annotations (Current Buffer)")
     (candidates . anything-ipa-candidates)
-    (action . goto-char)
-    (multiline))
+    (action . goto-char))
   "`anything' source of ipa in current-buffer.")
 
 (defun anything-ipa-candidates ()
@@ -77,8 +79,7 @@
                             (buffer-substring (point-at-bol) (point-at-eol)))
           for lineno = (line-number-at-pos pos)
           collect
-          (cons (format "%d:%s\n %s" lineno text line)
-                pos))))
+          (cons (format "%5d:[%s]%s" lineno text line) pos))))
 
 (defun anything-ipa ()
   "`anything' interface of ipa."
