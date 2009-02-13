@@ -1,5 +1,5 @@
 ;;; anything-ipa.el --- Anything interface of In Place Annotation
-;; $Id: anything-ipa.el,v 1.1 2009-02-13 00:20:05 rubikitch Exp $
+;; $Id: anything-ipa.el,v 1.2 2009-02-13 00:46:16 rubikitch Exp $
 
 ;; Copyright (C) 2009  rubikitch
 
@@ -24,9 +24,13 @@
 
 ;;; Commentary:
 
-;; Anything interface of in place annotations.  Variable
-;; `anything-c-source-ipa' is source for in place annotations in
-;; current buffer. And command `anything-ipa' is anything menu of it.
+;; Anything interface of in place annotations.
+
+;; Variable `anything-c-source-ipa' is source for in place annotations
+;; in current buffer. And command `anything-ipa' is anything menu of
+;; it. `anything-c-source-ipa-global' and `anything-ipa-global' are
+;; global ones.
+
 
 ;;; Installation:
 
@@ -41,17 +45,22 @@
 ;;; History:
 
 ;; $Log: anything-ipa.el,v $
-;; Revision 1.1  2009-02-13 00:20:05  rubikitch
+;; Revision 1.2  2009-02-13 00:46:16  rubikitch
+;; New variable: `anything-c-source-ipa-global'
+;; New command: `anything-ipa-global'
+;;
+;; Revision 1.1  2009/02/13 00:20:05  rubikitch
 ;; Initial revision
 ;;
 
 ;;; Code:
 
-(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.1 2009-02-13 00:20:05 rubikitch Exp $")
+(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.2 2009-02-13 00:46:16 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything)
 (require 'ipa)
 
+;;;; file-local source
 (defvar anything-c-source-ipa
   '((name . "In Place Annotations (Current Buffer)")
     (candidates . anything-ipa-candidates)
@@ -75,6 +84,29 @@
   "`anything' interface of ipa."
   (interactive)
   (anything 'anything-c-source-ipa))
+
+;;;; global source
+(defvar anything-c-source-ipa-global
+  '((name . "In Place Annotations (global)")
+    (init . (lambda () (anything-candidate-buffer (ipa-find-storage-file))))
+    (get-line . (lambda (s e)
+                  (unless (= s e)
+                    (cons (buffer-substring
+                           s e)
+                          s))))
+    (candidates-in-buffer)
+    (action ("Go To" . anything-ipa-go-to-annotation)))
+  "`anything' source of all IPAs.")
+
+(defun anything-ipa-go-to-annotation (pos)
+  (with-current-buffer (ipa-find-storage-file)
+    (goto-char pos)
+    (ipa-go-to-annotation)))
+
+(defun anything-ipa-global ()
+  "`anything' interface of ipa (global)."
+  (interactive)
+  (anything 'anything-c-source-ipa-global))
 
 (provide 'anything-ipa)
 
