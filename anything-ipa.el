@@ -1,5 +1,5 @@
 ;;; anything-ipa.el --- Anything interface of In Place Annotation
-;; $Id: anything-ipa.el,v 1.3 2009-02-13 00:48:08 rubikitch Exp $
+;; $Id: anything-ipa.el,v 1.4 2009-02-13 00:49:36 rubikitch Exp $
 
 ;; Copyright (C) 2009  rubikitch
 
@@ -45,7 +45,10 @@
 ;;; History:
 
 ;; $Log: anything-ipa.el,v $
-;; Revision 1.3  2009-02-13 00:48:08  rubikitch
+;; Revision 1.4  2009-02-13 00:49:36  rubikitch
+;; *** empty log message ***
+;;
+;; Revision 1.3  2009/02/13 00:48:08  rubikitch
 ;; `anything-c-source-ipa': format change
 ;;
 ;; Revision 1.2  2009/02/13 00:46:16  rubikitch
@@ -58,7 +61,7 @@
 
 ;;; Code:
 
-(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.3 2009-02-13 00:48:08 rubikitch Exp $")
+(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.4 2009-02-13 00:49:36 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything)
 (require 'ipa)
@@ -90,11 +93,7 @@
 (defvar anything-c-source-ipa-global
   '((name . "In Place Annotations (global)")
     (init . (lambda () (anything-candidate-buffer (ipa-find-storage-file))))
-    (get-line . (lambda (s e)
-                  (unless (= s e)
-                    (cons (buffer-substring
-                           s e)
-                          s))))
+    (get-line . (lambda (s e) (unless (= s e) (cons (buffer-substring s e) s))))
     (candidates-in-buffer)
     (action ("Go To" . anything-ipa-go-to-annotation)))
   "`anything' source of all IPAs.")
