@@ -1,5 +1,5 @@
 ;;; anything-ipa.el --- Anything interface of In Place Annotation
-;; $Id: anything-ipa.el,v 1.4 2009-02-13 00:49:36 rubikitch Exp $
+;; $Id: anything-ipa.el,v 1.5 2009-02-13 01:18:32 rubikitch Exp $
 
 ;; Copyright (C) 2009  rubikitch
 
@@ -45,7 +45,10 @@
 ;;; History:
 
 ;; $Log: anything-ipa.el,v $
-;; Revision 1.4  2009-02-13 00:49:36  rubikitch
+;; Revision 1.5  2009-02-13 01:18:32  rubikitch
+;; migemize
+;;
+;; Revision 1.4  2009/02/13 00:49:36  rubikitch
 ;; *** empty log message ***
 ;;
 ;; Revision 1.3  2009/02/13 00:48:08  rubikitch
@@ -61,7 +64,7 @@
 
 ;;; Code:
 
-(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.4 2009-02-13 00:49:36 rubikitch Exp $")
+(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.5 2009-02-13 01:18:32 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything)
 (require 'ipa)
@@ -70,7 +73,8 @@
 (defvar anything-c-source-ipa
   '((name . "In Place Annotations (Current Buffer)")
     (candidates . anything-ipa-candidates)
-    (action . goto-char))
+    (action . goto-char)
+    (migemo))
   "`anything' source of ipa in current-buffer.")
 
 (defun anything-ipa-candidates ()
@@ -95,6 +99,7 @@
     (init . (lambda () (anything-candidate-buffer (ipa-find-storage-file))))
     (get-line . (lambda (s e) (unless (= s e) (cons (buffer-substring s e) s))))
     (candidates-in-buffer)
+    (migemo)
     (action ("Go To" . anything-ipa-go-to-annotation)))
   "`anything' source of all IPAs.")
 
