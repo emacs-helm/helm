@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.41 2009-02-19 22:54:29 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.42 2009-02-19 23:04:33 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -39,20 +39,42 @@
 
 ;;; Installation:
 
-;; Install anything-match-plugin.el
+;; Put anything-complete.el to your load-path.
+;; The load-path is usually ~/elisp/.
+;; It's set in your ~/.emacs like this:
+;; (add-to-list 'load-path (expand-file-name "~/elisp"))
+;;
+;; Then install dependencies.
+;; 
+;; Install anything-match-plugin.el (must).
 ;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/anything-match-plugin.el
 ;;
-;; shell-history.el would help you.
+;; shell-history.el would help you (optional).
 ;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/shell-history.el
+;;
+;; If you want `anything-execute-extended-command' to show
+;; context-aware commands, use anything-kyr.el and
+;; anything-kyr-config.el (optional).
+;;
+;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/anything-kyr.el
+;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/anything-kyr-config.el
 
+;; And the following to your ~/.emacs startup file.
+;;
 ;; (require 'anything-complete)
 ;; ;; Automatically collect symbols by 150 secs
 ;; (anything-lisp-complete-symbol-set-timer 150)
+;; ;; replace completion commands with `anything'
+;; (anything-read-string-mode 1)
 
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.41  2009-02-19 22:54:29  rubikitch
+;; Revision 1.42  2009-02-19 23:04:33  rubikitch
+;; * update doc
+;; * use anything-kyr if any
+;;
+;; Revision 1.41  2009/02/19 22:54:29  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.40  2009/02/06 09:19:08  rubikitch
@@ -228,7 +250,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.41 2009-02-19 22:54:29 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.42 2009-02-19 23:04:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -799,7 +821,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 (defun anything-execute-extended-command ()
   (interactive)
-  (let ((cmd (anything anything-execute-extended-command-sources)))
+  (let ((cmd (anything
+              (if (require 'anything-kyr-config nil t)
+                  (cons anything-c-source-kyr
+                        anything-execute-extended-command-sources)
+                anything-execute-extended-command-sources))))
     (when cmd
       (setq extended-command-history (cons cmd (delete cmd extended-command-history)))
       (call-interactively (intern cmd)))))
