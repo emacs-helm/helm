@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.148 2009-02-16 23:40:22 rubikitch Exp $
+;; $Id: anything.el,v 1.149 2009-02-20 12:23:44 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -226,7 +226,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.148  2009-02-16 23:40:22  rubikitch
+;; Revision 1.149  2009-02-20 12:23:44  rubikitch
+;; `anything-header' face now inherits header-line (not a copy).
+;;
+;; Revision 1.148  2009/02/16 23:40:22  rubikitch
 ;; `real-to-display' attribute bug fix.
 ;;
 ;; Revision 1.147  2009/02/02 20:51:41  rubikitch
@@ -704,7 +707,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.148 2009-02-16 23:40:22 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.149 2009-02-20 12:23:44 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1193,12 +1196,9 @@ See also `anything-set-source-filter'.")
 (defgroup anything nil
   "Open anything." :prefix "anything-" :group 'convenience)
 
-(if (facep 'header-line)
-    (copy-face 'header-line 'anything-header)
-  
-  (defface anything-header 
-    '((t (:bold t :underline t))) 
-    "Face for header lines in the anything buffer." :group 'anything))
+(defface anything-header 
+  '((t (:inherit header-line))) 
+  "Face for header lines in the anything buffer." :group 'anything)
 
 (defvar anything-header-face 'anything-header
   "Face for header lines in the anything buffer.")
