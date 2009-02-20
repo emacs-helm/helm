@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.149 2009-02-20 12:23:44 rubikitch Exp $
+;; $Id: anything.el,v 1.150 2009-02-20 22:58:18 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -226,7 +226,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.149  2009-02-20 12:23:44  rubikitch
+;; Revision 1.150  2009-02-20 22:58:18  rubikitch
+;; Cancel timer in `anything-cleanup'.
+;;
+;; Revision 1.149  2009/02/20 12:23:44  rubikitch
 ;; `anything-header' face now inherits header-line (not a copy).
 ;;
 ;; Revision 1.148  2009/02/16 23:40:22  rubikitch
@@ -707,7 +710,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.149 2009-02-20 12:23:44 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.150 2009-02-20 22:58:18 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1777,6 +1780,8 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (setq cursor-type t))
   (bury-buffer anything-buffer)
   (anything-funcall-foreach 'cleanup)
+  (if anything-check-minibuffer-input-timer
+      (cancel-timer anything-check-minibuffer-input-timer))
   (anything-kill-async-processes)
   (run-hooks 'anything-cleanup-hook))
 
