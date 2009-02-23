@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.155 2009-02-23 21:30:52 rubikitch Exp $
+;; $Id: anything.el,v 1.156 2009-02-23 21:36:09 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.155  2009-02-23 21:30:52  rubikitch
+;; Revision 1.156  2009-02-23 21:36:09  rubikitch
+;; New Variable: `anything-display-source-at-screen-top'
+;;
+;; Revision 1.155  2009/02/23 21:30:52  rubikitch
 ;; New command: `anything-at-point'
 ;;
 ;; Revision 1.154  2009/02/23 08:57:54  rubikitch
@@ -730,7 +733,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.155 2009-02-23 21:30:52 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.156 2009-02-23 21:36:09 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1114,6 +1117,9 @@ Attributes:
   "*If t then the first nine matches can be selected using
   Ctrl+<number>.")
 
+(defvar anything-display-source-at-screen-top t
+  "*If t, `anything-next-source' and `anything-previous-source'
+  display candidates at the top of screen.")
 
 (defvar anything-candidate-number-limit 50
   "*Do not show more candidates than this limit from inidividual
@@ -2370,7 +2376,12 @@ UNIT and DIRECTION."
       (if (eobp)
           (forward-line -1))
 
-      (anything-mark-current-line))))
+      (anything-mark-current-line)
+      (if (and anything-display-source-at-screen-top (eq unit 'source))
+      (save-selected-window
+        (select-window (get-buffer-window anything-buffer 'visible))
+        (set-window-start (selected-window)
+                          (save-excursion (forward-line -1) (point))))))))
 
 
 (defun anything-mark-current-line ()
