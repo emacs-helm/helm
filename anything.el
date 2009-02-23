@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.150 2009-02-20 22:58:18 rubikitch Exp $
+;; $Id: anything.el,v 1.151 2009-02-23 08:21:24 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -226,7 +226,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.150  2009-02-20 22:58:18  rubikitch
+;; Revision 1.151  2009-02-23 08:21:24  rubikitch
+;; `anything-map' is now Emacs-standard key bindings by default.
+;; After evaluating `anything-iswitchb-setup'. some key bindings are adjusted to iswitchb.
+;;
+;; Revision 1.150  2009/02/20 22:58:18  rubikitch
 ;; Cancel timer in `anything-cleanup'.
 ;;
 ;; Revision 1.149  2009/02/20 12:23:44  rubikitch
@@ -710,7 +714,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.150 2009-02-20 22:58:18 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.151 2009-02-23 08:21:24 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1137,8 +1141,12 @@ See also `anything-set-source-filter'.")
   (let ((map (copy-keymap minibuffer-local-map)))
     (define-key map (kbd "<down>") 'anything-next-line)
     (define-key map (kbd "<up>") 'anything-previous-line)
+    (define-key map (kbd "C-n")     'anything-next-line)
+    (define-key map (kbd "C-p")     'anything-previous-line)
     (define-key map (kbd "<prior>") 'anything-previous-page)
     (define-key map (kbd "<next>") 'anything-next-page)
+    (define-key map (kbd "M-v")     'anything-previous-page)
+    (define-key map (kbd "C-v")     'anything-next-page)
     (define-key map (kbd "<right>") 'anything-next-source)
     (define-key map (kbd "<left>") 'anything-previous-source)
     (define-key map (kbd "<RET>") 'anything-exit-minibuffer)
@@ -1152,33 +1160,21 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-8") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-9") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-i") 'anything-select-action)
+
+    (define-key map (kbd "C-s") 'anything-isearch)
+    (define-key map (kbd "C-r") 'undefined)
     ;; the defalias is needed because commands are bound by name when
     ;; using iswitchb, so only commands having the prefix anything-
     ;; get rebound
     (defalias 'anything-previous-history-element 'previous-history-element)
-    ;; C-p is used instead of M-p, because anything uses ESC
-    ;; (currently hardcoded) for `anything-iswitchb-cancel-anything' and
-    ;; Emacs handles ESC and Meta as synonyms, so ESC overrides
-    ;; other commands with Meta prefix.
-    ;;
-    ;; Note that iswitchb uses M-p and M-n by default for history
-    ;; navigation, so you should bind C-p and C-n in
-    ;; `iswitchb-mode-map' if you use the history keys and don't want
-    ;; to use different keys for iswitchb while anything is not yet
-    ;; kicked in. These keys are not bound automatically by anything
-    ;; in `iswitchb-mode-map' because they (C-n at least) already have
-    ;; a standard iswitchb binding which you might be accustomed to.
-    (define-key map (kbd "C-p") 'anything-previous-history-element)
     (defalias 'anything-next-history-element 'next-history-element)
-    (define-key map (kbd "C-n") 'anything-next-history-element)
-    ;; Binding M-s is used instead of C-s, because C-s has a binding in
-    ;; iswitchb.  You can rebind it, of course.
-    (define-key map (kbd "M-s") 'anything-isearch)
-    ;; unbind C-r to prevent problems during anything-isearch
-    (define-key map (kbd "C-r") nil)
+    (define-key map (kbd "M-p") 'anything-previous-history-element)
+    (define-key map (kbd "M-n") 'anything-next-history-element)
     map)
-  "Keymap for anything.")
+  "Keymap for anything.
 
+If you execute `anything-iswitchb-setup', some keys are modified.
+See `anything-iswitchb-setup-keys'.")
 
 (defvar anything-isearch-map
   (let ((map (copy-keymap (current-global-map))))
@@ -3007,7 +3003,10 @@ If the user is idle for `anything-iswitchb-idle-delay' seconds
 after typing something into iswitchb then anything candidates are
 shown for the current iswitchb input.
 
-ESC cancels anything completion and returns to normal iswitchb."
+ESC cancels anything completion and returns to normal iswitchb.
+
+Some key bindings in `anything-map' is modified.
+See also `anything-iswitchb-setup-keys'."
   (interactive)
 
   (require 'iswitchb)
@@ -3027,9 +3026,39 @@ ESC cancels anything completion and returns to normal iswitchb."
     (if anything-iswitchb-candidate-selected
         (anything-execute-selection-action)
       ad-do-it))
-
+  (anything-iswitchb-setup-keys)
   (message "Iswitchb integration is activated."))
 
+(defun anything-iswitchb-setup-keys ()
+  "Modify `anything-map' for anything-iswitchb users.
+
+C-p is used instead of M-p, because anything uses ESC
+ (currently hardcoded) for `anything-iswitchb-cancel-anything' and
+Emacs handles ESC and Meta as synonyms, so ESC overrides
+other commands with Meta prefix.
+
+Note that iswitchb uses M-p and M-n by default for history
+navigation, so you should bind C-p and C-n in
+`iswitchb-mode-map' if you use the history keys and don't want
+to use different keys for iswitchb while anything is not yet
+kicked in. These keys are not bound automatically by anything
+in `iswitchb-mode-map' because they (C-n at least) already have
+a standard iswitchb binding which you might be accustomed to.
+
+Binding M-s is used instead of C-s, because C-s has a binding in
+iswitchb.  You can rebind it AFTER `anything-iswitchb-setup'.
+
+Unbind C-r to prevent problems during anything-isearch."
+  (define-key anything-map (kbd "C-s") nil)
+  (define-key anything-map (kbd "M-p") nil)
+  (define-key anything-map (kbd "M-n") nil)
+  (define-key anything-map (kbd "M-v") nil)
+  (define-key anything-map (kbd "C-v") nil)
+  (define-key anything-map (kbd "C-p") 'anything-previous-history-element)
+  (define-key anything-map (kbd "C-n") 'anything-next-history-element)
+  (define-key anything-map (kbd "M-s") nil)
+  (define-key anything-map (kbd "M-s") 'anything-isearch)
+  (define-key anything-map (kbd "C-r") nil))
 
 (defun anything-iswitchb-minibuffer-setup ()
   (when (eq this-command 'iswitchb-buffer)
