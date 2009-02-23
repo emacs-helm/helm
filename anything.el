@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.156 2009-02-23 21:36:09 rubikitch Exp $
+;; $Id: anything.el,v 1.157 2009-02-23 22:51:43 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.156  2009-02-23 21:36:09  rubikitch
+;; Revision 1.157  2009-02-23 22:51:43  rubikitch
+;; New function: `anything-document-attribute'
+;;
+;; Revision 1.156  2009/02/23 21:36:09  rubikitch
 ;; New Variable: `anything-display-source-at-screen-top'
 ;;
 ;; Revision 1.155  2009/02/23 21:30:52  rubikitch
@@ -733,7 +736,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.156 2009-02-23 21:36:09 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.157 2009-02-23 22:51:43 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1870,6 +1873,35 @@ Anything plug-ins are realized by this function."
            do (setq source (funcall f source))
            finally (return source)))
    sources))  
+
+;; (@* "Core: plug-in attribute documentation hack")
+(defvar anything-additional-attributes nil)
+(defun anything-document-attribute (attribute short-doc &optional long-doc)
+  "Register ATTRIBUTE documentation introduced by plug-in.
+SHORT-DOC is displayed beside attribute name.
+LONG-DOC is displayed below attribute name and short documentation."
+  (if long-doc
+      (setq short-doc (concat "(" short-doc ")"))
+    (setq long-doc short-doc
+          short-doc ""))
+  (add-to-list 'anything-additional-attributes attribute t)
+  (put attribute 'anything-attrdoc
+       (concat "- " (symbol-name attribute) " " short-doc "\n\n" long-doc "\n")))
+(put 'anything-document-attribute 'lisp-indent-function 2)
+
+(defadvice documentation-property (after anything-document-attribute activate)
+  "Hack to display plug-in attributes' documentation as `anything-sources' docstring."
+  (when (eq symbol 'anything-sources)
+    (setq ad-return-value
+          (concat ad-return-value "++++ Additional attributes by plug-ins ++++\n"
+                  (mapconcat (lambda (sym) (get sym 'anything-attrdoc))
+                             anything-additional-attributes
+                             "\n")))))
+;; (describe-variable 'anything-sources)
+;; (documentation-property 'anything-sources 'variable-documentation)
+;; (progn (ad-disable-advice 'documentation-property 'after 'anything-document-attribute) (ad-update 'documentation-property)) 
+
+
 
 ;; (@* "Core: all candidates")
 (defun anything-get-candidates (source)
