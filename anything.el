@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.151 2009-02-23 08:21:24 rubikitch Exp $
+;; $Id: anything.el,v 1.152 2009-02-23 08:32:17 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -226,7 +226,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.151  2009-02-23 08:21:24  rubikitch
+;; Revision 1.152  2009-02-23 08:32:17  rubikitch
+;; More key bindings.
+;;
+;; Revision 1.151  2009/02/23 08:21:24  rubikitch
 ;; `anything-map' is now Emacs-standard key bindings by default.
 ;; After evaluating `anything-iswitchb-setup'. some key bindings are adjusted to iswitchb.
 ;;
@@ -714,7 +717,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.151 2009-02-23 08:21:24 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.152 2009-02-23 08:32:17 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1160,6 +1163,14 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-8") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-9") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-i") 'anything-select-action)
+    (define-key map (kbd "C-z") 'anything-execute-persistent-action)
+
+    (define-key map (kbd "C-o") 'anything-next-source)
+    (define-key map (kbd "C-M-v") 'anything-scroll-other-window)
+    (define-key map (kbd "C-M-y") 'anything-scroll-other-window-down)
+    (define-key map (kbd "C-SPC") 'anything-toggle-visible-mark)
+    (define-key map (kbd "M-[") 'anything-prev-visible-mark)
+    (define-key map (kbd "M-]") 'anything-next-visible-mark)
 
     (define-key map (kbd "C-s") 'anything-isearch)
     (define-key map (kbd "C-r") 'undefined)
@@ -1179,6 +1190,7 @@ See `anything-iswitchb-setup-keys'.")
 (defvar anything-isearch-map
   (let ((map (copy-keymap (current-global-map))))
     (define-key map (kbd "<return>") 'anything-isearch-default-action)
+    (define-key map (kbd "<RET>") 'anything-isearch-default-action)
     (define-key map (kbd "C-i") 'anything-isearch-select-action)
     (define-key map (kbd "C-g") 'anything-isearch-cancel)
     (define-key map (kbd "M-s") 'anything-isearch-again)
