@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.152 2009-02-23 08:32:17 rubikitch Exp $
+;; $Id: anything.el,v 1.153 2009-02-23 08:38:57 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -97,6 +97,11 @@
 ;;   defined.
 
 ;;; (@* "Tips")
+
+;;
+;; `anything-map' is now Emacs-standard key bindings by default. If
+;; you are using `iswitchb', execute `anything-iswitchb-setup'. Then
+;; some key bindings are adjusted to `iswitchb'.
 
 ;;
 ;; There are many `anything' applications, using `anything' for
@@ -226,7 +231,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.152  2009-02-23 08:32:17  rubikitch
+;; Revision 1.153  2009-02-23 08:38:57  rubikitch
+;; update doc
+;;
+;; Revision 1.152  2009/02/23 08:32:17  rubikitch
 ;; More key bindings.
 ;;
 ;; Revision 1.151  2009/02/23 08:21:24  rubikitch
@@ -717,7 +725,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.152 2009-02-23 08:32:17 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.153 2009-02-23 08:38:57 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
