@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.153 2009-02-23 08:38:57 rubikitch Exp $
+;; $Id: anything.el,v 1.154 2009-02-23 08:57:54 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -30,9 +30,9 @@
 
 ;;
 ;; Start with M-x anything, narrow the list by typing some pattern,
-;; select with up/down/pgup/pgdown, choose with enter, left/right
-;; moves between sources. With TAB actions can be selected if the
-;; selected candidate has more than one possible action.
+;; select with up/down/pgup/pgdown/C-p/C-n/C-v/M-v, choose with enter,
+;; left/right moves between sources. With TAB actions can be selected
+;; if the selected candidate has more than one possible action.
 ;;
 ;; Note that anything.el provides only the framework and some example
 ;; configurations for demonstration purposes. See anything-config.el
@@ -97,6 +97,10 @@
 ;;   defined.
 
 ;;; (@* "Tips")
+
+;;
+;; To mark a candidate, press C-SPC as normal Emacs marking. To go to
+;; marked candidate, press M-[ or M-].
 
 ;;
 ;; `anything-map' is now Emacs-standard key bindings by default. If
@@ -220,18 +224,16 @@
 ;;
 ;;   - process status indication
 ;;
-;;   - results from async sources should appear in the order they are
-;;     specified in anything-sources
-;;
 ;;   - async sources doesn't honor digit-shortcut-count
 ;;
 ;;   - anything-candidate-number-limit can't be nil everywhere
-;;
-;;   - support multi line candidates
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.153  2009-02-23 08:38:57  rubikitch
+;; Revision 1.154  2009-02-23 08:57:54  rubikitch
+;; Visible Mark
+;;
+;; Revision 1.153  2009/02/23 08:38:57  rubikitch
 ;; update doc
 ;;
 ;; Revision 1.152  2009/02/23 08:32:17  rubikitch
@@ -725,7 +727,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.153 2009-02-23 08:38:57 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.154 2009-02-23 08:57:54 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2760,6 +2762,70 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   "Scroll other window (not *Anything* window) downward."
   (interactive)
   (anything-scroll-other-window-base 'scroll-other-window-down))
+
+;; (@* "Utility: Visible Mark")
+(defface anything-visible-mark
+  '((((min-colors 88) (background dark))
+     (:background "green1" :foreground "black"))
+    (((background dark)) (:background "green" :foreground "black"))
+    (((min-colors 88)) (:background "green1"))
+    (t (:background "green")))
+  "Face for visible mark.")
+(defvar anything-visible-mark-face 'anything-visible-mark)
+(defvar anything-visible-mark-overlays nil)
+
+(defun anything-clear-visible-mark ()
+  (mapc 'delete-overlay anything-visible-mark-overlays)
+  (setq anything-visible-mark-overlays nil))
+(add-hook 'anything-after-initialize-hook 'anything-clear-visible-mark)
+
+(defun anything-toggle-visible-mark ()
+  (interactive)
+  (with-anything-window
+    (anything-aif (loop for o in anything-visible-mark-overlays
+                        when (equal (line-beginning-position) (overlay-start o))
+                        do (return o))
+        ;; delete
+        (progn (delete-overlay it)
+               (delq it anything-visible-mark-overlays))
+      (let ((o (make-overlay (line-beginning-position) (1+ (line-end-position)))))
+        (overlay-put o 'face anything-visible-mark-face)
+        (overlay-put o 'source (assoc-default 'name (anything-get-current-source)))
+        (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
+        (add-to-list 'anything-visible-mark-overlays o)))))
+(defun anything-revive-visible-mark ()
+  (interactive)
+  (with-current-buffer anything-buffer
+    (loop for o in anything-visible-mark-overlays do
+          (goto-char (point-min))
+          (when (search-forward (overlay-get o 'string) nil t)
+            (forward-line -1)
+            (when (save-excursion
+                    (goto-char (anything-get-previous-header-pos))
+                    (equal (overlay-get o 'source)
+                           (buffer-substring (line-beginning-position) (line-end-position))))
+              (move-overlay o (line-beginning-position) (1+ (line-end-position))))))))
+(add-hook 'anything-update-hook 'anything-revive-visible-mark)
+
+(defun anything-next-visible-mark (&optional prev)
+  (interactive)
+  (with-anything-window
+    (setq anything-visible-mark-overlays
+          (sort* anything-visible-mark-overlays
+                 '< :key 'overlay-start))
+    (let ((i (position-if (lambda (o) (< (point) (overlay-start o)))
+                          anything-visible-mark-overlays)))
+      (when prev
+          (if (not i) (setq i (length anything-visible-mark-overlays)))
+          (if (equal (point) (overlay-start (nth (1- i) anything-visible-mark-overlays)))
+              (setq i (1- i))))
+      (when i
+        (goto-char (overlay-start (nth (if prev (1- i) i) anything-visible-mark-overlays)))
+        (anything-mark-current-line)))))
+
+(defun anything-prev-visible-mark ()
+  (interactive)
+  (anything-next-visible-mark t))
 
 ;; (@* "Utility: Incremental search within results")
 
