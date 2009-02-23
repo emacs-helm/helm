@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.154 2009-02-23 08:57:54 rubikitch Exp $
+;; $Id: anything.el,v 1.155 2009-02-23 21:30:52 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.154  2009-02-23 08:57:54  rubikitch
+;; Revision 1.155  2009-02-23 21:30:52  rubikitch
+;; New command: `anything-at-point'
+;;
+;; Revision 1.154  2009/02/23 08:57:54  rubikitch
 ;; Visible Mark
 ;;
 ;; Revision 1.153  2009/02/23 08:38:57  rubikitch
@@ -727,7 +730,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.154 2009-02-23 08:57:54 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.155 2009-02-23 21:30:52 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1730,6 +1733,16 @@ already-bound variables. Yuck!
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
        anything-last-sources anything-sources)
    nil nil t nil any-buffer))
+
+(defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
+  "Same as `anything' except when C-u is pressed, the initial input is the symbol at point."
+  (interactive)
+  (anything any-sources
+            (if current-prefix-arg
+                (concat "\\b" (thing-at-point 'symbol) "\\b"
+                        (if (featurep 'anything-match-plugin) " " ""))
+              any-input)
+            any-prompt any-resume any-preselect any-buffer))
 
 ;; (@* "Core: initialize")
 (defun anything-initialize ()
