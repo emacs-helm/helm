@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.157 2009-02-23 22:51:43 rubikitch Exp $
+;; $Id: anything.el,v 1.158 2009-02-24 06:39:20 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.157  2009-02-23 22:51:43  rubikitch
+;; Revision 1.158  2009-02-24 06:39:20  rubikitch
+;; suppress compile warnings.
+;;
+;; Revision 1.157  2009/02/23 22:51:43  rubikitch
 ;; New function: `anything-document-attribute'
 ;;
 ;; Revision 1.156  2009/02/23 21:36:09  rubikitch
@@ -736,7 +739,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.157 2009-02-23 22:51:43 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.158 2009-02-24 06:39:20 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1513,6 +1516,10 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
   (unless no-init (anything-funcall-foreach 'init))
   (unless no-update (anything-update)))
 
+(defvar anything-compile-source-functions
+  '(anything-compile-source--type anything-compile-source--dummy anything-compile-source--candidates-in-buffer)
+  "Functions to compile elements of `anything-sources' (plug-in).")
+
 (defun anything-get-sources ()
   "Return compiled `anything-sources', which is memoized.
 
@@ -1838,12 +1845,6 @@ to be handled."
                                'anything-check-minibuffer-input-1))))
 
 (defun anything-check-minibuffer-input-1 ()
-  (let (inhibit-quit)
-    (with-selected-window (minibuffer-window)
-      (anything-check-new-input (minibuffer-contents)))))
-
-
-(defun anything-check-minibuffer-input-1 ()
   (with-anything-quittable
     (with-selected-window (minibuffer-window)
       (anything-check-new-input (minibuffer-contents)))))
@@ -1858,9 +1859,6 @@ necessary."
     (anything-update)))
 
 ;; (@* "Core: source compiler")
-(defvar anything-compile-source-functions
-  '(anything-compile-source--type anything-compile-source--dummy anything-compile-source--candidates-in-buffer)
-  "Functions to compile elements of `anything-sources' (plug-in).")
 (defvar anything-compile-source-functions-default anything-compile-source-functions
   "Plug-ins this file provides.")
 (defun anything-compile-sources (sources funcs)
@@ -2826,7 +2824,8 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
     (((background dark)) (:background "green" :foreground "black"))
     (((min-colors 88)) (:background "green1"))
     (t (:background "green")))
-  "Face for visible mark.")
+  "Face for visible mark."
+  :group 'anything)
 (defvar anything-visible-mark-face 'anything-visible-mark)
 (defvar anything-visible-mark-overlays nil)
 
