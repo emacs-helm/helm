@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.158 2009-02-24 06:39:20 rubikitch Exp $
+;; $Id: anything.el,v 1.159 2009-02-26 23:45:48 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.158  2009-02-24 06:39:20  rubikitch
+;; Revision 1.159  2009-02-26 23:45:48  rubikitch
+;; * Check whether candidate is a string, otherwise ignore.
+;;
+;; Revision 1.158  2009/02/24 06:39:20  rubikitch
 ;; suppress compile warnings.
 ;;
 ;; Revision 1.157  2009/02/23 22:51:43  rubikitch
@@ -739,7 +742,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.158 2009-02-24 06:39:20 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.159 2009-02-26 23:45:48 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1987,12 +1990,13 @@ Cache the candidates if there is not yet a cached value."
 
                  (clrhash anything-match-hash)
                  (dolist (function functions)
-                   (let (newmatches)
+                   (let (newmatches c)
                      (dolist (candidate cands)
                        (when (and (not (gethash candidate anything-match-hash))
-                                  (funcall function (if (listp candidate)
-                                                        (car candidate)
-                                                      candidate)))
+                                  (stringp (setq c (if (listp candidate)
+                                                       (car candidate)
+                                                     candidate)))
+                                  (funcall function c))
                          (puthash candidate t anything-match-hash)
                          (push candidate newmatches)
 
@@ -2121,7 +2125,7 @@ the real value in a text property."
         (realvalue (if (listp match) (cdr match) match)))
     (and (functionp real-to-display)
          (setq string (funcall real-to-display realvalue)))
-    (when string                        ; real-to-display may return nil
+    (when (stringp string)                    ; real-to-display may return nil
       (funcall insert-function string)
       ;; Some sources with candidates-in-buffer have already added
       ;; 'anything-realvalue property when creating candidate buffer.
@@ -2406,12 +2410,10 @@ UNIT and DIRECTION."
       (if (eobp)
           (forward-line -1))
 
-      (anything-mark-current-line)
-      (if (and anything-display-source-at-screen-top (eq unit 'source))
-      (save-selected-window
-        (select-window (get-buffer-window anything-buffer 'visible))
+      (when (and anything-display-source-at-screen-top (eq unit 'source))
         (set-window-start (selected-window)
-                          (save-excursion (forward-line -1) (point))))))))
+                          (save-excursion (forward-line -1) (point))))
+      (anything-mark-current-line))))
 
 
 (defun anything-mark-current-line ()
