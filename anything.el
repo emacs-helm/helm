@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.160 2009-02-27 01:05:06 rubikitch Exp $
+;; $Id: anything.el,v 1.161 2009-02-27 07:18:46 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.160  2009-02-27 01:05:06  rubikitch
+;; Revision 1.161  2009-02-27 07:18:46  rubikitch
+;; Fix bug of `anything-scroll-other-window' and `anything-scroll-other-window-down'.
+;;
+;; Revision 1.160  2009/02/27 01:05:06  rubikitch
 ;; * Make sure to restore point after running `anything-update-hook'.
 ;; * Make `anything-compute-matches' easy to find error.
 ;;
@@ -746,7 +749,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.160 2009-02-27 01:05:06 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.161 2009-02-27 07:18:46 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2823,17 +2826,20 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 ;; scroll-other-window(-down)? for persistent-action
 (defun anything-scroll-other-window-base (command)
   (save-selected-window
-    (other-window 2)
+    (select-window
+     (some-window
+      (lambda (w) (not (string= anything-buffer (buffer-name (window-buffer w)))))
+      'no-minibuffer 'current-frame))
     (call-interactively command)))
 
 (defun anything-scroll-other-window ()
   "Scroll other window (not *Anything* window) upward."
   (interactive)
-  (anything-scroll-other-window-base 'scroll-other-window))
+  (anything-scroll-other-window-base 'scroll-up))
 (defun anything-scroll-other-window-down ()
   "Scroll other window (not *Anything* window) downward."
   (interactive)
-  (anything-scroll-other-window-base 'scroll-other-window-down))
+  (anything-scroll-other-window-base 'scroll-down))
 
 ;; (@* "Utility: Visible Mark")
 (defface anything-visible-mark
