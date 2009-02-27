@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.42 2009-02-19 23:04:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.43 2009-02-27 14:45:26 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -70,7 +70,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.42  2009-02-19 23:04:33  rubikitch
+;; Revision 1.43  2009-02-27 14:45:26  rubikitch
+;; Fix a read-only bug in `alcs-make-candidates'.
+;;
+;; Revision 1.42  2009/02/19 23:04:33  rubikitch
 ;; * update doc
 ;; * use anything-kyr if any
 ;;
@@ -250,7 +253,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.42 2009-02-19 23:04:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.43 2009-02-27 14:45:26 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -309,18 +312,20 @@
 
 (defun alcs-make-candidates ()
   (message "Collecting symbols...")
-  (alcs-create-buffer alcs-variables-buffer)
-  (alcs-create-buffer alcs-functions-buffer)
-  (alcs-create-buffer alcs-commands-buffer)
-  (alcs-create-buffer alcs-symbol-buffer)
-  (mapatoms
-   (lambda (sym)
-     (let ((name (symbol-name sym))
-           (fbp (fboundp sym)))
-       (cond ((commandp sym) (set-buffer alcs-commands-buffer) (insert name "\n"))
-             (fbp (set-buffer alcs-functions-buffer) (insert name "\n")))
-       (cond ((boundp sym) (set-buffer alcs-variables-buffer) (insert name "\n"))
-             ((not fbp) (set-buffer alcs-symbol-buffer) (insert name "\n"))))))
+  ;; To ignore read-only property.
+  (let ((inhibit-read-only t))
+    (alcs-create-buffer alcs-variables-buffer)
+    (alcs-create-buffer alcs-functions-buffer)
+    (alcs-create-buffer alcs-commands-buffer)
+    (alcs-create-buffer alcs-symbol-buffer)
+    (mapatoms
+     (lambda (sym)
+       (let ((name (symbol-name sym))
+             (fbp (fboundp sym)))
+         (cond ((commandp sym) (set-buffer alcs-commands-buffer) (insert name "\n"))
+               (fbp (set-buffer alcs-functions-buffer) (insert name "\n")))
+         (cond ((boundp sym) (set-buffer alcs-variables-buffer) (insert name "\n"))
+               ((not fbp) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
   (message "Collecting symbols...done"))
 
 (defun anything-lisp-complete-symbol-set-timer (update-period)
