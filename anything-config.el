@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-02-27 09:37:42 (JST) rubikitch>
+;; Time-stamp: <2009-02-27 17:38:59 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -125,6 +125,10 @@
 
 ;;; Change log:
 ;;
+;; 2009/02/27
+;;   * rubikitch:
+;;      * Improve `anything-c-shorten-home-path'.
+;;      * Fix bug of `anything-c-source-emacs-source-defun'.
 ;; 2009/02/25
 ;;   * rubikitch:
 ;;      * Fix bug in `anything-c-source-register' (thanks Thierry).
@@ -1482,8 +1486,7 @@ utility mdfind.")
 (defvar anything-c-source-emacs-source-defun
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
-;; FIXME use emacs-version
-    (condition . (string-match "/emacs22.+/src/.+c$" (or buffer-file-name "")))))
+    (condition . (string-match "/emacs2[0-9].+/src/.+c$" (or buffer-file-name "")))))
 ;; (anything 'anything-c-source-emacs-source-defun)
 
 (defvar anything-c-source-emacs-lisp-expectations
