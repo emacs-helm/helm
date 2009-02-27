@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.159 2009-02-26 23:45:48 rubikitch Exp $
+;; $Id: anything.el,v 1.160 2009-02-27 01:05:06 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -230,7 +230,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.159  2009-02-26 23:45:48  rubikitch
+;; Revision 1.160  2009-02-27 01:05:06  rubikitch
+;; * Make sure to restore point after running `anything-update-hook'.
+;; * Make `anything-compute-matches' easy to find error.
+;;
+;; Revision 1.159  2009/02/26 23:45:48  rubikitch
 ;; * Check whether candidate is a string, otherwise ignore.
 ;;
 ;; Revision 1.158  2009/02/24 06:39:20  rubikitch
@@ -742,7 +746,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.159 2009-02-26 23:45:48 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.160 2009-02-27 01:05:06 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1969,54 +1973,66 @@ Cache the candidates if there is not yet a cached value."
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
-  (let ((functions (assoc-default 'match source))
-        (limit (anything-candidate-number-limit source))
-        matches)
-    (cond ((or (equal anything-pattern "") (equal functions '(identity)))
-           (setq matches (anything-get-cached-candidates source))
-           (if (> (length matches) limit)
-               (setq matches 
-                     (subseq matches 0 limit))))
-          (t
-           (condition-case nil
-               (let ((item-count 0)
-                     (cands (anything-get-cached-candidates source))
-                     exit)
+  (let ((doit (lambda ()
+                (let ((functions (assoc-default 'match source))
+                      (limit (anything-candidate-number-limit source))
+                      matches)
+                  (cond ((or (equal anything-pattern "") (equal functions '(identity)))
+                         (setq matches (anything-get-cached-candidates source))
+                         (if (> (length matches) limit)
+                             (setq matches 
+                                   (subseq matches 0 limit))))
+                        (t
+                         (condition-case nil
+                             (let ((item-count 0)
+                                   (cands (anything-get-cached-candidates source))
+                                   exit)
 
-                 (unless functions
-                   (setq functions
-                         (list (lambda (candidate)
-                                 (string-match anything-pattern candidate)))))
+                               (unless functions
+                                 (setq functions
+                                       (list (lambda (candidate)
+                                               (string-match anything-pattern candidate)))))
 
-                 (clrhash anything-match-hash)
-                 (dolist (function functions)
-                   (let (newmatches c)
-                     (dolist (candidate cands)
-                       (when (and (not (gethash candidate anything-match-hash))
-                                  (stringp (setq c (if (listp candidate)
-                                                       (car candidate)
-                                                     candidate)))
-                                  (funcall function c))
-                         (puthash candidate t anything-match-hash)
-                         (push candidate newmatches)
+                               (clrhash anything-match-hash)
+                               (dolist (function functions)
+                                 (let (newmatches c)
+                                   (dolist (candidate cands)
+                                     (when (and (not (gethash candidate anything-match-hash))
+                                                (stringp (setq c (if (listp candidate)
+                                                                     (car candidate)
+                                                                   candidate)))
+                                                (funcall function c))
+                                       (puthash candidate t anything-match-hash)
+                                       (push candidate newmatches)
 
-                         (when limit
-                           (incf item-count)
-                           (when (= item-count limit)
-                             (setq exit t)
-                             (return)))))
+                                       (when limit
+                                         (incf item-count)
+                                         (when (= item-count limit)
+                                           (setq exit t)
+                                           (return)))))
 
-                     (setq matches (append matches (reverse newmatches)))
+                                   (setq matches (append matches (reverse newmatches)))
 
-                     (if exit
-                         (return)))))
+                                   (if exit
+                                       (return)))))
 
-             (invalid-regexp (setq matches nil)))))
+                           (invalid-regexp (setq matches nil)))))
 
-    (anything-aif (assoc-default 'filtered-candidate-transformer source)
-        (setq matches
-              (anything-funcall-with-source source it matches source)))
-    matches))
+                  (anything-aif (assoc-default 'filtered-candidate-transformer source)
+                      (setq matches
+                            (anything-funcall-with-source source it matches source)))
+                  matches))))
+    (if debug-on-error
+        (funcall doit)
+      (condition-case v
+          (funcall doit)
+        (error (anything-log-error
+                "anything-compute-matches: error when processing source: %s"
+                (assoc-default 'name source))
+               nil)))))
+
+(defun anything-log-error (&rest args)
+  (apply 'message args))
 
 (defun anything-process-source (source)
   "Display matches from SOURCE according to its settings."
@@ -2067,7 +2083,7 @@ Cache the candidates if there is not yet a cached value."
                        (= (overlay-start anything-selection-overlay)
                           (overlay-end anything-selection-overlay)))
               (goto-char (point-min))
-              (run-hooks 'anything-update-hook)
+              (save-excursion (run-hooks 'anything-update-hook))
               (anything-next-line)))
 
           (anything-maybe-fit-frame)))))
@@ -2101,7 +2117,7 @@ the current pattern."
             (anything-process-source source))))
 
       (goto-char (point-min))
-      (run-hooks 'anything-update-hook)
+      (save-excursion (run-hooks 'anything-update-hook))
       (anything-next-line)
 
       (setq delayed-sources (nreverse delayed-sources))
