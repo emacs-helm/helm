@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.161 2009-02-27 07:18:46 rubikitch Exp $
+;; $Id: anything.el,v 1.162 2009-02-28 01:24:13 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -97,6 +97,17 @@
 ;;   defined.
 
 ;;; (@* "Tips")
+
+;;
+;; Now symbols are acceptable as candidates. So you do not have to use
+;; `symbol-name' function. The source is much simpler. For example,
+;; `apropos-internal' returns a list of symbols.
+;; 
+;;   (anything
+;;    '(((name . "Commands")
+;;       (candidates . (lambda () (apropos-internal anything-pattern 'commandp)))
+;;       (volatile)
+;;       (action . describe-function))))
 
 ;;
 ;; To mark a candidate, press C-SPC as normal Emacs marking. To go to
@@ -230,7 +241,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.161  2009-02-27 07:18:46  rubikitch
+;; Revision 1.162  2009-02-28 01:24:13  rubikitch
+;; Symbols are now acceptable as candidate.
+;;
+;; Revision 1.161  2009/02/27 07:18:46  rubikitch
 ;; Fix bug of `anything-scroll-other-window' and `anything-scroll-other-window-down'.
 ;;
 ;; Revision 1.160  2009/02/27 01:05:06  rubikitch
@@ -749,7 +763,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.161 2009-02-27 07:18:46 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.162 2009-02-28 01:24:13 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -842,8 +856,20 @@ Attributes:
   either be a variable name, a function called with no parameters
   or the actual list of candidates.
 
-  The list must be a list of strings, so it's the responsibility
-  of the source to convert candidates to strings if necessary.
+  The list must be a list whose members are strings, symbols
+  or (DISPLAY . REAL) pairs.
+
+  In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
+  in the Anything buffer, but the REAL one is used as action
+  argument when the candidate is selected. This allows a more
+  readable presentation for candidates which would otherwise be,
+  for example, too long or have a common part shared with other
+  candidates which can be safely replaced with an abbreviated
+  string for display purposes.
+
+  Note that if the (DISPLAY . REAL) form is used then pattern
+  matching is done on the displayed string, not on the real
+  value.
 
   If the candidates have to be retrieved asynchronously (for
   example, by an external command which takes a while to run)
@@ -926,18 +952,9 @@ Attributes:
   This can be used to transform or remove items from the list of
   candidates.
 
-  The function can also substitute candidates in the returned
-  list with (DISPLAY . REAL) pairs. In this case the DISPLAY
-  string is shown in the Anything buffer, but the REAL one is
-  used as action argument when the candidate is selected. This
-  allows a more readable presentation for candidates which would
-  otherwise be, for example, too long or have a common part
-  shared with other candidates which can be safely replaced with
-  an abbreviated string for display purposes.
-
-  Note that if the (DISPLAY . REAL) form is used then pattern
-  matching is done on the displayed string, not on the real
-  value.
+  Note that `candidates' is run already, so the given transformer
+  function should also be able to handle candidates with (DISPLAY
+  . REAL) format.
 
 - filtered-candidate-transformer (optional)
 
@@ -961,9 +978,9 @@ Attributes:
   some of them will actually be dislpayed due to the limit
   imposed by `anything-candidate-number-limit'.
 
-  Note that `candidate-transformer' is run already, so the given
-  transformer function should also be able to handle candidates
-  with (DISPLAY . REAL) format.
+  Note that `candidates' and `candidate-transformer' is run
+  already, so the given transformer function should also be able
+  to handle candidates with (DISPLAY . REAL) format.
 
   This option has no effect for asynchronous sources. (Not yet,
   at least.
@@ -1998,13 +2015,15 @@ Cache the candidates if there is not yet a cached value."
 
                                (clrhash anything-match-hash)
                                (dolist (function functions)
-                                 (let (newmatches c)
+                                 (let (newmatches c cc)
                                    (dolist (candidate cands)
                                      (when (and (not (gethash candidate anything-match-hash))
-                                                (stringp (setq c (if (listp candidate)
+                                                (setq c (if (listp candidate)
                                                                      (car candidate)
-                                                                   candidate)))
-                                                (funcall function c))
+                                                                   candidate))
+                                                (setq cc (cond ((stringp c) c)
+                                                               ((symbolp c) (symbol-name c))))
+                                                (funcall function cc))
                                        (puthash candidate t anything-match-hash)
                                        (push candidate newmatches)
 
@@ -2144,6 +2163,7 @@ the real value in a text property."
         (realvalue (if (listp match) (cdr match) match)))
     (and (functionp real-to-display)
          (setq string (funcall real-to-display realvalue)))
+    (when (symbolp string) (setq string (symbol-name string)))
     (when (stringp string)                    ; real-to-display may return nil
       (funcall insert-function string)
       ;; Some sources with candidates-in-buffer have already added
@@ -4620,6 +4640,35 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (real-to-display . upcase)
             (action . identity))))
         (with-current-buffer (anything-buffer-get) (buffer-string)))
+      (desc "Symbols are acceptable as candidate.")
+      (expect '(("test" (sym "str")))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates sym "str")))))
+      (expect '(("test" ((sym . realsym) ("str" . "realstr"))))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates (sym . realsym) ("str" . "realstr"))))))
+      (expect '(("test" (sym)))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates sym "str")))
+         "sym"))
+      (expect '(("test" ("str")))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates sym "str")))
+         "str"))
+      (expect '(("test" ((sym . realsym))))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates (sym . realsym) ("str" . "realstr"))))
+         "sym"))
+      (expect '(("test" (("str" . "realstr"))))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates (sym . realsym) ("str" . "realstr"))))
+         "str"))
       )))
 
 
