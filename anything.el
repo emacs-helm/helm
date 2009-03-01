@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.162 2009-02-28 01:24:13 rubikitch Exp $
+;; $Id: anything.el,v 1.163 2009-03-01 05:15:00 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -116,7 +116,8 @@
 ;;
 ;; `anything-map' is now Emacs-standard key bindings by default. If
 ;; you are using `iswitchb', execute `anything-iswitchb-setup'. Then
-;; some key bindings are adjusted to `iswitchb'.
+;; some key bindings are adjusted to `iswitchb'. Note that
+;; anything-iswitchb is not maintained.
 
 ;;
 ;; There are many `anything' applications, using `anything' for
@@ -241,7 +242,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.162  2009-02-28 01:24:13  rubikitch
+;; Revision 1.163  2009-03-01 05:15:00  rubikitch
+;; anything-iswitchb and anything-isearch are marked as unmaintained.
+;; (document change only)
+;;
+;; Revision 1.162  2009/02/28 01:24:13  rubikitch
 ;; Symbols are now acceptable as candidate.
 ;;
 ;; Revision 1.161  2009/02/27 07:18:46  rubikitch
@@ -763,7 +768,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.162 2009-02-28 01:24:13 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.163 2009-03-01 05:15:00 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2926,7 +2931,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   (interactive)
   (anything-next-visible-mark t))
 
-;; (@* "Utility: Incremental search within results")
+;; (@* "Utility: Incremental search within results (unmaintained)")
 
 (defvar anything-isearch-original-global-map nil
   "Original global map before Anything isearch is started.")
@@ -2970,7 +2975,7 @@ occurrence of the current pattern.")
 
 
 (defun anything-isearch ()
-  "Start incremental search within results."
+  "Start incremental search within results. (UNMAINTAINED)"
   (interactive)
   (if (zerop (buffer-size (get-buffer (anything-buffer-get))))
       (message "There are no results.")
@@ -3169,7 +3174,7 @@ occurrence of the current pattern.")
   (setq anything-isearch-message-suffix ""))
 
 
-;; (@* "Utility: Iswitchb integration")
+;; (@* "Utility: Iswitchb integration (unmaintained)")
 
 (defvar anything-iswitchb-candidate-selected nil
   "Indicates whether an anything candidate is selected from iswitchb.")
@@ -3182,7 +3187,7 @@ occurrence of the current pattern.")
 
 
 (defun anything-iswitchb-setup ()
-  "Integrate anything completion into iswitchb.
+  "Integrate anything completion into iswitchb (UNMAINTAINED).
 
 If the user is idle for `anything-iswitchb-idle-delay' seconds
 after typing something into iswitchb then anything candidates are
