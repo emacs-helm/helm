@@ -1,5 +1,5 @@
 ;;; anything-ipa.el --- Anything interface of In Place Annotation
-;; $Id: anything-ipa.el,v 1.5 2009-02-13 01:18:32 rubikitch Exp $
+;; $Id: anything-ipa.el,v 1.6 2009-03-01 22:52:44 rubikitch Exp $
 
 ;; Copyright (C) 2009  rubikitch
 
@@ -45,7 +45,10 @@
 ;;; History:
 
 ;; $Log: anything-ipa.el,v $
-;; Revision 1.5  2009-02-13 01:18:32  rubikitch
+;; Revision 1.6  2009-03-01 22:52:44  rubikitch
+;; Use `ipa-annotation-face' for annotation text
+;;
+;; Revision 1.5  2009/02/13 01:18:32  rubikitch
 ;; migemize
 ;;
 ;; Revision 1.4  2009/02/13 00:49:36  rubikitch
@@ -64,7 +67,7 @@
 
 ;;; Code:
 
-(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.5 2009-02-13 01:18:32 rubikitch Exp $")
+(defvar anything-ipa-version "$Id: anything-ipa.el,v 1.6 2009-03-01 22:52:44 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything)
 (require 'ipa)
@@ -86,7 +89,9 @@
                             (buffer-substring (point-at-bol) (point-at-eol)))
           for lineno = (line-number-at-pos pos)
           collect
-          (cons (format "%5d:[%s]%s" lineno text line) pos))))
+          (cons (format "%5d:[%s]%s"
+                        lineno (propertize text 'face ipa-annotation-face) line)
+                pos))))
 
 (defun anything-ipa ()
   "`anything' interface of ipa."
