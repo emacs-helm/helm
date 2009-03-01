@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-01 21:12:13 (CET) thierry>
+;; Time-stamp: <2009-03-02 07:39:55 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -14,7 +14,7 @@
 ;; Copyright (C) 2009, rubikitch, all rights reserved.
 ;; Copyright (C) 2009, Thierry Volpiatto, all rights reserved.
 ;; Created: 2009-02-16 21:38:23
-;; Version: 0.3.7
+;; Version: 0.3.8
 ;; URL: http://www.emacswiki.org/emacs/download/anything-config.el
 ;; Keywords: anything, anything-config
 ;; Compatibility: GNU Emacs 22 ~ 23
@@ -131,6 +131,9 @@
 ;;     `anything-c-source-occur'              (Occur)
 
 ;;; Change log:
+;; 2009/03/02
+;;   * rubikitch:
+;;      * Add `anything-c-skip-current-file'.
 ;; 2009/03/01
 ;;   * Thierry Volpiatto:
 ;;      * Add myself as new maintainer.
@@ -2264,10 +2267,13 @@ displayed with the `file-name-shadow' face if available."
   (anything-c-shadow-entries files anything-c-boring-file-regexp))
 
 (defun anything-c-skip-boring-files (files)
-  "Files matching `anything-c-boring-file-regexp' will be
-skipped."
+  "Files matching `anything-c-boring-file-regexp' will be skipped."
   (anything-c-skip-entries files anything-c-boring-file-regexp))
 ;; (anything-c-skip-boring-files '("README" "/src/.svn/hoge"))
+
+(defun anything-c-skip-current-file (files)
+  "Current file will be skipped."
+  (remove (buffer-file-name anything-current-buffer) files))
 
 (defun anything-c-w32-pathname-transformer (args)
   "Change undesirable features of windows pathnames to ones more acceptable to
@@ -2652,6 +2658,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
                                     (anything-c-compose
                                      (list candidates)
                                      '(anything-c-w32-pathname-transformer
+                                       anything-c-skip-current-file
                                        anything-c-skip-boring-files
                                        anything-c-shorten-home-path)))))
         (command (action ("Call interactively" . anything-c-call-interactively)
