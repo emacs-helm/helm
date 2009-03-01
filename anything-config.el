@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-01 16:15:10 (CET) thierry>
+;; Time-stamp: <2009-03-01 21:12:13 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -1814,7 +1814,8 @@ removed."
                                              (calc-eval anything-pattern)
                                            (error "error")))))
     (volatile)
-    (action ("Do Nothing" . ignore))))
+    (action ("Copy result to kill-ring" . (lambda (elm)
+                                     (kill-new elm))))))
 ;; (anything 'anything-c-source-calculation-result)
 
 ;;; Google Suggestions
