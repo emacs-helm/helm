@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.163 2009-03-01 05:15:00 rubikitch Exp $
+;; $Id: anything.el,v 1.164 2009-03-02 01:51:40 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.163  2009-03-01 05:15:00  rubikitch
+;; Revision 1.164  2009-03-02 01:51:40  rubikitch
+;; better error handling.
+;;
+;; Revision 1.163  2009/03/01 05:15:00  rubikitch
 ;; anything-iswitchb and anything-isearch are marked as unmaintained.
 ;; (document change only)
 ;;
@@ -768,7 +771,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.163 2009-03-01 05:15:00 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.164 2009-03-02 01:51:40 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1436,6 +1439,7 @@ It is useful for `anything' applications.")
 (defvar anything-match-hash (make-hash-table :test 'equal))
 (defvar anything-cib-hash (make-hash-table :test 'equal))
 (defvar anything-tick-hash (make-hash-table :test 'equal))
+(defvar anything-issued-errors nil)
 
 ;; (@* "Programming Tools")
 (defmacro anything-aif (test-form then-form &rest else-forms)
@@ -1721,7 +1725,7 @@ already-bound variables. Yuck!
               (anything-sources (anything-normalize-sources any-sources)))
          
           (add-hook 'post-command-hook 'anything-check-minibuffer-input)
-
+          (add-hook 'minibuffer-setup-hook 'anything-print-error-messages)
           (setq anything-current-position (cons (point) (window-start)))
           (if any-resume
               (anything-initialize-overlays (anything-buffer-get))
@@ -1751,6 +1755,7 @@ already-bound variables. Yuck!
                          (read-string (or any-prompt "pattern: ")
                                       (if any-resume anything-pattern any-input))))))
             (anything-cleanup)
+            (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
             (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
             (anything-set-frame/window-configuration frameconfig))
           (unless anything-quit
@@ -1798,6 +1803,7 @@ already-bound variables. Yuck!
   (run-hooks 'anything-before-initialize-hook)
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
+  (setq anything-issued-errors nil)
   (setq anything-compiled-sources nil)
   (setq anything-saved-current-source nil)
   ;; Call the init function for sources where appropriate
@@ -2058,8 +2064,7 @@ Cache the candidates if there is not yet a cached value."
                 (assoc-default 'name source))
                nil)))))
 
-(defun anything-log-error (&rest args)
-  (apply 'message args))
+;; (anything '(((name . "error")(candidates . (lambda () (hage))) (action . identity))))
 
 (defun anything-process-source (source)
   "Display matches from SOURCE according to its settings."
@@ -2528,6 +2533,18 @@ UNIT and DIRECTION."
 (defun anything-pos-candidate-separator-p ()
   "Return t if the current line is a candidate separator."
   (get-text-property (line-beginning-position) 'anything-candidate-separator))
+
+;; (@* "Core: error handling")
+(defun anything-log-error (&rest args)
+  "Accumulate error messages into `anything-issued-errors'."
+  (let ((msg (apply 'format args)))
+    (unless (member msg anything-issued-errors)
+      (add-to-list 'anything-issued-errors msg))))
+
+(defun anything-print-error-messages ()
+  "Print error messages in `anything-issued-errors'."
+  (message "%s" (mapconcat 'identity (reverse anything-issued-errors) "\n")))
+
 
 ;; (@* "Core: misc")
 (defun anything-kill-buffer-hook ()
