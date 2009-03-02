@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-02 07:39:55 (JST) rubikitch>
+;; Time-stamp: <2009-03-02 10:27:26 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -134,6 +134,7 @@
 ;; 2009/03/02
 ;;   * rubikitch:
 ;;      * Add `anything-c-skip-current-file'.
+;;      * Rewrite `anything-test-sources' to modern fashion.
 ;; 2009/03/01
 ;;   * Thierry Volpiatto:
 ;;      * Add myself as new maintainer.
@@ -392,18 +393,13 @@ they will be displayed with face `file-name-shadow' if
   (anything-set-source-filter '("Kill Ring")))
 
 (defun anything-test-sources ()
-  "Insert source to buffer `*scratch*' for test."
+  "List all anything sources for test.
+The output is sexps which are evaluated by \\[eval-last-sexp]."
   (interactive)
-  (switch-to-buffer "*scratch*")
-  (goto-char (point-max))
-  (insert "\n")
-  (save-excursion
-    (insert
-     "(setq anything-sources-old anything-sources)\n"
-     "(setq anything-sources anything-sources-old)\n"
-     (mapconcat (lambda (sym) (format "(setq anything-sources (list %s))" sym))
-                (apropos-internal "^anything-c-source" #'boundp)
-                "\n"))))
+  (with-output-to-temp-buffer "*Anything Test Sources*"
+    (mapc (lambda (s) (princ (format ";; (anything '%s)\n" s)))
+          (apropos-internal "^anything-c-source" #'boundp))
+    (pop-to-buffer standard-output)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilities Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-nest (&rest same-as-anything)
