@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-02 10:27:26 (JST) rubikitch>
+;; Time-stamp: <2009-03-03 07:27:33 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -14,7 +14,7 @@
 ;; Copyright (C) 2009, rubikitch, all rights reserved.
 ;; Copyright (C) 2009, Thierry Volpiatto, all rights reserved.
 ;; Created: 2009-02-16 21:38:23
-;; Version: 0.3.8
+;; Version: 0.3.9
 ;; URL: http://www.emacswiki.org/emacs/download/anything-config.el
 ;; Keywords: anything, anything-config
 ;; Compatibility: GNU Emacs 22 ~ 23
@@ -991,7 +991,8 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 (defvar anything-c-source-bookmark-set
   '((name . "Set Bookmark")
     (dummy)
-    (action . bookmark-set)))
+    (action . bookmark-set))
+  "See (info \"(emacs)Bookmarks\").")
 ;; (anything 'anything-c-source-bookmark-set)
 
 ;;; Visible Bookmarks
@@ -1004,7 +1005,10 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   '((name . "Visible Bookmarks")
     (init . anything-c-source-bm-init)
     (candidates-in-buffer)
-    (type . line)))
+    (type . line))
+  "Needs bm.el.
+
+http://www.nongnu.org/bm/")
 
 (defun anything-c-source-bm-init ()
   "Init function for `anything-c-source-bm'."
@@ -1179,6 +1183,7 @@ word in the function's name, e.g. \"bb\" is an abbrev for
                                (anything-c-w3m-browse-bookmark candidate nil t))))
     (delayed)
     (volatile)))
+;; (anything 'anything-c-source-w3m-bookmarks)
 
 (defun anything-c-w3m-bookmarks-get-value (elm)
   (let ((value
@@ -1230,8 +1235,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
         (insert new-title))
       (save-buffer (current-buffer))
       (kill-buffer (current-buffer)))))
-
-;; (anything 'anything-c-source-w3m-bookmarks)
 
 ;;;; <Library>
 ;;; Elisp library scan
@@ -1348,7 +1351,8 @@ STRING is string to match."
                            (if (fboundp 'anything-traverse-occur-color-current-line)
                                (anything-traverse-occur-color-current-line))))
     (action . (lambda (elm)
-                (anything-c-imenu-default-action elm)))))
+                (anything-c-imenu-default-action elm))))
+  "See (info \"(emacs)Imenu\")")
 ;; (anything 'anything-c-source-imenu)
 
 (defun anything-c-imenu-default-action (elm)
@@ -1397,7 +1401,10 @@ STRING is string to match."
      . anything-c-source-ctags-init)
     (candidates-in-buffer)
     (adjust)
-    (type . line)))
+    (type . line))
+  "Needs Exuberant Ctags.
+
+http://ctags.sourceforge.net/")
 ;; (anything 'anything-c-source-ctags)
 
 ;; Semantic
@@ -1428,7 +1435,11 @@ STRING is string to match."
                         (mapcar 'car anything-semantic-candidates))))
     (action . (("Goto tag" . (lambda (candidate)
                                (let ((tag (cdr (assoc candidate anything-semantic-candidates))))
-                                 (semantic-go-to-tag tag))))))))
+                                 (semantic-go-to-tag tag)))))))
+  "Needs semantic in CEDET.
+
+http://cedet.sourceforge.net/semantic.shtml
+http://cedet.sourceforge.net/")
 ;; (anything 'anything-c-source-semantic)
 
 ;;; Function is called by
@@ -1450,8 +1461,7 @@ STRING is string to match."
     (delayed)
     (candidates-in-buffer))
   "Needs simple-call-tree.el.
-http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
-")
+http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 ;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
 ;;; Function calls
@@ -1473,8 +1483,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
     (delayed)
     (candidates-in-buffer))
   "Needs simple-call-tree.el.
-http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
-")
+http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 ;; (anything 'anything-c-source-simple-call-tree-callers-functions)
 
 ;;;; <Color and Face>
@@ -1489,7 +1498,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
     (get-line . buffer-substring)
     (action . (lambda (line)
                 (customize-face (intern (car (split-string line))))))
-    (requires-pattern . 3)))
+    (requires-pattern . 3))
+  "See (info \"(emacs)Faces\")")
 ;; (anything 'anything-c-source-customize-face)
 
 ;; Color
@@ -1576,9 +1586,12 @@ utility mdfind.")
     (action . anything-c-kill-ring-action)
     (last-command)
     (migemo)
-    (multiline)))
+    (multiline))
+  "Source for browse and insert contents of kill-ring.")
 
 (defun anything-c-kill-ring-action (str)
+  "Insert STR in `kill-ring' and set STR to the head.
+If this action is executed just after `yank', replace with STR as yanked string."
   (setq kill-ring (delete str kill-ring))
   (if (not (eq (anything-attr 'last-command) 'yank))
       (insert-for-yank str)
@@ -1610,10 +1623,14 @@ utility mdfind.")
   '((name . "Registers")
     (candidates . anything-c-registers)
     (multiline)
-    (action ("insert" . insert))))
+    (action ("insert" . insert)))
+  "See (info \"(emacs)Registers\")")
 
 ;; based on list-register.el
 (defun anything-c-registers ()
+  "Collecting register contents for insert.
+
+TODO DTRT for register contents."
   (loop for (char . val) in register-alist
         collect
         (let ((key (single-key-description char))
@@ -1668,7 +1685,8 @@ utility mdfind.")
   '((name . "TODO/FIXME/DRY comments")
     (headline . "^.*\\<\\(TODO\\|FIXME\\|DRY\\)\\>.*$")
     (adjust)
-    (recenter)))
+    (recenter))
+  "Show TODO/FIXME/DRY comments in current file.")
 ;; (anything 'anything-c-source-fixme)
 
 (defvar anything-c-source-rd-headline
@@ -1676,7 +1694,11 @@ utility mdfind.")
     (headline  "^= \\(.+\\)$" "^== \\(.+\\)$" "^=== \\(.+\\)$" "^==== \\(.+\\)$")
     (condition . (memq major-mode '(rdgrep-mode rd-mode)))
     (migemo)
-    (subexp . 1)))
+    (subexp . 1))
+  "Show RD headlines.
+
+RD is Ruby's POD.
+http://en.wikipedia.org/wiki/Ruby_Document_format")
 ;; (anything 'anything-c-source-rd-headline)
 
 (defvar anything-c-source-oddmuse-headline
@@ -1685,20 +1707,25 @@ utility mdfind.")
                "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
     (condition . (memq major-mode '(oddmuse-mode yaoddmuse-mode)))
     (migemo)
-    (subexp . 1)))
+    (subexp . 1))
+  "Show Oddmuse headlines, such as EmacsWiki.")
 ;; (anything 'anything-c-source-oddmuse-headline)
 
 
 (defvar anything-c-source-emacs-source-defun
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
-    (condition . (string-match "/emacs2[0-9].+/src/.+c$" (or buffer-file-name "")))))
+    (condition . (string-match "/emacs2[0-9].+/src/.+c$" (or buffer-file-name ""))))
+  "Show DEFUN/DEFVAR in Emacs C source file.")
 ;; (anything 'anything-c-source-emacs-source-defun)
 
 (defvar anything-c-source-emacs-lisp-expectations
   '((name . "Emacs Lisp Expectations")
     (headline . "(desc \\|(expectations")
-    (condition . (eq major-mode 'emacs-lisp-mode))))
+    (condition . (eq major-mode 'emacs-lisp-mode)))
+  "Show descriptions (desc) in Emacs Lisp Expectations.
+
+http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (anything 'anything-c-source-emacs-lisp-expectations)
 
 (defvar anything-c-source-emacs-lisp-toplevels
@@ -1706,7 +1733,10 @@ utility mdfind.")
     (headline . "^(\\|(@\\*")
     (get-line . buffer-substring)
     (condition . (eq major-mode 'emacs-lisp-mode))
-    (adjust)))
+    (adjust))
+  "Show top-level forms and linkd stars (optional) in Emacs Lisp.
+linkd.el is optional because linkd stars are extracted by regexp.
+http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;; (anything 'anything-c-source-emacs-lisp-toplevels)
 
 (defvar anything-c-source-org-headline
@@ -1721,7 +1751,12 @@ utility mdfind.")
                "^\\*\\*\\*\\*\\*\\*\\*\\* \\(.+\\)$")
     (condition . (eq major-mode 'org-mode))
     (migemo)
-    (subexp . 1)))
+    (subexp . 1))
+  "Show Org headlines.
+org-mode is very very much extended text-mode/outline-mode.
+
+See (find-library \"org.el\")
+See http://orgmode.org for the latest version.")
 ;; (anything 'anything-c-source-org-headline)
 
 ;;;; <Misc>
