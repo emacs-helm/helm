@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.164 2009-03-02 01:51:40 rubikitch Exp $
+;; $Id: anything.el,v 1.165 2009-03-03 07:14:42 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.164  2009-03-02 01:51:40  rubikitch
+;; Revision 1.165  2009-03-03 07:14:42  rubikitch
+;; Make sure to run `anything-update-hook' after processing delayed sources.
+;;
+;; Revision 1.164  2009/03/02 01:51:40  rubikitch
 ;; better error handling.
 ;;
 ;; Revision 1.163  2009/03/01 05:15:00  rubikitch
@@ -771,7 +774,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.164 2009-03-02 01:51:40 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.165 2009-03-03 07:14:42 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2115,9 +2118,10 @@ Cache the candidates if there is not yet a cached value."
                        (= (overlay-start anything-selection-overlay)
                           (overlay-end anything-selection-overlay)))
               (goto-char (point-min))
-              (save-excursion (run-hooks 'anything-update-hook))
               (anything-next-line)))
-
+          (save-excursion
+            (goto-char (point-min))
+            (run-hooks 'anything-update-hook))
           (anything-maybe-fit-frame)))))
 
 ;; (@* "Core: *anything* buffer contents")
@@ -2151,7 +2155,6 @@ the current pattern."
       (goto-char (point-min))
       (save-excursion (run-hooks 'anything-update-hook))
       (anything-next-line)
-
       (setq delayed-sources (nreverse delayed-sources))
       (if anything-test-mode
           (dolist (source delayed-sources)
