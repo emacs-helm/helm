@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.19 2008-09-08 06:58:59 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.20 2009-03-03 07:29:24 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -34,12 +34,20 @@
 ;; To include spaces to a regexp, prefix "\" before space,
 ;; it is controlled by `anything-mp-space-regexp' variable.
 
+;; This file highlights patterns like `occur' after
+;; `anything-mp-highlight-delay' seconds. This feature needs highlight.el.
+;;
+;; http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el
+
 ;; Just require it to use.
 
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.19  2008-09-08 06:58:59  rubikitch
+;; Revision 1.20  2009-03-03 07:29:24  rubikitch
+;; Highlight matches!
+;;
+;; Revision 1.19  2008/09/08 06:58:59  rubikitch
 ;; changed default `anything-mp-space-regexp' to "[\\ ] "
 ;;
 ;; Revision 1.18  2008/09/07 12:09:01  rubikitch
@@ -222,6 +230,36 @@
 (defun anything-mp-3p-search-backward (pattern &rest ignore)
   (anything-mp-3-search-base anything-prefix-search-backward re-search-backward eol bol))
 
+;;;; Highlight matches
+(defface anything-match
+  '((t (:inherit match)))
+  "Face used to highlight matches.")
+
+(defvar anything-mp-highlight-delay 0.7
+  "Highlight matches with `anything-match' face after this many seconds.
+ If nil, no highlight.
+Highlight process needs highlight.el.
+
+http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el")
+
+(defun anything-mp-highlight-match ()
+  "Highlight matches after `anything-mp-highlight-delay' seconds."
+  (when (and anything-mp-highlight-delay
+             (require 'highlight nil t)
+             (not (string= anything-pattern "")))
+    (run-with-idle-timer anything-mp-highlight-delay nil
+                         'anything-mp-highlight-match-internal)))
+(add-hook 'anything-update-hook 'anything-mp-highlight-match)
+
+(defun anything-mp-highlight-match-internal ()
+  (when (anything-window)
+    (set-buffer anything-buffer)
+    (hlt-highlight-regexp-region (point-min) (point-max)
+                                 (regexp-quote anything-pattern) 'anything-match)
+    (loop for (pred . re) in (anything-mp-3-get-patterns anything-pattern)
+          when (eq pred 'identity)
+          do
+          (hlt-highlight-regexp-region (point-min) (point-max) re 'anything-match))))
 
                          
 ;;;; source compier
