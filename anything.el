@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.165 2009-03-03 07:14:42 rubikitch Exp $
+;; $Id: anything.el,v 1.166 2009-03-03 10:35:57 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.165  2009-03-03 07:14:42  rubikitch
+;; Revision 1.166  2009-03-03 10:35:57  rubikitch
+;; Set default `anything-input-idle-delay' to 0.1
+;;
+;; Revision 1.165  2009/03/03 07:14:42  rubikitch
 ;; Make sure to run `anything-update-hook' after processing delayed sources.
 ;;
 ;; Revision 1.164  2009/03/02 01:51:40  rubikitch
@@ -774,7 +777,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.165 2009-03-03 07:14:42 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.166 2009-03-03 10:35:57 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1186,7 +1189,7 @@ Attributes:
   character typed, only if the user hesitates a bit.")
 
 
-(defvar anything-input-idle-delay nil
+(defvar anything-input-idle-delay 0.1
   "The user has to be idle for this many seconds, before ALL candidates are collected.
 Unlink `anything-input-idle', it is also effective for non-delayed sources.
 If nil, candidates are collected immediately. ")
