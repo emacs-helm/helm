@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.21 2009-03-03 08:51:23 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.22 2009-03-03 10:21:45 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -34,24 +34,24 @@
 ;; To include spaces to a regexp, prefix "\" before space,
 ;; it is controlled by `anything-mp-space-regexp' variable.
 
-;; This file highlights patterns like `occur' after
-;; `anything-mp-highlight-delay' seconds. Note that patterns longer
-;; than `anything-mp-highlight-threshold' are highlighted to avoid
-;; slowness.
+;; This file highlights patterns like `occur'. Note that patterns
+;; longer than `anything-mp-highlight-threshold' are highlighted. And
+;; region out of screen is highlighted after
+;; `anything-mp-highlight-delay' seconds.
 ;;
-;; Highlight in Emacs is very time-consuming process. To disable it is
-;; to set nil to `anything-mp-highlight-delay'.
-;;
-;; This feature needs highlight.el.
-;;
-;; http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el
+;; Highlight in Emacs is time-consuming process for slow computers. To
+;; disable it is to set nil to `anything-mp-highlight-delay'.
 
 ;; Just require it to use.
 
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.21  2009-03-03 08:51:23  rubikitch
+;; Revision 1.22  2009-03-03 10:21:45  rubikitch
+;; * Remove highlight.el dependency.
+;; * Very faster highlight.
+;;
+;; Revision 1.21  2009/03/03 08:51:23  rubikitch
 ;; New variable: `anything-mp-highlight-threshold'
 ;;
 ;; Revision 1.20  2009/03/03 07:29:24  rubikitch
@@ -247,36 +247,40 @@
 
 (defvar anything-mp-highlight-delay 0.7
   "Highlight matches with `anything-match' face after this many seconds.
- If nil, no highlight.
-Highlight process needs highlight.el.
+ If nil, no highlight. ")
 
-http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el")
-
-(defvar anything-mp-highlight-threshold 3
+(defvar anything-mp-highlight-threshold 2
   "Minimum length of pattern to highlight.
 The smaller  this value is, the slower highlight is.")
 
 (defun anything-mp-highlight-match ()
   "Highlight matches after `anything-mp-highlight-delay' seconds."
   (when (and anything-mp-highlight-delay
-             (require 'highlight nil t)
              (not (string= anything-pattern "")))
+    (anything-mp-highlight-match-internal (window-end (anything-window)))
     (run-with-idle-timer anything-mp-highlight-delay nil
-                         'anything-mp-highlight-match-internal)))
+                         'anything-mp-highlight-match-internal
+                         (with-current-buffer anything-buffer (point-max)))))
 (add-hook 'anything-update-hook 'anything-mp-highlight-match)
 
-(defun anything-mp-highlight-match-internal ()
+(defun anything-mp-highlight-region (start end regexp face)
+  (save-excursion
+    (goto-char start)
+    (let (me)
+      (while (and (setq me (re-search-forward regexp nil t)) (< (point) end))
+        (put-text-property (match-beginning 0) me 'face face)))))
+
+(defun* anything-mp-highlight-match-internal (end)
   (when (anything-window)
     (set-buffer anything-buffer)
     (let ((requote (regexp-quote anything-pattern)))
       (when (>= (length requote) anything-mp-highlight-threshold)
-        (hlt-highlight-regexp-region (point-min) (point-max)
+        (anything-mp-highlight-region (point-min) end
                                     requote 'anything-match)))
     (loop for (pred . re) in (anything-mp-3-get-patterns anything-pattern)
           when (and (eq pred 'identity) (>= (length re) anything-mp-highlight-threshold))
           do
-          (hlt-highlight-regexp-region (point-min) (point-max) re 'anything-match))))
-
+          (anything-mp-highlight-region (point-min) end re 'anything-match))))
                          
 ;;;; source compier
 (defvar anything-default-match-functions
