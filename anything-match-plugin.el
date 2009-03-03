@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.20 2009-03-03 07:29:24 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.21 2009-03-03 08:51:23 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -35,7 +35,14 @@
 ;; it is controlled by `anything-mp-space-regexp' variable.
 
 ;; This file highlights patterns like `occur' after
-;; `anything-mp-highlight-delay' seconds. This feature needs highlight.el.
+;; `anything-mp-highlight-delay' seconds. Note that patterns longer
+;; than `anything-mp-highlight-threshold' are highlighted to avoid
+;; slowness.
+;;
+;; Highlight in Emacs is very time-consuming process. To disable it is
+;; to set nil to `anything-mp-highlight-delay'.
+;;
+;; This feature needs highlight.el.
 ;;
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el
 
@@ -44,7 +51,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.20  2009-03-03 07:29:24  rubikitch
+;; Revision 1.21  2009-03-03 08:51:23  rubikitch
+;; New variable: `anything-mp-highlight-threshold'
+;;
+;; Revision 1.20  2009/03/03 07:29:24  rubikitch
 ;; Highlight matches!
 ;;
 ;; Revision 1.19  2008/09/08 06:58:59  rubikitch
@@ -242,6 +252,10 @@ Highlight process needs highlight.el.
 
 http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el")
 
+(defvar anything-mp-highlight-threshold 3
+  "Minimum length of pattern to highlight.
+The smaller  this value is, the slower highlight is.")
+
 (defun anything-mp-highlight-match ()
   "Highlight matches after `anything-mp-highlight-delay' seconds."
   (when (and anything-mp-highlight-delay
@@ -254,10 +268,12 @@ http://www.emacswiki.org/cgi-bin/wiki/download/highlight.el")
 (defun anything-mp-highlight-match-internal ()
   (when (anything-window)
     (set-buffer anything-buffer)
-    (hlt-highlight-regexp-region (point-min) (point-max)
-                                 (regexp-quote anything-pattern) 'anything-match)
+    (let ((requote (regexp-quote anything-pattern)))
+      (when (>= (length requote) anything-mp-highlight-threshold)
+        (hlt-highlight-regexp-region (point-min) (point-max)
+                                    requote 'anything-match)))
     (loop for (pred . re) in (anything-mp-3-get-patterns anything-pattern)
-          when (eq pred 'identity)
+          when (and (eq pred 'identity) (>= (length re) anything-mp-highlight-threshold))
           do
           (hlt-highlight-regexp-region (point-min) (point-max) re 'anything-match))))
 
