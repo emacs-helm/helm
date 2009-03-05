@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-05 17:14:28 (JST) rubikitch>
+;; Time-stamp: <2009-03-05 21:58:51 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -1622,106 +1622,90 @@ If this action is executed just after `yank', replace with STR as yanked string.
 (defvar anything-c-source-register
   '((name . "Registers")
     (candidates . anything-c-register-candidates)
+    (action-transformer . anything-c-register-action-transformer)
     (multiline)
-    (action ("insert" . insert)))
+    (action))
   "See (info \"(emacs)Registers\")")
 
-;; based on list-register.el
 (defun anything-c-register-candidates ()
-  "Collecting register contents for insert.
-
-TODO DTRT for register contents."
-  (loop for (char . val) in register-alist
-        collect
-        (let ((key (single-key-description char))
-              (string (cond
-                       ((numberp val)
-                        (int-to-string val))
-                       ((markerp val)
-                        (let ((buf (marker-buffer val)))
-                          (if (null buf)
-                              "a marker in no buffer"
-                            (concat
-                             "a buffer position:"
-                             (buffer-name buf)
-                             ", position "
-                             (int-to-string (marker-position val))))))
-                       ((and (consp val) (window-configuration-p (car val)))
-                        "conf:a window configuration.")
-                       ((and (consp val) (frame-configuration-p (car val)))
-                        "conf:a frame configuration.")
-                       ((and (consp val) (eq (car val) 'file))
-                        (concat "file:"
-                                (prin1-to-string (cdr val))
-                                "."))
-                       ((and (consp val) (eq (car val) 'file-query))
-                        (concat "file:a file-query reference: file "
-                                (car (cdr val))
-                                ", position "
-                                (int-to-string (car (cdr (cdr val))))
-                                "."))
-                       ((consp val)
-                        (let ((lines (format "%4d" (length val))))
-                          (format "%s: %s\n" lines
-                                  (truncate-string-to-width
-                                   (mapconcat 'identity (list (car val))
-;;                                   (mapconcat (lambda (y) y) val
-                                              "^J") (- (window-width) 15)))))
-                       ((stringp val)
-                        (anything-c-string-no-properties val))
-                       (t
-                        "GARBAGE!"))))
-          (cons (format "register %3s: %s" key string) string))))
-
-(defun anything-c-string-no-properties (str)
-  (setq str (copy-sequence str))
-  (set-text-properties 0 (length str) nil str)
-  str)
-
-(defun anything-c-register-candidates ()
-  "Collecting register contents for insert.
-
-TODO DTRT for register contents."
+  "Collecting register contents and appropriate commands."
   (loop for (char . val) in register-alist
         for key    = (single-key-description char)
-        for string = (cond
-                       ((numberp val)
-                        (int-to-string val))
-                       ((markerp val)
-                        (let ((buf (marker-buffer val)))
-                          (if (null buf)
-                              "a marker in no buffer"
-                            (concat
-                             "a buffer position:"
-                             (buffer-name buf)
-                             ", position "
-                             (int-to-string (marker-position val))))))
-                       ((and (consp val) (window-configuration-p (car val)))
-                        "conf:a window configuration.")
-                       ((and (consp val) (frame-configuration-p (car val)))
-                        "conf:a frame configuration.")
-                       ((and (consp val) (eq (car val) 'file))
-                        (concat "file:"
-                                (prin1-to-string (cdr val))
-                                "."))
-                       ((and (consp val) (eq (car val) 'file-query))
-                        (concat "file:a file-query reference: file "
-                                (car (cdr val))
-                                ", position "
-                                (int-to-string (car (cdr (cdr val))))
-                                "."))
-                       ((consp val)
-                        (let ((lines (format "%4d" (length val))))
-                          (format "%s: %s\n" lines
-                                  (truncate-string-to-width
-                                   (mapconcat 'identity (list (car val))
-                                              ;; (mapconcat (lambda (y) y) val
-                                              "^J") (- (window-width) 15)))))
-                       ((stringp val)
-                        (anything-c-string-no-properties val))
-                       (t
-                        "GARBAGE!"))
-        collect (cons (format "register %3s: %s" key string) string)))
+        for string-actions = (cond
+                              ((numberp val)
+                               (list (int-to-string val)
+                                     'insert-register
+                                     'increment-register))
+                              ((markerp val)
+                               (let ((buf (marker-buffer val)))
+                                 (if (null buf)
+                                     (list "a marker in no buffer")
+                                   (list (concat
+                                          "a buffer position:"
+                                          (buffer-name buf)
+                                          ", position "
+                                          (int-to-string (marker-position val)))
+                                         'jump-to-register
+                                         'insert-register))))
+                              ((and (consp val) (window-configuration-p (car val)))
+                               (list "window configuration."
+                                     'jump-to-register))
+                              ((and (consp val) (frame-configuration-p (car val)))
+                               (list "frame configuration."
+                                     'jump-to-register))
+                              ((and (consp val) (eq (car val) 'file))
+                               (list (concat "file:"
+                                             (prin1-to-string (cdr val))
+                                             ".")
+                                     'jump-to-register))
+                              ((and (consp val) (eq (car val) 'file-query))
+                               (list (concat "file:a file-query reference: file "
+                                             (car (cdr val))
+                                             ", position "
+                                             (int-to-string (car (cdr (cdr val))))
+                                             ".")
+                                     'jump-to-register))
+                              ((consp val)
+                               (let ((lines (format "%4d" (length val))))
+                                 (list (format "%s: %s\n" lines
+                                               (truncate-string-to-width
+                                                (mapconcat 'identity (list (car val))
+                                                           ;; (mapconcat (lambda (y) y) val
+                                                           "^J") (- (window-width) 15)))
+                                       'insert-register)))
+                              ((stringp val)
+                               (list ;; without properties
+                                     (substring-no-properties val) 
+                                     'insert-register
+                                     'append-to-register
+                                     'prepend-to-register))
+                              (t
+                               "GARBAGE!"))
+        collect (cons (format "register %3s: %s" key (car string-actions))
+                      (cons char (cdr string-actions)))))
+
+(defun anything-c-register-action-transformer (actions register-and-functions)
+  "Decide actions by the contents of register."
+  (let ((descriptions
+         '((insert-register
+            "Insert Register" .
+            (lambda (c) (insert-register (car c))))
+           (jump-to-register
+            "Jump to Register" .
+            (lambda (c) (jump-to-register (car c))))
+           (append-to-register
+            "Append Region to Register" .
+            (lambda (c) (append-to-register (car c) (region-beginning) (region-end))))
+           (prepend-to-register
+            "Prepend Region to Register" .
+            (lambda (c) (prepend-to-register (car c) (region-beginning) (region-end))))
+           (increment-register
+            "Increment Prefix Arg to Register" .
+            (lambda (c) (increment-register anything-current-prefix-arg (car c)))))))
+    (loop for func in (cdr register-and-functions)
+          for cell = (assq func descriptions)
+          when cell
+          collect (cdr cell))))
 
 ;; (anything 'anything-c-source-register)
 
