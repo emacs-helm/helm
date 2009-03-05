@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-05 16:53:53 (JST) rubikitch>
+;; Time-stamp: <2009-03-05 17:14:28 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -1677,6 +1677,51 @@ TODO DTRT for register contents."
   (setq str (copy-sequence str))
   (set-text-properties 0 (length str) nil str)
   str)
+
+(defun anything-c-register-candidates ()
+  "Collecting register contents for insert.
+
+TODO DTRT for register contents."
+  (loop for (char . val) in register-alist
+        for key    = (single-key-description char)
+        for string = (cond
+                       ((numberp val)
+                        (int-to-string val))
+                       ((markerp val)
+                        (let ((buf (marker-buffer val)))
+                          (if (null buf)
+                              "a marker in no buffer"
+                            (concat
+                             "a buffer position:"
+                             (buffer-name buf)
+                             ", position "
+                             (int-to-string (marker-position val))))))
+                       ((and (consp val) (window-configuration-p (car val)))
+                        "conf:a window configuration.")
+                       ((and (consp val) (frame-configuration-p (car val)))
+                        "conf:a frame configuration.")
+                       ((and (consp val) (eq (car val) 'file))
+                        (concat "file:"
+                                (prin1-to-string (cdr val))
+                                "."))
+                       ((and (consp val) (eq (car val) 'file-query))
+                        (concat "file:a file-query reference: file "
+                                (car (cdr val))
+                                ", position "
+                                (int-to-string (car (cdr (cdr val))))
+                                "."))
+                       ((consp val)
+                        (let ((lines (format "%4d" (length val))))
+                          (format "%s: %s\n" lines
+                                  (truncate-string-to-width
+                                   (mapconcat 'identity (list (car val))
+                                              ;; (mapconcat (lambda (y) y) val
+                                              "^J") (- (window-width) 15)))))
+                       ((stringp val)
+                        (anything-c-string-no-properties val))
+                       (t
+                        "GARBAGE!"))
+        collect (cons (format "register %3s: %s" key string) string)))
 
 ;; (anything 'anything-c-source-register)
 
