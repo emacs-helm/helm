@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-03 07:27:33 (JST) rubikitch>
+;; Time-stamp: <2009-03-05 16:53:53 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -14,7 +14,7 @@
 ;; Copyright (C) 2009, rubikitch, all rights reserved.
 ;; Copyright (C) 2009, Thierry Volpiatto, all rights reserved.
 ;; Created: 2009-02-16 21:38:23
-;; Version: 0.3.9
+;; Version: 0.4.0
 ;; URL: http://www.emacswiki.org/emacs/download/anything-config.el
 ;; Keywords: anything, anything-config
 ;; Compatibility: GNU Emacs 22 ~ 23
@@ -1621,13 +1621,13 @@ If this action is executed just after `yank', replace with STR as yanked string.
 ;;; Insert from register
 (defvar anything-c-source-register
   '((name . "Registers")
-    (candidates . anything-c-registers)
+    (candidates . anything-c-register-candidates)
     (multiline)
     (action ("insert" . insert)))
   "See (info \"(emacs)Registers\")")
 
 ;; based on list-register.el
-(defun anything-c-registers ()
+(defun anything-c-register-candidates ()
   "Collecting register contents for insert.
 
 TODO DTRT for register contents."
