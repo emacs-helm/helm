@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-06 12:00:01 (JST) rubikitch>
+;; Time-stamp: <2009-03-06 12:04:07 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2291,11 +2291,12 @@ directory, open this directory."
        (forward-char 1))
   (beginning-of-line))
 
-(anything-document-attribute 'no-new-window "type . file-line" "")
 (anything-document-attribute 'default-directory "type . file-line"
   "`default-directory' to interpret file.")
-(anything-document-attribute 'before-jump-hook "type . file-line / line" "")
-(anything-document-attribute 'after-jump-hook "type . file-line / line" "")
+(anything-document-attribute 'before-jump-hook "type . file-line / line"
+  "Function to call before jumping to the target location.")
+(anything-document-attribute 'after-jump-hook "type . file-line / line"
+  "Function to call after jumping to the target location.")
 (anything-document-attribute 'adjust "type . file-line"
   "Search around line matching line contents.")
 (anything-document-attribute 'recenter "type . file-line / line"
