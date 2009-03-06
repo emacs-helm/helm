@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-05 21:58:51 (JST) rubikitch>
+;; Time-stamp: <2009-03-06 11:48:12 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -129,6 +129,66 @@
 ;;     `anything-c-source-jabber-contacts'    (Jabber Contacts)
 ;;     `anything-c-source-call-source'        (Call anything source)
 ;;     `anything-c-source-occur'              (Occur)
+
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-insert-buffer-name'
+;;    Insert buffer name.
+;;  `anything-insert-symbol'
+;;    Insert current symbol.
+;;  `anything-insert-selection'
+;;    Insert current selection.
+;;  `anything-show-buffer-only'
+;;    Only show sources about buffer.
+;;  `anything-show-bbdb-only'
+;;    Only show sources about BBDB.
+;;  `anything-show-locate-only'
+;;    Only show sources about Locate.
+;;  `anything-show-info-only'
+;;    Only show sources about Info.
+;;  `anything-show-imenu-only'
+;;    Only show sources about Imenu.
+;;  `anything-show-files-only'
+;;    Only show sources about File.
+;;  `anything-show-w3m-bookmarks-only'
+;;    Only show source about w3m bookmark.
+;;  `anything-show-colors-only'
+;;    Only show source about color.
+;;  `anything-show-kill-ring-only'
+;;    Only show source about kill ring.
+;;  `anything-test-sources'
+;;    List all anything sources for test.
+;;  `anything-select-source'
+;;    Select source.
+;;  `anything-call-source'
+;;    Call anything source.
+;;  `anything-call-source-from-anything'
+;;    Call anything source within `anything' session.
+;;  `anything-c-adaptive-save-history'
+;;    Save history information to file given by
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+;;  `anything-c-use-standard-keys'
+;;    Whether use standard keybindings.
+;;  `anything-c-adaptive-history-file'
+;;    Path of file where history information is stored.
+;;  `anything-c-adaptive-history-length'
+;;    Maximum number of candidates stored for a source.
+;;  `anything-c-google-suggest-url'
+;;    URL used for looking up suggestions.
+;;  `anything-c-google-suggest-search-url'
+;;    URL used for searching.
+;;  `anything-c-boring-buffer-regexp'
+;;    The regexp that match boring buffers.
+;;  `anything-c-boring-file-regexp'
+;;    The regexp that match boring files.
+;;  `anything-kill-ring-threshold'
+;;    *Minimum length to be listed by `anything-c-source-kill-ring'.
 
 ;;; Change log:
 ;; 2009/03/02
