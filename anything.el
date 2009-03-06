@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.166 2009-03-03 10:35:57 rubikitch Exp $
+;; $Id: anything.el,v 1.167 2009-03-06 04:13:42 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.166  2009-03-03 10:35:57  rubikitch
+;; Revision 1.167  2009-03-06 04:13:42  rubikitch
+;; Fix doc
+;;
+;; Revision 1.166  2009/03/03 10:35:57  rubikitch
 ;; Set default `anything-input-idle-delay' to 0.1
 ;;
 ;; Revision 1.165  2009/03/03 07:14:42  rubikitch
@@ -777,7 +780,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.166 2009-03-03 10:35:57 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.167 2009-03-06 04:13:42 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1713,6 +1716,7 @@ already-bound variables. Yuck!
 - ANY-PRESELECT
 
   Initially selected candidate. Specified by exact candidate or a regexp.
+  Note that it is not working with delayed sources.
 
 - ANY-BUFFER
 
