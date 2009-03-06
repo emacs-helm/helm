@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-06 12:04:07 (JST) rubikitch>
+;; Time-stamp: <2009-03-06 12:40:20 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -1808,7 +1808,6 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
   "Show Oddmuse headlines, such as EmacsWiki.")
 ;; (anything 'anything-c-source-oddmuse-headline)
 
-
 (defvar anything-c-source-emacs-source-defun
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
@@ -1849,12 +1848,24 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
      "^\\*\\*\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
     (condition . (eq major-mode 'org-mode))
     (migemo)
-    (subexp . 1))
+    (subexp . 1)
+    (action-transformer
+     . (lambda (actions candidate)
+         '(("Go to Line" . anything-c-action-line-goto)
+           ("Insert Link to This Headline" . anything-c-org-headline-insert-link-to-headline)))))
   "Show Org headlines.
 org-mode is very very much extended text-mode/outline-mode.
 
 See (find-library \"org.el\")
 See http://orgmode.org for the latest version.")
+
+(defun anything-c-org-headline-insert-link-to-headline (lineno-and-content)
+  (insert
+   (save-excursion
+     (goto-line (car lineno-and-content))
+     (and (looking-at "^\\*+ \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
+          (org-make-link-string (concat "*" (match-string 1)))))))
+
 ;; (anything 'anything-c-source-org-headline)
 
 ;;;; <Misc>
@@ -2649,7 +2660,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 (defun anything-headline-get-candidates (regexp subexp)
   (save-excursion
     (set-buffer anything-current-buffer)
-    (when t
+    (save-excursion
       (goto-char (point-min))
       (if (functionp regexp) (setq regexp (funcall regexp)))
       (let (hierarchy curhead)
