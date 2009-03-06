@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-06 11:48:41 (JST) rubikitch>
+;; Time-stamp: <2009-03-06 12:00:01 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -1838,14 +1838,15 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 (defvar anything-c-source-org-headline
   '((name . "Org HeadLine")
-    (headline  "^\\* \\(.+\\)$"
-               "^\\*\\* \\(.+\\)$"
-               "^\\*\\*\\* \\(.+\\)$"
-               "^\\*\\*\\*\\* \\(.+\\)$"
-               "^\\*\\*\\*\\*\\* \\(.+\\)$"
-               "^\\*\\*\\*\\*\\*\\* \\(.+\\)$"
-               "^\\*\\*\\*\\*\\*\\*\\* \\(.+\\)$"
-               "^\\*\\*\\*\\*\\*\\*\\*\\* \\(.+\\)$")
+    (headline
+     "^\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+     "^\\*\\*\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
     (condition . (eq major-mode 'org-mode))
     (migemo)
     (subexp . 1))
