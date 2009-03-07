@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-08 04:46:00 (JST) rubikitch>
+;; Time-stamp: <2009-03-08 05:51:35 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -163,6 +163,8 @@
 ;;    Only show source about color.
 ;;  `anything-show-kill-ring-only'
 ;;    Only show source about kill ring.
+;;  `anything-show-this-source-only'
+;;    Only show this source.
 ;;  `anything-test-sources'
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
@@ -400,6 +402,13 @@ they will be displayed with face `file-name-shadow' if
   "Only show source about kill ring."
   (interactive)
   (anything-set-source-filter '("Kill Ring")))
+
+(defun anything-show-this-source-only ()
+  "Only show this source."
+  (interactive)
+  (setq anything-candidate-number-limit 9999)
+  (anything-set-source-filter
+   (list (assoc-default 'name (anything-get-current-source)))))
 
 (defun anything-test-sources ()
   "List all anything sources for test.
