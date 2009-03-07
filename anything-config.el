@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-07 02:10:34 (JST) rubikitch>
+;; Time-stamp: <2009-03-07 10:52:40 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -176,7 +176,7 @@
 ;; Below are customizable option list:
 ;;
 ;;  `anything-c-use-standard-keys'
-;;    Whether use standard keybindings.
+;;    Whether use standard keybindings. (no effect)
 ;;  `anything-c-adaptive-history-file'
 ;;    Path of file where history information is stored.
 ;;  `anything-c-adaptive-history-length'
@@ -245,14 +245,16 @@
   :group 'anything)
 
 (defcustom anything-c-use-standard-keys nil
-  "Whether use standard keybindings.
-If non-nil the keybindings of anything will be the standard
-bindings used in most parts of emacs, e.g. M-p/M-n for minibuffer
-history, C-s for isearch, etc.
+  "Whether use standard keybindings. (no effect)
 
-If it's nil anything uses some bindings that don't conflict with
-`iswitchb', e.g. C-p/C-n for the minibuffer history.  If you use
-`iswitchb' you probably should say nil here."
+Key definitions in anything-config.el are removed because
+anything.el uses Emacs-standard keys by default. e.g. M-p/M-n for
+minibuffer history, C-s for isearch, etc.
+
+If you use `iswitchb' with `anything',
+evaluate (anything-iswitchb-setup) .  Then some bindings that
+conflict with `iswitchb', e.g. C-p/C-n for the minibuffer
+history, are removed from `anything-map'. "
   :type 'boolean
   :group 'anything-config)
 
@@ -2656,53 +2658,6 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Keymap
-(when anything-c-use-standard-keys
-  (setq anything-map
-        (let ((map (copy-keymap minibuffer-local-map)))
-          (define-key map (kbd "<down>")  'anything-next-line)
-          (define-key map (kbd "<up>")    'anything-previous-line)
-          (define-key map (kbd "C-n")     'anything-next-line)
-          (define-key map (kbd "C-p")     'anything-previous-line)
-          (define-key map (kbd "<prior>") 'anything-previous-page)
-          (define-key map (kbd "<next>")  'anything-next-page)
-          (define-key map (kbd "M-v")     'anything-previous-page)
-          (define-key map (kbd "C-v")     'anything-next-page)
-          (define-key map (kbd "<right>") 'anything-next-source)
-          (define-key map (kbd "<left>")  'anything-previous-source)
-          (define-key map (kbd "<RET>")   'anything-exit-minibuffer)
-          (define-key map (kbd "C-1")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-2")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-3")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-4")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-5")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-6")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-7")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-8")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "C-9")     'anything-select-with-digit-shortcut)
-          (define-key map (kbd "<tab>")   'anything-select-action)
-          (defalias 'anything-next-history-element     'next-history-element)
-          (defalias 'anything-previous-history-element 'previous-history-element)
-          (define-key map (kbd "M-p")     'anything-previous-history-element)
-          (define-key map (kbd "M-n")     'anything-next-history-element)
-          (define-key map (kbd "C-s")     'anything-isearch)
-          (define-key map (kbd "C-r")     'undefined)
-          map))
-
-  (setq anything-isearch-map
-        (let ((map (copy-keymap (current-global-map))))
-          (define-key map (kbd "<return>")    'anything-isearch-default-action)
-          (define-key map (kbd "<tab>")       'anything-isearch-select-action)
-          (define-key map (kbd "C-g")         'anything-isearch-cancel)
-          (define-key map (kbd "C-s")         'anything-isearch-again)
-          (define-key map (kbd "C-r")         'undefined)
-          (define-key map (kbd "<backspace>") 'anything-isearch-delete)
-          ;; add printing chars
-          (let ((i ?\s))
-            (while (< i 256)
-              (define-key map (vector i) 'anything-isearch-printing-char)
-              (setq i (1+ i))))
-          map)))
 
 ;;; Type Attributes
 (setq anything-type-attributes
