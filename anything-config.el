@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-08 02:28:58 (JST) rubikitch>
+;; Time-stamp: <2009-03-08 04:46:00 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2017,6 +2017,7 @@ removed."
                           if name collect (cons (format "%s (%s)" name vname) var))))
     (action . (("Invoke anything with selected source" .
                 (lambda (candidate)
+                  (setq anything-candidate-number-limit 9999)
                   (anything candidate nil nil nil nil
                             anything-source-select-buffer)))
                ("Describe variable" . describe-variable)))
