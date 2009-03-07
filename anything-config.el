@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-07 10:52:40 (JST) rubikitch>
+;; Time-stamp: <2009-03-07 11:21:01 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -42,6 +42,11 @@
 ;; along with this program; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 ;; Floor, Boston, MA 02110-1301, USA.
+
+;;; !NOTICE!
+;;
+;; If this file does not work, upgrade anything.el!
+;; http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
 ;;; Commentary:
 ;;
