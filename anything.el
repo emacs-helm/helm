@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.167 2009-03-06 04:13:42 rubikitch Exp $
+;; $Id: anything.el,v 1.168 2009-03-07 21:01:10 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.167  2009-03-06 04:13:42  rubikitch
+;; Revision 1.168  2009-03-07 21:01:10  rubikitch
+;; Bug workaround
+;;
+;; Revision 1.167  2009/03/06 04:13:42  rubikitch
 ;; Fix doc
 ;;
 ;; Revision 1.166  2009/03/03 10:35:57  rubikitch
@@ -780,7 +783,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.167 2009-03-06 04:13:42 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.168 2009-03-07 21:01:10 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2574,12 +2577,13 @@ UNIT and DIRECTION."
              (boundp 'fit-frame-inhibit-fitting-flag)
              (not fit-frame-inhibit-fitting-flag)
              (anything-window))
-    (with-anything-window
-      (fit-frame nil nil nil t)
-      (modify-frame-parameters
-       (selected-frame)
-       `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
-         (top . 0)))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
+    (ignore-errors
+      (with-anything-window
+        (fit-frame nil nil nil t)
+        (modify-frame-parameters
+         (selected-frame)
+         `((left . ,(- (x-display-pixel-width) (+ (frame-pixel-width) 7)))
+           (top . 0))))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
 
 (defun anything-preselect (candidate-or-regexp)
   (when candidate-or-regexp
