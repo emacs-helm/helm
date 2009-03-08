@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-08 21:05:14 (CET) thierry>
+;; Time-stamp: <2009-03-08 23:23:53 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2125,6 +2125,10 @@ removed."
               (unless anything-c-gentoo-use-flags
                 (setq anything-c-gentoo-use-flags (anything-c-gentoo-get-use)))))
     (candidates . anything-c-gentoo-use-flags)
+    (filtered-candidate-transformer . (lambda (candidates source)
+                                        (anything-c-compose
+                                         (list candidates)
+                                         '(anything-c-highlight-local-use))))
     (action . (("Show which dep use this flag"
                 . (lambda (elm)
                     (switch-to-buffer anything-c-gentoo-buffer)
@@ -2134,14 +2138,15 @@ removed."
                              "-q"
                              "h"
                              ,elm))))
-               ("Description" . (lambda (elm)
-                                  (switch-to-buffer anything-c-gentoo-buffer)
-                                  (erase-buffer)
-                                  (apply #'call-process "euse" nil t nil
-                                         `("-i"
-                                           ,elm))
-                                  (font-lock-add-keywords nil `((,elm . font-lock-variable-name-face)))
-                                  (font-lock-mode 1)))))))
+               ("Description"
+                . (lambda (elm)
+                    (switch-to-buffer anything-c-gentoo-buffer)
+                    (erase-buffer)
+                    (apply #'call-process "euse" nil t nil
+                           `("-i"
+                             ,elm))
+                    (font-lock-add-keywords nil `((,elm . font-lock-variable-name-face)))
+                    (font-lock-mode 1)))))))
                
                                   
 ;; (anything 'anything-c-source-use-flags)
@@ -2175,6 +2180,15 @@ removed."
   "Return list of all installed package on your system."
   (split-string (cat anything-c-gentoo-world-file) "\n"))
 
+(defun anything-c-gentoo-get-local-use ()
+  (let ((use-list
+         (split-string (with-temp-buffer
+                         (call-process "portageq" nil t nil
+                                       "envvar"
+                                       "USE")
+                         (buffer-string)))))
+    use-list))
+
 (defface anything-gentoo-match-face '((t (:foreground "red")))
   "Face for anything-gentoo installed packages."
   :group 'traverse-faces)
@@ -2187,6 +2201,15 @@ removed."
                        else
                        collect i)))
     cand-world))
+
+(defun anything-c-highlight-local-use (use-flags)
+  (let* ((local-uses (anything-c-gentoo-get-local-use))
+         (cand-use (loop for i in use-flags
+                       if (member i local-uses)
+                       collect (propertize i 'face 'anything-gentoo-match-face)
+                       else
+                       collect i)))
+    cand-use))
 
 (defun anything-gentoo ()
   "Start anything with only gentoo sources."
