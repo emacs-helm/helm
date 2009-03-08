@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-08 19:54:08 (JST) rubikitch>
+;; Time-stamp: <2009-03-08 21:05:14 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -135,78 +135,9 @@
 ;;     `anything-c-source-jabber-contacts'    (Jabber Contacts)
 ;;     `anything-c-source-call-source'        (Call anything source)
 ;;     `anything-c-source-occur'              (Occur)
-
-;;; Commands:
-;;
-;; Below are complete command list:
-;;
-;;  `anything-insert-buffer-name'
-;;    Insert buffer name.
-;;  `anything-insert-symbol'
-;;    Insert current symbol.
-;;  `anything-insert-selection'
-;;    Insert current selection.
-;;  `anything-show-buffer-only'
-;;    Only show sources about buffer.
-;;  `anything-show-bbdb-only'
-;;    Only show sources about BBDB.
-;;  `anything-show-locate-only'
-;;    Only show sources about Locate.
-;;  `anything-show-info-only'
-;;    Only show sources about Info.
-;;  `anything-show-imenu-only'
-;;    Only show sources about Imenu.
-;;  `anything-show-files-only'
-;;    Only show sources about File.
-;;  `anything-show-w3m-bookmarks-only'
-;;    Only show source about w3m bookmark.
-;;  `anything-show-colors-only'
-;;    Only show source about color.
-;;  `anything-show-kill-ring-only'
-;;    Only show source about kill ring.
-;;  `anything-show-this-source-only'
-;;    Only show this source.
-;;  `anything-test-sources'
-;;    List all anything sources for test.
-;;  `anything-select-source'
-;;    Select source.
-;;  `anything-show-kill-ring'
-;;    Show `kill-ring'. It is drop-in replacement of `yank-pop'.
-;;  `anything-call-source'
-;;    Call anything source.
-;;  `anything-call-source-from-anything'
-;;    Call anything source within `anything' session.
-;;  `anything-c-adaptive-save-history'
-;;    Save history information to file given by
-;;
-;;; Customizable Options:
-;;
-;; Below are customizable option list:
-;;
-;;  `anything-c-use-standard-keys'
-;;    Whether use standard keybindings. (no effect)
-;;    default = nil
-;;  `anything-c-adaptive-history-file'
-;;    Path of file where history information is stored.
-;;    default = "~/.emacs.d/anything-c-adaptive-history"
-;;  `anything-c-adaptive-history-length'
-;;    Maximum number of candidates stored for a source.
-;;    default = 50
-;;  `anything-c-google-suggest-url'
-;;    URL used for looking up suggestions.
-;;    default = "http://www.google.com/complete/search?hl=en&js=true&qu="
-;;  `anything-c-google-suggest-search-url'
-;;    URL used for searching.
-;;    default = "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
-;;  `anything-c-boring-buffer-regexp'
-;;    The regexp that match boring buffers.
-;;    default = (rx (or (group bos " ") "*anything" " *Echo Area" " *Minibuf"))
-;;  `anything-c-boring-file-regexp'
-;;    The regexp that match boring files.
-;;    default = (rx (or (and "/" ... ...) (and line-start ".#") (and ... eol)))
-;;  `anything-kill-ring-threshold'
-;;    *Minimum length to be listed by `anything-c-source-kill-ring'.
-;;    default = 10
+;;  System:
+;;     `anything-c-source-gentoo'    (Portage sources)
+;;     `anything-c-source-use-flags' (Use Flags)
 
 ;;; Change log:
 ;;
@@ -2125,6 +2056,143 @@ removed."
     (requires-pattern . 1)
     (volatile)))
 ;; (anything 'anything-c-source-occur)
+
+;;;; <System>
+
+;; Sources for gentoo users
+
+(defvar anything-c-gentoo-world-file "/var/lib/portage/world")
+(defvar anything-c-gentoo-use-flags nil)
+(defvar anything-c-gentoo-buffer "*anything-gentoo*")
+(defvar anything-c-cache-gentoo nil)
+(defvar anything-c-cache-world nil)
+(defvar anything-c-source-gentoo
+  '((name . "Portage sources")
+    (init . (lambda ()
+              (get-buffer-create anything-c-gentoo-buffer)
+              (unless anything-c-cache-world
+                (setq anything-c-cache-world (anything-c-gentoo-get-world)))
+              (unless anything-c-cache-gentoo
+                (setq anything-c-cache-gentoo (anything-c-gentoo-init-list)))))
+    (candidates . anything-c-cache-gentoo)
+    (filtered-candidate-transformer . (lambda (candidates source)
+                                        (anything-c-compose
+                                         (list candidates)
+                                         '(anything-c-highlight-world))))
+    (action . (("Show package" . (lambda (elm)
+                                   (when (get-buffer "*EShell Command Output*")
+                                     (kill-buffer "*EShell Command Output*"))
+                                   (eshell-command (format "eix %s" elm))))
+               ("Show history" . (lambda (elm)
+                                   (when (get-buffer "*EShell Command Output*")
+                                     (kill-buffer "*EShell Command Output*"))
+                                   (eshell-command (format "genlop -qe %s" elm))))
+               ("Show extra infos" . (lambda (elm)
+                                       (when (get-buffer "*EShell Command Output*")
+                                         (kill-buffer "*EShell Command Output*"))
+                                       (eshell-command (format "genlop -qi %s" elm))))
+               ("Show use flags" . (lambda (elm)
+                                     (switch-to-buffer anything-c-gentoo-buffer)
+                                     (erase-buffer)
+                                     (apply #'call-process "equery" nil t nil
+                                            `("-C"
+                                              "-q"
+                                              "u"
+                                              ,elm))
+                                     (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
+                                     (font-lock-mode 1)))
+               ("Run emerge pretend" . (lambda (elm)
+                                         (when (get-buffer "*EShell Command Output*")
+                                           (kill-buffer "*EShell Command Output*"))
+                                         (eshell-command (format "emerge -p %s" elm))))
+               ("Show dependencies" . (lambda (elm)
+                                        (switch-to-buffer anything-c-gentoo-buffer)
+                                        (erase-buffer)
+                                        (apply #'call-process "equery" nil t nil
+                                               `("-C"
+                                                 "-q"
+                                                 "d"
+                                                 ,elm))))
+               ("Update" . (lambda (elm)
+                             (setq anything-c-cache-gentoo (anything-c-gentoo-init-list))
+                             (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
+
+;; (anything 'anything-c-source-gentoo)
+
+(defvar anything-c-source-use-flags
+  '((name . "Use Flags")
+    (init . (lambda ()
+              (unless anything-c-gentoo-use-flags
+                (setq anything-c-gentoo-use-flags (anything-c-gentoo-get-use)))))
+    (candidates . anything-c-gentoo-use-flags)
+    (action . (("Show which dep use this flag"
+                . (lambda (elm)
+                    (switch-to-buffer anything-c-gentoo-buffer)
+                    (erase-buffer)
+                    (apply #'call-process "equery" nil t nil
+                           `("-C"
+                             "-q"
+                             "h"
+                             ,elm))))
+               ("Description" . (lambda (elm)
+                                  (switch-to-buffer anything-c-gentoo-buffer)
+                                  (erase-buffer)
+                                  (apply #'call-process "euse" nil t nil
+                                         `("-i"
+                                           ,elm))
+                                  (font-lock-add-keywords nil `((,elm . font-lock-variable-name-face)))
+                                  (font-lock-mode 1)))))))
+               
+                                  
+;; (anything 'anything-c-source-use-flags)
+
+(defun anything-c-gentoo-init-list ()
+  "Return a list of all packages in Portage."
+  (let ((eix-list
+         (split-string (with-temp-buffer
+                         (call-process "eix" nil t nil
+                                       "--only-names")
+                         (buffer-string)))))
+    eix-list))
+
+(defun anything-c-gentoo-get-use ()
+  "Return a list of all use flags."
+  (let ((eix-list
+         (split-string (with-temp-buffer
+                         (call-process "eix" nil t nil
+                                       "--print-all-useflags")
+                         (buffer-string)))))
+    eix-list))
+
+(defmacro cat (file)
+  "Like cat."
+  `(let ((file-contents (with-temp-buffer
+                          (insert-file-contents ,file)
+                          (buffer-string))))
+     file-contents))
+
+(defun anything-c-gentoo-get-world ()
+  "Return list of all installed package on your system."
+  (split-string (cat anything-c-gentoo-world-file) "\n"))
+
+(defface anything-gentoo-match-face '((t (:foreground "red")))
+  "Face for anything-gentoo installed packages."
+  :group 'traverse-faces)
+
+(defun anything-c-highlight-world (eix)
+  "Highlight all installed package."
+  (let ((cand-world (loop for i in eix
+                       if (member i anything-c-cache-world)
+                       collect (propertize i 'face 'anything-gentoo-match-face)
+                       else
+                       collect i)))
+    cand-world))
+
+(defun anything-gentoo ()
+  "Start anything with only gentoo sources."
+  (interactive)
+  (anything '(anything-c-source-gentoo
+              anything-c-source-use-flags)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
