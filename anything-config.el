@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-08 05:51:35 (JST) rubikitch>
+;; Time-stamp: <2009-03-08 19:54:08 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -107,6 +107,7 @@
 ;;     `anything-c-source-semantic'                           (Semantic Tags)
 ;;     `anything-c-source-simple-call-tree-functions-callers' (Function is called by)
 ;;     `anything-c-source-simple-call-tree-callers-functions' (Function calls)
+;;     `anything-c-source-commands-and-options-in-file'       (Commands/Options in file)
 ;;  Color and Face:
 ;;     `anything-c-source-customize-face' (Customize Face)
 ;;     `anything-c-source-colors'         (Colors)
@@ -184,20 +185,28 @@
 ;;
 ;;  `anything-c-use-standard-keys'
 ;;    Whether use standard keybindings. (no effect)
+;;    default = nil
 ;;  `anything-c-adaptive-history-file'
 ;;    Path of file where history information is stored.
+;;    default = "~/.emacs.d/anything-c-adaptive-history"
 ;;  `anything-c-adaptive-history-length'
 ;;    Maximum number of candidates stored for a source.
+;;    default = 50
 ;;  `anything-c-google-suggest-url'
 ;;    URL used for looking up suggestions.
+;;    default = "http://www.google.com/complete/search?hl=en&js=true&qu="
 ;;  `anything-c-google-suggest-search-url'
 ;;    URL used for searching.
+;;    default = "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
 ;;  `anything-c-boring-buffer-regexp'
 ;;    The regexp that match boring buffers.
+;;    default = (rx (or (group bos " ") "*anything" " *Echo Area" " *Minibuf"))
 ;;  `anything-c-boring-file-regexp'
 ;;    The regexp that match boring files.
+;;    default = (rx (or (and "/" ... ...) (and line-start ".#") (and ... eol)))
 ;;  `anything-kill-ring-threshold'
 ;;    *Minimum length to be listed by `anything-c-source-kill-ring'.
+;;    default = 10
 
 ;;; Change log:
 ;;
@@ -1506,6 +1515,53 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
   "Needs simple-call-tree.el.
 http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 ;; (anything 'anything-c-source-simple-call-tree-callers-functions)
+
+;;; Commands/Options with doc
+(defvar anything-c-auto-document-data nil)
+(make-variable-buffer-local 'anything-c-auto-document-data)
+(defvar anything-c-source-commands-and-options-in-file
+  '((name . "Commands/Options in file")
+    (header-name
+     . (lambda (x) (format "Commands/Options in %s"
+                           (buffer-local-value 'buffer-file-name anything-current-buffer))))
+    (candidates . anything-command-and-options-candidates)
+    (multiline)
+    (action . imenu))
+  "List Commands and Options with doc. It needs auto-document.el .
+
+http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
+
+(defun anything-command-and-options-candidates ()
+  (with-current-buffer anything-current-buffer
+    (when (and (require 'auto-document nil t)
+               (eq major-mode 'emacs-lisp-mode)
+               (or (anything-current-buffer-is-modified)
+                   (not anything-c-auto-document-data)))
+      (or imenu--index-alist (imenu--make-index-alist t))
+      (setq anything-c-auto-document-data
+            (destructuring-bind (commands options)
+                (adoc-construct anything-current-buffer)
+              (append
+               (loop for (command . doc) in commands
+                     for cmdname = (symbol-name command)
+                     collect
+                     (cons (format "Command: %s\n %s"
+                                   (propertize cmdname 'face font-lock-function-name-face)
+                                   (adoc-first-line doc))
+                           (assoc cmdname imenu--index-alist)))
+               (loop with var-alist = (cdr (assoc "Variables" imenu--index-alist))
+                     for (option doc default) in options
+                     for optname = (symbol-name option)
+                     collect
+                     (cons (format "Option: %s\n %s\n default = %s"
+                                   (propertize optname 'face font-lock-variable-name-face)
+                                   (adoc-first-line doc)
+                                   (adoc-prin1-to-string default))
+                           (assoc optname
+                                  var-alist)))))))
+    anything-c-auto-document-data))
+
+;; (anything 'anything-c-source-commands-and-options-in-file)
 
 ;;;; <Color and Face>
 ;;; Customize Face
