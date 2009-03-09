@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 08:03:36 (CET) thierry>
+;; Time-stamp: <2009-03-09 10:06:42 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2199,6 +2199,8 @@ removed."
                                    (when (get-buffer "*EShell Command Output*")
                                      (kill-buffer "*EShell Command Output*"))
                                    (eshell-command (format "genlop -qe %s" elm))))
+               ("Browse HomePage" . (lambda (elm)
+                                      (browse-url (car (anything-c-gentoo-get-url elm)))))
                ("Show extra infos" . (lambda (elm)
                                        (when (get-buffer "*EShell Command Output*")
                                          (kill-buffer "*EShell Command Output*"))
@@ -2280,6 +2282,11 @@ removed."
                                        "--print-all-useflags")
                          (buffer-string)))))
     eix-list))
+
+(defun anything-c-gentoo-get-url (elm)
+  "Return a list of urls from eix output."
+  (split-string (eshell-command-result
+                 (format "eix %s | grep Homepage | awk '{print $2}'" elm))))
 
 (defmacro cat (file)
   "Like cat."
