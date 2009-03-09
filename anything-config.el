@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 11:44:48 (JST) rubikitch>
+;; Time-stamp: <2009-03-09 11:58:39 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -52,6 +52,8 @@
 ;;
 ;; Predefined configurations for `anything.el'
 ;;
+;; For quick start, try `anything-for-files' to open files.
+;; 
 ;; To configure anything you should setup `anything-sources'
 ;; with specify source, like below:
 ;;
@@ -143,6 +145,8 @@
 ;;
 ;; Below are complete command list:
 ;;
+;;  `anything-for-files'
+;;    Preconfigured `anything' for opening files.
 ;;  `anything-insert-buffer-name'
 ;;    Insert buffer name.
 ;;  `anything-insert-symbol'
@@ -342,7 +346,21 @@ they will be displayed with face `file-name-shadow' if
   :group 'anything-config)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; preconfigured anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun anything-for-files ()
+  "Preconfigured `anything' for opening files.
+ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate"
+  (interactive)
+  (anything '(anything-c-source-ffap-guesser
+              anything-c-source-recentf
+              anything-c-source-buffers+
+              anything-c-source-bookmarks
+              anything-c-source-file-cache
+              anything-c-source-files-in-current-dir+
+              anything-c-source-locate)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun anything-insert-buffer-name ()
   "Insert buffer name."
   (interactive)
