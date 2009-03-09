@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 18:26:41 (JST) rubikitch>
+;; Time-stamp: <2009-03-09 18:28:26 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2199,6 +2199,8 @@ removed."
                                    (when (get-buffer "*EShell Command Output*")
                                      (kill-buffer "*EShell Command Output*"))
                                    (eshell-command (format "genlop -qe %s" elm))))
+               ("Browse HomePage" . (lambda (elm)
+                                      (browse-url (car (anything-c-gentoo-get-url elm)))))
                ("Show extra infos" . (lambda (elm)
                                        (when (get-buffer "*EShell Command Output*")
                                          (kill-buffer "*EShell Command Output*"))
@@ -2280,6 +2282,11 @@ removed."
                                        "--print-all-useflags")
                          (buffer-string)))))
     eix-list))
+
+(defun anything-c-gentoo-get-url (elm)
+  "Return a list of urls from eix output."
+  (split-string (eshell-command-result
+                 (format "eix %s | grep Homepage | awk '{print $2}'" elm))))
 
 (defmacro cat (file)
   "Like cat."
