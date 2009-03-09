@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.170 2009-03-09 18:46:11 rubikitch Exp $
+;; $Id: anything.el,v 1.171 2009-03-09 18:49:44 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.170  2009-03-09 18:46:11  rubikitch
+;; Revision 1.171  2009-03-09 18:49:44  rubikitch
+;; New command: `anything-quit-and-find-file'
+;;
+;; Revision 1.170  2009/03/09 18:46:11  rubikitch
 ;; New API: `anything-run-after-quit'
 ;;
 ;; Revision 1.169  2009/03/09 10:02:49  rubikitch
@@ -789,7 +792,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.170 2009-03-09 18:46:11 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.171 2009-03-09 18:49:44 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1252,6 +1255,8 @@ See also `anything-set-source-filter'.")
 
     (define-key map (kbd "C-s") 'anything-isearch)
     (define-key map (kbd "C-r") 'undefined)
+    (define-key map (kbd "C-x C-f") 'anything-quit-and-find-file)
+
     ;; the defalias is needed because commands are bound by name when
     ;; using iswitchb, so only commands having the prefix anything-
     ;; get rebound
@@ -2976,6 +2981,13 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defun anything-prev-visible-mark ()
   (interactive)
   (anything-next-visible-mark t))
+
+;; (@* "Utility: `find-file' integration")
+(defun anything-quit-and-find-file ()
+  "Drop into `find-file' from `anything' like `iswitchb-find-file'.
+This command is a simple example of `anything-run-after-quit'."
+  (interactive)
+  (anything-run-after-quit 'call-interactively 'find-file))
 
 ;; (@* "Utility: Incremental search within results (unmaintained)")
 
