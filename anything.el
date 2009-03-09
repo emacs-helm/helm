@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.169 2009-03-09 10:02:49 rubikitch Exp $
+;; $Id: anything.el,v 1.170 2009-03-09 18:46:11 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.169  2009-03-09 10:02:49  rubikitch
+;; Revision 1.170  2009-03-09 18:46:11  rubikitch
+;; New API: `anything-run-after-quit'
+;;
+;; Revision 1.169  2009/03/09 10:02:49  rubikitch
 ;; Set candidate-number-limit attribute for actions.
 ;;
 ;; Revision 1.168  2009/03/07 21:01:10  rubikitch
@@ -786,7 +789,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.169 2009-03-09 10:02:49 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.170 2009-03-09 18:46:11 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1652,6 +1655,13 @@ Attributes:
 (defun anything-current-buffer-is-modified ()
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
   (anything-buffer-is-modified anything-current-buffer))
+
+(defun anything-run-after-quit (function &rest args)
+  "Perform an action after quitting `anything'.
+The action is to call FUNCTION with arguments ARGS."
+  (setq anything-quit t)
+  (apply 'run-with-idle-timer 0 nil function args)
+  (anything-exit-minibuffer))
 
 ;; (@* "Core: tools")
 (defun anything-current-frame/window-configuration ()
