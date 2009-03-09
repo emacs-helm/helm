@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 11:58:39 (JST) rubikitch>
+;; Time-stamp: <2009-03-09 08:03:36 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -147,6 +147,8 @@
 ;;
 ;;  `anything-for-files'
 ;;    Preconfigured `anything' for opening files.
+;;  `anything-info-at-point'
+;;    Preconfigured `anything' for searching info at point.
 ;;  `anything-insert-buffer-name'
 ;;    Insert buffer name.
 ;;  `anything-insert-symbol'
@@ -243,7 +245,11 @@
 ;; Evaluate (anything-c-insert-summary) before commit. This function
 ;; generates anything-c-source-* list.
 ;;
+;; Install also http://www.emacswiki.org/emacs/auto-document.el
+;; And eval it or run interactively.
+;;
 ;; [EVAL IT] (anything-c-insert-summary)
+;; [EVAL IT] (auto-document)
 ;;
 ;; Please write details documentation about function, then others will
 ;; read code more easier.   -- Andy Stewart
@@ -358,6 +364,15 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
               anything-c-source-file-cache
               anything-c-source-files-in-current-dir+
               anything-c-source-locate)))
+
+(defun anything-info-at-point ()
+  "Preconfigured `anything' for searching info at point."
+  (interactive)
+  (let ((pattern (thing-at-point 'sexp)))
+    (anything '(anything-c-source-info-elisp
+                anything-c-source-info-cl
+                anything-c-source-info-pages)
+              pattern))) 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
