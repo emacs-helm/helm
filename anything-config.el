@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 18:28:26 (JST) rubikitch>
+;; Time-stamp: <2009-03-09 16:20:09 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2288,16 +2288,14 @@ removed."
   (split-string (eshell-command-result
                  (format "eix %s | grep Homepage | awk '{print $2}'" elm))))
 
-(defmacro cat (file)
-  "Like cat."
-  `(let ((file-contents (with-temp-buffer
-                          (insert-file-contents ,file)
-                          (buffer-string))))
-     file-contents))
-
 (defun anything-c-gentoo-get-world ()
   "Return list of all installed package on your system."
-  (split-string (cat anything-c-gentoo-world-file) "\n"))
+  (let ((q-list
+         (split-string (with-temp-buffer
+                         (call-process "qlist" nil t nil
+                                       "-I")
+                         (buffer-string)))))
+    q-list))
 
 (defun anything-c-gentoo-get-local-use ()
   (let ((use-list
