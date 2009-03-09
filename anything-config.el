@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-08 23:23:53 (CET) thierry>
+;; Time-stamp: <2009-03-09 11:44:48 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -138,6 +138,80 @@
 ;;  System:
 ;;     `anything-c-source-gentoo'    (Portage sources)
 ;;     `anything-c-source-use-flags' (Use Flags)
+
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-insert-buffer-name'
+;;    Insert buffer name.
+;;  `anything-insert-symbol'
+;;    Insert current symbol.
+;;  `anything-insert-selection'
+;;    Insert current selection.
+;;  `anything-show-buffer-only'
+;;    Only show sources about buffer.
+;;  `anything-show-bbdb-only'
+;;    Only show sources about BBDB.
+;;  `anything-show-locate-only'
+;;    Only show sources about Locate.
+;;  `anything-show-info-only'
+;;    Only show sources about Info.
+;;  `anything-show-imenu-only'
+;;    Only show sources about Imenu.
+;;  `anything-show-files-only'
+;;    Only show sources about File.
+;;  `anything-show-w3m-bookmarks-only'
+;;    Only show source about w3m bookmark.
+;;  `anything-show-colors-only'
+;;    Only show source about color.
+;;  `anything-show-kill-ring-only'
+;;    Only show source about kill ring.
+;;  `anything-show-this-source-only'
+;;    Only show this source.
+;;  `anything-test-sources'
+;;    List all anything sources for test.
+;;  `anything-select-source'
+;;    Select source.
+;;  `anything-show-kill-ring'
+;;    Show `kill-ring'. It is drop-in replacement of `yank-pop'.
+;;  `anything-call-source'
+;;    Call anything source.
+;;  `anything-call-source-from-anything'
+;;    Call anything source within `anything' session.
+;;  `anything-gentoo'
+;;    Start anything with only gentoo sources.
+;;  `anything-c-adaptive-save-history'
+;;    Save history information to file given by
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+;;  `anything-c-use-standard-keys'
+;;    Whether use standard keybindings. (no effect)
+;;    default = nil
+;;  `anything-c-adaptive-history-file'
+;;    Path of file where history information is stored.
+;;    default = "~/.emacs.d/anything-c-adaptive-history"
+;;  `anything-c-adaptive-history-length'
+;;    Maximum number of candidates stored for a source.
+;;    default = 50
+;;  `anything-c-google-suggest-url'
+;;    URL used for looking up suggestions.
+;;    default = "http://www.google.com/complete/search?hl=en&js=true&qu="
+;;  `anything-c-google-suggest-search-url'
+;;    URL used for searching.
+;;    default = "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
+;;  `anything-c-boring-buffer-regexp'
+;;    The regexp that match boring buffers.
+;;    default = (rx (or (group bos " ") "*anything" " *Echo Area" " *Minibuf"))
+;;  `anything-c-boring-file-regexp'
+;;    The regexp that match boring files.
+;;    default = (rx (or (and "/" ... ...) (and line-start ".#") (and ... eol)))
+;;  `anything-kill-ring-threshold'
+;;    *Minimum length to be listed by `anything-c-source-kill-ring'.
+;;    default = 10
 
 ;;; Change log:
 ;;
@@ -711,12 +785,17 @@ The search pattern will be appended, so the
   '((name . "Recentf")
     (init . (lambda ()
               (require 'recentf)
-              (or recentf-mode (recentf-mode 1))))
+              (or recentf-mode (recentf-mode 1))
+              ;; Big value empowers anything/recentf
+              (when (and (numberp recentf-max-saved-items)
+                         (<= recentf-max-saved-items 20))
+                (setq recentf-max-saved-items 500))))
     (candidates . recentf-list)
     (match . (anything-c-match-on-file-name
               anything-c-match-on-directory-name))
     (type . file))
-  "See (info \"(emacs)File Conveniences\").")
+  "See (info \"(emacs)File Conveniences\").
+if `recentf-max-saved-items' is too small, set it to 500.")
 ;; (anything 'anything-c-source-recentf)
 
 ;;; ffap
