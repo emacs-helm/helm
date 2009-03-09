@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.168 2009-03-07 21:01:10 rubikitch Exp $
+;; $Id: anything.el,v 1.169 2009-03-09 10:02:49 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.168  2009-03-07 21:01:10  rubikitch
+;; Revision 1.169  2009-03-09 10:02:49  rubikitch
+;; Set candidate-number-limit attribute for actions.
+;;
+;; Revision 1.168  2009/03/07 21:01:10  rubikitch
 ;; Bug workaround
 ;;
 ;; Revision 1.167  2009/03/06 04:13:42  rubikitch
@@ -783,7 +786,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.168 2009-03-07 21:01:10 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.169 2009-03-09 10:02:49 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2350,7 +2353,9 @@ If action buffer is selected, back to the anything buffer."
                (set (make-local-variable 'anything-sources)
                     `(((name . "Actions")
                        (volatile)
-                       (candidates . ,actions))))
+                       (candidates . ,actions)
+                       ;; Override `anything-candidate-number-limit'
+                       (candidate-number-limit . 9999))))
                (set (make-local-variable 'anything-source-filter) nil)
                (set (make-local-variable 'anything-selection-overlay) nil)
                (set (make-local-variable 'anything-digit-overlays) nil)
