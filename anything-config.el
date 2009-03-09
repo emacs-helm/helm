@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 08:03:36 (CET) thierry>
+;; Time-stamp: <2009-03-09 18:26:41 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -58,15 +58,15 @@
 ;; with specify source, like below:
 ;;
 ;; (setq anything-sources
-;;       (list anything-c-source-buffers
-;;             anything-c-source-buffer-not-found
-;;             anything-c-source-file-name-history
-;;             anything-c-source-info-pages
-;;             anything-c-source-info-elisp
-;;             anything-c-source-man-pages
-;;             anything-c-source-locate
-;;             anything-c-source-emacs-commands
-;;             ))
+;;       '(anything-c-source-buffers
+;;         anything-c-source-buffer-not-found
+;;         anything-c-source-file-name-history
+;;         anything-c-source-info-pages
+;;         anything-c-source-info-elisp
+;;         anything-c-source-man-pages
+;;         anything-c-source-locate
+;;         anything-c-source-emacs-commands
+;;         ))
 ;;
 ;; Below are complete source list you can setup in `anything-sources':
 ;;
