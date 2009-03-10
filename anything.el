@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.171 2009-03-09 18:49:44 rubikitch Exp $
+;; $Id: anything.el,v 1.172 2009-03-10 17:11:58 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.171  2009-03-09 18:49:44  rubikitch
+;; Revision 1.172  2009-03-10 17:11:58  rubikitch
+;; `candidate-transformer', `filtered-candidate-transformer',
+;; `action-transformer' attributes: accept a list of functions
+;;
+;; Revision 1.171  2009/03/09 18:49:44  rubikitch
 ;; New command: `anything-quit-and-find-file'
 ;;
 ;; Revision 1.170  2009/03/09 18:46:11  rubikitch
@@ -792,7 +796,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.171 2009-03-09 18:49:44 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.172 2009-03-10 17:11:58 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1621,7 +1625,8 @@ Attributes:
            (actions (assoc-default 'action source)))
 
       (anything-aif (assoc-default 'action-transformer source)
-          (funcall it actions (anything-get-selection))
+          ;; (funcall it actions (anything-get-selection))
+          (anything-composed-funcall-with-source source it actions (anything-get-selection))
         actions))))
 
 (defun anything-get-current-source ()
@@ -1708,6 +1713,21 @@ It is used to check if candidate number is 0 or 1."
              (exit-minibuffer)
              (keyboard-quit)))))
 (put 'with-anything-quittable 'lisp-indent-function 0)
+
+(defun anything-compose (arg-lst func-lst)
+  "Call each function in FUNC-LST with the arguments specified in ARG-LST.
+The result of each function will be the new `car' of ARG-LST.
+
+This function allows easy sequencing of transformer functions."
+  (dolist (func func-lst)
+    (setcar arg-lst (apply func arg-lst)))
+  (car arg-lst))
+
+(defun anything-composed-funcall-with-source (source funcs &rest args)
+  (if (functionp funcs)
+      (apply 'anything-funcall-with-source source funcs args)
+    (apply 'anything-funcall-with-source
+           source (lambda (&rest args) (anything-compose args funcs)) args)))
 
 ;; (@* "Core: entry point")
 (defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
@@ -1994,7 +2014,7 @@ SOURCE."
 (defun anything-transform-candidates (candidates source)
   "Transform CANDIDATES according to candidate transformers."
   (anything-aif (assoc-default 'candidate-transformer source)
-      (anything-funcall-with-source source it candidates)
+      (anything-composed-funcall-with-source source it candidates)
     candidates))
 
 
@@ -2084,7 +2104,7 @@ Cache the candidates if there is not yet a cached value."
 
                   (anything-aif (assoc-default 'filtered-candidate-transformer source)
                       (setq matches
-                            (anything-funcall-with-source source it matches source)))
+                            (anything-composed-funcall-with-source source it matches source)))
                   matches))))
     (if debug-on-error
         (funcall doit)
@@ -3837,17 +3857,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (anything-test-candidates sources))))
       (expect '(("BAR" ("modified")))
         (let ((sources1 '(((name . "FOO")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified")))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified")))))))
               (sources2 '(((name . "BAR")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified"))))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified"))))))))
           (with-temp-buffer
             (clrhash anything-tick-hash)
             (insert "1")
@@ -3855,17 +3875,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (anything-test-candidates sources2))))
       (expect '(("FOO" ("unmodified")))
         (let ((sources1 '(((name . "FOO")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified")))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified")))))))
               (sources2 '(((name . "BAR")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified"))))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified"))))))))
           (with-temp-buffer
             (clrhash anything-tick-hash)
             (insert "1")
@@ -3874,17 +3894,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (anything-test-candidates sources1))))
       (expect '(("BAR" ("unmodified")))
         (let ((sources1 '(((name . "FOO")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified")))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified")))))))
               (sources2 '(((name . "BAR")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified"))))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified"))))))))
           (with-temp-buffer
             (clrhash anything-tick-hash)
             (insert "1")
@@ -3893,17 +3913,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (anything-test-candidates sources2))))
       (expect '(("BAR" ("modified")))
         (let ((sources1 '(((name . "FOO")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified")))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified")))))))
               (sources2 '(((name . "BAR")
-                          (candidates
-                           . (lambda ()
-                               (if (anything-current-buffer-is-modified)
-                                   '("modified")
-                                 '("unmodified"))))))))
+                           (candidates
+                            . (lambda ()
+                                (if (anything-current-buffer-is-modified)
+                                    '("modified")
+                                  '("unmodified"))))))))
           (with-temp-buffer
             (clrhash anything-tick-hash)
             (insert "1")
@@ -4607,10 +4627,10 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (desc "header-name attribute")
       (expect "original is transformed"
         (anything-test-update '(((name . "original")
-                                         (candidates "1")
-                                         (header-name
-                                          . (lambda (name)
-                                              (format "%s is transformed" name)))))
+                                 (candidates "1")
+                                 (header-name
+                                  . (lambda (name)
+                                      (format "%s is transformed" name)))))
                               "")
         (with-current-buffer (anything-buffer-get)
           (buffer-string)
@@ -4732,6 +4752,60 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
          '(((name . "test")
             (candidates (sym . realsym) ("str" . "realstr"))))
          "str"))
+      (desc "multiple transformers")
+      (expect '(("test" ("<FOO>")))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates "foo")
+            (candidate-transformer
+             . (lambda (cands)
+                 (anything-compose (list cands)
+                                   (list (lambda (c) (mapcar 'upcase c))
+                                         (lambda (c) (list (concat "<" (car c) ">")))))))))))
+      (expect '("<FOO>")
+        (anything-composed-funcall-with-source
+         '((name . "test"))
+         (list (lambda (c) (mapcar 'upcase c))
+               (lambda (c) (list (concat "<" (car c) ">"))))
+         '("foo"))
+        )
+      (expect '(("test" ("<FOO>")))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates "foo")
+            (candidate-transformer
+             (lambda (c) (mapcar 'upcase c))
+             (lambda (c) (list (concat "<" (car c) ">"))))))))
+      (expect '(("test" ("<BAR>")))
+        (anything-test-candidates
+         '(((name . "test")
+            (candidates "bar")
+            (filtered-candidate-transformer
+             (lambda (c s) (mapcar 'upcase c))
+             (lambda (c s) (list (concat "<" (car c) ">"))))))))
+      (expect '(("find-file" . find-file)
+                ("view-file" . view-file))
+        (stub zerop => nil)
+        (stub anything-get-current-source
+              => '((name . "test")
+                   (action)
+                   (action-transformer
+                    . (lambda (a s)
+                        (anything-compose
+                         (list a s)
+                         (list (lambda (a s) (push '("view-file" . view-file) a))
+                               (lambda (a s) (push '("find-file" . find-file) a))))))))
+        (anything-get-action))
+      (expect '(("find-file" . find-file)
+                ("view-file" . view-file))
+        (stub zerop => nil)
+        (stub anything-get-current-source
+              => '((name . "test")
+                   (action)
+                   (action-transformer
+                    (lambda (a s) (push '("view-file" . view-file) a))
+                    (lambda (a s) (push '("find-file" . find-file) a)))))
+        (anything-get-action))
       )))
 
 
