@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-10 19:16:25 (JST) rubikitch>
+;; Time-stamp: <2009-03-11 00:11:28 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -70,76 +70,6 @@
 ;;
 ;; Below are complete source list you can setup in `anything-sources':
 ;;
-;;  Buffer:
-;;     `anything-c-source-buffers'          (Buffers)
-;;     `anything-c-source-buffer-not-found' (Create buffer)
-;;     `anything-c-source-buffers+'         (Buffers)
-;;  File:
-;;     `anything-c-source-file-name-history'     (File Name History)
-;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
-;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
-;;     `anything-c-source-file-cache'            (File Cache)
-;;     `anything-c-source-locate'                (Locate)
-;;     `anything-c-source-recentf'               (Recentf)
-;;     `anything-c-source-ffap-guesser'          (File at point)
-;;  Help:
-;;     `anything-c-source-man-pages'  (Manual Pages)
-;;     `anything-c-source-info-pages' (Info Pages)
-;;     `anything-c-source-info-elisp' (Info Elisp)
-;;  Command:
-;;     `anything-c-source-complex-command-history'  (Complex Command History)
-;;     `anything-c-source-extended-command-history' (Emacs Commands History)
-;;     `anything-c-source-emacs-commands'           (Emacs Commands)
-;;     `anything-c-source-lacarte'                  (Lacarte)
-;;  Function:
-;;     `anything-c-source-emacs-functions'              (Emacs Functions)
-;;     `anything-c-source-emacs-functions-with-abbrevs' (Emacs Functions)
-;;  Bookmark:
-;;     `anything-c-source-bookmarks'       (Bookmarks)
-;;     `anything-c-source-bookmark-set'    (Set Bookmark)
-;;     `anything-c-source-bookmarks-ssh'   (Bookmarks-ssh)
-;;     `anything-c-source-bookmarks-su'    (Bookmarks-su)
-;;     `anything-c-source-bookmarks-local' (Bookmarks-Local)
-;;     `anything-c-source-w3m-bookmarks'   (W3m Bookmarks)
-;;  Library:
-;;     `anything-c-source-elisp-library-scan' (Elisp libraries (Scan))
-;;  Programming:
-;;     `anything-c-source-imenu'                              (Imenu)
-;;     `anything-c-source-ctags'                              (Exuberant ctags)
-;;     `anything-c-source-semantic'                           (Semantic Tags)
-;;     `anything-c-source-simple-call-tree-functions-callers' (Function is called by)
-;;     `anything-c-source-simple-call-tree-callers-functions' (Function calls)
-;;     `anything-c-source-commands-and-options-in-file'       (Commands/Options in file)
-;;  Color and Face:
-;;     `anything-c-source-customize-face' (Customize Face)
-;;     `anything-c-source-colors'         (Colors)
-;;  Search Engine:
-;;     `anything-c-source-tracker-search' (Tracker Search)
-;;     `anything-c-source-mac-spotlight'  (mdfind)
-;;  Kill ring:
-;;     `anything-c-source-kill-ring' (Kill Ring)
-;;  Register:
-;;     `anything-c-source-register' (Registers)
-;;  Headline Extraction:
-;;     `anything-c-source-fixme'                   (TODO/FIXME/DRY comments)
-;;     `anything-c-source-rd-headline'             (RD HeadLine)
-;;     `anything-c-source-oddmuse-headline'        (Oddmuse HeadLine)
-;;     `anything-c-source-emacs-source-defun'      (Emacs Source DEFUN)
-;;     `anything-c-source-emacs-lisp-expectations' (Emacs Lisp Expectations)
-;;     `anything-c-source-emacs-lisp-toplevels'    (Emacs Lisp Toplevel and Linkd Star)
-;;     `anything-c-source-org-headline'            (Org HeadLine)
-;;  Misc:
-;;     `anything-c-source-picklist'           (Picklist)
-;;     `anything-c-source-bbdb'               (BBDB)
-;;     `anything-c-source-evaluation-result'  (Evaluation Result)
-;;     `anything-c-source-calculation-result' (Calculation Result)
-;;     `anything-c-source-google-suggest'     (Google Suggest)
-;;     `anything-c-source-jabber-contacts'    (Jabber Contacts)
-;;     `anything-c-source-call-source'        (Call anything source)
-;;     `anything-c-source-occur'              (Occur)
-;;  System:
-;;     `anything-c-source-gentoo'    (Portage sources)
-;;     `anything-c-source-use-flags' (Use Flags)
 
 ;;; Commands:
 ;;
@@ -151,6 +81,8 @@
 ;;    Preconfigured `anything' for searching info at point.
 ;;  `anything-show-kill-ring'
 ;;    Show `kill-ring'. It is drop-in replacement of `yank-pop'.
+;;  `anything-minibuffer-history'
+;;    Show `minibuffer-history'.
 ;;  `anything-insert-buffer-name'
 ;;    Insert buffer name.
 ;;  `anything-insert-symbol'
@@ -185,10 +117,14 @@
 ;;    Call anything source.
 ;;  `anything-call-source-from-anything'
 ;;    Call anything source within `anything' session.
+;;  `anything-create-from-anything'
+;;    Run `anything-create' from `anything' as a fallback.
+;;  `anything-create'
+;;    Do many create actions from STRING.
 ;;  `anything-gentoo'
 ;;    Start anything with only gentoo sources.
 ;;  `anything-c-adaptive-save-history'
-;;    Save history information to file given by
+;;    Save history information to file given by `anything-c-adaptive-history-file'.
 ;;
 ;;; Customizable Options:
 ;;
@@ -218,6 +154,9 @@
 ;;  `anything-kill-ring-threshold'
 ;;    *Minimum length to be listed by `anything-c-source-kill-ring'.
 ;;    default = 10
+;;  `anything-create--actions-private'
+;;    User defined actions for `anything-create' / `anything-c-source-create'.
+;;    default = nil
 
 ;;; Change log:
 ;;
@@ -379,6 +318,15 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
 You may bind this command to M-y."
   (interactive)
   (anything 'anything-c-source-kill-ring nil nil nil nil "*anything kill-ring*"))
+
+(defun anything-minibuffer-history ()
+  "Show `minibuffer-history'.
+You may bind this command to C-r in minibuffer-local-map / minibuffer-local-completion-map."
+  (interactive)
+  (anything 'anything-c-source-minibuffer-history nil nil nil nil
+            "*anything minibuffer-history*"))
+;; (define-key minibuffer-local-map "\C-r" 'anything-minibuffer-history)
+;; (define-key minibuffer-local-completion-map "\C-r" 'anything-minibuffer-history)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2169,6 +2117,68 @@ removed."
     (volatile)))
 ;; (anything 'anything-c-source-occur)
 
+;; Create many actions for input
+(defvar anything-c-source-create
+  '((name . "Create")
+    (dummy)
+    (action)
+    (candidate-number-limit . 9999)
+    (action-transformer . anything-create--actions))
+  "Do many create actions from `anything-pattern'.
+See also `anything-create--actions'.")
+;; (anything 'anything-c-source-create)
+(defcustom anything-create--actions-private nil
+  "User defined actions for `anything-create' / `anything-c-source-create'.
+It is a list of (DISPLAY . FUNCTION) pairs like `action'
+attribute of `anything-sources'.
+
+It is prepended to predefined pairs."
+  :type 'list
+  :group 'anything-config)
+
+(defun anything-create-from-anything ()
+  "Run `anything-create' from `anything' as a fallback."
+  (interactive)
+  (anything-run-after-quit 'anything-create nil anything-pattern))
+
+(defun anything-create (&optional string initial-input)
+  "Do many create actions from STRING.
+See also `anything-create--actions'."
+  (interactive)
+  (setq string (or string (read-string "Create Anything: " initial-input)))
+  (anything '(((name . "Anything Create")
+               (header-name . (lambda (_) (format "Action for \"%s\"" string)))
+               (candidates . anything-create--actions)
+               (candidate-number-limit . 9999)
+               (action . (lambda (func) (funcall func string)))))))
+
+(defun anything-create--actions (&rest ignored)
+  "Default actions for `anything-create' / `anything-c-source-create'."
+  (remove-if-not
+   (lambda (pair) (and (consp pair) (functionp (cdr pair))))
+   (append anything-create--actions-private
+           '(("find-file" . find-file)
+             ("find-file other window" . find-file-other-window)
+             ("New buffer" . switch-to-buffer)
+             ("New buffer other window" . switch-to-buffer-other-window)
+             ("Bookmark Set" . bookmark-set)
+             ("Set Register" .
+              (lambda (x) (set-register (read-char "Register: ") x)))
+             ("Insert Linkd star" . linkd-insert-star)
+             ("Insert Linkd Tag" . linkd-insert-tag)
+             ("Insert Linkd Link" . linkd-insert-link)
+             ("Insert Linkd Lisp" . linkd-insert-lisp)
+             ("Insert Linkd Wiki" . linkd-insert-wiki)
+             ("Google Search" . google)))))
+
+;; Minibuffer History
+(defvar anything-c-source-minibuffer-history
+  '((name . "Minibuffer History")
+    (candidates . minibuffer-history)
+    (migemo)
+    (action . insert)))
+
+;; (anything 'anything-c-source-minibuffer-history)
 ;;;; <System>
 
 ;; Sources for gentoo users
@@ -2758,8 +2768,7 @@ when the user goes to the action list with TAB."
 (add-hook 'kill-emacs-hook 'anything-c-adaptive-save-history)
 
 (defun anything-c-adaptive-save-history ()
-  "Save history information to file given by
-`anything-c-adaptive-history-file'."
+  "Save history information to file given by `anything-c-adaptive-history-file'."
   (interactive)
   (with-temp-buffer
     (insert
