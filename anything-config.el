@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-09 16:20:09 (CET) thierry>
+;; Time-stamp: <2009-03-10 18:07:59 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -149,6 +149,8 @@
 ;;    Preconfigured `anything' for opening files.
 ;;  `anything-info-at-point'
 ;;    Preconfigured `anything' for searching info at point.
+;;  `anything-show-kill-ring'
+;;    Show `kill-ring'. It is drop-in replacement of `yank-pop'.
 ;;  `anything-insert-buffer-name'
 ;;    Insert buffer name.
 ;;  `anything-insert-symbol'
@@ -179,8 +181,6 @@
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
-;;  `anything-show-kill-ring'
-;;    Show `kill-ring'. It is drop-in replacement of `yank-pop'.
 ;;  `anything-call-source'
 ;;    Call anything source.
 ;;  `anything-call-source-from-anything'
@@ -352,7 +352,7 @@ they will be displayed with face `file-name-shadow' if
   :group 'anything-config)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; preconfigured anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
 ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate"
@@ -373,6 +373,12 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
                 anything-c-source-info-cl
                 anything-c-source-info-pages)
               pattern))) 
+
+(defun anything-show-kill-ring ()
+  "Show `kill-ring'. It is drop-in replacement of `yank-pop'.
+You may bind this command to M-y."
+  (interactive)
+  (anything 'anything-c-source-kill-ring nil nil nil nil "*anything kill-ring*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1734,12 +1740,6 @@ If this action is executed just after `yank', replace with STR as yanked string.
           (goto-char (prog1 (mark t)
                        (set-marker (mark-marker) (point) (current-buffer)))))))
   (kill-new str))
-
-(defun anything-show-kill-ring ()
-  "Show `kill-ring'. It is drop-in replacement of `yank-pop'.
-You may bind this command to M-y."
-  (interactive)
-  (anything 'anything-c-source-kill-ring nil nil nil nil "*anything kill-ring*"))
 
 ;; (anything 'anything-c-source-kill-ring)
 
