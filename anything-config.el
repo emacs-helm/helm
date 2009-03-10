@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-10 18:07:59 (JST) rubikitch>
+;; Time-stamp: <2009-03-10 19:16:25 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -1883,12 +1883,12 @@ http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (anything 'anything-c-source-emacs-lisp-expectations)
 
 (defvar anything-c-source-emacs-lisp-toplevels
-  '((name . "Emacs Lisp Toplevel and Linkd Star")
-    (headline . "^(\\|(@\\*")
+  '((name . "Emacs Lisp Toplevel / Level 4 Comment / Linkd Star")
+    (headline . "^(\\|(@\\*\\|^;;;;")
     (get-line . buffer-substring)
     (condition . (eq major-mode 'emacs-lisp-mode))
     (adjust))
-  "Show top-level forms and linkd stars (optional) in Emacs Lisp.
+  "Show top-level forms, level 4 comments and linkd stars (optional) in Emacs Lisp.
 linkd.el is optional because linkd stars are extracted by regexp.
 http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;; (anything 'anything-c-source-emacs-lisp-toplevels)
