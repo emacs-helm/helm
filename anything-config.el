@@ -1427,13 +1427,15 @@ STRING is string to match."
     (volatile)
     (persistent-action . (lambda (elm)
                            (anything-c-imenu-default-action elm)
-                           (if (fboundp 'anything-traverse-occur-color-current-line)
-                               (anything-traverse-occur-color-current-line))))
+                           (unless (fboundp 'semantic-imenu-tag-overlay)
+                             (anything-match-line-color-current-line))))
     (action . (lambda (elm)
                 (anything-c-imenu-default-action elm))))
   "See (info \"(emacs)Imenu\")")
+
 ;; (anything 'anything-c-source-imenu)
 
+(setq imenu-default-goto-function 'imenu-default-goto-function)
 (defun anything-c-imenu-default-action (elm)
   "The default action for `anything-c-source-imenu'."
   (let ((path (split-string elm anything-c-imenu-delimiter))
@@ -1443,7 +1445,7 @@ STRING is string to match."
           (setq alist (assoc (car path) alist))
           (setq elm (cadr path))
           (imenu (assoc elm alist)))
-      (imenu (assoc elm alist)))))
+        (imenu (assoc elm alist)))))
 
 ;;; Ctags
 (defvar anything-c-ctags-modes
@@ -1499,8 +1501,13 @@ http://ctags.sourceforge.net/")
                                            (eq class 'variable))
                                        (cons (cons (concat (make-string (* depth 2) ?\s)
                                                            (semantic-format-tag-summarize tag nil t)) tag)
-                                             (anything-semantic-construct-candidates (semantic-tag-components tag) (1+ depth)))))))
+                                             (anything-semantic-construct-candidates (semantic-tag-components tag)
+                                                                                     (1+ depth)))))))
                            tags))))
+
+(defun anything-semantic-default-action (candidate)
+  (let ((tag (cdr (assoc candidate anything-semantic-candidates))))
+    (semantic-go-to-tag tag)))
 
 (defvar anything-c-source-semantic
   '((name . "Semantic Tags")
@@ -1512,6 +1519,9 @@ http://ctags.sourceforge.net/")
     (candidates . (lambda ()
                     (if anything-semantic-candidates
                         (mapcar 'car anything-semantic-candidates))))
+    (persistent-action . (lambda (elm)
+                           (anything-semantic-default-action elm)
+                           (anything-match-line-color-current-line)))
     (action . (("Goto tag" . (lambda (candidate)
                                (let ((tag (cdr (assoc candidate anything-semantic-candidates))))
                                  (semantic-go-to-tag tag)))))))
@@ -1519,6 +1529,7 @@ http://ctags.sourceforge.net/")
 
 http://cedet.sourceforge.net/semantic.shtml
 http://cedet.sourceforge.net/")
+
 ;; (anything 'anything-c-source-semantic)
 
 ;;; Function is called by
@@ -2571,6 +2582,34 @@ It is added to `extended-command-history'.
           (lambda ()
             (when (overlayp anything-c-persistent-highlight-overlay)
               (delete-overlay anything-c-persistent-highlight-overlay))))
+
+(defvar anything-match-line-overlay-face nil)
+(defvar anything-match-line-overlay nil)
+(defun anything-match-line-color-current-line ()
+  "Highlight and underline current position"
+  (if (not anything-match-line-overlay)
+      (setq anything-match-line-overlay
+            (make-overlay
+             (line-beginning-position) (1+ (line-end-position))))
+      (move-overlay anything-match-line-overlay
+                    (line-beginning-position) (1+ (line-end-position))))
+  (overlay-put anything-match-line-overlay
+               'face anything-match-line-overlay-face))
+
+(defface anything-overlay-line-face '((t (:background "IndianRed4" :underline t)))
+  "Face for source header in the anything buffer." :group 'anything)
+
+(setq anything-match-line-overlay-face 'anything-overlay-line-face)
+
+(add-hook 'anything-cleanup-hook #'(lambda ()
+                                     (when anything-match-line-overlay
+                                       (delete-overlay anything-match-line-overlay)
+                                       (setq anything-match-line-overlay nil))))
+                                     
+(add-hook 'anything-after-persistent-action-hook #'(lambda ()
+                                                     (when anything-match-line-overlay
+                                                       (delete-overlay anything-match-line-overlay)
+                                                       (anything-match-line-color-current-line))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Actions Transformers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
