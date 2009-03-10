@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-11 00:11:28 (JST) rubikitch>
+;; Time-stamp: <2009-03-11 00:14:57 (JST) rubikitch>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -70,6 +70,78 @@
 ;;
 ;; Below are complete source list you can setup in `anything-sources':
 ;;
+;;  Buffer:
+;;     `anything-c-source-buffers'          (Buffers)
+;;     `anything-c-source-buffer-not-found' (Create buffer)
+;;     `anything-c-source-buffers+'         (Buffers)
+;;  File:
+;;     `anything-c-source-file-name-history'     (File Name History)
+;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
+;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
+;;     `anything-c-source-file-cache'            (File Cache)
+;;     `anything-c-source-locate'                (Locate)
+;;     `anything-c-source-recentf'               (Recentf)
+;;     `anything-c-source-ffap-guesser'          (File at point)
+;;  Help:
+;;     `anything-c-source-man-pages'  (Manual Pages)
+;;     `anything-c-source-info-pages' (Info Pages)
+;;     `anything-c-source-info-elisp' (Info Elisp)
+;;  Command:
+;;     `anything-c-source-complex-command-history'  (Complex Command History)
+;;     `anything-c-source-extended-command-history' (Emacs Commands History)
+;;     `anything-c-source-emacs-commands'           (Emacs Commands)
+;;     `anything-c-source-lacarte'                  (Lacarte)
+;;  Function:
+;;     `anything-c-source-emacs-functions'              (Emacs Functions)
+;;     `anything-c-source-emacs-functions-with-abbrevs' (Emacs Functions)
+;;  Bookmark:
+;;     `anything-c-source-bookmarks'       (Bookmarks)
+;;     `anything-c-source-bookmark-set'    (Set Bookmark)
+;;     `anything-c-source-bookmarks-ssh'   (Bookmarks-ssh)
+;;     `anything-c-source-bookmarks-su'    (Bookmarks-su)
+;;     `anything-c-source-bookmarks-local' (Bookmarks-Local)
+;;     `anything-c-source-w3m-bookmarks'   (W3m Bookmarks)
+;;  Library:
+;;     `anything-c-source-elisp-library-scan' (Elisp libraries (Scan))
+;;  Programming:
+;;     `anything-c-source-imenu'                              (Imenu)
+;;     `anything-c-source-ctags'                              (Exuberant ctags)
+;;     `anything-c-source-semantic'                           (Semantic Tags)
+;;     `anything-c-source-simple-call-tree-functions-callers' (Function is called by)
+;;     `anything-c-source-simple-call-tree-callers-functions' (Function calls)
+;;     `anything-c-source-commands-and-options-in-file'       (Commands/Options in file)
+;;  Color and Face:
+;;     `anything-c-source-customize-face' (Customize Face)
+;;     `anything-c-source-colors'         (Colors)
+;;  Search Engine:
+;;     `anything-c-source-tracker-search' (Tracker Search)
+;;     `anything-c-source-mac-spotlight'  (mdfind)
+;;  Kill ring:
+;;     `anything-c-source-kill-ring' (Kill Ring)
+;;  Register:
+;;     `anything-c-source-register' (Registers)
+;;  Headline Extraction:
+;;     `anything-c-source-fixme'                   (TODO/FIXME/DRY comments)
+;;     `anything-c-source-rd-headline'             (RD HeadLine)
+;;     `anything-c-source-oddmuse-headline'        (Oddmuse HeadLine)
+;;     `anything-c-source-emacs-source-defun'      (Emacs Source DEFUN)
+;;     `anything-c-source-emacs-lisp-expectations' (Emacs Lisp Expectations)
+;;     `anything-c-source-emacs-lisp-toplevels'    (Emacs Lisp Toplevel / Level 4 Comment / Linkd Star)
+;;     `anything-c-source-org-headline'            (Org HeadLine)
+;;  Misc:
+;;     `anything-c-source-picklist'           (Picklist)
+;;     `anything-c-source-bbdb'               (BBDB)
+;;     `anything-c-source-evaluation-result'  (Evaluation Result)
+;;     `anything-c-source-calculation-result' (Calculation Result)
+;;     `anything-c-source-google-suggest'     (Google Suggest)
+;;     `anything-c-source-jabber-contacts'    (Jabber Contacts)
+;;     `anything-c-source-call-source'        (Call anything source)
+;;     `anything-c-source-occur'              (Occur)
+;;     `anything-c-source-create'             (Create)
+;;     `anything-c-source-minibuffer-history' (Minibuffer History)
+;;  System:
+;;     `anything-c-source-gentoo'    (Portage sources)
+;;     `anything-c-source-use-flags' (Use Flags)
 
 ;;; Commands:
 ;;
