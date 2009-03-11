@@ -2399,6 +2399,16 @@ See also `anything-create--actions'."
   (anything '(anything-c-source-gentoo
               anything-c-source-use-flags)))
 
+(defvar anything-c-source-emacs-process
+  '((name . "Emacs Process")
+    (candidates . (lambda ()
+                    (mapcar #'process-name
+                            (process-list))))
+    (action . (("Kill Process" . (lambda (elm)
+                                   (delete-process (get-process elm))))))))
+                    
+;; (anything 'anything-c-source-emacs-process)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
 (defvar anything-c-external-commands-list nil
