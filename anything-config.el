@@ -706,11 +706,8 @@ buffer that is not the current buffer."
     (candidates . anything-c-buffer-list)
     (volatile)
     (type . buffer)
-    (candidate-transformer . (lambda (candidates)
-                               (anything-c-compose
-                                (list candidates)
-                                '(anything-c-highlight-buffers
-                                  anything-c-skip-boring-buffers))))
+    (candidate-transformer anything-c-highlight-buffers
+                           anything-c-skip-boring-buffers)
     (persistent-action . (lambda (name)
                            (flet ((kill (item)
                                     (with-current-buffer item
@@ -777,10 +774,7 @@ buffer that is not the current buffer."
     (candidates . (lambda ()
                     (directory-files
                      anything-c-default-directory t)))
-    (candidate-transformer . (lambda (candidates)
-                               (anything-c-compose
-                                (list candidates)
-                                '(anything-c-highlight-files))))
+    (candidate-transformer anything-c-highlight-files)
     (volatile)
     (type . file)))
 
@@ -1149,10 +1143,7 @@ http://www.nongnu.org/bm/")
                                       if (string-match "^(su)" i)
                                       collect i))
                       (sort lis-su 'string-lessp))))
-    (candidate-transformer . (lambda (candidates)
-                               (anything-c-compose
-                                (list candidates)
-                                '(anything-c-highlight-bookmark-su))))
+    (candidate-transformer anything-c-highlight-bookmark-su)
     
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -1208,10 +1199,7 @@ http://www.nongnu.org/bm/")
                                                (not (string-match "^(su)" i)))
                                        collect i))
                       (sort lis-loc 'string-lessp))))
-    (candidate-transformer . (lambda (candidates)
-                               (anything-c-compose
-                                (list candidates)
-                                '(anything-c-highlight-bookmark))))
+    (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 ;; (anything 'anything-c-source-bookmarks-local)
@@ -1255,10 +1243,7 @@ http://www.nongnu.org/bm/")
     (candidates . (lambda ()
                     (mapcar #'car
                             anything-c-w3m-bookmarks-alist)))
-    (filtered-candidate-transformer . (lambda (candidates source)
-                                        (anything-c-compose
-                                         (list candidates)
-                                         '(anything-c-highlight-w3m-bookmarks))))
+    (filtered-candidate-transformer anything-c-highlight-w3m-bookmarks)
     (action . (("Browse Url" . (lambda (candidate)
                                  (anything-c-w3m-browse-bookmark candidate)))
                ("Copy Url" . (lambda (elm)
@@ -2273,10 +2258,7 @@ See also `anything-create--actions'."
               (unless anything-c-cache-gentoo
                 (setq anything-c-cache-gentoo (anything-c-gentoo-init-list)))))
     (candidates . anything-c-cache-gentoo)
-    (filtered-candidate-transformer . (lambda (candidates source)
-                                        (anything-c-compose
-                                         (list candidates)
-                                         '(anything-c-highlight-world))))
+    (filtered-candidate-transformer anything-c-highlight-world)
     (action . (("Show package" . (lambda (elm)
                                    (when (get-buffer "*EShell Command Output*")
                                      (kill-buffer "*EShell Command Output*"))
@@ -2325,10 +2307,7 @@ See also `anything-create--actions'."
               (unless anything-c-gentoo-use-flags
                 (setq anything-c-gentoo-use-flags (anything-c-gentoo-get-use)))))
     (candidates . anything-c-gentoo-use-flags)
-    (filtered-candidate-transformer . (lambda (candidates source)
-                                        (anything-c-compose
-                                         (list candidates)
-                                         '(anything-c-highlight-local-use))))
+    (filtered-candidate-transformer anything-c-highlight-local-use)
     (action . (("Show which dep use this flag"
                 . (lambda (elm)
                     (switch-to-buffer anything-c-gentoo-buffer)
@@ -3083,18 +3062,12 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
           ("Delete file" . anything-c-delete-file)
           ("Open file externally" . anything-c-open-file-externally)
           ("Open file with default tool" . anything-c-open-file-with-default-tool))
-         (action-transformer . (lambda (actions candidate)
-                                 (anything-c-compose
-                                  (list actions candidate)
-                                  '(anything-c-transform-file-load-el
-                                    anything-c-transform-file-browse-url))))
-         (candidate-transformer . (lambda (candidates)
-                                    (anything-c-compose
-                                     (list candidates)
-                                     '(anything-c-w32-pathname-transformer
-                                       anything-c-skip-current-file
-                                       anything-c-skip-boring-files
-                                       anything-c-shorten-home-path)))))
+         (action-transformer anything-c-transform-file-load-el
+                             anything-c-transform-file-browse-url)
+         (candidate-transformer anything-c-w32-pathname-transformer
+                                anything-c-skip-current-file
+                                anything-c-skip-boring-files
+                                anything-c-shorten-home-path))
         (command (action ("Call interactively" . anything-c-call-interactively)
                          ("Describe command" . (lambda (command-name)
                                                  (describe-function (intern command-name))))
@@ -3110,21 +3083,12 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
                           ("Go to function's definition" . (lambda (function-name)
                                                              (find-function
                                                               (intern function-name)))))
-                  (action-transformer . (lambda (actions candidate)
-                                          (anything-c-compose
-                                           (list actions candidate)
-                                           '(anything-c-transform-function-call-interactively))))
-                  (candidate-transformer . (lambda (candidates)
-                                             (anything-c-compose
-                                              (list candidates)
-                                              '(anything-c-mark-interactive-functions)))))
+                  (action-transformer anything-c-transform-function-call-interactively)
+                  (candidate-transformer anything-c-mark-interactive-functions))
         (sexp (action ("Eval s-expression" . (lambda (c)
                                                (eval (read c))))
                       ("Add s-expression to kill ring" . kill-new))
-              (action-transformer . (lambda (actions candidate)
-                                      (anything-c-compose
-                                       (list actions candidate)
-                                       '(anything-c-transform-sexp-eval-command-sexp)))))
+              (action-transformer anything-c-transform-sexp-eval-command-sexp))
         ;; (bookmark (action ("Jump to bookmark" . bookmark-jump)
         ;;                   ("Delete bookmark" . bookmark-delete)))
         (bookmark (action ("Jump to bookmark" . (lambda (candidate)
