@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.172 2009-03-10 17:11:58 rubikitch Exp $
+;; $Id: anything.el,v 1.173 2009-03-11 08:10:32 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.172  2009-03-10 17:11:58  rubikitch
+;; Revision 1.173  2009-03-11 08:10:32  rubikitch
+;; Update doc
+;;
+;; Revision 1.172  2009/03/10 17:11:58  rubikitch
 ;; `candidate-transformer', `filtered-candidate-transformer',
 ;; `action-transformer' attributes: accept a list of functions
 ;;
@@ -796,7 +799,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.172 2009-03-10 17:11:58 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.173 2009-03-11 08:10:32 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -976,11 +979,12 @@ Attributes:
 
 - candidate-transformer (optional)
 
-  It's a function called with one argument when the completion
-  list from the source is built. The argument is the list of
-  candidates retrieved from the source. The function should
-  return a transformed list of candidates which will be used for
-  the actual completion.
+  It's a function or a list of functions called with one argument
+  when the completion list from the source is built. The argument
+  is the list of candidates retrieved from the source. The
+  function should return a transformed list of candidates which
+  will be used for the actual completion.  If it is a list of
+  functions, it calls each function sequentially.
 
   This can be used to transform or remove items from the list of
   candidates.
@@ -1020,9 +1024,11 @@ Attributes:
 
 - action-transformer (optional)
 
-  It's a function called with two arguments when the action list
-  from the source is assembled. The first argument is the list of
-  actions, the second is the current selection.
+  It's a function or a list of functions called with two
+  arguments when the action list from the source is
+  assembled. The first argument is the list of actions, the
+  second is the current selection.  If it is a list of functions,
+  it calls each function sequentially.
 
   The function should return a transformed action list.
 
