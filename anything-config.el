@@ -3,7 +3,7 @@
 ;; Filename: anything-config.el
 
 ;; Description: Predefined configurations for `anything.el'
-;; Time-stamp: <2009-03-11 00:14:57 (JST) rubikitch>
+;; Time-stamp: <2009-03-11 09:12:38 (CET) thierry>
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             Andy Stewart <lazycat.manatee@gmail.com>
@@ -2426,6 +2426,16 @@ See also `anything-create--actions'."
   (interactive)
   (anything '(anything-c-source-gentoo
               anything-c-source-use-flags)))
+
+(defvar anything-c-source-emacs-process
+  '((name . "Emacs Process")
+    (candidates . (lambda ()
+                    (mapcar #'process-name
+                            (process-list))))
+    (action . (("Kill Process" . (lambda (elm)
+                                   (delete-process (get-process elm))))))))
+                    
+;; (anything 'anything-c-source-emacs-process)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
