@@ -1173,16 +1173,15 @@ http://www.nongnu.org/bm/")
                            (if current-prefix-arg
                                (anything-c-w3m-browse-bookmark candidate t)
                                (anything-c-w3m-browse-bookmark candidate nil t))))
-    (delayed)
-    (volatile)))
+    (delayed)))
+
 ;; (anything 'anything-c-source-w3m-bookmarks)
 
 (defun anything-c-w3m-bookmarks-get-value (elm)
-  (let ((value
-         (replace-regexp-in-string "\"" ""
-                                   (cdr (assoc elm
-                                               anything-c-w3m-bookmarks-alist)))))
-    value))
+  (replace-regexp-in-string "\"" ""
+                            (cdr (assoc elm
+                                        anything-c-w3m-bookmarks-alist))))
+
 
 (defun anything-c-w3m-browse-bookmark (elm &optional use-firefox new-tab)
   (let* ((fn (if use-firefox
@@ -1196,11 +1195,10 @@ http://www.nongnu.org/bm/")
 
 
 (defun anything-c-highlight-w3m-bookmarks (books)
-  (let ((cand-mod (loop for i in books
-                     collect (propertize i
-                                         'face 'anything-w3m-bookmarks-face
-                                         'help-echo (anything-c-w3m-bookmarks-get-value i)))))
-    cand-mod))
+  (loop for i in books
+        collect (propertize i
+                           'face 'anything-w3m-bookmarks-face
+                           'help-echo (anything-c-w3m-bookmarks-get-value i))))
 
 
 (defun anything-c-w3m-delete-bookmark (elm)
