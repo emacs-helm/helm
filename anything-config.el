@@ -561,14 +561,8 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
 The match is done with `string-match'."
   (string-match anything-pattern candidate))
 
-(defun anything-c-compose (arg-lst func-lst)
-  "Call each function in FUNC-LST with the arguments specified in ARG-LST.
-The result of each function will be the new `car' of ARG-LST.
-
-This function allows easy sequencing of transformer functions."
-  (dolist (func func-lst)
-    (setcar arg-lst (apply func arg-lst)))
-  (car arg-lst))
+;; `anything-c-compose' is no more needed, it is for compatibility.
+(defalias 'anything-c-compose 'anything-compose)
 
 (defun anything-c-skip-entries (list regexp)
   "Remove entries which matches REGEXP from LIST."
