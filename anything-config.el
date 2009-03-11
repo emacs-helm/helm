@@ -686,6 +686,7 @@ buffer that is not the current buffer."
 (defvar anything-c-buffers-face2 'font-lock-type-face)
 (defvar anything-c-buffers-face3 'italic)
 (defun anything-c-highlight-buffers (buffers)
+  (require 'dired)
   (let ((cand-mod (loop for i in buffers
                      if (rassoc (get-buffer i) dired-buffers)
                      collect (propertize i
