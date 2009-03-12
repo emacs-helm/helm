@@ -2687,7 +2687,7 @@ file.  Else return ACTIONS unmodified."
 (defun anything-c-transform-function-call-interactively (actions candidate)
   "Add an action to call the function CANDIDATE interactively if
 it is a command.  Else return ACTIONS unmodified."
-  (if (commandp (intern candidate))
+  (if (commandp (intern-soft candidate))
       (append actions '(("Call Interactively"
                          .
                          anything-c-call-interactively)))
