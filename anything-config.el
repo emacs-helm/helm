@@ -2221,21 +2221,22 @@ See also `anything-create--actions'."
 
 ;; Sources for gentoo users
 
-(defvar anything-c-gentoo-world-file "/var/lib/portage/world")
 (defvar anything-c-gentoo-use-flags nil)
-(defvar anything-c-gentoo-buffer "*anything-gentoo*")
+(defvar anything-c-gentoo-buffer "*anything-gentoo-output*")
 (defvar anything-c-cache-gentoo nil)
 (defvar anything-c-cache-world nil)
 (defvar anything-c-source-gentoo
   '((name . "Portage sources")
     (init . (lambda ()
               (get-buffer-create anything-c-gentoo-buffer)
+              (unless anything-c-cache-gentoo
+                (anything-c-gentoo-setup-cache))
               (unless anything-c-cache-world
                 (setq anything-c-cache-world (anything-c-gentoo-get-world)))
-              (unless anything-c-cache-gentoo
-                (setq anything-c-cache-gentoo (anything-c-gentoo-init-list)))))
-    (candidates . anything-c-cache-gentoo)
-    (filtered-candidate-transformer anything-c-highlight-world)
+              (anything-c-gentoo-init-list)))
+    (candidates-in-buffer)
+    (match . identity)
+    (candidate-transformer anything-c-highlight-world)
     (action . (("Show package" . (lambda (elm)
                                    ;; DRY
                                    (when (get-buffer "*EShell Command Output*")
@@ -2277,7 +2278,7 @@ See also `anything-create--actions'."
                                                  "d"
                                                  ,elm))))
                ("Update" . (lambda (elm)
-                             (setq anything-c-cache-gentoo (anything-c-gentoo-init-list))
+                             (anything-c-gentoo-setup-cache)
                              (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
 
 ;; (anything 'anything-c-source-gentoo)
@@ -2286,9 +2287,11 @@ See also `anything-create--actions'."
   '((name . "Use Flags")
     (init . (lambda ()
               (unless anything-c-gentoo-use-flags
-                (setq anything-c-gentoo-use-flags (anything-c-gentoo-get-use)))))
-    (candidates . anything-c-gentoo-use-flags)
-    (filtered-candidate-transformer anything-c-highlight-local-use)
+                (anything-c-gentoo-setup-use-flags-cache))
+              (anything-c-gentoo-get-use)))
+    (candidates-in-buffer)
+    (match . identity)
+    (candidate-transformer anything-c-highlight-local-use)
     (action . (("Show which dep use this flag"
                 . (lambda (elm)
                     (switch-to-buffer anything-c-gentoo-buffer)
@@ -2313,19 +2316,38 @@ See also `anything-create--actions'."
 
 ;; DRY
 (defun anything-c-gentoo-init-list ()
-  "Return a list of all packages in Portage."
-  (split-string (with-temp-buffer
-                  (call-process "eix" nil t nil
-                                "--only-names")
-                  (buffer-string))))
+  "Initialize buffer with all packages in Portage."
+  (let* ((portage-buf (get-buffer-create "*anything-gentoo*"))
+         (buf (anything-candidate-buffer 'portage-buf)))
+    (with-current-buffer buf
+      (dolist (i anything-c-cache-gentoo)
+        (insert (concat i "\n"))))))
+
+(defun anything-c-gentoo-setup-cache ()
+  "Set up `anything-c-cache-gentoo'"
+  (setq anything-c-cache-gentoo
+        (split-string (with-temp-buffer
+                        (call-process "eix" nil t nil
+                                      "--only-names")
+                        (buffer-string)))))
 
 ;; DRY
 (defun anything-c-gentoo-get-use ()
-  "Return a list of all use flags."
-  (split-string (with-temp-buffer
-                  (call-process "eix" nil t nil
-                                "--print-all-useflags")
-                  (buffer-string))))
+  "Initialize buffer with all use flags."
+  (let* ((use-buf (get-buffer-create "*anything-gentoo-use*"))
+         (buf (anything-candidate-buffer 'use-buf)))
+    (with-current-buffer buf
+      (dolist (i anything-c-gentoo-use-flags)
+        (insert (concat i "\n"))))))
+      
+
+(defun anything-c-gentoo-setup-use-flags-cache ()
+  "Setup `anything-c-gentoo-use-flags'"
+  (setq anything-c-gentoo-use-flags
+        (split-string (with-temp-buffer
+                        (call-process "eix" nil t nil
+                                      "--print-all-useflags")
+                        (buffer-string)))))
 
 (defun anything-c-gentoo-get-url (elm)
   "Return a list of urls from eix output."
