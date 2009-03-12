@@ -599,6 +599,25 @@ The match is done with `string-match'."
       str-or-sym
     (intern str-or-sym)))
 
+(defun anything-c-describe-function (func)
+  "FUNC is symbol or string."
+  (describe-function (anything-c-symbolify func)))
+
+(defun anything-c-describe-variable (var)
+  "VAR is symbol or string."
+  (describe-variable (anything-c-symbolify var)))
+
+(defun anything-c-find-function (func)
+  "FUNC is symbol or string."
+  (find-function (anything-c-symbolify func)))
+
+(defun anything-c-find-variable (var)
+  "VAR is symbol or string."
+  (find-variable (anything-c-symbolify var)))
+
+(defun anything-c-kill-new (string &optional replace yank-handler)
+  "STRING is symbol or string."
+  (kill-new (anything-c-stringify string) replace yank-handler))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TODO
 (defvar anything-current-prefix-arg nil
@@ -3073,26 +3092,20 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 (define-anything-type-attribute 'command
   `((action ("Call interactively" . anything-c-call-interactively)
-            ("Describe command" . (lambda (command-name)
-                                    (describe-function (intern command-name))))
-            ("Add command to kill ring" . kill-new)
-            ("Go to command's definition" . (lambda (command-name)
-                                              (find-function
-                                               (intern command-name)))))
+            ("Describe command" . anything-c-describe-function)
+            ("Add command to kill ring" . anything-c-kill-new)
+            ("Go to command's definition" . anything-c-find-function))
     ;; Sort commands according to their usage count.
     (filtered-candidate-transformer . anything-c-adaptive-sort))
-  "Command name.")
+  "Command. (string or symbol)")
 
 (define-anything-type-attribute 'function
-  '((action ("Describe function" . (lambda (function-name)
-                                     (describe-function (intern function-name))))
-            ("Add function to kill ring" . kill-new)
-            ("Go to function's definition" . (lambda (function-name)
-                                               (find-function
-                                                (intern function-name)))))
+  '((action ("Describe function" . anything-c-describe-function)
+            ("Add function to kill ring" . anything-c-kill-new)
+            ("Go to function's definition" . anything-c-find-function))
     (action-transformer anything-c-transform-function-call-interactively)
     (candidate-transformer anything-c-mark-interactive-functions))
-  "Function name.")
+  "Function. (string or symbol)")
 
 (define-anything-type-attribute 'sexp
   '((action ("Eval s-expression" . (lambda (c) (eval (read c))))
