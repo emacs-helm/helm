@@ -2258,45 +2258,41 @@ See also `anything-create--actions'."
     (match . identity)
     (candidate-transformer anything-c-highlight-world)
     (action . (("Show package" . (lambda (elm)
-                                   ;; DRY
-                                   (when (get-buffer "*EShell Command Output*")
-                                     (kill-buffer "*EShell Command Output*"))
-                                   (eshell-command (format "eix %s" elm))))
+                                   (anything-c-gentoo-eshell-action elm "eix")))
                ("Show history" . (lambda (elm)
-                                   ;; DRY
-                                   (when (get-buffer "*EShell Command Output*")
-                                     (kill-buffer "*EShell Command Output*"))
-                                   (eshell-command (format "genlop -qe %s" elm))))
+                                   (if (member elm anything-c-cache-world)
+                                       (anything-c-gentoo-eshell-action elm "genlop -qe")
+                                       (message "No infos on packages not yet installed"))))
                ("Browse HomePage" . (lambda (elm)
                                       (browse-url (car (anything-c-gentoo-get-url elm)))))
                ("Show extra infos" . (lambda (elm)
-                                       ;; DRY
-                                       (when (get-buffer "*EShell Command Output*")
-                                         (kill-buffer "*EShell Command Output*"))
-                                       (eshell-command (format "genlop -qi %s" elm))))
+                                       (if (member elm anything-c-cache-world)
+                                           (anything-c-gentoo-eshell-action elm "genlop -qi")
+                                           (message "No infos on packages not yet installed"))))
                ("Show use flags" . (lambda (elm)
-                                     (switch-to-buffer anything-c-gentoo-buffer)
-                                     (erase-buffer)
-                                     (apply #'call-process "equery" nil t nil
-                                            `("-C"
-                                              "-q"
-                                              "u"
-                                              ,elm))
-                                     (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
-                                     (font-lock-mode 1)))
+                                     (if (member elm anything-c-cache-world)
+                                         (progn
+                                           (switch-to-buffer anything-c-gentoo-buffer)
+                                           (erase-buffer)
+                                           (apply #'call-process "equery" nil t nil
+                                                  `("-C"
+                                                    "u"
+                                                    ,elm))
+                                           (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
+                                           (font-lock-mode 1))
+                                         (message "No infos on packages not yet installed"))))
                ("Run emerge pretend" . (lambda (elm)
-                                         ;; DRY
-                                         (when (get-buffer "*EShell Command Output*")
-                                           (kill-buffer "*EShell Command Output*"))
-                                         (eshell-command (format "emerge -p %s" elm))))
+                                         (anything-c-gentoo-eshell-action elm "emerge -p")))
                ("Show dependencies" . (lambda (elm)
-                                        (switch-to-buffer anything-c-gentoo-buffer)
-                                        (erase-buffer)
-                                        (apply #'call-process "equery" nil t nil
-                                               `("-C"
-                                                 "-q"
-                                                 "d"
-                                                 ,elm))))
+                                        (if (member elm anything-c-cache-world)
+                                            (progn
+                                              (switch-to-buffer anything-c-gentoo-buffer)
+                                              (erase-buffer)
+                                              (apply #'call-process "equery" nil t nil
+                                                     `("-C"
+                                                       "d"
+                                                       ,elm)))
+                                            (message "No infos on packages not yet installed"))))
                ("Update" . (lambda (elm)
                              (anything-c-gentoo-setup-cache)
                              (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
@@ -2318,7 +2314,6 @@ See also `anything-create--actions'."
                     (erase-buffer)
                     (apply #'call-process "equery" nil t nil
                            `("-C"
-                             "-q"
                              "h"
                              ,elm))))
                ("Description"
@@ -2334,7 +2329,6 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-use-flags)
 
-;; DRY
 (defun anything-c-gentoo-init-list ()
   "Initialize buffer with all packages in Portage."
   (let* ((portage-buf (get-buffer-create "*anything-gentoo*"))
@@ -2351,7 +2345,12 @@ See also `anything-create--actions'."
                                       "--only-names")
                         (buffer-string)))))
 
-;; DRY
+(defun anything-c-gentoo-eshell-action (elm command)
+  (when (get-buffer "*EShell Command Output*")
+    (kill-buffer "*EShell Command Output*"))
+  (message "Wait searching...")
+  (eshell-command (format "%s %s" command elm)))
+
 (defun anything-c-gentoo-get-use ()
   "Initialize buffer with all use flags."
   (let* ((use-buf (get-buffer-create "*anything-gentoo-use*"))
