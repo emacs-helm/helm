@@ -382,7 +382,7 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   (anything '(anything-c-source-info-elisp
               anything-c-source-info-cl
               anything-c-source-info-pages)
-            (thing-at-point 'sexp))) 
+            (thing-at-point 'sexp)))
 
 (defun anything-show-kill-ring ()
   "Show `kill-ring'. It is drop-in replacement of `yank-pop'.
@@ -559,7 +559,7 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
 (defun anything-c-match-on-directory-name (candidate)
   "Return non-nil if `anything-pattern' match the directory part of CANDIDATE (a file)."
   (anything-aif (file-name-directory candidate)
-    (string-match anything-pattern it)))
+      (string-match anything-pattern it)))
 
 (defun anything-c-string-match (candidate)
   "Return non-nil if `anything-pattern' match CANDIDATE.
@@ -678,12 +678,12 @@ buffer that is not the current buffer."
   :group 'anything)
 
 (defface anything-file-name
-    '((t (:foreground "Blue")))
+  '((t (:foreground "Blue")))
   "*Face used for file names (without suffixes) in dired buffers."
   :group 'anything)
 
 (defface anything-dir-priv
-    '((t (:foreground "DarkRed" :background "LightGray")))
+  '((t (:foreground "DarkRed" :background "LightGray")))
   "*Face used for directory privilege indicator (d) in dired buffers."
   :group 'anything)
 
@@ -1116,8 +1116,8 @@ http://www.nongnu.org/bm/")
                     (let (lis-all lis-ssh)
                       (setq lis-all (bookmark-all-names))
                       (setq lis-ssh (loop for i in lis-all
-                                       if (string-match "^(ssh)" i)
-                                       collect i))
+                                          if (string-match "^(ssh)" i)
+                                          collect i))
                       (sort lis-ssh 'string-lessp))))
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -1132,11 +1132,11 @@ http://www.nongnu.org/bm/")
                     (let (lis-all lis-su)
                       (setq lis-all (bookmark-all-names))
                       (setq lis-su (loop for i in lis-all
-                                      if (string-match "^(su)" i)
-                                      collect i))
+                                         if (string-match "^(su)" i)
+                                         collect i))
                       (sort lis-su 'string-lessp))))
     (candidate-transformer anything-c-highlight-bookmark-su)
-    
+
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 ;; (anything 'anything-c-source-bookmarks-su)
@@ -1181,9 +1181,9 @@ http://www.nongnu.org/bm/")
                     (let (lis-all lis-loc)
                       (setq lis-all (bookmark-all-names))
                       (setq lis-loc (loop for i in lis-all
-                                       if (and (not (string-match "^(ssh)" i))
-                                               (not (string-match "^(su)" i)))
-                                       collect i))
+                                          if (and (not (string-match "^(ssh)" i))
+                                                  (not (string-match "^(su)" i)))
+                                          collect i))
                       (sort lis-loc 'string-lessp))))
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark))
@@ -1241,7 +1241,7 @@ http://www.nongnu.org/bm/")
     (persistent-action . (lambda (candidate)
                            (if current-prefix-arg
                                (anything-c-w3m-browse-bookmark candidate t)
-                               (anything-c-w3m-browse-bookmark candidate nil t))))
+                             (anything-c-w3m-browse-bookmark candidate nil t))))
     (delayed)))
 
 ;; (anything 'anything-c-source-w3m-bookmarks)
@@ -1264,8 +1264,8 @@ http://www.nongnu.org/bm/")
 (defun anything-c-highlight-w3m-bookmarks (books)
   (loop for i in books
         collect (propertize i
-                           'face 'anything-w3m-bookmarks-face
-                           'help-echo (anything-c-w3m-bookmarks-get-value i))))
+                            'face 'anything-w3m-bookmarks-face
+                            'help-echo (anything-c-w3m-bookmarks-get-value i))))
 
 
 (defun anything-c-w3m-delete-bookmark (elm)
@@ -1287,7 +1287,7 @@ http://www.nongnu.org/bm/")
       (find-file-literally w3m-bookmark-file)
       (goto-char (point-min))
       (when (re-search-forward (concat elm "<") nil t)
-        (goto-char (1- (point))) 
+        (goto-char (1- (point)))
         (delete-backward-char (length old-title))
         (insert new-title))
       (save-buffer (current-buffer))
@@ -1300,7 +1300,7 @@ http://www.nongnu.org/bm/")
     (init . (anything-c-elisp-library-scan-init))
     (candidates-in-buffer)
     (action ("Find library" . (lambda (candidate)
-                                  (find-file (find-library-name candidate))))
+                                (find-file (find-library-name candidate))))
             ("Find library other window" . (lambda (candidate)
                                              (find-file-other-window (find-library-name candidate))))
             ("Load library" . (lambda (candidate)
@@ -1519,17 +1519,18 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
 (defun anything-c-simple-call-tree-functions-callers-init ()
   (require 'simple-call-tree)
-  (when (anything-current-buffer-is-modified)
-    (simple-call-tree-analyze)
-    (let ((list (simple-call-tree-invert simple-call-tree-alist)))
-      (with-current-buffer (anything-candidate-buffer 'local)
-        (dolist (entry list)
-          (let ((callers (mapconcat #'identity (cdr entry) ", ")))
-            (insert (car entry) " is called by "
-                    (if (string= callers "")
-                        "no functions."
-                      callers)
-                    ".\n")))))))
+  (with-no-warnings
+    (when (anything-current-buffer-is-modified)
+      (simple-call-tree-analyze)
+      (let ((list (simple-call-tree-invert simple-call-tree-alist)))
+        (with-current-buffer (anything-candidate-buffer 'local)
+          (dolist (entry list)
+            (let ((callers (mapconcat #'identity (cdr entry) ", ")))
+              (insert (car entry) " is called by "
+                      (if (string= callers "")
+                          "no functions."
+                        callers)
+                      ".\n"))))))))
 ;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
 ;;; Function calls
@@ -1543,17 +1544,18 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
 (defun anything-c-simple-call-tree-callers-functions-init ()
   (require 'simple-call-tree)
-  (when (anything-current-buffer-is-modified)
-    (simple-call-tree-analyze)
-    (let ((list simple-call-tree-alist))
-      (with-current-buffer (anything-candidate-buffer 'local)
-        (dolist (entry list)
-          (let ((functions (mapconcat #'identity (cdr entry) ", ")))
-            (insert (car entry) " calls "
-                    (if (string= functions "")
-                        "no functions"
-                      functions)
-                    ".\n")))))))
+  (with-no-warnings
+    (when (anything-current-buffer-is-modified)
+      (simple-call-tree-analyze)
+      (let ((list simple-call-tree-alist))
+        (with-current-buffer (anything-candidate-buffer 'local)
+          (dolist (entry list)
+            (let ((functions (mapconcat #'identity (cdr entry) ", ")))
+              (insert (car entry) " calls "
+                      (if (string= functions "")
+                          "no functions"
+                        functions)
+                      ".\n"))))))))
 
 ;; (anything 'anything-c-source-simple-call-tree-callers-functions)
 
@@ -1792,10 +1794,10 @@ If this action is executed just after `yank', replace with STR as yanked string.
                                        'insert-register)))
                               ((stringp val)
                                (list ;; without properties
-                                     (substring-no-properties val) 
-                                     'insert-register
-                                     'append-to-register
-                                     'prepend-to-register))
+                                (substring-no-properties val)
+                                'insert-register
+                                'append-to-register
+                                'prepend-to-register))
                               (t
                                "GARBAGE!"))
         collect (cons (format "register %3s: %s" key (car string-actions))
@@ -2008,8 +2010,7 @@ removed."
                                              (calc-eval anything-pattern)
                                            (error "error")))))
     (volatile)
-    (action ("Copy result to kill-ring" . (lambda (elm)
-                                     (kill-new elm))))))
+    (action ("Copy result to kill-ring" . kill-new))))
 ;; (anything 'anything-c-source-calculation-result)
 
 ;;; Google Suggestions
@@ -2310,8 +2311,8 @@ See also `anything-create--actions'."
                              ,elm))
                     (font-lock-add-keywords nil `((,elm . font-lock-variable-name-face)))
                     (font-lock-mode 1)))))))
-               
-                                  
+
+
 ;; (anything 'anything-c-source-use-flags)
 
 ;; DRY
@@ -2339,7 +2340,7 @@ See also `anything-create--actions'."
     (with-current-buffer buf
       (dolist (i anything-c-gentoo-use-flags)
         (insert (concat i "\n"))))))
-      
+
 
 (defun anything-c-gentoo-setup-use-flags-cache ()
   "Setup `anything-c-gentoo-use-flags'"
@@ -2383,10 +2384,10 @@ See also `anything-create--actions'."
 (defun anything-c-highlight-local-use (use-flags)
   (let ((local-uses (anything-c-gentoo-get-local-use)))
     (loop for i in use-flags
-                       if (member i local-uses)
-                       collect (propertize i 'face 'anything-gentoo-match-face)
-                       else
-                       collect i)))
+          if (member i local-uses)
+          collect (propertize i 'face 'anything-gentoo-match-face)
+          else
+          collect i)))
 
 (defvar anything-c-source-emacs-process
   '((name . "Emacs Process")
@@ -2395,7 +2396,7 @@ See also `anything-create--actions'."
                             (process-list))))
     (action . (("Kill Process" . (lambda (elm)
                                    (delete-process (get-process elm))))))))
-                    
+
 ;; (anything 'anything-c-source-emacs-process)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2644,8 +2645,8 @@ It is added to `extended-command-history'.
       (setq anything-match-line-overlay
             (make-overlay
              (line-beginning-position) (1+ (line-end-position))))
-      (move-overlay anything-match-line-overlay
-                    (line-beginning-position) (1+ (line-end-position))))
+    (move-overlay anything-match-line-overlay
+                  (line-beginning-position) (1+ (line-end-position))))
   (overlay-put anything-match-line-overlay
                'face anything-match-line-overlay-face))
 
@@ -2658,7 +2659,7 @@ It is added to `extended-command-history'.
                                      (when anything-match-line-overlay
                                        (delete-overlay anything-match-line-overlay)
                                        (setq anything-match-line-overlay nil))))
-                                     
+
 (add-hook 'anything-after-persistent-action-hook #'(lambda ()
                                                      (when anything-match-line-overlay
                                                        (delete-overlay anything-match-line-overlay)
