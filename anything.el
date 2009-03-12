@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.173 2009-03-11 08:10:32 rubikitch Exp $
+;; $Id: anything.el,v 1.174 2009-03-12 19:12:24 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.173  2009-03-11 08:10:32  rubikitch
+;; Revision 1.174  2009-03-12 19:12:24  rubikitch
+;; New API: `define-anything-type-attribute'
+;;
+;; Revision 1.173  2009/03/11 08:10:32  rubikitch
 ;; Update doc
 ;;
 ;; Revision 1.172  2009/03/10 17:11:58  rubikitch
@@ -799,7 +802,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.173 2009-03-11 08:10:32 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.174 2009-03-12 19:12:24 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1679,6 +1682,29 @@ The action is to call FUNCTION with arguments ARGS."
   (apply 'run-with-idle-timer 0 nil function args)
   (anything-exit-minibuffer))
 
+(defun define-anything-type-attribute (type definition &optional doc)
+  "Register type attribute of TYPE as DEFINITION with DOC.
+DOC is displayed in `anything-type-attributes' docstring.
+
+Use this function is better than setting `anything-type-attributes' directly."
+  (anything-add-type-attribute type definition)
+  (and doc (anything-document-type-attribute type doc))
+  nil)
+
+(defvar anything-additional-attributes nil)
+(defun anything-document-attribute (attribute short-doc &optional long-doc)
+  "Register ATTRIBUTE documentation introduced by plug-in.
+SHORT-DOC is displayed beside attribute name.
+LONG-DOC is displayed below attribute name and short documentation."
+  (if long-doc
+      (setq short-doc (concat "(" short-doc ")"))
+    (setq long-doc short-doc
+          short-doc ""))
+  (add-to-list 'anything-additional-attributes attribute t)
+  (put attribute 'anything-attrdoc
+       (concat "- " (symbol-name attribute) " " short-doc "\n\n" long-doc "\n")))
+(put 'anything-document-attribute 'lisp-indent-function 2)
+
 ;; (@* "Core: tools")
 (defun anything-current-frame/window-configuration ()
   (funcall (cdr anything-save-configuration-functions)))
@@ -1968,20 +1994,8 @@ Anything plug-ins are realized by this function."
    sources))  
 
 ;; (@* "Core: plug-in attribute documentation hack")
-(defvar anything-additional-attributes nil)
-(defun anything-document-attribute (attribute short-doc &optional long-doc)
-  "Register ATTRIBUTE documentation introduced by plug-in.
-SHORT-DOC is displayed beside attribute name.
-LONG-DOC is displayed below attribute name and short documentation."
-  (if long-doc
-      (setq short-doc (concat "(" short-doc ")"))
-    (setq long-doc short-doc
-          short-doc ""))
-  (add-to-list 'anything-additional-attributes attribute t)
-  (put attribute 'anything-attrdoc
-       (concat "- " (symbol-name attribute) " " short-doc "\n\n" long-doc "\n")))
-(put 'anything-document-attribute 'lisp-indent-function 2)
 
+;; `anything-document-attribute' is public API.
 (defadvice documentation-property (after anything-document-attribute activate)
   "Hack to display plug-in attributes' documentation as `anything-sources' docstring."
   (when (eq symbol 'anything-sources)
@@ -1993,8 +2007,6 @@ LONG-DOC is displayed below attribute name and short documentation."
 ;; (describe-variable 'anything-sources)
 ;; (documentation-property 'anything-sources 'variable-documentation)
 ;; (progn (ad-disable-advice 'documentation-property 'after 'anything-document-attribute) (ad-update 'documentation-property)) 
-
-
 
 ;; (@* "Core: all candidates")
 (defun anything-get-candidates (source)
@@ -2669,6 +2681,27 @@ UNIT and DIRECTION."
   (anything-aif (assoc-default 'type source)
       (append source (assoc-default it anything-type-attributes) nil)
     source))
+
+;; `define-anything-type-attribute' is public API.
+
+(defun anything-add-type-attribute (type definition)
+  (anything-aif (assq type anything-type-attributes)
+      (setq anything-type-attributes (delete it anything-type-attributes)))
+  (push (cons type definition) anything-type-attributes))
+
+(defvar anything-types nil)
+(defun anything-document-type-attribute (type doc)
+  (add-to-list 'anything-types type t)
+  (put type 'anything-typeattrdoc
+       (concat "- " (symbol-name type) "\n\n" doc "\n")))
+
+(defadvice documentation-property (after anything-document-type-attribute activate)
+  "Hack to display type attributes' documentation as `anything-type-attributes' docstring."
+  (when (eq symbol 'anything-type-attributes)
+    (setq ad-return-value
+          (concat ad-return-value "\n\n++++ Types currently defined ++++\n"
+                  (mapconcat (lambda (sym) (get sym 'anything-typeattrdoc))
+                             anything-types "\n")))))
 
 ;; (@* "Built-in plug-in: dummy")
 (defun anything-dummy-candidate (candidate source)
@@ -4812,6 +4845,21 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                     (lambda (a s) (push '("view-file" . view-file) a))
                     (lambda (a s) (push '("find-file" . find-file) a)))))
         (anything-get-action))
+      (desc "define-anything-type-attribute")
+      (expect '((file (action . find-file)))
+        (let (anything-type-attributes)
+          (define-anything-type-attribute 'file '((action . find-file)))
+          anything-type-attributes))
+      (expect '((file (action . find-file)))
+        (let ((anything-type-attributes '((file (action . view-file)))))
+          (define-anything-type-attribute 'file '((action . find-file)))
+          anything-type-attributes))
+      (expect '((file (action . find-file))
+                (buffer (action . switch-to-buffer)))
+        (let (anything-type-attributes)
+          (define-anything-type-attribute 'buffer '((action . switch-to-buffer)))
+          (define-anything-type-attribute 'file '((action . find-file)))
+          anything-type-attributes))
       )))
 
 
