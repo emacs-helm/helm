@@ -3034,71 +3034,85 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Type Attributes
-(setq anything-type-attributes
-      `((buffer
-         (action
-          ,@(if pop-up-frames
-                '(("Switch to buffer other window" . switch-to-buffer-other-window)
-                  ("Switch to buffer" . switch-to-buffer))
-              '(("Switch to buffer" . switch-to-buffer)
-                ("Switch to buffer other window" . switch-to-buffer-other-window)
-                ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
-          ("Display buffer"   . display-buffer)
-          ("Revert buffer" . (lambda (elm)
-                               (with-current-buffer elm
-                                 (when (buffer-modified-p)
-                                   (revert-buffer t t)))))
-          ("Kill buffer"      . kill-buffer))
-         (candidate-transformer . anything-c-skip-boring-buffers))
-        (file
-         (action
-          ,@(if pop-up-frames
-                '(("Find file other window" . find-file-other-window)
-                  ("Find file" . find-file))
-              '(("Find file" . find-file)
-                ("Find file other window" . find-file-other-window)
-                ("Find file other frame" . find-file-other-frame)))
-          ("Open dired in file's directory" . anything-c-open-dired)
-          ("Delete file" . anything-c-delete-file)
-          ("Open file externally" . anything-c-open-file-externally)
-          ("Open file with default tool" . anything-c-open-file-with-default-tool))
-         (action-transformer anything-c-transform-file-load-el
-                             anything-c-transform-file-browse-url)
-         (candidate-transformer anything-c-w32-pathname-transformer
-                                anything-c-skip-current-file
-                                anything-c-skip-boring-files
-                                anything-c-shorten-home-path))
-        (command (action ("Call interactively" . anything-c-call-interactively)
-                         ("Describe command" . (lambda (command-name)
-                                                 (describe-function (intern command-name))))
-                         ("Add command to kill ring" . kill-new)
-                         ("Go to command's definition" . (lambda (command-name)
-                                                           (find-function
-                                                            (intern command-name)))))
-                 ;; Sort commands according to their usage count.
-                 (filtered-candidate-transformer . anything-c-adaptive-sort))
-        (function (action ("Describe function" . (lambda (function-name)
-                                                   (describe-function (intern function-name))))
-                          ("Add function to kill ring" . kill-new)
-                          ("Go to function's definition" . (lambda (function-name)
-                                                             (find-function
-                                                              (intern function-name)))))
-                  (action-transformer anything-c-transform-function-call-interactively)
-                  (candidate-transformer anything-c-mark-interactive-functions))
-        (sexp (action ("Eval s-expression" . (lambda (c)
-                                               (eval (read c))))
-                      ("Add s-expression to kill ring" . kill-new))
-              (action-transformer anything-c-transform-sexp-eval-command-sexp))
-        ;; (bookmark (action ("Jump to bookmark" . bookmark-jump)
-        ;;                   ("Delete bookmark" . bookmark-delete)))
-        (bookmark (action ("Jump to bookmark" . (lambda (candidate)
-                                                  (bookmark-jump candidate)
-                                                  (anything-update)))
-                          ("Delete bookmark" . bookmark-delete)
-                          ("Rename bookmark" . bookmark-rename)
-                          ("Relocate bookmark" . bookmark-relocate)))
-        (line (display-to-real . anything-c-display-to-real-line)
-              (action ("Go to Line" . anything-c-action-line-goto)))))
+(define-anything-type-attribute 'buffer
+  `((action
+     ,@(if pop-up-frames
+           '(("Switch to buffer other window" . switch-to-buffer-other-window)
+             ("Switch to buffer" . switch-to-buffer))
+         '(("Switch to buffer" . switch-to-buffer)
+           ("Switch to buffer other window" . switch-to-buffer-other-window)
+           ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
+     ("Display buffer"   . display-buffer)
+     ("Revert buffer" . (lambda (elm)
+                          (with-current-buffer elm
+                            (when (buffer-modified-p)
+                              (revert-buffer t t)))))
+     ("Kill buffer"      . kill-buffer))
+    (candidate-transformer . anything-c-skip-boring-buffers))
+  "Buffer or buffer name.")
+
+(define-anything-type-attribute 'file
+  `((action
+     ,@(if pop-up-frames
+           '(("Find file other window" . find-file-other-window)
+             ("Find file" . find-file))
+         '(("Find file" . find-file)
+           ("Find file other window" . find-file-other-window)
+           ("Find file other frame" . find-file-other-frame)))
+     ("Open dired in file's directory" . anything-c-open-dired)
+     ("Delete file" . anything-c-delete-file)
+     ("Open file externally" . anything-c-open-file-externally)
+     ("Open file with default tool" . anything-c-open-file-with-default-tool))
+    (action-transformer anything-c-transform-file-load-el
+                        anything-c-transform-file-browse-url)
+    (candidate-transformer anything-c-w32-pathname-transformer
+                           anything-c-skip-current-file
+                           anything-c-skip-boring-files
+                           anything-c-shorten-home-path))
+  "File name.")
+
+(define-anything-type-attribute 'command
+  `((action ("Call interactively" . anything-c-call-interactively)
+            ("Describe command" . (lambda (command-name)
+                                    (describe-function (intern command-name))))
+            ("Add command to kill ring" . kill-new)
+            ("Go to command's definition" . (lambda (command-name)
+                                              (find-function
+                                               (intern command-name)))))
+    ;; Sort commands according to their usage count.
+    (filtered-candidate-transformer . anything-c-adaptive-sort))
+  "Command name.")
+
+(define-anything-type-attribute 'function
+  '((action ("Describe function" . (lambda (function-name)
+                                     (describe-function (intern function-name))))
+            ("Add function to kill ring" . kill-new)
+            ("Go to function's definition" . (lambda (function-name)
+                                               (find-function
+                                                (intern function-name)))))
+    (action-transformer anything-c-transform-function-call-interactively)
+    (candidate-transformer anything-c-mark-interactive-functions))
+  "Function name.")
+
+(define-anything-type-attribute 'sexp
+  '((action ("Eval s-expression" . (lambda (c) (eval (read c))))
+            ("Add s-expression to kill ring" . kill-new))
+    (action-transformer anything-c-transform-sexp-eval-command-sexp))
+  "String representing S-Expressions.")
+
+(define-anything-type-attribute 'bookmark
+  '((action ("Jump to bookmark" . (lambda (candidate)
+                                    (bookmark-jump candidate)
+                                    (anything-update)))
+            ("Delete bookmark" . bookmark-delete)
+            ("Rename bookmark" . bookmark-rename)
+            ("Relocate bookmark" . bookmark-relocate)))
+  "Bookmark name.")
+
+(define-anything-type-attribute 'line
+  '((display-to-real . anything-c-display-to-real-line)
+    (action ("Go to Line" . anything-c-action-line-goto)))
+  "LINENO:CONTENT string, eg. \"  16:foo\".")
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
