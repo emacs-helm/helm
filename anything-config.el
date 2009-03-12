@@ -2762,7 +2762,7 @@ other candidate transformers."
   (let (list)
     (loop for function in functions
           do (push (cons (concat function
-                                 (when (commandp (intern function)) " (i)"))
+                                 (when (commandp (intern-soft function)) " (i)"))
                          function)
                    list)
           finally (return (nreverse list)))))
