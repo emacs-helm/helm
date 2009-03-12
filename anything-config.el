@@ -2263,6 +2263,8 @@ See also `anything-create--actions'."
                                    (if (member elm anything-c-cache-world)
                                        (anything-c-gentoo-eshell-action elm "genlop -qe")
                                        (message "No infos on packages not yet installed"))))
+               ("Copy in kill-ring" . kill-new)
+               ("insert at point" . insert)
                ("Browse HomePage" . (lambda (elm)
                                       (browse-url (car (anything-c-gentoo-get-url elm)))))
                ("Show extra infos" . (lambda (elm)
