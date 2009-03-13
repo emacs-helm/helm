@@ -2272,34 +2272,31 @@ See also `anything-create--actions'."
                                            (anything-c-gentoo-eshell-action elm "genlop -qi")
                                            (message "No infos on packages not yet installed"))))
                ("Show use flags" . (lambda (elm)
-                                     (if (member elm anything-c-cache-world)
-                                         (progn
-                                           (switch-to-buffer anything-c-gentoo-buffer)
-                                           (erase-buffer)
-                                           (apply #'call-process "equery" nil t nil
-                                                  `("-C"
-                                                    "u"
-                                                    ,elm))
-                                           (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
-                                           (font-lock-mode 1))
-                                         (message "No infos on packages not yet installed"))))
+                                     (anything-c-gentoo-default-action elm "equery" "-C" "u")
+                                     (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
+                                     (font-lock-mode 1)))
                ("Run emerge pretend" . (lambda (elm)
                                          (anything-c-gentoo-eshell-action elm "emerge -p")))
                ("Show dependencies" . (lambda (elm)
-                                        (if (member elm anything-c-cache-world)
-                                            (progn
-                                              (switch-to-buffer anything-c-gentoo-buffer)
-                                              (erase-buffer)
-                                              (apply #'call-process "equery" nil t nil
-                                                     `("-C"
-                                                       "d"
-                                                       ,elm)))
-                                            (message "No infos on packages not yet installed"))))
+                                        (anything-c-gentoo-default-action elm "equery" "-C" "d")))
+               ("Show related files" . (lambda (elm)
+                                         (anything-c-gentoo-default-action elm "equery" "files")))
                ("Update" . (lambda (elm)
                              (anything-c-gentoo-setup-cache)
                              (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
 
 ;; (anything 'anything-c-source-gentoo)
+
+(defun anything-c-gentoo-default-action (elm command &rest args)
+  "Gentoo default action that use `anything-c-gentoo-buffer'."
+  (if (member elm anything-c-cache-world)
+      (progn
+        (switch-to-buffer anything-c-gentoo-buffer)
+        (erase-buffer)
+        (let ((com-list (append args (list elm))))
+          (apply #'call-process command nil t nil
+                 com-list)))
+      (message "No infos on packages not yet installed")))
 
 (defvar anything-c-source-use-flags
   '((name . "Use Flags")
