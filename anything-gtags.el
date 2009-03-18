@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.14 2009-01-27 09:51:34 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.15 2009-03-18 17:31:39 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -28,10 +28,25 @@
 ;; * `anything-c-source-gtags-select' is a source for `gtags-find-tag'.
 ;; * Replace *GTAGS SELECT* buffer with `anything' interface.
 
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-gtags-select'
+;;    Tag jump using gtags and `anything'.
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.14  2009-01-27 09:51:34  rubikitch
+;; Revision 1.15  2009-03-18 17:31:39  rubikitch
+;; Apply SUGAWARA's patch to suppress filename output when `anything-gtags-classify' is non-nil.
+;;
+;; Revision 1.14  2009/01/27 09:51:34  rubikitch
 ;; * Push context when jumping with `anything-gtags-select'.
 ;; * New variable: `anything-gtags-enable-initial-pattern'.
 ;;
@@ -173,8 +188,13 @@
          (unless (equal prev-filename filename)
            (setq files (cons filename files))
            (erase-buffer))
-         (insert-buffer-substring buffer bol eol)
-         (insert "\n"))
+	 (let ((pos (point)))
+	   (insert-buffer-substring buffer bol eol)
+	   (goto-char pos)
+	   (while (re-search-forward filename nil t)
+	     (delete-region (match-beginning 0) (match-end 0)))
+	   (goto-char (point-max)))
+	 (insert "\n"))
        (forward-line 1)
        (setq prev-filename filename))
       (anything-set-sources
