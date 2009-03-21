@@ -2126,22 +2126,24 @@ A list of search engines."
              "-p"
              ,anything-pattern))
     (buffer-string)))
-  
+
+(defvar anything-c-surfraw-elvi nil)
 (defvar anything-c-surfraw-cache nil)
 (defvar anything-c-source-surfraw
   '((name . "Surfraw")
     (init . (lambda ()
               (unless anything-c-surfraw-cache
-                (let ((sr-alist (anything-c-build-elvi-alist)))
-                  (setq anything-c-surfraw-cache
-                        (loop for i in sr-alist 
-                           if (car i)
-                           collect (car i)))))))
+                (setq anything-c-surfraw-elvi (anything-c-build-elvi-alist))
+                (setq anything-c-surfraw-cache
+                      (loop for i in anything-c-surfraw-elvi 
+                         if (car i)
+                         collect (car i))))))
     (candidates . (lambda ()
                     (loop for i in anything-c-surfraw-cache
                        for s = (anything-c-surfraw-get-url i anything-pattern)
                        collect (concat (propertize i
-                                                   'face '((:foreground "green")))
+                                                   'face '((:foreground "green"))
+                                                   'help-echo (cdr (assoc i anything-c-surfraw-elvi)))
                                        ">>>" (replace-regexp-in-string "\n" "" s)))))
     (action . (("Browse" . (lambda (candidate)
                              (let ((url (second (split-string candidate ">>>"))))
