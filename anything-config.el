@@ -2117,7 +2117,7 @@ A list of search engines."
                collect (cons (first line) (mapconcat #'(lambda (x) x) (cdr line) " "))))))
     elvi-alist))
 
-(defun anything-c-surfraw-sort-elvi ()
+(defun anything-c-surfraw-sort-elvi (&optional only-fav)
   "Sort elvi alist according to `anything-c-surfraw-favorites'."
   (let* ((elvi-alist (anything-c-build-elvi-alist))
          (fav-alist (loop for j in anything-c-surfraw-favorites
@@ -2125,7 +2125,9 @@ A list of search engines."
          (rest-elvi (loop for i in elvi-alist
                          if (not (member i fav-alist))
                          collect i)))
-    (append fav-alist rest-elvi)))
+    (if only-fav
+        fav-alist
+        (append fav-alist rest-elvi))))
 
 (defun anything-c-surfraw-get-url (engine pattern)
   "Get search url from `engine' for `anything-pattern'."
@@ -2136,14 +2138,25 @@ A list of search engines."
              ,anything-pattern))
     (buffer-string)))
 
-(defvar anything-c-surfraw-favorites '("google" "wikipedia"))
+
+;; user variables
+(defvar anything-c-surfraw-favorites '("google" "wikipedia"
+                                       "yahoo" "translate"
+                                       "codesearch" "genpkg"
+                                       "genportage" "fast" 
+                                       "filesearching" "currency")
+  "All elements of this list will appear first in results.")
+(defvar anything-c-surfraw-use-only-favorites nil
+  "If non-nil use only `anything-c-surfraw-favorites'.")
+
 (defvar anything-c-surfraw-elvi nil)
 (defvar anything-c-surfraw-cache nil)
 (defvar anything-c-source-surfraw
   '((name . "Surfraw")
     (init . (lambda ()
               (unless anything-c-surfraw-cache
-                (setq anything-c-surfraw-elvi (anything-c-surfraw-sort-elvi))
+                (setq anything-c-surfraw-elvi (anything-c-surfraw-sort-elvi
+                                               anything-c-surfraw-use-only-favorites))
                 (setq anything-c-surfraw-cache
                       (loop for i in anything-c-surfraw-elvi 
                          if (car i)
