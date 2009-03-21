@@ -2117,6 +2117,15 @@ A list of search engines."
                collect (cons (first line) (mapconcat #'(lambda (x) x) (cdr line) " "))))))
     elvi-alist))
 
+(defun anything-c-surfraw-sort-elvi ()
+  "Sort elvi alist according to `anything-c-surfraw-favorites'."
+  (let* ((elvi-alist (anything-c-build-elvi-alist))
+         (fav-alist (loop for j in anything-c-surfraw-favorites
+                      collect (assoc j elvi-alist)))
+         (rest-elvi (loop for i in elvi-alist
+                         if (not (member i fav-alist))
+                         collect i)))
+    (append fav-alist rest-elvi)))
 
 (defun anything-c-surfraw-get-url (engine pattern)
   "Get search url from `engine' for `anything-pattern'."
@@ -2127,13 +2136,14 @@ A list of search engines."
              ,anything-pattern))
     (buffer-string)))
 
+(defvar anything-c-surfraw-favorites '("google" "wikipedia"))
 (defvar anything-c-surfraw-elvi nil)
 (defvar anything-c-surfraw-cache nil)
 (defvar anything-c-source-surfraw
   '((name . "Surfraw")
     (init . (lambda ()
               (unless anything-c-surfraw-cache
-                (setq anything-c-surfraw-elvi (anything-c-build-elvi-alist))
+                (setq anything-c-surfraw-elvi (anything-c-surfraw-sort-elvi))
                 (setq anything-c-surfraw-cache
                       (loop for i in anything-c-surfraw-elvi 
                          if (car i)
