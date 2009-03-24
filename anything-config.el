@@ -2657,7 +2657,7 @@ directory, open this directory."
   (anything-aif (anything-attr 'after-jump-hook)
       (funcall it))
   (when anything-in-persistent-action
-    (anything-persistent-highlight-point (point-at-bol) (point-at-eol))))
+    (anything-match-line-color-current-line)))
 
 (defun anything-find-file-as-root (candidate)
   (find-file (concat "/su::" (expand-file-name candidate))))
@@ -2723,33 +2723,21 @@ It is added to `extended-command-history'.
     (call-interactively (anything-c-symbolify cmd-or-name))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Persistent Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar anything-c-persistent-highlight-overlay
-  (make-overlay (point) (point)))
-
-(defun anything-persistent-highlight-point (start &optional end buf face rec)
-  (goto-char start)
-  (when (overlayp anything-c-persistent-highlight-overlay)
-    (move-overlay anything-c-persistent-highlight-overlay
-                  start
-                  (or end (line-end-position))
-                  buf))
-  (overlay-put anything-c-persistent-highlight-overlay 'face (or face 'highlight))
-  (when rec
-    (recenter)))
-
-(add-hook 'anything-cleanup-hook
-          (lambda ()
-            (when (overlayp anything-c-persistent-highlight-overlay)
-              (delete-overlay anything-c-persistent-highlight-overlay))))
+(defalias 'anything-persistent-highlight-point 'anything-match-line-color-current-line)
 
 (defvar anything-match-line-overlay-face nil)
 (defvar anything-match-line-overlay (make-overlay (point) (point)))
-(defun anything-match-line-color-current-line ()
+(defun anything-match-line-color-current-line (&optional start end buf face rec)
   "Highlight and underline current position"
   (move-overlay anything-match-line-overlay
-                (line-beginning-position) (1+ (line-end-position)))
+                (or start (line-beginning-position))
+                (or end (1+ (line-end-position)))
+                buf)
   (overlay-put anything-match-line-overlay
-               'face anything-match-line-overlay-face))
+               'face (or face anything-match-line-overlay-face))
+  (when rec
+    (goto-char start)
+    (recenter)))
 
 (defface anything-overlay-line-face '((t (:background "IndianRed4" :underline t)))
   "Face for source header in the anything buffer." :group 'anything)
