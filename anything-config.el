@@ -2743,15 +2743,11 @@ It is added to `extended-command-history'.
               (delete-overlay anything-c-persistent-highlight-overlay))))
 
 (defvar anything-match-line-overlay-face nil)
-(defvar anything-match-line-overlay nil)
+(defvar anything-match-line-overlay (make-overlay (point) (point)))
 (defun anything-match-line-color-current-line ()
   "Highlight and underline current position"
-  (if (not anything-match-line-overlay)
-      (setq anything-match-line-overlay
-            (make-overlay
-             (line-beginning-position) (1+ (line-end-position))))
-    (move-overlay anything-match-line-overlay
-                  (line-beginning-position) (1+ (line-end-position))))
+  (move-overlay anything-match-line-overlay
+                (line-beginning-position) (1+ (line-end-position)))
   (overlay-put anything-match-line-overlay
                'face anything-match-line-overlay-face))
 
@@ -2762,8 +2758,7 @@ It is added to `extended-command-history'.
 
 (add-hook 'anything-cleanup-hook #'(lambda ()
                                      (when anything-match-line-overlay
-                                       (delete-overlay anything-match-line-overlay)
-                                       (setq anything-match-line-overlay nil))))
+                                       (delete-overlay anything-match-line-overlay))))
 
 (add-hook 'anything-after-persistent-action-hook #'(lambda ()
                                                      (when anything-match-line-overlay
