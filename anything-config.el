@@ -2797,21 +2797,24 @@ It is added to `extended-command-history'.
 ;; (anything-c-set-variable 'hh)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Persistent Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defalias 'anything-persistent-highlight-point 'anything-match-line-color-current-line)
-
 (defvar anything-match-line-overlay-face nil)
-(defvar anything-match-line-overlay (make-overlay (point) (point)))
+(defvar anything-match-line-overlay nil)
+
 (defun anything-match-line-color-current-line (&optional start end buf face rec)
   "Highlight and underline current position"
-  (move-overlay anything-match-line-overlay
-                (or start (line-beginning-position))
-                (or end (1+ (line-end-position)))
-                buf)
+  (let ((args (list (or start (line-beginning-position))
+                    (or end (1+ (line-end-position)))
+                    buf)))
+    (if (not anything-match-line-overlay)
+        (setq anything-match-line-overlay (apply 'make-overlay args))
+      (apply 'move-overlay anything-match-line-overlay args)))
   (overlay-put anything-match-line-overlay
                'face (or face anything-match-line-overlay-face))
   (when rec
     (goto-char start)
     (recenter)))
+
+(defalias 'anything-persistent-highlight-point 'anything-match-line-color-current-line)
 
 (defface anything-overlay-line-face '((t (:background "IndianRed4" :underline t)))
   "Face for source header in the anything buffer." :group 'anything)
@@ -2820,7 +2823,8 @@ It is added to `extended-command-history'.
 
 (add-hook 'anything-cleanup-hook #'(lambda ()
                                      (when anything-match-line-overlay
-                                       (delete-overlay anything-match-line-overlay))))
+                                       (delete-overlay anything-match-line-overlay)
+                                       (setq anything-match-line-overlay nil))))
 
 (add-hook 'anything-after-persistent-action-hook #'(lambda ()
                                                      (when anything-match-line-overlay
