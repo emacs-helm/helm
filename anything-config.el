@@ -389,7 +389,7 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   (anything '(anything-c-source-info-elisp
               anything-c-source-info-cl
               anything-c-source-info-pages)
-            (thing-at-point 'sexp)))
+            (thing-at-point 'symbol)))
 
 (defun anything-show-kill-ring ()
   "Show `kill-ring'. It is drop-in replacement of `yank-pop'.
@@ -1018,16 +1018,12 @@ source.")
                     (loop for i in anything-c-info-cl-fn
                           if (string-match "^* [^ \n]+[^: ]" i)
                           collect (match-string 0 i))))
-    (action . (("Goto Info Node" . (lambda (candidate)
-                                     (Info-find-node "cl" "Function Index")
-                                     (Info-index (replace-regexp-in-string "* " "" candidate))))
-               ("Find Example" . (lambda (candidate)
-                                   (and (fboundp 'traverse-deep-rfind)
-                                        (traverse-deep-rfind traverse-example-directory
-                                                             (replace-regexp-in-string "* " "" candidate)
-                                                             ".el"))))))
+    (action . (lambda (candidate)
+                (Info-find-node "cl" "Function Index")
+                (Info-index (replace-regexp-in-string "* " "" candidate))))
     (volatile)
     (requires-pattern . 2)))
+;; (anything 'anything-c-source-info-cl)
 
 ;;;; <Command>
 ;;; Complex command history
