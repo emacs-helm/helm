@@ -86,6 +86,7 @@
 ;;     `anything-c-source-man-pages'  (Manual Pages)
 ;;     `anything-c-source-info-pages' (Info Pages)
 ;;     `anything-c-source-info-elisp' (Info Elisp)
+;;     `anything-c-source-info-cl'    (Info Common-Lisp)
 ;;  Command:
 ;;     `anything-c-source-complex-command-history'  (Complex Command History)
 ;;     `anything-c-source-extended-command-history' (Emacs Commands History)
