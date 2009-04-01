@@ -233,6 +233,9 @@
 ;;  `anything-kill-ring-threshold'
 ;;    *Minimum length to be listed by `anything-c-source-kill-ring'.
 ;;    default = 10
+;;  `anything-su-or-sudo'
+;;    What command to use for root access.
+;;    default = "su"
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
