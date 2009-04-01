@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.17 2009-03-18 17:50:08 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.18 2009-04-01 14:59:27 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.17  2009-03-18 17:50:08  rubikitch
+;; Revision 1.18  2009-04-01 14:59:27  rubikitch
+;; Disable no-filename display (`anything-gtags-classify' == t) because `aggs-select-it' needs file-name.
+;;
+;; Revision 1.17  2009/03/18 17:50:08  rubikitch
 ;; If `anything-gtags-classify' is t, enable classification and suppress filename output.
 ;; If it is other true symbol, enable classification and output filename.
 ;;
@@ -213,9 +216,10 @@ If it is other symbol, display file name in candidates even if classification is
            (setq files (cons filename files))
            (erase-buffer))
          (save-excursion (insert-buffer-substring buffer bol eol))
-         (when (eq anything-gtags-classify t)
-           (while (search-forward filename nil t)
-            (delete-region (match-beginning 0) (match-end 0))))
+         ;; [2009/04/01] disabled. because aggs-select-it needs filename.
+;;          (when (eq anything-gtags-classify t)
+;;            (while (search-forward filename nil t)
+;;             (delete-region (match-beginning 0) (match-end 0))))
          (goto-char (point-max))
 	 (insert "\n"))
        (forward-line 1)
