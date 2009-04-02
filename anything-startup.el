@@ -95,3 +95,12 @@
 ;;; anything-dabbrev-expand.el integrates dabbrev with anything.
 ;;; [EVAL IT] (install-elisp-from-emacswiki "anything-dabbrev-expand.el")
 (require 'anything-dabbrev-expand nil t)
+
+
+;; anything-c-shell-history.el
+;; anything-extension.el
+;; anything-grep.el
+;; anything-ipa.el
+;; anything-irfc.el
+;; anything-kyr-config.el
+;; anything-kyr.el
