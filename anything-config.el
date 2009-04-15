@@ -1974,7 +1974,7 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
 
 (defvar anything-c-source-emacs-lisp-expectations
   '((name . "Emacs Lisp Expectations")
-    (headline . "(desc \\|(expectations")
+    (headline . "(desc[ ]\\|(expectations")
     (condition . (eq major-mode 'emacs-lisp-mode)))
   "Show descriptions (desc) in Emacs Lisp Expectations.
 
