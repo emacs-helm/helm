@@ -1,8 +1,10 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.3 2009-04-18 10:02:10 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.4 2009-04-18 10:05:15 rubikitch Exp $
 
+;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
 
+;; Original Author: hchbaw
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: anything, convenience, complete
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything-show-completion.el
@@ -32,6 +34,9 @@
 ;; With this plug-in, current selection (`anything-get-selection') is
 ;; displayed at point. This plug-in is automatically detected by user
 ;; program such as anything-complete.el .
+;;
+;; This program is based on an idea by hchbaw.
+;;   http://d.hatena.ne.jp/hchbaw/20090416/1239878984
 
 ;;; For developers:
 ;;
@@ -89,7 +94,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.3  2009-04-18 10:02:10  rubikitch
+;; Revision 1.4  2009-04-18 10:05:15  rubikitch
+;; copyright
+;;
+;; Revision 1.3  2009/04/18 10:02:10  rubikitch
 ;; doc
 ;;
 ;; Revision 1.2  2009/04/18 09:21:14  rubikitch
@@ -102,7 +110,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.3 2009-04-18 10:02:10 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.4 2009-04-18 10:05:15 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
