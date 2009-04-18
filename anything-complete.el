@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.43 2009-02-27 14:45:26 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.44 2009-04-18 10:07:35 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -25,6 +25,26 @@
 ;;; Commentary:
 
 ;; Completion with Anything interface.
+
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-lisp-complete-symbol'
+;;    `lisp-complete-symbol' replacement using `anything'.
+;;  `anything-lisp-complete-symbol-partial-match'
+;;    `lisp-complete-symbol' replacement using `anything' (partial match).
+;;  `anything-apropos'
+;;    `apropos' replacement using `anything'.
+;;  `anything-read-string-mode'
+;;    If this minor mode is on, use `anything' version of `completing-read' and `read-file-name'.
+;;  `anything-complete-shell-history'
+;;    Select a command from shell history and insert it.
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
 
 ;; * `anything-lisp-complete-symbol', `anything-lisp-complete-symbol-partial-match':
 ;;     `lisp-complete-symbol' with `anything'
@@ -70,7 +90,11 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.43  2009-02-27 14:45:26  rubikitch
+;; Revision 1.44  2009-04-18 10:07:35  rubikitch
+;; * auto-document.
+;; * Use anything-show-completion.el if available.
+;;
+;; Revision 1.43  2009/02/27 14:45:26  rubikitch
 ;; Fix a read-only bug in `alcs-make-candidates'.
 ;;
 ;; Revision 1.42  2009/02/19 23:04:33  rubikitch
@@ -253,9 +277,17 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.43 2009-02-27 14:45:26 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.44 2009-04-18 10:07:35 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
+
+;; (@* "overlay")
+(when (require 'anything-show-completion nil t)
+  (dolist (f '(anything-complete
+               anything-lisp-complete-symbol
+               anything-lisp-complete-symbol-partial-match))
+    (use-anything-show-completion f '(length anything-complete-target))))
+
 
 ;; (@* "core")
 (defvar anything-complete-target "")
