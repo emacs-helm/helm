@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.5 2009-04-18 16:11:01 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.6 2009-04-18 16:11:33 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -94,7 +94,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.5  2009-04-18 16:11:01  rubikitch
+;; Revision 1.6  2009-04-18 16:11:33  rubikitch
+;; Removed a mess
+;;
+;; Revision 1.5  2009/04/18 16:11:01  rubikitch
 ;; * Fixed a typo.
 ;; * New function: `anything-show-completion-install'
 ;;
@@ -114,7 +117,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.5 2009-04-18 16:11:01 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.6 2009-04-18 16:11:33 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -173,17 +176,7 @@ It is evaluated in `asc-display-overlay'."
 (defun anything-show-completion-install (prefix-length-sexp)
   (asc-initialize-maybe)
   (move-overlay asc-overlay (point) (point) (current-buffer))
-  (overlay-put asc-overlay 'prefix-length-sexp prefix-length-sexp))(defun use-anything-show-completion (function prefix-length-sexp)
-  "Setup a before advice of FUNCTION to show the `anything-get-selection' contents as an overlay at point.
-
-PREFIX-LENGTH-SEXP is an expression to denote the length of prefix (completing target).
-It is evaluated in `asc-display-overlay'."
-  (eval `(defadvice ,function (before anything-show-completion activate)
-           (asc-initialize-maybe)
-           (move-overlay asc-overlay (point) (point) (current-buffer))
-           (overlay-put asc-overlay 'prefix-length-sexp ',prefix-length-sexp))))
-
-
+  (overlay-put asc-overlay 'prefix-length-sexp prefix-length-sexp))
 
 (provide 'anything-show-completion)
 
