@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.178 2009-04-20 16:18:58 rubikitch Exp $
+;; $Id: anything.el,v 1.179 2009-04-20 16:35:44 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,13 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.178  2009-04-20 16:18:58  rubikitch
+;; Revision 1.179  2009-04-20 16:35:44  rubikitch
+;; New keybindings in anything-map:
+;;   C-c C-d: `anything-delete-current-selection'
+;;   C-c C-y: `anything-yank-selection'
+;;   C-c C-k: `anything-kill-selection-and-quit'
+;;
+;; Revision 1.178  2009/04/20 16:18:58  rubikitch
 ;; New variable: `anything-display-function'
 ;;
 ;; Revision 1.177  2009/04/20 02:17:16  rubikitch
@@ -814,7 +820,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.178 2009-04-20 16:18:58 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.179 2009-04-20 16:35:44 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1281,6 +1287,10 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-s") 'anything-isearch)
     (define-key map (kbd "C-r") 'undefined)
     (define-key map (kbd "C-x C-f") 'anything-quit-and-find-file)
+
+    (define-key map (kbd "C-c C-d") 'anything-delete-current-selection)
+    (define-key map (kbd "C-c C-y") 'anything-yank-selection)
+    (define-key map (kbd "C-c C-k") 'anything-kill-selection-and-quit)
 
     ;; the defalias is needed because commands are bound by name when
     ;; using iswitchb, so only commands having the prefix anything-
