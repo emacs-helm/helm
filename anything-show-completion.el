@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.6 2009-04-18 16:11:33 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.7 2009-04-20 12:21:28 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -94,7 +94,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.6  2009-04-18 16:11:33  rubikitch
+;; Revision 1.7  2009-04-20 12:21:28  rubikitch
+;; Fixed an error when `anything' is invoked for the first time.
+;;
+;; Revision 1.6  2009/04/18 16:11:33  rubikitch
 ;; Removed a mess
 ;;
 ;; Revision 1.5  2009/04/18 16:11:01  rubikitch
@@ -117,7 +120,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.6 2009-04-18 16:11:33 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.7 2009-04-20 12:21:28 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -136,12 +139,14 @@
 (defun asc-initialize-maybe ()
   (unless asc-overlay
     (setq asc-overlay (make-overlay (point-min) (point-min)))
-    (overlay-put asc-overlay 'face anything-show-completion-face)))
-(asc-initialize-maybe)
+    (overlay-put asc-overlay 'face anything-show-completion-face)
+    (asc-cleanup)))
 
 (defun asc-cleanup ()
   (delete-overlay asc-overlay))
 (add-hook 'anything-cleanup-hook 'asc-cleanup)
+
+(asc-initialize-maybe)
 
 (defun asc-overlay-activate-p ()
   "Return non-nil if `anything' is being used for any completionic purposes."
