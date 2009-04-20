@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.44 2009-04-18 10:07:35 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.45 2009-04-20 16:24:33 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.44  2009-04-18 10:07:35  rubikitch
+;; Revision 1.45  2009-04-20 16:24:33  rubikitch
+;; Set anything-samewindow to nil for in-buffer completion.
+;;
+;; Revision 1.44  2009/04/18 10:07:35  rubikitch
 ;; * auto-document.
 ;; * Use anything-show-completion.el if available.
 ;;
@@ -277,7 +280,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.44 2009-04-18 10:07:35 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.45 2009-04-20 16:24:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -321,7 +324,8 @@
   (let ((anything-candidate-number-limit (or limit anything-candidate-number-limit))
         (anything-idle-delay (or idle-delay anything-idle-delay))
         (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
-        (anything-complete-target target))
+        (anything-complete-target target)
+        anything-samewindow)
     (anything-noresume sources nil nil nil nil "*anything complete*")))
 
 
@@ -506,7 +510,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-lisp-complete-symbol-1 (update sources input)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
-  (let ((anything-input-idle-delay
+  (let (anything-samewindow
+        (anything-input-idle-delay
          (or anything-lisp-complete-symbol-input-idle-delay
              anything-input-idle-delay)))
     (anything-noresume sources input nil nil nil "*anything complete*")))
@@ -726,7 +731,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (read-variable "variable: " 'find-file-hooks)
 ;; (read-variable "variable: " )
 (defun anything-read-symbol-1 (prompt buffer default-value)
-  (let (anything-input-idle-delay)
+  (let (anything-input-idle-delay anything-samewindow)
     (intern (or (anything-noresume `(,(ac-default-source
                                        (if default-value (format "%s" default-value)))
                                      ((name . ,prompt)
