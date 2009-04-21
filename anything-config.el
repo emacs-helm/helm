@@ -2191,7 +2191,7 @@ removed."
                                        "yahoo" "translate"
                                        "codesearch" "genpkg"
                                        "genportage" "fast" 
-                                       "filesearching" "currency")
+                                       "currency")
   "All elements of this list will appear first in results.")
 (defvar anything-c-surfraw-use-only-favorites nil
   "If non-nil use only `anything-c-surfraw-favorites'.")
@@ -2266,6 +2266,37 @@ A list of search engines."
     (delayed)))
 
 ;; (anything 'anything-c-source-surfraw)
+
+;;; Emms
+(defvar anything-c-source-emms-streams
+  '((name . "Emms Streams")
+    (init . (lambda ()
+              (emms-stream-init)))
+    (candidates . (lambda ()
+                    (mapcar 'car emms-stream-list)))
+    (action . (("Play" . (lambda (elm)
+                           (let* ((stream (assoc elm emms-stream-list))
+                                  (fn (intern (concat "emms-play-" (symbol-name (car (last stream))))))
+                                  (url (second stream)))
+                             (funcall fn url))))))
+    (volatile)))
+;; (anything 'anything-c-source-emms-streams)
+
+;; Don't forget to set `emms-source-file-default-directory'
+(defvar anything-c-source-emms-dired
+  '((name . "Music Directory")
+    (candidates . (lambda ()
+                    (cddr (directory-files emms-source-file-default-directory))))
+    (action . (("Play Directory" . (lambda (item)
+                                     (emms-play-directory
+                                      (expand-file-name item
+                                                        anything-c-emms-directory))))
+               ("Open dired in file's directory" . (lambda (item)
+                                                     (anything-c-open-dired
+                                                      (expand-file-name item
+                                                                        anything-c-emms-directory))))))
+    (volatile)))
+;; (anything 'anything-c-source-emms-dired)
 
 ;;; Jabber Contacts (jabber.el)
 (defun anything-c-jabber-online-contacts ()
