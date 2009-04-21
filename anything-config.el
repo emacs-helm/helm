@@ -2198,11 +2198,11 @@ A list of search engines."
     (action . (("Play Directory" . (lambda (item)
                                      (emms-play-directory
                                       (expand-file-name item
-                                                        anything-c-emms-directory))))
+                                                        emms-source-file-default-directory))))
                ("Open dired in file's directory" . (lambda (item)
                                                      (anything-c-open-dired
                                                       (expand-file-name item
-                                                                        anything-c-emms-directory))))))
+                                                                        emms-source-file-default-directory))))))
     (volatile)))
 ;; (anything 'anything-c-source-emms-dired)
 
