@@ -2270,6 +2270,30 @@ A list of search engines."
 ;; (anything 'anything-c-source-surfraw)
 
 ;;; Emms
+
+(defun anything-emms-stream-edit-bookmark (elm)
+  "Change the information of current bookmark."
+  (interactive)
+  (let* ((cur-buf anything-current-buffer)
+         (bookmark (assoc elm emms-stream-list))
+         (name     (read-from-minibuffer "Description: "
+                                         (nth 0 bookmark)))
+         (url      (read-from-minibuffer "URL: "
+                                         (nth 1 bookmark)))
+         (fd       (read-from-minibuffer "Feed Descriptor: "
+                                         (int-to-string (nth 2 bookmark))))
+         (type     (read-from-minibuffer "Type (url, streamlist, or lastfm): "
+                                         (format "%s" (car (last bookmark))))))
+    (save-excursion
+      (emms-streams)
+      (when (re-search-forward (concat "^" name) nil t)
+        (beginning-of-line)
+        (emms-stream-delete-bookmark)
+        (emms-stream-add-bookmark name url (string-to-number fd) type)
+        (emms-stream-save-bookmarks-file)
+        (emms-stream-quit)
+        (switch-to-buffer cur-buf)))))
+
 (defvar anything-c-source-emms-streams
   '((name . "Emms Streams")
     (init . (lambda ()
@@ -2280,7 +2304,8 @@ A list of search engines."
                            (let* ((stream (assoc elm emms-stream-list))
                                   (fn (intern (concat "emms-play-" (symbol-name (car (last stream))))))
                                   (url (second stream)))
-                             (funcall fn url))))))
+                             (funcall fn url))))
+               ("Edit" . anything-emms-stream-edit-bookmark)))
     (volatile)))
 ;; (anything 'anything-c-source-emms-streams)
 
