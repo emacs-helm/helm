@@ -196,6 +196,8 @@
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
+;;  `anything-emms-stream-edit-bookmark'
+;;    Change the information of current bookmark.
 ;;  `anything-call-source'
 ;;    Call anything source.
 ;;  `anything-call-source-from-anything'
