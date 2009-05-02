@@ -2067,16 +2067,23 @@ See http://orgmode.org for the latest version.")
 ;; (anything 'anything-c-source-org-headline)
 
 ;;; Anything yaoddmuse
+(defvar anything-yaoddmuse-use-cache-file nil)
 (defvar anything-c-yaoddmuse-cache-file "~/.emacs.d/yaoddmuse-cache.el")
 (defvar anything-c-yaoddmuse-ew-cache nil)
 (defvar anything-c-source-yaoddmuse-emacswiki-edit-or-view
   '((name . "Yaoddmuse Edit or View (EmacsWiki)")
     (candidates . (lambda ()
-                    (unless anything-c-yaoddmuse-ew-cache
-                      (load anything-c-yaoddmuse-cache-file)
-                      (setq anything-c-yaoddmuse-ew-cache
-                            (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                    anything-c-yaoddmuse-ew-cache))
+                    (if anything-yaoddmuse-use-cache-file
+                        (condition-case nil
+                            (progn
+                              (unless anything-c-yaoddmuse-ew-cache
+                                (load anything-c-yaoddmuse-cache-file)
+                                (setq anything-c-yaoddmuse-ew-cache
+                                      (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+                              anything-c-yaoddmuse-ew-cache)
+                          (error nil))
+                        (yaoddmuse-update-pagename t)
+                        (gethash "EmacsWiki" yaoddmuse-pages-hash))))
     (action . (("Edit page" . (lambda (candidate)
                                 (yaoddmuse-edit "EmacsWiki" candidate)))
                ("Browse page" . (lambda (candidate)
@@ -2095,9 +2102,12 @@ See http://orgmode.org for the latest version.")
                ("Install Elisp" . (lambda (elm)
                                     (install-elisp-from-emacswiki elm)))
                ("Update cache" . (lambda (candidate)
-                                   (anything-yaoddmuse-cache-pages t)
-                                   (setq anything-c-yaoddmuse-ew-cache
-                                         (gethash "EmacsWiki" yaoddmuse-pages-hash))))))))
+                                   (if anything-yaoddmuse-use-cache-file
+                                       (progn
+                                         (anything-yaoddmuse-cache-pages t)
+                                         (setq anything-c-yaoddmuse-ew-cache
+                                               (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+                                       (yaoddmuse-update-pagename))))))))
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view)
 
