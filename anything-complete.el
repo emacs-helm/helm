@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.47 2009-05-03 18:42:23 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.48 2009-05-03 19:07:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.47  2009-05-03 18:42:23  rubikitch
+;; Revision 1.48  2009-05-03 19:07:22  rubikitch
+;; anything-complete: `enable-recursive-minibuffers' = t
+;;
+;; Revision 1.47  2009/05/03 18:42:23  rubikitch
 ;; Remove *-partial-match sources.
 ;; They are aliased for compatibility.
 ;;
@@ -287,7 +290,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.47 2009-05-03 18:42:23 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.48 2009-05-03 19:07:22 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -325,6 +328,7 @@
         (anything-idle-delay (or idle-delay anything-idle-delay))
         (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
         (anything-complete-target target)
+        (enable-recursive-minibuffers t)
         anything-samewindow)
     (anything-noresume sources nil nil nil nil "*anything complete*")))
 
