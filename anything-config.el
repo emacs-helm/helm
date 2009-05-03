@@ -2067,6 +2067,8 @@ See http://orgmode.org for the latest version.")
 ;; (anything 'anything-c-source-org-headline)
 
 ;;; Anything yaoddmuse
+;; Be sure to have yaoddmuse.el installed
+;; install-elisp may be required if you want to install elisp file from here.
 (defvar anything-yaoddmuse-use-cache-file nil)
 (defvar anything-c-yaoddmuse-cache-file "~/.emacs.d/yaoddmuse-cache.el")
 (defvar anything-c-yaoddmuse-ew-cache nil)
@@ -2099,15 +2101,14 @@ See http://orgmode.org for the latest version.")
                                (message "Have copy page %s's URL to yank." candidate)))
                ("Create page" . (lambda (candidate)
                                   (yaoddmuse-edit "EmacsWiki" anything-input)))
-               ("Install Elisp" . (lambda (elm)
-                                    (install-elisp-from-emacswiki elm)))
                ("Update cache" . (lambda (candidate)
                                    (if anything-yaoddmuse-use-cache-file
                                        (progn
                                          (anything-yaoddmuse-cache-pages t)
                                          (setq anything-c-yaoddmuse-ew-cache
                                                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                                       (yaoddmuse-update-pagename))))))))
+                                       (yaoddmuse-update-pagename))))))
+    (action-transformer anything-c-yaoddmuse-action-transformer))) 
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view)
 
@@ -2127,7 +2128,16 @@ See http://orgmode.org for the latest version.")
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-post-library)
 
+(defun anything-c-yaoddmuse-action-transformer (actions candidate)
+  "Allow the use of `install-elisp' only on elisp files."
+  (if (string-match "\.el$" candidate)
+      (append actions '(("Install Elisp" . (lambda (elm)
+                                             (install-elisp-from-emacswiki elm)))))
+      actions))
+
 (defun anything-yaoddmuse-cache-pages (&optional load)
+  "Fetch the list of files on emacswiki and create cache file.
+If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
   (interactive)
   (yaoddmuse-update-pagename)
   (save-excursion
