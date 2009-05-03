@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.179 2009-04-20 16:35:44 rubikitch Exp $
+;; $Id: anything.el,v 1.180 2009-05-03 19:03:34 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -242,7 +242,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.179  2009-04-20 16:35:44  rubikitch
+;; Revision 1.180  2009-05-03 19:03:34  rubikitch
+;; Add `anything-input' to `minibuffer-history' even if `anything' is quit.
+;;
+;; Revision 1.179  2009/04/20 16:35:44  rubikitch
 ;; New keybindings in anything-map:
 ;;   C-c C-d: `anything-delete-current-selection'
 ;;   C-c C-y: `anything-yank-selection'
@@ -820,7 +823,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.179 2009-04-20 16:35:44 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.180 2009-05-03 19:03:34 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1874,6 +1877,7 @@ already-bound variables. Yuck!
                   (kill-buffer it))
               (run-hooks 'anything-after-action-hook)))))
     (quit
+     (setq minibuffer-history (cons anything-input minibuffer-history))
      (goto-char (car anything-current-position))
      (set-window-start (selected-window) (cdr anything-current-position))
      nil)))
