@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.45 2009-04-20 16:24:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.46 2009-05-03 18:33:35 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.45  2009-04-20 16:24:33  rubikitch
+;; Revision 1.46  2009-05-03 18:33:35  rubikitch
+;; Remove dependency of `ac-candidates-in-buffer'
+;;
+;; Revision 1.45  2009/04/20 16:24:33  rubikitch
 ;; Set anything-samewindow to nil for in-buffer completion.
 ;;
 ;; Revision 1.44  2009/04/18 10:07:35  rubikitch
@@ -280,7 +283,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.45 2009-04-20 16:24:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.46 2009-05-03 18:33:35 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -294,13 +297,6 @@
 
 ;; (@* "core")
 (defvar anything-complete-target "")
-(defun ac-candidates-in-buffer ()
-  (let ((anything-pattern
-         (if (equal "" anything-complete-target)
-             anything-pattern
-           (concat (if (anything-attr-defined 'prefix-match) "^" "")
-                   anything-complete-target " " anything-pattern))))
-    (anything-candidates-in-buffer)))
 
 (defun ac-insert (candidate)
   (let ((pt (point)))
@@ -311,7 +307,7 @@
 
 (add-to-list 'anything-type-attributes
              '(complete
-               (candidates-in-buffer . ac-candidates-in-buffer)
+               (candidates-in-buffer)
                (action . ac-insert)))
 
 ;; Warning: I'll change this function's interface. DON'T USE IN YOUR PROGRAM!
@@ -394,25 +390,25 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   '((name . "Functions")
     (init . (lambda () (alcs-init alcs-functions-buffer)))
     (prefix-match)
-    (candidates-in-buffer . ac-candidates-in-buffer)
+    (candidates-in-buffer)
     (type . complete-function)))
 (defvar anything-c-source-complete-emacs-commands
   '((name . "Commands")
     (init . (lambda () (alcs-init alcs-commands-buffer)))
     (prefix-match)
-    (candidates-in-buffer . ac-candidates-in-buffer)
+    (candidates-in-buffer)
     (type . complete-function)))
 (defvar anything-c-source-complete-emacs-variables
   '((name . "Variables")
     (init . (lambda () (alcs-init alcs-variables-buffer)))
     (prefix-match)
-    (candidates-in-buffer . ac-candidates-in-buffer)
+    (candidates-in-buffer)
     (type . complete-variable)))
 (defvar anything-c-source-complete-emacs-other-symbols
   '((name . "Other Symbols")
     (init . (lambda () (alcs-init alcs-symbol-buffer)))
     (prefix-match)
-    (candidates-in-buffer . ac-candidates-in-buffer)
+    (candidates-in-buffer)
     (filtered-candidate-transformer . alcs-sort)
     (action . ac-insert)))
 
@@ -519,7 +515,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-lisp-complete-symbol (update)
   "`lisp-complete-symbol' replacement using `anything'."
   (interactive "P")
-  (anything-lisp-complete-symbol-1 update anything-lisp-complete-symbol-sources nil))
+  (anything-lisp-complete-symbol-1 update anything-lisp-complete-symbol-sources
+                                   (anything-aif (symbol-at-point)
+                                       (format "^%s" it)
+                                     "")))
 (defun anything-lisp-complete-symbol-partial-match (update)
   "`lisp-complete-symbol' replacement using `anything' (partial match)."
   (interactive "P")
