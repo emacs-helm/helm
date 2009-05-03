@@ -5,7 +5,6 @@
 ;; Description: Predefined configurations for `anything.el'
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
-;;             Andy Stewart <lazycat.manatee@gmail.com>
 ;;             rubikitch    <rubikitch@ruby-lang.org>
 ;;             Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; Copyright (C) 2007 ~ 2009, Tassilo Horn, all rights reserved.
@@ -201,6 +200,8 @@
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
+;;  `anything-yaoddmuse-cache-pages'
+;;    Fetch the list of files on emacswiki and create cache file.
 ;;  `anything-yaoddmuse-emacswiki-edit-or-view'
 ;;    Edit or View EmacsWiki page.
 ;;  `anything-yaoddmuse-emacswiki-post-library'
