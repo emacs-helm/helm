@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.7 2009-04-20 12:21:28 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.8 2009-05-03 21:47:41 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -38,22 +38,6 @@
 ;; This program is based on an idea by hchbaw.
 ;;   http://d.hatena.ne.jp/hchbaw/20090416/1239878984
 
-;;; For developers:
-;;
-;; To enable anything-show-completion for user-defined function, use
-;; `use-anything-show-completion'. It accepts function and length of
-;; prefix (= current completing target) as a sexp. It must be used
-;; with soft-require.
-;;
-;; Example:
-;;   (when (require 'anything-show-completion nil t)
-;;     (use-anything-show-completion 'rct-complete-symbol--anything
-;;                                   '(length pattern)))
-;;
-;; Example in souce code:
-;;   http://www.emacswiki.org/cgi-bin/wiki/download/anything-complete.el
-;;   http://www.emacswiki.org/cgi-bin/wiki/download/anything-rcodetools.el
-
 ;;; Commands:
 ;;
 ;; Below are complete command list:
@@ -69,6 +53,22 @@
 ;;  `anything-show-completion-activate'
 ;;    *Set nil to turn off anything-show-completion.
 ;;    default = t
+
+;;; For developers:
+;;
+;; To enable anything-show-completion for user-defined function, use
+;; `use-anything-show-completion'. It accepts function and length of
+;; prefix (= current completing target) as a sexp. It must be used
+;; with soft-require.
+;;
+;; Example:
+;;   (when (require 'anything-show-completion nil t)
+;;     (use-anything-show-completion 'rct-complete-symbol--anything
+;;                                   '(length pattern)))
+;;
+;; Example in souce code:
+;;   http://www.emacswiki.org/cgi-bin/wiki/download/anything-complete.el
+;;   http://www.emacswiki.org/cgi-bin/wiki/download/anything-rcodetools.el
 
 ;;; Installation:
 ;;
@@ -94,7 +94,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.7  2009-04-20 12:21:28  rubikitch
+;; Revision 1.8  2009-05-03 21:47:41  rubikitch
+;; set `anything-display-function'
+;;
+;; Revision 1.7  2009/04/20 12:21:28  rubikitch
 ;; Fixed an error when `anything' is invoked for the first time.
 ;;
 ;; Revision 1.6  2009/04/18 16:11:33  rubikitch
@@ -120,7 +123,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.7 2009-04-20 12:21:28 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.8 2009-05-03 21:47:41 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -175,16 +178,36 @@ current (point)."
 
 PREFIX-LENGTH-SEXP is an expression to denote the length of prefix (completing target).
 It is evaluated in `asc-display-overlay'."
-  (eval `(defadvice ,function (before anything-show-completion activate)
-           (anything-show-completion-install ',prefix-length-sexp))))
+  (eval `(defadvice ,function (around anything-show-completion activate)
+           (anything-show-completion-install ',prefix-length-sexp)
+           (let ((anything-display-function 'asc-display-function)) ad-do-it))))
 
 (defun anything-show-completion-install (prefix-length-sexp)
   (asc-initialize-maybe)
   (move-overlay asc-overlay (point) (point) (current-buffer))
   (overlay-put asc-overlay 'prefix-length-sexp prefix-length-sexp))
 
-(provide 'anything-show-completion)
 
+
+(defun asc-point-at-upper-half-of-window-p (pt)
+  (<= (+ (count-screen-lines (window-start) pt)
+        (if header-line-format 1 0)
+        (if (zerop (current-column)) 0 0))
+      (- (/ (window-height) 2)
+         (if header-line-format 1 0))))
+ 
+;; (global-set-key "\C-x\C-z" (lambda () (interactive) (message "%s" (asc-point-at-upper-half-of-window-p (point)))))
+
+(defun asc-display-function (buf)
+  (let* ((cursor-upper-p (asc-point-at-upper-half-of-window-p (point))) 
+         (half (/ (window-height) 2))
+         (new-w (save-excursion
+                  (let (split-window-keep-point)
+                    (split-window-vertically)))))
+    (switch-to-buffer-other-window buf)))
+
+(provide 'anything-show-completion)
+;; (asc-display-function anything-buffer)
 ;; How to save (DO NOT REMOVE!!)
 ;; (emacswiki-post "anything-show-completion.el")
 ;;; anything-show-completion.el ends here
