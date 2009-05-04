@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.48 2009-05-03 19:07:22 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.49 2009-05-04 14:51:18 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.48  2009-05-03 19:07:22  rubikitch
+;; Revision 1.49  2009-05-04 14:51:18  rubikitch
+;; use `define-anything-type-attribute' to add `anything-type-attributes' entry.
+;;
+;; Revision 1.48  2009/05/03 19:07:22  rubikitch
 ;; anything-complete: `enable-recursive-minibuffers' = t
 ;;
 ;; Revision 1.47  2009/05/03 18:42:23  rubikitch
@@ -290,7 +293,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.48 2009-05-03 19:07:22 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.49 2009-05-04 14:51:18 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -312,10 +315,9 @@
       (delete-region (point) pt)))
   (insert candidate))
 
-(add-to-list 'anything-type-attributes
-             '(complete
-               (candidates-in-buffer)
-               (action . ac-insert)))
+(define-anything-type-attribute 'complete
+  '((candidates-in-buffer)
+    (action . ac-insert)))
 
 ;; Warning: I'll change this function's interface. DON'T USE IN YOUR PROGRAM!
 (defun anything-noresume (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
@@ -460,30 +462,26 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     anything-c-source-apropos-emacs-functions
     anything-c-source-apropos-emacs-variables))
 
-(add-to-list 'anything-type-attributes
-             '(apropos-function
-               (filtered-candidate-transformer . alcs-sort)
-               (persistent-action . alcs-describe-function)
-               (action
-                ("Describe Function" . alcs-describe-function)
-                ("Find Function" . alcs-find-function))))
-(add-to-list 'anything-type-attributes
-             '(apropos-variable
-               (filtered-candidate-transformer . alcs-sort)
-               (persistent-action . alcs-describe-variable)
-               (action
-                ("Describe Variable" . alcs-describe-variable)
-                ("Find Variable" . alcs-find-variable))))
-(add-to-list 'anything-type-attributes
-             '(complete-function
-               (filtered-candidate-transformer . alcs-sort)
-               (action . ac-insert)
-               (persistent-action . alcs-describe-function)))
-(add-to-list 'anything-type-attributes
-             '(complete-variable
-               (filtered-candidate-transformer . alcs-sort)
-               (action . ac-insert)
-               (persistent-action . alcs-describe-variable)))
+(define-anything-type-attribute 'apropos-function
+  '((filtered-candidate-transformer . alcs-sort)
+    (persistent-action . alcs-describe-function)
+    (action
+     ("Describe Function" . alcs-describe-function)
+     ("Find Function" . alcs-find-function))))
+(define-anything-type-attribute 'apropos-variable
+  '((filtered-candidate-transformer . alcs-sort)
+    (persistent-action . alcs-describe-variable)
+    (action
+     ("Describe Variable" . alcs-describe-variable)
+     ("Find Variable" . alcs-find-variable))))
+(define-anything-type-attribute 'complete-function
+  '((filtered-candidate-transformer . alcs-sort)
+    (action . ac-insert)
+    (persistent-action . alcs-describe-function)))
+(define-anything-type-attribute 'complete-variable
+  '((filtered-candidate-transformer . alcs-sort)
+    (action . ac-insert)
+    (persistent-action . alcs-describe-variable)))
 
 (defun anything-lisp-complete-symbol-1 (update sources input)
   (when (or update (null (get-buffer alcs-variables-buffer)))
