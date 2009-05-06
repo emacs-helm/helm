@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.18 2009-04-01 14:59:27 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.19 2009-05-06 18:37:20 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.18  2009-04-01 14:59:27  rubikitch
+;; Revision 1.19  2009-05-06 18:37:20  rubikitch
+;; Resumable
+;;
+;; Revision 1.18  2009/04/01 14:59:27  rubikitch
 ;; Disable no-filename display (`anything-gtags-classify' == t) because `aggs-select-it' needs file-name.
 ;;
 ;; Revision 1.17  2009/03/18 17:50:08  rubikitch
@@ -161,7 +164,9 @@ If it is other symbol, display file name in candidates even if classification is
      ("Goto the location"
       . (lambda (c) (aggs-select-it c t))))
     (persistent-action . aggs-select-it)
-    (cleanup . (lambda () (kill-buffer buffer)))))
+    (cleanup . (lambda ()
+                 (kill-buffer (buffer-local-value 'buffer (get-buffer aggs-buffer)))))))
+(defvar aggs-buffer "*anything gtags select*")
 
 (defun aggs-candidate-display (s e)
   ;; 16 = length of symbol
@@ -194,9 +199,13 @@ If it is other symbol, display file name in candidates even if classification is
                             (aggs-set-anything-current-position)
                             (anything-candidate-buffer buffer)))
                        ,@aggs-base-source)))))
+    (with-current-buffer (get-buffer-create aggs-buffer)
+      (set (make-local-variable 'buffer) buffer)
+      (set (make-local-variable 'pwd) pwd))
     (anything
      sources
-     nil nil nil (format "\\(\\(%d\\) +%s\\)" lineno (regexp-quote basename) ))))
+     nil nil nil (format "\\(\\(%d\\) +%s\\)" lineno (regexp-quote basename))
+     aggs-buffer)))
 
 (defun aggs-candidate-buffer-by-filename (filename)
   (get-buffer-create (concat "*anything gtags*" filename)))
@@ -236,14 +245,13 @@ If it is other symbol, display file name in candidates even if classification is
 
 (defun aggs-select-it (candidate &optional delete)
   (with-temp-buffer
-    (declare (special pwd buffer))
     ;; `pwd' is defined at `ag-hijack-gtags-select-mode'.
-    (setq default-directory pwd)
+    (setq default-directory (buffer-local-value 'pwd (get-buffer aggs-buffer)))
     (insert candidate "\n")
     (forward-line -1)
     (gtags-select-it nil)
     ;; `buffer' is defined at `gtags-goto-tag'.
-    (and delete (kill-buffer buffer))))
+    (and delete (kill-buffer (buffer-local-value 'buffer (get-buffer aggs-buffer))))))
 
 
 (defadvice switch-to-buffer (around anything-gtags activate)
