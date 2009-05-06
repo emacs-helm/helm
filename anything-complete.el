@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.49 2009-05-04 14:51:18 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.50 2009-05-06 12:34:45 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.49  2009-05-04 14:51:18  rubikitch
+;; Revision 1.50  2009-05-06 12:34:45  rubikitch
+;; `anything-complete': target is default input.
+;;
+;; Revision 1.49  2009/05/04 14:51:18  rubikitch
 ;; use `define-anything-type-attribute' to add `anything-type-attributes' entry.
 ;;
 ;; Revision 1.48  2009/05/03 19:07:22  rubikitch
@@ -293,7 +296,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.49 2009-05-04 14:51:18 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.50 2009-05-06 12:34:45 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -332,7 +335,7 @@
         (anything-complete-target target)
         (enable-recursive-minibuffers t)
         anything-samewindow)
-    (anything-noresume sources nil nil nil nil "*anything complete*")))
+    (anything-noresume sources target nil nil nil "*anything complete*")))
 
 
 ;; (@* "`lisp-complete-symbol' and `apropos' replacement")
