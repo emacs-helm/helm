@@ -148,9 +148,10 @@
 ;;     `anything-c-source-create'             (Create)
 ;;     `anything-c-source-minibuffer-history' (Minibuffer History)
 ;;  System:
-;;     `anything-c-source-gentoo'        (Portage sources)
-;;     `anything-c-source-use-flags'     (Use Flags)
-;;     `anything-c-source-emacs-process' (Emacs Process)
+;;     `anything-c-source-xrandr-change-resolution' (Change Resolution)
+;;     `anything-c-source-gentoo'                   (Portage sources)
+;;     `anything-c-source-use-flags'                (Use Flags)
+;;     `anything-c-source-emacs-process'            (Emacs Process)
 
 ;;; Commands:
 ;;
@@ -2653,6 +2654,30 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-minibuffer-history)
 ;;;; <System>
+
+;;; X RandR resolution change
+;;; FIXME I do not care multi-display.
+(defvar anything-c-xrandr-output "VGA")
+(defvar anything-c-xrandr-screen "0")
+(defvar anything-c-source-xrandr-change-resolution
+  '((name . "Change Resolution")
+    (candidates
+     . (lambda ()
+         (with-temp-buffer
+           (call-process "xrandr" nil (current-buffer) nil
+                         "--screen" anything-c-xrandr-screen "-q")
+           (goto-char 1)
+           (loop while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
+                 collect (match-string 1)))))
+    (action
+     ("Change Resolution" . (lambda (mode)
+                              (call-process "xrandr" nil nil nil
+                                            "--screen" anything-c-xrandr-screen
+                                            "--output" anything-c-xrandr-output
+                                            "--mode" mode))))))
+;; (anything 'anything-c-source-xrandr-change-resolution)
+
+
 
 ;; Sources for gentoo users
 
