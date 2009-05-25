@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.184 2009-05-25 19:05:04 rubikitch Exp $
+;; $Id: anything.el,v 1.185 2009-05-25 19:07:42 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -312,7 +312,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.184  2009-05-25 19:05:04  rubikitch
+;; Revision 1.185  2009-05-25 19:07:42  rubikitch
+;; `anything': set `case-fold-search' to t
+;; Because users can assign commands to capital letter keys.
+;;
+;; Revision 1.184  2009/05/25 19:05:04  rubikitch
 ;; Added auto-document
 ;;
 ;; Revision 1.183  2009/05/15 01:50:46  rubikitch
@@ -906,7 +910,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.184 2009-05-25 19:05:04 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.185 2009-05-25 19:07:42 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1923,6 +1927,7 @@ already-bound variables. Yuck!
               ;; when `anything' is invoked by action. Awful global scope.
               anything-source-name anything-in-persistent-action
               anything-quit
+              (case-fold-search t)
               (anything-buffer (or any-buffer anything-buffer))
               (anything-sources (anything-normalize-sources any-sources)))
          
