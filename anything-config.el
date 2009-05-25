@@ -431,8 +431,15 @@ You may bind this command to C-r in minibuffer-local-map / minibuffer-local-comp
   (interactive)
   (anything 'anything-c-source-minibuffer-history nil nil nil nil
             "*anything minibuffer-history*"))
-;; (define-key minibuffer-local-map "\C-r" 'anything-minibuffer-history)
-;; (define-key minibuffer-local-completion-map "\C-r" 'anything-minibuffer-history)
+
+(dolist (map (list minibuffer-local-filename-completion-map
+                   minibuffer-local-completion-map
+                   minibuffer-local-must-match-filename-map
+                   minibuffer-local-map
+                   minibuffer-local-isearch-map
+                   minibuffer-local-must-match-map
+                   minibuffer-local-ns-map))
+  (define-key map "\C-r" 'anything-minibuffer-history))
 
 (defun anything-gentoo ()
   "Start anything with only gentoo sources."
@@ -2648,7 +2655,8 @@ See also `anything-create--actions'."
 ;; Minibuffer History
 (defvar anything-c-source-minibuffer-history
   '((name . "Minibuffer History")
-    (candidates . minibuffer-history)
+    (header-name . (lambda (name) (format "%s (%s)" name minibuffer-history-variable)))
+    (candidates . (lambda () (symbol-value minibuffer-history-variable)))
     (migemo)
     (action . insert)))
 
