@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.50 2009-05-06 12:34:45 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.51 2009-05-25 18:57:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.50  2009-05-06 12:34:45  rubikitch
+;; Revision 1.51  2009-05-25 18:57:22  rubikitch
+;; Removed experimental tags
+;;
+;; Revision 1.50  2009/05/06 12:34:45  rubikitch
 ;; `anything-complete': target is default input.
 ;;
 ;; Revision 1.49  2009/05/04 14:51:18  rubikitch
@@ -296,7 +299,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.50 2009-05-06 12:34:45 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.51 2009-05-25 18:57:22 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -539,7 +542,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (ac-default-source nil t)
 ;; (ac-default-source nil)
 
-;; (@* "`completing-read' compatible read function (experimental)")
+;; (@* "`completing-read' compatible read function ")
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
   (if (or (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
@@ -587,7 +590,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil nil "nana")
 ;; (anything-completing-read "Test: " '("hoge" "foo" "bar"))
 
-;; (@* "`read-file-name' compatible read function (experimental)")
+;; (@* "`read-file-name' compatible read function ")
 (defvar anything-read-file-name-map nil)
 (defvar arfn-followed nil)
 (defvar arfn-dir nil)
@@ -688,7 +691,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (anything-read-file-name "file: ")
 ;; (read-file-name "file: " "/tmp")
 
-;; (@* "`read-buffer' compatible read function (experimental)")
+;; (@* "`read-buffer' compatible read function ")
 (defun anything-read-buffer (prompt &optional default require-match start matches-set)
   "`anything' replacement for `read-buffer'."
   (let (anything-input-idle-delay)
@@ -723,12 +726,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                                    nil prompt nil nil "*anything complete*")
                 (keyboard-quit)))))
 
-;; (@* "`read-variable' compatible read function (experimental)")
+;; (@* "`read-variable' compatible read function ")
 (defun anything-read-variable (prompt &optional default-value)
   (anything-read-symbol-1 prompt alcs-variables-buffer default-value))
 ;; (anything-read-variable "variable: " 'find-file-hooks)
 
-;; (@* "`read-command' compatible read function (experimental)")
+;; (@* "`read-command' compatible read function ")
 (defun anything-read-command (prompt &optional default-value)
   (anything-read-symbol-1 prompt alcs-commands-buffer default-value))
 ;; (anything-read-variable "command: ")
