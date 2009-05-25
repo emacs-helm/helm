@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.183 2009-05-15 01:50:46 rubikitch Exp $
+;; $Id: anything.el,v 1.184 2009-05-25 19:05:04 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -47,6 +47,76 @@
 ;; many tips to write smart sources!
 ;;
 ;; http://www.emacswiki.org/cgi-bin/emacs/RubikitchAnythingConfiguration
+
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything'
+;;    Select anything. In Lisp program, some optional arguments can be used.
+;;  `anything-resume'
+;;    Resurrect previously invoked `anything'.
+;;  `anything-at-point'
+;;    Same as `anything' except when C-u is pressed, the initial input is the symbol at point.
+;;  `anything-select-action'
+;;    Select an action for the currently selected candidate.
+;;  `anything-previous-line'
+;;    Move selection to the previous line.
+;;  `anything-next-line'
+;;    Move selection to the next line.
+;;  `anything-previous-page'
+;;    Move selection back with a pageful.
+;;  `anything-next-page'
+;;    Move selection forward with a pageful.
+;;  `anything-previous-source'
+;;    Move selection to the previous source.
+;;  `anything-next-source'
+;;    Move selection to the next source.
+;;  `anything-exit-minibuffer'
+;;    Select the current candidate by exiting the minibuffer.
+;;  `anything-delete-current-selection'
+;;    Delete the currently selected item.
+;;  `anything-select-2nd-action'
+;;    Select the 2nd action for the currently selected candidate.
+;;  `anything-select-3rd-action'
+;;    Select the 3rd action for the currently selected candidate.
+;;  `anything-select-4th-action'
+;;    Select the 4th action for the currently selected candidate.
+;;  `anything-execute-persistent-action'
+;;    If a candidate is selected then perform the associated action without quitting anything.
+;;  `anything-scroll-other-window'
+;;    Scroll other window (not *Anything* window) upward.
+;;  `anything-scroll-other-window-down'
+;;    Scroll other window (not *Anything* window) downward.
+;;  `anything-quit-and-find-file'
+;;    Drop into `find-file' from `anything' like `iswitchb-find-file'.
+;;  `anything-yank-selection'
+;;    Set minibuffer contents to current selection.
+;;  `anything-kill-selection-and-quit'
+;;    Store current selection to kill ring.
+;;  `anything-isearch'
+;;    Start incremental search within results. (UNMAINTAINED)
+;;  `anything-isearch-printing-char'
+;;    Add printing char to the pattern.
+;;  `anything-isearch-again'
+;;    Search again for the current pattern
+;;  `anything-isearch-delete'
+;;    Undo last event.
+;;  `anything-isearch-default-action'
+;;    Execute the default action for the selected candidate.
+;;  `anything-isearch-select-action'
+;;    Choose an action for the selected candidate.
+;;  `anything-isearch-cancel'
+;;    Cancel Anything isearch.
+;;  `anything-iswitchb-setup'
+;;    Integrate anything completion into iswitchb (UNMAINTAINED).
+;;  `anything-iswitchb-cancel-anything'
+;;    Cancel anything completion and return to standard iswitchb.
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
 
 ;; You can extend `anything' by writing plug-ins. As soon as
 ;; `anything' is invoked, `anything-sources' is compiled into basic
@@ -242,7 +312,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.183  2009-05-15 01:50:46  rubikitch
+;; Revision 1.184  2009-05-25 19:05:04  rubikitch
+;; Added auto-document
+;;
+;; Revision 1.183  2009/05/15 01:50:46  rubikitch
 ;; typo
 ;;
 ;; Revision 1.182  2009/05/08 18:28:18  rubikitch
@@ -833,7 +906,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.183 2009-05-15 01:50:46 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.184 2009-05-25 19:05:04 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
