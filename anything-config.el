@@ -2816,7 +2816,9 @@ See also `anything-create--actions'."
                ("Run emerge pretend" . (lambda (elm)
                                          (anything-c-gentoo-eshell-action elm "emerge -p")))
                ("Emerge" . (lambda (elm)
-                             (anything-gentoo-setup-shell elm)))
+                             (anything-gentoo-install elm)))
+               ("Unmerge" . (lambda (elm)
+                              (anything-gentoo-uninstall elm)))
                ("Show dependencies" . (lambda (elm)
                                         (anything-c-gentoo-default-action elm "equery" "-C" "d")))
                ("Show related files" . (lambda (elm)
@@ -2827,9 +2829,13 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-gentoo)
 
-(defun anything-gentoo-setup-shell (candidate)
+(defun anything-gentoo-install (candidate)
   (funcall anything-gentoo-prefered-shell)
   (insert (concat "sudo emerge -av " candidate)))
+
+(defun anything-gentoo-uninstall (candidate)
+  (funcall anything-gentoo-prefered-shell)
+  (insert (concat "sudo emerge -avC " candidate)))
 
 (defun anything-c-gentoo-default-action (elm command &rest args)
   "Gentoo default action that use `anything-c-gentoo-buffer'."
