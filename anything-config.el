@@ -509,7 +509,7 @@ With two prefix args allow choosing in which symbol to search."
       ("Kill Regexp as sexp" .
        (lambda (x) (anything-c-regexp-kill-new (prin1-to-string anything-input))))
       ("Query Replace Regexp" .
-       (lambda (x) (apply 'query-replace-regexp (anything-c-query-replace-args))))
+       (lambda (x) (apply 'query-replace-regexp (anything-c-query-replace-args (point)))))
       ("Kill Regexp" .
        (lambda (x) (anything-c-regexp-kill-new anything-input)))))))
 
@@ -3631,6 +3631,12 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   (dolist (i anything-c-marked-candidate-list)
     (anything-c-delete-file i)))
 
+(defun anything-ediff-marked-buffers (candidate)
+  (when (eq (length anything-c-marked-candidate-list) 2)
+    (let ((buf1 (first anything-c-marked-candidate-list))
+          (buf2 (second anything-c-marked-candidate-list)))
+      (ediff-buffers buf1 buf2))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Type Attributes
@@ -3646,7 +3652,8 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
      ("Revert buffer" . anything-revert-buffer)
      ("Revert Marked buffers" . anything-revert-marked-buffers)
      ("Kill buffer" . kill-buffer)
-     ("Kill Marked buffers" . anything-kill-marked-buffers))
+     ("Kill Marked buffers" . anything-kill-marked-buffers)
+     ("Ediff Marked buffers" . anything-ediff-marked-buffers))
     (candidate-transformer . anything-c-skip-boring-buffers))
   "Buffer or buffer name.")
 
