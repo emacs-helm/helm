@@ -3631,11 +3631,13 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   (dolist (i anything-c-marked-candidate-list)
     (anything-c-delete-file i)))
 
-(defun anything-ediff-marked-buffers (candidate)
+(defun anything-ediff-marked-buffers (candidate &optional merge)
   (when (eq (length anything-c-marked-candidate-list) 2)
     (let ((buf1 (first anything-c-marked-candidate-list))
           (buf2 (second anything-c-marked-candidate-list)))
-      (ediff-buffers buf1 buf2))))
+      (if merge
+          (ediff-merge-buffers buf1 buf2)
+          (ediff-buffers buf1 buf2)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -3653,7 +3655,9 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
      ("Revert Marked buffers" . anything-revert-marked-buffers)
      ("Kill buffer" . kill-buffer)
      ("Kill Marked buffers" . anything-kill-marked-buffers)
-     ("Ediff Marked buffers" . anything-ediff-marked-buffers))
+     ("Ediff Marked buffers" . anything-ediff-marked-buffers)
+     ("Ediff Merge marked buffers" . (lambda (candidate)
+                                       (anything-ediff-marked-buffers candidate t))))
     (candidate-transformer . anything-c-skip-boring-buffers))
   "Buffer or buffer name.")
 
