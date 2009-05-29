@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.186 2009-05-29 06:46:34 rubikitch Exp $
+;; $Id: anything.el,v 1.187 2009-05-29 06:49:05 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -312,7 +312,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.186  2009-05-29 06:46:34  rubikitch
+;; Revision 1.187  2009-05-29 06:49:05  rubikitch
+;; small refactoring
+;;
+;; Revision 1.186  2009/05/29 06:46:34  rubikitch
 ;; Prevent `anything-isearch-map' from overwriting `global-map'. With
 ;; `copy-keymap', the prefix command "M-s" in `global-map' ends up
 ;; getting clobbered by `anything-isearch-again', preventing `occur'
@@ -919,7 +922,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.186 2009-05-29 06:46:34 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.187 2009-05-29 06:49:05 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1414,10 +1417,8 @@ See `anything-iswitchb-setup-keys'.")
     (define-key map (kbd "M-s") 'anything-isearch-again)
     (define-key map (kbd "<backspace>") 'anything-isearch-delete)
     ;; add printing chars
-    (let ((i 32))
-      (while (< i 256)
-        (define-key map (vector i) 'anything-isearch-printing-char)
-        (setq i (1+ i))))
+    (loop for i from 32 below 256 do
+          (define-key map (vector i) 'anything-isearch-printing-char))
     map)
   "Keymap for anything incremental search.")
 
