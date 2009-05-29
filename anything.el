@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.185 2009-05-25 19:07:42 rubikitch Exp $
+;; $Id: anything.el,v 1.186 2009-05-29 06:46:34 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -312,7 +312,16 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.185  2009-05-25 19:07:42  rubikitch
+;; Revision 1.186  2009-05-29 06:46:34  rubikitch
+;; Prevent `anything-isearch-map' from overwriting `global-map'. With
+;; `copy-keymap', the prefix command "M-s" in `global-map' ends up
+;; getting clobbered by `anything-isearch-again', preventing `occur'
+;; (among other things) from running. This change replaces overwriting a
+;; copied map with writing to a sparse map whose parent is `global-map'.
+;;
+;; patched by DanielHackney. thanks!
+;;
+;; Revision 1.185  2009/05/25 19:07:42  rubikitch
 ;; `anything': set `case-fold-search' to t
 ;; Because users can assign commands to capital letter keys.
 ;;
@@ -910,7 +919,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.185 2009-05-25 19:07:42 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.186 2009-05-29 06:46:34 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1396,7 +1405,8 @@ If you execute `anything-iswitchb-setup', some keys are modified.
 See `anything-iswitchb-setup-keys'.")
 
 (defvar anything-isearch-map
-  (let ((map (copy-keymap (current-global-map))))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map (current-global-map))
     (define-key map (kbd "<return>") 'anything-isearch-default-action)
     (define-key map (kbd "<RET>") 'anything-isearch-default-action)
     (define-key map (kbd "C-i") 'anything-isearch-select-action)
