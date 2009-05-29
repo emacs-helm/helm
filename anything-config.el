@@ -1932,6 +1932,48 @@ with the tracker desktop search.")
 utility mdfind.")
 ;; (anything 'anything-c-source-mac-spotlight)
 
+;;;; <icicle>
+;;; Icicle regions
+(defvar anything-c-source-icicle-region
+  '((name . "Icicle Regions")
+    (candidates . (lambda ()
+                    (mapcar #'(lambda (x)
+                                (concat (car x) " => " (cadr (assoc (car x) icicle-region-alist))))
+                            icicle-region-alist)))
+    (action . (("Go to region" . (lambda (elm)
+                                   (let ((cand (car (split-string elm " => "))))
+                                     (anything-icicle-select-region-action cand))))
+               ("Remove region" . (lambda (elm)
+                                    (let ((cand (car (split-string elm " => "))))
+                                      (anything-icicle-delete-region-from-alist cand))))))))
+
+(defun anything-icicle-select-region-action (reg-name)
+  "Action function for `icicle-select-region'."
+  (let* ((reg   (assoc reg-name icicle-region-alist))
+         (buf   (cadr reg))
+         (file  (caddr reg)))
+    (when (and (not (get-buffer buf))
+               file) ; If no buffer, try to open the file.  If no file, msg.
+      (if (file-readable-p file)
+          (find-file-noselect file)
+          (message "No such file: `%s'" file)))
+    (when (get-buffer buf)
+      (pop-to-buffer buf)
+      (raise-frame)
+      (goto-char (cadr (cddr reg)))
+      (push-mark (car (cddr (cddr reg))) 'nomsg 'activate)))
+  (setq deactivate-mark  nil))
+
+
+(defun anything-icicle-delete-region-from-alist (reg-name)
+  "Delete the region named REG-NAME from `icicle-region-alist'."
+  (let ((alist-cand  (assoc reg-name icicle-region-alist)))
+    (setq icicle-region-alist
+          (delete (cons (car alist-cand) (cdr alist-cand)) icicle-region-alist)))
+  (funcall icicle-customize-save-variable-function 'icicle-region-alist icicle-region-alist))
+
+;; (anything 'anything-c-source-icicle-region)
+
 ;;;; <Kill ring>
 ;;; Kill ring
 (defvar anything-c-source-kill-ring
