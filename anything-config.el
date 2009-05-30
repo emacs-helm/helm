@@ -1936,22 +1936,29 @@ utility mdfind.")
 
 ;;;; <icicle>
 ;;; Icicle regions
+(defvar anything-icicle-region-alist nil)
 (defvar anything-c-source-icicle-region
   '((name . "Icicle Regions")
-    (candidates . (lambda ()
-                    (mapcar #'(lambda (x)
-                                (concat (car x) " => " (cadr (assoc (car x) icicle-region-alist))))
-                            icicle-region-alist)))
+    (init . (lambda ()
+              (setq anything-icicle-region-alist
+                    (loop
+                       with alist = icicle-region-alist
+                       for c from 0 to (length alist)
+                       for i in alist
+                       collect (concat (car i) " => " (cadr (nth c alist)))))))
+    (candidates . anything-icicle-region-alist)
     (action . (("Go to region" . (lambda (elm)
-                                   (let ((cand (car (split-string elm " => "))))
-                                     (anything-icicle-select-region-action cand))))
+                                   (let ((pos (position elm anything-icicle-region-alist)))
+                                     (anything-icicle-select-region-action pos))))
                ("Remove region" . (lambda (elm)
-                                    (let ((cand (car (split-string elm " => "))))
-                                      (anything-icicle-delete-region-from-alist cand))))))))
+                                    (let ((pos (position elm anything-icicle-region-alist)))
+                                      (anything-icicle-delete-region-from-alist pos))))))))
 
-(defun anything-icicle-select-region-action (reg-name)
+;; (anything 'anything-c-source-icicle-region)
+
+(defun anything-icicle-select-region-action (pos)
   "Action function for `icicle-select-region'."
-  (let* ((reg   (assoc reg-name icicle-region-alist))
+  (let* ((reg   (nth pos icicle-region-alist))
          (buf   (cadr reg))
          (file  (caddr reg)))
     (when (and (not (get-buffer buf))
@@ -1967,14 +1974,12 @@ utility mdfind.")
   (setq deactivate-mark  nil))
 
 
-(defun anything-icicle-delete-region-from-alist (reg-name)
+(defun anything-icicle-delete-region-from-alist (pos)
   "Delete the region named REG-NAME from `icicle-region-alist'."
-  (let ((alist-cand  (assoc reg-name icicle-region-alist)))
+  (let ((alist-cand  (nth pos icicle-region-alist)))
     (setq icicle-region-alist
           (delete (cons (car alist-cand) (cdr alist-cand)) icicle-region-alist)))
   (funcall icicle-customize-save-variable-function 'icicle-region-alist icicle-region-alist))
-
-;; (anything 'anything-c-source-icicle-region)
 
 ;;;; <Kill ring>
 ;;; Kill ring
