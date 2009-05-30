@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.51 2009-05-25 18:57:22 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.52 2009-05-30 05:04:30 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.51  2009-05-25 18:57:22  rubikitch
+;; Revision 1.52  2009-05-30 05:04:30  rubikitch
+;; Set `anything-execute-action-at-once-if-one' to t
+;;
+;; Revision 1.51  2009/05/25 18:57:22  rubikitch
 ;; Removed experimental tags
 ;;
 ;; Revision 1.50  2009/05/06 12:34:45  rubikitch
@@ -299,7 +302,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.51 2009-05-25 18:57:22 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.52 2009-05-30 05:04:30 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -336,6 +339,7 @@
         (anything-idle-delay (or idle-delay anything-idle-delay))
         (anything-input-idle-delay (or input-idle-delay anything-input-idle-delay))
         (anything-complete-target target)
+        (anything-execute-action-at-once-if-one t)
         (enable-recursive-minibuffers t)
         anything-samewindow)
     (anything-noresume sources target nil nil nil "*anything complete*")))
