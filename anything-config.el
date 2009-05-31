@@ -1952,9 +1952,20 @@ utility mdfind.")
                                      (anything-icicle-select-region-action pos))))
                ("Remove region" . (lambda (elm)
                                     (let ((pos (position elm anything-icicle-region-alist)))
-                                      (anything-icicle-delete-region-from-alist pos))))))))
+                                      (anything-icicle-delete-region-from-alist pos))))
+               ("Update" . anything-icicle-region-update)))))
 
 ;; (anything 'anything-c-source-icicle-region)
+
+(defun anything-icicle-region-update (elm)
+  "Remove entries in `icicle-region-alist' if files doesn't exists anymore."
+  (loop
+     for i in icicle-region-alist
+     when (and (caddr i)
+               (not (file-exists-p (caddr i))))
+     do
+       (let ((pos (position i icicle-region-alist)))
+         (anything-icicle-delete-region-from-alist pos))))
 
 (defun anything-icicle-select-region-action (pos)
   "Action function for `icicle-select-region'."
