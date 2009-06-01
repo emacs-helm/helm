@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.188 2009-05-29 18:33:07 rubikitch Exp $
+;; $Id: anything.el,v 1.189 2009-06-01 21:36:31 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -312,7 +312,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.188  2009-05-29 18:33:07  rubikitch
+;; Revision 1.189  2009-06-01 21:36:31  rubikitch
+;; New function: `anything-other-buffer'
+;;
+;; Revision 1.188  2009/05/29 18:33:07  rubikitch
 ;; avoid error when executing (anything-mark-current-line) in async process.
 ;;
 ;; Revision 1.187  2009/05/29 06:49:05  rubikitch
@@ -925,7 +928,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.188 2009-05-29 18:33:07 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.189 2009-06-01 21:36:31 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2015,6 +2018,10 @@ already-bound variables. Yuck!
                         (if (featurep 'anything-match-plugin) " " ""))
               any-input)
             any-prompt any-resume any-preselect any-buffer))
+
+(defun anything-other-buffer (any-sources any-buffer)
+  "Simplified interface of `anything' with other `anything-buffer'"
+  (anything any-sources nil nil nil nil any-buffer))
 
 ;; (@* "Core: Display *anything* buffer")
 (defun anything-display-buffer (buf)
