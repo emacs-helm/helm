@@ -1942,10 +1942,8 @@ utility mdfind.")
     (init . (lambda ()
               (setq anything-icicle-region-alist
                     (loop
-                       with alist = icicle-region-alist
-                       for c from 0 to (length alist)
-                       for i in alist
-                       collect (concat (car i) " => " (cadr (nth c alist)))))))
+                       for i in icicle-region-alist
+                       collect (concat (car i) " => " (cadr i))))))
     (candidates . anything-icicle-region-alist)
     (action . (("Go to region" . (lambda (elm)
                                    (let ((pos (position elm anything-icicle-region-alist)))
