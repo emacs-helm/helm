@@ -1994,7 +1994,10 @@ utility mdfind.")
   (funcall icicle-customize-save-variable-function 'icicle-region-alist icicle-region-alist))
 
 (defun anything-c-icicle-region-goto-region (candidate)
-  (let ((pos (position candidate anything-icicle-region-alist)))
+  (let ((pos (position candidate anything-icicle-region-alist))
+        (buf (second (split-string candidate " => "))))
+    (if (equal buf "*info*")
+        (info (caddr (nth pos icicle-region-alist))))
     (anything-icicle-select-region-action pos)))
 
 (defun anything-c-icicle-region-delete-region (candidate)
@@ -2884,10 +2887,8 @@ See also `anything-create--actions'."
                                      (font-lock-mode 1)))
                ("Run emerge pretend" . (lambda (elm)
                                          (anything-c-gentoo-eshell-action elm "emerge -p")))
-               ("Emerge" . (lambda (elm)
-                             (anything-gentoo-install elm)))
-               ("Unmerge" . (lambda (elm)
-                              (anything-gentoo-uninstall elm)))
+               ("Emerge" . anything-gentoo-install)
+               ("Unmerge" . anything-gentoo-uninstall)
                ("Show dependencies" . (lambda (elm)
                                         (anything-c-gentoo-default-action elm "equery" "-C" "d")))
                ("Show related files" . (lambda (elm)
@@ -2900,11 +2901,17 @@ See also `anything-create--actions'."
 
 (defun anything-gentoo-install (candidate)
   (funcall anything-gentoo-prefered-shell)
-  (insert (concat "sudo emerge -av " candidate)))
+  (if anything-c-marked-candidate-list
+      (let ((elms (mapconcat 'identity anything-c-marked-candidate-list " ")))
+        (insert (concat "sudo emerge -av " elms)))
+      (insert (concat "sudo emerge -av " candidate))))
 
 (defun anything-gentoo-uninstall (candidate)
   (funcall anything-gentoo-prefered-shell)
-  (insert (concat "sudo emerge -avC " candidate)))
+  (if anything-c-marked-candidate-list
+      (let ((elms (mapconcat 'identity anything-c-marked-candidate-list " ")))
+        (insert (concat "sudo emerge -avC " elms)))
+      (insert (concat "sudo emerge -avC " candidate))))
 
 (defun anything-c-gentoo-default-action (elm command &rest args)
   "Gentoo default action that use `anything-c-gentoo-buffer'."
