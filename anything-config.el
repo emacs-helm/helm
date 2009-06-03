@@ -900,7 +900,8 @@ buffer that is not the current buffer."
     (candidates . anything-c-buffer-list)
     (volatile)
     (type . buffer)
-    (candidate-transformer anything-c-highlight-buffers
+    (candidate-transformer anything-c-skip-current-buffer
+                           anything-c-highlight-buffers
                            anything-c-skip-boring-buffers)
     (persistent-action . anything-c-buffers+-persistent-action)))
 
@@ -3726,7 +3727,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
      ("Ediff Marked buffers" . anything-ediff-marked-buffers)
      ("Ediff Merge marked buffers" . (lambda (candidate)
                                        (anything-ediff-marked-buffers candidate t))))
-    (candidate-transformer . anything-c-skip-boring-buffers))
+    (candidate-transformer anything-c-skip-current-buffer anything-c-skip-boring-buffers))
   "Buffer or buffer name.")
 
 (define-anything-type-attribute 'file
