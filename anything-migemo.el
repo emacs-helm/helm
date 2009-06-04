@@ -1,7 +1,7 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.16 2008-10-03 20:43:18 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.17 2009-06-04 20:32:00 rubikitch Exp $
 
-;; Copyright (C) 2007  rubikitch
+;; Copyright (C) 2007, 2008, 2009  rubikitch
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: anything, convenience, tools, i18n, japanese
@@ -29,6 +29,18 @@
 ;; `anything' is migemo-ized. This means that pattern matching of
 ;; `anything' candidates is done by migemo-expanded `anything-pattern'.
 
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-migemo'
+;;    `anything' with migemo extension.
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+
 ;; If you want to use migemo search source-locally, add (migemo) to
 ;; the source. It sets match and search attribute appropriately for
 ;; migemo.
@@ -48,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.16  2008-10-03 20:43:18  rubikitch
+;; Revision 1.17  2009-06-04 20:32:00  rubikitch
+;; migemo is soft-required now; this file has no effect unless migemo is installed.
+;;
+;; Revision 1.16  2008/10/03 20:43:18  rubikitch
 ;; Use with anything-match-plugin.el
 ;;
 ;; Revision 1.15  2008/10/03 20:01:46  rubikitch
@@ -101,7 +116,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'anything))
-(require 'migemo)
+(require 'migemo nil t)
 (require 'anything-match-plugin nil t)
 (defvar anything-use-migemo nil
   "[Internal] If non-nil, `anything' is migemo-ized.")
@@ -132,36 +147,38 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
 ;; (anything-string-match-with-migemo "日本語入力" "nyuuryoku")
 ;; (anything-mp-3migemo-match "日本語入力" "nihongo nyuuryoku")
 (defun anything-compile-source--migemo (source)
-  (let* ((match-identity-p 
-          (or (assoc 'candidates-in-buffer source)
-              (equal '(identity) (assoc-default 'match source))))
-         (use-match-plugin
-          (memq 'anything-compile-source--match-plugin anything-compile-source-functions))
-         (matcher (if use-match-plugin
-                      'anything-mp-3migemo-match
-                    'anything-string-match-with-migemo))
-         (searcher (if (assoc 'search-from-end source)
+  (if (not (featurep 'migemo))
+      source
+    (let* ((match-identity-p 
+            (or (assoc 'candidates-in-buffer source)
+                (equal '(identity) (assoc-default 'match source))))
+           (use-match-plugin
+            (memq 'anything-compile-source--match-plugin anything-compile-source-functions))
+           (matcher (if use-match-plugin
+                        'anything-mp-3migemo-match
+                      'anything-string-match-with-migemo))
+           (searcher (if (assoc 'search-from-end source)
+                         (if use-match-plugin
+                             'anything-mp-3migemo-search-backward
+                           'migemo-backward)
                        (if use-match-plugin
-                           'anything-mp-3migemo-search-backward
-                         'migemo-backward)
-                     (if use-match-plugin
-                         'anything-mp-3migemo-search
-                       'migemo-forward))))
-    (cond (anything-use-migemo
-           `((delayed)
-             (search ,@(assoc-default 'search source) ,searcher)
-             ,(if match-identity-p
-                  '(match identity)
-                `(match ,matcher
-                        ,@(assoc-default 'match source)))
-             ,@source))
-          ((assoc 'migemo source)
-           `((search ,searcher)
-             ,(if match-identity-p
-                  '(match identity)
-                `(match ,matcher))
-             ,@source))
-          (t source))))
+                           'anything-mp-3migemo-search
+                         'migemo-forward))))
+      (cond (anything-use-migemo
+             `((delayed)
+               (search ,@(assoc-default 'search source) ,searcher)
+               ,(if match-identity-p
+                    '(match identity)
+                  `(match ,matcher
+                          ,@(assoc-default 'match source)))
+               ,@source))
+            ((assoc 'migemo source)
+             `((search ,searcher)
+               ,(if match-identity-p
+                    '(match identity)
+                  `(match ,matcher))
+               ,@source))
+            (t source)))))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--migemo t)
 
 ;;;; unit test
