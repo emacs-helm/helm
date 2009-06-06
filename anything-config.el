@@ -3423,7 +3423,8 @@ other candidate transformers."
 
 (defvar anything-c-marked-candidate-list nil)
 (defadvice anything-select-action (before save-marked-candidates () activate)
-  (setq anything-c-marked-candidate-list (anything-c-list-marked-candidate)))
+  (setq anything-c-marked-candidate-list (anything-c-list-marked-candidate))
+  (anything-clear-visible-mark))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Adaptive Sorting of Candidates ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar anything-c-adaptive-done nil
