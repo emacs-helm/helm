@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.189 2009-06-01 21:36:31 rubikitch Exp $
+;; $Id: anything.el,v 1.190 2009-06-07 17:09:50 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -312,7 +312,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.189  2009-06-01 21:36:31  rubikitch
+;; Revision 1.190  2009-06-07 17:09:50  rubikitch
+;; add M-<next>, C-M-S-v, M-<prior> to `anything-map'.
+;;
+;; Revision 1.189  2009/06/01 21:36:31  rubikitch
 ;; New function: `anything-other-buffer'
 ;;
 ;; Revision 1.188  2009/05/29 18:33:07  rubikitch
@@ -928,7 +931,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.189 2009-06-01 21:36:31 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.190 2009-06-07 17:09:50 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1387,7 +1390,10 @@ See also `anything-set-source-filter'.")
 
     (define-key map (kbd "C-o") 'anything-next-source)
     (define-key map (kbd "C-M-v") 'anything-scroll-other-window)
+    (define-key map (kbd "M-<next>") 'anything-scroll-other-window)
     (define-key map (kbd "C-M-y") 'anything-scroll-other-window-down)
+    (define-key map (kbd "C-M-S-v") 'anything-scroll-other-window-down)
+    (define-key map (kbd "M-<prior>") 'anything-scroll-other-window-down)
     (define-key map (kbd "C-SPC") 'anything-toggle-visible-mark)
     (define-key map (kbd "M-[") 'anything-prev-visible-mark)
     (define-key map (kbd "M-]") 'anything-next-visible-mark)
