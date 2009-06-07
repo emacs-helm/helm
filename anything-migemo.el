@@ -1,5 +1,5 @@
 ;;; anything-migemo.el --- Migemo plug-in for anything
-;; $Id: anything-migemo.el,v 1.17 2009-06-04 20:32:00 rubikitch Exp $
+;; $Id: anything-migemo.el,v 1.18 2009-06-07 17:52:22 rubikitch Exp $
 
 ;; Copyright (C) 2007, 2008, 2009  rubikitch
 
@@ -60,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-migemo.el,v $
-;; Revision 1.17  2009-06-04 20:32:00  rubikitch
+;; Revision 1.18  2009-06-07 17:52:22  rubikitch
+;; New macro `anything-migemize-command'.
+;;
+;; Revision 1.17  2009/06/04 20:32:00  rubikitch
 ;; migemo is soft-required now; this file has no effect unless migemo is installed.
 ;;
 ;; Revision 1.16  2008/10/03 20:43:18  rubikitch
@@ -180,6 +183,12 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
                ,@source))
             (t source)))))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--migemo t)
+
+(defmacro anything-migemize-command (command)
+  "Use migemo in COMMAND when selectiong candidate by `anything'.
+Bind `anything-use-migemo' = t in COMMAND."
+  `(defadvice ,command (around anything-use-migemo activate)
+     (let ((anything-use-migemo t)) ad-do-it)))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
