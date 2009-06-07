@@ -261,6 +261,12 @@
 ;;  `anything-su-or-sudo'
 ;;    What command to use for root access.
 ;;    default = "su"
+;;  `anything-for-files-prefered-list'
+;;    Your prefered sources to find files with `anything-for-files'.
+;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser anything-c-source-recentf anything-c-source-buffers+ anything-c-source-bookmarks ...))
+;;  `anything-info-at-point-prefered-list'
+;;    Your favorites info sources to find infos with `anything-info-at-point'.
+;;    default = (quote (anything-c-source-info-elisp anything-c-source-info-cl anything-c-source-info-pages))
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
