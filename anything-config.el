@@ -3797,12 +3797,16 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   "String representing S-Expressions.")
 
 (define-anything-type-attribute 'bookmark
-  '((action ("Jump to bookmark" . (lambda (candidate)
+  '((action
+     ("Jump to bookmark" . (lambda (candidate)
                                     (bookmark-jump candidate)
                                     (anything-update)))
-            ("Delete bookmark" . bookmark-delete)
-            ("Rename bookmark" . bookmark-rename)
-            ("Relocate bookmark" . bookmark-relocate)))
+     ("Jump to BM other window" . (lambda (candidate)
+                                    (bookmark-jump-other-window candidate)
+                                    (anything-update)))
+     ("Delete bookmark" . bookmark-delete)
+     ("Rename bookmark" . bookmark-rename)
+     ("Relocate bookmark" . bookmark-relocate)))
   "Bookmark name.")
 
 (define-anything-type-attribute 'line
