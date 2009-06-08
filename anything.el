@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.190 2009-06-07 17:09:50 rubikitch Exp $
+;; $Id: anything.el,v 1.191 2009-06-08 19:30:27 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -82,6 +82,8 @@
 ;;    Select the 3rd action for the currently selected candidate.
 ;;  `anything-select-4th-action'
 ;;    Select the 4th action for the currently selected candidate.
+;;  `anything-select-2nd-action-or-end-of-line'
+;;    Select the 2nd action for the currently selected candidate if the point is at the end of minibuffer.
 ;;  `anything-execute-persistent-action'
 ;;    If a candidate is selected then perform the associated action without quitting anything.
 ;;  `anything-scroll-other-window'
@@ -312,7 +314,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.190  2009-06-07 17:09:50  rubikitch
+;; Revision 1.191  2009-06-08 19:30:27  rubikitch
+;; New command: `anything-select-2nd-action-or-end-of-line'
+;;
+;; Revision 1.190  2009/06/07 17:09:50  rubikitch
 ;; add M-<next>, C-M-S-v, M-<prior> to `anything-map'.
 ;;
 ;; Revision 1.189  2009/06/01 21:36:31  rubikitch
@@ -931,7 +936,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.190 2009-06-07 17:09:50 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.191 2009-06-08 19:30:27 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3078,6 +3083,13 @@ Acceptable values of CREATE-OR-BUFFER:
   (interactive)
   (anything-select-nth-action 3))
 
+(defun anything-select-2nd-action-or-end-of-line ()
+  "Select the 2nd action for the currently selected candidate if the point is at the end of minibuffer.
+Otherwise goto the end of minibuffer."
+  (interactive)
+  (if (eolp)
+      (anything-select-nth-action 1)
+    (end-of-line)))
 
 ;; (@* "Utility: Persistent Action")
 (defun* anything-execute-persistent-action (&optional (attr 'persistent-action))
