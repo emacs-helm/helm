@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.191 2009-06-08 19:30:27 rubikitch Exp $
+;; $Id: anything.el,v 1.192 2009-06-08 19:36:39 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -76,6 +76,8 @@
 ;;    Select the current candidate by exiting the minibuffer.
 ;;  `anything-delete-current-selection'
 ;;    Delete the currently selected item.
+;;  `anything-delete-minibuffer-content'
+;;    Same as `delete-minibuffer-contents' but this is a command.
 ;;  `anything-select-2nd-action'
 ;;    Select the 2nd action for the currently selected candidate.
 ;;  `anything-select-3rd-action'
@@ -314,7 +316,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.191  2009-06-08 19:30:27  rubikitch
+;; Revision 1.192  2009-06-08 19:36:39  rubikitch
+;; New keybind: C-e, C-j, C-k
+;;
+;; Revision 1.191  2009/06/08 19:30:27  rubikitch
 ;; New command: `anything-select-2nd-action-or-end-of-line'
 ;;
 ;; Revision 1.190  2009/06/07 17:09:50  rubikitch
@@ -936,7 +941,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.191 2009-06-08 19:30:27 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.192 2009-06-08 19:36:39 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1392,7 +1397,8 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-9") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-i") 'anything-select-action)
     (define-key map (kbd "C-z") 'anything-execute-persistent-action)
-
+    (define-key map (kdb "C-e") 'anything-select-2nd-action-or-end-of-line)
+    (define-key map (kbd "C-j") 'anything-select-3rd-action)
     (define-key map (kbd "C-o") 'anything-next-source)
     (define-key map (kbd "C-M-v") 'anything-scroll-other-window)
     (define-key map (kbd "M-<next>") 'anything-scroll-other-window)
@@ -1402,6 +1408,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-SPC") 'anything-toggle-visible-mark)
     (define-key map (kbd "M-[") 'anything-prev-visible-mark)
     (define-key map (kbd "M-]") 'anything-next-visible-mark)
+    (define-key map (kbd "C-k") 'anything-delete-minibuffer-content)
 
     (define-key map (kbd "C-s") 'anything-isearch)
     (define-key map (kbd "C-r") 'undefined)
@@ -2838,6 +2845,11 @@ UNIT and DIRECTION."
            (delete-region (point-at-bol) (1+ (point-at-eol)))
            (when (eobp) (forward-line -1))))
     (anything-mark-current-line)))
+
+(defun anything-delete-minibuffer-content ()
+  "Same as `delete-minibuffer-contents' but this is a command."
+  (interactive)
+  (delete-minibuffer-contents))
 
 ;; (@* "Built-in plug-in: type")
 (defun anything-compile-source--type (source)
