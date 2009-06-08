@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.192 2009-06-08 19:36:39 rubikitch Exp $
+;; $Id: anything.el,v 1.193 2009-06-08 19:37:12 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -316,7 +316,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.192  2009-06-08 19:36:39  rubikitch
+;; Revision 1.193  2009-06-08 19:37:12  rubikitch
+;; typo!
+;;
+;; Revision 1.192  2009/06/08 19:36:39  rubikitch
 ;; New keybind: C-e, C-j, C-k
 ;;
 ;; Revision 1.191  2009/06/08 19:30:27  rubikitch
@@ -941,7 +944,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.192 2009-06-08 19:36:39 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.193 2009-06-08 19:37:12 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1397,7 +1400,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-9") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-i") 'anything-select-action)
     (define-key map (kbd "C-z") 'anything-execute-persistent-action)
-    (define-key map (kdb "C-e") 'anything-select-2nd-action-or-end-of-line)
+    (define-key map (kbd "C-e") 'anything-select-2nd-action-or-end-of-line)
     (define-key map (kbd "C-j") 'anything-select-3rd-action)
     (define-key map (kbd "C-o") 'anything-next-source)
     (define-key map (kbd "C-M-v") 'anything-scroll-other-window)
