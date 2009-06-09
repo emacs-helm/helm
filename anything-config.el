@@ -262,11 +262,8 @@
 ;;    What command to use for root access.
 ;;    default = "su"
 ;;  `anything-for-files-prefered-list'
-;;    Your prefered sources to find files with `anything-for-files'.
+;;    Your prefered sources to find files.
 ;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser anything-c-source-recentf anything-c-source-buffers+ anything-c-source-bookmarks ...))
-;;  `anything-info-at-point-prefered-list'
-;;    Your favorites info sources to find infos with `anything-info-at-point'.
-;;    default = (quote (anything-c-source-info-elisp anything-c-source-info-cl anything-c-source-info-pages))
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
@@ -450,8 +447,7 @@ You may bind this command to M-y."
   (anything 'anything-c-source-kill-ring nil nil nil nil "*anything kill-ring*"))
 
 (defun anything-minibuffer-history ()
-  "Show `minibuffer-history'.
-You may bind this command to C-r in minibuffer-local-map / minibuffer-local-completion-map."
+  "Show `minibuffer-history'."
   (interactive)
   (anything 'anything-c-source-minibuffer-history nil nil nil nil
             "*anything minibuffer-history*"))
@@ -2820,11 +2816,14 @@ See also `anything-create--actions'."
 (defvar anything-c-source-minibuffer-history
   '((name . "Minibuffer History")
     (header-name . (lambda (name) (format "%s (%s)" name minibuffer-history-variable)))
-    (candidates . (lambda () (symbol-value minibuffer-history-variable)))
+    (candidates . (lambda () (let ((history (symbol-value minibuffer-history-variable)))
+                               (if (consp (car history))
+                                   (mapcar 'prin1-to-string history)
+                                 history))))
     (migemo)
     (action . insert)))
-
 ;; (anything 'anything-c-source-minibuffer-history)
+
 ;;;; <System>
 
 ;;; X RandR resolution change
