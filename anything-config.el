@@ -1419,11 +1419,36 @@ http://www.nongnu.org/bm/")
         collect (propertize i 'face anything-c-bookmarks-face3)))
 
 (defun anything-c-highlight-bookmark (files)
+  "Colors mean:
+Grey ==> non--buffer-filename with saved region or not.
+Yellow ==> w3m url with saved region.
+Green ==> info buffer with saved region.
+Blue ==> regular file with maybe a region saved.
+RedOnWhite ==> Directory."
   (loop for i in files
-        if (file-directory-p (bookmark-get-filename i))
-        collect (propertize i 'face anything-c-bookmarks-face1)
-        else
-        collect (propertize i 'face anything-c-bookmarks-face2)))
+     if (and (bookmark-get-filename i)
+             (file-directory-p (bookmark-get-filename i)))
+     collect (propertize i 'face anything-c-bookmarks-face1)
+     if (and (bookmark-get-filename i)
+             (not (file-directory-p (bookmark-get-filename i)))
+             (file-exists-p (bookmark-get-filename i)))
+     collect (propertize i 'face anything-c-bookmarks-face2)
+     if (and (fboundp 'bookmark-get-buffername)
+             (bookmark-get-buffername i)
+             (not (bookmark-get-filename i)))
+     collect (propertize i 'face '((:foreground "grey")))
+     if (and (fboundp 'bookmark-get-buffername)
+             (string= (bookmark-get-buffername i) "*w3m*")
+             (when (bookmark-get-filename i)
+               (not (file-exists-p (bookmark-get-filename i)))))
+     collect (propertize i 'face '((:foreground "yellow")))
+     if (and (fboundp 'bookmark-get-buffername)
+             (string= (bookmark-get-buffername i) "*info*")
+             (when (bookmark-get-filename i)
+               (not (file-exists-p (bookmark-get-filename i)))))
+     collect (propertize i 'face '((:foreground "green")))))
+       
+             
 
 (defvar anything-c-source-bookmarks-local
   '((name . "Bookmarks-Local")
@@ -3798,8 +3823,17 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 (define-anything-type-attribute 'bookmark
   '((action
      ("Jump to bookmark" . (lambda (candidate)
-                                    (bookmark-jump candidate)
-                                    (anything-update)))
+                             (bookmark-jump candidate)
+                             (anything-update)
+                             (condition-case nil
+                                 (when bookmark-use-region
+                                   (let ((bmk-name (or (bookmark-get-buffername candidate)
+                                                       (file-name-nondirectory
+                                                        (bookmark-get-filename candidate)))))
+                                     (when bmk-name
+                                       (with-current-buffer bmk-name
+                                         (setq deactivate-mark nil)))))
+                               (error nil))))
      ("Jump to BM other window" . (lambda (candidate)
                                     (bookmark-jump-other-window candidate)
                                     (anything-update)))
