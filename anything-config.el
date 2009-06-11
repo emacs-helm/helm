@@ -1426,26 +1426,28 @@ Green ==> info buffer with saved region.
 Blue ==> regular file with maybe a region saved.
 RedOnWhite ==> Directory."
   (loop for i in files
-     if (and (bookmark-get-filename i)
-             (file-directory-p (bookmark-get-filename i)))
+     for pred = (bookmark-get-filename i)
+     for bufp = (bookmark-get-buffername i)
+     if (and pred
+             (file-directory-p pred))
      collect (propertize i 'face anything-c-bookmarks-face1)
-     if (and (bookmark-get-filename i)
-             (not (file-directory-p (bookmark-get-filename i)))
-             (file-exists-p (bookmark-get-filename i)))
+     if (and pred
+             (not (file-directory-p pred))
+             (file-exists-p pred))
      collect (propertize i 'face anything-c-bookmarks-face2)
      if (and (fboundp 'bookmark-get-buffername)
-             (bookmark-get-buffername i)
-             (not (bookmark-get-filename i)))
+             bufp
+             (not pred))
      collect (propertize i 'face '((:foreground "grey")))
      if (and (fboundp 'bookmark-get-buffername)
-             (string= (bookmark-get-buffername i) "*w3m*")
-             (when (bookmark-get-filename i)
-               (not (file-exists-p (bookmark-get-filename i)))))
+             (string= bufp "*w3m*")
+             (when pred
+               (not (file-exists-p pred))))
      collect (propertize i 'face '((:foreground "yellow")))
      if (and (fboundp 'bookmark-get-buffername)
-             (string= (bookmark-get-buffername i) "*info*")
-             (when (bookmark-get-filename i)
-               (not (file-exists-p (bookmark-get-filename i)))))
+             (string= bufp "*info*")
+             (when pred
+               (not (file-exists-p pred))))
      collect (propertize i 'face '((:foreground "green")))))
        
              
