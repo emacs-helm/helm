@@ -3361,10 +3361,9 @@ file.  Else return ACTIONS unmodified."
 
 (defun anything-c-transform-file-browse-url (actions candidate)
   "Add an action to browse the file CANDIDATE if it in a html
-file.  Else return ACTIONS unmodified."
-  (if (or (string= (file-name-extension candidate) "htm")
-          (string= (file-name-extension candidate) "html"))
-      (append actions '(("Browse with Browser" . browse-url)))
+file or URL.  Else return ACTIONS unmodified."
+  (if (string-match "^http\\|^ftp\\|html?$" candidate)
+      (cons '("Browse with Browser" . browse-url) actions )
     actions))
 
 ;;;; Function
