@@ -680,6 +680,17 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
     (pop-to-buffer standard-output)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilities Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; For compatibility
+(unless (fboundp 'region-active-p)
+  (defun region-active-p ()
+    "Return t if Transient Mark mode is enabled and the mark is active.
+
+Most commands that act on the region if it is active and
+Transient Mark mode is enabled, and on the text near point
+otherwise, should use `use-region-p' instead.  That function
+checks the value of `use-empty-active-region' as well."
+    (and transient-mark-mode mark-active)))
+
 (defun anything-nest (&rest same-as-anything)
   "Nested `anything'. If you use `anything' within `anything', use it."
   (with-selected-window (anything-window)
