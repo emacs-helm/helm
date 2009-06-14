@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.193 2009-06-08 19:37:12 rubikitch Exp $
+;; $Id: anything.el,v 1.194 2009-06-14 15:12:34 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -316,7 +316,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.193  2009-06-08 19:37:12  rubikitch
+;; Revision 1.194  2009-06-14 15:12:34  rubikitch
+;; typo
+;;
+;; Revision 1.193  2009/06/08 19:37:12  rubikitch
 ;; typo!
 ;;
 ;; Revision 1.192  2009/06/08 19:36:39  rubikitch
@@ -944,7 +947,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.193 2009-06-08 19:37:12 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.194 2009-06-14 15:12:34 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1339,7 +1342,7 @@ Attributes:
   display candidates at the top of screen.")
 
 (defvar anything-candidate-number-limit 50
-  "*Do not show more candidates than this limit from inidividual
+  "*Do not show more candidates than this limit from individual
   sources. It is usually pointless to show hundreds of matches
   when the pattern is empty, because it is much simpler to type a
   few characters to narrow down the list of potential candidates.
