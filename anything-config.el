@@ -263,7 +263,7 @@
 ;;    default = "su"
 ;;  `anything-for-files-prefered-list'
 ;;    Your prefered sources to find files.
-;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser anything-c-source-recentf anything-c-source-buffers+ anything-c-source-bookmarks ...))
+;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser anything-c-source-buffers+ anything-c-source-recentf anything-c-source-bookmarks ...))
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
@@ -407,8 +407,8 @@ they will be displayed with face `file-name-shadow' if
 
 (defcustom anything-for-files-prefered-list '(anything-c-source-ffap-line
                                               anything-c-source-ffap-guesser
-                                              anything-c-source-recentf
                                               anything-c-source-buffers+
+                                              anything-c-source-recentf
                                               anything-c-source-bookmarks
                                               anything-c-source-file-cache
                                               anything-c-source-files-in-current-dir+
