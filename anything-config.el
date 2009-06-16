@@ -2898,7 +2898,18 @@ See also `anything-create--actions'."
                                             "--mode" mode))))))
 ;; (anything 'anything-c-source-xrandr-change-resolution)
 
-
+;;; Xfont selection
+(defvar anything-c-source-xfonts
+  '((name . "X Fonts")
+    (candidates . (lambda ()
+                    (x-list-fonts "*")))
+    (multiline)
+    (action . (("Copy to kill ring" . (lambda (elm)
+                                        (kill-new elm)))
+               ("Set Font" . (lambda (elm)
+                               (kill-new elm)
+                               (set-default-font elm)))))))
+  ;; (anything 'anything-c-source-xfonts)
 
 ;; Sources for gentoo users
 
