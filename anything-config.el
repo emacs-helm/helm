@@ -449,8 +449,9 @@ You may bind this command to M-y."
 (defun anything-minibuffer-history ()
   "Show `minibuffer-history'."
   (interactive)
-  (anything 'anything-c-source-minibuffer-history nil nil nil nil
-            "*anything minibuffer-history*"))
+  (let ((enable-recursive-minibuffers t))
+    (anything 'anything-c-source-minibuffer-history nil nil nil nil
+              "*anything minibuffer-history*")))
 
 (dolist (map (list minibuffer-local-filename-completion-map
                    minibuffer-local-completion-map
