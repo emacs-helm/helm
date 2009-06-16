@@ -1441,7 +1441,11 @@ RedOnWhite ==> Directory."
      for bufp = (and (fboundp 'bookmark-get-buffername)
                      (bookmark-get-buffername i))
      for regp = (and (fboundp 'bookmark-get-endposition)
-                     (bookmark-get-endposition i))
+                     (bookmark-get-endposition i)
+                     (/= (bookmark-get-position i)
+                         (bookmark-get-endposition i)))
+     for handlerp = (and (fboundp 'bookmark-get-handler)
+                         (bookmark-get-handler i))
      if (and pred ;; directories
              (file-directory-p pred))
      collect (propertize i 'face anything-c-bookmarks-face1)
@@ -1465,9 +1469,8 @@ RedOnWhite ==> Directory."
                (not (file-exists-p pred))))
      collect (propertize i 'face '((:foreground "yellow")))
      if (and (fboundp 'bookmark-get-buffername) ;; info buffers
-             (string= bufp "*info*")
-             (when pred
-               (not (file-exists-p pred))))
+             (eq handlerp 'Info-bookmark-jump)
+             (string= bufp "*info*"))
      collect (propertize i 'face '((:foreground "green")))))
        
 
