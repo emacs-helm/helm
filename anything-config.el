@@ -2899,6 +2899,11 @@ See also `anything-create--actions'."
 ;; (anything 'anything-c-source-xrandr-change-resolution)
 
 ;;; Xfont selection
+(defun anything-c-persistent-xfont-action (elm)
+  "Show current font temporarily"
+  (let ((default-font elm))
+    (set-default-font default-font)))
+
 (defvar anything-c-source-xfonts
   '((name . "X Fonts")
     (candidates . (lambda ()
@@ -2908,8 +2913,11 @@ See also `anything-create--actions'."
                                         (kill-new elm)))
                ("Set Font" . (lambda (elm)
                                (kill-new elm)
-                               (set-default-font elm)))))))
-  ;; (anything 'anything-c-source-xfonts)
+                               (set-default-font elm 'keep-size)
+                               (message "New font have been copied to kill ring")))))
+    (persistent-action . anything-c-persistent-xfont-action)))
+  
+;; (anything 'anything-c-source-xfonts)
 
 ;; Sources for gentoo users
 
