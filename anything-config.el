@@ -171,6 +171,8 @@
 ;;    Start anything with only gentoo sources.
 ;;  `anything-surfraw-only'
 ;;    Launch only anything-surfraw.
+;;  `anything-imenu'
+;;    Show `imenu'.
 ;;  `anything-kill-buffers'
 ;;    You can continuously kill buffer you selected.
 ;;  `anything-query-replace-regexp'
@@ -490,6 +492,11 @@ With two prefix args allow choosing in which symbol to search."
           (setq pattern (replace-regexp-in-string "\n" "" pattern))
           (anything 'anything-c-source-surfraw pattern))
         (anything 'anything-c-source-surfraw))))
+
+(defun anything-imenu ()
+  "Show `imenu'."
+  (interactive)
+  (anything 'anything-c-source-imenu nil nil nil nil "*anything imenu*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
