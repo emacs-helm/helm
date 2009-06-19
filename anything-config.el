@@ -274,7 +274,7 @@
 ;;; Change log:
 ;;
 ;;  Change log of this file is found at
-;;  http://repo.or.cz/w/anything-config.git?a=shortlog;h=b30091a6bb64828eb3d70007db5b68d51b868bcc
+;;  http://repo.or.cz/w/anything-config.git?a=shortlog
 
 ;;; Contributors:
 ;;
