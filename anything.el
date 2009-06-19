@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.194 2009-06-14 15:12:34 rubikitch Exp $
+;; $Id: anything.el,v 1.195 2009-06-19 14:42:57 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -316,7 +316,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.194  2009-06-14 15:12:34  rubikitch
+;; Revision 1.195  2009-06-19 14:42:57  rubikitch
+;; silence byte compiler
+;;
+;; Revision 1.194  2009/06/14 15:12:34  rubikitch
 ;; typo
 ;;
 ;; Revision 1.193  2009/06/08 19:37:12  rubikitch
@@ -947,7 +950,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.194 2009-06-14 15:12:34 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.195 2009-06-19 14:42:57 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1839,6 +1842,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
   (anything-buffer-is-modified anything-current-buffer))
 
+(defvar anything-quit nil)
 (defun anything-run-after-quit (function &rest args)
   "Perform an action after quitting `anything'.
 The action is to call FUNCTION with arguments ARGS."
@@ -1900,7 +1904,6 @@ It is used to check if candidate number is 0 or 1."
   (with-current-buffer anything-buffer
     (1- (line-number-at-pos (1- (point-max))))))
 
-(defvar anything-quit nil)
 (defmacro with-anything-quittable (&rest body)
   `(let (inhibit-quit)
      (condition-case v
@@ -3110,6 +3113,12 @@ Otherwise goto the end of minibuffer."
     (end-of-line)))
 
 ;; (@* "Utility: Persistent Action")
+(defmacro with-anything-display-same-window (&rest body)
+  "Make `pop-to-buffer' and `display-buffer' display in the same window."
+  `(let ((display-buffer-function 'anything-persistent-action-display-buffer))
+     ,@body))
+(put 'with-anything-display-same-window 'lisp-indent-function 0)
+
 (defun* anything-execute-persistent-action (&optional (attr 'persistent-action))
   "If a candidate is selected then perform the associated action without quitting anything."
   (interactive)
@@ -3126,12 +3135,6 @@ Otherwise goto the end of minibuffer."
              (anything-get-action))
          t)
         (run-hooks 'anything-after-persistent-action-hook)))))
-
-(defmacro with-anything-display-same-window (&rest body)
-  "Make `pop-to-buffer' and `display-buffer' display in the same window."
-  `(let ((display-buffer-function 'anything-persistent-action-display-buffer))
-     ,@body))
-(put 'with-anything-display-same-window 'lisp-indent-function 0)
 
 (defun anything-persistent-action-display-buffer (buf &optional not-this-window)
   "Make `pop-to-buffer' and `display-buffer' display in the same window in persistent action.
