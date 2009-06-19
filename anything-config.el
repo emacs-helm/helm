@@ -151,6 +151,7 @@
 ;;     `anything-c-source-minibuffer-history' (Minibuffer History)
 ;;  System:
 ;;     `anything-c-source-xrandr-change-resolution' (Change Resolution)
+;;     `anything-c-source-xfonts'                   (X Fonts)
 ;;     `anything-c-source-gentoo'                   (Portage sources)
 ;;     `anything-c-source-use-flags'                (Use Flags)
 ;;     `anything-c-source-emacs-process'            (Emacs Process)
@@ -3788,12 +3789,22 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
     (anything-c-delete-file i)))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
-  (when (eq (length anything-c-marked-candidate-list) 2)
-    (let ((buf1 (first anything-c-marked-candidate-list))
-          (buf2 (second anything-c-marked-candidate-list)))
-      (if merge
-          (ediff-merge-buffers buf1 buf2)
-          (ediff-buffers buf1 buf2)))))
+  (let ((lg-lst (length anything-c-marked-candidate-list))
+        buf1 buf2)
+    (case lg-lst
+      (0
+       (error "Error:You have to mark at least 1 buffer"))
+      (1
+       (setq buf1 anything-current-buffer
+             buf2 (first anything-c-marked-candidate-list)))
+      (2 
+       (setq buf1 (first anything-c-marked-candidate-list)
+             buf2 (second anything-c-marked-candidate-list)))
+      (t
+       (error "Error:To much buffers marked!")))
+    (if merge
+        (ediff-merge-buffers buf1 buf2)
+        (ediff-buffers buf1 buf2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
