@@ -3806,6 +3806,14 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
         (ediff-merge-buffers buf1 buf2)
         (ediff-buffers buf1 buf2))))
 
+(defun anything-delete-marked-bookmarks (elm)
+  (anything-aif anything-c-marked-candidate-list
+      (progn
+        (dolist (i it)
+          (bookmark-delete i 'batch))
+        (bookmark-save))
+    (bookmark-delete elm)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Type Attributes
@@ -3902,7 +3910,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
                                      (bookmark-edit-annotation candidate)))
      ("Bookmark show annotation" . (lambda (candidate)
                                      (bookmark-show-annotation candidate)))
-     ("Delete bookmark" . bookmark-delete)
+     ("Delete bookmark" . anything-delete-marked-bookmarks)
      ("Rename bookmark" . bookmark-rename)
      ("Relocate bookmark" . bookmark-relocate)))
   "Bookmark name.")
