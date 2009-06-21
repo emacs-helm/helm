@@ -1457,17 +1457,17 @@ RedOnWhite ==> Directory."
                          (bookmark-get-handler i))
      if (and pred ;; directories
              (file-directory-p pred))
-     collect (propertize i 'face anything-c-bookmarks-face1)
+     collect (propertize i 'face anything-c-bookmarks-face1 'help-echo pred)
      if (and pred ;; regular files
              (not (file-directory-p pred))
              (file-exists-p pred)
              (not regp))
-     collect (propertize i 'face anything-c-bookmarks-face2)
+     collect (propertize i 'face anything-c-bookmarks-face2 'help-echo pred)
      if (and pred ;; regular files with regions saved
              (not (file-directory-p pred))
              (file-exists-p pred)
              regp)
-     collect (propertize i 'face '((:foreground "Indianred2")))
+     collect (propertize i 'face '((:foreground "Indianred2")) 'help-echo pred)
      if (and (fboundp 'bookmark-get-buffername) ;; buffer non--filename
              bufp
              (not pred))
@@ -1476,11 +1476,11 @@ RedOnWhite ==> Directory."
              (string= bufp "*w3m*")
              (when pred
                (not (file-exists-p pred))))
-     collect (propertize i 'face '((:foreground "yellow")))
+     collect (propertize i 'face '((:foreground "yellow")) 'help-echo pred)
      if (and (fboundp 'bookmark-get-buffername) ;; info buffers
              (eq handlerp 'Info-bookmark-jump)
              (string= bufp "*info*"))
-     collect (propertize i 'face '((:foreground "green")))))
+     collect (propertize i 'face '((:foreground "green")) 'help-echo pred)))
        
 
 (defvar anything-c-source-bookmarks-local
@@ -2912,10 +2912,14 @@ See also `anything-create--actions'."
   (let ((default-font elm))
     (set-default-font default-font)))
 
+(defvar anything-c-xfonts-cache nil)
 (defvar anything-c-source-xfonts
   '((name . "X Fonts")
-    (candidates . (lambda ()
-                    (x-list-fonts "*")))
+    (init . (lambda ()
+              (unless anything-c-xfonts-cache
+                (setq anything-c-xfonts-cache
+                      (x-list-fonts "*")))))  
+    (candidates . anything-c-xfonts-cache)
     (multiline)
     (action . (("Copy to kill ring" . (lambda (elm)
                                         (kill-new elm)))
