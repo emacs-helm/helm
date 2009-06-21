@@ -3514,6 +3514,9 @@ other candidate transformers."
   (setq anything-c-marked-candidate-list (anything-c-list-marked-candidate))
   (anything-clear-visible-mark))
 
+(defadvice anything-toggle-visible-mark (after move-to-next-line () activate)
+  (anything-next-line))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Adaptive Sorting of Candidates ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar anything-c-adaptive-done nil
   "nil if history information is not yet stored for the current
@@ -3814,6 +3817,14 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
         (ediff-merge-buffers buf1 buf2)
         (ediff-buffers buf1 buf2))))
 
+(defun anything-delete-marked-bookmarks (elm)
+  (anything-aif anything-c-marked-candidate-list
+      (progn
+        (dolist (i it)
+          (bookmark-delete i 'batch))
+        (bookmark-save))
+    (bookmark-delete elm)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Type Attributes
@@ -3910,7 +3921,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
                                      (bookmark-edit-annotation candidate)))
      ("Bookmark show annotation" . (lambda (candidate)
                                      (bookmark-show-annotation candidate)))
-     ("Delete bookmark" . bookmark-delete)
+     ("Delete bookmark" . anything-delete-marked-bookmarks)
      ("Rename bookmark" . bookmark-rename)
      ("Relocate bookmark" . bookmark-relocate)))
   "Bookmark name.")
