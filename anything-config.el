@@ -3506,6 +3506,9 @@ other candidate transformers."
   (setq anything-c-marked-candidate-list (anything-c-list-marked-candidate))
   (anything-clear-visible-mark))
 
+(defadvice anything-toggle-visible-mark (after move-to-next-line () activate)
+  (anything-next-line))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Adaptive Sorting of Candidates ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar anything-c-adaptive-done nil
   "nil if history information is not yet stored for the current
