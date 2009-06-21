@@ -174,6 +174,8 @@
 ;;    Launch only anything-surfraw.
 ;;  `anything-imenu'
 ;;    Show `imenu'.
+;;  `anything-google-suggest'
+;;    Google search with google suggest.
 ;;  `anything-kill-buffers'
 ;;    You can continuously kill buffer you selected.
 ;;  `anything-query-replace-regexp'
@@ -498,6 +500,12 @@ With two prefix args allow choosing in which symbol to search."
   "Show `imenu'."
   (interactive)
   (anything 'anything-c-source-imenu nil nil nil nil "*anything imenu*"))
+
+(defun anything-google-suggest ()
+  "Google search with google suggest."
+  (interactive)
+  (anything 'anything-c-source-google-suggest nil nil nil nil
+            "*anything google*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
