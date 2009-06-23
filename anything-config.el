@@ -3826,14 +3826,16 @@ With optional arg `merge' call `ediff-merge-buffers'."
 
 (defun anything-bookmark-active-region-maybe (candidate)
   "Active saved region if this bookmark have one."
-  (when (and (boundp bookmark-use-region-flag)
-             bookmark-use-region-flag)
-    (let ((bmk-name (or (bookmark-get-buffer-name candidate)
-                        (file-name-nondirectory
-                         (bookmark-get-filename candidate)))))
-      (when bmk-name
-        (with-current-buffer bmk-name
-          (setq deactivate-mark nil))))))
+  (condition-case nil
+      (when (and (boundp bookmark-use-region-flag)
+                 bookmark-use-region-flag)
+        (let ((bmk-name (or (bookmark-get-buffer-name candidate)
+                            (file-name-nondirectory
+                             (bookmark-get-filename candidate)))))
+          (when bmk-name
+            (with-current-buffer bmk-name
+              (setq deactivate-mark nil)))))
+    (error nil)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
