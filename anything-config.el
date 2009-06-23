@@ -1447,12 +1447,12 @@ Blue ==> regular file with maybe a region saved.
 RedOnWhite ==> Directory."
   (loop for i in files
      for pred = (bookmark-get-filename i)
-     for bufp = (and (fboundp 'bookmark-get-buffername)
-                     (bookmark-get-buffername i))
-     for regp = (and (fboundp 'bookmark-get-endposition)
-                     (bookmark-get-endposition i)
+     for bufp = (and (fboundp 'bookmark-get-buffer-name)
+                     (bookmark-get-buffer-name i))
+     for regp = (and (fboundp 'bookmark-get-end-position)
+                     (bookmark-get-end-position i)
                      (/= (bookmark-get-position i)
-                         (bookmark-get-endposition i)))
+                         (bookmark-get-end-position i)))
      for handlerp = (and (fboundp 'bookmark-get-handler)
                          (bookmark-get-handler i))
      if (and pred ;; directories
@@ -1468,16 +1468,16 @@ RedOnWhite ==> Directory."
              (file-exists-p pred)
              regp)
      collect (propertize i 'face '((:foreground "Indianred2")) 'help-echo pred)
-     if (and (fboundp 'bookmark-get-buffername) ;; buffer non--filename
+     if (and (fboundp 'bookmark-get-buffer-name) ;; buffer non--filename
              bufp
              (not pred))
      collect (propertize i 'face '((:foreground "grey")))
-     if (and (fboundp 'bookmark-get-buffername) ;; w3m buffers
+     if (and (fboundp 'bookmark-get-buffer-name) ;; w3m buffers
              (string= bufp "*w3m*")
              (when pred
                (not (file-exists-p pred))))
      collect (propertize i 'face '((:foreground "yellow")) 'help-echo pred)
-     if (and (fboundp 'bookmark-get-buffername) ;; info buffers
+     if (and (fboundp 'bookmark-get-buffer-name) ;; info buffers
              (eq handlerp 'Info-bookmark-jump)
              (string= bufp "*info*"))
      collect (propertize i 'face '((:foreground "green")) 'help-echo pred)))
@@ -3796,6 +3796,8 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
     (anything-c-delete-file i)))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
+  "Ediff 2 marked buffers or 1 marked buffer and current-buffer.
+With optional arg `merge' call `ediff-merge-buffers'."
   (let ((lg-lst (length anything-c-marked-candidate-list))
         buf1 buf2)
     (case lg-lst
@@ -3814,12 +3816,25 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
         (ediff-buffers buf1 buf2))))
 
 (defun anything-delete-marked-bookmarks (elm)
+  "Delete this bookmark or all marked bookmarks."
   (anything-aif anything-c-marked-candidate-list
       (progn
         (dolist (i it)
           (bookmark-delete i 'batch))
         (bookmark-save))
     (bookmark-delete elm)))
+
+(defun anything-bookmark-active-region-maybe (candidate)
+  "Active saved region if this bookmark have one."
+  (when (and (boundp bookmark-use-region-flag)
+             bookmark-use-region-flag)
+    (let ((bmk-name (or (bookmark-get-buffer-name candidate)
+                        (file-name-nondirectory
+                         (bookmark-get-filename candidate)))))
+      (when bmk-name
+        (with-current-buffer bmk-name
+          (setq deactivate-mark nil))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -3901,23 +3916,16 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
      ("Jump to bookmark" . (lambda (candidate)
                              (bookmark-jump candidate)
                              (anything-update)
-                             (condition-case nil
-                                 (when bookmark-use-region
-                                   (let ((bmk-name (or (bookmark-get-buffername candidate)
-                                                       (file-name-nondirectory
-                                                        (bookmark-get-filename candidate)))))
-                                     (when bmk-name
-                                       (with-current-buffer bmk-name
-                                         (setq deactivate-mark nil)))))
-                               (error nil))))
+                             (anything-bookmark-active-region-maybe candidate)))
      ("Jump to BM other window" . (lambda (candidate)
                                     (bookmark-jump-other-window candidate)
-                                    (anything-update)))
+                                    (anything-update)
+                                    (anything-bookmark-active-region-maybe candidate)))
      ("Bookmark edit annotation" . (lambda (candidate)
                                      (bookmark-edit-annotation candidate)))
      ("Bookmark show annotation" . (lambda (candidate)
                                      (bookmark-show-annotation candidate)))
-     ("Delete bookmark" . anything-delete-marked-bookmarks)
+     ("Delete bookmark(s)" . anything-delete-marked-bookmarks)
      ("Rename bookmark" . bookmark-rename)
      ("Relocate bookmark" . bookmark-relocate)))
   "Bookmark name.")
