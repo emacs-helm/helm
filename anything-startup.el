@@ -2,15 +2,6 @@
 
 ;;;; Installation
 
-;;; anything.el and add-ons have complex dependencies. So you should
-;;; install auto-install.el to semi-automate Emacs Lisp installation.
-;;; Install auto-install.el from
-;;; http://www.emacswiki.org/cgi-bin/wiki/download/auto-install.el
-;;; Then byte-compile and load it.
-(require 'auto-install nil t)
-(auto-install-compatibility-setup)
-(setq auto-install-directory "~/.emacs.d/auto-install/")
-
 ;;; anything.el is just a framework and predefined configuration is in
 ;;; anything-config.el. You need install both to use anything
 ;;; practically.
