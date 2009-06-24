@@ -1822,13 +1822,11 @@ http://ctags.sourceforge.net/")
     (persistent-action . (lambda (elm)
                            (anything-semantic-default-action elm)
                            (anything-match-line-color-current-line)))
-    (action ("Goto tag" . (lambda (candidate)
-                            (let ((tag (cdr (assoc candidate anything-semantic-candidates))))
-                              (semantic-go-to-tag tag))))))
+    (action . anything-semantic-default-action)
   "Needs semantic in CEDET.
 
 http://cedet.sourceforge.net/semantic.shtml
-http://cedet.sourceforge.net/")
+http://cedet.sourceforge.net/"))
 
 ;; (anything 'anything-c-source-semantic)
 
