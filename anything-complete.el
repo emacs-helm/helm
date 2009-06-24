@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.52 2009-05-30 05:04:30 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.53 2009-06-24 15:37:50 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -90,7 +90,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.52  2009-05-30 05:04:30  rubikitch
+;; Revision 1.53  2009-06-24 15:37:50  rubikitch
+;; `anything-c-source-complete-shell-history': require bug fix
+;;
+;; Revision 1.52  2009/05/30 05:04:30  rubikitch
 ;; Set `anything-execute-action-at-once-if-one' to t
 ;;
 ;; Revision 1.51  2009/05/25 18:57:22  rubikitch
@@ -302,7 +305,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.52 2009-05-30 05:04:30 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.53 2009-06-24 15:37:50 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -793,9 +796,9 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defvar anything-c-source-complete-shell-history
   '((name . "Shell History")
     (init . (lambda ()
+              (require 'shell-history)
               (with-current-buffer (anything-candidate-buffer (shell-history-buffer))
                 (revert-buffer t t)
-                (require 'shell-history)
                 (set (make-local-variable 'zsh-p)
                      (shell-history-zsh-extended-history-p)))))
     (get-line . acsh-get-line)
