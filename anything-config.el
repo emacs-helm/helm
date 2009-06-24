@@ -1455,29 +1455,39 @@ RedOnWhite ==> Directory."
                          (bookmark-get-end-position i)))
      for handlerp = (and (fboundp 'bookmark-get-handler)
                          (bookmark-get-handler i))
-     if (and pred ;; directories
+     ;; directories
+     if (and pred 
              (file-directory-p pred))
      collect (propertize i 'face anything-c-bookmarks-face1 'help-echo pred)
-     if (and pred ;; regular files
+     ;; regular files
+     if (and pred 
              (not (file-directory-p pred))
              (file-exists-p pred)
              (not regp))
      collect (propertize i 'face anything-c-bookmarks-face2 'help-echo pred)
-     if (and pred ;; regular files with regions saved
+     ;; regular files with regions saved
+     if (and pred 
              (not (file-directory-p pred))
              (file-exists-p pred)
              regp)
      collect (propertize i 'face '((:foreground "Indianred2")) 'help-echo pred)
-     if (and (fboundp 'bookmark-get-buffer-name) ;; buffer non--filename
+     ;; gnus
+     if (eq handlerp 'bookmark-jump-gnus)
+     collect (propertize i 'face '((:foreground "magenta")) 'help-echo pred)
+     ;; buffer non--filename
+     if (and (fboundp 'bookmark-get-buffer-name)
              bufp
+             (not (eq handlerp 'bookmark-jump-gnus))
              (not pred))
      collect (propertize i 'face '((:foreground "grey")))
-     if (and (fboundp 'bookmark-get-buffer-name) ;; w3m buffers
+     ;; w3m buffers
+     if (and (fboundp 'bookmark-get-buffer-name)
              (string= bufp "*w3m*")
              (when pred
                (not (file-exists-p pred))))
      collect (propertize i 'face '((:foreground "yellow")) 'help-echo pred)
-     if (and (fboundp 'bookmark-get-buffer-name) ;; info buffers
+     ;; info buffers
+     if (and (fboundp 'bookmark-get-buffer-name)
              (eq handlerp 'Info-bookmark-jump)
              (string= bufp "*info*"))
      collect (propertize i 'face '((:foreground "green")) 'help-echo pred)))
