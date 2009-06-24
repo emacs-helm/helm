@@ -29,3 +29,5 @@
 
 ;;; descbinds-anything.el replaces describe-bindings with anything interface.
 (require 'descbinds-anything nil t)
+
+(provide 'anything-startup)
