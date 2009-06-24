@@ -122,6 +122,9 @@
 ;;     `anything-c-source-icicle-region' (Icicle Regions)
 ;;  Kill ring:
 ;;     `anything-c-source-kill-ring' (Kill Ring)
+;;  Mark ring:
+;;     `anything-c-source-mark-ring'        (mark-ring)
+;;     `anything-c-source-global-mark-ring' (global-mark-ring)
 ;;  Register:
 ;;     `anything-c-source-register' (Registers)
 ;;  Headline Extraction:
@@ -210,6 +213,10 @@
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
+;;  `anything-mark-ring'
+;;    Preconfigured `anything' for `anything-c-source-mark-ring'.
+;;  `anything-global-mark-ring'
+;;    Preconfigured `anything' for `anything-c-source-global-mark-ring'.
 ;;  `anything-yaoddmuse-cache-pages'
 ;;    Fetch the list of files on emacswiki and create cache file.
 ;;  `anything-yaoddmuse-emacswiki-edit-or-view'
@@ -2114,6 +2121,95 @@ If this action is executed just after `yank', replace with STR as yanked string.
   (kill-new str))
 
 ;; (anything 'anything-c-source-kill-ring)
+
+;;;; <Mark ring>
+;; DO NOT include these sources in `anything-sources' use
+;; the commands `anything-mark-ring' and `anything-global-mark-ring' instead.
+
+(defun anything-c-source-mark-ring-candidates ()
+  (flet ((get-marks (pos)
+           (save-excursion
+             (goto-char pos)
+             (beginning-of-line)
+             (let ((line  (car (split-string (thing-at-point 'line) "[\n\r]"))))
+               (when (string= "" line)
+                 (setq line  "<EMPTY LINE>"))
+               (format "%7d: %s" (line-number-at-pos) line)))))
+    (with-current-buffer anything-current-buffer
+      (loop
+         with marks = (cons (mark-marker) mark-ring)
+         with recip = nil
+         for i in marks
+         for f = (get-marks i) 
+         if (not (member f recip))
+         do
+           (push f recip)
+         finally (return (reverse recip))))))
+           
+(defvar anything-mark-ring-cache nil)
+(defvar anything-c-source-mark-ring
+  '((name . "mark-ring")
+    (init . (lambda ()
+              (setq anything-mark-ring-cache
+                    (anything-c-source-mark-ring-candidates))))
+    (candidates . (lambda ()
+                    (anything-aif anything-mark-ring-cache
+                        it)))
+    (action . (("Goto line" . (lambda (candidate)
+                                (goto-line (string-to-number candidate))))))
+    (persistent-action . (lambda (candidate)
+                           (goto-line (string-to-number candidate))
+                           (anything-match-line-color-current-line)))))
+
+;; (anything 'anything-c-source-mark-ring)
+
+(defun anything-mark-ring ()
+  "Preconfigured `anything' for `anything-c-source-mark-ring'."
+  (interactive)
+  (anything 'anything-c-source-mark-ring))
+
+;;; Global-mark-ring
+(defvar anything-c-source-global-mark-ring
+  '((name . "global-mark-ring")
+    (candidates . anything-c-source-global-mark-ring-candidates)
+    (action . (("Goto line" . (lambda (candidate)
+                                (let ((items (split-string candidate ":")))
+                                  (switch-to-buffer (second items))
+                                  (goto-line (string-to-number (car items))))))))
+    (persistent-action . (lambda (candidate)
+                           (let ((items (split-string candidate ":")))
+                             (switch-to-buffer (second items))
+                             (goto-line (string-to-number (car items)))
+                             (anything-match-line-color-current-line))))))
+                             
+(defun anything-c-source-global-mark-ring-candidates ()
+  (flet ((buf-fn (m)
+           (with-current-buffer (marker-buffer m)
+             (goto-char m)
+             (beginning-of-line)
+             (let (line)
+               (if (string= "" line)
+                   (setq line  "<EMPTY LINE>")
+                   (setq line (car (split-string (thing-at-point 'line) "[\n\r]"))))
+               (format "%7d:%s:    %s" (line-number-at-pos) (marker-buffer m) line)))))
+    (loop
+       with marks = global-mark-ring
+       with recip = nil  
+       for i in marks
+       if (not (or (string-match "^ " (format "%s" (marker-buffer i)))
+                   (null (marker-buffer i))))
+       for a = (buf-fn i)
+       if (and a (not (member a recip)))
+       do
+         (push a recip)
+       finally (return (reverse recip)))))
+
+;; (anything 'anything-c-source-global-mark-ring)
+
+(defun anything-global-mark-ring ()
+  "Preconfigured `anything' for `anything-c-source-global-mark-ring'."
+  (interactive)
+  (anything 'anything-c-source-global-mark-ring))
 
 ;;;; <Register>
 ;;; Insert from register
