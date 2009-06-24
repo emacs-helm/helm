@@ -30,4 +30,7 @@
 ;;; descbinds-anything.el replaces describe-bindings with anything interface.
 (require 'descbinds-anything nil t)
 
+;;; `anything-grep' replaces standard `grep' command.
+(require 'anything-grep nil t)
+
 (provide 'anything-startup)
