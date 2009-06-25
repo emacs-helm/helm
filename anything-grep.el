@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.19 2009-02-03 21:06:49 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.20 2009-06-25 03:36:38 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -27,6 +27,20 @@
 ;; Do grep in anything buffer. When we search information with grep,
 ;; we often narrow the candidates. Let's use `anything' to do it.
 
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-grep'
+;;    Run grep in `anything' buffer to narrow results.
+;;  `anything-grep-by-name'
+;;    Do `anything-grep' from predefined location.
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+
 ;; `anything-grep' is simple interface to grep a query. It asks
 ;; directory to grep. The grep process is synchronous process. You may
 ;; have to wait when you grep the target for the first time. But once
@@ -46,7 +60,11 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.19  2009-02-03 21:06:49  rubikitch
+;; Revision 1.20  2009-06-25 03:36:38  rubikitch
+;; `agrep-real-to-display': avoid error
+;; auto-document
+;;
+;; Revision 1.19  2009/02/03 21:06:49  rubikitch
 ;; fontify file name and line number.
 ;; New variable: `anything-grep-fontify-file-name'
 ;;
@@ -114,7 +132,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.19 2009-02-03 21:06:49 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.20 2009-06-25 03:36:38 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -204,11 +222,11 @@ The command is converting standard input to EUC-JP line by line. ")
   (agrep-create-buffer (anything-attr 'command)  (anything-attr 'pwd)))
 
 (defun agrep-real-to-display (file-line-content)
-  (string-match ":\\([0-9]+\\):" file-line-content)
-  (format "%s:%s\n %s"
-          (substring file-line-content 0 (match-beginning 0))
-          (match-string 1 file-line-content)
-          (substring file-line-content (match-end 0))))
+  (and (string-match ":\\([0-9]+\\):" file-line-content)
+       (format "%s:%s\n %s"
+               (substring file-line-content 0 (match-beginning 0))
+               (match-string 1 file-line-content)
+               (substring file-line-content (match-end 0)))))
 
 (defun agrep-do-grep (command pwd)
   "Insert result of COMMAND. The current directory is PWD.
