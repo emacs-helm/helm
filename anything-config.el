@@ -168,17 +168,17 @@
 ;;  `anything-info-at-point'
 ;;    Preconfigured `anything' for searching info at point.
 ;;  `anything-show-kill-ring'
-;;    Show `kill-ring'. It is drop-in replacement of `yank-pop'.
+;;    Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
 ;;  `anything-minibuffer-history'
-;;    Show `minibuffer-history'.
+;;    Preconfigured `anything' for `minibuffer-history'.
 ;;  `anything-gentoo'
-;;    Start anything with only gentoo sources.
+;;    Preconfigured `anything' for  gentoo linux.
 ;;  `anything-surfraw-only'
-;;    Launch only anything-surfraw.
+;;    Preconfigured `anything' for surfraw.
 ;;  `anything-imenu'
-;;    Show `imenu'.
+;;    Preconfigured `anything' for `imenu'.
 ;;  `anything-google-suggest'
-;;    Google search with google suggest.
+;;    Preconfigured `anything' for google search with google suggest.
 ;;  `anything-kill-buffers'
 ;;    You can continuously kill buffer you selected.
 ;;  `anything-query-replace-regexp'
@@ -434,15 +434,7 @@ they will be displayed with face `file-name-shadow' if
   "Preconfigured `anything' for opening files.
 ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate"
   (interactive)
-  (anything anything-for-files-prefered-list))
-  ;; (anything '(anything-c-source-ffap-line
-  ;;             anything-c-source-ffap-guesser
-  ;;             anything-c-source-recentf
-  ;;             anything-c-source-buffers+
-  ;;             anything-c-source-bookmarks
-  ;;             anything-c-source-file-cache
-  ;;             anything-c-source-files-in-current-dir+
-  ;;             anything-c-source-locate)))
+  (anything-other-buffer anything-for-files-prefered-list "*anything for files*"))
 
 (defun anything-info-at-point ()
   "Preconfigured `anything' for searching info at point."
@@ -450,20 +442,20 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   (anything '(anything-c-source-info-elisp
               anything-c-source-info-cl
               anything-c-source-info-pages)
-            (thing-at-point 'symbol)))
+            (thing-at-point 'symbol) nil nil nil "*anything info*"))
 
 (defun anything-show-kill-ring ()
-  "Show `kill-ring'. It is drop-in replacement of `yank-pop'.
+  "Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
 You may bind this command to M-y."
   (interactive)
-  (anything 'anything-c-source-kill-ring nil nil nil nil "*anything kill-ring*"))
+  (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*"))
 
 (defun anything-minibuffer-history ()
-  "Show `minibuffer-history'."
+  "Preconfigured `anything' for `minibuffer-history'."
   (interactive)
   (let ((enable-recursive-minibuffers t))
-    (anything 'anything-c-source-minibuffer-history nil nil nil nil
-              "*anything minibuffer-history*")))
+    (anything-other-buffer 'anything-c-source-minibuffer-history
+                           "*anything minibuffer-history*")))
 
 (dolist (map (list minibuffer-local-filename-completion-map
                    minibuffer-local-completion-map
@@ -475,13 +467,14 @@ You may bind this command to M-y."
   (define-key map "\C-r" 'anything-minibuffer-history))
 
 (defun anything-gentoo ()
-  "Start anything with only gentoo sources."
+  "Preconfigured `anything' for  gentoo linux."
   (interactive)
-  (anything '(anything-c-source-gentoo
-              anything-c-source-use-flags)))
+  (anything-other-buffer '(anything-c-source-gentoo
+                           anything-c-source-use-flags)
+                         "*anything gentoo*"))
 
 (defun anything-surfraw-only ()
-  "Launch only anything-surfraw.
+  "Preconfigured `anything' for surfraw.
 If region is marked set anything-pattern to region.
 With one prefix arg search symbol at point.
 With two prefix args allow choosing in which symbol to search."
@@ -497,22 +490,19 @@ With two prefix args allow choosing in which symbol to search."
                   (completing-read "Search in: "
                                    (list "symbol" "sentence" "sexp" "line" "word"))))
            (setq pattern (thing-at-point search))))
-    (if pattern
-        (progn
-          (setq pattern (replace-regexp-in-string "\n" "" pattern))
-          (anything 'anything-c-source-surfraw pattern))
-        (anything 'anything-c-source-surfraw))))
+    (anything 'anything-c-source-surfraw
+              (and pattern (replace-regexp-in-string "\n" "" pattern))
+              nil nil nil "*anything surfraw*")))
 
 (defun anything-imenu ()
-  "Show `imenu'."
+  "Preconfigured `anything' for `imenu'."
   (interactive)
   (anything 'anything-c-source-imenu nil nil nil nil "*anything imenu*"))
 
 (defun anything-google-suggest ()
-  "Google search with google suggest."
+  "Preconfigured `anything' for google search with google suggest."
   (interactive)
-  (anything 'anything-c-source-google-suggest nil nil nil nil
-            "*anything google*"))
+  (anything-other-buffer 'anything-c-source-google-suggest "*anything google*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
