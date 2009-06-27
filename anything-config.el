@@ -172,7 +172,7 @@
 ;;  `anything-minibuffer-history'
 ;;    Preconfigured `anything' for `minibuffer-history'.
 ;;  `anything-gentoo'
-;;    Preconfigured `anything' for  gentoo linux.
+;;    Preconfigured `anything' for gentoo linux.
 ;;  `anything-surfraw-only'
 ;;    Preconfigured `anything' for surfraw.
 ;;  `anything-imenu'
@@ -467,7 +467,7 @@ You may bind this command to M-y."
   (define-key map "\C-r" 'anything-minibuffer-history))
 
 (defun anything-gentoo ()
-  "Preconfigured `anything' for  gentoo linux."
+  "Preconfigured `anything' for gentoo linux."
   (interactive)
   (anything-other-buffer '(anything-c-source-gentoo
                            anything-c-source-use-flags)
