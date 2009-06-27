@@ -179,6 +179,16 @@
 ;;    Preconfigured `anything' for `imenu'.
 ;;  `anything-google-suggest'
 ;;    Preconfigured `anything' for google search with google suggest.
+;;  `anything-for-buffers'
+;;    Preconfigured `anything' for buffer.
+;;  `anything-bbdb'
+;;    Preconfigured `anything' for BBDB.
+;;  `anything-locate'
+;;    Preconfigured `anything' for Locate.
+;;  `anything-w3m-bookmarks'
+;;    Preconfigured `anything' for w3m bookmark.
+;;  `anything-colors'
+;;    Preconfigured `anything' for color.
 ;;  `anything-kill-buffers'
 ;;    You can continuously kill buffer you selected.
 ;;  `anything-query-replace-regexp'
@@ -192,23 +202,23 @@
 ;;  `anything-insert-selection'
 ;;    Insert current selection.
 ;;  `anything-show-buffer-only'
-;;    Only show sources about buffer.
+;;    [OBSOLETE] Only show sources about buffer.
 ;;  `anything-show-bbdb-only'
-;;    Only show sources about BBDB.
+;;    [OBSOLETE] Only show sources about BBDB.
 ;;  `anything-show-locate-only'
-;;    Only show sources about Locate.
+;;    [OBSOLETE] Only show sources about Locate.
 ;;  `anything-show-info-only'
-;;    Only show sources about Info.
+;;    [OBSOLETE] Only show sources about Info.
 ;;  `anything-show-imenu-only'
-;;    Only show sources about Imenu.
+;;    [OBSOLETE] Only show sources about Imenu.
 ;;  `anything-show-files-only'
-;;    Only show sources about File.
+;;    [OBSOLETE] Only show sources about File.
 ;;  `anything-show-w3m-bookmarks-only'
-;;    Only show source about w3m bookmark.
+;;    [OBSOLETE] Only show source about w3m bookmark.
 ;;  `anything-show-colors-only'
-;;    Only show source about color.
+;;    [OBSOLETE] Only show source about color.
 ;;  `anything-show-kill-ring-only'
-;;    Only show source about kill ring.
+;;    [OBSOLETE] Only show source about kill ring.
 ;;  `anything-show-this-source-only'
 ;;    Only show this source.
 ;;  `anything-test-sources'
@@ -504,6 +514,35 @@ With two prefix args allow choosing in which symbol to search."
   (interactive)
   (anything-other-buffer 'anything-c-source-google-suggest "*anything google*"))
 
+;;; Converted from anything-show-*-only
+(defun anything-for-buffers ()
+  "Preconfigured `anything' for buffer."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-buffers "*anything for buffers*"))
+
+(defun anything-bbdb ()
+  "Preconfigured `anything' for BBDB."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-bbdb "*anything bbdb*"))
+
+(defun anything-locate ()
+  "Preconfigured `anything' for Locate."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-locate "*anything locate*"))
+
+(defun anything-w3m-bookmarks ()
+  "Preconfigured `anything' for w3m bookmark."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-w3m-bookmarks "*anything w3m bookmarks*"))
+
+(defun anything-colors ()
+  "Preconfigured `anything' for color."
+  (interactive)
+  (anything-other-buffer '(anything-c-source-colors anything-c-source-customize-face)
+                         "*anything colors*"))
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
 (defun anything-kill-buffers ()
@@ -628,52 +667,61 @@ With two prefix args allow choosing in which symbol to search."
      (anything-get-selection))))
 
 (defun anything-show-buffer-only ()
-  "Only show sources about buffer."
+  "[OBSOLETE] Only show sources about buffer.
+Use `anything-for-buffers' instead."
   (interactive)
   (anything-set-source-filter '("Buffers")))
 
 (defun anything-show-bbdb-only ()
-  "Only show sources about BBDB."
+  "[OBSOLETE] Only show sources about BBDB.
+Use `anything-bbdb' instead."
   (interactive)
   (anything-set-source-filter '("BBDB")))
 
 (defun anything-show-locate-only ()
-  "Only show sources about Locate."
+  "[OBSOLETE] Only show sources about Locate.
+Use `anything-locate' instead."
   (interactive)
   (anything-set-source-filter '("Locate")))
 
 (defun anything-show-info-only ()
-  "Only show sources about Info."
+  "[OBSOLETE] Only show sources about Info.
+Use `anything-info-at-point' instead."
   (interactive)
   (anything-set-source-filter '("Info Pages"
                                 "Info Elisp"
                                 "Info Common-Lisp")))
 
 (defun anything-show-imenu-only ()
-  "Only show sources about Imenu."
+  "[OBSOLETE] Only show sources about Imenu.
+Use `anything-imenu' instead."
   (interactive)
   (anything-set-source-filter '("Imenu")))
 
 (defun anything-show-files-only ()
-  "Only show sources about File."
+  "[OBSOLETE] Only show sources about File.
+Use `anything-for-files' instead."
   (interactive)
   (anything-set-source-filter '("File Name History"
                                 "Files from Current Directory"
                                 "Recentf")))
 
 (defun anything-show-w3m-bookmarks-only ()
-  "Only show source about w3m bookmark."
+  "[OBSOLETE] Only show source about w3m bookmark.
+Use `anything-w3m-bookmarks' instead."
   (interactive)
   (anything-set-source-filter '("W3m Bookmarks")))
 
 (defun anything-show-colors-only ()
-  "Only show source about color."
+  "[OBSOLETE] Only show source about color.
+Use `anything-colors' instead."
   (interactive)
   (anything-set-source-filter '("Colors"
                                 "Customize Faces")))
 
 (defun anything-show-kill-ring-only ()
-  "Only show source about kill ring."
+  "[OBSOLETE] Only show source about kill ring.
+Use `anything-show-kill-ring' instead."
   (interactive)
   (anything-set-source-filter '("Kill Ring")))
 
