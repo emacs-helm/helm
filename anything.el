@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.196 2009-06-29 13:29:25 rubikitch Exp $
+;; $Id: anything.el,v 1.197 2009-06-29 15:10:13 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -318,7 +318,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.196  2009-06-29 13:29:25  rubikitch
+;; Revision 1.197  2009-06-29 15:10:13  rubikitch
+;; OOPS! remove debug code
+;;
+;; Revision 1.196  2009/06/29 13:29:25  rubikitch
 ;; anything-follow-mode: automatical execution of persistent-action (C-c C-f)
 ;;
 ;; Revision 1.195  2009/06/19 14:42:57  rubikitch
@@ -955,7 +958,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.196 2009-06-29 13:29:25 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.197 2009-06-29 15:10:13 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3275,7 +3278,7 @@ You can paste it by typing C-y."
   nil " AFollow" :global t)
 
 (defun anything-follow-execute-persistent-action-maybe ()
-  (when (and (p anything-follow-mode)
+  (when (and anything-follow-mode
              (anything-window)
              (anything-get-selection))
     (save-excursion
