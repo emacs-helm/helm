@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.53 2009-06-24 15:37:50 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.54 2009-06-29 15:13:02 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -69,8 +69,9 @@
 ;; Install anything-match-plugin.el (must).
 ;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/anything-match-plugin.el
 ;;
-;; shell-history.el would help you (optional).
+;; shell-history.el / shell-command.el would help you (optional).
 ;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/shell-history.el
+;; M-x install-elisp http://www.emacswiki.org/cgi-bin/wiki/download/shell-command.el
 ;;
 ;; If you want `anything-execute-extended-command' to show
 ;; context-aware commands, use anything-kyr.el and
@@ -86,11 +87,16 @@
 ;; (anything-lisp-complete-symbol-set-timer 150)
 ;; ;; replace completion commands with `anything'
 ;; (anything-read-string-mode 1)
+;; ;; Bind C-o to complete shell history
+;; (anything-complete-shell-history-setup-key "\C-o")
 
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.53  2009-06-24 15:37:50  rubikitch
+;; Revision 1.54  2009-06-29 15:13:02  rubikitch
+;; New function: `anything-complete-shell-history-setup-key'
+;;
+;; Revision 1.53  2009/06/24 15:37:50  rubikitch
 ;; `anything-c-source-complete-shell-history': require bug fix
 ;;
 ;; Revision 1.52  2009/05/30 05:04:30  rubikitch
@@ -305,7 +311,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.53 2009-06-24 15:37:50 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.54 2009-06-29 15:13:02 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -792,6 +798,16 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (anything-complete 'anything-c-source-complete-shell-history
                      (or (word-at-point) "")
                      20))
+(defun anything-complete-shell-history-setup-key (key)
+  (when (and (require 'shell-command nil t)
+             (boundp 'shell-command-minibuffer-map))
+    (shell-command-completion-mode)
+    (define-key shell-command-minibuffer-map key 'anything-complete-shell-history))
+  (when (require 'background nil t)
+    (define-key background-minibuffer-map key 'anything-complete-shell-history))
+  (require 'shell)
+  (define-key shell-mode-map key 'anything-complete-shell-history))
+
 (defvar zsh-p nil)
 (defvar anything-c-source-complete-shell-history
   '((name . "Shell History")
