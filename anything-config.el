@@ -152,6 +152,7 @@
 ;;     `anything-c-source-occur'              (Occur)
 ;;     `anything-c-source-create'             (Create)
 ;;     `anything-c-source-minibuffer-history' (Minibuffer History)
+;;     `anything-c-source-elscreen'           (Elscreen)
 ;;  System:
 ;;     `anything-c-source-xrandr-change-resolution' (Change Resolution)
 ;;     `anything-c-source-xfonts'                   (X Fonts)
@@ -3031,6 +3032,28 @@ See also `anything-create--actions'."
     (migemo)
     (action . insert)))
 ;; (anything 'anything-c-source-minibuffer-history)
+
+;; elscreen
+(defvar anything-c-source-elscreen
+  '((name . "Elscreen")
+    (candidates . (lambda ()
+                    (if (cdr (elscreen-get-screen-to-name-alist))
+                        (sort
+                         (loop for sname in (elscreen-get-screen-to-name-alist)
+                               append (list (format "[%d] %s" (car sname) (cdr sname))) into lst
+                               finally (return lst))
+                         '(lambda (a b) (compare-strings a nil nil b nil nil))))))
+    (action . (("Change Screen".
+                (lambda (candidate)
+                  (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
+               ("Kill Screen".
+                (lambda (candidate)
+                  (elscreen-kill (- (aref candidate 1) (aref "0" 0)))))
+               ("Only Screen".
+                (lambda (candidate)
+                  (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
+                  (elscreen-kill-others)))))))
+;; (anything 'anything-c-source-elscreen)
 
 ;;;; <System>
 
