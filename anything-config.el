@@ -3666,26 +3666,6 @@ other candidate transformers."
                    list)
           finally (return (nreverse list)))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Marked candidates ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun anything-c-list-marked-candidate ()
-  (interactive)
-  (let (marked-candidates)
-    (with-anything-window
-      (goto-char (point-min))
-      (beginning-of-line)
-      (while (anything-next-visible-mark)
-        (push (buffer-substring-no-properties (point-at-bol) (point-at-eol)) marked-candidates)))
-    marked-candidates))
-
-(defvar anything-c-marked-candidate-list nil)
-(defadvice anything-select-action (before save-marked-candidates () activate)
-  (setq anything-c-marked-candidate-list (anything-c-list-marked-candidate))
-  (anything-clear-visible-mark))
-
-(defadvice anything-toggle-visible-mark (after move-to-next-line () activate)
-  (anything-next-line))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Adaptive Sorting of Candidates ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar anything-c-adaptive-done nil
   "nil if history information is not yet stored for the current
