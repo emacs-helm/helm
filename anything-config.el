@@ -3094,6 +3094,7 @@ See also `anything-create--actions'."
                       (x-list-fonts "*")))))  
     (candidates . anything-c-xfonts-cache)
     (multiline)
+    (volatile)
     (action . (("Copy to kill ring" . (lambda (elm)
                                         (kill-new elm)))
                ("Set Font" . (lambda (elm)
@@ -3971,10 +3972,8 @@ With optional arg `merge' call `ediff-merge-buffers'."
 (defun anything-delete-marked-bookmarks (elm)
   "Delete this bookmark or all marked bookmarks."
   (anything-aif anything-c-marked-candidate-list
-      (progn
-        (dolist (i it)
-          (bookmark-delete i 'batch))
-        (bookmark-save))
+      (dolist (i it)
+        (bookmark-delete i 'batch))
     (bookmark-delete elm)))
 
 (defun anything-bookmark-active-region-maybe (candidate)
