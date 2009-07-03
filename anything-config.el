@@ -1586,7 +1586,7 @@ RedOnWhite ==> Directory."
         (forward-line)
         (when (re-search-forward "href=" nil t)
           (beginning-of-line)
-          (when (re-search-forward "http://[^>]*" nil t)
+          (when (re-search-forward "\\(http\\|file\\)://[^>]*" nil t)
             (setq url (concat "\"" (match-string 0))))
           (beginning-of-line)
           (when (re-search-forward anything-w3m-bookmarks-regexp nil t)
