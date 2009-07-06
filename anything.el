@@ -1,5 +1,5 @@
-;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.197 2009-06-29 15:10:13 rubikitch Exp $
+;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
+;; $Id: anything.el,v 1.198 2009-07-06 15:22:48 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -318,7 +318,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.197  2009-06-29 15:10:13  rubikitch
+;; Revision 1.198  2009-07-06 15:22:48  rubikitch
+;; header modified (no code change)
+;;
+;; Revision 1.197  2009/06/29 15:10:13  rubikitch
 ;; OOPS! remove debug code
 ;;
 ;; Revision 1.196  2009/06/29 13:29:25  rubikitch
@@ -958,7 +961,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.197 2009-06-29 15:10:13 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.198 2009-07-06 15:22:48 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
