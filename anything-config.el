@@ -439,7 +439,21 @@ they will be displayed with face `file-name-shadow' if
   "Your prefered sources to find files."
   :type 'list
   :group 'anything-config)
- 
+
+(defcustom anything-create--actions-private nil
+  "User defined actions for `anything-create' / `anything-c-source-create'.
+It is a list of (DISPLAY . FUNCTION) pairs like `action'
+attribute of `anything-sources'.
+
+It is prepended to predefined pairs."
+  :type 'list
+  :group 'anything-config)
+
+(defcustom anything-allow-skipping-current-buffer t
+  "Show current buffer or not in anything buffer"
+  :type 'boolean
+  :group 'anything-config)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
@@ -2977,14 +2991,6 @@ A list of search engines."
   "Do many create actions from `anything-pattern'.
 See also `anything-create--actions'.")
 ;; (anything 'anything-c-source-create)
-(defcustom anything-create--actions-private nil
-  "User defined actions for `anything-create' / `anything-c-source-create'.
-It is a list of (DISPLAY . FUNCTION) pairs like `action'
-attribute of `anything-sources'.
-
-It is prepended to predefined pairs."
-  :type 'list
-  :group 'anything-config)
 
 (defun anything-create-from-anything ()
   "Run `anything-create' from `anything' as a fallback."
@@ -3646,7 +3652,9 @@ evaluate it and put it onto the `command-history'."
   (anything-c-skip-entries buffers anything-c-boring-buffer-regexp))
 
 (defun anything-c-skip-current-buffer (buffers)
-  (remove (buffer-name anything-current-buffer) buffers))
+  (if anything-allow-skipping-current-buffer
+      (remove (buffer-name anything-current-buffer) buffers)
+      buffers))
 
 (defun anything-c-shadow-boring-buffers (buffers)
   "Buffers matching `anything-c-boring-buffer-regexp' will be
