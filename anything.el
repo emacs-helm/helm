@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.198 2009-07-06 15:22:48 rubikitch Exp $
+;; $Id: anything.el,v 1.199 2009-07-19 13:22:29 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -318,7 +318,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.198  2009-07-06 15:22:48  rubikitch
+;; Revision 1.199  2009-07-19 13:22:29  rubikitch
+;; `anything-follow-execute-persistent-action-maybe': execute persistent action after `anything-input-idle-delay'
+;;
+;; Revision 1.198  2009/07/06 15:22:48  rubikitch
 ;; header modified (no code change)
 ;;
 ;; Revision 1.197  2009/06/29 15:10:13  rubikitch
@@ -961,7 +964,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.198 2009-07-06 15:22:48 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.199 2009-07-19 13:22:29 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3281,11 +3284,13 @@ You can paste it by typing C-y."
   nil " AFollow" :global t)
 
 (defun anything-follow-execute-persistent-action-maybe ()
-  (when (and anything-follow-mode
-             (anything-window)
-             (anything-get-selection))
-    (save-excursion
-      (anything-execute-persistent-action))))
+  "Execute persistent action after `anything-input-idle-delay' secs when `anything-follow-mode' is enabled."
+  (and anything-follow-mode
+       (sit-for anything-input-idle-delay)
+       (anything-window)
+       (anything-get-selection)
+       (save-excursion
+         (anything-execute-persistent-action))))
 
 ;; (@* "Utility: Incremental search within results (unmaintained)")
 
