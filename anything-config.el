@@ -290,6 +290,9 @@
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
+;;  `anything-allow-skipping-current-buffer'
+;;    Show current buffer or not in anything buffer
+;;    default = t
 
 ;;; Change log:
 ;;
@@ -3557,8 +3560,11 @@ It is added to `extended-command-history'.
   (setq extended-command-history
         (cons (anything-c-stringify cmd-or-name)
               (delete (anything-c-stringify cmd-or-name) extended-command-history)))
-  (let ((current-prefix-arg anything-current-prefix-arg))
-    (call-interactively (anything-c-symbolify cmd-or-name))))
+  (let ((current-prefix-arg anything-current-prefix-arg)
+        (cmd (anything-c-symbolify cmd-or-name)))
+    (if (stringp (symbol-function cmd))
+        (execute-kbd-macro (symbol-function cmd))
+      (call-interactively cmd))))
 
 (defun anything-c-set-variable (var)
   "Set value to VAR interactively."
