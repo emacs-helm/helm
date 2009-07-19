@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.54 2009-06-29 15:13:02 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.55 2009-07-19 07:33:33 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -93,7 +93,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.54  2009-06-29 15:13:02  rubikitch
+;; Revision 1.55  2009-07-19 07:33:33  rubikitch
+;; `anything-execute-extended-command': adjust to keyboard macro command
+;;
+;; Revision 1.54  2009/06/29 15:13:02  rubikitch
 ;; New function: `anything-complete-shell-history-setup-key'
 ;;
 ;; Revision 1.53  2009/06/24 15:37:50  rubikitch
@@ -311,7 +314,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.54 2009-06-29 15:13:02 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.55 2009-07-19 07:33:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -878,7 +881,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                 anything-execute-extended-command-sources))))
     (when cmd
       (setq extended-command-history (cons cmd (delete cmd extended-command-history)))
-      (call-interactively (intern cmd)))))
+      (setq cmd (intern cmd))
+      (if (stringp (symbol-function cmd))
+          (execute-kbd-macro (symbol-function cmd))
+        (call-interactively cmd)))))
 
 (defvar anything-find-file-additional-sources nil)
 (defun anything-find-file ()
