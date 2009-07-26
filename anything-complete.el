@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.55 2009-07-19 07:33:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.56 2009-07-26 21:25:04 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -93,7 +93,12 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.55  2009-07-19 07:33:33  rubikitch
+;; Revision 1.56  2009-07-26 21:25:04  rubikitch
+;; New variable: `anything-completing-read-use-default'
+;; New variable: `anything-completing-read-history-first'
+;; `anything-completing-read', `anything-read-file-name': history order bug fix
+;;
+;; Revision 1.55  2009/07/19 07:33:33  rubikitch
 ;; `anything-execute-extended-command': adjust to keyboard macro command
 ;;
 ;; Revision 1.54  2009/06/29 15:13:02  rubikitch
@@ -314,7 +319,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.55 2009-07-19 07:33:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.56 2009-07-26 21:25:04 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -573,31 +578,41 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                        (keyboard-quit))))
       (when (stringp result)
         (prog1 result
-          (add-to-list (or hist 'minibuffer-history) result))))))
+          (setq hist (or hist 'minibuffer-history))
+          (set hist (cons result (delete result (symbol-value hist)))))))))
 
 ;; TODO obarray/predicate hacks: command/variable/symbol
-
+(defvar anything-completing-read-use-default t
+  "Whether to use default value source.")
+(defvar anything-completing-read-history-first nil
+  "Whether to display history source first.")
 (defun* acr-sources (prompt collection predicate require-match initial hist default inherit-input-method &optional (additional-attrs '((action . identity))))
   "`anything' replacement for `completing-read'."
-  (let ((transformer-func
-         (if predicate
-             `(candidate-transformer
-               . (lambda (cands)
-                   (remove-if-not (lambda (c) (,predicate
-                                               (if (listp c) (car c) c))) cands)))))
-        (new-input-source (ac-new-input-source prompt require-match additional-attrs))
-        (history-source (unless require-match
-                          `((name . "History")
-                            (candidates . ,(or hist 'minibuffer-history))
-                            ,@additional-attrs)))
-        (default-source (ac-default-source default t)))
-  `(,default-source
-    ((name . "Completions")
-     (candidates . ,(mapcar (lambda (x) (or (car-safe x) x)) collection))
-     ,@additional-attrs
-     ,transformer-func)
-    ,history-source
-    ,new-input-source)))
+  (let* ((transformer-func
+          (if predicate
+              `(candidate-transformer
+                . (lambda (cands)
+                    (remove-if-not (lambda (c) (,predicate
+                                                (if (listp c) (car c) c))) cands)))))
+         (new-input-source (ac-new-input-source prompt require-match additional-attrs))
+         (history-source (unless require-match
+                           `((name . "History")
+                             (candidates . ,(or hist 'minibuffer-history))
+                             ,@additional-attrs)))
+         (default-source (and anything-completing-read-use-default (ac-default-source default t)))
+         (main-source `((name . "Completions")
+                        (candidates . ,(mapcar (lambda (x) (or (car-safe x) x)) collection))
+                        ,@additional-attrs
+                        ,transformer-func)))
+    (if anything-completing-read-history-first
+        `(,default-source
+           ,history-source
+           ,main-source
+           ,new-input-source)
+      `(,default-source
+           ,main-source
+           ,history-source
+           ,new-input-source))))
 ;; (anything-completing-read "Command: " obarray 'commandp t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (anything-old-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
@@ -658,7 +673,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
       (error "anything-read-file-name: file `%s' is not matched" result))
     (when (stringp result)
       (prog1 result
-        (add-to-list 'file-name-history result)))))
+        (add-to-list 'file-name-history result)
+        (setq file-name-history (cons result (delete result file-name-history)))))))
 
 (defun arfn-candidates (dir)
   (if (file-directory-p dir)
