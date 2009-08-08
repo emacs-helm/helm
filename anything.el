@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.200 2009-08-08 13:23:46 rubikitch Exp $
+;; $Id: anything.el,v 1.201 2009-08-08 13:25:30 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -318,7 +318,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.200  2009-08-08 13:23:46  rubikitch
+;; Revision 1.201  2009-08-08 13:25:30  rubikitch
+;; `anything-toggle-visible-mark': move next line after unmarking
+;;
+;; Revision 1.200  2009/08/08 13:23:46  rubikitch
 ;; `anything-toggle-visible-mark': Applied ThierryVolpiatto's patch. thx.
 ;;
 ;; Revision 1.199  2009/07/19 13:22:29  rubikitch
@@ -967,7 +970,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.200 2009-08-08 13:23:46 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.201 2009-08-08 13:25:30 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3242,8 +3245,8 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
         (overlay-put o 'source (assoc-default 'name (anything-get-current-source)))
         (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
         (add-to-list 'anything-visible-mark-overlays o)
-        (push (buffer-substring-no-properties (point-at-bol) (point-at-eol)) anything-c-marked-candidate-list)
-        (anything-next-line)))))
+        (push (buffer-substring-no-properties (point-at-bol) (point-at-eol)) anything-c-marked-candidate-list)))
+    (anything-next-line)))
 
 (add-hook 'anything-after-initialize-hook (lambda ()
                                    (setq anything-c-marked-candidate-list nil)))
