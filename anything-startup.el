@@ -23,12 +23,18 @@
 ;;; anything-complete.el replaces various completion with anything
 ;;; (like Icicles). Use Anything power for normal completion.
 (require 'anything-complete nil t)
+;; Automatically collect symbols by 150 secs
+(anything-lisp-complete-symbol-set-timer 150)
+;; Comment if you do not want to replace completion commands with `anything'.
+(anything-read-string-mode 1)
 
 ;;; anything-auto-install.el integrates auto-install.el with anything.
 (require 'anything-auto-install nil t)
 
 ;;; descbinds-anything.el replaces describe-bindings with anything interface.
 (require 'descbinds-anything nil t)
+;; Comment if you do not want to replace `describe-bindings' with `anything'.
+(descbinds-anything-install)
 
 ;;; `anything-grep' replaces standard `grep' command.
 (require 'anything-grep nil t)
