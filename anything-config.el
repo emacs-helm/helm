@@ -1578,6 +1578,144 @@ RedOnWhite ==> Directory."
   "See (info \"(emacs)Bookmarks\").")
 ;; (anything 'anything-c-source-bookmarks-local)
 
+;;; Sources to filter bookmark+ bookmarks.
+;; Dependency: http://www.emacswiki.org/cgi-bin/emacs/bookmark+.el
+
+(when (require 'bookmark+ nil t)
+  (bookmark-maybe-load-default-file)
+  
+  (defun anything-c-bookmark+-filter-setup-alist (fn &rest args)
+    "Return a filtered `bookmark-alist' using one of the bookmark+ filters functions."
+    (loop
+       with alist = (if args
+                        (apply #'(lambda (x) (funcall fn x)) args)
+                        (funcall fn))
+       for i in alist
+       for b = (car i)
+       collect b))
+
+  ;; Regions
+  (defvar anything-c-source-bookmark-regions
+    '((name . "Bookmark Regions")
+      (candidates . anything-c-bookmark-region-setup-alist)
+      (candidate-transformer anything-c-highlight-bookmark)
+      (type . bookmark)))
+
+  ;; (anything 'anything-c-source-bookmark-regions)
+
+  (defun anything-c-bookmark-region-setup-alist ()
+    "Specialized filter function for bookmark+ regions."
+    (anything-c-bookmark+-filter-setup-alist 'bookmark-region-alist-only))
+
+  ;; W3m
+  (defvar anything-c-source-bookmark-w3m
+    '((name . "Bookmark W3m")
+      (candidates . anything-c-bookmark-w3m-setup-alist)
+      (candidate-transformer anything-c-highlight-bookmark)
+      (type . bookmark)))
+
+  ;; (anything 'anything-c-source-bookmark-w3m)
+
+  (defun anything-c-bookmark-w3m-setup-alist ()
+    "Specialized filter function for bookmark+ w3m."
+    (anything-c-bookmark+-filter-setup-alist 'bookmark-w3m-alist-only))
+
+  ;; Gnus
+  (defvar anything-c-source-bookmark-gnus
+    '((name . "Bookmark Gnus")
+      (candidates . anything-c-bookmark-gnus-setup-alist)
+      (candidate-transformer anything-c-highlight-bookmark)
+      (type . bookmark)))
+  ;; (anything 'anything-c-source-bookmark-gnus)
+
+  (defun anything-c-bookmark-gnus-setup-alist ()
+    "Specialized filter function for bookmark+ gnus."
+    (anything-c-bookmark+-filter-setup-alist 'bookmark-gnus-alist-only))
+
+  ;; Info
+  (defvar anything-c-source-bookmark-info
+    '((name . "Bookmark Info")
+      (candidates . anything-c-bookmark-info-setup-alist)
+      (candidate-transformer anything-c-highlight-bookmark)
+      (type . bookmark)))
+  ;; (anything 'anything-c-source-bookmark-info)
+
+  (defun anything-c-bookmark-info-setup-alist ()
+    "Specialized filter function for bookmark+ info."
+    (anything-c-bookmark+-filter-setup-alist 'bookmark-info-alist-only))
+
+  ;; Local Files&directories
+  (defvar anything-c-source-bookmark-files&dirs
+    '((name . "Bookmark Files&Directories")
+      (candidates . anything-c-bookmark-local-files-setup-alist)
+      (candidate-transformer anything-c-highlight-bookmark)
+      (type . bookmark)))
+  ;; (anything 'anything-c-source-bookmark-files&dirs)
+
+  (defun anything-c-bookmark-local-files-setup-alist ()
+    "Specialized filter function for bookmark+ locals files."
+    (anything-c-bookmark+-filter-setup-alist 'bookmark-vanilla-alist-only 'hide-remote))
+
+  ;; Su Files&directories
+
+  (defun anything-c-highlight-bookmark+-su (bmk)
+    (if (root-or-sudo-logged-p)
+        (anything-c-highlight-bookmark bmk)
+        (anything-c-highlight-not-logged bmk)))
+
+  (defvar anything-c-source-bookmark-su-files&dirs
+    '((name . "Bookmark Root-Files&Directories")
+      (candidates . anything-c-bookmark-su-files-setup-alist)
+      (candidate-transformer anything-c-highlight-bookmark+-su)
+      (type . bookmark)))
+  ;; (anything 'anything-c-source-bookmark-tramp-files&dirs)
+
+  (defun anything-c-bookmark-su-files-setup-alist ()
+    "Specialized filter function for bookmark+ su/sudo files."
+    (loop
+       with l = (anything-c-bookmark+-filter-setup-alist 'bookmark-remote-alist-only)
+       for i in l
+       for isfile = (bookmark-get-filename i)
+       for istramp = (and isfile (boundp 'tramp-file-name-regexp)
+                          (save-match-data
+                            (string-match tramp-file-name-regexp isfile)))
+       for issu = (and istramp
+                       (string-match bookmark-su-or-sudo-regexp isfile))
+       if issu
+       collect i))
+
+  ;; Ssh Files&directories
+  (defvar anything-c-source-bookmark-ssh-files&dirs
+    '((name . "Bookmark Ssh-Files&Directories")
+      (candidates . anything-c-bookmark-ssh-files-setup-alist)
+      (type . bookmark)))
+  ;; (anything 'anything-c-source-bookmark-ssh-files&dirs)
+
+  (defun anything-c-bookmark-ssh-files-setup-alist ()
+    "Specialized filter function for bookmark+ ssh files."
+    (loop
+       with l = (anything-c-bookmark+-filter-setup-alist 'bookmark-remote-alist-only)
+       for i in l
+       for isfile = (bookmark-get-filename i)
+       for istramp = (and isfile (boundp 'tramp-file-name-regexp)
+                          (save-match-data
+                            (string-match tramp-file-name-regexp isfile)))
+       for isssh = (and istramp
+                        (string-match "/ssh:" isfile))
+       if isssh
+       collect i))
+
+  ;; All bookmark+ sources.
+  (defun anything-bookmark+ ()
+    "Preconfigured anything for bookmark+ sources."
+    (interactive)
+    (anything '(anything-c-source-bookmark-files&dirs
+                anything-c-source-bookmark-w3m
+                anything-c-source-bookmark-gnus
+                anything-c-source-bookmark-regions
+                anything-c-source-bookmark-su-files&dirs
+                anything-c-source-bookmark-ssh-files&dirs))))
+
 
 ;; W3m bookmark
 (eval-when-compile (require 'w3m-bookmark nil t))
