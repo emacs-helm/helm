@@ -1592,7 +1592,8 @@ RedOnWhite ==> Directory."
                         (funcall fn))
        for i in alist
        for b = (car i)
-       collect b))
+       collect b into sa
+       finally return (sort sa 'string-lessp)))
 
   ;; Regions
   (defvar anything-c-source-bookmark-regions
