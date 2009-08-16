@@ -1516,25 +1516,25 @@ Blue ==> regular file with maybe a region saved.
 RedOnWhite ==> Directory."
   (loop for i in bookmarks
      for pred = (bookmark-get-filename i)
-     for bufp = (and (fboundp 'bookmark-get-buffer-name)
-                     (bookmark-get-buffer-name i))
-     for regp = (and (fboundp 'bookmark-get-end-position)
-                     (bookmark-get-end-position i)
+     for bufp = (and (fboundp 'bookmarkp-get-buffer-name)
+                     (bookmarkp-get-buffer-name i))
+     for regp = (and (fboundp 'bookmarkp-get-end-position)
+                     (bookmarkp-get-end-position i)
                      (/= (bookmark-get-position i)
-                         (bookmark-get-end-position i)))
+                         (bookmarkp-get-end-position i)))
      for handlerp = (and (fboundp 'bookmark-get-handler)
                          (bookmark-get-handler i))
      ;; info buffers
-     if (and (fboundp 'bookmark-get-buffer-name)
+     if (and (fboundp 'bookmarkp-get-buffer-name)
              (eq handlerp 'Info-bookmark-jump)
              (string= bufp "*info*"))
      collect (propertize i 'face '((:foreground "green")) 'help-echo pred)
      ;; w3m buffers
-     if (and (fboundp 'bookmark-get-buffer-name)
+     if (and (fboundp 'bookmarkp-get-buffer-name)
              (string= bufp "*w3m*"))
      collect (propertize i 'face '((:foreground "yellow")) 'help-echo pred)
      ;; gnus buffers
-     if (eq handlerp 'bookmark-jump-gnus)
+     if (eq handlerp 'bookmarkp-jump-gnus)
      collect (propertize i 'face '((:foreground "magenta")) 'help-echo pred)
      ;; directories
      if (and pred 
@@ -1553,9 +1553,9 @@ RedOnWhite ==> Directory."
              (not regp))
      collect (propertize i 'face anything-c-bookmarks-face2 'help-echo pred)
      ;; buffer non--filename
-     if (and (fboundp 'bookmark-get-buffer-name)
+     if (and (fboundp 'bookmarkp-get-buffer-name)
              bufp
-             (not (eq handlerp 'bookmark-jump-gnus))
+             (not (eq handlerp 'bookmarkp-jump-gnus))
              (not pred))
      collect (propertize i 'face '((:foreground "grey")))))
        
@@ -1606,7 +1606,7 @@ RedOnWhite ==> Directory."
 
   (defun anything-c-bookmark-region-setup-alist ()
     "Specialized filter function for bookmark+ regions."
-    (anything-c-bookmark+-filter-setup-alist 'bookmark-region-alist-only))
+    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-region-alist-only))
 
   ;; W3m
   (defvar anything-c-source-bookmark-w3m
@@ -1619,7 +1619,7 @@ RedOnWhite ==> Directory."
 
   (defun anything-c-bookmark-w3m-setup-alist ()
     "Specialized filter function for bookmark+ w3m."
-    (anything-c-bookmark+-filter-setup-alist 'bookmark-w3m-alist-only))
+    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-w3m-alist-only))
 
   ;; Gnus
   (defvar anything-c-source-bookmark-gnus
@@ -1631,7 +1631,7 @@ RedOnWhite ==> Directory."
 
   (defun anything-c-bookmark-gnus-setup-alist ()
     "Specialized filter function for bookmark+ gnus."
-    (anything-c-bookmark+-filter-setup-alist 'bookmark-gnus-alist-only))
+    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-gnus-alist-only))
 
   ;; Info
   (defvar anything-c-source-bookmark-info
@@ -1643,7 +1643,7 @@ RedOnWhite ==> Directory."
 
   (defun anything-c-bookmark-info-setup-alist ()
     "Specialized filter function for bookmark+ info."
-    (anything-c-bookmark+-filter-setup-alist 'bookmark-info-alist-only))
+    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-info-alist-only))
 
   ;; Local Files&directories
   (defvar anything-c-source-bookmark-files&dirs
@@ -1655,12 +1655,12 @@ RedOnWhite ==> Directory."
 
   (defun anything-c-bookmark-local-files-setup-alist ()
     "Specialized filter function for bookmark+ locals files."
-    (anything-c-bookmark+-filter-setup-alist 'bookmark-vanilla-alist-only 'hide-remote))
+    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-files-alist-only 'hide-remote))
 
   ;; Su Files&directories
 
   (defun anything-c-highlight-bookmark+-su (bmk)
-    (if (root-or-sudo-logged-p)
+    (if (bookmarkp-root-or-sudo-logged-p)
         (anything-c-highlight-bookmark bmk)
         (anything-c-highlight-not-logged bmk)))
 
@@ -1669,19 +1669,19 @@ RedOnWhite ==> Directory."
       (candidates . anything-c-bookmark-su-files-setup-alist)
       (candidate-transformer anything-c-highlight-bookmark+-su)
       (type . bookmark)))
-  ;; (anything 'anything-c-source-bookmark-tramp-files&dirs)
+  ;; (anything 'anything-c-source-bookmark-su-files&dirs)
 
   (defun anything-c-bookmark-su-files-setup-alist ()
     "Specialized filter function for bookmark+ su/sudo files."
     (loop
-       with l = (anything-c-bookmark+-filter-setup-alist 'bookmark-remote-alist-only)
+       with l = (anything-c-bookmark+-filter-setup-alist 'bookmarkp-remote-alist-only)
        for i in l
        for isfile = (bookmark-get-filename i)
        for istramp = (and isfile (boundp 'tramp-file-name-regexp)
                           (save-match-data
                             (string-match tramp-file-name-regexp isfile)))
        for issu = (and istramp
-                       (string-match bookmark-su-or-sudo-regexp isfile))
+                       (string-match bookmarkp-su-or-sudo-regexp isfile))
        if issu
        collect i))
 
@@ -1695,7 +1695,7 @@ RedOnWhite ==> Directory."
   (defun anything-c-bookmark-ssh-files-setup-alist ()
     "Specialized filter function for bookmark+ ssh files."
     (loop
-       with l = (anything-c-bookmark+-filter-setup-alist 'bookmark-remote-alist-only)
+       with l = (anything-c-bookmark+-filter-setup-alist 'bookmarkp-remote-alist-only)
        for i in l
        for isfile = (bookmark-get-filename i)
        for istramp = (and isfile (boundp 'tramp-file-name-regexp)
