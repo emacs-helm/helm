@@ -1537,7 +1537,7 @@ RedOnWhite ==> Directory."
 
   (defun anything-c-bookmark-local-files-setup-alist ()
     "Specialized filter function for bookmark+ locals files."
-    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-files-alist-only 'hide-remote))
+    (anything-c-bookmark+-filter-setup-alist 'bookmarkp-local-file-alist-only))
 
   ;; Su Files&directories
 
