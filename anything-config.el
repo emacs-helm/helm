@@ -1437,8 +1437,8 @@ RedOnWhite ==> Directory."
      ;; buffer non--filename
      if (and (fboundp 'bookmarkp-get-buffer-name)
              bufp
-             (not (eq handlerp 'bookmarkp-jump-gnus))
-             (not pred))
+             (not (bookmark-get-handler i))
+             (if pred (not (file-exists-p pred)) (not pred)))
      collect (propertize i 'face '((:foreground "grey")))))
        
 
