@@ -1397,15 +1397,18 @@ Green ==> info buffer with saved region.
 Blue ==> regular file with maybe a region saved.
 RedOnWhite ==> Directory."
   (loop for i in bookmarks
-     for pred = (bookmark-get-filename i)
-     for bufp = (and (fboundp 'bookmarkp-get-buffer-name)
-                     (bookmarkp-get-buffer-name i))
-     for regp = (and (fboundp 'bookmarkp-get-end-position)
-                     (bookmarkp-get-end-position i)
-                     (/= (bookmark-get-position i)
-                         (bookmarkp-get-end-position i)))
-     for handlerp = (and (fboundp 'bookmark-get-handler)
-                         (bookmark-get-handler i))
+     for pred      = (bookmark-get-filename i)
+     for bufp      = (and (fboundp 'bookmarkp-get-buffer-name)
+                          (bookmarkp-get-buffer-name i))
+     for regp      = (and (fboundp 'bookmarkp-get-end-position)
+                          (bookmarkp-get-end-position i)
+                          (/= (bookmark-get-position i)
+                              (bookmarkp-get-end-position i)))
+     for handlerp  = (and (fboundp 'bookmark-get-handler)
+                          (bookmark-get-handler i))
+     for isannotation  = (bookmark-get-annotation i)       
+     if (and isannotation (not (string-equal isannotation "")))
+     do (setq i (concat "*" i))
      ;; info buffers
      if (and (fboundp 'bookmarkp-get-buffer-name)
              (eq handlerp 'Info-bookmark-jump)
@@ -3998,25 +4001,38 @@ With optional arg `merge' call `ediff-merge-buffers'."
         (ediff-merge-buffers buf1 buf2)
         (ediff-buffers buf1 buf2))))
 
+(defun anything-bookmark-get-bookmark-from-name (bmk)
+  "Return bookmark name even if it is a bookmark with annotation.
+e.g prepended with *.
+Return nil if bmk is not a valid bookmark."
+  (let ((bookmark (replace-regexp-in-string "\*" "" bmk)))
+    (if (assoc bookmark bookmark-alist)
+        bookmark
+        (when (assoc bmk bookmark-alist)
+          bmk))))
+
 (defun anything-delete-marked-bookmarks (elm)
   "Delete this bookmark or all marked bookmarks."
-  (anything-aif anything-c-marked-candidate-list
-      (dolist (i it)
-        (bookmark-delete i 'batch))
-    (bookmark-delete elm)))
+  (let ((bookmark (anything-bookmark-get-bookmark-from-name elm)))
+    (anything-aif anything-c-marked-candidate-list
+        (dolist (i it)
+          (let ((bmk (anything-bookmark-get-bookmark-from-name i)))
+            (bookmark-delete bmk 'batch)))
+      (bookmark-delete bookmark))))
 
 (defun anything-bookmark-active-region-maybe (candidate)
   "Active saved region if this bookmark have one."
-  (condition-case nil
-      (when (and (boundp bookmarkp-use-region-flag)
-                 bookmarkp-use-region-flag)
-        (let ((bmk-name (or (bookmarkp-get-buffer-name candidate)
-                            (file-name-nondirectory
-                             (bookmark-get-filename candidate)))))
-          (when bmk-name
-            (with-current-buffer bmk-name
-              (setq deactivate-mark nil)))))
-    (error nil)))
+  (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+    (condition-case nil
+        (when (and (boundp bookmarkp-use-region-flag)
+                   bookmarkp-use-region-flag)
+          (let ((bmk-name (or (bookmarkp-get-buffer-name bookmark)
+                              (file-name-nondirectory
+                               (bookmark-get-filename bookmark)))))
+            (when bmk-name
+              (with-current-buffer bmk-name
+                (setq deactivate-mark nil)))))
+      (error nil))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4097,21 +4113,29 @@ With optional arg `merge' call `ediff-merge-buffers'."
 (define-anything-type-attribute 'bookmark
   '((action
      ("Jump to bookmark" . (lambda (candidate)
-                             (bookmark-jump candidate)
+                             (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                               (bookmark-jump bookmark))
                              (anything-update)
                              (anything-bookmark-active-region-maybe candidate)))
      ("Jump to BM other window" . (lambda (candidate)
-                                    (bookmark-jump-other-window candidate)
+                                    (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                                      (bookmark-jump-other-window bookmark))
                                     (anything-update)
                                     (anything-bookmark-active-region-maybe candidate)))
      ("Bookmark edit annotation" . (lambda (candidate)
-                                     (bookmark-edit-annotation candidate)))
+                                     (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                                       (bookmark-edit-annotation bookmark))))
      ("Bookmark show annotation" . (lambda (candidate)
-                                     (bookmark-show-annotation candidate)))
+                                     (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                                       (bookmark-show-annotation bookmark))))
      ("Delete bookmark(s)" . anything-delete-marked-bookmarks)
-     ("Rename bookmark" . bookmark-rename)
-     ("Relocate bookmark" . bookmark-relocate)))
-  "Bookmark name.")
+     ("Rename bookmark" . (lambda (candidate)
+                            (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                              (bookmark-rename bookmark))))
+     ("Relocate bookmark" . (lambda (candidate)
+                              (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                                (bookmark-relocate bookmark))))
+     "Bookmark name.")))
 
 (define-anything-type-attribute 'line
   '((display-to-real . anything-c-display-to-real-line)
