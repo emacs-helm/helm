@@ -4018,7 +4018,7 @@ Return nil if bmk is not a valid bookmark."
         (dolist (i it)
           (let ((bmk (anything-bookmark-get-bookmark-from-name i)))
             (bookmark-delete bmk 'batch)))
-      (bookmark-delete bookmark))))
+      (bookmark-delete bookmark 'batch))))
 
 (defun anything-bookmark-active-region-maybe (candidate)
   "Active saved region if this bookmark have one."
