@@ -3263,7 +3263,7 @@ See also `anything-create--actions'."
     (kill-buffer "*EShell Command Output*"))
   (message "Wait searching...")
   (let ((buf-fname (buffer-file-name anything-current-buffer)))
-    (if (string-match tramp-file-name-regexp buf-fname)
+    (if (and buf-fname (string-match tramp-file-name-regexp buf-fname))
         (progn
           (save-window-excursion
             (pop-to-buffer "*scratch*")
