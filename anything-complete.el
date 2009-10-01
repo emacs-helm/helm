@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.57 2009-08-02 04:19:52 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.58 2009-10-01 03:07:44 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -93,7 +93,11 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.57  2009-08-02 04:19:52  rubikitch
+;; Revision 1.58  2009-10-01 03:07:44  rubikitch
+;; Fix an error in `anything-find-file'. Thanks to troter.
+;; http://d.hatena.ne.jp/troter/20090929/1254199115
+;;
+;; Revision 1.57  2009/08/02 04:19:52  rubikitch
 ;; New variable: `anything-complete-persistent-action'
 ;;
 ;; Revision 1.56  2009/07/26 21:25:04  rubikitch
@@ -322,7 +326,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.57 2009-08-02 04:19:52 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.58 2009-10-01 03:07:44 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -921,12 +925,13 @@ It accepts one argument, selected candidate.")
   (interactive)
   (let ((anything-map (anything-read-file-name-map))
         ;; anything-read-file-name-follow-directory uses these variables
+        (prompt "Find File: ")
         default-filename require-match predicate
         (additional-attrs '(;; because anything-c-skip-boring-files cannot
                             ;; handle (display . real) candidates
                             (candidate-transformer)
                             (type . file))))
-    (anything-complete (append (arfn-sources "Find File: " default-directory
+    (anything-complete (append (arfn-sources prompt default-directory
                                              nil nil nil nil additional-attrs)
                                anything-find-file-additional-sources)
                        "" )))
