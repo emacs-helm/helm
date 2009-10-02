@@ -1410,37 +1410,25 @@ RedOnWhite ==> Directory."
      if (and isannotation (not (string-equal isannotation "")))
      do (setq i (concat "*" i))
      ;; info buffers
-     if (and (fboundp 'bookmarkp-get-buffer-name)
-             (eq handlerp 'Info-bookmark-jump)
-             (string= bufp "*info*"))
+     if (eq handlerp 'Info-bookmark-jump)
      collect (propertize i 'face '((:foreground "green")) 'help-echo pred)
      ;; w3m buffers
-     if (and (fboundp 'bookmarkp-get-buffer-name)
-             (string= bufp "*w3m*"))
+     if (eq handlerp 'bookmarkp-jump-w3m)
      collect (propertize i 'face '((:foreground "yellow")) 'help-echo pred)
      ;; gnus buffers
      if (eq handlerp 'bookmarkp-jump-gnus)
      collect (propertize i 'face '((:foreground "magenta")) 'help-echo pred)
      ;; directories
-     if (and pred 
-             (file-directory-p pred))
+     if (and pred (file-directory-p pred))
      collect (propertize i 'face anything-c-bookmarks-face1 'help-echo pred)
      ;; regular files with regions saved
-     if (and pred 
-             (not (file-directory-p pred))
-             (file-exists-p pred)
-             regp)
+     if (and pred (not (file-directory-p pred)) (file-exists-p pred) regp)
      collect (propertize i 'face '((:foreground "Indianred2")) 'help-echo pred)
      ;; regular files
-     if (and pred 
-             (not (file-directory-p pred))
-             (file-exists-p pred)
-             (not regp))
+     if (and pred (not (file-directory-p pred)) (file-exists-p pred) (not regp))
      collect (propertize i 'face anything-c-bookmarks-face2 'help-echo pred)
      ;; buffer non--filename
-     if (and (fboundp 'bookmarkp-get-buffer-name)
-             bufp
-             (not (bookmark-get-handler i))
+     if (and (fboundp 'bookmarkp-get-buffer-name) bufp (not (bookmark-get-handler i))
              (if pred (not (file-exists-p pred)) (not pred)))
      collect (propertize i 'face '((:foreground "grey")))))
        
@@ -1468,18 +1456,36 @@ RedOnWhite ==> Directory."
 
 (when (require 'bookmark+ nil t)
   (bookmark-maybe-load-default-file)
-  
+
+  (defun anything-bookmarkp-maybe-sort (&optional alist)
+  "Sort or reverse-sort using `bookmarkp-bmenu-sort-function'.
+        Sort LIST using `bookmarkp-bmenu-sort-function'.
+        Reverse the result if `bookmarkp-reverse-sort-p' is non-nil.
+        Do nothing if `bookmarkp-bmenu-sort-function' is nil."
+  (let ((bmk-alist (or alist (copy-sequence bookmark-alist))))
+    (when bookmarkp-bmenu-sort-function
+      (sort
+       bmk-alist
+       (if bookmarkp-bmenu-reverse-sort-p
+           (lambda (a b)
+             (not (funcall bookmarkp-bmenu-sort-function a b)))
+           bookmarkp-bmenu-sort-function)))))
+
+
   (defun anything-c-bookmark+-filter-setup-alist (fn &rest args)
-    "Return a filtered `bookmark-alist' using one of the bookmark+ filters functions."
+    "Return a filtered `bookmark-alist' using one of the bookmark+ filters functions.
+If `bookmarkp-visit-flag' is turned on sort by visit frequency else alphabetically."
     (loop
        with alist = (if args
                         (apply #'(lambda (x) (funcall fn x)) args)
                         (funcall fn))
-       for i in alist
+       with sa = (anything-bookmarkp-maybe-sort alist)
+       for i in sa
        for b = (car i)
        collect b into sa
-       finally return (sort sa 'string-lessp)))
+       finally return sa))
 
+  
   ;; Regions
   (defvar anything-c-source-bookmark-regions
     '((name . "Bookmark Regions")
@@ -1598,6 +1604,7 @@ RedOnWhite ==> Directory."
     (anything '(anything-c-source-bookmark-files&dirs
                 anything-c-source-bookmark-w3m
                 anything-c-source-bookmark-gnus
+                anything-c-source-bookmark-info
                 anything-c-source-bookmark-regions
                 anything-c-source-bookmark-su-files&dirs
                 anything-c-source-bookmark-ssh-files&dirs))))
@@ -2105,62 +2112,6 @@ with the tracker desktop search.")
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 ;; (anything 'anything-c-source-mac-spotlight)
-
-;;;; <icicle>
-;;; Icicle regions
-;; See: http://www.emacswiki.org/emacs-en/Icicles_-_Multiple_Regions 
-;; That is the anything interface.
-
-(defvar anything-icicle-region-alist nil)
-(defvar anything-c-source-icicle-region
-  '((name . "Icicle Regions")
-    (init . (lambda ()
-              (setq anything-icicle-region-alist
-                    (loop
-                       for i in icicle-region-alist
-                       collect (concat (car i) " => " (cadr i))))))
-    (candidates . anything-icicle-region-alist)
-    (action . (("Go to region" . anything-c-icicle-region-goto-region)
-               ("Insert region at point" . (lambda (elm)
-                                             (let (reg)
-                                               (save-window-excursion
-                                                 (anything-c-icicle-region-goto-region elm)
-                                                 (setq reg (buffer-substring (mark) (point))))
-                                               (insert reg))))
-               ("Remove region" . anything-c-icicle-region-delete-region)
-               ("Update" . (lambda (elm)
-                             (icicle-purge-bad-file-regions)))))))
-
-;; (anything 'anything-c-source-icicle-region)
-
-(defun anything-icicle-select-region-action (pos)
-  "Go to the region at nth `pos' in `icicle-region-alist'.
-See `icicle-select-region-action'."
-  (let ((icicle-get-alist-candidate-function #'(lambda (pos)
-                                                 (nth pos icicle-region-alist))))
-    (icicle-select-region-action pos)))
-
-(defun anything-icicle-delete-region-from-alist (pos)
-  "Delete the region at nth `pos' from `icicle-region-alist'.
-See `icicle-delete-region-from-alist'."
-  (let ((alist-cand  (nth pos icicle-region-alist)))
-    (setq icicle-region-alist
-          (delete alist-cand icicle-region-alist)))
-  (funcall icicle-customize-save-variable-function 'icicle-region-alist icicle-region-alist))
-
-(defun anything-c-icicle-region-goto-region (candidate)
-  "Get the position of `candidate' and call `anything-icicle-select-region-action'." 
-  (let ((pos (position candidate anything-icicle-region-alist))
-        (buf (second (split-string candidate " => "))))
-    (if (equal buf "*info*")
-        (info (caddr (nth pos icicle-region-alist))))
-    (anything-icicle-select-region-action pos)))
-
-(defun anything-c-icicle-region-delete-region (candidate)
-  "Get the position of `candidate' and call `anything-icicle-delete-region-from-alist'."
-  (let ((pos (position candidate anything-icicle-region-alist)))
-    (anything-icicle-delete-region-from-alist pos)))
-
 
 ;;;; <Kill ring>
 ;;; Kill ring
@@ -4145,8 +4096,8 @@ Return nil if bmk is not a valid bookmark."
                               (bookmark-rename bookmark))))
      ("Relocate bookmark" . (lambda (candidate)
                               (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
-                                (bookmark-relocate bookmark))))
-     "Bookmark name.")))
+                                (bookmark-relocate bookmark))))))
+     "Bookmark name.")
 
 (define-anything-type-attribute 'line
   '((display-to-real . anything-c-display-to-real-line)
