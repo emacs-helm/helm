@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.201 2009-08-08 13:25:30 rubikitch Exp $
+;; $Id: anything.el,v 1.202 2009-10-02 10:03:34 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -318,7 +318,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.201  2009-08-08 13:25:30  rubikitch
+;; Revision 1.202  2009-10-02 10:03:34  rubikitch
+;; * Display "no candidates" rather than assertion
+;; * Ensure to call `remove-hook' in `anything-current-buffer'
+;;
+;; Revision 1.201  2009/08/08 13:25:30  rubikitch
 ;; `anything-toggle-visible-mark': move next line after unmarking
 ;;
 ;; Revision 1.200  2009/08/08 13:23:46  rubikitch
@@ -970,7 +974,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.201 2009-08-08 13:25:30 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.202 2009-10-02 10:03:34 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1839,7 +1843,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
       (let* ((header-pos (anything-get-previous-header-pos))
              (source-name
               (save-excursion
-                (assert header-pos)
+                (or header-pos (error "No candidates"))
                 (goto-char header-pos)
                 (buffer-substring-no-properties
                  (line-beginning-position) (line-end-position)))))
@@ -2024,8 +2028,9 @@ already-bound variables. Yuck!
                          (read-string (or any-prompt "pattern: ")
                                       (if any-resume anything-pattern any-input))))))
             (anything-cleanup)
-            (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
-            (remove-hook 'post-command-hook 'anything-check-minibuffer-input)
+            (with-current-buffer anything-current-buffer
+              (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
+              (remove-hook 'post-command-hook 'anything-check-minibuffer-input))
             (anything-set-frame/window-configuration frameconfig))
           (unless anything-quit
             (unwind-protect
