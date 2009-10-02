@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.202 2009-10-02 10:03:34 rubikitch Exp $
+;; $Id: anything.el,v 1.203 2009-10-02 10:04:07 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -142,7 +142,7 @@
 ;;
 ;; http://www.emacswiki.org/cgi-bin/emacs/AnythingPlugins
 
-;; Tested on Emacs 22.
+;; Tested on Emacs 22/23.
 ;;
 ;;
 ;; Thanks to Vagn Johansen for ideas.
@@ -318,7 +318,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.202  2009-10-02 10:03:34  rubikitch
+;; Revision 1.203  2009-10-02 10:04:07  rubikitch
+;; Tested on Emacs23 too. (no code change)
+;;
+;; Revision 1.202  2009/10/02 10:03:34  rubikitch
 ;; * Display "no candidates" rather than assertion
 ;; * Ensure to call `remove-hook' in `anything-current-buffer'
 ;;
@@ -974,7 +977,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.202 2009-10-02 10:03:34 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.203 2009-10-02 10:04:07 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
