@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.203 2009-10-02 10:04:07 rubikitch Exp $
+;; $Id: anything.el,v 1.204 2009-10-06 21:01:12 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -318,7 +318,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.203  2009-10-02 10:04:07  rubikitch
+;; Revision 1.204  2009-10-06 21:01:12  rubikitch
+;; Call `anything-process-delayed-sources' only if delayed-sources is available.
+;;
+;; Revision 1.203  2009/10/02 10:04:07  rubikitch
 ;; Tested on Emacs23 too. (no code change)
 ;;
 ;; Revision 1.202  2009/10/02 10:03:34  rubikitch
@@ -977,7 +980,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.203 2009-10-02 10:04:07 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.204 2009-10-06 21:01:12 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2433,12 +2436,13 @@ the current pattern."
           (dolist (source delayed-sources)
             (anything-process-source source))
         (anything-maybe-fit-frame)
-        (run-with-idle-timer (if (featurep 'xemacs)
-                                 0.1
-                               0)
-                             nil
-                             'anything-process-delayed-sources
-                             delayed-sources)))))
+        (when delayed-sources
+          (run-with-idle-timer (if (featurep 'xemacs)
+                                   0.1
+                                 0)
+                               nil
+                               'anything-process-delayed-sources
+                               delayed-sources))))))
 
 (defun anything-insert-match (match insert-function &optional real-to-display)
   "Insert MATCH into the anything buffer. If MATCH is a list then
