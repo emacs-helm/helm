@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.9 2009-05-03 22:01:32 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.10 2009-10-06 22:46:23 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -94,7 +94,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.9  2009-05-03 22:01:32  rubikitch
+;; Revision 1.10  2009-10-06 22:46:23  rubikitch
+;; `asc-display-function': Emacs23 fix
+;;
+;; Revision 1.9  2009/05/03 22:01:32  rubikitch
 ;; asc-display-function: split-window hack is effective only if one window is displayed.
 ;;
 ;; Revision 1.8  2009/05/03 21:47:41  rubikitch
@@ -126,7 +129,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.9 2009-05-03 22:01:32 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.10 2009-10-06 22:46:23 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -209,7 +212,8 @@ It is evaluated in `asc-display-overlay'."
            (new-w (save-excursion
                     (let (split-window-keep-point)
                       (split-window-vertically)))))
-      (switch-to-buffer-other-window buf))))
+      ;; TODO show anything window near the pointer
+      (set-window-buffer new-w buf))))
 
 (provide 'anything-show-completion)
 ;; (asc-display-function anything-buffer)
