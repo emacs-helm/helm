@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.58 2009-10-01 03:07:44 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.59 2009-10-07 10:29:34 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -93,7 +93,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.58  2009-10-01 03:07:44  rubikitch
+;; Revision 1.59  2009-10-07 10:29:34  rubikitch
+;; `anything-find-file': use `anything-other-buffer' instead of `anything-complete'
+;;
+;; Revision 1.58  2009/10/01 03:07:44  rubikitch
 ;; Fix an error in `anything-find-file'. Thanks to troter.
 ;; http://d.hatena.ne.jp/troter/20090929/1254199115
 ;;
@@ -326,7 +329,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.58 2009-10-01 03:07:44 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.59 2009-10-07 10:29:34 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -931,10 +934,10 @@ It accepts one argument, selected candidate.")
                             ;; handle (display . real) candidates
                             (candidate-transformer)
                             (type . file))))
-    (anything-complete (append (arfn-sources prompt default-directory
-                                             nil nil nil nil additional-attrs)
-                               anything-find-file-additional-sources)
-                       "" )))
+    (anything-other-buffer (append (arfn-sources prompt default-directory
+                                                 nil nil nil nil additional-attrs)
+                                   anything-find-file-additional-sources)
+                           "*anything find-file*")))
 ;;(anything-find-file)
 
 (add-hook 'after-init-hook 'alcs-make-candidates)
