@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.12 2009-10-08 10:24:37 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.13 2009-10-08 10:56:03 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -53,6 +53,9 @@
 ;;  `anything-show-completion-activate'
 ;;    *Set nil to turn off anything-show-completion.
 ;;    default = t
+;;  `anything-show-completion-minimum-window-height'
+;;    *Minimum completion window height.
+;;    default = 7
 
 ;;; For developers:
 ;;
@@ -94,7 +97,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.12  2009-10-08 10:24:37  rubikitch
+;; Revision 1.13  2009-10-08 10:56:03  rubikitch
+;; Fix an error when completion window is too small.
+;;
+;; Revision 1.12  2009/10/08 10:24:37  rubikitch
 ;; Show candidates under the point.
 ;;
 ;; Revision 1.11  2009/10/08 05:12:56  rubikitch
@@ -135,7 +141,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.12 2009-10-08 10:24:37 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.13 2009-10-08 10:56:03 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -150,6 +156,11 @@
   "*Set nil to turn off anything-show-completion."
   :type 'boolean  
   :group 'anything-show-completion)
+(defcustom anything-show-completion-minimum-window-height 7
+  "*Minimum completion window height."
+  :type 'integer
+  :group 'anything-show-completion)
+
 
 (defun asc-initialize-maybe ()
   (unless asc-overlay
@@ -207,21 +218,21 @@ It is evaluated in `asc-display-overlay'."
         (if (zerop (current-column)) 0 0))
       (- (/ (window-height) 2)
          (if header-line-format 1 0))))
- 
+
 ;; (global-set-key "\C-x\C-z" (lambda () (interactive) (message "%s" (asc-point-at-upper-half-of-window-p (point)))))
 (defun asc-display-function (buf)
   (let* ((cursor-upper-p (asc-point-at-upper-half-of-window-p (point))) 
          (half (/ (window-height) 2))
          (win (selected-window))
          (new-w (let ((split-window-keep-point))
-                  ;; FIXME the case when anything window is too small
-                  (split-window (selected-window)
-                                (+ 1
-                                   (if header-line-format 1 0)
-                                   (count-screen-lines
-                                    (window-start)
-                                    (point)))))))
-    ;; TODO show anything window near the pointer
+                  (split-window
+                   (selected-window)
+                   (min (+ 1
+                           (if header-line-format 1 0)
+                           (count-screen-lines
+                            (window-start)
+                            (point)))
+                        (- (frame-height) anything-show-completion-minimum-window-height))))))
     (with-selected-window win
       (recenter -1))
     (set-window-buffer new-w buf)))
