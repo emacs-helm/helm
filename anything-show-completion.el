@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.13 2009-10-08 10:56:03 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.14 2009-10-08 16:57:57 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -97,7 +97,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.13  2009-10-08 10:56:03  rubikitch
+;; Revision 1.14  2009-10-08 16:57:57  rubikitch
+;; added comments
+;;
+;; Revision 1.13  2009/10/08 10:56:03  rubikitch
 ;; Fix an error when completion window is too small.
 ;;
 ;; Revision 1.12  2009/10/08 10:24:37  rubikitch
@@ -141,7 +144,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.13 2009-10-08 10:56:03 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.14 2009-10-08 16:57:57 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -227,7 +230,8 @@ It is evaluated in `asc-display-overlay'."
          (new-w (let ((split-window-keep-point))
                   (split-window
                    (selected-window)
-                   (min (+ 1
+                   (min (+ 1            ; mode-line
+                           ;; window screen lines 
                            (if header-line-format 1 0)
                            (count-screen-lines
                             (window-start)
