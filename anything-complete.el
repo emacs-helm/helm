@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.59 2009-10-07 10:29:34 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.60 2009-10-08 05:12:27 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -93,7 +93,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.59  2009-10-07 10:29:34  rubikitch
+;; Revision 1.60  2009-10-08 05:12:27  rubikitch
+;; If anything-show-completion.el is available, candidates are shown near the point.
+;;
+;; Revision 1.59  2009/10/07 10:29:34  rubikitch
 ;; `anything-find-file': use `anything-other-buffer' instead of `anything-complete'
 ;;
 ;; Revision 1.58  2009/10/01 03:07:44  rubikitch
@@ -329,7 +332,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.59 2009-10-07 10:29:34 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.60 2009-10-08 05:12:27 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -339,7 +342,6 @@
                anything-lisp-complete-symbol
                anything-lisp-complete-symbol-partial-match))
     (use-anything-show-completion f '(length anything-complete-target))))
-
 
 ;; (@* "core")
 (defvar anything-complete-target "")
@@ -370,7 +372,6 @@
         (enable-recursive-minibuffers t)
         anything-samewindow)
     (anything-noresume sources target nil nil nil "*anything complete*")))
-
 
 ;; (@* "`lisp-complete-symbol' and `apropos' replacement")
 (defvar anything-lisp-complete-symbol-input-idle-delay 0.1
@@ -423,6 +424,21 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 (defun alcs-sort (candidates source)
   (sort candidates #'string<))
+(defun alcs-transformer-prepend-spacer (candidates source)
+  "Prepend spaces according to `current-column' for each CANDIDATES."
+  (let ((column (with-current-buffer anything-current-buffer
+                  (save-excursion
+                    (backward-char (string-width anything-complete-target))
+                    (current-column)))))
+    (mapcar (lambda (cand) (cons (concat (make-string column ? ) cand) cand))
+            candidates)))
+
+(defun alcs-transformer-prepend-spacer-maybe (candidates source)
+  ;; `anything-show-completion-activate' is defined in anything-show-completion.el
+  (if (and (boundp 'anything-show-completion-activate)
+           anything-show-completion-activate)
+      (alcs-transformer-prepend-spacer candidates source)
+    candidates))
 
 (defun alcs-describe-function (name)
   (describe-function (intern name)))
@@ -512,11 +528,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
      ("Describe Variable" . alcs-describe-variable)
      ("Find Variable" . alcs-find-variable))))
 (define-anything-type-attribute 'complete-function
-  '((filtered-candidate-transformer . alcs-sort)
+  '((filtered-candidate-transformer alcs-sort alcs-transformer-prepend-spacer-maybe)
     (action . ac-insert)
     (persistent-action . alcs-describe-function)))
 (define-anything-type-attribute 'complete-variable
-  '((filtered-candidate-transformer . alcs-sort)
+  '((filtered-candidate-transformer alcs-sort alcs-transformer-prepend-spacer-maybe)
     (action . ac-insert)
     (persistent-action . alcs-describe-variable)))
 
