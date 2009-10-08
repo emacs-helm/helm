@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.10 2009-10-06 22:46:23 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.11 2009-10-08 05:12:56 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -94,7 +94,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.10  2009-10-06 22:46:23  rubikitch
+;; Revision 1.11  2009-10-08 05:12:56  rubikitch
+;; Candidates are shown near the point.
+;;
+;; Revision 1.10  2009/10/06 22:46:23  rubikitch
 ;; `asc-display-function': Emacs23 fix
 ;;
 ;; Revision 1.9  2009/05/03 22:01:32  rubikitch
@@ -129,7 +132,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.10 2009-10-06 22:46:23 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.11 2009-10-08 05:12:56 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -203,17 +206,17 @@ It is evaluated in `asc-display-overlay'."
          (if header-line-format 1 0))))
  
 ;; (global-set-key "\C-x\C-z" (lambda () (interactive) (message "%s" (asc-point-at-upper-half-of-window-p (point)))))
-
 (defun asc-display-function (buf)
-  (if (not (one-window-p))
-      (pop-to-buffer buf)
-    (let* ((cursor-upper-p (asc-point-at-upper-half-of-window-p (point))) 
-           (half (/ (window-height) 2))
-           (new-w (save-excursion
-                    (let (split-window-keep-point)
-                      (split-window-vertically)))))
-      ;; TODO show anything window near the pointer
-      (set-window-buffer new-w buf))))
+  (let* ((cursor-upper-p (asc-point-at-upper-half-of-window-p (point))) 
+         (half (/ (window-height) 2))
+         (win (selected-window))
+         (new-w (save-excursion
+                  (let (split-window-keep-point)
+                    (split-window-vertically)))))
+    ;; TODO show anything window near the pointer
+    (with-selected-window win
+      (recenter -1))
+    (set-window-buffer new-w buf)))
 
 (provide 'anything-show-completion)
 ;; (asc-display-function anything-buffer)
