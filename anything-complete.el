@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.60 2009-10-08 05:12:27 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.61 2009-10-08 17:06:35 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -93,7 +93,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.60  2009-10-08 05:12:27  rubikitch
+;; Revision 1.61  2009-10-08 17:06:35  rubikitch
+;; `anything-complete-shell-history': taller window
+;;
+;; Revision 1.60  2009/10/08 05:12:27  rubikitch
 ;; If anything-show-completion.el is available, candidates are shown near the point.
 ;;
 ;; Revision 1.59  2009/10/07 10:29:34  rubikitch
@@ -332,7 +335,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.60 2009-10-08 05:12:27 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.61 2009-10-08 17:06:35 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -851,9 +854,10 @@ It accepts one argument, selected candidate.")
 (defun anything-complete-shell-history ()
   "Select a command from shell history and insert it."
   (interactive)
-  (anything-complete 'anything-c-source-complete-shell-history
-                     (or (word-at-point) "")
-                     20))
+  (let ((anything-show-completion-minimum-window-height (/ (frame-height) 2)))
+    (anything-complete 'anything-c-source-complete-shell-history
+                      (or (word-at-point) "")
+                      20)))
 (defun anything-complete-shell-history-setup-key (key)
   (when (and (require 'shell-command nil t)
              (boundp 'shell-command-minibuffer-map))
