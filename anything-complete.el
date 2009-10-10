@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.61 2009-10-08 17:06:35 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.62 2009-10-10 03:27:33 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -45,6 +45,9 @@
 ;;
 ;; Below are customizable option list:
 ;;
+;;  `anything-complete-sort-candidates'
+;;    *Whether to sort completion candidates.
+;;    default = nil
 
 ;; * `anything-lisp-complete-symbol', `anything-lisp-complete-symbol-partial-match':
 ;;     `lisp-complete-symbol' with `anything'
@@ -93,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.61  2009-10-08 17:06:35  rubikitch
+;; Revision 1.62  2009-10-10 03:27:33  rubikitch
+;; New variable: `anything-complete-sort-candidates'
+;;
+;; Revision 1.61  2009/10/08 17:06:35  rubikitch
 ;; `anything-complete-shell-history': taller window
 ;;
 ;; Revision 1.60  2009/10/08 05:12:27  rubikitch
@@ -289,53 +295,9 @@
 ;; Initial revision
 ;;
 
-;;; History of anything-lisp-complete-symbol.el
-
-;; Revision 1.13  2008/09/04 08:07:18  rubikitch
-;; use `anything-complete-target' rather than `alcs-target'.
-;;
-;; Revision 1.12  2008/09/04 07:50:34  rubikitch
-;; add docstrings
-;;
-;; Revision 1.11  2008/09/04 07:35:02  rubikitch
-;; use `add-to-list' to add `anything-type-attributes' entry.
-;;
-;; Revision 1.10  2008/09/04 01:19:56  rubikitch
-;; New source: `anything-c-source-emacs-function-at-point'
-;; New source: `anything-c-source-emacs-variable-at-point'
-;;
-;; Revision 1.9  2008/09/04 00:48:22  rubikitch
-;; New action: find-function, find-variable
-;;
-;; Revision 1.8  2008/09/03 11:02:51  rubikitch
-;; do `alcs-make-candidates' after load this file.
-;;
-;; Revision 1.7  2008/08/29 09:32:46  rubikitch
-;; make `alcs-make-candidates' faster
-;;
-;; Revision 1.6  2008/08/29 09:22:02  rubikitch
-;; add command sources.
-;; New command: `anything-apropos'
-;;
-;; Revision 1.5  2008/08/29 02:38:42  rubikitch
-;; New command: `anything-lisp-complete-symbol-partial-match'
-;;
-;; Revision 1.4  2008/08/26 10:42:54  rubikitch
-;; integration with `anything-dabbrev-expand'
-;;
-;; Revision 1.3  2008/08/25 20:45:45  rubikitch
-;; export variables
-;;
-;; Revision 1.2  2008/08/25 20:29:48  rubikitch
-;; add requires
-;;
-;; Revision 1.1  2008/08/25 20:26:09  rubikitch
-;; Initial revision
-;;
-
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.61 2009-10-08 17:06:35 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.62 2009-10-10 03:27:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -425,8 +387,16 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
           (anything-aif (symbol-at-point) (symbol-name it) "")))
   (anything-candidate-buffer (get-buffer bufname)))
 
-(defun alcs-sort (candidates source)
-  (sort candidates #'string<))
+(defcustom anything-complete-sort-candidates nil
+  "*Whether to sort completion candidates."
+  :type 'boolean  
+  :group 'anything-complete)
+
+(defun alcs-sort-maybe (candidates source)
+  (if anything-complete-sort-candidates
+      (sort candidates #'string<)
+    candidates))
+
 (defun alcs-transformer-prepend-spacer (candidates source)
   "Prepend spaces according to `current-column' for each CANDIDATES."
   (let ((column (with-current-buffer anything-current-buffer
@@ -471,7 +441,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   '((name . "Other Symbols")
     (init . (lambda () (alcs-init alcs-symbol-buffer)))
     (candidates-in-buffer)
-    (filtered-candidate-transformer . alcs-sort)
+    (filtered-candidate-transformer . alcs-sort-maybe)
     (action . ac-insert)))
 (defvar anything-c-source-apropos-emacs-functions
   '((name . "Apropos Functions")
@@ -519,23 +489,23 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     anything-c-source-apropos-emacs-variables))
 
 (define-anything-type-attribute 'apropos-function
-  '((filtered-candidate-transformer . alcs-sort)
+  '((filtered-candidate-transformer . alcs-sort-maybe)
     (persistent-action . alcs-describe-function)
     (action
      ("Describe Function" . alcs-describe-function)
      ("Find Function" . alcs-find-function))))
 (define-anything-type-attribute 'apropos-variable
-  '((filtered-candidate-transformer . alcs-sort)
+  '((filtered-candidate-transformer . alcs-sort-maybe)
     (persistent-action . alcs-describe-variable)
     (action
      ("Describe Variable" . alcs-describe-variable)
      ("Find Variable" . alcs-find-variable))))
 (define-anything-type-attribute 'complete-function
-  '((filtered-candidate-transformer alcs-sort alcs-transformer-prepend-spacer-maybe)
+  '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
     (action . ac-insert)
     (persistent-action . alcs-describe-function)))
 (define-anything-type-attribute 'complete-variable
-  '((filtered-candidate-transformer alcs-sort alcs-transformer-prepend-spacer-maybe)
+  '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
     (action . ac-insert)
     (persistent-action . alcs-describe-variable)))
 
