@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.62 2009-10-10 03:27:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.63 2009-10-11 20:27:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.62  2009-10-10 03:27:33  rubikitch
+;; Revision 1.63  2009-10-11 20:27:22  rubikitch
+;; `alcs-transformer-prepend-spacer': use physical column instead of logical column
+;;
+;; Revision 1.62  2009/10/10 03:27:33  rubikitch
 ;; New variable: `anything-complete-sort-candidates'
 ;;
 ;; Revision 1.61  2009/10/08 17:06:35  rubikitch
@@ -297,7 +300,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.62 2009-10-10 03:27:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.63 2009-10-11 20:27:22 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -397,12 +400,17 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
       (sort candidates #'string<)
     candidates))
 
+;;; borrowed from auto-complete.el
+(defun alcs-current-physical-column ()
+  "Current physical column. (not logical column)"
+  (- (point) (save-excursion (vertical-motion 0) (point))))
+
 (defun alcs-transformer-prepend-spacer (candidates source)
   "Prepend spaces according to `current-column' for each CANDIDATES."
   (let ((column (with-current-buffer anything-current-buffer
                   (save-excursion
                     (backward-char (string-width anything-complete-target))
-                    (current-column)))))
+                    (alcs-current-physical-column)))))
     (mapcar (lambda (cand) (cons (concat (make-string column ? ) cand) cand))
             candidates)))
 
