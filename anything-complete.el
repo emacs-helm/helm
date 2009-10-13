@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.63 2009-10-11 20:27:22 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.64 2009-10-13 05:40:51 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.63  2009-10-11 20:27:22  rubikitch
+;; Revision 1.64  2009-10-13 05:40:51  rubikitch
+;; `anything-completing-read': Show completions first when require-match == t
+;;
+;; Revision 1.63  2009/10/11 20:27:22  rubikitch
 ;; `alcs-transformer-prepend-spacer': use physical column instead of logical column
 ;;
 ;; Revision 1.62  2009/10/10 03:27:33  rubikitch
@@ -300,7 +303,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.63 2009-10-11 20:27:22 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.64 2009-10-13 05:40:51 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -621,15 +624,12 @@ It accepts one argument, selected candidate.")
                         ,@additional-attrs
                         ,persistent-action
                         ,transformer-func)))
-    (if anything-completing-read-history-first
-        `(,default-source
-           ,history-source
-           ,main-source
-           ,new-input-source)
-      `(,default-source
-           ,main-source
-           ,history-source
-           ,new-input-source))))
+    (cond (require-match
+           (list main-source default-source))
+          (anything-completing-read-history-first
+           (list default-source history-source main-source new-input-source))
+          (t
+           (list default-source main-source history-source new-input-source)))))
 ;; (anything-completing-read "Command: " obarray 'commandp t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (let ((anything-complete-persistent-action 'message)) (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t))
