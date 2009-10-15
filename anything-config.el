@@ -1591,42 +1591,23 @@ RedOnWhite ==> Directory."
 (when (require 'bookmark+ nil t)
   (bookmark-maybe-load-default-file)
 
-  (defun anything-bookmarkp-maybe-sort (&optional alist)
-  "Sort or reverse-sort using `bookmarkp-bmenu-sort-function'.
-        Sort LIST using `bookmarkp-bmenu-sort-function'.
-        Reverse the result if `bookmarkp-reverse-sort-p' is non-nil.
-        Do nothing if `bookmarkp-bmenu-sort-function' is nil."
-  (let ((bmk-alist (or alist (copy-sequence bookmark-alist))))
-    (when bookmarkp-bmenu-sort-function
-      (sort
-       bmk-alist
-       (if bookmarkp-bmenu-reverse-sort-p
-           (lambda (a b)
-             (not (funcall bookmarkp-bmenu-sort-function a b)))
-           bookmarkp-bmenu-sort-function)))))
-
-
   (defun anything-c-bookmark+-filter-setup-alist (fn &rest args)
-    "Return a filtered `bookmark-alist' using one of the bookmark+ filters functions.
-If `bookmarkp-visit-flag' is turned on sort by visit frequency else alphabetically."
+    "Return a filtered `bookmark-alist' sorted alphabetically."
     (loop
        with alist = (if args
                         (apply #'(lambda (x) (funcall fn x)) args)
                         (funcall fn))
-       with sa = (anything-bookmarkp-maybe-sort alist)
-       for i in sa
+       for i in alist
        for b = (car i)
        collect b into sa
-       finally return sa))
+       finally return (sort sa 'string-lessp)))
 
-  
   ;; Regions
   (defvar anything-c-source-bookmark-regions
     '((name . "Bookmark Regions")
       (candidates . anything-c-bookmark-region-setup-alist)
       (candidate-transformer anything-c-highlight-bookmark)
       (type . bookmark)))
-
   ;; (anything 'anything-c-source-bookmark-regions)
 
   (defun anything-c-bookmark-region-setup-alist ()
@@ -1639,7 +1620,6 @@ If `bookmarkp-visit-flag' is turned on sort by visit frequency else alphabetical
       (candidates . anything-c-bookmark-w3m-setup-alist)
       (candidate-transformer anything-c-highlight-bookmark)
       (type . bookmark)))
-
   ;; (anything 'anything-c-source-bookmark-w3m)
 
   (defun anything-c-bookmark-w3m-setup-alist ()
@@ -1683,7 +1663,6 @@ If `bookmarkp-visit-flag' is turned on sort by visit frequency else alphabetical
     (anything-c-bookmark+-filter-setup-alist 'bookmarkp-local-file-alist-only))
 
   ;; Su Files&directories
-
   (defun anything-c-highlight-bookmark+-su (bmk)
     (if (bookmarkp-root-or-sudo-logged-p)
         (anything-c-highlight-bookmark bmk)
