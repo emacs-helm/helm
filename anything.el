@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.206 2009-10-10 09:28:54 rubikitch Exp $
+;; $Id: anything.el,v 1.207 2009-10-16 19:47:39 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -47,6 +47,9 @@
 ;; many tips to write smart sources!
 ;;
 ;; http://www.emacswiki.org/cgi-bin/emacs/RubikitchAnythingConfiguration
+;;
+;; Here is Japanese translation of `anything-sources' attributes. Thanks.
+;; http://d.hatena.ne.jp/sirocco634/20091012/1255336649
 
 ;;; Commands:
 ;;
@@ -318,7 +321,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.206  2009-10-10 09:28:54  rubikitch
+;; Revision 1.207  2009-10-16 19:47:39  rubikitch
+;; Link to Japanese translation of `anything-sources' attributes. (No code change)
+;;
+;; Revision 1.206  2009/10/10 09:28:54  rubikitch
 ;; Remove an unnecessary test
 ;;
 ;; Revision 1.205  2009/10/10 06:21:28  rubikitch
@@ -987,7 +993,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.206 2009-10-10 09:28:54 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.207 2009-10-16 19:47:39 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
