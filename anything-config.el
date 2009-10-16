@@ -612,10 +612,12 @@ With two prefix args allow choosing in which symbol to search."
   (let ((region-only (and transient-mark-mode mark-active)))
     (list
      anything-input
-     (read-string (format "Query replace regexp %s%s%s with: "
-                          (if region-only "in region " "")
-                          anything-input
-                          (if current-prefix-arg "(word) " "")))
+     (query-replace-read-to anything-input
+                            (format "Query replace regexp %s%s%s with: "
+                                    (if region-only "in region " "")
+                                    anything-input
+                                    (if current-prefix-arg "(word) " ""))
+                            t)
      current-prefix-arg
      (if region-only
          (region-beginning)
@@ -635,7 +637,10 @@ With two prefix args allow choosing in which symbol to search."
                 collect (format "\n         $%d = %s"
                                 i (match-string i))))
    ;; match beginning
-   'anything-realvalue s))
+   ;; KLUDGE: point of anything-candidate-buffer is +1 than that of anything-current-buffer.
+   ;; It is implementation problem of candidates-in-buffer.
+   'anything-realvalue
+   (1- s)))
 
 (defun anything-c-regexp-persistent-action (txt)
   (goto-line (anything-aif (string-match "^ *\\([0-9]+\\)" txt)
