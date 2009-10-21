@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.207 2009-10-16 19:47:39 rubikitch Exp $
+;; $Id: anything.el,v 1.208 2009-10-21 11:31:15 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -321,7 +321,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.207  2009-10-16 19:47:39  rubikitch
+;; Revision 1.208  2009-10-21 11:31:15  rubikitch
+;; `anything': accept one source alist
+;;
+;; Revision 1.207  2009/10/16 19:47:39  rubikitch
 ;; Link to Japanese translation of `anything-sources' attributes. (No code change)
 ;;
 ;; Revision 1.206  2009/10/10 09:28:54  rubikitch
@@ -993,7 +996,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.207 2009-10-16 19:47:39 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.208 2009-10-21 11:31:15 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1938,7 +1941,11 @@ LONG-DOC is displayed below attribute name and short documentation."
           (anything-funcall-with-source source func)))))
 
 (defun anything-normalize-sources (sources)
-  (cond ((and sources (symbolp sources)) (list sources))
+  "If SOURCES is only one source, make a list."
+  (cond ((or (and sources               ; avoid nil
+                  (symbolp sources))
+             (and (listp sources) (assq 'name sources)))
+         (list sources))
         (sources)
         (t anything-sources)))  
 
@@ -4731,6 +4738,10 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (expect '(anything-c-source-test)
         (let ((anything-sources '(anything-c-source-test)))
           (anything-normalize-sources nil)))
+      (expect '(((name . "test")))
+        (anything-normalize-sources '((name . "test"))))
+      (expect '(((name . "test")))
+        (anything-normalize-sources '(((name . "test")))))
       (desc "anything-get-action")
       (expect '(("identity" . identity))
         (stub buffer-size => 1)
