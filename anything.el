@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.208 2009-10-21 11:31:15 rubikitch Exp $
+;; $Id: anything.el,v 1.209 2009-10-21 20:25:10 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -321,7 +321,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.208  2009-10-21 11:31:15  rubikitch
+;; Revision 1.209  2009-10-21 20:25:10  rubikitch
+;; Add a document. (no code change)
+;;
+;; Revision 1.208  2009/10/21 11:31:15  rubikitch
 ;; `anything': accept one source alist
 ;;
 ;; Revision 1.207  2009/10/16 19:47:39  rubikitch
@@ -996,7 +999,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.208 2009-10-21 11:31:15 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.209 2009-10-21 20:25:10 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1066,6 +1069,10 @@ can be written as
  (setq anything-sources '(anything-c-foo anything-c-bar))
 The latter is recommended because if you change anything-c-* variable,
 you do not have to update `anything-sources'.
+
+You are STRONGLY recommended to define a command which calls
+`anything' or `anything-other-buffer' with argument rather than
+to set `anything-sources' externally.
 
 If you want to change `anything-sources' during `anything' invocation,
 use `anything-set-sources', never use `setq'.
@@ -1989,8 +1996,11 @@ already-bound variables. Yuck!
 
 - ANY-SOURCES
 
-  Temporary value of `anything-sources'. ANY-SOURCES accepts a
-  symbol, interpreted as a variable of an anything source.
+  Temporary value of `anything-sources'.  It also accepts a
+  symbol, interpreted as a variable of an anything source.  It
+  also accepts an alist representing an anything source, which is
+  detected by (assq 'name ANY-SOURCES)
+
 
 - ANY-INPUT
 
