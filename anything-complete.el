@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.64 2009-10-13 05:40:51 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.65 2009-10-22 08:54:58 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.64  2009-10-13 05:40:51  rubikitch
+;; Revision 1.65  2009-10-22 08:54:58  rubikitch
+;; `anything-complete-shell-history-setup-key': Use `minibuffer-local-shell-command-map' if any
+;;
+;; Revision 1.64  2009/10/13 05:40:51  rubikitch
 ;; `anything-completing-read': Show completions first when require-match == t
 ;;
 ;; Revision 1.63  2009/10/11 20:27:22  rubikitch
@@ -303,7 +306,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.64 2009-10-13 05:40:51 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.65 2009-10-22 08:54:58 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -837,10 +840,16 @@ It accepts one argument, selected candidate.")
                       (or (word-at-point) "")
                       20)))
 (defun anything-complete-shell-history-setup-key (key)
-  (when (and (require 'shell-command nil t)
+  ;; for Emacs22
+  (when (and (not (boundp 'minibuffer-local-shell-command-map))
+             (require 'shell-command nil t)
              (boundp 'shell-command-minibuffer-map))
     (shell-command-completion-mode)
     (define-key shell-command-minibuffer-map key 'anything-complete-shell-history))
+  ;; for Emacs23
+  (when (boundp 'minibuffer-local-shell-command-map)
+    (define-key minibuffer-local-shell-command-map key 'anything-complete-shell-history))
+
   (when (require 'background nil t)
     (define-key background-minibuffer-map key 'anything-complete-shell-history))
   (require 'shell)
