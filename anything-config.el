@@ -1089,9 +1089,10 @@ buffer that is not the current buffer."
 ;;; Files in current dir
 (defvar anything-c-source-files-in-current-dir
   '((name . "Files from Current Directory")
-    (init . (lambda () (setq anything-c-default-directory default-directory)))
-    (candidates . (lambda () (directory-files anything-c-default-directory)))
-    (volatile)
+    (candidates . (lambda ()
+                    (with-current-buffer anything-current-buffer
+                      (directory-files default-directory))))
+    ;; volatile is not needed, I think.
     (type . file)))
 ;; (anything 'anything-c-source-files-in-current-dir)
 
@@ -1111,14 +1112,11 @@ buffer that is not the current buffer."
 
 (defvar anything-c-source-files-in-current-dir+
   '((name . "Files from Current Directory")
-    (init . (lambda ()
-              (setq anything-c-default-directory
-                    (expand-file-name default-directory))))
     (candidates . (lambda ()
-                    (directory-files
-                     anything-c-default-directory t)))
+                    (with-current-buffer anything-current-buffer
+                      (directory-files default-directory t))))
     (candidate-transformer anything-c-highlight-files)
-    (volatile)
+    ;; volatile is not needed, I think.
     (type . file)))
 
 ;; (anything 'anything-c-source-files-in-current-dir+)
