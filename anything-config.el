@@ -4242,9 +4242,9 @@ Return nil if bmk is not a valid bookmark."
   "Active saved region if this bookmark have one."
   (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
     (condition-case nil
-        (when (and (boundp bookmarkp-use-region-flag)
-                   bookmarkp-use-region-flag)
-          (let ((bmk-name (or (bookmarkp-get-buffer-name bookmark)
+        (when (and (boundp bmkext-use-region-flag)
+                   bmkext-use-region-flag)
+          (let ((bmk-name (or (bmkext-get-buffer-name bookmark)
                               (file-name-nondirectory
                                (bookmark-get-filename bookmark)))))
             (when bmk-name
@@ -4347,10 +4347,10 @@ Return nil if bmk is not a valid bookmark."
                                      (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
                                        (bookmark-show-annotation bookmark))))
      ("Delete bookmark(s)" . anything-delete-marked-bookmarks)
-     ,@(when (fboundp 'bookmarkp-edit-bookmark)
+     ,@(when (fboundp 'bmkext-edit-bookmark)
              '(("Edit Bookmark" . (lambda (candidate)
                                     (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
-                                            (bookmarkp-edit-bookmark bookmark))))))
+                                            (bmkext-edit-bookmark bookmark))))))
      ("Rename bookmark" . (lambda (candidate)
                             (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
                               (bookmark-rename bookmark))))
