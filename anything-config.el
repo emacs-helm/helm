@@ -1562,6 +1562,10 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                   (bmkext-get-end-position i)))
      for handlerp      = (and (fboundp 'bookmark-get-handler)
                               (bookmark-get-handler i))
+     for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
+                              (bmkext-w3m-bookmark-p i))
+     for isgnus        = (and (fboundp 'bmkext-gnus-bookmark-p)
+                              (bmkext-gnus-bookmark-p i)) 
      for isman         = (and (fboundp 'bmkext-man-bookmark-p) ; Man
                               (bmkext-man-bookmark-p i))
      for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
@@ -1574,10 +1578,10 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      if (eq handlerp 'Info-bookmark-jump)
      collect (propertize i 'face 'anything-bmkext-info 'help-echo pred)
      ;; w3m buffers
-     if (eq handlerp 'bmkext-jump-w3m)
+     if isw3m
      collect (propertize i 'face 'anything-bmkext-w3m 'help-echo pred)
      ;; gnus buffers
-     if (eq handlerp 'bmkext-jump-gnus)
+     if isgnus
      collect (propertize i 'face 'anything-bmkext-gnus 'help-echo pred)
      ;; Man Woman
      if (or iswoman isman) 
