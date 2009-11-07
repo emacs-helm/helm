@@ -126,8 +126,6 @@
 ;;  Search Engine:
 ;;     `anything-c-source-tracker-search' (Tracker Search)
 ;;     `anything-c-source-mac-spotlight'  (mdfind)
-;;  icicle:
-;;     `anything-c-source-icicle-region' (Icicle Regions)
 ;;  Kill ring:
 ;;     `anything-c-source-kill-ring' (Kill Ring)
 ;;  Mark ring:
@@ -665,8 +663,13 @@ With two prefix args allow choosing in which symbol to search."
    'anything-realvalue
    (1- s)))
 
+;; Shut up byte compiler
+(defun anything-goto-line (numline)
+  "Replacement of `goto-line'."
+  (goto-char (point-min)) (forward-line (1- numline)))
+
 (defun anything-c-regexp-persistent-action (txt)
-  (goto-line (anything-aif (string-match "^ *\\([0-9]+\\)" txt)
+  (anything-goto-line (anything-aif (string-match "^ *\\([0-9]+\\)" txt)
                  (string-to-number (match-string 1 txt)))))
 
 (defun anything-c-regexp-base (prompt attributes)
@@ -1234,7 +1237,7 @@ It is cleared after jumping line.")
         (ignore-errors
           (with-selected-window (get-buffer-window
                                  (get-file-buffer (car anything-c-ffap-line-location)))
-            (goto-line (cdr anything-c-ffap-line-location))))
+            (anything-goto-line (cdr anything-c-ffap-line-location))))
       (setq anything-c-ffap-line-location nil))))
 (add-hook 'anything-after-action-hook 'anything-c-ffap-line-goto-line)
 
@@ -2097,6 +2100,7 @@ http://ctags.sourceforge.net/")
 ;; (anything 'anything-c-source-ctags)
 
 ;; Semantic
+(defvar anything-semantic-candidates nil)
 (eval-when-compile (require 'semantic nil t))
 (defun anything-semantic-construct-candidates (tags depth)
   (when (require 'semantic nil t)
@@ -2404,9 +2408,9 @@ If this action is executed just after `yank', replace with STR as yanked string.
                     (anything-aif anything-mark-ring-cache
                         it)))
     (action . (("Goto line" . (lambda (candidate)
-                                (goto-line (string-to-number candidate))))))
+                                (anything-goto-line (string-to-number candidate))))))
     (persistent-action . (lambda (candidate)
-                           (goto-line (string-to-number candidate))
+                           (anything-goto-line (string-to-number candidate))
                            (anything-match-line-color-current-line)))))
 
 ;; (anything 'anything-c-source-mark-ring)
@@ -2423,11 +2427,11 @@ If this action is executed just after `yank', replace with STR as yanked string.
     (action . (("Goto line" . (lambda (candidate)
                                 (let ((items (split-string candidate ":")))
                                   (switch-to-buffer (second items))
-                                  (goto-line (string-to-number (car items))))))))
+                                  (anything-goto-line (string-to-number (car items))))))))
     (persistent-action . (lambda (candidate)
                            (let ((items (split-string candidate ":")))
                              (switch-to-buffer (second items))
-                             (goto-line (string-to-number (car items)))
+                             (anything-goto-line (string-to-number (car items)))
                              (anything-match-line-color-current-line))))))
                              
 (defun anything-c-source-global-mark-ring-candidates ()
@@ -2639,7 +2643,7 @@ See http://orgmode.org for the latest version.")
 (defun anything-c-org-headline-insert-link-to-headline (lineno-and-content)
   (insert
    (save-excursion
-     (goto-line (car lineno-and-content))
+     (anything-goto-line (car lineno-and-content))
      (and (looking-at "^\\*+ \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
           (org-make-link-string (concat "*" (match-string 1)))))))
 
@@ -3163,7 +3167,7 @@ A list of search engines."
                           (let ((lines (split-string (buffer-string) "\n" t)))
                             (cdr lines)))))))
     (action . (("Goto line" . (lambda (candidate)
-                                (goto-line (string-to-number candidate) anything-c-source-occur-current-buffer)))))
+                                (anything-goto-line (string-to-number candidate) anything-c-source-occur-current-buffer)))))
     (requires-pattern . 1)
     (volatile)))
 ;; (anything 'anything-c-source-occur)
@@ -3649,7 +3653,7 @@ directory, open this directory."
   (when file (funcall find-file-function file))
   (if (anything-attr-defined 'adjust)
       (anything-c-goto-line-with-adjustment lineno content)
-    (goto-line lineno))
+    (anything-goto-line lineno))
   (unless (anything-attr-defined 'recenter)
     (set-window-start (get-buffer-window anything-current-buffer) (point)))
   (anything-aif (anything-attr 'after-jump-hook)
@@ -3675,7 +3679,7 @@ directory, open this directory."
                           "\\(^\\|\^m\\) *" "^ *") ;allow indent
                       (regexp-quote line-content)))
     ;; If no char pos was given, try the given line number.
-    (setq startpos (progn (goto-line line) (point)))
+    (setq startpos (progn (anything-goto-line line) (point)))
     (or startpos (setq startpos (point-min)))
     ;; First see if the tag is right at the specified location.
     (goto-char startpos)
