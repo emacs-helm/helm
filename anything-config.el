@@ -2325,62 +2325,6 @@ with the tracker desktop search.")
 utility mdfind.")
 ;; (anything 'anything-c-source-mac-spotlight)
 
-;;;; <icicle>
-;;; Icicle regions
-;; See: http://www.emacswiki.org/emacs-en/Icicles_-_Multiple_Regions
-;; That is the anything interface.
-
-(defvar anything-icicle-region-alist nil)
-(defvar anything-c-source-icicle-region
-  '((name . "Icicle Regions")
-    (init . (lambda ()
-              (setq anything-icicle-region-alist
-                    (loop
-                       for i in icicle-region-alist
-                       collect (concat (car i) " => " (cadr i))))))
-    (candidates . anything-icicle-region-alist)
-    (action . (("Go to region" . anything-c-icicle-region-goto-region)
-               ("Insert region at point" . (lambda (elm)
-                                             (let (reg)
-                                               (save-window-excursion
-                                                 (anything-c-icicle-region-goto-region elm)
-                                                 (setq reg (buffer-substring (mark) (point))))
-                                               (insert reg))))
-               ("Remove region" . anything-c-icicle-region-delete-region)
-               ("Update" . (lambda (elm)
-                             (icicle-purge-bad-file-regions)))))))
-
-;; (anything 'anything-c-source-icicle-region)
-
-(defun anything-icicle-select-region-action (pos)
-  "Go to the region at nth `pos' in `icicle-region-alist'.
-See `icicle-select-region-action'."
-  (let ((icicle-get-alist-candidate-function #'(lambda (pos)
-                                                 (nth pos icicle-region-alist))))
-    (icicle-select-region-action pos)))
-
-(defun anything-icicle-delete-region-from-alist (pos)
-  "Delete the region at nth `pos' from `icicle-region-alist'.
-See `icicle-delete-region-from-alist'."
-  (let ((alist-cand  (nth pos icicle-region-alist)))
-    (setq icicle-region-alist
-          (delete alist-cand icicle-region-alist)))
-  (funcall icicle-customize-save-variable-function 'icicle-region-alist icicle-region-alist))
-
-(defun anything-c-icicle-region-goto-region (candidate)
-  "Get the position of `candidate' and call `anything-icicle-select-region-action'."
-  (let ((pos (position candidate anything-icicle-region-alist))
-        (buf (second (split-string candidate " => "))))
-    (if (equal buf "*info*")
-        (info (caddr (nth pos icicle-region-alist))))
-    (anything-icicle-select-region-action pos)))
-
-(defun anything-c-icicle-region-delete-region (candidate)
-  "Get the position of `candidate' and call `anything-icicle-delete-region-from-alist'."
-  (let ((pos (position candidate anything-icicle-region-alist)))
-    (anything-icicle-delete-region-from-alist pos)))
-
-
 
 ;;;; <Kill ring>
 ;;; Kill ring
