@@ -2846,7 +2846,7 @@ removed."
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
     (requires-pattern)
-    (match (lambda (candidate) t))
+    (match identity)
     (candidates  "dummy")
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
@@ -2854,7 +2854,6 @@ removed."
                                              (prin1-to-string
                                               (eval (read anything-pattern)))
                                            (error "Error")))))
-    (volatile)
     (action ("Do Nothing" . ignore))))
 ;; (anything 'anything-c-source-evaluation-result)
 
@@ -2862,14 +2861,13 @@ removed."
 (defvar anything-c-source-calculation-result
   '((name . "Calculation Result")
     (requires-pattern)
-    (match (lambda (candidate) t))
+    (match identity)
     (candidates  "dummy")
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
                                              (calc-eval anything-pattern)
                                            (error "error")))))
-    (volatile)
     (action ("Copy result to kill-ring" . kill-new))))
 ;; (anything 'anything-c-source-calculation-result)
 
