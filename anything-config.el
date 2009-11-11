@@ -3774,8 +3774,7 @@ It is added to `extended-command-history'.
 (defun anything-c-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
 file.  Else return ACTIONS unmodified."
-  (if (or (string= (file-name-extension candidate) "el")
-          (string= (file-name-extension candidate) "elc"))
+  (if (member (file-name-extension candidate) '("el" "elc"))
       (append actions '(("Load Emacs Lisp File" . load-file)))
     actions))
 
