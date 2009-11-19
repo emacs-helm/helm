@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.17 2009-11-11 17:43:34 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.18 2009-11-19 17:27:59 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -97,7 +97,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.17  2009-11-11 17:43:34  rubikitch
+;; Revision 1.18  2009-11-19 17:27:59  rubikitch
+;; asc-display-function: Take into account the beginning of line
+;;
+;; Revision 1.17  2009/11/11 17:43:34  rubikitch
 ;; Display bug fix. thanks to hchbaw
 ;;
 ;; http://d.hatena.ne.jp/hchbaw/20091111/1257960247
@@ -155,7 +158,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.17 2009-11-11 17:43:34 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.18 2009-11-19 17:27:59 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -247,9 +250,9 @@ It is evaluated in `asc-display-overlay'."
                           (min (+ 1     ; mode-line
                                   (if header-line-format 1 0) ;header-line
                                   ;; window screen lines 
-                                  (count-screen-lines
-                                   (window-start)
-                                   (point)))
+                                  (count-screen-lines (window-start) (point))
+                                  ;; adjustment of count-screen-lines and BOL
+                                  (if (bolp) 1 0))
                                (- (window-height) anything-show-completion-minimum-window-height))))))))
     (with-selected-window win
       (recenter -1))
