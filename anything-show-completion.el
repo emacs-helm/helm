@@ -1,5 +1,5 @@
 ;;; anything-show-completion.el --- Show selection in buffer for anything completion
-;; $Id: anything-show-completion.el,v 1.18 2009-11-19 17:27:59 rubikitch Exp $
+;; $Id: anything-show-completion.el,v 1.19 2009-11-19 20:16:51 rubikitch Exp $
 
 ;; Copyright (C) 2009  hchbaw
 ;; Copyright (C) 2009  rubikitch
@@ -97,7 +97,10 @@
 ;;; History:
 
 ;; $Log: anything-show-completion.el,v $
-;; Revision 1.18  2009-11-19 17:27:59  rubikitch
+;; Revision 1.19  2009-11-19 20:16:51  rubikitch
+;; asc-display-function: Fix an error "Window height XX too small (after splitting)"
+;;
+;; Revision 1.18  2009/11/19 17:27:59  rubikitch
 ;; asc-display-function: Take into account the beginning of line
 ;;
 ;; Revision 1.17  2009/11/11 17:43:34  rubikitch
@@ -158,7 +161,7 @@
 
 ;;; Code:
 
-(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.18 2009-11-19 17:27:59 rubikitch Exp $")
+(defvar anything-show-completion-version "$Id: anything-show-completion.el,v 1.19 2009-11-19 20:16:51 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-show-completion nil
   "anything-show-completion"
@@ -241,19 +244,21 @@ It is evaluated in `asc-display-overlay'."
   (let* ((cursor-upper-p (asc-point-at-upper-half-of-window-p (point))) 
          (half (/ (window-height) 2))
          (win (selected-window))
+         (upper-height (max window-min-height
+                            (min (+ 1                     ; mode-line
+                                    (if header-line-format 1 0) ;header-line
+                                    ;; window screen lines 
+                                    (count-screen-lines (window-start) (point))
+                                    ;; adjustment of count-screen-lines and BOL
+                                    (if (bolp) 1 0))
+                                 (- (window-height) anything-show-completion-minimum-window-height))))
          (new-w (let ((split-window-keep-point))
                   (if (active-minibuffer-window)
                       (minibuffer-selected-window)
-                    (split-window
-                     (selected-window)
-                     (max window-min-height
-                          (min (+ 1     ; mode-line
-                                  (if header-line-format 1 0) ;header-line
-                                  ;; window screen lines 
-                                  (count-screen-lines (window-start) (point))
-                                  ;; adjustment of count-screen-lines and BOL
-                                  (if (bolp) 1 0))
-                               (- (window-height) anything-show-completion-minimum-window-height))))))))
+                    (enlarge-window (if (<= (window-height) (+ anything-show-completion-minimum-window-height window-min-height))
+                                        (+ 4 anything-show-completion-minimum-window-height)
+                                      0))
+                    (split-window (selected-window) upper-height)))))
     (with-selected-window win
       (recenter -1))
     (set-window-buffer new-w buf)))
