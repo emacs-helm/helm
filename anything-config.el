@@ -3616,7 +3616,7 @@ directory, open this directory."
     (dired-goto-file file)))
 
 (defun anything-c-display-to-real-line (candidate)
-  (if (string-match "^ *\\([0-9]+\\):\\(.+\\)$" candidate)
+  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
       (list (string-to-number (match-string 1 candidate)) (match-string 2 candidate))
     (error "Line number not found")))
 
@@ -3635,7 +3635,7 @@ directory, open this directory."
 (defun anything-c-filtered-candidate-transformer-file-line (candidates source)
   (mapcar
    (lambda (candidate)
-     (if (not (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.+\\)$" candidate))
+     (if (not (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate))
          (error "Filename and line number not found")
        (let ((filename (match-string 1 candidate))
              (lineno (match-string 2 candidate))
