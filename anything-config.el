@@ -4326,8 +4326,41 @@ Return nil if bmk is not a valid bookmark."
 (define-anything-type-attribute 'line
   '((display-to-real . anything-c-display-to-real-line)
     (action ("Go to Line" . anything-c-action-line-goto)))
-  "LINENO:CONTENT string, eg. \"  16:foo\".")
+  "LINENO:CONTENT string, eg. \"  16:foo\".
 
+Optional `target-file' attribute is a name of target file.
+
+Optional `before-jump-hook' attribute is a function with no
+arguments which is called before jumping to position.
+
+Optional `after-jump-hook' attribute is a function with no
+arguments which is called after jumping to position.
+
+If `adjust' attribute is specified, searches the line whose
+content is CONTENT near the LINENO.
+
+If `recenter' attribute is specified, the line is displayed at
+the center of window, otherwise at the top of window.
+")
+
+(define-anything-type-attribute 'file-line
+  `((filtered-candidate-transformer anything-c-filtered-candidate-transformer-file-line)
+    (multiline)
+    (action ("Go to" . anything-c-action-file-line-goto)))
+  "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
+
+Optional `before-jump-hook' attribute is a function with no
+arguments which is called before jumping to position.
+
+Optional `after-jump-hook' attribute is a function with no
+arguments which is called after jumping to position.
+
+If `adjust' attribute is specified, searches the line whose
+content is CONTENT near the LINENO.
+
+If `recenter' attribute is specified, the line is displayed at
+the center of window, otherwise at the top of window.
+")
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
