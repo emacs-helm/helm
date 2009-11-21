@@ -4349,6 +4349,9 @@ the center of window, otherwise at the top of window.
     (action ("Go to" . anything-c-action-file-line-goto)))
   "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
 
+Optional `default-directory' attribute is a default-directory
+FILENAME is interpreted.
+
 Optional `before-jump-hook' attribute is a function with no
 arguments which is called before jumping to position.
 
