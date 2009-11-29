@@ -3368,8 +3368,8 @@ See also `anything-create--actions'."
 (defun* anything-gentoo-install (candidate &key action)
   (funcall anything-gentoo-prefered-shell)
   (let ((command (case action
-                   ('install "sudo emerge -av ")
-                   ('uninstall "sudo emerge -avC ")
+                   ('install "*sudo emerge -av ")
+                   ('uninstall "*sudo emerge -avC ")
                    (t (error "Unknow action")))))
   (if (anything-marked-candidates)
       (let ((elms (mapconcat 'identity (anything-marked-candidates) " ")))
