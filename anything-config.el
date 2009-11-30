@@ -388,7 +388,7 @@ history, are removed from `anything-map'. "
   :group 'anything-config)
 
 (defcustom anything-c-google-suggest-url
-  "http://www.google.com/complete/search?hl=en&js=true&qu="
+  "http://google.com/complete/search?output=toolbar&q="
   "URL used for looking up suggestions."
   :type 'string
   :group 'anything-config)
@@ -2882,68 +2882,56 @@ removed."
 ;; (anything 'anything-c-source-calculation-result)
 
 ;;; Google Suggestions
+(defun anything-c-google-suggest-fetch (input)
+  "Fetch suggestions for INPUT.
+Return an alist with elements like (data . number_results)."
+  (let (result-alist)
+    (with-current-buffer (url-retrieve-synchronously
+                          (concat anything-c-google-suggest-url
+                                  (url-hexify-string input)))
+      (setq result-alist (xml-get-children
+                       (car (xml-parse-region (point-min) (point-max)))
+                       'CompleteSuggestion)))
+    (loop
+       for i in result-alist
+       for data = (cdr (caadr (assoc 'suggestion i)))
+       for nqueries = (cdr (caadr (assoc 'num_queries i)))
+       collect (cons data nqueries) into cont
+       finally return cont)))
+
+(defun anything-c-google-suggest-set-candidates ()
+  "Set candidates with result and number of google results found."
+  (let ((suggestions (anything-c-google-suggest-fetch anything-input)))
+    (setq suggestions (loop for i in suggestions
+                         collect (concat (car i) " (" (cdr i) "results)")))
+    (if (some (lambda (data)
+                (equal (car (split-string data)) anything-input))
+              suggestions)
+        suggestions
+        ;; if there is no suggestion exactly matching the input then
+        ;; prepend a Search on Google item to the list
+        (append (list (cons (concat "Search for "
+                                    "'" anything-input "'"
+                                    " on Google")
+                            anything-input))
+                suggestions))))
+    
+(defun anything-c-google-suggest-action (candidate)
+  "Default action to jump to a google suggested candidate."
+  (let ((elm (car (split-string candidate))))
+    (browse-url (concat anything-c-google-suggest-search-url
+                        (url-hexify-string elm)))))
+
+
 (defvar anything-c-source-google-suggest
   '((name . "Google Suggest")
-    (candidates . (lambda ()
-                    (let ((suggestions (anything-c-google-suggest-fetch anything-input)))
-                      (if (some (lambda (suggestion)
-                                  (equal (cdr suggestion) anything-input))
-                                suggestions)
-                          suggestions
-                        ;; if there is no suggestion exactly matching the input then
-                        ;; prepend a Search on Google item to the list
-                        (append (list (cons (concat "Search for "
-                                                    "'" anything-input "'"
-                                                    " on Google")
-                                            anything-input))
-                                suggestions)))))
-    (action . (("Google Search" .
-                (lambda (candidate)
-                  (browse-url (concat anything-c-google-suggest-search-url
-                                      (url-hexify-string candidate)))))))
+    (candidates . anything-c-google-suggest-set-candidates)
+    (action . (("Google Search" . anything-c-google-suggest-action)))
     (volatile)
     (requires-pattern . 3)
     (delayed)))
 ;; (anything 'anything-c-source-google-suggest)
 
-(defun anything-c-google-suggest-fetch (input)
-  "Fetch suggestions for INPUT."
-  (let* ((result (with-current-buffer
-                     (url-retrieve-synchronously
-                      (concat anything-c-google-suggest-url
-                              (url-hexify-string input)))
-                   (buffer-substring (point-min) (point-max))))
-         (split (split-string result "new Array("))
-         (suggestions (anything-c-google-suggest-get-items (second split)))
-         (numbers (anything-c-google-suggest-get-items (third split)))
-         (longest (+ (apply 'max 0 (let (lengths)
-                                     (dotimes (i (length suggestions))
-                                       (push (+ (length (nth i suggestions))
-                                                (length (nth i numbers)))
-                                             lengths))
-                                     lengths))
-                     10))
-         items)
-    (dotimes (i (length suggestions))
-      (let ((suggestion (nth i suggestions))
-            (number (nth i numbers)))
-        (push (cons (concat suggestion
-                            (make-string (- longest
-                                            (length suggestion)
-                                            (length number))
-                                         32)
-                            number)
-                    suggestion)
-              items)))
-    items))
-
-(defun anything-c-google-suggest-get-items (str)
-  "Extract items from STR returned by Google Suggest."
-  (let ((start nil) items)
-    (while (string-match "\"\\([^\"]+?\\)\"" str start)
-      (push (match-string 1 str) items)
-      (setq start (1+ (match-end 1))))
-    items))
 
 ;;; Surfraw
 ;;; Need external program surfraw.
