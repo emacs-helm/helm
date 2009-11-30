@@ -2911,9 +2911,10 @@ Return an alist with elements like (data . number_results)."
         ;; if there is no suggestion exactly matching the input then
         ;; prepend a Search on Google item to the list
         (append
+         suggestions
          (list (cons (concat "Search for " "'" anything-input "'" " on Google")
-                     anything-input))
-         suggestions))))
+                     anything-input))))))
+         
     
 (defun anything-c-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
