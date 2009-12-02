@@ -3256,7 +3256,7 @@ See also `anything-create--actions'."
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
                ("Kill Screen".
                 (lambda (candidate)
-                  (elscreen-kill (- (aref candidate 1) (aref "0" 0)))))
+                  (elscreen-kill-internal (- (aref candidate 1) (aref "0" 0)))))
                ("Only Screen".
                 (lambda (candidate)
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
