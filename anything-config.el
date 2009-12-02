@@ -258,6 +258,8 @@
 ;;    Run `anything-create' from `anything' as a fallback.
 ;;  `anything-create'
 ;;    Do many create actions from STRING.
+;;  `anything-apt'
+;;    The `anything' frontend of APT package manager.
 ;;  `anything-c-set-variable'
 ;;    Set value to VAR interactively.
 ;;  `anything-c-adaptive-save-history'
@@ -3313,6 +3315,52 @@ See also `anything-create--actions'."
   
 ;; (anything 'anything-c-source-xfonts)
 
+;; Source for Debian/Ubuntu users
+(defvar anything-c-source-apt
+  '((name . "APT")
+    (init . anything-c-apt-init)
+    (candidates-in-buffer)
+    (display-to-real . anything-c-apt-display-to-real)
+    (candidate-number-limit . 9999)
+    (action
+     ("Show package description" . anything-c-apt-cache-show)
+     ("Install package" . anything-c-apt-install))))
+;; (anything 'anything-c-source-apt)
+
+(defvar anything-c-apt-query "emacs")
+(defvar anything-c-apt-search-command "apt-cache search '%s'")
+(defvar anything-c-apt-show-command "apt-cache show '%s'")
+(defvar anything-c-apt-install-command "xterm -e sudo apt-get install '%s' &")
+
+(defun anything-apt (query)
+  "The `anything' frontend of APT package manager."
+  (interactive "sAPT search: ")
+  (let ((anything-c-apt-query query))
+    (anything 'anything-c-source-apt)))
+
+(defun anything-c-apt-init ()
+  (with-current-buffer
+      (anything-candidate-buffer
+       (get-buffer-create (format "*anything-apt:%s*" anything-c-apt-query)))
+    (call-process-shell-command
+     (format anything-c-apt-search-command anything-c-apt-query)
+     nil (current-buffer))))
+(defun anything-c-apt-display-to-real (line)
+  (car (split-string line " - ")))
+
+(defun anything-c-shell-command-if-needed (command)
+  (interactive "sShell command: ")
+  (if (get-buffer command)		; if the buffer already exists
+      (switch-to-buffer command)	; then just switch to it
+    (switch-to-buffer command)		; otherwise create it
+    (insert (shell-command-to-string command))))
+
+(defun anything-c-apt-cache-show (package)
+  (anything-c-shell-command-if-needed (format anything-c-apt-show-command package)))
+(defun anything-c-apt-install (package)
+  (shell-command (format anything-c-apt-install-command package) "*apt install*"))
+
+;; (anything-c-apt-install "jed")
 ;; Sources for gentoo users
 
 (defvar anything-gentoo-prefered-shell 'eshell
