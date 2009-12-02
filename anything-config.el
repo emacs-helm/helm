@@ -278,7 +278,7 @@
 ;;    default = 50
 ;;  `anything-c-google-suggest-url'
 ;;    URL used for looking up suggestions.
-;;    default = "http://www.google.com/complete/search?hl=en&js=true&qu="
+;;    default = "http://google.com/complete/search?output=toolbar&q="
 ;;  `anything-c-google-suggest-search-url'
 ;;    URL used for searching.
 ;;    default = "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
@@ -688,14 +688,17 @@ With two prefix args allow choosing in which symbol to search."
       (anything
        (list
         (append
+         attributes
          '((init . (lambda () (anything-candidate-buffer anything-current-buffer)))
            (candidates-in-buffer)
            (get-line . anything-c-regexp-get-line)
            (persistent-action . anything-c-regexp-persistent-action)
            (multiline)
-           (delayed))
-         attributes))
+           (delayed))))
        nil prompt nil nil "*anything regexp*"))))
+
+;; (anything-c-regexp-base "Regexp: " '((name . "test")))
+;; (anything-c-regexp-base "Regexp: " '((name . "test") (candidates-in-buffer . (lambda () (let ((anything-pattern (eval (read anything-pattern)))) (anything-candidates-in-buffer))))))
 
 (defun anything-c-regexp-kill-new (input)
   (kill-new input)
