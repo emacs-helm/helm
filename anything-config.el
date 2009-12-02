@@ -633,21 +633,22 @@ With two prefix args allow choosing in which symbol to search."
    '((name . "Regexp Builder")
      (action
       ("Kill Regexp as sexp" .
-       (lambda (x) (anything-c-regexp-kill-new (prin1-to-string anything-input))))
+       (lambda (x) (anything-c-regexp-kill-new (prin1-to-string (funcall (anything-attr 'regexp))))))
       ("Query Replace Regexp" .
        (lambda (x) (apply 'query-replace-regexp (anything-c-query-replace-args (point)))))
       ("Kill Regexp" .
-       (lambda (x) (anything-c-regexp-kill-new anything-input)))))))
+       (lambda (x) (anything-c-regexp-kill-new (funcall (anything-attr 'regexp)))))))))
 
 (defun anything-c-query-replace-args (start-point)
   ;; create arguments of `query-replace-regexp'.
-  (let ((region-only (and transient-mark-mode mark-active)))
+  (let ((region-only (and transient-mark-mode mark-active))
+        (regexp (funcall (anything-attr 'regexp))))
     (list
-     anything-input
-     (query-replace-read-to anything-input
+     regexp
+     (query-replace-read-to regexp
                             (format "Query replace regexp %s%s%s with: "
                                     (if region-only "in region " "")
-                                    anything-input
+                                    regexp
                                     (if current-prefix-arg "(word) " ""))
                             t)
      current-prefix-arg)))
@@ -682,19 +683,31 @@ With two prefix args allow choosing in which symbol to search."
     (let ((anything-compile-source-functions
            ;; rule out anything-match-plugin because the input is one regexp.
            (delq 'anything-compile-source--match-plugin
-                 (copy-sequence anything-compile-source-functions))))
+                 (copy-sequence anything-compile-source-functions)))
+          (base-attributes
+           '((init . (lambda () (anything-candidate-buffer anything-current-buffer)))
+             (candidates-in-buffer)
+             (get-line . anything-c-regexp-get-line)
+             (persistent-action . anything-c-regexp-persistent-action)
+             (multiline)
+             (delayed))))
       (if (and transient-mark-mode mark-active)
           (narrow-to-region (region-beginning) (region-end)))
       (anything
        (list
         (append
          attributes
-         '((init . (lambda () (anything-candidate-buffer anything-current-buffer)))
-           (candidates-in-buffer)
-           (get-line . anything-c-regexp-get-line)
-           (persistent-action . anything-c-regexp-persistent-action)
-           (multiline)
-           (delayed))))
+         '((regexp . (lambda () anything-pattern)))
+         base-attributes)
+        ;; sexp form regexp
+        (append
+         `((name . ,(concat (assoc-default 'name attributes) " (sexp)")))
+         attributes
+         '((candidates-in-buffer
+            . (lambda () (let ((anything-pattern (eval (read anything-pattern))))
+                           (anything-candidates-in-buffer))))
+           (regexp . (lambda () (eval (read anything-pattern)))))
+         base-attributes))
        nil prompt nil nil "*anything regexp*"))))
 
 ;; (anything-c-regexp-base "Regexp: " '((name . "test")))
