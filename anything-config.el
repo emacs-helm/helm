@@ -1706,7 +1706,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; Regions
 (defvar anything-c-source-bookmark-regions
   '((name . "Bookmark Regions")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-region-setup-alist)
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark)))
@@ -1719,7 +1721,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; W3m
 (defvar anything-c-source-bookmark-w3m
   '((name . "Bookmark W3m")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-w3m-setup-alist)
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark)))
@@ -1732,7 +1736,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; Woman Man
 (defvar anything-c-source-bookmark-man
   '((name . "Bookmark Woman&Man")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-man-setup-alist)
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark)))
@@ -1746,7 +1752,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; Gnus
 (defvar anything-c-source-bookmark-gnus
   '((name . "Bookmark Gnus")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-gnus-setup-alist)
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark)))
@@ -1759,7 +1767,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; Info
 (defvar anything-c-source-bookmark-info
   '((name . "Bookmark Info")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-info-setup-alist)
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark)))
@@ -1772,7 +1782,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; Local Files&directories
 (defvar anything-c-source-bookmark-files&dirs
   '((name . "Bookmark Files&Directories")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-local-files-setup-alist)
     (candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark)))
@@ -1790,7 +1802,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 
 (defvar anything-c-source-bookmark-su-files&dirs
   '((name . "Bookmark Root-Files&Directories")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-su-files-setup-alist)
     (candidate-transformer anything-c-highlight-bmkext-su)
     (type . bookmark)))
@@ -1813,7 +1827,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; Ssh Files&directories
 (defvar anything-c-source-bookmark-ssh-files&dirs
   '((name . "Bookmark Ssh-Files&Directories")
-    (init . (lambda () (require 'bookmark-extensions) (bookmark-maybe-load-default-file)))
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-ssh-files-setup-alist)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-ssh-files&dirs)
@@ -1847,40 +1863,99 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
               anything-c-source-bookmark-ssh-files&dirs)))
 
 
+;; Firefox bookmarks
+(defvar anything-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ ]*")
+(defvar anything-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
+
+(defun anything-get-firefox-user-init-dir ()
+  "Guess the default Firefox user directory name."
+  (let* ((moz-dir (concat (getenv "HOME") "/.mozilla/firefox/"))
+         (moz-user-dir (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
+                         (goto-char (point-min))
+                         (when (search-forward "Path=" nil t)
+                           (buffer-substring-no-properties (point) (point-at-eol))))))
+    (file-name-as-directory (concat moz-dir moz-user-dir))))
+
+(defun anything-guess-firefox-bookmark-file ()
+  "Return the path of the Firefox bookmarks file."
+  (concat (anything-get-firefox-user-init-dir) "bookmarks.html"))
+
+(defun anything-html-bookmarks-to-alist (file url-regexp bmk-regexp)
+  "Parse html bookmark FILE and return an alist with (title . url) as elements."
+  (let (bookmarks-alist url title)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (goto-char (point-min))
+      (while (not (eobp))
+        (forward-line)
+        (when (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
+          (beginning-of-line)
+          (when (re-search-forward url-regexp nil t)
+            (setq url (concat "\"" (match-string 0))))
+          (beginning-of-line)
+          (when (re-search-forward bmk-regexp nil t)
+            (setq title (match-string 1)))
+          (push (cons title url) bookmarks-alist))))
+    (nreverse bookmarks-alist)))
+
+
+(defvar anything-c-firefox-bookmarks-alist nil)
+(defvar anything-c-source-firefox-bookmarks
+  '((name . "Firefox Bookmarks")
+    (init . (lambda ()
+              (setq anything-c-firefox-bookmarks-alist
+                    (anything-html-bookmarks-to-alist
+                     (anything-guess-firefox-bookmark-file)
+                     anything-firefox-bookmark-url-regexp
+                     anything-firefox-bookmarks-regexp))))
+    (candidates . (lambda ()
+                    (mapcar #'car
+                            anything-c-firefox-bookmarks-alist)))
+    (candidate-transformer anything-c-highlight-firefox-bookmarks)
+    (action . (("Browse Url" . (lambda (candidate)
+                                 (w3m-browse-url
+                                  (anything-c-firefox-bookmarks-get-value candidate)))) 
+               ("Browse Url Firefox" . (lambda (candidate)
+                                         (browse-url-firefox
+                                          (anything-c-firefox-bookmarks-get-value candidate)))) 
+               ("Copy Url" . (lambda (elm)
+                               (kill-new (anything-c-w3m-bookmarks-get-value elm))))))
+    (delayed)))
+;; (anything 'anything-c-source-firefox-bookmarks)
+
+(defun anything-c-firefox-bookmarks-get-value (elm)
+  (replace-regexp-in-string "\"" ""
+                            (cdr (assoc elm
+                                        anything-c-firefox-bookmarks-alist))))
+
+
+(defun anything-c-highlight-firefox-bookmarks (books)
+  (loop for i in books
+        collect (propertize i
+                            'face '((:foreground "YellowGreen"))
+                            'help-echo (anything-c-firefox-bookmarks-get-value i))))
+
 ;; W3m bookmark
 (eval-when-compile (require 'w3m-bookmark nil t))
 (unless (and (require 'w3m nil t)
              (require 'w3m-bookmark nil t))
   (defvar w3m-bookmark-file "~/.w3m/bookmark.html"))
-;; (defvar anything-w3m-bookmarks-regexp ">[^><]+[^</a>]+[a-z)0-9]+")
+
 
 (defface anything-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
   "Face for w3m bookmarks" :group 'anything)
 
-(defvar anything-w3m-bookmarks-regexp ">[^><]+.[^</a>]")
-(defun anything-w3m-bookmarks-to-alist ()
-  (let (bookmarks-alist url title)
-    (with-temp-buffer
-      (insert-file-contents w3m-bookmark-file) ;; or w3m-bookmark-file
-      (goto-char (point-min))
-      (while (not (eobp))
-        (forward-line)
-        (when (re-search-forward "href=" nil t)
-          (beginning-of-line)
-          (when (re-search-forward "\\(http\\|file\\)://[^>]*" nil t)
-            (setq url (concat "\"" (match-string 0))))
-          (beginning-of-line)
-          (when (re-search-forward anything-w3m-bookmarks-regexp nil t)
-            (setq title (match-string 0)))
-          (push (cons title url) bookmarks-alist))))
-    (reverse bookmarks-alist)))
-
+(defvar anything-w3m-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
+(defvar anything-w3m-bookmark-url-regexp "\\(https\\|http\\|ftp\\|file\\)://[^>]*")
 (defvar anything-c-w3m-bookmarks-alist nil)
 (defvar anything-c-source-w3m-bookmarks
   '((name . "W3m Bookmarks")
     (init . (lambda ()
               (setq anything-c-w3m-bookmarks-alist
-                    (anything-w3m-bookmarks-to-alist))))
+                    (anything-html-bookmarks-to-alist
+                     w3m-bookmark-file
+                     anything-w3m-bookmark-url-regexp
+                     anything-w3m-bookmarks-regexp))))
     (candidates . (lambda ()
                     (mapcar #'car
                             anything-c-w3m-bookmarks-alist)))
