@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.213 2009-12-03 09:59:58 rubikitch Exp $
+;; $Id: anything.el,v 1.214 2009-12-03 20:23:40 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,12 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.213  2009-12-03 09:59:58  rubikitch
+;; Revision 1.214  2009-12-03 20:23:40  rubikitch
+;; `anything-enable-digit-shortcuts' also accepts 'alphabet.
+;;
+;; Now alphabet shortcuts are usable.
+;;
+;; Revision 1.213  2009/12/03 09:59:58  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.212  2009/11/15 09:42:15  rubikitch
@@ -1016,7 +1021,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.213 2009-12-03 09:59:58 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.214 2009-12-03 20:23:40 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1411,8 +1416,15 @@ Attributes:
 
 
 (defvar anything-enable-digit-shortcuts nil
-  "*If t then the first nine matches can be selected using
-  Ctrl+<number>.")
+  "*Whether to use digit/alphabet shortcut to select the first nine matches.
+If t then they can be selected using Ctrl+<number>.
+If 'alphabet then they can be selected using Shift+<alphabet: a s d f g h j k l>.
+
+Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
+
+(defvar anything-shortcut-keys-alist
+  '((alphabet  ?a ?s ?d ?f ?g ?h ?j ?k ?l)
+    (t         ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)))
 
 (defvar anything-display-source-at-screen-top t
   "*If t, `anything-next-source' and `anything-previous-source'
@@ -1716,6 +1728,8 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
 (defvar anything-cib-hash (make-hash-table :test 'equal))
 (defvar anything-tick-hash (make-hash-table :test 'equal))
 (defvar anything-issued-errors nil)
+(defvar anything-shortcut-keys nil)
+
 
 ;; (@* "Programming Tools")
 (defmacro anything-aif (test-form then-form &rest else-forms)
@@ -2189,15 +2203,17 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
           (make-overlay (point-min) (point-min) (get-buffer buffer)))
     (overlay-put anything-selection-overlay 'face anything-selection-face))
 
+  (when anything-enable-digit-shortcuts
+    (setq anything-shortcut-keys (assoc-default anything-enable-digit-shortcuts anything-shortcut-keys-alist)))
+
   (if anything-enable-digit-shortcuts
       (unless anything-digit-overlays
-        (dotimes (i 9)
-          (push (make-overlay (point-min) (point-min)
-                              (get-buffer buffer))
-                anything-digit-overlays)
-          (overlay-put (car anything-digit-overlays)
-                       'before-string (concat (int-to-string (1+ i)) " - ")))
-        (setq anything-digit-overlays (nreverse anything-digit-overlays)))
+        (setq anything-digit-overlays
+              (loop for key in anything-shortcut-keys
+                    for overlay = (make-overlay (point-min) (point-min) (get-buffer buffer))
+                    do (overlay-put overlay 'before-string
+                                    (format "%s - " (upcase (make-string 1 key))))
+                    collect overlay)))
 
     (when anything-digit-overlays
       (dolist (overlay anything-digit-overlays)
@@ -2841,7 +2857,7 @@ UNIT and DIRECTION."
   (if anything-enable-digit-shortcuts
       (save-selected-window
         (select-window (anything-window))          
-        (let* ((index (- (anything-this-command-key) ?1))
+        (let* ((index (position (anything-this-command-key) anything-shortcut-keys))
                (overlay (nth index anything-digit-overlays)))
           (when (overlay-buffer overlay)
             (goto-char (overlay-start overlay))
