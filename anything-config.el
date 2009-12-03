@@ -1035,7 +1035,6 @@ buffer that is not the current buffer."
 (defvar anything-c-source-buffers
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
-    (volatile)
     (type . buffer)))
 ;; (anything 'anything-c-source-buffers)
 
@@ -1083,7 +1082,6 @@ buffer that is not the current buffer."
 (defvar anything-c-source-buffers+
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
-    (volatile)
     (type . buffer)
     (candidate-transformer anything-c-skip-current-buffer
                            anything-c-highlight-buffers
@@ -1344,7 +1342,6 @@ source.")
     (action . (lambda (candidate)
                 (Info-find-node "elisp" "Index")
                 (Info-index (replace-regexp-in-string "* " "" candidate))))
-    (volatile)
     (requires-pattern . 2)))
 ;; (anything 'anything-c-source-info-elisp)
 
@@ -1366,7 +1363,6 @@ source.")
     (action . (lambda (candidate)
                 (Info-find-node "cl" "Function Index")
                 (Info-index (replace-regexp-in-string "* " "" candidate))))
-    (volatile)
     (requires-pattern . 2)))
 ;; (anything 'anything-c-source-info-cl)
 
@@ -1395,7 +1391,6 @@ source.")
                                       (push (symbol-name a)
                                             commands))))
                       (sort commands 'string-lessp))))
-    (volatile)
     (type . command)
     (requires-pattern . 2))
   "Source for completing and invoking Emacs commands.
@@ -1427,7 +1422,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
                       (mapatoms (lambda (a) (if (functionp a)
                                                 (push (symbol-name a) commands))))
                       (sort commands 'string-lessp))))
-    (volatile)
     (type . function)
     (requires-pattern . 2))
   "Source for completing Emacs functions.")
@@ -2041,7 +2035,6 @@ STRING is string to match."
 (defvar anything-c-source-imenu
   '((name . "Imenu")
     (candidates . anything-c-imenu-candidates)
-    (volatile)
     (persistent-action . (lambda (elm)
                            (anything-c-imenu-default-action elm)
                            (unless (fboundp 'semantic-imenu-tag-overlay)
@@ -2815,7 +2808,6 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 (defvar anything-c-source-picklist
   '((name . "Picklist")
     (candidates . (lambda () (mapcar 'car picklist-list)))
-    (volatile)
     (type . file)))
 ;; (anything 'anything-c-source-picklist)
 
@@ -2856,7 +2848,6 @@ removed."
 (defvar anything-c-source-bbdb
   '((name . "BBDB")
     (candidates . anything-c-bbdb-candidates)
-    (volatile)
     (action ("Send a mail" . (lambda (candidate)
                                (bbdb-send-mail (anything-c-bbdb-get-record candidate))))
             ("View person's data" . (lambda (candidate)
@@ -3086,8 +3077,7 @@ A list of search engines."
                                   (url (second stream)))
                              (funcall fn url))))
                ("Delete" . anything-emms-stream-delete-bookmark)
-               ("Edit" . anything-emms-stream-edit-bookmark)))
-    (volatile)))
+               ("Edit" . anything-emms-stream-edit-bookmark)))))
 ;; (anything 'anything-c-source-emms-streams)
 
 ;; Don't forget to set `emms-source-file-default-directory'
@@ -3102,8 +3092,7 @@ A list of search engines."
                ("Open dired in file's directory" . (lambda (item)
                                                      (anything-c-open-dired
                                                       (expand-file-name item
-                                                                        emms-source-file-default-directory))))))
-    (volatile)))
+                                                                        emms-source-file-default-directory))))))))
 ;; (anything 'anything-c-source-emms-dired)
 
 ;;; Jabber Contacts (jabber.el)
@@ -3303,7 +3292,6 @@ See also `anything-create--actions'."
                 (setq anything-c-xfonts-cache
                       (x-list-fonts "*")))))  
     (candidates . anything-c-xfonts-cache)
-    (volatile)
     (action . (("Copy to kill ring" . (lambda (elm)
                                         (kill-new elm)))
                ("Set Font" . (lambda (elm)
