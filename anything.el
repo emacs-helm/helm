@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.214 2009-12-03 20:23:40 rubikitch Exp $
+;; $Id: anything.el,v 1.215 2009-12-03 20:37:13 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.214  2009-12-03 20:23:40  rubikitch
+;; Revision 1.215  2009-12-03 20:37:13  rubikitch
+;; `anything-enable-shortcuts' is an alias of `anything-enable-digit-shortcuts'.
+;; Alphabet shortcuts can be used now.
+;;
+;; Revision 1.214  2009/12/03 20:23:40  rubikitch
 ;; `anything-enable-digit-shortcuts' also accepts 'alphabet.
 ;;
 ;; Now alphabet shortcuts are usable.
@@ -1021,7 +1025,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.214 2009-12-03 20:23:40 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.215 2009-12-03 20:37:13 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1415,12 +1419,16 @@ Attributes:
   common attributes with a `file' type.")
 
 
-(defvar anything-enable-digit-shortcuts nil
+(defvar anything-enable-shortcuts nil
   "*Whether to use digit/alphabet shortcut to select the first nine matches.
 If t then they can be selected using Ctrl+<number>.
 If 'alphabet then they can be selected using Shift+<alphabet: a s d f g h j k l>.
 
 Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
+
+(defvaralias 'anything-enable-digit-shortcuts 'anything-enable-shortcuts
+  "Alphabet shortcuts are usable now. Then `anything-enable-digit-shortcuts' should be renamed.
+`anything-enable-digit-shortcuts' is retained for compatibility.")
 
 (defvar anything-shortcut-keys-alist
   '((alphabet  ?a ?s ?d ?f ?g ?h ?j ?k ?l)
