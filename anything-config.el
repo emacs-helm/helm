@@ -3303,7 +3303,6 @@ See also `anything-create--actions'."
                 (setq anything-c-xfonts-cache
                       (x-list-fonts "*")))))  
     (candidates . anything-c-xfonts-cache)
-    (multiline)
     (volatile)
     (action . (("Copy to kill ring" . (lambda (elm)
                                         (kill-new elm)))
