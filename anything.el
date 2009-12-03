@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.216 2009-12-03 20:43:51 rubikitch Exp $
+;; $Id: anything.el,v 1.217 2009-12-03 23:16:17 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.216  2009-12-03 20:43:51  rubikitch
+;; Revision 1.217  2009-12-03 23:16:17  rubikitch
+;; silence warning
+;;
+;; Revision 1.216  2009/12/03 20:43:51  rubikitch
 ;; Add keybindings for alphabet shortcuts
 ;;
 ;; Revision 1.215  2009/12/03 20:37:13  rubikitch
@@ -1028,7 +1031,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.216 2009-12-03 20:43:51 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.217 2009-12-03 23:16:17 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3577,7 +3580,7 @@ occurrence of the current pattern.")
 (defun anything-isearch-printing-char ()
   "Add printing char to the pattern."
   (interactive)
-  (let ((char (char-to-string last-command-char)))
+  (let ((char (char-to-string last-command-event)))
     (setq anything-isearch-pattern (concat anything-isearch-pattern char))
 
     (with-anything-window
