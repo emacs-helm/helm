@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.215 2009-12-03 20:37:13 rubikitch Exp $
+;; $Id: anything.el,v 1.216 2009-12-03 20:43:51 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.215  2009-12-03 20:37:13  rubikitch
+;; Revision 1.216  2009-12-03 20:43:51  rubikitch
+;; Add keybindings for alphabet shortcuts
+;;
+;; Revision 1.215  2009/12/03 20:37:13  rubikitch
 ;; `anything-enable-shortcuts' is an alias of `anything-enable-digit-shortcuts'.
 ;; Alphabet shortcuts can be used now.
 ;;
@@ -1025,7 +1028,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.215 2009-12-03 20:37:13 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.216 2009-12-03 20:43:51 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1500,6 +1503,15 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-7") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-8") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-9") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "A") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "S") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "D") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "F") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "G") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "H") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "J") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "K") 'anything-select-with-digit-shortcut)
+    (define-key map (kbd "L") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-i") 'anything-select-action)
     (define-key map (kbd "C-z") 'anything-execute-persistent-action)
     (define-key map (kbd "C-e") 'anything-select-2nd-action-or-end-of-line)
