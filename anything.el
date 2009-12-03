@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.212 2009-11-15 09:42:15 rubikitch Exp $
+;; $Id: anything.el,v 1.213 2009-12-03 09:59:58 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.212  2009-11-15 09:42:15  rubikitch
+;; Revision 1.213  2009-12-03 09:59:58  rubikitch
+;; refactoring
+;;
+;; Revision 1.212  2009/11/15 09:42:15  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.211  2009/11/06 21:42:58  rubikitch
@@ -1013,7 +1016,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.212 2009-11-15 09:42:15 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.213 2009-12-03 09:59:58 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2829,12 +2832,16 @@ UNIT and DIRECTION."
                   (1+ (line-end-position))))
   (anything-follow-execute-persistent-action-maybe))
 
+(defun anything-this-command-key ()
+  (event-basic-type (elt (this-command-keys-vector) 0)))
+;; (progn (read-key-sequence "Key: ") (p (anything-this-command-key)))
+
 (defun anything-select-with-digit-shortcut ()
   (interactive)
   (if anything-enable-digit-shortcuts
       (save-selected-window
         (select-window (anything-window))          
-        (let* ((index (- (event-basic-type (elt (this-command-keys-vector) 0)) ?1))
+        (let* ((index (- (anything-this-command-key) ?1))
                (overlay (nth index anything-digit-overlays)))
           (when (overlay-buffer overlay)
             (goto-char (overlay-start overlay))
