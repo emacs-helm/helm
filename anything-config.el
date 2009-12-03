@@ -4208,6 +4208,11 @@ Return nil if bmk is not a valid bookmark."
          '(("Switch to buffer" . switch-to-buffer)
            ("Switch to buffer other window" . switch-to-buffer-other-window)
            ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
+     ,@(when (fboundp 'elscreen-goto)
+             '(("Display buffer in Elscreen" . (lambda (candidate)
+                                                 (let ((target-screen (elscreen-find-screen-by-buffer
+                                                                       (get-buffer candidate) 'create)))
+                                                   (elscreen-goto target-screen))))))
      ("Display buffer"   . display-buffer)
      ("Revert buffer" . anything-revert-buffer)
      ("Revert Marked buffers" . anything-revert-marked-buffers)
