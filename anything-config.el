@@ -1919,8 +1919,8 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
                                          (browse-url-firefox
                                           (anything-c-firefox-bookmarks-get-value candidate)))) 
                ("Copy Url" . (lambda (elm)
-                               (kill-new (anything-c-w3m-bookmarks-get-value elm))))))
-    (delayed)))
+                               (kill-new (anything-c-w3m-bookmarks-get-value elm))))))))
+
 ;; (anything 'anything-c-source-firefox-bookmarks)
 
 (defun anything-c-firefox-bookmarks-get-value (elm)
@@ -1973,8 +1973,7 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
     (persistent-action . (lambda (candidate)
                            (if current-prefix-arg
                                (anything-c-w3m-browse-bookmark candidate t)
-                             (anything-c-w3m-browse-bookmark candidate nil t))))
-    (delayed)))
+                             (anything-c-w3m-browse-bookmark candidate nil t))))))
 
 ;; (anything 'anything-c-source-w3m-bookmarks)
 
