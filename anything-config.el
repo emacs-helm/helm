@@ -260,6 +260,12 @@ history, are removed from `anything-map'. "
   :type 'string
   :group 'anything-config)
 
+(defcustom anything-google-suggest-use-curl-p nil
+  "*When non--nil use CURL to get info from `anything-c-google-suggest-url'.
+Otherwise `url-retrieve-synchronously' is used."
+  :type 'boolean
+  :group 'anything-config)
+
 (defcustom anything-c-boring-buffer-regexp
   (rx (or
        (group bos  " ")
@@ -2835,19 +2841,25 @@ removed."
 (defun anything-c-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
-  (let (result-alist)
-    (with-current-buffer (url-retrieve-synchronously
-                          (concat anything-c-google-suggest-url
-                                  (url-hexify-string input)))
-      (setq result-alist (xml-get-children
-                          (car (xml-parse-region (point-min) (point-max)))
-                          'CompleteSuggestion)))
-    (loop
-       for i in result-alist
-       for data = (cdr (caadr (assoc 'suggestion i)))
-       for nqueries = (cdr (caadr (assoc 'num_queries i)))
-       collect (cons data nqueries) into cont
-       finally return cont)))
+  (let ((request (concat anything-c-google-suggest-url
+                         (url-hexify-string input))))
+    (flet ((fetch ()
+             (loop
+                with result-alist = (xml-get-children
+                                     (car (xml-parse-region (point-min) (point-max)))
+                                     'CompleteSuggestion)
+                for i in result-alist
+                for data = (cdr (caadr (assoc 'suggestion i)))
+                for nqueries = (cdr (caadr (assoc 'num_queries i)))
+                collect (cons data nqueries) into cont
+                finally return cont)))
+      (if anything-google-suggest-use-curl-p
+          (with-temp-buffer
+            (call-process "curl" nil t nil request)
+            (fetch))
+          (with-current-buffer
+              (url-retrieve-synchronously request)
+            (fetch))))))
 
 
 (defun anything-c-google-suggest-set-candidates ()
@@ -4544,6 +4556,9 @@ the center of window, otherwise at the top of window.
 ;;  `anything-c-google-suggest-search-url'
 ;;    URL used for searching.
 ;;    default = "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
+;;  `anything-google-suggest-use-curl-p'
+;;    *When non--nil use CURL to get info from `anything-c-google-suggest-url'.
+;;    default = nil
 ;;  `anything-c-boring-buffer-regexp'
 ;;    The regexp that match boring buffers.
 ;;    default = (rx (or (group bos " ") "*anything" " *Echo Area" " *Minibuf"))
