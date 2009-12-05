@@ -3194,13 +3194,16 @@ See also `anything-create--actions'."
                          (loop for sname in (elscreen-get-screen-to-name-alist)
                                append (list (format "[%d] %s" (car sname) (cdr sname))) into lst
                                finally (return lst))
-                         '(lambda (a b) (compare-strings a nil nil b nil nil))))))
+                         #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
     (action . (("Change Screen".
                 (lambda (candidate)
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
-               ("Kill Screen".
+               ("Kill Screen(s)".
                 (lambda (candidate)
-                  (elscreen-kill-internal (- (aref candidate 1) (aref "0" 0)))))
+                  (anything-aif (anything-marked-candidates)
+                      (dolist (i it)
+                        (elscreen-kill-internal (- (aref i 1) (aref "0" 0))))
+                    (elscreen-kill-internal (- (aref candidate 1) (aref "0" 0))))))
                ("Only Screen".
                 (lambda (candidate)
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
@@ -4208,6 +4211,16 @@ Return nil if bmk is not a valid bookmark."
                 (setq deactivate-mark nil)))))
       (error nil))))
 
+(defun anything-find-buffer-on-elscreen (candidate)
+  "Open buffer in new screen, if marked buffers open all in elscreens."
+  (anything-aif (anything-marked-candidates)
+      (dolist (i it)
+        (let ((target-screen (elscreen-find-screen-by-buffer
+                              (get-buffer i) 'create)))
+          (elscreen-goto target-screen)))
+    (let ((target-screen (elscreen-find-screen-by-buffer
+                          (get-buffer candidate) 'create)))
+      (elscreen-goto target-screen))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -4220,11 +4233,8 @@ Return nil if bmk is not a valid bookmark."
          '(("Switch to buffer" . switch-to-buffer)
            ("Switch to buffer other window" . switch-to-buffer-other-window)
            ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
-     ,@(when (require 'elscreen nil t);(fboundp 'elscreen-goto)
-             '(("Display buffer in Elscreen" . (lambda (candidate)
-                                                 (let ((target-screen (elscreen-find-screen-by-buffer
-                                                                       (get-buffer candidate) 'create)))
-                                                   (elscreen-goto target-screen))))))
+     ,@(when (require 'elscreen nil t)
+             '(("Display buffer in Elscreen" . anything-find-buffer-on-elscreen)))
      ("Display buffer"   . display-buffer)
      ("Revert buffer" . anything-revert-buffer)
      ("Revert Marked buffers" . anything-revert-marked-buffers)
