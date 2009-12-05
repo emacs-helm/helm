@@ -2838,6 +2838,7 @@ removed."
 ;; (anything 'anything-c-source-calculation-result)
 
 ;;; Google Suggestions
+(defvar anything-gg-sug-lgh-flag 0)
 (defun anything-c-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
@@ -2851,6 +2852,10 @@ Return an alist with elements like (data . number_results)."
                 for i in result-alist
                 for data = (cdr (caadr (assoc 'suggestion i)))
                 for nqueries = (cdr (caadr (assoc 'num_queries i)))
+                for ldata = (length data) 
+                do
+                  (when (> ldata anything-gg-sug-lgh-flag)
+                    (setq anything-gg-sug-lgh-flag ldata))
                 collect (cons data nqueries) into cont
                 finally return cont)))
       (if anything-google-suggest-use-curl-p
@@ -2866,7 +2871,10 @@ Return an alist with elements like (data . number_results)."
   "Set candidates with result and number of google results found."
   (let ((suggestions (anything-c-google-suggest-fetch anything-input)))
     (setq suggestions (loop for i in suggestions
-                           for elm = (concat (car i) " (" (cdr i) "results)")
+                         for interval = (- anything-gg-sug-lgh-flag (length (car i)))
+                         for elm = (concat (car i)
+                                           (make-string (+ 2 interval) ? )
+                                           "(" (cdr i) " results)")
                          collect (cons elm (car i))))
     (if (some (lambda (data) (equal (cdr data) anything-input)) suggestions)
         suggestions
