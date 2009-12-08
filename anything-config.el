@@ -76,6 +76,7 @@
 ;;     `anything-c-source-file-name-history'     (File Name History)
 ;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
 ;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
+;;     `anything-c-source-find-files'            (Find Files)
 ;;     `anything-c-source-file-cache'            (File Cache)
 ;;     `anything-c-source-locate'                (Locate)
 ;;     `anything-c-source-recentf'               (Recentf)
@@ -1017,6 +1018,86 @@ buffer that is not the current buffer."
     (type . file)))
 
 ;; (anything 'anything-c-source-files-in-current-dir+)
+
+;;; File name completion
+(defvar anything-c-source-find-files
+  '((name . "Find Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action . (("Find File" . find-file-at-point)
+               ("Find file other window" . find-file-other-window)
+               ("Find file as root" . anything-find-file-as-root)))))
+
+;; (anything 'anything-c-source-find-files)
+
+(defun* anything-reduce-file-name (fname level &key unix-close expand)
+    "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
+If LEVEL is positive reduce from end else from beginning.
+If UNIX-CLOSE is non--nil close filename with /.
+If EXPAND is non--nil expand-file-name."
+  (let* ((exp-fname (expand-file-name fname))
+         (fname-list (split-string (if (or (string= fname "~/") expand)
+                                       exp-fname fname) "/" t))
+         (len (length fname-list))
+         (pop-list (if (< level 0)
+                       (subseq fname-list (* level -1))
+                       (subseq fname-list 0 (- len level))))
+         (result (mapconcat #'(lambda (x) x) pop-list "/"))
+         (empty (string= result "")))
+    (when unix-close (setq result (concat result "/")))
+    (if (string-match "^~" result)
+        (if (string= result "~/") "~/" result)
+        (if (< level 0)
+            (if empty "../" (concat "../" result))
+            (if empty "/" (concat "/" result))))))
+
+(defun anything-find-files-get-candidates ()
+  "Create candidate list for `anything-c-source-find-files'."
+  (let ((path (if (string-match "^~" anything-pattern)
+                  (replace-match (getenv "HOME") nil t anything-pattern)
+                  anything-pattern)))
+    (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
+               (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
+           (list path))
+          ((string= anything-pattern "")
+           (directory-files (getenv "HOME") t))
+          ((and (file-directory-p path)
+                (file-exists-p path))
+           (directory-files path t))
+          (t
+           (directory-files (anything-reduce-file-name path 1 :unix-close t :expand t) t)))))
+
+(defun anything-c-highlight-ffiles (files)
+  "Candidate transformer for `anything-c-source-find-files'."
+  (loop for i in files
+     if (file-directory-p i)
+     collect (propertize i 'face anything-c-files-face1) into a
+     else
+     collect (propertize i 'face anything-c-files-face2) into a
+     finally return a))
+
+(defun anything-find-files-persistent-action (candidate)
+  "Open subtree CANDIDATE without quitting anything.
+If CANDIDATE is not a directory open this file."
+  (if (file-directory-p candidate)
+      (with-selected-window (minibuffer-window)
+        (delete-minibuffer-contents)
+        (let* ((len          (length candidate))
+               (cand-no-prop candidate))
+          (set-text-properties 0 len nil cand-no-prop) 
+          (insert cand-no-prop)))
+      (find-file candidate)))
+
+(defun anything-find-files ()
+  "Preconfigured anything for `find-file'."
+  (interactive)
+  (let ((fap (ffap-guesser)))
+    (anything 'anything-c-source-find-files
+              (or (if (and fap (file-exists-p fap)) (expand-file-name fap) fap)
+                  (expand-file-name default-directory)) "Find Files or Url: " nil nil "*Anything Find Files*")))
+
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
@@ -4524,6 +4605,8 @@ the center of window, otherwise at the top of window.
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
+;;  `anything-find-files'
+;;    Preconfigured anything for `find-file'.
 ;;  `anything-bookmark-ext'
 ;;    Preconfigured anything for bookmark-extensions sources.
 ;;  `anything-mark-ring'
