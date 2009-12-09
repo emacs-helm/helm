@@ -1028,6 +1028,7 @@ buffer that is not the current buffer."
     (volatile)
     (action . (("Find File" . find-file-at-point)
                ("Find file other window" . find-file-other-window)
+               ("Find file in Elscreen"  . elscreen-find-file)
                ("Find file as root" . anything-find-file-as-root)))))
 
 ;; (anything 'anything-c-source-find-files)
@@ -1062,7 +1063,7 @@ If EXPAND is non--nil expand-file-name."
                (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
            (list path))
           ((string= anything-pattern "")
-           (directory-files (getenv "HOME") t))
+           (directory-files "/" t))
           ((and (file-directory-p path)
                 (file-exists-p path))
            (directory-files path t))
