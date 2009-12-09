@@ -1038,15 +1038,15 @@ buffer that is not the current buffer."
 If LEVEL is positive reduce from end else from beginning.
 If UNIX-CLOSE is non--nil close filename with /.
 If EXPAND is non--nil expand-file-name."
-  (let* ((exp-fname (expand-file-name fname))
+  (let* ((exp-fname  (expand-file-name fname))
          (fname-list (split-string (if (or (string= fname "~/") expand)
                                        exp-fname fname) "/" t))
-         (len (length fname-list))
-         (pop-list (if (< level 0)
-                       (subseq fname-list (* level -1))
-                       (subseq fname-list 0 (- len level))))
-         (result (mapconcat #'(lambda (x) x) pop-list "/"))
-         (empty (string= result "")))
+         (len        (length fname-list))
+         (pop-list   (if (< level 0)
+                         (subseq fname-list (* level -1))
+                         (subseq fname-list 0 (- len level))))
+         (result     (mapconcat 'identity pop-list "/"))
+         (empty      (string= result "")))
     (when unix-close (setq result (concat result "/")))
     (if (string-match "^~" result)
         (if (string= result "~/") "~/" result)
@@ -1542,6 +1542,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                               (bmkext-man-bookmark-p i))
      for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
                               (bmkext-woman-bookmark-p i))
+     for handlerp      = (bookmark-get-handler i)
      for isannotation  = (bookmark-get-annotation i)
      ;; Add a * if bookmark have annotation
      if (and isannotation (not (string-equal isannotation "")))
@@ -1569,7 +1570,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
              (not regp) (not (or iswoman isman)))
      collect (propertize i 'face 'anything-bmkext-file 'help-echo pred)
      ;; buffer non--filename
-     if (and (fboundp 'bmkext-get-buffer-name) bufp (not (bookmark-get-handler i))
+     if (and (fboundp 'bmkext-get-buffer-name) bufp (not handlerp)
              (if pred (not (file-exists-p pred)) (not pred)))
      collect (propertize i 'face 'anything-bmkext-no--file)))
        
