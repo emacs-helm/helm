@@ -1181,6 +1181,9 @@ buffer that is not the current buffer."
 ;;; File name completion
 (defvar anything-c-source-find-files
   '((name . "Find Files")
+    (init . (lambda ()
+              (require 'ffap)
+              (setq ffap-newfile-prompt t)))
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1219,7 +1222,8 @@ If EXPAND is non--nil expand-file-name."
                   (replace-match (getenv "HOME") nil t anything-pattern)
                   anything-pattern)))
     (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
-               (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
+               (string-match "^\\(http\\|https\\|ftp\\)://.*" path)
+               (not (file-exists-p path)))
            (list path))
           ((string= anything-pattern "")
            (directory-files "/" t))
