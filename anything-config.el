@@ -1222,8 +1222,7 @@ If EXPAND is non--nil expand-file-name."
                   (replace-match (getenv "HOME") nil t anything-pattern)
                   anything-pattern)))
     (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
-               (string-match "^\\(http\\|https\\|ftp\\)://.*" path)
-               (not (file-exists-p path)))
+               (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
            (list path))
           ((string= anything-pattern "")
            (directory-files "/" t))
@@ -1231,7 +1230,9 @@ If EXPAND is non--nil expand-file-name."
                 (file-exists-p path))
            (directory-files path t))
           (t
-           (directory-files (anything-reduce-file-name path 1 :unix-close t :expand t) t)))))
+           (append
+            (list path)
+            (directory-files (anything-reduce-file-name path 1 :unix-close t :expand t) t))))))
 
 (defun anything-c-highlight-ffiles (files)
   "Candidate transformer for `anything-c-source-find-files'."
