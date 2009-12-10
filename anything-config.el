@@ -161,6 +161,8 @@
 ;;     `anything-c-source-minibuffer-history' (Minibuffer History)
 ;;     `anything-c-source-elscreen'           (Elscreen)
 ;;  System:
+;;     `anything-c-source-absolute-time-timers'     (Absolute Time Timers)
+;;     `anything-c-source-idle-time-timers'         (Idle Time Timers)
 ;;     `anything-c-source-xrandr-change-resolution' (Change Resolution)
 ;;     `anything-c-source-xfonts'                   (X Fonts)
 ;;     `anything-c-source-apt'                      (APT)
@@ -454,6 +456,13 @@ With two prefix args allow choosing in which symbol to search."
   "Preconfigured `anything' for visible bookmarks."
   (interactive)
   (anything-other-buffer 'anything-c-source-bm "*anything bm list*"))
+
+(defun anything-timers ()
+  "Preconfigured `anything' for timers."
+  (interactive)
+  (anything-other-buffer '(anything-c-source-absolute-time-timers
+                           anything-c-source-idle-time-timers)
+                         "*anything timers*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
@@ -3209,6 +3218,26 @@ See also `anything-create--actions'."
 
 ;;;; <System>
 
+;;; Timers
+(defvar anything-c-source-absolute-time-timers
+  '((name . "Absolute Time Timers")
+    (candidates . timer-list)
+    (type . timer)))
+;; (anything 'anything-c-source-absolute-time-timers)
+
+(defvar anything-c-source-idle-time-timers
+  '((name . "Idle Time Timers")
+    (candidates . timer-idle-list)
+    (type . timer)))
+;; (anything 'anything-c-source-idle-time-timers)
+
+(defun anything-c-timer-real-to-display (timer)
+  (destructuring-bind (_ t1 t2 t3 _ func args &rest rest) (append timer nil)
+    (format "%s %s(%s)"
+            (format-time-string "%m/%d %T" (list t1 t2 t3))
+            func
+            (mapconcat 'prin1-to-string (aref timer 6) " "))))
+
 ;;; X RandR resolution change
 ;;; FIXME I do not care multi-display.
 (defvar anything-c-xrandr-output "VGA")
@@ -4361,6 +4390,12 @@ content is CONTENT near the LINENO.
 If `recenter' attribute is specified, the line is displayed at
 the center of window, otherwise at the top of window.
 ")
+
+(define-anything-type-attribute 'timer
+  '((real-to-display . anything-c-timer-real-to-display)
+    (action ("Cancel Timer" . cancel-timer)))
+  "Timer.")
+
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
@@ -4470,6 +4505,8 @@ the center of window, otherwise at the top of window.
 ;;    Preconfigured `anything' for color.
 ;;  `anything-bm-list'
 ;;    Preconfigured `anything' for visible bookmarks.
+;;  `anything-timers'
+;;    Preconfigured `anything' for timers.
 ;;  `anything-kill-buffers'
 ;;    You can continuously kill buffer you selected.
 ;;  `anything-query-replace-regexp'
