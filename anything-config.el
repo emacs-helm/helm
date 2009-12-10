@@ -76,6 +76,7 @@
 ;;     `anything-c-source-file-name-history'     (File Name History)
 ;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
 ;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
+;;     `anything-c-source-find-files'            (Find Files)
 ;;     `anything-c-source-file-cache'            (File Cache)
 ;;     `anything-c-source-locate'                (Locate)
 ;;     `anything-c-source-recentf'               (Recentf)
@@ -240,6 +241,8 @@
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
+;;  `anything-find-files'
+;;    Preconfigured anything for `find-file'.
 ;;  `anything-bookmark-ext'
 ;;    Preconfigured anything for bookmark-extensions sources.
 ;;  `anything-mark-ring'
@@ -1175,6 +1178,87 @@ buffer that is not the current buffer."
 
 ;; (anything 'anything-c-source-files-in-current-dir+)
 
+;;; File name completion
+(defvar anything-c-source-find-files
+  '((name . "Find Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action . (("Find File" . find-file-at-point)
+               ("Find file other window" . find-file-other-window)
+               ("Find file in Elscreen"  . elscreen-find-file)
+               ("Find file as root" . anything-find-file-as-root)))))
+
+;; (anything 'anything-c-source-find-files)
+
+(defun* anything-reduce-file-name (fname level &key unix-close expand)
+    "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
+If LEVEL is positive reduce from end else from beginning.
+If UNIX-CLOSE is non--nil close filename with /.
+If EXPAND is non--nil expand-file-name."
+  (let* ((exp-fname  (expand-file-name fname))
+         (fname-list (split-string (if (or (string= fname "~/") expand)
+                                       exp-fname fname) "/" t))
+         (len        (length fname-list))
+         (pop-list   (if (< level 0)
+                         (subseq fname-list (* level -1))
+                         (subseq fname-list 0 (- len level))))
+         (result     (mapconcat 'identity pop-list "/"))
+         (empty      (string= result "")))
+    (when unix-close (setq result (concat result "/")))
+    (if (string-match "^~" result)
+        (if (string= result "~/") "~/" result)
+        (if (< level 0)
+            (if empty "../" (concat "../" result))
+            (if empty "/" (concat "/" result))))))
+
+(defun anything-find-files-get-candidates ()
+  "Create candidate list for `anything-c-source-find-files'."
+  (let ((path (if (string-match "^~" anything-pattern)
+                  (replace-match (getenv "HOME") nil t anything-pattern)
+                  anything-pattern)))
+    (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
+               (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
+           (list path))
+          ((string= anything-pattern "")
+           (directory-files "/" t))
+          ((and (file-directory-p path)
+                (file-exists-p path))
+           (directory-files path t))
+          (t
+           (directory-files (anything-reduce-file-name path 1 :unix-close t :expand t) t)))))
+
+(defun anything-c-highlight-ffiles (files)
+  "Candidate transformer for `anything-c-source-find-files'."
+  (loop for i in files
+     if (file-directory-p i)
+     collect (propertize i 'face anything-c-files-face1) into a
+     else
+     collect (propertize i 'face anything-c-files-face2) into a
+     finally return a))
+
+(defun anything-find-files-persistent-action (candidate)
+  "Open subtree CANDIDATE without quitting anything.
+If CANDIDATE is not a directory open this file."
+  (if (file-directory-p candidate)
+      (with-selected-window (minibuffer-window)
+        (delete-minibuffer-contents)
+        (let* ((len          (length candidate))
+               (cand-no-prop candidate))
+          (set-text-properties 0 len nil cand-no-prop) 
+          (insert cand-no-prop)))
+      (find-file candidate)))
+
+(defun anything-find-files ()
+  "Preconfigured anything for `find-file'."
+  (interactive)
+  (let ((fap (ffap-guesser)))
+    (anything 'anything-c-source-find-files
+              (or (if (and fap (file-exists-p fap)) (expand-file-name fap) fap)
+                  (expand-file-name default-directory)) "Find Files or Url: " nil nil "*Anything Find Files*")))
+
+
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
 
@@ -1617,6 +1701,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                               (bmkext-man-bookmark-p i))
      for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
                               (bmkext-woman-bookmark-p i))
+     for handlerp      = (bookmark-get-handler i)
      for isannotation  = (bookmark-get-annotation i)
      ;; Add a * if bookmark have annotation
      if (and isannotation (not (string-equal isannotation "")))
@@ -1644,7 +1729,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
              (not regp) (not (or iswoman isman)))
      collect (propertize i 'face 'anything-bmkext-file 'help-echo pred)
      ;; buffer non--filename
-     if (and (fboundp 'bmkext-get-buffer-name) bufp (not (bookmark-get-handler i))
+     if (and (fboundp 'bmkext-get-buffer-name) bufp (not handlerp)
              (if pred (not (file-exists-p pred)) (not pred)))
      collect (propertize i 'face 'anything-bmkext-no--file)))
        
@@ -2995,6 +3080,7 @@ removed."
 ;; (anything 'anything-c-source-calculation-result)
 
 ;;; Google Suggestions
+(defvar anything-gg-sug-lgh-flag 0)
 (defun anything-c-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
@@ -3008,6 +3094,10 @@ Return an alist with elements like (data . number_results)."
                 for i in result-alist
                 for data = (cdr (caadr (assoc 'suggestion i)))
                 for nqueries = (cdr (caadr (assoc 'num_queries i)))
+                for ldata = (length data) 
+                do
+                  (when (> ldata anything-gg-sug-lgh-flag)
+                    (setq anything-gg-sug-lgh-flag ldata))
                 collect (cons data nqueries) into cont
                 finally return cont)))
       (if anything-google-suggest-use-curl-p
@@ -3023,7 +3113,10 @@ Return an alist with elements like (data . number_results)."
   "Set candidates with result and number of google results found."
   (let ((suggestions (anything-c-google-suggest-fetch anything-input)))
     (setq suggestions (loop for i in suggestions
-                           for elm = (concat (car i) " (" (cdr i) "results)")
+                         for interval = (- anything-gg-sug-lgh-flag (length (car i)))
+                         for elm = (concat (car i)
+                                           (make-string (+ 2 interval) ? )
+                                           "(" (cdr i) " results)")
                          collect (cons elm (car i))))
     (if (some (lambda (data) (equal (cdr data) anything-input)) suggestions)
         suggestions
@@ -3351,13 +3444,16 @@ See also `anything-create--actions'."
                          (loop for sname in (elscreen-get-screen-to-name-alist)
                                append (list (format "[%d] %s" (car sname) (cdr sname))) into lst
                                finally (return lst))
-                         '(lambda (a b) (compare-strings a nil nil b nil nil))))))
+                         #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
     (action . (("Change Screen".
                 (lambda (candidate)
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
-               ("Kill Screen".
+               ("Kill Screen(s)".
                 (lambda (candidate)
-                  (elscreen-kill-internal (- (aref candidate 1) (aref "0" 0)))))
+                  (anything-aif (anything-marked-candidates)
+                      (dolist (i it)
+                        (elscreen-kill-internal (- (aref i 1) (aref "0" 0))))
+                    (elscreen-kill-internal (- (aref candidate 1) (aref "0" 0))))))
                ("Only Screen".
                 (lambda (candidate)
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
@@ -4385,6 +4481,16 @@ Return nil if bmk is not a valid bookmark."
                 (setq deactivate-mark nil)))))
       (error nil))))
 
+(defun anything-find-buffer-on-elscreen (candidate)
+  "Open buffer in new screen, if marked buffers open all in elscreens."
+  (anything-aif (anything-marked-candidates)
+      (dolist (i it)
+        (let ((target-screen (elscreen-find-screen-by-buffer
+                              (get-buffer i) 'create)))
+          (elscreen-goto target-screen)))
+    (let ((target-screen (elscreen-find-screen-by-buffer
+                          (get-buffer candidate) 'create)))
+      (elscreen-goto target-screen))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -4397,11 +4503,8 @@ Return nil if bmk is not a valid bookmark."
          '(("Switch to buffer" . switch-to-buffer)
            ("Switch to buffer other window" . switch-to-buffer-other-window)
            ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
-     ,@(when (require 'elscreen nil t);(fboundp 'elscreen-goto)
-             '(("Display buffer in Elscreen" . (lambda (candidate)
-                                                 (let ((target-screen (elscreen-find-screen-by-buffer
-                                                                       (get-buffer candidate) 'create)))
-                                                   (elscreen-goto target-screen))))))
+     ,@(when (require 'elscreen nil t)
+             '(("Display buffer in Elscreen" . anything-find-buffer-on-elscreen)))
      ("Display buffer"   . display-buffer)
      ("Revert buffer" . anything-revert-buffer)
      ("Revert Marked buffers" . anything-revert-marked-buffers)
