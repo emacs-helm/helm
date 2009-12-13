@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.68 2009-11-11 19:01:09 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.69 2009-12-13 23:06:34 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,13 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.68  2009-11-11 19:01:09  rubikitch
+;; Revision 1.69  2009-12-13 23:06:34  rubikitch
+;; New variable `anything-lisp-complete-symbol-add-space-on-startup':
+;;
+;; If non-nil, `anything-lisp-complete-symbol' and `anything-lisp-complete-symbol-partial-match' adds space on startup.
+;; It utilizes anything-match-plugin's feature.
+;;
+;; Revision 1.68  2009/11/11 19:01:09  rubikitch
 ;; Bug fix when completing at right side
 ;;
 ;; Revision 1.67  2009/11/11 18:03:49  rubikitch
@@ -315,7 +321,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.68 2009-11-11 19:01:09 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.69 2009-12-13 23:06:34 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -360,6 +366,9 @@
 (defvar anything-lisp-complete-symbol-input-idle-delay 0.1
   "`anything-input-idle-delay' for `anything-lisp-complete-symbol',
 `anything-lisp-complete-symbol-partial-match' and `anything-apropos'.")
+(defvar anything-lisp-complete-symbol-add-space-on-startup t
+  "If non-nil, `anything-lisp-complete-symbol' and `anything-lisp-complete-symbol-partial-match' adds space on startup.
+It utilizes anything-match-plugin's feature.")
 
 (defun alcs-create-buffer (name)
   (let ((b (get-buffer-create name)))
@@ -546,20 +555,24 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
              anything-input-idle-delay)))
     (anything-noresume sources input nil nil nil "*anything complete*")))
 
+(defun alcs-initial-input (partial-match)
+  (anything-aif (symbol-at-point)
+      (format "%s%s%s"
+              (if partial-match "" "^")
+              it
+              (if anything-lisp-complete-symbol-add-space-on-startup " " ""))
+    ""))
+
 (defun anything-lisp-complete-symbol (update)
   "`lisp-complete-symbol' replacement using `anything'."
   (interactive "P")
   (anything-lisp-complete-symbol-1 update anything-lisp-complete-symbol-sources
-                                   (anything-aif (symbol-at-point)
-                                       (format "^%s" it)
-                                     "")))
+                                   (alcs-initial-input nil)))
 (defun anything-lisp-complete-symbol-partial-match (update)
   "`lisp-complete-symbol' replacement using `anything' (partial match)."
   (interactive "P")
   (anything-lisp-complete-symbol-1 update anything-lisp-complete-symbol-sources
-                                   (anything-aif (symbol-at-point)
-                                       (symbol-name it)
-                                     "")))
+                                   (alcs-initial-input t)))
 (defun anything-apropos (update)
   "`apropos' replacement using `anything'."
   (interactive "P")
