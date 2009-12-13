@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.70 2009-12-13 23:17:18 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.71 2009-12-13 23:34:19 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.70  2009-12-13 23:17:18  rubikitch
+;; Revision 1.71  2009-12-13 23:34:19  rubikitch
+;; Show timestamp of lisp symbols
+;;
+;; Revision 1.70  2009/12/13 23:17:18  rubikitch
 ;; Make alcs-make-candidates timer singleton
 ;;
 ;; Revision 1.69  2009/12/13 23:06:34  rubikitch
@@ -324,7 +327,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.70 2009-12-13 23:17:18 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.71 2009-12-13 23:34:19 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -385,10 +388,14 @@ It utilizes anything-match-plugin's feature.")
 (defvar alcs-commands-buffer " *command symbols*")
 (defvar alcs-symbol-buffer " *other symbols*")
 
+(defvar alcs-symbols-time nil
+  "Timestamp of collected symbols")
+
 (defun alcs-make-candidates ()
   (message "Collecting symbols...")
   ;; To ignore read-only property.
   (let ((inhibit-read-only t))
+    (setq alcs-symbols-time (current-time))
     (alcs-create-buffer alcs-variables-buffer)
     (alcs-create-buffer alcs-functions-buffer)
     (alcs-create-buffer alcs-commands-buffer)
@@ -402,6 +409,9 @@ It utilizes anything-match-plugin's feature.")
          (cond ((boundp sym) (set-buffer alcs-variables-buffer) (insert name "\n"))
                ((not fbp) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
   (message "Collecting symbols...done"))
+
+(defun alcs-header-name (name)
+  (format "%s at %s" name (format-time-string "%H:%M:%S" alcs-symbols-time)))
 
 (defvar alcs-make-candidates-timer nil)
 (defun anything-lisp-complete-symbol-set-timer (update-period)
@@ -534,22 +544,26 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 (define-anything-type-attribute 'apropos-function
   '((filtered-candidate-transformer . alcs-sort-maybe)
+    (header-name . alcs-header-name)
     (persistent-action . alcs-describe-function)
     (action
      ("Describe Function" . alcs-describe-function)
      ("Find Function" . alcs-find-function))))
 (define-anything-type-attribute 'apropos-variable
   '((filtered-candidate-transformer . alcs-sort-maybe)
+    (header-name . alcs-header-name)
     (persistent-action . alcs-describe-variable)
     (action
      ("Describe Variable" . alcs-describe-variable)
      ("Find Variable" . alcs-find-variable))))
 (define-anything-type-attribute 'complete-function
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
+    (header-name . alcs-header-name)
     (action . ac-insert)
     (persistent-action . alcs-describe-function)))
 (define-anything-type-attribute 'complete-variable
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
+    (header-name . alcs-header-name)
     (action . ac-insert)
     (persistent-action . alcs-describe-variable)))
 
