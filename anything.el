@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.217 2009-12-03 23:16:17 rubikitch Exp $
+;; $Id: anything.el,v 1.218 2009-12-13 01:03:34 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.217  2009-12-03 23:16:17  rubikitch
+;; Revision 1.218  2009-12-13 01:03:34  rubikitch
+;; Changed data structure of `anything-shortcut-keys-alist'
+;;
+;; Revision 1.217  2009/12/03 23:16:17  rubikitch
 ;; silence warning
 ;;
 ;; Revision 1.216  2009/12/03 20:43:51  rubikitch
@@ -1031,7 +1034,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.217 2009-12-03 23:16:17 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.218 2009-12-13 01:03:34 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1437,8 +1440,8 @@ Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
 `anything-enable-digit-shortcuts' is retained for compatibility.")
 
 (defvar anything-shortcut-keys-alist
-  '((alphabet  ?a ?s ?d ?f ?g ?h ?j ?k ?l)
-    (t         ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)))
+  '((alphabet . "asdfghjkl")
+    (t        . "123456789")))
 
 (defvar anything-display-source-at-screen-top t
   "*If t, `anything-next-source' and `anything-previous-source'
@@ -2232,7 +2235,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (if anything-enable-digit-shortcuts
       (unless anything-digit-overlays
         (setq anything-digit-overlays
-              (loop for key in anything-shortcut-keys
+              (loop for key across anything-shortcut-keys
                     for overlay = (make-overlay (point-min) (point-min) (get-buffer buffer))
                     do (overlay-put overlay 'before-string
                                     (format "%s - " (upcase (make-string 1 key))))
