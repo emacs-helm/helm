@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.69 2009-12-13 23:06:34 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.70 2009-12-13 23:17:18 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.69  2009-12-13 23:06:34  rubikitch
+;; Revision 1.70  2009-12-13 23:17:18  rubikitch
+;; Make alcs-make-candidates timer singleton
+;;
+;; Revision 1.69  2009/12/13 23:06:34  rubikitch
 ;; New variable `anything-lisp-complete-symbol-add-space-on-startup':
 ;;
 ;; If non-nil, `anything-lisp-complete-symbol' and `anything-lisp-complete-symbol-partial-match' adds space on startup.
@@ -321,7 +324,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.69 2009-12-13 23:06:34 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.70 2009-12-13 23:17:18 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -400,10 +403,14 @@ It utilizes anything-match-plugin's feature.")
                ((not fbp) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
   (message "Collecting symbols...done"))
 
+(defvar alcs-make-candidates-timer nil)
 (defun anything-lisp-complete-symbol-set-timer (update-period)
   "Update Emacs symbols list when Emacs is idle,
 used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
-  (run-with-idle-timer update-period t 'alcs-make-candidates))
+  (when alcs-make-candidates-timer
+    (cancel-timer alcs-make-candidates-timer))
+  (setq alcs-make-candidates-timer
+        (run-with-idle-timer update-period t 'alcs-make-candidates)))
 
 (defvar alcs-physical-column-at-startup nil)
 (defun alcs-init (bufname)
