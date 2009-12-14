@@ -3480,7 +3480,6 @@ See also `anything-create--actions'."
     (candidates-in-buffer)
     (display-to-real . anything-c-top-display-to-real)
     (action
-     ("message" . message)
      ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %d" pid))))
      ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %d" pid)))))))
 ;; (anything 'anything-c-source-top)
