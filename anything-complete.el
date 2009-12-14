@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.71 2009-12-13 23:34:19 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.72 2009-12-14 00:13:28 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,12 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.71  2009-12-13 23:34:19  rubikitch
+;; Revision 1.72  2009-12-14 00:13:28  rubikitch
+;; New command: `alcs-update-restart'
+;;
+;; Pressing `C-c C-u' in `anything-lisp-complete-symbol' and `anything-lisp-complete-symbol-partial-match' recollects symbols and reexecutes this command.
+;;
+;; Revision 1.71  2009/12/13 23:34:19  rubikitch
 ;; Show timestamp of lisp symbols
 ;;
 ;; Revision 1.70  2009/12/13 23:17:18  rubikitch
@@ -327,7 +332,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.71 2009-12-13 23:34:19 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.72 2009-12-14 00:13:28 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -411,7 +416,8 @@ It utilizes anything-match-plugin's feature.")
   (message "Collecting symbols...done"))
 
 (defun alcs-header-name (name)
-  (format "%s at %s" name (format-time-string "%H:%M:%S" alcs-symbols-time)))
+  (format "%s at %s (Press `C-c C-u' to update)"
+          name (format-time-string "%H:%M:%S" alcs-symbols-time)))
 
 (defvar alcs-make-candidates-timer nil)
 (defun anything-lisp-complete-symbol-set-timer (update-period)
@@ -567,14 +573,23 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (action . ac-insert)
     (persistent-action . alcs-describe-variable)))
 
+(defvar alcs-this-command nil)
 (defun anything-lisp-complete-symbol-1 (update sources input)
+  (setq alcs-this-command this-command)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
   (let (anything-samewindow
         (anything-input-idle-delay
          (or anything-lisp-complete-symbol-input-idle-delay
-             anything-input-idle-delay)))
+             anything-input-idle-delay))
+        (anything-map (copy-keymap anything-map)))
+    (define-key anything-map "\C-c\C-u" 'alcs-update-restart)
     (anything-noresume sources input nil nil nil "*anything complete*")))
+
+(defun alcs-update-restart ()
+  (interactive)
+  (alcs-make-candidates)
+  (anything-run-after-quit 'call-interactively alcs-this-command))
 
 (defun alcs-initial-input (partial-match)
   (anything-aif (symbol-at-point)
