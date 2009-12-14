@@ -3490,7 +3490,8 @@ See also `anything-create--actions'."
 (defun anything-c-top-init ()
   (with-current-buffer (anything-candidate-buffer 'global)
     (call-process-shell-command
-     (format anything-c-top-command (frame-width))
+     (format anything-c-top-command
+             (- (frame-width) (if anything-enable-digit-shortcuts 4 0)))
      nil (current-buffer))))
 
 (defun anything-c-top-display-to-real (line)
