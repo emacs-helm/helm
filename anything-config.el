@@ -3480,9 +3480,12 @@ See also `anything-create--actions'."
     (candidates-in-buffer)
     (display-to-real . anything-c-top-display-to-real)
     (action
-     ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %d" pid))))
-     ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %d" pid)))))))
+     ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %s" pid))))
+     ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %s" pid)))))))
 ;; (anything 'anything-c-source-top)
+
+(defun anything-c-top-sh (cmd)
+  (message "Executed %s\n%s" cmd (shell-command-to-string cmd)))
 
 (defun anything-c-top-init ()
   (with-current-buffer (anything-candidate-buffer 'global)
