@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.218 2009-12-13 01:03:34 rubikitch Exp $
+;; $Id: anything.el,v 1.219 2009-12-14 03:21:11 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.218  2009-12-13 01:03:34  rubikitch
+;; Revision 1.219  2009-12-14 03:21:11  rubikitch
+;; Extend alphabet shortcuts to A-Z
+;;
+;; Revision 1.218  2009/12/13 01:03:34  rubikitch
 ;; Changed data structure of `anything-shortcut-keys-alist'
 ;;
 ;; Revision 1.217  2009/12/03 23:16:17  rubikitch
@@ -1034,7 +1037,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.218 2009-12-13 01:03:34 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.219 2009-12-14 03:21:11 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1431,7 +1434,7 @@ Attributes:
 (defvar anything-enable-shortcuts nil
   "*Whether to use digit/alphabet shortcut to select the first nine matches.
 If t then they can be selected using Ctrl+<number>.
-If 'alphabet then they can be selected using Shift+<alphabet: a s d f g h j k l>.
+If 'alphabet then they can be selected using Shift+<alphabet>.
 
 Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
 
@@ -1440,7 +1443,7 @@ Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
 `anything-enable-digit-shortcuts' is retained for compatibility.")
 
 (defvar anything-shortcut-keys-alist
-  '((alphabet . "asdfghjkl")
+  '((alphabet . "asdfghjklzxcvbnmqwertyuiop")
     (t        . "123456789")))
 
 (defvar anything-display-source-at-screen-top t
@@ -1509,15 +1512,8 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-7") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-8") 'anything-select-with-digit-shortcut)
     (define-key map (kbd "C-9") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "A") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "S") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "D") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "F") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "G") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "H") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "J") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "K") 'anything-select-with-digit-shortcut)
-    (define-key map (kbd "L") 'anything-select-with-digit-shortcut)
+    (loop for c from ?A to ?Z do
+          (define-key map (make-string 1 c) 'anything-select-with-digit-shortcut))
     (define-key map (kbd "C-i") 'anything-select-action)
     (define-key map (kbd "C-z") 'anything-execute-persistent-action)
     (define-key map (kbd "C-e") 'anything-select-2nd-action-or-end-of-line)
@@ -2463,7 +2459,8 @@ Cache the candidates if there is not yet a cached value."
         (anything-insert-header-from-source source)
         (dolist (match matches)
           (when (and anything-enable-digit-shortcuts
-                     (not (eq anything-digit-shortcut-count 9)))
+                     (not (eq anything-digit-shortcut-count
+                              (length anything-digit-overlays))))
             (move-overlay (nth anything-digit-shortcut-count
                                anything-digit-overlays)
                           (line-beginning-position)
