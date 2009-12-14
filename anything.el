@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.221 2009-12-14 20:29:49 rubikitch Exp $
+;; $Id: anything.el,v 1.222 2009-12-14 20:55:23 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.221  2009-12-14 20:29:49  rubikitch
+;; Revision 1.222  2009-12-14 20:55:23  rubikitch
+;; Fix display bug: `anything-enable-digit-shortcuts' / multiline
+;;
+;; Revision 1.221  2009/12/14 20:29:49  rubikitch
 ;; fix an error when executing `anything-prev-visible-mark' with no visible marks.
 ;;
 ;; Revision 1.220  2009/12/14 20:19:05  rubikitch
@@ -1043,7 +1046,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.221 2009-12-14 20:29:49 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.222 2009-12-14 20:55:23 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2472,6 +2475,10 @@ Cache the candidates if there is not yet a cached value."
             separate)
         (anything-insert-header-from-source source)
         (dolist (match matches)
+          (if (and multiline separate)
+              (anything-insert-candidate-separator)
+            (setq separate t))
+
           (when (and anything-enable-digit-shortcuts
                      (not (eq anything-digit-shortcut-count
                               (length anything-digit-overlays))))
@@ -2480,10 +2487,6 @@ Cache the candidates if there is not yet a cached value."
                           (line-beginning-position)
                           (line-beginning-position))
             (incf anything-digit-shortcut-count))
-
-          (if (and multiline separate)
-              (anything-insert-candidate-separator)
-            (setq separate t))
           (anything-insert-match match 'insert))
         
         (if multiline
