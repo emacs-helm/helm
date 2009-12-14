@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.219 2009-12-14 03:21:11 rubikitch Exp $
+;; $Id: anything.el,v 1.220 2009-12-14 20:19:05 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.219  2009-12-14 03:21:11  rubikitch
+;; Revision 1.220  2009-12-14 20:19:05  rubikitch
+;; Bugfix about anything-execute-action-at-once-if-one and multiline
+;;
+;; Revision 1.219  2009/12/14 03:21:11  rubikitch
 ;; Extend alphabet shortcuts to A-Z
 ;;
 ;; Revision 1.218  2009/12/13 01:03:34  rubikitch
@@ -1037,7 +1040,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.219 2009-12-14 03:21:11 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.220 2009-12-14 20:19:05 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2017,9 +2020,17 @@ LONG-DOC is displayed below attribute name and short documentation."
 
 (defun anything-approximate-candidate-number ()
   "Approximate Number of candidates.
-It is used to check if candidate number is 0 or 1."
+It is used to check if candidate number is 0, 1, or 2+."
   (with-current-buffer anything-buffer
-    (1- (line-number-at-pos (1- (point-max))))))
+    (let ((lines (1- (line-number-at-pos (1- (point-max))))))
+      (if (zerop lines)
+          0
+        (save-excursion
+          (goto-char (point-min))
+          (forward-line 1)
+          (if (anything-pos-multiline-p)
+              (if (search-forward anything-candidate-separator nil t) 2 1)
+            lines))))))
 
 (defmacro with-anything-quittable (&rest body)
   `(let (inhibit-quit)
@@ -5318,6 +5329,39 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (define-anything-type-attribute 'buffer '((action . switch-to-buffer)))
           (define-anything-type-attribute 'file '((action . find-file)))
           anything-type-attributes))
+      (defun "anything-approximate-candidate-number")
+      (expect 0
+        (with-temp-buffer
+          (let ((anything-buffer (current-buffer)))
+            (anything-approximate-candidate-number))))
+      (expect 1
+        (with-temp-buffer
+          (let ((anything-buffer (current-buffer)))
+            (insert "Title\n"
+                    "candiate1\n")
+            (anything-approximate-candidate-number))))
+      (expect t
+        (with-temp-buffer
+          (let ((anything-buffer (current-buffer)))
+            (insert "Title\n"
+                    "candiate1\n"
+                    "candiate2\n")
+            (<= 2 (anything-approximate-candidate-number)))))
+      (expect 1
+        (with-temp-buffer
+          (let ((anything-buffer (current-buffer)))
+            (insert "Title\n"
+                    (propertize "multi\nline\n" 'anything-multiline t))
+            (anything-approximate-candidate-number))))
+      (expect t
+        (with-temp-buffer
+          (let ((anything-buffer (current-buffer))
+                (anything-candidate-separator "-----"))
+            (insert "Title\n"
+                    (propertize "multi\nline1\n" 'anything-multiline t)
+                    "-----\n"
+                    (propertize "multi\nline2\n" 'anything-multiline t))
+            (<= 2 (anything-approximate-candidate-number)))))
       )))
 
 
