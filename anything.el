@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.220 2009-12-14 20:19:05 rubikitch Exp $
+;; $Id: anything.el,v 1.221 2009-12-14 20:29:49 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.220  2009-12-14 20:19:05  rubikitch
+;; Revision 1.221  2009-12-14 20:29:49  rubikitch
+;; fix an error when executing `anything-prev-visible-mark' with no visible marks.
+;;
+;; Revision 1.220  2009/12/14 20:19:05  rubikitch
 ;; Bugfix about anything-execute-action-at-once-if-one and multiline
 ;;
 ;; Revision 1.219  2009/12/14 03:21:11  rubikitch
@@ -1040,7 +1043,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.220 2009-12-14 20:19:05 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.221 2009-12-14 20:29:49 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3427,18 +3430,20 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defun anything-next-visible-mark (&optional prev)
   (interactive)
   (with-anything-window
-    (setq anything-visible-mark-overlays
-          (sort* anything-visible-mark-overlays
-                 '< :key 'overlay-start))
-    (let ((i (position-if (lambda (o) (< (point) (overlay-start o)))
-                          anything-visible-mark-overlays)))
-      (when prev
+    (block 'exit
+      (setq anything-visible-mark-overlays
+            (sort* anything-visible-mark-overlays
+                   '< :key 'overlay-start))
+      (let ((i (position-if (lambda (o) (< (point) (overlay-start o)))
+                            anything-visible-mark-overlays)))
+        (when prev
+          (unless anything-visible-mark-overlays (return-from 'exit nil))
           (if (not i) (setq i (length anything-visible-mark-overlays)))
           (if (equal (point) (overlay-start (nth (1- i) anything-visible-mark-overlays)))
               (setq i (1- i))))
-      (when i
-        (goto-char (overlay-start (nth (if prev (1- i) i) anything-visible-mark-overlays)))
-        (anything-mark-current-line)))))
+        (when i
+          (goto-char (overlay-start (nth (if prev (1- i) i) anything-visible-mark-overlays)))
+          (anything-mark-current-line))))))
 
 (defun anything-prev-visible-mark ()
   (interactive)
