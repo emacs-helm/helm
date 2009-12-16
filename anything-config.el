@@ -1253,9 +1253,10 @@ If CANDIDATE is not a directory open this file."
   (if (file-directory-p candidate)
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
-        (let* ((len          (length candidate))
-               (cand-no-prop candidate))
-          (set-text-properties 0 len nil cand-no-prop) 
+        (let* ((cand-no-prop (file-name-as-directory
+                              (expand-file-name candidate)))
+               (len          (length cand-no-prop)))
+          (set-text-properties 0 len nil cand-no-prop)
           (insert cand-no-prop)))
       (find-file candidate)))
 
