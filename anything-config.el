@@ -3482,7 +3482,8 @@ See also `anything-create--actions'."
     (display-to-real . anything-c-top-display-to-real)
     (action
      ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %s" pid))))
-     ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %s" pid)))))))
+     ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %s" pid))))
+     ("Copy PID" . (lambda (pid) (kill-new pid))))))
 ;; (anything 'anything-c-source-top)
 
 (defun anything-c-top-sh (cmd)
