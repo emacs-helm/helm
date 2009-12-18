@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.20 2009-06-25 03:36:38 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.21 2009-12-18 11:01:11 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -60,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.20  2009-06-25 03:36:38  rubikitch
+;; Revision 1.21  2009-12-18 11:01:11  rubikitch
+;; `agrep-real-to-display': erase "nil" message
+;;
+;; Revision 1.20  2009/06/25 03:36:38  rubikitch
 ;; `agrep-real-to-display': avoid error
 ;; auto-document
 ;;
@@ -132,7 +135,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.20 2009-06-25 03:36:38 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.21 2009-12-18 11:01:11 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -222,11 +225,12 @@ The command is converting standard input to EUC-JP line by line. ")
   (agrep-create-buffer (anything-attr 'command)  (anything-attr 'pwd)))
 
 (defun agrep-real-to-display (file-line-content)
-  (and (string-match ":\\([0-9]+\\):" file-line-content)
-       (format "%s:%s\n %s"
-               (substring file-line-content 0 (match-beginning 0))
-               (match-string 1 file-line-content)
-               (substring file-line-content (match-end 0)))))
+  (if (string-match ":\\([0-9]+\\):" file-line-content)
+      (format "%s:%s\n %s"
+              (substring file-line-content 0 (match-beginning 0))
+              (match-string 1 file-line-content)
+              (substring file-line-content (match-end 0)))
+    file-line-content))
 
 (defun agrep-do-grep (command pwd)
   "Insert result of COMMAND. The current directory is PWD.
