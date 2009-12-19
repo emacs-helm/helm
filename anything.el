@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.222 2009-12-14 20:55:23 rubikitch Exp $
+;; $Id: anything.el,v 1.223 2009-12-19 11:57:41 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.222  2009-12-14 20:55:23  rubikitch
+;; Revision 1.223  2009-12-19 11:57:41  rubikitch
+;; New attribute `delayed-init'
+;;
+;; Revision 1.222  2009/12/14 20:55:23  rubikitch
 ;; Fix display bug: `anything-enable-digit-shortcuts' / multiline
 ;;
 ;; Revision 1.221  2009/12/14 20:29:49  rubikitch
@@ -1046,7 +1049,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.222 2009-12-14 20:55:23 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.223 2009-12-19 11:57:41 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1747,6 +1750,8 @@ If you prefer scrolling line by line, set this value to 1.")
   "Function to display *anything* buffer.
 It is `anything-default-display-buffer' by default, which affects `anything-samewindow'.")
 
+(defvar anything-delayed-init-executed nil)
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; (@* "Internal Variables")
@@ -2200,6 +2205,7 @@ already-bound variables. Yuck!
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
   (run-hooks 'anything-before-initialize-hook)
+  (setq anything-delayed-init-executed nil)
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
   (setq anything-issued-errors nil)
@@ -2330,6 +2336,12 @@ Anything plug-ins are realized by this function."
 (defun anything-get-candidates (source)
   "Retrieve and return the list of candidates from
 SOURCE."
+  (let ((name (assoc-default 'name source)))
+    (unless (member name anything-delayed-init-executed)
+      (anything-aif (assoc-default 'delayed-init source)
+          (when (functionp it)
+            (funcall it)
+            (add-to-list 'anything-delayed-init-executed name)))))
   (let* ((candidate-source (assoc-default 'candidates source))
          (candidates
           (cond ((functionp candidate-source)
@@ -5370,6 +5382,36 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                     "-----\n"
                     (propertize "multi\nline2\n" 'anything-multiline t))
             (<= 2 (anything-approximate-candidate-number)))))
+      (desc "delayed-init attribute")
+      (expect 0
+        (let ((value 0))
+          (anything-test-candidates '(((name . "test")
+                                       (delayed-init . (lambda () (incf value)))
+                                       (candiates "abc")
+                                       (requires-pattern . 2)))
+                                    "")
+          value))
+      (expect 1
+        (let ((value 0))
+          (anything-test-candidates '(((name . "test")
+                                       (delayed-init . (lambda () (incf value)))
+                                       (candiates "abc")
+                                       (requires-pattern . 2)))
+                                    "abc")
+          value))
+      (expect 1
+        (let ((value 0) anything-test-mode)
+          (stub anything-get-sources => '(((name . "test")
+                                           (delayed-init . (lambda () (incf value)))
+                                           (candiates "abcd")
+                                           (requires-pattern . 2))))
+          (stub run-hooks)
+          (stub anything-maybe-fit-frame)
+          (let ((anything-pattern "abc"))
+            (anything-update))
+          (let ((anything-pattern "abcd"))
+            (anything-update))
+          value))
       )))
 
 
