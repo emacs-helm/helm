@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.224 2009-12-19 12:26:00 rubikitch Exp $
+;; $Id: anything.el,v 1.225 2009-12-19 20:11:16 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.224  2009-12-19 12:26:00  rubikitch
+;; Revision 1.225  2009-12-19 20:11:16  rubikitch
+;; add `delayed-init' doc
+;;
+;; Revision 1.224  2009/12/19 12:26:00  rubikitch
 ;; New attribute `pattern-transformer'
 ;;
 ;; Revision 1.223  2009/12/19 11:57:41  rubikitch
@@ -1052,7 +1055,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.224 2009-12-19 12:26:00 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.225 2009-12-19 20:11:16 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1208,6 +1211,13 @@ Attributes:
   anything does its job in the minibuffer and in the
   `anything-buffer' and the current directory can be different
   there.
+
+- delayed-init (optional)
+
+  Function called with no parameters before candidate function is
+  called.  It is similar with `init' attribute, but its
+  evaluation is deferred. It is useful to combine with
+  `requires-pattern' attribute.
 
 - match (optional)
 
