@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.226 2009-12-19 20:15:47 rubikitch Exp $
+;; $Id: anything.el,v 1.227 2009-12-19 20:30:12 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.226  2009-12-19 20:15:47  rubikitch
+;; Revision 1.227  2009-12-19 20:30:12  rubikitch
+;; add `pattern-transformer' doc
+;;
+;; Revision 1.226  2009/12/19 20:15:47  rubikitch
 ;; pattern-transformer can have multiple functions now
 ;;
 ;; Revision 1.225  2009/12/19 20:11:16  rubikitch
@@ -1058,7 +1061,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.226 2009-12-19 20:15:47 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.227 2009-12-19 20:30:12 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1304,6 +1307,14 @@ Attributes:
 
   This can be used to customize the list of actions based on the
   currently selected candidate.
+
+- pattern-transformer (optional)
+
+  It's a function or a list of functions called with one argument
+  before computing matches. Its argument is `anything-pattern'.
+  Functions should return transformed `anything-pattern'.
+
+  It is useful to change interpretation of `anything-pattern'.
 
 - delayed (optional)
 
