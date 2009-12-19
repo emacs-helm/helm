@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.21 2009-12-19 00:45:52 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.22 2009-12-19 01:22:27 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.21  2009-12-19 00:45:52  rubikitch
+;; Revision 1.22  2009-12-19 01:22:27  rubikitch
+;; cleanup
+;;
+;; Revision 1.21  2009/12/19 00:45:52  rubikitch
 ;; Avoid `select deleted buffer' error
 ;;
 ;; Revision 1.20  2009/12/19 00:31:55  rubikitch
@@ -217,25 +220,20 @@ If it is other symbol, display file name in candidates even if classification is
   (with-current-buffer gtags-select-buffer
     (goto-char (point-min))
     (let (files prev-filename)
-      (loop 
-       while (re-search-forward " [0-9]+ \\([^ ]+\\) " (point-at-eol) t)
-       for filename = (match-string 1)
-       for bol = (point-at-bol)
-       for eol = (point-at-eol)
-       do
-       (with-current-buffer (aggs-candidate-buffer-by-filename filename)
-         (unless (equal prev-filename filename)
-           (setq files (cons filename files))
-           (erase-buffer))
-         (save-excursion (insert-buffer-substring gtags-select-buffer bol eol))
-         ;; [2009/04/01] disabled. because aggs-select-it needs filename.
-;;          (when (eq anything-gtags-classify t)
-;;            (while (search-forward filename nil t)
-;;             (delete-region (match-beginning 0) (match-end 0))))
-         (goto-char (point-max))
-	 (insert "\n"))
-       (forward-line 1)
-       (setq prev-filename filename))
+      (loop while (re-search-forward " [0-9]+ \\([^ ]+\\) " (point-at-eol) t)
+            for filename = (match-string 1)
+            for bol = (point-at-bol)
+            for eol = (point-at-eol)
+            do
+            (with-current-buffer (aggs-candidate-buffer-by-filename filename)
+              (unless (equal prev-filename filename)
+                (setq files (cons filename files))
+                (erase-buffer))
+              (save-excursion (insert-buffer-substring gtags-select-buffer bol eol))
+              (goto-char (point-max))
+              (insert "\n"))
+            (forward-line 1)
+            (setq prev-filename filename))
       (anything-set-sources
        (loop for file in (nreverse files) collect
              (append `((name . ,file)
