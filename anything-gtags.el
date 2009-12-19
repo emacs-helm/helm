@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.19 2009-05-06 18:37:20 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.20 2009-12-19 00:31:55 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.19  2009-05-06 18:37:20  rubikitch
+;; Revision 1.20  2009-12-19 00:31:55  rubikitch
+;; Fixed variable bug
+;;
+;; Revision 1.19  2009/05/06 18:37:20  rubikitch
 ;; Resumable
 ;;
 ;; Revision 1.18  2009/04/01 14:59:27  rubikitch
@@ -165,7 +168,7 @@ If it is other symbol, display file name in candidates even if classification is
       . (lambda (c) (aggs-select-it c t))))
     (persistent-action . aggs-select-it)
     (cleanup . (lambda ()
-                 (kill-buffer (buffer-local-value 'buffer (get-buffer aggs-buffer)))))))
+                 (kill-buffer (buffer-local-value 'gtags-select-buffer (get-buffer aggs-buffer)))))))
 (defvar aggs-buffer "*anything gtags select*")
 
 (defun aggs-candidate-display (s e)
@@ -175,18 +178,20 @@ If it is other symbol, display file name in candidates even if classification is
   ;; It's needed because `anything' saves
   ;; *GTAGS SELECT* buffer's position,
   (save-window-excursion
-    (switch-to-buffer save)
+    (switch-to-buffer c-source-file)
     (setq anything-current-position (cons (point) (window-start)))))
 
 (defun ag-hijack-gtags-select-mode ()
-  ;; `save': C source file / `buffer': gtags-select-mode buffer
+  ;; `save' C source file / `buffer': gtags-select-mode gtags-select-buffer
   ;; They are defined at `gtags-goto-tag'.
   (declare (special save buffer))
-  (let* ((anything-candidate-number-limit 9999)
-         (pwd (with-current-buffer buffer (expand-file-name default-directory)))
-         (basename (substring (with-current-buffer save buffer-file-name)
+  (let* ((c-source-file save)
+         (gtags-select-buffer buffer)
+         (anything-candidate-number-limit 9999)
+         (pwd (with-current-buffer gtags-select-buffer (expand-file-name default-directory)))
+         (basename (substring (with-current-buffer c-source-file buffer-file-name)
                               (length pwd)))
-         (lineno (with-current-buffer save
+         (lineno (with-current-buffer c-source-file
                    (save-restriction
                      (widen)
                      (line-number-at-pos))))
@@ -197,10 +202,10 @@ If it is other symbol, display file name in candidates even if classification is
                        (init
                         . (lambda ()
                             (aggs-set-anything-current-position)
-                            (anything-candidate-buffer buffer)))
+                            (anything-candidate-buffer gtags-select-buffer)))
                        ,@aggs-base-source)))))
     (with-current-buffer (get-buffer-create aggs-buffer)
-      (set (make-local-variable 'buffer) buffer)
+      (set (make-local-variable 'gtags-select-buffer) gtags-select-buffer)
       (set (make-local-variable 'pwd) pwd))
     (anything
      sources
@@ -211,7 +216,7 @@ If it is other symbol, display file name in candidates even if classification is
   (get-buffer-create (concat "*anything gtags*" filename)))
 (defun aggs-meta-source-init ()
   (aggs-set-anything-current-position)
-  (with-current-buffer buffer
+  (with-current-buffer gtags-select-buffer
     (goto-char (point-min))
     (let (files prev-filename)
       (loop 
@@ -224,7 +229,7 @@ If it is other symbol, display file name in candidates even if classification is
          (unless (equal prev-filename filename)
            (setq files (cons filename files))
            (erase-buffer))
-         (save-excursion (insert-buffer-substring buffer bol eol))
+         (save-excursion (insert-buffer-substring gtags-select-buffer bol eol))
          ;; [2009/04/01] disabled. because aggs-select-it needs filename.
 ;;          (when (eq anything-gtags-classify t)
 ;;            (while (search-forward filename nil t)
@@ -251,7 +256,7 @@ If it is other symbol, display file name in candidates even if classification is
     (forward-line -1)
     (gtags-select-it nil)
     ;; `buffer' is defined at `gtags-goto-tag'.
-    (and delete (kill-buffer (buffer-local-value 'buffer (get-buffer aggs-buffer))))))
+    (and delete (kill-buffer (buffer-local-value 'gtags-select-buffer (get-buffer aggs-buffer))))))
 
 
 (defadvice switch-to-buffer (around anything-gtags activate)
