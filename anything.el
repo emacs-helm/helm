@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.225 2009-12-19 20:11:16 rubikitch Exp $
+;; $Id: anything.el,v 1.226 2009-12-19 20:15:47 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.225  2009-12-19 20:11:16  rubikitch
+;; Revision 1.226  2009-12-19 20:15:47  rubikitch
+;; pattern-transformer can have multiple functions now
+;;
+;; Revision 1.225  2009/12/19 20:11:16  rubikitch
 ;; add `delayed-init' doc
 ;;
 ;; Revision 1.224  2009/12/19 12:26:00  rubikitch
@@ -1055,7 +1058,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.225 2009-12-19 20:11:16 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.226 2009-12-19 20:15:47 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2427,9 +2430,10 @@ Cache the candidates if there is not yet a cached value."
   (let ((doit (lambda ()
                 (let ((functions (assoc-default 'match source))
                       (limit (anything-candidate-number-limit source))
-                      (anything-pattern (anything-aif (assoc-default 'pattern-transformer source)
-                                            (funcall it anything-pattern)
-                                          anything-pattern))
+                      (anything-pattern
+                       (anything-aif (assoc-default 'pattern-transformer source)
+                           (anything-composed-funcall-with-source source it anything-pattern)
+                         anything-pattern))
                       matches)
                   (cond ((or (equal anything-pattern "") (equal functions '(identity)))
                          (setq matches (anything-get-cached-candidates source))
@@ -5424,6 +5428,16 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (candidates "foo" "bar"))
                                     ((name . "test3")
                                      (pattern-transformer . (lambda (pat) "bar"))
+                                     (candidates "foo" "bar")))
+                                  "xfoo"))
+      (expect '(("test2" ("foo")) ("test3" ("bar")))
+        (anything-test-candidates '(((name . "test1")
+                                     (candidates "foo" "bar"))
+                                    ((name . "test2")
+                                     (pattern-transformer (lambda (pat) (substring pat 1)))
+                                     (candidates "foo" "bar"))
+                                    ((name . "test3")
+                                     (pattern-transformer (lambda (pat) "bar"))
                                      (candidates "foo" "bar")))
                                   "xfoo"))
       (expect '(("test2" ("foo")) ("test3" ("bar")))
