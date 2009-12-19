@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.20 2009-12-19 00:31:55 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.21 2009-12-19 00:45:52 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.20  2009-12-19 00:31:55  rubikitch
+;; Revision 1.21  2009-12-19 00:45:52  rubikitch
+;; Avoid `select deleted buffer' error
+;;
+;; Revision 1.20  2009/12/19 00:31:55  rubikitch
 ;; Fixed variable bug
 ;;
 ;; Revision 1.19  2009/05/06 18:37:20  rubikitch
@@ -163,12 +166,7 @@ If it is other symbol, display file name in candidates even if classification is
     (get-line . aggs-candidate-display)
     (display-to-real
      . (lambda (c) (if (string-match "^ " c) (concat "_ " c) c)))
-    (action
-     ("Goto the location"
-      . (lambda (c) (aggs-select-it c t))))
-    (persistent-action . aggs-select-it)
-    (cleanup . (lambda ()
-                 (kill-buffer (buffer-local-value 'gtags-select-buffer (get-buffer aggs-buffer)))))))
+    (action ("Goto the location" . aggs-select-it))))
 (defvar aggs-buffer "*anything gtags select*")
 
 (defun aggs-candidate-display (s e)
@@ -248,15 +246,13 @@ If it is other symbol, display file name in candidates even if classification is
       (anything-funcall-foreach 'init))))
            
 
-(defun aggs-select-it (candidate &optional delete)
+(defun aggs-select-it (candidate)
   (with-temp-buffer
     ;; `pwd' is defined at `ag-hijack-gtags-select-mode'.
     (setq default-directory (buffer-local-value 'pwd (get-buffer aggs-buffer)))
     (insert candidate "\n")
     (forward-line -1)
-    (gtags-select-it nil)
-    ;; `buffer' is defined at `gtags-goto-tag'.
-    (and delete (kill-buffer (buffer-local-value 'gtags-select-buffer (get-buffer aggs-buffer))))))
+    (gtags-select-it nil)))
 
 
 (defadvice switch-to-buffer (around anything-gtags activate)
