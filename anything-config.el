@@ -1193,11 +1193,16 @@ buffer that is not the current buffer."
     (volatile)
     (action . (("Find File" . find-file-at-point)
                ("Find file other window" . find-file-other-window)
-               ("Find file in Dired" . anything-c-open-dired)
+               ("Find file in Dired" . anything-c-point-file-in-dired)
                ("Find file in Elscreen"  . elscreen-find-file)
                ("Find file as root" . anything-find-file-as-root)))))
 
 ;; (anything 'anything-c-source-find-files)
+
+(defun anything-c-point-file-in-dired (file)
+  "Put point on filename FILE in dired buffer."
+  (dired (file-name-directory file))
+  (dired-goto-file file)))
 
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
