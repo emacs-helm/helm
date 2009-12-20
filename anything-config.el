@@ -1202,7 +1202,7 @@ buffer that is not the current buffer."
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
   (dired (file-name-directory file))
-  (dired-goto-file file)))
+  (dired-goto-file file))
 
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
