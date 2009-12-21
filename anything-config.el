@@ -4072,15 +4072,18 @@ It is added to `extended-command-history'.
 
 (setq anything-match-line-overlay-face 'anything-overlay-line-face)
 
-(add-hook 'anything-cleanup-hook #'(lambda ()
-                                     (when anything-match-line-overlay
-                                       (delete-overlay anything-match-line-overlay)
-                                       (setq anything-match-line-overlay nil))))
+(defun anything-match-line-cleanup ()
+  (when anything-match-line-overlay
+    (delete-overlay anything-match-line-overlay)
+    (setq anything-match-line-overlay nil)))
 
-(add-hook 'anything-after-persistent-action-hook #'(lambda ()
-                                                     (when anything-match-line-overlay
-                                                       (delete-overlay anything-match-line-overlay)
-                                                       (anything-match-line-color-current-line))))
+(defun anything-match-line-update ()
+  (when anything-match-line-overlay
+    (delete-overlay anything-match-line-overlay)
+    (anything-match-line-color-current-line)))
+
+(add-hook 'anything-cleanup-hook 'anything-match-line-cleanup)
+(add-hook 'anything-after-persistent-action-hook 'anything-match-line-update)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Actions Transformers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
