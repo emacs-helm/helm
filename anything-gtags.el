@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.22 2009-12-19 01:22:27 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.23 2009-12-21 10:41:21 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.22  2009-12-19 01:22:27  rubikitch
+;; Revision 1.23  2009-12-21 10:41:21  rubikitch
+;; Use `anything-persistent-highlight-point' if available.
+;;
+;; Revision 1.22  2009/12/19 01:22:27  rubikitch
 ;; cleanup
 ;;
 ;; Revision 1.21  2009/12/19 00:45:52  rubikitch
@@ -123,6 +126,7 @@
 ;;; Code:
 
 (require 'anything)
+(require 'anything-config nil t)        ; highlight line if available
 (require 'gtags)
 
 (defgroup anything-gtags nil
@@ -242,7 +246,6 @@ If it is other symbol, display file name in candidates even if classification is
                                   ,(aggs-candidate-buffer-by-filename file)))))
                      aggs-base-source)))
       (anything-funcall-foreach 'init))))
-           
 
 (defun aggs-select-it (candidate)
   (with-temp-buffer
@@ -250,8 +253,11 @@ If it is other symbol, display file name in candidates even if classification is
     (setq default-directory (buffer-local-value 'pwd (get-buffer aggs-buffer)))
     (insert candidate "\n")
     (forward-line -1)
-    (gtags-select-it nil)))
-
+    (gtags-select-it nil)
+    ;; TODO fboundp
+     (when (and anything-in-persistent-action
+               (fboundp 'anything-persistent-highlight-point))
+      (anything-persistent-highlight-point (point-at-bol) (point-at-eol)))))
 
 (defadvice switch-to-buffer (around anything-gtags activate)
   "Use `anything' instead of `gtags-select-mode' when `anything-gtags-hijack-gtags-select-mode' is non-nil."
