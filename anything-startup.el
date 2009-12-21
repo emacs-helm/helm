@@ -1,5 +1,7 @@
 ;;; anything-startup.el --- anything.el startup file
 
+;;; $Id: anything-startup.el,v 1.9 2009-12-21 12:41:43 rubikitch Exp $
+
 ;;;; Installation
 
 ;;; anything.el is just a framework and predefined configuration is in
@@ -28,6 +30,9 @@
 ;; Comment if you do not want to replace completion commands with `anything'.
 (anything-read-string-mode 1)
 
+;;; anything-show-completion.el shows current selection prettily.
+(require 'anything-show-completion)
+
 ;;; anything-auto-install.el integrates auto-install.el with anything.
 (require 'anything-auto-install nil t)
 
@@ -40,3 +45,7 @@
 (require 'anything-grep nil t)
 
 (provide 'anything-startup)
+
+;; How to save (DO NOT REMOVE!!)
+;; (emacswiki-post "anything-startup.el")
+;;; anything-startup.el ends here
