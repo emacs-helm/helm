@@ -1193,32 +1193,16 @@ buffer that is not the current buffer."
     (volatile)
     (action . (("Find File" . find-file-at-point)
                ("Find file other window" . find-file-other-window)
-               ("Find file in Dired" . anything-c-open-dired)
+               ("Find file in Dired" . anything-c-point-file-in-dired)
                ("Find file in Elscreen"  . elscreen-find-file)
                ("Find file as root" . anything-find-file-as-root)))))
 
 ;; (anything 'anything-c-source-find-files)
 
-(defun* anything-reduce-file-name (fname level &key unix-close expand)
-    "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
-If LEVEL is positive reduce from end else from beginning.
-If UNIX-CLOSE is non--nil close filename with /.
-If EXPAND is non--nil expand-file-name."
-  (let* ((exp-fname  (expand-file-name fname))
-         (fname-list (split-string (if (or (string= fname "~/") expand)
-                                       exp-fname fname) "/" t))
-         (len        (length fname-list))
-         (pop-list   (if (< level 0)
-                         (subseq fname-list (* level -1))
-                         (subseq fname-list 0 (- len level))))
-         (result     (mapconcat 'identity pop-list "/"))
-         (empty      (string= result "")))
-    (when unix-close (setq result (concat result "/")))
-    (if (string-match "^~" result)
-        (if (string= result "~/") "~/" result)
-        (if (< level 0)
-            (if empty "../" (concat "../" result))
-            (if empty "/" (concat "/" result))))))
+(defun anything-c-point-file-in-dired (file)
+  "Put point on filename FILE in dired buffer."
+  (dired (file-name-directory file))
+  (dired-goto-file file))
 
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
@@ -1236,7 +1220,7 @@ If EXPAND is non--nil expand-file-name."
           (t
            (append
             (list path)
-            (directory-files (anything-reduce-file-name path 1 :unix-close t :expand t) t))))))
+            (directory-files (file-name-directory path) t))))))
 
 (defun anything-c-highlight-ffiles (files)
   "Candidate transformer for `anything-c-source-find-files'."
