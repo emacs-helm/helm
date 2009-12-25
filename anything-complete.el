@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.72 2009-12-14 00:13:28 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.73 2009-12-25 01:35:59 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.72  2009-12-14 00:13:28  rubikitch
+;; Revision 1.73  2009-12-25 01:35:59  rubikitch
+;; Adjust `anything-noresume' to latest version of `anything'
+;;
+;; Revision 1.72  2009/12/14 00:13:28  rubikitch
 ;; New command: `alcs-update-restart'
 ;;
 ;; Pressing `C-c C-u' in `anything-lisp-complete-symbol' and `anything-lisp-complete-symbol-partial-match' recollects symbols and reexecutes this command.
@@ -332,7 +335,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.72 2009-12-14 00:13:28 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.73 2009-12-25 01:35:59 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -360,7 +363,7 @@
 ;; Warning: I'll change this function's interface. DON'T USE IN YOUR PROGRAM!
 (defun anything-noresume (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   (let (anything-last-sources anything-compiled-sources anything-last-buffer)
-    (anything any-sources any-input any-prompt any-resume any-preselect any-buffer)))
+    (anything any-sources any-input any-prompt 'noresume any-preselect any-buffer)))
 
 (defun anything-complete (sources target &optional limit idle-delay input-idle-delay)
   "Basic completion interface using `anything'."
