@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.227 2009-12-19 20:30:12 rubikitch Exp $
+;; $Id: anything.el,v 1.228 2009-12-25 01:34:35 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,12 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.227  2009-12-19 20:30:12  rubikitch
+;; Revision 1.228  2009-12-25 01:34:35  rubikitch
+;; * `anything-resume' use anything interface to select anything buffers.
+;; * Its candidates are sorted by most recently used order.
+;; * 4th arg of `anything' accepts 'noresume not to resume this session.
+;;
+;; Revision 1.227  2009/12/19 20:30:12  rubikitch
 ;; add `pattern-transformer' doc
 ;;
 ;; Revision 1.226  2009/12/19 20:15:47  rubikitch
@@ -1061,7 +1066,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.227 2009-12-19 20:30:12 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.228 2009-12-25 01:34:35 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2095,6 +2100,9 @@ This function allows easy sequencing of transformer functions."
            source (lambda (&rest args) (anything-compose args funcs)) args)))
 
 ;; (@* "Core: entry point")
+(defvar anything-buffers nil
+  "All of `anything-buffer' in most recently used order.")
+
 (defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   "Select anything. In Lisp program, some optional arguments can be used.
 
@@ -2120,7 +2128,8 @@ already-bound variables. Yuck!
 
 - ANY-RESUME
 
-  Resurrect previously instance of `anything'. Skip the initialization.
+  If t, Resurrect previously instance of `anything'. Skip the initialization.
+  If 'noresume, this instance of `anything' cannot be resumed.
 
 - ANY-PRESELECT
 
@@ -2147,15 +2156,17 @@ already-bound variables. Yuck!
           (add-hook 'post-command-hook 'anything-check-minibuffer-input)
           (add-hook 'minibuffer-setup-hook 'anything-print-error-messages)
           (setq anything-current-position (cons (point) (window-start)))
-          (if any-resume
+          (if (eq any-resume t)
               (anything-initialize-overlays (anything-buffer-get))
             (anything-initialize))
-          (setq anything-last-buffer anything-buffer)
+          (unless (eq any-resume 'noresume)
+            (anything-recent-push anything-buffer 'anything-buffers)
+            (setq anything-last-buffer anything-buffer))
           (when any-input (setq anything-input any-input anything-pattern any-input))
           (anything-display-buffer anything-buffer)
           (unwind-protect
               (progn
-                (if any-resume (anything-mark-current-line) (anything-update))
+                (if (eq any-resume t) (anything-mark-current-line) (anything-update))
                 
                 (select-frame-set-input-focus (window-frame (minibuffer-window)))
                 (anything-preselect any-preselect)
@@ -2170,7 +2181,7 @@ already-bound variables. Yuck!
                               (funcall anything-quit-if-no-candidate)))
                         (t
                          (read-string (or any-prompt "pattern: ")
-                                      (if any-resume anything-pattern any-input))))))
+                                      (if (eq any-resume t) anything-pattern any-input))))))
             (anything-cleanup)
             (with-current-buffer anything-current-buffer
               (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
@@ -2193,18 +2204,26 @@ already-bound variables. Yuck!
   (interactive)
   (when current-prefix-arg
     (setq any-buffer
-          (completing-read
-           "Resume anything buffer: "
-           (delq nil
-                 (mapcar (lambda (b)
-                           (when (buffer-local-value 'anything-last-sources-local b)
-                             (list (buffer-name b)))) (buffer-list)))
-           nil t nil nil anything-buffer)))
+          ;; (completing-read
+          ;;  "Resume anything buffer: "
+          ;;  (mapcar 'list anything-buffers)
+          ;;  nil t nil nil )
+          (anything '(((name . "Resume anything buffer")
+                       (candidates . anything-buffers)
+                       (action . identity)))
+                    nil nil 'noresume nil "*anything resume*")))
+  (setq anything-pattern nil)
   (setq anything-compiled-sources nil)
   (anything
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
        anything-last-sources anything-sources)
    nil nil t nil any-buffer))
+
+(defun anything-recent-push (elt list-var)
+  "Add ELT to the value of LIST-VAR as most recently used value."
+  (let ((m (member elt (symbol-value list-var))))
+    (and m (set list-var (delq (car m) (symbol-value list-var))))
+    (push elt (symbol-value list-var))))
 
 (defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   "Same as `anything' except when C-u is pressed, the initial input is the symbol at point."
@@ -5470,6 +5489,16 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                                      (insert "foo\nbar\n"))))
                                      (candidates-in-buffer)))
                                   "xfoo"))
+      (desc "anything-recent-push")
+      (expect '("foo" "bar" "baz")
+        (let ((lst '("bar" "baz")))
+          (anything-recent-push "foo" 'lst)))
+      (expect '("foo" "bar" "baz")
+        (let ((lst '("foo" "bar" "baz")))
+          (anything-recent-push "foo" 'lst)))
+      (expect '("foo" "bar" "baz")
+        (let ((lst '("bar" "foo" "baz")))
+          (anything-recent-push "foo" 'lst)))
       )))
 
 
