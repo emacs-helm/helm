@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.228 2009-12-25 01:34:35 rubikitch Exp $
+;; $Id: anything.el,v 1.229 2009-12-26 21:41:33 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.228  2009-12-25 01:34:35  rubikitch
+;; Revision 1.229  2009-12-26 21:41:33  rubikitch
+;; revive `anything-input' when resuming
+;;
+;; Revision 1.228  2009/12/25 01:34:35  rubikitch
 ;; * `anything-resume' use anything interface to select anything buffers.
 ;; * Its candidates are sorted by most recently used order.
 ;; * 4th arg of `anything' accepts 'noresume not to resume this session.
@@ -1066,7 +1069,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.228 2009-12-25 01:34:35 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.229 2009-12-26 21:41:33 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2180,8 +2183,7 @@ already-bound variables. Yuck!
                          (and (functionp anything-quit-if-no-candidate)
                               (funcall anything-quit-if-no-candidate)))
                         (t
-                         (read-string (or any-prompt "pattern: ")
-                                      (if (eq any-resume t) anything-pattern any-input))))))
+                         (read-string (or any-prompt "pattern: ") any-input)))))
             (anything-cleanup)
             (with-current-buffer anything-current-buffer
               (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
@@ -2199,25 +2201,23 @@ already-bound variables. Yuck!
      (set-window-start (selected-window) (cdr anything-current-position))
      nil)))
 
+(defun anything-resume-select-buffer ()
+  (let (anything-pattern anything-input)
+    (anything '(((name . "Resume anything buffer")
+                 (candidates . anything-buffers)
+                 (action . identity)))
+              nil nil 'noresume nil "*anything resume*")))
+
 (defun* anything-resume (&optional (any-buffer anything-last-buffer))
   "Resurrect previously invoked `anything'."
   (interactive)
   (when current-prefix-arg
-    (setq any-buffer
-          ;; (completing-read
-          ;;  "Resume anything buffer: "
-          ;;  (mapcar 'list anything-buffers)
-          ;;  nil t nil nil )
-          (anything '(((name . "Resume anything buffer")
-                       (candidates . anything-buffers)
-                       (action . identity)))
-                    nil nil 'noresume nil "*anything resume*")))
-  (setq anything-pattern nil)
+    (setq any-buffer (anything-resume-select-buffer)))
   (setq anything-compiled-sources nil)
   (anything
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
        anything-last-sources anything-sources)
-   nil nil t nil any-buffer))
+   (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil t nil any-buffer))
 
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
@@ -2579,12 +2579,14 @@ Cache the candidates if there is not yet a cached value."
           (anything-maybe-fit-frame)))))
 
 ;; (@* "Core: *anything* buffer contents")
+(defvar anything-input-local nil)
 (defun anything-update ()
   "Update the list of matches in the anything buffer according to
 the current pattern."
   (setq anything-digit-shortcut-count 0)
   (anything-kill-async-processes)
   (with-current-buffer (anything-buffer-get)
+    (set (make-local-variable 'anything-input-local) anything-pattern)
     (erase-buffer)
 
     (if anything-enable-digit-shortcuts
