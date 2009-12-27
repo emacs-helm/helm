@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.229 2009-12-26 21:41:33 rubikitch Exp $
+;; $Id: anything.el,v 1.230 2009-12-27 09:28:06 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.229  2009-12-26 21:41:33  rubikitch
+;; Revision 1.230  2009-12-27 09:28:06  rubikitch
+;; `anything-window-configuration' save/restore anything window configuration (NOT YET)
+;;
+;; Revision 1.229  2009/12/26 21:41:33  rubikitch
 ;; revive `anything-input' when resuming
 ;;
 ;; Revision 1.228  2009/12/25 01:34:35  rubikitch
@@ -1069,7 +1072,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.229 2009-12-26 21:41:33 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.230 2009-12-27 09:28:06 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2158,6 +2161,8 @@ already-bound variables. Yuck!
          
           (add-hook 'post-command-hook 'anything-check-minibuffer-input)
           (add-hook 'minibuffer-setup-hook 'anything-print-error-messages)
+          (add-hook 'minibuffer-exit-hook (lambda () (anything-window-configuration 'set)))
+
           (setq anything-current-position (cons (point) (window-start)))
           (if (eq any-resume t)
               (anything-initialize-overlays (anything-buffer-get))
@@ -2166,11 +2171,14 @@ already-bound variables. Yuck!
             (anything-recent-push anything-buffer 'anything-buffers)
             (setq anything-last-buffer anything-buffer))
           (when any-input (setq anything-input any-input anything-pattern any-input))
+          
+          ;; (if (eq any-resume t)
+          ;;     (anything-window-configuration 'get)
+          ;;   (anything-display-buffer anything-buffer))
           (anything-display-buffer anything-buffer)
           (unwind-protect
               (progn
                 (if (eq any-resume t) (anything-mark-current-line) (anything-update))
-                
                 (select-frame-set-input-focus (window-frame (minibuffer-window)))
                 (anything-preselect any-preselect)
                 (let ((ncandidate (anything-approximate-candidate-number))
@@ -2186,6 +2194,7 @@ already-bound variables. Yuck!
                          (read-string (or any-prompt "pattern: ") any-input)))))
             (anything-cleanup)
             (with-current-buffer anything-current-buffer
+              (remove-hook 'minibuffer-exit-hook (lambda () (anything-window-configuration 'set)))
               (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
               (remove-hook 'post-command-hook 'anything-check-minibuffer-input))
             (anything-set-frame/window-configuration frameconfig))
@@ -2218,6 +2227,19 @@ already-bound variables. Yuck!
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
        anything-last-sources anything-sources)
    (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil t nil any-buffer))
+
+(defvar anything-window-configuration nil)
+;;; (set-window-configuration (buffer-local-value 'anything-window-configuration (get-buffer "*anything buffers*")))
+(defun anything-window-configuration (get-or-set)
+  (with-current-buffer anything-buffer
+    (case get-or-set
+      ('set
+       (set (make-local-variable 'anything-window-configuration)
+            (cons (current-window-configuration)
+                  (window-point (anything-window)))))
+      ('get
+       (set-window-configuration (car anything-window-configuration))
+       (set-window-point (anything-window) (cdr anything-window-configuration))))))
 
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
