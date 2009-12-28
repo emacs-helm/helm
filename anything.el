@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.236 2009-12-28 07:07:09 rubikitch Exp $
+;; $Id: anything.el,v 1.237 2009-12-28 07:15:30 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.236  2009-12-28 07:07:09  rubikitch
+;; Revision 1.237  2009-12-28 07:15:30  rubikitch
+;; `anything-window-configuration' stores window configuration only.
+;;
+;; Revision 1.236  2009/12/28 07:07:09  rubikitch
 ;; `anything-resume' resumes window configuration now.
 ;;
 ;; Revision 1.235  2009/12/28 04:12:33  rubikitch
@@ -1090,7 +1093,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.236 2009-12-28 07:07:09 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.237 2009-12-28 07:15:30 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2238,13 +2241,10 @@ already-bound variables. Yuck!
     ('set
      (with-current-buffer anything-buffer
        (set (make-local-variable 'anything-window-configuration)
-            (cons (current-window-configuration)
-                  (window-point (anything-window))))))
+            (current-window-configuration))))
     ('get
-     (destructuring-bind (wc . pt)
-         (with-current-buffer anything-buffer anything-window-configuration)
-       (set-window-configuration wc)
-       (set-window-point (anything-window) pt))
+     (with-current-buffer anything-buffer
+       (set-window-configuration anything-window-configuration))
      (select-window (anything-window)))))
 
 (defun anything-recent-push (elt list-var)
