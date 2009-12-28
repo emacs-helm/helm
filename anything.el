@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.237 2009-12-28 07:15:30 rubikitch Exp $
+;; $Id: anything.el,v 1.238 2009-12-28 07:19:37 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.237  2009-12-28 07:15:30  rubikitch
+;; Revision 1.238  2009-12-28 07:19:37  rubikitch
+;; bugfix
+;;
+;; Revision 1.237  2009/12/28 07:15:30  rubikitch
 ;; `anything-window-configuration' stores window configuration only.
 ;;
 ;; Revision 1.236  2009/12/28 07:07:09  rubikitch
@@ -1093,7 +1096,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.237 2009-12-28 07:15:30 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.238 2009-12-28 07:19:37 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2182,7 +2185,7 @@ already-bound variables. Yuck!
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
           (if (eq any-resume t)
-              (anything-window-configuration 'get)
+              (anything-window-configuration 'set)
             (anything-display-buffer anything-buffer))
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
@@ -2236,13 +2239,13 @@ already-bound variables. Yuck!
 
 (defvar anything-window-configuration nil)
 ;;; (set-window-configuration (buffer-local-value 'anything-window-configuration (get-buffer "*anything buffers*")))
-(defun anything-window-configuration (get-or-set)
-  (case get-or-set
-    ('set
+(defun anything-window-configuration (store-or-set)
+  (case store-or-set
+    ('store
      (with-current-buffer anything-buffer
        (set (make-local-variable 'anything-window-configuration)
             (current-window-configuration))))
-    ('get
+    ('set
      (with-current-buffer anything-buffer
        (set-window-configuration anything-window-configuration))
      (select-window (anything-window)))))
@@ -2358,11 +2361,11 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 (defun anything-hooks (setup-or-cleanup)
   (let ((hooks '((post-command-hook anything-check-minibuffer-input)
                  (minibuffer-setup-hook anything-print-error-messages)
-                 (minibuffer-exit-hook (lambda () (anything-window-configuration 'set))))))
+                 (minibuffer-exit-hook (lambda () (anything-window-configuration 'store))))))
     (with-current-buffer anything-current-buffer
       (if (eq setup-or-cleanup 'setup)
           (dolist (args hooks) (apply 'add-hook args))
-        (dolist (args (reverse hooks)) (apply 'add-hook args))))))
+        (dolist (args (reverse hooks)) (apply 'remove-hook args))))))
 
 ;; (@* "Core: clean up")
 (defun anything-cleanup ()
