@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.230 2009-12-27 09:28:06 rubikitch Exp $
+;; $Id: anything.el,v 1.231 2009-12-28 02:33:41 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.230  2009-12-27 09:28:06  rubikitch
+;; Revision 1.231  2009-12-28 02:33:41  rubikitch
+;; refactoring
+;;
+;; Revision 1.230  2009/12/27 09:28:06  rubikitch
 ;; `anything-window-configuration' save/restore anything window configuration (NOT YET)
 ;;
 ;; Revision 1.229  2009/12/26 21:41:33  rubikitch
@@ -1072,7 +1075,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.230 2009-12-27 09:28:06 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.231 2009-12-28 02:33:41 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2159,10 +2162,7 @@ already-bound variables. Yuck!
               (anything-buffer (or any-buffer anything-buffer))
               (anything-sources (anything-normalize-sources any-sources)))
          
-          (add-hook 'post-command-hook 'anything-check-minibuffer-input)
-          (add-hook 'minibuffer-setup-hook 'anything-print-error-messages)
-          (add-hook 'minibuffer-exit-hook (lambda () (anything-window-configuration 'set)))
-
+          (anything-hooks 'setup)
           (setq anything-current-position (cons (point) (window-start)))
           (if (eq any-resume t)
               (anything-initialize-overlays (anything-buffer-get))
@@ -2194,9 +2194,7 @@ already-bound variables. Yuck!
                          (read-string (or any-prompt "pattern: ") any-input)))))
             (anything-cleanup)
             (with-current-buffer anything-current-buffer
-              (remove-hook 'minibuffer-exit-hook (lambda () (anything-window-configuration 'set)))
-              (remove-hook 'minibuffer-setup-hook 'anything-print-error-messages)
-              (remove-hook 'post-command-hook 'anything-check-minibuffer-input))
+              (anything-hooks 'cleanup))
             (anything-set-frame/window-configuration frameconfig))
           (unless anything-quit
             (unwind-protect
@@ -2211,11 +2209,10 @@ already-bound variables. Yuck!
      nil)))
 
 (defun anything-resume-select-buffer ()
-  (let (anything-pattern anything-input)
-    (anything '(((name . "Resume anything buffer")
-                 (candidates . anything-buffers)
-                 (action . identity)))
-              nil nil 'noresume nil "*anything resume*")))
+  (anything '(((name . "Resume anything buffer")
+               (candidates . anything-buffers)
+               (action . identity)))
+            nil nil 'noresume nil "*anything resume*"))
 
 (defun* anything-resume (&optional (any-buffer anything-last-buffer))
   "Resurrect previously invoked `anything'."
@@ -2332,6 +2329,14 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
       (dolist (overlay anything-digit-overlays)
         (delete-overlay overlay))
       (setq anything-digit-overlays nil))))
+
+(defun anything-hooks (setup-or-cleanup)
+  (let ((hooks '((post-command-hook anything-check-minibuffer-input)
+                 (minibuffer-setup-hook anything-print-error-messages)
+                 (minibuffer-exit-hook (lambda () (anything-window-configuration 'set))))))
+    (if (eq setup-or-cleanup 'setup)
+        (dolist (args hooks) (apply 'add-hook args))
+      (dolist (args (reverse hooks)) (apply 'add-hook args)))))
 
 ;; (@* "Core: clean up")
 (defun anything-cleanup ()
