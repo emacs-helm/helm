@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.233 2009-12-28 03:43:12 rubikitch Exp $
+;; $Id: anything.el,v 1.234 2009-12-28 03:57:33 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.233  2009-12-28 03:43:12  rubikitch
+;; Revision 1.234  2009-12-28 03:57:33  rubikitch
+;; `anything-resume': New optional argument
+;;
+;; Revision 1.233  2009/12/28 03:43:12  rubikitch
 ;; remove warnings
 ;;
 ;; Revision 1.232  2009/12/28 03:37:25  rubikitch
@@ -1081,7 +1084,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.233 2009-12-28 03:43:12 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.234 2009-12-28 03:57:33 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2206,17 +2209,17 @@ already-bound variables. Yuck!
   (goto-char (car anything-current-position))
   (set-window-start (selected-window) (cdr anything-current-position)))
 
-(defun anything-resume-select-buffer ()
+(defun anything-resume-select-buffer (input)
   (anything '(((name . "Resume anything buffer")
                (candidates . anything-buffers)
                (action . identity)))
-            nil nil 'noresume nil "*anything resume*"))
+            input nil 'noresume nil "*anything resume*"))
 
-(defun* anything-resume (&optional (any-buffer anything-last-buffer))
+(defun* anything-resume (&optional (any-buffer anything-last-buffer) buffer-pattern)
   "Resurrect previously invoked `anything'."
   (interactive)
-  (when current-prefix-arg
-    (setq any-buffer (anything-resume-select-buffer)))
+  (when (or current-prefix-arg buffer-pattern)
+    (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
   (setq anything-compiled-sources nil)
   (anything
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
