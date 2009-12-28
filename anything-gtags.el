@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.23 2009-12-21 10:41:21 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.24 2009-12-28 01:39:51 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -49,7 +49,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.23  2009-12-21 10:41:21  rubikitch
+;; Revision 1.24  2009-12-28 01:39:51  rubikitch
+;; Support multiple anything gtags buffer (resume)
+;;
+;; Revision 1.23  2009/12/21 10:41:21  rubikitch
 ;; Use `anything-persistent-highlight-point' if available.
 ;;
 ;; Revision 1.22  2009/12/19 01:22:27  rubikitch
@@ -208,7 +211,9 @@ If it is other symbol, display file name in candidates even if classification is
                         . (lambda ()
                             (aggs-set-anything-current-position)
                             (anything-candidate-buffer gtags-select-buffer)))
-                       ,@aggs-base-source)))))
+                       ,@aggs-base-source))))
+         (aggs-buffer (concat "*anything gtags*"
+                              (substring (buffer-name gtags-select-buffer) 15))))
     (with-current-buffer (get-buffer-create aggs-buffer)
       (set (make-local-variable 'gtags-select-buffer) gtags-select-buffer)
       (set (make-local-variable 'pwd) pwd))
@@ -250,7 +255,7 @@ If it is other symbol, display file name in candidates even if classification is
 (defun aggs-select-it (candidate)
   (with-temp-buffer
     ;; `pwd' is defined at `ag-hijack-gtags-select-mode'.
-    (setq default-directory (buffer-local-value 'pwd (get-buffer aggs-buffer)))
+    (setq default-directory (buffer-local-value 'pwd (get-buffer anything-buffer)))
     (insert candidate "\n")
     (forward-line -1)
     (gtags-select-it nil)
