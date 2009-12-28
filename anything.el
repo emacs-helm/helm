@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.238 2009-12-28 07:19:37 rubikitch Exp $
+;; $Id: anything.el,v 1.239 2009-12-28 07:33:28 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -85,6 +85,8 @@
 ;;    Delete the currently selected item.
 ;;  `anything-delete-minibuffer-content'
 ;;    Same as `delete-minibuffer-contents' but this is a command.
+;;  `anything-toggle-resplit-window'
+;;    Toggle resplit anything window, vertically or horizontally.
 ;;  `anything-select-2nd-action'
 ;;    Select the 2nd action for the currently selected candidate.
 ;;  `anything-select-3rd-action'
@@ -325,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.238  2009-12-28 07:19:37  rubikitch
+;; Revision 1.239  2009-12-28 07:33:28  rubikitch
+;; New command: `anything-toggle-resplit-window'  (C-t)
+;;
+;; Revision 1.238  2009/12/28 07:19:37  rubikitch
 ;; bugfix
 ;;
 ;; Revision 1.237  2009/12/28 07:15:30  rubikitch
@@ -1096,7 +1101,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.238 2009-12-28 07:19:37 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.239 2009-12-28 07:33:28 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1605,6 +1610,7 @@ See also `anything-set-source-filter'.")
 
     (define-key map (kbd "C-s") 'anything-isearch)
     (define-key map (kbd "C-r") 'undefined)
+    (define-key map (kbd "C-t") 'anything-toggle-resplit-window)
     (define-key map (kbd "C-x C-f") 'anything-quit-and-find-file)
 
     (define-key map (kbd "C-c C-d") 'anything-delete-current-selection)
@@ -3361,6 +3367,19 @@ Acceptable values of CREATE-OR-BUFFER:
       (append source `((candidates . ,(or (cdr it) 'anything-candidates-in-buffer))
                        (volatile) (match identity)))
     source))
+
+;; (@* "Utility: resplit anything window")
+(defun anything-toggle-resplit-window ()
+  "Toggle resplit anything window, vertically or horizontally."
+  (interactive)
+  (with-anything-window
+    (let ((before-height (window-height)))
+      (delete-window)
+      (set-window-buffer
+       (select-window (if (= (window-height) before-height)
+                          (split-window-vertically)
+                        (split-window-horizontally)))
+       anything-buffer))))
 
 ;; (@* "Utility: select another action by key")
 (defun anything-select-nth-action (n)
