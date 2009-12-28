@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.231 2009-12-28 02:33:41 rubikitch Exp $
+;; $Id: anything.el,v 1.232 2009-12-28 03:37:25 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.231  2009-12-28 02:33:41  rubikitch
+;; Revision 1.232  2009-12-28 03:37:25  rubikitch
+;; refactoring
+;;
+;; Revision 1.231  2009/12/28 02:33:41  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.230  2009/12/27 09:28:06  rubikitch
@@ -1075,7 +1078,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.231 2009-12-28 02:33:41 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.232 2009-12-28 03:37:25 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2161,52 +2164,44 @@ already-bound variables. Yuck!
               (case-fold-search t)
               (anything-buffer (or any-buffer anything-buffer))
               (anything-sources (anything-normalize-sources any-sources)))
-         
           (anything-hooks 'setup)
-          (setq anything-current-position (cons (point) (window-start)))
-          (if (eq any-resume t)
-              (anything-initialize-overlays (anything-buffer-get))
-            (anything-initialize))
-          (unless (eq any-resume 'noresume)
-            (anything-recent-push anything-buffer 'anything-buffers)
-            (setq anything-last-buffer anything-buffer))
-          (when any-input (setq anything-input any-input anything-pattern any-input))
-          
+          (anything-initialize-1 any-resume)
           ;; (if (eq any-resume t)
           ;;     (anything-window-configuration 'get)
           ;;   (anything-display-buffer anything-buffer))
           (anything-display-buffer anything-buffer)
           (unwind-protect
-              (progn
-                (if (eq any-resume t) (anything-mark-current-line) (anything-update))
-                (select-frame-set-input-focus (window-frame (minibuffer-window)))
-                (anything-preselect any-preselect)
-                (let ((ncandidate (anything-approximate-candidate-number))
-                      (minibuffer-local-map anything-map))
-                  (cond ((and anything-execute-action-at-once-if-one
-                              (= ncandidate 1))
-                         (ignore))
-                        ((and anything-quit-if-no-candidate (= ncandidate 0))
-                         (setq anything-quit t)
-                         (and (functionp anything-quit-if-no-candidate)
-                              (funcall anything-quit-if-no-candidate)))
-                        (t
-                         (read-string (or any-prompt "pattern: ") any-input)))))
+              (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
             (anything-cleanup)
-            (with-current-buffer anything-current-buffer
-              (anything-hooks 'cleanup))
+            (anything-hooks 'cleanup)
             (anything-set-frame/window-configuration frameconfig))
           (unless anything-quit
-            (unwind-protect
-                (anything-execute-selection-action)
-              (anything-aif (get-buffer anything-action-buffer)
-                  (kill-buffer it))
-              (run-hooks 'anything-after-action-hook)))))
+            (anything-execute-selection-action-1))))
     (quit
-     (setq minibuffer-history (cons anything-input minibuffer-history))
-     (goto-char (car anything-current-position))
-     (set-window-start (selected-window) (cdr anything-current-position))
+     (anything-on-quit)
      nil)))
+
+(defun anything-initialize-1 (any-resume)
+  (setq anything-current-position (cons (point) (window-start)))
+  (if (eq any-resume t)
+      (anything-initialize-overlays (anything-buffer-get))
+    (anything-initialize))
+  (unless (eq any-resume 'noresume)
+    (anything-recent-push anything-buffer 'anything-buffers)
+    (setq anything-last-buffer anything-buffer))
+  (when any-input (setq anything-input any-input anything-pattern any-input)))
+
+(defun anything-execute-selection-action-1 ()
+  (unwind-protect
+      (anything-execute-selection-action)
+    (anything-aif (get-buffer anything-action-buffer)
+        (kill-buffer it))
+    (run-hooks 'anything-after-action-hook)))
+
+(defun anything-on-quit ()
+  (setq minibuffer-history (cons anything-input minibuffer-history))
+  (goto-char (car anything-current-position))
+  (set-window-start (selected-window) (cdr anything-current-position)))
 
 (defun anything-resume-select-buffer ()
   (anything '(((name . "Resume anything buffer")
@@ -2287,6 +2282,22 @@ already-bound variables. Yuck!
   (anything-create-anything-buffer)
   (run-hooks 'anything-after-initialize-hook))
 
+(defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume)
+  (if (eq any-resume t) (anything-mark-current-line) (anything-update))
+  (select-frame-set-input-focus (window-frame (minibuffer-window)))
+  (anything-preselect any-preselect)
+  (let ((ncandidate (anything-approximate-candidate-number))
+        (minibuffer-local-map anything-map))
+    (cond ((and anything-execute-action-at-once-if-one
+                (= ncandidate 1))
+           (ignore))
+          ((and anything-quit-if-no-candidate (= ncandidate 0))
+           (setq anything-quit t)
+           (and (functionp anything-quit-if-no-candidate)
+                (funcall anything-quit-if-no-candidate)))
+          (t
+           (read-string (or any-prompt "pattern: ") any-input)))))
+
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
 If TEST-MODE is non-nil, clear `anything-candidate-cache'."
@@ -2334,9 +2345,10 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (let ((hooks '((post-command-hook anything-check-minibuffer-input)
                  (minibuffer-setup-hook anything-print-error-messages)
                  (minibuffer-exit-hook (lambda () (anything-window-configuration 'set))))))
-    (if (eq setup-or-cleanup 'setup)
-        (dolist (args hooks) (apply 'add-hook args))
-      (dolist (args (reverse hooks)) (apply 'add-hook args)))))
+    (with-current-buffer anything-current-buffer
+      (if (eq setup-or-cleanup 'setup)
+          (dolist (args hooks) (apply 'add-hook args))
+        (dolist (args (reverse hooks)) (apply 'add-hook args))))))
 
 ;; (@* "Core: clean up")
 (defun anything-cleanup ()
