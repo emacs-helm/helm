@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.235 2009-12-28 04:12:33 rubikitch Exp $
+;; $Id: anything.el,v 1.236 2009-12-28 07:07:09 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.235  2009-12-28 04:12:33  rubikitch
+;; Revision 1.236  2009-12-28 07:07:09  rubikitch
+;; `anything-resume' resumes window configuration now.
+;;
+;; Revision 1.235  2009/12/28 04:12:33  rubikitch
 ;; Fix tiny bug
 ;;
 ;; Revision 1.234  2009/12/28 03:57:33  rubikitch
@@ -1087,7 +1090,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.235 2009-12-28 04:12:33 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.236 2009-12-28 07:07:09 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2175,10 +2178,9 @@ already-bound variables. Yuck!
               (anything-sources (anything-normalize-sources any-sources)))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
-          ;; (if (eq any-resume t)
-          ;;     (anything-window-configuration 'get)
-          ;;   (anything-display-buffer anything-buffer))
-          (anything-display-buffer anything-buffer)
+          (if (eq any-resume t)
+              (anything-window-configuration 'get)
+            (anything-display-buffer anything-buffer))
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
             (anything-cleanup)
@@ -2232,15 +2234,18 @@ already-bound variables. Yuck!
 (defvar anything-window-configuration nil)
 ;;; (set-window-configuration (buffer-local-value 'anything-window-configuration (get-buffer "*anything buffers*")))
 (defun anything-window-configuration (get-or-set)
-  (with-current-buffer anything-buffer
-    (case get-or-set
-      ('set
+  (case get-or-set
+    ('set
+     (with-current-buffer anything-buffer
        (set (make-local-variable 'anything-window-configuration)
             (cons (current-window-configuration)
-                  (window-point (anything-window)))))
-      ('get
-       (set-window-configuration (car anything-window-configuration))
-       (set-window-point (anything-window) (cdr anything-window-configuration))))))
+                  (window-point (anything-window))))))
+    ('get
+     (destructuring-bind (wc . pt)
+         (with-current-buffer anything-buffer anything-window-configuration)
+       (set-window-configuration wc)
+       (set-window-point (anything-window) pt))
+     (select-window (anything-window)))))
 
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
