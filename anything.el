@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.234 2009-12-28 03:57:33 rubikitch Exp $
+;; $Id: anything.el,v 1.235 2009-12-28 04:12:33 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.234  2009-12-28 03:57:33  rubikitch
+;; Revision 1.235  2009-12-28 04:12:33  rubikitch
+;; Fix tiny bug
+;;
+;; Revision 1.234  2009/12/28 03:57:33  rubikitch
 ;; `anything-resume': New optional argument
 ;;
 ;; Revision 1.233  2009/12/28 03:43:12  rubikitch
@@ -1084,7 +1087,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.234 2009-12-28 03:57:33 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.235 2009-12-28 04:12:33 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2170,8 +2173,8 @@ already-bound variables. Yuck!
               (case-fold-search t)
               (anything-buffer (or any-buffer anything-buffer))
               (anything-sources (anything-normalize-sources any-sources)))
-          (anything-hooks 'setup)
           (anything-initialize-1 any-resume any-input)
+          (anything-hooks 'setup)
           ;; (if (eq any-resume t)
           ;;     (anything-window-configuration 'get)
           ;;   (anything-display-buffer anything-buffer))
