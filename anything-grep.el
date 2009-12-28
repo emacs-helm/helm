@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.21 2009-12-18 11:01:11 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.22 2009-12-28 08:56:56 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -60,7 +60,11 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.21  2009-12-18 11:01:11  rubikitch
+;; Revision 1.22  2009-12-28 08:56:56  rubikitch
+;; `anything-grep-by-name': INCOMPATIBLE!!! swap optional arguments
+;; `anything-grep-by-name' can utilize `repeat-complex-command'.
+;;
+;; Revision 1.21  2009/12/18 11:01:11  rubikitch
 ;; `agrep-real-to-display': erase "nil" message
 ;;
 ;; Revision 1.20  2009/06/25 03:36:38  rubikitch
@@ -135,7 +139,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.21 2009-12-18 11:01:11 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.22 2009-12-28 08:56:56 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -321,13 +325,18 @@ It asks COMMAND for grep command line and PWD for current directory."
 (defvar agbn-last-name nil
   "The last used name by `anything-grep-by-name'.")
 
-(defun anything-grep-by-name (&optional name query)
+(defun anything-grep-by-name (&optional query name)
   "Do `anything-grep' from predefined location.
 It asks NAME for location name and QUERY."
-  (interactive)
+  ;; DRY
+  (interactive
+   (list (read-string "Grep query: ")
+         (completing-read "Grep by name: " anything-grep-alist
+                          nil t nil nil agbn-last-name)))
   (setq query (or query (read-string "Grep query: ")))
   (setq name (or name
-                 (completing-read "Grep by name: " anything-grep-alist nil t nil nil agbn-last-name)))
+                 (completing-read "Grep by name: " anything-grep-alist
+                                  nil t nil nil agbn-last-name)))
   (setq agbn-last-name name)
   (anything-aif (assoc-default name anything-grep-alist)
       (progn
