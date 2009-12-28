@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.24 2009-12-28 01:39:51 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.25 2009-12-28 03:59:17 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -34,6 +34,8 @@
 ;;
 ;;  `anything-gtags-select'
 ;;    Tag jump using gtags and `anything'.
+;;  `anything-gtags-resume'
+;;    Select previously selected anything gtags buffer.
 ;;
 ;;; Customizable Options:
 ;;
@@ -49,7 +51,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.24  2009-12-28 01:39:51  rubikitch
+;; Revision 1.25  2009-12-28 03:59:17  rubikitch
+;; New command `anything-gtags-resume'
+;;
+;; Revision 1.24  2009/12/28 01:39:51  rubikitch
 ;; Support multiple anything gtags buffer (resume)
 ;;
 ;; Revision 1.23  2009/12/21 10:41:21  rubikitch
@@ -263,6 +268,11 @@ If it is other symbol, display file name in candidates even if classification is
      (when (and anything-in-persistent-action
                (fboundp 'anything-persistent-highlight-point))
       (anything-persistent-highlight-point (point-at-bol) (point-at-eol)))))
+
+(defun anything-gtags-resume ()
+  "Select previously selected anything gtags buffer."
+  (interactive)
+  (anything-resume nil "*anything  gtags* "))
 
 (defadvice switch-to-buffer (around anything-gtags activate)
   "Use `anything' instead of `gtags-select-mode' when `anything-gtags-hijack-gtags-select-mode' is non-nil."
