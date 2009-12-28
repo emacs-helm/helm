@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.232 2009-12-28 03:37:25 rubikitch Exp $
+;; $Id: anything.el,v 1.233 2009-12-28 03:43:12 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -325,7 +325,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.232  2009-12-28 03:37:25  rubikitch
+;; Revision 1.233  2009-12-28 03:43:12  rubikitch
+;; remove warnings
+;;
+;; Revision 1.232  2009/12/28 03:37:25  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.231  2009/12/28 02:33:41  rubikitch
@@ -1078,7 +1081,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.232 2009-12-28 03:37:25 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.233 2009-12-28 03:43:12 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1676,7 +1679,7 @@ anything completions with \.")
   "Overlay used to highlight the current match during isearch.")
 
 (defvar anything-digit-overlays nil
-  "Overlays for digit shortcuts. See `anything-enable-digit-shortcuts'.")
+  "Overlays for digit shortcuts. See `anything-enable-shortcuts'.")
 
 (defvar anything-candidate-cache nil
   "Holds the available candidate withing a single anything invocation.")
@@ -2165,7 +2168,7 @@ already-bound variables. Yuck!
               (anything-buffer (or any-buffer anything-buffer))
               (anything-sources (anything-normalize-sources any-sources)))
           (anything-hooks 'setup)
-          (anything-initialize-1 any-resume)
+          (anything-initialize-1 any-resume any-input)
           ;; (if (eq any-resume t)
           ;;     (anything-window-configuration 'get)
           ;;   (anything-display-buffer anything-buffer))
@@ -2181,7 +2184,7 @@ already-bound variables. Yuck!
      (anything-on-quit)
      nil)))
 
-(defun anything-initialize-1 (any-resume)
+(defun anything-initialize-1 (any-resume any-input)
   (setq anything-current-position (cons (point) (window-start)))
   (if (eq any-resume t)
       (anything-initialize-overlays (anything-buffer-get))
@@ -2324,10 +2327,10 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
           (make-overlay (point-min) (point-min) (get-buffer buffer)))
     (overlay-put anything-selection-overlay 'face anything-selection-face))
 
-  (when anything-enable-digit-shortcuts
-    (setq anything-shortcut-keys (assoc-default anything-enable-digit-shortcuts anything-shortcut-keys-alist)))
+  (when anything-enable-shortcuts
+    (setq anything-shortcut-keys (assoc-default anything-enable-shortcuts anything-shortcut-keys-alist)))
 
-  (if anything-enable-digit-shortcuts
+  (if anything-enable-shortcuts
       (unless anything-digit-overlays
         (setq anything-digit-overlays
               (loop for key across anything-shortcut-keys
@@ -2580,7 +2583,7 @@ Cache the candidates if there is not yet a cached value."
               (anything-insert-candidate-separator)
             (setq separate t))
 
-          (when (and anything-enable-digit-shortcuts
+          (when (and anything-enable-shortcuts
                      (not (eq anything-digit-shortcut-count
                               (length anything-digit-overlays))))
             (move-overlay (nth anything-digit-shortcut-count
@@ -2628,7 +2631,7 @@ the current pattern."
     (set (make-local-variable 'anything-input-local) anything-pattern)
     (erase-buffer)
 
-    (if anything-enable-digit-shortcuts
+    (if anything-enable-shortcuts
         (dolist (overlay anything-digit-overlays)
           (delete-overlay overlay)))
 
@@ -2997,7 +3000,7 @@ UNIT and DIRECTION."
 
 (defun anything-select-with-digit-shortcut ()
   (interactive)
-  (if anything-enable-digit-shortcuts
+  (if anything-enable-shortcuts
       (save-selected-window
         (select-window (anything-window))          
         (let* ((index (position (anything-this-command-key) anything-shortcut-keys))
@@ -4073,7 +4076,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
    (\"source name2\" (\"candidate3\" \"candidate4\")))
 "
   (let ((anything-test-mode t)
-        anything-enable-digit-shortcuts
+        anything-enable-shortcuts
         anything-candidate-cache
         (anything-sources (anything-normalize-sources sources))
         (anything-compile-source-functions compile-source-functions)
