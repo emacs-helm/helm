@@ -1,5 +1,5 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.25 2009-12-28 03:59:17 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.26 2009-12-28 04:07:00 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -51,7 +51,10 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.25  2009-12-28 03:59:17  rubikitch
+;; Revision 1.26  2009-12-28 04:07:00  rubikitch
+;; remove warnings
+;;
+;; Revision 1.25  2009/12/28 03:59:17  rubikitch
 ;; New command `anything-gtags-resume'
 ;;
 ;; Revision 1.24  2009/12/28 01:39:51  rubikitch
@@ -188,6 +191,7 @@ If it is other symbol, display file name in candidates even if classification is
   ;; 16 = length of symbol
   (buffer-substring-no-properties (+ s 16) e))
 (defun aggs-set-anything-current-position ()
+  (declare (special c-source-file))
   ;; It's needed because `anything' saves
   ;; *GTAGS SELECT* buffer's position,
   (save-window-excursion
@@ -230,6 +234,7 @@ If it is other symbol, display file name in candidates even if classification is
 (defun aggs-candidate-buffer-by-filename (filename)
   (get-buffer-create (concat "*anything gtags*" filename)))
 (defun aggs-meta-source-init ()
+  (declare (special gtags-select-buffer))
   (aggs-set-anything-current-position)
   (with-current-buffer gtags-select-buffer
     (goto-char (point-min))
