@@ -1242,7 +1242,7 @@ If prefix numeric arg is given go ARG level down."
                   (replace-match (getenv "HOME") nil t anything-pattern)
                   anything-pattern)))
     (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
-               (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
+               (string-match "^\\(http\\|https\\|ftp\\|mailto\\):/?/?.*" path))
            (list path))
           ((string= anything-pattern "")
            (directory-files "/" t))
