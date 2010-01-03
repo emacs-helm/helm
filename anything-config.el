@@ -1230,7 +1230,9 @@ If EXPAND is non--nil expand-file-name."
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
-  (when (equal (cdr (assoc 'name (anything-get-current-source))) "Find Files")
+  (when (or (equal (cdr (assoc 'name (anything-get-current-source))) "Find Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Copy Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Rename Files"))
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg :unix-close t :expand t)))
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
@@ -1295,6 +1297,91 @@ If CANDIDATE is not a directory open this file."
               (or (if (and fap (file-exists-p fap)) (expand-file-name fap) fap)
                   (expand-file-name default-directory)) "Find Files or Url: " nil nil "*Anything Find Files*")))
 
+
+;;; Anything completion for copy and rename files from dired.
+(defvar anything-c-source-copy-files
+  '((name . "Copy Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Copy File" . (lambda (candidate)
+                       (anything-copy-or-rename-action candidate :action 'copy)))))))
+
+
+(defvar anything-c-source-rename-files
+  '((name . "Rename Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Rename File" . (lambda (candidate)
+                         (anything-copy-or-rename-action candidate :action 'rename)))))))
+
+
+(defun* anything-copy-or-rename-action (candidate &key action)
+  (let ((files   (dired-get-marked-files))
+        (fn      (case action
+                   ('copy 'dired-copy-file)
+                   ('rename 'dired-rename-file)))
+        (fm-mess (case action
+                   ('copy "%d Files Copied to %s.")
+                   ('rename "%d Files moved to %s."))))
+    (loop
+       for i in files
+       do (funcall fn i candidate 1))
+    (set-text-properties 0 (length candidate) nil candidate)
+    (message fm-mess (length files) candidate)))
+
+(defun* anything-dired-copy-or-rename-file (&key action)
+  (let* ((files     (dired-get-marked-files))
+         (len       (length files))
+         (fname     (if (> len 1)
+                        (format "* %d Files" len)
+                        (car files)))
+         (source    (case action
+                      ('copy 'anything-c-source-copy-files)
+                      ('rename 'anything-c-source-rename-files)))
+         (prompt-fm (case action
+                      ('copy "Copy %s to: ")
+                      ('rename "Rename %s to: ")))
+         (buffer    (case action
+                      ('copy "*Anything Copy Files*")
+                      ('rename "*Anything Rename Files*"))))
+    (anything source
+              (or (dired-dwim-target-directory)
+                  (expand-file-name default-directory))
+              (format prompt-fm fname) nil nil buffer)))
+
+
+(defun anything-dired-rename-file ()
+  "Preconfigured anything to rename files from dired."
+  (interactive)
+  (anything-dired-copy-or-rename-file :action 'rename))
+
+(defun anything-dired-copy-file ()
+  "Preconfigured anything to copy files from dired."
+  (interactive)
+  (anything-dired-copy-or-rename-file :action 'copy))
+
+(defvar anything-dired-bindings nil)
+(defun anything-dired-bindings (&optional arg)
+  "Replace usual dired commands `C' and `R' by anything ones.
+When call interactively toggle dired bindings and anything bindings.
+When call non--interactively with arg > 0, enable anything bindings.
+You can put (anything-dired-binding 1) in init file to enable anything bindings."
+  (interactive)
+  (if (or (when arg (> arg 0)) (not anything-dired-bindings))
+      (progn
+        (define-key dired-mode-map (kbd "C") 'anything-dired-copy-file)
+        (define-key dired-mode-map (kbd "R") 'anything-dired-rename-file)
+        (setq anything-dired-bindings t))
+      (progn
+        (define-key dired-mode-map (kbd "C") 'dired-do-copy)
+        (define-key dired-mode-map (kbd "R") 'dired-do-rename)
+        (setq anything-dired-bindings nil))))
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
