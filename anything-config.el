@@ -1263,6 +1263,9 @@ If prefix numeric arg is given go ARG level down."
 (defun anything-c-highlight-ffiles (files)
   "Candidate transformer for `anything-c-source-find-files'."
   (loop for i in files
+     if (file-symlink-p i)
+     collect (propertize i 'face '((:foreground "DarkOrange"))
+                         'help-echo (file-truename i)) into a
      if (file-directory-p i)
      collect (propertize i 'face anything-c-files-face1) into a
      else
@@ -1272,15 +1275,17 @@ If prefix numeric arg is given go ARG level down."
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
 If CANDIDATE is not a directory open this file."
-  (if (file-directory-p candidate)
-      (with-selected-window (minibuffer-window)
-        (delete-minibuffer-contents)
-        (let* ((cand-no-prop (file-name-as-directory
-                              (expand-file-name candidate)))
-               (len          (length cand-no-prop)))
-          (set-text-properties 0 len nil cand-no-prop)
-          (insert cand-no-prop)))
-      (find-file candidate)))
+  (flet ((insert-in-minibuffer (elm)
+           (with-selected-window (minibuffer-window)
+             (delete-minibuffer-contents)
+             (set-text-properties 0 (length elm) nil elm)
+             (insert elm))))
+    (cond ((file-directory-p candidate)
+           (insert-in-minibuffer (file-name-as-directory
+                                  (expand-file-name candidate))))
+          ((file-symlink-p candidate)
+           (insert-in-minibuffer (file-truename candidate)))
+          (t (find-file candidate)))))
 
 (defun anything-find-files ()
   "Preconfigured anything for `find-file'."
