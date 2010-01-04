@@ -1321,7 +1321,18 @@ If CANDIDATE is not a directory open this file."
                          (anything-copy-or-rename-action candidate :action 'rename)))))))
 
 
+(defun anything-dired-overwrite-p (fname candidate)
+  "Determine if overwrite or not target candidate.
+Return the value of target."
+  (or (if (file-directory-p candidate)
+          (let ((target (concat (file-name-as-directory candidate)
+                                (file-name-nondirectory fname))))
+            (when (file-exists-p target) target))
+          (when (file-exists-p candidate) candidate))))
+      
 (defun* anything-copy-or-rename-action (candidate &key action)
+  "Copy or rename file at point or marked files in dired to CANDIDATE.
+ACTION is a key that can be one of 'copy or 'rename."
   (let ((files   (dired-get-marked-files))
         (fn      (case action
                    ('copy 'dired-copy-file)
@@ -1331,9 +1342,13 @@ If CANDIDATE is not a directory open this file."
                    ('rename "%d Files moved to %s."))))
     (loop
        for i in files
-       do (funcall fn i candidate 1))
+       for overwrite = (anything-dired-overwrite-p i candidate)
+       do (if overwrite
+              (when (y-or-n-p (format "Really Overwrite`%s'? " overwrite))
+                (funcall fn i candidate t))
+              (funcall fn i candidate t))
     (set-text-properties 0 (length candidate) nil candidate)
-    (message fm-mess (length files) candidate)))
+    (message fm-mess (length files) candidate))))
 
 (defun* anything-dired-copy-or-rename-file (&key action)
   (let* ((files     (dired-get-marked-files))
