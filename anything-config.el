@@ -1333,8 +1333,9 @@ ACTION is a key that can be one of 'copy or 'rename."
      (when (file-directory-p candidate)
        #'(lambda (from)
            ;; When CANDIDATE is a directory, build file-name in this directory.
-           ;; Else we use nil as arg instead of a function.
-           (expand-file-name (file-name-nondirectory from) candidate)))))) 
+           ;; Else we use nil as arg instead of this function.
+           (expand-file-name (file-name-nondirectory from) candidate)))
+     dired-keep-marker-copy)))
 
 
 (defun* anything-dired-copy-or-rename-file (&key action)
