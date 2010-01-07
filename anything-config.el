@@ -1232,7 +1232,9 @@ If prefix numeric arg is given go ARG level down."
   (interactive "p")
   (when (or (equal (cdr (assoc 'name (anything-get-current-source))) "Find Files")
             (equal (cdr (assoc 'name (anything-get-current-source))) "Copy Files")
-            (equal (cdr (assoc 'name (anything-get-current-source))) "Rename Files"))
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Rename Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Symlink Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Hardlink Files"))
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg :unix-close t :expand t)))
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
@@ -1333,15 +1335,31 @@ If CANDIDATE is not a directory open this file."
                              (anything-dired-action candidate :action 'relsymlink)))))))
 
 
+(defvar anything-c-source-hardlink-files
+  '((name . "Hardlink Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Hardlink File" . (lambda (candidate)
+                           (anything-dired-action candidate :action 'hardlink)))))))
+
 (defun* anything-dired-action (candidate &key action)
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
-  (let ((files (dired-get-marked-files))
-        (fn    (case action
-                 ('copy       'dired-copy-file)
-                 ('rename     'dired-rename-file)
-                 ('symlink    'make-symbolic-link)
-                 ('relsymlink 'dired-make-relative-symlink))))
+  (let ((files  (dired-get-marked-files))
+        (fn     (case action
+                  ('copy       'dired-copy-file)
+                  ('rename     'dired-rename-file)
+                  ('symlink    'make-symbolic-link)
+                  ('relsymlink 'dired-make-relative-symlink)
+                  ('hardlink   'dired-hardlink)))
+        (marker (case action
+                  ((copy rename)   dired-keep-marker-copy)
+                  ('symlink        dired-keep-marker-symlink)
+                  ('relsymlink     dired-keep-marker-relsymlink)
+                  ('hardlink       dired-keep-marker-hardlink))))
     (dired-create-files
      fn (symbol-name action) files
      (if (file-directory-p candidate)
@@ -1350,7 +1368,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from)
              (expand-file-name (file-name-nondirectory from) candidate))
          #'(lambda (from) candidate))
-     dired-keep-marker-copy)))
+     marker)))
 
 
 (defun* anything-dired-do-action-on-file (&key action)
@@ -1362,15 +1380,18 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          (source    (case action
                       ('copy 'anything-c-source-copy-files)
                       ('rename 'anything-c-source-rename-files)
-                      ('symlink 'anything-c-source-symlink-files)))
+                      ('symlink 'anything-c-source-symlink-files)
+                      ('hardlink 'anything-c-source-hardlink-files)))
          (prompt-fm (case action
                       ('copy "Copy %s to: ")
                       ('rename "Rename %s to: ")
-                      (symlink "Symlink %s to: ")))
+                      ('symlink "Symlink %s to: ")
+                      ('hardlink "Hardlink %s to: ")))
          (buffer    (case action
                       ('copy "*Anything Copy Files*")
                       ('rename "*Anything Rename Files*")
-                      ('symlink "*Anything Symlink Files*"))))
+                      ('symlink "*Anything Symlink Files*")
+                      ('hardlink "*Anything Hardlink Files*"))))
     (anything source
               (or (dired-dwim-target-directory)
                   (expand-file-name default-directory))
@@ -1392,6 +1413,11 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
   (interactive)
   (anything-dired-do-action-on-file :action 'symlink))
 
+(defun anything-dired-hardlink-file ()
+  "Preconfigured anything to hardlink files from dired."
+  (interactive)
+  (anything-dired-do-action-on-file :action 'hardlink))
+
 (defvar anything-dired-bindings nil)
 (defun anything-dired-bindings (&optional arg)
   "Replace usual dired commands `C' and `R' by anything ones.
@@ -1404,10 +1430,12 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
         (define-key dired-mode-map (kbd "C") 'anything-dired-copy-file)
         (define-key dired-mode-map (kbd "R") 'anything-dired-rename-file)
         (define-key dired-mode-map (kbd "S") 'anything-dired-symlink-file)
+        (define-key dired-mode-map (kbd "H") 'anything-dired-hardlink-file)
         (setq anything-dired-bindings t))
       (define-key dired-mode-map (kbd "C") 'dired-do-copy)
       (define-key dired-mode-map (kbd "R") 'dired-do-rename)
       (define-key dired-mode-map (kbd "S") 'dired-do-symlink)
+      (define-key dired-mode-map (kbd "H") 'dired-do-hardlink)
       (setq anything-dired-bindings nil)))
 
 ;;; File Cache
