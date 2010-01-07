@@ -1298,7 +1298,7 @@ If CANDIDATE is not a directory open this file."
                   (expand-file-name default-directory)) "Find Files or Url: " nil nil "*Anything Find Files*")))
 
 
-;;; Anything completion for copy and rename files from dired.
+;;; Anything completion for copy, rename and symlink files from dired.
 (defvar anything-c-source-copy-files
   '((name . "Copy Files")
     (candidates . anything-find-files-get-candidates)
@@ -1307,7 +1307,7 @@ If CANDIDATE is not a directory open this file."
     (volatile)
     (action .
      (("Copy File" . (lambda (candidate)
-                       (anything-copy-or-rename-action candidate :action 'copy)))))))
+                       (anything-dired-action candidate :action 'copy)))))))
 
 
 (defvar anything-c-source-rename-files
@@ -1318,27 +1318,42 @@ If CANDIDATE is not a directory open this file."
     (volatile)
     (action .
      (("Rename File" . (lambda (candidate)
-                         (anything-copy-or-rename-action candidate :action 'rename)))))))
+                         (anything-dired-action candidate :action 'rename)))))))
+
+(defvar anything-c-source-symlink-files
+  '((name . "Symlink Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Symlink File" . (lambda (candidate)
+                          (anything-dired-action candidate :action 'symlink)))
+      ("RelSymlink File" . (lambda (candidate)
+                             (anything-dired-action candidate :action 'relsymlink)))))))
 
 
-(defun* anything-copy-or-rename-action (candidate &key action)
-  "Copy or rename file at point or marked files in dired to CANDIDATE.
-ACTION is a key that can be one of 'copy or 'rename."
-  (let ((files   (dired-get-marked-files))
-        (fn      (case action
-                   ('copy 'dired-copy-file)
-                   ('rename 'dired-rename-file))))
+(defun* anything-dired-action (candidate &key action)
+  "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
+ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
+  (let ((files (dired-get-marked-files))
+        (fn    (case action
+                 ('copy       'dired-copy-file)
+                 ('rename     'dired-rename-file)
+                 ('symlink    'make-symbolic-link)
+                 ('relsymlink 'dired-make-relative-symlink))))
     (dired-create-files
      fn (symbol-name action) files
-     (when (file-directory-p candidate)
-       #'(lambda (from)
-           ;; When CANDIDATE is a directory, build file-name in this directory.
-           ;; Else we use nil as arg instead of this function.
-           (expand-file-name (file-name-nondirectory from) candidate)))
+     (if (file-directory-p candidate)
+         ;; When CANDIDATE is a directory, build file-name in this directory.
+         ;; Else we use CANDIDATE.
+         #'(lambda (from)
+             (expand-file-name (file-name-nondirectory from) candidate))
+         #'(lambda (from) candidate))
      dired-keep-marker-copy)))
 
 
-(defun* anything-dired-copy-or-rename-file (&key action)
+(defun* anything-dired-do-action-on-file (&key action)
   (let* ((files     (dired-get-marked-files))
          (len       (length files))
          (fname     (if (> len 1)
@@ -1346,13 +1361,16 @@ ACTION is a key that can be one of 'copy or 'rename."
                         (car files)))
          (source    (case action
                       ('copy 'anything-c-source-copy-files)
-                      ('rename 'anything-c-source-rename-files)))
+                      ('rename 'anything-c-source-rename-files)
+                      ('symlink 'anything-c-source-symlink-files)))
          (prompt-fm (case action
                       ('copy "Copy %s to: ")
-                      ('rename "Rename %s to: ")))
+                      ('rename "Rename %s to: ")
+                      (symlink "Symlink %s to: ")))
          (buffer    (case action
                       ('copy "*Anything Copy Files*")
-                      ('rename "*Anything Rename Files*"))))
+                      ('rename "*Anything Rename Files*")
+                      ('symlink "*Anything Symlink Files*"))))
     (anything source
               (or (dired-dwim-target-directory)
                   (expand-file-name default-directory))
@@ -1362,12 +1380,17 @@ ACTION is a key that can be one of 'copy or 'rename."
 (defun anything-dired-rename-file ()
   "Preconfigured anything to rename files from dired."
   (interactive)
-  (anything-dired-copy-or-rename-file :action 'rename))
+  (anything-dired-do-action-on-file :action 'rename))
 
 (defun anything-dired-copy-file ()
   "Preconfigured anything to copy files from dired."
   (interactive)
-  (anything-dired-copy-or-rename-file :action 'copy))
+  (anything-dired-do-action-on-file :action 'copy))
+
+(defun anything-dired-symlink-file ()
+  "Preconfigured anything to symlink files from dired."
+  (interactive)
+  (anything-dired-do-action-on-file :action 'symlink))
 
 (defvar anything-dired-bindings nil)
 (defun anything-dired-bindings (&optional arg)
@@ -1380,11 +1403,12 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
       (progn
         (define-key dired-mode-map (kbd "C") 'anything-dired-copy-file)
         (define-key dired-mode-map (kbd "R") 'anything-dired-rename-file)
+        (define-key dired-mode-map (kbd "S") 'anything-dired-symlink-file)
         (setq anything-dired-bindings t))
-      (progn
-        (define-key dired-mode-map (kbd "C") 'dired-do-copy)
-        (define-key dired-mode-map (kbd "R") 'dired-do-rename)
-        (setq anything-dired-bindings nil))))
+      (define-key dired-mode-map (kbd "C") 'dired-do-copy)
+      (define-key dired-mode-map (kbd "R") 'dired-do-rename)
+      (define-key dired-mode-map (kbd "S") 'dired-do-symlink)
+      (setq anything-dired-bindings nil)))
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
