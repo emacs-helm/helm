@@ -1291,6 +1291,21 @@ If CANDIDATE is not a directory open this file."
            (insert-in-minibuffer (file-truename candidate)))
           (t (find-file candidate)))))
 
+(defun anything-find-files-insert-current-fname ()
+  "Insert current candidate file-name in minibuffer."
+  (interactive)
+  (when (or (equal (cdr (assoc 'name (anything-get-current-source))) "Find Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Copy Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Rename Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Symlink Files")
+            (equal (cdr (assoc 'name (anything-get-current-source))) "Hardlink Files"))
+    (let ((new-pattern (anything-get-selection anything-last-buffer)))
+      (set-text-properties 0 (length new-pattern) nil new-pattern)
+      (with-selected-window (minibuffer-window)
+        (delete-minibuffer-contents)
+        (insert new-pattern)))))
+(define-key anything-map (kbd "C-:") 'anything-find-files-insert-current-fname)
+
 (defun anything-find-files ()
   "Preconfigured anything for `find-file'."
   (interactive)
