@@ -1250,11 +1250,24 @@ If prefix numeric arg is given go ARG level down."
   (dired (file-name-directory file))
   (dired-goto-file file))
 
+(defun anything-create-tramp-name (fname)
+  "Build filename for `anything-pattern' like /su:: or /sudo::."
+  (apply #'tramp-make-tramp-file-name
+         (loop
+            with v = (tramp-dissect-file-name fname)
+            for i across v collect i)))
+  
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let ((path (if (string-match "^~" anything-pattern)
-                  (replace-match (getenv "HOME") nil t anything-pattern)
-                  anything-pattern))
+  (let ((path (cond ((string-match "^~" anything-pattern)
+                     (replace-match (getenv "HOME") nil t anything-pattern))
+                    ((string-match "/su::" anything-pattern)
+                     (let ((tramp-name (anything-create-tramp-name "/su::")))
+                       (replace-match tramp-name nil t anything-pattern)))
+                    ((string-match "/sudo::" anything-pattern)
+                     (let ((tramp-name (anything-create-tramp-name "/sudo::")))
+                       (replace-match tramp-name nil t anything-pattern)))
+                    (t anything-pattern)))
         ;; Don't try to tramp connect before entering the second ":".
         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
     (setq anything-pattern path)
