@@ -2480,8 +2480,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
                                  (insert (anything-c-colors-get-name candidate)))))
             ("Insert RGB" . (lambda (candidate)
                               (with-current-buffer anything-current-buffer
-                                (insert (anything-c-colors-get-rgb candidate))))))
-    (requires-pattern . 3)))
+                                (insert (anything-c-colors-get-rgb candidate))))))))
 ;; (anything 'anything-c-source-colors)
 
 (defun anything-c-colors-get-name (candidate)
