@@ -82,6 +82,7 @@
 ;;     `anything-c-source-recentf'               (Recentf)
 ;;     `anything-c-source-ffap-guesser'          (File at point)
 ;;     `anything-c-source-ffap-line'             (File/Lineno at point)
+;;     `anything-c-source-files-in-all-dired'    (Files in all dired buffer.)
 ;;  Help:
 ;;     `anything-c-source-man-pages'  (Manual Pages)
 ;;     `anything-c-source-info-pages' (Info Pages)
@@ -242,8 +243,20 @@
 ;;    List all anything sources for test.
 ;;  `anything-select-source'
 ;;    Select source.
+;;  `anything-find-files-down-one-level'
+;;    Go down one level like unix command `cd ..'.
 ;;  `anything-find-files'
 ;;    Preconfigured anything for `find-file'.
+;;  `anything-dired-rename-file'
+;;    Preconfigured anything to rename files from dired.
+;;  `anything-dired-copy-file'
+;;    Preconfigured anything to copy files from dired.
+;;  `anything-dired-symlink-file'
+;;    Preconfigured anything to symlink files from dired.
+;;  `anything-dired-hardlink-file'
+;;    Preconfigured anything to hardlink files from dired.
+;;  `anything-dired-bindings'
+;;    Replace usual dired commands `C' and `R' by anything ones.
 ;;  `anything-bookmark-ext'
 ;;    Preconfigured anything for bookmark-extensions sources.
 ;;  `anything-mark-ring'
@@ -1579,6 +1592,32 @@ It is cleared after jumping line.")
     (type . file)))
 ;; (anything 'anything-c-source-ffap-line)
 
+;;; list of files gleaned from every dired buffer
+(defun anything-c-files-in-all-dired-candidates ()
+  (save-excursion
+    (mapcan
+     (lambda (dir)
+       (cond ((listp dir)               ;filelist
+              dir)
+             ((equal "" (file-name-nondirectory dir)) ;dir
+              (directory-files dir t))
+             (t                         ;wildcard
+              (file-expand-wildcards dir t))))
+     (delq nil
+           (mapcar (lambda (buf)
+                     (set-buffer buf)
+                     (when (eq major-mode 'dired-mode)
+                       (if (consp dired-directory)
+                           (cdr dired-directory) ;filelist
+                         dired-directory))) ;dir or wildcard
+                   (buffer-list))))))
+;; (dired '("~/" "~/.emacs-custom.el" "~/.emacs.bmk"))
+
+(defvar anything-c-source-files-in-all-dired
+  '((name . "Files in all dired buffer.")
+    (candidates . anything-c-files-in-all-dired-candidates)
+    (type . file)))
+;; (anything 'anything-c-source-files-in-all-dired)
 
 ;;;; <Help>
 ;;; Man Pages
