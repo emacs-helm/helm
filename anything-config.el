@@ -1254,7 +1254,10 @@ If prefix numeric arg is given go ARG level down."
   "Create candidate list for `anything-c-source-find-files'."
   (let ((path (if (string-match "^~" anything-pattern)
                   (replace-match (getenv "HOME") nil t anything-pattern)
-                  anything-pattern)))
+                  anything-pattern))
+        ;; Don't try to tramp connect before entering the second ":".
+        (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
+    (setq anything-pattern path)
     (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
                (string-match ffap-url-regexp path))
            (list path))
