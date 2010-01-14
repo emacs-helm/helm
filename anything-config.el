@@ -1199,18 +1199,80 @@ buffer that is not the current buffer."
 
 ;; (anything 'anything-c-source-find-files)
 
+(defun* anything-reduce-file-name (fname level &key unix-close expand)
+    "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
+If LEVEL is positive reduce from end else from beginning.
+If UNIX-CLOSE is non--nil close filename with /.
+If EXPAND is non--nil expand-file-name."
+  (let* ((exp-fname  (expand-file-name fname))
+         (fname-list (split-string (if (or (string= fname "~/") expand)
+                                       exp-fname fname) "/" t))
+         (len        (length fname-list))
+         (pop-list   (if (< level 0)
+                         (subseq fname-list (* level -1))
+                         (subseq fname-list 0 (- len level))))
+         (result     (mapconcat 'identity pop-list "/"))
+         (empty      (string= result "")))
+    (when unix-close (setq result (concat result "/")))
+    (if (string-match "^~" result)
+        (if (string= result "~/") "~/" result)
+        (if (< level 0)
+            (if empty "../" (concat "../" result))
+            (cond ((and (eq system-type 'windows-nt) empty)
+                   "c:/")
+                  ((and (not empty) (eq system-type 'windows-nt))
+                   result)
+                  (empty "/")
+                  (t
+                   (concat "/" result)))))))
+
+(defun anything-find-files-or-dired-p ()
+  "Test if current source is a dired or find-files source."
+  (or (equal (cdr (assoc 'name (anything-get-current-source))) "Find Files")
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Copy Files")
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Rename Files")
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Symlink Files")
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Hardlink Files")))
+
+(defun anything-find-files-down-one-level (arg)
+  "Go down one level like unix command `cd ..'.
+If prefix numeric arg is given go ARG level down."
+  (interactive "p")
+  (when (anything-find-files-or-dired-p)
+    (let ((new-pattern (anything-reduce-file-name anything-pattern arg :unix-close t :expand t)))
+      (with-selected-window (minibuffer-window)
+        (delete-minibuffer-contents)
+        (insert new-pattern)))))
+(define-key anything-map (kbd "C-.") 'anything-find-files-down-one-level)
+
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
   (dired (file-name-directory file))
   (dired-goto-file file))
 
+(defun anything-create-tramp-name (fname)
+  "Build filename for `anything-pattern' like /su:: or /sudo::."
+  (apply #'tramp-make-tramp-file-name
+         (loop
+            with v = (tramp-dissect-file-name fname)
+            for i across v collect i)))
+  
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let ((path (if (string-match "^~" anything-pattern)
-                  (replace-match (getenv "HOME") nil t anything-pattern)
-                  anything-pattern)))
+  (let ((path (cond ((string-match "^~" anything-pattern)
+                     (replace-match (getenv "HOME") nil t anything-pattern))
+                    ((string-match "/su::" anything-pattern)
+                     (let ((tramp-name (anything-create-tramp-name "/su::")))
+                       (replace-match tramp-name nil t anything-pattern)))
+                    ((string-match "/sudo::" anything-pattern)
+                     (let ((tramp-name (anything-create-tramp-name "/sudo::")))
+                       (replace-match tramp-name nil t anything-pattern)))
+                    (t anything-pattern)))
+        ;; Don't try to tramp connect before entering the second ":".
+        (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
+    (setq anything-pattern path)
     (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
-               (string-match "^\\(http\\|https\\|ftp\\)://.*" path))
+               (string-match ffap-url-regexp path))
            (list path))
           ((string= anything-pattern "")
            (directory-files "/" t))
@@ -1225,6 +1287,9 @@ buffer that is not the current buffer."
 (defun anything-c-highlight-ffiles (files)
   "Candidate transformer for `anything-c-source-find-files'."
   (loop for i in files
+     if (file-symlink-p i)
+     collect (propertize i 'face '((:foreground "DarkOrange"))
+                         'help-echo (file-truename i)) into a
      if (file-directory-p i)
      collect (propertize i 'face anything-c-files-face1) into a
      else
@@ -1234,15 +1299,21 @@ buffer that is not the current buffer."
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
 If CANDIDATE is not a directory open this file."
-  (if (file-directory-p candidate)
-      (with-selected-window (minibuffer-window)
-        (delete-minibuffer-contents)
-        (let* ((cand-no-prop (file-name-as-directory
-                              (expand-file-name candidate)))
-               (len          (length cand-no-prop)))
-          (set-text-properties 0 len nil cand-no-prop)
-          (insert cand-no-prop)))
-      (find-file candidate)))
+  (flet ((insert-in-minibuffer (elm)
+           (with-selected-window (minibuffer-window)
+             (delete-minibuffer-contents)
+             (set-text-properties 0 (length elm) nil elm)
+             (insert elm))))
+    (cond ((file-directory-p candidate)
+           (insert-in-minibuffer (file-name-as-directory
+                                  (expand-file-name candidate))))
+          ((file-symlink-p candidate)
+           (insert-in-minibuffer (file-truename candidate)))
+          (t
+           (let ((new-pattern (anything-get-selection anything-last-buffer)))
+             (set-text-properties 0 (length new-pattern) nil new-pattern)
+             (insert-in-minibuffer new-pattern))))))
+
 
 (defun anything-find-files ()
   "Preconfigured anything for `find-file'."
@@ -1250,8 +1321,147 @@ If CANDIDATE is not a directory open this file."
   (let ((fap (ffap-guesser)))
     (anything 'anything-c-source-find-files
               (or (if (and fap (file-exists-p fap)) (expand-file-name fap) fap)
-                  (expand-file-name default-directory)) "Find Files or Url: " nil nil "*Anything Find Files*")))
+                  (expand-file-name default-directory))
+              "Find Files or Url: " nil nil "*Anything Find Files*")))
 
+
+;;; Anything completion for copy, rename and symlink files from dired.
+(defvar anything-c-source-copy-files
+  '((name . "Copy Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Copy File" . (lambda (candidate)
+                       (anything-dired-action candidate :action 'copy)))))))
+
+
+(defvar anything-c-source-rename-files
+  '((name . "Rename Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Rename File" . (lambda (candidate)
+                         (anything-dired-action candidate :action 'rename)))))))
+
+(defvar anything-c-source-symlink-files
+  '((name . "Symlink Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Symlink File" . (lambda (candidate)
+                          (anything-dired-action candidate :action 'symlink)))
+      ("RelSymlink File" . (lambda (candidate)
+                             (anything-dired-action candidate :action 'relsymlink)))))))
+
+
+(defvar anything-c-source-hardlink-files
+  '((name . "Hardlink Files")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Hardlink File" . (lambda (candidate)
+                           (anything-dired-action candidate :action 'hardlink)))))))
+
+(defun* anything-dired-action (candidate &key action)
+  "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
+ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
+  (let ((files  (dired-get-marked-files))
+        (fn     (case action
+                  ('copy       'dired-copy-file)
+                  ('rename     'dired-rename-file)
+                  ('symlink    'make-symbolic-link)
+                  ('relsymlink 'dired-make-relative-symlink)
+                  ('hardlink   'dired-hardlink)))
+        (marker (case action
+                  ((copy rename)   dired-keep-marker-copy)
+                  ('symlink        dired-keep-marker-symlink)
+                  ('relsymlink     dired-keep-marker-relsymlink)
+                  ('hardlink       dired-keep-marker-hardlink))))
+    (dired-create-files
+     fn (symbol-name action) files
+     (if (file-directory-p candidate)
+         ;; When CANDIDATE is a directory, build file-name in this directory.
+         ;; Else we use CANDIDATE.
+         #'(lambda (from)
+             (expand-file-name (file-name-nondirectory from) candidate))
+         #'(lambda (from) candidate))
+     marker)))
+
+
+(defun* anything-dired-do-action-on-file (&key action)
+  (let* ((files     (dired-get-marked-files))
+         (len       (length files))
+         (fname     (if (> len 1)
+                        (format "* %d Files" len)
+                        (car files)))
+         (source    (case action
+                      ('copy     'anything-c-source-copy-files)
+                      ('rename   'anything-c-source-rename-files)
+                      ('symlink  'anything-c-source-symlink-files)
+                      ('hardlink 'anything-c-source-hardlink-files)))
+         (prompt-fm (case action
+                      ('copy     "Copy %s to: ")
+                      ('rename   "Rename %s to: ")
+                      ('symlink  "Symlink %s to: ")
+                      ('hardlink "Hardlink %s to: ")))
+         (buffer    (case action
+                      ('copy     "*Anything Copy Files*")
+                      ('rename   "*Anything Rename Files*")
+                      ('symlink  "*Anything Symlink Files*")
+                      ('hardlink "*Anything Hardlink Files*"))))
+    (anything source
+              (or (dired-dwim-target-directory)
+                  (expand-file-name default-directory))
+              (format prompt-fm fname) nil nil buffer)))
+
+
+(defun anything-dired-rename-file ()
+  "Preconfigured anything to rename files from dired."
+  (interactive)
+  (anything-dired-do-action-on-file :action 'rename))
+
+(defun anything-dired-copy-file ()
+  "Preconfigured anything to copy files from dired."
+  (interactive)
+  (anything-dired-do-action-on-file :action 'copy))
+
+(defun anything-dired-symlink-file ()
+  "Preconfigured anything to symlink files from dired."
+  (interactive)
+  (anything-dired-do-action-on-file :action 'symlink))
+
+(defun anything-dired-hardlink-file ()
+  "Preconfigured anything to hardlink files from dired."
+  (interactive)
+  (anything-dired-do-action-on-file :action 'hardlink))
+
+(defvar anything-dired-bindings nil)
+(defun anything-dired-bindings (&optional arg)
+  "Replace usual dired commands `C' and `R' by anything ones.
+When call interactively toggle dired bindings and anything bindings.
+When call non--interactively with arg > 0, enable anything bindings.
+You can put (anything-dired-binding 1) in init file to enable anything bindings."
+  (interactive)
+  (if (or (when arg (> arg 0)) (not anything-dired-bindings))
+      (progn
+        (define-key dired-mode-map (kbd "C") 'anything-dired-copy-file)
+        (define-key dired-mode-map (kbd "R") 'anything-dired-rename-file)
+        (define-key dired-mode-map (kbd "S") 'anything-dired-symlink-file)
+        (define-key dired-mode-map (kbd "H") 'anything-dired-hardlink-file)
+        (setq anything-dired-bindings t))
+      (define-key dired-mode-map (kbd "C") 'dired-do-copy)
+      (define-key dired-mode-map (kbd "R") 'dired-do-rename)
+      (define-key dired-mode-map (kbd "S") 'dired-do-symlink)
+      (define-key dired-mode-map (kbd "H") 'dired-do-hardlink)
+      (setq anything-dired-bindings nil)))
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
