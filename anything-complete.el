@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.73 2009-12-25 01:35:59 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.74 2010-01-23 04:18:18 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.73  2009-12-25 01:35:59  rubikitch
+;; Revision 1.74  2010-01-23 04:18:18  rubikitch
+;; `ac-new-input-source': temporarily disable shortcuts
+;;
+;; Revision 1.73  2009/12/25 01:35:59  rubikitch
 ;; Adjust `anything-noresume' to latest version of `anything'
 ;;
 ;; Revision 1.72  2009/12/14 00:13:28  rubikitch
@@ -335,7 +338,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.73 2009-12-25 01:35:59 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.74 2010-01-23 04:18:18 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -631,7 +634,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 
 (defun ac-new-input-source (prompt require-match &optional additional-attrs)
   (unless require-match
-    `((name . ,prompt) (dummy) ,@additional-attrs)))
+    `((name . ,prompt)
+      (init . (lambda () (setq anything-orig-enable-shortcuts anything-enable-shortcuts
+                               anything-enable-shortcuts nil)))
+      (cleanup . (lambda () (setq anything-enable-shortcuts anything-orig-enable-shortcuts)))
+      (dummy)
+      ,@additional-attrs)))
 (defun* ac-default-source (default &optional accept-empty (additional-attrs '((action . identity))))
   `((name . "Default")
     (default-value . ,(or default (and accept-empty "")))
