@@ -1,7 +1,7 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.76 2010-01-29 09:19:21 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.77 2010-01-29 09:20:33 rubikitch Exp $
 
-;; Copyright (C) 2008  rubikitch
+;; Copyright (C) 2008, 2009, 2010 rubikitch
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: matching, convenience, anything
@@ -99,7 +99,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.76  2010-01-29 09:19:21  rubikitch
+;; Revision 1.77  2010-01-29 09:20:33  rubikitch
+;; update Copyright
+;;
+;; Revision 1.76  2010/01/29 09:19:21  rubikitch
 ;; New option: `anything-execute-extended-command-use-kyr'
 ;;
 ;; Revision 1.75  2010/01/29 09:15:24  rubikitch
@@ -349,7 +352,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.76 2010-01-29 09:19:21 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.77 2010-01-29 09:20:33 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
