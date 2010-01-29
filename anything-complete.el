@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.74 2010-01-23 04:18:18 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.75 2010-01-29 09:15:24 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -96,7 +96,12 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.74  2010-01-23 04:18:18  rubikitch
+;; Revision 1.75  2010-01-29 09:15:24  rubikitch
+;; Make `anything-execute-extended-command' faster
+;; * eliminate "Commands (by prefix)", which makes it slow down
+;; * `C-c C-u' to update commands instead
+;;
+;; Revision 1.74  2010/01/23 04:18:18  rubikitch
 ;; `ac-new-input-source': temporarily disable shortcuts
 ;;
 ;; Revision 1.73  2009/12/25 01:35:59  rubikitch
@@ -338,7 +343,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.74 2010-01-23 04:18:18 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.75 2010-01-29 09:15:24 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -980,22 +985,21 @@ It accepts one argument, selected candidate.")
      (action . identity)
      (persistent-action . alcs-describe-function))
     ((name . "Commands")
+     (header-name . alcs-header-name)
      (init . (lambda () (anything-candidate-buffer
                          (get-buffer alcs-commands-buffer))))
      (candidates-in-buffer)
      (action . identity)
-     (persistent-action . alcs-describe-function))
-    ((name . "Commands (by prefix)")
-     (candidates
-      . (lambda ()
-          (all-completions anything-pattern obarray 'commandp)))
-     (volatile)
-     (action . identity)
      (persistent-action . alcs-describe-function))))
 
+;; (with-current-buffer " *command symbols*" (erase-buffer))
 (defun anything-execute-extended-command ()
   (interactive)
-  (let ((cmd (anything
+  (setq alcs-this-command this-command)
+  (let* ((anything-map
+          (prog1 (copy-keymap anything-map)
+            (define-key anything-map "\C-c\C-u" 'alcs-update-restart)))
+         (cmd (anything
               (if (require 'anything-kyr-config nil t)
                   (cons anything-c-source-kyr
                         anything-execute-extended-command-sources)
