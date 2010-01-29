@@ -1283,6 +1283,7 @@ If prefix numeric arg is given go ARG level down."
                     (t anything-pattern)))
         ;; Don't try to tramp connect before entering the second ":".
         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
+    (set-text-properties 0 (length path) nil path)
     (setq anything-pattern path)
     (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
                (string-match ffap-url-regexp path))
