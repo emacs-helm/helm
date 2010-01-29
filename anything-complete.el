@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.75 2010-01-29 09:15:24 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.76 2010-01-29 09:19:21 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -48,6 +48,9 @@
 ;;  `anything-complete-sort-candidates'
 ;;    *Whether to sort completion candidates.
 ;;    default = nil
+;;  `anything-execute-extended-command-use-kyr'
+;;    *Use `anything-kyr' (context-aware commands) in `anything-execute-extended-command'. 
+;;    default = t
 
 ;; * `anything-lisp-complete-symbol', `anything-lisp-complete-symbol-partial-match':
 ;;     `lisp-complete-symbol' with `anything'
@@ -96,7 +99,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.75  2010-01-29 09:15:24  rubikitch
+;; Revision 1.76  2010-01-29 09:19:21  rubikitch
+;; New option: `anything-execute-extended-command-use-kyr'
+;;
+;; Revision 1.75  2010/01/29 09:15:24  rubikitch
 ;; Make `anything-execute-extended-command' faster
 ;; * eliminate "Commands (by prefix)", which makes it slow down
 ;; * `C-c C-u' to update commands instead
@@ -343,7 +349,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.75 2010-01-29 09:15:24 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.76 2010-01-29 09:19:21 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -455,6 +461,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   :type 'boolean  
   :group 'anything-complete)
 
+(defcustom anything-execute-extended-command-use-kyr t
+  "*Use `anything-kyr' (context-aware commands) in `anything-execute-extended-command'. "
+  :type 'boolean  
+  :group 'anything-complete)
 (defun alcs-sort-maybe (candidates source)
   (if anything-complete-sort-candidates
       (sort candidates #'string<)
@@ -1000,7 +1010,8 @@ It accepts one argument, selected candidate.")
           (prog1 (copy-keymap anything-map)
             (define-key anything-map "\C-c\C-u" 'alcs-update-restart)))
          (cmd (anything
-              (if (require 'anything-kyr-config nil t)
+              (if (and anything-execute-extended-command-use-kyr
+                       (require 'anything-kyr-config nil t))
                   (cons anything-c-source-kyr
                         anything-execute-extended-command-sources)
                 anything-execute-extended-command-sources))))
