@@ -1309,14 +1309,11 @@ If prefix numeric arg is given go ARG level down."
         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
     (set-text-properties 0 (length path) nil path)
     (setq anything-pattern path)
-    (cond ((or (and (not (file-directory-p path)) (file-exists-p path))
+    (cond ((or (file-regular-p path)
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
-          ((string= anything-pattern "")
-           (directory-files "/" t))
-          ((and (file-directory-p path)
-                (file-exists-p path))
-           (directory-files path t))
+          ((string= anything-pattern "") (directory-files "/" t))
+          ((file-directory-p path) (directory-files path t))
           (t
            (append
             (list path)
