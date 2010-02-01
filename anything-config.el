@@ -531,6 +531,13 @@ This hack is invoked when pressing C-M-x in the form (defvar anything-c-source-X
   :type 'boolean
   :group 'anything-config)
 
+(defcustom anything-tramp-verbose 0
+  "*Just like `tramp-verbose' but specific to anything.
+When set to 0 don't show tramp messages in anything.
+If you want to have the default tramp messages set it to 3."
+  :type 'integer
+  :group 'anything-config)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
@@ -1305,6 +1312,7 @@ If prefix numeric arg is given go ARG level down."
                      (let ((tramp-name (anything-create-tramp-name "/sudo::")))
                        (replace-match tramp-name nil t anything-pattern)))
                     (t anything-pattern)))
+        (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
         ;; Don't try to tramp connect before entering the second ":".
         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
     (set-text-properties 0 (length path) nil path)
