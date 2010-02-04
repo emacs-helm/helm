@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.77 2010-01-29 09:20:33 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.78 2010-02-04 19:27:07 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -30,16 +30,24 @@
 ;;
 ;; Below are complete command list:
 ;;
+;;  `alcs-update-restart'
+;;    Update lisp symbols and restart current `anything' session.
 ;;  `anything-lisp-complete-symbol'
 ;;    `lisp-complete-symbol' replacement using `anything'.
 ;;  `anything-lisp-complete-symbol-partial-match'
 ;;    `lisp-complete-symbol' replacement using `anything' (partial match).
 ;;  `anything-apropos'
 ;;    `apropos' replacement using `anything'.
+;;  `anything-read-file-name-follow-directory'
+;;    Follow directory in `anything-read-file-name'.
 ;;  `anything-read-string-mode'
 ;;    If this minor mode is on, use `anything' version of `completing-read' and `read-file-name'.
 ;;  `anything-complete-shell-history'
 ;;    Select a command from shell history and insert it.
+;;  `anything-execute-extended-command'
+;;    Replacement of `execute-extended-command'.
+;;  `anything-find-file'
+;;    Replacement of `find-file'.
 ;;
 ;;; Customizable Options:
 ;;
@@ -99,7 +107,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.77  2010-01-29 09:20:33  rubikitch
+;; Revision 1.78  2010-02-04 19:27:07  rubikitch
+;; Added docstrings
+;;
+;; Revision 1.77  2010/01/29 09:20:33  rubikitch
 ;; update Copyright
 ;;
 ;; Revision 1.76  2010/01/29 09:19:21  rubikitch
@@ -352,7 +363,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.77 2010-01-29 09:20:33 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.78 2010-02-04 19:27:07 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -611,6 +622,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (anything-noresume sources input nil nil nil "*anything complete*")))
 
 (defun alcs-update-restart ()
+  "Update lisp symbols and restart current `anything' session."
   (interactive)
   (alcs-make-candidates)
   (anything-run-after-quit 'call-interactively alcs-this-command))
@@ -750,6 +762,7 @@ It accepts one argument, selected candidate.")
   anything-read-file-name-map)
 
 (defun anything-read-file-name-follow-directory ()
+  "Follow directory in `anything-read-file-name'."
   (interactive)
   ;; These variables are bound by `arfn-sources' or `anything-find-file'.
   (declare (special prompt default-filename require-match predicate additional-attrs))
@@ -1007,6 +1020,7 @@ It accepts one argument, selected candidate.")
 
 ;; (with-current-buffer " *command symbols*" (erase-buffer))
 (defun anything-execute-extended-command ()
+  "Replacement of `execute-extended-command'."
   (interactive)
   (setq alcs-this-command this-command)
   (let* ((anything-map
@@ -1027,6 +1041,7 @@ It accepts one argument, selected candidate.")
 
 (defvar anything-find-file-additional-sources nil)
 (defun anything-find-file ()
+  "Replacement of `find-file'."
   (interactive)
   (let ((anything-map (anything-read-file-name-map))
         ;; anything-read-file-name-follow-directory uses these variables
