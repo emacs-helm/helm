@@ -1225,7 +1225,8 @@ buffer that is not the current buffer."
 
 ;; (anything 'anything-c-source-files-in-current-dir+)
 
-;;; File name completion
+;;; Anything replacement of file name completion for `find-file' and friends.
+
 (defvar anything-c-source-find-files
   '((name . "Find Files")
     (init . (lambda ()
@@ -1276,7 +1277,9 @@ If EXPAND is non--nil expand-file-name."
       (equal (cdr (assoc 'name (anything-get-current-source))) "Copy Files")
       (equal (cdr (assoc 'name (anything-get-current-source))) "Rename Files")
       (equal (cdr (assoc 'name (anything-get-current-source))) "Symlink Files")
-      (equal (cdr (assoc 'name (anything-get-current-source))) "Hardlink Files")))
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Hardlink Files")
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Write File")
+      (equal (cdr (assoc 'name (anything-get-current-source))) "Insert File")))
 
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
@@ -1373,7 +1376,45 @@ If CANDIDATE is not a directory open this file."
               "Find Files or Url: " nil nil "*Anything Find Files*")))
 
 
-;;; Anything completion for copy, rename and symlink files from dired.
+;;; Anything completion for `write-file'.==> C-x C-w
+(defvar anything-c-source-write-file
+  '((name . "Write File")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Write File" . (lambda (candidate)
+                        (write-file candidate 'confirm)))))))
+
+(defun anything-write-file ()
+  "Preconfigured anything providing completion for `write-file'."
+  (interactive)
+  (anything 'anything-c-source-write-file
+            (expand-file-name default-directory)
+            "Write buffer to file: " nil nil "*Anything write file*"))
+
+;;; Anything completion for `insert-file'.==> C-x i
+(defvar anything-c-source-insert-file
+  '((name . "Insert File")
+    (candidates . anything-find-files-get-candidates)
+    (candidate-transformer anything-c-highlight-ffiles)
+    (persistent-action . anything-find-files-persistent-action)
+    (volatile)
+    (action .
+     (("Insert File" . (lambda (candidate)
+                        (when (y-or-n-p (format "Really insert %s in %s "
+                                                candidate anything-current-buffer))
+                          (insert-file candidate))))))))
+
+(defun anything-insert-file ()
+  "Preconfigured anything providing completion for `insert-file'."
+  (interactive)
+  (anything 'anything-c-source-insert-file
+            (expand-file-name default-directory)
+            "Insert file here: " nil nil "*Anything insert file*"))
+
+;;; Anything completion for copy, rename and (rel)sym/hard/link files from dired.
 (defvar anything-c-source-copy-files
   '((name . "Copy Files")
     (candidates . anything-find-files-get-candidates)
