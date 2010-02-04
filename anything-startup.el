@@ -1,6 +1,6 @@
 ;;; anything-startup.el --- anything.el startup file
 
-;;; $Id: anything-startup.el,v 1.9 2009-12-21 12:41:43 rubikitch Exp $
+;;; $Id: anything-startup.el,v 1.10 2010-02-04 19:57:31 rubikitch Exp $
 
 ;;;; Installation
 
@@ -27,6 +27,8 @@
 (require 'anything-complete nil t)
 ;; Automatically collect symbols by 150 secs
 (anything-lisp-complete-symbol-set-timer 150)
+(define-key emacs-lisp-mode-map "\C-\M-i" 'anything-lisp-complete-symbol-partial-match)
+(define-key lisp-interaction-mode-map "\C-\M-i" 'anything-lisp-complete-symbol-partial-match)
 ;; Comment if you do not want to replace completion commands with `anything'.
 (anything-read-string-mode 1)
 
