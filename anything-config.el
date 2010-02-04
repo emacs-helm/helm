@@ -3747,6 +3747,7 @@ See also `anything-create--actions'."
   "Preconfigured `anything' for top command."
   (interactive)
   (let ((anything-samewindow t)
+        (anything-enable-shortcuts)
         (anything-display-function 'anything-default-display-buffer)
         (anything-map (copy-keymap anything-map))
         (anything-candidate-number-limit 9999))
