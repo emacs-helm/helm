@@ -4238,7 +4238,7 @@ The code is ripped out of `eshell-complete-commands-list'."
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
   (let ((buffers (anything-c-file-buffers file)))
-    (delete-file file)
+    (dired-delete-file file 'dired-recursive-deletes)
     (when buffers
       (dolist (buf buffers)
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
@@ -4831,10 +4831,17 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 (defun anything-delete-marked-files (candidate)
   (anything-aif (anything-marked-candidates)
       (if (y-or-n-p (format "Delete *%s Files " (length it)))
-          (dolist (i it) (anything-c-delete-file i))
+          (progn
+            (dolist (i it)
+              (set-text-properties 0 (length i) nil i)
+              (anything-c-delete-file i))
+            (message "%s Files deleted" (length it)))
           (message "(No deletions performed)"))
+    (set-text-properties 0 (length candidate) nil candidate)
     (if (y-or-n-p (format "Really delete file `%s' " candidate))
-        (anything-c-delete-file candidate)
+        (progn
+          (anything-c-delete-file candidate)
+          (message "1 file deleted"))
         (message "(No deletions performed)"))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
