@@ -1240,7 +1240,8 @@ buffer that is not the current buffer."
                ("Find file other window" . find-file-other-window)
                ("Find file in Dired" . anything-c-point-file-in-dired)
                ("Find file in Elscreen"  . elscreen-find-file)
-               ("Find file as root" . anything-find-file-as-root)))))
+               ("Find file as root" . anything-find-file-as-root)
+               ("Delete File(s)" . anything-delete-marked-files)))))
 
 ;; (anything 'anything-c-source-find-files)
 
