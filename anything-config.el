@@ -4225,31 +4225,26 @@ The code is ripped out of `eshell-complete-commands-list'."
             completions))))
 
 (defun anything-c-file-buffers (filename)
-  "Returns a list of those buffer names which correspond to the
-file given by FILENAME."
-  (let (name ret)
-    (dolist (buf (buffer-list) ret)
+  "Returns a list of buffer names corresponding to FILENAME."
+  (let ((name     (expand-file-name filename))
+        (buf-list ()))
+    (dolist (buf (buffer-list) buf-list)
       (let ((bfn (buffer-file-name buf)))
-        (when (and bfn
-                   (string= filename bfn))
-          (push (buffer-name buf) ret)))
-      ret)))
+        (when (and bfn (string= name bfn))
+          (push (buffer-name buf) buf-list))))))
 
 (defun anything-c-delete-file (file)
-  "Delete the given file after querying the user.  Ask to kill
-buffers associated with that file, too."
-  (if (y-or-n-p (format "Really delete file %s? " file))
-      (progn
-        (let ((buffers (anything-c-file-buffers file)))
-          (delete-file file)
-          (dolist (buf buffers)
-            (when (y-or-n-p (format "Kill buffer %s, too? " buf))
-              (kill-buffer buf)))))
-    (message "Nothing deleted.")))
+  "Delete the given file after querying the user.
+Ask to kill buffers associated with that file, too."
+  (let ((buffers (anything-c-file-buffers file)))
+    (delete-file file)
+    (when buffers
+      (dolist (buf buffers)
+        (when (y-or-n-p (format "Kill buffer %s, too? " buf))
+          (kill-buffer buf))))))
 
 (defun anything-c-open-file-externally (file)
-  "Open FILE with an external tool.  Query the user which tool to
-use."
+  "Open FILE with an external tool. Query the user which tool to use."
   (start-process "anything-c-open-file-externally"
                  nil
                  (completing-read "Program: "
@@ -4833,8 +4828,13 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
     (kill-buffer i)))
 
 (defun anything-delete-marked-files (candidate)
-  (dolist (i (anything-marked-candidates))
-    (anything-c-delete-file i)))
+  (anything-aif (anything-marked-candidates)
+      (if (y-or-n-p (format "Delete *%s Files " (length it)))
+          (dolist (i it) (anything-c-delete-file i))
+          (message "(No deletions performed)"))
+    (if (y-or-n-p (format "Really delete file `%s' " candidate))
+        (anything-c-delete-file candidate)
+        (message "(No deletions performed)"))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
   "Ediff 2 marked buffers or 1 marked buffer and current-buffer.
@@ -4935,8 +4935,7 @@ Return nil if bmk is not a valid bookmark."
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))
      ("Open dired in file's directory" . anything-c-open-dired)
-     ("Delete file" . anything-c-delete-file)
-     ("Delete Marked files" . anything-delete-marked-files)
+     ("Delete file(s)" . anything-delete-marked-files)
      ("Open file externally" . anything-c-open-file-externally)
      ("Open file with default tool" . anything-c-open-file-with-default-tool))
     (action-transformer anything-c-transform-file-load-el
