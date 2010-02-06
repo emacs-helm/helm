@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.78 2010-02-04 19:27:07 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.79 2010-02-06 23:38:21 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -99,6 +99,8 @@
 ;; (require 'anything-complete)
 ;; ;; Automatically collect symbols by 150 secs
 ;; (anything-lisp-complete-symbol-set-timer 150)
+;; (define-key emacs-lisp-mode-map "\C-\M-i" 'anything-lisp-complete-symbol-partial-match)
+;; (define-key lisp-interaction-mode-map "\C-\M-i" 'anything-lisp-complete-symbol-partial-match)
 ;; ;; replace completion commands with `anything'
 ;; (anything-read-string-mode 1)
 ;; ;; Bind C-o to complete shell history
@@ -107,7 +109,11 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.78  2010-02-04 19:27:07  rubikitch
+;; Revision 1.79  2010-02-06 23:38:21  rubikitch
+;; * `alcs-update-restart': use `anything-update' instead
+;; * Minor fix in `anything-execute-extended-command-sources'
+;;
+;; Revision 1.78  2010/02/04 19:27:07  rubikitch
 ;; Added docstrings
 ;;
 ;; Revision 1.77  2010/01/29 09:20:33  rubikitch
@@ -363,7 +369,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.78 2010-02-04 19:27:07 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.79 2010-02-06 23:38:21 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -621,11 +627,13 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (define-key anything-map "\C-c\C-u" 'alcs-update-restart)
     (anything-noresume sources input nil nil nil "*anything complete*")))
 
+;; Test alcs-update-restart (with-current-buffer alcs-commands-buffer (erase-buffer))
+;; Test alcs-update-restart (kill-buffer alcs-commands-buffer)
 (defun alcs-update-restart ()
   "Update lisp symbols and restart current `anything' session."
   (interactive)
   (alcs-make-candidates)
-  (anything-run-after-quit 'call-interactively alcs-this-command))
+  (anything-update))
 
 (defun alcs-initial-input (partial-match)
   (anything-aif (symbol-at-point)
@@ -1013,7 +1021,7 @@ It accepts one argument, selected candidate.")
     ((name . "Commands")
      (header-name . alcs-header-name)
      (init . (lambda () (anything-candidate-buffer
-                         (get-buffer alcs-commands-buffer))))
+                         (get-buffer-create alcs-commands-buffer))))
      (candidates-in-buffer)
      (action . identity)
      (persistent-action . alcs-describe-function))))
