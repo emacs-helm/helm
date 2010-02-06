@@ -1,7 +1,7 @@
 ;;; anything-gtags.el --- GNU GLOBAL anything.el interface
-;; $Id: anything-gtags.el,v 1.26 2009-12-28 04:07:00 rubikitch Exp $
+;; $Id: anything-gtags.el,v 1.27 2010-02-06 12:33:13 rubikitch Exp $
 
-;; Copyright (C) 2008  rubikitch
+;; Copyright (C) 2008, 2009, 2010  rubikitch
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: global, languages
@@ -51,7 +51,11 @@
 ;;; History:
 
 ;; $Log: anything-gtags.el,v $
-;; Revision 1.26  2009-12-28 04:07:00  rubikitch
+;; Revision 1.27  2010-02-06 12:33:13  rubikitch
+;; Added more actions to `anything-c-source-gtags-select'.
+;; http://d.hatena.ne.jp/shinking/20100130/1264869641
+;;
+;; Revision 1.26  2009/12/28 04:07:00  rubikitch
 ;; remove warnings
 ;;
 ;; Revision 1.25  2009/12/28 03:59:17  rubikitch
@@ -159,7 +163,14 @@
     (action
      ("Goto the location" . (lambda (candidate)
                               (gtags-push-context)
-                              (gtags-goto-tag candidate ""))))))
+                              (gtags-goto-tag candidate "")))
+     ("Goto the location (other-window)" . (lambda (candidate)
+                                             (gtags-push-context)
+                                             (gtags-goto-tag candidate "" t)))
+     ("Move to the referenced point" . (lambda (candidate)
+                                         (gtags-push-context)
+                                         (gtags-goto-tag candidate "r"))))))
+
 ;; (setq anything-sources (list anything-c-source-gtags-select))
 
 (defun anything-gtags-select ()
