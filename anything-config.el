@@ -3378,8 +3378,7 @@ removed."
     (candidates . anything-c-bbdb-candidates)
     (action ("Send a mail" . (lambda (candidate)
                                (bbdb-send-mail (anything-c-bbdb-get-record candidate))))
-            ("View person's data" . (lambda (candidate)
-                                      (bbdb-redisplay-one-record (anything-c-bbdb-get-record candidate)))))
+            ("View person's data" . anything-c-bbdb-view-person-action))
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (setq anything-c-bbdb-name anything-pattern)
                                         (if (not candidates)
@@ -3389,6 +3388,16 @@ removed."
                             (anything-c-bbdb-create-contact actions candidate)))))
 ;; (anything 'anything-c-source-bbdb)
 
+(defun anything-c-bbdb-view-person-action (candidate)
+  "View BBDB data of single CANDIDATE or marked candidates."
+  (let* ((cand-list (anything-marked-candidates))
+         (len (length cand-list)))
+    (if (> len 1)
+        (let ((bbdb-append-records len))
+          (dolist (i cand-list)
+            (bbdb-redisplay-one-record (anything-c-bbdb-get-record i))))
+        (bbdb-redisplay-one-record (anything-c-bbdb-get-record candidate)))))
+  
 ;;; Evaluation Result
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
