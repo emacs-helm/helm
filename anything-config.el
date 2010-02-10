@@ -7,10 +7,10 @@
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             rubikitch    <rubikitch@ruby-lang.org>
 ;;             Thierry Volpiatto <thierry.volpiatto@gmail.com>
-;; Copyright (C) 2007 ~ 2009, Tassilo Horn, all rights reserved.
+;; Copyright (C) 2007 ~ 2010, Tassilo Horn, all rights reserved.
 ;; Copyright (C) 2009, Andy Stewart, all rights reserved.
-;; Copyright (C) 2009, rubikitch, all rights reserved.
-;; Copyright (C) 2009, Thierry Volpiatto, all rights reserved.
+;; Copyright (C) 2009 ~ 2010, rubikitch, all rights reserved.
+;; Copyright (C) 2009 ~ 2010, Thierry Volpiatto, all rights reserved.
 ;; Created: 2009-02-16 21:38:23
 ;; Version: 0.4.1
 ;; URL: http://www.emacswiki.org/emacs/download/anything-config.el
