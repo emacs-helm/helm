@@ -558,6 +558,22 @@ If you want to have the default tramp messages set it to 3."
   :type 'integer
   :group 'anything-config)
 
+;;; Documentation
+(defun anything-c-describe-anything-bindings ()
+  "Describe `anything' bindings."
+  (interactive)
+  (anything-run-after-quit
+   #'(lambda ()
+       (with-current-buffer (get-buffer-create "*Anything Help*")
+         (insert
+          (substitute-command-keys
+           "The keys that are defined for `anything' are:
+       \\{anything-map}")))
+       (pop-to-buffer "*Anything Help*")
+       (goto-char (point-min)))))
+
+(define-key anything-map (kbd "C-h m") 'anything-c-describe-anything-bindings)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
