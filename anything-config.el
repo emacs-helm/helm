@@ -565,6 +565,7 @@ If you want to have the default tramp messages set it to 3."
   (anything-run-after-quit
    #'(lambda ()
        (with-current-buffer (get-buffer-create "*Anything Help*")
+         (erase-buffer)
          (insert
           (substitute-command-keys
            "The keys that are defined for `anything' are:
