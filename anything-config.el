@@ -412,6 +412,7 @@
 ;;; Require
 (require 'anything)
 (require 'thingatpt)
+(require 'ffap)
 
 ;;; Code:
 
@@ -1267,7 +1268,6 @@ buffer that is not the current buffer."
 (defvar anything-c-source-find-files
   '((name . "Find Files (`C-z':expand directory, `C-.':Go to precedent level)")
     (init . (lambda ()
-              (require 'ffap)
               (setq ffap-newfile-prompt t)))
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
