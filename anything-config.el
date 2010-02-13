@@ -1311,14 +1311,15 @@ If EXPAND is non--nil expand-file-name."
 
 (defun anything-find-files-or-dired-p ()
   "Test if current source is a dired or find-files source."
-  (let ((doc " (`C-z':expand directory, `C-.':Go to precedent level)"))
-    (or (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Find Files" doc))
-        (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Copy Files" doc))
-        (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Rename Files" doc))
-        (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Symlink Files" doc))
-        (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Hardlink Files" doc))
-        (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Write File" doc))
-        (equal (cdr (assoc 'name (anything-get-current-source))) (concat "Insert File" doc)))))
+  (let ((doc        " (`C-z':expand directory, `C-.':Go to precedent level)")
+        (ff-sources '("Find Files" "Copy Files"
+                      "Rename Files" "Symlink Files"
+                      "Hardlink Files" "Write File" "Insert File"))
+        (cur-source (cdr (assoc 'name (anything-get-current-source)))))
+    (catch 'break
+      (dolist (i ff-sources)
+        (when (equal cur-source (concat i doc))
+          (throw 'break t))))))
 
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
