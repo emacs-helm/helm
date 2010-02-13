@@ -1395,8 +1395,12 @@ If CANDIDATE is not a directory open this file."
              (delete-minibuffer-contents)
              (set-text-properties 0 (length elm) nil elm)
              (insert elm))))
-    (cond ((file-directory-p candidate)
+    (cond ((and (file-directory-p candidate) (file-symlink-p candidate))
            (insert-in-minibuffer (file-name-as-directory
+                                  (file-truename
+                                   (expand-file-name candidate)))))
+           ((file-directory-p candidate)
+            (insert-in-minibuffer (file-name-as-directory
                                   (expand-file-name candidate))))
           ((file-symlink-p candidate)
            (insert-in-minibuffer (file-truename candidate)))
