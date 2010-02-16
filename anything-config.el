@@ -3401,8 +3401,7 @@ removed."
 (defvar anything-c-source-bbdb
   '((name . "BBDB")
     (candidates . anything-c-bbdb-candidates)
-    (action ("Send a mail" . (lambda (candidate)
-                               (bbdb-send-mail (anything-c-bbdb-get-record candidate))))
+    (action ("Send a mail" . anything-c-bbdb-compose-mail)
             ("View person's data" . anything-c-bbdb-view-person-action))
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (setq anything-c-bbdb-name anything-pattern)
@@ -3420,6 +3419,20 @@ removed."
         (dolist (i it)
           (bbdb-redisplay-one-record (anything-c-bbdb-get-record i))))
     (bbdb-redisplay-one-record (anything-c-bbdb-get-record candidate))))
+
+(defun anything-c-bbdb-collect-mail-addresses ()
+  "Return a list of all mail addresses of records in bbdb buffer."
+  (with-current-buffer bbdb-buffer-name
+    (loop for i in bbdb-records
+       if (bbdb-record-net (car i))
+       collect (bbdb-dwim-net-address (car i)))))
+
+(defun anything-c-bbdb-compose-mail (candidate)
+  "Compose a mail with all records of bbdb buffer."
+  (anything-c-bbdb-view-person-action candidate)
+  (let* ((address-list (anything-c-bbdb-collect-mail-addresses))
+         (address-str  (mapconcat 'identity address-list ",\n    ")))
+    (compose-mail address-str)))
 
 ;;; Evaluation Result
 (defvar anything-c-source-evaluation-result
