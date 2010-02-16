@@ -3415,14 +3415,12 @@ removed."
 
 (defun anything-c-bbdb-view-person-action (candidate)
   "View BBDB data of single CANDIDATE or marked candidates."
-  (let* ((cand-list (anything-marked-candidates))
-         (len (length cand-list)))
-    (if (> len 1)
-        (let ((bbdb-append-records len))
-          (dolist (i cand-list)
-            (bbdb-redisplay-one-record (anything-c-bbdb-get-record i))))
-        (bbdb-redisplay-one-record (anything-c-bbdb-get-record candidate)))))
-  
+  (anything-aif (anything-marked-candidates)
+      (let ((bbdb-append-records (length it)))
+        (dolist (i it)
+          (bbdb-redisplay-one-record (anything-c-bbdb-get-record i))))
+    (bbdb-redisplay-one-record (anything-c-bbdb-get-record candidate))))
+
 ;;; Evaluation Result
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
