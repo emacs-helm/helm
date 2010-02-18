@@ -1361,29 +1361,29 @@ If prefix numeric arg is given go ARG level down."
         (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
         ;; Don't try to tramp connect before entering the second ":".
         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
-    ;; Inlined version of `tramp-handle-directory-files'
+    ;; Inlined version (<2010-02-18 Jeu.>.) of `tramp-handle-directory-files'
     ;; to fix bug in tramp that doesn't show the dot file names(i.e "." "..")
-    ;; when using `directory-files' on tramp names.
+    ;; and sorting.
     (flet ((tramp-handle-directory-files
                (directory &optional full match nosort files-only)
              "Like `directory-files' for Tramp files."
              ;; FILES-ONLY is valid for XEmacs only.
              (when (file-directory-p directory)
-               (setq directory (expand-file-name directory))
+               (setq directory (file-name-as-directory (expand-file-name directory)))
                (let ((temp (nreverse (file-name-all-completions "" directory)))
-                     result item dot)
+                     result item)
+
                  (while temp
                    (setq item (directory-file-name (pop temp)))
                    (when (and (or (null match) (string-match match item))
                               (or (null files-only)
-                                  ;; files only
+                                  ;; Files only.
                                   (and (equal files-only t) (file-regular-p item))
-                                  ;; directories only
+                                  ;; Directories only.
                                   (file-directory-p item)))
-                     (if (and full (or (string= "." item) (string= ".." item)))
-                         (push (concat (file-name-as-directory directory) item) dot)
-                         (push (if full (expand-file-name item directory)  item) result))))
-                 (append (sort dot 'string-lessp) result)))))
+                     (push (if full (concat directory item) item)
+                           result)))
+                 (if nosort result (sort result 'string<))))))
 
       (set-text-properties 0 (length path) nil path)
       (setq anything-pattern path)
