@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.241 2010-01-29 18:53:17 rubikitch Exp $
+;; $Id: anything.el,v 1.242 2010-02-19 17:37:12 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.241  2010-01-29 18:53:17  rubikitch
+;; Revision 1.242  2010-02-19 17:37:12  rubikitch
+;; error check in `anything-set-source-filter'
+;;
+;; Revision 1.241  2010/01/29 18:53:17  rubikitch
 ;; Fix a bug of `candidate-number-limit' in process sources.
 ;;
 ;; Revision 1.240  2010/01/23 04:21:31  rubikitch
@@ -1108,7 +1111,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.241 2010-01-29 18:53:17 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.242 2010-02-19 17:37:12 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1941,6 +1944,9 @@ It is useful to write your sources."
 ;;  
 (defun anything-set-source-filter (sources)
   "Sets the value of `anything-source-filter' and updates the list of results."
+  (unless (and (listp sources)
+               (loop for name in sources always (stringp name)))
+    (error "invalid data in `anything-set-source-filter': %S" sources))
   (setq anything-source-filter sources)
   (anything-update))
 
