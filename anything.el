@@ -1,8 +1,8 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.245 2010-02-20 10:36:01 rubikitch Exp $
+;; $Id: anything.el,v 1.246 2010-02-20 10:38:58 rubikitch Exp $
 
-;; Copyright (C) 2007        Tamas Patrovics
-;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
+;; Copyright (C) 2007              Tamas Patrovics
+;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
 
 ;; Author: Tamas Patrovics
 ;; Maintainer: rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.245  2010-02-20 10:36:01  rubikitch
+;; Revision 1.246  2010-02-20 10:38:58  rubikitch
+;; update copyright
+;;
+;; Revision 1.245  2010/02/20 10:36:01  rubikitch
 ;; New API: `anything-require-at-least-version'
 ;;
 ;; Revision 1.244  2010/02/20 10:06:54  rubikitch
@@ -1121,7 +1124,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.245 2010-02-20 10:36:01 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.246 2010-02-20 10:38:58 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
