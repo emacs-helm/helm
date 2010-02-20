@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.80 2010-02-20 10:16:30 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.81 2010-02-20 10:38:31 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.80  2010-02-20 10:16:30  rubikitch
+;; Revision 1.81  2010-02-20 10:38:31  rubikitch
+;; More strict version check.
+;;
+;; Revision 1.80  2010/02/20 10:16:30  rubikitch
 ;; * `ac-new-input-source': remove unnecessary attributes
 ;; * version check
 ;;
@@ -373,16 +376,21 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.80 2010-02-20 10:16:30 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.81 2010-02-20 10:38:31 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
-(when (string< anything-version "$Id: anything.el,v 1.244")
-  (error "Please update anything.el!!
+;; version check
+(let ((version "1.244"))
+  (when (and (string= "1." (substring version 0 2))
+             (string-match "1\.\\([0-9]+\\)" anything-version)
+             (< (string-to-number (match-string 1 anything-version))
+                (string-to-number (substring version 2))))
+    (error "Please update anything.el!!
 
 http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
-or  M-x install-elisp-from-emacswiki anything.el"))
+or  M-x install-elisp-from-emacswiki anything.el")))
 
 ;; (@* "overlay")
 (when (require 'anything-show-completion nil t)
