@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.243 2010-02-20 09:54:16 rubikitch Exp $
+;; $Id: anything.el,v 1.244 2010-02-20 10:06:54 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.243  2010-02-20 09:54:16  rubikitch
+;; Revision 1.244  2010-02-20 10:06:54  rubikitch
+;; * New plug-in: `disable-shortcuts'
+;; * `dummy' plug-in implies `disable-shortcuts' because it enables us to input capital letters.
+;;
+;; Revision 1.243  2010/02/20 09:54:16  rubikitch
 ;; `anything-compile-source--dummy': swap arguments of `append'
 ;;
 ;; Revision 1.242  2010/02/19 17:37:12  rubikitch
@@ -1114,7 +1118,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.243 2010-02-20 09:54:16 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.244 2010-02-20 10:06:54 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1489,12 +1493,19 @@ Attributes:
 
   Pass empty string \"\" to action function.
 
+- disable-shortcuts (optional)
+
+  Disable `anything-enable-shortcuts' in current `anything' session.
+
+  This attribute is implemented by plug-in.
+  
 - dummy (optional)
 
   Set `anything-pattern' to candidate. If this attribute is
   specified, The candidates attribute is ignored.
 
   This attribute is implemented by plug-in.
+  This plug-in implies disable-shortcuts plug-in.
 
 - multiline (optional)
 
@@ -1963,7 +1974,10 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
   (unless no-update (anything-update)))
 
 (defvar anything-compile-source-functions
-  '(anything-compile-source--type anything-compile-source--dummy anything-compile-source--candidates-in-buffer)
+  '(anything-compile-source--type
+    anything-compile-source--dummy
+    anything-compile-source--disable-shortcuts
+    anything-compile-source--candidates-in-buffer)
   "Functions to compile elements of `anything-sources' (plug-in).")
 
 (defun anything-get-sources ()
@@ -3207,7 +3221,18 @@ UNIT and DIRECTION."
                 (accept-empty)
                 (match identity)
                 (filtered-candidate-transformer . anything-dummy-candidate)
+                (disable-shortcuts)
                 (volatile)))
+    source))
+
+;; (@* "Built-in plug-in: disable-shortcuts")
+(defvar anything-orig-enable-shortcuts nil)
+(defun anything-compile-source--disable-shortcuts (source)
+  (if (assoc 'disable-shortcuts source)
+      (append source
+              '((init . (lambda () (setq anything-orig-enable-shortcuts anything-enable-shortcuts
+                                         anything-enable-shortcuts nil)))
+                (cleanup . (lambda () (setq anything-enable-shortcuts anything-orig-enable-shortcuts)))))
     source))
 
 ;; (@* "Built-in plug-in: candidates-in-buffer")
