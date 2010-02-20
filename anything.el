@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.242 2010-02-19 17:37:12 rubikitch Exp $
+;; $Id: anything.el,v 1.243 2010-02-20 09:54:16 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.242  2010-02-19 17:37:12  rubikitch
+;; Revision 1.243  2010-02-20 09:54:16  rubikitch
+;; `anything-compile-source--dummy': swap arguments of `append'
+;;
+;; Revision 1.242  2010/02/19 17:37:12  rubikitch
 ;; error check in `anything-set-source-filter'
 ;;
 ;; Revision 1.241  2010/01/29 18:53:17  rubikitch
@@ -1111,7 +1114,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.242 2010-02-19 17:37:12 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.243 2010-02-20 09:54:16 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3199,12 +3202,12 @@ UNIT and DIRECTION."
 
 (defun anything-compile-source--dummy (source)
   (if (assoc 'dummy source)
-      (append '((candidates "dummy")
+      (append source
+              '((candidates "dummy")
                 (accept-empty)
                 (match identity)
                 (filtered-candidate-transformer . anything-dummy-candidate)
-                (volatile))
-              source)
+                (volatile)))
     source))
 
 ;; (@* "Built-in plug-in: candidates-in-buffer")
