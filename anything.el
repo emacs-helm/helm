@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.247 2010-02-20 10:41:39 rubikitch Exp $
+;; $Id: anything.el,v 1.248 2010-02-20 12:34:38 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.247  2010-02-20 10:41:39  rubikitch
+;; Revision 1.248  2010-02-20 12:34:38  rubikitch
+;; Mode-line help!! `anything-mode-line-string' is help string.
+;;
+;; Revision 1.247  2010/02/20 10:41:39  rubikitch
 ;; Automatically update `anything-version' when upgrading
 ;;
 ;; Revision 1.246  2010/02/20 10:38:58  rubikitch
@@ -1129,7 +1132,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.247 2010-02-20 10:41:39 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.248 2010-02-20 12:34:38 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1855,6 +1858,10 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
 
 (defvar anything-delayed-init-executed nil)
 
+(defvar anything-mode-line-string "(C-c?:help TAB:act C-m/C-e/C-j:nthact C-o:nextsrc C-z:pers-act C-SPC:mark M-[/M-]:movemark C-t:splt C-cC-f:follow)"
+  "Help string displayed in mode-line in `anything'.
+If nil, use default `mode-line-format'.")
+
 (put 'anything 'timid-completion 'disabled)
 
 ;; (@* "Internal Variables")
@@ -2387,6 +2394,11 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (erase-buffer)
     (set (make-local-variable  'inhibit-read-only) t)
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
+    (if anything-mode-line-string
+        (setq mode-line-format
+              '(" " mode-line-buffer-identification " "
+                (line-number-mode "%l") " " anything-mode-line-string "-%-"))
+      (kill-local-variable 'mode-line-format))
     (setq cursor-type nil)
     (setq mode-name "Anything"))
   (anything-initialize-overlays anything-buffer)
