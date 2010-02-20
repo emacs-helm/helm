@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.246 2010-02-20 10:38:58 rubikitch Exp $
+;; $Id: anything.el,v 1.247 2010-02-20 10:41:39 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.246  2010-02-20 10:38:58  rubikitch
+;; Revision 1.247  2010-02-20 10:41:39  rubikitch
+;; Automatically update `anything-version' when upgrading
+;;
+;; Revision 1.246  2010/02/20 10:38:58  rubikitch
 ;; update copyright
 ;;
 ;; Revision 1.245  2010/02/20 10:36:01  rubikitch
@@ -1124,7 +1127,9 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.246 2010-02-20 10:38:58 rubikitch Exp $")
+;; ugly hack to auto-update version
+(defvar anything-version nil)
+(setq anything-version "$Id: anything.el,v 1.247 2010-02-20 10:41:39 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
