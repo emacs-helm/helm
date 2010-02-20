@@ -188,6 +188,8 @@
 ;;
 ;; Below are complete command list:
 ;;
+;;  `anything-c-describe-anything-bindings'
+;;    Describe `anything' bindings.
 ;;  `anything-for-files'
 ;;    Preconfigured `anything' for opening files.
 ;;  `anything-info-at-point'
@@ -415,6 +417,18 @@
 (require 'ffap)
 
 ;;; Code:
+
+;; version check
+(let ((version "1.244"))
+  (when (and (string= "1." (substring version 0 2))
+             (string-match "1\.\\([0-9]+\\)" anything-version)
+             (< (string-to-number (match-string 1 anything-version))
+                (string-to-number (substring version 2))))
+    (error "Please update anything.el!!
+
+http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+
+or  M-x install-elisp-from-emacswiki anything.el")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Customize ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgroup anything-config nil
@@ -3462,9 +3476,7 @@ removed."
 ;;; Evaluation Result
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
-    (requires-pattern)
-    (match identity)
-    (candidates  "dummy")
+    (dummy)
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
@@ -3477,9 +3489,7 @@ removed."
 ;;; Calculation Result
 (defvar anything-c-source-calculation-result
   '((name . "Calculation Result")
-    (requires-pattern)
-    (match identity)
-    (candidates  "dummy")
+    (dummy)
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
