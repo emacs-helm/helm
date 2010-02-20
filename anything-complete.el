@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.79 2010-02-06 23:38:21 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.80 2010-02-20 10:16:30 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,11 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.79  2010-02-06 23:38:21  rubikitch
+;; Revision 1.80  2010-02-20 10:16:30  rubikitch
+;; * `ac-new-input-source': remove unnecessary attributes
+;; * version check
+;;
+;; Revision 1.79  2010/02/06 23:38:21  rubikitch
 ;; * `alcs-update-restart': use `anything-update' instead
 ;; * Minor fix in `anything-execute-extended-command-sources'
 ;;
@@ -369,9 +373,16 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.79 2010-02-06 23:38:21 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.80 2010-02-20 10:16:30 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
+
+(when (string< anything-version "$Id: anything.el,v 1.244")
+  (error "Please update anything.el!!
+
+http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+
+or  M-x install-elisp-from-emacswiki anything.el"))
 
 ;; (@* "overlay")
 (when (require 'anything-show-completion nil t)
@@ -673,9 +684,6 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun ac-new-input-source (prompt require-match &optional additional-attrs)
   (unless require-match
     `((name . ,prompt)
-      (init . (lambda () (setq anything-orig-enable-shortcuts anything-enable-shortcuts
-                               anything-enable-shortcuts nil)))
-      (cleanup . (lambda () (setq anything-enable-shortcuts anything-orig-enable-shortcuts)))
       (dummy)
       ,@additional-attrs)))
 (defun* ac-default-source (default &optional accept-empty (additional-attrs '((action . identity))))
