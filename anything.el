@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.244 2010-02-20 10:06:54 rubikitch Exp $
+;; $Id: anything.el,v 1.245 2010-02-20 10:36:01 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.244  2010-02-20 10:06:54  rubikitch
+;; Revision 1.245  2010-02-20 10:36:01  rubikitch
+;; New API: `anything-require-at-least-version'
+;;
+;; Revision 1.244  2010/02/20 10:06:54  rubikitch
 ;; * New plug-in: `disable-shortcuts'
 ;; * `dummy' plug-in implies `disable-shortcuts' because it enables us to input capital letters.
 ;;
@@ -1118,7 +1121,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.244 2010-02-20 10:06:54 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.245 2010-02-20 10:36:01 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2097,6 +2100,19 @@ LONG-DOC is displayed below attribute name and short documentation."
   (put attribute 'anything-attrdoc
        (concat "- " (symbol-name attribute) " " short-doc "\n\n" long-doc "\n")))
 (put 'anything-document-attribute 'lisp-indent-function 2)
+
+(defun anything-require-at-least-version (version)
+  "Output error message unless anything.el is older than VERSION.
+This is suitable for anything applications."
+  (when (and (string= "1." (substring version 0 2))
+             (string-match "1\.\\([0-9]+\\)" anything-version)
+             (< (string-to-number (match-string 1 anything-version))
+                (string-to-number (substring version 2))))
+    (error "Please update anything.el!!
+
+http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+
+or  M-x install-elisp-from-emacswiki anything.el")))
 
 ;; (@* "Core: tools")
 (defun anything-current-frame/window-configuration ()
@@ -5621,6 +5637,19 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (expect '("foo" "bar" "baz")
         (let ((lst '("bar" "foo" "baz")))
           (anything-recent-push "foo" 'lst)))
+      (desc "anything-require-at-least-version")
+      (expect nil
+        (anything-require-at-least-version "1.1"))
+      (expect nil
+        (anything-require-at-least-version "1.200"))
+      (expect nil
+        (anything-require-at-least-version
+         (and (string-match "1\.\\([0-9]+\\)" anything-version)
+              (match-string 0 anything-version))))
+      (expect (error)
+        (anything-require-at-least-version "1.999"))
+      (expect (error)
+        (anything-require-at-least-version "1.2000"))
       )))
 
 
