@@ -1,5 +1,5 @@
 ;;;; anything-menu.el --- menu command using anything interface
-;; $Id: anything-menu.el,v 1.2 2010-02-23 10:10:34 rubikitch Exp $
+;; $Id: anything-menu.el,v 1.3 2010-02-23 10:23:52 rubikitch Exp $
 
 ;; Copyright (C) 2010  rubikitch
 
@@ -60,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-menu.el,v $
-;; Revision 1.2  2010-02-23 10:10:34  rubikitch
+;; Revision 1.3  2010-02-23 10:23:52  rubikitch
+;; New function `anything-menu-select-from-file'
+;;
+;; Revision 1.2  2010/02/23 10:10:34  rubikitch
 ;; implemented
 ;;
 ;; Revision 1.1  2010/02/23 09:44:09  rubikitch
@@ -69,7 +72,7 @@
 
 ;;; Code:
 
-(defvar anything-menu-version "$Id: anything-menu.el,v 1.2 2010-02-23 10:10:34 rubikitch Exp $")
+(defvar anything-menu-version "$Id: anything-menu.el,v 1.3 2010-02-23 10:23:52 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-menu nil
   "anything-menu"
@@ -107,6 +110,16 @@
                     (candidates . am-selections)
                     (action . am/write-result)))
                  nil (concat am-prompt ": ") nil nil "*anything menu select*"))
+
+(defun* anything-menu-select-from-file (am-filename &optional (am-prompt "selection"))
+  (anything-menu `(((name . ,am-prompt)
+                    (init . (lambda ()
+                              (with-current-buffer (anything-candidate-buffer 'global)
+                                (insert-file-contents am-filename))))
+                    (candidates-in-buffer)
+                    (action . am/write-result)))
+                 nil (concat am-prompt ": ") nil nil "*anything menu select*"))
+
 (provide 'anything-menu)
 
 ;; (save-window-excursion (bg2 "gnudoit '(anything-menu-select \"selections\" \"a\" \"b\")'"))
