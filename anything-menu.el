@@ -1,5 +1,5 @@
 ;;;; anything-menu.el --- menu command using anything interface
-;; $Id: anything-menu.el,v 1.4 2010-02-23 16:48:41 rubikitch Exp $
+;; $Id: anything-menu.el,v 1.5 2010-02-23 20:39:41 rubikitch Exp $
 
 ;; Copyright (C) 2010  rubikitch
 
@@ -60,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-menu.el,v $
-;; Revision 1.4  2010-02-23 16:48:41  rubikitch
+;; Revision 1.5  2010-02-23 20:39:41  rubikitch
+;; add `make-frame-visible'
+;;
+;; Revision 1.4  2010/02/23 16:48:41  rubikitch
 ;; migemized
 ;;
 ;; Revision 1.3  2010/02/23 10:23:52  rubikitch
@@ -75,7 +78,7 @@
 
 ;;; Code:
 
-(defvar anything-menu-version "$Id: anything-menu.el,v 1.4 2010-02-23 16:48:41 rubikitch Exp $")
+(defvar anything-menu-version "$Id: anything-menu.el,v 1.5 2010-02-23 20:39:41 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-menu nil
   "anything-menu"
@@ -88,6 +91,7 @@
     (setq am/frame (make-frame '((name . "anything menu")
                                  (title . "anything menu")))))
   (select-frame am/frame)
+  (make-frame-visible am/frame)
   (sit-for 0))
 
 (defun am/close-frame ()
