@@ -1297,6 +1297,7 @@ buffer that is not the current buffer."
                            ("Find file in Dired" . anything-c-point-file-in-dired)
                            ,(when (require 'elscreen nil t)
                                   '("Find file in Elscreen"  . elscreen-find-file))
+                           ("Complete at point" . anything-c-insert-file-name-completion-at-point)
                            ("Find file as root" . anything-find-file-as-root)
                            ("Delete File(s)" . anything-delete-marked-files))))))
 
@@ -1451,6 +1452,18 @@ If CANDIDATE is not a directory open this file."
            (let ((new-pattern (anything-get-selection anything-last-buffer)))
              (set-text-properties 0 (length new-pattern) nil new-pattern)
              (insert-in-minibuffer new-pattern))))))
+
+
+(defun anything-c-insert-file-name-completion-at-point (candidate)
+  "Insert file name completion at point."
+  (let ((end   (point))
+        (guess (thing-at-point 'filename)))
+    (condition-case nil
+        (when (file-exists-p (file-name-directory guess))
+          (search-backward guess (- (point) (length guess)))
+          (delete-region (point) end)
+          (insert (abbreviate-file-name candidate)))
+      (error nil))))
 
 
 (defun anything-find-files ()
