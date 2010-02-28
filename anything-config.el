@@ -4145,9 +4145,9 @@ See also `anything-create--actions'."
                                         (anything-c-gentoo-default-action elm "equery" "-C" "d")))
                ("Show related files" . (lambda (elm)
                                          (anything-c-gentoo-default-action elm "equery" "files")))
-               ("Update" . (lambda (elm)
-                             (anything-c-gentoo-setup-cache)
-                             (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
+               ("Refresh" . (lambda (elm)
+                              (anything-c-gentoo-setup-cache)
+                              (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
 
 ;; (anything 'anything-c-source-gentoo)
 
@@ -4183,15 +4183,7 @@ See also `anything-create--actions'."
     (candidates-in-buffer)
     (match . identity)
     (candidate-transformer anything-c-highlight-local-use)
-    (action . (("Show which dep use this flag"
-                . (lambda (elm)
-                    (switch-to-buffer anything-c-gentoo-buffer)
-                    (erase-buffer)
-                    (apply #'call-process "equery" nil t nil
-                           `("-C"
-                             "h"
-                             ,elm))))
-               ("Description"
+    (action . (("Description"
                 . (lambda (elm)
                     (switch-to-buffer anything-c-gentoo-buffer)
                     (erase-buffer)
@@ -4199,7 +4191,24 @@ See also `anything-create--actions'."
                            `("-i"
                              ,elm))
                     (font-lock-add-keywords nil `((,elm . font-lock-variable-name-face)))
-                    (font-lock-mode 1)))))))
+                    (font-lock-mode 1)))
+               ("Enable"
+                . (lambda (elm)
+                    (anything-c-gentoo-eshell-action elm "*sudo euse -E")))
+               ("Disable"
+                . (lambda (elm)
+                    (anything-c-gentoo-eshell-action elm "*sudo euse -D")))
+               ("Remove"
+                . (lambda (elm)
+                    (anything-c-gentoo-eshell-action elm "*sudo euse -P")))
+               ("Show which dep use this flag"
+                . (lambda (elm)
+                    (switch-to-buffer anything-c-gentoo-buffer)
+                    (erase-buffer)
+                    (apply #'call-process "equery" nil t nil
+                           `("-C"
+                             "h"
+                             ,elm))))))))
 
 
 ;; (anything 'anything-c-source-use-flags)
