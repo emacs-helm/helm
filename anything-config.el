@@ -1293,13 +1293,14 @@ buffer that is not the current buffer."
     (persistent-action . anything-find-files-persistent-action)
     (volatile)
     (action . ,(delq nil `(("Find File" . find-file-at-point)
-                           ("Find file other window" . find-file-other-window)
                            ("Find file in Dired" . anything-c-point-file-in-dired)
                            ,(when (require 'elscreen nil t)
                                   '("Find file in Elscreen"  . elscreen-find-file))
                            ("Complete at point" . anything-c-insert-file-name-completion-at-point)
+                           ("Delete File(s)" . anything-delete-marked-files)
                            ("Find file as root" . anything-find-file-as-root)
-                           ("Delete File(s)" . anything-delete-marked-files))))))
+                           ("Find file other window" . find-file-other-window)
+                           ("Find file other frame" . find-file-other-frame))))))
 
 ;; (anything 'anything-c-source-find-files)
 
