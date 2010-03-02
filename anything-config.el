@@ -4699,60 +4699,71 @@ when a candidate is selected with RET."
 when the user goes to the action list with TAB."
   (anything-c-adaptive-store-selection))
 
+(defun anything-c-source-use-adaptative-p ()
+  "Return current source only if it use adaptative history, nil otherwise."
+  (let ((source (anything-get-current-source)))
+    (when (or (assoc-default 'filtered-candidate-transformer
+                             (assoc (assoc-default 'type source)
+                                    anything-type-attributes))
+              (assoc-default 'filtered-candidate-transformer
+                             source))
+      source)))
+
 (defun anything-c-adaptive-store-selection ()
   "Store history information for the selected candidate."
   (unless anything-c-adaptive-done
     (setq anything-c-adaptive-done t)
-    (let* ((source (anything-get-current-source))
-           (source-name (or (assoc-default 'type source)
-                            (assoc-default 'name source)))
-           (source-info (or (assoc source-name anything-c-adaptive-history)
-                            (progn
-                              (push (list source-name) anything-c-adaptive-history)
-                              (car anything-c-adaptive-history))))
-           (selection (anything-get-selection))
-           (selection-info (progn
-                             (setcdr source-info
-                                     (cons
-                                      (let ((found (assoc selection (cdr source-info))))
-                                        (if (not found)
-                                            ;; new entry
-                                            (list selection)
+    (let ((source (anything-c-source-use-adaptative-p)))
+      (when source
+        (let* ((source-name (or (assoc-default 'type source)
+                                (assoc-default 'name source)))
+               (source-info (or (assoc source-name anything-c-adaptive-history)
+                                (progn
+                                  (push (list source-name) anything-c-adaptive-history)
+                                  (car anything-c-adaptive-history))))
+               (selection (anything-get-selection))
+               (selection-info (progn
+                                 (setcdr source-info
+                                         (cons
+                                          (let ((found (assoc selection (cdr source-info))))
+                                            (if (not found)
+                                                ;; new entry
+                                                (list selection)
 
-                                          ;; move entry to the beginning of the
-                                          ;; list, so that it doesn't get
-                                          ;; trimmed when the history is
-                                          ;; truncated
-                                          (setcdr source-info
-                                                  (delete found (cdr source-info)))
-                                          found))
-                                      (cdr source-info)))
-                             (cadr source-info)))
-           (pattern-info (progn
-                           (setcdr selection-info
-                                   (cons
-                                    (let ((found (assoc anything-pattern (cdr selection-info))))
-                                      (if (not found)
-                                          ;; new entry
-                                          (cons anything-pattern 0)
+                                                ;; move entry to the beginning of the
+                                                ;; list, so that it doesn't get
+                                                ;; trimmed when the history is
+                                                ;; truncated
+                                                (setcdr source-info
+                                                        (delete found (cdr source-info)))
+                                                found))
+                                          (cdr source-info)))
+                                 (cadr source-info)))
+               (pattern-info (progn
+                               (setcdr selection-info
+                                       (cons
+                                        (let ((found (assoc anything-pattern (cdr selection-info))))
+                                          (if (not found)
+                                              ;; new entry
+                                              (cons anything-pattern 0)
 
-                                        ;; move entry to the beginning of the
-                                        ;; list, so if two patterns used the
-                                        ;; same number of times then the one
-                                        ;; used last appears first in the list
-                                        (setcdr selection-info
-                                                (delete found (cdr selection-info)))
-                                        found))
-                                    (cdr selection-info)))
-                           (cadr selection-info))))
+                                              ;; move entry to the beginning of the
+                                              ;; list, so if two patterns used the
+                                              ;; same number of times then the one
+                                              ;; used last appears first in the list
+                                              (setcdr selection-info
+                                                      (delete found (cdr selection-info)))
+                                              found))
+                                        (cdr selection-info)))
+                               (cadr selection-info))))
 
-      ;; increase usage count
-      (setcdr pattern-info (1+ (cdr pattern-info)))
+          ;; increase usage count
+          (setcdr pattern-info (1+ (cdr pattern-info)))
 
-      ;; truncate history if needed
-      (if (> (length (cdr selection-info)) anything-c-adaptive-history-length)
-          (setcdr selection-info
-                  (subseq (cdr selection-info) 0 anything-c-adaptive-history-length))))))
+          ;; truncate history if needed
+          (if (> (length (cdr selection-info)) anything-c-adaptive-history-length)
+              (setcdr selection-info
+                      (subseq (cdr selection-info) 0 anything-c-adaptive-history-length))))))))
 
 (if (file-readable-p anything-c-adaptive-history-file)
     (load-file anything-c-adaptive-history-file))
