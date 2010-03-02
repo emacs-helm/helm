@@ -4699,14 +4699,14 @@ when a candidate is selected with RET."
 when the user goes to the action list with TAB."
   (anything-c-adaptive-store-selection))
 
-(defun anything-c-source-use-adaptative-p ()
+(defun anything-c-source-use-adaptative-p (&optional source-name)
   "Return current source only if it use adaptative history, nil otherwise."
-  (let ((source (anything-get-current-source)))
-    (when (or (assoc-default 'filtered-candidate-transformer
-                             (assoc (assoc-default 'type source)
-                                    anything-type-attributes))
-              (assoc-default 'filtered-candidate-transformer
-                             source))
+  (let* ((source (or source-name (anything-get-current-source)))
+         (adapt-source (or (assoc-default 'filtered-candidate-transformer
+                                          (assoc (assoc-default 'type source)
+                                                 anything-type-attributes))
+                           (assoc-default 'filtered-candidate-transformer source))))
+    (when (eq adapt-source 'anything-c-adaptive-sort)
       source)))
 
 (defun anything-c-adaptive-store-selection ()
