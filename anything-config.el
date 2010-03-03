@@ -4705,9 +4705,14 @@ when the user goes to the action list with TAB."
          (adapt-source (or (assoc-default 'filtered-candidate-transformer
                                           (assoc (assoc-default 'type source)
                                                  anything-type-attributes))
-                           (assoc-default 'filtered-candidate-transformer source))))
-    (when (eq adapt-source 'anything-c-adaptive-sort)
-      source)))
+                           (assoc-default 'candidate-transformer
+                                          (assoc (assoc-default 'type source)
+                                                 anything-type-attributes))
+                           (assoc-default 'filtered-candidate-transformer source)
+                           (assoc-default 'candidate-transformer source))))
+    (if (listp adapt-source)
+        (when (member 'anything-c-adaptive-sort adapt-source) source)
+        (when (eq adapt-source 'anything-c-adaptive-sort) source))))
 
 (defun anything-c-adaptive-store-selection ()
   "Store history information for the selected candidate."
