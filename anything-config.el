@@ -5138,7 +5138,8 @@ Return nil if bmk is not a valid bookmark."
 (define-anything-type-attribute 'bookmark
   `((action
      ("Jump to bookmark" . (lambda (candidate)
-                             (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
+                             (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate))
+                                   (current-prefix-arg anything-current-prefix-arg))
                                (bookmark-jump bookmark))
                              (anything-update)
                              (anything-bookmark-active-region-maybe candidate)))
