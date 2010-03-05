@@ -3766,7 +3766,8 @@ A list of search engines."
                                   (url (second stream)))
                              (funcall fn url))))
                ("Delete" . anything-emms-stream-delete-bookmark)
-               ("Edit" . anything-emms-stream-edit-bookmark)))))
+               ("Edit" . anything-emms-stream-edit-bookmark)))
+    (filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-streams)
 
 ;; Don't forget to set `emms-source-file-default-directory'
@@ -3774,14 +3775,18 @@ A list of search engines."
   '((name . "Music Directory")
     (candidates . (lambda ()
                     (cddr (directory-files emms-source-file-default-directory))))
-    (action . (("Play Directory" . (lambda (item)
-                                     (emms-play-directory
-                                      (expand-file-name item
-                                                        emms-source-file-default-directory))))
-               ("Open dired in file's directory" . (lambda (item)
-                                                     (anything-c-open-dired
-                                                      (expand-file-name item
-                                                                        emms-source-file-default-directory))))))))
+    (action .
+     (("Play Directory" . (lambda (item)
+                            (emms-play-directory
+                             (expand-file-name
+                              item
+                              emms-source-file-default-directory))))
+      ("Open dired in file's directory" . (lambda (item)
+                                            (anything-c-open-dired
+                                             (expand-file-name
+                                              item
+                                              emms-source-file-default-directory))))))
+    (filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-dired)
 
 ;;; Jabber Contacts (jabber.el)
