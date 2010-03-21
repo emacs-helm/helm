@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.22 2009-12-28 08:56:56 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.23 2010-03-21 06:28:32 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009  rubikitch
 
@@ -60,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.22  2009-12-28 08:56:56  rubikitch
+;; Revision 1.23  2010-03-21 06:28:32  rubikitch
+;; refactoring
+;;
+;; Revision 1.22  2009/12/28 08:56:56  rubikitch
 ;; `anything-grep-by-name': INCOMPATIBLE!!! swap optional arguments
 ;; `anything-grep-by-name' can utilize `repeat-complex-command'.
 ;;
@@ -139,7 +142,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.22 2009-12-28 08:56:56 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.23 2010-03-21 06:28:32 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -325,18 +328,25 @@ It asks COMMAND for grep command line and PWD for current directory."
 (defvar agbn-last-name nil
   "The last used name by `anything-grep-by-name'.")
 
+(defun agrep-by-name-read-info (&rest kinds)
+  (let ((result (mapcar (lambda (kind)
+                          (case kind
+                            ('query (read-string "Grep query: "))
+                            ('name (completing-read
+                                    "Grep by name: "
+                                    anything-grep-alist
+                                    nil t nil nil agbn-last-name))))
+                        kinds)))
+    (if (cdr result)                    ; length >= 1
+        result
+      (car result))))
+
 (defun anything-grep-by-name (&optional query name)
   "Do `anything-grep' from predefined location.
 It asks NAME for location name and QUERY."
-  ;; DRY
-  (interactive
-   (list (read-string "Grep query: ")
-         (completing-read "Grep by name: " anything-grep-alist
-                          nil t nil nil agbn-last-name)))
-  (setq query (or query (read-string "Grep query: ")))
-  (setq name (or name
-                 (completing-read "Grep by name: " anything-grep-alist
-                                  nil t nil nil agbn-last-name)))
+  (interactive (agrep-by-name-read-info 'query 'name))
+  (setq query (or query (agrep-by-name-read-info 'query)))
+  (setq name (or name (agrep-by-name-read-info 'name)))
   (setq agbn-last-name name)
   (anything-aif (assoc-default name anything-grep-alist)
       (progn
@@ -348,6 +358,29 @@ It asks NAME for location name and QUERY."
                                            (shell-quote-argument query)) dir)))
                  it)))
     (error "no such name %s" name)))
+
+;;;; unit test
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
+(dont-compile
+  (when (fboundp 'expectations)
+    (expectations
+      (desc "agrep-by-name-read-info")
+      (expect "query1"
+        (stub read-string => "query1")
+        (agrep-by-name-read-info 'query))
+      (expect "elinit"
+        (stub completing-read => "elinit")
+        (agrep-by-name-read-info 'name))
+      (expect '("query1" "elinit")
+        (stub read-string => "query1")
+        (stub completing-read => "elinit")
+        (agrep-by-name-read-info 'query 'name))
+      (expect '("elinit" "query1")
+        (stub read-string => "query1")
+        (stub completing-read => "elinit")
+        (agrep-by-name-read-info 'name 'query))
+      )))
 
 (provide 'anything-grep)
 
