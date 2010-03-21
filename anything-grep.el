@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.24 2010-03-21 06:28:42 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.25 2010-03-21 06:34:25 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010  rubikitch
 
@@ -35,6 +35,8 @@
 ;;    Run grep in `anything' buffer to narrow results.
 ;;  `anything-grep-by-name'
 ;;    Do `anything-grep' from predefined location.
+;;  `anything-grep-by-name-reversed'
+;;    Do `anything-grep' from predefined location.
 ;;
 ;;; Customizable Options:
 ;;
@@ -60,7 +62,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.24  2010-03-21 06:28:42  rubikitch
+;; Revision 1.25  2010-03-21 06:34:25  rubikitch
+;; New function: `anything-grep-by-name-reversed'
+;;
+;; Revision 1.24  2010/03/21 06:28:42  rubikitch
 ;; update copyright
 ;;
 ;; Revision 1.23  2010/03/21 06:28:32  rubikitch
@@ -145,7 +150,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.24 2010-03-21 06:28:42 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.25 2010-03-21 06:34:25 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -361,6 +366,14 @@ It asks NAME for location name and QUERY."
                                            (shell-quote-argument query)) dir)))
                  it)))
     (error "no such name %s" name)))
+
+(defun anything-grep-by-name-reversed (&optional name query)
+  "Do `anything-grep' from predefined location.
+It asks QUERY and NAME for location name.
+
+Difference with `anything-grep-by-name' is prompt order."
+  (interactive (agrep-by-name-read-info (quote name) (quote query)))
+  (anything-grep-by-name query name))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
