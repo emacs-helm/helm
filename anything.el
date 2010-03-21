@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.249 2010-02-23 20:43:35 rubikitch Exp $
+;; $Id: anything.el,v 1.250 2010-03-21 02:32:29 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,12 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.249  2010-02-23 20:43:35  rubikitch
+;; Revision 1.250  2010-03-21 02:32:29  rubikitch
+;; Fix `select deleted buffer' error message when calling `anything-resume'.
+;;
+;; It was occurred when killing `anything-current-buffer' and calling `anything-resume'.
+;;
+;; Revision 1.249  2010/02/23 20:43:35  rubikitch
 ;; `anything-update': Ensure to call `anything-next-line'
 ;;
 ;; Revision 1.248  2010/02/20 12:34:38  rubikitch
@@ -1135,7 +1140,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.249 2010-02-23 20:43:35 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.250 2010-03-21 02:32:29 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2439,10 +2444,9 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (let ((hooks '((post-command-hook anything-check-minibuffer-input)
                  (minibuffer-setup-hook anything-print-error-messages)
                  (minibuffer-exit-hook (lambda () (anything-window-configuration 'store))))))
-    (with-current-buffer anything-current-buffer
-      (if (eq setup-or-cleanup 'setup)
-          (dolist (args hooks) (apply 'add-hook args))
-        (dolist (args (reverse hooks)) (apply 'remove-hook args))))))
+    (if (eq setup-or-cleanup 'setup)
+        (dolist (args hooks) (apply 'add-hook args))
+      (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
 
 ;; (@* "Core: clean up")
 (defun anything-cleanup ()
