@@ -1457,13 +1457,16 @@ If CANDIDATE is not a directory open this file."
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."
-  (let ((end   (point))
-        (guess (thing-at-point 'filename)))
+  (let* ((end         (point))
+         (guess       (thing-at-point 'filename))
+         (full-path-p (string-match (concat "^" (getenv "HOME")) guess)))
     (condition-case nil
         (when (file-exists-p (file-name-directory guess))
           (search-backward guess (- (point) (length guess)))
           (delete-region (point) end)
-          (insert (abbreviate-file-name candidate)))
+          (if full-path-p
+              (insert (expand-file-name candidate))
+              (insert (abbreviate-file-name candidate))))
       (error nil))))
 
 
