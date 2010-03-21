@@ -1,7 +1,7 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.23 2010-03-21 06:28:32 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.24 2010-03-21 06:28:42 rubikitch Exp $
 
-;; Copyright (C) 2008, 2009  rubikitch
+;; Copyright (C) 2008, 2009, 2010  rubikitch
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: convenience, unix
@@ -60,7 +60,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.23  2010-03-21 06:28:32  rubikitch
+;; Revision 1.24  2010-03-21 06:28:42  rubikitch
+;; update copyright
+;;
+;; Revision 1.23  2010/03/21 06:28:32  rubikitch
 ;; refactoring
 ;;
 ;; Revision 1.22  2009/12/28 08:56:56  rubikitch
@@ -142,7 +145,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.23 2010-03-21 06:28:32 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.24 2010-03-21 06:28:42 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
