@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.251 2010-03-21 02:39:34 rubikitch Exp $
+;; $Id: anything.el,v 1.252 2010-03-21 06:08:44 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.251  2010-03-21 02:39:34  rubikitch
+;; Revision 1.252  2010-03-21 06:08:44  rubikitch
+;; Mark bug fix. thx hchbaw!
+;; http://d.hatena.ne.jp/hchbaw/20100226/1267200447
+;;
+;; Revision 1.251  2010/03/21 02:39:34  rubikitch
 ;; Fix a wrong usage of `delq'. thx hchbaw.
 ;; http://d.hatena.ne.jp/hchbaw/20100226/1267200447
 ;;
@@ -1144,7 +1148,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.251 2010-03-21 02:39:34 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.252 2010-03-21 06:08:44 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3653,13 +3657,20 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   (with-current-buffer anything-buffer
     (loop for o in anything-visible-mark-overlays do
           (goto-char (point-min))
-          (when (search-forward (overlay-get o 'string) nil t)
-            (forward-line -1)
-            (when (save-excursion
-                    (goto-char (anything-get-previous-header-pos))
-                    (equal (overlay-get o 'source)
-                           (buffer-substring (line-beginning-position) (line-end-position))))
-              (move-overlay o (line-beginning-position) (1+ (line-end-position))))))))
+          (let (moved)
+            (while (and (not moved)
+                        (search-forward (overlay-get o 'string) nil t))
+              (forward-line -1)
+              (when (and (save-excursion
+                           (goto-char (anything-get-previous-header-pos))
+                           (equal (overlay-get o 'source)
+                                  (buffer-substring (line-beginning-position) (line-end-position))))
+                         (not (find-if (lambda (x)
+                                         (memq x anything-visible-mark-overlays))
+                                       (overlays-at (point)))))
+                (move-overlay o (line-beginning-position) (1+ (line-end-position)))
+                (setq moved t))
+              (forward-line 1))))))
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
 (defun anything-next-visible-mark (&optional prev)
