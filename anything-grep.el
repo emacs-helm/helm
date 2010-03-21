@@ -1,5 +1,5 @@
 ;;; anything-grep.el --- search refinement of grep result with anything
-;; $Id: anything-grep.el,v 1.26 2010-03-21 11:13:30 rubikitch Exp $
+;; $Id: anything-grep.el,v 1.27 2010-03-21 11:31:04 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010  rubikitch
 
@@ -62,7 +62,10 @@
 ;;; History:
 
 ;; $Log: anything-grep.el,v $
-;; Revision 1.26  2010-03-21 11:13:30  rubikitch
+;; Revision 1.27  2010-03-21 11:31:04  rubikitch
+;; Resume bug fix
+;;
+;; Revision 1.26  2010/03/21 11:13:30  rubikitch
 ;; `anything-grep' works asynchronously
 ;;
 ;; Revision 1.25  2010/03/21 06:34:25  rubikitch
@@ -153,7 +156,7 @@
 
 ;;; Code:
 
-(defvar anything-grep-version "$Id: anything-grep.el,v 1.26 2010-03-21 11:13:30 rubikitch Exp $")
+(defvar anything-grep-version "$Id: anything-grep.el,v 1.27 2010-03-21 11:31:04 rubikitch Exp $")
 (require 'anything)
 (require 'grep)
 
@@ -232,25 +235,21 @@ The command is converting standard input to EUC-JP line by line. ")
   `((command . ,command)
     (pwd . ,pwd)
     (name . ,(format "%s [%s]" command pwd))
-    (anything-grep)))
+    (action . agrep-goto)
+    (anything-grep)
+    (candidate-number-limit . 9999)
+    (migemo)
+    ;; to inherit faces
+    (candidates-in-buffer)
+    (get-line . buffer-substring)
+    ,@(when anything-grep-multiline
+        '((multiline)
+          (real-to-display . agrep-real-to-display)))))
 
 (defun anything-compile-source--agrep-init (source)
   (if (assq 'anything-grep source)
-      (append '((init . agrep-init)) source)
-    source))
-
-(defun anything-compile-source--agrep-sentinel (source)
-  (if (assq 'anything-grep source)
-      `((action . agrep-goto)
-        (candidate-number-limit . 9999)
-        (migemo)
-        ;; to inherit faces
-        (candidates-in-buffer)
-        (get-line . buffer-substring)
-        ,@(when anything-grep-multiline
-            '((multiline)
-              (real-to-display . agrep-real-to-display)))
-        ,@source)
+      (append '((init . agrep-init)
+                (candidates)) source)
     source))
 
 (defun agrep-init ()
@@ -291,9 +290,7 @@ GNU grep is expected for COMMAND. The grep result is colorized."
     (agrep-fontify))
   (unless agrep-waiting-source
     ;; call anything
-    (let ((anything-quit-if-no-candidate (lambda () (message "No matches")))
-          (anything-compile-source-functions
-           (cons 'anything-compile-source--agrep-sentinel anything-compile-source-functions)))
+    (let ((anything-quit-if-no-candidate (lambda () (message "No matches"))))
       (anything anything-grep-sources nil nil nil nil "*anything grep*"))))
 
 (defun agrep-fontify ()
