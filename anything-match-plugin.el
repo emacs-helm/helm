@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.22 2009-03-03 10:21:45 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.23 2010-03-22 08:02:11 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -28,6 +28,16 @@
 ;; It gives anything.el search refinement functionality.
 ;; exact match -> prefix match -> multiple regexp match
 
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+
 ;; A query of multiple regexp match is space-delimited string.
 ;; Anything displays candidates which matches all the regexps.
 ;; A regexp with "!" prefix means not matching the regexp.
@@ -47,7 +57,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.22  2009-03-03 10:21:45  rubikitch
+;; Revision 1.23  2010-03-22 08:02:11  rubikitch
+;; grep-candidates plugin prototype
+;;
+;; Revision 1.22  2009/03/03 10:21:45  rubikitch
 ;; * Remove highlight.el dependency.
 ;; * Very faster highlight.
 ;;
@@ -303,6 +316,24 @@ The smaller  this value is, the slower highlight is.")
       ,@source)))
 
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--match-plugin t)
+
+;;;; grep-candidates plug-in
+(defun agp-candidates ()
+  (start-process-shell-command
+   "anything-grep-candidates" nil
+   (agp-command-line anything-pattern (anything-mklist (anything-attr 'grep-candidates)))))
+(defun agp-command-line (query files)
+  (format "anything-match-plugin-grep.rb %s %s"
+          (shell-quote-argument anything-pattern)
+          (mapconcat 'expand-file-name (anything-mklist (anything-attr 'grep-candidates)) " ")))
+(defun anything-compile-source--grep-candidates (source)
+  (if (assq 'grep-candidates source)
+      (append source
+              '((candidates . agp-candidates)))
+    source))
+(add-to-list 'anything-compile-source-functions 'anything-compile-source--grep-candidates)
+
+;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message))))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
