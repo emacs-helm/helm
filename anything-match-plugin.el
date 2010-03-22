@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.23 2010-03-22 08:02:11 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.24 2010-03-22 09:01:22 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -57,7 +57,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.23  2010-03-22 08:02:11  rubikitch
+;; Revision 1.24  2010-03-22 09:01:22  rubikitch
+;; grep-candidates plugin released
+;;
+;; Revision 1.23  2010/03/22 08:02:11  rubikitch
 ;; grep-candidates plugin prototype
 ;;
 ;; Revision 1.22  2009/03/03 10:21:45  rubikitch
@@ -212,11 +215,13 @@
   (unless (equal pattern anything-mp-3-pattern-str)
     (setq anything-mp-3-pattern-str pattern
           anything-mp-3-pattern-list
-          (loop for pat in (amp-mp-make-regexps pattern)
-                collect (if (string= "!" (substring pat 0 1))
-                            (cons 'not (substring pat 1))
-                          (cons 'identity pat)))))
+          (anything-mp-3-get-patterns-internal pattern)))
   anything-mp-3-pattern-list)
+(defun anything-mp-3-get-patterns-internal (pattern)
+  (loop for pat in (amp-mp-make-regexps pattern)
+        collect (if (string= "!" (substring pat 0 1))
+                            (cons 'not (substring pat 1))
+                          (cons 'identity pat))))
 (defun* anything-mp-3-match (str &optional (pattern anything-pattern))
   (loop for (pred . re) in (anything-mp-3-get-patterns pattern)
         always (funcall pred (string-match re str))))
@@ -321,11 +326,23 @@ The smaller  this value is, the slower highlight is.")
 (defun agp-candidates ()
   (start-process-shell-command
    "anything-grep-candidates" nil
-   (agp-command-line anything-pattern (anything-mklist (anything-attr 'grep-candidates)))))
-(defun agp-command-line (query files)
-  (format "anything-match-plugin-grep.rb %s %s"
-          (shell-quote-argument anything-pattern)
-          (mapconcat 'expand-file-name (anything-mklist (anything-attr 'grep-candidates)) " ")))
+   (agp-command-line anything-pattern
+                     (anything-mklist (anything-attr 'grep-candidates))
+                     (anything-candidate-number-limit (anything-get-current-source)))))
+(defun agp-command-line (query files &optional limit)
+  (with-temp-buffer
+    (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
+          for i from 0
+          do
+          (setq re (replace-regexp-in-string "^-" "\\-" re))
+          (unless (zerop i) (insert " | ")) 
+          (insert "grep -ih "
+                  (if (eq flag 'identity) "" "-v ")
+                  (shell-quote-argument re))
+          (when (zerop i) (insert " "
+                                  (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " "))))
+    (when limit (insert (format " | head -%d" limit)))
+    (buffer-string)))
 (defun anything-compile-source--grep-candidates (source)
   (if (assq 'grep-candidates source)
       (append source
@@ -333,7 +350,9 @@ The smaller  this value is, the slower highlight is.")
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--grep-candidates)
 
-;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message))))
+;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed))))
+;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed) (candidate-number-limit . 2))))
+;; (let ((anything-candidate-number-limit 2)) (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed)))))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
@@ -353,6 +372,28 @@ The smaller  this value is, the slower highlight is.")
       (expect '("foo bar" "baz")
         (let ((anything-mp-space-regexp "\\\\ "))
           (amp-mp-make-regexps "foo\\ bar baz")))
+      (desc "anything-mp-3-get-patterns-internal")
+      (expect '((identity . "foo"))
+        (anything-mp-3-get-patterns-internal "foo"))
+      (expect '((identity . "foo") (identity . "bar"))
+        (anything-mp-3-get-patterns-internal "foo bar"))
+      (expect '((identity . "foo") (not . "bar"))
+        (anything-mp-3-get-patterns-internal "foo !bar"))
+      (desc "agp-command-line")
+      (expect "grep -ih foo /f1"
+        (agp-command-line "foo" '("/f1")))
+      (expect "grep -ih foo /f1 | grep -ih bar"
+        (agp-command-line "foo bar" '("/f1")))
+      (expect "grep -ih foo /f1 | grep -ih -v bar"
+        (agp-command-line "foo !bar" '("/f1")))
+      (expect "grep -ih foo /f1 /f\\ 2 | grep -ih -v bar | grep -ih baz"
+        (agp-command-line "foo !bar baz" '("/f1" "/f 2")))
+      (expect (concat "grep -ih foo " (expand-file-name "~/.emacs.el"))
+        (agp-command-line "foo" '("~/.emacs.el")))
+      (expect "grep -ih f\\ o /f\\ 1"
+        (agp-command-line "f  o" '("/f 1")))
+      (expect "grep -ih foo /f1 | head -5"
+        (agp-command-line "foo" '("/f1") 5))
       (desc "anything-exact-match")
       (expect (non-nil)
         (anything-exact-match "thunder" "thunder"))
