@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.82 2010-03-22 05:57:57 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.83 2010-03-22 06:10:40 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.82  2010-03-22 05:57:57  rubikitch
+;; Revision 1.83  2010-03-22 06:10:40  rubikitch
+;; tidy
+;;
+;; Revision 1.82  2010/03/22 05:57:57  rubikitch
 ;; New sources:
 ;;   `anything-c-source-complete-emacs-faces',
 ;;   `anything-c-source-apropos-emacs-faces',
@@ -383,7 +386,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.82 2010-03-22 05:57:57 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.83 2010-03-22 06:10:40 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -475,11 +478,11 @@ It utilizes anything-match-plugin's feature.")
        (let ((name (symbol-name sym))
              (bp (boundp sym))
              (fbp (fboundp sym)))
-         (cond ((commandp sym) (set-buffer alcs-commands-buffer) (insert name "\n"))
-               (fbp (set-buffer alcs-functions-buffer) (insert name "\n")))
-         (cond (bp (set-buffer alcs-variables-buffer) (insert name "\n")))
-         (cond ((facep sym) (set-buffer alcs-faces-buffer) (insert name "\n"))
-               ((and (not fbp) (not bp)) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
+         (cond ((commandp sym)    (set-buffer alcs-commands-buffer) (insert name "\n"))
+               (fbp               (set-buffer alcs-functions-buffer) (insert name "\n")))
+         (cond (bp                (set-buffer alcs-variables-buffer) (insert name "\n")))
+         (cond ((facep sym)       (set-buffer alcs-faces-buffer) (insert name "\n"))
+               ((not (or bp fbp)) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
   (message "Collecting symbols...done"))
 
 (defun alcs-header-name (name)
