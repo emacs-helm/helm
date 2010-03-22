@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.252 2010-03-21 06:08:44 rubikitch Exp $
+;; $Id: anything.el,v 1.253 2010-03-22 07:04:03 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -327,7 +327,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.252  2010-03-21 06:08:44  rubikitch
+;; Revision 1.253  2010-03-22 07:04:03  rubikitch
+;; `anything-get-current-source': return nil when no candidates rather than error
+;;
+;; Revision 1.252  2010/03/21 06:08:44  rubikitch
 ;; Mark bug fix. thx hchbaw!
 ;; http://d.hatena.ne.jp/hchbaw/20100226/1267200447
 ;;
@@ -1148,7 +1151,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.252 2010-03-21 06:08:44 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.253 2010-03-22 07:04:03 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2070,22 +2073,25 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
   ;; The name `anything-get-current-source' should be used in init function etc.
   (if (and (boundp 'anything-source-name) (stringp anything-source-name))
       source
-    (with-current-buffer (anything-buffer-get)
-      ;; This goto-char shouldn't be necessary, but point is moved to
-      ;; point-min somewhere else which shouldn't happen.
-      (goto-char (overlay-start anything-selection-overlay))
-      (let* ((header-pos (anything-get-previous-header-pos))
-             (source-name
-              (save-excursion
-                (or header-pos (error "No candidates"))
-                (goto-char header-pos)
-                (buffer-substring-no-properties
-                 (line-beginning-position) (line-end-position)))))
-        (some (lambda (source)
-                (if (equal (assoc-default 'name source)
-                           source-name)
-                    source))
-              (anything-get-sources))))))
+    (block exit
+      (with-current-buffer (anything-buffer-get)
+        ;; This goto-char shouldn't be necessary, but point is moved to
+        ;; point-min somewhere else which shouldn't happen.
+        (goto-char (overlay-start anything-selection-overlay))
+        (let* ((header-pos (anything-get-previous-header-pos))
+               (source-name
+                (save-excursion
+                  (unless header-pos
+                    (message "No candidates")
+                    (return-from exit nil))
+                  (goto-char header-pos)
+                  (buffer-substring-no-properties
+                   (line-beginning-position) (line-end-position)))))
+          (some (lambda (source)
+                  (if (equal (assoc-default 'name source)
+                             source-name)
+                      source))
+                (anything-get-sources)))))))
 
 (defun anything-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `anything' was invoked."
