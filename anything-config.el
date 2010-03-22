@@ -415,6 +415,7 @@
 (require 'anything)
 (require 'thingatpt)
 (require 'ffap)
+(require 'cl)
 
 ;;; Code:
 
@@ -4047,8 +4048,11 @@ See also `anything-create--actions'."
 ;;; Xfont selection
 (defun anything-c-persistent-xfont-action (elm)
   "Show current font temporarily"
-  (let ((default-font elm))
-    (set-default-font default-font)))
+  (let ((current-font (cdr (assoc 'font (frame-parameters))))
+        (default-font elm))
+    (unwind-protect
+         (progn (set-frame-font default-font 'keep-size) (sit-for 2))
+      (set-frame-font current-font))))
 
 (defvar anything-c-xfonts-cache nil)
 (defvar anything-c-source-xfonts
@@ -4062,7 +4066,7 @@ See also `anything-create--actions'."
                                         (kill-new elm)))
                ("Set Font" . (lambda (elm)
                                (kill-new elm)
-                               (set-default-font elm 'keep-size)
+                               (set-frame-font elm 'keep-size)
                                (message "New font have been copied to kill ring")))))
     (persistent-action . anything-c-persistent-xfont-action)))
   
