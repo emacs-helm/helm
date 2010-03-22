@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.81 2010-02-20 10:38:31 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.82 2010-03-22 05:57:57 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,14 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.81  2010-02-20 10:38:31  rubikitch
+;; Revision 1.82  2010-03-22 05:57:57  rubikitch
+;; New sources:
+;;   `anything-c-source-complete-emacs-faces',
+;;   `anything-c-source-apropos-emacs-faces',
+;;   `anything-c-source-emacs-face-at-point'
+;; `anything-lisp-complete-symbol', `anything-apropos': Search faces too
+;;
+;; Revision 1.81  2010/02/20 10:38:31  rubikitch
 ;; More strict version check.
 ;;
 ;; Revision 1.80  2010/02/20 10:16:30  rubikitch
@@ -376,7 +383,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.81 2010-02-20 10:38:31 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.82 2010-03-22 05:57:57 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -447,6 +454,7 @@ It utilizes anything-match-plugin's feature.")
 (defvar alcs-variables-buffer " *variable symbols*")
 (defvar alcs-functions-buffer " *function symbols*")
 (defvar alcs-commands-buffer " *command symbols*")
+(defvar alcs-faces-buffer " *face symbols*")
 (defvar alcs-symbol-buffer " *other symbols*")
 
 (defvar alcs-symbols-time nil
@@ -460,15 +468,18 @@ It utilizes anything-match-plugin's feature.")
     (alcs-create-buffer alcs-variables-buffer)
     (alcs-create-buffer alcs-functions-buffer)
     (alcs-create-buffer alcs-commands-buffer)
+    (alcs-create-buffer alcs-faces-buffer)
     (alcs-create-buffer alcs-symbol-buffer)
     (mapatoms
      (lambda (sym)
        (let ((name (symbol-name sym))
+             (bp (boundp sym))
              (fbp (fboundp sym)))
          (cond ((commandp sym) (set-buffer alcs-commands-buffer) (insert name "\n"))
                (fbp (set-buffer alcs-functions-buffer) (insert name "\n")))
-         (cond ((boundp sym) (set-buffer alcs-variables-buffer) (insert name "\n"))
-               ((not fbp) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
+         (cond (bp (set-buffer alcs-variables-buffer) (insert name "\n")))
+         (cond ((facep sym) (set-buffer alcs-faces-buffer) (insert name "\n"))
+               ((and (not fbp) (not bp)) (set-buffer alcs-symbol-buffer) (insert name "\n")))))))
   (message "Collecting symbols...done"))
 
 (defun alcs-header-name (name)
@@ -537,6 +548,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (describe-function (intern name)))
 (defun alcs-describe-variable (name)
   (describe-variable (intern name)))
+(defun alcs-describe-face (name)
+  (describe-face (intern name)))
 (defun alcs-find-function (name)
   (find-function (intern name)))
 (defun alcs-find-variable (name)
@@ -557,6 +570,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (init . (lambda () (alcs-init alcs-variables-buffer)))
     (candidates-in-buffer)
     (type . complete-variable)))
+(defvar anything-c-source-complete-emacs-faces
+  '((name . "Faces")
+    (init . (lambda () (alcs-init alcs-faces-buffer)))
+    (candidates-in-buffer)
+    (type . complete-face)))
 (defvar anything-c-source-complete-emacs-other-symbols
   '((name . "Other Symbols")
     (init . (lambda () (alcs-init alcs-symbol-buffer)))
@@ -581,7 +599,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (candidates-in-buffer)
     (requires-pattern . 3)
     (type . apropos-variable)))
-
+(defvar anything-c-source-apropos-emacs-faces
+  '((name . "Apropos Faces")
+    (init . (lambda () (alcs-init alcs-faces-buffer)))
+    (candidates-in-buffer)
+    (requires-pattern . 3)
+    (type . apropos-face)))
 (defvar anything-c-source-emacs-function-at-point
   '((name . "Function at point")
     (candidates
@@ -589,7 +612,6 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                     (anything-aif (function-called-at-point)
                         (list (symbol-name it))))))
     (type . apropos-function)))
-
 (defvar anything-c-source-emacs-variable-at-point
   '((name . "Variable at point")
     (candidates
@@ -597,16 +619,25 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
                     (anything-aif (variable-at-point)
                         (unless (equal 0 it) (list (symbol-name it)))))))
     (type . apropos-variable)))
+(defvar anything-c-source-emacs-face-at-point
+  '((name . "Face at point")
+    (candidates
+     . (lambda () (with-current-buffer anything-current-buffer
+                    (anything-aif (face-at-point)
+                        (unless (equal 0 it) (list (symbol-name it)))))))
+    (type . apropos-variable)))
 
 (defvar anything-lisp-complete-symbol-sources
   '(anything-c-source-complete-emacs-commands
     anything-c-source-complete-emacs-functions
-    anything-c-source-complete-emacs-variables))
+    anything-c-source-complete-emacs-variables
+    anything-c-source-complete-emacs-faces))
 
 (defvar anything-apropos-sources
   '(anything-c-source-apropos-emacs-commands
     anything-c-source-apropos-emacs-functions
-    anything-c-source-apropos-emacs-variables))
+    anything-c-source-apropos-emacs-variables
+    anything-c-source-apropos-emacs-faces))
 
 (define-anything-type-attribute 'apropos-function
   '((filtered-candidate-transformer . alcs-sort-maybe)
@@ -622,6 +653,12 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (action
      ("Describe Variable" . alcs-describe-variable)
      ("Find Variable" . alcs-find-variable))))
+(define-anything-type-attribute 'apropos-face
+  '((filtered-candidate-transformer . alcs-sort-maybe)
+    (header-name . alcs-header-name)
+    (persistent-action . alcs-describe-face)
+    (action
+     ("Describe Face" . alcs-describe-face))))
 (define-anything-type-attribute 'complete-function
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
     (header-name . alcs-header-name)
@@ -632,6 +669,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (header-name . alcs-header-name)
     (action . ac-insert)
     (persistent-action . alcs-describe-variable)))
+(define-anything-type-attribute 'complete-face
+  '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
+    (header-name . alcs-header-name)
+    (action . ac-insert)
+    (persistent-action . alcs-describe-face)))
 
 (defvar alcs-this-command nil)
 (defun anything-lisp-complete-symbol-1 (update sources input)
