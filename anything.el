@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.253 2010-03-22 07:04:03 rubikitch Exp $
+;; $Id: anything.el,v 1.254 2010-03-23 00:33:18 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -184,6 +184,22 @@
 ;;; (@* "Tips")
 
 ;;
+;; `anything-interpret-value' is useful function to interpret value
+;; like `candidates' attribute.
+;;
+;; (anything-interpret-value "literal")            ; => "literal"
+;; (anything-interpret-value (lambda () "lambda")) ; => "lambda"
+;; (let ((source '((name . "lambda with source name"))))
+;;   (anything-interpret-value
+;;    (lambda () anything-source-name)
+;;    source))                             ; => "lambda with source name"
+;; (flet ((f () "function symbol"))
+;;   (anything-interpret-value 'f))        ; => "function symbol"
+;; (let ((v "variable symbol"))
+;;   (anything-interpret-value 'v))        ; => "variable symbol"
+;; (anything-interpret-value 'unbounded-1) ; error
+
+;;
 ;; Now symbols are acceptable as candidates. So you do not have to use
 ;; `symbol-name' function. The source is much simpler. For example,
 ;; `apropos-internal' returns a list of symbols.
@@ -327,7 +343,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.253  2010-03-22 07:04:03  rubikitch
+;; Revision 1.254  2010-03-23 00:33:18  rubikitch
+;; New API: `anything-interpret-value'
+;;
+;; Revision 1.253  2010/03/22 07:04:03  rubikitch
 ;; `anything-get-current-source': return nil when no candidates rather than error
 ;;
 ;; Revision 1.252  2010/03/21 06:08:44  rubikitch
@@ -1151,7 +1170,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.253 2010-03-22 07:04:03 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.254 2010-03-23 00:33:18 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2151,6 +2170,27 @@ http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
 or  M-x install-elisp-from-emacswiki anything.el")))
 
+(defun anything-interpret-value (value &optional source)
+  "interpret VALUE as variable, function or literal.
+If VALUE is a function, call it with no arguments and return the value.
+If SOURCE is `anything' source, `anything-source-name' is source name.
+
+If VALUE is a variable, return the value.
+
+If VALUE is a symbol, but it is not a function or a variable, cause an error.
+
+Otherwise, return VALUE itself."
+  (cond ((and source (functionp value))
+         (anything-funcall-with-source source value))
+        ((functionp value)
+         (funcall value))
+        ((and (symbolp value) (boundp value))
+         (symbol-value value))
+        ((symbolp value)
+         (error "anything-interpret-value: Symbol must be a function or a variable"))
+        (t
+         value)))
+
 ;; (@* "Core: tools")
 (defun anything-current-frame/window-configuration ()
   (funcall (cdr anything-save-configuration-functions)))
@@ -2540,20 +2580,12 @@ SOURCE."
             (funcall it)
             (add-to-list 'anything-delayed-init-executed name)))))
   (let* ((candidate-source (assoc-default 'candidates source))
-         (candidates
-          (cond ((functionp candidate-source)
-                 (anything-funcall-with-source source candidate-source))
-                ((listp candidate-source)
-                 candidate-source)
-                ((and (symbolp candidate-source) (boundp candidate-source))
-                 (symbol-value candidate-source))
-                (t
-                 (error (concat "Candidates must either be a function, "
+         (candidates (anything-interpret-value candidate-source source)))
+    (cond ((processp candidates) candidates)
+          ((listp candidates) (anything-transform-candidates candidates source))
+          (t (error (concat "Candidates must either be a function, "
                                  " a variable or a list: %s")
                         candidate-source)))))
-    (if (processp candidates)
-        candidates
-      (anything-transform-candidates candidates source))))
          
 
 (defun anything-transform-candidates (candidates source)
@@ -4272,6 +4304,22 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
               anything-buffer-file-name
             ;;(kill-buffer "__a_file__")
             )))
+      (desc "anything-interpret-value")
+      (expect "literal"
+        (anything-interpret-value "literal"))
+      (expect "lambda"
+        (anything-interpret-value (lambda () "lambda")))
+      (expect "lambda with source name"
+        (let ((source '((name . "lambda with source name"))))
+          (anything-interpret-value (lambda () anything-source-name) source)))
+      (expect "function symbol"
+        (flet ((f () "function symbol"))
+          (anything-interpret-value 'f)))
+      (expect "variable symbol"
+        (let ((v "variable symbol"))
+          (anything-interpret-value 'v)))
+      (expect (error error *)
+        (anything-interpret-value 'unbounded-1))
       (desc "anything-compile-sources")
       (expect '(((name . "foo")))
         (anything-compile-sources '(((name . "foo"))) nil)
@@ -4331,6 +4379,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (expect '("foo" "bar")
         (anything-get-candidates '((name . "foo")
                                    (candidates . (lambda () '("foo" "bar"))))))
+      (expect '("foo" "bar")
+        (let ((var '("foo" "bar")))
+          (anything-get-candidates '((name . "foo")
+                                     (candidates . var)))))
+      (expect (error error *)
+        (anything-get-candidates '((name . "foo")
+                                   (candidates . "err"))))
+      (expect (error error *)
+        (let ((var "err"))
+          (anything-get-candidates '((name . "foo")
+                                     (candidates . var)))))
       (desc "anything-compute-matches")
       (expect '("foo" "bar")
         (let ((anything-pattern ""))
