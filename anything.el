@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.254 2010-03-23 00:33:18 rubikitch Exp $
+;; $Id: anything.el,v 1.255 2010-03-24 02:35:47 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -343,7 +343,12 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.254  2010-03-23 00:33:18  rubikitch
+;; Revision 1.255  2010-03-24 02:35:47  rubikitch
+;; `anything-candidate-number-limit':
+;; When (candidate-number-limit) is specified in SOURCE,
+;; cancel the effect of `anything-candidate-number-limit'.
+;;
+;; Revision 1.254  2010/03/23 00:33:18  rubikitch
 ;; New API: `anything-interpret-value'
 ;;
 ;; Revision 1.253  2010/03/22 07:04:03  rubikitch
@@ -1170,7 +1175,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.254 2010-03-23 00:33:18 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.255 2010-03-24 02:35:47 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2633,10 +2638,12 @@ Cache the candidates if there is not yet a cached value."
 
 ;; (@* "Core: narrowing candidates")
 (defun anything-candidate-number-limit (source)
-  "`anything-candidate-number-limit' variable may be overridden by SOURCE."
-  (or (assoc-default 'candidate-number-limit source)
-      anything-candidate-number-limit
-      99999999))
+  "`anything-candidate-number-limit' variable may be overridden by SOURCE.
+If (candidate-number-limit) is in SOURCE, show all candidates in SOURCE,
+ie. cancel the effect of `anything-candidate-number-limit'."
+  (anything-aif (assq 'candidate-number-limit source)
+      (or (cdr it) 99999999)
+    (or anything-candidate-number-limit 99999999)))
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
@@ -5239,6 +5246,11 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
               (anything-candidate-number-limit 20))
           (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c")
                                       (candidate-number-limit . 2) (volatile)))))
+      (expect '("a" "b" "c" "d")
+        (let ((anything-pattern "[abcd]")
+              (anything-candidate-number-limit 2))
+          (anything-compute-matches '((name . "FOO") (candidates "a" "b" "c" "d")
+                                      (candidate-number-limit) (volatile)))))
       (expect '(("TEST" ("a" "b" "c")))
         (let ((anything-candidate-number-limit 2))
           (anything-test-candidates
@@ -5645,7 +5657,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (define-anything-type-attribute 'buffer '((action . switch-to-buffer)))
           (define-anything-type-attribute 'file '((action . find-file)))
           anything-type-attributes))
-      (defun "anything-approximate-candidate-number")
+      (desc "anything-approximate-candidate-number")
       (expect 0
         (with-temp-buffer
           (let ((anything-buffer (current-buffer)))
