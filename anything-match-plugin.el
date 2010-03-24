@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.26 2010-03-24 10:48:55 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.27 2010-03-24 11:11:28 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -57,7 +57,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.26  2010-03-24 10:48:55  rubikitch
+;; Revision 1.27  2010-03-24 11:11:28  rubikitch
+;; Added :group keyword to `defface anything-match'
+;;
+;; Revision 1.26  2010/03/24 10:48:55  rubikitch
 ;; grep-candidates plug-in: document / imply `delayed' attribute
 ;;
 ;; Revision 1.25  2010/03/24 10:38:48  rubikitch
@@ -277,7 +280,8 @@ or  M-x install-elisp-from-emacswiki anything.el")))
 ;;;; Highlight matches
 (defface anything-match
   '((t (:inherit match)))
-  "Face used to highlight matches.")
+  "Face used to highlight matches."
+  :group 'anything)
 
 (defvar anything-mp-highlight-delay 0.7
   "Highlight matches with `anything-match' face after this many seconds.
