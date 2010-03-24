@@ -4887,8 +4887,7 @@ candidate can be in (DISPLAY . REAL) format."
 (defun anything-p-candidats-file-init ()
   (destructuring-bind (file &optional updating)
       (anything-mklist (anything-attr 'candidates-file))
-    (when (symbolp file)
-      (setq file (symbol-value file)))
+    (setq file (anything-interpret-value file))
     (with-current-buffer (anything-candidate-buffer (find-file-noselect file))
       (when updating
         (buffer-disable-undo)
@@ -4898,6 +4897,7 @@ candidate can be in (DISPLAY . REAL) format."
 (anything-document-attribute 'candidates-file "candidates-file plugin"
   "Use a file as the candidates buffer.
 
+1st argument is a filename, string or function name or variable name.
 If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 ;; Plug-in: headline
