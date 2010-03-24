@@ -589,9 +589,9 @@ If you want to have the default tramp messages set it to 3."
        (pop-to-buffer "*Anything Help*")
        (goto-char (point-min)))))
 
-;; rubikitch: I think many people binds `delete-backward-char' to C-h.
-;;            So I rebound `anything-c-describe-anything-bindings' to C-c ?.
-(define-key anything-map (kbd "C-c ?") 'anything-c-describe-anything-bindings)
+;; Use `describe-mode' key in `global-map'
+(dolist (k (where-is-internal 'describe-mode global-map))
+  (define-key anything-map k 'anything-c-describe-anything-bindings))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
