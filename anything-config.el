@@ -75,8 +75,9 @@
 ;; buffer, because M-x anything-resume revives anything command.
 
 ;;
+;; Anything sources can be tested by M-x `anything-call-source'.
 ;; Below are complete source list you can setup in the first argument
-;; of `anything-other-buffer' (or `anything-sources'):
+;; of `anything-other-buffer':
 ;;
 ;;  Buffer:
 ;;     `anything-c-source-buffers'          (Buffers)
