@@ -3821,12 +3821,14 @@ A list of search engines."
 (defvar anything-source-select-buffer "*anything source select*")
 (defvar anything-c-source-call-source
   `((name . "Call anything source")
-    (candidate-number-limit . 9999)
+    (candidate-number-limit)
     (candidates . (lambda ()
                     (loop for vname in (all-completions "anything-c-source-" obarray)
                           for var = (intern vname)
                           for name = (ignore-errors (assoc-default 'name (symbol-value var)))
-                          if name collect (cons (format "%s (%s)" name vname) var))))
+                          if name collect (cons (format "%s `%s'"
+                                                        name (propertize vname 'face 'font-lock-variable-name-face))
+                                                var))))
     (action . (("Invoke anything with selected source" .
                 (lambda (candidate)
                   (setq anything-candidate-number-limit 9999)
