@@ -303,6 +303,8 @@
 ;;    Do many create actions from STRING.
 ;;  `anything-top'
 ;;    Preconfigured `anything' for top command.
+;;  `anything-select-xfont'
+;;    Preconfigured `anything' to select Xfont.
 ;;  `anything-apt'
 ;;    The `anything' frontend of APT package manager.
 ;;  `anything-c-set-variable'
@@ -4072,7 +4074,12 @@ See also `anything-create--actions'."
                                (set-frame-font elm 'keep-size)
                                (message "New font have been copied to kill ring")))))
     (persistent-action . anything-c-persistent-xfont-action)))
-  
+
+(defun anything-select-xfont ()
+  "Preconfigured `anything' to select Xfont."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-xfonts "*anything select* xfont"))
+
 ;; (anything 'anything-c-source-xfonts)
 
 ;; Source for Debian/Ubuntu users
