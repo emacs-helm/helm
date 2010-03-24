@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.25 2010-03-24 10:38:48 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.26 2010-03-24 10:48:55 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -57,7 +57,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.25  2010-03-24 10:38:48  rubikitch
+;; Revision 1.26  2010-03-24 10:48:55  rubikitch
+;; grep-candidates plug-in: document / imply `delayed' attribute
+;;
+;; Revision 1.25  2010/03/24 10:38:48  rubikitch
 ;; grep-candidates plugin: grep-candidates attribute can also accept variable/function name.
 ;;
 ;; Revision 1.24  2010/03/22 09:01:22  rubikitch
@@ -359,11 +362,22 @@ The smaller  this value is, the slower highlight is.")
 (defun anything-compile-source--grep-candidates (source)
   (if (assq 'grep-candidates source)
       (append source
-              '((candidates . agp-candidates)))
+              '((candidates . agp-candidates)
+                (delayed)))
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--grep-candidates)
 
-;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed))))
+(anything-document-attribute 'grep-candidates "grep-candidates plug-in"
+  "grep-candidates plug-in provides anything-match-plugin.el feature with grep and head program.
+It is MUCH FASTER than normal match-plugin to search from vary large (> 1MB) candidates.
+Make sure to install these programs.
+
+It expands `candidates' and `delayed' attributes.
+
+`grep-candidates' attribute accepts a filename or list of filename.
+It also accepts 0-argument function name or variable name.")
+
+;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message))))
 ;; (let ((a "~/.emacs.el")) (anything '(((name . "grep-test")  (grep-candidates . a) (action . message) (delayed)))))
 ;; (let ((a "~/.emacs.el")) (anything '(((name . "grep-test")  (grep-candidates . (lambda () a)) (action . message) (delayed)))))
 ;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed) (candidate-number-limit . 2))))
