@@ -423,7 +423,7 @@
 ;;; Code:
 
 ;; version check
-(let ((version "1.244"))
+(let ((version "1.256"))
   (when (and (string= "1." (substring version 0 2))
              (string-match "1\.\\([0-9]+\\)" anything-version)
              (< (string-to-number (match-string 1 anything-version))
