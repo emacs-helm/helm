@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.256 2010-03-24 08:29:43 rubikitch Exp $
+;; $Id: anything.el,v 1.257 2010-03-24 11:08:19 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -343,7 +343,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.256  2010-03-24 08:29:43  rubikitch
+;; Revision 1.257  2010-03-24 11:08:19  rubikitch
+;; revert to 1.255
+;;
+;; Revision 1.256  2010/03/24 08:29:43  rubikitch
 ;; `anything-check-minibuffer-input' set repeat timer.
 ;;
 ;; Revision 1.255  2010/03/24 02:35:47  rubikitch
@@ -1178,7 +1181,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.256 2010-03-24 08:29:43 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.257 2010-03-24 11:08:19 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2531,7 +2534,7 @@ to be handled."
     (if anything-check-minibuffer-input-timer
         (cancel-timer anything-check-minibuffer-input-timer))
     (setq anything-check-minibuffer-input-timer
-          (run-with-idle-timer anything-input-idle-delay 'repeat
+          (run-with-idle-timer anything-input-idle-delay nil
                                'anything-check-minibuffer-input-1))))
 
 (defun anything-check-minibuffer-input-1 ()
