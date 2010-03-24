@@ -1,5 +1,5 @@
 ;;; anything-match-plugin.el --- Humane match plug-in for anything
-;; $Id: anything-match-plugin.el,v 1.24 2010-03-22 09:01:22 rubikitch Exp $
+;; $Id: anything-match-plugin.el,v 1.25 2010-03-24 10:38:48 rubikitch Exp $
 
 ;; Copyright (C) 2008  rubikitch
 
@@ -57,7 +57,10 @@
 ;;; History:
 
 ;; $Log: anything-match-plugin.el,v $
-;; Revision 1.24  2010-03-22 09:01:22  rubikitch
+;; Revision 1.25  2010-03-24 10:38:48  rubikitch
+;; grep-candidates plugin: grep-candidates attribute can also accept variable/function name.
+;;
+;; Revision 1.24  2010/03/22 09:01:22  rubikitch
 ;; grep-candidates plugin released
 ;;
 ;; Revision 1.23  2010/03/22 08:02:11  rubikitch
@@ -138,6 +141,16 @@
 (require 'anything)
 (require 'cl)
 
+(let ((version "1.256"))
+  (when (and (string= "1." (substring version 0 2))
+             (string-match "1\.\\([0-9]+\\)" anything-version)
+             (< (string-to-number (match-string 1 anything-version))
+                (string-to-number (substring version 2))))
+    (error "Please update anything.el!!
+
+http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+
+or  M-x install-elisp-from-emacswiki anything.el")))
 ;;;; multiple patterns
 (defvar anything-use-multiple-patterns t
   "If non-nil, enable anything-use-multiple-patterns.")
@@ -327,7 +340,7 @@ The smaller  this value is, the slower highlight is.")
   (start-process-shell-command
    "anything-grep-candidates" nil
    (agp-command-line anything-pattern
-                     (anything-mklist (anything-attr 'grep-candidates))
+                     (anything-mklist (anything-interpret-value (anything-attr 'grep-candidates)))
                      (anything-candidate-number-limit (anything-get-current-source)))))
 (defun agp-command-line (query files &optional limit)
   (with-temp-buffer
@@ -351,6 +364,8 @@ The smaller  this value is, the slower highlight is.")
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--grep-candidates)
 
 ;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed))))
+;; (let ((a "~/.emacs.el")) (anything '(((name . "grep-test")  (grep-candidates . a) (action . message) (delayed)))))
+;; (let ((a "~/.emacs.el")) (anything '(((name . "grep-test")  (grep-candidates . (lambda () a)) (action . message) (delayed)))))
 ;; (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed) (candidate-number-limit . 2))))
 ;; (let ((anything-candidate-number-limit 2)) (anything '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed)))))
 
