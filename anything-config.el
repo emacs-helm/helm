@@ -1285,7 +1285,8 @@ buffer that is not the current buffer."
 
 ;;; Anything replacement of file name completion for `find-file' and friends.
 
-(defvar anything-c-find-files-doc-header " (`C-z':Expand Candidate, `C-.':Go to precedent level)"
+(defvar anything-c-find-files-doc-header (format " (`C-z':Expand Candidate, `%s':Go to precedent level)"
+                                                 (if (window-system) "C-." "C-l")) 
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 
 (defvar anything-c-source-find-files
@@ -1354,7 +1355,11 @@ If prefix numeric arg is given go ARG level down."
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
         (insert new-pattern)))))
-(define-key anything-map (kbd "C-.") 'anything-find-files-down-one-level)
+
+;; `C-.' doesn't work in terms use `C-l' instead. 
+(if (window-system)
+    (define-key anything-map (kbd "C-.") 'anything-find-files-down-one-level)
+    (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))
 
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
