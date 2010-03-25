@@ -4616,9 +4616,12 @@ file.  Else return ACTIONS unmodified."
 (defun anything-c-transform-file-browse-url (actions candidate)
   "Add an action to browse the file CANDIDATE if it in a html
 file or URL.  Else return ACTIONS unmodified."
-  (if (string-match "^http\\|^ftp\\|\\.html?$" candidate)
-      (cons '("Browse with Browser" . browse-url) actions )
-    actions))
+  (let ((browse-action '("Browse with Browser" . browse-url)))
+    (cond ((string-match "^http\\|^ftp" candidate)
+           (cons browse-action actions))
+          ((string-match "\\.html?$" candidate)
+           (append actions (list browse-action)))
+          (t actions))))
 
 ;;;; Function
 (defun anything-c-transform-function-call-interactively (actions candidate)
