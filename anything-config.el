@@ -74,117 +74,6 @@
 ;; different sources. Each anything command should have own anything
 ;; buffer, because M-x anything-resume revives anything command.
 
-;;
-;; Anything sources can be tested by M-x `anything-call-source'.
-;; Below are complete source list you can setup in the first argument
-;; of `anything-other-buffer':
-;;
-;;  Buffer:
-;;     `anything-c-source-buffers'          (Buffers)
-;;     `anything-c-source-buffer-not-found' (Create buffer)
-;;     `anything-c-source-buffers+'         (Buffers)
-;;  File:
-;;     `anything-c-source-file-name-history'     (File Name History)
-;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
-;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
-;;     `anything-c-source-find-files'            (Find Files)
-;;     `anything-c-source-file-cache'            (File Cache)
-;;     `anything-c-source-locate'                (Locate)
-;;     `anything-c-source-recentf'               (Recentf)
-;;     `anything-c-source-ffap-guesser'          (File at point)
-;;     `anything-c-source-ffap-line'             (File/Lineno at point)
-;;     `anything-c-source-files-in-all-dired'    (Files in all dired buffer.)
-;;  Help:
-;;     `anything-c-source-man-pages'  (Manual Pages)
-;;     `anything-c-source-info-pages' (Info Pages)
-;;     `anything-c-source-info-elisp' (Info Elisp)
-;;     `anything-c-source-info-cl'    (Info Common-Lisp)
-;;  Command:
-;;     `anything-c-source-complex-command-history'  (Complex Command History)
-;;     `anything-c-source-extended-command-history' (Emacs Commands History)
-;;     `anything-c-source-emacs-commands'           (Emacs Commands)
-;;     `anything-c-source-lacarte'                  (Lacarte)
-;;  Function:
-;;     `anything-c-source-emacs-functions'              (Emacs Functions)
-;;     `anything-c-source-emacs-functions-with-abbrevs' (Emacs Functions)
-;;  Variable:
-;;     `anything-c-source-emacs-variables' (Emacs Variables)
-;;  Bookmark:
-;;     `anything-c-source-bookmarks'               (Bookmarks)
-;;     `anything-c-source-bookmark-set'            (Set Bookmark)
-;;     `anything-c-source-bookmarks-ssh'           (Bookmarks-ssh)
-;;     `anything-c-source-bookmarks-su'            (Bookmarks-root)
-;;     `anything-c-source-bookmarks-local'         (Bookmarks-Local)
-;;     `anything-c-source-bookmark-regions'        (Bookmark Regions)
-;;     `anything-c-source-bookmark-w3m'            (Bookmark W3m)
-;;     `anything-c-source-bookmark-man'            (Bookmark Woman&Man)
-;;     `anything-c-source-bookmark-gnus'           (Bookmark Gnus)
-;;     `anything-c-source-bookmark-info'           (Bookmark Info)
-;;     `anything-c-source-bookmark-files&dirs'     (Bookmark Files&Directories)
-;;     `anything-c-source-bookmark-su-files&dirs'  (Bookmark Root-Files&Directories)
-;;     `anything-c-source-bookmark-ssh-files&dirs' (Bookmark Ssh-Files&Directories)
-;;     `anything-c-source-firefox-bookmarks'       (Firefox Bookmarks)
-;;     `anything-c-source-w3m-bookmarks'           (W3m Bookmarks)
-;;  Library:
-;;     `anything-c-source-elisp-library-scan' (Elisp libraries (Scan))
-;;  Programming:
-;;     `anything-c-source-imenu'                              (Imenu)
-;;     `anything-c-source-ctags'                              (Exuberant ctags)
-;;     `anything-c-source-semantic'                           (Semantic Tags)
-;;     `anything-c-source-simple-call-tree-functions-callers' (Function is called by)
-;;     `anything-c-source-simple-call-tree-callers-functions' (Function calls)
-;;     `anything-c-source-commands-and-options-in-file'       (Commands/Options in file)
-;;  Color and Face:
-;;     `anything-c-source-customize-face' (Customize Face)
-;;     `anything-c-source-colors'         (Colors)
-;;  Search Engine:
-;;     `anything-c-source-tracker-search' (Tracker Search)
-;;     `anything-c-source-mac-spotlight'  (mdfind)
-;;  Kill ring:
-;;     `anything-c-source-kill-ring' (Kill Ring)
-;;  Mark ring:
-;;     `anything-c-source-mark-ring'        (mark-ring)
-;;     `anything-c-source-global-mark-ring' (global-mark-ring)
-;;  Register:
-;;     `anything-c-source-register' (Registers)
-;;  Headline Extraction:
-;;     `anything-c-source-fixme'                            (TODO/FIXME/DRY comments)
-;;     `anything-c-source-rd-headline'                      (RD HeadLine)
-;;     `anything-c-source-oddmuse-headline'                 (Oddmuse HeadLine)
-;;     `anything-c-source-emacs-source-defun'               (Emacs Source DEFUN)
-;;     `anything-c-source-emacs-lisp-expectations'          (Emacs Lisp Expectations)
-;;     `anything-c-source-emacs-lisp-toplevels'             (Emacs Lisp Toplevel / Level 4 Comment / Linkd Star)
-;;     `anything-c-source-org-headline'                     (Org HeadLine)
-;;     `anything-c-source-yaoddmuse-emacswiki-edit-or-view' (Yaoddmuse Edit or View (EmacsWiki))
-;;     `anything-c-source-yaoddmuse-emacswiki-post-library' (Yaoddmuse Post library (EmacsWiki))
-;;     `anything-c-source-eev-anchor'                       (Anchors)
-;;  Misc:
-;;     `anything-c-source-picklist'           (Picklist)
-;;     `anything-c-source-bbdb'               (BBDB)
-;;     `anything-c-source-evaluation-result'  (Evaluation Result)
-;;     `anything-c-source-calculation-result' (Calculation Result)
-;;     `anything-c-source-google-suggest'     (Google Suggest)
-;;     `anything-c-source-yahoo-suggest'      (Yahoo Suggest)
-;;     `anything-c-source-surfraw'            (Surfraw)
-;;     `anything-c-source-emms-streams'       (Emms Streams)
-;;     `anything-c-source-emms-dired'         (Music Directory)
-;;     `anything-c-source-jabber-contacts'    (Jabber Contacts)
-;;     `anything-c-source-call-source'        (Call anything source)
-;;     `anything-c-source-occur'              (Occur)
-;;     `anything-c-source-create'             (Create)
-;;     `anything-c-source-minibuffer-history' (Minibuffer History)
-;;     `anything-c-source-elscreen'           (Elscreen)
-;;  System:
-;;     `anything-c-source-top'                      (Top (Press C-c C-u to refresh))
-;;     `anything-c-source-absolute-time-timers'     (Absolute Time Timers)
-;;     `anything-c-source-idle-time-timers'         (Idle Time Timers)
-;;     `anything-c-source-xrandr-change-resolution' (Change Resolution)
-;;     `anything-c-source-xfonts'                   (X Fonts)
-;;     `anything-c-source-apt'                      (APT)
-;;     `anything-c-source-gentoo'                   (Portage sources)
-;;     `anything-c-source-use-flags'                (Use Flags)
-;;     `anything-c-source-emacs-process'            (Emacs Process)
-
 ;;; Commands:
 ;;
 ;; Below are complete command list:
@@ -368,6 +257,116 @@
 ;;    *Just like `tramp-verbose' but specific to anything.
 ;;    default = 0
 
+;;
+;; Anything sources can be tested by M-x `anything-call-source'.
+;; Below are complete source list you can setup in the first argument
+;;
+;;  Buffer:
+;;     `anything-c-source-buffers'          (Buffers)
+;;     `anything-c-source-buffer-not-found' (Create buffer)
+;;     `anything-c-source-buffers+'         (Buffers)
+;;  File:
+;;     `anything-c-source-file-name-history'     (File Name History)
+;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
+;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
+;;     `anything-c-source-find-files'            (Find Files (`C-z':Expand Candidate, `C-.':Go to precedent level))
+;;     `anything-c-source-file-cache'            (File Cache)
+;;     `anything-c-source-locate'                (Locate)
+;;     `anything-c-source-recentf'               (Recentf)
+;;     `anything-c-source-ffap-guesser'          (File at point)
+;;     `anything-c-source-ffap-line'             (File/Lineno at point)
+;;     `anything-c-source-files-in-all-dired'    (Files in all dired buffer.)
+;;  Help:
+;;     `anything-c-source-man-pages'  (Manual Pages)
+;;     `anything-c-source-info-pages' (Info Pages)
+;;     `anything-c-source-info-elisp' (Info Elisp)
+;;     `anything-c-source-info-cl'    (Info Common-Lisp)
+;;  Command:
+;;     `anything-c-source-complex-command-history'  (Complex Command History)
+;;     `anything-c-source-extended-command-history' (Emacs Commands History)
+;;     `anything-c-source-emacs-commands'           (Emacs Commands)
+;;     `anything-c-source-lacarte'                  (Lacarte)
+;;  Function:
+;;     `anything-c-source-emacs-functions'              (Emacs Functions)
+;;     `anything-c-source-emacs-functions-with-abbrevs' (Emacs Functions)
+;;  Variable:
+;;     `anything-c-source-emacs-variables' (Emacs Variables)
+;;  Bookmark:
+;;     `anything-c-source-bookmarks'               (Bookmarks)
+;;     `anything-c-source-bookmark-set'            (Set Bookmark)
+;;     `anything-c-source-bookmarks-ssh'           (Bookmarks-ssh)
+;;     `anything-c-source-bookmarks-su'            (Bookmarks-root)
+;;     `anything-c-source-bookmarks-local'         (Bookmarks-Local)
+;;     `anything-c-source-bookmark-regions'        (Bookmark Regions)
+;;     `anything-c-source-bookmark-w3m'            (Bookmark W3m)
+;;     `anything-c-source-bookmark-man'            (Bookmark Woman&Man)
+;;     `anything-c-source-bookmark-gnus'           (Bookmark Gnus)
+;;     `anything-c-source-bookmark-info'           (Bookmark Info)
+;;     `anything-c-source-bookmark-files&dirs'     (Bookmark Files&Directories)
+;;     `anything-c-source-bookmark-su-files&dirs'  (Bookmark Root-Files&Directories)
+;;     `anything-c-source-bookmark-ssh-files&dirs' (Bookmark Ssh-Files&Directories)
+;;     `anything-c-source-firefox-bookmarks'       (Firefox Bookmarks)
+;;     `anything-c-source-w3m-bookmarks'           (W3m Bookmarks)
+;;  Library:
+;;     `anything-c-source-elisp-library-scan' (Elisp libraries (Scan))
+;;  Programming:
+;;     `anything-c-source-imenu'                              (Imenu)
+;;     `anything-c-source-ctags'                              (Exuberant ctags)
+;;     `anything-c-source-semantic'                           (Semantic Tags)
+;;     `anything-c-source-simple-call-tree-functions-callers' (Function is called by)
+;;     `anything-c-source-simple-call-tree-callers-functions' (Function calls)
+;;     `anything-c-source-commands-and-options-in-file'       (Commands/Options in file)
+;;  Color and Face:
+;;     `anything-c-source-customize-face' (Customize Face)
+;;     `anything-c-source-colors'         (Colors)
+;;  Search Engine:
+;;     `anything-c-source-tracker-search' (Tracker Search)
+;;     `anything-c-source-mac-spotlight'  (mdfind)
+;;  Kill ring:
+;;     `anything-c-source-kill-ring' (Kill Ring)
+;;  Mark ring:
+;;     `anything-c-source-mark-ring'        (mark-ring)
+;;     `anything-c-source-global-mark-ring' (global-mark-ring)
+;;  Register:
+;;     `anything-c-source-register' (Registers)
+;;  Headline Extraction:
+;;     `anything-c-source-fixme'                            (TODO/FIXME/DRY comments)
+;;     `anything-c-source-rd-headline'                      (RD HeadLine)
+;;     `anything-c-source-oddmuse-headline'                 (Oddmuse HeadLine)
+;;     `anything-c-source-emacs-source-defun'               (Emacs Source DEFUN)
+;;     `anything-c-source-emacs-lisp-expectations'          (Emacs Lisp Expectations)
+;;     `anything-c-source-emacs-lisp-toplevels'             (Emacs Lisp Toplevel / Level 4 Comment / Linkd Star)
+;;     `anything-c-source-org-headline'                     (Org HeadLine)
+;;     `anything-c-source-yaoddmuse-emacswiki-edit-or-view' (Yaoddmuse Edit or View (EmacsWiki))
+;;     `anything-c-source-yaoddmuse-emacswiki-post-library' (Yaoddmuse Post library (EmacsWiki))
+;;     `anything-c-source-eev-anchor'                       (Anchors)
+;;  Misc:
+;;     `anything-c-source-org-keywords'       (Org Keywords)
+;;     `anything-c-source-picklist'           (Picklist)
+;;     `anything-c-source-bbdb'               (BBDB)
+;;     `anything-c-source-evaluation-result'  (Evaluation Result)
+;;     `anything-c-source-calculation-result' (Calculation Result)
+;;     `anything-c-source-google-suggest'     (Google Suggest)
+;;     `anything-c-source-yahoo-suggest'      (Yahoo Suggest)
+;;     `anything-c-source-surfraw'            (Surfraw)
+;;     `anything-c-source-emms-streams'       (Emms Streams)
+;;     `anything-c-source-emms-dired'         (Music Directory)
+;;     `anything-c-source-jabber-contacts'    (Jabber Contacts)
+;;     `anything-c-source-call-source'        (Call anything source)
+;;     `anything-c-source-occur'              (Occur)
+;;     `anything-c-source-create'             (Create)
+;;     `anything-c-source-minibuffer-history' (Minibuffer History)
+;;     `anything-c-source-elscreen'           (Elscreen)
+;;  System:
+;;     `anything-c-source-top'                      (Top (Press C-c C-u to refresh))
+;;     `anything-c-source-absolute-time-timers'     (Absolute Time Timers)
+;;     `anything-c-source-idle-time-timers'         (Idle Time Timers)
+;;     `anything-c-source-xrandr-change-resolution' (Change Resolution)
+;;     `anything-c-source-xfonts'                   (X Fonts)
+;;     `anything-c-source-apt'                      (APT)
+;;     `anything-c-source-gentoo'                   (Portage sources)
+;;     `anything-c-source-use-flags'                (Use Flags)
+;;     `anything-c-source-emacs-process'            (Emacs Process)
 
 ;;; Change log:
 ;;
@@ -3433,6 +3432,81 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 ;; (anything 'anything-c-source-eev-anchor)
 
 ;;;; <Misc>
+;;; Org keywords
+(defvar anything-c-source-org-keywords
+  '((name . "Org Keywords")
+    (init . anything-c-org-keywords-init)
+    (candidates . anything-c-org-keywords-candidates)
+    (action . anything-c-org-keywords-insert)
+    (persistent-action . anything-c-org-keywords-show-help)
+    (keywords-examples)
+    (keywords)))
+;; (anything 'anything-c-source-org-keywords)
+(defvar anything-c-org-keywords-info-location
+  '(("#+TITLE:" . "(org)Export options")
+    ("#+AUTHOR:" . "(org)Export options")
+    ("#+DATE:" . "(org)Export options")
+    ("#+EMAIL:" . "(org)Export options")
+    ("#+DESCRIPTION:" . "(org)Export options")
+    ("#+KEYWORDS:" . "(org)Export options")
+    ("#+LANGUAGE:" . "(org)Export options")
+    ("#+TEXT:" . "(org)Export options")
+    ("#+TEXT:" . "(org)Export options")
+    ("#+OPTIONS:" . "(org)Export options")
+    ("#+BIND:" . "(org)Export options")
+    ("#+LINK_UP:" . "(org)Export options")
+    ("#+LINK_HOME:" . "(org)Export options")
+    ("#+LATEX_HEADER:" . "(org)Export options")
+    ("#+EXPORT_SELECT_TAGS:" . "(org)Export options")
+    ("#+EXPORT_EXCLUDE_TAGS:" . "(org)Export options")
+    ("#+INFOJS_OPT" . "(org)Javascript support")
+    ("#+BEGIN_HTML" . "(org)Quoting HTML tags")
+    ("#+BEGIN_LaTeX" . "(org)Quoting LaTeX code")
+    ("#+ORGTBL" . "(org)Radio tables")
+    ("#+HTML:" . "(org)Quoting HTML tags")
+    ("#+LaTeX:" . "(org)Quoting LaTeX code")
+    ("#+BEGIN:" . "(org)Dynamic blocks") ;clocktable columnview
+    ("#+BEGIN_EXAMPLE" . "(org)Literal examples")
+    ("#+BEGIN_QUOTE" . "(org)Paragraphs")
+    ("#+BEGIN_VERSE" . "(org)Paragraphs")
+    ("#+BEGIN_SRC" . "(org)Literal examples")
+    ("#+CAPTION" . "(org)Tables in HTML export")
+    ("#+LABEL" . "(org)Tables in LaTeX export")
+    ("#+ATTR_HTML" . "(org)Links")
+    ("#+ATTR_LaTeX" . "(org)Images in LaTeX export")))
+
+(defun anything-c-org-keywords-init ()
+  (unless (anything-attr 'keywords-examples)
+    (require 'org)
+    (anything-attrset 'keywords-examples
+                      (append
+                       (mapcar
+                        (lambda (x)
+                          (string-match "^#\\+\\(\\([A-Z_]+:?\\).*\\)" x)
+                          (cons (match-string 2 x) (match-string 1 x)))
+                        (org-split-string (org-get-current-options) "\n"))
+                       (mapcar 'list org-additional-option-like-keywords)))
+    (anything-attrset 'keywords (mapcar 'car keywords-examples))))
+
+(defun anything-c-org-keywords-candidates ()
+  (anything-attr 'keywords))
+
+(defun anything-c-org-keywords-insert (keyword)
+  (cond ((string-match "BEGIN" keyword)
+         (insert "#+" keyword " ")
+         (save-excursion
+           (insert "\n" (replace-regexp-in-string "BEGIN" "END" keyword) "\n")))
+        (t
+         (insert "#+" keyword " "))))
+
+(defun anything-c-org-keywords-show-help (keyword)
+  (info (or (assoc-default (concat "#+" keyword) anything-c-org-keywords-info-location)
+            "(org)In-buffer settings"))
+  (search-forward (concat "#+" keyword) nil t)
+  (anything-persistent-highlight-point)
+  (message "%s" (or (cdr (assoc keyword (anything-attr 'keywords-examples))) "")))
+
+
 ;;; Picklist
 (defvar anything-c-source-picklist
   '((name . "Picklist")
