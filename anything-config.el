@@ -2799,41 +2799,32 @@ http://cedet.sourceforge.net/"))
 (defvar anything-c-source-simple-call-tree-functions-callers
   '((name . "Function is called by")
     (init . anything-c-simple-call-tree-functions-callers-init)
-    (delayed)
-    (candidates-in-buffer))
+    (multiline)
+    (candidates . anything-c-simple-call-tree-candidates))
   "Needs simple-call-tree.el.
 http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
-(defun anything-c-simple-call-tree-functions-callers-init ()
+(defun anything-c-simple-call-tree-init-base (function message)
   (require 'simple-call-tree)
   (with-no-warnings
     (when (anything-current-buffer-is-modified)
       (simple-call-tree-analyze)
-      (let ((list (simple-call-tree-invert simple-call-tree-alist)))
+      (let ((list (funcall function simple-call-tree-alist)))
         (with-current-buffer (anything-candidate-buffer 'local)
           (dolist (entry list)
-            (let ((callers (concat "  " (mapconcat #'identity (cdr entry) "\n  "))))
-              (insert (car entry) " is called by\n"
-                      (if (string= callers "")
+            (let ((funcs (concat "  " (mapconcat #'identity (cdr entry) "\n  "))))
+              (insert (car entry) message
+                      (if (string= funcs "  ")
                           "  no functions."
-                        callers)
-                      "\n"))))))))
+                        funcs)
+                      "\n\n"))))))))
 
-(defun anything-c-simple-call-tree-functions-callers-candidates ()
-  (with-current-buffer anything-current-buffer
-    (require 'simple-call-tree)
-    (with-no-warnings
-      (when (anything-current-buffer-is-modified)
-        (simple-call-tree-analyze)
-        (let ((list (simple-call-tree-invert simple-call-tree-alist)))
-          (with-current-buffer (anything-candidate-buffer 'local)
-            (dolist (entry list)
-              (let ((callers (mapconcat #'identity (cdr entry) ", ")))
-                (insert (car entry) " is called by "
-                        (if (string= callers "")
-                            "no functions."
-                          callers)
-                        ".\n")))))))))
+(defun anything-c-simple-call-tree-functions-callers-init ()
+  (anything-c-simple-call-tree-init-base 'simple-call-tree-invert " is called by\n"))
+
+(defun anything-c-simple-call-tree-candidates ()
+  (with-current-buffer (anything-candidate-buffer)
+    (split-string (buffer-string) "\n\n")))
 
 ;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
@@ -2841,25 +2832,13 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 (defvar anything-c-source-simple-call-tree-callers-functions
   '((name . "Function calls")
     (init . anything-c-simple-call-tree-callers-functions-init)
-    (delayed)
-    (candidates-in-buffer))
+    (multiline)
+    (candidates . anything-c-simple-call-tree-candidates))
   "Needs simple-call-tree.el.
 http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
 (defun anything-c-simple-call-tree-callers-functions-init ()
-  (require 'simple-call-tree)
-  (with-no-warnings
-    (when (anything-current-buffer-is-modified)
-      (simple-call-tree-analyze)
-      (let ((list simple-call-tree-alist))
-        (with-current-buffer (anything-candidate-buffer 'local)
-          (dolist (entry list)
-            (let ((functions (mapconcat #'identity (cdr entry) ", ")))
-              (insert (car entry) " calls "
-                      (if (string= functions "")
-                          "no functions"
-                        functions)
-                      ".\n"))))))))
+  (anything-c-simple-call-tree-init-base 'identity " calls \n"))
 
 ;; (anything 'anything-c-source-simple-call-tree-callers-functions)
 
