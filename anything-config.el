@@ -168,6 +168,8 @@
 ;;    Replace usual dired commands `C' and `R' by anything ones.
 ;;  `anything-bookmark-ext'
 ;;    Preconfigured anything for bookmark-extensions sources.
+;;  `anything-simple-call-tree'
+;;    Preconfigured `anything' for simple-call-tree. List function relationships.
 ;;  `anything-mark-ring'
 ;;    Preconfigured `anything' for `anything-c-source-mark-ring'.
 ;;  `anything-global-mark-ring'
@@ -2796,6 +2798,14 @@ http://cedet.sourceforge.net/"))
 ;; (anything 'anything-c-source-semantic)
 
 ;;; Function is called by
+(defun anything-simple-call-tree ()
+  "Preconfigured `anything' for simple-call-tree. List function relationships."
+  (interactive)
+  (anything-other-buffer
+   '(anything-c-source-simple-call-tree-functions-callers
+     anything-c-source-simple-call-tree-callers-functions)
+   "*anything simple-call-tree*"))
+
 (defvar anything-c-source-simple-call-tree-functions-callers
   '((name . "Function is called by")
     (init . anything-c-simple-call-tree-functions-callers-init)
@@ -2804,11 +2814,18 @@ http://cedet.sourceforge.net/"))
   "Needs simple-call-tree.el.
 http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
+(defvar anything-c-simple-call-tree-tick nil)
+(make-variable-buffer-local 'anything-c-simple-call-tree-tick)
+(defun anything-c-simple-call-tree-analyze-maybe ()
+  (unless (eq (buffer-chars-modified-tick) anything-c-simple-call-tree-tick)
+    (simple-call-tree-analyze)
+    (setq anything-c-simple-call-tree-tick (buffer-chars-modified-tick))))
+
 (defun anything-c-simple-call-tree-init-base (function message)
   (require 'simple-call-tree)
   (with-no-warnings
     (when (anything-current-buffer-is-modified)
-      (simple-call-tree-analyze)
+      (anything-c-simple-call-tree-analyze-maybe)
       (let ((list (funcall function simple-call-tree-alist)))
         (with-current-buffer (anything-candidate-buffer 'local)
           (dolist (entry list)
