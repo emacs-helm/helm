@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.258 2010-03-26 12:10:55 rubikitch Exp $
+;; $Id: anything.el,v 1.259 2010-03-26 22:52:15 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -345,7 +345,12 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.258  2010-03-26 12:10:55  rubikitch
+;; Revision 1.259  2010-03-26 22:52:15  rubikitch
+;; `anything-quit-and-find-file':
+;;   If current selection is a buffer or a file, `find-file' from its directory.
+;;   Idea from http://i-yt.info/?date=20090826#p01 with some modification. Thanks.
+;;
+;; Revision 1.258  2010/03/26 12:10:55  rubikitch
 ;; * modify `anything-mode-line-string'
 ;; * New command `anything-help'
 ;;
@@ -1187,7 +1192,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.258 2010-03-26 12:10:55 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.259 2010-03-26 22:52:15 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3786,9 +3791,17 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 ;; (@* "Utility: `find-file' integration")
 (defun anything-quit-and-find-file ()
   "Drop into `find-file' from `anything' like `iswitchb-find-file'.
-This command is a simple example of `anything-run-after-quit'."
+If current selection is a buffer or a file, `find-file' from its directory."
   (interactive)
-  (anything-run-after-quit 'call-interactively 'find-file))
+  (anything-run-after-quit
+   (lambda (f)
+     (if (file-exists-p f)
+         (let ((default-directory (file-name-directory f)))
+           (call-interactively 'find-file))
+       (call-interactively 'find-file)))
+   (anything-aif (get-buffer (anything-get-selection))
+       (buffer-file-name it)
+     (expand-file-name (anything-get-selection)))))
 
 ;; (@* "Utility: Selection Paste")
 (defun anything-yank-selection ()
