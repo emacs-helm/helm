@@ -3489,7 +3489,8 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
     (anything-attrset 'keywords (mapcar 'car keywords-examples))))
 
 (defun anything-c-org-keywords-candidates ()
-  (anything-attr 'keywords))
+  (and (eq (buffer-local-value 'major-mode anything-current-buffer) 'org-mode)
+       (anything-attr 'keywords)))
 
 (defun anything-c-org-keywords-insert (keyword)
   (cond ((string-match "BEGIN" keyword)
