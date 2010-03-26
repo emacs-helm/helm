@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.257 2010-03-24 11:08:19 rubikitch Exp $
+;; $Id: anything.el,v 1.258 2010-03-26 12:10:55 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -81,6 +81,8 @@
 ;;    Move selection to the next source.
 ;;  `anything-exit-minibuffer'
 ;;    Select the current candidate by exiting the minibuffer.
+;;  `anything-help'
+;;    Help of `anything'.
 ;;  `anything-delete-current-selection'
 ;;    Delete the currently selected item.
 ;;  `anything-delete-minibuffer-content'
@@ -343,7 +345,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.257  2010-03-24 11:08:19  rubikitch
+;; Revision 1.258  2010-03-26 12:10:55  rubikitch
+;; * modify `anything-mode-line-string'
+;; * New command `anything-help'
+;;
+;; Revision 1.257  2010/03/24 11:08:19  rubikitch
 ;; revert to 1.255
 ;;
 ;; Revision 1.256  2010/03/24 08:29:43  rubikitch
@@ -1181,7 +1187,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.257 2010-03-24 11:08:19 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.258 2010-03-26 12:10:55 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1705,6 +1711,9 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-c C-k") 'anything-kill-selection-and-quit)
     (define-key map (kbd "C-c C-f") 'anything-follow-mode)
 
+    ;; Use `describe-mode' key in `global-map'
+    (dolist (k (where-is-internal 'describe-mode global-map))
+      (define-key map k 'anything-help))
     ;; the defalias is needed because commands are bound by name when
     ;; using iswitchb, so only commands having the prefix anything-
     ;; get rebound
@@ -1907,9 +1916,14 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
 
 (defvar anything-delayed-init-executed nil)
 
-(defvar anything-mode-line-string "(C-c?:help TAB:act C-m/C-e/C-j:nthact C-o:nextsrc C-z:pers-act C-SPC:mark M-[/M-]:movemark C-t:splt C-cC-f:follow)"
+(defvar anything-mode-line-string "(\\<anything-map>\\[anything-help]:help \\[anything-select-action]:act \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\\[anything-select-3rd-action]:nthact \\[anything-execute-persistent-action]:pers-act)"
   "Help string displayed in mode-line in `anything'.
 If nil, use default `mode-line-format'.")
+
+(defvar anything-help-message
+  "\\<anything-map>The keys that are defined for `anything' are:
+       \\{anything-map}"
+  "Detailed help message string for `anything'.")
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -2457,6 +2471,7 @@ already-bound variables. Yuck!
           (t
            (read-string (or any-prompt "pattern: ") any-input)))))
 
+(defvar anything-mode-line-string-real nil)
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
 If TEST-MODE is non-nil, clear `anything-candidate-cache'."
@@ -2468,9 +2483,11 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (set (make-local-variable  'inhibit-read-only) t)
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
     (if anything-mode-line-string
-        (setq mode-line-format
+        (setq anything-mode-line-string-real
+              (substitute-command-keys anything-mode-line-string)
+              mode-line-format
               '(" " mode-line-buffer-identification " "
-                (line-number-mode "%l") " " anything-mode-line-string "-%-"))
+                (line-number-mode "%l") " " anything-mode-line-string-real "-%-"))
       (kill-local-variable 'mode-line-format))
     (setq cursor-type nil)
     (setq mode-name "Anything"))
@@ -3220,6 +3237,26 @@ UNIT and DIRECTION."
   "Print error messages in `anything-issued-errors'."
   (message "%s" (mapconcat 'identity (reverse anything-issued-errors) "\n")))
 
+
+;; (@* "Core: help")
+(defun anything-help ()
+  "Help of `anything'."
+  (interactive)
+  (save-window-excursion
+    (select-window (anything-window))
+    (delete-other-windows)
+    (switch-to-buffer (get-buffer-create " *Anything Help*"))
+    (setq mode-line-format "%b (SPC:NextPage b:PrevPage other:Exit)")
+    (setq cursor-type nil)
+    (erase-buffer)
+    (insert (substitute-command-keys anything-help-message))
+    (goto-char 1)
+    (ignore-errors
+      (loop for event = (read-event) do
+            (case event
+              (?  (scroll-up))
+              (?b (scroll-down))
+              (t (return)))))))
 
 ;; (@* "Core: misc")
 (defun anything-kill-buffer-hook ()
