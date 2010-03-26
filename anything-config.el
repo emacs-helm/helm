@@ -79,7 +79,7 @@
 ;; Below are complete command list:
 ;;
 ;;  `anything-c-describe-anything-bindings'
-;;    Describe `anything' bindings.
+;;    [OBSOLETE] Describe `anything' bindings.
 ;;  `anything-for-files'
 ;;    Preconfigured `anything' for opening files.
 ;;  `anything-info-at-point'
@@ -577,8 +577,9 @@ If you want to have the default tramp messages set it to 3."
   :group 'anything-config)
 
 ;;; Documentation
+;; It is replaced by `anything-help'
 (defun anything-c-describe-anything-bindings ()
-  "Describe `anything' bindings."
+  "[OBSOLETE] Describe `anything' bindings."
   (interactive)
   (anything-run-after-quit
    #'(lambda ()
@@ -592,8 +593,8 @@ If you want to have the default tramp messages set it to 3."
        (goto-char (point-min)))))
 
 ;; Use `describe-mode' key in `global-map'
-(dolist (k (where-is-internal 'describe-mode global-map))
-  (define-key anything-map k 'anything-c-describe-anything-bindings))
+;; (dolist (k (where-is-internal 'describe-mode global-map))
+;;   (define-key anything-map k 'anything-c-describe-anything-bindings))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
