@@ -2810,7 +2810,10 @@ http://cedet.sourceforge.net/"))
   '((name . "Function is called by")
     (init . anything-c-simple-call-tree-functions-callers-init)
     (multiline)
-    (candidates . anything-c-simple-call-tree-candidates))
+    (candidates . anything-c-simple-call-tree-candidates)
+    (persistent-action . anything-c-simple-call-tree-persistent-action)
+    (action ("Find definition selected by persistent-action" .
+             anything-c-simple-call-tree-find-definition)))
   "Needs simple-call-tree.el.
 http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
@@ -2843,6 +2846,25 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
   (with-current-buffer (anything-candidate-buffer)
     (split-string (buffer-string) "\n\n")))
 
+(defvar anything-c-simple-call-tree-related-functions nil)
+(defvar anything-c-simple-call-tree-function-index 0)
+(defun anything-c-simple-call-tree-persistent-action (candidate)
+  (unless (eq last-command 'anything-execute-persistent-action)
+    (setq anything-c-simple-call-tree-related-functions
+          (delete "no functions."
+                  (split-string
+                   (replace-regexp-in-string "  \\| is called by\\| calls " "" candidate)
+                   "\n")))
+    (setq anything-c-simple-call-tree-function-index -1))
+  (incf anything-c-simple-call-tree-function-index)
+  (anything-c-simple-call-tree-find-definition candidate))
+
+(defun anything-c-simple-call-tree-find-definition (candidate)
+  (find-function (intern
+                  (nth (mod anything-c-simple-call-tree-function-index
+                            (length anything-c-simple-call-tree-related-functions))
+                       anything-c-simple-call-tree-related-functions))))
+
 ;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
 ;;; Function calls
@@ -2850,7 +2872,10 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
   '((name . "Function calls")
     (init . anything-c-simple-call-tree-callers-functions-init)
     (multiline)
-    (candidates . anything-c-simple-call-tree-candidates))
+    (candidates . anything-c-simple-call-tree-candidates)
+    (persistent-action . anything-c-simple-call-tree-persistent-action)
+    (action ("Find definition selected by persistent-action" .
+             anything-c-simple-call-tree-find-definition)))
   "Needs simple-call-tree.el.
 http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
