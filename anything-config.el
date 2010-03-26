@@ -2812,12 +2812,29 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
       (let ((list (simple-call-tree-invert simple-call-tree-alist)))
         (with-current-buffer (anything-candidate-buffer 'local)
           (dolist (entry list)
-            (let ((callers (mapconcat #'identity (cdr entry) ", ")))
-              (insert (car entry) " is called by "
+            (let ((callers (concat "  " (mapconcat #'identity (cdr entry) "\n  "))))
+              (insert (car entry) " is called by\n"
                       (if (string= callers "")
-                          "no functions."
+                          "  no functions."
                         callers)
-                      ".\n"))))))))
+                      "\n"))))))))
+
+(defun anything-c-simple-call-tree-functions-callers-candidates ()
+  (with-current-buffer anything-current-buffer
+    (require 'simple-call-tree)
+    (with-no-warnings
+      (when (anything-current-buffer-is-modified)
+        (simple-call-tree-analyze)
+        (let ((list (simple-call-tree-invert simple-call-tree-alist)))
+          (with-current-buffer (anything-candidate-buffer 'local)
+            (dolist (entry list)
+              (let ((callers (mapconcat #'identity (cdr entry) ", ")))
+                (insert (car entry) " is called by "
+                        (if (string= callers "")
+                            "no functions."
+                          callers)
+                        ".\n")))))))))
+
 ;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
 ;;; Function calls
