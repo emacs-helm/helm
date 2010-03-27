@@ -3525,7 +3525,7 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
                           (cons (match-string 2 x) (match-string 1 x)))
                         (org-split-string (org-get-current-options) "\n"))
                        (mapcar 'list org-additional-option-like-keywords)))
-    (anything-attrset 'keywords (mapcar 'car keywords-examples))))
+    (anything-attrset 'keywords (mapcar 'car (anything-attr 'keywords-examples)))))
 
 (defun anything-c-org-keywords-candidates ()
   (and (eq (buffer-local-value 'major-mode anything-current-buffer) 'org-mode)
