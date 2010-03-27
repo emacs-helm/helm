@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.83 2010-03-22 06:10:40 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.84 2010-03-27 02:43:45 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.83  2010-03-22 06:10:40  rubikitch
+;; Revision 1.84  2010-03-27 02:43:45  rubikitch
+;; Use `anything-force-update' feature
+;;
+;; Revision 1.83  2010/03/22 06:10:40  rubikitch
 ;; tidy
 ;;
 ;; Revision 1.82  2010/03/22 05:57:57  rubikitch
@@ -386,12 +389,12 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.83 2010-03-22 06:10:40 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.84 2010-03-27 02:43:45 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
 ;; version check
-(let ((version "1.244"))
+(let ((version "1.263"))
   (when (and (string= "1." (substring version 0 2))
              (string-match "1\.\\([0-9]+\\)" anything-version)
              (< (string-to-number (match-string 1 anything-version))
@@ -646,6 +649,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   '((filtered-candidate-transformer . alcs-sort-maybe)
     (header-name . alcs-header-name)
     (persistent-action . alcs-describe-function)
+    (update . alcs-make-candidates)
     (action
      ("Describe Function" . alcs-describe-function)
      ("Find Function" . alcs-find-function))))
@@ -653,12 +657,14 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   '((filtered-candidate-transformer . alcs-sort-maybe)
     (header-name . alcs-header-name)
     (persistent-action . alcs-describe-variable)
+    (update . alcs-make-candidates)
     (action
      ("Describe Variable" . alcs-describe-variable)
      ("Find Variable" . alcs-find-variable))))
 (define-anything-type-attribute 'apropos-face
   '((filtered-candidate-transformer . alcs-sort-maybe)
     (header-name . alcs-header-name)
+    (update . alcs-make-candidates)
     (persistent-action . alcs-describe-face)
     (action
      ("Describe Face" . alcs-describe-face))))
@@ -666,16 +672,19 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
     (header-name . alcs-header-name)
     (action . ac-insert)
+    (update . alcs-make-candidates)
     (persistent-action . alcs-describe-function)))
 (define-anything-type-attribute 'complete-variable
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
     (header-name . alcs-header-name)
     (action . ac-insert)
+    (update . alcs-make-candidates)
     (persistent-action . alcs-describe-variable)))
 (define-anything-type-attribute 'complete-face
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
     (header-name . alcs-header-name)
     (action . ac-insert)
+    (update . alcs-make-candidates)
     (persistent-action . alcs-describe-face)))
 
 (defvar alcs-this-command nil)
@@ -686,9 +695,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (let (anything-samewindow
         (anything-input-idle-delay
          (or anything-lisp-complete-symbol-input-idle-delay
-             anything-input-idle-delay))
-        (anything-map (copy-keymap anything-map)))
-    (define-key anything-map "\C-c\C-u" 'alcs-update-restart)
+             anything-input-idle-delay)))
     (anything-noresume sources input nil nil nil "*anything complete*")))
 
 ;; Test alcs-update-restart (with-current-buffer alcs-commands-buffer (erase-buffer))
@@ -1078,6 +1085,7 @@ It accepts one argument, selected candidate.")
   '(((name . "Emacs Commands History")
      (candidates . extended-command-history)
      (action . identity)
+     (update . alcs-make-candidates)
      (persistent-action . alcs-describe-function))
     ((name . "Commands")
      (header-name . alcs-header-name)
@@ -1085,6 +1093,7 @@ It accepts one argument, selected candidate.")
                          (get-buffer-create alcs-commands-buffer))))
      (candidates-in-buffer)
      (action . identity)
+     (update . alcs-make-candidates)
      (persistent-action . alcs-describe-function))))
 
 ;; (with-current-buffer " *command symbols*" (erase-buffer))
@@ -1092,10 +1101,7 @@ It accepts one argument, selected candidate.")
   "Replacement of `execute-extended-command'."
   (interactive)
   (setq alcs-this-command this-command)
-  (let* ((anything-map
-          (prog1 (copy-keymap anything-map)
-            (define-key anything-map "\C-c\C-u" 'alcs-update-restart)))
-         (cmd (anything
+  (let* ((cmd (anything
               (if (and anything-execute-extended-command-use-kyr
                        (require 'anything-kyr-config nil t))
                   (cons anything-c-source-kyr
