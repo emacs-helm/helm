@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.260 2010-03-27 02:01:28 rubikitch Exp $
+;; $Id: anything.el,v 1.261 2010-03-27 02:29:39 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -345,7 +345,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.260  2010-03-27 02:01:28  rubikitch
+;; Revision 1.261  2010-03-27 02:29:39  rubikitch
+;; New function `anything-goto-source'
+;;
+;; Revision 1.260  2010/03/27 02:01:28  rubikitch
 ;; reimplement move selection commands
 ;;
 ;; Revision 1.259  2010/03/26 22:52:15  rubikitch
@@ -1195,7 +1198,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.260 2010-03-27 02:01:28 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.261 2010-03-27 02:29:39 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3147,7 +3150,16 @@ UNIT and DIRECTION."
    (lambda () (goto-char (or (anything-get-next-header-pos) (point-min))))
    'source 'next))
 
-
+(defun anything-goto-source (source-or-name)
+  "Move the selection to the source (SOURCE-OR-NAME)."
+  (anything-move-selection-common
+   (lambda ()
+     (goto-char (point-min))
+     (let ((name (if (stringp source-or-name) source-or-name
+                   (assoc-default 'name source-or-name))))
+       (while (not (string= name (buffer-substring (point-at-bol) (point-at-eol))))
+         (goto-char (anything-get-next-header-pos)))))
+   'source 'next))
 
 (defun anything-mark-current-line ()
   "Move selection overlay to current line."
