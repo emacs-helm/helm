@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.259 2010-03-26 22:52:15 rubikitch Exp $
+;; $Id: anything.el,v 1.260 2010-03-27 02:01:28 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -345,7 +345,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.259  2010-03-26 22:52:15  rubikitch
+;; Revision 1.260  2010-03-27 02:01:28  rubikitch
+;; reimplement move selection commands
+;;
+;; Revision 1.259  2010/03/26 22:52:15  rubikitch
 ;; `anything-quit-and-find-file':
 ;;   If current selection is a buffer or a file, `find-file' from its directory.
 ;;   Idea from http://i-yt.info/?date=20090826#p01 with some modification. Thanks.
@@ -1192,7 +1195,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.259 2010-03-26 22:52:15 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.260 2010-03-27 02:01:28 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3029,134 +3032,122 @@ If action buffer is selected, back to the anything buffer."
              (anything-check-minibuffer-input))))))
 
 ;; (@* "Core: selection")
-(defun anything-previous-line ()
-  "Move selection to the previous line."
-  (interactive)
-  (anything-move-selection 'line 'previous))
-
-(defun anything-next-line ()
-  "Move selection to the next line."
-  (interactive)
-  (anything-move-selection 'line 'next))
-
-(defun anything-previous-page ()
-  "Move selection back with a pageful."
-  (interactive)
-  (anything-move-selection 'page 'previous))
-
-(defun anything-next-page ()
-  "Move selection forward with a pageful."
-  (interactive)
-  (anything-move-selection 'page 'next))
-
-(defun anything-beginning-of-buffer ()
-  "Move selection at the top."
-  (interactive)
-  (anything-move-selection 'edge 'previous))
-
-(defun anything-end-of-buffer ()
-  "Move selection at the bottom."
-  (interactive)
-  (anything-move-selection 'edge 'next))
-
-(defun anything-previous-source ()
-  "Move selection to the previous source."
-  (interactive)
-  (anything-move-selection 'source 'previous))
-
-
-(defun anything-next-source ()
-  "Move selection to the next source."
-  (interactive)
-  (anything-move-selection 'source 'next))
-
-
-(defun anything-move-selection (unit direction)
+(defun anything-move-selection-common (move-func unit direction)
   "Move the selection marker to a new position determined by
 UNIT and DIRECTION."
   (unless (or (zerop (buffer-size (get-buffer (anything-buffer-get))))
               (not (anything-window)))
     (with-anything-window
-      (case unit
-        (line (case direction
-                (next (if (not (anything-pos-multiline-p))
-                          (forward-line 1)
-                        (let ((header-pos (anything-get-next-header-pos))
-                              (candidate-pos (anything-get-next-candidate-separator-pos)))
-                          (if (and candidate-pos
-                                   (or (null header-pos)
-                                       (< candidate-pos header-pos)))
-                              (goto-char candidate-pos)
-                            (if header-pos
-                                (goto-char header-pos)))
-                          (if candidate-pos
-                              (forward-line 1)))))
-                
-                (previous (progn
-                            (forward-line -1)
-                            (when (anything-pos-multiline-p)
-                              (if (or (anything-pos-header-line-p)
-                                      (anything-pos-candidate-separator-p))
-                                  (forward-line -1)
-                                (forward-line 1))
-                              (let ((header-pos (anything-get-previous-header-pos))
-                                    (candidate-pos (anything-get-previous-candidate-separator-pos)))
-                                (when header-pos
-                                  (if (or (null candidate-pos) (< candidate-pos header-pos))
-                                      (goto-char header-pos)
-                                    (goto-char candidate-pos))
-                                  (forward-line 1))))))
-                
-                (t (error "Invalid direction."))))
-
-        (page (case direction
-                (next (condition-case nil
-                          (scroll-up)
-                        (end-of-buffer (goto-char (point-max)))))
-                (previous (condition-case nil
-                              (scroll-down)
-                            (beginning-of-buffer (goto-char (point-min)))))
-                (t (error "Invalid direction."))))
-
-        (source (case direction
-                   (next (goto-char (or (anything-get-next-header-pos)
-                                        (point-min))))
-                   (previous (progn
-                               (forward-line -1)
-                               (if (bobp)
-                                   (goto-char (point-max))
-                                 (if (anything-pos-header-line-p)
-                                     (forward-line -1)
-                                   (forward-line 1)))
-                               (goto-char (anything-get-previous-header-pos))
-                               (forward-line 1)))
-                   (t (error "Invalid direction."))))
-                
-        (edge (case direction
-                (next (goto-char (point-max)))
-                (previous (goto-char (point-min)))
-                (t (error "Invalid direction."))))
-
-        (t (error "Invalid unit.")))
-
+      (funcall move-func)
       (while (and (not (bobp))
                   (or (anything-pos-header-line-p)
                       (anything-pos-candidate-separator-p)))
         (forward-line (if (and (eq direction 'previous)
-                               (not (eq (line-beginning-position)
-                                        (point-min))))
+                               (not (eq (line-beginning-position) (point-min))))
                           -1
                         1)))
-      (if (bobp)
-          (forward-line 1))
-      (if (eobp)
-          (forward-line -1))
-
+      (and (bobp) (forward-line 1))     ;skip first header
+      (and (eobp) (forward-line -1))    ;avoid last empty line
       (when (and anything-display-source-at-screen-top (eq unit 'source))
         (set-window-start (selected-window)
                           (save-excursion (forward-line -1) (point))))
       (when (anything-get-previous-header-pos)
         (anything-mark-current-line)))))
+
+(defun anything-previous-line ()
+  "Move selection to the previous line."
+  (interactive)
+  (anything-move-selection-common
+   (lambda ()
+     (forward-line -1)
+     (when (anything-pos-multiline-p)
+       (if (or (anything-pos-header-line-p)
+               (anything-pos-candidate-separator-p))
+           (forward-line -1)
+         (forward-line 1))
+       (let ((header-pos (anything-get-previous-header-pos))
+             (candidate-pos (anything-get-previous-candidate-separator-pos)))
+         (when header-pos
+           (if (or (null candidate-pos) (< candidate-pos header-pos))
+               (goto-char header-pos)
+             (goto-char candidate-pos))
+           (forward-line 1)))))
+   'line 'previous))
+
+(defun anything-next-line ()
+  "Move selection to the next line."
+  (interactive)
+  (anything-move-selection-common
+   (lambda ()
+     (if (not (anything-pos-multiline-p))
+         (forward-line 1)
+       (let ((header-pos (anything-get-next-header-pos))
+             (candidate-pos (anything-get-next-candidate-separator-pos)))
+         (if (and candidate-pos
+                  (or (null header-pos)
+                      (< candidate-pos header-pos)))
+             (goto-char candidate-pos)
+           (if header-pos
+               (goto-char header-pos)))
+         (if candidate-pos
+             (forward-line 1)))))
+   'line 'next))
+
+(defun anything-previous-page ()
+  "Move selection back with a pageful."
+  (interactive)
+  (anything-move-selection-common
+   (lambda ()
+     (condition-case nil
+         (scroll-down)
+       (beginning-of-buffer (goto-char (point-min)))))
+   'page 'previous))
+
+(defun anything-next-page ()
+  "Move selection forward with a pageful."
+  (interactive)
+  (anything-move-selection-common
+   (lambda ()
+     (condition-case nil
+         (scroll-up)
+       (end-of-buffer (goto-char (point-max)))))
+   'page 'next))
+
+(defun anything-beginning-of-buffer ()
+  "Move selection at the top."
+  (interactive)
+  (anything-move-selection-common (lambda () (goto-char (point-min)))
+                                  'edge 'previous))
+
+(defun anything-end-of-buffer ()
+  "Move selection at the bottom."
+  (interactive)
+  (anything-move-selection-common (lambda () (goto-char (point-max)))
+                                  'edge 'next))
+
+(defun anything-previous-source ()
+  "Move selection to the previous source."
+  (interactive)
+  (anything-move-selection-common
+   (lambda ()
+     (forward-line -1)
+     (if (bobp)
+         (goto-char (point-max))
+       (if (anything-pos-header-line-p)
+           (forward-line -1)
+         (forward-line 1)))
+     (goto-char (anything-get-previous-header-pos))
+     (forward-line 1))
+   'source 'previous))
+
+(defun anything-next-source ()
+  "Move selection to the next source."
+  (interactive)
+  (anything-move-selection-common
+   (lambda () (goto-char (or (anything-get-next-header-pos) (point-min))))
+   'source 'next))
+
+
 
 (defun anything-mark-current-line ()
   "Move selection overlay to current line."
