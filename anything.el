@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.262 2010-03-27 02:31:55 rubikitch Exp $
+;; $Id: anything.el,v 1.263 2010-03-27 02:34:40 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.262  2010-03-27 02:31:55  rubikitch
+;; Revision 1.263  2010-03-27 02:34:40  rubikitch
+;; doc
+;;
+;; Revision 1.262  2010/03/27 02:31:55  rubikitch
 ;; New command: `anything-force-update' C-c C-u
 ;;
 ;; Revision 1.261  2010/03/27 02:29:39  rubikitch
@@ -1203,7 +1206,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.262 2010-03-27 02:31:55 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.263 2010-03-27 02:34:40 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1595,6 +1598,10 @@ Attributes:
 - multiline (optional)
 
   Enable to selection multiline candidates.
+
+- update (optional)
+
+  Function called with no parameters when \\<anything-map>\\[anything-force-update] is pressed.
 ")
 
 
