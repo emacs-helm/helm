@@ -1470,6 +1470,7 @@ If CANDIDATE is not a directory open this file."
   (let* ((end         (point))
          (guess       (thing-at-point 'filename))
          (full-path-p (string-match (concat "^" (getenv "HOME")) guess)))
+    (set-text-properties 0 (length candidate) nil candidate)
     (condition-case nil
         (when (file-exists-p (file-name-directory guess))
           (search-backward guess (- (point) (length guess)))
