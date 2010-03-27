@@ -424,7 +424,7 @@
 ;;; Code:
 
 ;; version check
-(let ((version "1.256"))
+(let ((version "1.263"))
   (when (and (string= "1." (substring version 0 2))
              (string-match "1\.\\([0-9]+\\)" anything-version)
              (< (string-to-number (match-string 1 anything-version))
@@ -4089,6 +4089,7 @@ See also `anything-create--actions'."
     (init . anything-c-top-init)
     (candidates-in-buffer)
     (display-to-real . anything-c-top-display-to-real)
+    (update . anything-c-top-update)
     (action
      ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %s" pid))))
      ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %s" pid))))
@@ -4108,11 +4109,9 @@ See also `anything-create--actions'."
 (defun anything-c-top-display-to-real (line)
   (car (split-string line)))
 
-(defun anything-c-top-refresh ()
-  (interactive)
+(defun anything-c-top-update ()
   (let ((anything-source-name (assoc-default 'name anything-c-source-top))) ;UGLY HACK
-    (anything-c-top-init))
-  (anything-update))
+    (anything-c-top-init)))
 
 (defun anything-top ()
   "Preconfigured `anything' for top command."
@@ -4120,9 +4119,7 @@ See also `anything-create--actions'."
   (let ((anything-samewindow t)
         (anything-enable-shortcuts)
         (anything-display-function 'anything-default-display-buffer)
-        (anything-map (copy-keymap anything-map))
         (anything-candidate-number-limit 9999))
-    (define-key anything-map "\C-c\C-u" 'anything-c-top-refresh)
     (save-window-excursion
       (delete-other-windows)
       (anything-other-buffer 'anything-c-source-top "*anything top*"))))
