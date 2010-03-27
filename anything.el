@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.261 2010-03-27 02:29:39 rubikitch Exp $
+;; $Id: anything.el,v 1.262 2010-03-27 02:31:55 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -61,6 +61,8 @@
 ;;    Resurrect previously invoked `anything'.
 ;;  `anything-at-point'
 ;;    Same as `anything' except when C-u is pressed, the initial input is the symbol at point.
+;;  `anything-force-update'
+;;    Recalculate and update candidates.
 ;;  `anything-select-action'
 ;;    Select an action for the currently selected candidate.
 ;;  `anything-previous-line'
@@ -345,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.261  2010-03-27 02:29:39  rubikitch
+;; Revision 1.262  2010-03-27 02:31:55  rubikitch
+;; New command: `anything-force-update' C-c C-u
+;;
+;; Revision 1.261  2010/03/27 02:29:39  rubikitch
 ;; New function `anything-goto-source'
 ;;
 ;; Revision 1.260  2010/03/27 02:01:28  rubikitch
@@ -1198,7 +1203,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.261 2010-03-27 02:29:39 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.262 2010-03-27 02:31:55 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1721,6 +1726,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-c C-y") 'anything-yank-selection)
     (define-key map (kbd "C-c C-k") 'anything-kill-selection-and-quit)
     (define-key map (kbd "C-c C-f") 'anything-follow-mode)
+    (define-key map (kbd "C-c C-u") 'anything-force-update)
 
     ;; Use `describe-mode' key in `global-map'
     (dolist (k (where-is-internal 'describe-mode global-map))
@@ -2848,6 +2854,29 @@ the current pattern."
                                  nil
                                  'anything-process-delayed-sources
                                  delayed-sources)))))))
+
+(defun anything-force-update ()
+  "Recalculate and update candidates.
+If current source has `update' attribute, a function without argument, call it before update."
+  (interactive)
+  (anything-aif (anything-attr 'update)
+      (anything-funcall-with-source (anything-get-current-source) it))
+  ;; Remove from candidate cache to recalculate candidates
+  (setq anything-candidate-cache
+        (delete (assoc (assoc-default 'name (anything-get-current-source)) anything-candidate-cache)
+                anything-candidate-cache))
+  ;; Go to original selection after update
+  (let ((selection (anything-get-selection))
+        (source (anything-get-current-source)))
+    (anything-update)
+    (with-anything-window
+      (anything-goto-source source)
+      (forward-char -1)                 ;back to \n
+      (if (search-forward (concat "\n" selection "\n") nil t)
+          (forward-line -1)
+        (goto-char (point-min))
+        (forward-line 1))
+      (anything-mark-current-line))))
 
 (defun anything-insert-match (match insert-function &optional ignored)
   "Insert MATCH into the anything buffer. If MATCH is a list then
