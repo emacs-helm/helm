@@ -1829,6 +1829,12 @@ source.")
                               (sort (mapcar 'car woman-topic-all-completions)
                                     'string-lessp))))))
     (action  ("Show with Woman" . woman))
+    ;; Woman does not work OS X
+    ;; http://xahlee.org/emacs/modernization_man_page.html
+    (action-transformer . (lambda (actions candidate)
+                            (if (eq system-type 'darwin)
+                                '(("Show with Man" . man))
+                              actions)))
     (requires-pattern . 2)))
 ;; (anything 'anything-c-source-man-pages)
 
