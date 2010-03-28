@@ -598,6 +598,61 @@ If you want to have the default tramp messages set it to 3."
 ;; (dolist (k (where-is-internal 'describe-mode global-map))
 ;;   (define-key anything-map k 'anything-c-describe-anything-bindings))
 
+;;; Help message
+(setq anything-help-message
+      (concat
+       "\\<anything-map>"
+       "`anything' is QuickSilver-like candidate-selection framework.
+
+Narrow the list by typing some pattern,
+Multiple patterns are allowed by splitting by space.
+Select with natural Emacs operations, choose with RET.
+
+== Basic Operations ==
+C-p, Up: Previous Line
+C-n, Down : Next Line
+M-v, PageUp : Previous Page
+C-v, PageDown : Next Page
+Enter : Execute first (default) action / Select 
+M-< : First Line
+M-> : Last Line
+M-PageUp, C-M-S-v, C-M-y : Previous Page (other-window)
+M-PageDown, C-M-v : Next Page (other-window)
+
+Tab, C-i : Show action list
+Left : Previous Source
+Right, C-o : Next Source
+C-k : Delete pattern
+C-z : Persistent Action (Execute action with anything session kept)
+
+== Shortcuts For 2nd/3rd Action ==
+\\[anything-select-2nd-action-or-end-of-line] : Execute 2nd Action (if the minibuffer cursor is at end of line)
+\\[anything-select-3rd-action] : Execute 3rd Action
+
+== Visible Marks ==
+Visible marks store candidate. Some actions uses marked candidates.
+
+\\[anything-toggle-visible-mark] : Toggle Visible Mark
+\\[anything-prev-visible-mark] : Previous Mark
+\\[anything-next-visible-mark] : Next Mark
+
+== Miscellaneous Commands ==
+\\[anything-toggle-resplit-window] : Toggle vertical/horizontal split anything window
+\\[anything-quit-and-find-file] : Drop into `find-file'
+\\[anything-delete-current-selection] : Delete Selected Item (visually)
+\\[anything-kill-selection-and-quit] : Set Item Into the kill-ring And Quit
+\\[anything-yank-selection] : Yank Selected Item Into Pattern
+\\[anything-follow-mode] : Toggle Automatical Execution Of Persistent Action
+\\[anything-force-update] : Recalculate And Redisplay Candidates
+
+== Global Commands ==
+\\<global-map>\\[anything-resume] revives last `anything' session.
+It is very useful, so you should bind any key.
+
+Simgle source is executed by \\[anything-call-source].
+
+Enjoy!"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
