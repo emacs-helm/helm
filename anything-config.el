@@ -5155,7 +5155,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
            (or (anything-attr 'persistent-help)
                (anything-aif (assoc-default 'action (anything-get-current-source))
                    (cond ((symbolp it) (symbol-name it))
-                         ((listp it) (caar it))))
+                         ((listp it) (or (ignore-errors (caar it) "")))))
                "")
            " (keeping session)")))
 
