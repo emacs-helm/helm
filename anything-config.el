@@ -5145,15 +5145,17 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 ;; Plug-in: persistent-help
 (defun anything-compile-source--persistent-help (source)
-  (if (assoc-default 'persistent-help source)
-      (append source '((header-line . anything-persistent-help-string)))
-    source))
+  (append source '((header-line . anything-persistent-help-string))))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--persistent-help)
 
 (defun anything-persistent-help-string ()
   (substitute-command-keys
    (concat "\\<anything-map>\\[anything-execute-persistent-action]: "
-           (anything-attr 'persistent-help)
+           (or (anything-attr 'persistent-help)
+               (anything-aif (assoc-default 'action (anything-get-current-source))
+                   (cond ((symbolp it) (symbol-name it))
+                         ((listp it) (caar it))))
+               "")
            " (keeping session)")))
 
 (anything-document-attribute 'persistent-help "persistent-help plug-in"
