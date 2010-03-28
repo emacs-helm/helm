@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.265 2010-03-28 05:07:00 rubikitch Exp $
+;; $Id: anything.el,v 1.266 2010-03-28 06:12:43 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.265  2010-03-28 05:07:00  rubikitch
+;; Revision 1.266  2010-03-28 06:12:43  rubikitch
+;; process source and multiline: in the making (not usable)
+;;
+;; Revision 1.265  2010/03/28 05:07:00  rubikitch
 ;; Change default `anything-sources'. It is only a sample, no problem.
 ;;
 ;; Revision 1.264  2010/03/27 19:02:52  rubikitch
@@ -1212,7 +1215,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.265 2010-03-28 05:07:00 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.266 2010-03-28 06:12:43 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2763,7 +2766,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                 `(,@anything-test-candidate-list
                   (,(assoc-default 'name source)
                    ,matches))))
-      (let ((multiline (assoc 'multiline source))
+      (let ((multiline (assq 'multiline source))
             (start (point))
             separate)
         (anything-insert-header-from-source source)
@@ -2951,7 +2954,9 @@ the real value in a text property."
                   (append process-info `((insertion-marker . ,(point-marker))))))
 
         (let ((lines (split-string string "\n"))
-              candidates)
+              (multiline (assq 'multiline process-info))
+              (start (point))
+              candidates separate)
           (while lines
             (if (not (cdr lines))
                 ;; store last incomplete line until new output arrives
@@ -2969,8 +2974,15 @@ the real value in a text property."
 
           (setq candidates (reverse candidates))
           (dolist (candidate (anything-transform-candidates candidates process-info))
+            ;; FIXME
+            ;; (if (and multiline separate)
+            ;;      (anything-insert-candidate-separator)
+            ;;   (setq separate t))
             (anything-insert-match candidate 'insert-before-markers)
             (incf (cdr item-count-info))
+            ;; FIXME
+            ;; (if multiline
+            ;;     (put-text-property start (point) 'anything-multiline t))
             (when (>= (cdr item-count-info) limit)
               (anything-kill-async-process process)
               (return)))))
