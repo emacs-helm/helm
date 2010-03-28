@@ -1223,7 +1223,7 @@ buffer that is not the current buffer."
                            anything-c-highlight-buffers
                            anything-c-skip-boring-buffers)
     (persistent-action . anything-c-buffers+-persistent-action)
-    (persistent-help . "Show this buffer / C-c \\[anything-execute-persistent-action]: Kill this buffer")))
+    (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
 
 (defun anything-c-buffers+-persistent-action (name)
   (flet ((kill (item)
@@ -1489,10 +1489,18 @@ If CANDIDATE is not a directory open this file."
 (defun anything-find-files ()
   "Preconfigured anything for `find-file'."
   (interactive)
-  (let ((fap (ffap-guesser)))
+  (let* ((fap    (ffap-guesser))
+         (file-p (and fap (file-exists-p fap)))
+         (tap    (thing-at-point 'filename))
+         (bname  (if (and file-p (not (string= fap tap)))
+                     ;; `ffap-guesser' use `file-name-directory'
+                     ;; because it have more than one completion
+                     ;; against this partial filename.
+                     ;; extract this basename anyway to complete against it.
+                     (file-name-nondirectory tap) ""))
+         (input  (if file-p (concat (expand-file-name fap) bname) fap))) 
     (anything 'anything-c-source-find-files
-              (or (if (and fap (file-exists-p fap)) (expand-file-name fap) fap)
-                  (expand-file-name default-directory))
+              (or input (expand-file-name default-directory))
               "Find Files or Url: " nil nil "*Anything Find Files*")))
 
 
