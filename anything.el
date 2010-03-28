@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.267 2010-03-28 20:11:30 rubikitch Exp $
+;; $Id: anything.el,v 1.268 2010-03-28 21:42:01 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.267  2010-03-28 20:11:30  rubikitch
+;; Revision 1.268  2010-03-28 21:42:01  rubikitch
+;; Add some keys in `anything-help'
+;;
+;; Revision 1.267  2010/03/28 20:11:30  rubikitch
 ;; Modify `anything-mode-line-string'
 ;;
 ;; Revision 1.266  2010/03/28 06:12:43  rubikitch
@@ -1218,7 +1221,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.267 2010-03-28 20:11:30 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.268 2010-03-28 21:42:01 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -3316,7 +3319,7 @@ UNIT and DIRECTION."
     (select-window (anything-window))
     (delete-other-windows)
     (switch-to-buffer (get-buffer-create " *Anything Help*"))
-    (setq mode-line-format "%b (SPC:NextPage b:PrevPage other:Exit)")
+    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
     (setq cursor-type nil)
     (erase-buffer)
     (insert (substitute-command-keys anything-help-message))
@@ -3324,8 +3327,8 @@ UNIT and DIRECTION."
     (ignore-errors
       (loop for event = (read-event) do
             (case event
-              (?  (scroll-up))
-              (?b (scroll-down))
+              ((?\C-v ? )  (scroll-up))
+              ((?\M-v ?b) (scroll-down))
               (t (return)))))))
 
 ;; (@* "Core: misc")
