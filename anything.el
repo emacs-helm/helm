@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.266 2010-03-28 06:12:43 rubikitch Exp $
+;; $Id: anything.el,v 1.267 2010-03-28 20:11:30 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.266  2010-03-28 06:12:43  rubikitch
+;; Revision 1.267  2010-03-28 20:11:30  rubikitch
+;; Modify `anything-mode-line-string'
+;;
+;; Revision 1.266  2010/03/28 06:12:43  rubikitch
 ;; process source and multiline: in the making (not usable)
 ;;
 ;; Revision 1.265  2010/03/28 05:07:00  rubikitch
@@ -1215,7 +1218,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.266 2010-03-28 06:12:43 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.267 2010-03-28 20:11:30 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1943,7 +1946,7 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
 
 (defvar anything-delayed-init-executed nil)
 
-(defvar anything-mode-line-string "(\\<anything-map>\\[anything-help]:help \\[anything-select-action]:act \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\\[anything-select-3rd-action]:nthact \\[anything-execute-persistent-action]:pers-act)"
+(defvar anything-mode-line-string "(\\<anything-map>\\[anything-help]:help \\[anything-select-action]:ActionList \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\\[anything-select-3rd-action]:NthAction"
   "Help string displayed in mode-line in `anything'.
 If nil, use default `mode-line-format'.")
 (make-variable-buffer-local 'anything-mode-line-string)
