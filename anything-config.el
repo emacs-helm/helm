@@ -5126,6 +5126,27 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   (dolist (i (anything-marked-candidates))
     (kill-buffer i)))
 
+;; Plug-in: persistent-help
+(defun anything-compile-source--persistent-help (source)
+  (if (assoc-default 'persistent-help source)
+      (append source '((header-line . anything-persistent-help-string)))
+    source))
+(add-to-list 'anything-compile-source-functions 'anything-compile-source--persistent-help)
+
+(defun anything-persistent-help-string ()
+  (substitute-command-keys
+   (concat "\\<anything-map>\\[anything-execute-persistent-action]: "
+           (anything-attr 'persistent-help)
+           " (keeping session)")))
+
+(anything-document-attribute 'persistent-help "persistent-help plug-in"
+  "A string to explain persistent-action of this source.
+It also accepts a function or a variable name.")
+
+;; (anything '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun anything-delete-marked-files (candidate)
   (anything-aif (anything-marked-candidates)
       (if (y-or-n-p (format "Delete *%s Files " (length it)))
