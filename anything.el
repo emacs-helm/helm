@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.264 2010-03-27 19:02:52 rubikitch Exp $
+;; $Id: anything.el,v 1.265 2010-03-28 05:07:00 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.264  2010-03-27 19:02:52  rubikitch
+;; Revision 1.265  2010-03-28 05:07:00  rubikitch
+;; Change default `anything-sources'. It is only a sample, no problem.
+;;
+;; Revision 1.264  2010/03/27 19:02:52  rubikitch
 ;; New attributes: `mode-line' and `header-line'
 ;;
 ;; Revision 1.263  2010/03/27 02:34:40  rubikitch
@@ -1209,7 +1212,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.264 2010-03-27 19:02:52 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.265 2010-03-28 05:07:00 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1247,22 +1250,6 @@
                                             (directory-files
                                              anything-default-directory)))
                             (type . file))
-
-                           ((name . "Manual Pages")
-                            (candidates . ,(progn
-                                             ;; XEmacs doesn't have a woman :)
-                                             (declare (special woman-file-name
-                                                               woman-topic-all-completions))
-                                             (condition-case nil
-                                                 (progn
-                                                   (require 'woman)
-                                                   (woman-file-name "")
-                                                   (sort (mapcar 'car
-                                                                 woman-topic-all-completions)
-                                                         'string-lessp))
-                                               (error nil))))
-                            (action . (("Open Manual Page" . woman)))
-                            (requires-pattern . 2))
 
                            ((name . "Complex Command History")
                             (candidates . (lambda ()
