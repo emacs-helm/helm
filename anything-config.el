@@ -1485,24 +1485,16 @@ If CANDIDATE is not a directory open this file."
               (insert (abbreviate-file-name candidate))))
       (error nil))))
 
-
 (defun anything-find-files ()
   "Preconfigured anything for `find-file'."
   (interactive)
   (let* ((fap    (ffap-guesser))
          (file-p (and fap (file-exists-p fap)))
          (tap    (thing-at-point 'filename))
-         (bname  (if (and file-p (not (string= fap tap)))
-                     ;; `ffap-guesser' use `file-name-directory'
-                     ;; because it have more than one completion
-                     ;; against this partial filename.
-                     ;; extract this basename anyway to complete against it.
-                     (file-name-nondirectory tap) ""))
-         (input  (if file-p (concat (expand-file-name fap) bname) fap))) 
+         (input  (if file-p (expand-file-name tap) fap))) 
     (anything 'anything-c-source-find-files
               (or input (expand-file-name default-directory))
               "Find Files or Url: " nil nil "*Anything Find Files*")))
-
 
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
