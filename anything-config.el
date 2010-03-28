@@ -599,6 +599,17 @@ If you want to have the default tramp messages set it to 3."
 ;;   (define-key anything-map k 'anything-c-describe-anything-bindings))
 
 ;;; Help message
+(defun anything-c-list-preconfigured-anything ()
+  (loop with doc
+        with sym
+        for entry in (cdr (assoc (locate-library "anything-config") load-history))
+        if (and (consp entry)
+                (eq (car entry) 'defun)
+                (string-match "^Preconfigured.+$"
+                              (setq doc (or (documentation (setq sym (cdr entry)))
+                                            ""))))
+        collect (format "\\[%s] : %s\n" sym (match-string 0 doc))))
+
 (setq anything-help-message
       (concat
        "\\<anything-map>"
@@ -659,17 +670,6 @@ You can use them without configuration.
        (apply 'concat (anything-c-list-preconfigured-anything))
        "
 Enjoy!"))
-
-(defun anything-c-list-preconfigured-anything ()
-  (loop with doc
-        with sym
-        for entry in (cdr (assoc (locate-library "anything-config") load-history))
-        if (and (consp entry)
-                (eq (car entry) 'defun)
-                (string-match "^Preconfigured.+$"
-                              (setq doc (or (documentation (setq sym (cdr entry)))
-                                            ""))))
-        collect (format "\\[%s] : %s\n" sym (match-string 0 doc))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
