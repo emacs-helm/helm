@@ -651,7 +651,25 @@ It is very useful, so you should bind any key.
 
 Simgle source is executed by \\[anything-call-source].
 
+== Preconfigured `anything' ==
+Preconfigured `anything' is commands that uses `anything' interface.
+You can use them without configuration.
+
+"
+       (apply 'concat (anything-c-list-preconfigured-anything))
+       "
 Enjoy!"))
+
+(defun anything-c-list-preconfigured-anything ()
+  (loop with doc
+        with sym
+        for entry in (cdr (assoc (locate-library "anything-config") load-history))
+        if (and (consp entry)
+                (eq (car entry) 'defun)
+                (string-match "^Preconfigured.+$"
+                              (setq doc (or (documentation (setq sym (cdr entry)))
+                                            ""))))
+        collect (format "\\[%s] : %s\n" sym (match-string 0 doc))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun anything-for-files ()
