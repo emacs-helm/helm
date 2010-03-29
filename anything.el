@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.268 2010-03-28 21:42:01 rubikitch Exp $
+;; $Id: anything.el,v 1.269 2010-03-29 08:42:23 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,11 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.268  2010-03-28 21:42:01  rubikitch
+;; Revision 1.269  2010-03-29 08:42:23  rubikitch
+;; * New attribute `resume'
+;; * Fix a bug of `disable-shortcuts' plug-in
+;;
+;; Revision 1.268  2010/03/28 21:42:01  rubikitch
 ;; Add some keys in `anything-help'
 ;;
 ;; Revision 1.267  2010/03/28 20:11:30  rubikitch
@@ -1221,7 +1225,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.268 2010-03-28 21:42:01 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.269 2010-03-29 08:42:23 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1611,7 +1615,10 @@ Attributes:
 
   source local `header-line-format'.
   It accepts also variable/function name.
-")
+
+- resume (optional)
+
+  Function called with no parameters when `anything-resume' is started.")
 
 
 ;; This value is only provided as an example. Customize it to your own
@@ -2396,7 +2403,8 @@ already-bound variables. Yuck!
   (unless (eq any-resume 'noresume)
     (anything-recent-push anything-buffer 'anything-buffers)
     (setq anything-last-buffer anything-buffer))
-  (when any-input (setq anything-input any-input anything-pattern any-input)))
+  (when any-input (setq anything-input any-input anything-pattern any-input))
+  (and (eq any-resume t) (anything-funcall-foreach 'resume)))
 
 (defun anything-execute-selection-action-1 ()
   (unwind-protect
@@ -3440,12 +3448,18 @@ UNIT and DIRECTION."
 
 ;; (@* "Built-in plug-in: disable-shortcuts")
 (defvar anything-orig-enable-shortcuts nil)
+(defun anything-save-enable-shortcuts ()
+  (setq anything-orig-enable-shortcuts anything-enable-shortcuts
+        anything-enable-shortcuts nil))
 (defun anything-compile-source--disable-shortcuts (source)
   (if (assoc 'disable-shortcuts source)
-      (append source
-              '((init . (lambda () (setq anything-orig-enable-shortcuts anything-enable-shortcuts
-                                         anything-enable-shortcuts nil)))
-                (cleanup . (lambda () (setq anything-enable-shortcuts anything-orig-enable-shortcuts)))))
+      (append `((init ,@(anything-mklist (assoc-default 'init source))
+                      anything-save-enable-shortcuts)
+                (resume ,@(anything-mklist (assoc-default 'resume source))
+                        anything-save-enable-shortcuts)
+                (cleanup ,@(anything-mklist (assoc-default 'cleanup source))
+                         (lambda () (setq anything-enable-shortcuts anything-orig-enable-shortcuts))))
+              source)
     source))
 
 ;; (@* "Built-in plug-in: candidates-in-buffer")
