@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.269 2010-03-29 08:42:23 rubikitch Exp $
+;; $Id: anything.el,v 1.270 2010-03-29 09:56:12 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.269  2010-03-29 08:42:23  rubikitch
+;; Revision 1.270  2010-03-29 09:56:12  rubikitch
+;; Call `filtered-candidate-transformer' functions even if process sources
+;;
+;; Revision 1.269  2010/03/29 08:42:23  rubikitch
 ;; * New attribute `resume'
 ;; * Fix a bug of `disable-shortcuts' plug-in
 ;;
@@ -1225,7 +1228,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.269 2010-03-29 08:42:23 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.270 2010-03-29 09:56:12 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2651,10 +2654,12 @@ SOURCE."
                         candidate-source)))))
          
 
-(defun anything-transform-candidates (candidates source)
+(defun anything-transform-candidates (candidates source &optional process-p)
   "Transform CANDIDATES according to candidate transformers."
   (anything-aif (assoc-default 'candidate-transformer source)
       (setq candidates (anything-composed-funcall-with-source source it candidates)))
+  (anything-aif (assoc-default 'filtered-candidate-transformer source)
+      (setq candidates (anything-composed-funcall-with-source source it candidates source)))
   (anything-aif (assoc-default 'real-to-display source)
       (setq candidates (anything-funcall-with-source
                         source 'mapcar
@@ -2982,12 +2987,12 @@ the real value in a text property."
                           candidates)
                     (setcdr incomplete-line-info nil))
 
-              (push (car lines) candidates)))
+                (push (car lines) candidates)))
                   
             (pop lines))
 
           (setq candidates (reverse candidates))
-          (dolist (candidate (anything-transform-candidates candidates process-info))
+          (dolist (candidate (anything-transform-candidates candidates process-info t))
             ;; FIXME
             ;; (if (and multiline separate)
             ;;      (anything-insert-candidate-separator)
