@@ -5233,9 +5233,11 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   (substitute-command-keys
    (concat "\\<anything-map>\\[anything-execute-persistent-action]: "
            (or (anything-attr 'persistent-help)
-               (anything-aif (assoc-default 'action (anything-get-current-source))
+               (anything-aif (or (assoc-default 'persistent-action (anything-get-current-source))
+                                 (assoc-default 'action (anything-get-current-source))
+                                 )
                    (cond ((symbolp it) (symbol-name it))
-                         ((listp it) (or (ignore-errors (caar it) "")))))
+                         ((listp it) (or (ignore-errors (caar it))  ""))))
                "")
            " (keeping session)")))
 
