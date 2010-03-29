@@ -1365,7 +1365,7 @@ buffer that is not the current buffer."
 
 ;;; Anything replacement of file name completion for `find-file' and friends.
 
-(defvar anything-c-find-files-doc-header (format " (`C-z':Expand Candidate, `%s':Go to precedent level)"
+(defvar anything-c-find-files-doc-header (format " (`%s':Go to precedent level)"
                                                  (if window-system "C-." "C-l")) 
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 
@@ -1376,6 +1376,7 @@ buffer that is not the current buffer."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action . ,(delq nil `(("Find File" . find-file-at-point)
                            ("Find file in Dired" . anything-c-point-file-in-dired)
@@ -1575,6 +1576,7 @@ If CANDIDATE is not a directory open this file."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action .
      (("Write File" . (lambda (candidate)
@@ -1593,6 +1595,7 @@ If CANDIDATE is not a directory open this file."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action .
      (("Insert File" . (lambda (candidate)
@@ -1613,6 +1616,7 @@ If CANDIDATE is not a directory open this file."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action .
      (("Copy File" . (lambda (candidate)
@@ -1624,6 +1628,7 @@ If CANDIDATE is not a directory open this file."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action .
      (("Rename File" . (lambda (candidate)
@@ -1634,6 +1639,7 @@ If CANDIDATE is not a directory open this file."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action .
      (("Symlink File" . (lambda (candidate)
@@ -1647,6 +1653,7 @@ If CANDIDATE is not a directory open this file."
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
+    (persistent-help . "Expand Candidate")
     (volatile)
     (action .
      (("Hardlink File" . (lambda (candidate)
