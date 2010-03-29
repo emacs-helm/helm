@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.270 2010-03-29 09:56:12 rubikitch Exp $
+;; $Id: anything.el,v 1.271 2010-03-29 09:59:17 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.270  2010-03-29 09:56:12  rubikitch
+;; Revision 1.271  2010-03-29 09:59:17  rubikitch
+;; stupid bug
+;;
+;; Revision 1.270  2010/03/29 09:56:12  rubikitch
 ;; Call `filtered-candidate-transformer' functions even if process sources
 ;;
 ;; Revision 1.269  2010/03/29 08:42:23  rubikitch
@@ -1228,7 +1231,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.270 2010-03-29 09:56:12 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.271 2010-03-29 09:59:17 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2658,7 +2661,7 @@ SOURCE."
   "Transform CANDIDATES according to candidate transformers."
   (anything-aif (assoc-default 'candidate-transformer source)
       (setq candidates (anything-composed-funcall-with-source source it candidates)))
-  (anything-aif (assoc-default 'filtered-candidate-transformer source)
+  (anything-aif (and process-p (assoc-default 'filtered-candidate-transformer source))
       (setq candidates (anything-composed-funcall-with-source source it candidates source)))
   (anything-aif (assoc-default 'real-to-display source)
       (setq candidates (anything-funcall-with-source
