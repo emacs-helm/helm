@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.84 2010-03-27 02:43:45 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.85 2010-03-31 03:22:29 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.84  2010-03-27 02:43:45  rubikitch
+;; Revision 1.85  2010-03-31 03:22:29  rubikitch
+;; anything attribute completion from M-x anything-lisp-complete-symbol(-partial-match)
+;;
+;; Revision 1.84  2010/03/27 02:43:45  rubikitch
 ;; Use `anything-force-update' feature
 ;;
 ;; Revision 1.83  2010/03/22 06:10:40  rubikitch
@@ -389,7 +392,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.84 2010-03-27 02:43:45 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.85 2010-03-31 03:22:29 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -634,7 +637,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (type . apropos-variable)))
 
 (defvar anything-lisp-complete-symbol-sources
-  '(anything-c-source-complete-emacs-commands
+  '(anything-c-source-complete-anything-attributes
+    anything-c-source-complete-emacs-commands
     anything-c-source-complete-emacs-functions
     anything-c-source-complete-emacs-variables
     anything-c-source-complete-emacs-faces))
@@ -728,6 +732,73 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   "`apropos' replacement using `anything'."
   (interactive "P")
   (anything-lisp-complete-symbol-1 update anything-apropos-sources nil))
+
+;; (@* "anything attribute completion")
+(defvar anything-c-source-complete-anything-attributes
+  '((name . "Anything Attributes")
+    (candidates . acaa-candidates)
+    (action . ac-insert)
+    (persistent-action . acaa-describe-anything-attribute)
+    (filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
+    (header-name . alcs-header-name)
+    (action . ac-insert)))
+;; (anything 'anything-c-source-complete-anything-attributes)
+
+(defun acaa-describe-anything-attribute (str)
+  (anything-describe-anything-attribute (intern str)))
+
+(defun acaa-candidates ()
+  (with-current-buffer anything-current-buffer
+    (when (and (require 'yasnippet nil t)
+               (acaa-completing-attribute-p (point)))
+      (mapcar 'symbol-name anything-additional-attributes))))
+
+(defvar acaa-anything-commands-regexp
+  (concat "(" (regexp-opt '("anything" "anything-other-buffer")) " "))
+
+(defun acaa-completing-attribute-p (point)
+  (save-excursion
+    (goto-char point)
+    (ignore-errors
+      (or (save-excursion
+            (backward-up-list 3)
+            (looking-at (concat "(defvar anything-c-source-"
+                                "\\|"
+                                acaa-anything-commands-regexp)))
+          (save-excursion
+            (backward-up-list 4)
+            (looking-at acaa-anything-commands-regexp))))))
+
+;; (anything '(ini
+;;;; unit test
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
+(dont-compile
+  (when (fboundp 'expectations)
+    (expectations
+      (desc "acaa-completing-attribute-p")
+      (expect t
+        (with-temp-buffer
+          (insert "(anything '(((na")
+          (acaa-completing-attribute-p (point))))
+      (expect t
+        (with-temp-buffer
+          (insert "(anything '((na")
+          (acaa-completing-attribute-p (point))))
+      (expect nil
+        (with-temp-buffer
+          (insert "(anything-hoge '((na")
+          (acaa-completing-attribute-p (point))))
+      (expect nil
+        (with-temp-buffer
+          (insert "(anything-hoge '(((na")
+          (acaa-completing-attribute-p (point))))
+      (expect t
+        (with-temp-buffer
+          (insert "(defvar anything-c-source-hoge '((na")
+          (acaa-completing-attribute-p (point))))
+
+      )))
 
 ;; (@* "anything-read-string-mode / read-* compatibility functions")
 ;; moved from anything.el
