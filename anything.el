@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.273 2010-03-31 02:37:18 rubikitch Exp $
+;; $Id: anything.el,v 1.274 2010-03-31 02:43:35 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -131,6 +131,8 @@
 ;;    Integrate anything completion into iswitchb (UNMAINTAINED).
 ;;  `anything-iswitchb-cancel-anything'
 ;;    Cancel anything completion and return to standard iswitchb.
+;;  `anything-describe-anything-attribute'
+;;    Display the full documentation of ANYTHING-ATTRIBUTE (a symbol).
 ;;
 ;;; Customizable Options:
 ;;
@@ -347,7 +349,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.273  2010-03-31 02:37:18  rubikitch
+;; Revision 1.274  2010-03-31 02:43:35  rubikitch
+;; New command: `anything-describe-anything-attribute'
+;;
+;; Revision 1.273  2010/03/31 02:37:18  rubikitch
 ;; Document all attributes by `anything-document-attribute' instead of `anything-sources' docstring
 ;;
 ;; Revision 1.272  2010/03/29 21:05:47  rubikitch
@@ -1237,7 +1242,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.273 2010-03-31 02:37:18 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.274 2010-03-31 02:43:35 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -4072,6 +4077,15 @@ buffer as BUFFER."
         (buffer-modified-tick)))))
 
 ;;(@* "Attribute Documentation")
+(defun anything-describe-anything-attribute (anything-attribute)
+  "Display the full documentation of ANYTHING-ATTRIBUTE (a symbol)."
+  (interactive (list (intern
+                      (completing-read
+                       "Describe anything attribute: "
+                       (mapcar 'symbol-name anything-additional-attributes)))))
+  (with-output-to-temp-buffer "*Help*"
+    (princ (get anything-attribute 'anything-attrdoc))))
+
 (anything-document-attribute 'name "mandatory"
   "  The name of the source. It is also the heading which appears
   above the list of matches from the source. Must be unique. ")
