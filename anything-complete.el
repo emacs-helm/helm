@@ -1,5 +1,5 @@
 ;;; anything-complete.el --- completion with anything
-;; $Id: anything-complete.el,v 1.85 2010-03-31 03:22:29 rubikitch Exp $
+;; $Id: anything-complete.el,v 1.86 2010-03-31 23:14:13 rubikitch Exp $
 
 ;; Copyright (C) 2008, 2009, 2010 rubikitch
 
@@ -109,7 +109,10 @@
 ;;; History:
 
 ;; $Log: anything-complete.el,v $
-;; Revision 1.85  2010-03-31 03:22:29  rubikitch
+;; Revision 1.86  2010-03-31 23:14:13  rubikitch
+;; `anything-completing-read': Fix a case when HIST is a cons.
+;;
+;; Revision 1.85  2010/03/31 03:22:29  rubikitch
 ;; anything attribute completion from M-x anything-lisp-complete-symbol(-partial-match)
 ;;
 ;; Revision 1.84  2010/03/27 02:43:45  rubikitch
@@ -392,7 +395,7 @@
 
 ;;; Code:
 
-(defvar anything-complete-version "$Id: anything-complete.el,v 1.85 2010-03-31 03:22:29 rubikitch Exp $")
+(defvar anything-complete-version "$Id: anything-complete.el,v 1.86 2010-03-31 23:14:13 rubikitch Exp $")
 (require 'anything-match-plugin)
 (require 'thingatpt)
 
@@ -832,6 +835,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (if (or (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
     ;; support only collection list.
+    (setq hist (or (car-safe hist) hist))
     (let* (anything-input-idle-delay
            (result (or (anything-noresume (acr-sources
                                            prompt
