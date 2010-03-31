@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.276 2010-03-31 08:52:50 rubikitch Exp $
+;; $Id: anything.el,v 1.277 2010-03-31 08:56:53 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -349,7 +349,14 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.276  2010-03-31 08:52:50  rubikitch
+;; Revision 1.277  2010-03-31 08:56:53  rubikitch
+;; Anything saves/restores window configuration instead of frame configuration now.
+;; The default is changed because flickering is occurred in some environment.
+;;
+;; If you want to save and restore frame configuration, set this variable to
+;;  '(set-frame-configuration . current-frame-configuration)
+;;
+;; Revision 1.276  2010/03/31 08:52:50  rubikitch
 ;; Fitting frame is disabled by default, because some flickering occurred
 ;; in some environment.  To enable fitting, set both
 ;; `anything-inhibit-fit-frame-flag' and `fit-frame-inhibit-fitting' to
@@ -1251,7 +1258,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.276 2010-03-31 08:52:50 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.277 2010-03-31 08:56:53 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1625,9 +1632,12 @@ This flag makes `anything' a bit faster with many sources.")
   "`anything-buffer' of previously `anything' session.")
 
 (defvar anything-save-configuration-functions
-  '(set-frame-configuration . current-frame-configuration)
-  "If you hate flickering, set this variable to
- '(set-window-configuration . current-window-configuration)
+  '(set-window-configuration . current-window-configuration)
+  "If you want to save and restore frame configuration, set this variable to
+ '(set-frame-configuration . current-frame-configuration)
+
+Older version saves/restores frame configuration, but the default is changed now,
+because flickering is occurred in some environment.
 ")
 
 (defvar anything-persistent-action-use-special-display nil
