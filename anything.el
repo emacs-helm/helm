@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.278 2010-03-31 09:01:08 rubikitch Exp $
+;; $Id: anything.el,v 1.279 2010-03-31 09:22:58 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -206,6 +206,16 @@
 ;;; (@* "Tips")
 
 ;;
+;; If you want to create anything sources, yasnippet would help you.
+;; http://yasnippet.googlecode.com/
+;;
+;; Then get the snippet from
+;; http://www.emacswiki.org/cgi-bin/wiki/download/anything-source.yasnippet
+;;
+;; Put it in ~/.emacs.d/plugins/yasnippet/snippets/text-mode/emacs-lisp-mode/
+
+
+;;
 ;; `anything-interpret-value' is useful function to interpret value
 ;; like `candidates' attribute.
 ;;
@@ -365,7 +375,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.278  2010-03-31 09:01:08  rubikitch
+;; Revision 1.279  2010-03-31 09:22:58  rubikitch
+;; Add tips of yasnippet for source creators (no code change)
+;;
+;; Revision 1.278  2010/03/31 09:01:08  rubikitch
 ;; Added info to INCOMPATIBLE CHANGES
 ;;
 ;; Revision 1.277  2010/03/31 08:56:53  rubikitch
@@ -1277,7 +1290,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.278 2010-03-31 09:01:08 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.279 2010-03-31 09:22:58 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
