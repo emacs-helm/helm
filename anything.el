@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.275 2010-03-31 02:46:09 rubikitch Exp $
+;; $Id: anything.el,v 1.276 2010-03-31 08:52:50 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -349,7 +349,13 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.275  2010-03-31 02:46:09  rubikitch
+;; Revision 1.276  2010-03-31 08:52:50  rubikitch
+;; Fitting frame is disabled by default, because some flickering occurred
+;; in some environment.  To enable fitting, set both
+;; `anything-inhibit-fit-frame-flag' and `fit-frame-inhibit-fitting' to
+;; nil.
+;;
+;; Revision 1.275  2010/03/31 02:46:09  rubikitch
 ;; (defvaralias 'anything-attributes 'anything-additional-attributes)
 ;;
 ;; Revision 1.274  2010/03/31 02:43:35  rubikitch
@@ -1245,7 +1251,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.275 2010-03-31 02:46:09 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.276 2010-03-31 08:52:50 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1657,6 +1663,13 @@ If nil, use default `mode-line-format'.")
   "Detailed help message string for `anything'.")
 
 (put 'anything 'timid-completion 'disabled)
+
+(defvar anything-inhibit-fit-frame-flag t
+  "If non-nil, inhibit fitting anything frame to its buffer.
+It is nil by default because some flickering occurred in some environment.
+
+To enable fitting, set both `anything-inhibit-fit-frame-flag' and
+`fit-frame-inhibit-fitting' to nil.")
 
 ;; (@* "Internal Variables")
 (defvar anything-test-candidate-list nil)
@@ -3044,9 +3057,12 @@ UNIT and DIRECTION."
 
 (defun anything-maybe-fit-frame ()
   "Fit anything frame to its buffer, and put it at top right of display.
- To inhibit fitting, set `fit-frame-inhibit-fitting-flag' to t.
- You can set user options `fit-frame-max-width-percent' and
- `fit-frame-max-height-percent' to control max frame size."
+
+It is disabled by default because some flickering occurred in some environment.
+To enable fitting, set both `anything-inhibit-fit-frame-flag' and
+ `fit-frame-inhibit-fitting' to nil.
+You can set user options `fit-frame-max-width-percent' and
+`fit-frame-max-height-percent' to control max frame size."
   (declare (warn (unresolved 0)))
   (when (and (require 'fit-frame nil t)
              (boundp 'fit-frame-inhibit-fitting-flag)
