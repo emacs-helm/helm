@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.277 2010-03-31 08:56:53 rubikitch Exp $
+;; $Id: anything.el,v 1.278 2010-03-31 09:01:08 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -180,6 +180,22 @@
 
 ;;; (@* "INCOMPATIBLE CHANGES")
 
+;; v1.277
+;; 
+;;   Default setting of `anything-save-configuration-functions' is changed.
+;;   Anything saves/restores window configuration instead of frame configuration now.
+;;   The default is changed because flickering is occurred in some environment.
+;;   
+;;   If you want to save and restore frame configuration, set this variable to
+;;    '(set-frame-configuration . current-frame-configuration)
+;;
+;; v1.276
+;;
+;;   Fitting frame is disabled by default, because some flickering occurred
+;;   in some environment.  To enable fitting, set both
+;;   `anything-inhibit-fit-frame-flag' and `fit-frame-inhibit-fitting' to
+;;   nil.
+;;
 ;; v1.114
 ;;
 ;;   `anything-attr' returns nil when the source attribute is defined
@@ -349,7 +365,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.277  2010-03-31 08:56:53  rubikitch
+;; Revision 1.278  2010-03-31 09:01:08  rubikitch
+;; Added info to INCOMPATIBLE CHANGES
+;;
+;; Revision 1.277  2010/03/31 08:56:53  rubikitch
 ;; Anything saves/restores window configuration instead of frame configuration now.
 ;; The default is changed because flickering is occurred in some environment.
 ;;
@@ -1258,7 +1277,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.277 2010-03-31 08:56:53 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.278 2010-03-31 09:01:08 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
