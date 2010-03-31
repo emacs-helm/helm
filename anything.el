@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.272 2010-03-29 21:05:47 rubikitch Exp $
+;; $Id: anything.el,v 1.273 2010-03-31 02:37:18 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -347,7 +347,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.272  2010-03-29 21:05:47  rubikitch
+;; Revision 1.273  2010-03-31 02:37:18  rubikitch
+;; Document all attributes by `anything-document-attribute' instead of `anything-sources' docstring
+;;
+;; Revision 1.272  2010/03/29 21:05:47  rubikitch
 ;; `anything-mode-line-string': use `make-local-variable' instead
 ;;
 ;; Revision 1.271  2010/03/29 09:59:17  rubikitch
@@ -1234,7 +1237,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.272 2010-03-29 21:05:47 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.273 2010-03-31 02:37:18 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1298,336 +1301,7 @@ use `anything-set-sources', never use `setq'.
 
 Attributes:
 
-- name (mandatory)
-
-  The name of the source. It is also the heading which appears
-  above the list of matches from the source. Must be unique.
-
-- header-name (optional)
-
-  A function returning the display string of the header. Its
-  argument is the name of the source. This attribute is useful to
-  add an additional information with the source name.
-
-- candidates (mandatory if candidates-in-buffer attribute is not provided)
-
-  Specifies how to retrieve candidates from the source. It can
-  either be a variable name, a function called with no parameters
-  or the actual list of candidates.
-
-  The list must be a list whose members are strings, symbols
-  or (DISPLAY . REAL) pairs.
-
-  In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
-  in the Anything buffer, but the REAL one is used as action
-  argument when the candidate is selected. This allows a more
-  readable presentation for candidates which would otherwise be,
-  for example, too long or have a common part shared with other
-  candidates which can be safely replaced with an abbreviated
-  string for display purposes.
-
-  Note that if the (DISPLAY . REAL) form is used then pattern
-  matching is done on the displayed string, not on the real
-  value.
-
-  If the candidates have to be retrieved asynchronously (for
-  example, by an external command which takes a while to run)
-  then the function should start the external command
-  asynchronously and return the associated process object.
-  Anything will take care of managing the process (receiving the
-  output from it, killing it if necessary, etc.). The process
-  should return candidates matching the current pattern (see
-  variable `anything-pattern'.)
-
-  Note that currently results from asynchronous sources appear
-  last in the anything buffer regardless of their position in
-  `anything-sources'.
-
-- action (mandatory if type attribute is not provided)
-
-  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
-  FUNCTION is called with one parameter: the selected candidate.
-
-  An action other than the default can be chosen from this list
-  of actions for the currently selected candidate (by default
-  with TAB). The DISPLAY string is shown in the completions
-  buffer and the FUNCTION is invoked when an action is
-  selected. The first action of the list is the default.
-
-- type (optional if action attribute is provided)
-
-  Indicates the type of the items the source returns. 
-
-  Merge attributes not specified in the source itself from
-  `anything-type-attributes'.
-
-  This attribute is implemented by plug-in.
-
-- init (optional)
-
-  Function called with no parameters when anything is started. It
-  is useful for collecting current state information which can be
-  used to create the list of candidates later.
-
-  For example, if a source needs to work with the current
-  directory then it can store its value here, because later
-  anything does its job in the minibuffer and in the
-  `anything-buffer' and the current directory can be different
-  there.
-
-- delayed-init (optional)
-
-  Function called with no parameters before candidate function is
-  called.  It is similar with `init' attribute, but its
-  evaluation is deferred. It is useful to combine with
-  `requires-pattern' attribute.
-
-- match (optional)
-
-  List of functions called with one parameter: a candidate. The
-  function should return non-nil if the candidate matches the
-  current pattern (see variable `anything-pattern').
-
-  This attribute allows the source to override the default
-  pattern matching based on `string-match'. It can be used, for
-  example, to implement a source for file names and do the
-  pattern matching on the basename of files, since it's more
-  likely one is typing part of the basename when searching for a
-  file, instead of some string anywhere else in its path.
-
-  If the list contains more than one function then the list of
-  matching candidates from the source is constructed by appending
-  the results after invoking the first function on all the
-  potential candidates, then the next function, and so on. The
-  matching candidates supplied by the first function appear first
-  in the list of results and then results from the other
-  functions, respectively.
-
-  This attribute has no effect for asynchronous sources (see
-  attribute `candidates'), since they perform pattern matching
-  themselves.
-
-- candidate-transformer (optional)
-
-  It's a function or a list of functions called with one argument
-  when the completion list from the source is built. The argument
-  is the list of candidates retrieved from the source. The
-  function should return a transformed list of candidates which
-  will be used for the actual completion.  If it is a list of
-  functions, it calls each function sequentially.
-
-  This can be used to transform or remove items from the list of
-  candidates.
-
-  Note that `candidates' is run already, so the given transformer
-  function should also be able to handle candidates with (DISPLAY
-  . REAL) format.
-
-- filtered-candidate-transformer (optional)
-
-  It has the same format as `candidate-transformer', except the
-  function is called with two parameters: the candidate list and
-  the source.
-
-  This transformer is run on the candidate list which is already
-  filtered by the current pattern. While `candidate-transformer'
-  is run only once, it is run every time the input pattern is
-  changed.
-
-  It can be used to transform the candidate list dynamically, for
-  example, based on the current pattern.
-
-  In some cases it may also be more efficent to perform candidate
-  transformation here, instead of with `candidate-transformer'
-  even if this transformation is done every time the pattern is
-  changed.  For example, if a candidate set is very large then
-  `candidate-transformer' transforms every candidate while only
-  some of them will actually be dislpayed due to the limit
-  imposed by `anything-candidate-number-limit'.
-
-  Note that `candidates' and `candidate-transformer' is run
-  already, so the given transformer function should also be able
-  to handle candidates with (DISPLAY . REAL) format.
-
-  This option has no effect for asynchronous sources. (Not yet,
-  at least.
-
-- action-transformer (optional)
-
-  It's a function or a list of functions called with two
-  arguments when the action list from the source is
-  assembled. The first argument is the list of actions, the
-  second is the current selection.  If it is a list of functions,
-  it calls each function sequentially.
-
-  The function should return a transformed action list.
-
-  This can be used to customize the list of actions based on the
-  currently selected candidate.
-
-- pattern-transformer (optional)
-
-  It's a function or a list of functions called with one argument
-  before computing matches. Its argument is `anything-pattern'.
-  Functions should return transformed `anything-pattern'.
-
-  It is useful to change interpretation of `anything-pattern'.
-
-- delayed (optional)
-
-  Candidates from the source are shown only if the user stops
-  typing and is idle for `anything-idle-delay' seconds.
-
-- volatile (optional)
-
-  Indicates the source assembles the candidate list dynamically,
-  so it shouldn't be cached within a single Anything
-  invocation. It is only applicable to synchronous sources,
-  because asynchronous sources are not cached.
-
-- requires-pattern (optional)
-
-  If present matches from the source are shown only if the
-  pattern is not empty. Optionally, it can have an integer
-  parameter specifying the required length of input which is
-  useful in case of sources with lots of candidates.
-
-- persistent-action (optional)
-
-  Function called with one parameter; the selected candidate.
-
-  An action performed by `anything-execute-persistent-action'.
-  If none, use the default action.
-
-- candidates-in-buffer (optional)
-
-  Shortcut attribute for making and narrowing candidates using
-  buffers.  This newly-introduced attribute prevents us from
-  forgetting to add volatile and match attributes.
-
-  See docstring of `anything-candidates-in-buffer'.
-
-  (candidates-in-buffer) is equivalent of three attributes:
-    (candidates . anything-candidates-in-buffer)
-    (volatile)
-    (match identity)
-
-  (candidates-in-buffer . candidates-function) is equivalent of:
-    (candidates . candidates-function)
-    (volatile)
-    (match identity)
-
-  This attribute is implemented by plug-in.
-
-- search (optional)
-
-  List of functions like `re-search-forward' or `search-forward'.
-  Buffer search function used by `anything-candidates-in-buffer'.
-  By default, `anything-candidates-in-buffer' uses `re-search-forward'.
-  This attribute is meant to be used with
-  (candidates . anything-candidates-in-buffer) or
-  (candidates-in-buffer) in short.
-
-- search-from-end (optional)
-
-  Make `anything-candidates-in-buffer' search from the end of buffer.
-  If this attribute is specified, `anything-candidates-in-buffer' uses
-  `re-search-backward' instead.
-
-- get-line (optional)
-
-  A function like `buffer-substring-no-properties' or `buffer-substring'.
-  This function converts point of line-beginning and point of line-end,
-  which represents a candidate computed by `anything-candidates-in-buffer'.
-  By default, `anything-candidates-in-buffer' uses
-  `buffer-substring-no-properties'.
-
-- display-to-real (optional)
-
-  Function called with one parameter; the selected candidate.
-
-  The function transforms the selected candidate, and the result
-  is passed to the action function.  The display-to-real
-  attribute provides another way to pass other string than one
-  shown in Anything buffer.
-
-  Traditionally, it is possible to make candidates,
-  candidate-transformer or filtered-candidate-transformer
-  function return a list with (DISPLAY . REAL) pairs. But if REAL
-  can be generated from DISPLAY, display-to-real is more
-  convenient and faster.
-
-- real-to-display (optional)
-
-  Function called with one parameter; the selected candidate.
-
-  The inverse of display-to-real attribute.
-
-  The function transforms the selected candidate, which is passed
-  to the action function, for display.  The real-to-display
-  attribute provides the other way to pass other string than one
-  shown in Anything buffer.
-
-  Traditionally, it is possible to make candidates,
-  candidate-transformer or filtered-candidate-transformer
-  function return a list with (DISPLAY . REAL) pairs. But if
-  DISPLAY can be generated from REAL, real-to-display is more
-  convenient.
-
-  Note that DISPLAY parts returned from candidates /
-  candidate-transformer are IGNORED as the name `display-to-real'
-  says.
-
-- cleanup (optional)
-
-  Function called with no parameters when *anything* buffer is closed. It
-  is useful for killing unneeded candidates buffer.
-
-  Note that the function is executed BEFORE performing action.
-
-- candidate-number-limit (optional)
-
-  Override `anything-candidate-number-limit' only for this source.
-
-- accept-empty (optional)
-
-  Pass empty string \"\" to action function.
-
-- disable-shortcuts (optional)
-
-  Disable `anything-enable-shortcuts' in current `anything' session.
-
-  This attribute is implemented by plug-in.
-  
-- dummy (optional)
-
-  Set `anything-pattern' to candidate. If this attribute is
-  specified, The candidates attribute is ignored.
-
-  This attribute is implemented by plug-in.
-  This plug-in implies disable-shortcuts plug-in.
-
-- multiline (optional)
-
-  Enable to selection multiline candidates.
-
-- update (optional)
-
-  Function called with no parameters when \\<anything-map>\\[anything-force-update] is pressed.
-
-- mode-line (optional)
-
-  source local `anything-mode-line-string'. (included in `mode-line-format')
-  It accepts also variable/function name.
-
-- header-line (optional)
-
-  source local `header-line-format'.
-  It accepts also variable/function name.
-
-- resume (optional)
-
-  Function called with no parameters when `anything-resume' is started.")
+")
 
 
 ;; This value is only provided as an example. Customize it to your own
@@ -2632,7 +2306,7 @@ Anything plug-ins are realized by this function."
   "Hack to display plug-in attributes' documentation as `anything-sources' docstring."
   (when (eq symbol 'anything-sources)
     (setq ad-return-value
-          (concat ad-return-value "++++ Additional attributes by plug-ins ++++\n"
+          (concat ad-return-value "\n"
                   (mapconcat (lambda (sym) (get sym 'anything-attrdoc))
                              anything-additional-attributes
                              "\n")))))
@@ -4397,6 +4071,272 @@ buffer as BUFFER."
           (length buffer-undo-list)
         (buffer-modified-tick)))))
 
+;;(@* "Attribute Documentation")
+(anything-document-attribute 'name "mandatory"
+  "  The name of the source. It is also the heading which appears
+  above the list of matches from the source. Must be unique. ")
+(anything-document-attribute 'header-name "optional"
+  "  A function returning the display string of the header. Its
+  argument is the name of the source. This attribute is useful to
+  add an additional information with the source name. ")
+(anything-document-attribute 'candidates "mandatory if candidates-in-buffer attribute is not provided"
+  "  Specifies how to retrieve candidates from the source. It can
+  either be a variable name, a function called with no parameters
+  or the actual list of candidates.
+
+  The list must be a list whose members are strings, symbols
+  or (DISPLAY . REAL) pairs.
+
+  In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
+  in the Anything buffer, but the REAL one is used as action
+  argument when the candidate is selected. This allows a more
+  readable presentation for candidates which would otherwise be,
+  for example, too long or have a common part shared with other
+  candidates which can be safely replaced with an abbreviated
+  string for display purposes.
+
+  Note that if the (DISPLAY . REAL) form is used then pattern
+  matching is done on the displayed string, not on the real
+  value.
+
+  If the candidates have to be retrieved asynchronously (for
+  example, by an external command which takes a while to run)
+  then the function should start the external command
+  asynchronously and return the associated process object.
+  Anything will take care of managing the process (receiving the
+  output from it, killing it if necessary, etc.). The process
+  should return candidates matching the current pattern (see
+  variable `anything-pattern'.)
+
+  Note that currently results from asynchronous sources appear
+  last in the anything buffer regardless of their position in
+  `anything-sources'. ")
+(anything-document-attribute 'action "mandatory if type attribute is not provided"
+  "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
+  FUNCTION is called with one parameter: the selected candidate.
+
+  An action other than the default can be chosen from this list
+  of actions for the currently selected candidate (by default
+  with TAB). The DISPLAY string is shown in the completions
+  buffer and the FUNCTION is invoked when an action is
+  selected. The first action of the list is the default. ")
+(anything-document-attribute 'type "optional if action attribute is provided"
+  "  Indicates the type of the items the source returns. 
+
+  Merge attributes not specified in the source itself from
+  `anything-type-attributes'.
+
+  This attribute is implemented by plug-in. ")
+(anything-document-attribute 'init "optional"
+  "  Function called with no parameters when anything is started. It
+  is useful for collecting current state information which can be
+  used to create the list of candidates later.
+
+  For example, if a source needs to work with the current
+  directory then it can store its value here, because later
+  anything does its job in the minibuffer and in the
+  `anything-buffer' and the current directory can be different
+  there. ")
+(anything-document-attribute 'delayed-init "optional"
+  "  Function called with no parameters before candidate function is
+  called.  It is similar with `init' attribute, but its
+  evaluation is deferred. It is useful to combine with ")
+(anything-document-attribute 'match "optional"
+  "  List of functions called with one parameter: a candidate. The
+  function should return non-nil if the candidate matches the
+  current pattern (see variable `anything-pattern').
+
+  This attribute allows the source to override the default
+  pattern matching based on `string-match'. It can be used, for
+  example, to implement a source for file names and do the
+  pattern matching on the basename of files, since it's more
+  likely one is typing part of the basename when searching for a
+  file, instead of some string anywhere else in its path.
+
+  If the list contains more than one function then the list of
+  matching candidates from the source is constructed by appending
+  the results after invoking the first function on all the
+  potential candidates, then the next function, and so on. The
+  matching candidates supplied by the first function appear first
+  in the list of results and then results from the other
+  functions, respectively.
+
+  This attribute has no effect for asynchronous sources (see
+  attribute `candidates'), since they perform pattern matching
+  themselves. ")
+(anything-document-attribute 'candidate-transformer "optional"
+  "  It's a function or a list of functions called with one argument
+  when the completion list from the source is built. The argument
+  is the list of candidates retrieved from the source. The
+  function should return a transformed list of candidates which
+  will be used for the actual completion.  If it is a list of
+  functions, it calls each function sequentially.
+
+  This can be used to transform or remove items from the list of
+  candidates.
+
+  Note that `candidates' is run already, so the given transformer
+  function should also be able to handle candidates with (DISPLAY
+  . REAL) format. ")
+(anything-document-attribute 'filtered-candidate-transformer "optional"
+  "  It has the same format as `candidate-transformer', except the
+  function is called with two parameters: the candidate list and
+  the source.
+
+  This transformer is run on the candidate list which is already
+  filtered by the current pattern. While `candidate-transformer'
+  is run only once, it is run every time the input pattern is
+  changed.
+
+  It can be used to transform the candidate list dynamically, for
+  example, based on the current pattern.
+
+  In some cases it may also be more efficent to perform candidate
+  transformation here, instead of with `candidate-transformer'
+  even if this transformation is done every time the pattern is
+  changed.  For example, if a candidate set is very large then
+  `candidate-transformer' transforms every candidate while only
+  some of them will actually be dislpayed due to the limit
+  imposed by `anything-candidate-number-limit'.
+
+  Note that `candidates' and `candidate-transformer' is run
+  already, so the given transformer function should also be able
+  to handle candidates with (DISPLAY . REAL) format.
+
+  This option has no effect for asynchronous sources. (Not yet,
+  at least. ")
+(anything-document-attribute 'action-transformer "optional"
+  "  It's a function or a list of functions called with two
+  arguments when the action list from the source is
+  assembled. The first argument is the list of actions, the
+  second is the current selection.  If it is a list of functions,
+  it calls each function sequentially.
+
+  The function should return a transformed action list.
+
+  This can be used to customize the list of actions based on the
+  currently selected candidate. ")
+(anything-document-attribute 'pattern-transformer "optional"
+  "  It's a function or a list of functions called with one argument
+  before computing matches. Its argument is `anything-pattern'.
+  Functions should return transformed `anything-pattern'.
+
+  It is useful to change interpretation of `anything-pattern'. ")
+(anything-document-attribute 'delayed "optional"
+  "  Candidates from the source are shown only if the user stops
+  typing and is idle for `anything-idle-delay' seconds. ")
+(anything-document-attribute 'volatile "optional"
+  "  Indicates the source assembles the candidate list dynamically,
+  so it shouldn't be cached within a single Anything
+  invocation. It is only applicable to synchronous sources,
+  because asynchronous sources are not cached. ")
+(anything-document-attribute 'requires-pattern "optional"
+  "  If present matches from the source are shown only if the
+  pattern is not empty. Optionally, it can have an integer
+  parameter specifying the required length of input which is
+  useful in case of sources with lots of candidates. ")
+(anything-document-attribute 'persistent-action "optional"
+  "  Function called with one parameter; the selected candidate.
+
+  An action performed by `anything-execute-persistent-action'.
+  If none, use the default action. ")
+(anything-document-attribute 'candidates-in-buffer "optional"
+  "  Shortcut attribute for making and narrowing candidates using
+  buffers.  This newly-introduced attribute prevents us from
+  forgetting to add volatile and match attributes.
+
+  See docstring of `anything-candidates-in-buffer'.
+
+  (candidates-in-buffer) is equivalent of three attributes:
+    (candidates . anything-candidates-in-buffer)
+    (volatile)
+    (match identity)
+
+  (candidates-in-buffer . candidates-function) is equivalent of:
+    (candidates . candidates-function)
+    (volatile)
+    (match identity)
+
+  This attribute is implemented by plug-in. ")
+(anything-document-attribute 'search "optional"
+  "  List of functions like `re-search-forward' or `search-forward'.
+  Buffer search function used by `anything-candidates-in-buffer'.
+  By default, `anything-candidates-in-buffer' uses `re-search-forward'.
+  This attribute is meant to be used with
+  (candidates . anything-candidates-in-buffer) or
+  (candidates-in-buffer) in short. ")
+(anything-document-attribute 'search-from-end "optional"
+  "  Make `anything-candidates-in-buffer' search from the end of buffer.
+  If this attribute is specified, `anything-candidates-in-buffer' uses
+  `re-search-backward' instead. ")
+(anything-document-attribute 'get-line "optional"
+  "  A function like `buffer-substring-no-properties' or `buffer-substring'.
+  This function converts point of line-beginning and point of line-end,
+  which represents a candidate computed by `anything-candidates-in-buffer'.
+  By default, `anything-candidates-in-buffer' uses
+  `buffer-substring-no-properties'. ")
+(anything-document-attribute 'display-to-real "optional"
+  "  Function called with one parameter; the selected candidate.
+
+  The function transforms the selected candidate, and the result
+  is passed to the action function.  The display-to-real
+  attribute provides another way to pass other string than one
+  shown in Anything buffer.
+
+  Traditionally, it is possible to make candidates,
+  candidate-transformer or filtered-candidate-transformer
+  function return a list with (DISPLAY . REAL) pairs. But if REAL
+  can be generated from DISPLAY, display-to-real is more
+  convenient and faster. ")
+(anything-document-attribute 'real-to-display "optional"
+  "  Function called with one parameter; the selected candidate.
+
+  The inverse of display-to-real attribute.
+
+  The function transforms the selected candidate, which is passed
+  to the action function, for display.  The real-to-display
+  attribute provides the other way to pass other string than one
+  shown in Anything buffer.
+
+  Traditionally, it is possible to make candidates,
+  candidate-transformer or filtered-candidate-transformer
+  function return a list with (DISPLAY . REAL) pairs. But if
+  DISPLAY can be generated from REAL, real-to-display is more
+  convenient.
+
+  Note that DISPLAY parts returned from candidates /
+  candidate-transformer are IGNORED as the name `display-to-real'
+  says. ")
+(anything-document-attribute 'cleanup "optional"
+  "  Function called with no parameters when *anything* buffer is closed. It
+  is useful for killing unneeded candidates buffer.
+
+  Note that the function is executed BEFORE performing action. ")
+(anything-document-attribute 'candidate-number-limit "optional"
+  "  Override `anything-candidate-number-limit' only for this source. ")
+(anything-document-attribute 'accept-empty "optional"
+  "  Pass empty string \"\" to action function. ")
+(anything-document-attribute 'disable-shortcuts "optional"
+  "  Disable `anything-enable-shortcuts' in current `anything' session.
+
+  This attribute is implemented by plug-in. ")
+(anything-document-attribute 'dummy "optional"
+  "  Set `anything-pattern' to candidate. If this attribute is
+  specified, The candidates attribute is ignored.
+
+  This attribute is implemented by plug-in.
+  This plug-in implies disable-shortcuts plug-in. ")
+(anything-document-attribute 'multiline "optional"
+  "  Enable to selection multiline candidates. ")
+(anything-document-attribute 'update "optional"
+  "  Function called with no parameters when \\<anything-map>\\[anything-force-update] is pressed. ")
+(anything-document-attribute 'mode-line "optional"
+  "  source local `anything-mode-line-string'. (included in `mode-line-format')
+  It accepts also variable/function name. ")
+(anything-document-attribute 'header-line "optional"
+  "  source local `header-line-format'.
+  It accepts also variable/function name. ")
+(anything-document-attribute 'resume "optional" "  Function called with no parameters when `anything-resume' is started.")
 
 ;; (@* "Unit Tests")
 
