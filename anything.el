@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.274 2010-03-31 02:43:35 rubikitch Exp $
+;; $Id: anything.el,v 1.275 2010-03-31 02:46:09 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -349,7 +349,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.274  2010-03-31 02:43:35  rubikitch
+;; Revision 1.275  2010-03-31 02:46:09  rubikitch
+;; (defvaralias 'anything-attributes 'anything-additional-attributes)
+;;
+;; Revision 1.274  2010/03/31 02:43:35  rubikitch
 ;; New command: `anything-describe-anything-attribute'
 ;;
 ;; Revision 1.273  2010/03/31 02:37:18  rubikitch
@@ -1242,7 +1245,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.274 2010-03-31 02:43:35 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.275 2010-03-31 02:46:09 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1896,7 +1899,9 @@ Use this function is better than setting `anything-type-attributes' directly."
   (and doc (anything-document-type-attribute type doc))
   nil)
 
-(defvar anything-additional-attributes nil)
+(defvar anything-additional-attributes nil
+  "List of all `anything' attributes.")
+(defvaralias 'anything-attributes 'anything-additional-attributes)
 (defun anything-document-attribute (attribute short-doc &optional long-doc)
   "Register ATTRIBUTE documentation introduced by plug-in.
 SHORT-DOC is displayed beside attribute name.
