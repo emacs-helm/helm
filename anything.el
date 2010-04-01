@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.279 2010-03-31 09:22:58 rubikitch Exp $
+;; $Id: anything.el,v 1.280 2010-04-01 02:22:22 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -375,7 +375,10 @@
 
 ;; (@* "HISTORY")
 ;; $Log: anything.el,v $
-;; Revision 1.279  2010-03-31 09:22:58  rubikitch
+;; Revision 1.280  2010-04-01 02:22:22  rubikitch
+;; `anything': new argument ANY-KEYMAP
+;;
+;; Revision 1.279  2010/03/31 09:22:58  rubikitch
 ;; Add tips of yasnippet for source creators (no code change)
 ;;
 ;; Revision 1.278  2010/03/31 09:01:08  rubikitch
@@ -1290,7 +1293,7 @@
 
 ;; ugly hack to auto-update version
 (defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.279 2010-03-31 09:22:58 rubikitch Exp $")
+(setq anything-version "$Id: anything.el,v 1.280 2010-04-01 02:22:22 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -2075,7 +2078,7 @@ This function allows easy sequencing of transformer functions."
 (defvar anything-buffers nil
   "All of `anything-buffer' in most recently used order.")
 
-(defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
+(defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
   "Select anything. In Lisp program, some optional arguments can be used.
 
 Note that all the optional arguments are prefixed because of
@@ -2111,6 +2114,10 @@ already-bound variables. Yuck!
 - ANY-BUFFER
 
   `anything-buffer' instead of *anything*.
+
+- ANY-KEYMAP
+
+  `anything-map' for current `anything' session.
 "
   ;; TODO more document
   (interactive)
@@ -2123,7 +2130,8 @@ already-bound variables. Yuck!
               anything-quit anything-follow-mode
               (case-fold-search t)
               (anything-buffer (or any-buffer anything-buffer))
-              (anything-sources (anything-normalize-sources any-sources)))
+              (anything-sources (anything-normalize-sources any-sources))
+              (anything-map (or any-keymap anything-map)))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
           (if (eq any-resume t)
