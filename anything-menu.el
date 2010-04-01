@@ -1,5 +1,5 @@
-;;;; anything-menu.el --- menu command using anything interface
-;; $Id: anything-menu.el,v 1.5 2010-02-23 20:39:41 rubikitch Exp $
+;;;; anything-menu.el --- anything.el candidate selection outside Emacs 
+;; $Id: anything-menu.el,v 1.6 2010-04-01 12:10:35 rubikitch Exp $
 
 ;; Copyright (C) 2010  rubikitch
 
@@ -24,12 +24,27 @@
 
 ;;; Commentary:
 ;;
-;; 
+;; This file provides anything.el candidate selection outside
+;; Emacs. You have to enable emacsserver or gnuserv by M-x
+;; server-start or M-x gnuserv-start.
+;;
+;; [EVAL IT] (describe-function 'anything-menu)
+;; [EVAL IT] (describe-function 'anything-menu-select)
+;; [EVAL IT] (describe-function 'anything-menu-select-from-file)
+;;
+;; First you have to install anything-menu script, which takes one argument, candidate file.
+;; http://www.emacswiki.org/cgi-bin/wiki/download/anything-menu
+;;
+;; To demonstrate anything-menu, execute the following from shell
+;; $ anything-menu ~/.emacs
+;;
 
 ;;; Commands:
 ;;
 ;; Below are complete command list:
 ;;
+;;  `anything-menu'
+;;    Call `anything' outside Emacs.
 ;;
 ;;; Customizable Options:
 ;;
@@ -60,7 +75,11 @@
 ;;; History:
 
 ;; $Log: anything-menu.el,v $
-;; Revision 1.5  2010-02-23 20:39:41  rubikitch
+;; Revision 1.6  2010-04-01 12:10:35  rubikitch
+;; * document
+;; * `anything-menu': ANY-KEYMAP argument
+;;
+;; Revision 1.5  2010/02/23 20:39:41  rubikitch
 ;; add `make-frame-visible'
 ;;
 ;; Revision 1.4  2010/02/23 16:48:41  rubikitch
@@ -78,7 +97,7 @@
 
 ;;; Code:
 
-(defvar anything-menu-version "$Id: anything-menu.el,v 1.5 2010-02-23 20:39:41 rubikitch Exp $")
+(defvar anything-menu-version "$Id: anything-menu.el,v 1.6 2010-04-01 12:10:35 rubikitch Exp $")
 (require 'anything)
 (defgroup anything-menu nil
   "anything-menu"
@@ -103,16 +122,21 @@
 (defun am/write-result (line)
   (write-region (or line "") nil am/tmp-file))
 
-(defun anything-menu (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
+(defun anything-menu (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
+  "Call `anything' outside Emacs.
+Arguments are the same as `anything'.
+Pop up anything frame and close it after session."
   (interactive)
   (am/set-frame)
   (unwind-protect
       (let ((anything-samewindow t)
             (anything-display-function 'anything-default-display-buffer))
-        (anything any-sources any-input any-prompt any-resume any-preselect any-buffer))
+        (anything any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap))
     (am/close-frame)))
 
 (defun anything-menu-select (am-prompt &rest am-selections)
+  "Select from a list AM-SELECTIONS and write selection to /tmp/.am-tmp-file,
+the default file of `am/tmp-file'. "
   (anything-menu `(((name . ,am-prompt)
                     (candidates . am-selections)
                     (migemo)
@@ -120,6 +144,10 @@
                  nil (concat am-prompt ": ") nil nil "*anything menu select*"))
 
 (defun* anything-menu-select-from-file (am-filename &optional (am-prompt "selection"))
+  "Select a candidate in file AM-FILENAME and write selection to /tmp/.am-tmp-file,
+the default file of `am/tmp-file'.
+
+The anything-menu script calls this function and print selection to stdout."
   (anything-menu `(((name . ,am-prompt)
                     (init . (lambda ()
                               (with-current-buffer (anything-candidate-buffer 'global)
