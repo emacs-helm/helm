@@ -4073,30 +4073,45 @@ A list of search engines."
   (setq anything-input-idle-delay 0)
   (anything-set-sources '(anything-c-source-call-source)))
 
+
 ;; Occur
+
+(defun anything-c-occur-goto-line (candidate)
+  "Goto line action for anything-c-source-occur."
+  (anything-goto-line (string-to-number candidate)))
+
+(defun anything-c-occur-persistent-action (candidate)
+  "Persistent action for anything occur source."
+  (anything-c-occur-goto-line candidate)
+  (anything-match-line-color-current-line))
+
+(defun anything-c-get-occur-candidates ()
+  "Get `anything-c-source-occur' candidates."
+  (with-temp-buffer
+    (let ((count (occur-engine
+                  anything-pattern
+                  (list anything-current-buffer) (current-buffer)
+                  list-matching-lines-default-context-lines nil
+                  list-matching-lines-buffer-name-face
+                  nil list-matching-lines-face
+                  (not (eq occur-excluded-properties t)))))
+      (when (> count 0)
+        (cdr (split-string (buffer-string) "\n" t))))))
+
 (defvar anything-c-source-occur
   '((name . "Occur")
-    (init . (lambda ()
-              (setq anything-c-source-occur-current-buffer
-                    (current-buffer))))
-    (candidates . (lambda ()
-                    (setq anything-occur-buf (get-buffer-create "*Anything Occur*"))
-                    (with-current-buffer anything-occur-buf
-                      (erase-buffer)
-                      (let ((count (occur-engine anything-pattern
-                                                 (list anything-c-source-occur-current-buffer) anything-occur-buf
-                                                 list-matching-lines-default-context-lines nil
-                                                 list-matching-lines-buffer-name-face
-                                                 nil list-matching-lines-face
-                                                 (not (eq occur-excluded-properties t)))))
-                        (when (> count 0)
-                          (let ((lines (split-string (buffer-string) "\n" t)))
-                            (cdr lines)))))))
-    (action . (("Goto line" . (lambda (candidate)
-                                (anything-goto-line (string-to-number candidate) anything-c-source-occur-current-buffer)))))
+    (candidates . anything-c-get-occur-candidates)
+    (persistent-action . anything-c-occur-persistent-action)
+    (action . anything-c-occur-goto-line)
     (requires-pattern . 1)
+    (delayed)
     (volatile)))
 ;; (anything 'anything-c-source-occur)
+
+(defun anything-occur ()
+  "Preconfigured Anything for Occur source."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*"))
 
 ;; Do many actions for input
 (defvar anything-c-source-create
