@@ -1727,7 +1727,7 @@ To enable fitting, set both `anything-inhibit-fit-frame-flag' and
 (defvar anything-tick-hash (make-hash-table :test 'equal))
 (defvar anything-issued-errors nil)
 (defvar anything-shortcut-keys nil)
-
+(defvar anything-once-called-functions nil)
 
 ;; (@* "Programming Tools")
 (defmacro anything-aif (test-form then-form &rest else-forms)
@@ -2007,6 +2007,13 @@ Otherwise, return VALUE itself."
         (t
          value)))
 
+(defun anything-once (function &rest args)
+  "Ensure FUNCTION with ARGS to be called once in `anything' session."
+  (let ((spec (cons function args)))
+    (unless (member spec anything-once-called-functions)
+      (apply function args)
+      (push spec anything-once-called-functions))))
+
 ;; (@* "Core: tools")
 (defun anything-current-frame/window-configuration ()
   (funcall (cdr anything-save-configuration-functions)))
@@ -2235,6 +2242,7 @@ already-bound variables. Yuck!
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
   (run-hooks 'anything-before-initialize-hook)
+  (setq anything-once-called-functions nil)
   (setq anything-delayed-init-executed nil)
   (setq anything-current-buffer (current-buffer))
   (setq anything-buffer-file-name buffer-file-name)
@@ -3210,8 +3218,9 @@ You can set user options `fit-frame-max-width-percent' and
 ;; (@* "Built-in plug-in: disable-shortcuts")
 (defvar anything-orig-enable-shortcuts nil)
 (defun anything-save-enable-shortcuts ()
-  (setq anything-orig-enable-shortcuts anything-enable-shortcuts
-        anything-enable-shortcuts nil))
+  (anything-once
+   (lambda () (setq anything-orig-enable-shortcuts anything-enable-shortcuts
+                    anything-enable-shortcuts nil))))
 (defun anything-compile-source--disable-shortcuts (source)
   (if (assoc 'disable-shortcuts source)
       (append `((init ,@(anything-mklist (assoc-default 'init source))
