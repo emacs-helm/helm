@@ -188,6 +188,8 @@
 ;;    Preconfigured `anything' to call anything source.
 ;;  `anything-call-source-from-anything'
 ;;    Call anything source within `anything' session.
+;;  `anything-occur'
+;;    Preconfigured Anything for Occur source.
 ;;  `anything-create-from-anything'
 ;;    Run `anything-create' from `anything' as a fallback.
 ;;  `anything-create'
@@ -1539,9 +1541,11 @@ If CANDIDATE is not a directory open this file."
           ((file-symlink-p candidate)
            (insert-in-minibuffer (file-truename candidate)))
           (t
-           (let ((new-pattern (anything-get-selection anything-last-buffer)))
-             (set-text-properties 0 (length new-pattern) nil new-pattern)
-             (insert-in-minibuffer new-pattern))))))
+           ;; rubikitch: docstring says that normal file are opened
+           ;; (let ((new-pattern (anything-get-selection anything-last-buffer)))
+           ;;   (set-text-properties 0 (length new-pattern) nil new-pattern)
+           ;;   (insert-in-minibuffer new-pattern))
+           (find-file candidate)))))
 
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
