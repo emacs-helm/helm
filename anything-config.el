@@ -1543,7 +1543,6 @@ If CANDIDATE is not a directory expand CANDIDATE filename."
            (insert-in-minibuffer (file-truename candidate)))
           (t
            (let ((new-pattern (anything-get-selection anything-last-buffer)))
-             (set-text-properties 0 (length new-pattern) nil new-pattern)
              (insert-in-minibuffer new-pattern))))))
 
 
