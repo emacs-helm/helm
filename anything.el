@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.280 2010-04-01 02:22:22 rubikitch Exp $
+;; $Id: anything.el,v 1.281 2010-04-01 02:22:22 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -1737,8 +1737,10 @@ To enable fitting, set both `anything-inhibit-fit-frame-flag' and
 (put 'anything-aif 'lisp-indent-function 2)
 
 (defun anything-mklist (obj)
-  "If OBJ is a list, return itself, otherwise make a list with one element."
-  (if (listp obj) obj (list obj)))
+  "If OBJ is a list (but not lambda), return itself, otherwise make a list with one element."
+  (if (and (listp obj) (not (functionp obj)))
+      obj
+    (list obj)))
 
 ;; (@* "Anything API")
 (defun anything-buffer-get ()
@@ -5484,6 +5486,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-mklist 1))
       (expect '(2)
         (anything-mklist '(2)))
+      (expect '((lambda ()))
+        (anything-mklist (lambda ())))
       (desc "anything-before-initialize-hook")
       (expect 'called
         (let ((anything-before-initialize-hook '((lambda () (setq v 'called))))
