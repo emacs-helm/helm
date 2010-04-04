@@ -1523,9 +1523,10 @@ If prefix numeric arg is given go ARG level down."
      collect (propertize i 'face anything-c-files-face2) into a
      finally return a))
 
+
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
-If CANDIDATE is not a directory open this file."
+If CANDIDATE is not a directory expand CANDIDATE filename."
   (flet ((insert-in-minibuffer (elm)
            (with-selected-window (minibuffer-window)
              (delete-minibuffer-contents)
@@ -1541,11 +1542,9 @@ If CANDIDATE is not a directory open this file."
           ((file-symlink-p candidate)
            (insert-in-minibuffer (file-truename candidate)))
           (t
-           ;; rubikitch: docstring says that normal file are opened
-           ;; (let ((new-pattern (anything-get-selection anything-last-buffer)))
-           ;;   (set-text-properties 0 (length new-pattern) nil new-pattern)
-           ;;   (insert-in-minibuffer new-pattern))
-           (find-file candidate)))))
+           (let ((new-pattern (anything-get-selection anything-last-buffer)))
+             (set-text-properties 0 (length new-pattern) nil new-pattern)
+             (insert-in-minibuffer new-pattern))))))
 
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
