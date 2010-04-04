@@ -1544,9 +1544,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
            (insert-in-minibuffer (file-truename candidate)))
           (t ; First hit on C-z expand CANDIDATE second hit open file.
            (let ((new-pattern   (anything-get-selection anything-last-buffer))
-                 (num-lines-buf (length (split-string
-                                         (with-current-buffer anything-last-buffer
-                                           (buffer-string)) "\n"))))
+                 (num-lines-buf (with-current-buffer anything-last-buffer
+                                  (count-lines (point-min) (point-max)))))
              (if (> num-lines-buf 3)
                  (insert-in-minibuffer new-pattern) (find-file candidate)))))))
 
