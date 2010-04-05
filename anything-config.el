@@ -2122,13 +2122,10 @@ source.")
 ;; (anything 'anything-c-source-info-goops)
 
 ;; Info Index screen
-;;; FIXME
-;; * Concept Index::               Index of concepts.
-;; * Command Index::               Index of all `screen' commands.
-;; * Keystroke Index::             Index of default key bindings.
 (defvar anything-c-source-info-screen
   '((name . "Info index: screen")
-    (info-index . "screen")))
+    (info-index . "screen")
+    (index-nodes "Concept Index" "Command Index" "Keystroke Index")))
 ;; (anything 'anything-c-source-info-screen)
 
 ;; Info Index latex
@@ -5428,7 +5425,7 @@ candidate can be in (DISPLAY . REAL) format."
               (tobuf (anything-candidate-buffer 'global))
               (infobuf (current-buffer))
               s e)
-          (dolist (node (Info-index-nodes))
+          (dolist (node (or (anything-attr 'index-nodes) (Info-index-nodes)))
             (Info-goto-node node)
             (goto-char (point-min))
             (while (search-forward "\n* " nil t)
@@ -5469,6 +5466,14 @@ candidate can be in (DISPLAY . REAL) format."
   "Create a source of info index very easily.
 
 ex. (defvar anything-c-source-info-wget '((info-index . \"wget\"))")
+
+(anything-document-attribute 'index-nodes "info-index plugin (optional)"
+  "Index nodes of info file.
+
+If it is omitted, `Info-index-nodes' is used to collect index nodes.
+Some info files are missing index specification.
+
+ex. See `anything-c-source-info-screen'.")
 
 ;; Plug-in: candidates-file
 (defun anything-compile-source--candidates-file (source)
