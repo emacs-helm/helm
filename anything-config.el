@@ -5117,6 +5117,57 @@ candidate can be in (DISPLAY . REAL) format."
            y)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Plug-in ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Plug-in: info-index
+(defun* anything-c-info-init (&optional (file (anything-attr 'info-file)))
+  (let (result)
+    (save-window-excursion
+      (info file)
+      (let (Info-history
+            (tobuf (anything-candidate-buffer 'global))
+            (infobuf (current-buffer))
+            s e)
+        (dolist (node (Info-index-nodes))
+          (Info-goto-node node)
+          (goto-char (point-min))
+          (while (search-forward "\n* " nil t)
+            (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
+              '(save-current-buffer (buffer-substring-no-properties (point-at-bol) (point-at-eol)) result)
+              (setq s (point-at-bol)
+                    e (point-at-eol))
+              (with-current-buffer tobuf
+                (insert-buffer-substring infobuf s e)
+                (insert "\n")))))))))
+
+(defun anything-c-info-goto (node-line)
+  (Info-goto-node (car node-line))
+  (anything-goto-line (cdr node-line)))
+
+(defun anything-c-info-display-to-real (line)
+  (and (string-match
+        "\\* +\\([^\n]*.+[^\n]*\\):[ \t]+\\([^\n]*\\)\\.\\(?:[ \t\n]*(line +\\([0-9]+\\))\\)?" line)
+       (cons (format "(%s)%s" (anything-attr 'info-file) (match-string 2 line))
+             (string-to-number (or (match-string 3 line) "1")))))
+
+(defun anything-c-make-info-source (file)
+  `((name . ,(concat "Info Index: " file))
+    (info-file . ,file)
+    (init . anything-c-info-init)
+    (display-to-real . anything-c-info-display-to-real)
+    (get-line . buffer-substring)
+    (candidates-in-buffer)
+    (action ("Goto node" . anything-c-info-goto))))
+
+(defun anything-compile-source--info-index (source)
+  (anything-aif (assoc-default 'info-index source)
+      (anything-c-make-info-source it)
+    source))
+(add-to-list 'anything-compile-source-functions 'anything-compile-source--info-index)
+
+(anything-document-attribute 'info-index "info-index plugin"
+  "Create a source of info index very easily.
+
+ex. (defvar anything-c-source-info-wget '((info-index . \"wget\"))")
+
 ;; Plug-in: candidates-file
 (defun anything-compile-source--candidates-file (source)
   (if (assoc-default 'candidates-file source)
