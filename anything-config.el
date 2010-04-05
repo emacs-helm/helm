@@ -273,7 +273,7 @@
 ;;     `anything-c-source-file-name-history'     (File Name History)
 ;;     `anything-c-source-files-in-current-dir'  (Files from Current Directory)
 ;;     `anything-c-source-files-in-current-dir+' (Files from Current Directory)
-;;     `anything-c-source-find-files'            (Find Files (`C-z':Expand Candidate, `C-.':Go to precedent level))
+;;     `anything-c-source-find-files'            (Find Files (`C-.':Go to precedent level))
 ;;     `anything-c-source-file-cache'            (File Cache)
 ;;     `anything-c-source-locate'                (Locate)
 ;;     `anything-c-source-recentf'               (Recentf)
@@ -283,8 +283,8 @@
 ;;  Help:
 ;;     `anything-c-source-man-pages'  (Manual Pages)
 ;;     `anything-c-source-info-pages' (Info Pages)
-;;     `anything-c-source-info-elisp' (Info Elisp)
-;;     `anything-c-source-info-cl'    (Info Common-Lisp)
+;;     `anything-c-source-info-elisp' (Info index: elisp)
+;;     `anything-c-source-info-cl'    (Info index: cl)
 ;;  Command:
 ;;     `anything-c-source-complex-command-history'  (Complex Command History)
 ;;     `anything-c-source-extended-command-history' (Emacs Commands History)
@@ -371,7 +371,7 @@
 ;;     `anything-c-source-gentoo'                   (Portage sources)
 ;;     `anything-c-source-use-flags'                (Use Flags)
 ;;     `anything-c-source-emacs-process'            (Emacs Process)
-
+;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (
 ;;; Change log:
 ;;
 ;;  Change log of this file is found at
@@ -1961,14 +1961,19 @@ source.")
     (requires-pattern . 2)))
 ;; (anything 'anything-c-source-info-pages)
 
+
+;;; Use info-index plug-in. Note that `name' attribute is
+;;; not needed but `anything-c-insert-summary' uses it.
 ;; Info Elisp
 (defvar anything-c-source-info-elisp
-  '((info-index . "elisp")))
+  '((name . "Info index: elisp")
+    (info-index . "elisp")))
 ;; (anything 'anything-c-source-info-elisp)
 
 ;; Info-Common-Lisp
 (defvar anything-c-source-info-cl
-  '((info-index . "cl")))
+  '((name . "Info index: cl")
+    (info-index . "cl")))
 ;; (anything 'anything-c-source-info-cl)
 
 ;;;; <Command>
@@ -5282,7 +5287,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   "A string to explain persistent-action of this source.
 It also accepts a function or a variable name.")
 
-;; (anything '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
+;;; (anything '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
