@@ -1962,45 +1962,13 @@ source.")
 ;; (anything 'anything-c-source-info-pages)
 
 ;; Info Elisp
-(defvar anything-c-info-elisp nil)
 (defvar anything-c-source-info-elisp
-  `((name . "Info Elisp")
-    (init . (lambda ()
-              (save-window-excursion
-                (unless anything-c-info-elisp
-                  (with-temp-buffer
-                    (Info-find-node "elisp" "Index")
-                    (setq anything-c-info-elisp (split-string (buffer-string) "\n"))
-                    (Info-exit))))))
-    (candidates . (lambda ()
-                    (loop for i in anything-c-info-elisp
-                          if (string-match "^* [^ \n]+[^: ]" i)
-                          collect (match-string 0 i))))
-    (action . (lambda (candidate)
-                (Info-find-node "elisp" "Index")
-                (Info-index (replace-regexp-in-string "* " "" candidate))))
-    (requires-pattern . 2)))
+  '((info-index . "elisp")))
 ;; (anything 'anything-c-source-info-elisp)
 
 ;; Info-Common-Lisp
-(defvar anything-c-info-cl-fn nil)
 (defvar anything-c-source-info-cl
-  `((name . "Info Common-Lisp")
-    (init . (lambda ()
-              (save-window-excursion
-                (unless anything-c-info-cl-fn
-                  (with-temp-buffer
-                    (Info-find-node "cl" "Function Index")
-                    (setq anything-c-info-cl-fn (split-string (buffer-string) "\n"))
-                    (Info-exit))))))
-    (candidates . (lambda ()
-                    (loop for i in anything-c-info-cl-fn
-                          if (string-match "^* [^ \n]+[^: ]" i)
-                          collect (match-string 0 i))))
-    (action . (lambda (candidate)
-                (Info-find-node "cl" "Function Index")
-                (Info-index (replace-regexp-in-string "* " "" candidate))))
-    (requires-pattern . 2)))
+  '((info-index . "cl")))
 ;; (anything 'anything-c-source-info-cl)
 
 ;;;; <Command>
