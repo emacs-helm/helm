@@ -1672,11 +1672,15 @@ If CANDIDATE is alone, open file CANDIDATE filename."
     (persistent-help . "Expand Candidate")
     (volatile)
     (action .
-     (("Copy File" . (lambda (candidate)
-                       (anything-dired-action candidate :action 'copy)))))))
+     (("Copy File"
+       . (lambda (candidate)
+           (anything-dired-action candidate :action 'copy)))
+      ("Copy and Follow"
+       . (lambda (candidate)
+           (anything-dired-action candidate :action 'copy :follow t)))))))
 
 
-(defvar anything-c-source-rename-files
+(defvar  anything-c-source-rename-files
   `((name . ,(concat "Rename Files" anything-c-find-files-doc-header))
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
@@ -1684,8 +1688,12 @@ If CANDIDATE is alone, open file CANDIDATE filename."
     (persistent-help . "Expand Candidate")
     (volatile)
     (action .
-     (("Rename File" . (lambda (candidate)
-                         (anything-dired-action candidate :action 'rename)))))))
+     (("Rename File"
+       . (lambda (candidate)
+           (anything-dired-action candidate :action 'rename)))
+      ("Rename and Follow"
+       . (lambda (candidate)
+           (anything-dired-action candidate :action 'rename :follow t)))))))
 
 (defvar anything-c-source-symlink-files
   `((name . ,(concat "Symlink Files" anything-c-find-files-doc-header))
@@ -1712,7 +1720,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
      (("Hardlink File" . (lambda (candidate)
                            (anything-dired-action candidate :action 'hardlink)))))))
 
-(defun* anything-dired-action (candidate &key action)
+(defun* anything-dired-action (candidate &key action follow)
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
   (let ((files  (dired-get-marked-files))
@@ -1735,7 +1743,16 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from)
              (expand-file-name (file-name-nondirectory from) candidate))
          #'(lambda (from) candidate))
-     marker)))
+     marker)
+    (when follow
+      (let* ((fsrc       (car files))
+             (dir-target (directory-file-name candidate))
+             (fname      (if (file-directory-p fsrc)
+                             (concat dir-target
+                                     (file-relative-name fsrc dir-target))
+                             (concat (file-name-as-directory candidate)
+                                     (file-name-nondirectory fsrc)))))
+        (anything-c-point-file-in-dired fname)))))
 
 
 (defun* anything-dired-do-action-on-file (&key action)
