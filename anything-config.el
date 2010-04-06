@@ -1746,15 +1746,16 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
      marker)
     (when follow
       (let* ((src          (car files))
+             (dest         (expand-file-name candidate))
              (basename-src (if (file-directory-p src)
                                (file-relative-name
                                 (directory-file-name src)
                                 (file-name-directory src))
                                (file-name-nondirectory src)))
-             (fname        (if (file-directory-p candidate)
-                               (concat (file-name-as-directory candidate)
+             (fname        (if (file-directory-p dest)
+                               (concat (file-name-as-directory dest)
                                        basename-src)
-                               candidate)))
+                               dest)))
         (anything-c-point-file-in-dired fname)))))
 
 
