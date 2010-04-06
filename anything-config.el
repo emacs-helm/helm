@@ -1745,13 +1745,16 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from) candidate))
      marker)
     (when follow
-      (let* ((fsrc       (car files))
-             (dir-target (directory-file-name candidate))
-             (fname      (if (file-directory-p fsrc)
-                             (concat dir-target
-                                     (file-relative-name fsrc dir-target))
-                             (concat (file-name-as-directory candidate)
-                                     (file-name-nondirectory fsrc)))))
+      (let* ((src          (car files))
+             (basename-src (if (file-directory-p src)
+                               (file-relative-name
+                                (directory-file-name src)
+                                (file-name-directory src))
+                               (file-name-nondirectory src)))
+             (fname        (if (file-directory-p candidate)
+                               (concat (file-name-as-directory candidate)
+                                       basename-src)
+                               candidate)))
         (anything-c-point-file-in-dired fname)))))
 
 
