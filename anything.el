@@ -3126,6 +3126,7 @@ You can set user options `fit-frame-max-width-percent' and
   (declare (warn (unresolved 0)))
   (when (and (require 'fit-frame nil t)
              (boundp 'fit-frame-inhibit-fitting-flag)
+             (not anything-inhibit-fit-frame-flag)
              (not fit-frame-inhibit-fitting-flag)
              (anything-window))
     (ignore-errors
