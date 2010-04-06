@@ -305,7 +305,9 @@ The smaller  this value is, the slower highlight is.")
   (save-excursion
     (goto-char start)
     (let (me)
-      (while (and (setq me (re-search-forward regexp nil t)) (< (point) end))
+      (while (and (setq me (re-search-forward regexp nil t))
+                  (< (point) end)
+                  (< 0 (- (match-end 0) (match-beginning 0))))
         (put-text-property (match-beginning 0) me 'face face)))))
 
 (defun* anything-mp-highlight-match-internal (end)
