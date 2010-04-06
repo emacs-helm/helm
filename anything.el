@@ -1,5 +1,5 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.281 2010-04-01 02:22:22 rubikitch Exp $
+;; $Id: anything.el,v 1.282 2010-04-01 02:22:22 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -5957,6 +5957,32 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-require-at-least-version "1.999"))
       (expect (error)
         (anything-require-at-least-version "1.2000"))
+      (desc "anything-once")
+      (expect 2
+        (let ((i 0))
+          (anything-test-candidates
+           '(((name . "1")
+              (init . (lambda () (incf i))))
+             ((name . "2")
+              (init . (lambda () (incf i))))))
+          i))
+      (expect 1
+        (let ((i 0))
+          (anything-test-candidates
+           '(((name . "1")
+              (init . (lambda () (anything-once (lambda () (incf i))))))
+             ((name . "2")
+              (init . (lambda () (anything-once (lambda () (incf i))))))))
+          i))
+      (expect 1
+        (let ((i 0))
+          (flet ((init1 () (anything-once (lambda () (incf i)))))
+            (anything-test-candidates
+             '(((name . "1")
+                (init . init1))
+               ((name . "2")
+                (init . init1)))))
+          i))
       )))
 
 
