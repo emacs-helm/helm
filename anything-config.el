@@ -5049,6 +5049,9 @@ directory, open this directory."
 (defun anything-find-file-as-root (candidate)
   (find-file (concat "/" anything-su-or-sudo "::" (expand-file-name candidate))))
 
+(defun anything-find-many-files (ignore)
+  (mapc 'find-file (anything-marked-candidates)))
+
 ;; borrowed from etags.el
 ;; (anything-c-goto-line-with-adjustment (line-number-at-pos) ";; borrowed from etags.el")
 (defun anything-c-goto-line-with-adjustment (line line-content)
@@ -5762,9 +5765,9 @@ Return nil if bmk is not a valid bookmark."
   `((action
      ,@(if pop-up-frames
            '(("Find file other window" . find-file-other-window)
-             ("Find file" . find-file)
+             ("Find file(s)" . anything-find-many-files)
              ("Find file as root" . anything-find-file-as-root))
-         '(("Find file" . find-file)
+         '(("Find file" . anything-find-many-files)
            ("Find file as root" . anything-find-file-as-root)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))
