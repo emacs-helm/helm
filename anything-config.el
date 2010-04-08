@@ -247,7 +247,8 @@
 ;;    default = "su"
 ;;  `anything-for-files-prefered-list'
 ;;    Your prefered sources to find files.
-;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser anything-c-source-buffers+ anything-c-source-recentf anything-c-source-bookmarks ...))
+;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser
+;;    \anything-c-source-buffers+ anything-c-source-recentf anything-c-source-bookmarks ...))
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
@@ -418,7 +419,7 @@
 ;;     `anything-c-source-gentoo'			(Portage sources)
 ;;     `anything-c-source-use-flags'			(Use Flags)
 ;;     `anything-c-source-emacs-process'		(Emacs Process)
-;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (;;     `anything-c-source-info-elisp'    (
+
 ;;; Change log:
 ;;
 ;;  Change log of this file is found at
@@ -457,9 +458,6 @@
 
 
 ;;; TODO
-;;
-;; - anything-c-adaptive stores infos for sources/types that don't have
-;;   set it as `filtered-candidate-transformer'.
 ;;
 ;; - Fix documentation, now many functions haven't documentations.
 ;;
