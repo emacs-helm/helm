@@ -1007,10 +1007,11 @@ It accepts one argument, selected candidate.")
 (defun anything-read-buffer (prompt &optional default require-match start matches-set)
   "`anything' replacement for `read-buffer'."
   (let (anything-input-idle-delay)
-    (anything-noresume (arb-sources prompt
-                                    (if (bufferp default) (buffer-name default) default)
-                                    require-match start matches-set)
-                       start prompt nil nil "*anything complete*")))
+    (or (anything-noresume (arb-sources prompt
+                                        (if (bufferp default) (buffer-name default) default)
+                                        require-match start matches-set)
+                           start prompt nil nil "*anything complete*")
+        (keyboard-quit))))
 
 (defun* arb-sources (prompt default require-match start matches-set &optional (additional-attrs '((action . identity))))
   `(,(ac-default-source default t)
