@@ -801,5 +801,5 @@ It also accepts 0-argument function name or variable name.")
 (provide 'anything-match-plugin)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-match-plugin.el")
+;; (progn (magit-push) (emacswiki-post "anything-match-plugin.el"))
 ;;; anything-match-plugin.el ends here

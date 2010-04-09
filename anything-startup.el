@@ -49,5 +49,5 @@
 (provide 'anything-startup)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-startup.el")
+;; (progn (magit-push) (emacswiki-post "anything-startup.el"))
 ;;; anything-startup.el ends here

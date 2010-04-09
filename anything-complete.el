@@ -1303,5 +1303,5 @@ It accepts one argument, selected candidate.")
 (provide 'anything-complete)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-complete.el")
+;; (progn (magit-push) (emacswiki-post "anything-complete.el"))
 ;;; anything-complete.el ends here

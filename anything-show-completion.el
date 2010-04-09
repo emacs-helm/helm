@@ -266,5 +266,5 @@ It is evaluated in `asc-display-overlay'."
 (provide 'anything-show-completion)
 ;; (asc-display-function anything-buffer)
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-show-completion.el")
+;; (progn (magit-push) (emacswiki-post "anything-show-completion.el"))
 ;;; anything-show-completion.el ends here

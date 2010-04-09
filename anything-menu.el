@@ -163,5 +163,5 @@ The anything-menu script calls this function and print selection to stdout."
 ;; (find-sh0 "cat /tmp/.am-tmp-file")
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-menu.el")
+;; (progn (magit-push) (emacswiki-post "anything-menu.el"))
 ;;; anything-menu.el ends here

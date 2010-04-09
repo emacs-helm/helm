@@ -6009,5 +6009,5 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 
 (provide 'anything)
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything.el")
+;; (progn (magit-push) (emacswiki-post "anything-config.el"))
 ;;; anything.el ends here

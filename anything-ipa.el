@@ -26,6 +26,20 @@
 
 ;; Anything interface of in place annotations.
 
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `anything-ipa'
+;;    `anything' interface of ipa.
+;;  `anything-ipa-global'
+;;    `anything' interface of ipa (global).
+;;
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+
 ;; Variable `anything-c-source-ipa' is source for in place annotations
 ;; in current buffer. And command `anything-ipa' is anything menu of
 ;; it. `anything-c-source-ipa-global' and `anything-ipa-global' are
@@ -121,5 +135,5 @@
 (provide 'anything-ipa)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-ipa.el")
+;; (progn (magit-push) (emacswiki-post "anything-ipa.el"))
 ;;; anything-ipa.el ends here

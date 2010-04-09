@@ -436,5 +436,5 @@ Difference with `anything-grep-by-name' is prompt order."
 (provide 'anything-grep)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-grep.el")
+;; (progn (magit-push) (emacswiki-post "anything-grep.el"))
 ;;; anything-grep.el ends here

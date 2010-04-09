@@ -247,8 +247,7 @@
 ;;    default = "su"
 ;;  `anything-for-files-prefered-list'
 ;;    Your prefered sources to find files.
-;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser
-;;    \anything-c-source-buffers+ anything-c-source-recentf anything-c-source-bookmarks ...))
+;;    default = (quote (anything-c-source-ffap-line anything-c-source-ffap-guesser anything-c-source-buffers+ anything-c-source-recentf anything-c-source-bookmarks ...))
 ;;  `anything-create--actions-private'
 ;;    User defined actions for `anything-create' / `anything-c-source-create'.
 ;;    default = nil
@@ -5950,7 +5949,7 @@ the center of window, otherwise at the top of window.
 ;;; End:
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-config.el")
+;; (progn (magit-push) (emacswiki-post "anything.el"))
 ;;; anything-config.el ends here
 
 ;;; LocalWords:  Tassilo Patrovics Vagn Johansen Dahl Clementson infos

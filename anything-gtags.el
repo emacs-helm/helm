@@ -310,5 +310,5 @@ If it is other symbol, display file name in candidates even if classification is
 (provide 'anything-gtags)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (emacswiki-post "anything-gtags.el")
+;; (progn (magit-push) (emacswiki-post "anything-gtags.el"))
 ;;; anything-gtags.el ends here
