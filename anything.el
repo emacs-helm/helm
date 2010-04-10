@@ -2474,6 +2474,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
   "Compute matches from SOURCE according to its settings."
   (let ((doit (lambda ()
                 (let ((functions (assoc-default 'match source))
+                      (anything-source-name (assoc-default 'name source))
                       (limit (anything-candidate-number-limit source))
                       (anything-pattern
                        (anything-aif (assoc-default 'pattern-transformer source)
@@ -4653,6 +4654,13 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
          '(((name . "FOO") (candidates "foo" "bar")
             (match (lambda (c) (string-match (concat "^" anything-pattern) c)))))
          "ar"))
+      (expect "TestSource"
+        (let (x)
+          (anything-test-candidates
+           '(((name . "TestSource") (candidates "a")
+              (match (lambda (c) (setq x anything-source-name)))))
+           "a")
+          x))
       (desc "init attribute")
       (expect '(("FOO" ("bar")))
         (let (v)
