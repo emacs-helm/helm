@@ -1658,7 +1658,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
   (interactive)
   (anything 'anything-c-source-insert-file
             (expand-file-name default-directory)
-            "Insert file here: " nil nil "*Anything insert file*"))
+            "Insert file: " nil nil "*Anything insert file*"))
 
 ;;; Anything completion for copy, rename and (rel)sym/hard/link files from dired.
 (defvar anything-c-source-copy-files
