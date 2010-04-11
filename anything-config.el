@@ -1502,18 +1502,16 @@ If prefix numeric arg is given go ARG level down."
   
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let ((path (cond ((string-match "^~" anything-pattern)
+  (let* (; Don't try to tramp connect before entering the second ":".
+         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:?")
+         (path (cond ((string-match "^~" anything-pattern)
                      (replace-match (getenv "HOME") nil t anything-pattern))
-                    ((string-match "/su::" anything-pattern)
-                     (let ((tramp-name (anything-create-tramp-name "/su::")))
-                       (replace-match tramp-name nil t anything-pattern)))
-                    ((string-match "/sudo::" anything-pattern)
-                     (let ((tramp-name (anything-create-tramp-name "/sudo::")))
+                    ((string-match tramp-file-name-regexp anything-pattern)
+                     (let ((tramp-name (anything-create-tramp-name
+                                        (match-string 0 anything-pattern))))
                        (replace-match tramp-name nil t anything-pattern)))
                     (t anything-pattern)))
-        (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
-        ;; Don't try to tramp connect before entering the second ":".
-        (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:"))
+        (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     ;; Inlined version (<2010-02-18 Jeu.>.) of `tramp-handle-directory-files'
     ;; to fix bug in tramp that doesn't show the dot file names(i.e "." "..")
     ;; and sorting.
