@@ -44,6 +44,10 @@
 ;; To include spaces to a regexp, prefix "\" before space,
 ;; it is controlled by `anything-mp-space-regexp' variable.
 
+;; If multiple regexps are specified, first one also tries to match the source name.
+;; If you want to disable this feature, evaluate
+;;   (setq anything-mp-match-source-name nil) .
+
 ;; This file highlights patterns like `occur'. Note that patterns
 ;; longer than `anything-mp-highlight-threshold' are highlighted. And
 ;; region out of screen is highlighted after
@@ -162,6 +166,10 @@ or  M-x install-elisp-from-emacswiki anything.el")))
   "If non-nil, enable anything-use-multiple-patterns.")
 (defvar anything-mp-space-regexp "[\\ ] "
   "Regexp to represent space itself in multiple regexp match.")
+(defvar anything-mp-match-source-name t
+  "If non-nil, first query in space-delimited pattern try to match the source name.
+It needs at least two queries.
+For example, to list candidats of \"foo\" source, input pattern as \"foo .\".")
 
 (defun amp-mp-make-regexps (pattern)
   (if (string= pattern "") '("")
@@ -241,12 +249,32 @@ or  M-x install-elisp-from-emacswiki anything.el")))
         collect (if (string= "!" (substring pat 0 1))
                             (cons 'not (substring pat 1))
                           (cons 'identity pat))))
+(defun anything-mp-handle-source-name-maybe (pattern self else)
+  (when (stringp pattern)
+    (setq pattern (anything-mp-3-get-patterns pattern)))
+  ;; PATTERN is list of (pred . re) now.
+  (when pattern
+    (destructuring-bind ((first-pred . first-re) . rest) pattern
+      (if (and anything-mp-match-source-name
+               (stringp anything-source-name)
+               (eq 'identity first-pred))
+          (let (anything-mp-match-source-name)
+            (or (and (string-match first-re anything-source-name)
+                     (funcall self rest))
+                (funcall self pattern)))
+        (funcall else)))))
+
 (defun* anything-mp-3-match (str &optional (pattern anything-pattern))
-  (loop for (pred . re) in (anything-mp-3-get-patterns pattern)
-        always (funcall pred (string-match re str))))
+  (anything-mp-handle-source-name-maybe
+   pattern (apply-partially 'anything-mp-3-match str)
+   (lambda ()
+     (loop for (pred . re) in pattern
+           always (funcall pred (string-match re str))))))
 
 (defmacro anything-mp-3-search-base (searchfn1 searchfn2 b e)
-  `(loop with pat = (anything-mp-3-get-patterns pattern)
+  `(loop with pat = (if (stringp pattern)
+                        (anything-mp-3-get-patterns pattern)
+                      pattern)
          while (,searchfn1 (or (cdar pat) "") nil t)
          for bol = (point-at-bol)
          for eol = (point-at-eol)
@@ -260,22 +288,36 @@ or  M-x install-elisp-from-emacswiki anything.el")))
          finally (return nil)))
 
 (defun anything-mp-3-search (pattern &rest ignore)
-  (anything-mp-3-search-base re-search-forward re-search-forward bol eol))
+  (anything-mp-handle-source-name-maybe
+   pattern 'anything-mp-3-search
+   (lambda () (anything-mp-3-search-base
+               re-search-forward re-search-forward bol eol))))
 (defun anything-mp-3-search-backward (pattern &rest ignore)
-  (anything-mp-3-search-base re-search-backward re-search-backward eol bol))
-
+  (anything-mp-handle-source-name-maybe
+   pattern 'anything-mp-3-search-backward
+   (lambda () (anything-mp-3-search-base
+               re-search-backward re-search-backward eol bol))))
 ;; mp-3p- (multiple regexp pattern 3 with prefix search)
 (defun* anything-mp-3p-match (str &optional (pattern anything-pattern))
-  (destructuring-bind ((first-pred . first-re) . rest)
-      (anything-mp-3-get-patterns pattern)
-    (and (funcall first-pred (anything-prefix-match str first-re))
-         (loop for (pred . re) in rest
-               always (funcall pred (string-match re str))))))
+  (anything-mp-handle-source-name-maybe
+   pattern (apply-partially 'anything-mp-3p-match str)
+   (lambda ()
+     (declare (special first-pred first-re))
+     (and (funcall first-pred (anything-prefix-match str first-re))
+          (loop for (pred . re) in rest
+                always (funcall pred (string-match re str)))))))
+
 (defun anything-mp-3p-search (pattern &rest ignore)
-  (anything-mp-3-search-base anything-prefix-search re-search-forward bol eol))
+  (anything-mp-handle-source-name-maybe
+   pattern 'anything-mp-3p-search
+   (lambda () (anything-mp-3-search-base
+               anything-prefix-search re-search-forward bol eol))))
 
 (defun anything-mp-3p-search-backward (pattern &rest ignore)
-  (anything-mp-3-search-base anything-prefix-search-backward re-search-backward eol bol))
+  (anything-mp-handle-source-name-maybe
+   pattern 'anything-mp-3p-search-backward
+   (lambda () (anything-mp-3-search-base
+               anything-prefix-search-backward re-search-backward eol bol))))
 
 ;;;; Highlight matches
 (defface anything-match
@@ -318,7 +360,8 @@ The smaller  this value is, the slower highlight is.")
         (anything-mp-highlight-region (point-min) end
                                     requote 'anything-match)))
     (loop for (pred . re) in (anything-mp-3-get-patterns anything-pattern)
-          when (and (eq pred 'identity) (>= (length re) anything-mp-highlight-threshold))
+          when (and (eq pred 'identity)
+                    (>= (length re) anything-mp-highlight-threshold))
           do
           (anything-mp-highlight-region (point-min) end re 'anything-match))))
                          
@@ -328,7 +371,8 @@ The smaller  this value is, the slower highlight is.")
 (defvar anything-default-search-functions
   '(anything-exact-search anything-mp-3p-search anything-mp-3-search))
 (defvar anything-default-search-backward-functions
-  '(anything-exact-search-backward anything-mp-3p-search-backward anything-mp-3-search-backward))
+  '(anything-exact-search-backward anything-mp-3p-search-backward
+                                   anything-mp-3-search-backward))
 (defun anything-compile-source--match-plugin (source)
   (let ((searchers (if (assoc 'search-from-end source)
                        anything-default-search-backward-functions
@@ -349,8 +393,10 @@ The smaller  this value is, the slower highlight is.")
   (start-process-shell-command
    "anything-grep-candidates" nil
    (agp-command-line anything-pattern
-                     (anything-mklist (anything-interpret-value (anything-attr 'grep-candidates)))
-                     (anything-candidate-number-limit (anything-get-current-source)))))
+                     (anything-mklist (anything-interpret-value
+                                       (anything-attr 'grep-candidates)))
+                     (anything-candidate-number-limit
+                      (anything-get-current-source)))))
 (defun agp-command-line (query files &optional limit)
   (with-temp-buffer
     (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
@@ -796,6 +842,65 @@ It also accepts 0-argument function name or variable name.")
                                   "info !elisp"
                                   '(anything-compile-source--candidates-in-buffer
                                     anything-compile-source--match-plugin)))
+      ;; anything-mp-match-source-name
+      (expect '(("SourceName" ("foo")))
+        (let ((anything-mp-match-source-name t))
+          (anything-test-candidates '(((name . "SourceName")
+                                       (candidates "foo" "bar")))
+                                    "source f"
+                                    '(anything-compile-source--match-plugin))))
+      (expect '(("SourceName cib" ("foo")))
+        (let ((anything-mp-match-source-name t))
+          (anything-test-candidates '(((name . "SourceName cib")
+                                       (init
+                                        . (lambda ()
+                                            (with-current-buffer (anything-candidate-buffer 'global)
+                                              (insert "foo\nbar\n"))))
+                                       (candidates-in-buffer)))
+                                    "source f"
+                                    '(anything-compile-source--candidates-in-buffer
+                                      anything-compile-source--match-plugin))))
+      (expect '(("SourceName cib search-from-end" ("bar")))
+        (let ((anything-mp-match-source-name t))
+          (anything-test-candidates '(((name . "SourceName cib search-from-end")
+                                       (init
+                                        . (lambda ()
+                                            (with-current-buffer (anything-candidate-buffer 'global)
+                                              (insert "foo\nbar\n"))))
+                                       (search-from-end)
+                                       (candidates-in-buffer)))
+                                    "source b"
+                                    '(anything-compile-source--candidates-in-buffer
+                                      anything-compile-source--match-plugin))))
+      (expect '(("SourceName" ("foo" "bar")))
+        (let ((anything-mp-match-source-name t))
+          (anything-test-candidates '(((name . "SourceName")
+                                       (candidates "foo" "bar")))
+                                    "source ."
+                                    '(anything-compile-source--match-plugin))))
+      (expect '(("SourceName cib" ("foo" "bar")))
+        (let ((anything-mp-match-source-name t))
+          (anything-test-candidates '(((name . "SourceName cib")
+                                       (init
+                                        . (lambda ()
+                                            (with-current-buffer (anything-candidate-buffer 'global)
+                                              (insert "foo\nbar\n"))))
+                                       (candidates-in-buffer)))
+                                    "source ."
+                                    '(anything-compile-source--candidates-in-buffer
+                                      anything-compile-source--match-plugin))))
+      (expect '(("SourceName cib search-from-end" ("bar" "foo")))
+        (let ((anything-mp-match-source-name t))
+          (anything-test-candidates '(((name . "SourceName cib search-from-end")
+                                       (init
+                                        . (lambda ()
+                                            (with-current-buffer (anything-candidate-buffer 'global)
+                                              (insert "foo\nbar\n"))))
+                                       (search-from-end)
+                                       (candidates-in-buffer)))
+                                    "source ."
+                                    '(anything-compile-source--candidates-in-buffer
+                                      anything-compile-source--match-plugin))))
       )))
 ;; (anything-compile-sources '(((name . "test"))) anything-compile-source-functions)
 (provide 'anything-match-plugin)
