@@ -5949,7 +5949,7 @@ the center of window, otherwise at the top of window.
 ;;; End:
 
 ;; How to save (DO NOT REMOVE!!)
-;; (progn (magit-push) (emacswiki-post "anything.el"))
+;; (progn (magit-push) (emacswiki-post "anything-config.el"))
 ;;; anything-config.el ends here
 
 ;;; LocalWords:  Tassilo Patrovics Vagn Johansen Dahl Clementson infos
