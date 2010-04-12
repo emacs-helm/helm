@@ -1417,6 +1417,8 @@ buffer that is not the current buffer."
 
 (defvar anything-c-source-find-files
   `((name . ,(concat "Find Files" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (init . (lambda ()
               (setq ffap-newfile-prompt t)))
     (candidates . anything-find-files-get-candidates)
