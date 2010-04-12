@@ -49,8 +49,10 @@
   "anything-multi-sources"
   :group 'emacs)
 
-(defvar anything-multi-source-delimiter-candidates '("delimiter"))
-(defvar anything-multi-source-delimiter-name "name")
+(defvar anything-multi-source-delimiter-candidates
+  '("anything-multi-source-delimiter-candidates--3e3r3x903oj09fnreiojioxe"))
+(defvar anything-multi-source-delimiter-name
+  "anything-multi-source-delimiter-name--339024u3fz09e90390ir309330923")
 (defvar anything-multi-source-delimiter
   `((name . ,anything-multi-source-delimiter-name)
     (match identity)
