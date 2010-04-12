@@ -44,7 +44,6 @@
 
 ;;; Code:
 
-(defvar anything-multi-sources-version "$Id: 50autoinsert.el,v 1.19 2009/09/15 10:29:59 rubikitch Exp rubikitch $")
 (eval-when-compile (require 'cl))
 (defgroup anything-multi-sources nil
   "anything-multi-sources"
