@@ -94,7 +94,7 @@
       (funcall push-line)
       (setq delimiter-flag
             (equal (car concat-headers) anything-multi-source-delimiter-name))
-      (when (and (not delimiter-flag)
+      (when (and (not delimiter-flag)   ;delete header
                  in-multi-source)
         (delete-region (1- (point)) (progn (forward-line 1) (point))))
       (when delimiter-flag
@@ -108,7 +108,11 @@
                    (funcall push-line)))
                (forward-line 0)
                (ams-delete-delimiter-source)
-               (save-excursion (forward-line 1) (setq multi-source-start (point))))
+               (if (equal (buffer-substring-no-properties (point-at-bol) (point-at-eol))
+                          anything-multi-source-delimiter-name)
+                   (ams-delete-delimiter-source)
+                 (save-excursion (forward-line 1) (setq multi-source-start (point)))
+                 (setq in-multi-source (not in-multi-source))))
               (t
                (save-excursion
                  (forward-line -1) (setq multi-source-end (point))
@@ -118,8 +122,8 @@
                (ams-delete-delimiter-source)
                (save-excursion
                  (goto-char concat-header-pos)
-                 (funcall rewrite-first-source-name))))
-        (setq in-multi-source (not in-multi-source))))))
+                 (funcall rewrite-first-source-name))
+               (setq in-multi-source (not in-multi-source))))))))
 
 (defun ams-sort-candidates (s e source)
   (when (eq (assoc-default 'type source) 'line)
