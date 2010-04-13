@@ -151,7 +151,7 @@
 ;;  `anything-find-files-down-one-level'
 ;;    Go down one level like unix command `cd ..'.
 ;;  `anything-find-files'
-;;    Preconfigured `anything' for `find-file'.
+;;    Preconfigured `anything' for anything implementation of `find-file'.
 ;;  `anything-write-file'
 ;;    Preconfigured `anything' providing completion for `write-file'.
 ;;  `anything-insert-file'
@@ -1617,9 +1617,18 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                        (file-name-directory (expand-file-name tap)))))
          (input  (if file-p (expand-file-name tap) fap))) 
     (anything 'anything-c-source-find-files
-              (or input (expand-file-name default-directory))
+              (anything-find-files-input)
               "Find Files or Url: " nil nil "*Anything Find Files*")))
 
+(defun anything-find-files-input ()
+  "Default input of `anything-find-files'."
+  (let* ((fap    (ffap-guesser))
+         (tap    (thing-at-point 'filename))
+         (file-p (and fap (file-exists-p fap)
+                      (file-exists-p
+                       (file-name-directory (expand-file-name tap)))))
+         (input (if file-p (expand-file-name tap) fap)))
+    (or input (expand-file-name default-directory))))
 
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
