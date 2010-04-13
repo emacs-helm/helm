@@ -1611,7 +1611,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
   (let* ((fap    (ffap-guesser))
          (tap    (thing-at-point 'filename))
          (file-p (and fap (file-exists-p fap)
-                      (file-exists-p (file-name-directory tap))))
+                      (file-exists-p
+                       (file-name-directory (expand-file-name tap)))))
          (input  (if file-p (expand-file-name tap) fap))) 
     (anything 'anything-c-source-find-files
               (or input (expand-file-name default-directory))
