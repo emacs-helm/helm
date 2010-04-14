@@ -1610,21 +1610,13 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 (defun anything-find-files ()
   "Preconfigured `anything' for anything implementation of `find-file'."
   (interactive)
-  (let* ((fap    (ffap-guesser))
-         (tap    (thing-at-point 'filename))
-         (file-p (and fap (file-exists-p fap)
-                      (file-exists-p
-                       (file-name-directory (expand-file-name tap)))))
-         (input  (if file-p (expand-file-name tap) fap))) 
-    (anything 'anything-c-source-find-files
-              (anything-find-files-input)
-              "Find Files or Url: " nil nil "*Anything Find Files*")))
+  (anything 'anything-c-source-find-files
+            (anything-find-files-input (ffap-guesser) (thing-at-point 'filename))
+            "Find Files or Url: " nil nil "*Anything Find Files*"))
 
-(defun anything-find-files-input ()
+(defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
-  (let* ((fap    (ffap-guesser))
-         (tap    (thing-at-point 'filename))
-         (file-p (and fap (file-exists-p fap)
+  (let* ((file-p (and fap (file-exists-p fap)
                       (file-exists-p
                        (file-name-directory (expand-file-name tap)))))
          (input (if file-p (expand-file-name tap) fap)))
