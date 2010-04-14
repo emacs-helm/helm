@@ -1593,19 +1593,27 @@ If CANDIDATE is alone, open file CANDIDATE filename."
              (if (> num-lines-buf 3)
                  (insert-in-minibuffer new-pattern) (find-file candidate)))))))
 
-
 (defun anything-c-insert-file-name-completion-at-point (candidate)
-  "Insert file name completion at point."
+  "Insert filename completion at point."
   (let* ((end         (point))
-         (guess       (thing-at-point 'filename))
-         (full-path-p (string-match (concat "^" (getenv "HOME")) guess)))
+         (guess       (anything-get-regexp-filename-at-point))
+         (full-path-p (string-match (concat "^" (getenv "HOME")) (cdr guess))))
     (set-text-properties 0 (length candidate) nil candidate)
-    (when guess
-      (search-backward guess (- (point) (length guess)))
-      (delete-region (point) end)
-      (if full-path-p
-          (insert (expand-file-name candidate))
-          (insert (abbreviate-file-name candidate))))))
+    (delete-region (- (point) (car guess)) end)
+    (if full-path-p
+        (insert (expand-file-name candidate))
+        (insert (abbreviate-file-name candidate)))))
+
+
+(defun anything-get-regexp-filename-at-point ()
+  "Return filename at point even if filename contain regexps."
+  (let ((thing-at-point-file-name-chars "\\(^\\|~/\\|/\\)*[:alnum:]_.${}#%,:"))
+    (save-excursion
+      (loop with count = 0
+         for tap = (thing-at-point 'filename)
+         while (and (string= tap "") (not (looking-back "\"\\|\'\\|\n")))
+         do (progn (forward-char -1) (incf count))
+         finally return (cons (+ count (length tap)) tap)))))
 
 (defun anything-find-files ()
   "Preconfigured `anything' for anything implementation of `find-file'."
@@ -1619,7 +1627,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
   (let* ((file-p (and fap (file-exists-p fap)
                       (file-exists-p
                        (file-name-directory (expand-file-name tap)))))
-         (input (if file-p (expand-file-name tap) fap)))
+         (input  (if file-p (expand-file-name tap) fap)))
     (or input (expand-file-name default-directory))))
 
 ;;; Anything completion for `write-file'.==> C-x C-w
