@@ -1594,26 +1594,42 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                  (insert-in-minibuffer new-pattern) (find-file candidate)))))))
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
-  "Insert filename completion at point."
+  "Insert file name completion at point."
   (let* ((end         (point))
-         (guess       (anything-get-regexp-filename-at-point))
-         (full-path-p (string-match (concat "^" (getenv "HOME")) (cdr guess))))
+         (guess       (thing-at-point 'filename))
+         (full-path-p (string-match (concat "^" (getenv "HOME")) guess)))
     (set-text-properties 0 (length candidate) nil candidate)
-    (delete-region (- (point) (car guess)) end)
-    (if full-path-p
-        (insert (expand-file-name candidate))
-        (insert (abbreviate-file-name candidate)))))
+    (when (and guess (not (string= guess "")))
+      (search-backward guess (- (point) (length guess)))
+      (delete-region (point) end)
+      (if full-path-p
+          (insert (expand-file-name candidate))
+          (insert (abbreviate-file-name candidate))))))
+
+;;; REGRESSION:
+;;; FIXME completing on regexps don't erase initial text.
+;;
+;; (defun anything-c-insert-file-name-completion-at-point (candidate)
+;;   "Insert filename completion at point."
+;;   (let* ((end         (point))
+;;          (guess       (anything-get-regexp-filename-at-point))
+;;          (full-path-p (string-match (concat "^" (getenv "HOME")) (cdr guess))))
+;;     (set-text-properties 0 (length candidate) nil candidate)
+;;     (delete-region (- (point) (car guess)) end)
+;;     (if full-path-p
+;;         (insert (expand-file-name candidate))
+;;         (insert (abbreviate-file-name candidate)))))
 
 
-(defun anything-get-regexp-filename-at-point ()
-  "Return filename at point even if filename contain regexps."
-  (let ((thing-at-point-file-name-chars "\\(^\\|~/\\|/\\)*[:alnum:]_.${}#%,:"))
-    (save-excursion
-      (loop with count = 0
-         for tap = (thing-at-point 'filename)
-         while (and (string= tap "") (not (looking-back "\"\\|\'\\|\n")))
-         do (progn (forward-char -1) (incf count))
-         finally return (cons (+ count (length tap)) tap)))))
+;; (defun anything-get-regexp-filename-at-point ()
+;;   "Return filename at point even if filename contain regexps."
+;;   (let ((thing-at-point-file-name-chars "\\(^\\|~/\\|/\\)*[:alnum:]_.${}#%,:"))
+;;     (save-excursion
+;;       (loop with count = 0
+;;          for tap = (thing-at-point 'filename)
+;;          while (and (string= tap "") (not (looking-back "\"\\|\'\\|\n")))
+;;          do (progn (forward-char -1) (incf count))
+;;          finally return (cons (+ count (length tap)) tap)))))
 
 (defun anything-find-files ()
   "Preconfigured `anything' for anything implementation of `find-file'."
