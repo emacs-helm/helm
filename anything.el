@@ -1716,6 +1716,10 @@ It is nil by default because some flickering occurred in some environment.
 To enable fitting, set both `anything-inhibit-fit-frame-flag' and
 `fit-frame-inhibit-fitting' to nil.")
 
+(defvar anything-source-in-each-line-flag nil
+  "If non-nil, add anything-source text-property in each candidate.
+experimental feature.")
+
 ;; (@* "Internal Variables")
 (defvar anything-test-candidate-list nil)
 (defvar anything-test-mode nil)
@@ -1908,25 +1912,28 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
   ;; The name `anything-get-current-source' should be used in init function etc.
   (if (and (boundp 'anything-source-name) (stringp anything-source-name))
       source
-    (block exit
-      (with-current-buffer (anything-buffer-get)
-        ;; This goto-char shouldn't be necessary, but point is moved to
-        ;; point-min somewhere else which shouldn't happen.
-        (goto-char (overlay-start anything-selection-overlay))
-        (let* ((header-pos (anything-get-previous-header-pos))
-               (source-name
-                (save-excursion
-                  (unless header-pos
-                    (message "No candidates")
-                    (return-from exit nil))
-                  (goto-char header-pos)
-                  (buffer-substring-no-properties
-                   (line-beginning-position) (line-end-position)))))
-          (some (lambda (source)
-                  (if (equal (assoc-default 'name source)
-                             source-name)
-                      source))
-                (anything-get-sources)))))))
+    (or 
+     (with-current-buffer (anything-buffer-get)
+       (get-text-property (point) 'anything-source))
+     (block exit
+       (with-current-buffer (anything-buffer-get)
+         ;; This goto-char shouldn't be necessary, but point is moved to
+         ;; point-min somewhere else which shouldn't happen.
+         (goto-char (overlay-start anything-selection-overlay))
+         (let* ((header-pos (anything-get-previous-header-pos))
+                (source-name
+                 (save-excursion
+                   (unless header-pos
+                     (message "No candidates")
+                     (return-from exit nil))
+                   (goto-char header-pos)
+                   (buffer-substring-no-properties
+                    (line-beginning-position) (line-end-position)))))
+           (some (lambda (source)
+                   (if (equal (assoc-default 'name source)
+                              source-name)
+                       source))
+                 (anything-get-sources))))))))
 
 (defun anything-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `anything' was invoked."
@@ -2565,7 +2572,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                           (line-beginning-position)
                           (line-beginning-position))
             (incf anything-digit-shortcut-count))
-          (anything-insert-match match 'insert))
+          (anything-insert-match match 'insert source))
         
         (if multiline
             (put-text-property start (point) 'anything-multiline t))))))
@@ -2664,7 +2671,7 @@ If current source has `update' attribute, a function without argument, call it b
         (forward-line 1))
       (anything-mark-current-line))))
 
-(defun anything-insert-match (match insert-function &optional ignored)
+(defun anything-insert-match (match insert-function source)
   "Insert MATCH into the anything buffer. If MATCH is a list then
 insert the string inteneded to appear on the display and store
 the real value in a text property."
@@ -2679,6 +2686,9 @@ the real value in a text property."
       (unless (get-text-property start 'anything-realvalue)
         (put-text-property start (line-end-position)
                            'anything-realvalue realvalue))
+      (when anything-source-in-each-line-flag
+        (put-text-property start (line-end-position)
+                           'anything-source source))
       (funcall insert-function "\n"))))
 
 (defun anything-insert-header-from-source (source)
@@ -2760,7 +2770,7 @@ the real value in a text property."
             ;; (if (and multiline separate)
             ;;      (anything-insert-candidate-separator)
             ;;   (setq separate t))
-            (anything-insert-match candidate 'insert-before-markers)
+            (anything-insert-match candidate 'insert-before-markers process-info)
             (incf (cdr item-count-info))
             ;; FIXME
             ;; (if multiline
