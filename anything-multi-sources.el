@@ -60,6 +60,7 @@
     (volatile)
     (candidates . anything-multi-source-delimiter-candidates)))
 
+(setq anything-source-in-each-line-flag t)
 (defun ams-delete-delimiter-source ()
   (delete-region (point) (progn (forward-line 3)  (point))))
 (defun anything-multi-sources-update-function ()
