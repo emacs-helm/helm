@@ -127,8 +127,7 @@
                (setq in-multi-source (not in-multi-source))))))))
 
 (defun ams-sort-candidates (s e source)
-  (when (eq (assoc-default 'type source) 'line)
-    (sort-numeric-fields 1 s e)))
+  (sort-numeric-fields 1 s e))
 
 (add-hook 'anything-update-hook 'anything-multi-sources-update-function)
 (provide 'anything-multi-sources)
