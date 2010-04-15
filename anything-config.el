@@ -2560,10 +2560,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      for pred          = (bookmark-get-filename i)
      for bufp          = (and (fboundp 'bmkext-get-buffer-name)
                               (bmkext-get-buffer-name i))
-     for regp          = (and (fboundp 'bmkext-get-end-position)
-                              (bmkext-get-end-position i)
-                              (/= (bookmark-get-position i)
-                                  (bmkext-get-end-position i)))
      for handlerp      = (and (fboundp 'bookmark-get-handler)
                               (bookmark-get-handler i))
      for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
@@ -2594,17 +2590,10 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      ;; directories
      if (and pred (file-directory-p pred))
      collect (propertize i 'face anything-c-bookmarks-face1 'help-echo pred)
-     ;; regular files with regions saved
-     if (and pred (not (file-directory-p pred)) (file-exists-p pred) regp)
-     collect (propertize i 'face 'anything-bmkext-region 'help-echo pred)
      ;; regular files
      if (and pred (not (file-directory-p pred)) (file-exists-p pred)
-             (not regp) (not (or iswoman isman)))
-     collect (propertize i 'face 'anything-bmkext-file 'help-echo pred)
-     ;; buffer non--filename
-     if (and (fboundp 'bmkext-get-buffer-name) bufp (not handlerp)
-             (if pred (not (file-exists-p pred)) (not pred)))
-     collect (propertize i 'face 'anything-bmkext-no--file)))
+             (not (or iswoman isman)))
+     collect (propertize i 'face 'anything-bmkext-file 'help-echo pred)))
        
 ;;; Faces for bookmarks
 (defface anything-bmkext-info
@@ -2625,11 +2614,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 (defface anything-bmkext-man
   '((t (:foreground "Orange4")))
   "*Face used for Woman/man bookmarks."
-  :group 'anything)
-
-(defface anything-bmkext-region
-  '((t (:foreground "Indianred2")))
-  "*Face used for region bookmarks."
   :group 'anything)
 
 (defface anything-bmkext-no--file
@@ -2682,22 +2666,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      for b = (car i)
      collect b into sa
      finally return (sort sa 'string-lessp)))
-
-;; Regions
-(defvar anything-c-source-bookmark-regions
-  '((name . "Bookmark Regions")
-    (init . (lambda ()
-              (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . anything-c-bookmark-region-setup-alist)
-    (candidate-transformer anything-c-highlight-bookmark)
-    (filtered-candidate-transformer . anything-c-adaptive-sort)
-    (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-regions)
-
-(defun anything-c-bookmark-region-setup-alist ()
-  "Specialized filter function for bookmarks regions."
-  (anything-c-bmkext-filter-setup-alist 'bmkext-region-alist-only))
 
 ;; W3m
 (defvar anything-c-source-bookmark-w3m
@@ -2847,7 +2815,6 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
               anything-c-source-bookmark-gnus
               anything-c-source-bookmark-info
               anything-c-source-bookmark-man
-              anything-c-source-bookmark-regions
               anything-c-source-bookmark-su-files&dirs
               anything-c-source-bookmark-ssh-files&dirs)))
 
