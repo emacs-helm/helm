@@ -5564,14 +5564,15 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
                  (loop for i from 0 to hierarchy
                     collecting (aref curhead i)))
                (arrange (headlines)
-                 (loop with curhead = (make-vector (hierarchies headlines) "")
-                    for ((str . pt) . hierarchy) in headlines
-                    do (aset curhead hierarchy str)
-                    collecting
-                      (cons
-                       (mapconcat 'identity (vector-0-n curhead hierarchy) " / ")
-                       pt))))
-          (if (listp regexp)
+                 (unless (null headlines) ; FIX headlines empty bug!
+                   (loop with curhead = (make-vector (hierarchies headlines) "")
+                      for ((str . pt) . hierarchy) in headlines
+                      do (aset curhead hierarchy str)
+                      collecting
+                        (cons
+                         (mapconcat 'identity (vector-0-n curhead hierarchy) " / ")
+                         pt)))))
+            (if (listp regexp)
               (arrange
                (sort
                 (loop for re in regexp
