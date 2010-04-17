@@ -4413,6 +4413,7 @@ A list of search engines."
   '((name . "Occur")
     (candidates . anything-c-get-occur-candidates)
     (persistent-action . anything-c-occur-persistent-action)
+    (persistent-help . "Goto Line")
     (action . anything-c-occur-goto-line)
     (requires-pattern . 1)
     (delayed)
