@@ -5695,20 +5695,6 @@ Return nil if bmk is not a valid bookmark."
             (bookmark-delete bmk 'batch)))
       (bookmark-delete bookmark 'batch))))
 
-(defun anything-bookmark-active-region-maybe (candidate)
-  "Active saved region if this bookmark have one."
-  (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
-    (condition-case nil
-        (when (and (boundp bmkext-use-region-flag)
-                   bmkext-use-region-flag)
-          (let ((bmk-name (or (bmkext-get-buffer-name bookmark)
-                              (file-name-nondirectory
-                               (bookmark-get-filename bookmark)))))
-            (when bmk-name
-              (with-current-buffer bmk-name
-                (setq deactivate-mark nil)))))
-      (error nil))))
-
 (defun anything-require-or-error (feature function)
   (or (require feature nil t)
       (error "Need %s to use `%s'." feature function)))
@@ -5812,13 +5798,11 @@ Return nil if bmk is not a valid bookmark."
                              (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate))
                                    (current-prefix-arg anything-current-prefix-arg))
                                (bookmark-jump bookmark))
-                             (anything-update)
-                             (anything-bookmark-active-region-maybe candidate)))
+                             (anything-update)))
      ("Jump to BM other window" . (lambda (candidate)
                                     (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
                                       (bookmark-jump-other-window bookmark))
-                                    (anything-update)
-                                    (anything-bookmark-active-region-maybe candidate)))
+                                    (anything-update)))
      ("Bookmark edit annotation" . (lambda (candidate)
                                      (let ((bookmark (anything-bookmark-get-bookmark-from-name candidate)))
                                        (bookmark-edit-annotation bookmark))))
