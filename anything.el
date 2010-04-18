@@ -2094,6 +2094,7 @@ This function allows easy sequencing of transformer functions."
 (defvar anything-buffers nil
   "All of `anything-buffer' in most recently used order.")
 
+;;;###autoload
 (defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
   "Select anything. In Lisp program, some optional arguments can be used.
 
@@ -2225,6 +2226,7 @@ already-bound variables. Yuck!
     (and m (set list-var (delq (car m) (symbol-value list-var))))
     (push elt (symbol-value list-var))))
 
+;;;###autoload
 (defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   "Same as `anything' except when C-u is pressed, the initial input is the symbol at point."
   (interactive)
