@@ -4961,8 +4961,9 @@ If program is already running exit with error.
 You can set your own list of commands with
 `anything-c-external-commands-list'."
   (interactive (list
-                (anything-comp-read "RunProgram: "
-                                    (anything-c-external-commands-list-1))))
+                (anything-comp-read
+                 "RunProgram: "
+                 (anything-c-external-commands-list-1 'sort))))
   (if (or (get-process program)
           (anything-c-get-pid-from-process-name program))
       (error "Error: %s is already running" program)
@@ -4972,7 +4973,17 @@ You can set your own list of commands with
        (get-process program)
        #'(lambda (process event)
            (when (string= event "finished\n")
-             (message "%s process...Finished." process))))))
+             (message "%s process...Finished." process))))
+      (setq anything-c-external-commands-list
+            (push (pop (nthcdr (anything-c-position
+                                program anything-c-external-commands-list)
+                               anything-c-external-commands-list))
+                  anything-c-external-commands-list))))
+
+(defsubst* anything-c-position (item seq &key (test 'eq))
+  "A simple and faster replacement of CL `position'."
+  (loop for i in seq for index from 0
+     when (funcall test i item) return index))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4982,7 +4993,7 @@ You can set your own list of commands with
 variable is not set by the user, it will be calculated
 automatically.")
 
-(defun anything-c-external-commands-list-1 ()
+(defun anything-c-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.
 
 If `anything-c-external-commands-list' is non-nil it will
@@ -4992,32 +5003,34 @@ and sets `anything-c-external-commands-list'.
 The code is ripped out of `eshell-complete-commands-list'."
   (if anything-c-external-commands-list
       anything-c-external-commands-list
-    (setq anything-c-external-commands-list
-          (let* ((paths (split-string (getenv "PATH") path-separator))
-                 (cwd (file-name-as-directory
-                       (expand-file-name default-directory)))
-                 (path "") (comps-in-path ())
-                 (file "") (filepath "") (completions ()))
-            ;; Go thru each path in the search path, finding completions.
-            (while paths
-              (setq path (file-name-as-directory
-                          (expand-file-name (or (car paths) ".")))
-                    comps-in-path
-                    (and (file-accessible-directory-p path)
-                         (file-name-all-completions "" path)))
-              ;; Go thru each completion found, to see whether it should be
-              ;; used, e.g. see if it's executable.
-              (while comps-in-path
-                (setq file (car comps-in-path)
-                      filepath (concat path file))
-                (if (and (not (member file completions))
-                         (or (string-equal path cwd)
-                             (not (file-directory-p filepath)))
-                         (file-executable-p filepath))
-                    (setq completions (cons file completions)))
-                (setq comps-in-path (cdr comps-in-path)))
-              (setq paths (cdr paths)))
-            completions))))
+      (setq anything-c-external-commands-list
+            (let* ((paths (split-string (getenv "PATH") path-separator))
+                   (cwd (file-name-as-directory
+                         (expand-file-name default-directory)))
+                   (path "") (comps-in-path ())
+                   (file "") (filepath "") (completions ()))
+              ;; Go thru each path in the search path, finding completions.
+              (while paths
+                (setq path (file-name-as-directory
+                            (expand-file-name (or (car paths) ".")))
+                      comps-in-path
+                      (and (file-accessible-directory-p path)
+                           (file-name-all-completions "" path)))
+                ;; Go thru each completion found, to see whether it should be
+                ;; used, e.g. see if it's executable.
+                (while comps-in-path
+                  (setq file (car comps-in-path)
+                        filepath (concat path file))
+                  (if (and (not (member file completions))
+                           (or (string-equal path cwd)
+                               (not (file-directory-p filepath)))
+                           (file-executable-p filepath))
+                      (setq completions (cons file completions)))
+                  (setq comps-in-path (cdr comps-in-path)))
+                (setq paths (cdr paths)))
+              (if sort
+                  (sort completions #'(lambda (x y) (string< x y)))
+                  completions)))))
 
 (defun anything-c-file-buffers (filename)
   "Returns a list of buffer names corresponding to FILENAME."
