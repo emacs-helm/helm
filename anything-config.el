@@ -4925,6 +4925,55 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-emacs-process)
 
+;; Run Externals commands within Emacs
+(defun* anything-comp-read (prompt collection &key test initial-input)
+  "Anything `completing-read' emulation."
+  (or (anything-noresume
+       `((name . "Completions")
+         (candidates
+          . ,#'(lambda ()
+                 (if test
+                     (loop for i in collection
+                        when (funcall test i) collect i)
+                     collection)))
+         (action . (("candidate" . ,'identity))))
+       initial-input
+       prompt)
+      (keyboard-quit)))
+
+(defun anything-c-get-pid-from-process-name (process-name)
+  "Get pid from running process PROCESS-NAME."
+  (let ((process-list (list-system-processes)))
+    (catch 'break
+      (dolist (i process-list)
+        (let ((process-attr (process-attributes i)))
+          (when process-attr
+            (when (string-match process-name
+                                (cdr (assq 'comm
+                                           process-attr)))
+              (throw 'break
+                i))))))))
+
+;;;###autoload
+(defun anything-c-run-external-command (program)
+  "Run External PROGRAM asyncronously from Emacs.
+If program is already running exit with error.
+You can set your own list of commands with
+`anything-c-external-commands-list'."
+  (interactive (list
+                (anything-comp-read "RunProgram: "
+                                    (anything-c-external-commands-list-1))))
+  (if (or (get-process program)
+          (anything-c-get-pid-from-process-name program)
+      (error "Error: %s is already running" program)
+      (message "Starting %s..." program)
+      (start-process-shell-command program nil program)
+      (set-process-sentinel
+       (get-process program)
+       #'(lambda (process event)
+           (when (string= event "finished\n")
+             (message "%s process...Finished." process))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
