@@ -4972,7 +4972,7 @@ You can set your own list of commands with
        (get-process program)
        #'(lambda (process event)
            (when (string= event "finished\n")
-             (message "%s process...Finished." process))))))
+             (message "%s process...Finished." process)))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
