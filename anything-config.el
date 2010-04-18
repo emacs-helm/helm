@@ -718,12 +718,14 @@ You can use them without configuration.
 Enjoy!"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;###autoload
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
 ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate"
   (interactive)
   (anything-other-buffer anything-for-files-prefered-list "*anything for files*"))
 
+;;;###autoload
 (defun anything-info-at-point ()
   "Preconfigured `anything' for searching info at point."
   (interactive)
@@ -732,12 +734,14 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
               anything-c-source-info-pages)
             (thing-at-point 'symbol) nil nil nil "*anything info*"))
 
+;;;###autoload
 (defun anything-show-kill-ring ()
   "Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
 You may bind this command to M-y."
   (interactive)
   (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*"))
 
+;;;###autoload
 (defun anything-minibuffer-history ()
   "Preconfigured `anything' for `minibuffer-history'."
   (interactive)
@@ -759,6 +763,7 @@ You may bind this command to M-y."
                    minibuffer-local-ns-map))
   (define-key map "\C-r" 'anything-minibuffer-history))
 
+;;;###autoload
 (defun anything-gentoo ()
   "Preconfigured `anything' for gentoo linux."
   (interactive)
@@ -766,6 +771,7 @@ You may bind this command to M-y."
                            anything-c-source-use-flags)
                          "*anything gentoo*"))
 
+;;;###autoload
 (defun anything-surfraw-only ()
   "Preconfigured `anything' for surfraw.
 If region is marked set anything-pattern to region.
@@ -787,53 +793,63 @@ With two prefix args allow choosing in which symbol to search."
               (and pattern (replace-regexp-in-string "\n" "" pattern))
               nil nil nil "*anything surfraw*")))
 
+;;;###autoload
 (defun anything-imenu ()
   "Preconfigured `anything' for `imenu'."
   (interactive)
   (anything 'anything-c-source-imenu nil nil nil nil "*anything imenu*"))
 
+;;;###autoload
 (defun anything-google-suggest ()
   "Preconfigured `anything' for google search with google suggest."
   (interactive)
   (anything-other-buffer 'anything-c-source-google-suggest "*anything google*"))
 
+;;;###autoload
 (defun anything-yahoo-suggest ()
   "Preconfigured `anything' for Yahoo searching with Yahoo suggest."
   (interactive)
   (anything-other-buffer 'anything-c-source-yahoo-suggest "*anything yahoo*"))
 
 ;;; Converted from anything-show-*-only
+;;;###autoload
 (defun anything-for-buffers ()
   "Preconfigured `anything' for buffer."
   (interactive)
   (anything-other-buffer 'anything-c-source-buffers "*anything for buffers*"))
 
+;;;###autoload
 (defun anything-bbdb ()
   "Preconfigured `anything' for BBDB."
   (interactive)
   (anything-other-buffer 'anything-c-source-bbdb "*anything bbdb*"))
 
+;;;###autoload
 (defun anything-locate ()
   "Preconfigured `anything' for Locate."
   (interactive)
   (anything-other-buffer 'anything-c-source-locate "*anything locate*"))
 
+;;;###autoload
 (defun anything-w3m-bookmarks ()
   "Preconfigured `anything' for w3m bookmark."
   (interactive)
   (anything-other-buffer 'anything-c-source-w3m-bookmarks "*anything w3m bookmarks*"))
 
+;;;###autoload
 (defun anything-colors ()
   "Preconfigured `anything' for color."
   (interactive)
   (anything-other-buffer '(anything-c-source-colors anything-c-source-customize-face)
                          "*anything colors*"))
 
+;;;###autoload
 (defun anything-bm-list ()
   "Preconfigured `anything' for visible bookmarks."
   (interactive)
   (anything-other-buffer 'anything-c-source-bm "*anything bm list*"))
 
+;;;###autoload
 (defun anything-timers ()
   "Preconfigured `anything' for timers."
   (interactive)
@@ -843,6 +859,7 @@ With two prefix args allow choosing in which symbol to search."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
+;;;###autoload
 (defun anything-kill-buffers ()
   "Preconfigured `anything' to kill buffer you selected."
   (interactive)
@@ -857,6 +874,7 @@ With two prefix args allow choosing in which symbol to search."
    nil nil))
 
 ;;; Regexp
+;;;###autoload
 (defun anything-query-replace-regexp (&rest args)
   "Preconfigured `anything' : Drop-in replacement of `query-replace-regexp' with building regexp visually."
   (interactive
@@ -879,6 +897,7 @@ With two prefix args allow choosing in which symbol to search."
                (region-end)))))
   (apply 'query-replace-regexp args))
 
+;;;###autoload
 (defun anything-regexp ()
   "Preconfigured `anything' : It is like `re-builder'. It helps buliding regexp and replacement."
   (interactive)
@@ -1631,6 +1650,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 ;;          do (progn (forward-char -1) (incf count))
 ;;          finally return (cons (+ count (length tap)) tap)))))
 
+;;;###autoload
 (defun anything-find-files ()
   "Preconfigured `anything' for anything implementation of `find-file'."
   (interactive)
@@ -1658,6 +1678,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
      (("Write File" . (lambda (candidate)
                         (write-file candidate 'confirm)))))))
 
+;;;###autoload
 (defun anything-write-file ()
   "Preconfigured `anything' providing completion for `write-file'."
   (interactive)
@@ -1679,6 +1700,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                                                 candidate anything-current-buffer))
                           (insert-file candidate))))))))
 
+;;;###autoload
 (defun anything-insert-file ()
   "Preconfigured `anything' providing completion for `insert-file'."
   (interactive)
@@ -1809,27 +1831,32 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
               (format prompt-fm fname) nil nil buffer)))
 
 
+;;;###autoload
 (defun anything-dired-rename-file ()
   "Preconfigured `anything' to rename files from dired."
   (interactive)
   (anything-dired-do-action-on-file :action 'rename))
 
+;;;###autoload
 (defun anything-dired-copy-file ()
   "Preconfigured `anything' to copy files from dired."
   (interactive)
   (anything-dired-do-action-on-file :action 'copy))
 
+;;;###autoload
 (defun anything-dired-symlink-file ()
   "Preconfigured `anything' to symlink files from dired."
   (interactive)
   (anything-dired-do-action-on-file :action 'symlink))
 
+;;;###autoload
 (defun anything-dired-hardlink-file ()
   "Preconfigured `anything' to hardlink files from dired."
   (interactive)
   (anything-dired-do-action-on-file :action 'hardlink))
 
 (defvar anything-dired-bindings nil)
+;;;###autoload
 (defun anything-dired-bindings (&optional arg)
   "Replace usual dired commands `C' and `R' by anything ones.
 When call interactively toggle dired bindings and anything bindings.
@@ -2838,6 +2865,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 
 
 ;; All bookmark-extensions sources.
+;;;###autoload
 (defun anything-bookmark-ext ()
   "Preconfigured `anything' for bookmark-extensions sources.
 See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
@@ -3237,6 +3265,7 @@ http://cedet.sourceforge.net/"))
 ;; (anything 'anything-c-source-semantic)
 
 ;;; Function is called by
+;;;###autoload
 (defun anything-simple-call-tree ()
   "Preconfigured `anything' for simple-call-tree. List function relationships."
   (interactive)
@@ -3545,6 +3574,7 @@ If this action is executed just after `yank', replace with STR as yanked string.
 
 ;; (anything 'anything-c-source-mark-ring)
 
+;;;###autoload
 (defun anything-mark-ring ()
   "Preconfigured `anything' for `anything-c-source-mark-ring'."
   (interactive)
@@ -3589,6 +3619,7 @@ If this action is executed just after `yank', replace with STR as yanked string.
 
 ;; (anything 'anything-c-source-global-mark-ring)
 
+;;;###autoload
 (defun anything-global-mark-ring ()
   "Preconfigured `anything' for `anything-c-source-global-mark-ring'."
   (interactive)
@@ -3849,6 +3880,7 @@ See http://orgmode.org for the latest version.")
                                              (install-elisp-from-emacswiki elm)))))
       actions))
 
+;;;###autoload
 (defun anything-yaoddmuse-cache-pages (&optional load)
   "Fetch the list of files on emacswiki and create cache file.
 If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
@@ -3868,11 +3900,13 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
               load)
       (load anything-c-yaoddmuse-cache-file))))
 
+;;;###autoload
 (defun anything-yaoddmuse-emacswiki-edit-or-view ()
   "Preconfigured `anything' to edit or view EmacsWiki page."
   (interactive)
   (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view))
 
+;;;###autoload
 (defun anything-yaoddmuse-emacswiki-post-library ()
   "Preconfigured `anything' to post library to EmacsWiki."
   (interactive)
@@ -4287,6 +4321,7 @@ A list of search engines."
 
 ;;; Emms
 
+;;;###autoload
 (defun anything-emms-stream-edit-bookmark (elm)
   "Change the information of current emms-stream bookmark from anything."
   (interactive)
@@ -4405,6 +4440,7 @@ A list of search engines."
     (persistent-help . "Show description of this source")))
 ;; (anything 'anything-c-source-call-source)
 
+;;;###autoload
 (defun anything-call-source ()
   "Preconfigured `anything' to call anything source."
   (interactive)
@@ -4452,6 +4488,7 @@ A list of search engines."
     (volatile)))
 ;; (anything 'anything-c-source-occur)
 
+;;;###autoload
 (defun anything-occur ()
   "Preconfigured Anything for Occur source."
   (interactive)
@@ -4473,6 +4510,7 @@ See also `anything-create--actions'.")
   (interactive)
   (anything-run-after-quit 'anything-create nil anything-pattern))
 
+;;;###autoload
 (defun anything-create (&optional string initial-input)
   "Preconfigured `anything' to do many create actions from STRING.
 See also `anything-create--actions'."
@@ -4574,6 +4612,7 @@ See also `anything-create--actions'."
   (let ((anything-source-name (assoc-default 'name anything-c-source-top))) ;UGLY HACK
     (anything-c-top-init)))
 
+;;;###autoload
 (defun anything-top ()
   "Preconfigured `anything' for top command."
   (interactive)
@@ -4653,6 +4692,7 @@ See also `anything-create--actions'."
     (persistent-action . anything-c-persistent-xfont-action)
     (persistent-help . "Switch to this font temporarily")))
 
+;;;###autoload
 (defun anything-select-xfont ()
   "Preconfigured `anything' to select Xfont."
   (interactive)
@@ -4677,6 +4717,7 @@ See also `anything-create--actions'."
 (defvar anything-c-apt-show-command "apt-cache show '%s'")
 (defvar anything-c-apt-install-command "xterm -e sudo apt-get install '%s' &")
 
+;;;###autoload
 (defun anything-apt (query)
   "Preconfigured `anything' : frontend of APT package manager."
   (interactive "sAPT search: ")
@@ -4693,6 +4734,7 @@ See also `anything-create--actions'."
 (defun anything-c-apt-display-to-real (line)
   (car (split-string line " - ")))
 
+;;;###autoload
 (defun anything-c-shell-command-if-needed (command)
   (interactive "sShell command: ")
   (if (get-buffer command)		; if the buffer already exists
@@ -4987,6 +5029,7 @@ Ask to kill buffers associated with that file, too."
                                   (anything-c-external-commands-list-1))
                  file))
 
+;;;###autoload
 (defun w32-shell-execute-open-file (file)
   (interactive "fOpen file:")
   (with-no-warnings
@@ -5125,6 +5168,7 @@ directory, open this directory."
 (anything-document-attribute 'target-file "type . line"
   "Goto line of target-file.")
 
+;;;###autoload
 (defun anything-c-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
 It is added to `extended-command-history'.
@@ -5138,6 +5182,7 @@ It is added to `extended-command-history'.
         (execute-kbd-macro (symbol-function cmd))
       (call-interactively cmd))))
 
+;;;###autoload
 (defun anything-c-set-variable (var)
   "Set value to VAR interactively."
   (interactive)
