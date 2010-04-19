@@ -1732,6 +1732,7 @@ experimental feature.")
 (defvar anything-issued-errors nil)
 (defvar anything-shortcut-keys nil)
 (defvar anything-once-called-functions nil)
+(defvar anything-follow-mode nil)
 
 ;; (@* "Programming Tools")
 (defmacro anything-aif (test-form then-form &rest else-forms)
@@ -2297,6 +2298,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (erase-buffer)
     (set (make-local-variable 'inhibit-read-only) t)
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
+    (set (make-local-variable 'anything-follow-mode) nil)
     
     (setq cursor-type nil)
     (setq mode-name "Anything"))
@@ -3695,13 +3697,19 @@ You can paste it by typing C-y."
 
 
 ;; (@* "Utility: Automatical execution of persistent-action")
-(define-minor-mode anything-follow-mode
+(add-to-list 'minor-mode-alist '(anything-follow-mode " AFollow"))
+(defun anything-follow-mode ()
   "If this mode is on, persistent action is executed everytime the cursor is moved."
-  nil " AFollow" :global t)
+  (interactive)
+  (with-current-buffer anything-buffer
+    (setq anything-follow-mode (not anything-follow-mode))
+    (message "anything-follow-mode is %s"
+             (if anything-follow-mode "enabled" "disabled"))))
 
 (defun anything-follow-execute-persistent-action-maybe ()
   "Execute persistent action after `anything-input-idle-delay' secs when `anything-follow-mode' is enabled."
-  (and anything-follow-mode
+  (and (buffer-local-value 'anything-follow-mode
+                           (get-buffer-create anything-buffer))
        (sit-for anything-input-idle-delay)
        (anything-window)
        (anything-get-selection)
