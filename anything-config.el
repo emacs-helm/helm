@@ -4926,16 +4926,47 @@ See also `anything-create--actions'."
 ;; (anything 'anything-c-source-emacs-process)
 
 ;; Run Externals commands within Emacs
+(defmacro* anything-comp-hash-get-items (hash-table &key test)
+  "Get the list of all keys/values of hash-table."
+  `(let ((li-items ())) 
+     (maphash #'(lambda (x y)
+                  (if ,test
+                      (when (funcall ,test y)
+                        (push (list x y) li-items))
+                      (push (list x y) li-items)))
+              ,hash-table)
+     li-items))
+
+(defun anything-comp-read-get-candidates (collection &optional test)
+  "Convert collection to list.
+If collection is an `obarray', a test is maybe needed, otherwise
+the list would be incomplete.
+See `obarray'."
+  (cond ((and (listp collection) test)
+         (loop for i in collection
+              when (funcall test i) collect i))
+        ((and (vectorp collection) test)
+         (let (ob)
+           (mapatoms
+            #'(lambda (s)
+                (when (funcall test s) (push s ob))))
+           ob))
+        ((and (hash-table-p collection) test)
+         (anything-comp-hash-get-items collection :test test))
+        ((vectorp collection)
+         (loop for i across collection collect i))
+        ((hash-table-p collection)
+         (anything-comp-hash-get-items collection))
+        (t collection)))
+         
 (defun* anything-comp-read (prompt collection &key test initial-input)
-  "Anything `completing-read' emulation."
+  "Anything `completing-read' emulation.
+Collection can be a list, vector, obarray or hash-table."
   (or (anything
        `((name . "Completions")
          (candidates
-          . ,#'(lambda ()
-                 (if test
-                     (loop for i in collection
-                        when (funcall test i) collect i)
-                     collection)))
+          . (lambda ()
+              (anything-comp-read-get-candidates collection test)))
          (action . (("candidate" . ,'identity))))
        initial-input
        prompt)
