@@ -4928,7 +4928,7 @@ See also `anything-create--actions'."
 ;; Run Externals commands within Emacs
 (defun* anything-comp-read (prompt collection &key test initial-input)
   "Anything `completing-read' emulation."
-  (or (anything-noresume
+  (or (anything
        `((name . "Completions")
          (candidates
           . ,#'(lambda ()
