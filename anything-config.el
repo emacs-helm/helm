@@ -613,7 +613,8 @@ It is prepended to predefined pairs."
 
 (defcustom anything-c-enable-eval-defun-hack t
   "*If non-nil, execute `anything' using the source at point when C-M-x is pressed.
-This hack is invoked when pressing C-M-x in the form (defvar anything-c-source-XXX ...) or (setq anything-c-source-XXX ...)."
+This hack is invoked when pressing C-M-x in the form \
+(defvar anything-c-source-XXX ...) or (setq anything-c-source-XXX ...)."
   :type 'boolean
   :group 'anything-config)
 
@@ -622,6 +623,15 @@ This hack is invoked when pressing C-M-x in the form (defvar anything-c-source-X
 When set to 0 don't show tramp messages in anything.
 If you want to have the default tramp messages set it to 3."
   :type 'integer
+  :group 'anything-config)
+
+(defcustom anything-back-to-emacs-shell-command nil
+  "*A shell command to come back to Emacs after running externals programs.
+Stumpwm users could use:
+\"stumpish eval \"\(stumpwm::emacs\)\"\".
+With others windows manager you could use:
+\"wmctrl -xa emacs\"."
+  :type 'string
   :group 'anything-config)
 
 ;;; Documentation
@@ -4985,6 +4995,7 @@ Collection can be a list, vector, obarray or hash-table."
               (throw 'break
                 i))))))))
 
+
 ;;;###autoload
 (defun anything-c-run-external-command (program)
   "Run External PROGRAM asyncronously from Emacs.
@@ -5004,7 +5015,9 @@ You can set your own list of commands with
        (get-process program)
        #'(lambda (process event)
            (when (string= event "finished\n")
-             (message "%s process...Finished." process))))
+             (message "%s process...Finished." process)
+             (when anything-back-to-emacs-shell-command
+               (shell-command anything-back-to-emacs-shell-command)))))
       (setq anything-c-external-commands-list
             (push (pop (nthcdr (anything-c-position
                                 program anything-c-external-commands-list)
