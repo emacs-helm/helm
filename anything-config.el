@@ -1461,6 +1461,7 @@ buffer that is not the current buffer."
                            ("Complete at point" . anything-c-insert-file-name-completion-at-point)
                            ("Delete File(s)" . anything-delete-marked-files)
                            ("Find file as root" . anything-find-file-as-root)
+                           ("Open file externally" . anything-c-open-file-externally)
                            ("Find file other window" . find-file-other-window)
                            ("Find file other frame" . find-file-other-frame))))))
 
@@ -4969,17 +4970,19 @@ See `obarray'."
          (anything-comp-hash-get-items collection))
         (t collection)))
          
-(defun* anything-comp-read (prompt collection &key test initial-input)
+(defun* anything-comp-read (prompt collection &key test initial-input
+                                   (buffer "*Anything Completions*"))
   "Anything `completing-read' emulation.
 Collection can be a list, vector, obarray or hash-table."
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
   (or (anything
        `((name . "Completions")
          (candidates
           . (lambda ()
               (anything-comp-read-get-candidates collection test)))
          (action . (("candidate" . ,'identity))))
-       initial-input
-       prompt)
+       initial-input prompt 'noresume nil buffer)
       (keyboard-quit)))
 
 (defun anything-c-get-pid-from-process-name (process-name)
@@ -5097,11 +5100,16 @@ Ask to kill buffers associated with that file, too."
 
 (defun anything-c-open-file-externally (file)
   "Open FILE with an external tool. Query the user which tool to use."
-  (start-process "anything-c-open-file-externally"
-                 nil
-                 (completing-read "Program: "
-                                  (anything-c-external-commands-list-1))
-                 file))
+  (let* ((fname   (expand-file-name file))
+         (program (anything-comp-read
+                  "Program: " (anything-c-external-commands-list-1 'sort))))
+    (start-process "anything-c-open-file-externally"
+                   nil program fname)
+    (setq anything-c-external-commands-list
+          (push (pop (nthcdr (anything-c-position
+                              program anything-c-external-commands-list)
+                             anything-c-external-commands-list))
+                anything-c-external-commands-list))))
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
@@ -5111,6 +5119,7 @@ Ask to kill buffers associated with that file, too."
                                "/" "\\"
                                (replace-regexp-in-string ; strip cygdrive paths
                                 "/cygdrive/\\(.\\)" "\\1:" file nil nil) nil t))))
+
 (defun anything-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
   (if (eq system-type 'windows-nt)
