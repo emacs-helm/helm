@@ -90,7 +90,11 @@
 (defvar anything-c-source-ipa
   '((name . "In Place Annotations (Current Buffer)")
     (candidates . anything-ipa-candidates)
-    (action . goto-char)
+    (action ("Go To" . goto-char)
+            ("Edit (empty string to delete)" .
+             (lambda (p) (save-excursion (goto-char p) (ipa-edit t))))
+            ("Move" .
+             (lambda (p) (goto-char p) (ipa-move t))))
     (migemo))
   "`anything' source of ipa in current-buffer.")
 
