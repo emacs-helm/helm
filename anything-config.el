@@ -2522,7 +2522,7 @@ http://www.nongnu.org/bm/")
                 (end (overlay-end bm))
                 (annotation (or (overlay-get bm 'annotation) "")))
             (unless (< (- end start) 1) ; org => (if (< (- end start) 2)
-              (let ((str (format "%7d: [%s]: %s\n"
+              (let ((str (format "%5d: [%s]: %s\n"
                                  (line-number-at-pos start)
                                  annotation
                                  (buffer-substring start (1- end)))))
