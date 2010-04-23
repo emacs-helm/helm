@@ -2146,7 +2146,7 @@ already-bound variables. Yuck!
               ;; It is needed because `anything-source-name' is non-nil
               ;; when `anything' is invoked by action. Awful global scope.
               anything-source-name anything-in-persistent-action
-              anything-quit anything-follow-mode
+              anything-quit
               (case-fold-search t)
               (anything-buffer (or any-buffer anything-buffer))
               (anything-map (or any-keymap anything-map)))
