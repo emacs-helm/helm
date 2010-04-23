@@ -2906,7 +2906,8 @@ UNIT and DIRECTION."
   (if anything-mode-line-string
       (setq mode-line-format
             '(" " mode-line-buffer-identification " "
-              (line-number-mode "%l") " " anything-mode-line-string-real "-%-")
+              (line-number-mode "%l") " " (anything-follow-mode "(F)")
+              " " anything-mode-line-string-real "-%-")
             anything-mode-line-string-real
             (substitute-command-keys anything-mode-line-string))
     (setq mode-line-format
