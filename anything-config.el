@@ -613,7 +613,8 @@ It is prepended to predefined pairs."
 
 (defcustom anything-c-enable-eval-defun-hack t
   "*If non-nil, execute `anything' using the source at point when C-M-x is pressed.
-This hack is invoked when pressing C-M-x in the form (defvar anything-c-source-XXX ...) or (setq anything-c-source-XXX ...)."
+This hack is invoked when pressing C-M-x in the form \
+(defvar anything-c-source-XXX ...) or (setq anything-c-source-XXX ...)."
   :type 'boolean
   :group 'anything-config)
 
@@ -622,6 +623,15 @@ This hack is invoked when pressing C-M-x in the form (defvar anything-c-source-X
 When set to 0 don't show tramp messages in anything.
 If you want to have the default tramp messages set it to 3."
   :type 'integer
+  :group 'anything-config)
+
+(defcustom anything-back-to-emacs-shell-command nil
+  "*A shell command to come back to Emacs after running externals programs.
+Stumpwm users could use:
+\"stumpish eval \"\(stumpwm::emacs\)\"\".
+With others windows manager you could use:
+\"wmctrl -xa emacs\"."
+  :type 'string
   :group 'anything-config)
 
 ;;; Documentation
@@ -1451,6 +1461,7 @@ buffer that is not the current buffer."
                            ("Complete at point" . anything-c-insert-file-name-completion-at-point)
                            ("Delete File(s)" . anything-delete-marked-files)
                            ("Find file as root" . anything-find-file-as-root)
+                           ("Open file externally" . anything-c-open-file-externally)
                            ("Find file other window" . find-file-other-window)
                            ("Find file other frame" . find-file-other-frame))))))
 
@@ -4925,6 +4936,102 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-emacs-process)
 
+;; Run Externals commands within Emacs
+(defmacro* anything-comp-hash-get-items (hash-table &key test)
+  "Get the list of all keys/values of hash-table."
+  `(let ((li-items ())) 
+     (maphash #'(lambda (x y)
+                  (if ,test
+                      (when (funcall ,test y)
+                        (push (list x y) li-items))
+                      (push (list x y) li-items)))
+              ,hash-table)
+     li-items))
+
+(defun anything-comp-read-get-candidates (collection &optional test)
+  "Convert collection to list.
+If collection is an `obarray', a test is maybe needed, otherwise
+the list would be incomplete.
+See `obarray'."
+  (cond ((and (listp collection) test)
+         (loop for i in collection
+              when (funcall test i) collect i))
+        ((and (vectorp collection) test)
+         (let (ob)
+           (mapatoms
+            #'(lambda (s)
+                (when (funcall test s) (push s ob))))
+           ob))
+        ((and (hash-table-p collection) test)
+         (anything-comp-hash-get-items collection :test test))
+        ((vectorp collection)
+         (loop for i across collection collect i))
+        ((hash-table-p collection)
+         (anything-comp-hash-get-items collection))
+        (t collection)))
+         
+(defun* anything-comp-read (prompt collection &key test initial-input
+                                   (buffer "*Anything Completions*"))
+  "Anything `completing-read' emulation.
+Collection can be a list, vector, obarray or hash-table."
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
+  (or (anything
+       `((name . "Completions")
+         (candidates
+          . (lambda ()
+              (anything-comp-read-get-candidates collection test)))
+         (action . (("candidate" . ,'identity))))
+       initial-input prompt 'noresume nil buffer)
+      (keyboard-quit)))
+
+(defun anything-c-get-pid-from-process-name (process-name)
+  "Get pid from running process PROCESS-NAME."
+  (let ((process-list (list-system-processes)))
+    (catch 'break
+      (dolist (i process-list)
+        (let ((process-attr (process-attributes i)))
+          (when process-attr
+            (when (string-match process-name
+                                (cdr (assq 'comm
+                                           process-attr)))
+              (throw 'break
+                i))))))))
+
+
+;;;###autoload
+(defun anything-c-run-external-command (program)
+  "Run External PROGRAM asyncronously from Emacs.
+If program is already running exit with error.
+You can set your own list of commands with
+`anything-c-external-commands-list'."
+  (interactive (list
+                (anything-comp-read
+                 "RunProgram: "
+                 (anything-c-external-commands-list-1 'sort))))
+  (if (or (get-process program)
+          (anything-c-get-pid-from-process-name program))
+      (error "Error: %s is already running" program)
+      (message "Starting %s..." program)
+      (start-process-shell-command program nil program)
+      (set-process-sentinel
+       (get-process program)
+       #'(lambda (process event)
+           (when (string= event "finished\n")
+             (message "%s process...Finished." process)
+             (when anything-back-to-emacs-shell-command
+               (shell-command anything-back-to-emacs-shell-command)))))
+      (setq anything-c-external-commands-list
+            (push (pop (nthcdr (anything-c-position
+                                program anything-c-external-commands-list)
+                               anything-c-external-commands-list))
+                  anything-c-external-commands-list))))
+
+(defsubst* anything-c-position (item seq &key (test 'eq))
+  "A simple and faster replacement of CL `position'."
+  (loop for i in seq for index from 0
+     when (funcall test i item) return index))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
@@ -4933,7 +5040,7 @@ See also `anything-create--actions'."
 variable is not set by the user, it will be calculated
 automatically.")
 
-(defun anything-c-external-commands-list-1 ()
+(defun anything-c-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.
 
 If `anything-c-external-commands-list' is non-nil it will
@@ -4943,32 +5050,34 @@ and sets `anything-c-external-commands-list'.
 The code is ripped out of `eshell-complete-commands-list'."
   (if anything-c-external-commands-list
       anything-c-external-commands-list
-    (setq anything-c-external-commands-list
-          (let* ((paths (split-string (getenv "PATH") path-separator))
-                 (cwd (file-name-as-directory
-                       (expand-file-name default-directory)))
-                 (path "") (comps-in-path ())
-                 (file "") (filepath "") (completions ()))
-            ;; Go thru each path in the search path, finding completions.
-            (while paths
-              (setq path (file-name-as-directory
-                          (expand-file-name (or (car paths) ".")))
-                    comps-in-path
-                    (and (file-accessible-directory-p path)
-                         (file-name-all-completions "" path)))
-              ;; Go thru each completion found, to see whether it should be
-              ;; used, e.g. see if it's executable.
-              (while comps-in-path
-                (setq file (car comps-in-path)
-                      filepath (concat path file))
-                (if (and (not (member file completions))
-                         (or (string-equal path cwd)
-                             (not (file-directory-p filepath)))
-                         (file-executable-p filepath))
-                    (setq completions (cons file completions)))
-                (setq comps-in-path (cdr comps-in-path)))
-              (setq paths (cdr paths)))
-            completions))))
+      (setq anything-c-external-commands-list
+            (let* ((paths (split-string (getenv "PATH") path-separator))
+                   (cwd (file-name-as-directory
+                         (expand-file-name default-directory)))
+                   (path "") (comps-in-path ())
+                   (file "") (filepath "") (completions ()))
+              ;; Go thru each path in the search path, finding completions.
+              (while paths
+                (setq path (file-name-as-directory
+                            (expand-file-name (or (car paths) ".")))
+                      comps-in-path
+                      (and (file-accessible-directory-p path)
+                           (file-name-all-completions "" path)))
+                ;; Go thru each completion found, to see whether it should be
+                ;; used, e.g. see if it's executable.
+                (while comps-in-path
+                  (setq file (car comps-in-path)
+                        filepath (concat path file))
+                  (if (and (not (member file completions))
+                           (or (string-equal path cwd)
+                               (not (file-directory-p filepath)))
+                           (file-executable-p filepath))
+                      (setq completions (cons file completions)))
+                  (setq comps-in-path (cdr comps-in-path)))
+                (setq paths (cdr paths)))
+              (if sort
+                  (sort completions #'(lambda (x y) (string< x y)))
+                  completions)))))
 
 (defun anything-c-file-buffers (filename)
   "Returns a list of buffer names corresponding to FILENAME."
@@ -4991,11 +5100,16 @@ Ask to kill buffers associated with that file, too."
 
 (defun anything-c-open-file-externally (file)
   "Open FILE with an external tool. Query the user which tool to use."
-  (start-process "anything-c-open-file-externally"
-                 nil
-                 (completing-read "Program: "
-                                  (anything-c-external-commands-list-1))
-                 file))
+  (let* ((fname   (expand-file-name file))
+         (program (anything-comp-read
+                  "Program: " (anything-c-external-commands-list-1 'sort))))
+    (start-process "anything-c-open-file-externally"
+                   nil program fname)
+    (setq anything-c-external-commands-list
+          (push (pop (nthcdr (anything-c-position
+                              program anything-c-external-commands-list)
+                             anything-c-external-commands-list))
+                anything-c-external-commands-list))))
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
@@ -5005,6 +5119,7 @@ Ask to kill buffers associated with that file, too."
                                "/" "\\"
                                (replace-regexp-in-string ; strip cygdrive paths
                                 "/cygdrive/\\(.\\)" "\\1:" file nil nil) nil t))))
+
 (defun anything-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
   (if (eq system-type 'windows-nt)
