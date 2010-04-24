@@ -1706,7 +1706,8 @@ If nil, use default `mode-line-format'.")
 (defvar anything-help-message
   "\\<anything-map>The keys that are defined for `anything' are:
        \\{anything-map}"
-  "Detailed help message string for `anything'.")
+  "Detailed help message string for `anything'.
+It also accepts function or variable symbol.")
 
 (put 'anything 'timid-completion 'disabled)
 
@@ -3115,7 +3116,8 @@ UNIT and DIRECTION."
     (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
     (setq cursor-type nil)
     (erase-buffer)
-    (insert (substitute-command-keys anything-help-message))
+    (insert (substitute-command-keys
+             (anything-interpret-value anything-help-message)))
     (goto-char 1)
     (ignore-errors
       (loop for event = (read-event) do
