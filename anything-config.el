@@ -419,14 +419,13 @@
 
 ;;; For Maintainers:
 ;;
-;; Evaluate (anything-c-insert-summary) before commit. This function
-;; generates anything-c-source-* list.
+;; Evaluate (autodoc-update-all) before commit. This function
+;; generates anything-c-source-* / functions / options list.
 ;;
-;; Install also http://www.emacswiki.org/emacs/auto-document.el
+;; Install also http://www.emacswiki.org/emacs/autodoc.el
 ;; And eval it or run interactively.
 ;;
-;; [EVAL IT] (anything-c-insert-summary)
-;; [EVAL IT] (auto-document)
+;; [EVAL IT] (autodoc-update-all)
 ;;
 ;; Please write details documentation about function, then others will
 ;; read code more easier.   -- Andy Stewart
