@@ -813,7 +813,9 @@ With two prefix args allow choosing in which symbol to search."
 
 ;;;###autoload
 (defun anything-locate ()
-  "Preconfigured `anything' for Locate."
+  "Preconfigured `anything' for Locate.
+Note you can add locate command after entering pattern.
+See man locate for more infos."
   (interactive)
   (anything-other-buffer 'anything-c-source-locate "*anything locate*"))
 
