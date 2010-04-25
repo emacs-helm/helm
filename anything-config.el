@@ -693,7 +693,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\<global-map>\\[anything-resume] revives last `anything' session.
 It is very useful, so you should bind any key.
 
-Simgle source is executed by \\[anything-call-source].
+Single source is executed by \\[anything-call-source].
 
 == Preconfigured `anything' ==
 Preconfigured `anything' is commands that uses `anything' interface.
