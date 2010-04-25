@@ -813,7 +813,9 @@ With two prefix args allow choosing in which symbol to search."
 
 ;;;###autoload
 (defun anything-locate ()
-  "Preconfigured `anything' for Locate."
+  "Preconfigured `anything' for Locate.
+Note you can add locate command after entering pattern.
+See man locate for more infos."
   (interactive)
   (anything-other-buffer 'anything-c-source-locate "*anything locate*"))
 
@@ -1889,25 +1891,28 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
 ;; (anything 'anything-c-source-file-cache)
 
 ;;; Locate
-(defvar anything-c-locate-options
-  (cond
-   ((eq system-type 'darwin) '("locate"))
-   ((eq system-type 'berkeley-unix) '("locate" "-i"))
-   (t '("locate" "-i" "-r")))
-  "A list where the `car' is the name of the locat program followed by options.
-The search pattern will be appended, so the
-\"-r\" option should be the last option.")
+(defvar anything-c-locate-command
+  (case system-type
+    ('gnu/linux "locate -i -r %s")
+    ('berkeley-unix "locate -i %s")
+    (t "locate %s"))
+  "A list of arguments for locate program.
+The \"-r\" option must be the last option.")
+
+(defun anything-c-locate-init ()
+  "Initialize async locate process for `anything-c-source-locate'."
+  (start-process-shell-command "locate-process" nil
+                               (format anything-c-locate-command
+                                       anything-pattern)))
 
 (defvar anything-c-source-locate
   '((name . "Locate")
-    (candidates . (lambda ()
-                    (apply 'start-process "locate-process" nil
-                           (append anything-c-locate-options
-                                   (list anything-pattern)))))
+    (candidates . anything-c-locate-init)
     (type . file)
     (requires-pattern . 3)
     (delayed))
-  "Source for retrieving files matching the current input pattern with locate.")
+  "Find files matching the current input pattern with locate.")
+
 ;; (anything 'anything-c-source-locate)
 
 ;;; Recentf files
