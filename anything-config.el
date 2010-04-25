@@ -422,7 +422,7 @@
 ;; Evaluate (autodoc-update-all) before commit. This function
 ;; generates anything-c-source-* / functions / options list.
 ;;
-;; Install also http://www.emacswiki.org/emacs/autodoc.el
+;; Install also developer-tools/autodoc.el
 ;; And eval it or run interactively.
 ;;
 ;; [EVAL IT] (autodoc-update-all)
