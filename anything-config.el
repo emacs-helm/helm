@@ -5859,7 +5859,7 @@ Return nil if bmk is not a valid bookmark."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; Type Attributes
+;;;; Type Attributes
 (define-anything-type-attribute 'buffer
   `((action
      ,@(if pop-up-frames
@@ -6010,6 +6010,14 @@ the center of window, otherwise at the top of window.
   '((real-to-display . anything-c-timer-real-to-display)
     (action ("Cancel Timer" . cancel-timer)))
   "Timer.")
+
+;;;; Default `anything-sources'
+;; Setting `anything-sources' is DEPRECATED, but it seems that newbies
+;; tend to invoke M-x anything directly. So I offer default setting.
+(setq anything-sources
+      '(anything-c-source-buffers+
+        anything-c-source-recentf
+        anything-c-source-files-in-current-dir+))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
