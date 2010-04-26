@@ -4433,7 +4433,8 @@ A list of search engines."
 (defun anything-execute-anything-command ()
   "Preconfigured `anything' to execute preconfigured `anything'."
   (interactive)
-  (anything-other-buffer 'anything-c-source-anything-commands))
+  (anything-other-buffer 'anything-c-source-anything-commands
+                         "*anything commands*"))
 
 ;; Occur
 
