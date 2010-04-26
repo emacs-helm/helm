@@ -1617,6 +1617,7 @@ But the anything buffer has no contents. ")
 (defvar anything-restored-variables
   '( anything-candidate-number-limit
      anything-source-filter
+     anything-source-in-each-line-flag
      anything-sources)
   "Variables which are restored after `anything' invocation.")
 ;; `anything-saved-sources' is removed
