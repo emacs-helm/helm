@@ -640,7 +640,11 @@ With others windows manager you could use:
                 (string-match "^Preconfigured.+$"
                               (setq doc (or (documentation (setq sym (cdr entry)))
                                             ""))))
-        collect (format "\\[%s] : %s\n" sym (match-string 0 doc))))
+        collect (cons sym (match-string 0 doc))))
+
+(defun anything-c-format-preconfigured-anything ()
+  (mapcar (lambda (x) (format "\\[%s] : %s\n" (car x) (cdr x)))
+          (anything-c-list-preconfigured-anything)))
 
 (setq anything-help-message
       (lambda ()
@@ -700,7 +704,7 @@ Preconfigured `anything' is commands that uses `anything' interface.
 You can use them without configuration.
 
 "
-         (apply 'concat (anything-c-list-preconfigured-anything))
+         (apply 'concat (anything-c-format-preconfigured-anything))
          "
 Enjoy!")))
 
@@ -4413,6 +4417,23 @@ A list of search engines."
   (setq anything-input-idle-delay 0)
   (anything-set-sources '(anything-c-source-call-source)))
 
+;;; Execute Preconfigured anything.
+(defvar anything-c-source-anything-commands
+  '((name . "Preconfigured Anything")
+    (candidates . anything-c-anything-commands-candidates)
+    (type . command)))
+;; (anything 'anything-c-source-anything-commands)
+
+(defun anything-c-anything-commands-candidates ()
+  (loop for (cmd . desc) in (anything-c-list-preconfigured-anything)
+        collect (cons (substitute-command-keys (format "\\[%s] : %s" cmd desc))
+                      cmd)))
+
+;;;###autoload
+(defun anything-execute-anything-command ()
+  "Preconfigured `anything' to execute preconfigured `anything'."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-anything-commands))
 
 ;; Occur
 
