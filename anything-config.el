@@ -5932,7 +5932,8 @@ Return nil if bmk is not a valid bookmark."
             ("Add command to kill ring" . anything-c-kill-new)
             ("Go to command's definition" . anything-c-find-function))
     ;; Sort commands according to their usage count.
-    (filtered-candidate-transformer . anything-c-adaptive-sort))
+    (filtered-candidate-transformer . anything-c-adaptive-sort)
+    (persistent-action . anything-c-describe-function))
   "Command. (string or symbol)")
 
 (define-anything-type-attribute 'function
