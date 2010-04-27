@@ -1883,7 +1883,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
       (define-key dired-mode-map (kbd "H") 'dired-do-hardlink)
       (setq anything-dired-bindings nil)))
 
-(defun* anything-read-file-name (prompt &key (initial-input default-directory)
+(defun* anything-c-read-file-name (prompt &key (initial-input default-directory)
                                         (buffer "*Anything Completions*")
                                         test)
   "Anything `read-file-name' emulation.
