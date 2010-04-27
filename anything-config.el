@@ -1477,11 +1477,12 @@ If EXPAND is non--nil expand-file-name."
                   (t
                    (concat "/" result)))))))
 
-(defun anything-find-files-or-dired-p ()
+(defun anything-file-completion-source-p ()
   "Test if current source is a dired or find-files source."
   (let ((ff-sources '("Find Files" "Copy Files"
                       "Rename Files" "Symlink Files"
-                      "Hardlink Files" "Write File" "Insert File"))
+                      "Hardlink Files" "Write File"
+                      "Insert File" "Read file name"))
         (cur-source (cdr (assoc 'name (anything-get-current-source)))))
     (catch 'break
       (dolist (i ff-sources)
@@ -1492,7 +1493,7 @@ If EXPAND is non--nil expand-file-name."
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
-  (when (anything-find-files-or-dired-p)
+  (when (anything-file-completion-source-p)
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg :unix-close t :expand t)))
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
@@ -1663,6 +1664,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
   `((name . ,(concat "Write File" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1683,6 +1686,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 ;;; Anything completion for `insert-file'.==> C-x i
 (defvar anything-c-source-insert-file
   `((name . ,(concat "Insert File" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1705,6 +1710,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 ;;; Anything completion for copy, rename and (rel)sym/hard/link files from dired.
 (defvar anything-c-source-copy-files
   `((name . ,(concat "Copy Files" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1721,6 +1728,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 
 (defvar  anything-c-source-rename-files
   `((name . ,(concat "Rename Files" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1736,6 +1745,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 
 (defvar anything-c-source-symlink-files
   `((name . ,(concat "Symlink Files" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1750,6 +1761,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 
 (defvar anything-c-source-hardlink-files
   `((name . ,(concat "Hardlink Files" anything-c-find-files-doc-header))
+    ;; It is needed for filenames with capital letters
+    (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
     (candidate-transformer anything-c-highlight-ffiles)
     (persistent-action . anything-find-files-persistent-action)
@@ -1869,6 +1882,31 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
       (define-key dired-mode-map (kbd "S") 'dired-do-symlink)
       (define-key dired-mode-map (kbd "H") 'dired-do-hardlink)
       (setq anything-dired-bindings nil)))
+
+(defun* anything-read-file-name (prompt &key (initial-input default-directory)
+                                        (buffer "*Anything Completions*")
+                                        test)
+  "Anything `read-file-name' emulation.
+INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
+  (or (anything
+       `((name . ,(concat "Read file name" anything-c-find-files-doc-header))
+         ;; It is needed for filenames with capital letters
+         (disable-shortcuts)
+         (candidates . (lambda ()
+                         (if test
+                             (loop with seq = (anything-find-files-get-candidates)
+                                for fname in seq when (funcall test fname)
+                                collect fname)
+                             (anything-find-files-get-candidates))))
+         (candidate-transformer anything-c-highlight-ffiles)
+         (persistent-action . anything-find-files-persistent-action)
+         (persistent-help . "Expand Candidate")
+         (volatile)
+         (action . (("candidate" . ,'identity))))
+         initial-input prompt 'noresume nil buffer)
+      (keyboard-quit)))
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
