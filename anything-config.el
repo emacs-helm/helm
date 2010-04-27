@@ -4399,7 +4399,8 @@ A list of search engines."
                   (setq anything-candidate-number-limit 9999)
                   (anything candidate nil nil nil nil
                             anything-source-select-buffer)))
-               ("Describe variable" . describe-variable)))
+               ("Describe variable" . describe-variable)
+               ("Find variable" . find-variable)))
     (persistent-action . describe-variable)
     (persistent-help . "Show description of this source")))
 ;; (anything 'anything-c-source-call-source)
