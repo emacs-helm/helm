@@ -58,20 +58,19 @@
 
 (eval-when-compile (require 'cl))
 
-(defsubst* autodoc-find-readlines (bfile regexp &key (insert-fn 'file))
-  "Return an alist of all the (num-line line) of a file or buffer BFILE matching REGEXP."
-  (let ((count 0)
-        (fn    (case insert-fn
-                 ('file 'insert-file-contents)
-                 ('buffer 'insert-buffer-substring))))
+
+(defsubst* autodoc-find-readlines (bfile regexp &key (insert-fn 'buffer))
+  "Return an alist of all the (numline line)  matching REGEXP."
+  (let ((fn (case insert-fn
+              ('file 'insert-file-contents)
+              ('buffer 'insert-buffer-substring))))
     (with-temp-buffer
       (funcall fn bfile) ; call insert function
       (goto-char (point-min))
       (loop
          with lines-list = (split-string (buffer-string) "\n")
-         for i in lines-list when (string-match regexp i)
-         collect (list count (replace-regexp-in-string "\n" "" i)) into lis
-         do (incf count)
+         for i in lines-list for count from 0 when (string-match regexp i)
+         collect (list count i) into lis
          finally return lis))))
 
 (defvar autodoc-truncate-long-lines 80
