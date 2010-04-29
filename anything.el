@@ -3157,8 +3157,8 @@ to a list of variable names.\n\n")
                  anything-debug-variables
                  (apropos-internal "^anything-" 'boundp)))
     (insert "** "
-            (symbol-name v) "\n"
-            (pp-to-string (symbol-value v)) "\n"))
+            (pp-to-string v) "\n"
+            (pp-to-string (eval v)) "\n"))
     (message "Calculating all anything-related values...Done")
 )
 
