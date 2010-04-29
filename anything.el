@@ -3150,12 +3150,17 @@ UNIT and DIRECTION."
   (anything-help-internal " *Anything Debug*" 'anything-debug-output-function))
 
 (defun anything-debug-output-function (&optional vars)
+  (message "Calculating all anything-related values...")
+  (insert "If you debug some variables, set `anything-debug-variables'
+to a list of variable names.\n\n")
   (dolist (v (or vars
                  anything-debug-variables
                  (apropos-internal "^anything-" 'boundp)))
-  (insert "** "
-          (symbol-name v) "\n"
-          (pp-to-string (symbol-value v)) "\n")))
+    (insert "** "
+            (symbol-name v) "\n"
+            (pp-to-string (symbol-value v)) "\n"))
+    (message "Calculating all anything-related values...Done")
+)
 
 ;; (@* "Core: misc")
 (defun anything-kill-buffer-hook ()
