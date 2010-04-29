@@ -5777,7 +5777,8 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
                       do (aset curhead hierarchy str)
                       collecting
                         (cons
-                         (mapconcat 'identity (vector-0-n curhead hierarchy) " / ")
+                         (format "H%d:%s" (1+ hierarchy)
+                                 (mapconcat 'identity (vector-0-n curhead hierarchy) " / "))
                          pt)))))
             (if (listp regexp)
               (arrange
