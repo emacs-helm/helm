@@ -1297,7 +1297,7 @@
 (defvar anything-version nil)
 (setq anything-version "$Id: anything.el,v 1.280 2010-04-01 02:22:22 rubikitch Exp $")
 (require 'cl)
-(require 'anything-match-plugin nil t)
+;; (require 'anything-match-plugin nil t)
 
 ;; (@* "User Configuration")
 
