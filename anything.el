@@ -1902,9 +1902,13 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
                       (get-text-property (overlay-start
                                           anything-selection-overlay)
                                          'anything-realvalue))
-                 (buffer-substring-no-properties
-                  (overlay-start anything-selection-overlay)
-                  (1- (overlay-end anything-selection-overlay))))))
+                 (let ((disp (buffer-substring-no-properties
+                              (overlay-start anything-selection-overlay)
+                              (1- (overlay-end anything-selection-overlay))))
+                       (source (anything-get-current-source)))
+                   (anything-aif (assoc-default 'display-to-real source)
+                       (anything-funcall-with-source source it disp)
+                     disp)))))
         (unless (equal selection "")
           selection)))))
 
@@ -2693,15 +2697,16 @@ insert the string inteneded to appear on the display and store
 the real value in a text property."
   (let ((start (line-beginning-position (point)))
         (string (if (listp match) (car match) match))
-        (realvalue (if (listp match) (cdr match) match)))
+        (realvalue (if (listp match) (cdr match))))
     (when (symbolp string) (setq string (symbol-name string)))
     (when (stringp string)
       (funcall insert-function string)
       ;; Some sources with candidates-in-buffer have already added
       ;; 'anything-realvalue property when creating candidate buffer.
       (unless (get-text-property start 'anything-realvalue)
-        (put-text-property start (line-end-position)
-                           'anything-realvalue realvalue))
+        (and realvalue
+             (put-text-property start (line-end-position)
+                                'anything-realvalue realvalue)))
       (when anything-source-in-each-line-flag
         (put-text-property start (line-end-position)
                            'anything-source source))
@@ -2823,7 +2828,7 @@ the real value in a text property."
   
 
 ;; (@* "Core: action")
-(defun anything-execute-selection-action (&optional selection action clear-saved-action display-to-real)
+(defun anything-execute-selection-action (&optional selection action clear-saved-action)
   "If a candidate was selected then perform the associated
 action."
   (setq selection (or selection (anything-get-selection)))
@@ -2835,18 +2840,13 @@ action."
   (let ((source (or anything-saved-current-source (anything-get-current-source))))
     (if (and (not selection) (assoc 'accept-empty source))
         (setq selection ""))
-    (setq display-to-real
-          (or display-to-real (assoc-default 'display-to-real source)
-              #'identity))
     (if (and (listp action)
              (not (functionp action)))  ; lambda
         ;;select the default action
         (setq action (cdar action)))
     (unless clear-saved-action (setq anything-saved-action nil))
     (if (and selection action)
-        (anything-funcall-with-source
-         source  action
-         (anything-funcall-with-source source display-to-real selection)))))
+        (anything-funcall-with-source source  action selection))))
 
 (defun anything-select-action ()
   "Select an action for the currently selected candidate.
@@ -5141,18 +5141,11 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (desc "anything-execute-selection-action")
       (expect "FOO"
         (anything-execute-selection-action
-         "foo" '(("upcase" . upcase))  nil #'identity))
+         "foo" '(("upcase" . upcase))  nil))
       (expect "FOO"
         (anything-execute-selection-action
-         "foo" '(("upcase" . (lambda (c) (upcase c)))) nil #'identity))
+         "foo" '(("upcase" . (lambda (c) (upcase c)))) nil))
       (desc "display-to-real attribute")
-      (expect "FOO"
-        (anything-execute-selection-action
-         "foo"
-         '(("identity" . identity))
-         nil
-         #'upcase
-         ))
       (expect "FOO"
         (anything-test-candidates
          '(((name . "TEST")
