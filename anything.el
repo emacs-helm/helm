@@ -1937,7 +1937,8 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
          ;; This goto-char shouldn't be necessary, but point is moved to
          ;; point-min somewhere else which shouldn't happen.
          (goto-char (overlay-start anything-selection-overlay))
-         (let* ((header-pos (anything-get-previous-header-pos))
+         (let* ((header-pos (or (anything-get-previous-header-pos)
+                                (anything-get-next-header-pos)))
                 (source-name
                  (save-excursion
                    (unless header-pos
