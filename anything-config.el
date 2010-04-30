@@ -5740,8 +5740,8 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
              (with-current-buffer anything-current-buffer
                (eval (or (anything-attr 'condition) t))))
     (anything-headline-make-candidate-buffer
-     (anything-attr 'headline)
-     (anything-attr 'subexp))))
+     (anything-interpret-value (anything-attr 'headline))
+     (anything-interpret-value (anything-attr 'subexp)))))
 
 (anything-document-attribute 'headline "Headline plug-in"
   "Regexp string for anything-headline to scan.")
