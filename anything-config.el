@@ -1936,10 +1936,15 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
 ;; (anything 'anything-c-source-file-cache)
 
 ;;; Locate
+;; NOTE for WINDOZE users:
+;; You have to install Everything with his command line interface here:
+;; http://www.voidtools.com/download.php
+
 (defvar anything-c-locate-command
   (case system-type
     ('gnu/linux "locate -i -r %s")
     ('berkeley-unix "locate -i %s")
+    ('windows-nt "es -i -r %s")
     (t "locate %s"))
   "A list of arguments for locate program.
 The \"-r\" option must be the last option.")
