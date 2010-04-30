@@ -5193,7 +5193,7 @@ directory, open this directory."
     (error "Line number not found")))
 
 (defun anything-c-action-line-goto (lineno-and-content)
-  (apply #'anything-goto-file-line (anything-attr 'target-file)
+  (apply #'anything-goto-file-line (anything-interpret-value (anything-attr 'target-file))
          (append lineno-and-content
                  (list (if (and (anything-attr-defined 'target-file)
                                 (not anything-in-persistent-action))
