@@ -5218,12 +5218,10 @@ directory, open this directory."
                        content)
                (list (expand-file-name
                       filename
-                      (anything-aif (anything-attr 'default-directory)
-                          (if (functionp it) (funcall it) it)
-                        (and (anything-candidate-buffer)
-                             (buffer-local-value
-                              'default-directory
-                              (anything-candidate-buffer)))))
+                      (or (anything-interpret-value (anything-attr 'default-directory))
+                          (and (anything-candidate-buffer)
+                               (buffer-local-value
+                                'default-directory (anything-candidate-buffer)))))
                      (string-to-number lineno) content)))))
    candidates))
 
