@@ -5828,7 +5828,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 (defun anything-persistent-help-string ()
   (substitute-command-keys
    (concat "\\<anything-map>\\[anything-execute-persistent-action]: "
-           (or (anything-attr 'persistent-help)
+           (or (anything-interpret-value (anything-attr 'persistent-help))
                (anything-aif (or (assoc-default 'persistent-action (anything-get-current-source))
                                  (assoc-default 'action (anything-get-current-source))
                                  )
