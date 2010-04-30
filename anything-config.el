@@ -5727,7 +5727,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 (defun anything-compile-source--anything-headline (source)
   (if (assoc-default 'headline source)
       (append '((init . anything-headline-init)
-                (get-line-fn . buffer-substring)
+                (get-line . buffer-substring)
                 (type . line))
               source
               '((candidates-in-buffer)
