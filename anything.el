@@ -2160,11 +2160,14 @@ already-bound variables. Yuck!
           (setq anything-sources (anything-normalize-sources any-sources))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
-          (if (eq any-resume t)
-              (condition-case x
-                  (anything-window-configuration 'restore)
-                (error (anything-display-buffer anything-buffer)))
-            (anything-display-buffer anything-buffer))
+          (cond ((eq any-resume t)
+                 (condition-case x
+                     (anything-window-configuration 'restore)
+                   (error (anything-display-buffer anything-buffer))))
+                ((eq any-resume 'window-only)
+                 (anything-display-buffer anything-buffer))
+                (t
+                 (anything-display-buffer anything-buffer)))
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
             (anything-cleanup)
@@ -2176,16 +2179,20 @@ already-bound variables. Yuck!
      (anything-on-quit)
      nil)))
 
+(defun anything-resume-p (any-resume)
+  "Whethre current anything session is resumed or not."
+  (memq any-resume '(t window-only)))
+
 (defun anything-initialize-1 (any-resume any-input)
   (anything-current-position 'save)
-  (if (eq any-resume t)
+  (if (anything-resume-p any-resume)
       (anything-initialize-overlays (anything-buffer-get))
     (anything-initialize))
   (unless (eq any-resume 'noresume)
     (anything-recent-push anything-buffer 'anything-buffers)
     (setq anything-last-buffer anything-buffer))
   (when any-input (setq anything-input any-input anything-pattern any-input))
-  (and (eq any-resume t) (anything-funcall-foreach 'resume)))
+  (and (anything-resume-p any-resume) (anything-funcall-foreach 'resume)))
 
 (defun anything-execute-selection-action-1 ()
   (unwind-protect
@@ -2204,7 +2211,7 @@ already-bound variables. Yuck!
                (action . identity)))
             input nil 'noresume nil "*anything resume*"))
 
-(defun* anything-resume (&optional (any-buffer anything-last-buffer) buffer-pattern)
+(defun* anything-resume (&optional (any-buffer anything-last-buffer) buffer-pattern (any-resume t))
   "Resurrect previously invoked `anything'."
   (interactive)
   (when (or current-prefix-arg buffer-pattern)
@@ -2213,7 +2220,11 @@ already-bound variables. Yuck!
   (anything
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
        anything-last-sources anything-sources)
-   (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil t nil any-buffer))
+   (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil any-resume nil any-buffer))
+
+(defun* anything-resume-window-only (&optional (any-buffer anything-last-buffer) buffer-pattern)
+  (interactive)
+  (anything-resume any-buffer buffer-pattern 'window-only))
 
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
@@ -2307,7 +2318,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (run-hooks 'anything-after-initialize-hook))
 
 (defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume)
-  (if (eq any-resume t) (anything-mark-current-line) (anything-update))
+  (if (anything-resume-p any-resume) (anything-mark-current-line) (anything-update))
   (select-frame-set-input-focus (window-frame (minibuffer-window)))
   (anything-preselect any-preselect)
   (let ((ncandidate (anything-approximate-candidate-number))
