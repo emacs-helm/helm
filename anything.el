@@ -2160,14 +2160,11 @@ already-bound variables. Yuck!
           (setq anything-sources (anything-normalize-sources any-sources))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
-          (cond ((eq any-resume t)
-                 (condition-case x
-                     (anything-window-configuration 'restore)
-                   (error (anything-display-buffer anything-buffer))))
-                ((eq any-resume 'window-only)
-                 (anything-display-buffer anything-buffer))
-                (t
-                 (anything-display-buffer anything-buffer)))
+          (if (eq any-resume t)
+              (condition-case x
+                  (anything-window-configuration 'restore)
+                (error (anything-display-buffer anything-buffer)))
+            (anything-display-buffer anything-buffer))
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
             (anything-cleanup)
