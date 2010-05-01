@@ -1643,10 +1643,6 @@ But the anything buffer has no contents. ")
 (defvar anything-buffer-file-name nil
   "`buffer-file-name' when `anything' is invoked.")
 
-(defvar anything-current-position nil
-  "Cons of (point) and (window-start) when `anything' is invoked.
-It is needed because restoring position when `anything' is keyboard-quitted.")
-
 (defvar anything-saved-action nil
   "Saved value of the currently selected action by key.")
 
@@ -2043,12 +2039,6 @@ Otherwise, return VALUE itself."
       (push spec anything-once-called-functions))))
 
 ;; (@* "Core: tools")
-(defun anything-current-frame/window-configuration ()
-  (funcall (cdr anything-save-configuration-functions)))
-
-(defun anything-set-frame/window-configuration (conf)
-  (funcall (car anything-save-configuration-functions) conf))
-
 (defun anything-funcall-with-source (source func &rest args)
   (let ((anything-source-name (assoc-default 'name source)))
     (apply func args)))
@@ -2159,27 +2149,27 @@ already-bound variables. Yuck!
   (interactive)
   (condition-case v
       (with-anything-restore-variables
-        (let ((frameconfig (anything-current-frame/window-configuration))
-              ;; It is needed because `anything-source-name' is non-nil
+        (let (;; It is needed because `anything-source-name' is non-nil
               ;; when `anything' is invoked by action. Awful global scope.
               anything-source-name anything-in-persistent-action
               anything-quit
               (case-fold-search t)
               (anything-buffer (or any-buffer anything-buffer))
               (anything-map (or any-keymap anything-map)))
+          (anything-frame/window-configuration 'save)
           (setq anything-sources (anything-normalize-sources any-sources))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
           (if (eq any-resume t)
               (condition-case x
-                  (anything-window-configuration 'set)
+                  (anything-window-configuration 'restore)
                 (error (anything-display-buffer anything-buffer)))
             (anything-display-buffer anything-buffer))
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
             (anything-cleanup)
             (anything-hooks 'cleanup)
-            (anything-set-frame/window-configuration frameconfig))
+            (anything-frame/window-configuration 'restore))
           (unless anything-quit
             (anything-execute-selection-action-1))))
     (quit
@@ -2187,7 +2177,7 @@ already-bound variables. Yuck!
      nil)))
 
 (defun anything-initialize-1 (any-resume any-input)
-  (setq anything-current-position (cons (point) (window-start)))
+  (anything-current-position 'save)
   (if (eq any-resume t)
       (anything-initialize-overlays (anything-buffer-get))
     (anything-initialize))
@@ -2206,8 +2196,7 @@ already-bound variables. Yuck!
 
 (defun anything-on-quit ()
   (setq minibuffer-history (cons anything-input minibuffer-history))
-  (goto-char (car anything-current-position))
-  (set-window-start (selected-window) (cdr anything-current-position)))
+  (anything-current-position 'restore))
 
 (defun anything-resume-select-buffer (input)
   (anything '(((name . "Resume anything buffer")
@@ -2226,24 +2215,51 @@ already-bound variables. Yuck!
        anything-last-sources anything-sources)
    (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil t nil any-buffer))
 
-(defvar anything-window-configuration nil)
-;;; (set-window-configuration (buffer-local-value 'anything-window-configuration (get-buffer "*anything buffers*")))
-(defun anything-window-configuration (store-or-set)
-  (case store-or-set
-    ('store
-     (with-current-buffer anything-buffer
-       (set (make-local-variable 'anything-window-configuration)
-            (current-window-configuration))))
-    ('set
-     (with-current-buffer anything-buffer
-       (set-window-configuration anything-window-configuration))
-     (select-window (anything-window)))))
-
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
   (let ((m (member elt (symbol-value list-var))))
     (and m (set list-var (delq (car m) (symbol-value list-var))))
     (push elt (symbol-value list-var))))
+
+;;; (@* "Core: Accessors")
+(defvar anything-window-configuration nil)
+;;; (set-window-configuration (buffer-local-value 'anything-window-configuration (get-buffer "*anything buffers*")))
+(defun anything-window-configuration (save-or-restore)
+  (case save-or-restore
+    ((save store)
+     (with-current-buffer anything-buffer
+       (set (make-local-variable 'anything-window-configuration)
+            (current-window-configuration))))
+    ((restore set)
+     (with-current-buffer anything-buffer
+       (set-window-configuration anything-window-configuration))
+     (select-window (anything-window)))))
+
+(defvar anything-current-position nil
+  "Cons of (point) and (window-start) when `anything' is invoked.
+It is needed because restoring position when `anything' is keyboard-quitted.")
+(defun anything-current-position (save-or-restore)
+  (case save-or-restore
+    (save
+     (setq anything-current-position (cons (point) (window-start))))
+    (restore
+     (goto-char (car anything-current-position))
+     (set-window-start (selected-window) (cdr anything-current-position)))))
+
+(defun anything-current-frame/window-configuration ()
+  (funcall (cdr anything-save-configuration-functions)))
+
+(defun anything-set-frame/window-configuration (conf)
+  (funcall (car anything-save-configuration-functions) conf))
+
+(declare-function 'anything-frame/window-configuration "anything")
+(lexical-let (conf)
+  (defun anything-frame/window-configuration (save-or-restore)
+    (case save-or-restore
+      (save    (setq conf (funcall (cdr anything-save-configuration-functions))))
+      (restore (funcall (car anything-save-configuration-functions) conf)))))
+
+
 
 ;;;###autoload
 (defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
@@ -2354,7 +2370,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 (defun anything-hooks (setup-or-cleanup)
   (let ((hooks '((post-command-hook anything-check-minibuffer-input)
                  (minibuffer-setup-hook anything-print-error-messages)
-                 (minibuffer-exit-hook (lambda () (anything-window-configuration 'store))))))
+                 (minibuffer-exit-hook (lambda () (anything-window-configuration 'save))))))
     (if (eq setup-or-cleanup 'setup)
         (dolist (args hooks) (apply 'add-hook args))
       (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
