@@ -2246,9 +2246,9 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
      (goto-char (car anything-current-position))
      (set-window-start (selected-window) (cdr anything-current-position)))))
 
+;;; FIXME I want to remove them. But anything-iswitchb uses them.
 (defun anything-current-frame/window-configuration ()
   (funcall (cdr anything-save-configuration-functions)))
-
 (defun anything-set-frame/window-configuration (conf)
   (funcall (car anything-save-configuration-functions) conf))
 
