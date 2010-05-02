@@ -2469,7 +2469,7 @@ SOURCE."
     (unless (member name anything-delayed-init-executed)
       (anything-aif (assoc-default 'delayed-init source)
           (when (functionp it)
-            (funcall it)
+            (with-current-buffer anything-current-buffer (funcall it))
             (add-to-list 'anything-delayed-init-executed name)))))
   (let* ((candidate-source (assoc-default 'candidates source))
          (candidates (anything-interpret-value candidate-source source)))
@@ -6032,6 +6032,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                        (requires-pattern . 2)))
                                     "abc")
           value))
+      (expect t
+        (let (value)
+          (with-temp-buffer
+            (anything-test-candidates '(((name . "test")
+                                         (delayed-init
+                                          . (lambda () (setq value
+                                                             (eq anything-current-buffer (current-buffer)))))
+                                         (candiates "abc")
+                                         (requires-pattern . 2)))
+                                      "abc")
+            value)))
       (desc "pattern-transformer attribute")
       (expect '(("test2" ("foo")) ("test3" ("bar")))
         (anything-test-candidates '(((name . "test1")
