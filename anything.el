@@ -2219,6 +2219,9 @@ already-bound variables. Yuck!
        anything-last-sources anything-sources)
    (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil any-resume nil any-buffer))
 
+;;; rubikitch: experimental
+;;; I use this and check it whether I am convenient.
+;;; I may introduce an option to control the behavior.
 (defun* anything-resume-window-only (&optional (any-buffer anything-last-buffer) buffer-pattern)
   (interactive)
   (anything-resume any-buffer buffer-pattern 'window-only))
