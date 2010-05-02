@@ -5615,6 +5615,32 @@ candidate can be in (DISPLAY . REAL) format."
              (cdr y)
            y)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Outliner ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun anything-after-update-hook--outline ()
+  (if (eq anything-outline-using t)
+      (anything-outline-goto-near-line)))
+(add-hook 'anything-after-update-hook 'anything-after-update-hook--outline)
+
+(defun anything-outline-goto-near-line ()
+  (with-anything-window
+    ;; TODO need consideration whether to update position by every input.
+    (when t ; (equal anything-pattern "")
+      (anything-goto-line 2)
+      (let ((lineno (with-current-buffer anything-current-buffer
+                      (line-number-at-pos (car anything-current-position)))))
+        (block exit
+          (while (<= (progn (skip-chars-forward " ")
+                            (or (number-at-point) lineno))
+                     lineno)
+            (forward-line 1)
+            (when (eobp)
+              (forward-line -1)
+              (return-from exit))))
+        (forward-line -1)
+        (and (bobp) (forward-line 1))
+        (and (anything-pos-header-line-p) (forward-line -2))
+        (anything-mark-current-line)))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Plug-in ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Plug-in: info-index
 (defun* anything-c-info-init (&optional (file (anything-attr 'info-file)))
