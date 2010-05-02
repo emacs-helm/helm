@@ -1724,10 +1724,11 @@ To enable fitting, set both `anything-inhibit-fit-frame-flag' and
   "If non-nil, add anything-source text-property in each candidate.
 experimental feature.")
 
-(defvar anything-debug-variables nil
-  "Variables to show in `anything-debug-output'.
+(defvar anything-debug-forms nil
+  "Forms to show in `anything-debug-output'.
 Otherwise all variables started with `anything-' are shown.
 It is useful for debug.")
+(defvaralias 'anything-debug-variables 'anything-debug-forms)
 
 ;; (@* "Internal Variables")
 (defvar anything-test-candidate-list nil)
@@ -3180,10 +3181,10 @@ UNIT and DIRECTION."
 
 (defun anything-debug-output-function (&optional vars)
   (message "Calculating all anything-related values...")
-  (insert "If you debug some variables, set `anything-debug-variables'
-to a list of variable names.\n\n")
+  (insert "If you debug some variables or forms, set `anything-debug-forms'
+to a list of forms.\n\n")
   (dolist (v (or vars
-                 anything-debug-variables
+                 anything-debug-forms
                  (apropos-internal "^anything-" 'boundp)))
     (insert "** "
             (pp-to-string v) "\n"
