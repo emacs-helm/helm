@@ -1614,8 +1614,15 @@ Global variables are initialized and the anything buffer is created.
 But the anything buffer has no contents. ")
 
 (defvar anything-update-hook nil
-  "Run after the anything buffer was updated according the new
-  input pattern.")
+  "Run after the anything buffer was updated according the new input pattern.
+This hook is run at the beginning of buffer.
+The first candidate is selected after running this hook.
+See also `anything-after-update-hook'.")
+
+(defvar anything-after-update-hook nil
+  "Run after the anything buffer was updated according the new input pattern.
+This is very similar to `anything-update-hook' but selection is not moved.
+It is useful to select a particular object instead of the first one. ")
 
 (defvar anything-cleanup-hook nil
   "Run after anything minibuffer is closed, IOW this hook is executed BEFORE performing action. ")
@@ -2703,7 +2710,10 @@ the current pattern."
                                    0)
                                  nil
                                  'anything-process-delayed-sources
-                                 delayed-sources)))))))
+                                 delayed-sources))
+          ;; FIXME I want to execute anything-after-update-hook
+          ;; AFTER processing delayed sources
+          (run-hooks 'anything-after-update-hook))))))
 
 (defun anything-force-update ()
   "Recalculate and update candidates.
