@@ -184,11 +184,16 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
             (t source)))))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--migemo t)
 
+(defvar anything-migemize-command-idle-delay 0.1
+  "`anything-idle-delay' for migemized command.")
 (defmacro anything-migemize-command (command)
   "Use migemo in COMMAND when selectiong candidate by `anything'.
-Bind `anything-use-migemo' = t in COMMAND."
+Bind `anything-use-migemo' = t in COMMAND.
+`anything-migemize-command-idle-delay' is used instead of  `anything-idle-delay'."
   `(defadvice ,command (around anything-use-migemo activate)
-     (let ((anything-use-migemo t)) ad-do-it)))
+     (let ((anything-use-migemo t)
+           (anything-idle-delay anything-migemize-command-idle-delay))
+       ad-do-it)))
 
 ;;;; unit test
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
