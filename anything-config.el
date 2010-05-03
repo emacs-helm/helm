@@ -843,7 +843,8 @@ See man locate for more infos."
 (defun anything-bm-list ()
   "Preconfigured `anything' for visible bookmarks."
   (interactive)
-  (anything-other-buffer 'anything-c-source-bm "*anything bm list*"))
+  (let ((anything-outline-using t))
+    (anything-other-buffer 'anything-c-source-bm "*anything bm list*")))
 
 ;;;###autoload
 (defun anything-timers ()
