@@ -2721,6 +2721,10 @@ the current pattern."
   "Recalculate and update candidates.
 If current source has `update' attribute, a function without argument, call it before update."
   (interactive)
+  (anything-aif (anything-candidate-buffer)
+      (kill-buffer it))
+  (anything-aif (anything-attr 'init)
+      (anything-funcall-with-source (anything-get-current-source) it))
   (anything-aif (anything-attr 'update)
       (anything-funcall-with-source (anything-get-current-source) it))
   ;; Remove from candidate cache to recalculate candidates
