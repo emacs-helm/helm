@@ -4460,7 +4460,8 @@ A list of search engines."
 (defvar anything-c-source-anything-commands
   '((name . "Preconfigured Anything")
     (candidates . anything-c-anything-commands-candidates)
-    (type . command)))
+    (type . command)
+    (candidate-number-limit)))
 ;; (anything 'anything-c-source-anything-commands)
 
 (defun anything-c-anything-commands-candidates ()
