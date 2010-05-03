@@ -2056,8 +2056,10 @@ Otherwise, return VALUE itself."
 
 ;; (@* "Core: tools")
 (defun anything-funcall-with-source (source func &rest args)
-  (let ((anything-source-name (assoc-default 'name source)))
-    (apply func args)))
+  (let ((anything-source-name (assoc-default 'name source))
+        result)
+    (dolist (func (if (functionp func) (list func) func) result)
+      (setq result (apply func args)))))
 
 (defun anything-funcall-foreach (sym)
   "Call the sym function(s) for each source if any."
@@ -2065,8 +2067,7 @@ Otherwise, return VALUE itself."
     (when (symbolp source)
       (setq source (symbol-value source)))
     (anything-aif (assoc-default sym source)
-        (dolist (func (if (functionp it) (list it) it))
-          (anything-funcall-with-source source func)))))
+        (anything-funcall-with-source source it))))
 
 (defun anything-normalize-sources (sources)
   "If SOURCES is only one source, make a list."
