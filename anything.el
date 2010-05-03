@@ -2732,7 +2732,7 @@ If current source has `update' attribute, a function without argument, call it b
         (delete (assoc (assoc-default 'name (anything-get-current-source)) anything-candidate-cache)
                 anything-candidate-cache))
   ;; Go to original selection after update
-  (let ((selection (anything-get-selection))
+  (let ((selection (anything-get-selection nil t))
         (source (anything-get-current-source)))
     (anything-update)
     (with-anything-window
