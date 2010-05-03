@@ -2056,6 +2056,8 @@ Otherwise, return VALUE itself."
 
 ;; (@* "Core: tools")
 (defun anything-funcall-with-source (source func &rest args)
+  "Call FUNC with ARGS with variable `anything-source-name' and `source' is bound.
+FUNC can be function list. Return the result of last function call."
   (let ((anything-source-name (assoc-default 'name source))
         result)
     (dolist (func (if (functionp func) (list func) func) result)
