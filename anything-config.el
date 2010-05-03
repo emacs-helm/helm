@@ -5616,8 +5616,10 @@ candidate can be in (DISPLAY . REAL) format."
            y)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Outliner ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar anything-outline-goto-near-line-flag t)
 (defun anything-after-update-hook--outline ()
-  (if (eq anything-outline-using t)
+  (if (and (eq anything-outline-using t)
+           (eq anything-outline-goto-near-line-flag t))
       (anything-outline-goto-near-line)))
 (add-hook 'anything-after-update-hook 'anything-after-update-hook--outline)
 
