@@ -2721,28 +2721,28 @@ the current pattern."
   "Recalculate and update candidates.
 If current source has `update' attribute, a function without argument, call it before update."
   (interactive)
-  (anything-aif (anything-candidate-buffer)
-      (kill-buffer it))
-  (anything-aif (anything-attr 'init)
-      (anything-funcall-with-source (anything-get-current-source) it))
-  (anything-aif (anything-attr 'update)
-      (anything-funcall-with-source (anything-get-current-source) it))
-  ;; Remove from candidate cache to recalculate candidates
-  (setq anything-candidate-cache
-        (delete (assoc (assoc-default 'name (anything-get-current-source)) anything-candidate-cache)
-                anything-candidate-cache))
-  ;; Go to original selection after update
-  (let ((selection (anything-get-selection nil t))
-        (source (anything-get-current-source)))
-    (anything-update)
-    (with-anything-window
-      (anything-goto-source source)
-      (forward-char -1)                 ;back to \n
-      (if (search-forward (concat "\n" selection "\n") nil t)
-          (forward-line -1)
-        (goto-char (point-min))
-        (forward-line 1))
-      (anything-mark-current-line))))
+  (let ((source (anything-get-current-source)))
+    (anything-aif (anything-candidate-buffer)
+        (kill-buffer it))
+    (anything-aif (assoc-default 'init source)
+        (anything-funcall-with-source source it))
+    (anything-aif (assoc-default 'update source)
+        (anything-funcall-with-source source it))
+    ;; Remove from candidate cache to recalculate candidates
+    (setq anything-candidate-cache
+          (delete (assoc (assoc-default 'name source) anything-candidate-cache)
+                  anything-candidate-cache))
+    ;; Go to original selection after update
+    (let ((selection (anything-get-selection nil t)))
+      (anything-update)
+      (with-anything-window
+        (anything-goto-source source)
+        (forward-char -1)                ;back to \n
+        (if (search-forward (concat "\n" selection "\n") nil t)
+            (forward-line -1)
+          (goto-char (point-min))
+          (forward-line 1))
+        (anything-mark-current-line)))))
 
 (defun anything-insert-match (match insert-function source)
   "Insert MATCH into the anything buffer. If MATCH is a list then
