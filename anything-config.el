@@ -5875,15 +5875,15 @@ It also accepts a function or a variable name.")
 (defun anything-delete-marked-files (ignore)
   (let* ((it (anything-marked-candidates))
          (len (length it)))
-    (if (y-or-n-p (format "Delete *%s File(s):\n%s"
-                          len
-                          (mapconcat (lambda (f) (format "- %s\n" f)) it "")))
-        (progn
-          (dolist (i it)
-            (set-text-properties 0 (length i) nil i)
-            (anything-c-delete-file i))
-          (message "%s File(s) deleted" len))
-      (message "(No deletions performed)"))))
+    (if (not (y-or-n-p
+              (format "Delete *%s File(s):\n%s"
+                      len
+                      (mapconcat (lambda (f) (format "- %s\n" f)) it ""))))
+        (message "(No deletions performed)")
+      (dolist (i it)
+        (set-text-properties 0 (length i) nil i)
+        (anything-c-delete-file i))
+      (message "%s File(s) deleted" len))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
   "Ediff 2 marked buffers or 1 marked buffer and current-buffer.
