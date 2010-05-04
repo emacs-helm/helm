@@ -5873,20 +5873,23 @@ It also accepts a function or a variable name.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun anything-delete-marked-files (candidate)
-  (anything-aif (anything-marked-candidates)
-      (if (y-or-n-p (format "Delete *%s Files " (length it)))
-          (progn
-            (dolist (i it)
-              (set-text-properties 0 (length i) nil i)
-              (anything-c-delete-file i))
-            (message "%s Files deleted" (length it)))
+  (let* ((it (anything-marked-candidates))
+         (len (length it)))
+    (if (<= 2 len)
+        (if (y-or-n-p (format "Delete *%s Files " len))
+            (progn
+              (dolist (i it)
+                (set-text-properties 0 (length i) nil i)
+                (anything-c-delete-file i))
+              (message "%s Files deleted" len))
           (message "(No deletions performed)"))
-    (set-text-properties 0 (length candidate) nil candidate)
-    (if (y-or-n-p (format "Really delete file `%s' " candidate))
-        (progn
-          (anything-c-delete-file candidate)
-          (message "1 file deleted"))
-        (message "(No deletions performed)"))))
+      (setq candidate (car it))
+      (set-text-properties 0 (length candidate) nil candidate)
+      (if (y-or-n-p (format "Really delete file `%s' " candidate))
+          (progn
+            (anything-c-delete-file candidate)
+            (message "1 file deleted"))
+        (message "(No deletions performed)")))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
   "Ediff 2 marked buffers or 1 marked buffer and current-buffer.
