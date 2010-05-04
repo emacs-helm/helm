@@ -4661,12 +4661,16 @@ See also `anything-create--actions'."
 ;; (anything 'anything-c-source-idle-time-timers)
 
 (defun anything-c-timer-real-to-display (timer)
-  (destructuring-bind (_ t1 t2 t3 _ func args &rest rest)
+  (destructuring-bind (triggered t1 t2 t3 repeat-delay func args idle-delay)
       (append timer nil)                ;use `append' to convert vector->list
-    (format "%s %s(%s)"
-            (format-time-string "%m/%d %T" (list t1 t2 t3))
+    (format "%s repeat=%5S %s(%s)"
+            (let ((time (list t1 t2 t3)))
+              (if idle-delay
+                  (format-time-string "idle-for=%5s" time)
+                (format-time-string "%m/%d %T" time)))
+            repeat-delay
             func
-            (mapconcat 'prin1-to-string (aref timer 6) " "))))
+            (mapconcat 'prin1-to-string args " "))))
 
 ;;; X RandR resolution change
 ;;; FIXME I do not care multi-display.
