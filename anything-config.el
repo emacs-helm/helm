@@ -5873,14 +5873,14 @@ It also accepts a function or a variable name.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun anything-delete-marked-files (ignore)
-  (let* ((it (anything-marked-candidates))
-         (len (length it)))
+  (let* ((files (anything-marked-candidates))
+         (len (length files)))
     (if (not (y-or-n-p
               (format "Delete *%s File(s):\n%s"
                       len
-                      (mapconcat (lambda (f) (format "- %s\n" f)) it ""))))
+                      (mapconcat (lambda (f) (format "- %s\n" f)) files ""))))
         (message "(No deletions performed)")
-      (dolist (i it)
+      (dolist (i files)
         (set-text-properties 0 (length i) nil i)
         (anything-c-delete-file i))
       (message "%s File(s) deleted" len))))
