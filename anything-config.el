@@ -4734,8 +4734,8 @@ See also `anything-create--actions'."
     (action
      ("Show package description" . anything-c-apt-cache-show)
      ("Install package" . anything-c-apt-install))
-    (persistent-action . anything-c-apt-refresh)
-    (persistent-help . "Refresh")))
+    (persistent-action . anything-c-apt-persistent-action)
+    (persistent-help . "Show - C-u Refresh")))
 ;; (anything 'anything-c-source-apt)
 
 (defvar anything-c-apt-query "emacs")
@@ -4749,10 +4749,16 @@ See also `anything-create--actions'."
   "*Face used for apt installed candidates."
   :group 'anything)
 
-(defun anything-c-apt-refresh (candidate)
+(defun anything-c-apt-refresh ()
   "Refresh installed candidates list."
   (setq anything-c-apt-installed-packages nil)
   (anything-force-update))
+
+(defun anything-c-apt-persistent-action (candidate)
+  "Persistent action for APT source."
+  (if current-prefix-arg
+      (anything-c-apt-refresh)
+      (anything-c-apt-cache-show candidate)))
 
 ;;;###autoload
 (defun anything-apt (query)
