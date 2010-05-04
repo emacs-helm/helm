@@ -1404,6 +1404,7 @@ Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
 
 (defvar anything-shortcut-keys-alist
   '((alphabet . "asdfghjklzxcvbnmqwertyuiop")
+    (prefix   . "asdfghjklzxcvbnmqwertyuiop1234567890") ;EXPERIMENTAL
     (t        . "123456789")))
 
 (defvar anything-display-source-at-screen-top t
@@ -3116,6 +3117,27 @@ UNIT and DIRECTION."
             (anything-mark-current-line)
             (anything-exit-minibuffer))))
     (self-insert-command 1)))
+
+;;; EXPERIMENTAL TODO documentation 
+(defun anything-select-with-prefix-shortcut ()
+  (interactive)
+  (if (eq anything-enable-shortcuts 'prefix)
+      (save-selected-window
+        (select-window (anything-window))          
+        (let* ((key (read-event "Select shortcut key: "))
+               (index (position key anything-shortcut-keys))
+               (overlay (ignore-errors (nth index anything-digit-overlays))))
+          (if (not (and overlay (overlay-buffer overlay)))
+              (when (numberp key)
+                (select-window (minibuffer-window))
+                (self-insert-command 1))
+            (goto-char (overlay-start overlay))
+            (anything-mark-current-line)
+            (anything-exit-minibuffer))))
+    (self-insert-command 1)))
+;; (setq anything-enable-shortcuts 'prefix)
+;; (define-key anything-map "@" 'anything-select-with-prefix-shortcut)
+;; (define-key anything-map (kbd "<f18>") 'anything-select-with-prefix-shortcut)
 
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
