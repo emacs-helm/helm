@@ -6148,7 +6148,11 @@ the center of window, otherwise at the top of window.
 
 (define-anything-type-attribute 'timer
   '((real-to-display . anything-c-timer-real-to-display)
-    (action ("Cancel Timer" . cancel-timer)))
+    (action ("Cancel Timer" . cancel-timer)
+            ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
+            ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
+    (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
+    (persistent-help . "Describe Function"))
   "Timer.")
 
 ;;;; Default `anything-sources'
