@@ -4661,7 +4661,8 @@ See also `anything-create--actions'."
 ;; (anything 'anything-c-source-idle-time-timers)
 
 (defun anything-c-timer-real-to-display (timer)
-  (destructuring-bind (_ t1 t2 t3 _ func args &rest rest) (append timer nil)
+  (destructuring-bind (_ t1 t2 t3 _ func args &rest rest)
+      (append timer nil)                ;use `append' to convert vector->list
     (format "%s %s(%s)"
             (format-time-string "%m/%d %T" (list t1 t2 t3))
             func
