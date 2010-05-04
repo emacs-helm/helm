@@ -4728,17 +4728,31 @@ See also `anything-create--actions'."
   '((name . "APT")
     (init . anything-c-apt-init)
     (candidates-in-buffer)
+    (candidate-transformer anything-c-apt-candidate-transformer)
     (display-to-real . anything-c-apt-display-to-real)
     (candidate-number-limit . 9999)
     (action
      ("Show package description" . anything-c-apt-cache-show)
-     ("Install package" . anything-c-apt-install))))
+     ("Install package" . anything-c-apt-install))
+    (persistent-action . anything-c-apt-refresh)
+    (persistent-help . "Refresh")))
 ;; (anything 'anything-c-source-apt)
 
 (defvar anything-c-apt-query "emacs")
 (defvar anything-c-apt-search-command "apt-cache search '%s'")
 (defvar anything-c-apt-show-command "apt-cache show '%s'")
 (defvar anything-c-apt-install-command "xterm -e sudo apt-get install '%s' &")
+(defvar anything-c-apt-installed-packages nil)
+
+(defface anything-apt-installed
+  '((t (:foreground "green")))
+  "*Face used for apt installed candidates."
+  :group 'anything)
+
+(defun anything-c-apt-refresh (candidate)
+  "Refresh installed candidates list."
+  (setq anything-c-apt-installed-packages nil)
+  (anything-force-update))
 
 ;;;###autoload
 (defun anything-apt (query)
@@ -4747,14 +4761,38 @@ See also `anything-create--actions'."
   (let ((anything-c-apt-query query))
     (anything 'anything-c-source-apt)))
 
+(defun anything-c-apt-candidate-transformer (candidates)
+  "Show installed candidates in a different color."
+  (loop
+     with all
+     for cand in candidates
+     for name = (anything-c-apt-display-to-real cand)
+     if (member name anything-c-apt-installed-packages)
+     collect (propertize cand 'face 'anything-apt-installed) into all
+     else collect cand into all finally return all))
+
 (defun anything-c-apt-init ()
+  "Initialize list of debian packages."
+  (unless anything-c-apt-installed-packages
+    (message "Updating installed candidate list...")
+    (setq anything-c-apt-installed-packages
+          (with-temp-buffer
+            (call-process-shell-command "dpkg --get-selections"
+                                        nil (current-buffer))
+            (loop for i in (split-string (buffer-string) "\n" t)
+               collect (car (split-string i))))))
   (with-current-buffer
       (anything-candidate-buffer
        (get-buffer-create (format "*anything-apt:%s*" anything-c-apt-query)))
     (call-process-shell-command
      (format anything-c-apt-search-command anything-c-apt-query)
-     nil (current-buffer))))
+     nil (current-buffer)))
+  (message "Updating installed candidate list...done"))
+
 (defun anything-c-apt-display-to-real (line)
+  "Return only name of a debian package.
+LINE is displayed like:
+package name - description."
   (car (split-string line " - ")))
 
 ;;;###autoload
@@ -4767,7 +4805,9 @@ See also `anything-create--actions'."
 
 (defun anything-c-apt-cache-show (package)
   (anything-c-shell-command-if-needed (format anything-c-apt-show-command package)))
+
 (defun anything-c-apt-install (package)
+  (setq anything-c-apt-installed-packages nil)
   (shell-command (format anything-c-apt-install-command package) "*apt install*"))
 
 ;; (anything-c-apt-install "jed")
