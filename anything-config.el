@@ -5634,6 +5634,7 @@ candidate can be in (DISPLAY . REAL) format."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Outliner ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar anything-outline-goto-near-line-flag t)
+(defvar anything-outline-using nil)
 (defun anything-after-update-hook--outline ()
   (if (and (eq anything-outline-using t)
            (eq anything-outline-goto-near-line-flag t))
