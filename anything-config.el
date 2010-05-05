@@ -3928,26 +3928,18 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 ;;; Eev anchors
 (defvar anything-c-source-eev-anchor
   '((name . "Anchors")
-    (init . (lambda ()
-              (setq anything-c-eev-anchor-buffer
-                    (current-buffer))))
-    (candidates . (lambda ()
-                    (condition-case nil
-                        (save-excursion
-                          (with-current-buffer anything-c-eev-anchor-buffer
-                            (goto-char (point-min))
-                            (let (anchors)
-                              (while (re-search-forward (format ee-anchor-format "\\([^\.].+\\)") nil t)
-                                (push (match-string-no-properties 1) anchors))
-                              (setq anchors (reverse anchors)))))
-                      (error nil))))
+    (candidates
+     . (lambda ()
+         (ignore-errors
+           (with-current-buffer anything-current-buffer
+             (loop initially (goto-char (point-min))
+                   while (re-search-forward (format ee-anchor-format "\\([^\.].+\\)") nil t)
+                   collect (match-string-no-properties 1))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
                            (anything-match-line-color-current-line)))
     (persistent-help . "Show this entry")
-    (action . (("Goto link" . (lambda (item)
-                                (ee-to item)))))))
-
+    (action . (("Goto link" . ee-to)))))
 ;; (anything 'anything-c-source-eev-anchor)
 
 ;;;; <Misc>
