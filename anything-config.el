@@ -3934,7 +3934,10 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
            (with-current-buffer anything-current-buffer
              (loop initially (goto-char (point-min))
                    while (re-search-forward (format ee-anchor-format "\\([^\.].+\\)") nil t)
-                   collect (match-string-no-properties 1))))))
+                   for anchor = (match-string-no-properties 1)
+                   collect (cons (format "%5d:%s"
+                                         (line-number-at-pos (match-beginning 0))
+                                         (format ee-anchor-format anchor)) anchor))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
                            (anything-match-line-color-current-line)))
