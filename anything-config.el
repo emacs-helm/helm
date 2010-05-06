@@ -4728,7 +4728,7 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-xfonts)
 
-;; Source for Debian/Ubuntu users
+;;; Source for Debian/Ubuntu users
 (defvar anything-c-source-apt
   '((name . "APT")
     (init . anything-c-apt-init)
@@ -4738,7 +4738,8 @@ See also `anything-create--actions'."
     (candidate-number-limit . 9999)
     (action
      ("Show package description" . anything-c-apt-cache-show)
-     ("Install package" . anything-c-apt-install))
+     ("Install package" . anything-c-apt-install)
+     ("Uninstall package" . anything-c-apt-uninstall))
     (persistent-action . anything-c-apt-persistent-action)
     (persistent-help . "Show - C-u Refresh")))
 ;; (anything 'anything-c-source-apt)
@@ -4746,7 +4747,6 @@ See also `anything-create--actions'."
 (defvar anything-c-apt-query "emacs")
 (defvar anything-c-apt-search-command "apt-cache search '%s'")
 (defvar anything-c-apt-show-command "apt-cache show '%s'")
-(defvar anything-c-apt-install-command "xterm -e sudo apt-get install '%s' &")
 (defvar anything-c-apt-installed-packages nil)
 
 (defface anything-apt-installed
@@ -4795,6 +4795,7 @@ See also `anything-create--actions'."
   (with-current-buffer
       (anything-candidate-buffer
        (get-buffer-create (format "*anything-apt:%s*" anything-c-apt-query)))
+    (erase-buffer)
     (call-process-shell-command
      (format anything-c-apt-search-command anything-c-apt-query)
      nil (current-buffer)))
@@ -4818,11 +4819,31 @@ package name - description."
   (anything-c-shell-command-if-needed (format anything-c-apt-show-command package)))
 
 (defun anything-c-apt-install (package)
-  (setq anything-c-apt-installed-packages nil)
-  (shell-command (format anything-c-apt-install-command package) "*apt install*"))
+  (anything-c-apt-install1 package :action 'install))
 
+(defun anything-c-apt-uninstall (package)
+  (anything-c-apt-install1 package :action 'uninstall))
+
+(defun* anything-c-apt-install1 (candidate &key action)
+  (ansi-term (getenv "SHELL") "anything apt")
+  (term-line-mode)
+  (let ((command (case action
+                   ('install "sudo apt-get install '%s'")
+                   ('uninstall "sudo apt-get remove '%s'")
+                   (t (error "Unknow action"))))
+        (beg (point)) end)
+    (goto-char (point-max))
+    (insert (format command candidate))
+    (setq end (point))
+    (if (y-or-n-p (format "%s package" (symbol-name action)))
+        (progn
+          (setq anything-c-apt-installed-packages nil)
+          (term-char-mode) (term-send-input))
+        (delete-region beg end) (term-send-eof) (kill-buffer))))
+        
 ;; (anything-c-apt-install "jed")
-;; Sources for gentoo users
+
+;;; Sources for gentoo users
 
 (defvar anything-gentoo-prefered-shell 'eshell
   "Your favorite shell to run emerge command.")
