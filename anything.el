@@ -2726,7 +2726,7 @@ the current pattern."
 If current source has `update' attribute, a function without argument, call it before update."
   (interactive)
   (let ((source (anything-get-current-source)))
-    (anything-aif (anything-candidate-buffer)
+    (anything-aif (anything-funcall-with-source source 'anything-candidate-buffer)
         (kill-buffer it))
     (anything-aif (assoc-default 'init source)
         (anything-funcall-with-source source it))
