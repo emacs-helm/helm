@@ -107,6 +107,8 @@
 ;;    Scroll other window (not *Anything* window) upward.
 ;;  `anything-scroll-other-window-down'
 ;;    Scroll other window (not *Anything* window) downward.
+;;  `anything-display-all-visible-marks'
+;;    Show all `anything' visible marks strings.
 ;;  `anything-quit-and-find-file'
 ;;    Drop into `find-file' from `anything' like `iswitchb-find-file'.
 ;;  `anything-yank-selection'
@@ -1503,6 +1505,7 @@ See also `anything-set-source-filter'.")
 
     ;; Debugging command
     (define-key map "\C-c\C-x\C-d" 'anything-debug-output)
+    (define-key map "\C-c\C-x\C-m" 'anything-display-all-visible-marks)
     ;; Use `describe-mode' key in `global-map'
     (dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'anything-help))
@@ -3718,6 +3721,15 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
           (push display anything-c-marked-candidate-list)
           (push (cons source selection) anything-marked-candidates)))
       (anything-next-line))))
+
+(defun anything-display-all-visible-marks ()
+  "Show all `anything' visible marks strings."
+  (interactive)
+  (lexical-let ((overlays anything-visible-mark-overlays))
+    (anything-run-after-quit
+     (lambda ()
+       (with-output-to-temp-buffer "*anything visible marks*"
+         (dolist (o overlays) (princ (overlay-get o 'string))))))))
 
 (defun anything-marked-candidates ()
   "Marked candidates (real value) of current source if any,
