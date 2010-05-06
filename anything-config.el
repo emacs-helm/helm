@@ -5123,6 +5123,43 @@ You can set your own list of commands with
   (loop for i in seq for index from 0
      when (funcall test i item) return index))
 
+(defvar anything-c-source-ratpoison-commands
+  '((name . "Ratpoison Commands")
+    (init . anything-c-ratpoison-commands-init)
+    (candidates-in-buffer)
+    (action ("Execute the command" . anything-c-ratpoison-commands-execute))
+    (display-to-real . anything-c-ratpoison-commands-display-to-real)
+    (candidate-number-limit)))
+;; (anything 'anything-c-source-ratpoison-commands)
+
+(defun anything-c-ratpoison-commands-init ()
+  (unless (anything-candidate-buffer)
+    (with-current-buffer (anything-candidate-buffer 'global)
+      ;; with ratpoison prefix key
+      (save-excursion
+        (call-process "ratpoison" nil (current-buffer) nil "-c" "help"))
+      (while (re-search-forward "^\\([^ ]+\\) \\(.+\\)$" nil t)
+        (replace-match "<ratpoison> \\1: \\2"))
+      (goto-char (point-max))
+      ;; direct binding
+      (save-excursion
+        (call-process "ratpoison" nil (current-buffer) nil "-c" "help top"))
+      (while (re-search-forward "^\\([^ ]+\\) \\(.+\\)$" nil t)
+        (replace-match "\\1: \\2")))))
+
+(defun anything-c-ratpoison-commands-display-to-real (display)
+  (and (string-match ": " display)
+       (substring display (match-end 0))))
+
+(defun anything-c-ratpoison-commands-execute (candidate)
+  (call-process "ratpoison" nil nil nil "-ic" candidate))
+
+;;;###autoload
+(defun anything-ratpoison-commands ()
+  "Preconfigured `anything' to execute ratpoison commands."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-ratpoison-commands
+                         "*anything ratpoison commands*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
