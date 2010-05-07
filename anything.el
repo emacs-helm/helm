@@ -3725,7 +3725,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defun anything-display-all-visible-marks ()
   "Show all `anything' visible marks strings."
   (interactive)
-  (lexical-let ((overlays anything-visible-mark-overlays))
+  (lexical-let ((overlays (reverse anything-visible-mark-overlays)))
     (anything-run-after-quit
      (lambda ()
        (with-output-to-temp-buffer "*anything visible marks*"
