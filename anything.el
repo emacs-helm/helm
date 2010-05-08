@@ -379,6 +379,10 @@
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el
 
+;;
+;; If you want to create anything sources, see anything-config.el.
+;; It is huge collection of sources. You can learn from examples.
+
 
 ;; (@* "TODO")
 ;;
