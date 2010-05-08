@@ -212,6 +212,10 @@
 ;;; (@* "Tips")
 
 ;;
+;; You can edit current selection using `anything-edit-current-selection'.
+;; It is useful after persistent-action.
+
+;;
 ;; For `anything' users, setting `anything-sources' directly and
 ;; invoke M-x anything is obsolete way for now. Try M-x
 ;; `anything-migrate-sources'!
