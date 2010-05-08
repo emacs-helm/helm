@@ -2914,7 +2914,8 @@ If action buffer is selected, back to the anything buffer."
   (interactive)
   (cond ((get-buffer-window anything-action-buffer 'visible)
          (set-window-buffer (get-buffer-window anything-action-buffer) anything-buffer)
-         (kill-buffer anything-action-buffer))
+         (kill-buffer anything-action-buffer)
+         (insert anything-input))
         (t
          (setq anything-saved-selection (anything-get-selection))
          (unless anything-saved-selection
