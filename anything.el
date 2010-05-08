@@ -3318,6 +3318,8 @@ You can set user options `fit-frame-max-width-percent' and
       (anything-mark-current-line))))
 
 (defmacro anything-edit-current-selection (&rest forms)
+  "Evaluate FORMS at current selection in the anything buffer.
+You can edit the line."
   `(anything-edit-current-selection-1
     (lambda () ,@forms)))
 
