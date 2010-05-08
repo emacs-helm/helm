@@ -3322,6 +3322,7 @@ You can set user options `fit-frame-max-width-percent' and
 You can edit the line."
   `(anything-edit-current-selection-1
     (lambda () ,@forms)))
+(put 'anything-edit-current-selection 'lisp-indent-function 0)
 
 (defun anything-delete-minibuffer-content ()
   "Same as `delete-minibuffer-contents' but this is a command."
