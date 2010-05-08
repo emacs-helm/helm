@@ -124,7 +124,7 @@
 ;; `anything-regexp'
 ;; Preconfigured `anything' : It is like `re-builder'. It helps buliding regexp and replacement.
 ;; `anything-insert-buffer-name'
-;; Insert buffer name.
+;; Not documented.
 ;; `anything-insert-symbol'
 ;; Insert current symbol.
 ;; `anything-insert-selection'
@@ -171,6 +171,8 @@
 ;; Preconfigured `anything' to hardlink files from dired.
 ;; `anything-dired-bindings'
 ;; Replace usual dired commands `C' and `R' by anything ones.
+;; `anything-manage-advice'
+;; Preconfigured `anything' to disable/enable function advices.
 ;; `anything-bookmark-ext'
 ;; Preconfigured `anything' for bookmark-extensions sources.
 ;; `anything-simple-call-tree'
@@ -211,6 +213,8 @@
 ;; Not documented.
 ;; `anything-c-run-external-command'
 ;; Run External PROGRAM asyncronously from Emacs.
+;; `anything-ratpoison-commands'
+;; Preconfigured `anything' to execute ratpoison commands.
 ;; `anything-c-set-variable'
 ;; Set value to VAR interactively.
 ;; `anything-c-adaptive-save-history'
@@ -332,6 +336,7 @@
 ;; `anything-c-source-lacarte'                            (Lacarte)
 ;; `anything-c-source-emacs-functions'                    (Emacs Functions)
 ;; `anything-c-source-emacs-functions-with-abbrevs'       (Emacs Functions)
+;; `anything-c-source-advice'                             (Function Advice)
 ;; `anything-c-source-emacs-variables'                    (Emacs Variables)
 ;; `anything-c-source-bookmarks'                          (Bookmarks)
 ;; `anything-c-source-bookmark-set'                       (Set Bookmark)
@@ -399,6 +404,7 @@
 ;; `anything-c-source-gentoo'                             (Portage sources)
 ;; `anything-c-source-use-flags'                          (Use Flags)
 ;; `anything-c-source-emacs-process'                      (Emacs Process)
+;; `anything-c-source-ratpoison-commands'                 (Ratpoison Commands)
 
 ;;  *** END auto-documentation
 
