@@ -2500,6 +2500,80 @@ word in the function's name, e.g. \"bb\" is an abbrev for
                           (setq anything-c-function-abbrev-regexp str))))))))
 ;; (anything 'anything-c-source-emacs-functions-with-abbrevs)
 
+(defvar anything-c-source-advice
+  '((name . "Function Advice")
+    (init . anything-c-advice-init)
+    (candidates . anything-c-advice-candidates)
+    (action ("Toggle Enable/Disable" . anything-c-advice-toggle))
+;;    (real-to-display . anything-c-advice-real-to-display)
+    
+    
+    (persistent-action . anything-c-advice-persistent-action)
+    (persistent-help . "Describe function / C-u C-z: Toggle advice")))
+;; (anything 'anything-c-source-advice)
+;; (let ((debug-on-signal t))(anything 'anything-c-source-advice))
+;; (testadvice)
+
+(defun anything-c-advice-candidates ()
+  (require 'advice)
+  (loop for (fname) in ad-advised-functions
+        for function = (intern fname)
+        append
+        (loop for class in ad-advice-classes append
+              (loop for advice in (ad-get-advice-info-field function class) 
+                    for enabled = (ad-advice-enabled advice)
+                    collect
+                    (cons (format "%s %s %s"
+                                  (if enabled "Enabled " "Disabled")
+                                  (propertize fname 'face 'font-lock-function-name-face) 
+                                  (ad-make-single-advice-docstring advice class nil))
+                          (list function class advice))))))
+
+(defun anything-c-advice-persistent-action (func-class-advice)
+  (if current-prefix-arg
+      (anything-c-advice-toggle func-class-advice)
+    (describe-function (car func-class-advice))))
+
+(defun anything-c-advice-toggle (func-class-advice)
+  (destructuring-bind (function class advice) func-class-advice
+    (cond ((ad-advice-enabled advice)
+           (ad-advice-set-enabled advice nil)
+           (message "Disabled"))
+          (t                            ;disabled
+           (ad-advice-set-enabled advice t)
+           (message "Enabled")))
+    (ad-activate function)
+    (and anything-in-persistent-action
+         (anything-c-advice-update-current-display-string))))
+
+(defun anything-c-advice-update-current-display-string ()
+  (with-anything-window
+    (beginning-of-line)
+    (let ((newword (cond ((looking-at "Disabled") "Enabled")
+                         ((looking-at "Enabled")  "Disabled")))
+          realvalue)
+      (when newword
+        (setq realvalue (get-text-property (point) 'anything-realvalue))
+        (delete-region (point) (progn (forward-word 1) (point)))
+        (insert newword)
+        (beginning-of-line)
+        (put-text-property (point) (point-at-eol) 'anything-realvalue realvalue)
+        (anything-mark-current-line)))))
+
+(defun anything-c-advice-update-current-display-string ()
+  (anything-edit-current-selection
+    (let ((newword (cond ((looking-at "Disabled") "Enabled")
+                         ((looking-at "Enabled")  "Disabled")))
+          realvalue)
+      (when newword
+        (delete-region (point) (progn (forward-word 1) (point)))
+        (insert newword)))))
+;;;###autoload
+(defun anything-manage-advice ()
+  "Preconfigured `anything' to disable/enable function advices."
+  (interactive)
+   (anything-other-buffer 'anything-c-source-advice "*anything advice*"))
+
 ;;;; <Variable>
 ;;; Emacs variables
 (defvar anything-c-source-emacs-variables
