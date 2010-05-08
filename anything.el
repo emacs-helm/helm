@@ -3307,6 +3307,20 @@ You can set user options `fit-frame-max-width-percent' and
            (when (eobp) (forward-line -1))))
     (anything-mark-current-line)))
 
+(defun anything-edit-current-selection-1 (func)
+  (with-anything-window
+    (beginning-of-line)
+    (let ((realvalue (get-text-property (point) 'anything-realvalue)))
+      (funcall func)
+      (beginning-of-line)
+      (and realvalue
+           (put-text-property (point) (point-at-eol) 'anything-realvalue realvalue))
+      (anything-mark-current-line))))
+
+(defmacro anything-edit-current-selection (&rest forms)
+  `(anything-edit-current-selection-1
+    (lambda () ,@forms)))
+
 (defun anything-delete-minibuffer-content ()
   "Same as `delete-minibuffer-contents' but this is a command."
   (interactive)
