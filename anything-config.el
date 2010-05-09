@@ -2671,7 +2671,7 @@ http://www.nongnu.org/bm/")
                                          if (string-match (format "^(%s)" anything-su-or-sudo) i)
                                          collect i))
                       (sort lis-su 'string-lessp))))
-    (candidate-transformer anything-c-highlight-bookmark-su)
+    (filtered-candidate-transformer anything-c-highlight-bookmark-su)
 
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -2685,12 +2685,12 @@ http://www.nongnu.org/bm/")
         (throw 'break t)))))
 
 
-(defun anything-c-highlight-bookmark-su (files)
+(defun anything-c-highlight-bookmark-su (files source)
   (if (tv-root-logged-p)
-      (anything-c-highlight-bookmark files)
-    (anything-c-highlight-not-logged files)))
+      (anything-c-highlight-bookmark files source)
+      (anything-c-highlight-not-logged files source)))
 
-(defun anything-c-highlight-not-logged (files)
+(defun anything-c-highlight-not-logged (files source)
   (loop for i in files
         collect (propertize i 'face anything-c-bookmarks-face3)))
 
