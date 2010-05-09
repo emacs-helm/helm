@@ -1406,7 +1406,7 @@ Attributes:
 If t then they can be selected using Ctrl+<number>.
 If 'alphabet then they can be selected using Shift+<alphabet>.
 
-Keys (digit/alphabet) are listed in `anything-digit-shortcut-index-alist'.")
+Keys (digit/alphabet) are listed in `anything-shortcut-keys-alist'.")
 
 (defvaralias 'anything-enable-digit-shortcuts 'anything-enable-shortcuts
   "Alphabet shortcuts are usable now. Then `anything-enable-digit-shortcuts' should be renamed.
