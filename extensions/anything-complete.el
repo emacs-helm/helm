@@ -557,15 +557,15 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     candidates))
 
 (defun alcs-describe-function (name)
-  (describe-function (intern name)))
+  (describe-function (anything-c-symbolify name)))
 (defun alcs-describe-variable (name)
-  (describe-variable (intern name)))
+  (describe-variable (anything-c-symbolify name)))
 (defun alcs-describe-face (name)
-  (describe-face (intern name)))
+  (describe-face (anything-c-symbolify name)))
 (defun alcs-find-function (name)
-  (find-function (intern name)))
+  (find-function (anything-c-symbolify name)))
 (defun alcs-find-variable (name)
-  (find-variable (intern name)))
+  (find-variable (anything-c-symbolify name)))
 
 (defvar anything-c-source-complete-emacs-functions
   '((name . "Functions")
@@ -748,7 +748,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (anything 'anything-c-source-complete-anything-attributes)
 
 (defun acaa-describe-anything-attribute (str)
-  (anything-describe-anything-attribute (intern str)))
+  (anything-describe-anything-attribute (anything-c-symbolify str)))
 
 (defun acaa-candidates ()
   (with-current-buffer anything-current-buffer
