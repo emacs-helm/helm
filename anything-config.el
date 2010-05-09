@@ -2552,27 +2552,13 @@ word in the function's name, e.g. \"bb\" is an abbrev for
          (anything-c-advice-update-current-display-string))))
 
 (defun anything-c-advice-update-current-display-string ()
-  (with-anything-window
-    (beginning-of-line)
+  (anything-edit-current-selection
     (let ((newword (cond ((looking-at "Disabled") "Enabled")
                          ((looking-at "Enabled")  "Disabled")))
           realvalue)
       (when newword
-        (setq realvalue (get-text-property (point) 'anything-realvalue))
         (delete-region (point) (progn (forward-word 1) (point)))
-        (insert newword)
-        (beginning-of-line)
-        (put-text-property (point) (point-at-eol) 'anything-realvalue realvalue)
-        (anything-mark-current-line)))))
-
-;; (defun anything-c-advice-update-current-display-string ()
-;;   (anything-edit-current-selection
-;;     (let ((newword (cond ((looking-at "Disabled") "Enabled")
-;;                          ((looking-at "Enabled")  "Disabled")))
-;;           realvalue)
-;;       (when newword
-;;         (delete-region (point) (progn (forward-word 1) (point)))
-;;         (insert newword)))))
+        (insert newword)))))
 
 ;;;###autoload
 (defun anything-manage-advice ()
