@@ -2565,14 +2565,15 @@ word in the function's name, e.g. \"bb\" is an abbrev for
         (put-text-property (point) (point-at-eol) 'anything-realvalue realvalue)
         (anything-mark-current-line)))))
 
-(defun anything-c-advice-update-current-display-string ()
-  (anything-edit-current-selection
-    (let ((newword (cond ((looking-at "Disabled") "Enabled")
-                         ((looking-at "Enabled")  "Disabled")))
-          realvalue)
-      (when newword
-        (delete-region (point) (progn (forward-word 1) (point)))
-        (insert newword)))))
+;; (defun anything-c-advice-update-current-display-string ()
+;;   (anything-edit-current-selection
+;;     (let ((newword (cond ((looking-at "Disabled") "Enabled")
+;;                          ((looking-at "Enabled")  "Disabled")))
+;;           realvalue)
+;;       (when newword
+;;         (delete-region (point) (progn (forward-word 1) (point)))
+;;         (insert newword)))))
+
 ;;;###autoload
 (defun anything-manage-advice ()
   "Preconfigured `anything' to disable/enable function advices."
@@ -2895,11 +2896,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (anything-c-bmkext-filter-setup-alist 'bmkext-local-file-alist-only))
 
 ;; Su Files&directories
-(defun anything-c-highlight-bmkext-su (bmk)
-  (if (bmkext-root-or-sudo-logged-p)
-      (anything-c-highlight-bookmark bmk)
-      (anything-c-highlight-not-logged bmk)))
-
 (defvar anything-c-source-bookmark-su-files&dirs
   '((name . "Bookmark Root-Files&Directories")
     (init . (lambda ()
@@ -2908,7 +2904,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
     (candidates . anything-c-bookmark-su-files-setup-alist)
     (filtered-candidate-transformer
      anything-c-adaptive-sort
-     anything-c-highlight-bookmark)
+     anything-c-highlight-bookmark-su)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-su-files&dirs)
 
