@@ -211,6 +211,15 @@
 
 ;;; (@* "Tips")
 
+;; 
+;; `anything-enable-shortcuts' enables us to select candidate easily.
+;; If 'prefix then they can be selected using <prefix-key> <alnum>. 
+;; The prefix key is `anything-select-with-prefix-shortcut'.
+;; If the <prefix-key> is a letter, pressing twice inputs the letter itself.
+;; e.g.
+;;  (setq anything-enable-shortcuts 'prefix)
+;;  (define-key anything-map \"@\" 'anything-select-with-prefix-shortcut)
+
 ;;
 ;; You can edit current selection using `anything-edit-current-selection'.
 ;; It is useful after persistent-action.
@@ -1404,7 +1413,16 @@ Attributes:
 (defvar anything-enable-shortcuts nil
   "*Whether to use digit/alphabet shortcut to select the first nine matches.
 If t then they can be selected using Ctrl+<number>.
-If 'alphabet then they can be selected using Shift+<alphabet>.
+
+If 'prefix then they can be selected using <prefix-key> <alnum>. 
+The prefix key is `anything-select-with-prefix-shortcut'.
+If the <prefix-key> is a letter, pressing twice inputs the letter itself.
+e.g.
+ (setq anything-enable-shortcuts 'prefix)
+ (define-key anything-map \"@\" 'anything-select-with-prefix-shortcut)
+ 
+If 'alphabet then they can be selected using Shift+<alphabet> (deprecated).
+It is not recommended because you cannot input capital letters in pattern.
 
 Keys (digit/alphabet) are listed in `anything-shortcut-keys-alist'.")
 
@@ -1414,7 +1432,7 @@ Keys (digit/alphabet) are listed in `anything-shortcut-keys-alist'.")
 
 (defvar anything-shortcut-keys-alist
   '((alphabet . "asdfghjklzxcvbnmqwertyuiop")
-    (prefix   . "asdfghjklzxcvbnmqwertyuiop1234567890") ;EXPERIMENTAL
+    (prefix   . "asdfghjklzxcvbnmqwertyuiop1234567890")
     (t        . "123456789")))
 
 (defvar anything-display-source-at-screen-top t
