@@ -1808,11 +1808,18 @@ It is useful for debug.")
 (put 'with-anything-window 'lisp-indent-function 0)
 
 (defmacro with-anything-restore-variables(&rest body)
-  "Restore variables specified by `anything-restored-variables' after executing BODY ."
-  `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables)))
+  "Restore variables specified by `anything-restored-variables' after executing BODY .
+`post-command-hook' is handled specially."
+  `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables))
+         (--post-command-hook-pair (cons post-command-hook
+                                         (default-value 'post-command-hook))))
+     (setq post-command-hook '(t))
+     (setq-default post-command-hook nil)
      (unwind-protect (progn ,@body)
        (loop for (var . value) in --orig-vars
-             do (set var value)))))
+             do (set var value))
+       (setq post-command-hook (car --post-command-hook-pair))
+       (setq-default post-command-hook (cdr --post-command-hook-pair)))))
 (put 'with-anything-restore-variables 'lisp-indent-function 0)
 
 (defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
