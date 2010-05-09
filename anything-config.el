@@ -2508,7 +2508,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 
 (defvar anything-c-source-advice
   '((name . "Function Advice")
-    (init . anything-c-advice-init)
     (candidates . anything-c-advice-candidates)
     (action ("Toggle Enable/Disable" . anything-c-advice-toggle))
 ;;    (real-to-display . anything-c-advice-real-to-display)
