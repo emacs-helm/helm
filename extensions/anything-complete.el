@@ -695,7 +695,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (persistent-action . alcs-describe-face)))
 
 (defvar alcs-this-command nil)
-(defun anything-lisp-complete-symbol-1 (update sources input)
+(defun* anything-lisp-complete-symbol-1 (update sources input &optional (buffer "*anything complete*"))
   (setq alcs-this-command this-command)
   (when (or update (null (get-buffer alcs-variables-buffer)))
     (alcs-make-candidates))
@@ -703,7 +703,9 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
         (anything-input-idle-delay
          (or anything-lisp-complete-symbol-input-idle-delay
              anything-input-idle-delay)))
-    (anything-noresume sources input nil nil nil "*anything complete*")))
+    (funcall
+     (if (equal buffer "*anything complete*") 'anything-noresume 'anything)
+     sources input nil nil nil buffer)))
 
 ;; Test alcs-update-restart (with-current-buffer alcs-commands-buffer (erase-buffer))
 ;; Test alcs-update-restart (kill-buffer alcs-commands-buffer)
@@ -734,7 +736,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 (defun anything-apropos (update)
   "`apropos' replacement using `anything'."
   (interactive "P")
-  (anything-lisp-complete-symbol-1 update anything-apropos-sources nil))
+  (anything-lisp-complete-symbol-1 update anything-apropos-sources nil "*anything apropos*"))
 
 ;; (@* "anything attribute completion")
 (defvar anything-c-source-complete-anything-attributes
