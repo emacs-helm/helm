@@ -3144,7 +3144,7 @@ UNIT and DIRECTION."
 
 (defun anything-select-with-digit-shortcut ()
   (interactive)
-  (if anything-enable-shortcuts
+  (if (eq anything-enable-shortcuts 'alphabet)
       (save-selected-window
         (select-window (anything-window))          
         (let* ((index (position (anything-this-command-key) anything-shortcut-keys))
