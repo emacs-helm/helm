@@ -5323,7 +5323,8 @@ Ask to kill buffers associated with that file, too."
                    nil program fname)
     (setq anything-c-external-commands-list
           (push (pop (nthcdr (anything-c-position
-                              program anything-c-external-commands-list)
+                              program anything-c-external-commands-list
+                              :test 'equal)
                              anything-c-external-commands-list))
                 anything-c-external-commands-list))))
 
