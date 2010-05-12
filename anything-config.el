@@ -4801,7 +4801,8 @@ See also `anything-create--actions'."
     (action
      ("Show package description" . anything-c-apt-cache-show)
      ("Install package" . anything-c-apt-install)
-     ("Uninstall package" . anything-c-apt-uninstall))
+     ("Remove package" . anything-c-apt-uninstall)
+     ("Purge package" . anything-c-apt-purge))
     (persistent-action . anything-c-apt-persistent-action)
     (persistent-help . "Show - C-u Refresh")))
 ;; (anything 'anything-c-source-apt)
@@ -4886,12 +4887,16 @@ package name - description."
 (defun anything-c-apt-uninstall (package)
   (anything-c-apt-install1 package :action 'uninstall))
 
+(defun anything-c-apt-purge (package)
+  (anything-c-apt-install1 package :action 'purge))
+
 (defun* anything-c-apt-install1 (candidate &key action)
   (ansi-term (getenv "SHELL") "anything apt")
   (term-line-mode)
   (let ((command (case action
                    ('install "sudo apt-get install '%s'")
                    ('uninstall "sudo apt-get remove '%s'")
+                   ('purge "sudo apt-get purge '%s'")
                    (t (error "Unknow action"))))
         (beg (point)) end)
     (goto-char (point-max))
