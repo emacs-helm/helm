@@ -5345,13 +5345,15 @@ If not found or a prefix arg is given query the user which tool to use."
                           (anything-comp-read
                            "Program: "
                            collection)
-                          " %s"))))
-    (start-process-shell-command (format "%s-%s" program fname)
+                          " %s")))
+         (progname   (replace-regexp-in-string " %s" "" program))
+         (process    (format "%s-%s" progname fname)))
+    (start-process-shell-command process
                    nil (format program fname))
-    (when (member program anything-c-external-commands-list)
+    (when (member progname anything-c-external-commands-list)
       (setq anything-c-external-commands-list
             (push (pop (nthcdr (anything-c-position
-                                program anything-c-external-commands-list
+                                progname anything-c-external-commands-list
                                 :test 'equal)
                                anything-c-external-commands-list))
                   anything-c-external-commands-list)))))
