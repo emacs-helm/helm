@@ -4910,6 +4910,7 @@ package name - description."
     (setq end (point))
     (if (y-or-n-p (format "%s package" (symbol-name action)))
         (progn
+          (setq anything-c-external-commands-list nil)
           (setq anything-c-apt-installed-packages nil)
           (term-char-mode) (term-send-input))
         (delete-region beg end) (term-send-eof) (kill-buffer))))
@@ -4972,6 +4973,7 @@ package name - description."
 ;; (anything 'anything-c-source-gentoo)
 
 (defun* anything-gentoo-install (candidate &key action)
+  (setq anything-c-external-commands-list nil)
   (funcall anything-gentoo-prefered-shell)
   (let ((command (case action
                    ('install "*sudo emerge -av ")
