@@ -2235,14 +2235,14 @@ already-bound variables. Yuck!
   ;; TODO more document
   (interactive)
   (condition-case v
-      (with-anything-restore-variables
-        (let (;; It is needed because `anything-source-name' is non-nil
-              ;; when `anything' is invoked by action. Awful global scope.
-              anything-source-name anything-in-persistent-action
-              anything-quit
-              (case-fold-search t)
-              (anything-buffer (or any-buffer anything-buffer))
-              (anything-map (or any-keymap anything-map)))
+      (let ( ;; It is needed because `anything-source-name' is non-nil
+            ;; when `anything' is invoked by action. Awful global scope.
+            anything-source-name anything-in-persistent-action
+                                 anything-quit
+                                 (case-fold-search t)
+                                 (anything-buffer (or any-buffer anything-buffer))
+                                 (anything-map (or any-keymap anything-map)))
+        (with-anything-restore-variables
           (anything-frame/window-configuration 'save)
           (setq anything-sources (anything-normalize-sources any-sources))
           (anything-initialize-1 any-resume any-input)
@@ -2256,9 +2256,9 @@ already-bound variables. Yuck!
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume)
             (anything-cleanup)
             (anything-hooks 'cleanup)
-            (anything-frame/window-configuration 'restore))
-          (unless anything-quit
-            (anything-execute-selection-action-1))))
+            (anything-frame/window-configuration 'restore)))
+        (unless anything-quit
+          (anything-execute-selection-action-1)))
     (quit
      (anything-on-quit)
      nil)))
