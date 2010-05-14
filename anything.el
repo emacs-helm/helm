@@ -51,6 +51,27 @@
 ;; Here is Japanese translation of `anything-sources' attributes. Thanks.
 ;; http://d.hatena.ne.jp/sirocco634/20091012/1255336649
 
+;;; Bug Report:
+;;
+;; If you have problem, send a bug report via M-x anything-send-bug-report.
+;; The step is:
+;;  0) Setup mail in Emacs, the easiest way is:
+;;       (setq user-mail-address "your@mail.address")
+;;       (setq user-full-name "Your Full Name")
+;;       (setq smtpmail-smtp-server "your.smtp.server.jp")
+;;       (setq mail-user-agent 'message-user-agent)
+;;       (setq message-send-mail-function 'message-smtpmail-send-it)
+;;  1) Be sure to use the LATEST version of anything.el.
+;;  2) Enable debugger. M-x toggle-debug-on-error or (setq debug-on-error t)
+;;  3) Use Lisp version instead of compiled one: (load "anything.el")
+;;  4) Do it!
+;;  5) If you got an error, please do not close *Backtrace* buffer.
+;;  6) M-x anything-send-bug-report and M-x insert-buffer *Backtrace*
+;;  7) Describe the bug using a precise recipe.
+;;  8) Type C-c C-c to send.
+;;  # If you are a Japanese, please write in Japanese:-)
+
+
 ;;; Commands:
 ;;
 ;; Below are complete command list:
@@ -1532,6 +1553,7 @@ See also `anything-set-source-filter'.")
     ;; Debugging command
     (define-key map "\C-c\C-x\C-d" 'anything-debug-output)
     (define-key map "\C-c\C-x\C-m" 'anything-display-all-visible-marks)
+    (define-key map "\C-c\C-x\C-b" 'anything-send-bug-report-from-anything)
     ;; Use `describe-mode' key in `global-map'
     (dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'anything-help))
@@ -4675,6 +4697,50 @@ buffer as BUFFER."
   "  source local `header-line-format'.
   It accepts also variable/function name. ")
 (anything-document-attribute 'resume "optional" "  Function called with no parameters when `anything-resume' is started.")
+
+;; (@* "Bug Report")
+(defvar anything-maintainer-mail-address
+  (concat "rubiki" "tch@ru" "by-lang.org"))
+(defvar anything-bug-report-salutation
+  "Describe bug below, using a precise recipe.
+
+When I executed M-x ...
+
+How to send a bug report:
+  1) Be sure to use the LATEST version of anything.el.
+  2) Enable debugger. M-x toggle-debug-on-error or (setq debug-on-error t)
+  3) Use Lisp version instead of compiled one: (load \"anything.el\")
+  4) If you got an error, please paste *Backtrace* buffer.
+  5) Type C-c C-c to send.
+# If you are a Japanese, please write in Japanese:-)")
+(defvar anything-no-dump-variables
+  '(anything-candidate-buffer-alist
+    anything-digit-overlays
+    anything-help-message
+    ))
+
+(defun anything-dump-variables-in-bug-report ()
+  (let ((hash (make-hash-table)))
+    (loop for var in (apropos-internal "anything-" 'boundp)
+          for vname = (symbol-name var)
+          unless (or (string-match "-map$" vname)
+                     (string-match "^anything-c-source-" vname)
+                     (string-match "-hash$" vname)
+                     (string-match "-face$" vname)
+                     (memq var anything-no-dump-variables))
+          collect var)))
+
+(defun anything-send-bug-report ()
+  (interactive)
+  (reporter-submit-bug-report
+   anything-maintainer-mail-address
+   "anything.el"
+   (anything-dump-variables-in-bug-report)
+   nil nil
+   anything-bug-report-salutation))
+
+(defun anything-send-bug-report-from-anything ()
+  (interactive))
 
 ;; (@* "Unit Tests")
 
