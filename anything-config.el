@@ -647,7 +647,9 @@ With others windows manager you could use:
 (defun anything-c-list-preconfigured-anything ()
   (loop with doc
         with sym
-        for entry in (cdr (assoc (locate-library "anything-config") load-history))
+        for entry in (cdr (assoc
+                           (file-truename (locate-library "anything-config"))
+                           load-history))
         if (and (consp entry)
                 (eq (car entry) 'defun)
                 (string-match "^Preconfigured.+$"
