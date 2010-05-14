@@ -4721,7 +4721,9 @@ How to send a bug report:
   '(anything-candidate-buffer-alist
     anything-digit-overlays
     anything-help-message
-    ))
+    anything-candidate-cache
+    )
+  "Variables not to dump in bug report.")
 
 (defun anything-dumped-variables-in-bug-report ()
   (let ((hash (make-hash-table)))
