@@ -160,6 +160,10 @@
 ;;    Cancel anything completion and return to standard iswitchb.
 ;;  `anything-describe-anything-attribute'
 ;;    Display the full documentation of ANYTHING-ATTRIBUTE (a symbol).
+;;  `anything-send-bug-report'
+;;    Send a bug report of anything.el.
+;;  `anything-send-bug-report-from-anything'
+;;    Send a bug report of anything.el in anything session.
 ;;
 ;;; Customizable Options:
 ;;
@@ -4731,16 +4735,21 @@ How to send a bug report:
           collect var)))
 
 (defun anything-send-bug-report ()
+  "Send a bug report of anything.el."
   (interactive)
-  (reporter-submit-bug-report
-   anything-maintainer-mail-address
-   "anything.el"
-   (anything-dumped-variables-in-bug-report)
-   nil nil
-   anything-bug-report-salutation))
+  (with-current-buffer (or anything-last-buffer
+                           (current-buffer))
+    (reporter-submit-bug-report
+     anything-maintainer-mail-address
+     "anything.el"
+     (anything-dumped-variables-in-bug-report)
+     nil nil
+     anything-bug-report-salutation)))
 
 (defun anything-send-bug-report-from-anything ()
-  (interactive))
+  "Send a bug report of anything.el in anything session."
+  (interactive)
+  (anything-run-after-quit 'anything-send-bug-report))
 
 ;; (@* "Unit Tests")
 
