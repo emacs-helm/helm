@@ -4719,7 +4719,7 @@ How to send a bug report:
     anything-help-message
     ))
 
-(defun anything-dump-variables-in-bug-report ()
+(defun anything-dumped-variables-in-bug-report ()
   (let ((hash (make-hash-table)))
     (loop for var in (apropos-internal "anything-" 'boundp)
           for vname = (symbol-name var)
@@ -4735,7 +4735,7 @@ How to send a bug report:
   (reporter-submit-bug-report
    anything-maintainer-mail-address
    "anything.el"
-   (anything-dump-variables-in-bug-report)
+   (anything-dumped-variables-in-bug-report)
    nil nil
    anything-bug-report-salutation))
 
