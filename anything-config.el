@@ -1465,15 +1465,21 @@ buffer that is not the current buffer."
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
-    (action . ,(delq nil `(("Find File" . find-file-at-point)
-                           ("Find file in Dired" . anything-c-point-file-in-dired)
-                           ,(and (locate-library "elscreen") '("Find file in Elscreen"  . anything-elscreen-find-file))
-                           ("Complete at point" . anything-c-insert-file-name-completion-at-point)
-                           ("Delete File(s)" . anything-delete-marked-files)
-                           ("Find file as root" . anything-find-file-as-root)
-                           ("Open file externally" . anything-c-open-file-externally)
-                           ("Find file other window" . find-file-other-window)
-                           ("Find file other frame" . find-file-other-frame))))))
+    (action
+     . ,(delq
+         nil
+         `(("Find File" . find-file-at-point)
+           ("Find file in Dired" . anything-c-point-file-in-dired)
+           ,(and (locate-library "elscreen")
+                 '("Find file in Elscreen"  . anything-elscreen-find-file))
+           ("Complete at point"
+            . anything-c-insert-file-name-completion-at-point)
+           ("Delete File(s)" . anything-delete-marked-files)
+           ("Find file as root" . anything-find-file-as-root)
+           ("Open file externally (C-u to choose)"
+            . anything-c-open-file-externally)
+           ("Find file other window" . find-file-other-window)
+           ("Find file other frame" . find-file-other-frame))))))
 
 ;; (anything 'anything-c-source-find-files)
 
@@ -4803,7 +4809,8 @@ See also `anything-create--actions'."
     (action
      ("Show package description" . anything-c-apt-cache-show)
      ("Install package" . anything-c-apt-install)
-     ("Uninstall package" . anything-c-apt-uninstall))
+     ("Remove package" . anything-c-apt-uninstall)
+     ("Purge package" . anything-c-apt-purge))
     (persistent-action . anything-c-apt-persistent-action)
     (persistent-help . "Show - C-u Refresh")))
 ;; (anything 'anything-c-source-apt)
@@ -4888,12 +4895,16 @@ package name - description."
 (defun anything-c-apt-uninstall (package)
   (anything-c-apt-install1 package :action 'uninstall))
 
+(defun anything-c-apt-purge (package)
+  (anything-c-apt-install1 package :action 'purge))
+
 (defun* anything-c-apt-install1 (candidate &key action)
   (ansi-term (getenv "SHELL") "anything apt")
   (term-line-mode)
   (let ((command (case action
                    ('install "sudo apt-get install '%s'")
                    ('uninstall "sudo apt-get remove '%s'")
+                   ('purge "sudo apt-get purge '%s'")
                    (t (error "Unknow action"))))
         (beg (point)) end)
     (goto-char (point-max))
@@ -4901,6 +4912,7 @@ package name - description."
     (setq end (point))
     (if (y-or-n-p (format "%s package" (symbol-name action)))
         (progn
+          (setq anything-c-external-commands-list nil)
           (setq anything-c-apt-installed-packages nil)
           (term-char-mode) (term-send-input))
         (delete-region beg end) (term-send-eof) (kill-buffer))))
@@ -4963,6 +4975,7 @@ package name - description."
 ;; (anything 'anything-c-source-gentoo)
 
 (defun* anything-gentoo-install (candidate &key action)
+  (setq anything-c-external-commands-list nil)
   (funcall anything-gentoo-prefered-shell)
   (let ((command (case action
                    ('install "*sudo emerge -av ")
@@ -5316,19 +5329,38 @@ Ask to kill buffers associated with that file, too."
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
           (kill-buffer buf))))))
 
+(defun anything-get-mailcap-for-file (filename)
+  "Get the command to use for FILENAME from mailcap file.
+The command is like <command %s> and is meant to use with `format'."
+  (let* ((ext  (file-name-extension filename))
+         (mime (when ext (mailcap-extension-to-mime ext))))
+    (when mime (mailcap-mime-info mime))))
+
 (defun anything-c-open-file-externally (file)
-  "Open FILE with an external tool. Query the user which tool to use."
-  (let* ((fname   (expand-file-name file))
-         (program (anything-comp-read
-                  "Program: " (anything-c-external-commands-list-1 'sort))))
-    (start-process "anything-c-open-file-externally"
-                   nil program fname)
-    (setq anything-c-external-commands-list
-          (push (pop (nthcdr (anything-c-position
-                              program anything-c-external-commands-list
-                              :test 'equal)
-                             anything-c-external-commands-list))
-                anything-c-external-commands-list))))
+  "Open FILE with an external tool found in .mailcap file.
+If not found or a prefix arg is given query the user which tool to use."
+  (let* ((fname      (expand-file-name file))
+         (collection (anything-c-external-commands-list-1 'sort))
+         (def-prog   (anything-get-mailcap-for-file fname))
+         (program    (or (unless (or anything-current-prefix-arg
+                                     (not def-prog))
+                           def-prog)
+                         (concat
+                          (anything-comp-read
+                           "Program: "
+                           collection)
+                          " %s")))
+         (progname   (replace-regexp-in-string " %s" "" program))
+         (process    (format "%s-%s" progname fname)))
+    (start-process-shell-command process
+                   nil (format program fname))
+    (when (member progname anything-c-external-commands-list)
+      (setq anything-c-external-commands-list
+            (push (pop (nthcdr (anything-c-position
+                                progname anything-c-external-commands-list
+                                :test 'equal)
+                               anything-c-external-commands-list))
+                  anything-c-external-commands-list)))))
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
@@ -5337,7 +5369,8 @@ Ask to kill buffers associated with that file, too."
     (w32-shell-execute "open" (replace-regexp-in-string ;for UNC paths
                                "/" "\\"
                                (replace-regexp-in-string ; strip cygdrive paths
-                                "/cygdrive/\\(.\\)" "\\1:" file nil nil) nil t))))
+                                "/cygdrive/\\(.\\)" "\\1:"
+                                file nil nil) nil t))))
 
 (defun anything-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
