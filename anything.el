@@ -53,7 +53,10 @@
 
 ;;; Bug Report:
 ;;
-;; If you have problem, send a bug report via M-x anything-send-bug-report.
+;; If you have problems, send a bug report via C-c C-x C-b in anything session (best)
+;; or M-x anything-send-bug-report outside anything session.
+;; I implemented bug report feature because I want to know your current state.
+;; It helps me to solve problems easily.
 ;; The step is:
 ;;  0) Setup mail in Emacs, the easiest way is:
 ;;       (setq user-mail-address "your@mail.address")
@@ -66,7 +69,9 @@
 ;;  3) Use Lisp version instead of compiled one: (load "anything.el")
 ;;  4) Do it!
 ;;  5) If you got an error, please do not close *Backtrace* buffer.
-;;  6) M-x anything-send-bug-report and M-x insert-buffer *Backtrace*
+;;  6) Type C-c C-x C-b (anything session, best!) 
+;;     or M-x anything-send-bug-report (outside)
+;;     then M-x insert-buffer *Backtrace* (if you got error)
 ;;  7) Describe the bug using a precise recipe.
 ;;  8) Type C-c C-c to send.
 ;;  # If you are a Japanese, please write in Japanese:-)
@@ -1771,7 +1776,7 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
 
 (defvar anything-delayed-init-executed nil)
 
-(defvar anything-mode-line-string "\\<anything-map>\\[anything-help]:help \\[anything-select-action]:ActionList \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\\[anything-select-3rd-action]:NthAction"
+(defvar anything-mode-line-string "\\<anything-map>\\[anything-help]:help \\[anything-select-action]:Acts \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\\[anything-select-3rd-action]:NthAct \\[anything-send-bug-report-from-anything]:BugReport"
   "Help string displayed in mode-line in `anything'.
 If nil, use default `mode-line-format'.")
 
