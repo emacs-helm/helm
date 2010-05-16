@@ -4666,10 +4666,9 @@ See also `anything-create--actions'."
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
                ("Kill Screen(s)".
                 (lambda (candidate)
-                  (anything-aif (anything-marked-candidates)
-                      (dolist (i it)
-                        (elscreen-kill-internal (- (aref i 1) (aref "0" 0))))
-                    (elscreen-kill-internal (- (aref candidate 1) (aref "0" 0))))))
+                  (dolist (i (anything-marked-candidates))
+                    (elscreen-goto (- (aref i 1) (aref "0" 0)))
+                    (elscreen-kill))))
                ("Only Screen".
                 (lambda (candidate)
                   (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
