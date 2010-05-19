@@ -5522,6 +5522,7 @@ It is added to `extended-command-history'.
         (cmd (anything-c-symbolify cmd-or-name)))
     (if (stringp (symbol-function cmd))
         (execute-kbd-macro (symbol-function cmd))
+      (setq this-command cmd)
       (call-interactively cmd))))
 
 ;;;###autoload
