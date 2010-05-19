@@ -1190,6 +1190,7 @@ It accepts one argument, selected candidate.")
       (setq cmd (intern cmd))
       (if (stringp (symbol-function cmd))
           (execute-kbd-macro (symbol-function cmd))
+        (setq this-command cmd)
         (call-interactively cmd)))))
 
 (defvar anything-find-file-additional-sources nil)
