@@ -1861,14 +1861,22 @@ It is useful for debug.")
 `post-command-hook' is handled specially."
   `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables))
          (--post-command-hook-pair (cons post-command-hook
-                                         (default-value 'post-command-hook))))
+                                         (default-value 'post-command-hook)))
+         (--pre-command-hook-pair (cons pre-command-hook
+                                         (default-value 'pre-command-hook))))
      (setq post-command-hook '(t))
      (setq-default post-command-hook nil)
+     ;; FIXME I'm not sure whether it is necessary.
+     ;; (setq pre-command-hook '(t))
+     ;; (setq-default pre-command-hook nil)
      (unwind-protect (progn ,@body)
        (loop for (var . value) in --orig-vars
              do (set var value))
        (setq post-command-hook (car --post-command-hook-pair))
-       (setq-default post-command-hook (cdr --post-command-hook-pair)))))
+       (setq-default post-command-hook (cdr --post-command-hook-pair))
+       ;; (setq pre-command-hook (car --pre-command-hook-pair))
+       ;; (setq-default pre-command-hook (cdr --pre-command-hook-pair))
+       )))
 (put 'with-anything-restore-variables 'lisp-indent-function 0)
 
 (defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
@@ -2241,7 +2249,9 @@ already-bound variables. Yuck!
                                  anything-quit
                                  (case-fold-search t)
                                  (anything-buffer (or any-buffer anything-buffer))
-                                 (anything-map (or any-keymap anything-map)))
+                                 (anything-map (or any-keymap anything-map))
+                                 ;; cua-mode ; avoid error when region is selected
+                                 )
         (with-anything-restore-variables
           (anything-frame/window-configuration 'save)
           (setq anything-sources (anything-normalize-sources any-sources))
@@ -4430,6 +4440,15 @@ buffer as BUFFER."
       (if (listp buffer-undo-list)
           (length buffer-undo-list)
         (buffer-modified-tick)))))
+
+;; (@* "CUA workaround")
+(defadvice cua-delete-region (around anything-avoid-cua activate)
+  (ignore-errors ad-do-it))
+(defadvice copy-region-as-kill (around anything-avoid-cua activate)
+  (if cua-mode
+      (ignore-errors ad-do-it)
+    ad-do-it))
+
 
 ;;(@* "Attribute Documentation")
 (defun anything-describe-anything-attribute (anything-attribute)
