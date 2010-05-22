@@ -1711,7 +1711,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
      (("Insert File" . (lambda (candidate)
                         (when (y-or-n-p (format "Really insert %s in %s "
                                                 candidate anything-current-buffer))
-                          (insert-file candidate))))))))
+                          (insert-file-contents candidate))))))))
 
 ;;;###autoload
 (defun anything-insert-file ()
