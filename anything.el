@@ -2805,9 +2805,9 @@ If current source has `update' attribute, a function without argument, call it b
   (let ((source (anything-get-current-source)))
     (anything-aif (anything-funcall-with-source source 'anything-candidate-buffer)
         (kill-buffer it))
-    (anything-aif (assoc-default 'init source)
-        (anything-funcall-with-source source it))
     (anything-aif (assoc-default 'update source)
+        (anything-funcall-with-source source it))
+    (anything-aif (assoc-default 'init source)
         (anything-funcall-with-source source it))
     ;; Remove from candidate cache to recalculate candidates
     (setq anything-candidate-cache
