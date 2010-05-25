@@ -3398,10 +3398,16 @@ You can edit the line."
     (lambda () ,@forms)))
 (put 'anything-edit-current-selection 'lisp-indent-function 0)
 
+(defun anything-set-pattern (pattern)
+  "Set minibuffer contents to PATTERN."
+  (with-selected-window (minibuffer-window)
+    (delete-minibuffer-contents)
+    (insert pattern)))
+
 (defun anything-delete-minibuffer-content ()
   "Same as `delete-minibuffer-contents' but this is a command."
   (interactive)
-  (delete-minibuffer-contents))
+  (anything-set-pattern ""))
 
 ;; (@* "Built-in plug-in: type")
 (defun anything-compile-source--type (source)
@@ -3904,8 +3910,7 @@ If current selection is a buffer or a file, `find-file' from its directory."
 (defun anything-yank-selection ()
   "Set minibuffer contents to current selection."
   (interactive)
-  (delete-minibuffer-contents)
-  (insert (anything-get-selection nil t)))
+  (anything-set-pattern (anything-get-selection nil t)))
 
 (defun anything-kill-selection-and-quit ()
   "Store current selection to kill ring.
