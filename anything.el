@@ -3278,10 +3278,10 @@ UNIT and DIRECTION."
     (select-window (anything-window))
     (delete-other-windows)
     (switch-to-buffer (get-buffer-create bufname))
-    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
-    (setq cursor-type nil)
     (erase-buffer)
     (funcall insert-content-fn)
+    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
+    (setq cursor-type nil)
     (goto-char 1)
     (ignore-errors
       (loop for event = (read-event) do
