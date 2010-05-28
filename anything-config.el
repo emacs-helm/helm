@@ -1664,16 +1664,20 @@ If CANDIDATE is alone, open file CANDIDATE filename."
   "Preconfigured `anything' for anything implementation of `find-file'."
   (interactive)
   (anything 'anything-c-source-find-files
-            (anything-find-files-input (ffap-guesser) (thing-at-point 'filename))
+            (anything-find-files-input (ffap-guesser)
+                                       (thing-at-point 'filename))
             "Find Files or Url: " nil nil "*Anything Find Files*"))
 
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
-  (let* ((file-p (and fap (file-exists-p fap)
-                      (file-exists-p
-                       (file-name-directory (expand-file-name tap)))))
-         (input  (if file-p (expand-file-name tap) fap)))
-    (or input (expand-file-name default-directory))))
+  (let* ((def-dir (if (eq major-mode 'dired-mode)
+                      (dired-current-directory)
+                      default-directory))
+         (file-p  (and fap (file-exists-p fap)
+                       (file-exists-p
+                        (file-name-directory (expand-file-name tap def-dir)))))
+         (input   (if file-p (expand-file-name tap def-dir) fap)))
+    (or input (expand-file-name def-dir))))
 
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
@@ -3123,7 +3127,7 @@ C-u \\[anything-execute-persistent-action]: Open URL with Firefox")))
       (goto-char (point-min))
       (when (re-search-forward (concat elm "<") nil t)
         (goto-char (1- (point)))
-        (delete-backward-char (length old-title))
+        (delete-char (- (length old-title)))
         (insert new-title))
       (save-buffer (current-buffer))
       (kill-buffer (current-buffer)))))
