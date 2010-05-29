@@ -1901,9 +1901,10 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
       (define-key dired-mode-map (kbd "H") 'dired-do-hardlink)
       (setq anything-dired-bindings nil)))
 
-(defun* anything-c-read-file-name (prompt &key (initial-input default-directory)
-                                        (buffer "*Anything Completions*")
-                                        test)
+(defun* anything-c-read-file-name (prompt &key
+                                          (initial-input (expand-file-name default-directory))
+                                          (buffer "*Anything Completions*")
+                                          test)
   "Anything `read-file-name' emulation.
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
@@ -3306,6 +3307,9 @@ http://ctags.sourceforge.net/")
 ;; Semantic
 (defvar anything-semantic-candidates nil)
 (eval-when-compile (require 'semantic nil t))
+(autoload 'semantic-format-tag-summarize "format")
+(autoload 'semantic-tag-components "tag")
+(autoload 'semantic-go-to-tag "tag-file")
 (defun anything-semantic-construct-candidates (tags depth)
   (when (require 'semantic nil t)
     (apply 'append
