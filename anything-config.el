@@ -3307,9 +3307,6 @@ http://ctags.sourceforge.net/")
 ;; Semantic
 (defvar anything-semantic-candidates nil)
 (eval-when-compile (require 'semantic nil t))
-(autoload 'semantic-format-tag-summarize "format")
-(autoload 'semantic-tag-components "tag")
-(autoload 'semantic-go-to-tag "tag-file")
 (defun anything-semantic-construct-candidates (tags depth)
   (when (require 'semantic nil t)
     (apply 'append
