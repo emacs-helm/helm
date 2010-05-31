@@ -2695,34 +2695,46 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 
 (defun anything-process-source (source)
   "Display matches from SOURCE according to its settings."
-  (let ((matches (anything-compute-matches source)))
-    (when matches
-      (when anything-test-mode
+  (if (assq 'direct-insert-match source) ;experimental
+      (anything-process-source--direct-insert-match source)
+    (let ((matches (anything-compute-matches source)))
+      (when matches
+        (when anything-test-mode
           (setq anything-test-candidate-list
                 `(,@anything-test-candidate-list
                   (,(assoc-default 'name source)
                    ,matches))))
-      (let ((multiline (assq 'multiline source))
-            (start (point))
-            separate)
-        (anything-insert-header-from-source source)
-        (dolist (match matches)
-          (if (and multiline separate)
-              (anything-insert-candidate-separator)
-            (setq separate t))
+        (let ((multiline (assq 'multiline source))
+              (start (point))
+              separate)
+          (anything-insert-header-from-source source)
+          (dolist (match matches)
+            (if (and multiline separate)
+                (anything-insert-candidate-separator)
+              (setq separate t))
 
-          (when (and anything-enable-shortcuts
-                     (not (eq anything-digit-shortcut-count
-                              (length anything-digit-overlays))))
-            (move-overlay (nth anything-digit-shortcut-count
-                               anything-digit-overlays)
-                          (line-beginning-position)
-                          (line-beginning-position))
-            (incf anything-digit-shortcut-count))
-          (anything-insert-match match 'insert source))
+            (when (and anything-enable-shortcuts
+                       (not (eq anything-digit-shortcut-count
+                                (length anything-digit-overlays))))
+              (move-overlay (nth anything-digit-shortcut-count
+                                 anything-digit-overlays)
+                            (line-beginning-position)
+                            (line-beginning-position))
+              (incf anything-digit-shortcut-count))
+            (anything-insert-match match 'insert source))
         
-        (if multiline
-            (put-text-property start (point) 'anything-multiline t))))))
+          (if multiline
+              (put-text-property start (point) 'anything-multiline t)))))))
+
+(defun anything-process-source--direct-insert-match (source)
+  "[EXPERIMENTAL] Insert candidates from `anything-candidate-buffer'"
+  (let ((anything-source-name (assoc-default 'name source))
+        content-buf)
+    (funcall (assoc-default 'candidates source))
+    (setq content-buf (anything-candidate-buffer))
+    (unless (zerop (buffer-size content-buf))
+      (anything-insert-header-from-source source)
+      (insert-buffer-substring content-buf))))
 
 (defun anything-process-delayed-sources (delayed-sources)
   "Process delayed sources if the user is idle for
