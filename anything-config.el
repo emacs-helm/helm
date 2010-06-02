@@ -3893,8 +3893,8 @@ See http://orgmode.org for the latest version.")
   (insert
    (save-excursion
      (anything-goto-line (car lineno-and-content))
-     (and (looking-at "^\\*+ \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
-          (org-make-link-string (concat "*" (match-string 1)))))))
+     (and (looking-at org-complex-heading-regexp)
+          (org-make-link-string (concat "*" (match-string 4)))))))
 
 ;; (anything 'anything-c-source-org-headline)
 
