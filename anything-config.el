@@ -4954,7 +4954,8 @@ package name - description."
                ("Copy in kill-ring" . kill-new)
                ("insert at point" . insert)
                ("Browse HomePage" . (lambda (elm)
-                                      (browse-url (car (anything-c-gentoo-get-url elm)))))
+                                      (let ((urls (anything-c-gentoo-get-url elm)))
+                                        (browse-url (anything-comp-read "Url: " urls)))))
                ("Show extra infos" . (lambda (elm)
                                        (if (member elm anything-c-cache-world)
                                            (anything-c-gentoo-eshell-action elm "genlop -qi")
@@ -5092,8 +5093,18 @@ package name - description."
 
 (defun anything-c-gentoo-get-url (elm)
   "Return a list of urls from eix output."
-  (split-string (eshell-command-result
-                 (format "eix %s | grep Homepage | awk '{print $2}'" elm))))
+  (loop
+     with url-list = (split-string
+                      (with-temp-buffer
+                        (call-process "eix" nil t nil
+                                      elm "--format" "<homepage>\n")
+                        (buffer-string)))
+     with all
+     for i in url-list
+     when (and (string-match "^http://.*" i)
+               (not (member i all)))
+     collect i into all
+     finally return all))
 
 (defun anything-c-gentoo-get-world ()
   "Return list of all installed package on your system."
