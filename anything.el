@@ -3784,21 +3784,6 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   (setq anything-visible-mark-overlays nil))
 (add-hook 'anything-after-initialize-hook 'anything-clear-visible-mark)
 
-;; (defun anything-toggle-visible-mark ()
-;;   (interactive)
-;;   (with-anything-window
-;;     (anything-aif (loop for o in anything-visible-mark-overlays
-;;                         when (equal (line-beginning-position) (overlay-start o))
-;;                         do (return o))
-;;         ;; delete
-;;         (progn (delete-overlay it)
-;;                (delq it anything-visible-mark-overlays))
-;;       (let ((o (make-overlay (line-beginning-position) (1+ (line-end-position)))))
-;;         (overlay-put o 'face anything-visible-mark-face)
-;;         (overlay-put o 'source (assoc-default 'name (anything-get-current-source)))
-;;         (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
-;;         (add-to-list 'anything-visible-mark-overlays o)))))
-
 (defvar anything-c-marked-candidate-list nil
   "[OBSOLETE] DO NOT USE!!")
 (defvar anything-marked-candidates nil
