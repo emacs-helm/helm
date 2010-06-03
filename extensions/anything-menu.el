@@ -120,7 +120,7 @@
                                 activate
                              end")))
 (defun am/write-result (line)
-  (write-region (or line "") nil am/tmp-file))
+  (write-region (or line "") nil am/tmp-file nil 'silent))
 
 (defun anything-menu (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
   "Call `anything' outside Emacs.
