@@ -1698,6 +1698,7 @@ It is useful to select a particular object instead of the first one. ")
   '( anything-candidate-number-limit
      anything-source-filter
      anything-source-in-each-line-flag
+     anything-map
      anything-sources)
   "Variables which are restored after `anything' invocation.")
 ;; `anything-saved-sources' is removed
@@ -2249,12 +2250,13 @@ already-bound variables. Yuck!
                                  anything-quit
                                  (case-fold-search t)
                                  (anything-buffer (or any-buffer anything-buffer))
-                                 (anything-map (or any-keymap anything-map))
                                  ;; cua-mode ; avoid error when region is selected
                                  )
         (with-anything-restore-variables
           (anything-frame/window-configuration 'save)
           (setq anything-sources (anything-normalize-sources any-sources))
+          ;; anything-map should be buffer-local
+          (unless any-resume (setq anything-map (or any-keymap anything-map)))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
           (if (eq any-resume t)
@@ -6359,6 +6361,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                 `((,source . "mark1")
                   (((name . "other")) . "mark2")
                   (,source . "mark3"))))
+          (stub anything-buffer-get => (current-buffer))
           (stub anything-get-current-source => source)
           (anything-marked-candidates)))
       (expect '("current")
