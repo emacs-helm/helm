@@ -2257,11 +2257,7 @@ already-bound variables. Yuck!
           (setq anything-sources (anything-normalize-sources any-sources))
           (anything-initialize-1 any-resume any-input)
           (anything-hooks 'setup)
-          (if (eq any-resume t)
-              (condition-case x
-                  (anything-window-configuration 'restore)
-                (error (anything-display-buffer anything-buffer)))
-            (anything-display-buffer anything-buffer))
+          (anything-display-buffer anything-buffer)
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume any-keymap)
             (anything-cleanup)
@@ -2330,19 +2326,6 @@ already-bound variables. Yuck!
     (push elt (symbol-value list-var))))
 
 ;;; (@* "Core: Accessors")
-(defvar anything-window-configuration nil)
-;;; (set-window-configuration (buffer-local-value 'anything-window-configuration (get-buffer "*anything buffers*")))
-(defun anything-window-configuration (save-or-restore)
-  (case save-or-restore
-    ((save store)
-     (with-current-buffer anything-buffer
-       (set (make-local-variable 'anything-window-configuration)
-            (current-window-configuration))))
-    ((restore set)
-     (with-current-buffer anything-buffer
-       (set-window-configuration anything-window-configuration))
-     (select-window (anything-window)))))
-
 (defvar anything-current-position nil
   "Cons of (point) and (window-start) when `anything' is invoked.
 It is needed because restoring position when `anything' is keyboard-quitted.")
@@ -2387,7 +2370,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 ;; (@* "Core: Display *anything* buffer")
 (defun anything-display-buffer (buf)
   "Display *anything* buffer."
-  (funcall anything-display-function buf))
+  (funcall (with-current-buffer buf anything-display-function) buf))
 
 (defun anything-default-display-buffer (buf)
   (funcall (if anything-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
@@ -2445,6 +2428,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (set (make-local-variable 'inhibit-read-only) t)
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
     (set (make-local-variable 'anything-follow-mode) nil)
+    (set (make-local-variable 'anything-display-function) anything-display-function)
     
     (setq cursor-type nil)
     (setq mode-name "Anything"))
@@ -2481,8 +2465,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 
 (defun anything-hooks (setup-or-cleanup)
   (let ((hooks '((post-command-hook anything-check-minibuffer-input)
-                 (minibuffer-setup-hook anything-print-error-messages)
-                 (minibuffer-exit-hook (lambda () (anything-window-configuration 'save))))))
+                 (minibuffer-setup-hook anything-print-error-messages))))
     (if (eq setup-or-cleanup 'setup)
         (dolist (args hooks) (apply 'add-hook args))
       (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
@@ -3365,17 +3348,17 @@ You can set user options `fit-frame-max-width-percent' and
            (top . 0))))))) ; The (top . 0) shouldn't be necessary (Emacs bug).
 
 (defun anything-preselect (candidate-or-regexp)
-  (when candidate-or-regexp
-    (with-anything-window
+  (with-anything-window
+    (when candidate-or-regexp
       (goto-char (point-min))
       ;; go to first candidate of first source
       (forward-line 1)
       (let ((start (point)))
         (unless (or (re-search-forward (concat "^" (regexp-quote candidate-or-regexp) "$") nil t)
-                (progn (goto-char start)
-                       (re-search-forward candidate-or-regexp nil t)))
-          (goto-char start))
-        (anything-mark-current-line)))))
+                    (progn (goto-char start)
+                           (re-search-forward candidate-or-regexp nil t)))
+          (goto-char start))))
+    (anything-mark-current-line)))
 
 (defun anything-delete-current-selection ()
   "Delete the currently selected item."
