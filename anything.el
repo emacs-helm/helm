@@ -3780,8 +3780,10 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defvar anything-visible-mark-overlays nil)
 
 (defun anything-clear-visible-mark ()
-  (mapc 'delete-overlay anything-visible-mark-overlays)
-  (setq anything-visible-mark-overlays nil))
+  (with-current-buffer (anything-buffer-get)
+    (mapc 'delete-overlay anything-visible-mark-overlays)
+    (set (make-local-variable 'anything-visible-mark-overlays)
+         nil)))
 (add-hook 'anything-after-initialize-hook 'anything-clear-visible-mark)
 
 (defvar anything-c-marked-candidate-list nil
@@ -3831,19 +3833,21 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 otherwise 1-element list of current selection.
 
 It is analogous to `dired-get-marked-files'."
-  (if anything-marked-candidates
-      (loop with current-src = (anything-get-current-source)
-            for (source . real) in (reverse anything-marked-candidates)
-            when (eq current-src source)
-            collect real)
-    (list (anything-get-selection))))
+  (with-current-buffer (anything-buffer-get)
+    (if anything-marked-candidates
+        (loop with current-src = (anything-get-current-source)
+              for (source . real) in (reverse anything-marked-candidates)
+              when (equal current-src source)
+              collect real)
+      (list (anything-get-selection)))))
 
 (defun anything-reset-marked-candidates ()
-  (setq anything-c-marked-candidate-list nil)
-  (setq anything-marked-candidates nil))
+  (with-current-buffer (anything-buffer-get)
+    (set (make-local-variable 'anything-c-marked-candidate-list) nil)
+    (set (make-local-variable 'anything-marked-candidates) nil)))
 
 (add-hook 'anything-after-initialize-hook 'anything-reset-marked-candidates)
-(add-hook 'anything-after-action-hook 'anything-reset-marked-candidates)
+;; (add-hook 'anything-after-action-hook 'anything-reset-marked-candidates)
 
 (defun anything-revive-visible-mark ()
   (interactive)
