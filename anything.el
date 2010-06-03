@@ -2255,9 +2255,7 @@ already-bound variables. Yuck!
         (with-anything-restore-variables
           (anything-frame/window-configuration 'save)
           (setq anything-sources (anything-normalize-sources any-sources))
-          ;; anything-map should be buffer-local
-          (unless any-resume (setq anything-map (or any-keymap anything-map)))
-          (anything-initialize-1 any-resume any-input)
+          (anything-initialize-1 any-resume any-input any-keymap)
           (anything-hooks 'setup)
           (if (eq any-resume t)
               (condition-case x
@@ -2279,11 +2277,11 @@ already-bound variables. Yuck!
   "Whethre current anything session is resumed or not."
   (memq any-resume '(t window-only)))
 
-(defun anything-initialize-1 (any-resume any-input)
+(defun anything-initialize-1 (any-resume any-input any-keymap)
   (anything-current-position 'save)
   (if (anything-resume-p any-resume)
       (anything-initialize-overlays (anything-buffer-get))
-    (anything-initialize))
+    (anything-initialize any-keymap))
   (unless (eq any-resume 'noresume)
     (anything-recent-push anything-buffer 'anything-buffers)
     (setq anything-last-buffer anything-buffer))
@@ -2395,7 +2393,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (funcall (if anything-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
 
 ;; (@* "Core: initialize")
-(defun anything-initialize ()
+(defun anything-initialize (any-keymap)
   "Initialize anything settings and set up the anything buffer."
   (run-hooks 'anything-before-initialize-hook)
   (setq anything-once-called-functions nil)
@@ -2414,6 +2412,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (setq anything-last-sources anything-sources)
 
   (anything-create-anything-buffer)
+  (with-current-buffer anything-buffer
+    (and any-keymap (set (make-local-variable 'anything-map) any-keymap)))
   (run-hooks 'anything-after-initialize-hook))
 
 (defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume)
@@ -2421,7 +2421,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (select-frame-set-input-focus (window-frame (minibuffer-window)))
   (anything-preselect any-preselect)
   (let ((ncandidate (anything-approximate-candidate-number))
-        (minibuffer-local-map anything-map))
+        (minibuffer-local-map (with-current-buffer (anything-buffer-get)
+                                anything-map)))
     (cond ((and anything-execute-action-at-once-if-one
                 (= ncandidate 1))
            (ignore))
