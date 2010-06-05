@@ -5026,13 +5026,13 @@ package name - description."
                     (font-lock-mode 1)))
                ("Enable"
                 . (lambda (elm)
-                    (anything-c-gentoo-eshell-action elm "*sudo euse -E")))
+                    (anything-c-gentoo-eshell-action elm "*sudo -p Password: euse -E")))
                ("Disable"
                 . (lambda (elm)
-                    (anything-c-gentoo-eshell-action elm "*sudo euse -D")))
+                    (anything-c-gentoo-eshell-action elm "*sudo -p Password: euse -D")))
                ("Remove"
                 . (lambda (elm)
-                    (anything-c-gentoo-eshell-action elm "*sudo euse -P")))
+                    (anything-c-gentoo-eshell-action elm "*sudo -p Password: euse -P")))
                ("Show which dep use this flag"
                 . (lambda (elm)
                     (switch-to-buffer anything-c-gentoo-buffer)
