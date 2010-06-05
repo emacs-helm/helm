@@ -2421,7 +2421,11 @@ source.")
                               (woman-file-name "")
                               (sort (mapcar 'car woman-topic-all-completions)
                                     'string-lessp))))))
-    (action  ("Show with Woman" . woman))
+    (action  ("Show with Woman" . (lambda (candidate)
+                                    (let ((wfiles (woman-file-name-all-completions candidate)))
+                                      (if (> (length wfiles) 1)
+                                          (woman-find-file (anything-comp-read "ManFile: " wfiles))
+                                          (woman candidate))))))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)
