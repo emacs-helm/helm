@@ -2424,7 +2424,8 @@ source.")
     (action  ("Show with Woman" . (lambda (candidate)
                                     (let ((wfiles (woman-file-name-all-completions candidate)))
                                       (if (> (length wfiles) 1)
-                                          (woman-find-file (anything-comp-read "ManFile: " wfiles))
+                                          (woman-find-file (anything-comp-read "ManFile: " wfiles
+                                                                               :must-match t))
                                           (woman candidate))))))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
@@ -4959,7 +4960,7 @@ package name - description."
                ("insert at point" . insert)
                ("Browse HomePage" . (lambda (elm)
                                       (let ((urls (anything-c-gentoo-get-url elm)))
-                                        (browse-url (anything-comp-read "Url: " urls)))))
+                                        (browse-url (anything-comp-read "Url: " urls :must-match t)))))
                ("Show extra infos" . (lambda (elm)
                                        (if (member elm anything-c-cache-world)
                                            (anything-c-gentoo-eshell-action elm "genlop -qi")
