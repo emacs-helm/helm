@@ -4355,11 +4355,10 @@ Return an alist with elements like (data . number_results)."
                       :must-match t)))
   (let* ((engine-nodesc (car (split-string engine)))
          (url (with-temp-buffer
-                (apply #'call-process "surfraw" nil t nil
-                       `(,engine-nodesc
-                         "-p"
-                         ,pattern))
-                (buffer-string))))
+                (apply 'call-process "surfraw" nil t nil
+                       (list engine-nodesc "-p" pattern))
+                (replace-regexp-in-string
+                 "\n" "" (buffer-string)))))
     (if (string= engine-nodesc "W")
         (anything-c-browse-url)
         (anything-c-browse-url url))))
