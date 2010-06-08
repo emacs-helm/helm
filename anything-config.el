@@ -794,28 +794,6 @@ You may bind this command to M-y."
                          "*anything gentoo*"))
 
 ;;;###autoload
-(defun anything-surfraw-only ()
-  "Preconfigured `anything' for surfraw.
-If region is marked set anything-pattern to region.
-With one prefix arg search symbol at point.
-With two prefix args allow choosing in which symbol to search."
-  (interactive)
-  (let (search pattern)
-    (cond ((region-active-p)
-           (setq pattern (buffer-substring (region-beginning) (region-end))))
-          ((equal current-prefix-arg '(4))
-           (setq pattern (thing-at-point 'symbol)))
-          ((equal current-prefix-arg '(16))
-           (setq search
-                 (intern
-                  (completing-read "Search in: "
-                                   (list "symbol" "sentence" "sexp" "line" "word"))))
-           (setq pattern (thing-at-point search))))
-    (anything 'anything-c-source-surfraw
-              (and pattern (replace-regexp-in-string "\n" "" pattern))
-              nil nil nil "*anything surfraw*")))
-
-;;;###autoload
 (defun anything-imenu ()
   "Preconfigured `anything' for `imenu'."
   (interactive)
@@ -4326,85 +4304,65 @@ Return an alist with elements like (data . number_results)."
 ;;; Need external program surfraw.
 ;;; http://surfraw.alioth.debian.org/
 ;; user variables
-(defvar anything-c-surfraw-favorites '("google" "wikipedia"
-                                       "yahoo" "translate"
-                                       "codesearch" "genpkg"
-                                       "genportage" "fast" 
-                                       "currency")
-  "All elements of this list will appear first in results.")
-(defvar anything-c-surfraw-use-only-favorites nil
-  "If non-nil use only `anything-c-surfraw-favorites'.")
+(require 'browse-url)
+(defvar w3m-command nil)
 
+(defvar anything-browse-url-default-browser-alist
+  `((,w3m-command . w3m-browse-url)
+    (,browse-url-firefox-program . browse-url-firefox)
+    (,browse-url-kde-program . browse-url-kde)
+    (,browse-url-gnome-moz-program . browse-url-gnome-moz)
+    (,browse-url-mozilla-program . browse-url-mozilla)
+    (,browse-url-galeon-program . browse-url-galeon)
+    (,browse-url-netscape-program . browse-url-netscape)
+    (,browse-url-mosaic-program . browse-url-mosaic)
+    (,browse-url-xterm-program . browse-url-text-xterm))
+  "*Alist of (executable . function) to try to find a suitable url browser.")
 
-(defun anything-c-build-elvi-alist ()
-  "Build elvi alist.
-A list of search engines."
-  (let* ((elvi-list
-          (with-temp-buffer
-            (call-process "surfraw" nil t nil
-                          "-elvi")
-            (split-string (buffer-string) "\n")))
-         (elvi-alist
-          (let (line)
-            (loop for i in elvi-list
-               do
-               (setq line (split-string i))
-               collect (cons (first line) (mapconcat #'(lambda (x) x) (cdr line) " "))))))
-    elvi-alist))
+(defvar anything-c-home-url "http://www.google.fr"
+  "*Default url to use as home url.")
 
-(defun anything-c-surfraw-sort-elvi (&optional only-fav)
-  "Sort elvi alist according to `anything-c-surfraw-favorites'."
-  (let* ((elvi-alist (anything-c-build-elvi-alist))
-         (fav-alist (loop for j in anything-c-surfraw-favorites
-                      collect (assoc j elvi-alist)))
-         (rest-elvi (loop for i in elvi-alist
-                         if (not (member i fav-alist))
-                         collect i)))
-    (if only-fav
-        fav-alist
-        (append fav-alist rest-elvi))))
+(defun anything-browse-url-default-browser (url &rest args)
+  "Find a suitable browser and ask it to load URL."
+  (let ((default-browser (loop
+                            for i in anything-browse-url-default-browser-alist
+                            when (executable-find (car i)) return (cdr i))))
+    (if default-browser
+        (apply default-browser url args)
+        (error "No usable browser found"))))
 
-(defun anything-c-surfraw-get-url (engine pattern)
-  "Get search url from `engine' for `anything-pattern'."
-  (with-temp-buffer
-    (apply #'call-process "surfraw" nil t nil
-           `(,engine
-             "-p"
-             ,anything-pattern))
-    (buffer-string)))
+(defun* anything-c-browse-url (&optional (url anything-c-home-url))
+  "Default command to browse URL."
+  (if browse-url-browser-function
+      (browse-url url)
+      (anything-browse-url-default-browser url)))
 
+(defun anything-c-build-elvi-list ()
+  "Return list of all engines and descriptions handled by surfraw."
+  (cdr
+   (with-temp-buffer
+     (call-process "surfraw" nil t nil
+                   "-elvi")
+     (split-string (buffer-string) "\n"))))
 
-(defvar anything-c-surfraw-elvi nil)
-(defvar anything-c-surfraw-cache nil)
-(defvar anything-c-source-surfraw
-  '((name . "Surfraw")
-    (init . (lambda ()
-              (unless anything-c-surfraw-cache
-                (setq anything-c-surfraw-elvi (anything-c-surfraw-sort-elvi
-                                               anything-c-surfraw-use-only-favorites))
-                (setq anything-c-surfraw-cache
-                      (loop for i in anything-c-surfraw-elvi 
-                         if (car i)
-                         collect (car i))))))
-    (candidates . (lambda ()
-                    (loop for i in anything-c-surfraw-cache
-                       for s = (anything-c-surfraw-get-url i anything-pattern)
-                       collect (concat (propertize i
-                                                   'face '((:foreground "green"))
-                                                   'help-echo (cdr (assoc i anything-c-surfraw-elvi)))
-                                       ">>>" (replace-regexp-in-string "\n" "" s)))))
-    (action . (("Browse" . (lambda (candidate)
-                             (let ((url (second (split-string candidate ">>>"))))
-                               (browse-url url))))
-               ("Browse firefox" . (lambda (candidate)
-                                     (let ((url (second (split-string candidate ">>>"))))
-                                       (browse-url-firefox url t))))))
-    (volatile)
-    (requires-pattern . 3)
-    (multiline)
-    (delayed)))
-
-;; (anything 'anything-c-source-surfraw)
+;;;###autoload
+(defun anything-surfraw (pattern engine)
+  "Search PATTERN with search ENGINE."
+  (interactive (list (read-string "SearchFor: ")
+                     (anything-comp-read
+                      "Engine: "
+                      (anything-c-build-elvi-list)
+                      :must-match t)))
+  (let* ((engine-nodesc (car (split-string engine)))
+         (url (with-temp-buffer
+                (apply #'call-process "surfraw" nil t nil
+                       `(,engine-nodesc
+                         "-p"
+                         ,pattern))
+                (buffer-string))))
+    (if (string= engine-nodesc "W")
+        (anything-c-browse-url)
+        (anything-c-browse-url url))))
 
 ;;; Emms
 
