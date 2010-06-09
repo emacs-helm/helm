@@ -1451,7 +1451,7 @@ buffer that is not the current buffer."
     (action
      . ,(delq
          nil
-         `(("Find File" . find-file-at-point)
+         `(("Find File" . anything-c-find-file-or-marked)
            ("Find file in Dired" . anything-c-point-file-in-dired)
            ,(and (locate-library "elscreen")
                  '("Find file in Elscreen"  . anything-elscreen-find-file))
@@ -6049,9 +6049,10 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   (substitute-command-keys
    (concat "\\<anything-map>\\[anything-execute-persistent-action]: "
            (or (anything-interpret-value (anything-attr 'persistent-help))
-               (anything-aif (or (assoc-default 'persistent-action (anything-get-current-source))
-                                 (assoc-default 'action (anything-get-current-source))
-                                 )
+               (anything-aif (or (assoc-default 'persistent-action
+                                                (anything-get-current-source))
+                                 (assoc-default 'action
+                                                (anything-get-current-source)))
                    (cond ((symbolp it) (symbol-name it))
                          ((listp it) (or (ignore-errors (caar it))  ""))))
                "")
@@ -6064,6 +6065,13 @@ It also accepts a function or a variable name.")
 ;;; (anything '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun anything-c-find-file-or-marked (candidate)
+  "Open file CANDIDATE or open anything marked files in background."
+  (let ((marked (anything-marked-candidates)))
+    (if (> (length marked) 1)
+        (dolist (i marked) (find-file-noselect i))
+        (find-file-at-point candidate))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
