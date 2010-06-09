@@ -4465,8 +4465,8 @@ Return an alist with elements like (data . number_results)."
   '((name . "Emms files")
     (candidates . (lambda ()
                     (loop for v being the hash-values in emms-cache-db
-                       when (assq 'info-file v)
-                       collect (assoc-default 'info-file v))))
+                       for name = (assoc-default 'name v)
+                       unless (string-match "^http:" name) collect name)))
     (candidate-transformer . anything-c-emms-files-modifier)
     (action . (("Play file" . emms-play-file)
                ("Add to Playlist and play"
