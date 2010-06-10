@@ -4459,6 +4459,7 @@ Return an alist with elements like (data . number_results)."
 (defun anything-c-emms-play-current-playlist ()
   "Play current playlist."
   (with-current-emms-playlist
+    (emms-playlist-first)
     (emms-playlist-mode-play-smart)))
 
 (defvar anything-c-source-emms-files
@@ -4474,7 +4475,8 @@ Return an alist with elements like (data . number_results)."
                     (emms-playlist-new)
                     (dolist (i (anything-marked-candidates))
                       (emms-add-playlist-file i))
-                    (anything-c-emms-play-current-playlist)))))))
+                    (unless emms-player-playing-p
+                      (anything-c-emms-play-current-playlist))))))))
 
 ;; (anything 'anything-c-source-emms-files)
 
