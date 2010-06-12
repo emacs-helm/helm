@@ -1625,17 +1625,21 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."
-  (let* ((end         (point))
-         (guess       (thing-at-point 'filename))
-         (full-path-p (or (string-match (concat "^" (getenv "HOME")) guess)
-                          (string-match "^[^\~]" guess))))
-    (set-text-properties 0 (length candidate) nil candidate)
-    (when (and guess (not (string= guess "")))
-      (search-backward guess (- (point) (length guess)))
-      (delete-region (point) end)
-      (if full-path-p
-          (insert (expand-file-name candidate))
-          (insert (abbreviate-file-name candidate))))))
+  (if buffer-read-only
+      (error "Error: Buffer `%s' is read-only" (buffer-name))
+      (let* ((end         (point))
+             (guess       (thing-at-point 'filename))
+             (full-path-p (or (string-match (concat "^" (getenv "HOME")) guess)
+                              (string-match "^[^\~]" guess))))
+        (set-text-properties 0 (length candidate) nil candidate)
+        (if (and guess (not (string= guess "")))
+            (progn
+              (search-backward guess (- (point) (length guess)))
+              (delete-region (point) end)
+              (if full-path-p
+                  (insert (expand-file-name candidate))
+                  (insert (abbreviate-file-name candidate))))
+            (message "I see nothing to complete here!")))))
 
 ;;;###autoload
 (defun anything-find-files ()
