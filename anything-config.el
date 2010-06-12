@@ -4609,7 +4609,6 @@ Return an alist with elements like (data . number_results)."
   '((name . "Create")
     (dummy)
     (action)
-    (candidate-number-limit . 9999)
     (action-transformer . anything-create--actions))
   "Do many create actions from `anything-pattern'.
 See also `anything-create--actions'.")
