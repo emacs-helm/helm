@@ -4628,7 +4628,7 @@ See also `anything-create--actions'."
   (anything '(((name . "Anything Create")
                (header-name . (lambda (_) (format "Action for \"%s\"" string)))
                (candidates . anything-create--actions)
-               (candidate-number-limit . 9999)
+               (candidate-number-limit)
                (action . (lambda (func) (funcall func string)))))))
 
 (defun anything-create--actions (&rest ignored)
