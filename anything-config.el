@@ -3567,16 +3567,18 @@ utility mdfind.")
 (defvar anything-c-source-kill-ring
   '((name . "Kill Ring")
     (init . (lambda () (anything-attrset 'last-command last-command)))
-    (candidates . (lambda ()
-                    (loop for kill in kill-ring
-                          unless (or (< (length kill) anything-kill-ring-threshold)
-                                     (string-match "^[\\s\\t]+$" kill))
-                          collect kill)))
+    (candidates . anything-c-kill-ring-candidates)
     (action . anything-c-kill-ring-action)
     (last-command)
     (migemo)
     (multiline))
   "Source for browse and insert contents of kill-ring.")
+
+(defun anything-c-kill-ring-candidates ()
+  (loop for kill in kill-ring
+        unless (or (< (length kill) anything-kill-ring-threshold)
+                   (string-match "^[\\s\\t]+$" kill))
+        collect kill))
 
 (defun anything-c-kill-ring-action (str)
   "Insert STR in `kill-ring' and set STR to the head.
