@@ -185,6 +185,10 @@
 ;; Preconfigured `anything' to edit or view EmacsWiki page.
 ;; `anything-yaoddmuse-emacswiki-post-library'
 ;; Preconfigured `anything' to post library to EmacsWiki.
+;; `anything-eval-expression'
+;; Preconfigured anything for `anything-c-source-evaluation-result'.
+;; `anything-eval-expression-with-eldoc'
+;; Same as `anything-eval-expression' but with `eldoc' support.
 ;; `anything-surfraw'
 ;; Search PATTERN with search ENGINE.
 ;; `anything-emms-stream-edit-bookmark'
@@ -1485,10 +1489,8 @@ If EXPAND is non--nil expand-file-name."
         (if (string= result "~/") "~/" result)
         (if (< level 0)
             (if empty "../" (concat "../" result))
-            (cond ((and (eq system-type 'windows-nt) empty)
-                   "c:/")
-                  ((and (not empty) (eq system-type 'windows-nt))
-                   result)
+            (cond ((eq system-type 'windows-nt)
+                   (if empty "c:/" result))
                   (empty "/")
                   (t
                    (concat "/" result)))))))
@@ -4184,8 +4186,41 @@ removed."
                                              (pp-to-string
                                               (eval (read anything-pattern)))
                                            (error "Error")))))
-    (action ("Do Nothing" . ignore))))
+    (action ("Copy result to kill-ring" . kill-new))))
 ;; (anything 'anything-c-source-evaluation-result)
+
+;;;###autoload
+(defun anything-eval-expression ()
+  "Preconfigured anything for `anything-c-source-evaluation-result'."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-evaluation-result
+                         "*anything eval*"))
+
+;;;###autoload
+(defun anything-eval-expression-with-eldoc ()
+  "Same as `anything-eval-expression' but with `eldoc' support."
+  (interactive)
+  (if (window-system)
+      (let ((timer (run-with-idle-timer eldoc-idle-delay
+                                        'repeat 'anything-eldoc-show-in-eval)))
+        (unwind-protect
+             (call-interactively 'anything-eval-expression)
+          (cancel-timer timer)))
+      (call-interactively 'anything-eval-expression)))
+
+(defun anything-eldoc-show-in-eval ()
+  "Return eldoc in a tooltip for current minibuffer input."
+  (let* ((str-all (minibuffer-completion-contents))
+         (sym     (when str-all
+                    (with-temp-buffer
+                      (insert str-all)
+                      (goto-char (point-max))
+                      (unless (looking-back ")\\|\"") (forward-char -1))
+                      (eldoc-current-symbol))))
+         (doc     (or (eldoc-get-var-docstring sym)
+                      (eldoc-get-fnsym-args-string
+                       (car (eldoc-fnsym-in-current-sexp))))))
+    (when doc (tooltip-show doc))))
 
 ;;; Calculation Result
 (defvar anything-c-source-calculation-result
