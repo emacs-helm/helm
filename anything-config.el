@@ -1489,10 +1489,8 @@ If EXPAND is non--nil expand-file-name."
         (if (string= result "~/") "~/" result)
         (if (< level 0)
             (if empty "../" (concat "../" result))
-            (cond ((and (eq system-type 'windows-nt) empty)
-                   "c:/")
-                  ((and (not empty) (eq system-type 'windows-nt))
-                   result)
+            (cond ((eq system-type 'windows-nt)
+                   (if empty "c:/" result))
                   (empty "/")
                   (t
                    (concat "/" result)))))))
