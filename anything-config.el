@@ -5242,17 +5242,11 @@ Collection can be a list, vector, obarray or hash-table."
 
 (defun anything-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
-  (let ((process-list (list-system-processes)))
-    (catch 'break
-      (dolist (i process-list)
-        (let ((process-attr (process-attributes i)))
-          (when process-attr
-            (when (string-match process-name
-                                (cdr (assq 'comm
-                                           process-attr)))
-              (throw 'break
-                i))))))))
-
+  (loop with process-list = (list-system-processes)
+     for pid in process-list
+     for process = (assoc-default 'comm (process-attributes pid))
+     when (and process (string-match process-name process))
+     return pid))
 
 ;;;###autoload
 (defun anything-c-run-external-command (program)
