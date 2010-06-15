@@ -5271,9 +5271,9 @@ In this case EXE must be provided as \"EXE %s\"."
            (get-process real-com)
            #'(lambda (process event)
                (when (string= event "finished\n")
-                 (message "%s process...Finished." process)
                  (when anything-raise-command
-                   (shell-command  (format anything-raise-command "emacs"))))))
+                   (shell-command  (format anything-raise-command "emacs")))
+                 (message "%s process...Finished." process))))
           (setq anything-c-external-commands-list
                 (push (pop (nthcdr (anything-c-position
                                     real-com anything-c-external-commands-list
