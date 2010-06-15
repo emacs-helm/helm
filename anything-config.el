@@ -941,9 +941,9 @@ See man locate for more infos."
           (format "%5d: %s" (line-number-at-pos s) (buffer-substring s e))
           ;; subexps
           (loop for i from 0 to (1- (/ (length (match-data)) 2))
-                unless (zerop i)
-                collect (format "\n         $%d = %s"
-                                i (match-string i))))
+                collect (format "\n         \\%s = %s"
+                                (if (zerop i) "&" i)
+                                (match-string i))))
    ;; match beginning
    ;; KLUDGE: point of anything-candidate-buffer is +1 than that of anything-current-buffer.
    ;; It is implementation problem of candidates-in-buffer.
