@@ -260,8 +260,8 @@
 ;; Default Value: t
 ;; `anything-tramp-verbose'
 ;; Default Value: 0
-;; `anything-back-to-emacs-shell-command'
-;; Default Value: "    (stumpish eval \"(stumpwm::emacs)\")"
+;; `anything-raise-command'
+;; Default Value: "    (stumpish eval \"(stumpwm::%s)\")"
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -618,12 +618,13 @@ If you want to have the default tramp messages set it to 3."
   :type 'integer
   :group 'anything-config)
 
-(defcustom anything-back-to-emacs-shell-command nil
-  "*A shell command to come back to Emacs after running externals programs.
+(defcustom anything-raise-command nil
+  "*A shell command to jump to a window running specific program.
 Stumpwm users could use:
-\"stumpish eval \"\(stumpwm::emacs\)\"\".
+\"stumpish eval \"\(stumpwm::%s\)\"\".
 With others windows manager you could use:
-\"wmctrl -xa emacs\"."
+\"wmctrl -xa %s\".
+Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
@@ -5248,6 +5249,38 @@ Collection can be a list, vector, obarray or hash-table."
      when (and process (string-match process-name process))
      return pid))
 
+
+(defun anything-run-or-raise (exe &optional file)
+  "Generic command that run asynchronously EXE.
+If EXE is already running just jump to his window if `anything-raise-command'
+is non--nil.
+When FILE argument is provided run EXE with FILE.
+In this case EXE must be provided as \"EXE %s\"."
+  (let ((real-com (car (split-string (replace-regexp-in-string " %s" "" exe)))))
+    (if (or (get-process real-com)
+            (anything-c-get-pid-from-process-name real-com))
+        (if anything-raise-command
+            (shell-command  (format anything-raise-command real-com))
+            (error "Error: %s is already running" real-com))
+        (when (member real-com anything-c-external-commands-list)
+          (message "Starting %s..." real-com)
+          (if file
+              (start-process-shell-command real-com nil (format exe file))
+              (start-process-shell-command real-com nil real-com))
+          (set-process-sentinel
+           (get-process real-com)
+           #'(lambda (process event)
+               (when (string= event "finished\n")
+                 (message "%s process...Finished." process)
+                 (when anything-raise-command
+                   (shell-command  (format anything-raise-command "emacs"))))))
+          (setq anything-c-external-commands-list
+                (push (pop (nthcdr (anything-c-position
+                                    real-com anything-c-external-commands-list
+                                    :test 'equal)
+                                   anything-c-external-commands-list))
+                      anything-c-external-commands-list))))))
+
 ;;;###autoload
 (defun anything-c-run-external-command (program)
   "Run External PROGRAM asyncronously from Emacs.
@@ -5259,24 +5292,7 @@ You can set your own list of commands with
                  "RunProgram: "
                  (anything-c-external-commands-list-1 'sort)
                  :must-match t)))
-  (if (or (get-process program)
-          (anything-c-get-pid-from-process-name program))
-      (error "Error: %s is already running" program)
-      (message "Starting %s..." program)
-      (start-process-shell-command program nil program)
-      (set-process-sentinel
-       (get-process program)
-       #'(lambda (process event)
-           (when (string= event "finished\n")
-             (message "%s process...Finished." process)
-             (when anything-back-to-emacs-shell-command
-               (shell-command anything-back-to-emacs-shell-command)))))
-      (setq anything-c-external-commands-list
-            (push (pop (nthcdr (anything-c-position
-                                program anything-c-external-commands-list
-                                :test 'equal)
-                               anything-c-external-commands-list))
-                  anything-c-external-commands-list))))
+  (anything-run-or-raise program))
 
 (defsubst* anything-c-position (item seq &key (test 'eq))
   "A simple and faster replacement of CL `position'."
@@ -5406,18 +5422,8 @@ If not found or a prefix arg is given query the user which tool to use."
                           (anything-comp-read
                            "Program: "
                            collection :must-match t)
-                          " %s")))
-         (progname   (replace-regexp-in-string " %s" "" program))
-         (process    (format "%s-%s" progname fname)))
-    (start-process-shell-command process
-                   nil (format program fname))
-    (when (member progname anything-c-external-commands-list)
-      (setq anything-c-external-commands-list
-            (push (pop (nthcdr (anything-c-position
-                                progname anything-c-external-commands-list
-                                :test 'equal)
-                               anything-c-external-commands-list))
-                  anything-c-external-commands-list)))))
+                          " %s"))))
+    (anything-run-or-raise program file)))
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
