@@ -4182,8 +4182,9 @@ removed."
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
-                                             (pp-to-string
-                                              (eval (read anything-pattern)))
+                                             (with-current-buffer anything-current-buffer
+                                               (pp-to-string
+                                                (eval (read anything-pattern))))
                                            (error "Error")))))
     (action ("Copy result to kill-ring" . kill-new))))
 ;; (anything 'anything-c-source-evaluation-result)
