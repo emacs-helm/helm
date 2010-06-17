@@ -562,6 +562,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (describe-variable (anything-c-symbolify name)))
 (defun alcs-describe-face (name)
   (describe-face (anything-c-symbolify name)))
+(defun alcs-customize-face (name)
+  (customize-face (anything-c-symbolify name)))
 (defun alcs-find-function (name)
   (find-function (anything-c-symbolify name)))
 (defun alcs-find-variable (name)
@@ -674,6 +676,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     (update . alcs-make-candidates)
     (persistent-action . alcs-describe-face)
     (action
+     ("Customize Face" . alcs-customize-face)
      ("Describe Face" . alcs-describe-face))))
 (define-anything-type-attribute 'complete-function
   '((filtered-candidate-transformer alcs-sort-maybe alcs-transformer-prepend-spacer-maybe)
