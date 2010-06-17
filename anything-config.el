@@ -4184,10 +4184,17 @@ removed."
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
-                                             (pp-to-string
-                                              (eval (read anything-pattern)))
+                                             (with-current-buffer anything-current-buffer
+                                               (pp-to-string
+                                                (eval (read anything-pattern))))
                                            (error "Error")))))
-    (action ("Copy result to kill-ring" . kill-new))))
+    (action ("Copy result to kill-ring" . (lambda (candidate)
+                                            (with-current-buffer anything-buffer
+                                              (let ((end (save-excursion
+                                                           (goto-char (point-max))
+                                                           (search-backward "\n")
+                                                           (point))))
+                                                (kill-region (point) end))))))))
 ;; (anything 'anything-c-source-evaluation-result)
 
 ;;;###autoload
