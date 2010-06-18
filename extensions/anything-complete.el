@@ -531,7 +531,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   (if anything-complete-sort-candidates
       (sort candidates #'string<)
     candidates))
-
+(defun alcs-fontify-face (candidates source)
+  (mapcar
+   (lambda (facename)
+     (propertize facename 'face (intern-soft facename)))
+   candidates))
 ;;; borrowed from pulldown.el
 (defun alcs-current-physical-column ()
   "Current physical column. (not logical column)"
@@ -671,7 +675,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
      ("Describe Variable" . alcs-describe-variable)
      ("Find Variable" . alcs-find-variable))))
 (define-anything-type-attribute 'apropos-face
-  '((filtered-candidate-transformer . alcs-sort-maybe)
+  '((filtered-candidate-transformer alcs-sort-maybe alcs-fontify-face)
+    (get-line . buffer-substring)
     (header-name . alcs-header-name)
     (update . alcs-make-candidates)
     (persistent-action . alcs-describe-face)
