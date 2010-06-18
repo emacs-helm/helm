@@ -4198,11 +4198,11 @@ removed."
 ;; (anything 'anything-c-source-evaluation-result)
 
 ;;;###autoload
-(defun anything-eval-expression ()
+(defun anything-eval-expression (arg)
   "Preconfigured anything for `anything-c-source-evaluation-result'."
-  (interactive)
-  (anything-other-buffer 'anything-c-source-evaluation-result
-                         "*anything eval*"))
+  (interactive "P")
+  (anything 'anything-c-source-evaluation-result (when arg (thing-at-point 'sexp))
+            nil nil nil "*anything eval*"))
 
 ;;;###autoload
 (defun anything-eval-expression-with-eldoc ()
