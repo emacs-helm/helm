@@ -3013,8 +3013,9 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
     (candidates . (lambda ()
                     (mapcar #'car
                             anything-c-firefox-bookmarks-alist)))
-    (candidate-transformer anything-c-highlight-firefox-bookmarks)
-    (filtered-candidate-transformer . anything-c-adaptive-sort)
+    (filtered-candidate-transformer
+     anything-c-adaptive-sort
+     anything-c-highlight-firefox-bookmarks)
     (action . (("Browse Url" . (lambda (candidate)
                                  (w3m-browse-url
                                   (anything-c-firefox-bookmarks-get-value candidate)))) 
@@ -3032,8 +3033,8 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
                                         anything-c-firefox-bookmarks-alist))))
 
 
-(defun anything-c-highlight-firefox-bookmarks (books)
-  (loop for i in books
+(defun anything-c-highlight-firefox-bookmarks (bookmarks source)
+  (loop for i in bookmarks
         collect (propertize i
                             'face '((:foreground "YellowGreen"))
                             'help-echo (anything-c-firefox-bookmarks-get-value i))))
@@ -3061,8 +3062,9 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
                      anything-w3m-bookmarks-regexp))))
     (candidates . (lambda ()
                     (mapcar #'car anything-c-w3m-bookmarks-alist)))
-    (candidate-transformer anything-c-highlight-w3m-bookmarks)
-    (filtered-candidate-transformer . anything-c-adaptive-sort)
+    (filtered-candidate-transformer
+     anything-c-adaptive-sort
+     anything-c-highlight-w3m-bookmarks)
     (action . (("Browse Url" . (lambda (candidate)
                                  (anything-c-w3m-browse-bookmark candidate)))
                ("Copy Url" . (lambda (elm)
@@ -3091,8 +3093,8 @@ C-u \\[anything-execute-persistent-action]: Open URL with Firefox")))
          (arg (and (eq fn 'w3m-browse-url) new-tab)))
     (funcall fn (anything-c-w3m-bookmarks-get-value elm) arg)))
 
-(defun anything-c-highlight-w3m-bookmarks (books)
-  (loop for i in books
+(defun anything-c-highlight-w3m-bookmarks (bookmarks source)
+  (loop for i in bookmarks
         collect (propertize
                  i 'face 'anything-w3m-bookmarks-face
                  'help-echo (anything-c-w3m-bookmarks-get-value i))))
