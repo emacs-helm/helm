@@ -1635,14 +1635,14 @@ If CANDIDATE is alone, open file CANDIDATE filename."
              (full-path-p (or (string-match (concat "^" (getenv "HOME")) guess)
                               (string-match "^[^\~]" guess))))
         (set-text-properties 0 (length candidate) nil candidate)
-        (if (and guess (not (string= guess "")))
+        (if (and guess (not (string= guess "")) (string-match "^~\\|/.*" guess))
             (progn
               (search-backward guess (- (point) (length guess)))
               (delete-region (point) end)
               (if full-path-p
                   (insert (expand-file-name candidate))
                   (insert (abbreviate-file-name candidate))))
-            (message "I see nothing to complete here!")))))
+            (error "Aborting completion: No valid file name at point")))))
 
 ;;;###autoload
 (defun anything-find-files ()
