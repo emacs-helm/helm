@@ -5235,7 +5235,8 @@ See `obarray'."
         (t collection)))
 
 (defun* anything-comp-read (prompt collection &key test initial-input
-                                   (buffer "*Anything Completions*") must-match)
+                                   (buffer "*Anything Completions*") must-match
+                                   (requires-pattern 0))
   "Anything `completing-read' emulation.
 Collection can be a list, vector, obarray or hash-table."
   (when (get-buffer anything-action-buffer)
@@ -5247,6 +5248,7 @@ Collection can be a list, vector, obarray or hash-table."
               (let ((cands (anything-comp-read-get-candidates collection test)))
                 (if (or must-match (string= anything-pattern ""))
                     cands (append (list anything-pattern) cands)))))
+         (requires-pattern . ,requires-pattern)
          (volatile)
          (action . (("candidate" . ,'identity))))
        initial-input prompt 'noresume nil buffer)
