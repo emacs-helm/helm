@@ -2456,6 +2456,18 @@ To get non-interactive functions listed, use
 `anything-c-source-emacs-functions'.")
 ;; (anything 'anything-c-source-emacs-commands)
 
+;; Another replacement of `M-x' that act exactly like the
+;; vanilla Emacs one, no problem of windows configuration, prefix args
+;; are passed before calling `M-x' (e.g C-u M-x..).
+(defun anything-M-x ()
+  "Anything replacement of regular `M-x' `execute-extended-command'."
+  (interactive)
+  (let ((command (anything-comp-read "M-x " obarray
+                                     :test 'commandp
+                                     :must-match t
+                                     :requires-pattern 2)))
+    (call-interactively (intern command))))
+
 ;;; LaCarte
 (defvar anything-c-source-lacarte
   '((name . "Lacarte")
