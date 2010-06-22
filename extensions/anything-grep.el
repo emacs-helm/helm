@@ -218,6 +218,7 @@ The command is converting standard input to EUC-JP line by line. ")
 ;; (@* "core")
 (defvar anything-grep-sources nil
   "`anything-sources' for last invoked `anything-grep'.")
+(defvar anything-grep-buffer-name nil)
 (defun anything-grep-base (sources &optional bufname)
   "Invoke `anything' for `anything-grep'."
   (and anything-grep-save-buffers-before-grep
