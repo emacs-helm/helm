@@ -285,14 +285,29 @@ GNU grep is expected for COMMAND. The grep result is colorized."
                                   (format "cd %s; %s" pwd command))
      'agrep-sentinel)))
 
+(defvar agrep-do-after-minibuffer-exit nil)
+(defun agrep-minibuffer-exit-hook ()
+  (when agrep-do-after-minibuffer-exit
+    (run-at-time 1 nil agrep-do-after-minibuffer-exit)
+    (setq agrep-do-after-minibuffer-exit nil)))
+(add-hook 'minibuffer-exit-hook 'agrep-minibuffer-exit-hook)
+
+(defun agrep-show (func)
+  (if (active-minibuffer-window)
+      (setq agrep-do-after-minibuffer-exit func)
+    (funcall func)))
+;; (anything-grep "sleep 1; grep -Hin grep anything-grep.el" "~/src/anything-config/extensions/")
+
 (defun agrep-sentinel (proc stat)
   (with-current-buffer (process-buffer proc)
     (setq agrep-waiting-source (delete agrep-source-local agrep-waiting-source))
     (agrep-fontify))
   (unless agrep-waiting-source
     ;; call anything
-    (let ((anything-quit-if-no-candidate (lambda () (message "No matches"))))
-      (anything anything-grep-sources nil nil nil nil anything-grep-buffer-name))))
+    (agrep-show
+     (lambda ()
+       (let ((anything-quit-if-no-candidate (lambda () (message "No matches"))))
+         (anything anything-grep-sources nil nil nil nil anything-grep-buffer-name))))))
 
 (defun agrep-fontify ()
   "Fontify the result of `agrep-do-grep'."
