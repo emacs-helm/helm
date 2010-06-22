@@ -2425,6 +2425,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (when test-mode
     (setq anything-candidate-cache nil))
   (with-current-buffer (get-buffer-create anything-buffer)
+    (kill-all-local-variables)
     (buffer-disable-undo)
     (erase-buffer)
     (set (make-local-variable 'inhibit-read-only) t)
