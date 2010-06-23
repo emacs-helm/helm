@@ -841,8 +841,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
 ;; (ac-default-source nil)
 
 ;; (@* "`completing-read' compatible read function ")
+(defvar anything-use-original-function nil
+  "If non-nil, use original implementation not anything version.")
 (defun anything-completing-read (prompt collection &optional predicate require-match initial hist default inherit-input-method)
-  (if (or (arrayp collection) (functionp collection))
+  (if (or anything-use-original-function
+          (arrayp collection) (functionp collection))
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
     ;; support only collection list.
     (setq hist (or (car-safe hist) hist))
