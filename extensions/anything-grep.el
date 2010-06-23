@@ -387,14 +387,17 @@ It asks COMMAND for grep command line and PWD for current directory."
   "The last used name by `anything-grep-by-name'.")
 
 (defun agrep-by-name-read-info (&rest kinds)
-  (let ((result (mapcar (lambda (kind)
-                          (case kind
-                            ('query (read-string "Grep query: "))
-                            ('name (completing-read
-                                    "Grep by name: "
-                                    anything-grep-alist
-                                    nil t nil nil agbn-last-name))))
-                        kinds)))
+  (let* ((default (or (thing-at-point 'symbol) ""))
+         (result (mapcar (lambda (kind)
+                           (case kind
+                             ('query (read-string
+                                      (format "Grep query (default:%s): " default)
+                                      nil nil default))
+                             ('name (completing-read
+                                     "Grep by name: "
+                                     anything-grep-alist
+                                     nil t nil nil agbn-last-name))))
+                         kinds)))
     (if (cdr result)                    ; length >= 1
         result
       (car result))))
