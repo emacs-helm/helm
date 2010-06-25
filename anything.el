@@ -2552,12 +2552,16 @@ SOURCE."
             (dolist (f (if (functionp it) (list it) it))
               (add-to-list 'anything-delayed-init-executed name))))))
   (let* ((candidate-source (assoc-default 'candidates source))
-         (candidates (anything-interpret-value candidate-source source)))
+         (type-error (lambda ()
+                       (error (concat "Candidates must either be a function, "
+                                      " a variable or a list: %s")
+                              candidate-source)))
+         (candidates (condition-case err
+                         (anything-interpret-value candidate-source source)
+                       (error (funcall type-error)))))
     (cond ((processp candidates) candidates)
           ((listp candidates) (anything-transform-candidates candidates source))
-          (t (error (concat "Candidates must either be a function, "
-                                 " a variable or a list: %s")
-                        candidate-source)))))
+          (t (funcall type-error)))))
          
 
 (defun anything-transform-candidates (candidates source &optional process-p)
@@ -4921,6 +4925,9 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (let ((var "err"))
           (anything-get-candidates '((name . "foo")
                                      (candidates . var)))))
+      (expect (error error *)
+        (anything-get-candidates '((name . "foo")
+                                     (candidates . unDeFined-syMbol))))
       (desc "anything-compute-matches")
       (expect '("foo" "bar")
         (let ((anything-pattern ""))
