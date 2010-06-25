@@ -884,9 +884,10 @@ It accepts one argument, selected candidate.")
               '(persistent-action
                 . (lambda (cand) (funcall anything-complete-persistent-action cand)))))
          (new-input-source (ac-new-input-source prompt require-match additional-attrs))
-         (history-source (unless require-match
+         (histvar (or hist 'minibuffer-history))
+         (history-source (when (and (boundp histvar) (not require-match))
                            `((name . "History")
-                             (candidates . ,(or hist 'minibuffer-history))
+                             (candidates . ,histvar)
                              ,persistent-action
                              ,@additional-attrs)))
          (default-source (and anything-completing-read-use-default (ac-default-source default t)))
@@ -904,6 +905,8 @@ It accepts one argument, selected candidate.")
           (t
            (list default-source main-source history-source new-input-source)))))
 ;; (anything-completing-read "Command: " obarray 'commandp t)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil 'hoge-history)
+;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t nil nil "foo")
 ;; (let ((anything-complete-persistent-action 'message)) (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t))
