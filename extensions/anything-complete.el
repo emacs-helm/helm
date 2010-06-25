@@ -860,7 +860,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
       (when (stringp result)
         (prog1 result
           (setq hist (or hist 'minibuffer-history))
-          (set hist (cons result (delete result (symbol-value hist)))))))))
+          (set hist (cons result (ignore-errors (delete result (symbol-value hist))))))))))
 
 ;; TODO obarray/predicate hacks: command/variable/symbol
 (defvar anything-completing-read-use-default t
@@ -906,6 +906,7 @@ It accepts one argument, selected candidate.")
            (list default-source main-source history-source new-input-source)))))
 ;; (anything-completing-read "Command: " obarray 'commandp t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil 'hoge-history)
+;; hoge-history
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil nil nil)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t)
 ;; (anything-completing-read "Test: " '(("hoge")("foo")("bar")) nil t nil nil "foo")
