@@ -4194,6 +4194,7 @@ removed."
 ;;; Evaluation Result
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
+    (disable-shortcuts)
     (dummy)
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
