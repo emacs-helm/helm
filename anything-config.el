@@ -5429,8 +5429,9 @@ Ask to kill buffers associated with that file, too."
           (kill-buffer buf))))))
 
 (defun anything-get-mailcap-for-file (filename)
-  "Get the command to use for FILENAME from mailcap file.
+  "Get the command to use for FILENAME from mailcap files.
 The command is like <command %s> and is meant to use with `format'."
+  (mailcap-parse-mailcaps)
   (let* ((ext  (file-name-extension filename))
          (mime (when ext (mailcap-extension-to-mime ext))))
     (when mime (mailcap-mime-info mime))))
