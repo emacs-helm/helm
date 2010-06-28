@@ -169,6 +169,8 @@
 ;; Preconfigured `anything' to hardlink files from dired.
 ;; `anything-dired-bindings'
 ;; Replace usual dired commands `C' and `R' by anything ones.
+;; `anything-M-x'
+;; Anything replacement of regular `M-x' `execute-extended-command'.
 ;; `anything-manage-advice'
 ;; Preconfigured `anything' to disable/enable function advices.
 ;; `anything-bookmark-ext'
@@ -261,7 +263,7 @@
 ;; `anything-tramp-verbose'
 ;; Default Value: 0
 ;; `anything-raise-command'
-;; Default Value: "    (stumpish eval \"(stumpwm::%s)\")"
+;; Default Value: "wmctrl -xa %s"
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -348,6 +350,7 @@
 ;; `anything-c-source-bookmarks-ssh'                      (Bookmarks-ssh)
 ;; `anything-c-source-bookmarks-su'                       (Bookmarks-root)
 ;; `anything-c-source-bookmarks-local'                    (Bookmarks-Local)
+;; `anything-c-source-bmkext-addressbook'                 (Bookmark Addressbook)
 ;; `anything-c-source-bookmark-w3m'                       (Bookmark W3m)
 ;; `anything-c-source-bookmark-man'                       (Bookmark Woman&Man)
 ;; `anything-c-source-bookmark-gnus'                      (Bookmark Gnus)
@@ -2720,6 +2723,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                               (bmkext-woman-bookmark-p i))
      for handlerp      = (bookmark-get-handler i)
      for isannotation  = (bookmark-get-annotation i)
+     for isabook       = (bmkext-bookmark-addressbook-p i)
      ;; Add a * if bookmark have annotation
      if (and isannotation (not (string-equal isannotation "")))
      do (setq i (concat "*" i))
@@ -2735,6 +2739,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      ;; Man Woman
      if (or iswoman isman) 
      collect (propertize i 'face 'anything-bmkext-man 'help-echo pred)
+     if (and (not pred) isabook)
+     collect (propertize i 'face '((:foreground "Tomato")))
      ;; directories
      if (and pred (file-directory-p pred))
      collect (propertize i 'face anything-c-bookmarks-face1 'help-echo pred)
@@ -2814,6 +2820,41 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      for b = (car i)
      collect b into sa
      finally return (sort sa 'string-lessp)))
+
+;; Addressbook
+(defvar anything-c-source-bmkext-addressbook
+  '((name . "Bookmark Addressbook")
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
+    (candidates . anything-c-bmkext-addressbook-setup-alist)
+    (persistent-action . (lambda (candidate)
+                           (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
+                             (bookmark--jump-via bmk 'pop-to-buffer))))
+    (filtered-candidate-transformer
+     anything-c-adaptive-sort
+     anything-c-highlight-bookmark)
+    (action . (("Show person's data" . (lambda (candidate)
+                                         (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
+                                           (bookmark-jump bmk))))
+               ("Send Mail" . (lambda (candidate)
+                                (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
+                                  (if anything-current-prefix-arg
+                                      (addressbook-set-mail-buffer1 bmk 'append)
+                                      (addressbook-set-mail-buffer1 bmk)))))
+               ("Edit Bookmark" . (lambda (candidate)
+                                    (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
+                                      (addressbook-bookmark-edit
+                                       (assoc bmk bookmark-alist)))))
+               ("Show annotation" . (lambda (candidate)
+                                      (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
+                                        (bookmark-show-annotation bmk))))
+               ("Edit annotation" . bookmark-edit-annotation)))))
+                                
+
+(defun anything-c-bmkext-addressbook-setup-alist ()
+  "Specialized filter function for bookmarks w3m."
+  (anything-c-bmkext-filter-setup-alist 'bmkext-addressbook-alist-only))
 
 ;; W3m
 (defvar anything-c-source-bookmark-w3m
@@ -2962,6 +3003,7 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
   (interactive)
   (anything '(anything-c-source-bookmark-files&dirs
               anything-c-source-bookmark-w3m
+              anything-c-source-bmkext-addressbook
               anything-c-source-bookmark-gnus
               anything-c-source-bookmark-info
               anything-c-source-bookmark-man
