@@ -2839,7 +2839,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
     (action . (("Show person's data"
                 . (lambda (candidate)
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
-                                candidate)))
+                                candidate))
+                          (current-prefix-arg anything-current-prefix-arg))
                       (bookmark-jump bmk))))
                ("Send Mail"
                 . (lambda (candidate)
