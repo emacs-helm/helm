@@ -2828,27 +2828,50 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bmkext-addressbook-setup-alist)
-    (persistent-action . (lambda (candidate)
-                           (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
-                             (bookmark--jump-via bmk 'pop-to-buffer))))
+    (persistent-action
+     . (lambda (candidate)
+         (let ((bmk (anything-bookmark-get-bookmark-from-name
+                     candidate)))
+           (bookmark--jump-via bmk 'pop-to-buffer))))
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
-    (action . (("Show person's data" . (lambda (candidate)
-                                         (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
-                                           (bookmark-jump bmk))))
-               ("Send Mail" . (lambda (candidate)
-                                (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
-                                  (if anything-current-prefix-arg
-                                      (addressbook-set-mail-buffer1 bmk 'append)
-                                      (addressbook-set-mail-buffer1 bmk)))))
-               ("Edit Bookmark" . (lambda (candidate)
-                                    (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
-                                      (addressbook-bookmark-edit
-                                       (assoc bmk bookmark-alist)))))
-               ("Show annotation" . (lambda (candidate)
-                                      (let ((bmk (anything-bookmark-get-bookmark-from-name candidate)))
-                                        (bookmark-show-annotation bmk))))
+    (action . (("Show person's data"
+                . (lambda (candidate)
+                    (let ((bmk (anything-bookmark-get-bookmark-from-name
+                                candidate)))
+                      (bookmark-jump bmk))))
+               ("Send Mail"
+                . (lambda (candidate)
+                    (let ((bmk (anything-bookmark-get-bookmark-from-name
+                                candidate)))
+                      (if anything-current-prefix-arg
+                          (addressbook-set-mail-buffer1 bmk 'append)
+                          (addressbook-set-mail-buffer1 bmk)))))
+               ("Edit Bookmark"
+                . (lambda (candidate)
+                    (let ((bmk (anything-bookmark-get-bookmark-from-name
+                                candidate)))
+                      (addressbook-bookmark-edit
+                       (assoc bmk bookmark-alist)))))
+               ("Insert Email at point"
+                . (lambda (candidate)
+                    (let* ((bmk   (anything-bookmark-get-bookmark-from-name
+                                   candidate))
+                           (mlist (split-string
+                                   (assoc-default
+                                    'email (assoc bmk bookmark-alist))
+                                   ", ")))
+                      (insert
+                       (if (> (length mlist) 1)
+                           (anything-comp-read
+                            "Insert Mail Address: " mlist :must-match t)
+                           (car mlist))))))
+               ("Show annotation"
+                . (lambda (candidate)
+                    (let ((bmk (anything-bookmark-get-bookmark-from-name
+                                candidate)))
+                      (bookmark-show-annotation bmk))))
                ("Edit annotation" . bookmark-edit-annotation)))))
                                 
 
