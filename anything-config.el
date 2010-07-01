@@ -2808,7 +2808,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 
 ;;; Sources to filter bookmark-extensions bookmarks.
 ;; Dependency: http://mercurial.intuxication.org/hg/emacs-bookmark-extension
-
+;; If you want to enable google-maps in addressbook you will need
+;; Julien Danjou google-maps-el package available here:
+;; http://julien.danjou.info/google-maps-el.html
 
 (defun anything-c-bmkext-filter-setup-alist (fn &rest args)
   "Return a filtered `bookmark-alist' sorted alphabetically."
@@ -2873,7 +2875,12 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
                                 candidate)))
                       (bookmark-show-annotation bmk))))
-               ("Edit annotation" . bookmark-edit-annotation)))))
+               ("Edit annotation" . bookmark-edit-annotation)
+               ("Show Google map" . (lambda (candidate)
+                                      (let* ((bmk (anything-bookmark-get-bookmark-from-name
+                                                  candidate))
+                                             (full-bmk (assoc bmk bookmark-alist)))
+                                        (addressbook-google-map full-bmk))))))))
                                 
 
 (defun anything-c-bmkext-addressbook-setup-alist ()
