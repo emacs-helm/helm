@@ -635,6 +635,40 @@ Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
+;;; Anything-command-map
+(defvar anything-command-map)
+(define-prefix-command 'anything-command-map)
+(define-key global-map (kbd "<f5> a") 'anything-command-map)
+(define-key anything-command-map (kbd "d") 'anything-delicious)           
+(define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
+(define-key anything-command-map (kbd "g") 'anything-gentoo)
+(define-key anything-command-map (kbd "a g") 'anything-apt)              
+(define-key anything-command-map (kbd "q") 'anything-qpatchs-only)        
+(define-key anything-command-map (kbd "l") 'anything-locate)              
+(define-key anything-command-map (kbd "s") 'anything-surfraw)             
+(define-key anything-command-map (kbd "r") 'anything-regexp)              
+(define-key anything-command-map (kbd "w") 'anything-w3m-bookmarks)       
+(define-key anything-command-map (kbd "x") 'anything-firefox-bookmarks)   
+(define-key anything-command-map (kbd "#") 'anything-emms)                
+(define-key anything-command-map (kbd "m") 'anything-man-woman)           
+(define-key anything-command-map (kbd "t") 'anything-top)                 
+(define-key anything-command-map (kbd "i") 'anything-imenu)               
+(define-key anything-command-map (kbd "v") 'anything-eev-anchors)
+(define-key anything-command-map (kbd "C-x r l") 'anything-bookmark-ext)
+(define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
+(define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
+(define-key anything-command-map (kbd "C-:") 'anything-eval-expression-with-eldoc)
+(define-key anything-command-map (kbd "C-,") 'anything-calcul-expression)
+(define-key anything-command-map (kbd "M-x") 'anything-M-x)
+(define-key anything-command-map (kbd "C-x C-w") 'anything-write-file)
+(define-key anything-command-map (kbd "C-x i") 'anything-insert-file)
+(define-key anything-command-map (kbd "M-s o") 'anything-occur)
+(define-key anything-command-map (kbd "c") 'anything-colors)
+(define-key anything-command-map (kbd "f") 'anything-select-xfont)
+(define-key anything-command-map (kbd "C-c f") 'anything-recentf)
+(define-key anything-command-map (kbd "C-c g") 'anything-google-suggest)
+(define-key anything-command-map (kbd "C-h i") 'anything-info-at-point)
+
 ;;; Menu
 (easy-menu-define nil global-map
   "`anything' menu"
@@ -651,14 +685,20 @@ Though wmctrl work also with stumpwm."
     "Commands:"
     ["Emacs Commands" anything-M-x t]
     "----"
+    "Info:"
+    ["Info at point" anything-info-at-point t]
+    "----"
     "Tools:"
     ["Occur" anything-occur t]
     ["Browse Kill ring" anything-show-kill-ring t]
     ["Mark Ring" anything-all-mark-rings t]
     ["Colors & Faces" anything-colors t]
-    ["Show xfonts" anything-xfonts t]
+    ["Show xfonts" anything-select-xfont t]
     ["Imenu" anything-imenu t]
-    ["Google Suggest" anything-google-suggest t]))
+    ["Google Suggest" anything-google-suggest t]
+    ["Eval expression" anything-eval-expression-with-eldoc t]
+    ["Calcul expression" anything-calcul-expression t]
+    ["Top externals process" anything-top t]))
 
 ;;; Documentation
 ;; It is replaced by `anything-help'
