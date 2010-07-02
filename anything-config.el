@@ -631,6 +631,31 @@ Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
+;;; Menu
+(easy-menu-define nil global-map
+  "`anything' menu"
+  '("Anything"
+    "----"
+    "Files:"
+    ["Find files" anything-find-files t]
+    ["Recent Files" anything-recentf t]
+    ["Locate" anything-locate t]
+    "----"
+    "Buffers:"
+    ["Find buffers" anything-buffers+ t]
+    "----"
+    "Commands:"
+    ["Emacs Commands" anything-M-x t]
+    "----"
+    "Tools:"
+    ["Occur" anything-occur t]
+    ["Browse Kill ring" anything-show-kill-ring t]
+    ["Mark Ring" anything-all-mark-rings t]
+    ["Colors & Faces" anything-colors t]
+    ["Show xfonts" anything-xfonts t]
+    ["Imenu" anything-imenu t]
+    ["Google Suggest" anything-google-suggest t]))
+
 ;;; Documentation
 ;; It is replaced by `anything-help'
 (defun anything-c-describe-anything-bindings ()
@@ -825,6 +850,12 @@ You may bind this command to M-y."
   "Preconfigured `anything' for buffer."
   (interactive)
   (anything-other-buffer 'anything-c-source-buffers "*anything for buffers*"))
+
+;;;###autoload
+(defun anything-buffers+ ()
+  "Enhanced preconfigured `anything' for buffer."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-buffers+ "*anything buffers*"))
 
 ;;;###autoload
 (defun anything-bbdb ()
@@ -3294,6 +3325,7 @@ STRING is string to match."
 
 (defvar anything-c-source-imenu
   '((name . "Imenu")
+    (init . (lambda () (require 'imenu)))
     (candidates . anything-c-imenu-candidates)
     (persistent-action . (lambda (elm)
                            (anything-c-imenu-default-action elm)
@@ -3700,7 +3732,8 @@ If this action is executed just after `yank', replace with STR as yanked string.
 
 ;;;; <Mark ring>
 ;; DO NOT include these sources in `anything-sources' use
-;; the commands `anything-mark-ring' and `anything-global-mark-ring' instead.
+;; the commands `anything-mark-ring', `anything-global-mark-ring' or
+;; `anything-all-mark-rings' instead.
 
 (defun anything-c-source-mark-ring-candidates ()
   (flet ((get-marks (pos)
@@ -3716,18 +3749,17 @@ If this action is executed just after `yank', replace with STR as yanked string.
          with marks = (cons (mark-marker) mark-ring)
          with recip = nil
          for i in marks
-         for f = (get-marks i) 
-         if (not (member f recip))
-         do
-           (push f recip)
-         finally (return (reverse recip))))))
+         for m = (get-marks i) 
+         unless (member m recip)
+         collect m into recip
+         finally return recip))))
            
 (defvar anything-mark-ring-cache nil)
 (defvar anything-c-source-mark-ring
   '((name . "mark-ring")
     (init . (lambda ()
-              (setq anything-mark-ring-cache
-                    (anything-c-source-mark-ring-candidates))))
+                  (setq anything-mark-ring-cache
+                        (anything-c-source-mark-ring-candidates))))
     (candidates . (lambda ()
                     (anything-aif anything-mark-ring-cache
                         it)))
@@ -3790,6 +3822,14 @@ If this action is executed just after `yank', replace with STR as yanked string.
   "Preconfigured `anything' for `anything-c-source-global-mark-ring'."
   (interactive)
   (anything 'anything-c-source-global-mark-ring))
+
+;;;###autoload
+(defun anything-all-mark-rings ()
+  "Preconfigured `anything' for `anything-c-source-global-mark-ring' and \
+`anything-c-source-mark-ring'."
+  (interactive)
+  (anything '(anything-c-source-global-mark-ring
+              anything-c-source-mark-ring)))
 
 ;;;; <Register>
 ;;; Insert from register
