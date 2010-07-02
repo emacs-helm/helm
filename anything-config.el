@@ -103,6 +103,8 @@
 ;; Preconfigured `anything' for Yahoo searching with Yahoo suggest.
 ;; `anything-for-buffers'
 ;; Preconfigured `anything' for buffer.
+;; `anything-buffers+'
+;; Enhanced preconfigured `anything' for buffer.
 ;; `anything-bbdb'
 ;; Preconfigured `anything' for BBDB.
 ;; `anything-locate'
@@ -181,6 +183,8 @@
 ;; Preconfigured `anything' for `anything-c-source-mark-ring'.
 ;; `anything-global-mark-ring'
 ;; Preconfigured `anything' for `anything-c-source-global-mark-ring'.
+;; `anything-all-mark-rings'
+;; Preconfigured `anything' for `anything-c-source-global-mark-ring' and `anything-c-source-mark-ring'.
 ;; `anything-yaoddmuse-cache-pages'
 ;; Fetch the list of files on emacswiki and create cache file.
 ;; `anything-yaoddmuse-emacswiki-edit-or-view'
@@ -3758,8 +3762,10 @@ If this action is executed just after `yank', replace with STR as yanked string.
 (defvar anything-c-source-mark-ring
   '((name . "mark-ring")
     (init . (lambda ()
-                  (setq anything-mark-ring-cache
-                        (anything-c-source-mark-ring-candidates))))
+              (setq anything-mark-ring-cache
+                    (condition-case nil
+                        (anything-c-source-mark-ring-candidates)
+                    (error nil)))))
     (candidates . (lambda ()
                     (anything-aif anything-mark-ring-cache
                         it)))
@@ -3807,13 +3813,13 @@ If this action is executed just after `yank', replace with STR as yanked string.
        with marks = global-mark-ring
        with recip = nil  
        for i in marks
-       if (not (or (string-match "^ " (format "%s" (marker-buffer i)))
-                   (null (marker-buffer i))))
-       for a = (buf-fn i)
-       if (and a (not (member a recip)))
-       do
-         (push a recip)
-       finally (return (reverse recip)))))
+       for gm = (unless (or (string-match
+                            "^ " (format "%s" (marker-buffer i)))
+                           (null (marker-buffer i)))
+                 (buf-fn i))
+       when (and gm (not (member gm recip)))
+       collect gm into recip
+       finally return recip)))
 
 ;; (anything 'anything-c-source-global-mark-ring)
 
