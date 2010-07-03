@@ -51,7 +51,7 @@
 ;; Predefined configurations for `anything.el'
 ;;
 ;; For quick start, try `anything-for-files' to open files.
-;; 
+;;
 ;; To configure anything you should define anything command
 ;; with your favorite sources, like below:
 ;;
@@ -639,22 +639,22 @@ Though wmctrl work also with stumpwm."
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
 (define-key global-map (kbd "<f5> a") 'anything-command-map)
-(define-key anything-command-map (kbd "d") 'anything-delicious)           
+(define-key anything-command-map (kbd "d") 'anything-delicious)
 (define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
 (define-key anything-command-map (kbd "g") 'anything-gentoo)
-(define-key anything-command-map (kbd "a g") 'anything-apt)              
-(define-key anything-command-map (kbd "q") 'anything-qpatchs-only)        
-(define-key anything-command-map (kbd "l") 'anything-locate)              
-(define-key anything-command-map (kbd "s") 'anything-surfraw)             
-(define-key anything-command-map (kbd "r") 'anything-regexp)              
-(define-key anything-command-map (kbd "w") 'anything-w3m-bookmarks)       
-(define-key anything-command-map (kbd "x") 'anything-firefox-bookmarks)   
-(define-key anything-command-map (kbd "#") 'anything-emms)                
-(define-key anything-command-map (kbd "m") 'anything-man-woman)           
-(define-key anything-command-map (kbd "t") 'anything-top)                 
-(define-key anything-command-map (kbd "i") 'anything-imenu)               
+(define-key anything-command-map (kbd "a g") 'anything-apt)
+(define-key anything-command-map (kbd "q") 'anything-qpatchs-only)
+(define-key anything-command-map (kbd "l") 'anything-locate)
+(define-key anything-command-map (kbd "s") 'anything-surfraw)
+(define-key anything-command-map (kbd "r") 'anything-regexp)
+(define-key anything-command-map (kbd "w") 'anything-w3m-bookmarks)
+(define-key anything-command-map (kbd "x") 'anything-firefox-bookmarks)
+(define-key anything-command-map (kbd "#") 'anything-emms)
+(define-key anything-command-map (kbd "m") 'anything-man-woman)
+(define-key anything-command-map (kbd "t") 'anything-top)
+(define-key anything-command-map (kbd "i") 'anything-imenu)
 (define-key anything-command-map (kbd "v") 'anything-eev-anchors)
-(define-key anything-command-map (kbd "C-x r l") 'anything-bookmark-ext)
+(define-key anything-command-map (kbd "C-x r l") 'anything-bookmarks)
 (define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
 (define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
 (define-key anything-command-map (kbd "C-:") 'anything-eval-expression-with-eldoc)
@@ -668,16 +668,21 @@ Though wmctrl work also with stumpwm."
 (define-key anything-command-map (kbd "C-c f") 'anything-recentf)
 (define-key anything-command-map (kbd "C-c g") 'anything-google-suggest)
 (define-key anything-command-map (kbd "C-h i") 'anything-info-at-point)
+(define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
+(define-key anything-command-map (kbd "C-x r i") 'anything-register)
 
 ;;; Menu
 (easy-menu-define nil global-map
   "`anything' menu"
   '("Anything"
+    "Anything Menu"
+    "----"
     "----"
     "Files:"
     ["Find files" anything-find-files t]
     ["Recent Files" anything-recentf t]
     ["Locate" anything-locate t]
+    ["Bookmarks" anything-bookmarks t]
     "----"
     "Buffers:"
     ["Find buffers" anything-buffers+ t]
@@ -691,6 +696,7 @@ Though wmctrl work also with stumpwm."
     "Tools:"
     ["Occur" anything-occur t]
     ["Browse Kill ring" anything-show-kill-ring t]
+    ["Browse register" anything-register t]
     ["Mark Ring" anything-all-mark-rings t]
     ["Colors & Faces" anything-colors t]
     ["Show xfonts" anything-select-xfont t]
@@ -757,7 +763,7 @@ C-p, Up: Previous Line
 C-n, Down : Next Line
 M-v, PageUp : Previous Page
 C-v, PageDown : Next Page
-Enter : Execute first (default) action / Select 
+Enter : Execute first (default) action / Select
 M-< : First Line
 M-> : Last Line
 M-PageUp, C-M-S-v, C-M-y : Previous Page (other-window)
@@ -927,6 +933,16 @@ See man locate for more infos."
   (interactive)
   (anything-other-buffer '(anything-c-source-colors anything-c-source-customize-face)
                          "*anything colors*"))
+
+;;;###autoload
+(defun anything-bookmarks ()
+  (interactive)
+  (anything-other-buffer 'anything-c-source-bookmarks "*anything bookmarks*"))
+
+;;;###autoload
+(defun anything-register ()
+  (interactive)
+  (anything-other-buffer 'anything-c-source-register "*anything register*"))
 
 ;;;###autoload
 (defun anything-bm-list ()
@@ -1356,7 +1372,7 @@ It is cleared after executing action.")
                          (cons 'source
                                (cons (match-string-no-properties 3)
                                      (assoc-default 'name (symbol-value (intern (match-string-no-properties 3)))))))))))
-                         
+
 ;; (find-epp (anything-c-create-summary))
 
 (defun anything-c-insert-summary ()
@@ -1517,7 +1533,7 @@ buffer that is not the current buffer."
 ;;; Anything replacement of file name completion for `find-file' and friends.
 
 (defvar anything-c-find-files-doc-header (format " (`%s':Go to precedent level)"
-                                                 (if window-system "C-." "C-l")) 
+                                                 (if window-system "C-." "C-l"))
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 
 (defvar anything-c-source-find-files
@@ -1596,7 +1612,7 @@ If prefix numeric arg is given go ARG level down."
         (delete-minibuffer-contents)
         (insert new-pattern)))))
 
-;; `C-.' doesn't work in terms use `C-l' instead. 
+;; `C-.' doesn't work in terms use `C-l' instead.
 (if window-system
     (define-key anything-map (kbd "C-.") 'anything-find-files-down-one-level)
   (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))
@@ -1612,7 +1628,7 @@ If prefix numeric arg is given go ARG level down."
          (loop
             with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
-  
+
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ( ; Don't try to tramp connect before entering the second ":".
@@ -2609,8 +2625,8 @@ word in the function's name, e.g. \"bb\" is an abbrev for
     (candidates . anything-c-advice-candidates)
     (action ("Toggle Enable/Disable" . anything-c-advice-toggle))
 ;;    (real-to-display . anything-c-advice-real-to-display)
-    
-    
+
+
     (persistent-action . anything-c-advice-persistent-action)
     (persistent-help . "Describe function / C-u C-z: Toggle advice")))
 ;; (anything 'anything-c-source-advice)
@@ -2623,12 +2639,12 @@ word in the function's name, e.g. \"bb\" is an abbrev for
         for function = (intern fname)
         append
         (loop for class in ad-advice-classes append
-              (loop for advice in (ad-get-advice-info-field function class) 
+              (loop for advice in (ad-get-advice-info-field function class)
                     for enabled = (ad-advice-enabled advice)
                     collect
                     (cons (format "%s %s %s"
                                   (if enabled "Enabled " "Disabled")
-                                  (propertize fname 'face 'font-lock-function-name-face) 
+                                  (propertize fname 'face 'font-lock-function-name-face)
                                   (ad-make-single-advice-docstring advice class nil))
                           (list function class advice))))))
 
@@ -2791,7 +2807,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
                               (bmkext-w3m-bookmark-p i))
      for isgnus        = (and (fboundp 'bmkext-gnus-bookmark-p)
-                              (bmkext-gnus-bookmark-p i)) 
+                              (bmkext-gnus-bookmark-p i))
      for isman         = (and (fboundp 'bmkext-man-bookmark-p) ; Man
                               (bmkext-man-bookmark-p i))
      for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
@@ -2812,7 +2828,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      if isgnus
      collect (propertize i 'face 'anything-bmkext-gnus 'help-echo pred)
      ;; Man Woman
-     if (or iswoman isman) 
+     if (or iswoman isman)
      collect (propertize i 'face 'anything-bmkext-man 'help-echo pred)
      if (and (not pred) isabook)
      collect (propertize i 'face '((:foreground "Tomato")))
@@ -2823,7 +2839,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      if (and pred (not (file-directory-p pred)) (file-exists-p pred)
              (not (or iswoman isman)))
      collect (propertize i 'face 'anything-bmkext-file 'help-echo pred)))
-       
+
 ;;; Faces for bookmarks
 (defface anything-bmkext-info
   '((t (:foreground "green")))
@@ -2876,7 +2892,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                                   (not (string-match "^(su)" i)))
                                           collect i))
                       (sort lis-loc 'string-lessp))))
-    (candidate-transformer anything-c-highlight-bookmark)
+    ;(candidate-transformer anything-c-highlight-bookmark)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 ;; (anything 'anything-c-source-bookmarks-local)
@@ -2956,7 +2972,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                                   candidate))
                                              (full-bmk (assoc bmk bookmark-alist)))
                                         (addressbook-google-map full-bmk))))))))
-                                
+
 
 (defun anything-c-bmkext-addressbook-setup-alist ()
   "Specialized filter function for bookmarks w3m."
@@ -3178,10 +3194,10 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
      anything-c-highlight-firefox-bookmarks)
     (action . (("Browse Url" . (lambda (candidate)
                                  (w3m-browse-url
-                                  (anything-c-firefox-bookmarks-get-value candidate)))) 
+                                  (anything-c-firefox-bookmarks-get-value candidate))))
                ("Browse Url Firefox" . (lambda (candidate)
                                          (browse-url-firefox
-                                          (anything-c-firefox-bookmarks-get-value candidate)))) 
+                                          (anything-c-firefox-bookmarks-get-value candidate))))
                ("Copy Url" . (lambda (elm)
                                (kill-new (anything-c-w3m-bookmarks-get-value elm))))))))
 
@@ -3793,11 +3809,11 @@ If this action is executed just after `yank', replace with STR as yanked string.
          with marks = (cons (mark-marker) mark-ring)
          with recip = nil
          for i in marks
-         for m = (get-marks i) 
+         for m = (get-marks i)
          unless (member m recip)
          collect m into recip
          finally return recip))))
-           
+
 (defvar anything-mark-ring-cache nil)
 (defvar anything-c-source-mark-ring
   '((name . "mark-ring")
@@ -3838,7 +3854,7 @@ If this action is executed just after `yank', replace with STR as yanked string.
                              (anything-goto-line (string-to-number (car items)))
                              (anything-match-line-color-current-line))))
     (persistent-help . "Show this line")))
-                             
+
 (defun anything-c-source-global-mark-ring-candidates ()
   (flet ((buf-fn (m)
            (with-current-buffer (marker-buffer m)
@@ -3851,7 +3867,7 @@ If this action is executed just after `yank', replace with STR as yanked string.
                (format "%7d:%s:    %s" (line-number-at-pos) (marker-buffer m) line)))))
     (loop
        with marks = global-mark-ring
-       with recip = nil  
+       with recip = nil
        for i in marks
        for gm = (unless (or (string-match
                             "^ " (format "%s" (marker-buffer i)))
@@ -4105,7 +4121,7 @@ See http://orgmode.org for the latest version.")
                                          (setq anything-c-yaoddmuse-ew-cache
                                                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
                                        (yaoddmuse-update-pagename))))))
-    (action-transformer anything-c-yaoddmuse-action-transformer))) 
+    (action-transformer anything-c-yaoddmuse-action-transformer)))
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view)
 
@@ -4431,7 +4447,7 @@ Return an alist with elements like (data . number_results)."
                 for i in result-alist
                 for data = (cdr (caadr (assoc 'suggestion i)))
                 for nqueries = (cdr (caadr (assoc 'num_queries i)))
-                for ldata = (length data) 
+                for ldata = (length data)
                 do
                   (when (> ldata anything-gg-sug-lgh-flag)
                     (setq anything-gg-sug-lgh-flag ldata))
@@ -4463,8 +4479,8 @@ Return an alist with elements like (data . number_results)."
          suggestions
          (list (cons (concat "Search for " "'" anything-input "'" " on Google")
                      anything-input))))))
-         
-    
+
+
 (defun anything-c-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
   (browse-url (concat anything-c-google-suggest-search-url
@@ -4507,7 +4523,7 @@ Return an alist with elements like (data . number_results)."
          suggestions
          (list (cons (concat "Search for " "'" anything-input "'" " on Yahoo")
                      anything-input))))))
-         
+
 (defun anything-c-yahoo-suggest-action (candidate)
   "Default action to jump to a Yahoo suggested candidate."
   (browse-url (concat anything-c-yahoo-suggest-search-url
@@ -5013,7 +5029,7 @@ See also `anything-create--actions'."
     (init . (lambda ()
               (unless anything-c-xfonts-cache
                 (setq anything-c-xfonts-cache
-                      (x-list-fonts "*")))))  
+                      (x-list-fonts "*")))))
     (candidates . anything-c-xfonts-cache)
     (action . (("Copy to kill ring" . (lambda (elm)
                                         (kill-new elm)))
@@ -5150,7 +5166,7 @@ package name - description."
           (setq anything-c-apt-installed-packages nil)
           (term-char-mode) (term-send-input))
         (delete-region beg end) (term-send-eof) (kill-buffer))))
-        
+
 ;; (anything-c-apt-install "jed")
 
 ;;; Sources for gentoo users
@@ -5219,7 +5235,7 @@ package name - description."
     (insert (concat command elms))
     (setq end (point))
     (term-char-mode) (term-send-input)))
-    
+
 (defun anything-c-gentoo-default-action (elm command &rest args)
   "Gentoo default action that use `anything-c-gentoo-buffer'."
   (if (member elm anything-c-cache-world)
@@ -5375,7 +5391,7 @@ package name - description."
 ;; Run Externals commands within Emacs
 (defmacro* anything-comp-hash-get-items (hash-table &key test)
   "Get the list of all keys/values of hash-table."
-  `(let ((li-items ())) 
+  `(let ((li-items ()))
      (maphash #'(lambda (x y)
                   (if ,test
                       (when (funcall ,test y)
@@ -6362,7 +6378,7 @@ With optional arg `merge' call `ediff-merge-buffers'."
       (1
        (setq buf1 anything-current-buffer
              buf2 (first (anything-marked-candidates))))
-      (2 
+      (2
        (setq buf1 (first (anything-marked-candidates))
              buf2 (second (anything-marked-candidates))))
       (t
