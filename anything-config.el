@@ -635,6 +635,10 @@ Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
+(defun anything-configuration ()
+  (interactive)
+  (customize-group "anything-config"))
+
 ;;; Anything-command-map
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
@@ -653,7 +657,6 @@ Though wmctrl work also with stumpwm."
 (define-key anything-command-map (kbd "m") 'anything-man-woman)
 (define-key anything-command-map (kbd "t") 'anything-top)
 (define-key anything-command-map (kbd "i") 'anything-imenu)
-(define-key anything-command-map (kbd "v") 'anything-eev-anchors)
 (define-key anything-command-map (kbd "C-x r l") 'anything-bookmarks)
 (define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
 (define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
@@ -670,6 +673,7 @@ Though wmctrl work also with stumpwm."
 (define-key anything-command-map (kbd "C-h i") 'anything-info-at-point)
 (define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
 (define-key anything-command-map (kbd "C-x r i") 'anything-register)
+(define-key anything-command-map (kbd "C-c C-x") 'anything-c-run-external-command)
 
 ;;; Menu
 (easy-menu-define nil global-map
@@ -689,6 +693,7 @@ Though wmctrl work also with stumpwm."
     "----"
     "Commands:"
     ["Emacs Commands" anything-M-x t]
+    ["Externals Commands" anything-c-run-external-command t]
     "----"
     "Info:"
     ["Info at point" anything-info-at-point t]
@@ -704,7 +709,9 @@ Though wmctrl work also with stumpwm."
     ["Google Suggest" anything-google-suggest t]
     ["Eval expression" anything-eval-expression-with-eldoc t]
     ["Calcul expression" anything-calcul-expression t]
-    ["Top externals process" anything-top t]))
+    ["Top externals process" anything-top t]
+    "----"
+    ["Prefered Options" anything-configuration t]))
 
 ;;; Documentation
 ;; It is replaced by `anything-help'
