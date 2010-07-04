@@ -670,7 +670,7 @@ Though wmctrl work also with stumpwm."
 (define-key anything-command-map (kbd "f") 'anything-select-xfont)
 (define-key anything-command-map (kbd "C-c f") 'anything-recentf)
 (define-key anything-command-map (kbd "C-c g") 'anything-google-suggest)
-(define-key anything-command-map (kbd "C-h i") 'anything-info-at-point)
+(define-key anything-command-map (kbd "h i") 'anything-info-at-point)
 (define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
 (define-key anything-command-map (kbd "C-x r i") 'anything-register)
 (define-key anything-command-map (kbd "C-c C-x") 'anything-c-run-external-command)
