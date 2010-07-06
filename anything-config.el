@@ -648,6 +648,7 @@ Though wmctrl work also with stumpwm."
   (customize-group "anything-config"))
 
 ;;; Anything-command-map
+;;;###autoload
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
 (define-key global-map (kbd "<f5> a") 'anything-command-map)
@@ -4503,8 +4504,8 @@ Return an alist with elements like (data . number_results)."
 
 (defun anything-c-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
-  (browse-url (concat anything-c-google-suggest-search-url
-                      (url-hexify-string candidate))))
+  (anything-c-browse-url (concat anything-c-google-suggest-search-url
+                                 (url-hexify-string candidate))))
 
 
 (defvar anything-c-source-google-suggest
@@ -4546,8 +4547,8 @@ Return an alist with elements like (data . number_results)."
 
 (defun anything-c-yahoo-suggest-action (candidate)
   "Default action to jump to a Yahoo suggested candidate."
-  (browse-url (concat anything-c-yahoo-suggest-search-url
-                      (url-hexify-string candidate))))
+  (anything-c-browse-url (concat anything-c-yahoo-suggest-search-url
+                                 (url-hexify-string candidate))))
 
 (defvar anything-c-source-yahoo-suggest
   '((name . "Yahoo Suggest")
@@ -4565,6 +4566,8 @@ Return an alist with elements like (data . number_results)."
 ;; user variables
 (require 'browse-url)
 (defvar w3m-command nil)
+(defvar anything-c-home-url "http://www.google.fr"
+  "*Default url to use as home url.")
 
 (defvar anything-browse-url-default-browser-alist
   `((,w3m-command . w3m-browse-url)
@@ -4578,14 +4581,11 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-xterm-program . browse-url-text-xterm))
   "*Alist of (executable . function) to try to find a suitable url browser.")
 
-(defvar anything-c-home-url "http://www.google.fr"
-  "*Default url to use as home url.")
-
 (defun anything-browse-url-default-browser (url &rest args)
   "Find a suitable browser and ask it to load URL."
   (let ((default-browser (loop
                             for i in anything-browse-url-default-browser-alist
-                            when (executable-find (car i)) return (cdr i))))
+                            when (and (car i) (executable-find (car i))) return (cdr i))))
     (if default-browser
         (apply default-browser url args)
         (error "No usable browser found"))))
