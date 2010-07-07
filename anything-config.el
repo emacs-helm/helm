@@ -2947,6 +2947,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
          (let ((bmk (anything-bookmark-get-bookmark-from-name
                      candidate)))
            (bookmark--jump-via bmk 'pop-to-buffer))))
+    (persistent-help . "Show contact - Prefix with C-u to append")
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
@@ -3151,7 +3152,8 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
               anything-c-source-bookmark-info
               anything-c-source-bookmark-man
               anything-c-source-bookmark-su-files&dirs
-              anything-c-source-bookmark-ssh-files&dirs)))
+              anything-c-source-bookmark-ssh-files&dirs)
+            nil "SearchBookmark: " nil nil "*anything bmkext*"))
 
 
 ;; Firefox bookmarks
