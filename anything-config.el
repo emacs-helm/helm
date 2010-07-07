@@ -1584,11 +1584,13 @@ buffer that is not the current buffer."
            ("Find file as root" . anything-find-file-as-root)
            ("Open file externally (C-u to choose)"
             . anything-c-open-file-externally)
+           ("Create dired buffer on marked"
+            . anything-c-create-dired-on-marked)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame))))))
 
 ;; (anything 'anything-c-source-find-files)
-
+    
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
 If LEVEL is positive reduce from end else from beginning.
@@ -6375,6 +6377,12 @@ It also accepts a function or a variable name.")
     (if (> (length marked) 1)
         (dolist (i marked) (find-file-noselect i))
         (find-file-at-point candidate))))
+
+(defun anything-c-create-dired-on-marked (candidate)
+  "Create a new dired buffer with only marked candidates."
+  (let ((marked      (anything-marked-candidates))
+        (buffer-name (read-string "New Dired Buffer: ")))
+    (dired (cons buffer-name marked))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
