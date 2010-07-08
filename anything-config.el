@@ -941,7 +941,27 @@ See man locate for more infos."
 (defun anything-w3m-bookmarks ()
   "Preconfigured `anything' for w3m bookmark."
   (interactive)
-  (anything-other-buffer 'anything-c-source-w3m-bookmarks "*anything w3m bookmarks*"))
+  (anything-other-buffer 'anything-c-source-w3m-bookmarks
+                         "*anything w3m bookmarks*"))
+
+;;;###autoload
+(defun anything-firefox-bookmarks ()
+  "Preconfigured `anything' for firefox bookmark.
+You will have to enable html bookmarks in firefox:
+open about:config in firefox and double click on this line to enable value \
+to true:
+
+user_pref(\"browser.bookmarks.autoExportHTML\", false);
+
+You should have now:
+
+user_pref(\"browser.bookmarks.autoExportHTML\", true);
+
+After closing firefox, you will be able to browse you bookmarks.
+"
+  (interactive)
+  (anything-other-buffer 'anything-c-source-firefox-bookmarks
+                         "*Anything Firefox*"))
 
 ;;;###autoload
 (defun anything-colors ()
@@ -3217,12 +3237,12 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
-    (action . (("Browse Url" . (lambda (candidate)
-                                 (w3m-browse-url
-                                  (anything-c-firefox-bookmarks-get-value candidate))))
-               ("Browse Url Firefox" . (lambda (candidate)
+    (action . (("Browse Url Firefox" . (lambda (candidate)
                                          (browse-url-firefox
                                           (anything-c-firefox-bookmarks-get-value candidate))))
+               ("Browse Url w3m" . (lambda (candidate)
+                                 (w3m-browse-url
+                                  (anything-c-firefox-bookmarks-get-value candidate))))
                ("Copy Url" . (lambda (elm)
                                (kill-new (anything-c-w3m-bookmarks-get-value elm))))))))
 
