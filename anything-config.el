@@ -1544,7 +1544,7 @@ buffer that is not the current buffer."
   '((name . "Files from Current Directory")
     (candidates . (lambda ()
                     (with-current-buffer anything-current-buffer
-                      (directory-files default-directory))))
+                      (directory-files (anything-c-current-directory)))))
     ;; volatile is not needed, I think.
     (type . file)))
 ;; (anything 'anything-c-source-files-in-current-dir)
@@ -1567,7 +1567,7 @@ buffer that is not the current buffer."
   '((name . "Files from Current Directory")
     (candidates . (lambda ()
                     (with-current-buffer anything-current-buffer
-                      (directory-files default-directory t))))
+                      (directory-files (anything-c-current-directory) t))))
     (candidate-transformer anything-c-highlight-files)
     ;; volatile is not needed, I think.
     (type . file)))
@@ -1793,11 +1793,16 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                                        (thing-at-point 'filename))
             "Find Files or Url: " nil nil "*Anything Find Files*"))
 
+(defun anything-c-current-directory ()
+  "Return current-directory name at point.
+Useful in dired buffers when there is inserted subdirs."
+  (if (eq major-mode 'dired-mode)
+      (dired-current-directory)
+      default-directory))
+  
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
-  (let* ((def-dir (if (eq major-mode 'dired-mode)
-                      (dired-current-directory)
-                      default-directory))
+  (let* ((def-dir (anything-c-current-directory))
          (file-p  (and fap (file-exists-p fap)
                        (file-exists-p
                         (file-name-directory (expand-file-name tap def-dir)))))
@@ -1977,7 +1982,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                       ('hardlink "*Anything Hardlink Files*"))))
     (anything source
               (or (dired-dwim-target-directory)
-                  (expand-file-name default-directory))
+                  (expand-file-name (anything-c-current-directory)))
               (format prompt-fm fname) nil nil buffer)))
 
 
