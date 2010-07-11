@@ -5501,25 +5501,25 @@ directory, open this directory."
 
 (require 'compile)
 (defun anything-c-filtered-candidate-transformer-file-line (candidates source)
-  (mapcar
-   (lambda (candidate)
-     (if (not (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate))
-         (error "Filename and line number not found")
-       (let ((filename (match-string 1 candidate))
-             (lineno (match-string 2 candidate))
-             (content (match-string 3 candidate)))
-         (cons (format "%s:%s\n %s"
-                       (propertize filename 'face compilation-info-face)
-                       (propertize lineno 'face compilation-line-face)
-                       content)
-               (list (expand-file-name
-                      filename
-                      (or (anything-interpret-value (anything-attr 'default-directory))
-                          (and (anything-candidate-buffer)
-                               (buffer-local-value
-                                'default-directory (anything-candidate-buffer)))))
-                     (string-to-number lineno) content)))))
-   candidates))
+  (delq nil
+        (mapcar
+         (lambda (candidate)
+           (when (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate)
+             (let ((filename (match-string 1 candidate))
+                   (lineno (match-string 2 candidate))
+                   (content (match-string 3 candidate)))
+               (cons (format "%s:%s\n %s"
+                             (propertize filename 'face compilation-info-face)
+                             (propertize lineno 'face compilation-line-face)
+                             content)
+                     (list (expand-file-name
+                            filename
+                            (or (anything-interpret-value (anything-attr 'default-directory))
+                                (and (anything-candidate-buffer)
+                                     (buffer-local-value
+                                      'default-directory (anything-candidate-buffer)))))
+                           (string-to-number lineno) content)))))
+         candidates)))
 
 (defun* anything-goto-file-line (file lineno content &optional (find-file-function #'find-file))
   (anything-aif (anything-attr 'before-jump-hook)
