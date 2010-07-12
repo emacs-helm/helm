@@ -1986,8 +1986,10 @@ Attributes:
    (anything-compiled-sources)
    ;; first time
    (t
-    (setq anything-compiled-sources
-          (anything-compile-sources anything-sources anything-compile-source-functions)))))
+    (prog1
+        (setq anything-compiled-sources
+              (anything-compile-sources anything-sources anything-compile-source-functions))
+      (anything-log-eval anything-compiled-sources)))))
 
 (defun* anything-get-selection (&optional (buffer nil buffer-s) (force-display-part))
   "Return the currently selected item or nil.
@@ -2270,6 +2272,8 @@ already-bound variables. Yuck!
 "
   ;; TODO more document
   (interactive)
+  (anything-log "start session ++++++++++++++++++++++++++++++++++++++++++")
+  (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
   (condition-case v
       (let ( ;; It is needed because `anything-source-name' is non-nil
             ;; when `anything' is invoked by action. Awful global scope.
@@ -2282,13 +2286,15 @@ already-bound variables. Yuck!
         (with-anything-restore-variables
           (anything-initialize-1 any-resume any-input any-sources)
           (anything-display-buffer anything-buffer)
+          (anything-log "show prompt")
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume any-keymap)
             (anything-cleanup)))
-        (unless anything-quit
-          (anything-execute-selection-action-1)))
+        (prog1 (unless anything-quit (anything-execute-selection-action-1))
+          (anything-log "end session --------------------------------------------")))
     (quit
      (anything-on-quit)
+     (anything-log "end session (quit) -------------------------------------")
      nil)))
 
 (defun anything-resume-p (any-resume)
@@ -2300,8 +2306,10 @@ already-bound variables. Yuck!
 
 This function name should be `anything-initialize', but anything
 extensions may advice `anything-initalize'. I cannot rename, sigh."
+  (anything-log "start initialization: any-resume=%S any-input=%S" any-resume any-input)
   (anything-frame/window-configuration 'save)
   (setq anything-sources (anything-normalize-sources any-sources))
+  (anything-log "sources = %S" anything-sources)
   (anything-hooks 'setup)
   (anything-current-position 'save)
   (if (anything-resume-p any-resume)
@@ -2311,7 +2319,8 @@ extensions may advice `anything-initalize'. I cannot rename, sigh."
     (anything-recent-push anything-buffer 'anything-buffers)
     (setq anything-last-buffer anything-buffer))
   (when any-input (setq anything-input any-input anything-pattern any-input))
-  (and (anything-resume-p any-resume) (anything-funcall-foreach 'resume)))
+  (and (anything-resume-p any-resume) (anything-funcall-foreach 'resume))
+  (anything-log "end initialization"))
 
 (defun anything-execute-selection-action-1 ()
   (unwind-protect
@@ -2375,6 +2384,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (declare-function 'anything-frame/window-configuration "anything")
 (lexical-let (conf)
   (defun anything-frame/window-configuration (save-or-restore)
+    (anything-log-eval anything-save-configuration-functions)
     (case save-or-restore
       (save    (setq conf (funcall (cdr anything-save-configuration-functions))))
       (restore (funcall (car anything-save-configuration-functions) conf)))))
@@ -2436,6 +2446,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
            (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
 
            anything-map)))
+    (anything-log-eval ncandidate anything-execute-action-at-once-if-one
+                       anything-quit-if-no-candidate)
     (cond ((and anything-execute-action-at-once-if-one
                 (= ncandidate 1))
            (ignore))
@@ -2452,6 +2464,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (when test-mode
     (setq anything-candidate-cache nil))
   (with-current-buffer (get-buffer-create anything-buffer)
+    (anything-log "kill local variables: %S" (buffer-local-variables))
     (kill-all-local-variables)
     (buffer-disable-undo)
     (erase-buffer)
@@ -2459,6 +2472,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
     (set (make-local-variable 'anything-follow-mode) nil)
     (set (make-local-variable 'anything-display-function) anything-display-function)
+    (anything-log-eval anything-display-function anything-let-variables)
     (loop for (var . val) in anything-let-variables
           do (set (make-local-variable var) val))
     
@@ -2468,6 +2482,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (get-buffer anything-buffer))
 
 (defun anything-initialize-overlays (buffer)
+  (anything-log "overlay setup")
   (if anything-selection-overlay
       ;; make sure the overlay belongs to the anything buffer if
       ;; it's newly created
@@ -2505,6 +2520,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 ;; (@* "Core: clean up")
 (defun anything-cleanup ()
   "Clean up the mess."
+  (anything-log "start cleanup")
   (with-current-buffer anything-buffer
     (setq cursor-type t))
   (bury-buffer anything-buffer)
@@ -3002,6 +3018,7 @@ the real value in a text property."
 (defun anything-execute-selection-action (&optional selection action clear-saved-action)
   "If a candidate was selected then perform the associated
 action."
+  (anything-log "executing action")
   (setq selection (or selection (anything-get-selection)))
   (setq action (or action
                    anything-saved-action
@@ -3739,11 +3756,13 @@ Otherwise goto the end of minibuffer."
 (defun* anything-execute-persistent-action (&optional (attr 'persistent-action))
   "If a candidate is selected then perform the associated action without quitting anything."
   (interactive)
+  (anything-log "executing persistent-action")
   (save-selected-window
     (select-window (get-buffer-window (anything-buffer-get)))
     (select-window (setq minibuffer-scroll-window
                          (if (one-window-p t) (split-window)
                            (next-window (selected-window) 1))))
+    (anything-log-eval (current-buffer))
     (let ((anything-in-persistent-action t))
       (with-anything-display-same-window
         (anything-execute-selection-action
@@ -4423,6 +4442,7 @@ shown yet and bind anything commands in iswitchb."
     (anything-iswitchb-minibuffer-exit)))
 
 ;; (@* "Utility: logging")
+(defvar anything-debug nil)
 (defun anything-log (format-string &rest args)
   "Write a message to the *Anythingn Log* buffer.
 Arguments are same as `format'."
@@ -4437,7 +4457,10 @@ Arguments are same as `format'."
                         (anything-log-get-current-function)
                         (apply #'format (cons format-string args))))))))
 
-
+(defmacro anything-log-eval (&rest exprs)
+  "Write each EXPR evaluation result to the *Anything Log* buffer."
+  `(progn
+     ,@(mapcar (lambda (expr) `(anything-log "%S = %S" ',expr ,expr)) exprs)))
 (defun anything-log-get-current-function ()
   "Get function name calling `anything-log'.
 The original idea is from `tramp-debug-message'."
