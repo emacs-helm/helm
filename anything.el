@@ -4418,6 +4418,35 @@ shown yet and bind anything commands in iswitchb."
       (define-key (current-local-map) (car binding) (cdr binding)))
     (anything-iswitchb-minibuffer-exit)))
 
+;; (@* "Utility: logging")
+(defun anything-log (format-string &rest args)
+  "Write a message to the *Anythingn Log* buffer.
+Arguments are same as `format'."
+  (when (or debug-on-error anything-debug)
+    (with-current-buffer (get-buffer-create "*Anything Log*")
+      (buffer-disable-undo)
+      (goto-char (point-max))
+      (insert (let ((tm (current-time)))
+                (format "%s.%06d (%s) %s\n"
+                        (format-time-string "%H:%M:%S" tm)
+                        (nth 2 tm)
+                        (anything-log-get-current-function)
+                        (apply #'format (cons format-string args))))))))
+
+
+(defun anything-log-get-current-function ()
+  "Get function name calling `anything-log'.
+The original idea is from `tramp-debug-message'."
+  (loop for btn from 1 to 20            ;avoid inf-loop
+        for btf = (second (backtrace-frame btn))
+        for fn  = (if (symbolp btf) (symbol-name btf) "")
+        do (when (and (string-match "^anything" fn)
+                      (not (string-match "^anything-log" fn)))
+             (return fn))))
+
+;; (anything-log "test")
+;; (switch-to-buffer-other-window "*Anything Log*")
+
 ;; (@* "Compatibility")
 
 ;; Copied assoc-default from XEmacs version 21.5.12
