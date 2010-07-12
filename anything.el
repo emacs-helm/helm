@@ -4844,7 +4844,6 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
   (let ((anything-test-mode t)
         anything-enable-shortcuts
         anything-candidate-cache
-        (anything-sources (anything-normalize-sources sources))
         (anything-compile-source-functions compile-source-functions)
         anything-before-initialize-hook
         anything-after-initialize-hook
@@ -4852,8 +4851,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         anything-test-candidate-list)
     (get-buffer-create anything-buffer)
 
-    (anything-initialize)
-    (setq anything-input input anything-pattern input)
+    (anything-initialize-1 nil input sources)
     (anything-update)
     ;; test-mode spec: select 1st candidate!
     (with-current-buffer anything-buffer
