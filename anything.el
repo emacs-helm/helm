@@ -2296,6 +2296,10 @@ already-bound variables. Yuck!
   (memq any-resume '(t window-only)))
 
 (defun anything-initialize-1 (any-resume any-input any-sources)
+  "The real initialization of `anything'.
+
+This function name should be `anything-initialize', but anything
+extensions may advice `anything-initalize'. I cannot rename, sigh."
   (anything-frame/window-configuration 'save)
   (setq anything-sources (anything-normalize-sources any-sources))
   (anything-hooks 'setup)
