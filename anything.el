@@ -2280,16 +2280,11 @@ already-bound variables. Yuck!
                                  ;; cua-mode ; avoid error when region is selected
                                  )
         (with-anything-restore-variables
-          (anything-frame/window-configuration 'save)
-          (setq anything-sources (anything-normalize-sources any-sources))
-          (anything-initialize-1 any-resume any-input)
-          (anything-hooks 'setup)
+          (anything-initialize-1 any-resume any-input any-sources)
           (anything-display-buffer anything-buffer)
           (unwind-protect
               (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume any-keymap)
-            (anything-cleanup)
-            (anything-hooks 'cleanup)
-            (anything-frame/window-configuration 'restore)))
+            (anything-cleanup)))
         (unless anything-quit
           (anything-execute-selection-action-1)))
     (quit
@@ -2300,7 +2295,10 @@ already-bound variables. Yuck!
   "Whethre current anything session is resumed or not."
   (memq any-resume '(t window-only)))
 
-(defun anything-initialize-1 (any-resume any-input)
+(defun anything-initialize-1 (any-resume any-input any-sources)
+  (anything-frame/window-configuration 'save)
+  (setq anything-sources (anything-normalize-sources any-sources))
+  (anything-hooks 'setup)
   (anything-current-position 'save)
   (if (anything-resume-p any-resume)
       (anything-initialize-overlays (anything-buffer-get))
@@ -2510,7 +2508,9 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (if anything-check-minibuffer-input-timer
       (cancel-timer anything-check-minibuffer-input-timer))
   (anything-kill-async-processes)
-  (run-hooks 'anything-cleanup-hook))
+  (run-hooks 'anything-cleanup-hook)
+  (anything-hooks 'cleanup)
+  (anything-frame/window-configuration 'restore))
 
 ;; (@* "Core: input handling")
 (defun anything-check-minibuffer-input ()
