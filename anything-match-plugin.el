@@ -399,16 +399,19 @@ The smaller  this value is, the slower highlight is.")
                       (anything-get-current-source)))))
 (defun agp-command-line (query files &optional limit)
   (with-temp-buffer
-    (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
-          for i from 0
-          do
-          (setq re (replace-regexp-in-string "^-" "\\-" re))
-          (unless (zerop i) (insert " | ")) 
-          (insert "grep -ih "
-                  (if (eq flag 'identity) "" "-v ")
-                  (shell-quote-argument re))
-          (when (zerop i) (insert " "
-                                  (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " "))))
+    (if (string= query "")
+        (insert "cat "
+                (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " "))
+      (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
+            for i from 0
+            do
+            (setq re (replace-regexp-in-string "^-" "\\-" re))
+            (unless (zerop i) (insert " | ")) 
+            (insert "grep -ih "
+                    (if (eq flag 'identity) "" "-v ")
+                    (shell-quote-argument re))
+            (when (zerop i) (insert " "
+                                    (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " ")))))
     (when limit (insert (format " | head -%d" limit)))
     (buffer-string)))
 (defun anything-compile-source--grep-candidates (source)
