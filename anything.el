@@ -1440,6 +1440,9 @@ Attributes:
   common attributes with a `file' type.")
 
 
+(defvaralias 'anything-enable-digit-shortcuts 'anything-enable-shortcuts
+  "Alphabet shortcuts are usable now. Then `anything-enable-digit-shortcuts' should be renamed.
+`anything-enable-digit-shortcuts' is retained for compatibility.")
 (defvar anything-enable-shortcuts nil
   "*Whether to use digit/alphabet shortcut to select the first nine matches.
 If t then they can be selected using Ctrl+<number>.
@@ -1455,10 +1458,6 @@ If 'alphabet then they can be selected using Shift+<alphabet> (deprecated).
 It is not recommended because you cannot input capital letters in pattern.
 
 Keys (digit/alphabet) are listed in `anything-shortcut-keys-alist'.")
-
-(defvaralias 'anything-enable-digit-shortcuts 'anything-enable-shortcuts
-  "Alphabet shortcuts are usable now. Then `anything-enable-digit-shortcuts' should be renamed.
-`anything-enable-digit-shortcuts' is retained for compatibility.")
 
 (defvar anything-shortcut-keys-alist
   '((alphabet . "asdfghjklzxcvbnmqwertyuiop")
@@ -1801,11 +1800,11 @@ To enable fitting, set both `anything-inhibit-fit-frame-flag' and
   "If non-nil, add anything-source text-property in each candidate.
 experimental feature.")
 
+(defvaralias 'anything-debug-variables 'anything-debug-forms)
 (defvar anything-debug-forms nil
   "Forms to show in `anything-debug-output'.
 Otherwise all variables started with `anything-' are shown.
 It is useful for debug.")
-(defvaralias 'anything-debug-variables 'anything-debug-forms)
 
 (defvar anything-debug nil
   "If non-nil, write log message into *Anything Log* buffer.
@@ -2125,9 +2124,9 @@ Use this function is better than setting `anything-type-attributes' directly."
   (and doc (anything-document-type-attribute type doc))
   nil)
 
+(defvaralias 'anything-attributes 'anything-additional-attributes)
 (defvar anything-additional-attributes nil
   "List of all `anything' attributes.")
-(defvaralias 'anything-attributes 'anything-additional-attributes)
 (defun anything-document-attribute (attribute short-doc &optional long-doc)
   "Register ATTRIBUTE documentation introduced by plug-in.
 SHORT-DOC is displayed beside attribute name.
