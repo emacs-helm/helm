@@ -412,7 +412,7 @@ The smaller  this value is, the slower highlight is.")
                     (shell-quote-argument re))
             (when (zerop i) (insert " "
                                     (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " ")))))
-    (when limit (insert (format " | head -%d" limit)))
+    (when limit (insert (format " | head -n %d" limit)))
     (buffer-string)))
 (defun anything-compile-source--grep-candidates (source)
   (if (assq 'grep-candidates source)
@@ -487,7 +487,7 @@ was called."
         (agp-command-line "foo" '("~/.emacs.el")))
       (expect "grep -ih f\\ o /f\\ 1"
         (agp-command-line "f  o" '("/f 1")))
-      (expect "grep -ih foo /f1 | head -5"
+      (expect "grep -ih foo /f1 | head -n 5"
         (agp-command-line "foo" '("/f1") 5))
       (desc "anything-exact-match")
       (expect (non-nil)
