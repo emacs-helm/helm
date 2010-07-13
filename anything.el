@@ -2698,24 +2698,26 @@ Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
          (candidate-cache (assoc name anything-candidate-cache))
          candidates)
-    (if candidate-cache
-        (setq candidates (cdr candidate-cache))
+    (cond (candidate-cache
+           (anything-log "use cached candidates")
+           (setq candidates (cdr candidate-cache)))
 
-      (setq candidates (anything-get-candidates source))
+          (t
+           (anything-log "calculate candidates")
+           (setq candidates (anything-get-candidates source))
+           (if (processp candidates)
+               (progn
+                 (push (cons candidates
+                             (append source 
+                                     (list (cons 'item-count 0)
+                                           (cons 'incomplete-line ""))))
+                       anything-async-processes)
+                 (set-process-filter candidates 'anything-output-filter)
+                 (setq candidates nil))
 
-      (if (processp candidates)
-          (progn
-            (push (cons candidates
-                        (append source 
-                                (list (cons 'item-count 0)
-                                      (cons 'incomplete-line ""))))
-                  anything-async-processes)
-            (set-process-filter candidates 'anything-output-filter)
-            (setq candidates nil))
-
-        (unless (assoc 'volatile source)
-          (setq candidate-cache (cons name candidates))
-          (push candidate-cache anything-candidate-cache))))
+             (unless (assoc 'volatile source)
+               (setq candidate-cache (cons name candidates))
+               (push candidate-cache anything-candidate-cache)))))
 
     candidates))
 
@@ -2799,6 +2801,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 
 (defun anything-process-source (source)
   "Display matches from SOURCE according to its settings."
+  (anything-log-eval (assoc-default 'name source))
   (if (assq 'direct-insert-match source) ;experimental
       (anything-process-source--direct-insert-match source)
     (let ((matches (anything-compute-matches source)))
@@ -2832,6 +2835,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 
 (defun anything-process-source--direct-insert-match (source)
   "[EXPERIMENTAL] Insert candidates from `anything-candidate-buffer'"
+  (anything-log-eval (assoc-default 'name source))
   (let ((anything-source-name (assoc-default 'name source))
         content-buf)
     (funcall (assoc-default 'candidates source))
@@ -2844,6 +2848,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
   "Process delayed sources if the user is idle for
 `anything-idle-delay' seconds."
   (with-anything-quittable
+    (anything-log-eval (ignore-errors (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources)))
     (if (sit-for (if anything-input-idle-delay
                      (max 0 (- anything-idle-delay anything-input-idle-delay))
                    anything-idle-delay))
@@ -2869,6 +2874,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 (defun anything-update ()
   "Update the list of matches in the anything buffer according to
 the current pattern."
+  (anything-log "start update")
   (setq anything-digit-shortcut-count 0)
   (anything-kill-async-processes)
   (with-current-buffer (anything-buffer-get)
@@ -2912,7 +2918,8 @@ the current pattern."
                                  delayed-sources))
           ;; FIXME I want to execute anything-after-update-hook
           ;; AFTER processing delayed sources
-          (anything-log-run-hook 'anything-after-update-hook))))))
+          (anything-log-run-hook 'anything-after-update-hook))
+        (anything-log "end update")))))
 
 (defun anything-force-update ()
   "Recalculate and update candidates.
@@ -3005,7 +3012,7 @@ the real value in a text property."
          (incomplete-line-info (assoc 'incomplete-line process-info))
          (item-count-info (assoc 'item-count process-info))
          (limit (anything-candidate-number-limit process-info)))
-
+    (anything-log-eval string (cdr incomplete-line-info))
     (with-current-buffer anything-buffer
       (save-excursion
         (if insertion-marker
@@ -3941,12 +3948,14 @@ otherwise 1-element list of current selection.
 
 It is analogous to `dired-get-marked-files'."
   (with-current-buffer (anything-buffer-get)
-    (if anything-marked-candidates
-        (loop with current-src = (anything-get-current-source)
-              for (source . real) in (reverse anything-marked-candidates)
-              when (equal current-src source)
-              collect real)
-      (list (anything-get-selection)))))
+    (let ((cands (if anything-marked-candidates
+                     (loop with current-src = (anything-get-current-source)
+                           for (source . real) in (reverse anything-marked-candidates)
+                           when (equal current-src source)
+                           collect real)
+                   (list (anything-get-selection)))))
+      (anything-log-eval cands)
+      cands)))
 
 (defun anything-reset-marked-candidates ()
   (with-current-buffer (anything-buffer-get)
