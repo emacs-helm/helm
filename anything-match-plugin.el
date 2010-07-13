@@ -389,15 +389,16 @@ The smaller  this value is, the slower highlight is.")
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--match-plugin t)
 
 ;;;; grep-candidates plug-in
-(defun agp-candidates ()
+(defun agp-candidates (&optional filter)
   (start-process-shell-command
    "anything-grep-candidates" nil
    (agp-command-line anything-pattern
                      (anything-mklist (anything-interpret-value
                                        (anything-attr 'grep-candidates)))
                      (anything-candidate-number-limit
-                      (anything-get-current-source)))))
-(defun agp-command-line (query files &optional limit)
+                      (anything-get-current-source))
+                     filter)))
+(defun agp-command-line (query files &optional limit filter)
   (with-temp-buffer
     (if (string= query "")
         (insert "cat "
@@ -413,6 +414,7 @@ The smaller  this value is, the slower highlight is.")
             (when (zerop i) (insert " "
                                     (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " ")))))
     (when limit (insert (format " | head -n %d" limit)))
+    (when filter (insert " | " filter))
     (buffer-string)))
 (defun anything-compile-source--grep-candidates (source)
   (if (assq 'grep-candidates source)
@@ -489,6 +491,8 @@ was called."
         (agp-command-line "f  o" '("/f 1")))
       (expect "grep -ih foo /f1 | head -n 5"
         (agp-command-line "foo" '("/f1") 5))
+      (expect "grep -ih foo /f1 | head -n 5 | nkf -w"
+        (agp-command-line "foo" '("/f1") 5 "nkf -w"))
       (desc "anything-exact-match")
       (expect (non-nil)
         (anything-exact-match "thunder" "thunder"))
