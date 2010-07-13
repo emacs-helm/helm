@@ -2648,16 +2648,19 @@ Anything plug-ins are realized by this function."
 ;; (progn (ad-disable-advice 'documentation-property 'after 'anything-document-attribute) (ad-update 'documentation-property)) 
 
 ;; (@* "Core: all candidates")
-(defun anything-get-candidates (source)
-  "Retrieve and return the list of candidates from
-SOURCE."
+(defun anything-process-delayed-init (source)
   (let ((name (assoc-default 'name source)))
     (unless (member name anything-delayed-init-executed)
       (anything-aif (assoc-default 'delayed-init source)
           (with-current-buffer anything-current-buffer
             (anything-funcall-with-source source it)
             (dolist (f (if (functionp it) (list it) it))
-              (add-to-list 'anything-delayed-init-executed name))))))
+              (add-to-list 'anything-delayed-init-executed name)))))))
+
+(defun anything-get-candidates (source)
+  "Retrieve and return the list of candidates from
+SOURCE."
+  (anything-process-delayed-init source)
   (let* ((candidate-source (assoc-default 'candidates source))
          (type-error (lambda ()
                        (error (concat "Candidates must either be a function, "
