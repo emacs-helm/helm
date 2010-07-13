@@ -1822,6 +1822,39 @@ It is useful for debug.")
 (defvar anything-follow-mode nil)
 (defvar anything-let-variables nil)
 
+;; (@* "Utility: logging")
+(defvar anything-debug nil)
+(defun anything-log (format-string &rest args)
+  "Write a message to the *Anythingn Log* buffer.
+Arguments are same as `format'."
+  (when (or debug-on-error anything-debug)
+    (with-current-buffer (get-buffer-create "*Anything Log*")
+      (buffer-disable-undo)
+      (goto-char (point-max))
+      (insert (let ((tm (current-time)))
+                (format "%s.%06d (%s) %s\n"
+                        (format-time-string "%H:%M:%S" tm)
+                        (nth 2 tm)
+                        (anything-log-get-current-function)
+                        (apply #'format (cons format-string args))))))))
+
+(defmacro anything-log-eval (&rest exprs)
+  "Write each EXPR evaluation result to the *Anything Log* buffer."
+  `(progn
+     ,@(mapcar (lambda (expr) `(anything-log "%S = %S" ',expr ,expr)) exprs)))
+(defun anything-log-get-current-function ()
+  "Get function name calling `anything-log'.
+The original idea is from `tramp-debug-message'."
+  (loop for btn from 1 to 40            ;avoid inf-loop
+        for btf = (second (backtrace-frame btn))
+        for fn  = (if (symbolp btf) (symbol-name btf) "")
+        do (when (and (string-match "^anything" fn)
+                      (not (string-match "^anything-log" fn)))
+             (return fn))))
+
+;; (anything-log "test")
+;; (switch-to-buffer-other-window "*Anything Log*")
+
 ;; (@* "Programming Tools")
 (defmacro anything-aif (test-form then-form &rest else-forms)
   "Anaphoric if. Temporary variable `it' is the result of test-form."
@@ -4440,39 +4473,6 @@ shown yet and bind anything commands in iswitchb."
     (dolist (binding anything-iswitchb-saved-keys)
       (define-key (current-local-map) (car binding) (cdr binding)))
     (anything-iswitchb-minibuffer-exit)))
-
-;; (@* "Utility: logging")
-(defvar anything-debug nil)
-(defun anything-log (format-string &rest args)
-  "Write a message to the *Anythingn Log* buffer.
-Arguments are same as `format'."
-  (when (or debug-on-error anything-debug)
-    (with-current-buffer (get-buffer-create "*Anything Log*")
-      (buffer-disable-undo)
-      (goto-char (point-max))
-      (insert (let ((tm (current-time)))
-                (format "%s.%06d (%s) %s\n"
-                        (format-time-string "%H:%M:%S" tm)
-                        (nth 2 tm)
-                        (anything-log-get-current-function)
-                        (apply #'format (cons format-string args))))))))
-
-(defmacro anything-log-eval (&rest exprs)
-  "Write each EXPR evaluation result to the *Anything Log* buffer."
-  `(progn
-     ,@(mapcar (lambda (expr) `(anything-log "%S = %S" ',expr ,expr)) exprs)))
-(defun anything-log-get-current-function ()
-  "Get function name calling `anything-log'.
-The original idea is from `tramp-debug-message'."
-  (loop for btn from 1 to 20            ;avoid inf-loop
-        for btf = (second (backtrace-frame btn))
-        for fn  = (if (symbolp btf) (symbol-name btf) "")
-        do (when (and (string-match "^anything" fn)
-                      (not (string-match "^anything-log" fn)))
-             (return fn))))
-
-;; (anything-log "test")
-;; (switch-to-buffer-other-window "*Anything Log*")
 
 ;; (@* "Compatibility")
 
