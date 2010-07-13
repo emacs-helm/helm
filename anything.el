@@ -1939,6 +1939,12 @@ It is useful to write your sources."
   (anything-aif (assq attribute-name src)
       (cdr it)))
 
+(defun* anything-attr* (attribute-name &optional (src (anything-get-current-source)))
+  "Get the value of ATTRIBUTE-NAME of SRC (source) and pass to `anything-interpret-value'.
+if SRC is omitted, use current source.
+It is useful to write your sources."
+  (anything-interpret-value (anything-attr attribute-name src)))
+
 (defun* anything-attr-defined (attribute-name &optional (src (anything-get-current-source)))
   "Return non-nil if ATTRIBUTE-NAME of SRC (source)  is defined.
 if SRC is omitted, use current source.
@@ -5649,6 +5655,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
               (hoge)                    ;INCOMPATIBLE!
               (init . (lambda () (setq v (anything-attr 'hoge))))
               (candidates "a"))))
+          v))
+      (desc "anything-attr*")
+      (expect "generic"
+        (let (v (value1 "generic"))
+          (anything-test-candidates
+           '(((name . "FOO")
+              (hoge . value1)
+              (init . (lambda () (setq v (anything-attr* 'hoge)))))))
           v))
       (desc "anything-attr-defined")
       (expect (non-nil)
