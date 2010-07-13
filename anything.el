@@ -1927,9 +1927,11 @@ The original idea is from `tramp-debug-message'."
          (deferred-action-function 'anything-deferred-action-function)
          (--pre-command-hook-pair (cons pre-command-hook
                                         (default-value 'pre-command-hook))))
+     (anything-log "save variables: %S" --orig-vars)
      (unwind-protect (progn ,@body)
        (loop for (var . value) in --orig-vars
-             do (set var value)))))
+             do (set var value))
+       (anything-log "restore variables"))))
 (put 'with-anything-restore-variables 'lisp-indent-function 0)
 
 (defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
@@ -1998,6 +2000,7 @@ It is useful to write your sources."
                (loop for name in sources always (stringp name)))
     (error "invalid data in `anything-set-source-filter': %S" sources))
   (setq anything-source-filter sources)
+  (anything-log-eval anything-source-filter)
   (anything-update))
 
 (defun anything-set-sources (sources &optional no-init no-update)
@@ -2007,7 +2010,8 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
   (with-current-buffer anything-buffer
     (setq anything-compiled-sources nil
           anything-sources sources
-          anything-last-sources-local sources))
+          anything-last-sources-local sources)
+    (anything-log-eval anything-compiled-sources anything-sources))
   (unless no-init (anything-funcall-foreach 'init))
   (unless no-update (anything-update)))
 
@@ -2062,6 +2066,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
                        (anything-funcall-with-source source it disp)
                      disp)))))
         (unless (equal selection "")
+          (anything-log-eval selection)
           selection)))))
 
 (defun anything-get-action ()
@@ -2112,9 +2117,11 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
                      "/"
                      (anything-attr 'name)))
          (source-tick (or (gethash key anything-tick-hash) 0))
-         (buffer-tick (buffer-chars-modified-tick b)))
-    (prog1 (/= source-tick buffer-tick)
-      (puthash key buffer-tick anything-tick-hash))))
+         (buffer-tick (buffer-chars-modified-tick b))
+         (modifiedp (/= source-tick buffer-tick)))
+    (puthash key buffer-tick anything-tick-hash)
+    (anything-log-eval buffer modifiedp)
+    modifiedp))
 (defun anything-current-buffer-is-modified ()
   "Return non-nil when `anything-current-buffer' is modified since `anything' was invoked."
   (anything-buffer-is-modified anything-current-buffer))
@@ -2124,6 +2131,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
   "Perform an action after quitting `anything'.
 The action is to call FUNCTION with arguments ARGS."
   (setq anything-quit t)
+  (anything-log-eval function args)
   (apply 'run-with-idle-timer 0 nil function args)
   (anything-exit-minibuffer))
 
@@ -2323,7 +2331,7 @@ already-bound variables. Yuck!
 "
   ;; TODO more document
   (interactive)
-  (anything-log "start session ++++++++++++++++++++++++++++++++++++++++++")
+  (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
   (condition-case v
       (let ( ;; It is needed because `anything-source-name' is non-nil
@@ -2607,6 +2615,7 @@ necessary."
     (setq anything-pattern input)
     (unless (anything-action-window)
       (setq anything-input anything-pattern))
+    (anything-log-eval anything-pattern anything-input)
     (anything-update)))
 
 ;; (@* "Core: source compiler")
