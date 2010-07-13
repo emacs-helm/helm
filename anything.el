@@ -1825,7 +1825,8 @@ It is useful for debug.")
 ;; (@* "Utility: logging")
 (defvar anything-debug nil)
 (defun anything-log (format-string &rest args)
-  "Write a message to the *Anythingn Log* buffer.
+  "Log message if `debug-on-error' or `anything-debug' is non-nil.
+Messages are written to the *Anythingn Log* buffer.
 Arguments are same as `format'."
   (when (or debug-on-error anything-debug)
     (with-current-buffer (get-buffer-create "*Anything Log*")
