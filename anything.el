@@ -1807,6 +1807,11 @@ Otherwise all variables started with `anything-' are shown.
 It is useful for debug.")
 (defvaralias 'anything-debug-variables 'anything-debug-forms)
 
+(defvar anything-debug nil
+  "If non-nil, write log message into *Anything Log* buffer.
+If `debug-on-error' is non-nil, write log message regardless of this variable.
+It is disabled by default because *Anything Log* grows quickly.")
+
 ;; (@* "Internal Variables")
 (defvar anything-test-candidate-list nil)
 (defvar anything-test-mode nil)
@@ -1823,7 +1828,6 @@ It is useful for debug.")
 (defvar anything-let-variables nil)
 
 ;; (@* "Utility: logging")
-(defvar anything-debug nil)
 (defun anything-log (format-string &rest args)
   "Log message if `debug-on-error' or `anything-debug' is non-nil.
 Messages are written to the *Anythingn Log* buffer.
