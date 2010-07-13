@@ -1844,7 +1844,13 @@ Arguments are same as `format'."
 (defmacro anything-log-eval (&rest exprs)
   "Write each EXPR evaluation result to the *Anything Log* buffer."
   `(anything-log-eval-internal ',exprs))
-
+(defun anything-log-run-hook (hook)
+  (anything-log "executing %s" hook)
+  (when (boundp hook)
+    (anything-log-eval (symbol-value hook))
+    (anything-log-eval (default-value hook)))
+  (run-hooks hook)
+  (anything-log "executed %s" hook))
 (defun anything-log-eval-internal (exprs)
   (mapc (lambda (expr) (anything-log "%S = %S" expr (eval expr))) exprs))
 (defun anything-log-get-current-function ()
@@ -2365,7 +2371,7 @@ extensions may advice `anything-initalize'. I cannot rename, sigh."
       (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
-    (run-hooks 'anything-after-action-hook)))
+    (anything-log-run-hook 'anything-after-action-hook)))
 
 (defun anything-on-quit ()
   (setq minibuffer-history (cons anything-input minibuffer-history))
@@ -2455,7 +2461,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 ;; (@* "Core: initialize")
 (defun anything-initialize ()
   "Initialize anything settings and set up the anything buffer."
-  (run-hooks 'anything-before-initialize-hook)
+  (anything-log-run-hook 'anything-before-initialize-hook)
   (setq anything-once-called-functions nil)
   (setq anything-delayed-init-executed nil)
   (setq anything-current-buffer (current-buffer))
@@ -2472,7 +2478,7 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (setq anything-last-sources anything-sources)
 
   (anything-create-anything-buffer)
-  (run-hooks 'anything-after-initialize-hook))
+  (anything-log-run-hook 'anything-after-initialize-hook))
 
 (defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume any-keymap)
   (if (anything-resume-p any-resume) (anything-mark-current-line) (anything-update))
@@ -2566,7 +2572,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (if anything-check-minibuffer-input-timer
       (cancel-timer anything-check-minibuffer-input-timer))
   (anything-kill-async-processes)
-  (run-hooks 'anything-cleanup-hook)
+  (anything-log-run-hook 'anything-cleanup-hook)
   (anything-hooks 'cleanup)
   (anything-frame/window-configuration 'restore))
 
@@ -2836,7 +2842,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
               (anything-next-line)))
           (save-excursion
             (goto-char (point-min))
-            (run-hooks 'anything-update-hook))
+            (anything-log-run-hook 'anything-update-hook))
           (anything-maybe-fit-frame)))))
 
 ;; (@* "Core: *anything* buffer contents")
@@ -2871,7 +2877,7 @@ the current pattern."
                 (anything-process-source source))))
 
         (goto-char (point-min))
-        (save-excursion (run-hooks 'anything-update-hook))
+        (save-excursion (anything-log-run-hook 'anything-update-hook))
         (anything-next-line)
         (setq delayed-sources (nreverse delayed-sources))
         (if anything-test-mode
@@ -2887,7 +2893,7 @@ the current pattern."
                                  delayed-sources))
           ;; FIXME I want to execute anything-after-update-hook
           ;; AFTER processing delayed sources
-          (run-hooks 'anything-after-update-hook))))))
+          (anything-log-run-hook 'anything-after-update-hook))))))
 
 (defun anything-force-update ()
   "Recalculate and update candidates.
@@ -3027,7 +3033,7 @@ the real value in a text property."
 
       (anything-maybe-fit-frame)
 
-      (run-hooks 'anything-update-hook)
+      (anything-log-run-hook 'anything-update-hook)
 
       (if (bobp)
           (anything-next-line)
@@ -3808,7 +3814,7 @@ Otherwise goto the end of minibuffer."
          (or (assoc-default attr (anything-get-current-source))
              (anything-get-action))
          t)
-        (run-hooks 'anything-after-persistent-action-hook)))))
+        (anything-log-run-hook 'anything-after-persistent-action-hook)))))
 
 (defun anything-persistent-action-display-buffer (buf &optional not-this-window)
   "Make `pop-to-buffer' and `display-buffer' display in the same window in persistent action.
@@ -4896,7 +4902,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 (defmacro anything-test-update (sources pattern)
   "Test helper macro for anything. It is meant for testing *anything* buffer contents."
   `(progn (stub anything-get-sources => ,sources)
-          (stub run-hooks => nil)
+          (stub anything-log-run-hook => nil)
           (stub anything-maybe-fit-frame => nil)
           (stub run-with-idle-timer => nil)
           (let (anything-test-mode (anything-pattern ,pattern))
@@ -5740,7 +5746,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       ;; TODO el-mock.el should express 2nd call of function.
       ;;     (expect (mock (anything-process-source '((name . "2"))))
       ;;       (stub anything-get-sources => '(((name . "1")) ((name . "2"))))
-      ;;       (stub run-hooks)
+      ;;       (stub anything-log-run-hook)
       ;;       (stub anything-maybe-fit-frame)
       ;;       (stub run-with-idle-timer)
       ;;       (anything-update))
@@ -5748,7 +5754,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                          '(((name . "2") (delayed)))))
         (stub anything-get-sources => '(((name . "1"))
                                         ((name . "2") (delayed))))
-        (stub run-hooks)
+        (stub anything-log-run-hook)
         (stub anything-maybe-fit-frame)
         (let ((anything-pattern "") anything-test-mode)
           (anything-update)))
