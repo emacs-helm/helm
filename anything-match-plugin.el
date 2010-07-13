@@ -37,6 +37,9 @@
 ;;
 ;; Below are customizable option list:
 ;;
+;;  `anything-grep-candidates-fast-directory-regexp'
+;;    *Directory regexp where a RAM disk (or tmpfs) is mounted.
+;;    default = nil
 
 ;; A query of multiple regexp match is space-delimited string.
 ;; Anything displays candidates which matches all the regexps.
@@ -151,7 +154,7 @@
 (require 'anything)
 (require 'cl)
 
-(let ((version "1.256"))
+(let ((version "1.283"))
   (when (and (string= "1." (substring version 0 2))
              (string-match "1\.\\([0-9]+\\)" anything-version)
              (< (string-to-number (match-string 1 anything-version))
@@ -161,6 +164,15 @@
 http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
 or  M-x install-elisp-from-emacswiki anything.el")))
+
+(defcustom anything-grep-candidates-fast-directory-regexp nil
+  "*Directory regexp where a RAM disk (or tmpfs) is mounted.
+If non-nil, grep-candidates plugin gets faster because it uses grep as synchronous process.
+
+ex. (setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\")"
+  :type 'string
+  :group 'anything)
+
 ;;;; multiple patterns
 (defvar anything-use-multiple-patterns t
   "If non-nil, enable anything-use-multiple-patterns.")
@@ -390,15 +402,26 @@ The smaller  this value is, the slower highlight is.")
 
 ;;;; grep-candidates plug-in
 (defun agp-candidates (&optional filter)
-  (start-process-shell-command
-   "anything-grep-candidates" nil
-   (agp-command-line anything-pattern
-                     (anything-mklist (anything-interpret-value
-                                       (anything-attr 'grep-candidates)))
-                     (anything-candidate-number-limit
-                      (anything-get-current-source))
-                     filter)))
+  "Normal version of grep-candidates candidates function.
+Grep is run by asynchronous process."
+  (start-process-shell-command "anything-grep-candidates" nil
+                               (agp-command-line-2 filter)))
+(defun agp-candidates-synchronous-grep (&optional filter)
+  "Faster version of grep-candidates candidates function.
+Grep is run by synchronous process.
+It is faster when candidate files are in ramdisk."
+  (split-string (shell-command-to-string (agp-command-line-2 filter)) "\n"))
+(defun agp-candidates-synchronous-grep--direct-insert-match (&optional filter)
+  "[EXPERIMENTAL]Fastest version of grep-candidates candidates function at the cost of absense of transformers.
+Grep is run by synchronous process.
+It is faster when candidate files are in ramdisk.
+
+If (direct-insert-match) is in the source, this function is used."
+  (with-current-buffer (anything-candidate-buffer 'global)
+    (call-process-shell-command (agp-command-line-2 filter) nil t)))
+
 (defun agp-command-line (query files &optional limit filter)
+  "Build command line used by grep-candidates from QUERY, FILES, LIMIT, and FILTER."
   (with-temp-buffer
     (if (string= query "")
         (insert "cat "
@@ -416,11 +439,36 @@ The smaller  this value is, the slower highlight is.")
     (when limit (insert (format " | head -n %d" limit)))
     (when filter (insert " | " filter))
     (buffer-string)))
+(defun agp-command-line-2 (filter)
+  "Build command line used by grep-candidates from FILTER and current source."
+  (agp-command-line
+   anything-pattern
+   (anything-mklist (anything-interpret-value (anything-attr 'grep-candidates)))
+   (anything-candidate-number-limit (anything-get-current-source))
+   filter))
 (defun anything-compile-source--grep-candidates (source)
-  (if (assq 'grep-candidates source)
+  (anything-aif (assoc-default 'grep-candidates source)
       (append source
-              '((candidates . agp-candidates)
-                (delayed)))
+              (let ((use-fast-directory
+                     (string-match
+                      anything-grep-candidates-fast-directory-regexp
+                      (car (anything-mklist (anything-interpret-value it))))))
+                (cond ((and use-fast-directory (assq 'direct-insert-match source))
+                       (anything-log "fastest version (use-fast-directory and direct-insert-match)")
+                       `((candidates . agp-candidates-synchronous-grep--direct-insert-match)
+                         (match identity)
+                         (volatile)
+                         (requires-pattern)))
+                      (use-fast-directory
+                       (anything-log "faster version (use-fast-directory)")
+                       `((candidates . agp-candidates-synchronous-grep)
+                         (match identity)
+                         (volatile)
+                         (requires-pattern)))
+                      (t
+                       (anything-log "normal version")
+                       '((candidates . agp-candidates)
+                         (delayed))))))
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--grep-candidates)
 
