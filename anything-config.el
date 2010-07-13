@@ -3524,6 +3524,9 @@ http://ctags.sourceforge.net/")
 ;; (anything 'anything-c-source-ctags)
 
 ;; Semantic
+(declare-function semantic-format-tag-summarize "format.el" (tag &optional parent color) t)
+(declare-function semantic-tag-components "tag.el" (tag) t)
+(declare-function semantic-go-to-tag "tag-file.el" (tag) t)
 (defvar anything-semantic-candidates nil)
 (eval-when-compile (require 'semantic nil t))
 (defun anything-semantic-construct-candidates (tags depth)
@@ -4347,6 +4350,15 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 ;; (anything 'anything-c-source-picklist)
 
 ;;; BBDB
+(defvar bbdb-records)
+(defvar bbdb-buffer-name)
+(declare-function bbdb "ext:bbdb-com")
+(declare-function bbdb-current-record "ext:bbdb-com")
+(declare-function bbdb-redisplay-one-record "ext:bbdb-com")
+(declare-function bbdb-record-net "ext:bbdb-com" (string) t)
+(declare-function bbdb-current-record "ext:bbdb-com")
+(declare-function bbdb-dwim-net-address "ext:bbdb-com")
+
 (defun anything-c-bbdb-candidates ()
   "Return a list of all names in the bbdb database.  The format
 is \"Firstname Lastname\"."
