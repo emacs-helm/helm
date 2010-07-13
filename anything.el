@@ -1860,7 +1860,7 @@ The original idea is from `tramp-debug-message'."
         for btf = (second (backtrace-frame btn))
         for fn  = (if (symbolp btf) (symbol-name btf) "")
         do (when (and (string-match "^anything" fn)
-                      (not (string-match "^anything-log" fn)))
+                      (not (string-match "^anything-\\(?:interpret\\|log\\|.*funcall\\)" fn)))
              (return fn))))
 
 ;; (anything-log "test")
@@ -2210,6 +2210,7 @@ Otherwise, return VALUE itself."
 FUNC can be function list. Return the result of last function call."
   (let ((anything-source-name (assoc-default 'name source))
         result)
+    (anything-log-eval anything-source-name func args)
     (dolist (func (if (functionp func) (list func) func) result)
       (setq result (apply func args)))))
 
