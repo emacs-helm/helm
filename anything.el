@@ -1837,11 +1837,12 @@ Arguments are same as `format'."
                         (nth 2 tm)
                         (anything-log-get-current-function)
                         (apply #'format (cons format-string args))))))))
-
 (defmacro anything-log-eval (&rest exprs)
   "Write each EXPR evaluation result to the *Anything Log* buffer."
-  `(progn
-     ,@(mapcar (lambda (expr) `(anything-log "%S = %S" ',expr ,expr)) exprs)))
+  `(anything-log-eval-internal ',exprs))
+
+(defun anything-log-eval-internal (exprs)
+  (mapc (lambda (expr) (anything-log "%S = %S" expr (eval expr))) exprs))
 (defun anything-log-get-current-function ()
   "Get function name calling `anything-log'.
 The original idea is from `tramp-debug-message'."
