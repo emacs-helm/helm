@@ -1077,9 +1077,12 @@ It accepts one argument, selected candidate.")
   (defalias 'anything-old-read-command (symbol-function 'read-command))
   (put 'anything-read-string-mode 'orig-read-buffer-function read-buffer-function))
   
-;; (anything-read-string-mode -1)
-;; (anything-read-string-mode 1)
-;; (anything-read-string-mode 0)
+;; (progn (anything-read-string-mode -1) anything-read-string-mode)
+;; (progn (anything-read-string-mode 1) anything-read-string-mode)
+;; (progn (anything-read-string-mode 0) anything-read-string-mode)
+;; (progn (anything-read-string-mode '(string buffer variable command)) anything-read-string-mode)
+(defvar anything-read-string-mode-flags '(string file buffer variable command)
+  "Saved ARG of `anything-read-string-mode'.")
 (defun anything-read-string-mode (arg)
   "If this minor mode is on, use `anything' version of `completing-read' and `read-file-name'.
 
@@ -1096,11 +1099,11 @@ So, (anything-read-string-mode 1) and
   (when (consp anything-read-string-mode)
     (anything-read-string-mode-uninstall))
   (setq anything-read-string-mode
-        (cond ((listp arg) arg)                       ; not interactive
+        (cond ((consp arg) (setq anything-read-string-mode-flags arg)) ; not interactive
               (arg (> (prefix-numeric-value arg) 0))  ; C-u M-x
               (t   (not anything-read-string-mode)))) ; M-x 
   (when (eq anything-read-string-mode t)
-    (setq anything-read-string-mode '(string file buffer variable command)))
+    (setq anything-read-string-mode anything-read-string-mode-flags))
   (if anything-read-string-mode
       (anything-read-string-mode-install)
     (anything-read-string-mode-uninstall)))
