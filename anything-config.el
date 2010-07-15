@@ -652,11 +652,9 @@ Though wmctrl work also with stumpwm."
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
 (define-key global-map (kbd "<f5> a") 'anything-command-map)
-(define-key anything-command-map (kbd "d") 'anything-delicious)
 (define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
 (define-key anything-command-map (kbd "g") 'anything-gentoo)
 (define-key anything-command-map (kbd "a g") 'anything-apt)
-(define-key anything-command-map (kbd "q") 'anything-qpatchs-only)
 (define-key anything-command-map (kbd "l") 'anything-locate)
 (define-key anything-command-map (kbd "s") 'anything-surfraw)
 (define-key anything-command-map (kbd "r") 'anything-regexp)
@@ -666,8 +664,9 @@ Though wmctrl work also with stumpwm."
 (define-key anything-command-map (kbd "m") 'anything-man-woman)
 (define-key anything-command-map (kbd "t") 'anything-top)
 (define-key anything-command-map (kbd "i") 'anything-imenu)
-(define-key anything-command-map (kbd "C-x r l") 'anything-c-pp-bookmarks)
+(define-key anything-command-map (kbd "C-x r b") 'anything-c-pp-bookmarks)
 (define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
+(define-key anything-command-map (kbd "C-c <SPC>") 'anything-all-mark-rings)
 (define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
 (define-key anything-command-map (kbd "C-:") 'anything-eval-expression-with-eldoc)
 (define-key anything-command-map (kbd "C-,") 'anything-calcul-expression)
@@ -1604,8 +1603,8 @@ buffer that is not the current buffer."
            ("Find file as root" . anything-find-file-as-root)
            ("Open file externally (C-u to choose)"
             . anything-c-open-file-externally)
-           ("Create dired buffer on marked"
-            . anything-c-create-dired-on-marked)
+           ;; ("Create dired buffer on marked"
+           ;;  . anything-c-create-dired-on-marked)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame))))))
 
@@ -3524,9 +3523,9 @@ http://ctags.sourceforge.net/")
 ;; (anything 'anything-c-source-ctags)
 
 ;; Semantic
-(declare-function semantic-format-tag-summarize "format.el" (tag &optional parent color) t)
-(declare-function semantic-tag-components "tag.el" (tag) t)
-(declare-function semantic-go-to-tag "tag-file.el" (tag) t)
+(declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
+(declare-function semantic-tag-components "ext:tag.el" (tag) t)
+(declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
 (defvar anything-semantic-candidates nil)
 (eval-when-compile (require 'semantic nil t))
 (defun anything-semantic-construct-candidates (tags depth)
@@ -4358,6 +4357,8 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 (declare-function bbdb-record-net "ext:bbdb-com" (string) t)
 (declare-function bbdb-current-record "ext:bbdb-com")
 (declare-function bbdb-dwim-net-address "ext:bbdb-com")
+(declare-function bbdb-records "ext:bbdb-com"
+                  (&optional dont-check-disk already-in-db-buffer))
 
 (defun anything-c-bbdb-candidates ()
   "Return a list of all names in the bbdb database.  The format
@@ -6418,11 +6419,14 @@ It also accepts a function or a variable name.")
         (dolist (i marked) (find-file-noselect i))
         (find-file-at-point candidate))))
 
-(defun anything-c-create-dired-on-marked (candidate)
-  "Create a new dired buffer with only marked candidates."
-  (let ((marked      (anything-marked-candidates))
-        (buffer-name (read-string "New Dired Buffer: ")))
-    (dired (cons buffer-name marked))))
+;; FIXME there is a bug in dired that confuse all dired commands
+;; when using this feature, so i suspend it until bug is fixed in emacs.
+;;
+;; (defun anything-c-create-dired-on-marked (candidate)
+;;   "Create a new dired buffer with only marked candidates."
+;;   (let ((marked      (anything-marked-candidates))
+;;         (buffer-name (read-string "New Dired Buffer: ")))
+;;     (dired (cons buffer-name marked))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
