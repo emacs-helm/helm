@@ -4141,16 +4141,14 @@ See http://orgmode.org for the latest version.")
   '((name . "Yaoddmuse Edit or View (EmacsWiki)")
     (candidates . (lambda ()
                     (if anything-yaoddmuse-use-cache-file
-                        (condition-case nil
-                            (progn
-                              (unless anything-c-yaoddmuse-ew-cache
-                                (load anything-c-yaoddmuse-cache-file)
-                                (setq anything-c-yaoddmuse-ew-cache
-                                      (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                              anything-c-yaoddmuse-ew-cache)
-                          (error nil))
-                        (yaoddmuse-update-pagename t)
-                        (gethash "EmacsWiki" yaoddmuse-pages-hash))))
+                        (ignore-errors
+                          (unless anything-c-yaoddmuse-ew-cache
+                            (load anything-c-yaoddmuse-cache-file)
+                            (setq anything-c-yaoddmuse-ew-cache
+                                  (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+                          anything-c-yaoddmuse-ew-cache)
+                      (yaoddmuse-update-pagename t)
+                      (gethash "EmacsWiki" yaoddmuse-pages-hash))))
     (action . (("Edit page" . (lambda (candidate)
                                 (yaoddmuse-edit "EmacsWiki" candidate)))
                ("Browse page" . (lambda (candidate)
@@ -4172,7 +4170,7 @@ See http://orgmode.org for the latest version.")
                                          (anything-yaoddmuse-cache-pages t)
                                          (setq anything-c-yaoddmuse-ew-cache
                                                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                                       (yaoddmuse-update-pagename))))))
+                                     (yaoddmuse-update-pagename))))))
     (action-transformer anything-c-yaoddmuse-action-transformer)))
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view)
