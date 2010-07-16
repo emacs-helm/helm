@@ -3543,11 +3543,12 @@ http://ctags.sourceforge.net/")
 ;; (anything 'anything-c-source-ctags)
 
 ;; Semantic
+(eval-when-compile (require 'semantic nil t))
 (declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
 (declare-function semantic-tag-components "ext:tag.el" (tag) t)
 (declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
 (defvar anything-semantic-candidates nil)
-(eval-when-compile (require 'semantic nil t))
+
 (defun anything-semantic-construct-candidates (tags depth)
   (when (require 'semantic nil t)
     (apply 'append
