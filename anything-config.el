@@ -113,6 +113,8 @@
 ;; Preconfigured `anything' for Locate.
 ;; `anything-w3m-bookmarks'
 ;; Preconfigured `anything' for w3m bookmark.
+;; `anything-firefox-bookmarks'
+;; Preconfigured `anything' for firefox bookmark.
 ;; `anything-colors'
 ;; Preconfigured `anything' for color.
 ;; `anything-bookmarks'
@@ -364,6 +366,7 @@
 ;; `anything-c-source-bookmarks-local'				(Bookmarks-Local)
 ;; `anything-c-source-bmkext-addressbook'			(Bookmark Addressbook)
 ;; `anything-c-source-bookmark-w3m'				(Bookmark W3m)
+;; `anything-c-source-bookmark-images'				(Bookmark Images)
 ;; `anything-c-source-bookmark-man'				(Bookmark Woman&Man)
 ;; `anything-c-source-bookmark-gnus'				(Bookmark Gnus)
 ;; `anything-c-source-bookmark-info'				(Bookmark Info)
@@ -3043,6 +3046,23 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   "Specialized filter function for bookmarks w3m."
   (anything-c-bmkext-filter-setup-alist 'bmkext-w3m-alist-only))
 
+;; Images
+(defvar anything-c-source-bookmark-images
+  '((name . "Bookmark Images")
+    (init . (lambda ()
+              (require 'bookmark-extensions)
+              (bookmark-maybe-load-default-file)))
+    (candidates . anything-c-bookmark-images-setup-alist)
+    (filtered-candidate-transformer
+     anything-c-adaptive-sort
+     anything-c-highlight-bookmark)
+    (type . bookmark)))
+;; (anything 'anything-c-source-bookmark-images)
+
+(defun anything-c-bookmark-images-setup-alist ()
+  "Specialized filter function for images bookmarks."
+  (anything-c-bmkext-filter-setup-alist 'bmkext-image-file-alist-only))
+
 ;; Woman Man
 (defvar anything-c-source-bookmark-man
   '((name . "Bookmark Woman&Man")
@@ -3177,6 +3197,7 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
               anything-c-source-bookmark-gnus
               anything-c-source-bookmark-info
               anything-c-source-bookmark-man
+              anything-c-source-bookmark-images
               anything-c-source-bookmark-su-files&dirs
               anything-c-source-bookmark-ssh-files&dirs)
             nil "SearchBookmark: " nil nil "*anything bmkext*"))
