@@ -3554,9 +3554,7 @@ http://ctags.sourceforge.net/")
   '((name . "Semantic Tags")
     (init . (lambda ()
               (setq anything-semantic-candidates
-                    (condition-case nil
-                        (anything-semantic-construct-candidates (semantic-fetch-tags) 0)
-                      (error nil)))))
+                    (ignore-errors (anything-semantic-construct-candidates (semantic-fetch-tags) 0)))))
     (candidates . (lambda ()
                     (if anything-semantic-candidates
                         (mapcar 'car anything-semantic-candidates))))
