@@ -3454,15 +3454,14 @@ STRING is string to match."
         (setq imenu--index-alist nil)
         (setq anything-c-cached-imenu-tick tick
               anything-c-cached-imenu-candidates
-              (condition-case nil
-                  (mapcan
-                   'anything-imenu-create-candidates
-                   (setq anything-c-cached-imenu-alist
-                         (let ((index (imenu--make-index-alist)))
-                           (if anything-c-imenu-index-filter
-                               (funcall anything-c-imenu-index-filter index)
-                             index))))
-                (error nil)))
+              (ignore-errors
+                (mapcan
+                 'anything-imenu-create-candidates
+                 (setq anything-c-cached-imenu-alist
+                       (let ((index (imenu--make-index-alist)))
+                         (if anything-c-imenu-index-filter
+                             (funcall anything-c-imenu-index-filter index)
+                           index))))))
         (setq anything-c-cached-imenu-candidates
               (mapcar #'(lambda (x)
                           (if (stringp x)
