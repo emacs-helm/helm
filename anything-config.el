@@ -3871,9 +3871,7 @@ If this action is executed just after `yank', replace with STR as yanked string.
   '((name . "mark-ring")
     (init . (lambda ()
               (setq anything-mark-ring-cache
-                    (condition-case nil
-                        (anything-c-source-mark-ring-candidates)
-                    (error nil)))))
+                    (ignore-errors (anything-c-source-mark-ring-candidates)))))
     (candidates . (lambda ()
                     (anything-aif anything-mark-ring-cache
                         it)))
