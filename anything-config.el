@@ -3776,7 +3776,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
      (insert (capitalize candidate))
      (goto-char (point-min))
      (search-forward-regexp "\\s-\\{2,\\}")
-     (kill-line)
+     (delete-region (point) (point-max))
      (buffer-string))))
 
 (defun anything-c-colors-get-rgb (candidate)
@@ -3787,7 +3787,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
      (insert (capitalize candidate))
      (goto-char (point-max))
      (search-backward-regexp "\\s-\\{2,\\}")
-     (kill-region (point) (point-min))
+     (delete-region (point) (point-min))
      (buffer-string))))
 
 ;;;; <Search Engine>
