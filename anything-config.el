@@ -651,9 +651,17 @@ Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
+(defun anything-set-anything-command-map-prefix-key (var key)
+  (when (boundp 'anything-command-map-prefix-key)
+    (global-unset-key (read-kbd-macro anything-command-map-prefix-key)))
+  (setq anything-command-map-prefix-key key)
+  (global-set-key (read-kbd-macro anything-command-map-prefix-key)
+                  'anything-command-map))
+
 (defcustom anything-command-map-prefix-key "<f5> a"
   "*The prefix key for all `anything-command-map' commands."
   :type 'string
+  :set 'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
 
 ;;;###autoload
@@ -666,8 +674,6 @@ Though wmctrl work also with stumpwm."
 ;;;###autoload
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
-(global-set-key (read-kbd-macro anything-command-map-prefix-key)
-                'anything-command-map)
 
 (define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
 (define-key anything-command-map (kbd "l") 'anything-locate)
