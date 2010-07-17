@@ -434,6 +434,9 @@
 ;;; Change log:
 ;;
 ;;  Change log of this file is found at
+;;  http://repo.or.cz/w/anything-config.git/history/master:/anything-config.el
+;;
+;;  Change log of this project is found at
 ;;  http://repo.or.cz/w/anything-config.git?a=shortlog
 
 ;;; Contributors:
