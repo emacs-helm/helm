@@ -4936,7 +4936,9 @@ Return an alist with elements like (data . number_results)."
 
 (defun anything-c-anything-commands-candidates ()
   (loop for (cmd . desc) in (anything-c-list-preconfigured-anything)
-        collect (cons (substitute-command-keys (format "\\[%s] : %s" cmd desc))
+        collect (cons (if (where-is-internal cmd nil t)
+                          (substitute-command-keys (format "M-x %s (\\[%s]) : %s" cmd cmd desc))
+                        (substitute-command-keys (format "\\[%s] : %s" cmd desc)))
                       cmd)))
 
 ;;;###autoload
