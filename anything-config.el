@@ -714,42 +714,34 @@ This default value is very likely to be changed, because it is under discussion.
 (easy-menu-define nil global-map
   "`anything' menu"
   '("Anything"
-    "Anything Menu"
-    "----"
-    "----"
-    "All:"
     ["All anything commands" anything-execute-anything-command t]
-    "----"
-    "Files:"
     ["Find any Files/Buffers" anything-for-files t]
-    ["Find files" anything-find-files t]
-    ["Recent Files" anything-recentf t]
-    ["Locate" anything-locate t]
-    ["Bookmarks" anything-c-pp-bookmarks t]
     "----"
-    "Buffers:"
-    ["Find buffers" anything-buffers+ t]
-    "----"
-    "Commands:"
-    ["Emacs Commands" anything-M-x t]
-    ["Externals Commands" anything-c-run-external-command t]
-    "----"
-    "Info:"
-    ["Info at point" anything-info-at-point t]
-    "----"
-    "Tools:"
-    ["Occur" anything-occur t]
-    ["Browse Kill ring" anything-show-kill-ring t]
-    ["Browse register" anything-register t]
-    ["Mark Ring" anything-all-mark-rings t]
-    ["Colors & Faces" anything-colors t]
-    ["Show xfonts" anything-select-xfont t]
-    ["Imenu" anything-imenu t]
-    ["Google Suggest" anything-google-suggest t]
-    ["Eval expression" anything-eval-expression-with-eldoc t]
-    ["Calcul expression" anything-calcul-expression t]
-    ["Man pages" anything-man-woman t]
-    ["Top externals process" anything-top t]
+    ("Files:"
+     ["Find files" anything-find-files t]
+     ["Recent Files" anything-recentf t]
+     ["Locate" anything-locate t]
+     ["Bookmarks" anything-c-pp-bookmarks t])
+    ("Buffers:"
+     ["Find buffers" anything-buffers+ t])
+    ("Commands:"
+     ["Emacs Commands" anything-M-x t]
+     ["Externals Commands" anything-c-run-external-command t])
+    ("Info:"
+     ["Info at point" anything-info-at-point t])
+    ("Tools:"
+     ["Occur" anything-occur t]
+     ["Browse Kill ring" anything-show-kill-ring t]
+     ["Browse register" anything-register t]
+     ["Mark Ring" anything-all-mark-rings t]
+     ["Colors & Faces" anything-colors t]
+     ["Show xfonts" anything-select-xfont t]
+     ["Imenu" anything-imenu t]
+     ["Google Suggest" anything-google-suggest t]
+     ["Eval expression" anything-eval-expression-with-eldoc t]
+     ["Calcul expression" anything-calcul-expression t]
+     ["Man pages" anything-man-woman t]
+     ["Top externals process" anything-top t])
     "----"
     ["Prefered Options" anything-configuration t]))
 
