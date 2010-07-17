@@ -721,7 +721,7 @@ This default value is very likely to be changed, because it is under discussion.
     ["All anything commands" anything-execute-anything-command t]
     "----"
     "Files:"
-    ["Find any Files" anything-for-files t]
+    ["Find any Files/Buffers" anything-for-files t]
     ["Find files" anything-find-files t]
     ["Recent Files" anything-recentf t]
     ["Locate" anything-locate t]
@@ -748,6 +748,7 @@ This default value is very likely to be changed, because it is under discussion.
     ["Google Suggest" anything-google-suggest t]
     ["Eval expression" anything-eval-expression-with-eldoc t]
     ["Calcul expression" anything-calcul-expression t]
+    ["Man pages" anything-man-woman t]
     ["Top externals process" anything-top t]
     "----"
     ["Prefered Options" anything-configuration t]))
