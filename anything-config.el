@@ -659,7 +659,10 @@ Though wmctrl work also with stumpwm."
                   'anything-command-map))
 
 (defcustom anything-command-map-prefix-key "<f5> a"
-  "*The prefix key for all `anything-command-map' commands."
+  "*The prefix key for all `anything-command-map' commands.
+
+!!WARNING!!
+This default value is very likely to be changed, because it is under discussion."
   :type 'string
   :set 'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
