@@ -678,6 +678,7 @@ This default value is very likely to be changed, because it is under discussion.
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
 
+;; rubikitch: Please change it freely because it is in discussion. I'll track from git.
 (define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
 (define-key anything-command-map (kbd "l") 'anything-locate)
 (define-key anything-command-map (kbd "s") 'anything-surfraw)
