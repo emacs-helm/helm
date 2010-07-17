@@ -278,6 +278,8 @@
 ;; Default Value: 0
 ;; `anything-raise-command'
 ;; Default Value: nil
+;; `anything-command-map-prefix-key'
+;; Default Value: "<f5> a"
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -649,6 +651,11 @@ Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
+(defcustom anything-command-map-prefix-key "<f5> a"
+  "*The prefix key for all `anything-command-map' commands."
+  :type 'string
+  :group 'anything-config)
+
 (defun anything-configuration ()
   (interactive)
   (customize-group "anything-config"))
@@ -657,10 +664,10 @@ Though wmctrl work also with stumpwm."
 ;;;###autoload
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
-(define-key global-map (kbd "<f5> a") 'anything-command-map)
+(global-set-key (read-kbd-macro anything-command-map-prefix-key)
+                'anything-command-map)
+
 (define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
-(define-key anything-command-map (kbd "g") 'anything-gentoo)
-(define-key anything-command-map (kbd "a g") 'anything-apt)
 (define-key anything-command-map (kbd "l") 'anything-locate)
 (define-key anything-command-map (kbd "s") 'anything-surfraw)
 (define-key anything-command-map (kbd "r") 'anything-regexp)
@@ -674,6 +681,7 @@ Though wmctrl work also with stumpwm."
 (define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
 (define-key anything-command-map (kbd "C-c <SPC>") 'anything-all-mark-rings)
 (define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
+(define-key anything-command-map (kbd "F") 'anything-for-files)
 (define-key anything-command-map (kbd "C-:") 'anything-eval-expression-with-eldoc)
 (define-key anything-command-map (kbd "C-,") 'anything-calcul-expression)
 (define-key anything-command-map (kbd "M-x") 'anything-M-x)
@@ -696,7 +704,11 @@ Though wmctrl work also with stumpwm."
     "Anything Menu"
     "----"
     "----"
+    "All:"
+    ["All anything commands" anything-execute-anything-command t]
+    "----"
     "Files:"
+    ["Find any Files" anything-for-files t]
     ["Find files" anything-find-files t]
     ["Recent Files" anything-recentf t]
     ["Locate" anything-locate t]
