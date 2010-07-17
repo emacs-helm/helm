@@ -1,5 +1,4 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.283 2010-04-01 02:22:22 rubikitch Exp $
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
@@ -9,6 +8,8 @@
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
+(defvar anything-version nil)
+(setq anything-version "1.284")
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -439,9 +440,6 @@
 ;;  Change log of this project is found at
 ;;  http://repo.or.cz/w/anything-config.git?a=shortlog
 
-;; ugly hack to auto-update version
-(defvar anything-version nil)
-(setq anything-version "$Id: anything.el,v 1.283 2010-04-01 02:22:22 rubikitch Exp $")
 (require 'cl)
 ;; (require 'anything-match-plugin nil t)
 
