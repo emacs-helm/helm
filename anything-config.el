@@ -679,6 +679,7 @@ This default value is very likely to be changed, because it is under discussion.
 (define-prefix-command 'anything-command-map)
 
 ;; rubikitch: Please change it freely because it is in discussion. I'll track from git.
+(define-key anything-command-map (kbd "<SPC>") 'anything-execute-anything-command)
 (define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
 (define-key anything-command-map (kbd "l") 'anything-locate)
 (define-key anything-command-map (kbd "s") 'anything-surfraw)
@@ -693,7 +694,7 @@ This default value is very likely to be changed, because it is under discussion.
 (define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
 (define-key anything-command-map (kbd "C-c <SPC>") 'anything-all-mark-rings)
 (define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
-(define-key anything-command-map (kbd "F") 'anything-for-files)
+(define-key anything-command-map (kbd "f") 'anything-for-files)
 (define-key anything-command-map (kbd "C-:") 'anything-eval-expression-with-eldoc)
 (define-key anything-command-map (kbd "C-,") 'anything-calcul-expression)
 (define-key anything-command-map (kbd "M-x") 'anything-M-x)
@@ -701,7 +702,7 @@ This default value is very likely to be changed, because it is under discussion.
 (define-key anything-command-map (kbd "C-x i") 'anything-insert-file)
 (define-key anything-command-map (kbd "M-s o") 'anything-occur)
 (define-key anything-command-map (kbd "c") 'anything-colors)
-(define-key anything-command-map (kbd "f") 'anything-select-xfont)
+(define-key anything-command-map (kbd "F") 'anything-select-xfont)
 (define-key anything-command-map (kbd "C-c f") 'anything-recentf)
 (define-key anything-command-map (kbd "C-c g") 'anything-google-suggest)
 (define-key anything-command-map (kbd "h i") 'anything-info-at-point)
