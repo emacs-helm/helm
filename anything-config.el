@@ -656,7 +656,9 @@ Though wmctrl work also with stumpwm."
   :type 'string
   :group 'anything-config)
 
+;;;###autoload
 (defun anything-configuration ()
+  "Customize `anything'."
   (interactive)
   (customize-group "anything-config"))
 
@@ -942,7 +944,11 @@ You may bind this command to M-y."
 
 ;;;###autoload
 (defun anything-bbdb ()
-  "Preconfigured `anything' for BBDB."
+  "Preconfigured `anything' for BBDB.
+
+Needs BBDB.
+
+http://bbdb.sourceforge.net/"
   (interactive)
   (anything-other-buffer 'anything-c-source-bbdb "*anything bbdb*"))
 
@@ -956,7 +962,12 @@ See man locate for more infos."
 
 ;;;###autoload
 (defun anything-w3m-bookmarks ()
-  "Preconfigured `anything' for w3m bookmark."
+  "Preconfigured `anything' for w3m bookmark.
+
+Needs w3m and emacs-w3m.
+
+http://w3m.sourceforge.net/
+http://emacs-w3m.namazu.org/"
   (interactive)
   (anything-other-buffer 'anything-c-source-w3m-bookmarks
                          "*anything w3m bookmarks*"))
@@ -989,11 +1000,13 @@ After closing firefox, you will be able to browse you bookmarks.
 
 ;;;###autoload
 (defun anything-bookmarks ()
+  "Preconfigured `anything' for bookmarks."
   (interactive)
   (anything-other-buffer 'anything-c-source-bookmarks "*anything bookmarks*"))
 
 ;;;###autoload
 (defun anything-c-pp-bookmarks ()
+  "Preconfigured `anything' for bookmarks (pretty-printed)."
   (interactive)
   (anything-other-buffer '(anything-c-source-bookmarks-local
                            anything-c-source-bookmarks-su
@@ -1002,12 +1015,17 @@ After closing firefox, you will be able to browse you bookmarks.
 
 ;;;###autoload
 (defun anything-register ()
+  "Preconfigured `anything' for Emacs registers."
   (interactive)
   (anything-other-buffer 'anything-c-source-register "*anything register*"))
 
 ;;;###autoload
 (defun anything-bm-list ()
-  "Preconfigured `anything' for visible bookmarks."
+  "Preconfigured `anything' for visible bookmarks.
+
+Needs bm.el
+
+http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (interactive)
   (let ((anything-outline-using t))
     (anything-other-buffer 'anything-c-source-bm "*anything bm list*")))
@@ -2621,8 +2639,10 @@ To get non-interactive functions listed, use
 ;; Another replacement of `M-x' that act exactly like the
 ;; vanilla Emacs one, no problem of windows configuration, prefix args
 ;; are passed before calling `M-x' (e.g C-u M-x..).
+;;;###autoload
 (defun anything-M-x ()
-  "Anything replacement of regular `M-x' `execute-extended-command'."
+  "Preconfigured `anything' for Emacs commands.
+It is `anything' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
   (let ((command (anything-comp-read "M-x " obarray
                                      :test 'commandp
@@ -3204,7 +3224,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;;;###autoload
 (defun anything-bookmark-ext ()
   "Preconfigured `anything' for bookmark-extensions sources.
-See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
+Needs bookmark-ext.el
+
+http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
   (interactive)
   (anything '(anything-c-source-bookmark-files&dirs
               anything-c-source-bookmark-w3m
@@ -3341,7 +3363,11 @@ See: <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>."
                                (anything-c-w3m-browse-bookmark candidate t)
                                (anything-c-w3m-browse-bookmark candidate nil t))))
     (persistent-help . "Open URL with emacs-w3m in new tab / \
-C-u \\[anything-execute-persistent-action]: Open URL with Firefox")))
+C-u \\[anything-execute-persistent-action]: Open URL with Firefox"))
+  "Needs w3m and emacs-w3m.
+
+http://w3m.sourceforge.net/
+http://emacs-w3m.namazu.org/")
 
 ;; (anything 'anything-c-source-w3m-bookmarks)
 
@@ -3609,7 +3635,10 @@ http://cedet.sourceforge.net/"))
 ;;; Function is called by
 ;;;###autoload
 (defun anything-simple-call-tree ()
-  "Preconfigured `anything' for simple-call-tree. List function relationships."
+  "Preconfigured `anything' for simple-call-tree. List function relationships.
+
+Needs simple-call-tree.el.
+http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el"
   (interactive)
   (anything-other-buffer
    '(anything-c-source-simple-call-tree-functions-callers
@@ -4203,7 +4232,10 @@ See http://orgmode.org for the latest version.")
                                          (setq anything-c-yaoddmuse-ew-cache
                                                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
                                      (yaoddmuse-update-pagename))))))
-    (action-transformer anything-c-yaoddmuse-action-transformer)))
+    (action-transformer anything-c-yaoddmuse-action-transformer))
+  "Needs yaoddmuse.el.
+
+http://www.emacswiki.org/emacs/download/yaoddmuse.el")
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view)
 
@@ -4219,7 +4251,10 @@ See http://orgmode.org for the latest version.")
                ("Post library" . (lambda (candidate)
                                    (yaoddmuse-post-file (find-library-name candidate)
                                                         "EmacsWiki"
-                                                        (file-name-nondirectory (find-library-name candidate)))))))))
+                                                        (file-name-nondirectory (find-library-name candidate))))))))
+  "Needs yaoddmuse.el.
+
+http://www.emacswiki.org/emacs/download/yaoddmuse.el")
 
 ;; (anything 'anything-c-source-yaoddmuse-emacswiki-post-library)
 
@@ -4252,13 +4287,21 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 
 ;;;###autoload
 (defun anything-yaoddmuse-emacswiki-edit-or-view ()
-  "Preconfigured `anything' to edit or view EmacsWiki page."
+  "Preconfigured `anything' to edit or view EmacsWiki page.
+
+Needs yaoddmuse.el.
+
+http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (interactive)
   (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view))
 
 ;;;###autoload
 (defun anything-yaoddmuse-emacswiki-post-library ()
-  "Preconfigured `anything' to post library to EmacsWiki."
+  "Preconfigured `anything' to post library to EmacsWiki.
+
+Needs yaoddmuse.el.
+
+http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (interactive)
   (anything 'anything-c-source-yaoddmuse-emacswiki-post-library))
 
@@ -4434,7 +4477,10 @@ removed."
                                             (list "*Add to contacts*")
                                           candidates)))
     (action-transformer . (lambda (actions candidate)
-                            (anything-c-bbdb-create-contact actions candidate)))))
+                            (anything-c-bbdb-create-contact actions candidate))))
+  "Needs BBDB.
+
+http://bbdb.sourceforge.net/")
 ;; (anything 'anything-c-source-bbdb)
 
 (defun anything-c-bbdb-view-person-action (candidate)
@@ -4489,7 +4535,7 @@ removed."
 
 ;;;###autoload
 (defun anything-eval-expression-with-eldoc ()
-  "Same as `anything-eval-expression' but with `eldoc' support."
+  "Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. "
   (interactive)
   (if (window-system)
       (let ((timer (run-with-idle-timer eldoc-idle-delay
@@ -4678,7 +4724,7 @@ Return an alist with elements like (data . number_results)."
 
 ;;;###autoload
 (defun anything-surfraw (pattern engine)
-  "Search PATTERN with search ENGINE."
+  "Preconfigured `anything' to search PATTERN with search ENGINE."
   (interactive (list (read-string "SearchFor: ")
                      (anything-comp-read
                       "Engine: "
@@ -5576,7 +5622,7 @@ In this case EXE must be provided as \"EXE %s\"."
 
 ;;;###autoload
 (defun anything-c-run-external-command (program)
-  "Run External PROGRAM asyncronously from Emacs.
+  "Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
 If program is already running exit with error.
 You can set your own list of commands with
 `anything-c-external-commands-list'."
