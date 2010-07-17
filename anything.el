@@ -1259,9 +1259,11 @@ This is suitable for anything applications."
                 (string-to-number (substring version 2))))
     (error "Please update anything.el!!
 
-http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+M-x auto-install-batch anything
 
-or  M-x install-elisp-from-emacswiki anything.el")))
+You must have auto-install.el too.
+http://www.emacswiki.org/cgi-bin/wiki/download/auto-install.el
+")))
 
 (defun anything-interpret-value (value &optional source)
   "interpret VALUE as variable, function or literal.
