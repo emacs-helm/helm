@@ -922,6 +922,7 @@ Arguments are same as `format'."
   (when (or debug-on-error anything-debug)
     (with-current-buffer (get-buffer-create "*Anything Log*")
       (buffer-disable-undo)
+      (set (make-local-variable 'inhibit-read-only) t)
       (goto-char (point-max))
       (insert (let ((tm (current-time)))
                 (format "%s.%06d (%s) %s\n"
