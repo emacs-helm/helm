@@ -1450,7 +1450,18 @@ already-bound variables. Yuck!
      nil)))
 
 (defun anything* (&rest keys)
-  (anything-let-internal (anything*-parse-keys keys) (lambda () (anything))))
+  (anything-let-internal (anything*-parse-keys keys) 'anything))
+
+(defun anything*-parse-keys (keys)
+  (loop for (key value &rest _) on keys by #'cddr
+        for symname = (substring (symbol-name key) 1)
+        for sym = (intern (if (string-match "^anything-" symname)
+                              symname
+                            (concat "anything-" symname)))
+        collect (list sym value)))
+;; (anything*-parse-keys '(:sources '(((name . hoge))) :anything-candidate-number-limit 22))
+;; (anything* :sources '(((name . "test00")(candidates "10" "20" "30"))) :anything-candidate-number-limit 2)
+;; (anything* :sources '(((name . "test")(candidates "1" "2" "3"))) :buffer " *any0*")
 
 (defun anything-resume-p (any-resume)
   "Whethre current anything session is resumed or not."
