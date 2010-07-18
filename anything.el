@@ -970,19 +970,21 @@ The original idea is from `tramp-debug-message'."
 ;; (@* "Anything API")
 (defmacro anything-let (varlist &rest body)
   "Like `let'. Bind anything buffer local variables according to VARLIST then eval BODY."
-  `(progn (setq anything-let-variables (anything-let-eval-varlist ',varlist))
-          (unwind-protect
-              (progn ,@body)
-            (setq anything-let-variables nil))))
+  `(anything-let-internal (anything-let-eval-varlist ',varlist)
+                          (lambda () ,@body)))
 (put 'anything-let 'lisp-indent-function 1)
 
 (defmacro anything-let* (varlist &rest body)
   "Like `let*'. Bind anything buffer local variables according to VARLIST then eval BODY."
-  `(progn (setq anything-let-variables (anything-let*-eval-varlist ',varlist))
-          (unwind-protect
-              (progn ,@body)
-            (setq anything-let-variables nil))))
+  `(anything-let-internal (anything-let*-eval-varlist ',varlist)
+                          (lambda () ,@body)))
 (put 'anything-let* 'lisp-indent-function 1)
+
+(defun anything-let-internal (binding bodyfunc)
+  (setq anything-let-variables binding)
+  (unwind-protect
+      (funcall bodyfunc)
+    (setq anything-let-variables nil)))
 
 (defun anything-buffer-get ()
   "If *anything action* buffer is shown, return `anything-action-buffer', otherwise `anything-buffer'."
@@ -5608,6 +5610,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (and (assq 'a (buffer-local-variables))
                  (assq 'b (buffer-local-variables))
                  (assq 'c (buffer-local-variables))))))
+      (expect 'retval
+        (let ((a 9999)
+              (b 8)
+              (c)
+              (anything-buffer (exps-tmpbuf)))
+          (anything-let ((a 1)
+                         (b (1+ a))
+                         c)
+            'retval)))
       (desc "anything-let*")
       (expect '(1 2 nil)
         (let ((a 9999)
@@ -5633,6 +5644,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (and (assq 'a (buffer-local-variables))
                  (assq 'b (buffer-local-variables))
                  (assq 'c (buffer-local-variables))))))
+      (expect 'retval*
+        (let ((a 9999)
+              (b 8)
+              (c)
+              (anything-buffer (exps-tmpbuf)))
+          (anything-let* ((a 1)
+                         (b (1+ a))
+                         c)
+            'retval*)))
       )))
 
 
