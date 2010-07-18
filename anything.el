@@ -980,12 +980,6 @@ The original idea is from `tramp-debug-message'."
                           (lambda () ,@body)))
 (put 'anything-let* 'lisp-indent-function 1)
 
-(defun anything-let-internal (binding bodyfunc)
-  (setq anything-let-variables binding)
-  (unwind-protect
-      (funcall bodyfunc)
-    (setq anything-let-variables nil)))
-
 (defun anything-buffer-get ()
   "If *anything action* buffer is shown, return `anything-action-buffer', otherwise `anything-buffer'."
   (if (anything-action-window)
@@ -1309,6 +1303,12 @@ Otherwise, return VALUE itself."
                            `(setq ,pair nil)))
                        varlist)
              (mapcar (lambda (v) (cons v (symbol-value v))) ',vars)))))
+(defun anything-let-internal (binding bodyfunc)
+  (setq anything-let-variables binding)
+  (unwind-protect
+      (funcall bodyfunc)
+    (setq anything-let-variables nil)))
+
 
 ;; (@* "Core: tools")
 (defun anything-funcall-with-source (source func &rest args)
