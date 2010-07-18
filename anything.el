@@ -1449,8 +1449,14 @@ already-bound variables. Yuck!
      (anything-log "end session (quit) -------------------------------------")
      nil)))
 
+(defvar anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 (defun anything* (&rest keys)
-  (anything-let-internal (anything*-parse-keys keys) 'anything))
+  (anything-let-internal
+   (anything*-parse-keys keys)
+   (lambda ()
+     (apply 'anything
+            (mapcar (lambda (key) (plist-get keys key))
+                    anything*-argument-keys)))))
 
 (defun anything*-parse-keys (keys)
   (loop for (key value &rest _) on keys by #'cddr
@@ -1458,10 +1464,12 @@ already-bound variables. Yuck!
         for sym = (intern (if (string-match "^anything-" symname)
                               symname
                             (concat "anything-" symname)))
+        unless (memq key anything*-argument-keys)
         collect (list sym value)))
 ;; (anything*-parse-keys '(:sources '(((name . hoge))) :anything-candidate-number-limit 22))
-;; (anything* :sources '(((name . "test00")(candidates "10" "20" "30"))) :anything-candidate-number-limit 2)
 ;; (anything* :sources '(((name . "test")(candidates "1" "2" "3"))) :buffer " *any0*")
+;; FIXME (anything* :sources '(((name . "test00")(candidates "10" "20" "30"))) :anything-candidate-number-limit 2)
+
 
 (defun anything-resume-p (any-resume)
   "Whethre current anything session is resumed or not."
