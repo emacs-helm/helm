@@ -1449,6 +1449,9 @@ already-bound variables. Yuck!
      (anything-log "end session (quit) -------------------------------------")
      nil)))
 
+(defun anything* (&rest keys)
+  (anything-let-internal (anything*-parse-keys keys) (lambda () (anything))))
+
 (defun anything-resume-p (any-resume)
   "Whethre current anything session is resumed or not."
   (memq any-resume '(t window-only)))
