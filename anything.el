@@ -1378,33 +1378,6 @@ This function allows easy sequencing of transformer functions."
            source (lambda (&rest args) (anything-compose args funcs)) args)))
 
 ;; (@* "Core: entry point")
-(defun anything-internal (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
-  "Older interface of `anything'. It is called by `anything'."
-  (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
-  (condition-case v
-      (let ( ;; It is needed because `anything-source-name' is non-nil
-            ;; when `anything' is invoked by action. Awful global scope.
-            anything-source-name anything-in-persistent-action
-                                 anything-quit
-                                 (case-fold-search t)
-                                 (anything-buffer (or any-buffer anything-buffer))
-                                 ;; cua-mode ; avoid error when region is selected
-                                 )
-        (with-anything-restore-variables
-          (anything-initialize-1 any-resume any-input any-sources)
-          (anything-display-buffer anything-buffer)
-          (anything-log "show prompt")
-          (unwind-protect
-              (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume any-keymap)
-            (anything-cleanup)))
-        (prog1 (unless anything-quit (anything-execute-selection-action-1))
-          (anything-log "end session --------------------------------------------")))
-    (quit
-     (anything-on-quit)
-     (anything-log "end session (quit) -------------------------------------")
-     nil)))
-
 (defconst anything-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 ;;;###autoload
 (defun anything (&rest plist)
@@ -1475,6 +1448,69 @@ source in *buffers* buffer and set
                         anything-argument-keys))))
     (apply 'anything-internal plist)))
 
+(defun* anything-resume (&optional (any-buffer anything-last-buffer) buffer-pattern (any-resume t))
+  "Resurrect previously invoked `anything'."
+  (interactive)
+  (when (or current-prefix-arg buffer-pattern)
+    (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
+  (setq anything-compiled-sources nil)
+  (anything
+   (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
+       anything-last-sources anything-sources)
+   (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil any-resume nil any-buffer))
+
+;;; rubikitch: experimental
+;;; I use this and check it whether I am convenient.
+;;; I may introduce an option to control the behavior.
+(defun* anything-resume-window-only (&optional (any-buffer anything-last-buffer) buffer-pattern)
+  (interactive)
+  (anything-resume any-buffer buffer-pattern 'window-only))
+
+;;;###autoload
+(defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
+  "Same as `anything' except when C-u is pressed, the initial input is the symbol at point."
+  (interactive)
+  (anything any-sources
+            (if current-prefix-arg
+                (concat "\\b" (thing-at-point 'symbol) "\\b"
+                        (if (featurep 'anything-match-plugin) " " ""))
+              any-input)
+            any-prompt any-resume any-preselect any-buffer))
+
+(defun anything-other-buffer (any-sources any-buffer)
+  "Simplified interface of `anything' with other `anything-buffer'"
+  (anything any-sources nil nil nil nil any-buffer))
+
+;;; (@* "Core: entry point helper")
+(defun anything-internal (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
+  "Older interface of `anything'. It is called by `anything'."
+  (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
+  (condition-case v
+      (let ( ;; It is needed because `anything-source-name' is non-nil
+            ;; when `anything' is invoked by action. Awful global scope.
+            anything-source-name anything-in-persistent-action
+                                 anything-quit
+                                 (case-fold-search t)
+                                 (anything-buffer (or any-buffer anything-buffer))
+                                 ;; cua-mode ; avoid error when region is selected
+                                 )
+        (with-anything-restore-variables
+          (anything-initialize-1 any-resume any-input any-sources)
+          (anything-display-buffer anything-buffer)
+          (anything-log "show prompt")
+          (unwind-protect
+              (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume any-keymap)
+            (anything-cleanup)))
+        (prog1 (unless anything-quit (anything-execute-selection-action-1))
+          (anything-log "end session --------------------------------------------")))
+    (quit
+     (anything-on-quit)
+     (anything-log "end session (quit) -------------------------------------")
+     nil)))
+
+
+
 (defun anything-parse-keys (keys)
   (loop for (key value &rest _) on keys by #'cddr
         for symname = (substring (symbol-name key) 1)
@@ -1528,24 +1564,6 @@ extensions may advice `anything-initalize'. I cannot rename, sigh."
                (action . identity)))
             input nil 'noresume nil "*anything resume*"))
 
-(defun* anything-resume (&optional (any-buffer anything-last-buffer) buffer-pattern (any-resume t))
-  "Resurrect previously invoked `anything'."
-  (interactive)
-  (when (or current-prefix-arg buffer-pattern)
-    (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
-  (setq anything-compiled-sources nil)
-  (anything
-   (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
-       anything-last-sources anything-sources)
-   (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil any-resume nil any-buffer))
-
-;;; rubikitch: experimental
-;;; I use this and check it whether I am convenient.
-;;; I may introduce an option to control the behavior.
-(defun* anything-resume-window-only (&optional (any-buffer anything-last-buffer) buffer-pattern)
-  (interactive)
-  (anything-resume any-buffer buffer-pattern 'window-only))
-
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
   (let ((m (member elt (symbol-value list-var))))
@@ -1577,23 +1595,6 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
     (case save-or-restore
       (save    (setq conf (funcall (cdr anything-save-configuration-functions))))
       (restore (funcall (car anything-save-configuration-functions) conf)))))
-
-
-
-;;;###autoload
-(defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
-  "Same as `anything' except when C-u is pressed, the initial input is the symbol at point."
-  (interactive)
-  (anything any-sources
-            (if current-prefix-arg
-                (concat "\\b" (thing-at-point 'symbol) "\\b"
-                        (if (featurep 'anything-match-plugin) " " ""))
-              any-input)
-            any-prompt any-resume any-preselect any-buffer))
-
-(defun anything-other-buffer (any-sources any-buffer)
-  "Simplified interface of `anything' with other `anything-buffer'"
-  (anything any-sources nil nil nil nil any-buffer))
 
 ;; (@* "Core: Display *anything* buffer")
 (defun anything-display-buffer (buf)
