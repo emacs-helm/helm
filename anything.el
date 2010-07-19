@@ -1302,6 +1302,8 @@ Otherwise, return VALUE itself."
                        varlist)
              (mapcar (lambda (v) (cons v (symbol-value v))) ',vars)))))
 (defun anything-let-internal (binding bodyfunc)
+  "Evaluate BODYFUNC and Set BINDING to anything buffer-local variables.
+BINDING is a list of (VARNAME . VALUE) pair."
   (setq anything-let-variables binding)
   (unwind-protect
       (funcall bodyfunc)
