@@ -1159,13 +1159,10 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
 (defun anything-get-action ()
   "Return the associated action for the selected candidate."
   (unless (anything-empty-buffer-p (anything-buffer-get))
-    (let* ((source (anything-get-current-source))
-           (actions (assoc-default 'action source)))
-
-      (anything-aif (assoc-default 'action-transformer source)
-          ;; (funcall it actions (anything-get-selection))
-          (anything-composed-funcall-with-source source it actions (anything-get-selection))
-        actions))))
+    (anything-aif (anything-attr 'action-transformer)
+        (anything-composed-funcall-with-source
+         (anything-get-current-source) it (anything-attr 'action) (anything-get-selection))
+      (anything-attr 'action))))
 
 (defun anything-get-current-source ()
   "Return the source for the current selection / in init/candidates/action/candidate-transformer/filtered-candidate-transformer function."
