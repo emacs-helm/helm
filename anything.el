@@ -1377,6 +1377,12 @@ This function allows easy sequencing of transformer functions."
     (apply 'anything-funcall-with-source
            source (lambda (&rest args) (anything-compose args funcs)) args)))
 
+(defun anything-new-timer (variable timer)
+  "Set new TIMER to VARIABLE. Old timer is cancelled."
+  (anything-aif (symbol-value variable)
+      (cancel-timer it))
+  (set variable timer))
+
 ;; (@* "Core: entry point")
 (defconst anything-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 ;;;###autoload
@@ -1707,6 +1713,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
       (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
 
 ;; (@* "Core: clean up")
+;;; TODO move
 (defun anything-cleanup ()
   "Clean up the mess."
   (anything-log "start cleanup")
@@ -1714,8 +1721,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (setq cursor-type t))
   (bury-buffer anything-buffer)
   (anything-funcall-foreach 'cleanup)
-  (if anything-check-minibuffer-input-timer
-      (cancel-timer anything-check-minibuffer-input-timer))
+  (anything-new-timer 'anything-check-minibuffer-input-timer nil)
   (anything-kill-async-processes)
   (anything-log-run-hook 'anything-cleanup-hook)
   (anything-hooks 'cleanup)
@@ -1727,11 +1733,9 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 to be handled."
   (if (or (not anything-input-idle-delay) (anything-action-window))
       (anything-check-minibuffer-input-1)
-    (if anything-check-minibuffer-input-timer
-        (cancel-timer anything-check-minibuffer-input-timer))
-    (setq anything-check-minibuffer-input-timer
-          (run-with-idle-timer anything-input-idle-delay nil
-                               'anything-check-minibuffer-input-1))))
+    (anything-new-timer 'anything-check-minibuffer-input-timer
+                        (run-with-idle-timer anything-input-idle-delay nil
+                                             'anything-check-minibuffer-input-1))))
 
 (defun anything-check-minibuffer-input-1 ()
   (with-anything-quittable
