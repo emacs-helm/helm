@@ -1187,8 +1187,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
                    (goto-char header-pos)
                    (anything-current-line-contents))))
            (some (lambda (source)
-                   (if (equal (assoc-default 'name source)
-                              source-name)
+                   (if (equal (assoc-default 'name source) source-name)
                        source))
                  (anything-get-sources))))))))
 
