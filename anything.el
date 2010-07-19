@@ -82,6 +82,8 @@
 ;;
 ;; Below are complete command list:
 ;;
+;;  `anything'
+;;    Select anything. In Lisp program, some optional arguments can be used.
 ;;  `anything-resume'
 ;;    Resurrect previously invoked `anything'.
 ;;  `anything-at-point'
@@ -1379,47 +1381,7 @@ This function allows easy sequencing of transformer functions."
   "All of `anything-buffer' in most recently used order.")
 
 (defun anything-internal (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
-  "Select anything. In Lisp program, some optional arguments can be used.
-
-Note that all the optional arguments are prefixed because of
-dynamic scope problem, IOW argument variables may eat
-already-bound variables. Yuck!
-
-- ANY-SOURCES
-
-  Temporary value of `anything-sources'.  It also accepts a
-  symbol, interpreted as a variable of an anything source.  It
-  also accepts an alist representing an anything source, which is
-  detected by (assq 'name ANY-SOURCES)
-
-
-- ANY-INPUT
-
-  Temporary value of `anything-pattern', ie. initial input of minibuffer.
-
-- ANY-PROMPT
-
-  Prompt other than \"pattern: \".
-
-- ANY-RESUME
-
-  If t, Resurrect previously instance of `anything'. Skip the initialization.
-  If 'noresume, this instance of `anything' cannot be resumed.
-
-- ANY-PRESELECT
-
-  Initially selected candidate. Specified by exact candidate or a regexp.
-  Note that it is not working with delayed sources.
-
-- ANY-BUFFER
-
-  `anything-buffer' instead of *anything*.
-
-- ANY-KEYMAP
-
-  `anything-map' for current `anything' session.
-"
-  ;; TODO more document
+  "Older interface of `anything'. It is called by `anything'."
   (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
   (condition-case v
@@ -1447,16 +1409,73 @@ already-bound variables. Yuck!
 
 (defvar anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 ;;;###autoload
-(defun anything (&rest keys)
+(defun anything (&rest plist)
+  "Select anything. In Lisp program, some optional arguments can be used.
+
+PLIST is a list like (:key1 val1 :key2 val2 ...) or
+ (&optional sources input prompt resume preselect buffer keymap).
+
+Basic keywords are the following:
+
+- :sources
+
+  Temporary value of `anything-sources'.  It also accepts a
+  symbol, interpreted as a variable of an anything source.  It
+  also accepts an alist representing an anything source, which is
+  detected by (assq 'name ANY-SOURCES)
+
+- :input
+
+  Temporary value of `anything-pattern', ie. initial input of minibuffer.
+
+- :prompt
+
+  Prompt other than \"pattern: \".
+
+- :resume
+
+  If t, Resurrect previously instance of `anything'. Skip the initialization.
+  If 'noresume, this instance of `anything' cannot be resumed.
+
+- :preselect
+
+  Initially selected candidate. Specified by exact candidate or a regexp.
+  Note that it is not working with delayed sources.
+
+- :buffer
+
+  `anything-buffer' instead of *anything*.
+
+- :keymap
+
+  `anything-map' for current `anything' session.
+
+
+Of course, conventional arguments are supported, the two are same.
+
+ (anything :sources sources :input input :prompt prompt :resume resume
+           :preselect preselect :buffer buffer :keymap keymap)
+ (anything sources input prompt resume preselect buffer keymap)
+           
+
+Other keywords are interpreted as local variables of this anything session.
+The `anything-' prefix can be omitted. For example,
+
+ (anything :sources 'anything-c-source-buffers
+           :buffer \"*buffers*\" :candidate-number-limit 10)
+
+means starting anything session with `anything-c-source-buffers'
+source in *buffers* buffer and set
+`anything-candidate-number-limit' to 10 as session local variable. "
   (interactive)
-  (if (keywordp (car keys))
+  (if (keywordp (car plist))
       (anything-let-internal
-       (anything*-parse-keys keys)
+       (anything*-parse-keys plist)
        (lambda ()
          (apply 'anything
-                (mapcar (lambda (key) (plist-get keys key))
+                (mapcar (lambda (key) (plist-get plist key))
                         anything*-argument-keys))))
-    (apply 'anything-internal keys)))
+    (apply 'anything-internal plist)))
 
 (defun anything*-parse-keys (keys)
   (loop for (key value &rest _) on keys by #'cddr
