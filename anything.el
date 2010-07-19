@@ -82,8 +82,6 @@
 ;;
 ;; Below are complete command list:
 ;;
-;;  `anything-internal'
-;;    Select anything. In Lisp program, some optional arguments can be used.
 ;;  `anything-resume'
 ;;    Resurrect previously invoked `anything'.
 ;;  `anything-at-point'
@@ -1423,7 +1421,6 @@ already-bound variables. Yuck!
   `anything-map' for current `anything' session.
 "
   ;; TODO more document
-  (interactive)
   (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
   (condition-case v
