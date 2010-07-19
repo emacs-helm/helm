@@ -5679,6 +5679,19 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                          (b (1+ a))
                          c)
             'retval*)))
+      (desc "anything*")
+      (expect (mock (anything 'test-source "input" "prompt: " nil "preselect" "*test*" nil))
+        (anything* :sources   'test-source
+                   :input     "input"
+                   :prompt    "prompt: "
+                   :resume    nil
+                   :preselect "preselect"
+                   :buffer    "*test*"
+                   :keymap    nil))
+      (expect (mock (anything 'test-source nil nil nil nil "*test*" nil))
+        (anything* :sources                'test-source
+                   :buffer                 "*test*"
+                   :candidate-number-limit 20))
       )))
 
 
