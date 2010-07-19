@@ -9,7 +9,7 @@
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
 (defvar anything-version nil)
-(setq anything-version "1.284")
+(setq anything-version "1.285")
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
