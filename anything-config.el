@@ -5550,19 +5550,14 @@ If collection is an `obarray', a test is maybe needed, otherwise
 the list would be incomplete.
 See `obarray'."
   (cond ((and (listp collection) test)
-         (loop for i in collection
-              when (funcall test i) collect i))
+         (loop for i in collection when (funcall test i) collect i))
         ((and (eq collection obarray) test)
          (loop for s being the symbols of collection
-            when (funcall test s)
-            collect s))
+            when (funcall test s) collect s))
         ((and (vectorp collection) test)
-         (loop for i across collection
-            when (funcall test i)
-            collect (if (numberp i) (int-to-string i) i)))
+         (loop for i across collection when (funcall test i) collect i))
         ((vectorp collection)
-         (loop for i across collection
-            collect (if (numberp i) (int-to-string i) i)))
+         (loop for i across collection collect i))
         ((and (hash-table-p collection) test)
          (anything-comp-hash-get-items collection :test test))
         ((hash-table-p collection)
