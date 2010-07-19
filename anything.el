@@ -970,13 +970,13 @@ The original idea is from `tramp-debug-message'."
 
 ;; (@* "Anything API")
 (defmacro anything-let (varlist &rest body)
-  "Like `let'. Bind anything buffer local variables according to VARLIST then eval BODY."
+  "[OBSOLETE] Like `let'. Bind anything buffer local variables according to VARLIST then eval BODY."
   `(anything-let-internal (anything-let-eval-varlist ',varlist)
                           (lambda () ,@body)))
 (put 'anything-let 'lisp-indent-function 1)
 
 (defmacro anything-let* (varlist &rest body)
-  "Like `let*'. Bind anything buffer local variables according to VARLIST then eval BODY."
+  "[OBSOLETE] Like `let*'. Bind anything buffer local variables according to VARLIST then eval BODY."
   `(anything-let-internal (anything-let*-eval-varlist ',varlist)
                           (lambda () ,@body)))
 (put 'anything-let* 'lisp-indent-function 1)
