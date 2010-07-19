@@ -82,7 +82,7 @@
 ;;
 ;; Below are complete command list:
 ;;
-;;  `anything'
+;;  `anything-internal'
 ;;    Select anything. In Lisp program, some optional arguments can be used.
 ;;  `anything-resume'
 ;;    Resurrect previously invoked `anything'.
@@ -1381,7 +1381,7 @@ This function allows easy sequencing of transformer functions."
   "All of `anything-buffer' in most recently used order.")
 
 ;;;###autoload
-(defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
+(defun anything-internal (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
   "Select anything. In Lisp program, some optional arguments can be used.
 
 Note that all the optional arguments are prefixed because of
@@ -1450,7 +1450,8 @@ already-bound variables. Yuck!
      nil)))
 
 (defvar anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
-(defun anything* (&rest keys)
+(defun anything (&rest keys)
+  (interactive)
   (if (keywordp (car keys))
       (anything-let-internal
        (anything*-parse-keys keys)
@@ -1458,7 +1459,7 @@ already-bound variables. Yuck!
          (apply 'anything
                 (mapcar (lambda (key) (plist-get keys key))
                         anything*-argument-keys))))
-    (apply 'anything keys)))
+    (apply 'anything-internal keys)))
 
 (defun anything*-parse-keys (keys)
   (loop for (key value &rest _) on keys by #'cddr
@@ -5681,21 +5682,21 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                          (b (1+ a))
                          c)
             'retval*)))
-      (desc "anything*")
-      (expect (mock (anything 'test-source "input" "prompt: " nil "preselect" "*test*" nil))
-        (anything* :sources   'test-source
+      (desc "anything with keyw")
+      (expect (mock (anything-internal 'test-source "input" "prompt: " nil "preselect" "*test*" nil))
+        (anything :sources   'test-source
                    :input     "input"
                    :prompt    "prompt: "
                    :resume    nil
                    :preselect "preselect"
                    :buffer    "*test*"
                    :keymap    nil))
-      (expect (mock (anything 'test-source nil nil nil nil "*test*" nil))
-        (anything* :sources                'test-source
+      (expect (mock (anything-internal 'test-source nil nil nil nil "*test*" nil))
+        (anything :sources                'test-source
                    :buffer                 "*test*"
                    :candidate-number-limit 20))
-      (expect (mock (anything 'test-source nil nil nil nil "*test*" nil))
-        (anything* 'test-source nil nil nil nil "*test*" nil))
+      (expect (mock (anything-internal 'test-source nil nil nil nil "*test*" nil))
+        (anything 'test-source nil nil nil nil "*test*" nil))
       )))
 
 
