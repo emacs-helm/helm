@@ -242,6 +242,10 @@
 
 ;;; (@* "Tips")
 
+;;
+;; `anything' accepts keyword arguments. See docstring.
+;; [EVAL IT] (describe-function 'anything)
+
 ;; 
 ;; `anything-enable-shortcuts' enables us to select candidate easily.
 ;; If 'prefix then they can be selected using <prefix-key> <alnum>. 
