@@ -1477,6 +1477,7 @@ source in *buffers* buffer and set
               any-input)
             any-prompt any-resume any-preselect any-buffer))
 
+;;;###autoload
 (defun anything-other-buffer (any-sources any-buffer)
   "Simplified interface of `anything' with other `anything-buffer'"
   (anything any-sources nil nil nil nil any-buffer))
