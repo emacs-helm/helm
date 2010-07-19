@@ -1137,7 +1137,7 @@ Attributes:
 if BUFFER is nil or unspecified, use anything-buffer as default value.
 If FORCE-DISPLAY-PART is non-nil, return the display string."
   (setq buffer (if (and buffer buffer-s) buffer anything-buffer))
-  (unless (zerop (buffer-size (get-buffer buffer)))
+  (unless (anything-empty-buffer-p buffer)
     (with-current-buffer buffer
       (let ((selection
              (or (and (not force-display-part)
@@ -1158,7 +1158,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
 
 (defun anything-get-action ()
   "Return the associated action for the selected candidate."
-  (unless (zerop (buffer-size (get-buffer (anything-buffer-get))))
+  (unless (anything-empty-buffer-p (anything-buffer-get))
     (let* ((source (anything-get-current-source))
            (actions (assoc-default 'action source)))
 
@@ -1291,6 +1291,9 @@ Otherwise, return VALUE itself."
       (push spec anything-once-called-functions))))
 
 ;; (@* "Core: API helper")
+(defun anything-empty-buffer-p (&optional buffer)
+  (zerop (buffer-size (and buffer (get-buffer buffer)))))
+
 (defun anything-let-eval-varlist (varlist)
   (mapcar (lambda (pair)
             (if (listp pair)
@@ -1972,7 +1975,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
         content-buf)
     (funcall (assoc-default 'candidates source))
     (setq content-buf (anything-candidate-buffer))
-    (unless (zerop (buffer-size content-buf))
+    (unless (anything-empty-buffer-p content-buf)
       (anything-insert-header-from-source source)
       (insert-buffer-substring content-buf))))
 
@@ -1990,7 +1993,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
             (dolist (source delayed-sources)
               (anything-process-source source))
 
-            (when (and (not (equal (buffer-size) 0))
+            (when (and (not (anything-empty-buffer-p))
                        ;; no selection yet
                        (= (overlay-start anything-selection-overlay)
                           (overlay-end anything-selection-overlay)))
@@ -2279,7 +2282,7 @@ If action buffer is selected, back to the anything buffer."
 (defun anything-move-selection-common (move-func unit direction)
   "Move the selection marker to a new position determined by
 UNIT and DIRECTION."
-  (unless (or (zerop (buffer-size (get-buffer (anything-buffer-get))))
+  (unless (or (anything-empty-buffer-p (anything-buffer-get))
               (not (anything-window)))
     (with-anything-window
       (funcall move-func)
@@ -3272,7 +3275,7 @@ occurrence of the current pattern.")
 (defun anything-isearch ()
   "Start incremental search within results. (UNMAINTAINED)"
   (interactive)
-  (if (zerop (buffer-size (get-buffer (anything-buffer-get))))
+  (if (anything-empty-buffer-p (anything-buffer-get))
       (message "There are no results.")
 
     (setq anything-isearch-original-message-timeout minibuffer-message-timeout)
@@ -3581,7 +3584,7 @@ Unbind C-r to prevent problems during anything-isearch."
 (defun anything-iswitchb-handle-update ()
   "Pop up the anything buffer if it's not empty and it's not
 shown yet and bind anything commands in iswitchb."
-  (unless (or (equal (buffer-size (get-buffer anything-buffer)) 0)
+  (unless (or (anything-empty-buffer-p anything-buffer)
               anything-iswitchb-frame-configuration)
     (setq anything-iswitchb-frame-configuration (anything-current-frame/window-configuration))
 
