@@ -1465,10 +1465,13 @@ already-bound variables. Yuck!
                               symname
                             (concat "anything-" symname)))
         unless (memq key anything*-argument-keys)
-        collect (list sym value)))
+        collect (cons sym value)))
 ;; (anything*-parse-keys '(:sources '(((name . hoge))) :anything-candidate-number-limit 22))
 ;; (anything* :sources '(((name . "test")(candidates "1" "2" "3"))) :buffer " *any0*")
-;; FIXME (anything* :sources '(((name . "test00")(candidates "10" "20" "30"))) :anything-candidate-number-limit 2)
+;; (let ((anything-candidate-number-limit 2))(anything* :sources '(((name . "test")(candidates "1" "2" "3"))) :buffer " *any0*"))
+;; (anything-let ((anything-candidate-number-limit 2))(anything-other-buffer '(((name . "test")(candidates "1" "2" "3"))) " *any0*"))
+;; (anything* :sources '(((name . "test00")(candidates "10" "20" "30"))) :anything-candidate-number-limit 2)
+;; (anything* :sources '(((name . "test00")(candidates "10" "20" "30"))) :candidate-number-limit 2)
 
 
 (defun anything-resume-p (any-resume)
