@@ -1013,9 +1013,7 @@ The original idea is from `tramp-debug-message'."
 (defmacro with-anything-restore-variables(&rest body)
   "Restore variables specified by `anything-restored-variables' after executing BODY . "
   `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables))
-         (deferred-action-function 'anything-deferred-action-function)
-         (--pre-command-hook-pair (cons pre-command-hook
-                                        (default-value 'pre-command-hook))))
+         (deferred-action-function 'anything-deferred-action-function))
      (anything-log "save variables: %S" --orig-vars)
      (unwind-protect (progn ,@body)
        (loop for (var . value) in --orig-vars
