@@ -1189,8 +1189,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
                      (message "No candidates")
                      (return-from exit nil))
                    (goto-char header-pos)
-                   (buffer-substring-no-properties
-                    (line-beginning-position) (line-end-position)))))
+                   (anything-current-line-contents))))
            (some (lambda (source)
                    (if (equal (assoc-default 'name source)
                               source-name)
@@ -1317,6 +1316,10 @@ Otherwise, return VALUE itself."
 
 
 ;; (@* "Core: tools")
+(defun anything-current-line-contents ()
+  "Current line strig without properties."
+  (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+
 (defun anything-funcall-with-source (source func &rest args)
   "Call FUNC with ARGS with variable `anything-source-name' and `source' is bound.
 FUNC can be function list. Return the result of last function call."
@@ -2420,7 +2423,7 @@ UNIT and DIRECTION."
      (goto-char (point-min))
      (let ((name (if (stringp source-or-name) source-or-name
                    (assoc-default 'name source-or-name))))
-       (while (not (string= name (buffer-substring (point-at-bol) (point-at-eol))))
+       (while (not (string= name (anything-current-line-contents)))
          (goto-char (anything-get-next-header-pos)))))
    'source 'next))
 
@@ -3042,7 +3045,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defun anything-toggle-visible-mark ()
   (interactive)
   (with-anything-window
-    (let ((display (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
+    (let ((display (anything-current-line-contents))
           (source (anything-get-current-source))
           (selection (anything-get-selection)))
       (anything-aif (loop for o in anything-visible-mark-overlays
@@ -3112,7 +3115,7 @@ It is analogous to `dired-get-marked-files'."
               (when (and (save-excursion
                            (goto-char (anything-get-previous-header-pos))
                            (equal (overlay-get o 'source)
-                                  (buffer-substring (line-beginning-position) (line-end-position))))
+                                  (anything-current-line-contents)))
                          (not (find-if (lambda (x)
                                          (memq x anything-visible-mark-overlays))
                                        (overlays-at (point)))))
