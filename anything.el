@@ -1378,9 +1378,6 @@ This function allows easy sequencing of transformer functions."
            source (lambda (&rest args) (anything-compose args funcs)) args)))
 
 ;; (@* "Core: entry point")
-(defvar anything-buffers nil
-  "All of `anything-buffer' in most recently used order.")
-
 (defun anything-internal (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer any-keymap)
   "Older interface of `anything'. It is called by `anything'."
   (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -1491,6 +1488,8 @@ source in *buffers* buffer and set
   "Whethre current anything session is resumed or not."
   (memq any-resume '(t window-only)))
 
+(defvar anything-buffers nil
+  "All of `anything-buffer' in most recently used order.")
 (defun anything-initialize-1 (any-resume any-input any-sources)
   "The real initialization of `anything'.
 
