@@ -1194,9 +1194,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
 (defun anything-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `anything' was invoked."
   (let* ((b (get-buffer buffer))
-         (key (concat (buffer-name b)
-                     "/"
-                     (anything-attr 'name)))
+         (key (concat (buffer-name b) "/" (anything-attr 'name)))
          (source-tick (or (gethash key anything-tick-hash) 0))
          (buffer-tick (buffer-chars-modified-tick b))
          (modifiedp (/= source-tick buffer-tick)))
