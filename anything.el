@@ -1168,28 +1168,28 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
   "Return the source for the current selection / in init/candidates/action/candidate-transformer/filtered-candidate-transformer function."
   (declare (special source))
   ;; The name `anything-get-current-source' should be used in init function etc.
-  (if (and (boundp 'anything-source-name) (stringp anything-source-name))
-      source
-    (with-current-buffer (anything-buffer-get)
-      (or 
-       (get-text-property (point) 'anything-source)
-       (block exit
-         ;; This goto-char shouldn't be necessary, but point is moved to
-         ;; point-min somewhere else which shouldn't happen.
-         (goto-char (overlay-start anything-selection-overlay))
-         (let* ((header-pos (or (anything-get-previous-header-pos)
-                                (anything-get-next-header-pos)))
-                (source-name
-                 (save-excursion
-                   (unless header-pos
-                     (message "No candidates")
-                     (return-from exit nil))
-                   (goto-char header-pos)
-                   (anything-current-line-contents))))
-           (some (lambda (source)
-                   (if (equal (assoc-default 'name source) source-name)
-                       source))
-                 (anything-get-sources))))))))
+  (with-current-buffer (anything-buffer-get)
+    (cond ((and (boundp 'anything-source-name) (stringp anything-source-name))
+           source)
+          ((get-text-property (point) 'anything-source))
+          (t
+           (block exit
+             ;; This goto-char shouldn't be necessary, but point is moved to
+             ;; point-min somewhere else which shouldn't happen.
+             (goto-char (overlay-start anything-selection-overlay))
+             (let* ((header-pos (or (anything-get-previous-header-pos)
+                                    (anything-get-next-header-pos)))
+                    (source-name
+                     (save-excursion
+                       (unless header-pos
+                         (message "No candidates")
+                         (return-from exit nil))
+                       (goto-char header-pos)
+                       (anything-current-line-contents))))
+               (some (lambda (source)
+                       (if (equal (assoc-default 'name source) source-name)
+                           source))
+                     (anything-get-sources))))))))
 
 (defun anything-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `anything' was invoked."
