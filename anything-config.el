@@ -5552,16 +5552,19 @@ See `obarray'."
   (cond ((and (listp collection) test)
          (loop for i in collection
               when (funcall test i) collect i))
+        ((and (eq collection obarray) test)
+         (loop for s being the symbols of collection
+            when (funcall test s)
+            collect s))
         ((and (vectorp collection) test)
-         (let (ob)
-           (mapatoms
-            #'(lambda (s)
-                (when (funcall test s) (push s ob))))
-           ob))
+         (loop for i across collection
+            when (funcall test i)
+            collect (if (numberp i) (int-to-string i) i)))
+        ((vectorp collection)
+         (loop for i across collection
+            collect (if (numberp i) (int-to-string i) i)))
         ((and (hash-table-p collection) test)
          (anything-comp-hash-get-items collection :test test))
-        ((vectorp collection)
-         (loop for i across collection collect i))
         ((hash-table-p collection)
          (anything-comp-hash-get-items collection))
         (t collection)))
