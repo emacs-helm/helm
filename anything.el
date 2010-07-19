@@ -1407,7 +1407,7 @@ This function allows easy sequencing of transformer functions."
      (anything-log "end session (quit) -------------------------------------")
      nil)))
 
-(defconst anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
+(defconst anything-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 ;;;###autoload
 (defun anything (&rest plist)
   "Select anything. In Lisp program, some optional arguments can be used.
@@ -1470,22 +1470,22 @@ source in *buffers* buffer and set
   (interactive)
   (if (keywordp (car plist))
       (anything-let-internal
-       (anything*-parse-keys plist)
+       (anything-parse-keys plist)
        (lambda ()
          (apply 'anything
                 (mapcar (lambda (key) (plist-get plist key))
-                        anything*-argument-keys))))
+                        anything-argument-keys))))
     (apply 'anything-internal plist)))
 
-(defun anything*-parse-keys (keys)
+(defun anything-parse-keys (keys)
   (loop for (key value &rest _) on keys by #'cddr
         for symname = (substring (symbol-name key) 1)
         for sym = (intern (if (string-match "^anything-" symname)
                               symname
                             (concat "anything-" symname)))
-        unless (memq key anything*-argument-keys)
+        unless (memq key anything-argument-keys)
         collect (cons sym value)))
-;; (anything*-parse-keys '(:sources '(((name . hoge))) :anything-candidate-number-limit 22))
+;; (anything-parse-keys '(:sources '(((name . hoge))) :anything-candidate-number-limit 22))
 ;; (anything* :sources '(((name . "test")(candidates "1" "2" "3"))) :buffer " *any0*")
 ;; (let ((anything-candidate-number-limit 2))(anything* :sources '(((name . "test")(candidates "1" "2" "3"))) :buffer " *any0*"))
 ;; (anything-let ((anything-candidate-number-limit 2))(anything-other-buffer '(((name . "test")(candidates "1" "2" "3"))) " *any0*"))
