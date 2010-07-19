@@ -1698,8 +1698,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
                     collect overlay)))
 
     (when anything-digit-overlays
-      (dolist (overlay anything-digit-overlays)
-        (delete-overlay overlay))
+      (mapc 'delete-overlay anything-digit-overlays)
       (setq anything-digit-overlays nil))))
 
 (defun anything-hooks (setup-or-cleanup)
