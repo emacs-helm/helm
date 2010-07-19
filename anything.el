@@ -1451,12 +1451,14 @@ already-bound variables. Yuck!
 
 (defvar anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 (defun anything* (&rest keys)
-  (anything-let-internal
-   (anything*-parse-keys keys)
-   (lambda ()
-     (apply 'anything
-            (mapcar (lambda (key) (plist-get keys key))
-                    anything*-argument-keys)))))
+  (if (keywordp (car keys))
+      (anything-let-internal
+       (anything*-parse-keys keys)
+       (lambda ()
+         (apply 'anything
+                (mapcar (lambda (key) (plist-get keys key))
+                        anything*-argument-keys))))
+    (apply 'anything keys)))
 
 (defun anything*-parse-keys (keys)
   (loop for (key value &rest _) on keys by #'cddr
@@ -5692,6 +5694,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything* :sources                'test-source
                    :buffer                 "*test*"
                    :candidate-number-limit 20))
+      (expect (mock (anything 'test-source nil nil nil nil "*test*" nil))
+        (anything* 'test-source nil nil nil nil "*test*" nil))
       )))
 
 
