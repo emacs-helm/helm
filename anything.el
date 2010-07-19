@@ -1572,6 +1572,7 @@ extensions may advice `anything-initalize'. I cannot rename, sigh."
     (push elt (symbol-value list-var))))
 
 ;;; (@* "Core: Accessors")
+;;; rubikitch: I love to create functions to control variables.
 (defvar anything-current-position nil
   "Cons of (point) and (window-start) when `anything' is invoked.
 It is needed because restoring position when `anything' is keyboard-quitted.")
