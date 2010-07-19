@@ -1685,21 +1685,19 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
           (make-overlay (point-min) (point-min) (get-buffer buffer)))
     (overlay-put anything-selection-overlay 'face anything-selection-face))
 
-  (when anything-enable-shortcuts
-    (setq anything-shortcut-keys (assoc-default anything-enable-shortcuts anything-shortcut-keys-alist)))
-
-  (if anything-enable-shortcuts
-      (unless anything-digit-overlays
-        (setq anything-digit-overlays
-              (loop for key across anything-shortcut-keys
-                    for overlay = (make-overlay (point-min) (point-min) (get-buffer buffer))
-                    do (overlay-put overlay 'before-string
-                                    (format "%s - " (upcase (make-string 1 key))))
-                    collect overlay)))
-
-    (when anything-digit-overlays
-      (mapc 'delete-overlay anything-digit-overlays)
-      (setq anything-digit-overlays nil))))
+  (cond (anything-enable-shortcuts
+         (setq anything-shortcut-keys
+               (assoc-default anything-enable-shortcuts anything-shortcut-keys-alist))
+         (unless anything-digit-overlays
+           (setq anything-digit-overlays
+                 (loop for key across anything-shortcut-keys
+                       for overlay = (make-overlay (point-min) (point-min) (get-buffer buffer))
+                       do (overlay-put overlay 'before-string
+                                       (format "%s - " (upcase (make-string 1 key))))
+                       collect overlay))))
+        (anything-digit-overlays
+         (mapc 'delete-overlay anything-digit-overlays)
+         (setq anything-digit-overlays nil))))
 
 (defun anything-hooks (setup-or-cleanup)
   (let ((hooks '((deferred-action-list anything-check-minibuffer-input)
