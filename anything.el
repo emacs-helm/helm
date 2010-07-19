@@ -1325,8 +1325,6 @@ FUNC can be function list. Return the result of last function call."
 (defun anything-funcall-foreach (sym)
   "Call the sym function(s) for each source if any."
   (dolist (source (anything-get-sources))
-    (when (symbolp source)
-      (setq source (symbol-value source)))
     (anything-aif (assoc-default sym source)
         (anything-funcall-with-source source it))))
 
