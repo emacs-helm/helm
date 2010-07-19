@@ -1407,7 +1407,7 @@ This function allows easy sequencing of transformer functions."
      (anything-log "end session (quit) -------------------------------------")
      nil)))
 
-(defvar anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
+(defconst anything*-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
 ;;;###autoload
 (defun anything (&rest plist)
   "Select anything. In Lisp program, some optional arguments can be used.
