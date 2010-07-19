@@ -1632,18 +1632,18 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (if (anything-resume-p any-resume) (anything-mark-current-line) (anything-update))
   (select-frame-set-input-focus (window-frame (minibuffer-window)))
   (anything-preselect any-preselect)
-  (let ((ncandidate (anything-approximate-candidate-number))
-        (minibuffer-local-map
+  (let ((minibuffer-local-map
          (with-current-buffer (anything-buffer-get)
            (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
-
            anything-map)))
-    (anything-log-eval ncandidate anything-execute-action-at-once-if-one
+    (anything-log-eval (anything-approximate-candidate-number)
+                       anything-execute-action-at-once-if-one
                        anything-quit-if-no-candidate)
     (cond ((and anything-execute-action-at-once-if-one
-                (= ncandidate 1))
+                (= (anything-approximate-candidate-number) 1))
            (ignore))
-          ((and anything-quit-if-no-candidate (= ncandidate 0))
+          ((and anything-quit-if-no-candidate
+                (= (anything-approximate-candidate-number) 0))
            (setq anything-quit t)
            (and (functionp anything-quit-if-no-candidate)
                 (funcall anything-quit-if-no-candidate)))
