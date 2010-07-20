@@ -1812,30 +1812,25 @@ SOURCE."
   "Return the cached value of candidates for SOURCE.
 Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
-         (candidate-cache (assoc name anything-candidate-cache))
-         candidates)
+         (candidate-cache (assoc name anything-candidate-cache)))
     (cond (candidate-cache
            (anything-log "use cached candidates")
-           (setq candidates (cdr candidate-cache)))
-
+           (cdr candidate-cache))
           (t
            (anything-log "calculate candidates")
-           (setq candidates (anything-get-candidates source))
-           (if (processp candidates)
-               (progn
-                 (push (cons candidates
-                             (append source 
-                                     (list (cons 'item-count 0)
-                                           (cons 'incomplete-line ""))))
-                       anything-async-processes)
-                 (set-process-filter candidates 'anything-output-filter)
-                 (setq candidates nil))
-
-             (unless (assoc 'volatile source)
-               (setq candidate-cache (cons name candidates))
-               (push candidate-cache anything-candidate-cache)))))
-
-    candidates))
+           (let ((candidates (anything-get-candidates source)))
+             (cond ((processp candidates)
+                    (push (cons candidates
+                                (append source 
+                                        (list (cons 'item-count 0)
+                                              (cons 'incomplete-line ""))))
+                          anything-async-processes)
+                    (set-process-filter candidates 'anything-output-filter)
+                    (setq candidates nil))
+                   ((not (assoc 'volatile source))
+                    (setq candidate-cache (cons name candidates))
+                    (push candidate-cache anything-candidate-cache)))
+             candidates)))))
 
 ;;; (@* "Core: candidate transformers")
 (defun anything-process-candidate-transformer (candidates source)
