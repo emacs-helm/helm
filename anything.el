@@ -1878,54 +1878,55 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
-  (let ((doit (lambda ()
-                (let ((matchfns (or (assoc-default 'match source)
-                                    anything-default-match-functions))
-                      (anything-source-name (assoc-default 'name source))
-                      (limit (anything-candidate-number-limit source))
-                      (anything-pattern
-                       (anything-aif (assoc-default 'pattern-transformer source)
-                           (anything-composed-funcall-with-source source it anything-pattern)
-                         anything-pattern))
-                      matches)
-                  (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
-                         (setq matches (anything-get-cached-candidates source))
-                         (if (> (length matches) limit)
-                             (setq matches (subseq matches 0 limit))))
-                        (t
-                         (condition-case nil
-                             (let ((item-count 0)
-                                   (cands (anything-get-cached-candidates source))
-                                   exit)
-                               (clrhash anything-match-hash)
-                               (dolist (match matchfns)
-                                 (let (newmatches)
-                                   (dolist (candidate cands)
-                                     (when (and (not (gethash candidate anything-match-hash))
-                                                (funcall match (format "%s" (or (car-safe candidate)
-                                                                                candidate))))
-                                       (puthash candidate t anything-match-hash)
-                                       (push candidate newmatches)
-                                       (incf item-count)
-                                       (when (= item-count limit)
-                                         (setq exit t)
-                                         (return))))
+  (if debug-on-error
+      (anything-compute-matches-internal source)
+    (condition-case v
+        (anything-compute-matches-internal source)
+      (error (anything-log-error
+              "anything-compute-matches: error when processing source: %s"
+              (assoc-default 'name source))
+             nil))))
 
-                                   (setq matches (append matches (reverse newmatches)))
+(defun anything-compute-matches-internal (source)
+  (let ((matchfns (or (assoc-default 'match source)
+                      anything-default-match-functions))
+        (anything-source-name (assoc-default 'name source))
+        (limit (anything-candidate-number-limit source))
+        (anything-pattern
+         (anything-aif (assoc-default 'pattern-transformer source)
+             (anything-composed-funcall-with-source source it anything-pattern)
+           anything-pattern))
+        matches)
+    (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
+           (setq matches (anything-get-cached-candidates source))
+           (if (> (length matches) limit)
+               (setq matches (subseq matches 0 limit))))
+          (t
+           (condition-case nil
+               (let ((item-count 0)
+                     (cands (anything-get-cached-candidates source))
+                     exit)
+                 (clrhash anything-match-hash)
+                 (dolist (match matchfns)
+                   (let (newmatches)
+                     (dolist (candidate cands)
+                       (when (and (not (gethash candidate anything-match-hash))
+                                  (funcall match (format "%s" (or (car-safe candidate)
+                                                                  candidate))))
+                         (puthash candidate t anything-match-hash)
+                         (push candidate newmatches)
+                         (incf item-count)
+                         (when (= item-count limit)
+                           (setq exit t)
+                           (return))))
 
-                                   (if exit
-                                       (return)))))
+                     (setq matches (append matches (reverse newmatches)))
 
-                           (invalid-regexp (setq matches nil)))))
-                  (anything-process-filtered-candidate-transformer matches source)))))
-    (if debug-on-error
-        (funcall doit)
-      (condition-case v
-          (funcall doit)
-        (error (anything-log-error
-                "anything-compute-matches: error when processing source: %s"
-                (assoc-default 'name source))
-               nil)))))
+                     (if exit
+                         (return)))))
+
+             (invalid-regexp (setq matches nil)))))
+    (anything-process-filtered-candidate-transformer matches source)))
 
 ;; (anything '(((name . "error")(candidates . (lambda () (hage))) (action . identity))))
 
