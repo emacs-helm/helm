@@ -1993,7 +1993,7 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
   "Process delayed sources if the user is idle for
 `anything-idle-delay' seconds."
   (with-anything-quittable
-    (anything-log-eval (ignore-errors (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources)))
+    (anything-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
     (if (sit-for (if anything-input-idle-delay
                      (max 0 (- anything-idle-delay anything-input-idle-delay))
                    anything-idle-delay))
