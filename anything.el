@@ -2027,6 +2027,11 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
            (< (window-height (get-buffer-window (current-buffer)))
               (line-number-at-pos (point-max))))))
 
+(defun anything-move-first-line ()
+  (goto-char (point-min))
+  (save-excursion (anything-log-run-hook 'anything-update-hook))
+  (anything-next-line))
+
 (defun anything-update ()
   "Update the list of matches in the anything buffer according to
 the current pattern."
@@ -2036,22 +2041,19 @@ the current pattern."
   (with-current-buffer (anything-buffer-get)
     (set (make-local-variable 'anything-input-local) anything-pattern)
     (erase-buffer)
-
     (when anything-enable-shortcuts
       (mapc 'delete-overlay anything-digit-overlays))
-
     (let (delayed-sources)
       (unwind-protect
-          (dolist (source (anything-get-sources))
-            (when (anything-update-source-p source)
-              (if (anything-delayed-source-p source)
-                  (push source delayed-sources)
-                (anything-process-source source))))
-        (anything-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-        (goto-char (point-min))
-        (save-excursion (anything-log-run-hook 'anything-update-hook))
-        (anything-next-line)
-        (setq delayed-sources (nreverse delayed-sources))
+          (setq delayed-sources
+                (loop for source in (remove-if-not 'anything-update-source-p
+                                                   (anything-get-sources))
+                      if (anything-delayed-source-p source)
+                      collect source
+                      else do (anything-process-source source)))
+        (anything-log-eval
+         (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
+        (anything-move-first-line)
         (if anything-test-mode
             (mapc 'anything-process-source delayed-sources)
           (anything-maybe-fit-frame)
