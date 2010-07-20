@@ -2014,24 +2014,6 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
 
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
-(defun anything-update-source-p (source)
-  (and (or (not anything-source-filter)
-           (member (assoc-default 'name source) anything-source-filter))
-       (>= (length anything-pattern)
-           (anything-aif (assoc 'requires-pattern source)
-               (or (cdr it) 1)
-             0))))
-(defun anything-delayed-source-p (source)
-  (or (assoc 'delayed source)
-      (and anything-quick-update
-           (< (window-height (get-buffer-window (current-buffer)))
-              (line-number-at-pos (point-max))))))
-
-(defun anything-update-move-first-line ()
-  (goto-char (point-min))
-  (save-excursion (anything-log-run-hook 'anything-update-hook))
-  (anything-next-line))
-
 (defun anything-update ()
   "Update the list of matches in the anything buffer according to
 the current pattern."
@@ -2066,6 +2048,24 @@ the current pattern."
           ;; AFTER processing delayed sources
           (anything-log-run-hook 'anything-after-update-hook))
         (anything-log "end update")))))
+
+(defun anything-update-source-p (source)
+  (and (or (not anything-source-filter)
+           (member (assoc-default 'name source) anything-source-filter))
+       (>= (length anything-pattern)
+           (anything-aif (assoc 'requires-pattern source)
+               (or (cdr it) 1)
+             0))))
+(defun anything-delayed-source-p (source)
+  (or (assoc 'delayed source)
+      (and anything-quick-update
+           (< (window-height (get-buffer-window (current-buffer)))
+              (line-number-at-pos (point-max))))))
+
+(defun anything-update-move-first-line ()
+  (goto-char (point-min))
+  (save-excursion (anything-log-run-hook 'anything-update-hook))
+  (anything-next-line))
 
 (defun anything-force-update ()
   "Recalculate and update candidates.
