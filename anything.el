@@ -1994,25 +1994,25 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
 `anything-idle-delay' seconds."
   (with-anything-quittable
     (anything-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-    (if (sit-for (if anything-input-idle-delay
-                     (max 0 (- anything-idle-delay anything-input-idle-delay))
-                   anything-idle-delay))
-        (with-current-buffer anything-buffer        
-          (save-excursion
-            (goto-char (point-max))
-            (dolist (source delayed-sources)
-              (anything-process-source source))
+    (when (sit-for (if anything-input-idle-delay
+                       (max 0 (- anything-idle-delay anything-input-idle-delay))
+                     anything-idle-delay))
+      (with-current-buffer anything-buffer        
+        (save-excursion
+          (goto-char (point-max))
+          (dolist (source delayed-sources)
+            (anything-process-source source))
 
-            (when (and (not (anything-empty-buffer-p))
-                       ;; no selection yet
-                       (= (overlay-start anything-selection-overlay)
-                          (overlay-end anything-selection-overlay)))
-              (goto-char (point-min))
-              (anything-next-line)))
-          (save-excursion
+          (when (and (not (anything-empty-buffer-p))
+                     ;; no selection yet
+                     (= (overlay-start anything-selection-overlay)
+                        (overlay-end anything-selection-overlay)))
             (goto-char (point-min))
-            (anything-log-run-hook 'anything-update-hook))
-          (anything-maybe-fit-frame)))))
+            (anything-next-line)))
+        (save-excursion
+          (goto-char (point-min))
+          (anything-log-run-hook 'anything-update-hook))
+        (anything-maybe-fit-frame)))))
 
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
