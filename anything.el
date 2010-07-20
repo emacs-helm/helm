@@ -945,7 +945,10 @@ Arguments are same as `format'."
   (run-hooks hook)
   (anything-log "executed %s" hook))
 (defun anything-log-eval-internal (exprs)
-  (mapc (lambda (expr) (anything-log "%S = %S" expr (eval expr))) exprs))
+  (dolist (expr exprs)
+    (condition-case err
+        (anything-log "%S = %S" expr (eval expr))
+      (error (anything-log "%S = ERROR!" expr)))))
 (defun anything-log-get-current-function ()
   "Get function name calling `anything-log'.
 The original idea is from `tramp-debug-message'."
@@ -5747,6 +5750,11 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                   :candidate-number-limit 20))
       (expect (mock (anything-internal 'test-source nil nil nil nil "*test*" nil))
         (anything 'test-source nil nil nil nil "*test*" nil))
+      (desc "anything-log-eval-internal")
+      (expect (mock (anything-log "%S = %S" '(+ 1 2) 3))
+        (anything-log-eval-internal '((+ 1 2))))
+      (expect (mock (anything-log "%S = ERROR!" 'unDeFined))
+        (anything-log-eval-internal '(unDeFined)))
 
       )))
 
