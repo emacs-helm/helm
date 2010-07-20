@@ -1955,13 +1955,13 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
             (if (and multiline separate)
                 (anything-insert-candidate-separator)
               (setq separate t))
-            (anything-put-digit-overlays-maybe)
+            (anything-put-digit-overlay-maybe)
             (anything-insert-match match 'insert source))
         
           (if multiline
               (put-text-property start (point) 'anything-multiline t)))))))
 
-(defun anything-put-digit-overlays-maybe ()
+(defun anything-put-digit-overlay-maybe ()
   (when (and anything-enable-shortcuts
              (not (eq anything-digit-shortcut-count
                       (length anything-digit-overlays))))
