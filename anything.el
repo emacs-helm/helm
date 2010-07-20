@@ -1807,6 +1807,37 @@ SOURCE."
           ((listp candidates) (anything-transform-candidates candidates source))
           (t (funcall type-error)))))
          
+
+(defun anything-get-cached-candidates (source)
+  "Return the cached value of candidates for SOURCE.
+Cache the candidates if there is not yet a cached value."
+  (let* ((name (assoc-default 'name source))
+         (candidate-cache (assoc name anything-candidate-cache))
+         candidates)
+    (cond (candidate-cache
+           (anything-log "use cached candidates")
+           (setq candidates (cdr candidate-cache)))
+
+          (t
+           (anything-log "calculate candidates")
+           (setq candidates (anything-get-candidates source))
+           (if (processp candidates)
+               (progn
+                 (push (cons candidates
+                             (append source 
+                                     (list (cons 'item-count 0)
+                                           (cons 'incomplete-line ""))))
+                       anything-async-processes)
+                 (set-process-filter candidates 'anything-output-filter)
+                 (setq candidates nil))
+
+             (unless (assoc 'volatile source)
+               (setq candidate-cache (cons name candidates))
+               (push candidate-cache anything-candidate-cache)))))
+
+    candidates))
+
+;;; (@* "Core: candidate transformers")
 (defun anything-process-candidate-transformer (candidates source)
   (anything-aif (assoc-default 'candidate-transformer source)
       (anything-composed-funcall-with-source source it candidates)
@@ -1837,35 +1868,6 @@ SOURCE."
     (anything-process-candidate-transformer candidates source) source process-p)
    source))
 
-
-(defun anything-get-cached-candidates (source)
-  "Return the cached value of candidates for SOURCE.
-Cache the candidates if there is not yet a cached value."
-  (let* ((name (assoc-default 'name source))
-         (candidate-cache (assoc name anything-candidate-cache))
-         candidates)
-    (cond (candidate-cache
-           (anything-log "use cached candidates")
-           (setq candidates (cdr candidate-cache)))
-
-          (t
-           (anything-log "calculate candidates")
-           (setq candidates (anything-get-candidates source))
-           (if (processp candidates)
-               (progn
-                 (push (cons candidates
-                             (append source 
-                                     (list (cons 'item-count 0)
-                                           (cons 'incomplete-line ""))))
-                       anything-async-processes)
-                 (set-process-filter candidates 'anything-output-filter)
-                 (setq candidates nil))
-
-             (unless (assoc 'volatile source)
-               (setq candidate-cache (cons name candidates))
-               (push candidate-cache anything-candidate-cache)))))
-
-    candidates))
 
 ;; (@* "Core: narrowing candidates")
 (defun anything-candidate-number-limit (source)
