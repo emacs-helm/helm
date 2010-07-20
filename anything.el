@@ -1807,13 +1807,19 @@ SOURCE."
           ((listp candidates) (anything-transform-candidates candidates source))
           (t (funcall type-error)))))
          
-
-(defun anything-transform-candidates (candidates source &optional process-p)
-  "Transform CANDIDATES according to candidate transformers."
+(defun anything-process-candidate-transformer (candidates source)
   (anything-aif (assoc-default 'candidate-transformer source)
-      (setq candidates (anything-composed-funcall-with-source source it candidates)))
-  (anything-aif (and process-p (assoc-default 'filtered-candidate-transformer source))
-      (setq candidates (anything-composed-funcall-with-source source it candidates source)))
+      (anything-composed-funcall-with-source source it candidates)
+    candidates))
+(defun anything-process-filtered-candidate-transformer (candidates source)
+  (anything-aif (assoc-default 'filtered-candidate-transformer source)
+      (anything-composed-funcall-with-source source it candidates source)
+    candidates))
+(defun anything-process-filtered-candidate-transformer-maybe (candidates source process-p)
+  (if process-p
+      (anything-process-filtered-candidate-transformer candidates source)
+    candidates))
+(defun anything-process-real-to-display (candidates source)
   (anything-aif (assoc-default 'real-to-display source)
       (setq candidates (anything-funcall-with-source
                         source 'mapcar
@@ -1822,8 +1828,14 @@ SOURCE."
                               ;; override DISPLAY from candidate-transformer
                               (cons (funcall it (cdr cand_)) (cdr cand_))
                             (cons (funcall it cand_) cand_)))
-                        candidates)))
-  candidates)
+                        candidates))
+    candidates))
+(defun anything-transform-candidates (candidates source &optional process-p)
+  "Transform CANDIDATES according to candidate transformers."
+  (anything-process-real-to-display
+   (anything-process-filtered-candidate-transformer-maybe
+    (anything-process-candidate-transformer candidates source) source process-p)
+   source))
 
 
 (defun anything-get-cached-candidates (source)
@@ -4274,6 +4286,25 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                                      (filtered-candidate-transformer
                                       . (lambda (cands src) (mapcar 'upcase cands)))))
                                   "ar"))
+      (desc "anything-transform-candidates in process")
+      (expect (mock (anything-composed-funcall-with-source
+                     '((name . "FOO") (candidates "foo" "bar")
+                       (filtered-candidate-transformer
+                        . (lambda (cands src) (mapcar 'upcase cands))))
+                     (lambda (cands src) (mapcar 'upcase cands))
+                     '("foo" "bar")
+                     '((name . "FOO") (candidates "foo" "bar")
+                       (filtered-candidate-transformer
+                        . (lambda (cands src) (mapcar 'upcase cands))))
+                     t))
+        (stub anything-process-candidate-transformer => '("foo" "bar"))
+        (anything-transform-candidates
+         '("foo" "bar")
+         '((name . "FOO") (candidates "foo" "bar")
+                       (filtered-candidate-transformer
+                        . (lambda (cands src) (mapcar 'upcase cands))))
+         t)
+        )
       (desc "anything-candidates-in-buffer-1")
       (expect nil
         (anything-candidates-in-buffer-1 nil))
@@ -5692,22 +5723,22 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
               (c)
               (anything-buffer (exps-tmpbuf)))
           (anything-let* ((a 1)
-                         (b (1+ a))
-                         c)
+                          (b (1+ a))
+                          c)
             'retval*)))
       (desc "anything with keyw")
       (expect (mock (anything-internal 'test-source "input" "prompt: " nil "preselect" "*test*" nil))
         (anything :sources   'test-source
-                   :input     "input"
-                   :prompt    "prompt: "
-                   :resume    nil
-                   :preselect "preselect"
-                   :buffer    "*test*"
-                   :keymap    nil))
+                  :input     "input"
+                  :prompt    "prompt: "
+                  :resume    nil
+                  :preselect "preselect"
+                  :buffer    "*test*"
+                  :keymap    nil))
       (expect (mock (anything-internal 'test-source nil nil nil nil "*test*" nil))
         (anything :sources                'test-source
-                   :buffer                 "*test*"
-                   :candidate-number-limit 20))
+                  :buffer                 "*test*"
+                  :candidate-number-limit 20))
       (expect (mock (anything-internal 'test-source nil nil nil nil "*test*" nil))
         (anything 'test-source nil nil nil nil "*test*" nil))
       )))
