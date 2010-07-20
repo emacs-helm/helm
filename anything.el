@@ -5732,7 +5732,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                           (b (1+ a))
                           c)
             'retval*)))
-      (desc "anything with keyw")
+      (desc "anything with keyword")
       (expect (mock (anything-internal 'test-source "input" "prompt: " nil "preselect" "*test*" nil))
         (anything :sources   'test-source
                   :input     "input"
@@ -5747,6 +5747,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                   :candidate-number-limit 20))
       (expect (mock (anything-internal 'test-source nil nil nil nil "*test*" nil))
         (anything 'test-source nil nil nil nil "*test*" nil))
+
       )))
 
 
