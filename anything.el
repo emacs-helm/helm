@@ -1982,7 +1982,9 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
     (setq content-buf (anything-candidate-buffer))
     (unless (anything-empty-buffer-p content-buf)
       (anything-insert-header-from-source source)
-      (insert-buffer-substring content-buf))))
+      (insert-buffer-substring content-buf)
+      ;; TODO call anything-put-digit-overlay-maybe with loop
+      )))
 
 (defun anything-process-delayed-sources (delayed-sources)
   "Process delayed sources if the user is idle for
