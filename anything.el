@@ -2000,9 +2000,7 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
       (with-current-buffer anything-buffer        
         (save-excursion
           (goto-char (point-max))
-          (dolist (source delayed-sources)
-            (anything-process-source source))
-
+          (mapc 'anything-process-source delayed-sources)
           (when (and (not (anything-empty-buffer-p))
                      ;; no selection yet
                      (= (overlay-start anything-selection-overlay)
