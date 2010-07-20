@@ -2014,6 +2014,19 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
 
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
+(defun anything-update-source-p (source)
+  (and (or (not anything-source-filter)
+           (member (assoc-default 'name source) anything-source-filter))
+       (>= (length anything-pattern)
+           (anything-aif (assoc 'requires-pattern source)
+               (or (cdr it) 1)
+             0))))
+(defun anything-delayed-source-p (source)
+  (or (assoc 'delayed source)
+      (and anything-quick-update
+           (< (window-height (get-buffer-window (current-buffer)))
+              (line-number-at-pos (point-max))))))
+
 (defun anything-update ()
   "Update the list of matches in the anything buffer according to
 the current pattern."
@@ -2030,19 +2043,11 @@ the current pattern."
     (let (delayed-sources)
       (unwind-protect
           (dolist (source (anything-get-sources))
-            (when (and (or (not anything-source-filter)
-                           (member (assoc-default 'name source) anything-source-filter))
-                       (>= (length anything-pattern)
-                           (anything-aif (assoc 'requires-pattern source)
-                               (or (cdr it) 1)
-                             0)))
-              (if (or (assoc 'delayed source)
-                      (and anything-quick-update
-                           (< (window-height (get-buffer-window (current-buffer)))
-                              (line-number-at-pos (point-max)))))
+            (when (anything-update-source-p source)
+              (if (anything-delayed-source-p source)
                   (push source delayed-sources)
                 (anything-process-source source))))
-
+        (anything-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
         (goto-char (point-min))
         (save-excursion (anything-log-run-hook 'anything-update-hook))
         (anything-next-line)
@@ -2051,9 +2056,7 @@ the current pattern."
             (mapc 'anything-process-source delayed-sources)
           (anything-maybe-fit-frame)
           (when delayed-sources
-            (run-with-idle-timer (if (featurep 'xemacs)
-                                     0.1
-                                   0)
+            (run-with-idle-timer (if (featurep 'xemacs) 0.1 0)
                                  nil
                                  'anything-process-delayed-sources
                                  delayed-sources))
