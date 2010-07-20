@@ -1947,18 +1947,16 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
                 `(,@anything-test-candidate-list
                   (,(assoc-default 'name source)
                    ,matches))))
-        (let ((multiline (assq 'multiline source))
-              (start (point))
-              separate)
-          (anything-insert-header-from-source source)
-          (dolist (match matches)
-            (if (and multiline separate)
-                (anything-insert-candidate-separator)
-              (setq separate t))
-            (anything-insert-match-with-digit-overlay match))
-        
-          (if multiline
-              (put-text-property start (point) 'anything-multiline t)))))))
+        (anything-insert-header-from-source source)
+        (if (not (assq 'multiline source))
+            (mapc 'anything-insert-match-with-digit-overlay matches)
+          (let ((start (point)) separate)
+            (dolist (match matches)
+              (if separate
+                  (anything-insert-candidate-separator)
+                (setq separate t))
+              (anything-insert-match-with-digit-overlay match))
+            (put-text-property start (point) 'anything-multiline t)))))))
 
 (defun anything-insert-match-with-digit-overlay (match)
   (declare (special source))
