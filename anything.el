@@ -2114,8 +2114,7 @@ the real value in a text property."
              (put-text-property start (line-end-position)
                                 'anything-realvalue realvalue)))
       (when anything-source-in-each-line-flag
-        (put-text-property start (line-end-position)
-                           'anything-source source))
+        (put-text-property start (line-end-position) 'anything-source source))
       (funcall insert-function "\n"))))
 
 (defun anything-insert-header-from-source (source)
