@@ -2074,25 +2074,28 @@ If current source has `update' attribute, a function without argument, call it b
   (let ((source (anything-get-current-source)))
     (anything-aif (anything-funcall-with-source source 'anything-candidate-buffer)
         (kill-buffer it))
-    (anything-aif (assoc-default 'update source)
-        (anything-funcall-with-source source it))
-    (anything-aif (assoc-default 'init source)
-        (anything-funcall-with-source source it))
-    ;; Remove from candidate cache to recalculate candidates
-    (setq anything-candidate-cache
-          (delete (assoc (assoc-default 'name source) anything-candidate-cache)
-                  anything-candidate-cache))
-    ;; Go to original selection after update
+    (dolist (attr '(update init))
+      (anything-aif (assoc-default attr source)
+        (anything-funcall-with-source source it)))
+    (anything-remove-candidate-cache source)
     (let ((selection (anything-get-selection nil t)))
       (anything-update)
-      (with-anything-window
+      (anything-keep-selection source selection))))
+
+(defun anything-keep-selection (source selection)
+  (with-anything-window
         (anything-goto-source source)
         (forward-char -1)                ;back to \n
         (if (search-forward (concat "\n" selection "\n") nil t)
             (forward-line -1)
           (goto-char (point-min))
           (forward-line 1))
-        (anything-mark-current-line)))))
+        (anything-mark-current-line)))
+
+(defun anything-remove-candidate-cache (source)
+  (setq anything-candidate-cache
+        (delete (assoc (assoc-default 'name source) anything-candidate-cache)
+                anything-candidate-cache)))
 
 (defun anything-insert-match (match insert-function source)
   "Insert MATCH into the anything buffer. If MATCH is a list then
