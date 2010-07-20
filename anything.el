@@ -1876,7 +1876,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
   (let ((doit (lambda ()
-                (let ((functions (assoc-default 'match source))
+                (let ((matchfns (assoc-default 'match source))
                       (anything-source-name (assoc-default 'name source))
                       (limit (anything-candidate-number-limit source))
                       (anything-pattern
@@ -1884,7 +1884,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                            (anything-composed-funcall-with-source source it anything-pattern)
                          anything-pattern))
                       matches)
-                  (cond ((or (equal anything-pattern "") (equal functions '(identity)))
+                  (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
                          (setq matches (anything-get-cached-candidates source))
                          (if (> (length matches) limit)
                              (setq matches 
@@ -1895,13 +1895,13 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                                    (cands (anything-get-cached-candidates source))
                                    exit)
 
-                               (unless functions
-                                 (setq functions
+                               (unless matchfns
+                                 (setq matchfns
                                        (list (lambda (candidate)
                                                (string-match anything-pattern candidate)))))
 
                                (clrhash anything-match-hash)
-                               (dolist (function functions)
+                               (dolist (function matchfns)
                                  (let (newmatches c cc)
                                    (dolist (candidate cands)
                                      (when (and (not (gethash candidate anything-match-hash))
