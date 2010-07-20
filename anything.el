@@ -1929,11 +1929,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                                        (return)))))
 
                            (invalid-regexp (setq matches nil)))))
-
-                  (anything-aif (assoc-default 'filtered-candidate-transformer source)
-                      (setq matches
-                            (anything-composed-funcall-with-source source it matches source)))
-                  matches))))
+                  (anything-process-filtered-candidate-transformer matches source)))))
     (if debug-on-error
         (funcall doit)
       (condition-case v
