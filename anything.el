@@ -1892,8 +1892,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                   (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
                          (setq matches (anything-get-cached-candidates source))
                          (if (> (length matches) limit)
-                             (setq matches 
-                                   (subseq matches 0 limit))))
+                             (setq matches (subseq matches 0 limit))))
                         (t
                          (condition-case nil
                              (let ((item-count 0)
@@ -1905,19 +1904,17 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                                    (dolist (candidate cands)
                                      (when (and (not (gethash candidate anything-match-hash))
                                                 (setq c (if (listp candidate)
-                                                                     (car candidate)
-                                                                   candidate))
+                                                            (car candidate)
+                                                          candidate))
                                                 (setq cc (cond ((stringp c) c)
                                                                ((symbolp c) (symbol-name c))))
                                                 (funcall function cc))
                                        (puthash candidate t anything-match-hash)
                                        (push candidate newmatches)
-
-                                       (when limit
-                                         (incf item-count)
-                                         (when (= item-count limit)
-                                           (setq exit t)
-                                           (return)))))
+                                       (incf item-count)
+                                       (when (= item-count limit)
+                                         (setq exit t)
+                                         (return))))
 
                                    (setq matches (append matches (reverse newmatches)))
 
