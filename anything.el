@@ -2119,9 +2119,10 @@ the real value in a text property."
 
 (defun anything-insert-header-from-source (source)
   (let ((name (assoc-default 'name source)))
-    (anything-insert-header name
-                            (anything-aif (assoc-default 'header-name source)
-                                (anything-funcall-with-source source it name)))))
+    (anything-insert-header
+     name
+     (anything-aif (assoc-default 'header-name source)
+         (anything-funcall-with-source source it name)))))
 
 (defun anything-insert-header (name &optional display-string)
   "Insert header of source NAME into the anything buffer."
