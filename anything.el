@@ -1892,15 +1892,20 @@ ie. cancel the effect of `anything-candidate-number-limit'."
 CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
   (format "%s" (or (car-safe candidate) candidate)))
 
+(defun anything-process-pattern-transformer (pattern)
+  (anything-aif (assoc-default 'pattern-transformer source)
+      (anything-composed-funcall-with-source source it pattern)
+    pattern))
+
+(defun anything-match-functions (source)
+  (or (assoc-default 'match source)
+      anything-default-match-functions))
+
 (defun anything-compute-matches-internal (source)
-  (let ((matchfns (or (assoc-default 'match source)
-                      anything-default-match-functions))
+  (let ((matchfns (anything-match-functions source))
         (anything-source-name (assoc-default 'name source))
         (limit (anything-candidate-number-limit source))
-        (anything-pattern
-         (anything-aif (assoc-default 'pattern-transformer source)
-             (anything-composed-funcall-with-source source it anything-pattern)
-           anything-pattern))
+        (anything-pattern (anything-process-pattern-transformer anything-pattern))
         matches)
     (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
            (setq matches (anything-get-cached-candidates source))
