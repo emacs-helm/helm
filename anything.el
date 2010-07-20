@@ -2102,8 +2102,8 @@ If current source has `update' attribute, a function without argument, call it b
 insert the string inteneded to appear on the display and store
 the real value in a text property."
   (let ((start (line-beginning-position (point)))
-        (string (if (listp match) (car match) match))
-        (realvalue (if (listp match) (cdr match))))
+        (string (or (car-safe match) match))
+        (realvalue (cdr-safe match)))
     (when (symbolp string) (setq string (symbol-name string)))
     (when (stringp string)
       (funcall insert-function string)
