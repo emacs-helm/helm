@@ -1887,6 +1887,11 @@ ie. cancel the effect of `anything-candidate-number-limit'."
               (assoc-default 'name source))
              nil))))
 
+(defun anything-candidate-get-display (candidate)
+  "Get display part (searched) from CANDIDATE.
+CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
+  (format "%s" (or (car-safe candidate) candidate)))
+
 (defun anything-compute-matches-internal (source)
   (let ((matchfns (or (assoc-default 'match source)
                       anything-default-match-functions))
@@ -1911,8 +1916,7 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                    (let (newmatches)
                      (dolist (candidate cands)
                        (when (and (not (gethash candidate anything-match-hash))
-                                  (funcall match (format "%s" (or (car-safe candidate)
-                                                                  candidate))))
+                                  (funcall match (anything-candidate-get-display candidate)))
                          (puthash candidate t anything-match-hash)
                          (push candidate newmatches)
                          (incf item-count)
@@ -4209,6 +4213,12 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (let ((anything-pattern "[abc]")
               anything-candidate-number-limit)
           (anything-compute-matches '((name . "FOO") (candidates a b c) (volatile)))))
+      (expect '(("foo" . "FOO") ("bar" . "BAR"))
+        (let ((anything-pattern ""))
+          (anything-compute-matches '((name . "FOO") (candidates ("foo" . "FOO") ("bar" . "BAR")) (volatile)))))
+      (expect '(("foo" . "FOO"))
+        (let ((anything-pattern "foo"))
+          (anything-compute-matches '((name . "FOO") (candidates ("foo" . "FOO") ("bar" . "foo")) (volatile)))))
       ;; using anything-test-candidate-list
       (desc "anything-test-candidates")
       (expect '(("FOO" ("foo" "bar")))
