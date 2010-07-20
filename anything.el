@@ -1955,19 +1955,21 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
             (if (and multiline separate)
                 (anything-insert-candidate-separator)
               (setq separate t))
-
-            (when (and anything-enable-shortcuts
-                       (not (eq anything-digit-shortcut-count
-                                (length anything-digit-overlays))))
-              (move-overlay (nth anything-digit-shortcut-count
-                                 anything-digit-overlays)
-                            (line-beginning-position)
-                            (line-beginning-position))
-              (incf anything-digit-shortcut-count))
+            (anything-put-digit-overlays-maybe)
             (anything-insert-match match 'insert source))
         
           (if multiline
               (put-text-property start (point) 'anything-multiline t)))))))
+
+(defun anything-put-digit-overlays-maybe ()
+  (when (and anything-enable-shortcuts
+             (not (eq anything-digit-shortcut-count
+                      (length anything-digit-overlays))))
+    (move-overlay (nth anything-digit-shortcut-count
+                       anything-digit-overlays)
+                  (line-beginning-position)
+                  (line-beginning-position))
+    (incf anything-digit-shortcut-count)))
 
 (defun anything-process-source--direct-insert-match (source)
   "[EXPERIMENTAL] Insert candidates from `anything-candidate-buffer'"
