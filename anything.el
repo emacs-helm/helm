@@ -2024,9 +2024,8 @@ the current pattern."
     (set (make-local-variable 'anything-input-local) anything-pattern)
     (erase-buffer)
 
-    (if anything-enable-shortcuts
-        (dolist (overlay anything-digit-overlays)
-          (delete-overlay overlay)))
+    (when anything-enable-shortcuts
+      (mapc 'delete-overlay anything-digit-overlays))
 
     (let (delayed-sources)
       (unwind-protect
@@ -2049,8 +2048,7 @@ the current pattern."
         (anything-next-line)
         (setq delayed-sources (nreverse delayed-sources))
         (if anything-test-mode
-            (dolist (source delayed-sources)
-              (anything-process-source source))
+            (mapc 'anything-process-source delayed-sources)
           (anything-maybe-fit-frame)
           (when delayed-sources
             (run-with-idle-timer (if (featurep 'xemacs)
