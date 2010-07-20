@@ -2076,7 +2076,7 @@ If current source has `update' attribute, a function without argument, call it b
         (kill-buffer it))
     (dolist (attr '(update init))
       (anything-aif (assoc-default attr source)
-        (anything-funcall-with-source source it)))
+          (anything-funcall-with-source source it)))
     (anything-remove-candidate-cache source)
     (let ((selection (anything-get-selection nil t)))
       (anything-update)
@@ -2084,13 +2084,13 @@ If current source has `update' attribute, a function without argument, call it b
 
 (defun anything-keep-selection (source selection)
   (with-anything-window
-        (anything-goto-source source)
-        (forward-char -1)                ;back to \n
-        (if (search-forward (concat "\n" selection "\n") nil t)
-            (forward-line -1)
-          (goto-char (point-min))
-          (forward-line 1))
-        (anything-mark-current-line)))
+    (anything-goto-source source)
+    (forward-char -1)                ;back to \n
+    (if (search-forward (concat "\n" selection "\n") nil t)
+        (forward-line -1)
+      (goto-char (point-min))
+      (forward-line 1))
+    (anything-mark-current-line)))
 
 (defun anything-remove-candidate-cache (source)
   (setq anything-candidate-cache
