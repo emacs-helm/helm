@@ -1873,10 +1873,15 @@ ie. cancel the effect of `anything-candidate-number-limit'."
       (or (cdr it) 99999999)
     (or anything-candidate-number-limit 99999999)))
 
+(defconst anything-default-match-functions
+  (list (lambda (candidate)
+          (string-match anything-pattern candidate))))
+
 (defun anything-compute-matches (source)
   "Compute matches from SOURCE according to its settings."
   (let ((doit (lambda ()
-                (let ((matchfns (assoc-default 'match source))
+                (let ((matchfns (or (assoc-default 'match source)
+                                    anything-default-match-functions))
                       (anything-source-name (assoc-default 'name source))
                       (limit (anything-candidate-number-limit source))
                       (anything-pattern
@@ -1894,12 +1899,6 @@ ie. cancel the effect of `anything-candidate-number-limit'."
                              (let ((item-count 0)
                                    (cands (anything-get-cached-candidates source))
                                    exit)
-
-                               (unless matchfns
-                                 (setq matchfns
-                                       (list (lambda (candidate)
-                                               (string-match anything-pattern candidate)))))
-
                                (clrhash anything-match-hash)
                                (dolist (function matchfns)
                                  (let (newmatches c cc)
