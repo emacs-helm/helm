@@ -2027,7 +2027,7 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
            (< (window-height (get-buffer-window (current-buffer)))
               (line-number-at-pos (point-max))))))
 
-(defun anything-move-first-line ()
+(defun anything-update-move-first-line ()
   (goto-char (point-min))
   (save-excursion (anything-log-run-hook 'anything-update-hook))
   (anything-next-line))
@@ -2053,7 +2053,7 @@ the current pattern."
                       else do (anything-process-source source)))
         (anything-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-        (anything-move-first-line)
+        (anything-update-move-first-line)
         (if anything-test-mode
             (mapc 'anything-process-source delayed-sources)
           (anything-maybe-fit-frame)
