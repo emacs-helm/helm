@@ -2155,7 +2155,10 @@ the real value in a text property."
 ;; (@* "Core: async process")
 (defun anything-output-filter (process string)
   "Process output from PROCESS."
-  (let* ((process-assoc (assoc process anything-async-processes))
+  (anything-output-filter-1 (assoc process anything-async-processes) string))
+
+(defun anything-output-filter-1 (process-assoc string)
+  (let* ((process (car process-assoc))
          (process-info (cdr process-assoc))
          (insertion-marker (assoc-default 'insertion-marker process-info))
          (incomplete-line-info (assoc 'incomplete-line process-info))
