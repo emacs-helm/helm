@@ -108,6 +108,10 @@
 ;;    Move selection to the previous source.
 ;;  `anything-next-source'
 ;;    Move selection to the next source.
+;;  `anything-select-with-prefix-shortcut'
+;;    Invoke default action with prefix shortcut.
+;;  `anything-select-with-digit-shortcut'
+;;    Invoke default action with digit/alphabet shortcut.
 ;;  `anything-exit-minibuffer'
 ;;    Select the current candidate by exiting the minibuffer.
 ;;  `anything-help'
@@ -2463,14 +2467,15 @@ UNIT and DIRECTION."
             (anything-exit-minibuffer))))
     (self-insert-command 1)))
 
-;;; EXPERIMENTAL TODO documentation 
 (defun anything-select-with-prefix-shortcut ()
+  "Invoke default action with prefix shortcut."
   (interactive)
   (anything-select-with-shortcut-internal
    '(prefix)
    (lambda () (read-event "Select shortcut key: "))))
-;;; FIXME DIGIT shortcut
+
 (defun anything-select-with-digit-shortcut ()
+  "Invoke default action with digit/alphabet shortcut."
   (interactive)
   (anything-select-with-shortcut-internal
    '(alphabet t) 'anything-this-command-key))
