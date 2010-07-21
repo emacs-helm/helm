@@ -2193,15 +2193,8 @@ the real value in a text property."
 
           (setq candidates (reverse candidates))
           (dolist (candidate (anything-transform-candidates candidates process-info t))
-            ;; FIXME
-            ;; (if (and multiline separate)
-            ;;      (anything-insert-candidate-separator)
-            ;;   (setq separate t))
             (anything-insert-match candidate 'insert-before-markers process-info)
             (incf (cdr item-count-info))
-            ;; FIXME
-            ;; (if multiline
-            ;;     (put-text-property start (point) 'anything-multiline t))
             (when (>= (cdr item-count-info) limit)
               (anything-kill-async-process process)
               (return)))))
