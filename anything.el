@@ -2159,25 +2159,25 @@ the real value in a text property."
 
 (defun anything-output-filter-1 (process-assoc string)
   (let* ((process (car process-assoc))
-         (process-info (cdr process-assoc))
-         (limit (anything-candidate-number-limit process-info)))
+         (source (cdr process-assoc))
+         (limit (anything-candidate-number-limit source)))
     (anything-log-eval string)
     (with-current-buffer anything-buffer
       (save-excursion
-        (anything-aif (assoc-default 'insertion-marker process-info)
+        (anything-aif (assoc-default 'insertion-marker source)
             (goto-char it)
           (goto-char (point-max))
-          (anything-insert-header-from-source process-info)
+          (anything-insert-header-from-source source)
           (setcdr process-assoc
-                  (append process-info `((insertion-marker . ,(point-marker))))))
+                  (append source `((insertion-marker . ,(point-marker))))))
         (dolist (candidate (anything-transform-candidates
                             (anything-output-filter--collect-candidates
                              (split-string string "\n")
-                             (assoc 'incomplete-line process-info))
-                            process-info t))
-          (anything-insert-match candidate 'insert-before-markers process-info)
-          (incf (cdr (assoc 'item-count process-info)))
-          (when (>= (assoc-default 'item-count process-info) limit)
+                             (assoc 'incomplete-line source))
+                            source t))
+          (anything-insert-match candidate 'insert-before-markers source)
+          (incf (cdr (assoc 'item-count source)))
+          (when (>= (assoc-default 'item-count source) limit)
             (anything-kill-async-process process)
             (return))))
       (anything-output-filter--post-process))))
