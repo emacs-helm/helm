@@ -2552,12 +2552,15 @@ UNIT and DIRECTION."
     (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
     (setq cursor-type nil)
     (goto-char 1)
-    (ignore-errors
-      (loop for event = (read-event) do
-            (case event
-              ((?\C-v ? )  (scroll-up))
-              ((?\M-v ?b) (scroll-down))
-              (t (return)))))))
+    (anything-help-event-loop)))
+
+(defun anything-help-event-loop ()
+  (ignore-errors
+    (loop for event = (read-event) do
+          (case event
+            ((?\C-v ? )  (scroll-up))
+            ((?\M-v ?b) (scroll-down))
+            (t (return))))))
 
 (defun anything-help ()
   "Help of `anything'."
