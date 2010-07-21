@@ -2158,29 +2158,32 @@ the real value in a text property."
   (anything-output-filter-1 (assoc process anything-async-processes) string))
 
 (defun anything-output-filter-1 (process-assoc string)
-  (let* ((process (car process-assoc))
-         (source (cdr process-assoc))
-         (limit (anything-candidate-number-limit source)))
-    (anything-log-eval string)
-    (with-current-buffer anything-buffer
+  (anything-log-eval string)
+  (with-current-buffer anything-buffer
+    (let ((source (cdr process-assoc)))
       (save-excursion
-        (anything-aif (assoc-default 'insertion-marker source)
-            (goto-char it)
-          (goto-char (point-max))
-          (anything-insert-header-from-source source)
-          (setcdr process-assoc
-                  (append source `((insertion-marker . ,(point-marker))))))
-        (dolist (candidate (anything-transform-candidates
-                            (anything-output-filter--collect-candidates
-                             (split-string string "\n")
-                             (assoc 'incomplete-line source))
-                            source t))
-          (anything-insert-match candidate 'insert-before-markers source)
-          (incf (cdr (assoc 'item-count source)))
-          (when (>= (assoc-default 'item-count source) limit)
-            (anything-kill-async-process process)
-            (return))))
-      (anything-output-filter--post-process))))
+       (anything-aif (assoc-default 'insertion-marker source)
+           (goto-char it)
+         (goto-char (point-max))
+         (anything-insert-header-from-source source)
+         (setcdr process-assoc
+                 (append source `((insertion-marker . ,(point-marker))))))
+       (anything-output-filter--process-source
+        (car process-assoc) source
+        (anything-candidate-number-limit source))))
+    (anything-output-filter--post-process)))
+
+(defun anything-output-filter--process-source (process source limit)
+  (dolist (candidate (anything-transform-candidates
+                      (anything-output-filter--collect-candidates
+                       (split-string string "\n")
+                       (assoc 'incomplete-line source))
+                      source t))
+    (anything-insert-match candidate 'insert-before-markers source)
+    (incf (cdr (assoc 'item-count source)))
+    (when (>= (assoc-default 'item-count source) limit)
+      (anything-kill-async-process process)
+      (return))))
 
 (defun anything-output-filter--collect-candidates (lines incomplete-line-info)
   (anything-log-eval (cdr incomplete-line-info))
