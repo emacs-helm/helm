@@ -2899,7 +2899,7 @@ Acceptable values of CREATE-OR-BUFFER:
   Create a new global candidates buffer,
   named \" *anything candidates:SOURCE*\".
 - other non-nil value
-  Create a new global candidates buffer,
+  Create a new local candidates buffer,
   named \" *anything candidates:SOURCE*ANYTHING-CURRENT-BUFFER\".
 "
   (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
