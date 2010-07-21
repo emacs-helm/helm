@@ -2467,8 +2467,8 @@ UNIT and DIRECTION."
       (save-selected-window
         (select-window (anything-window))          
         (let* ((key (read-event "Select shortcut key: "))
-               (index (position key anything-shortcut-keys))
-               (overlay (ignore-errors (nth index anything-digit-overlays))))
+               (overlay (ignore-errors (nth (position key anything-shortcut-keys)
+                                            anything-digit-overlays))))
           (if (not (and overlay (overlay-buffer overlay)))
               (when (numberp key)
                 (select-window (minibuffer-window))
