@@ -2435,9 +2435,9 @@ UNIT and DIRECTION."
                 (line-beginning-position)
                 (if (anything-pos-multiline-p)
                     (let ((header-pos (anything-get-next-header-pos))
-                          (candidate-pos (anything-get-next-candidate-separator-pos)))
-                      (or (and (null header-pos) candidate-pos candidate-pos)
-                          (and header-pos candidate-pos (< candidate-pos header-pos) candidate-pos)
+                          (separator-pos (anything-get-next-candidate-separator-pos)))
+                      (or (and (null header-pos) separator-pos separator-pos)
+                          (and header-pos separator-pos (< separator-pos header-pos) separator-pos)
                           header-pos
                           (point-max)))
                   (1+ (line-end-position))))
