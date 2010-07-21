@@ -1922,6 +1922,19 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
   (or (assoc-default 'match source)
       anything-default-match-functions))
 
+(defmacro anything-accumulate-candidates-internal (cand newmatches hash item-count limit)
+  "INTERNAL: add CAND (ITEM-COUNT th match) into NEWMATCHES.
+Use HASH to uniq NEWMATCHES.
+if ITEM-COUNT reaches LIMIT, exit from inner loop."
+  `(unless (gethash ,cand ,hash)
+     (puthash ,cand t ,hash)
+     (push ,cand ,newmatches)
+     (incf ,item-count)
+     (when (= ,item-count ,limit)
+       (setq exit t)
+       (return))))
+
+
 (defun anything-compute-matches-internal (source)
   (let ((matchfns (anything-match-functions source))
         (anything-source-name (assoc-default 'name source))
@@ -1940,14 +1953,9 @@ CANDIDATE is a string, a symbol, or (DISPLAY . REAL) cons cell."
                  (clrhash anything-match-hash)
                  (dolist (match matchfns)
                    (dolist (candidate cands)
-                     (when (and (not (gethash candidate anything-match-hash))
-                                (funcall match (anything-candidate-get-display candidate)))
-                       (puthash candidate t anything-match-hash)
-                       (push candidate newmatches)
-                       (incf item-count)
-                       (when (= item-count limit)
-                         (setq exit t)
-                         (return))))
+                     (when (funcall match (anything-candidate-get-display candidate))
+                       (anything-accumulate-candidates-internal
+                        candidate newmatches anything-match-hash item-count limit)))
                    (setq matches (append matches (reverse newmatches)))
                    (if exit (return))))
 
@@ -2846,13 +2854,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                while (funcall searcher pattern nil t)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
                do
-               (unless (gethash cand anything-cib-hash)
-                 (puthash cand t anything-cib-hash)
-                 (push cand newmatches)
-                 (incf item-count)
-                 (when (= item-count limit)
-                   (setq exit t)
-                   (return)))
+               (anything-accumulate-candidates-internal cand newmatches anything-cib-hash item-count limit)
                (funcall next-line-fn 1))
          (setq matches (append matches (nreverse newmatches)))
          (if exit (return)))
