@@ -2838,19 +2838,19 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
        (dolist (searcher search-fns)
          (goto-char start-point)
          (setq newmatches nil)
-         (loop with i = 1
+         (loop with item-count = 1
                with next-line-fn =
                (if search-from-end
                    (lambda (x) (goto-char (max (point-at-bol) 1)))
                  #'forward-line)
                while (funcall searcher pattern nil t)
-               if (or (funcall endp) (< limit i))
+               if (or (funcall endp) (< limit item-count))
                do (setq exit t) (return)
                else do
                (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
                  (unless (gethash cand anything-cib-hash)
                    (puthash cand t anything-cib-hash)
-                   (incf i)
+                   (incf item-count)
                    (push cand newmatches)))
                (funcall next-line-fn 1))
          (setq matches (append matches (nreverse newmatches)))
@@ -4357,6 +4357,12 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-candidates-in-buffer-1 
            (current-buffer) "oo+"
            #'buffer-substring-no-properties '(search-forward) 50 nil)))
+      (expect '("foo+" "bar+")
+        (with-temp-buffer
+          (insert "foo+\nbar+\nbaz+\n")
+          (anything-candidates-in-buffer-1
+           (current-buffer) "."
+           'buffer-substring-no-properties '(re-search-forward) 2 nil)))
       (expect '(("foo+" "FOO+"))
         (with-temp-buffer
           (insert "foo+\nbar+\nbaz+\n")
