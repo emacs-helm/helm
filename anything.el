@@ -2187,11 +2187,11 @@ the real value in a text property."
          (setcdr process-assoc
                  (append source `((insertion-marker . ,(point-marker))))))
        (anything-output-filter--process-source
-        (car process-assoc) source
+        (car process-assoc) string source
         (anything-candidate-number-limit source))))
     (anything-output-filter--post-process)))
 
-(defun anything-output-filter--process-source (process source limit)
+(defun anything-output-filter--process-source (process string source limit)
   (dolist (candidate (anything-transform-candidates
                       (anything-output-filter--collect-candidates
                        (split-string string "\n")
