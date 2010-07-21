@@ -2337,13 +2337,14 @@ UNIT and DIRECTION."
   (interactive)
   (anything-move-selection-common
    (lambda ()
-     (forward-line -1)
-     (when (anything-pos-multiline-p)
+     (if (not (anything-pos-multiline-p))
+         (forward-line -1)      ;double forward-line is meaningful
+       (forward-line -1)        ;because evaluation order is important
        (anything-skip-header-and-separator-line 'previous)
        (let ((header-pos (anything-get-previous-header-pos))
              (separator-pos (anything-get-previous-candidate-separator-pos)))
          (when header-pos
-           (if (or (null separator-pos) (< separator-pos header-pos))
+           (if (or (null separator-pos) (< separator-pos header-pos)) ; first candidate
                (goto-char header-pos)
              (goto-char separator-pos))
            (forward-line 1)))))
