@@ -2279,7 +2279,7 @@ If action buffer is selected, back to the anything buffer."
            (if (functionp actions)
                (message "Sole action: %s" actions)
              (anything-show-action-buffer actions)
-             (anything-set-pattern "")
+             (anything-delete-minibuffer-contents)
              (setq anything-pattern 'dummy) ; so that it differs from the previous one
              (anything-check-minibuffer-input))))))
 
