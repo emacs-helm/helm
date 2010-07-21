@@ -2447,26 +2447,11 @@ UNIT and DIRECTION."
   (event-basic-type (elt (this-command-keys-vector) 0)))
 ;; (progn (read-key-sequence "Key: ") (p (anything-this-command-key)))
 
-(defun anything-select-with-digit-shortcut ()
-  (interactive)
-  (if (eq anything-enable-shortcuts 'alphabet)
+(defun anything-select-with-shortcut-internal (type get-key-func)
+  (if (eq anything-enable-shortcuts type)
       (save-selected-window
         (select-window (anything-window))          
-        (let ((overlay (nth (position (anything-this-command-key) anything-shortcut-keys)
-                             anything-digit-overlays)))
-          (when (overlay-buffer overlay)
-            (goto-char (overlay-start overlay))
-            (anything-mark-current-line)
-            (anything-exit-minibuffer))))
-    (self-insert-command 1)))
-
-;;; EXPERIMENTAL TODO documentation 
-(defun anything-select-with-prefix-shortcut ()
-  (interactive)
-  (if (eq anything-enable-shortcuts 'prefix)
-      (save-selected-window
-        (select-window (anything-window))          
-        (let* ((key (read-event "Select shortcut key: "))
+        (let* ((key (funcall get-key-func))
                (overlay (ignore-errors (nth (position key anything-shortcut-keys)
                                             anything-digit-overlays))))
           (if (not (and overlay (overlay-buffer overlay)))
@@ -2477,6 +2462,19 @@ UNIT and DIRECTION."
             (anything-mark-current-line)
             (anything-exit-minibuffer))))
     (self-insert-command 1)))
+
+;;; EXPERIMENTAL TODO documentation 
+(defun anything-select-with-prefix-shortcut ()
+  (interactive)
+  (anything-select-with-shortcut-internal
+   'prefix
+   (lambda () (read-event "Select shortcut key: "))))
+;;; FIXME DIGIT shortcut
+(defun anything-select-with-digit-shortcut ()
+  (interactive)
+  (anything-select-with-shortcut-internal
+   'alphabet 'anything-this-command-key))
+
 ;; (setq anything-enable-shortcuts 'prefix)
 ;; (define-key anything-map "@" 'anything-select-with-prefix-shortcut)
 ;; (define-key anything-map (kbd "<f18>") 'anything-select-with-prefix-shortcut)
