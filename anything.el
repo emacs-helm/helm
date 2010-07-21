@@ -2363,9 +2363,7 @@ UNIT and DIRECTION."
                      (or (null header-pos) (< separator-pos header-pos)))
                 (goto-char separator-pos))
                (header-pos
-                (goto-char header-pos)))
-         (when separator-pos
-           (forward-line 1)))))
+                (goto-char header-pos))))))
    'line 'next))
 
 (defun anything-previous-page ()
