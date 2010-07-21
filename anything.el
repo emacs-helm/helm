@@ -2344,9 +2344,9 @@ UNIT and DIRECTION."
        (let ((header-pos (anything-get-previous-header-pos))
              (separator-pos (anything-get-previous-candidate-separator-pos)))
          (when header-pos
-           (if (or (null separator-pos) (< separator-pos header-pos)) ; first candidate
-               (goto-char header-pos)
-             (goto-char separator-pos))
+           (goto-char (if (or (null separator-pos) (< separator-pos header-pos)) ; first
+                          header-pos
+                        separator-pos))
            (forward-line 1)))))
    'line 'previous))
 
