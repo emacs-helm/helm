@@ -2221,7 +2221,7 @@ the real value in a text property."
   
 
 ;; (@* "Core: action")
-(defun anything-execute-selection-action (&optional selection action clear-saved-action)
+(defun anything-execute-selection-action (&optional selection action preserve-saved-action)
   "If a candidate was selected then perform the associated
 action."
   (anything-log "executing action")
@@ -2238,7 +2238,7 @@ action."
              (not (functionp action)))  ; lambda
         ;;select the default action
         (setq action (cdar action)))
-    (unless clear-saved-action (setq anything-saved-action nil))
+    (unless preserve-saved-action (setq anything-saved-action nil))
     (if (and selection action)
         (anything-funcall-with-source source  action selection))))
 
