@@ -3029,7 +3029,8 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
          (same-window-regexps
           (unless (and anything-persistent-action-use-special-display
                        (or (member name
-                                   (mapcar (lambda (x) (or (car-safe x) x)) special-display-buffer-names))
+                                   (mapcar (lambda (x) (or (car-safe x) x))
+                                           special-display-buffer-names))
                            (remove-if-not
                             (lambda (x) (string-match (or (car-safe x) x) name))
                             special-display-regexps)))
