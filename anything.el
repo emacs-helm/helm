@@ -641,7 +641,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-SPC") 'anything-toggle-visible-mark)
     (define-key map (kbd "M-[") 'anything-prev-visible-mark)
     (define-key map (kbd "M-]") 'anything-next-visible-mark)
-    (define-key map (kbd "C-k") 'anything-delete-minibuffer-content)
+    (define-key map (kbd "C-k") 'anything-delete-minibuffer-contents)
 
     (define-key map (kbd "C-s") 'anything-isearch)
     (define-key map (kbd "C-r") 'undefined)
