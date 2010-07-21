@@ -2826,32 +2826,36 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
         (if (string= pattern "")
             (anything-initial-candidates-from-candidate-buffer
              endp get-line-fn limit search-from-end)
-          (let (buffer-read-only
-                matches exit newmatches)
-            (anything-search-from-candidate-buffer-internal
-              (lambda ()
-                (clrhash anything-cib-hash)
-                (dolist (searcher search-fns)
-                    (goto-char start-point)
-                    (setq newmatches nil)
-                    (loop with i = 1
-                          with next-line-fn =
-                            (if search-from-end
-                                (lambda (x) (goto-char (max (point-at-bol) 1)))
-                              #'forward-line)
-                          while (funcall searcher pattern nil t)
-                          if (or (funcall endp) (< limit i))
-                          do (setq exit t) (return)
-                          else do
-                          (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                            (unless (gethash cand anything-cib-hash)
-                              (puthash cand t anything-cib-hash)
-                              (incf i)
-                              (push cand newmatches)))
-                          (funcall next-line-fn 1))
-                    (setq matches (append matches (nreverse newmatches)))
-                    (if exit (return)))))
-            (delq nil matches)))))))
+          (anything-search-from-candidate-buffer
+           pattern get-line-fn search-fns limit search-from-end start-point endp))))))
+
+(defun anything-search-from-candidate-buffer (pattern get-line-fn search-fns limit search-from-end start-point endp)
+  (let (buffer-read-only
+        matches exit newmatches)
+    (anything-search-from-candidate-buffer-internal
+     (lambda ()
+       (clrhash anything-cib-hash)
+       (dolist (searcher search-fns)
+         (goto-char start-point)
+         (setq newmatches nil)
+         (loop with i = 1
+               with next-line-fn =
+               (if search-from-end
+                   (lambda (x) (goto-char (max (point-at-bol) 1)))
+                 #'forward-line)
+               while (funcall searcher pattern nil t)
+               if (or (funcall endp) (< limit i))
+               do (setq exit t) (return)
+               else do
+               (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
+                 (unless (gethash cand anything-cib-hash)
+                   (puthash cand t anything-cib-hash)
+                   (incf i)
+                   (push cand newmatches)))
+               (funcall next-line-fn 1))
+         (setq matches (append matches (nreverse newmatches)))
+         (if exit (return)))
+       (delq nil matches)))))
 
 (defun anything-initial-candidates-from-candidate-buffer (endp get-line-fn limit search-from-end)
   (delq nil (loop with next-line-fn =
