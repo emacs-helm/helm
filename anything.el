@@ -2341,11 +2341,11 @@ UNIT and DIRECTION."
      (when (anything-pos-multiline-p)
        (anything-skip-header-and-separator-line 'previous)
        (let ((header-pos (anything-get-previous-header-pos))
-             (candidate-pos (anything-get-previous-candidate-separator-pos)))
+             (separator-pos (anything-get-previous-candidate-separator-pos)))
          (when header-pos
-           (if (or (null candidate-pos) (< candidate-pos header-pos))
+           (if (or (null separator-pos) (< separator-pos header-pos))
                (goto-char header-pos)
-             (goto-char candidate-pos))
+             (goto-char separator-pos))
            (forward-line 1)))))
    'line 'previous))
 
@@ -2357,14 +2357,14 @@ UNIT and DIRECTION."
      (if (not (anything-pos-multiline-p))
          (forward-line 1)
        (let ((header-pos (anything-get-next-header-pos))
-             (candidate-pos (anything-get-next-candidate-separator-pos)))
-         (if (and candidate-pos
+             (separator-pos (anything-get-next-candidate-separator-pos)))
+         (if (and separator-pos
                   (or (null header-pos)
-                      (< candidate-pos header-pos)))
-             (goto-char candidate-pos)
+                      (< separator-pos header-pos)))
+             (goto-char separator-pos)
            (if header-pos
                (goto-char header-pos)))
-         (if candidate-pos
+         (if separator-pos
              (forward-line 1)))))
    'line 'next))
 
