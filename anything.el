@@ -2222,8 +2222,7 @@ the real value in a text property."
   "Kill all known asynchronous processes according to
 `anything-async-processes'."
     "Kill locate process."
-    (dolist (process-info anything-async-processes)
-      (anything-kill-async-process (car process-info)))
+    (mapc 'anything-kill-async-process (mapcar 'car anything-async-processes))
     (setq anything-async-processes nil))
 
 
