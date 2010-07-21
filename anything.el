@@ -2160,9 +2160,8 @@ the real value in a text property."
 (defun anything-output-filter-1 (process-assoc string)
   (let* ((process (car process-assoc))
          (process-info (cdr process-assoc))
-         (incomplete-line-info (assoc 'incomplete-line process-info)) 
          (limit (anything-candidate-number-limit process-info)))
-    (anything-log-eval string (cdr incomplete-line-info))
+    (anything-log-eval string)
     (with-current-buffer anything-buffer
       (save-excursion
         (anything-aif (assoc-default 'insertion-marker process-info)
@@ -2174,7 +2173,9 @@ the real value in a text property."
 
         (let ((lines (split-string string "\n"))
               (start (point))
+              (incomplete-line-info (assoc 'incomplete-line process-info)) 
               candidates separate)
+          (anything-log-eval (cdr incomplete-line-info))
           (while lines
             (if (not (cdr lines))
                 ;; store last incomplete line until new output arrives
