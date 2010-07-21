@@ -2838,20 +2838,21 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
        (dolist (searcher search-fns)
          (goto-char start-point)
          (setq newmatches nil)
-         (loop with item-count = 1
+         (loop with item-count = 0
                with next-line-fn =
                (if search-from-end
                    (lambda (x) (goto-char (max (point-at-bol) 1)))
                  #'forward-line)
                while (funcall searcher pattern nil t)
-               if (or (funcall endp) (< limit item-count))
-               do (setq exit t) (return)
-               else do
-               (let ((cand (funcall get-line-fn (point-at-bol) (point-at-eol))))
-                 (unless (gethash cand anything-cib-hash)
-                   (puthash cand t anything-cib-hash)
-                   (incf item-count)
-                   (push cand newmatches)))
+               for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
+               do
+               (unless (gethash cand anything-cib-hash)
+                 (puthash cand t anything-cib-hash)
+                 (push cand newmatches)
+                 (incf item-count)
+                 (when (= item-count limit)
+                   (setq exit t)
+                   (return)))
                (funcall next-line-fn 1))
          (setq matches (append matches (nreverse newmatches)))
          (if exit (return)))
