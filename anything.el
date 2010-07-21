@@ -2828,7 +2828,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
              endp get-line-fn limit search-from-end)
           (let (buffer-read-only
                 matches exit newmatches)
-            (anything-search-candidate-buffer-internal
+            (anything-search-from-candidate-buffer-internal
               (lambda ()
                 (clrhash anything-cib-hash)
                 (dolist (searcher search-fns)
@@ -2863,7 +2863,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                   collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
                   do (funcall next-line-fn 1))))
 
-(defun anything-search-candidate-buffer-internal (search-fn)
+(defun anything-search-from-candidate-buffer-internal (search-fn)
   (goto-char (point-min))
   (insert "\n")
   (goto-char (point-max))
