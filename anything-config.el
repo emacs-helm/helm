@@ -3056,7 +3056,11 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
                                 candidate)))
                       (bookmark-show-annotation bmk))))
-               ("Edit annotation" . bookmark-edit-annotation)
+               ("Edit annotation"
+                . (lambda (candidate)
+                    (let ((bmk (anything-bookmark-get-bookmark-from-name
+                                candidate)))
+                      (bookmark-edit-annotation bmk))))
                ("Show Google map" . (lambda (candidate)
                                       (let* ((bmk (anything-bookmark-get-bookmark-from-name
                                                   candidate))
