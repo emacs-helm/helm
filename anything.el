@@ -2288,21 +2288,28 @@ UNIT and DIRECTION."
               (not (anything-window)))
     (with-anything-window
       (funcall move-func)
-      (while (and (not (bobp))
-                  (or (anything-pos-header-line-p)
-                      (anything-pos-candidate-separator-p)))
-        (forward-line (if (and (eq direction 'previous)
-                               (not (eq (line-beginning-position) (point-min))))
-                          -1
-                        1)))
-      (and (bobp) (forward-line 1))     ;skip first header
-      (and (eobp) (forward-line -1))    ;avoid last empty line
-      (when (and anything-display-source-at-screen-top (eq unit 'source))
-        (set-window-start (selected-window)
-                          (save-excursion (forward-line -1) (point))))
+      (anything-skip-noncandidate-line direction)
+      (anything-display-source-at-screen-top-maybe unit)
       (when (anything-get-previous-header-pos)
         (anything-mark-current-line))
       (anything-display-mode-line (anything-get-current-source)))))
+
+(defun anything-display-source-at-screen-top-maybe (unit)
+  (when (and anything-display-source-at-screen-top (eq unit 'source))
+    (set-window-start (selected-window)
+                      (save-excursion (forward-line -1) (point)))))
+
+(defun anything-skip-noncandidate-line (direction)
+  (while (and (not (bobp))   ;skip header-line and candidate-separator
+              (or (anything-pos-header-line-p)
+                  (anything-pos-candidate-separator-p)))
+    (forward-line (if (and (eq direction 'previous)
+                           (not (eq (line-beginning-position) (point-min))))
+                      -1
+                    1)))
+  (and (bobp) (forward-line 1))     ;skip first header
+  (and (eobp) (forward-line -1))    ;avoid last empty line
+  )
 
 (defvar anything-mode-line-string-real nil)
 (defun anything-display-mode-line (source)
