@@ -2170,36 +2170,36 @@ the real value in a text property."
           (anything-insert-header-from-source process-info)
           (setcdr process-assoc
                   (append process-info `((insertion-marker . ,(point-marker))))))
-
-        (let ((lines (split-string string "\n"))
-              (start (point))
-              (incomplete-line-info (assoc 'incomplete-line process-info)) 
-              candidates separate)
-          (anything-log-eval (cdr incomplete-line-info))
-          (while lines
-            (if (not (cdr lines))
-                ;; store last incomplete line until new output arrives
-                (setcdr incomplete-line-info (car lines))
-
-              (if (cdr incomplete-line-info)
-                  (progn
-                    (push (concat (cdr incomplete-line-info) (car lines))
-                          candidates)
-                    (setcdr incomplete-line-info nil))
-
-                (push (car lines) candidates)))
-            
-            (pop lines))
-
-          (setq candidates (reverse candidates))
-          (let ((item-count-info (assoc 'item-count process-info)))
-            (dolist (candidate (anything-transform-candidates candidates process-info t))
-              (anything-insert-match candidate 'insert-before-markers process-info)
-              (incf (cdr item-count-info))
-              (when (>= (cdr item-count-info) limit)
-                (anything-kill-async-process process)
-                (return))))))
+        (let ((item-count-info (assoc 'item-count process-info)))
+          (dolist (candidate (anything-transform-candidates
+                              (anything-output-filter--collect-candidates
+                               (split-string string "\n")
+                               (assoc 'incomplete-line process-info))
+                              process-info t))
+            (anything-insert-match candidate 'insert-before-markers process-info)
+            (incf (cdr item-count-info))
+            (when (>= (cdr item-count-info) limit)
+              (anything-kill-async-process process)
+              (return)))))
       (anything-output-filter--post-process))))
+
+(defun anything-output-filter--collect-candidates (lines incomplete-line-info)
+  (anything-log-eval (cdr incomplete-line-info))
+  (let (candidates)
+    (while lines
+      (if (not (cdr lines))
+          ;; store last incomplete line until new output arrives
+          (setcdr incomplete-line-info (car lines))
+
+        (if (cdr incomplete-line-info)
+            (progn
+              (push (concat (cdr incomplete-line-info) (car lines))
+                    candidates)
+              (setcdr incomplete-line-info nil))
+
+          (push (car lines) candidates)))
+      (pop lines))
+    (nreverse candidates)))
 
 (defun anything-output-filter--post-process ()
   (anything-maybe-fit-frame)
