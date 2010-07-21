@@ -2187,21 +2187,14 @@ the real value in a text property."
 
 (defun anything-output-filter--collect-candidates (lines incomplete-line-info)
   (anything-log-eval (cdr incomplete-line-info))
-  (let (candidates)
-    (while lines
-      (if (not (cdr lines))
-          ;; store last incomplete line until new output arrives
-          (setcdr incomplete-line-info (car lines))
-
-        (if (cdr incomplete-line-info)
-            (progn
-              (push (concat (cdr incomplete-line-info) (car lines))
-                    candidates)
-              (setcdr incomplete-line-info nil))
-
-          (push (car lines) candidates)))
-      (pop lines))
-    (nreverse candidates)))
+  (butlast
+   (loop for line in lines collect
+         (if (cdr incomplete-line-info)
+             (prog1
+                 (concat (cdr incomplete-line-info) line)
+               (setcdr incomplete-line-info nil))
+           line)
+         finally (setcdr incomplete-line-info line))))
 
 (defun anything-output-filter--post-process ()
   (anything-maybe-fit-frame)
@@ -4308,8 +4301,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-transform-candidates
          '("foo" "bar")
          '((name . "FOO") (candidates "foo" "bar")
-                       (filtered-candidate-transformer
-                        . (lambda (cands src) (mapcar 'upcase cands))))
+           (filtered-candidate-transformer
+            . (lambda (cands src) (mapcar 'upcase cands))))
          t)
         )
       (desc "anything-candidates-in-buffer-1")
@@ -5754,6 +5747,31 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (expect (mock (anything-log "%S = ERROR!" 'unDeFined))
         (anything-log-eval-internal '(unDeFined)))
 
+      (desc "anything-output-filter--collect-candidates")
+      (expect '("a" "b" "")
+        (split-string "a\nb\n" "\n"))
+      (expect '("a" "b")
+        (anything-output-filter--collect-candidates
+         '("a" "b" "") (cons 'incomplete-line  "")))
+      (expect '("a" "b")
+        (split-string "a\nb" "\n"))
+      (expect '("a")
+        (anything-output-filter--collect-candidates
+         '("a" "b") (cons 'incomplete-line  "")))
+      (expect '(incomplete-line . "b")
+        (let ((incomplete-line-info (cons 'incomplete-line  "")))
+          (anything-output-filter--collect-candidates
+           '("a" "b") incomplete-line-info)
+          incomplete-line-info))
+      (expect '("" "c" "")
+        (split-string "\nc\n" "\n"))
+      (expect '("b" "c")
+        ;; "a\nb" + "\nc\n"
+        (let ((incomplete-line-info (cons 'incomplete-line  "")))
+          (anything-output-filter--collect-candidates
+           '("a" "b") incomplete-line-info)
+          (anything-output-filter--collect-candidates
+           '("" "c" "") incomplete-line-info)))
       )))
 
 
