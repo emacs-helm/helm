@@ -2652,7 +2652,7 @@ You can set user options `fit-frame-max-width-percent' and
            (when (eobp) (forward-line -1))))
     (anything-mark-current-line)))
 
-(defun anything-edit-current-selection-1 (func)
+(defun anything-edit-current-selection-internal (func)
   (with-anything-window
     (beginning-of-line)
     (let ((realvalue (get-text-property (point) 'anything-realvalue)))
@@ -2665,7 +2665,7 @@ You can set user options `fit-frame-max-width-percent' and
 (defmacro anything-edit-current-selection (&rest forms)
   "Evaluate FORMS at current selection in the anything buffer.
 You can edit the line."
-  `(anything-edit-current-selection-1
+  `(anything-edit-current-selection-internal
     (lambda () ,@forms)))
 (put 'anything-edit-current-selection 'lisp-indent-function 0)
 
