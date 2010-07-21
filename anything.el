@@ -2452,8 +2452,8 @@ UNIT and DIRECTION."
   (if (eq anything-enable-shortcuts 'alphabet)
       (save-selected-window
         (select-window (anything-window))          
-        (let* ((index (position (anything-this-command-key) anything-shortcut-keys))
-               (overlay (nth index anything-digit-overlays)))
+        (let ((overlay (nth (position (anything-this-command-key) anything-shortcut-keys)
+                             anything-digit-overlays)))
           (when (overlay-buffer overlay)
             (goto-char (overlay-start overlay))
             (anything-mark-current-line)
