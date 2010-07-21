@@ -2816,7 +2816,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                                    (anything-candidate-number-limit source)
                                    (assoc 'search-from-end source)))
 
-(defun* anything-candidates-in-buffer-1 (buffer &optional (pattern anything-pattern) (get-line-fn 'buffer-substring-no-properties) (search-fns '(re-search-forward)) (limit anything-candidate-number-limit) search-from-end)
+(defun anything-candidates-in-buffer-1 (buffer pattern get-line-fn search-fns limit search-from-end)
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
@@ -4319,27 +4319,33 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         )
       (desc "anything-candidates-in-buffer-1")
       (expect nil
-        (anything-candidates-in-buffer-1 nil))
+        (anything-candidates-in-buffer-1
+         nil ""
+         'buffer-substring-no-properties '(re-search-forward) 50 nil))
       (expect '("foo+" "bar+" "baz+")
         (with-temp-buffer
           (insert "foo+\nbar+\nbaz+\n")
-          (let ((anything-candidate-number-limit 5))
-            (anything-candidates-in-buffer-1 (current-buffer) ""))))
+          (anything-candidates-in-buffer-1
+           (current-buffer) ""
+           'buffer-substring-no-properties '(re-search-forward) 5 nil)))
       (expect '("foo+" "bar+")
         (with-temp-buffer
           (insert "foo+\nbar+\nbaz+\n")
-          (let ((anything-candidate-number-limit 2))
-            (anything-candidates-in-buffer-1 (current-buffer) ""))))
+          (anything-candidates-in-buffer-1
+           (current-buffer) ""
+           'buffer-substring-no-properties '(re-search-forward) 2 nil)))
       (expect '("foo+")
         (with-temp-buffer
           (insert "foo+\nbar+\nbaz+\n")
-          (anything-candidates-in-buffer-1 (current-buffer) "oo\\+")))
+          (anything-candidates-in-buffer-1
+           (current-buffer) "oo\\+"
+           'buffer-substring-no-properties '(re-search-forward) 50 nil)))
       (expect '("foo+")
         (with-temp-buffer
           (insert "foo+\nbar+\nbaz+\n")
           (anything-candidates-in-buffer-1 
            (current-buffer) "oo+"
-           #'buffer-substring-no-properties '(search-forward))))
+           #'buffer-substring-no-properties '(search-forward) 50 nil)))
       (expect '(("foo+" "FOO+"))
         (with-temp-buffer
           (insert "foo+\nbar+\nbaz+\n")
@@ -4347,7 +4353,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
            (current-buffer) "oo\\+"
            (lambda (s e)
              (let ((l (buffer-substring-no-properties s e)))
-               (list l (upcase l)))))))
+               (list l (upcase l))))
+           '(re-search-forward) 50 nil)))
       (desc "anything-candidates-in-buffer")
       (expect '(("TEST" ("foo+" "bar+" "baz+")))
         (anything-test-candidates
