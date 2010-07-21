@@ -2160,8 +2160,7 @@ the real value in a text property."
 (defun anything-output-filter-1 (process-assoc string)
   (let* ((process (car process-assoc))
          (process-info (cdr process-assoc))
-         (incomplete-line-info (assoc 'incomplete-line process-info))
-         (item-count-info (assoc 'item-count process-info))
+         (incomplete-line-info (assoc 'incomplete-line process-info)) 
          (limit (anything-candidate-number-limit process-info)))
     (anything-log-eval string (cdr incomplete-line-info))
     (with-current-buffer anything-buffer
@@ -2188,27 +2187,27 @@ the real value in a text property."
                     (setcdr incomplete-line-info nil))
 
                 (push (car lines) candidates)))
-                  
+            
             (pop lines))
 
           (setq candidates (reverse candidates))
-          (dolist (candidate (anything-transform-candidates candidates process-info t))
-            (anything-insert-match candidate 'insert-before-markers process-info)
-            (incf (cdr item-count-info))
-            (when (>= (cdr item-count-info) limit)
-              (anything-kill-async-process process)
-              (return)))))
+          (let ((item-count-info (assoc 'item-count process-info)))
+            (dolist (candidate (anything-transform-candidates candidates process-info t))
+              (anything-insert-match candidate 'insert-before-markers process-info)
+              (incf (cdr item-count-info))
+              (when (>= (cdr item-count-info) limit)
+                (anything-kill-async-process process)
+                (return))))))
+      (anything-output-filter--post-process))))
 
-      (anything-maybe-fit-frame)
-
-      (anything-log-run-hook 'anything-update-hook)
-
-      (if (bobp)
-          (anything-next-line)
-
-        (save-selected-window
-          (select-window (get-buffer-window anything-buffer 'visible))
-          (anything-mark-current-line))))))
+(defun anything-output-filter--post-process ()
+  (anything-maybe-fit-frame)
+  (anything-log-run-hook 'anything-update-hook)
+  (if (bobp)
+      (anything-next-line)
+    (save-selected-window
+      (select-window (get-buffer-window anything-buffer 'visible))
+      (anything-mark-current-line))))
 
 
 (defun anything-kill-async-processes ()
