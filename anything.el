@@ -2176,7 +2176,6 @@ the real value in a text property."
                   (append process-info `((insertion-marker . ,(point-marker))))))
 
         (let ((lines (split-string string "\n"))
-              (multiline (assq 'multiline process-info))
               (start (point))
               candidates separate)
           (while lines
