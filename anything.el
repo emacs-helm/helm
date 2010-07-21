@@ -2359,12 +2359,11 @@ UNIT and DIRECTION."
          (forward-line 1)
        (let ((header-pos (anything-get-next-header-pos))
              (separator-pos (anything-get-next-candidate-separator-pos)))
-         (if (and separator-pos
-                  (or (null header-pos)
-                      (< separator-pos header-pos)))
-             (goto-char separator-pos)
-           (if header-pos
-               (goto-char header-pos)))
+         (cond ((and separator-pos
+                     (or (null header-pos) (< separator-pos header-pos)))
+                (goto-char separator-pos))
+               (header-pos
+                (goto-char header-pos)))
          (if separator-pos
              (forward-line 1)))))
    'line 'next))
