@@ -2529,6 +2529,7 @@ UNIT and DIRECTION."
 ;; (@* "Core: error handling")
 (defun anything-log-error (&rest args)
   "Accumulate error messages into `anything-issued-errors'."
+  (apply 'anything-log (concat "ERROR: " (car args)) (cdr args))
   (let ((msg (apply 'format args)))
     (unless (member msg anything-issued-errors)
       (add-to-list 'anything-issued-errors msg))))
