@@ -2225,22 +2225,24 @@ the real value in a text property."
   "If a candidate was selected then perform the associated
 action."
   (anything-log "executing action")
-  (setq selection (or selection (anything-get-selection)))
-  (setq action (or action
-                   anything-saved-action
-                   (if (get-buffer anything-action-buffer)
-                       (anything-get-selection anything-action-buffer)
-                     (anything-get-action))))
+  (setq action (anything-get-default-action
+                (or action
+                    anything-saved-action
+                    (if (get-buffer anything-action-buffer)
+                        (anything-get-selection anything-action-buffer)
+                      (anything-get-action)))))
   (let ((source (or anything-saved-current-source (anything-get-current-source))))
-    (if (and (not selection) (assoc 'accept-empty source))
-        (setq selection ""))
-    (if (and (listp action)
-             (not (functionp action)))  ; lambda
-        ;;select the default action
-        (setq action (cdar action)))
+    (setq selection (or selection
+                        (anything-get-selection)
+                        (and (assoc 'accept-empty source) "")))
     (unless preserve-saved-action (setq anything-saved-action nil))
     (if (and selection action)
         (anything-funcall-with-source source  action selection))))
+
+(defun anything-get-default-action (action)
+  (if (and (listp action) (not (functionp action)))
+      (cdar action)
+    action))
 
 (defun anything-select-action ()
   "Select an action for the currently selected candidate.
@@ -4702,6 +4704,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (candidates "foo")
             (action ("identity" . (lambda (c) (identity c)))))))
         (anything-execute-selection-action))
+      (desc "anything-get-default-action")
+      (expect 'upcase
+        (anything-get-default-action '(("upcase" . upcase))))
+      (expect 'downcase
+        (anything-get-default-action '(("downcase" . downcase))))
+      (expect (lambda (x) (capitalize x))
+        (anything-get-default-action (lambda (x) (capitalize x))))
+      (expect 'identity
+        (anything-get-default-action 'identity))
       (desc "anything-execute-selection-action")
       (expect "FOO"
         (anything-execute-selection-action
@@ -4709,6 +4720,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (expect "FOO"
         (anything-execute-selection-action
          "foo" '(("upcase" . (lambda (c) (upcase c)))) nil))
+
       (desc "display-to-real attribute")
       (expect "FOO"
         (anything-test-candidates
