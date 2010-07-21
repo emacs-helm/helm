@@ -2587,8 +2587,7 @@ to a list of forms.\n\n")
     (insert "** "
             (pp-to-string v) "\n"
             (pp-to-string (eval v)) "\n"))
-    (message "Calculating all anything-related values...Done")
-)
+  (message "Calculating all anything-related values...Done"))
 
 ;; (@* "Core: misc")
 (defun anything-kill-buffer-hook ()
