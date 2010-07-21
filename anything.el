@@ -2902,28 +2902,32 @@ Acceptable values of CREATE-OR-BUFFER:
   Create a new local candidates buffer,
   named \" *anything candidates:SOURCE*ANYTHING-CURRENT-BUFFER\".
 "
-  (let* ((gbufname (format " *anything candidates:%s*" anything-source-name))
-         (lbufname (concat gbufname (buffer-name anything-current-buffer)))
+  (let* ((global-bname (format " *anything candidates:%s*" anything-source-name))
+         (local-bname (concat global-bname (buffer-name anything-current-buffer)))
          buf)
     (when create-or-buffer
       (if (bufferp create-or-buffer)
           (setq anything-candidate-buffer-alist
                 (cons (cons anything-source-name create-or-buffer)
-                      (delete (assoc anything-source-name anything-candidate-buffer-alist)
+                      (delete (assoc anything-source-name
+                                     anything-candidate-buffer-alist)
                               anything-candidate-buffer-alist)))
         (add-to-list 'anything-candidate-buffer-alist
                      (cons anything-source-name create-or-buffer))
         (when (eq create-or-buffer 'global)
           (loop for b in (buffer-list)
-                if (string-match (format "^%s" (regexp-quote gbufname)) (buffer-name b))
+                if (string-match (format "^%s" (regexp-quote global-bname))
+                                 (buffer-name b))
                 do (kill-buffer b)))
         (with-current-buffer
-            (get-buffer-create (if (eq create-or-buffer 'global) gbufname lbufname))
+            (get-buffer-create (if (eq create-or-buffer 'global)
+                                   global-bname
+                                 local-bname))
           (buffer-disable-undo)
           (erase-buffer)
           (font-lock-mode -1))))
-    (or (get-buffer lbufname)
-        (get-buffer gbufname)
+    (or (get-buffer local-bname)
+        (get-buffer global-bname)
         (anything-aif (assoc-default anything-source-name anything-candidate-buffer-alist)
             (and (buffer-live-p it) it)))))
 
