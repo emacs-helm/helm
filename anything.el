@@ -2867,7 +2867,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                     #'forward-line)
                   until (funcall endp)
                   for i from 1 to limit
-                  collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+                  collect (funcall get-line-fn (point-at-bol) (point-at-eol))
                   do (funcall next-line-fn 1))))
 
 (defun anything-search-from-candidate-buffer-internal (search-fn)
