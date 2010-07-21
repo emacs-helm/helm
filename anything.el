@@ -2824,17 +2824,9 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
             (endp (if search-from-end #'bobp #'eobp)))
         (goto-char (1- start-point))
         (if (string= pattern "")
-            (delq nil (loop with next-line-fn =
-                              (if search-from-end
-                                  (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
-                                #'forward-line)
-                            until (funcall endp)
-                            for i from 1 to limit
-                            collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-                            do (funcall next-line-fn 1)))
-          
-          (let ((i 1)
-                buffer-read-only
+            (anything-initial-candidates-from-candidate-buffer
+             endp get-line-fn limit search-from-end)
+          (let (buffer-read-only
                 matches exit newmatches)
             (anything-search-candidate-buffer-internal
               (lambda ()
@@ -2842,7 +2834,8 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                 (dolist (searcher search-fns)
                     (goto-char start-point)
                     (setq newmatches nil)
-                    (loop with next-line-fn =
+                    (loop with i = 1
+                          with next-line-fn =
                             (if search-from-end
                                 (lambda (x) (goto-char (max (point-at-bol) 1)))
                               #'forward-line)
@@ -2859,6 +2852,16 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                     (setq matches (append matches (nreverse newmatches)))
                     (if exit (return)))))
             (delq nil matches)))))))
+
+(defun anything-initial-candidates-from-candidate-buffer (endp get-line-fn limit search-from-end)
+  (delq nil (loop with next-line-fn =
+                  (if search-from-end
+                      (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
+                    #'forward-line)
+                  until (funcall endp)
+                  for i from 1 to limit
+                  collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+                  do (funcall next-line-fn 1))))
 
 (defun anything-search-candidate-buffer-internal (search-fn)
   (goto-char (point-min))
