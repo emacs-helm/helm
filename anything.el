@@ -963,6 +963,20 @@ The original idea is from `tramp-debug-message'."
                       (not (string-match "^anything-\\(?:interpret\\|log\\|.*funcall\\)" fn)))
              (return fn))))
 
+(defun anything-log-error (&rest args)
+  "Accumulate error messages into `anything-issued-errors'."
+  (apply 'anything-log (concat "ERROR: " (car args)) (cdr args))
+  (let ((msg (apply 'format args)))
+    (unless (member msg anything-issued-errors)
+      (add-to-list 'anything-issued-errors msg))))
+
+(defun anything-print-error-messages ()
+  "Print error messages in `anything-issued-errors'."
+  (message "%s" (mapconcat 'identity (reverse anything-issued-errors) "\n")))
+
+
+
+
 ;; (anything-log "test")
 ;; (switch-to-buffer-other-window "*Anything Log*")
 
@@ -2525,19 +2539,6 @@ UNIT and DIRECTION."
 (defun anything-pos-candidate-separator-p ()
   "Return t if the current line is a candidate separator."
   (get-text-property (line-beginning-position) 'anything-candidate-separator))
-
-;; (@* "Core: error handling")
-(defun anything-log-error (&rest args)
-  "Accumulate error messages into `anything-issued-errors'."
-  (apply 'anything-log (concat "ERROR: " (car args)) (cdr args))
-  (let ((msg (apply 'format args)))
-    (unless (member msg anything-issued-errors)
-      (add-to-list 'anything-issued-errors msg))))
-
-(defun anything-print-error-messages ()
-  "Print error messages in `anything-issued-errors'."
-  (message "%s" (mapconcat 'identity (reverse anything-issued-errors) "\n")))
-
 
 ;; (@* "Core: help")
 (defun anything-help-internal (bufname insert-content-fn)
