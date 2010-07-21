@@ -2160,16 +2160,14 @@ the real value in a text property."
 (defun anything-output-filter-1 (process-assoc string)
   (let* ((process (car process-assoc))
          (process-info (cdr process-assoc))
-         (insertion-marker (assoc-default 'insertion-marker process-info))
          (incomplete-line-info (assoc 'incomplete-line process-info))
          (item-count-info (assoc 'item-count process-info))
          (limit (anything-candidate-number-limit process-info)))
     (anything-log-eval string (cdr incomplete-line-info))
     (with-current-buffer anything-buffer
       (save-excursion
-        (if insertion-marker
-            (goto-char insertion-marker)
-        
+        (anything-aif (assoc-default 'insertion-marker process-info)
+            (goto-char it)
           (goto-char (point-max))
           (anything-insert-header-from-source process-info)
           (setcdr process-assoc
