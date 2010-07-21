@@ -120,7 +120,7 @@
 ;;    Show all anything-related variables at this time.
 ;;  `anything-delete-current-selection'
 ;;    Delete the currently selected item.
-;;  `anything-delete-minibuffer-content'
+;;  `anything-delete-minibuffer-contents'
 ;;    Same as `delete-minibuffer-contents' but this is a command.
 ;;  `anything-toggle-resplit-window'
 ;;    Toggle resplit anything window, vertically or horizontally.
@@ -2675,10 +2675,11 @@ You can edit the line."
     (delete-minibuffer-contents)
     (insert pattern)))
 
-(defun anything-delete-minibuffer-content ()
+(defun anything-delete-minibuffer-contents ()
   "Same as `delete-minibuffer-contents' but this is a command."
   (interactive)
   (anything-set-pattern ""))
+(defalias 'anything-delete-minibuffer-content 'anything-delete-minibuffer-contents)
 
 ;; (@* "Built-in plug-in: type")
 (defun anything-compile-source--type (source)
