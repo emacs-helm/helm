@@ -2274,8 +2274,7 @@ If action buffer is selected, back to the anything buffer."
          `(((name . "Actions")
             (volatile)
             (candidates . ,actions)
-            ;; Override `anything-candidate-number-limit'
-            (candidate-number-limit . 9999))))
+            (candidate-number-limit))))
     (set (make-local-variable 'anything-source-filter) nil)
     (set (make-local-variable 'anything-selection-overlay) nil)
     (set (make-local-variable 'anything-digit-overlays) nil)
