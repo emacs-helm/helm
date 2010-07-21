@@ -2447,8 +2447,8 @@ UNIT and DIRECTION."
   (event-basic-type (elt (this-command-keys-vector) 0)))
 ;; (progn (read-key-sequence "Key: ") (p (anything-this-command-key)))
 
-(defun anything-select-with-shortcut-internal (type get-key-func)
-  (if (eq anything-enable-shortcuts type)
+(defun anything-select-with-shortcut-internal (types get-key-func)
+  (if (memq anything-enable-shortcuts types)
       (save-selected-window
         (select-window (anything-window))          
         (let* ((key (funcall get-key-func))
@@ -2467,13 +2467,13 @@ UNIT and DIRECTION."
 (defun anything-select-with-prefix-shortcut ()
   (interactive)
   (anything-select-with-shortcut-internal
-   'prefix
+   '(prefix)
    (lambda () (read-event "Select shortcut key: "))))
 ;;; FIXME DIGIT shortcut
 (defun anything-select-with-digit-shortcut ()
   (interactive)
   (anything-select-with-shortcut-internal
-   'alphabet 'anything-this-command-key))
+   '(alphabet t) 'anything-this-command-key))
 
 ;; (setq anything-enable-shortcuts 'prefix)
 ;; (define-key anything-map "@" 'anything-select-with-prefix-shortcut)
