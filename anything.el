@@ -2821,35 +2821,32 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
   (when buffer
     (with-current-buffer buffer
       (let ((start-point (if search-from-end (point-max) (point-min)))
-            (next-line-fn (if search-from-end
-                              (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
-                            #'forward-line))
             (endp (if search-from-end #'bobp #'eobp)))
         (goto-char (1- start-point))
         (if (string= pattern "")
-            (delq nil (loop until (funcall endp)
-                                    for i from 1 to limit
-                                    collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
-                                    do (funcall next-line-fn 1)))
-                    
+            (delq nil (loop with next-line-fn =
+                              (if search-from-end
+                                  (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
+                                #'forward-line)
+                            until (funcall endp)
+                            for i from 1 to limit
+                            collecting (funcall get-line-fn (point-at-bol) (point-at-eol))
+                            do (funcall next-line-fn 1)))
+          
           (let ((i 1)
-                (next-line-fn (if search-from-end
-                                  (lambda (x) (goto-char (max (point-at-bol) 1)))
-                                #'forward-line))
                 buffer-read-only
                 matches exit newmatches)
-            (progn
-              (goto-char (point-min))
-              (insert "\n")
-              (goto-char (point-max))
-              (insert "\n")
-              (setq start-point (if search-from-end (point-max) (point-min)))
-              (clrhash anything-cib-hash)
-              (unwind-protect
-                  (dolist (searcher search-fns)
+            (anything-search-candidate-buffer-internal
+              (lambda ()
+                (clrhash anything-cib-hash)
+                (dolist (searcher search-fns)
                     (goto-char start-point)
                     (setq newmatches nil)
-                    (loop while (funcall searcher pattern nil t)
+                    (loop with next-line-fn =
+                            (if search-from-end
+                                (lambda (x) (goto-char (max (point-at-bol) 1)))
+                              #'forward-line)
+                          while (funcall searcher pattern nil t)
                           if (or (funcall endp) (< limit i))
                           do (setq exit t) (return)
                           else do
@@ -2860,15 +2857,22 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                               (push cand newmatches)))
                           (funcall next-line-fn 1))
                     (setq matches (append matches (nreverse newmatches)))
-                    (if exit (return)))
-                (goto-char (point-min))
-                (delete-char 1)
-                (goto-char (1- (point-max)))
-                (delete-char 1)
-                           
-                (set-buffer-modified-p nil)))
+                    (if exit (return)))))
             (delq nil matches)))))))
 
+(defun anything-search-candidate-buffer-internal (search-fn)
+  (goto-char (point-min))
+  (insert "\n")
+  (goto-char (point-max))
+  (insert "\n")
+  (unwind-protect
+      (funcall search-fn)
+    (goto-char (point-min))
+    (delete-char 1)
+    (goto-char (1- (point-max)))
+    (delete-char 1)
+                
+    (set-buffer-modified-p nil)))
 
 (defun anything-candidate-buffer (&optional create-or-buffer)
   "Register and return a buffer containing candidates of current source.
