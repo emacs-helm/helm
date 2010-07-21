@@ -2300,16 +2300,19 @@ UNIT and DIRECTION."
                       (save-excursion (forward-line -1) (point)))))
 
 (defun anything-skip-noncandidate-line (direction)
-  (while (and (not (bobp))   ;skip header-line and candidate-separator
+  (anything-skip-header-and-separator-line direction)
+  (and (bobp) (forward-line 1))     ;skip first header
+  (and (eobp) (forward-line -1))    ;avoid last empty line
+  )
+
+(defun anything-skip-header-and-separator-line (direction)
+  (while (and (not (bobp))
               (or (anything-pos-header-line-p)
                   (anything-pos-candidate-separator-p)))
     (forward-line (if (and (eq direction 'previous)
                            (not (eq (line-beginning-position) (point-min))))
                       -1
-                    1)))
-  (and (bobp) (forward-line 1))     ;skip first header
-  (and (eobp) (forward-line -1))    ;avoid last empty line
-  )
+                    1))))
 
 (defvar anything-mode-line-string-real nil)
 (defun anything-display-mode-line (source)
