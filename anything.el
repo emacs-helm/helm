@@ -2260,26 +2260,29 @@ If action buffer is selected, back to the anything buffer."
          (let ((actions (anything-get-action)))
            (if (functionp actions)
                (message "Sole action: %s" actions)
-             (with-current-buffer (get-buffer-create anything-action-buffer)
-               (erase-buffer)
-               (buffer-disable-undo)
-               (set-window-buffer (get-buffer-window anything-buffer) anything-action-buffer)
-               (set (make-local-variable 'anything-sources)
-                    `(((name . "Actions")
-                       (volatile)
-                       (candidates . ,actions)
-                       ;; Override `anything-candidate-number-limit'
-                       (candidate-number-limit . 9999))))
-               (set (make-local-variable 'anything-source-filter) nil)
-               (set (make-local-variable 'anything-selection-overlay) nil)
-               (set (make-local-variable 'anything-digit-overlays) nil)
-               (anything-initialize-overlays anything-action-buffer))
+             (anything-show-action-buffer actions)
              (with-selected-window (minibuffer-window)
                (delete-minibuffer-contents))
              (setq anything-pattern 'dummy) ; so that it differs from the
                                         ; previous one
            
              (anything-check-minibuffer-input))))))
+
+(defun anything-show-action-buffer (actions)
+  (with-current-buffer (get-buffer-create anything-action-buffer)
+    (erase-buffer)
+    (buffer-disable-undo)
+    (set-window-buffer (get-buffer-window anything-buffer) anything-action-buffer)
+    (set (make-local-variable 'anything-sources)
+         `(((name . "Actions")
+            (volatile)
+            (candidates . ,actions)
+            ;; Override `anything-candidate-number-limit'
+            (candidate-number-limit . 9999))))
+    (set (make-local-variable 'anything-source-filter) nil)
+    (set (make-local-variable 'anything-selection-overlay) nil)
+    (set (make-local-variable 'anything-digit-overlays) nil)
+    (anything-initialize-overlays anything-action-buffer)))
 
 ;; (@* "Core: selection")
 (defun anything-move-selection-common (move-func unit direction)
