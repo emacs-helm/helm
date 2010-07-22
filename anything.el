@@ -3157,12 +3157,13 @@ otherwise 1-element list of current selection.
 
 It is analogous to `dired-get-marked-files'."
   (with-current-buffer (anything-buffer-get)
-    (let ((cands (if anything-marked-candidates
-                     (loop with current-src = (anything-get-current-source)
-                           for (source . real) in (reverse anything-marked-candidates)
-                           when (equal current-src source)
-                           collect real)
-                   (list (anything-get-selection)))))
+    (let ((cands
+           (if anything-marked-candidates
+               (loop with current-src = (anything-get-current-source)
+                     for (source . real) in (reverse anything-marked-candidates)
+                     when (equal current-src source)
+                     collect real)
+             (list (anything-get-selection)))))
       (anything-log-eval cands)
       cands)))
 
