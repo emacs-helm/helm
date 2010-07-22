@@ -3154,12 +3154,12 @@ It is analogous to `dired-get-marked-files'."
 (defun anything-revive-visible-mark ()
   (interactive)
   (with-current-buffer anything-buffer
-    (loop for o in anything-visible-mark-overlays do
-          (goto-char (point-min))
-          (while (and (search-forward (overlay-get o 'string) nil t)
-                      (anything-current-source-name= (overlay-get o 'source)))
-            ;; Now the next line of visible mark
-            (move-overlay o (line-beginning-position 0) (1+ (line-end-position 0)))))))
+    (dolist (o anything-visible-mark-overlays do)
+      (goto-char (point-min))
+      (while (and (search-forward (overlay-get o 'string) nil t)
+                  (anything-current-source-name= (overlay-get o 'source)))
+        ;; Now the next line of visible mark
+        (move-overlay o (line-beginning-position 0) (1+ (line-end-position 0)))))))
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
 (defun anything-next-visible-mark (&optional prev)
