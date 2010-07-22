@@ -2477,16 +2477,17 @@ UNIT and DIRECTION."
 
 (defun anything-mark-current-line ()
   "Move selection overlay to current line."
-  (move-overlay anything-selection-overlay
-                (point-at-bol)
-                (if (anything-pos-multiline-p)
-                    (let ((header-pos (anything-get-next-header-pos))
-                          (separator-pos (anything-get-next-candidate-separator-pos)))
-                      (or (and (null header-pos) separator-pos separator-pos)
-                          (and header-pos separator-pos (< separator-pos header-pos) separator-pos)
-                          header-pos
-                          (point-max)))
-                  (1+ (point-at-eol))))
+  (move-overlay
+   anything-selection-overlay (point-at-bol)
+   (if (anything-pos-multiline-p)
+       (let ((header-pos (anything-get-next-header-pos))
+             (separator-pos (anything-get-next-candidate-separator-pos)))
+         (or (and (null header-pos) separator-pos)
+             (and header-pos separator-pos (< separator-pos header-pos)
+                  separator-pos)
+             header-pos
+             (point-max)))
+     (1+ (point-at-eol))))
   (anything-follow-execute-persistent-action-maybe))
 
 (defun anything-this-command-key ()
