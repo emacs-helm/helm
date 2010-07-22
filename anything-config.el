@@ -3281,10 +3281,11 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
 (defun anything-get-firefox-user-init-dir ()
   "Guess the default Firefox user directory name."
   (let* ((moz-dir (concat (getenv "HOME") "/.mozilla/firefox/"))
-         (moz-user-dir (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
-                         (goto-char (point-min))
-                         (when (search-forward "Path=" nil t)
-                           (buffer-substring-no-properties (point) (point-at-eol))))))
+         (moz-user-dir
+          (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
+            (goto-char (point-min))
+            (when (search-forward "Path=" nil t)
+              (buffer-substring-no-properties (point) (point-at-eol))))))
     (file-name-as-directory (concat moz-dir moz-user-dir))))
 
 (defun anything-guess-firefox-bookmark-file ()
