@@ -4142,13 +4142,16 @@ replace with STR as yanked string."
            (lambda (c) (jump-to-register (car c))))
           (append-to-register
            "Append Region to Register" .
-           (lambda (c) (append-to-register (car c) (region-beginning) (region-end))))
+           (lambda (c) (append-to-register
+                        (car c) (region-beginning) (region-end))))
           (prepend-to-register
            "Prepend Region to Register" .
-           (lambda (c) (prepend-to-register (car c) (region-beginning) (region-end))))
+           (lambda (c) (prepend-to-register
+                        (car c) (region-beginning) (region-end))))
           (increment-register
            "Increment Prefix Arg to Register" .
-           (lambda (c) (increment-register anything-current-prefix-arg (car c)))))
+           (lambda (c) (increment-register
+                        anything-current-prefix-arg (car c)))))
         for func in (cdr register-and-functions)
         for cell = (assq func func-actions)
         when cell
