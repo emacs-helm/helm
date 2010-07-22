@@ -2770,7 +2770,8 @@ You can edit the line."
                 (resume ,@(anything-mklist (assoc-default 'resume source))
                         anything-save-enable-shortcuts)
                 (cleanup ,@(anything-mklist (assoc-default 'cleanup source))
-                         (lambda () (setq anything-enable-shortcuts anything-orig-enable-shortcuts))))
+                         (lambda () (setq anything-enable-shortcuts
+                                          anything-orig-enable-shortcuts))))
               source)
     source))
 
