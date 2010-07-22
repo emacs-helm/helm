@@ -2287,9 +2287,8 @@ source.")
                        (Info-exit)
                        topics)))))))
     (action . (("Show with Info" .(lambda (node-str)
-                                    (info (replace-regexp-in-string "^[^:]+: "
-                                                                    ""
-                                                                    node-str))))))
+                                    (info (replace-regexp-in-string
+                                           "^[^:]+: " "" node-str))))))
     (requires-pattern . 2)))
 ;; (anything 'anything-c-source-info-pages)
 
