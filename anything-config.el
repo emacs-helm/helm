@@ -1447,11 +1447,13 @@ It is cleared after executing action.")
 ;; (progn (ad-disable-advice 'eval-defun 'after 'anything-source-hack) (ad-update 'eval-defun))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Document Generator ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defconst anything-c-create-summary-index-regexp
+  "^;;;; <\\(.+?\\)>$\\|^;; (anything '\\(.+?\\))$\\|^ *;; (anything '\\(.+?\\))$")
 (defun anything-c-create-summary ()
   "Create `anything' summary."
   (save-excursion
     (goto-char (point-min))
-    (loop while (re-search-forward "^;;;; <\\(.+?\\)>$\\|^;; (anything '\\(.+?\\))$\\|^ *;; (anything '\\(.+?\\))$"  nil t)
+    (loop while (re-search-forward anything-c-create-summary-index-regexp nil t)
           collect (cond ((match-beginning 1)
                          (cons 'section (match-string-no-properties 1)))
                         ((match-beginning 2)
