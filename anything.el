@@ -1773,7 +1773,8 @@ to be handled."
       (anything-check-minibuffer-input-1)
     (anything-new-timer
      'anything-check-minibuffer-input-timer
-     (run-with-idle-timer anything-input-idle-delay nil 'anything-check-minibuffer-input-1))))
+     (run-with-idle-timer anything-input-idle-delay nil
+                          'anything-check-minibuffer-input-1))))
 
 (defun anything-check-minibuffer-input-1 ()
   (with-anything-quittable
