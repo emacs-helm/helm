@@ -2219,8 +2219,9 @@ It is cleared after jumping line.")
   (when (car anything-c-ffap-line-location)
     (unwind-protect
         (ignore-errors
-          (with-selected-window (get-buffer-window
-                                 (get-file-buffer (car anything-c-ffap-line-location)))
+          (with-selected-window
+              (get-buffer-window
+               (get-file-buffer (car anything-c-ffap-line-location)))
             (anything-goto-line (cdr anything-c-ffap-line-location)))))))
 (add-hook 'anything-after-action-hook 'anything-c-ffap-line-goto-line)
 (add-hook 'anything-after-persistent-action-hook 'anything-c-ffap-line-goto-line)
