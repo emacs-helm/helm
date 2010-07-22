@@ -1947,11 +1947,13 @@ Useful in dired buffers when there is inserted subdirs."
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
-    (action .
-     (("Symlink File" . (lambda (candidate)
-                          (anything-dired-action candidate :action 'symlink)))
-      ("RelSymlink File" . (lambda (candidate)
-                             (anything-dired-action candidate :action 'relsymlink)))))))
+    (action
+     . (("Symlink File"
+         . (lambda (candidate)
+             (anything-dired-action candidate :action 'symlink)))
+        ("RelSymlink File"
+         . (lambda (candidate)
+             (anything-dired-action candidate :action 'relsymlink)))))))
 
 
 (defvar anything-c-source-hardlink-files
