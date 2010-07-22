@@ -3517,7 +3517,8 @@ occurrence of the current pattern.")
     (select-window anything-isearch-original-window))
 
   (use-global-map anything-isearch-original-global-map)
-  (setq-default deferred-action-list anything-isearch-original-deferred-action-list)
+  (setq-default deferred-action-list
+                anything-isearch-original-deferred-action-list)
   (when (overlayp anything-isearch-overlay) 
     (delete-overlay anything-isearch-overlay)))
 
