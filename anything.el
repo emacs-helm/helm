@@ -2861,7 +2861,8 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
             (anything-initial-candidates-from-candidate-buffer
              endp get-line-fn limit search-from-end)
           (anything-search-from-candidate-buffer
-           pattern get-line-fn search-fns limit search-from-end start-point endp))))))
+           pattern get-line-fn search-fns limit search-from-end
+           start-point endp))))))
 
 (defun anything-search-from-candidate-buffer (pattern get-line-fn search-fns limit search-from-end start-point endp)
   (let (buffer-read-only
