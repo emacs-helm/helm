@@ -1495,7 +1495,8 @@ source in *buffers* buffer and set
   (anything
    (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
        anything-last-sources anything-sources)
-   (buffer-local-value 'anything-input-local (get-buffer any-buffer)) nil any-resume nil any-buffer))
+   (buffer-local-value 'anything-input-local (get-buffer any-buffer))
+   nil any-resume nil any-buffer))
 
 ;;; rubikitch: experimental
 ;;; I use this and check it whether I am convenient.
