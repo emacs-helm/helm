@@ -1982,10 +1982,11 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
         (anything-pattern (anything-process-pattern-transformer
                            anything-pattern source)))
     (anything-process-filtered-candidate-transformer
-     (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
-            (anything-take-first-elements (anything-get-cached-candidates source) limit))
-           (t
-            (anything-match-from-candidates (anything-get-cached-candidates source) matchfns limit)))
+     (if (or (equal anything-pattern "") (equal matchfns '(identity)))
+         (anything-take-first-elements
+          (anything-get-cached-candidates source) limit)
+       (anything-match-from-candidates
+        (anything-get-cached-candidates source) matchfns limit))
      source)))
 
 ;; (anything '(((name . "error")(candidates . (lambda () (hage))) (action . identity))))
