@@ -187,7 +187,9 @@ For example, to list candidats of \"foo\" source, input pattern as \"foo .\".")
 
 (defun amp-mp-make-regexps (pattern)
   (if (string= pattern "") '("")
-    (loop for s in (split-string (replace-regexp-in-string anything-mp-space-regexp "\000\000" pattern) " " t)
+    (loop for s in (split-string
+                    (replace-regexp-in-string anything-mp-space-regexp
+                                              "\000\000" pattern) " " t)
         collect (replace-regexp-in-string "\000\000" " " s))))
 
 (defun amp-mp-1-make-regexp (pattern)
