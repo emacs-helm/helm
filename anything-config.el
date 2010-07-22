@@ -3521,14 +3521,15 @@ STRING is string to match."
 (defun anything-imenu-create-candidates (entry)
   "Create candidates with ENTRY."
   (if (listp (cdr entry))
-      (mapcan (lambda (sub)
-                (if (consp (cdr sub))
-                    (mapcar
-                     (lambda (subentry)
-                       (concat (car entry) anything-c-imenu-delimiter subentry))
-                     (anything-imenu-create-candidates sub))
-                  (list (concat (car entry) anything-c-imenu-delimiter (car sub)))))
-              (cdr entry))
+      (mapcan
+       (lambda (sub)
+         (if (consp (cdr sub))
+             (mapcar
+              (lambda (subentry)
+                (concat (car entry) anything-c-imenu-delimiter subentry))
+              (anything-imenu-create-candidates sub))
+           (list (concat (car entry) anything-c-imenu-delimiter (car sub)))))
+       (cdr entry))
     (list entry)))
 
 (defvar anything-c-source-imenu
