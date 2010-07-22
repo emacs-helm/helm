@@ -1670,7 +1670,9 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (anything-log-run-hook 'anything-after-initialize-hook))
 
 (defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume any-keymap)
-  (if (anything-resume-p any-resume) (anything-mark-current-line) (anything-update))
+  (if (anything-resume-p any-resume)
+      (anything-mark-current-line)
+    (anything-update))
   (select-frame-set-input-focus (window-frame (minibuffer-window)))
   (anything-preselect any-preselect)
   (let ((minibuffer-local-map
