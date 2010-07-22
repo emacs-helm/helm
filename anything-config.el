@@ -3725,7 +3725,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
                       "\n\n"))))))))
 
 (defun anything-c-simple-call-tree-functions-callers-init ()
-  (anything-c-simple-call-tree-init-base 'simple-call-tree-invert " is called by\n"))
+  (anything-c-simple-call-tree-init-base 'simple-call-tree-invert
+                                         " is called by\n"))
 
 (defun anything-c-simple-call-tree-candidates ()
   (with-current-buffer (anything-candidate-buffer)
