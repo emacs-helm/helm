@@ -601,14 +601,15 @@ they will be displayed with face `file-name-shadow' if
   :type 'string
   :group 'anything-config)
 
-(defcustom anything-for-files-prefered-list '(anything-c-source-ffap-line
-                                              anything-c-source-ffap-guesser
-                                              anything-c-source-buffers+
-                                              anything-c-source-recentf
-                                              anything-c-source-bookmarks
-                                              anything-c-source-file-cache
-                                              anything-c-source-files-in-current-dir+
-                                              anything-c-source-locate)
+(defcustom anything-for-files-prefered-list
+  '(anything-c-source-ffap-line
+    anything-c-source-ffap-guesser
+    anything-c-source-buffers+
+    anything-c-source-recentf
+    anything-c-source-bookmarks
+    anything-c-source-file-cache
+    anything-c-source-files-in-current-dir+
+    anything-c-source-locate)
   "Your prefered sources to find files."
   :type 'list
   :group 'anything-config)
