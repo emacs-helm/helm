@@ -457,27 +457,28 @@ If (direct-insert-match) is in the source, this function is used."
    filter))
 (defun anything-compile-source--grep-candidates (source)
   (anything-aif (assoc-default 'grep-candidates source)
-      (append source
-              (let ((use-fast-directory
-                     (string-match
-                      anything-grep-candidates-fast-directory-regexp
-                      (car (anything-mklist (anything-interpret-value it))))))
-                (cond ((and use-fast-directory (assq 'direct-insert-match source))
-                       (anything-log "fastest version (use-fast-directory and direct-insert-match)")
-                       `((candidates . agp-candidates-synchronous-grep--direct-insert-match)
-                         (match identity)
-                         (volatile)
-                         (requires-pattern)))
-                      (use-fast-directory
-                       (anything-log "faster version (use-fast-directory)")
-                       `((candidates . agp-candidates-synchronous-grep)
-                         (match identity)
-                         (volatile)
-                         (requires-pattern)))
-                      (t
-                       (anything-log "normal version")
-                       '((candidates . agp-candidates)
-                         (delayed))))))
+      (append
+       source
+       (let ((use-fast-directory
+              (string-match
+               anything-grep-candidates-fast-directory-regexp
+               (car (anything-mklist (anything-interpret-value it))))))
+         (cond ((and use-fast-directory (assq 'direct-insert-match source))
+                (anything-log "fastest version (use-fast-directory and direct-insert-match)")
+                `((candidates . agp-candidates-synchronous-grep--direct-insert-match)
+                  (match identity)
+                  (volatile)
+                  (requires-pattern)))
+               (use-fast-directory
+                (anything-log "faster version (use-fast-directory)")
+                `((candidates . agp-candidates-synchronous-grep)
+                  (match identity)
+                  (volatile)
+                  (requires-pattern)))
+               (t
+                (anything-log "normal version")
+                '((candidates . agp-candidates)
+                  (delayed))))))
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--grep-candidates)
 
