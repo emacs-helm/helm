@@ -1041,7 +1041,8 @@ The original idea is from `tramp-debug-message'."
   (dolist (f deferred-action-list) (funcall f)))
 (defmacro with-anything-restore-variables(&rest body)
   "Restore variables specified by `anything-restored-variables' after executing BODY . "
-  `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables))
+  `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v)))
+                              anything-restored-variables))
          (deferred-action-function 'anything-deferred-action-function))
      (anything-log "save variables: %S" --orig-vars)
      (unwind-protect (progn ,@body)
