@@ -3431,7 +3431,8 @@ occurrence of the current pattern.")
                         'start anything-isearch-match-start
                         'pos (copy-marker start))
                   anything-isearch-match-positions)
-            (setq anything-isearch-match-start (copy-marker (match-beginning 0))))))
+            (setq anything-isearch-match-start
+                  (copy-marker (match-beginning 0))))))
   
       (anything-mark-current-line))))
 
