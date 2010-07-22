@@ -663,7 +663,8 @@ Though wmctrl work also with stumpwm."
   "*The prefix key for all `anything-command-map' commands.
 
 !!WARNING!!
-This default value is very likely to be changed, because it is under discussion."
+This default value is very likely to be changed,
+because it is under discussion."
   :type 'string
   :set 'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
