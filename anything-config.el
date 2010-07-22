@@ -4193,7 +4193,8 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
 (defvar anything-c-source-emacs-source-defun
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
-    (condition . (string-match "/emacs2[0-9].+/src/.+c$" (or buffer-file-name ""))))
+    (condition . (string-match "/emacs2[0-9].+/src/.+c$"
+                               (or buffer-file-name ""))))
   "Show DEFUN/DEFVAR in Emacs C source file.")
 ;; (anything 'anything-c-source-emacs-source-defun)
 
