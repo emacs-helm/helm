@@ -2269,22 +2269,23 @@ source.")
 
 (defvar anything-c-source-info-pages
   `((name . "Info Pages")
-    (candidates . (lambda ()
-                    (if anything-c-info-pages
-                        anything-c-info-pages
-                      (setq anything-c-info-pages
-                            (save-window-excursion
-                              (save-excursion
-                                (require 'info)
-                                (Info-find-node "dir" "top")
-                                (goto-char (point-min))
-                                (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-                                      topics)
-                                  (while (re-search-forward info-topic-regexp nil t)
-                                    (add-to-list 'topics (match-string-no-properties 1)))
-                                  (goto-char (point-min))
-                                  (Info-exit)
-                                  topics)))))))
+    (candidates
+     . (lambda ()
+         (if anything-c-info-pages
+             anything-c-info-pages
+           (setq anything-c-info-pages
+                 (save-window-excursion
+                   (save-excursion
+                     (require 'info)
+                     (Info-find-node "dir" "top")
+                     (goto-char (point-min))
+                     (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+                           topics)
+                       (while (re-search-forward info-topic-regexp nil t)
+                         (add-to-list 'topics (match-string-no-properties 1)))
+                       (goto-char (point-min))
+                       (Info-exit)
+                       topics)))))))
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string "^[^:]+: "
                                                                     ""
