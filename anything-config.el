@@ -3348,9 +3348,10 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
 
 (defun anything-c-highlight-firefox-bookmarks (bookmarks source)
   (loop for i in bookmarks
-        collect (propertize i
-                            'face '((:foreground "YellowGreen"))
-                            'help-echo (anything-c-firefox-bookmarks-get-value i))))
+        collect (propertize
+                 i
+                 'face '((:foreground "YellowGreen"))
+                 'help-echo (anything-c-firefox-bookmarks-get-value i))))
 
 ;; W3m bookmark
 (eval-when-compile (require 'w3m-bookmark nil t))
