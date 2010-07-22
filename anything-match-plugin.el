@@ -167,7 +167,9 @@ or  M-x install-elisp-from-emacswiki anything.el")))
 
 (defcustom anything-grep-candidates-fast-directory-regexp nil
   "*Directory regexp where a RAM disk (or tmpfs) is mounted.
-If non-nil, grep-candidates plugin gets faster because it uses grep as synchronous process.
+
+If non-nil, grep-candidates plugin gets faster because it uses
+grep as synchronous process.
 
 ex. (setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\")"
   :type 'string
