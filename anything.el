@@ -3146,6 +3146,11 @@ It is analogous to `dired-get-marked-files'."
 (add-hook 'anything-after-initialize-hook 'anything-reset-marked-candidates)
 ;; (add-hook 'anything-after-action-hook 'anything-reset-marked-candidates)
 
+(defun anything-current-source-name= (name)
+  (save-excursion
+    (goto-char (anything-get-previous-header-pos))
+    (equal name (anything-current-line-contents))))
+
 (defun anything-revive-visible-mark ()
   (interactive)
   (with-current-buffer anything-buffer
@@ -3155,10 +3160,7 @@ It is analogous to `dired-get-marked-files'."
             (while (and (not moved)
                         (search-forward (overlay-get o 'string) nil t))
               (forward-line -1)
-              (when (and (save-excursion
-                           (goto-char (anything-get-previous-header-pos))
-                           (equal (overlay-get o 'source)
-                                  (anything-current-line-contents)))
+              (when (and (anything-current-source-name= (overlay-get o 'source))
                          (not (find-if (lambda (x)
                                          (memq x anything-visible-mark-overlays))
                                        (overlays-at (point)))))
