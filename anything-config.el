@@ -2716,15 +2716,16 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   (append anything-c-source-emacs-functions
           '((match anything-c-match-function-by-abbrev
                    anything-c-string-match))
-          '((init . (lambda ()
-                      (defadvice anything-update
-                        (before anything-c-update-function-abbrev-regexp activate)
-                        (let ((char-list (append anything-pattern nil))
-                              (str "^"))
-                          (dolist (c char-list)
-                            (setq str (concat str (list c) "[^-]*-")))
-                          (setq str (concat (substring str 0 (1- (length str))) "$"))
-                          (setq anything-c-function-abbrev-regexp str))))))))
+          '((init
+             . (lambda ()
+                 (defadvice anything-update
+                   (before anything-c-update-function-abbrev-regexp activate)
+                   (let ((char-list (append anything-pattern nil))
+                         (str "^"))
+                     (dolist (c char-list)
+                       (setq str (concat str (list c) "[^-]*-")))
+                     (setq str (concat (substring str 0 (1- (length str))) "$"))
+                     (setq anything-c-function-abbrev-regexp str))))))))
 ;; (anything 'anything-c-source-emacs-functions-with-abbrevs)
 
 (defvar anything-c-source-advice
