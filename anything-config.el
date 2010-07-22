@@ -3056,7 +3056,11 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
                                 candidate)))
                       (bookmark-show-annotation bmk))))
-               ("Edit annotation" . bookmark-edit-annotation)
+               ("Edit annotation"
+                . (lambda (candidate)
+                    (let ((bmk (anything-bookmark-get-bookmark-from-name
+                                candidate)))
+                      (bookmark-edit-annotation bmk))))
                ("Show Google map" . (lambda (candidate)
                                       (let* ((bmk (anything-bookmark-get-bookmark-from-name
                                                   candidate))
@@ -5550,18 +5554,16 @@ If collection is an `obarray', a test is maybe needed, otherwise
 the list would be incomplete.
 See `obarray'."
   (cond ((and (listp collection) test)
-         (loop for i in collection
-              when (funcall test i) collect i))
+         (loop for i in collection when (funcall test i) collect i))
+        ((and (eq collection obarray) test)
+         (loop for s being the symbols of collection
+            when (funcall test s) collect s))
         ((and (vectorp collection) test)
-         (let (ob)
-           (mapatoms
-            #'(lambda (s)
-                (when (funcall test s) (push s ob))))
-           ob))
-        ((and (hash-table-p collection) test)
-         (anything-comp-hash-get-items collection :test test))
+         (loop for i across collection when (funcall test i) collect i))
         ((vectorp collection)
          (loop for i across collection collect i))
+        ((and (hash-table-p collection) test)
+         (anything-comp-hash-get-items collection :test test))
         ((hash-table-p collection)
          (anything-comp-hash-get-items collection))
         (t collection)))
