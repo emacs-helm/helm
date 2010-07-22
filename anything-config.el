@@ -3594,7 +3594,8 @@ STRING is string to match."
     (with-current-buffer (anything-candidate-buffer 'local)
       (call-process-shell-command
        (if (string-match "\\.el\\.gz$" anything-buffer-file-name)
-           (format "ctags -e -u -f- --language-force=lisp --fields=n =(zcat %s) " anything-buffer-file-name)
+           (format "ctags -e -u -f- --language-force=lisp --fields=n =(zcat %s) "
+                   anything-buffer-file-name)
          (format "ctags -e -u -f- --fields=n %s " anything-buffer-file-name))
        nil (current-buffer))
       (goto-char (point-min))
@@ -3602,7 +3603,9 @@ STRING is string to match."
       (delete-region (point-min) (point))
       (loop while (and (not (eobp)) (search-forward "\001" (point-at-eol) t))
             for lineno-start = (point)
-            for lineno = (buffer-substring lineno-start (1- (search-forward "," (point-at-eol) t)))
+            for lineno = (buffer-substring
+                          lineno-start
+                          (1- (search-forward "," (point-at-eol) t)))
             do
             (beginning-of-line)
             (insert (format "%5s:" lineno))
