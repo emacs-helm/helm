@@ -963,12 +963,13 @@ Arguments are same as `format'."
 (defun anything-log-get-current-function ()
   "Get function name calling `anything-log'.
 The original idea is from `tramp-debug-message'."
-  (loop for btn from 1 to 40            ;avoid inf-loop
+  (loop with exclude-func-re = "^anything-\\(?:interpret\\|log\\|.*funcall\\)"
+        for btn from 1 to 40            ;avoid inf-loop
         for btf = (second (backtrace-frame btn))
         for fn  = (if (symbolp btf) (symbol-name btf) "")
-        do (when (and (string-match "^anything" fn)
-                      (not (string-match "^anything-\\(?:interpret\\|log\\|.*funcall\\)" fn)))
-             (return fn))))
+        if (and (string-match "^anything" fn)
+                (not (string-match exclude-func-re fn)))
+        return fn))
 
 (defun anything-log-error (&rest args)
   "Accumulate error messages into `anything-issued-errors'."
