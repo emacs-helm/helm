@@ -3451,8 +3451,9 @@ occurrence of the current pattern.")
                 (eq start (point)))
             (progn
               (goto-char start)
-              (unless (eq 'error (plist-get (car anything-isearch-match-positions)
-                                            'event))
+              (unless (eq 'error
+                          (plist-get (car anything-isearch-match-positions)
+                                     'event))
                 (setq anything-isearch-message-suffix "no more matches")))
 
           (push (list 'event 'search-again
