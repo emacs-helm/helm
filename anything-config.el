@@ -4011,10 +4011,11 @@ replace with STR as yanked string."
 (defvar anything-c-source-global-mark-ring
   '((name . "global-mark-ring")
     (candidates . anything-c-source-global-mark-ring-candidates)
-    (action . (("Goto line" . (lambda (candidate)
-                                (let ((items (split-string candidate ":")))
-                                  (switch-to-buffer (second items))
-                                  (anything-goto-line (string-to-number (car items))))))))
+    (action . (("Goto line"
+                . (lambda (candidate)
+                    (let ((items (split-string candidate ":")))
+                      (switch-to-buffer (second items))
+                      (anything-goto-line (string-to-number (car items))))))))
     (persistent-action . (lambda (candidate)
                            (let ((items (split-string candidate ":")))
                              (switch-to-buffer (second items))
