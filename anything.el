@@ -1529,18 +1529,20 @@ source in *buffers* buffer and set
   (condition-case v
       (let ( ;; It is needed because `anything-source-name' is non-nil
             ;; when `anything' is invoked by action. Awful global scope.
-            anything-source-name anything-in-persistent-action
-                                 anything-quit
-                                 (case-fold-search t)
-                                 (anything-buffer (or any-buffer anything-buffer))
-                                 ;; cua-mode ; avoid error when region is selected
-                                 )
+            anything-source-name
+            anything-in-persistent-action
+            anything-quit
+            (case-fold-search t)
+            (anything-buffer (or any-buffer anything-buffer))
+            ;; cua-mode ; avoid error when region is selected
+            )
         (with-anything-restore-variables
           (anything-initialize-1 any-resume any-input any-sources)
           (anything-display-buffer anything-buffer)
           (anything-log "show prompt")
           (unwind-protect
-              (anything-read-pattern-maybe any-prompt any-input any-preselect any-resume any-keymap)
+              (anything-read-pattern-maybe
+               any-prompt any-input any-preselect any-resume any-keymap)
             (anything-cleanup)))
         (prog1 (unless anything-quit (anything-execute-selection-action-1))
           (anything-log "end session --------------------------------------------")))
