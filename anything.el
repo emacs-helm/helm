@@ -1958,7 +1958,8 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
   (let ((matchfns (anything-match-functions source))
         (anything-source-name (assoc-default 'name source))
         (limit (anything-candidate-number-limit source))
-        (anything-pattern (anything-process-pattern-transformer anything-pattern source))
+        (anything-pattern (anything-process-pattern-transformer
+                           anything-pattern source))
         matches)
     (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
            (setq matches (anything-get-cached-candidates source))
@@ -1972,8 +1973,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                  (clrhash anything-match-hash)
                  (dolist (match matchfns)
                    (dolist (candidate cands)
-                     (when (funcall match (anything-candidate-get-display candidate))
-                       (anything-accumulate-candidates-internal
+                     (when (funcall match (anything-candidate-get-display candidate))                       (anything-accumulate-candidates-internal
                         candidate newmatches anything-match-hash item-count limit)))
                    (setq matches (append matches (reverse newmatches)))
                    (if exit (return))))
