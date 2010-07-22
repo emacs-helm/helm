@@ -526,10 +526,10 @@ Attributes:
 ;; taste!
 (defvar anything-type-attributes
   '((file (action . (("Find File" . find-file)
-                     ("Delete File" . (lambda (file)
-                                        (if (y-or-n-p (format "Really delete file %s? "
-                                                              file))
-                                            (delete-file file)))))))
+                     ("Delete File" .
+                      (lambda (file)
+                        (if (y-or-n-p (format "Really delete file %s? " file))
+                            (delete-file file)))))))
     (buffer (action . (("Switch to Buffer" . switch-to-buffer)
                        ("Pop to Buffer"    . pop-to-buffer)
                        ("Display Buffer"   . display-buffer)
