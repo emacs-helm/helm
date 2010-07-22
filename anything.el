@@ -1953,6 +1953,27 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
        (setq exit t)
        (return))))
 
+(defun anything-take-first-elements (seq n)
+  (if (> (length seq) n)
+      (setq seq (subseq seq 0 n))
+    seq))
+
+(defun anything-match-from-candidates (cands matchfns limit)
+  (let (matches)
+    (condition-case nil
+       (let ((item-count 0) 
+             exit newmatches)
+         (clrhash anything-match-hash)
+         (dolist (match matchfns)
+           (dolist (candidate cands)
+             (when (funcall match (anything-candidate-get-display candidate))
+               (anything-accumulate-candidates-internal
+                candidate newmatches anything-match-hash item-count limit)))
+           (setq matches (append matches (reverse newmatches)))
+           (if exit (return))))
+
+     (invalid-regexp (setq matches nil)))
+    matches))
 
 (defun anything-compute-matches-internal (source)
   (let ((matchfns (anything-match-functions source))
@@ -1962,24 +1983,11 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                            anything-pattern source))
         matches)
     (cond ((or (equal anything-pattern "") (equal matchfns '(identity)))
-           (setq matches (anything-get-cached-candidates source))
-           (if (> (length matches) limit)
-               (setq matches (subseq matches 0 limit))))
+           (setq matches
+                 (anything-take-first-elements (anything-get-cached-candidates source) limit)))
           (t
-           (condition-case nil
-               (let ((item-count 0)
-                     (cands (anything-get-cached-candidates source))
-                     exit newmatches)
-                 (clrhash anything-match-hash)
-                 (dolist (match matchfns)
-                   (dolist (candidate cands)
-                     (when (funcall match (anything-candidate-get-display candidate))
-                       (anything-accumulate-candidates-internal
-                        candidate newmatches anything-match-hash item-count limit)))
-                   (setq matches (append matches (reverse newmatches)))
-                   (if exit (return))))
-
-             (invalid-regexp (setq matches nil)))))
+           (setq matches (anything-match-from-candidates (anything-get-cached-candidates source) matchfns limit))
+))
     (anything-process-filtered-candidate-transformer matches source)))
 
 ;; (anything '(((name . "error")(candidates . (lambda () (hage))) (action . identity))))
