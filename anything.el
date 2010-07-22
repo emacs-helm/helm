@@ -460,47 +460,48 @@
 ;; (@* "User Configuration")
 
 ;; This is only an example. Customize it to your own taste!
-(defvar anything-sources `(((name . "Buffers")
-                            (candidates
-                             . (lambda ()
-                                 (remove-if (lambda (name)
-                                              (or (equal name anything-buffer)
-                                                  (eq ?\  (aref name 0))))
-                                            (mapcar 'buffer-name (buffer-list)))))
-			    (type . buffer))
+(defvar anything-sources
+  `(((name . "Buffers")
+     (candidates
+      . (lambda ()
+          (remove-if (lambda (name)
+                       (or (equal name anything-buffer)
+                           (eq ?\  (aref name 0))))
+                     (mapcar 'buffer-name (buffer-list)))))
+     (type . buffer))
 
-                           ((name . "File Name History")
-                            (candidates . file-name-history)
-                            (match (lambda (candidate)
-                                     ;; list basename matches first
-                                     (string-match 
-                                      anything-pattern 
-                                      (file-name-nondirectory candidate)))
+    ((name . "File Name History")
+     (candidates . file-name-history)
+     (match (lambda (candidate)
+              ;; list basename matches first
+              (string-match 
+               anything-pattern 
+               (file-name-nondirectory candidate)))
 
-                                   (lambda (candidate)                                     
-                                     ;; and then directory part matches
-                                     (let ((dir (file-name-directory candidate)))
-                                       (if dir
-                                           (string-match anything-pattern dir)))))
-                            (type . file))
+            (lambda (candidate)                                     
+              ;; and then directory part matches
+              (let ((dir (file-name-directory candidate)))
+                (if dir
+                    (string-match anything-pattern dir)))))
+     (type . file))
 
-                           ((name . "Files from Current Directory")
-                            (init . (lambda ()
-                                      (setq anything-default-directory
-                                            default-directory)))
-                            (candidates . (lambda ()
-                                            (directory-files
-                                             anything-default-directory)))
-                            (type . file))
+    ((name . "Files from Current Directory")
+     (init . (lambda ()
+               (setq anything-default-directory
+                     default-directory)))
+     (candidates . (lambda ()
+                     (directory-files
+                      anything-default-directory)))
+     (type . file))
 
-                           ((name . "Complex Command History")
-                            (candidates . (lambda ()
-                                            (mapcar 'prin1-to-string
-                                                    command-history)))
-                            (action . (("Repeat Complex Command" . 
-                                        (lambda (c)
-                                          (eval (read c))))))
-                            (delayed)))
+    ((name . "Complex Command History")
+     (candidates . (lambda ()
+                     (mapcar 'prin1-to-string
+                             command-history)))
+     (action . (("Repeat Complex Command" . 
+                 (lambda (c)
+                   (eval (read c))))))
+     (delayed)))
   "The source of candidates for anything.
 It accepts symbols:
  (setq anything-sources (list anything-c-foo anything-c-bar))
