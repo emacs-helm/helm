@@ -2881,7 +2881,8 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                while (funcall searcher pattern nil t)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
                do
-               (anything-accumulate-candidates-internal cand newmatches anything-cib-hash item-count limit)
+               (anything-accumulate-candidates-internal
+                cand newmatches anything-cib-hash item-count limit)
                (funcall next-line-fn 1))
          (setq matches (append matches (nreverse newmatches)))
          (if exit (return)))
