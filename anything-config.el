@@ -1699,7 +1699,8 @@ If EXPAND is non--nil expand-file-name."
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
   (when (anything-file-completion-source-p)
-    (let ((new-pattern (anything-reduce-file-name anything-pattern arg :unix-close t :expand t)))
+    (let ((new-pattern (anything-reduce-file-name anything-pattern arg
+                                                  :unix-close t :expand t)))
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
         (insert new-pattern)))))
