@@ -1192,7 +1192,8 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
   (unless (anything-empty-buffer-p (anything-buffer-get))
     (anything-aif (anything-attr 'action-transformer)
         (anything-composed-funcall-with-source
-         (anything-get-current-source) it (anything-attr 'action) (anything-get-selection))
+         (anything-get-current-source) it
+         (anything-attr 'action) (anything-get-selection))
       (anything-attr 'action))))
 
 (defun anything-get-current-source ()
@@ -1343,7 +1344,7 @@ BINDING is a list of (VARNAME . VALUE) pair."
 ;; (@* "Core: tools")
 (defun anything-current-line-contents ()
   "Current line strig without properties."
-  (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+  (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
 
 (defun anything-funcall-with-source (source func &rest args)
   "Call FUNC with ARGS with variable `anything-source-name' and `source' is bound.
@@ -2008,8 +2009,8 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                       (length anything-digit-overlays))))
     (move-overlay (nth anything-digit-shortcut-count
                        anything-digit-overlays)
-                  (line-beginning-position)
-                  (line-beginning-position))
+                  (point-at-bol)
+                  (point-at-bol))
     (incf anything-digit-shortcut-count)))
 
 (defun anything-process-source--direct-insert-match (source)
@@ -2137,7 +2138,7 @@ If current source has `update' attribute, a function without argument, call it b
   "Insert MATCH into the anything buffer. If MATCH is a list then
 insert the string inteneded to appear on the display and store
 the real value in a text property."
-  (let ((start (line-beginning-position (point)))
+  (let ((start (point-at-bol (point)))
         (string (or (car-safe match) match))
         (realvalue (cdr-safe match)))
     (when (symbolp string) (setq string (symbol-name string)))
@@ -2147,10 +2148,10 @@ the real value in a text property."
       ;; 'anything-realvalue property when creating candidate buffer.
       (unless (get-text-property start 'anything-realvalue)
         (and realvalue
-             (put-text-property start (line-end-position)
+             (put-text-property start (point-at-eol)
                                 'anything-realvalue realvalue)))
       (when anything-source-in-each-line-flag
-        (put-text-property start (line-end-position) 'anything-source source))
+        (put-text-property start (point-at-eol) 'anything-source source))
       (funcall insert-function "\n"))))
 
 (defun anything-insert-header-from-source (source)
@@ -2169,10 +2170,10 @@ the real value in a text property."
 
   (let ((start (point)))
     (insert name)
-    (put-text-property (line-beginning-position)
-                       (line-end-position) 'anything-header t)
+    (put-text-property (point-at-bol)
+                       (point-at-eol) 'anything-header t)
     (when display-string
-      (overlay-put (make-overlay (line-beginning-position) (line-end-position))
+      (overlay-put (make-overlay (point-at-bol) (point-at-eol))
                    'display display-string))
     (insert "\n")
     (put-text-property start (point) 'face anything-header-face)))
@@ -2181,8 +2182,8 @@ the real value in a text property."
 (defun anything-insert-candidate-separator ()
   "Insert separator of candidates into the anything buffer."
   (insert anything-candidate-separator)
-  (put-text-property (line-beginning-position)
-                     (line-end-position) 'anything-candidate-separator t)
+  (put-text-property (point-at-bol)
+                     (point-at-eol) 'anything-candidate-separator t)
   (insert "\n"))
 
 
@@ -2346,7 +2347,7 @@ UNIT and DIRECTION."
               (or (anything-pos-header-line-p)
                   (anything-pos-candidate-separator-p)))
     (forward-line (if (and (eq direction 'previous)
-                           (not (eq (line-beginning-position) (point-min))))
+                           (not (eq (point-at-bol) (point-min))))
                       -1
                     1))))
 
@@ -2468,7 +2469,7 @@ UNIT and DIRECTION."
 (defun anything-mark-current-line ()
   "Move selection overlay to current line."
   (move-overlay anything-selection-overlay
-                (line-beginning-position)
+                (point-at-bol)
                 (if (anything-pos-multiline-p)
                     (let ((header-pos (anything-get-next-header-pos))
                           (separator-pos (anything-get-next-candidate-separator-pos)))
@@ -2476,7 +2477,7 @@ UNIT and DIRECTION."
                           (and header-pos separator-pos (< separator-pos header-pos) separator-pos)
                           header-pos
                           (point-max)))
-                  (1+ (line-end-position))))
+                  (1+ (point-at-eol))))
   (anything-follow-execute-persistent-action-maybe))
 
 (defun anything-this-command-key ()
@@ -2551,12 +2552,12 @@ UNIT and DIRECTION."
 
 (defun anything-pos-header-line-p ()
   "Return t if the current line is a header line."
-  (or (get-text-property (line-beginning-position) 'anything-header)
-      (get-text-property (line-beginning-position) 'anything-header-separator)))
+  (or (get-text-property (point-at-bol) 'anything-header)
+      (get-text-property (point-at-bol) 'anything-header-separator)))
 
 (defun anything-pos-candidate-separator-p ()
   "Return t if the current line is a candidate separator."
-  (get-text-property (line-beginning-position) 'anything-candidate-separator))
+  (get-text-property (point-at-bol) 'anything-candidate-separator))
 
 ;; (@* "Core: help")
 (defun anything-help-internal (bufname insert-content-fn)
@@ -3090,7 +3091,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 
 (defun anything-this-visible-mark ()
   (loop for o in anything-visible-mark-overlays
-        when (equal (line-beginning-position) (overlay-start o))
+        when (equal (point-at-bol) (overlay-start o))
         do   (return o)))
 
 (defun anything-delete-visible-mark (overlay)
@@ -3104,7 +3105,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   (setq anything-visible-mark-overlays (delq overlay anything-visible-mark-overlays)))
 
 (defun anything-make-visible-mark ()
-  (let ((o (make-overlay (line-beginning-position) (1+ (line-end-position)))))
+  (let ((o (make-overlay (point-at-bol) (1+ (point-at-eol)))))
     (overlay-put o 'face anything-visible-mark-face)
     (overlay-put o 'source (assoc-default 'name (anything-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
@@ -3166,7 +3167,7 @@ It is analogous to `dired-get-marked-files'."
       (while (and (search-forward (overlay-get o 'string) nil t)
                   (anything-current-source-name= (overlay-get o 'source)))
         ;; Now the next line of visible mark
-        (move-overlay o (line-beginning-position 0) (1+ (line-end-position 0)))))))
+        (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
 (defun anything-next-visible-mark (&optional prev)
