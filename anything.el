@@ -2972,8 +2972,9 @@ Acceptable values of CREATE-OR-BUFFER:
 
 (defun anything-compile-source--candidates-in-buffer (source)
   (anything-aif (assoc 'candidates-in-buffer source)
-      (append source `((candidates . ,(or (cdr it) 'anything-candidates-in-buffer))
-                       (volatile) (match identity)))
+      (append source
+              `((candidates . ,(or (cdr it) 'anything-candidates-in-buffer))
+                (volatile) (match identity)))
     source))
 
 ;; (@* "Utility: resplit anything window")
