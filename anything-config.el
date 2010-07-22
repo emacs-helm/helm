@@ -1067,10 +1067,11 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Preconfigured `anything' : Drop-in replacement of `query-replace-regexp' with building regexp visually."
   (interactive
    (let ((common
-          (anything-c-regexp-base "Query Replace Regexp: "
-                                  '((name . "Lines matching Regexp")
-                                    (mode-line . "Set replace start line and type RET.")
-                                    (action . anything-c-query-replace-args)))))
+          (anything-c-regexp-base
+           "Query Replace Regexp: "
+           '((name . "Lines matching Regexp")
+             (mode-line . "Set replace start line and type RET.")
+             (action . anything-c-query-replace-args)))))
      (if (not common)
          (keyboard-quit))
      (list (car common) (cadr common) (caddr common)
