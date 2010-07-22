@@ -3156,7 +3156,6 @@ It is analogous to `dired-get-marked-files'."
     (equal name (anything-current-line-contents))))
 
 (defun anything-revive-visible-mark ()
-  (interactive)
   (with-current-buffer anything-buffer
     (dolist (o anything-visible-mark-overlays do)
       (goto-char (point-min))
