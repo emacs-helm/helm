@@ -3931,7 +3931,8 @@ utility mdfind.")
 
 (defun anything-c-kill-ring-action (str)
   "Insert STR in `kill-ring' and set STR to the head.
-If this action is executed just after `yank', replace with STR as yanked string."
+If this action is executed just after `yank',
+replace with STR as yanked string."
   (setq kill-ring (delete str kill-ring))
   (if (not (eq (anything-attr 'last-command) 'yank))
       (insert-for-yank str)
