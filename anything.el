@@ -1415,7 +1415,8 @@ This function allows easy sequencing of transformer functions."
   (set variable timer))
 
 ;; (@* "Core: entry point")
-(defconst anything-argument-keys '(:sources :input :prompt :resume :preselect :buffer :keymap))
+(defconst anything-argument-keys
+  '(:sources :input :prompt :resume :preselect :buffer :keymap))
 ;;;###autoload
 (defun anything (&rest plist)
   "Select anything. In Lisp program, some optional arguments can be used.
