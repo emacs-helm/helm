@@ -1734,7 +1734,8 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
          (unless anything-digit-overlays
            (setq anything-digit-overlays
                  (loop for key across anything-shortcut-keys
-                       for overlay = (make-overlay (point-min) (point-min) (get-buffer buffer))
+                       for overlay = (make-overlay (point-min) (point-min)
+                                                   (get-buffer buffer))
                        do (overlay-put overlay 'before-string
                                        (format "%s - " (upcase (make-string 1 key))))
                        collect overlay))))
