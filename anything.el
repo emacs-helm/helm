@@ -2656,7 +2656,9 @@ You can set user options `fit-frame-max-width-percent' and
       ;; go to first candidate of first source
       (forward-line 1)
       (let ((start (point)))
-        (unless (or (re-search-forward (concat "^" (regexp-quote candidate-or-regexp) "$") nil t)
+        (unless (or (re-search-forward
+                     (concat "^" (regexp-quote candidate-or-regexp) "$")
+                     nil t)
                     (progn (goto-char start)
                            (re-search-forward candidate-or-regexp nil t)))
           (goto-char start))))
