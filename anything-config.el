@@ -3739,7 +3739,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
     (setq anything-c-simple-call-tree-related-functions
           (delete "no functions."
                   (split-string
-                   (replace-regexp-in-string "  \\| is called by\\| calls " "" candidate)
+                   (replace-regexp-in-string "  \\| is called by\\| calls "
+                                             "" candidate)
                    "\n")))
     (setq anything-c-simple-call-tree-function-index -1))
   (incf anything-c-simple-call-tree-function-index)
