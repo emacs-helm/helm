@@ -3454,12 +3454,13 @@ http://emacs-w3m.namazu.org/")
   '((name . "Elisp libraries (Scan)")
     (init . (anything-c-elisp-library-scan-init))
     (candidates-in-buffer)
-    (action ("Find library" . (lambda (candidate)
-                                (find-file (find-library-name candidate))))
-            ("Find library other window" . (lambda (candidate)
-                                             (find-file-other-window (find-library-name candidate))))
-            ("Load library" . (lambda (candidate)
-                                (load-library candidate))))))
+    (action ("Find library"
+             . (lambda (candidate) (find-file (find-library-name candidate))))
+            ("Find library other window"
+             . (lambda (candidate)
+                 (find-file-other-window (find-library-name candidate))))
+            ("Load library"
+             . (lambda (candidate) (load-library candidate))))))
 ;; (anything 'anything-c-source-elisp-library-scan)
 
 (defun anything-c-elisp-library-scan-init ()
