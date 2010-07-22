@@ -1973,7 +1973,8 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                  (clrhash anything-match-hash)
                  (dolist (match matchfns)
                    (dolist (candidate cands)
-                     (when (funcall match (anything-candidate-get-display candidate))                       (anything-accumulate-candidates-internal
+                     (when (funcall match (anything-candidate-get-display candidate))
+                       (anything-accumulate-candidates-internal
                         candidate newmatches anything-match-hash item-count limit)))
                    (setq matches (append matches (reverse newmatches)))
                    (if exit (return))))
@@ -2390,8 +2391,8 @@ UNIT and DIRECTION."
        (let ((header-pos (anything-get-previous-header-pos))
              (separator-pos (anything-get-previous-candidate-separator-pos)))
          (when header-pos
-           (goto-char (if (or (null separator-pos) (< separator-pos header-pos)) ; first
-                          header-pos
+           (goto-char (if (or (null separator-pos) (< separator-pos header-pos))
+                          header-pos ; first candidate
                         separator-pos))
            (forward-line 1)))))
    'line 'previous))
