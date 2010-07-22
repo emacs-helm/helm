@@ -1159,7 +1159,8 @@ Attributes:
    (t
     (prog1
         (setq anything-compiled-sources
-              (anything-compile-sources anything-sources anything-compile-source-functions))
+              (anything-compile-sources
+               anything-sources anything-compile-source-functions))
       (anything-log-eval anything-compiled-sources)))))
 
 (defun* anything-get-selection (&optional (buffer nil buffer-s) (force-display-part))
