@@ -2750,10 +2750,11 @@ word in the function's name, e.g. \"bb\" is an abbrev for
               (loop for advice in (ad-get-advice-info-field function class)
                     for enabled = (ad-advice-enabled advice)
                     collect
-                    (cons (format "%s %s %s"
-                                  (if enabled "Enabled " "Disabled")
-                                  (propertize fname 'face 'font-lock-function-name-face)
-                                  (ad-make-single-advice-docstring advice class nil))
+                    (cons (format
+                           "%s %s %s"
+                           (if enabled "Enabled " "Disabled")
+                           (propertize fname 'face 'font-lock-function-name-face)
+                           (ad-make-single-advice-docstring advice class nil))
                           (list function class advice))))))
 
 (defun anything-c-advice-persistent-action (func-class-advice)
