@@ -2114,17 +2114,18 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
 
 (defvar anything-c-source-file-cache
   '((name . "File Cache")
-    (init . (lambda ()
-              (require 'filecache nil t)
-              (unless anything-c-source-file-cache-initialized
-                (setq anything-c-file-cache-files
-                      (loop for item in file-cache-alist append
-                            (destructuring-bind (base &rest dirs) item
-                              (loop for dir in dirs collect
-                                    (concat dir base)))))
-                (defadvice file-cache-add-file (after file-cache-list activate)
-                  (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
-                (setq anything-c-source-file-cache-initialized t))))
+    (init
+     . (lambda ()
+         (require 'filecache nil t)
+         (unless anything-c-source-file-cache-initialized
+           (setq anything-c-file-cache-files
+                 (loop for item in file-cache-alist append
+                       (destructuring-bind (base &rest dirs) item
+                         (loop for dir in dirs collect
+                               (concat dir base)))))
+           (defadvice file-cache-add-file (after file-cache-list activate)
+             (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
+           (setq anything-c-source-file-cache-initialized t))))
     (candidates . anything-c-file-cache-files)
     (match anything-c-match-on-file-name
            anything-c-match-on-directory-name)
