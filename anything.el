@@ -3070,8 +3070,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defun anything-clear-visible-mark ()
   (with-current-buffer (anything-buffer-get)
     (mapc 'delete-overlay anything-visible-mark-overlays)
-    (set (make-local-variable 'anything-visible-mark-overlays)
-         nil)))
+    (set (make-local-variable 'anything-visible-mark-overlays) nil)))
 (add-hook 'anything-after-initialize-hook 'anything-clear-visible-mark)
 
 (defvar anything-c-marked-candidate-list nil
