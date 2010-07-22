@@ -4031,8 +4031,10 @@ replace with STR as yanked string."
              (let (line)
                (if (string= "" line)
                    (setq line  "<EMPTY LINE>")
-                   (setq line (car (split-string (thing-at-point 'line) "[\n\r]"))))
-               (format "%7d:%s:    %s" (line-number-at-pos) (marker-buffer m) line)))))
+                   (setq line (car (split-string (thing-at-point 'line)
+                                                 "[\n\r]"))))
+               (format "%7d:%s:    %s"
+                       (line-number-at-pos) (marker-buffer m) line)))))
     (loop
        with marks = global-mark-ring
        with recip = nil
