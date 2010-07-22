@@ -142,6 +142,8 @@
 ;;    Toggle anything visible bookmark at point.
 ;;  `anything-display-all-visible-marks'
 ;;    Show all `anything' visible marks strings.
+;;  `anything-next-visible-mark'
+;;    Move next anything visible mark.
 ;;  `anything-quit-and-find-file'
 ;;    Drop into `find-file' from `anything' like `iswitchb-find-file'.
 ;;  `anything-yank-selection'
@@ -3163,22 +3165,18 @@ It is analogous to `dired-get-marked-files'."
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
 (defun anything-next-visible-mark (&optional prev)
+  "Move next anything visible mark."
   (interactive)
   (with-anything-window
-    (block 'exit
-      (setq anything-visible-mark-overlays
-            (sort* anything-visible-mark-overlays
-                   '< :key 'overlay-start))
-      (let ((i (position-if (lambda (o) (< (point) (overlay-start o)))
-                            anything-visible-mark-overlays)))
-        (when prev
-          (unless anything-visible-mark-overlays (return-from 'exit nil))
-          (if (not i) (setq i (length anything-visible-mark-overlays)))
-          (if (equal (point) (overlay-start (nth (1- i) anything-visible-mark-overlays)))
-              (setq i (1- i))))
-        (when i
-          (goto-char (overlay-start (nth (if prev (1- i) i) anything-visible-mark-overlays)))
-          (anything-mark-current-line))))))
+    (let ((points (sort (mapcar 'overlay-start anything-visible-mark-overlays) '<)))
+      (ignore-errors
+        (goto-char (nth (+ (loop for pt in points
+                                 for i from 0
+                                 if (or (< (point) pt) (and prev (= (point) pt)))
+                                 do (return i))
+                           (if prev -1 0))
+                        points)))
+      (anything-mark-current-line))))
 
 (defun anything-prev-visible-mark ()
   (interactive)
