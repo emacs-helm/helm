@@ -144,6 +144,8 @@
 ;;    Show all `anything' visible marks strings.
 ;;  `anything-next-visible-mark'
 ;;    Move next anything visible mark.
+;;  `anything-prev-visible-mark'
+;;    Move previous anything visible mark.
 ;;  `anything-quit-and-find-file'
 ;;    Drop into `find-file' from `anything' like `iswitchb-find-file'.
 ;;  `anything-yank-selection'
@@ -3179,6 +3181,7 @@ It is analogous to `dired-get-marked-files'."
       (anything-mark-current-line))))
 
 (defun anything-prev-visible-mark ()
+  "Move previous anything visible mark."
   (interactive)
   (anything-next-visible-mark t))
 
