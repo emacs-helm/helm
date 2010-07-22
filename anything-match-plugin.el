@@ -429,7 +429,9 @@ If (direct-insert-match) is in the source, this function is used."
   (with-temp-buffer
     (if (string= query "")
         (insert "cat "
-                (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " "))
+                (mapconcat
+                 (lambda (f) (shell-quote-argument (expand-file-name f)))
+                 files " "))
       (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
             for i from 0
             do
@@ -438,8 +440,11 @@ If (direct-insert-match) is in the source, this function is used."
             (insert "grep -ih "
                     (if (eq flag 'identity) "" "-v ")
                     (shell-quote-argument re))
-            (when (zerop i) (insert " "
-                                    (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f))) files " ")))))
+            (when (zerop i)
+              (insert " "
+                      (mapconcat (lambda (f) (shell-quote-argument
+                                              (expand-file-name f)))
+                                 files " ")))))
     (when limit (insert (format " | head -n %d" limit)))
     (when filter (insert " | " filter))
     (buffer-string)))
