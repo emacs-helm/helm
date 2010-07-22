@@ -3848,16 +3848,17 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
                          (anything-candidate-buffer (get-buffer "*Colors*")))))
     (candidates-in-buffer)
     (get-line . buffer-substring)
-    (action ("Copy Name" . (lambda (candidate)
-                             (kill-new (anything-c-colors-get-name candidate))))
-            ("Copy RGB" . (lambda (candidate)
-                            (kill-new (anything-c-colors-get-rgb candidate))))
-            ("Insert Name" . (lambda (candidate)
-                               (with-current-buffer anything-current-buffer
-                                 (insert (anything-c-colors-get-name candidate)))))
-            ("Insert RGB" . (lambda (candidate)
-                              (with-current-buffer anything-current-buffer
-                                (insert (anything-c-colors-get-rgb candidate))))))))
+    (action
+     ("Copy Name" . (lambda (candidate)
+                      (kill-new (anything-c-colors-get-name candidate))))
+     ("Copy RGB" . (lambda (candidate)
+                     (kill-new (anything-c-colors-get-rgb candidate))))
+     ("Insert Name" . (lambda (candidate)
+                        (with-current-buffer anything-current-buffer
+                          (insert (anything-c-colors-get-name candidate)))))
+     ("Insert RGB" . (lambda (candidate)
+                       (with-current-buffer anything-current-buffer
+                         (insert (anything-c-colors-get-rgb candidate))))))))
 ;; (anything 'anything-c-source-colors)
 
 (defun anything-c-colors-get-name (candidate)
