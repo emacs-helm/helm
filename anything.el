@@ -3638,7 +3638,8 @@ Unbind C-r to prevent problems during anything-isearch."
   (anything-cleanup)
 
   (when anything-iswitchb-frame-configuration
-    (anything-set-frame/window-configuration anything-iswitchb-frame-configuration)
+    (anything-set-frame/window-configuration
+     anything-iswitchb-frame-configuration)
     (setq anything-iswitchb-frame-configuration nil)))
 
 
