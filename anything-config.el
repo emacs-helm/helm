@@ -1001,8 +1001,9 @@ After closing firefox, you will be able to browse you bookmarks.
 (defun anything-colors ()
   "Preconfigured `anything' for color."
   (interactive)
-  (anything-other-buffer '(anything-c-source-colors anything-c-source-customize-face)
-                         "*anything colors*"))
+  (anything-other-buffer
+   '(anything-c-source-colors anything-c-source-customize-face)
+   "*anything colors*"))
 
 ;;;###autoload
 (defun anything-bookmarks ()
