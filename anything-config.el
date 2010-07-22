@@ -3379,20 +3379,25 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-w3m-bookmarks)
-    (action . (("Browse Url" . (lambda (candidate)
-                                 (anything-c-w3m-browse-bookmark candidate)))
-               ("Copy Url" . (lambda (elm)
-                               (kill-new (anything-c-w3m-bookmarks-get-value elm))))
-               ("Browse Url Firefox" . (lambda (candidate)
-                                         (anything-c-w3m-browse-bookmark candidate t)))
-               ("Delete Bookmark" . (lambda (candidate)
-                                      (anything-c-w3m-delete-bookmark candidate)))
-               ("Rename Bookmark" . (lambda (candidate)
-                                      (anything-c-w3m-rename-bookmark candidate)))))
+    (action . (("Browse Url"
+                . (lambda (candidate)
+                    (anything-c-w3m-browse-bookmark candidate)))
+               ("Copy Url"
+                . (lambda (elm)
+                    (kill-new (anything-c-w3m-bookmarks-get-value elm))))
+               ("Browse Url Firefox"
+                . (lambda (candidate)
+                    (anything-c-w3m-browse-bookmark candidate t)))
+               ("Delete Bookmark"
+                . (lambda (candidate)
+                    (anything-c-w3m-delete-bookmark candidate)))
+               ("Rename Bookmark"
+                . (lambda (candidate)
+                    (anything-c-w3m-rename-bookmark candidate)))))
     (persistent-action . (lambda (candidate)
                            (if current-prefix-arg
                                (anything-c-w3m-browse-bookmark candidate t)
-                               (anything-c-w3m-browse-bookmark candidate nil t))))
+                             (anything-c-w3m-browse-bookmark candidate nil t))))
     (persistent-help . "Open URL with emacs-w3m in new tab / \
 C-u \\[anything-execute-persistent-action]: Open URL with Firefox"))
   "Needs w3m and emacs-w3m.
