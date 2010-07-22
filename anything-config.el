@@ -3991,8 +3991,9 @@ replace with STR as yanked string."
     (candidates . (lambda ()
                     (anything-aif anything-mark-ring-cache
                         it)))
-    (action . (("Goto line" . (lambda (candidate)
-                                (anything-goto-line (string-to-number candidate))))))
+    (action . (("Goto line"
+                . (lambda (candidate)
+                    (anything-goto-line (string-to-number candidate))))))
     (persistent-action . (lambda (candidate)
                            (anything-goto-line (string-to-number candidate))
                            (anything-match-line-color-current-line)))
