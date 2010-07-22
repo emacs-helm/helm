@@ -2691,7 +2691,8 @@ You can set user options `fit-frame-max-width-percent' and
       (funcall func)
       (beginning-of-line)
       (and realvalue
-           (put-text-property (point) (point-at-eol) 'anything-realvalue realvalue))
+           (put-text-property (point) (point-at-eol)
+                              'anything-realvalue realvalue))
       (anything-mark-current-line))))
 
 (defmacro anything-edit-current-selection (&rest forms)
