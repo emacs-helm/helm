@@ -3804,20 +3804,22 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
                (loop for (command . doc) in commands
                      for cmdname = (symbol-name command)
                      collect
-                     (cons (format "Command: %s\n %s"
-                                   (propertize cmdname 'face font-lock-function-name-face)
-                                   (adoc-first-line doc))
-                           (assoc cmdname imenu--index-alist)))
+                     (cons
+                      (format "Command: %s\n %s"
+                              (propertize cmdname 'face font-lock-function-name-face)
+                              (adoc-first-line doc))
+                      (assoc cmdname imenu--index-alist)))
                (loop with var-alist = (cdr (assoc "Variables" imenu--index-alist))
                      for (option doc default) in options
                      for optname = (symbol-name option)
                      collect
-                     (cons (format "Option: %s\n %s\n default = %s"
-                                   (propertize optname 'face font-lock-variable-name-face)
-                                   (adoc-first-line doc)
-                                   (adoc-prin1-to-string default))
-                           (assoc optname
-                                  var-alist)))))))
+                     (cons
+                      (format "Option: %s\n %s\n default = %s"
+                              (propertize optname 'face font-lock-variable-name-face)
+                              (adoc-first-line doc)
+                              (adoc-prin1-to-string default))
+                      (assoc optname
+                             var-alist)))))))
     anything-c-auto-document-data))
 
 ;; (anything 'anything-c-source-commands-and-options-in-file)
