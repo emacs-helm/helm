@@ -138,6 +138,8 @@
 ;;    Scroll other window (not *Anything* window) upward.
 ;;  `anything-scroll-other-window-down'
 ;;    Scroll other window (not *Anything* window) downward.
+;;  `anything-toggle-visible-mark'
+;;    Toggle anything visible bookmark at point.
 ;;  `anything-display-all-visible-marks'
 ;;    Show all `anything' visible marks strings.
 ;;  `anything-quit-and-find-file'
@@ -3077,34 +3079,40 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   "[OBSOLETE] DO NOT USE!!")
 (defvar anything-marked-candidates nil
   "Marked candadates. List of (source . real) pair.")
+
+(defun anything-this-visible-mark ()
+  (loop for o in anything-visible-mark-overlays
+        when (equal (line-beginning-position) (overlay-start o))
+        do   (return o)))
+
+(defun anything-delete-visible-mark (overlay)
+  (setq anything-c-marked-candidate-list
+        (remove (anything-current-line-contents) anything-c-marked-candidate-list))
+  (setq anything-marked-candidates
+        (remove
+         (cons (anything-get-current-source) (anything-get-selection))
+         anything-marked-candidates))
+  (delete-overlay overlay)
+  (setq anything-visible-mark-overlays (delq overlay anything-visible-mark-overlays)))
+
+(defun anything-make-visible-mark ()
+  (let ((o (make-overlay (line-beginning-position) (1+ (line-end-position)))))
+    (overlay-put o 'face anything-visible-mark-face)
+    (overlay-put o 'source (assoc-default 'name (anything-get-current-source)))
+    (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
+    (add-to-list 'anything-visible-mark-overlays o))
+  (push (anything-current-line-contents) anything-c-marked-candidate-list)
+  (push (cons (anything-get-current-source) (anything-get-selection))
+        anything-marked-candidates))
+
 (defun anything-toggle-visible-mark ()
+  "Toggle anything visible bookmark at point."
   (interactive)
   (with-anything-window
-    (let ((display (anything-current-line-contents))
-          (source (anything-get-current-source))
-          (selection (anything-get-selection)))
-      (anything-aif (loop for o in anything-visible-mark-overlays
-                          when (equal (line-beginning-position) (overlay-start o))
-                          do   (return o))
-          ;; delete
-          (progn
-            (setq anything-c-marked-candidate-list
-                  (remove
-                   display anything-c-marked-candidate-list))
-            (setq anything-marked-candidates
-                  (remove
-                   (cons source selection)
-                   anything-marked-candidates))
-            (delete-overlay it)
-            (setq anything-visible-mark-overlays (delq it anything-visible-mark-overlays)))
-        (let ((o (make-overlay (line-beginning-position) (1+ (line-end-position)))))
-          (overlay-put o 'face anything-visible-mark-face)
-          (overlay-put o 'source (assoc-default 'name source))
-          (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
-          (add-to-list 'anything-visible-mark-overlays o)
-          (push display anything-c-marked-candidate-list)
-          (push (cons source selection) anything-marked-candidates)))
-      (anything-next-line))))
+    (anything-aif (anything-this-visible-mark)
+        (anything-delete-visible-mark it)
+      (anything-make-visible-mark))
+    (anything-next-line)))
 
 (defun anything-display-all-visible-marks ()
   "Show all `anything' visible marks strings."
