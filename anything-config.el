@@ -3048,7 +3048,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                 candidate)))
                       (if anything-current-prefix-arg
                           (addressbook-set-mail-buffer1 bmk 'append)
-                          (addressbook-set-mail-buffer1 bmk)))))
+                        (addressbook-set-mail-buffer1 bmk)))))
                ("Edit Bookmark"
                 . (lambda (candidate)
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
@@ -3067,7 +3067,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                        (if (> (length mlist) 1)
                            (anything-comp-read
                             "Insert Mail Address: " mlist :must-match t)
-                           (car mlist))))))
+                         (car mlist))))))
                ("Show annotation"
                 . (lambda (candidate)
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
@@ -3078,11 +3078,12 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
                                 candidate)))
                       (bookmark-edit-annotation bmk))))
-               ("Show Google map" . (lambda (candidate)
-                                      (let* ((bmk (anything-bookmark-get-bookmark-from-name
-                                                  candidate))
-                                             (full-bmk (assoc bmk bookmark-alist)))
-                                        (addressbook-google-map full-bmk))))))))
+               ("Show Google map"
+                . (lambda (candidate)
+                    (let* ((bmk (anything-bookmark-get-bookmark-from-name
+                                 candidate))
+                           (full-bmk (assoc bmk bookmark-alist)))
+                      (addressbook-google-map full-bmk))))))))
 
 
 (defun anything-c-bmkext-addressbook-setup-alist ()
