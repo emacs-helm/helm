@@ -3120,7 +3120,8 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
          (cons (anything-get-current-source) (anything-get-selection))
          anything-marked-candidates))
   (delete-overlay overlay)
-  (setq anything-visible-mark-overlays (delq overlay anything-visible-mark-overlays)))
+  (setq anything-visible-mark-overlays
+        (delq overlay anything-visible-mark-overlays)))
 
 (defun anything-make-visible-mark ()
   (let ((o (make-overlay (point-at-bol) (1+ (point-at-eol)))))
