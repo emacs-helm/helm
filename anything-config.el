@@ -4077,56 +4077,57 @@ replace with STR as yanked string."
   "Collecting register contents and appropriate commands."
   (loop for (char . val) in register-alist
         for key    = (single-key-description char)
-        for string-actions = (cond
-                              ((numberp val)
-                               (list (int-to-string val)
-                                     'insert-register
-                                     'increment-register))
-                              ((markerp val)
-                               (let ((buf (marker-buffer val)))
-                                 (if (null buf)
-                                     (list "a marker in no buffer")
-                                   (list (concat
-                                          "a buffer position:"
-                                          (buffer-name buf)
-                                          ", position "
-                                          (int-to-string (marker-position val)))
-                                         'jump-to-register
-                                         'insert-register))))
-                              ((and (consp val) (window-configuration-p (car val)))
-                               (list "window configuration."
-                                     'jump-to-register))
-                              ((and (consp val) (frame-configuration-p (car val)))
-                               (list "frame configuration."
-                                     'jump-to-register))
-                              ((and (consp val) (eq (car val) 'file))
-                               (list (concat "file:"
-                                             (prin1-to-string (cdr val))
-                                             ".")
-                                     'jump-to-register))
-                              ((and (consp val) (eq (car val) 'file-query))
-                               (list (concat "file:a file-query reference: file "
-                                             (car (cdr val))
-                                             ", position "
-                                             (int-to-string (car (cdr (cdr val))))
-                                             ".")
-                                     'jump-to-register))
-                              ((consp val)
-                               (let ((lines (format "%4d" (length val))))
-                                 (list (format "%s: %s\n" lines
-                                               (truncate-string-to-width
-                                                (mapconcat 'identity (list (car val))
-                                                           ;; (mapconcat (lambda (y) y) val
-                                                           "^J") (- (window-width) 15)))
-                                       'insert-register)))
-                              ((stringp val)
-                               (list ;; without properties
-                                (substring-no-properties val)
-                                'insert-register
-                                'append-to-register
-                                'prepend-to-register))
-                              (t
-                               "GARBAGE!"))
+        for string-actions =
+        (cond
+         ((numberp val)
+          (list (int-to-string val)
+                'insert-register
+                'increment-register))
+         ((markerp val)
+          (let ((buf (marker-buffer val)))
+            (if (null buf)
+                (list "a marker in no buffer")
+              (list (concat
+                     "a buffer position:"
+                     (buffer-name buf)
+                     ", position "
+                     (int-to-string (marker-position val)))
+                    'jump-to-register
+                    'insert-register))))
+         ((and (consp val) (window-configuration-p (car val)))
+          (list "window configuration."
+                'jump-to-register))
+         ((and (consp val) (frame-configuration-p (car val)))
+          (list "frame configuration."
+                'jump-to-register))
+         ((and (consp val) (eq (car val) 'file))
+          (list (concat "file:"
+                        (prin1-to-string (cdr val))
+                        ".")
+                'jump-to-register))
+         ((and (consp val) (eq (car val) 'file-query))
+          (list (concat "file:a file-query reference: file "
+                        (car (cdr val))
+                        ", position "
+                        (int-to-string (car (cdr (cdr val))))
+                        ".")
+                'jump-to-register))
+         ((consp val)
+          (let ((lines (format "%4d" (length val))))
+            (list (format "%s: %s\n" lines
+                          (truncate-string-to-width
+                           (mapconcat 'identity (list (car val))
+                                      ;; (mapconcat (lambda (y) y) val
+                                      "^J") (- (window-width) 15)))
+                  'insert-register)))
+         ((stringp val)
+          (list ;; without properties
+           (substring-no-properties val)
+           'insert-register
+           'append-to-register
+           'prepend-to-register))
+         (t
+          "GARBAGE!"))
         collect (cons (format "register %3s: %s" key (car string-actions))
                       (cons char (cdr string-actions)))))
 
