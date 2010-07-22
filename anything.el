@@ -3656,7 +3656,8 @@ Unbind C-r to prevent problems during anything-isearch."
 shown yet and bind anything commands in iswitchb."
   (unless (or (anything-empty-buffer-p anything-buffer)
               anything-iswitchb-frame-configuration)
-    (setq anything-iswitchb-frame-configuration (anything-current-frame/window-configuration))
+    (setq anything-iswitchb-frame-configuration
+          (anything-current-frame/window-configuration))
 
     (save-selected-window 
       (if (not anything-samewindow)
