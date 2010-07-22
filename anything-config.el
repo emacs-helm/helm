@@ -1096,11 +1096,14 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
      (mode-line . "Press TAB to select action.")
      (action
       ("Kill Regexp as sexp" .
-       (lambda (x) (anything-c-regexp-kill-new (prin1-to-string (funcall (anything-attr 'regexp))))))
+       (lambda (x) (anything-c-regexp-kill-new
+                    (prin1-to-string (funcall (anything-attr 'regexp))))))
       ("Query Replace Regexp" .
-       (lambda (x) (apply 'query-replace-regexp (anything-c-query-replace-args (point)))))
+       (lambda (x) (apply 'query-replace-regexp
+                          (anything-c-query-replace-args (point)))))
       ("Kill Regexp" .
-       (lambda (x) (anything-c-regexp-kill-new (funcall (anything-attr 'regexp)))))))))
+       (lambda (x) (anything-c-regexp-kill-new
+                    (funcall (anything-attr 'regexp)))))))))
 
 (defun anything-c-query-replace-args (start-point)
   ;; create arguments of `query-replace-regexp'.
