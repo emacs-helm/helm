@@ -3326,14 +3326,17 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
-    (action . (("Browse Url Firefox" . (lambda (candidate)
-                                         (browse-url-firefox
-                                          (anything-c-firefox-bookmarks-get-value candidate))))
-               ("Browse Url w3m" . (lambda (candidate)
-                                 (w3m-browse-url
-                                  (anything-c-firefox-bookmarks-get-value candidate))))
-               ("Copy Url" . (lambda (elm)
-                               (kill-new (anything-c-w3m-bookmarks-get-value elm))))))))
+    (action . (("Browse Url Firefox"
+                . (lambda (candidate)
+                    (browse-url-firefox
+                     (anything-c-firefox-bookmarks-get-value candidate))))
+               ("Browse Url w3m"
+                . (lambda (candidate)
+                    (w3m-browse-url
+                     (anything-c-firefox-bookmarks-get-value candidate))))
+               ("Copy Url"
+                . (lambda (elm)
+                    (kill-new (anything-c-w3m-bookmarks-get-value elm))))))))
 
 ;; (anything 'anything-c-source-firefox-bookmarks)
 
