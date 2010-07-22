@@ -3157,7 +3157,7 @@ It is analogous to `dired-get-marked-files'."
 
 (defun anything-revive-visible-mark ()
   (with-current-buffer anything-buffer
-    (dolist (o anything-visible-mark-overlays do)
+    (dolist (o anything-visible-mark-overlays); do)
       (goto-char (point-min))
       (while (and (search-forward (overlay-get o 'string) nil t)
                   (anything-current-source-name= (overlay-get o 'source)))
