@@ -3747,10 +3747,11 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
   (anything-c-simple-call-tree-find-definition candidate))
 
 (defun anything-c-simple-call-tree-find-definition (candidate)
-  (find-function (intern
-                  (nth (mod anything-c-simple-call-tree-function-index
-                            (length anything-c-simple-call-tree-related-functions))
-                       anything-c-simple-call-tree-related-functions))))
+  (find-function
+   (intern
+    (nth (mod anything-c-simple-call-tree-function-index
+              (length anything-c-simple-call-tree-related-functions))
+         anything-c-simple-call-tree-related-functions))))
 
 ;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
