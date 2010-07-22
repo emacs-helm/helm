@@ -1453,17 +1453,17 @@ It is cleared after executing action.")
   "Create `anything' summary."
   (save-excursion
     (goto-char (point-min))
-    (loop while (re-search-forward anything-c-create-summary-index-regexp nil t)
-          collect (cond ((match-beginning 1)
-                         (cons 'section (match-string-no-properties 1)))
-                        ((match-beginning 2)
-                         (cons 'source
-                               (cons (match-string-no-properties 2)
-                                     (assoc-default 'name (symbol-value (intern (match-string-no-properties 2)))))))
-                        ((match-beginning 3)
-                         (cons 'source
-                               (cons (match-string-no-properties 3)
-                                     (assoc-default 'name (symbol-value (intern (match-string-no-properties 3)))))))))))
+    (loop with it
+          while (re-search-forward anything-c-create-summary-index-regexp nil t)
+          collect
+          (cond ((setq it (match-string-no-properties 1))
+                 (cons 'section it))
+                ((setq it (match-string-no-properties 2))
+                 `(source ,it .
+                          ,(assoc-default 'name (symbol-value (intern it)))))
+                ((setq it (match-string-no-properties 3))
+                 `(source ,it .
+                          ,(assoc-default 'name (symbol-value (intern it)))))))))
 
 ;; (find-epp (anything-c-create-summary))
 
