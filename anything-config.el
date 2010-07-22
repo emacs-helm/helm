@@ -3780,7 +3780,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
   '((name . "Commands/Options in file")
     (header-name
      . (lambda (x) (format "Commands/Options in %s"
-                           (buffer-local-value 'buffer-file-name anything-current-buffer))))
+                           (buffer-local-value 'buffer-file-name
+                                               anything-current-buffer))))
     (candidates . anything-command-and-options-candidates)
     (multiline)
     (action . imenu))
