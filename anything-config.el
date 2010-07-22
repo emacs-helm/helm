@@ -1965,9 +1965,10 @@ Useful in dired buffers when there is inserted subdirs."
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
-    (action .
-     (("Hardlink File" . (lambda (candidate)
-                           (anything-dired-action candidate :action 'hardlink)))))))
+    (action
+     . (("Hardlink File"
+         . (lambda (candidate)
+             (anything-dired-action candidate :action 'hardlink)))))))
 
 (defun* anything-dired-action (candidate &key action follow)
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
