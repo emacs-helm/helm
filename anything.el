@@ -3044,20 +3044,16 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
      (some-window
       (lambda (w) (not (string= anything-buffer (buffer-name (window-buffer w)))))
       'no-minibuffer 'current-frame))
-    (call-interactively command)))
+    (funcall command anything-scroll-amount)))
 
 (defun anything-scroll-other-window ()
   "Scroll other window (not *Anything* window) upward."
   (interactive)
-  (anything-scroll-other-window-base (lambda ()
-                                       (interactive)
-                                       (scroll-up anything-scroll-amount))))
+  (anything-scroll-other-window-base 'scroll-up))
 (defun anything-scroll-other-window-down ()
   "Scroll other window (not *Anything* window) downward."
   (interactive)
-  (anything-scroll-other-window-base (lambda ()
-                                       (interactive)
-                                       (scroll-down anything-scroll-amount))))
+  (anything-scroll-other-window-base 'scroll-down))
 
 ;; (@* "Utility: Visible Mark")
 (defface anything-visible-mark
