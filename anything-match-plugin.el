@@ -382,21 +382,21 @@ The smaller  this value is, the slower highlight is.")
           (anything-mp-highlight-region (point-min) end re 'anything-match))))
                          
 ;;;; source compier
-(defvar anything-default-match-functions
+(defvar anything-mp-default-match-functions
   '(anything-exact-match anything-mp-3p-match anything-mp-3-match))
-(defvar anything-default-search-functions
+(defvar anything-mp-default-search-functions
   '(anything-exact-search anything-mp-3p-search anything-mp-3-search))
-(defvar anything-default-search-backward-functions
+(defvar anything-mp-default-search-backward-functions
   '(anything-exact-search-backward anything-mp-3p-search-backward
                                    anything-mp-3-search-backward))
 (defun anything-compile-source--match-plugin (source)
   (let ((searchers (if (assoc 'search-from-end source)
-                       anything-default-search-backward-functions
-                     anything-default-search-functions)))
+                       anything-mp-default-search-backward-functions
+                     anything-mp-default-search-functions)))
     `(,(if (or (assoc 'candidates-in-buffer source)
                (equal '(identity) (assoc-default 'match source)))
            '(match identity)
-         `(match ,@anything-default-match-functions
+         `(match ,@anything-mp-default-match-functions
                  ,@(assoc-default 'match source)))
       (search ,@searchers
               ,@(assoc-default 'search source))
