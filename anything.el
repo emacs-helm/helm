@@ -1961,18 +1961,17 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
 (defun anything-match-from-candidates (cands matchfns limit)
   (let (matches)
     (condition-case nil
-       (let ((item-count 0) 
-             exit newmatches)
-         (clrhash anything-match-hash)
-         (dolist (match matchfns)
-           (dolist (candidate cands)
-             (when (funcall match (anything-candidate-get-display candidate))
-               (anything-accumulate-candidates-internal
-                candidate newmatches anything-match-hash item-count limit)))
-           (setq matches (append matches (reverse newmatches)))
-           (if exit (return))))
-
-     (invalid-regexp (setq matches nil)))
+        (let ((item-count 0) exit)
+          (clrhash anything-match-hash)
+          (dolist (match matchfns)
+            (let (newmatches)
+              (dolist (candidate cands)
+                (when (funcall match (anything-candidate-get-display candidate))
+                  (anything-accumulate-candidates-internal
+                   candidate newmatches anything-match-hash item-count limit)))
+              (setq matches (append matches (reverse newmatches)))
+              (if exit (return)))))
+      (invalid-regexp (setq matches nil)))
     matches))
 
 (defun anything-compute-matches-internal (source)
