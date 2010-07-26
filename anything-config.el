@@ -1658,7 +1658,7 @@ buffer that is not the current buffer."
            ("Find file other frame" . find-file-other-frame))))))
 
 ;; (anything 'anything-c-source-find-files)
-    
+
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
 If LEVEL is positive reduce from end else from beginning.
@@ -1761,7 +1761,7 @@ If prefix numeric arg is given go ARG level down."
                  (if nosort result (sort result 'string<))))))
 
       (set-text-properties 0 (length path) nil path)
-      (setq anything-pattern path)
+      (setq anything-pattern (replace-regexp-in-string " " ".*" path))
       (cond ((or (file-regular-p path)
                  (and ffap-url-regexp (string-match ffap-url-regexp path)))
              (list path))
