@@ -2642,11 +2642,11 @@ To enable fitting, set both `anything-inhibit-fit-frame-flag' and
 You can set user options `fit-frame-max-width-percent' and
 `fit-frame-max-height-percent' to control max frame size."
   (declare (warn (unresolved 0)))
-  (when (and (require 'fit-frame nil t)
+  (when (and (not anything-inhibit-fit-frame-flag)
+             (anything-window)
+             (require 'fit-frame nil t)
              (boundp 'fit-frame-inhibit-fitting-flag)
-             (not anything-inhibit-fit-frame-flag)
-             (not fit-frame-inhibit-fitting-flag)
-             (anything-window))
+             (not fit-frame-inhibit-fitting-flag))
     (ignore-errors
       (with-anything-window
         (fit-frame nil nil nil t)
