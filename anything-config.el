@@ -1837,10 +1837,11 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 (defun anything-find-files ()
   "Preconfigured `anything' for anything implementation of `find-file'."
   (interactive)
-  (anything 'anything-c-source-find-files
-            (anything-find-files-input (ffap-guesser)
-                                       (thing-at-point 'filename))
-            "Find Files or Url: " nil nil "*Anything Find Files*"))
+  (anything :sources 'anything-c-source-find-files
+            :input (anything-find-files-input (ffap-guesser)
+                                              (thing-at-point 'filename))
+            :prompt "Find Files or Url: "
+            :buffer "*Anything Find Files*"))
 
 (defun anything-c-current-directory ()
   "Return current-directory name at point.
@@ -2092,6 +2093,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (or (anything
+       :sources
        `((name . ,(concat "Read file name" anything-c-find-files-doc-header))
          ;; It is needed for filenames with capital letters
          (disable-shortcuts)
@@ -2106,7 +2108,10 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
          (persistent-help . "Expand Candidate")
          (volatile)
          (action . (("candidate" . ,'identity))))
-         initial-input prompt 'noresume nil buffer)
+       :input initial-input
+       :prompt prompt
+       :resume 'noresume
+       :buffer buffer)
       (keyboard-quit)))
 
 ;;; File Cache
@@ -3256,16 +3261,19 @@ Needs bookmark-ext.el
 
 http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
   (interactive)
-  (anything '(anything-c-source-bookmark-files&dirs
-              anything-c-source-bookmark-w3m
-              anything-c-source-bmkext-addressbook
-              anything-c-source-bookmark-gnus
-              anything-c-source-bookmark-info
-              anything-c-source-bookmark-man
-              anything-c-source-bookmark-images
-              anything-c-source-bookmark-su-files&dirs
-              anything-c-source-bookmark-ssh-files&dirs)
-            nil "SearchBookmark: " nil nil "*anything bmkext*"))
+  (anything
+   :sources
+   '(anything-c-source-bookmark-files&dirs
+     anything-c-source-bookmark-w3m
+     anything-c-source-bmkext-addressbook
+     anything-c-source-bookmark-gnus
+     anything-c-source-bookmark-info
+     anything-c-source-bookmark-man
+     anything-c-source-bookmark-images
+     anything-c-source-bookmark-su-files&dirs
+     anything-c-source-bookmark-ssh-files&dirs)
+   :prompt "SearchBookmark: "
+   :buffer "*anything bmkext*"))
 
 
 ;; Firefox bookmarks
@@ -5632,6 +5640,7 @@ Collection can be a list, vector, obarray or hash-table."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (or (anything
+       :sources
        `((name . "Completions")
          (candidates
           . (lambda ()
@@ -5641,7 +5650,10 @@ Collection can be a list, vector, obarray or hash-table."
          (requires-pattern . ,requires-pattern)
          (volatile)
          (action . (("candidate" . ,'identity))))
-       initial-input prompt 'noresume nil buffer)
+       :input initial-input
+       :prompt prompt
+       :resume 'noresume
+       :buffer buffer)
       (keyboard-quit)))
 
 (defun anything-c-get-pid-from-process-name (process-name)
