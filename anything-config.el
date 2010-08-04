@@ -1853,11 +1853,29 @@ Useful in dired buffers when there is inserted subdirs."
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
   (let* ((def-dir (anything-c-current-directory))
+         (lib     (anything-find-library-at-point))
          (file-p  (and fap (file-exists-p fap)
                        (file-exists-p
                         (file-name-directory (expand-file-name tap def-dir)))))
-         (input   (if file-p (expand-file-name tap def-dir) fap)))
+         (input   (cond (file-p (expand-file-name tap def-dir))
+                        (lib)
+                        (t fap))))
     (or input (expand-file-name def-dir))))
+
+(defun anything-find-library-at-point ()
+  "Find library path when inside a `require' sexp."
+  (let* ((beg-sexp (save-excursion (re-search-backward "(" (point-at-bol) t)))
+         (end-sexp (save-excursion (re-search-forward ")" (point-at-eol) t)))
+         (sexp     (and beg-sexp end-sexp
+                        (buffer-substring (1+ beg-sexp) (1- end-sexp)))))
+    (when (and sexp (string-match "require \'.*" sexp))
+      (find-library-name
+       (replace-regexp-in-string
+        "'" ""
+        ;; If require use third arg, ignore it,
+        ;; always use library path found in `load-path'.
+        (second (split-string (match-string 0 sexp))))))))
+
 
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
