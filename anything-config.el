@@ -5033,7 +5033,7 @@ Return an alist with elements like (data . number_results)."
   (anything-candidate-buffer anything-current-buffer))
 
 (defun anything-c-occur-get-line (s e)
-  (format "%7d:%s" (line-number-at-pos s) (buffer-substring s e)))
+  (format "%7d:%s" (line-number-at-pos (1- s)) (buffer-substring s e)))
 
 (defvar anything-c-source-occur
   '((name . "Occur")
