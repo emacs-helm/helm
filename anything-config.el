@@ -5029,35 +5029,20 @@ Return an alist with elements like (data . number_results)."
                          "*anything commands*"))
 
 ;; Occur
+(defun anything-c-occur-init ()
+  (anything-candidate-buffer anything-current-buffer))
 
-(defun anything-c-occur-goto-line (candidate)
-  "Goto line action for anything-c-source-occur."
-  (anything-goto-line (string-to-number candidate)))
-
-(defun anything-c-occur-persistent-action (candidate)
-  "Persistent action for anything occur source."
-  (anything-c-occur-goto-line candidate)
-  (anything-match-line-color-current-line))
-
-(defun anything-c-get-occur-candidates ()
-  "Get `anything-c-source-occur' candidates."
-  (with-temp-buffer
-    (let ((count (occur-engine
-                  anything-pattern
-                  (list anything-current-buffer) (current-buffer)
-                  list-matching-lines-default-context-lines nil
-                  list-matching-lines-buffer-name-face
-                  nil list-matching-lines-face
-                  (not (eq occur-excluded-properties t)))))
-      (when (> count 0)
-        (cdr (split-string (buffer-string) "\n" t))))))
+(defun anything-c-occur-get-line (s e)
+  (format "%7d:%s" (line-number-at-pos s) (buffer-substring s e)))
 
 (defvar anything-c-source-occur
   '((name . "Occur")
-    (candidates . anything-c-get-occur-candidates)
-    (persistent-action . anything-c-occur-persistent-action)
-    (persistent-help . "Goto Line")
-    (action . anything-c-occur-goto-line)
+    (init . anything-c-occur-init)
+    (candidates-in-buffer)
+    (migemo)
+    (get-line . anything-c-occur-get-line)
+    (type . line)
+    (recenter)
     (requires-pattern . 1)
     (delayed)
     (volatile)))
