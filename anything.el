@@ -2046,26 +2046,24 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
 `anything-idle-delay' seconds."
   (with-anything-quittable
     (anything-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-    (when (sit-for (if anything-input-idle-delay
-                       (max 0 (- anything-idle-delay anything-input-idle-delay))
-                     anything-idle-delay))
-      (with-current-buffer anything-buffer        
-        (save-excursion
-          (goto-char (point-max))
-          (mapc 'anything-process-source delayed-sources)
-          (when (and (not (anything-empty-buffer-p))
-                     ;; no selection yet
-                     (= (overlay-start anything-selection-overlay)
-                        (overlay-end anything-selection-overlay)))
-            (goto-char (point-min))
-            (anything-next-line)))
-        (save-excursion
+    (with-current-buffer anything-buffer        
+      (save-excursion
+        (goto-char (point-max))
+        (mapc 'anything-process-source delayed-sources)
+        (when (and (not (anything-empty-buffer-p))
+                   ;; no selection yet
+                   (= (overlay-start anything-selection-overlay)
+                      (overlay-end anything-selection-overlay)))
           (goto-char (point-min))
-          (anything-log-run-hook 'anything-update-hook))
-        (anything-maybe-fit-frame)))))
+          (anything-next-line)))
+      (save-excursion
+        (goto-char (point-min))
+        (anything-log-run-hook 'anything-update-hook))
+      (anything-maybe-fit-frame))))
 
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
+(defvar anything-process-delayed-sources-timer nil)
 (defun anything-update ()
   "Update the list of matches in the anything buffer according to
 the current pattern."
@@ -2092,10 +2090,15 @@ the current pattern."
             (mapc 'anything-process-source delayed-sources)
           (anything-maybe-fit-frame)
           (when delayed-sources
-            (run-with-idle-timer (if (featurep 'xemacs) 0.1 0)
-                                 nil
-                                 'anything-process-delayed-sources
-                                 delayed-sources))
+            (anything-new-timer
+             'anything-process-delayed-sources-timer
+             (run-with-idle-timer
+              (if anything-input-idle-delay
+                  (max 0 (- anything-idle-delay anything-input-idle-delay))
+                anything-idle-delay)
+              nil
+              'anything-process-delayed-sources
+              delayed-sources)))
           ;; FIXME I want to execute anything-after-update-hook
           ;; AFTER processing delayed sources
           (anything-log-run-hook 'anything-after-update-hook))
