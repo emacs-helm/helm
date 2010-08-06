@@ -2304,7 +2304,7 @@ If action buffer is selected, back to the anything buffer."
          (set-window-buffer (get-buffer-window anything-action-buffer)
                             anything-buffer)
          (kill-buffer anything-action-buffer)
-         (anything-set-pattern anything-input))
+         (anything-set-pattern anything-input 'noupdate))
         (t
          (setq anything-saved-selection (anything-get-selection))
          (unless anything-saved-selection
@@ -2708,11 +2708,15 @@ You can edit the line."
     (lambda () ,@forms)))
 (put 'anything-edit-current-selection 'lisp-indent-function 0)
 
-(defun anything-set-pattern (pattern)
-  "Set minibuffer contents to PATTERN."
+(defun anything-set-pattern (pattern &optional noupdate)
+  "Set minibuffer contents to PATTERN.
+if optional NOUPDATE is non-nil, anything buffer is not changed."
   (with-selected-window (minibuffer-window)
     (delete-minibuffer-contents)
-    (insert pattern)))
+    (insert pattern))
+  (when noupdate
+    (anything-hooks 'cleanup)
+    (run-with-idle-timer 0 nil 'anything-hooks 'setup)))
 
 (defun anything-delete-minibuffer-contents ()
   "Same as `delete-minibuffer-contents' but this is a command."
