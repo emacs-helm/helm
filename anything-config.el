@@ -1072,7 +1072,7 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
    (prin1-to-string (funcall (anything-attr 'regexp)))))
 
 (defun anything-c-kill-regexp (candidate)
-  (anything-c-regexp-kill-new anything-pattern))
+  (anything-c-regexp-kill-new (funcall (anything-attr 'regexp))))
 
 (defun anything-c-query-replace-args (regexp)
   "create arguments of `query-replace-regexp' action in `anything-regexp'."
@@ -1100,7 +1100,13 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
     (delayed)
     (requires-pattern . 2)
     (mode-line . "Press TAB to select action.")
-    (regexp . (lambda () anything-pattern))
+    ;; RUBIKITCH:
+    ;; I use here `anything-input' because `anything-pattern' is lost when
+    ;; using actions from action buffer (otherwise no e.g from RET, C-e or C-j).
+    ;; It seem `anything-select-action' reset `anything-pattern' to empty too early.
+    ;; Though the regexp attribute stay defined (tested with *-attr-defined).
+    ;; Can you fix it?
+    (regexp . (lambda () anything-input))
     (action . (("Query Replace Regexp" . anything-c-query-replace-regexp)
                ("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
                ("Kill Regexp" . anything-c-kill-regexp)))))
