@@ -1062,73 +1062,59 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
    nil nil))
 
 ;;; Regexp
-;;;###autoload
-(defun anything-query-replace-regexp (&rest args)
-  "Preconfigured `anything' : Drop-in replacement of `query-replace-regexp' with building regexp visually."
-  (interactive
-   (let ((common
-          (anything-c-regexp-base
-           "Query Replace Regexp: "
-           '((name . "Lines matching Regexp")
-             (mode-line . "Set replace start line and type RET.")
-             (action . anything-c-query-replace-args)))))
-     (if (not common)
-         (keyboard-quit))
-     (list (car common) (cadr common) (caddr common)
-	   ;; These are done separately here
-	   ;; so that command-history will record these expressions
-	   ;; rather than the values they had this time.
-           ;;
-           ;; This idea is borrowed from original `query-replace-regexp'.
-           (if (and transient-mark-mode mark-active)
-               (region-beginning))
-           (if (and transient-mark-mode mark-active)
-               (region-end)))))
-  (apply 'query-replace-regexp args))
+(defun anything-c-query-replace-regexp (candidate)
+  (let ((regexp (funcall (anything-attr 'regexp))))
+    (apply 'query-replace-regexp
+           (anything-c-query-replace-args regexp))))
 
-;;;###autoload
-(defun anything-regexp ()
-  "Preconfigured `anything' : It is like `re-builder'. It helps buliding regexp and replacement."
-  (interactive)
-  (anything-c-regexp-base
-   "Regexp: "
-   '((name . "Regexp Builder")
-     (mode-line . "Press TAB to select action.")
-     (action
-      ("Kill Regexp as sexp" .
-       (lambda (x) (anything-c-regexp-kill-new
-                    (prin1-to-string (funcall (anything-attr 'regexp))))))
-      ("Query Replace Regexp" .
-       (lambda (x) (apply 'query-replace-regexp
-                          (anything-c-query-replace-args (point)))))
-      ("Kill Regexp" .
-       (lambda (x) (anything-c-regexp-kill-new
-                    (funcall (anything-attr 'regexp)))))))))
+(defun anything-c-kill-regexp-as-sexp (candidate)
+  (anything-c-regexp-kill-new
+   (prin1-to-string (funcall (anything-attr 'regexp)))))
 
-(defun anything-c-query-replace-args (start-point)
-  ;; create arguments of `query-replace-regexp'.
-  (let ((region-only (and transient-mark-mode mark-active))
-        (regexp (funcall (anything-attr 'regexp))))
+(defun anything-c-kill-regexp (candidate)
+  (anything-c-regexp-kill-new anything-pattern))
+
+(defun anything-c-query-replace-args (regexp)
+  "create arguments of `query-replace-regexp' action in `anything-regexp'."
+  (let ((region-only (anything-region-active-p)))
     (list
      regexp
      (query-replace-read-to regexp
-                            (format "Query replace regexp %s%s%s with: "
-                                    (if region-only "in region " "")
-                                    regexp
-                                    (if current-prefix-arg "(word) " ""))
+                            (format "Query replace %s regexp %s"
+                                    (if anything-current-prefix-arg "word " "")
+                                    (if region-only "in region " ""))
                             t)
-     current-prefix-arg)))
+     anything-current-prefix-arg
+     (when region-only (region-beginning))
+     (when region-only (region-end)))))
+
+(defvar anything-c-source-regexp
+  '((name . "Regexp Builder")
+    (init . (lambda ()
+              (anything-candidate-buffer anything-current-buffer)))
+    (candidates-in-buffer)
+    (get-line . anything-c-regexp-get-line)
+    (persistent-action . anything-c-regexp-persistent-action)
+    (persistent-help . "Show this line")
+    (multiline)
+    (delayed)
+    (requires-pattern . 2)
+    (mode-line . "Press TAB to select action.")
+    (regexp . (lambda () anything-pattern))
+    (action . (("Query Replace Regexp" . anything-c-query-replace-regexp)
+               ("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
+               ("Kill Regexp" . anything-c-kill-regexp)))))
 
 (defun anything-c-regexp-get-line (s e)
   (propertize
    (apply 'concat
           ;; Line contents
-          (format "%5d: %s" (line-number-at-pos s) (buffer-substring s e))
+          (format "%5d: %s" (line-number-at-pos (1- s)) (buffer-substring s e))
           ;; subexps
           (loop for i from 0 to (1- (/ (length (match-data)) 2))
-                collect (format "\n         \\%s = %s"
-                                (if (zerop i) "&" i)
-                                (match-string i))))
+             collect (format "\n         \\%s = %s"
+                             (if (zerop i) "&" i)
+                             (match-string i))))
    ;; match beginning
    ;; KLUDGE: point of anything-candidate-buffer is +1 than that of anything-current-buffer.
    ;; It is implementation problem of candidates-in-buffer.
@@ -1145,45 +1131,28 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (goto-char pt)
   (anything-persistent-highlight-point))
 
-(defun anything-c-regexp-base (prompt attributes)
+(defun anything-c-regexp-kill-new (input)
+  (kill-new input)
+  (message "Killed: %s" input))
+
+(defun anything-region-active-p ()
+  (and transient-mark-mode mark-active (not (eq (mark) (point)))))
+  
+;;;###autoload
+(defun anything-regexp ()
+  (interactive)
   (save-restriction
     (let ((anything-compile-source-functions
            ;; rule out anything-match-plugin because the input is one regexp.
            (delq 'anything-compile-source--match-plugin
-                 (copy-sequence anything-compile-source-functions)))
-          (base-attributes
-           '((init . (lambda () (anything-candidate-buffer anything-current-buffer)))
-             (candidates-in-buffer)
-             (get-line . anything-c-regexp-get-line)
-             (persistent-action . anything-c-regexp-persistent-action)
-             (persistent-help . "Show this line")
-             (multiline)
-             (delayed))))
-      (if (and transient-mark-mode mark-active)
-          (narrow-to-region (region-beginning) (region-end)))
-      (anything
-       (list
-        (append
-         attributes
-         '((regexp . (lambda () anything-pattern)))
-         base-attributes)
-        ;; sexp form regexp
-        (append
-         `((name . ,(concat (assoc-default 'name attributes) " (sexp)")))
-         attributes
-         '((candidates-in-buffer
-            . (lambda () (let ((anything-pattern (eval (read anything-pattern))))
-                           (anything-candidates-in-buffer))))
-           (regexp . (lambda () (eval (read anything-pattern)))))
-         base-attributes))
-       nil prompt nil nil "*anything regexp*"))))
+                 (copy-sequence anything-compile-source-functions))))
+      (when (anything-region-active-p)
+        (narrow-to-region (region-beginning) (region-end)))
+      (anything :sources
+                anything-c-source-regexp
+                :buffer "*anything regexp*"
+                :prompt "Regexp: "))))
 
-;; (anything-c-regexp-base "Regexp: " '((name . "test")))
-;; (anything-c-regexp-base "Regexp: " '((name . "test") (candidates-in-buffer . (lambda () (let ((anything-pattern (eval (read anything-pattern)))) (anything-candidates-in-buffer))))))
-
-(defun anything-c-regexp-kill-new (input)
-  (kill-new input)
-  (message "Killed: %s" input))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
