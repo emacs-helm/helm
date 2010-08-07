@@ -1118,8 +1118,8 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
           (format "%5d: %s" (line-number-at-pos (1- s)) (buffer-substring s e))
           ;; subexps
           (loop for i from 0 to (1- (/ (length (match-data)) 2))
-             collect (format "\n         \\%s = %s"
-                             (if (zerop i) "&" i)
+             collect (format "\n         %s = '%s'"
+                             (if (zerop i) "Group 0: " (format "Group %d: " i))
                              (match-string i))))
    ;; match beginning
    ;; KLUDGE: point of anything-candidate-buffer is +1 than that of anything-current-buffer.
