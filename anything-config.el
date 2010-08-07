@@ -1142,17 +1142,31 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (message "Killed: %s" input))
 
 (defun anything-region-active-p ()
-  (and transient-mark-mode mark-active (not (eq (mark) (point)))))
-  
+  (and transient-mark-mode mark-active (/= (mark) (point))))
+
+(defun* anything-current-buffer-narrowed-p (&optional
+                                            (buffer anything-current-buffer))
+  "Check if BUFFER is narrowed.
+Default is `anything-current-buffer'."
+  (with-current-buffer buffer
+    (let ((beg (point-min))
+          (end (point-max))
+          (total (buffer-size)))
+      (or (/= beg 1) (/= end (1+ total))))))
+
 ;;;###autoload
 (defun anything-regexp ()
+  "Preconfigured anything to build regexps and run query-replace-regexp \
+against."
   (interactive)
   (save-restriction
     (let ((anything-compile-source-functions
            ;; rule out anything-match-plugin because the input is one regexp.
            (delq 'anything-compile-source--match-plugin
                  (copy-sequence anything-compile-source-functions))))
-      (when (anything-region-active-p)
+      (when (and (anything-region-active-p)
+                 ;; Don't narrow to region if buffer is already narrowed.
+                 (not (anything-current-buffer-narrowed-p)))
         (narrow-to-region (region-beginning) (region-end)))
       (anything :sources
                 anything-c-source-regexp
