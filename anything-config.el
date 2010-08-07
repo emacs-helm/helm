@@ -80,7 +80,7 @@
 ;;  * Commands defined here are:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'command :prefix "anything-" :docstring t)
 ;; `anything-configuration'
-;; Not documented.
+;; Customize `anything'.
 ;; `anything-c-describe-anything-bindings'
 ;; [OBSOLETE] Describe `anything' bindings.
 ;; `anything-mini'
@@ -91,6 +91,8 @@
 ;; Preconfigured `anything' for `recentf'.
 ;; `anything-info-at-point'
 ;; Preconfigured `anything' for searching info at point.
+;; `anything-info-emacs'
+;; Preconfigured anything for Emacs manual index.
 ;; `anything-show-kill-ring'
 ;; Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
 ;; `anything-minibuffer-history'
@@ -118,21 +120,19 @@
 ;; `anything-colors'
 ;; Preconfigured `anything' for color.
 ;; `anything-bookmarks'
-;; Not documented.
+;; Preconfigured `anything' for bookmarks.
 ;; `anything-c-pp-bookmarks'
-;; Not documented.
+;; Preconfigured `anything' for bookmarks	(pretty-printed).
 ;; `anything-register'
-;; Not documented.
+;; Preconfigured `anything' for Emacs registers.
 ;; `anything-bm-list'
 ;; Preconfigured `anything' for visible bookmarks.
 ;; `anything-timers'
 ;; Preconfigured `anything' for timers.
 ;; `anything-kill-buffers'
 ;; Preconfigured `anything' to kill buffer you selected.
-;; `anything-query-replace-regexp'
-;; Preconfigured `anything' : Drop-in replacement of `query-replace-regexp' with building regexp visually.
 ;; `anything-regexp'
-;; Preconfigured `anything' : It is like `re-builder'. It helps buliding regexp and replacement.
+;; Preconfigured anything to build regexps and run query-replace-regexp against.
 ;; `anything-insert-buffer-name'
 ;; Insert buffer name.
 ;; `anything-insert-symbol'
@@ -182,7 +182,7 @@
 ;; `anything-dired-bindings'
 ;; Replace usual dired commands `C' and `R' by anything ones.
 ;; `anything-M-x'
-;; Anything replacement of regular `M-x' `execute-extended-command'.
+;; Preconfigured `anything' for Emacs commands.
 ;; `anything-manage-advice'
 ;; Preconfigured `anything' to disable/enable function advices.
 ;; `anything-bookmark-ext'
@@ -204,9 +204,9 @@
 ;; `anything-eval-expression'
 ;; Preconfigured anything for `anything-c-source-evaluation-result'.
 ;; `anything-eval-expression-with-eldoc'
-;; Same as `anything-eval-expression' but with `eldoc' support.
+;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
 ;; `anything-surfraw'
-;; Search PATTERN with search ENGINE.
+;; Preconfigured `anything' to search PATTERN with search ENGINE.
 ;; `anything-emms-stream-edit-bookmark'
 ;; Change the information of current emms-stream bookmark from anything.
 ;; `anything-emms-stream-delete-bookmark'
@@ -232,7 +232,7 @@
 ;; `anything-c-shell-command-if-needed'
 ;; Not documented.
 ;; `anything-c-run-external-command'
-;; Run External PROGRAM asyncronously from Emacs.
+;; Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
 ;; `anything-ratpoison-commands'
 ;; Preconfigured `anything' to execute ratpoison commands.
 ;; `anything-c-set-variable'
@@ -283,6 +283,7 @@
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
+;; `anything-c-source-regexp'					(Regexp Builder)
 ;; `anything-c-source-buffers'					(Buffers)
 ;; `anything-c-source-buffer-not-found'				(Create buffer)
 ;; `anything-c-source-buffers+'					(Buffers)
@@ -1035,6 +1036,34 @@ After closing firefox, you will be able to browse you bookmarks.
   "Preconfigured `anything' for Emacs registers."
   (interactive)
   (anything-other-buffer 'anything-c-source-register "*anything register*"))
+
+;;;###autoload
+(defun anything-man-woman ()
+  "Preconfigured `anything' for Man and Woman pages."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-man-pages "*Anything man woman*"))
+
+;;;###autoload
+(defun anything-org-keywords ()
+  "Preconfigured `anything' for org keywords."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-org-keywords "*org keywords*"))
+
+;;;###autoload
+(defun anything-emms ()
+  "Preconfigured `anything' for emms sources."
+  (interactive)
+  (anything '(anything-c-source-emms-streams
+              anything-c-source-emms-files
+              anything-c-source-emms-dired)
+            nil nil nil nil
+            "*Anything Emms*"))
+
+;;;###autoload
+(defun anything-eev-anchors ()
+  "Preconfigured `anything' for eev anchors."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-eev-anchor "*Anything eev anchors*"))
 
 ;;;###autoload
 (defun anything-bm-list ()
