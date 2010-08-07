@@ -708,6 +708,7 @@ because it is under discussion."
 (define-key anything-command-map (kbd "C-c f") 'anything-recentf)
 (define-key anything-command-map (kbd "C-c g") 'anything-google-suggest)
 (define-key anything-command-map (kbd "h i") 'anything-info-at-point)
+(define-key anything-command-map (kbd "h r") 'anything-info-emacs)
 (define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
 (define-key anything-command-map (kbd "C-x r i") 'anything-register)
 (define-key anything-command-map (kbd "C-c C-x") 'anything-c-run-external-command)
@@ -730,12 +731,14 @@ because it is under discussion."
      ["Emacs Commands" anything-M-x t]
      ["Externals Commands" anything-c-run-external-command t])
     ("Info:"
-     ["Info at point" anything-info-at-point t])
+     ["Info at point" anything-info-at-point t]
+     ["Emacs Manual index" anything-info-emacs t])
     ("Tools:"
      ["Occur" anything-occur t]
      ["Browse Kill ring" anything-show-kill-ring t]
      ["Browse register" anything-register t]
      ["Mark Ring" anything-all-mark-rings t]
+     ["Regexp handler" anything-regexp t]
      ["Colors & Faces" anything-colors t]
      ["Show xfonts" anything-select-xfont t]
      ["Imenu" anything-imenu t]
@@ -871,6 +874,7 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   "Preconfigured `anything' for `recentf'."
   (interactive)
   (anything-other-buffer 'anything-c-source-recentf "*anything recentf*"))
+
 ;;;###autoload
 (defun anything-info-at-point ()
   "Preconfigured `anything' for searching info at point."
@@ -879,6 +883,12 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
               anything-c-source-info-cl
               anything-c-source-info-pages)
             (thing-at-point 'symbol) nil nil nil "*anything info*"))
+
+;;;###autoload
+(defun anything-info-emacs ()
+  "Preconfigured anything for Emacs manual index."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-info-emacs "*info emacs*"))
 
 ;;;###autoload
 (defun anything-show-kill-ring ()
