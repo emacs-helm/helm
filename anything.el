@@ -3207,18 +3207,23 @@ It is analogous to `dired-get-marked-files'."
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
 (defun anything-next-point-in-list (curpos points &optional prev)
-  (cond ;; rule out special cases
-        ((null points)                        curpos)
-        ((and prev (< curpos (car points)))   curpos)
-        ((< (car (last points)) curpos)
-         (if prev (car (last points)) curpos))
-        (t
-         (nth (+ (loop for pt in points
-                       for i from 0
-                       if (or (< curpos pt) (and prev (= curpos pt)))
-                       do (return i))
-                 (if prev -1 0))
-              points))))
+  (cond
+   ;; rule out special cases
+   ((null points)                        curpos)
+   ((and prev (< curpos (car points)))   curpos)
+   ((< (car (last points)) curpos)
+    (if prev (car (last points)) curpos))
+   (t
+    (nth (if prev
+             (loop for pt in points
+                   for i from 0
+                   if (<= curpos pt)
+                   do (return (1- i)))
+           (loop for pt in points
+                 for i from 0
+                 if (< curpos pt)
+                 do (return i)))
+         points))))
 
 (defun anything-next-visible-mark (&optional prev)
   "Move next anything visible mark."
