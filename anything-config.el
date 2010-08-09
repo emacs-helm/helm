@@ -5087,7 +5087,11 @@ Return an alist with elements like (data . number_results)."
 (defun anything-occur ()
   "Preconfigured Anything for Occur source."
   (interactive)
-  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*"))
+  (let ((anything-compile-source-functions
+         ;; rule out anything-match-plugin because the input is one regexp.
+         (delq 'anything-compile-source--match-plugin
+               (copy-sequence anything-compile-source-functions))))
+  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
 
 ;; Do many actions for input
 (defvar anything-c-source-create
