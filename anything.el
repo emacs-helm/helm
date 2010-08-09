@@ -3208,18 +3208,17 @@ It is analogous to `dired-get-marked-files'."
 
 (defun anything-next-point-in-list (curpos points &optional prev)
   (cond ;; rule out special cases
-        ((null points)                             curpos)
-        ((and prev (< curpos (car points)))        curpos)
-        ((and prev (< (car (last points)) curpos)) (car (last points)))
+        ((null points)                        curpos)
+        ((and prev (< curpos (car points)))   curpos)
+        ((< (car (last points)) curpos)
+         (if prev (car (last points)) curpos))
         (t
-         (condition-case err
-             (nth (+ (loop for pt in points
-                           for i from 0
-                           if (or (< curpos pt) (and prev (= curpos pt)))
-                           do (return i))
-                     (if prev -1 0))
-                  points)
-           (error curpos)))))
+         (nth (+ (loop for pt in points
+                       for i from 0
+                       if (or (< curpos pt) (and prev (= curpos pt)))
+                       do (return i))
+                 (if prev -1 0))
+              points))))
 
 (defun anything-next-visible-mark (&optional prev)
   "Move next anything visible mark."
