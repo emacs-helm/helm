@@ -2718,8 +2718,15 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
   (let ((command (anything-comp-read "M-x " obarray
                                      :test 'commandp
                                      :must-match t
-                                     :requires-pattern 2)))
-    (call-interactively (intern command))))
+                                     :requires-pattern 2
+                                     :name "Emacs Commands"
+                                     :persistent-action
+                                     #'(lambda (candidate)
+                                         (describe-function (intern candidate)))
+                                     :history extended-command-history)))
+    (call-interactively (intern command))
+    (setq extended-command-history
+          (cons command (delete command extended-command-history)))))
 
 ;;; LaCarte
 (defvar anything-c-source-lacarte
@@ -5080,7 +5087,11 @@ Return an alist with elements like (data . number_results)."
 (defun anything-occur ()
   "Preconfigured Anything for Occur source."
   (interactive)
-  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*"))
+  (let ((anything-compile-source-functions
+         ;; rule out anything-match-plugin because the input is one regexp.
+         (delq 'anything-compile-source--match-plugin
+               (copy-sequence anything-compile-source-functions))))
+  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
 
 ;; Do many actions for input
 (defvar anything-c-source-create
@@ -5663,24 +5674,39 @@ See `obarray'."
          (anything-comp-hash-get-items collection))
         (t collection)))
 
-(defun* anything-comp-read (prompt collection &key test initial-input
-                                   (buffer "*Anything Completions*") must-match
-                                   (requires-pattern 0))
+(defun* anything-comp-read (prompt collection
+                                   &key
+                                   test
+                                   initial-input
+                                   (buffer "*Anything Completions*")
+                                   must-match
+                                   (requires-pattern 0)
+                                   (history nil)
+                                   (persistent-action nil)
+                                   (name "Anything Completions"))
   "Anything `completing-read' emulation.
 Collection can be a list, vector, obarray or hash-table."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (or (anything
        :sources
-       `((name . "Completions")
-         (candidates
-          . (lambda ()
-              (let ((cands (anything-comp-read-get-candidates collection test)))
-                (if (or must-match (string= anything-pattern ""))
-                    cands (append (list anything-pattern) cands)))))
-         (requires-pattern . ,requires-pattern)
-         (volatile)
-         (action . (("candidate" . ,'identity))))
+       `(((name . ,(format "%s History" name))
+          (candidates . (lambda ()
+                          (anything-comp-read-get-candidates history)))
+          (volatile)
+          (persistent-action . ,persistent-action)
+          (action . ,'identity))
+         ((name . ,name)
+          (candidates
+           . (lambda ()
+               (let ((cands (anything-comp-read-get-candidates
+                             collection test)))
+                 (if (or must-match (string= anything-pattern ""))
+                     cands (append (list anything-pattern) cands)))))
+          (requires-pattern . ,requires-pattern)
+          (persistent-action . ,persistent-action)
+          (volatile)
+          (action . (("candidate" . ,'identity)))))
        :input initial-input
        :prompt prompt
        :resume 'noresume
