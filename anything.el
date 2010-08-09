@@ -3203,10 +3203,10 @@ It is analogous to `dired-get-marked-files'."
         (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
-(defun anything-next-point-in-list (pt points &optional prev)
+(defun anything-next-point-in-list (curpos points &optional prev)
   (nth (+ (loop for pt in points
                 for i from 0
-                if (or (< (point) pt) (and prev (= (point) pt)))
+                if (or (< curpos pt) (and prev (= curpos pt)))
                 do (return i))
           (if prev -1 0))
        points))
@@ -5883,7 +5883,6 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-output-filter--collect-candidates
            '("" "c" "") incomplete-line-info)))
       (desc "anything-next-point-in-list")
-      
       )))
 
 
