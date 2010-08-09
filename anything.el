@@ -2093,9 +2093,7 @@ the current pattern."
             (anything-new-timer
              'anything-process-delayed-sources-timer
              (run-with-idle-timer
-              (if anything-input-idle-delay
-                  (max 0 (- anything-idle-delay anything-input-idle-delay))
-                anything-idle-delay)
+              (anything-get-delay-time-for-delayed-sources)
               nil
               'anything-process-delayed-sources
               delayed-sources)))
@@ -2103,6 +2101,11 @@ the current pattern."
           ;; AFTER processing delayed sources
           (anything-log-run-hook 'anything-after-update-hook))
         (anything-log "end update")))))
+
+(defun anything-get-delay-time-for-delayed-sources ()
+  (if anything-input-idle-delay
+      (max 0 (- anything-idle-delay anything-input-idle-delay))
+    anything-idle-delay))
 
 (defun anything-update-source-p (source)
   (and (or (not anything-source-filter)
@@ -5077,21 +5080,18 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-test-update '(((name . "1") (requires-pattern . 3))) "xx"))
 
       (desc "delay")
-      (expect (mock (sit-for 0.25))
-        (stub with-current-buffer)
+      (expect 0.25
         (let ((anything-idle-delay 1.0)
               (anything-input-idle-delay 0.75))
-          (anything-process-delayed-sources t)))
-      (expect (mock (sit-for 0.0))
-        (stub with-current-buffer)
+          (anything-get-delay-time-for-delayed-sources)))
+      (expect 0.0
         (let ((anything-idle-delay 0.2)
               (anything-input-idle-delay 0.5))
-          (anything-process-delayed-sources t)))    
-      (expect (mock (sit-for 0.5))
-        (stub with-current-buffer)
+          (anything-get-delay-time-for-delayed-sources)))    
+      (expect 0.5
         (let ((anything-idle-delay 0.5)
               (anything-input-idle-delay nil))
-          (anything-process-delayed-sources t)))
+          (anything-get-delay-time-for-delayed-sources)))
       (desc "anything-normalize-sources")
       (expect '(anything-c-source-test)
         (anything-normalize-sources 'anything-c-source-test))
