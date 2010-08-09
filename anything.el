@@ -5909,6 +5909,12 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (anything-next-point-in-list 5 '(10) nil))
       (expect 10
         (anything-next-point-in-list 15 '(10) t))
+      (expect 20
+        (anything-next-point-in-list 10 '(10 20) nil))
+      (expect 10
+        (anything-next-point-in-list 20 '(10 20) t))
+      (expect 20
+        (anything-next-point-in-list 30 '(10 20 30) t))
       )))
 
 
