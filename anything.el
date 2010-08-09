@@ -3203,19 +3203,23 @@ It is analogous to `dired-get-marked-files'."
         (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
+(defun anything-next-point-in-list (pt points &optional prev)
+  (nth (+ (loop for pt in points
+                for i from 0
+                if (or (< (point) pt) (and prev (= (point) pt)))
+                do (return i))
+          (if prev -1 0))
+       points))
+
 (defun anything-next-visible-mark (&optional prev)
   "Move next anything visible mark."
   (interactive)
   (with-anything-window
-    (let ((points (sort (mapcar 'overlay-start anything-visible-mark-overlays) '<)))
-      (ignore-errors
-        (goto-char (nth (+ (loop for pt in points
-                                 for i from 0
-                                 if (or (< (point) pt) (and prev (= (point) pt)))
-                                 do (return i))
-                           (if prev -1 0))
-                        points)))
-      (anything-mark-current-line))))
+    (goto-char (anything-next-point-in-list
+                (point)
+                (sort (mapcar 'overlay-start anything-visible-mark-overlays) '<)
+                prev))
+    (anything-mark-current-line)))
 
 (defun anything-prev-visible-mark ()
   "Move previous anything visible mark."
@@ -5878,6 +5882,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
            '("a" "b") incomplete-line-info)
           (anything-output-filter--collect-candidates
            '("" "c" "") incomplete-line-info)))
+      (desc "anything-next-point-in-list")
+      
       )))
 
 
