@@ -5883,6 +5883,26 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
           (anything-output-filter--collect-candidates
            '("" "c" "") incomplete-line-info)))
       (desc "anything-next-point-in-list")
+      (expect 10
+        (anything-next-point-in-list 5 '(10 20) nil))
+      (expect 20
+        (anything-next-point-in-list 15 '(10 20) nil))
+      (expect 25
+        (anything-next-point-in-list 25 '(10 20) nil))
+      (expect 5
+        (anything-next-point-in-list 5 '(10 20) t))
+      (expect 10
+        (anything-next-point-in-list 15 '(10 20) t))
+      (expect 20
+        (anything-next-point-in-list 25 '(10 20) t))
+      (expect 5
+        (anything-next-point-in-list 5 '() nil))
+      (expect 5
+        (anything-next-point-in-list 5 '() t))
+      (expect 10
+        (anything-next-point-in-list 5 '(10) nil))
+      (expect 10
+        (anything-next-point-in-list 15 '(10) t))
       )))
 
 
