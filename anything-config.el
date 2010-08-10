@@ -1885,25 +1885,33 @@ Useful in dired buffers when there is inserted subdirs."
          (file-p  (and fap (file-exists-p fap)
                        (file-exists-p
                         (file-name-directory (expand-file-name tap def-dir)))))
-         (input   (cond (file-p (expand-file-name tap def-dir))
-                        (lib)
+         (input   (cond (lib)
+                        (file-p (expand-file-name tap def-dir))
                         (t fap))))
     (or input (expand-file-name def-dir))))
 
 (defun anything-find-library-at-point ()
-  "Find library path when inside a `require' sexp."
-  (let* ((beg-sexp (save-excursion (re-search-backward "(" (point-at-bol) t)))
-         (end-sexp (save-excursion (re-search-forward ")" (point-at-eol) t)))
+  "Try to find library path at point.
+Find inside `require' and `declare-function' sexp."
+  (let* ((beg-sexp (save-excursion (search-backward "(" (point-at-bol) t)))
+         (end-sexp (save-excursion (search-forward ")" (point-at-eol) t)))
          (sexp     (and beg-sexp end-sexp
-                        (buffer-substring (1+ beg-sexp) (1- end-sexp)))))
-    (when (and sexp (string-match "require \'.*" sexp))
-      (find-library-name
-       (replace-regexp-in-string
-        "'" ""
-        ;; If require use third arg, ignore it,
-        ;; always use library path found in `load-path'.
-        (second (split-string (match-string 0 sexp))))))))
-
+                        (buffer-substring-no-properties
+                         (1+ beg-sexp) (1- end-sexp)))))
+    (ignore-errors
+      (cond ((and sexp (string-match "require \'.+[^)]" sexp))
+             (find-library-name
+              (replace-regexp-in-string
+               "'\\|\)\\|\(" ""
+               ;; If require use third arg, ignore it,
+               ;; always use library path found in `load-path'.
+               (second (split-string (match-string 0 sexp))))))
+            ((and sexp (string-match-p "^declare-function" sexp))
+             (find-library-name
+              (replace-regexp-in-string
+               "\"\\|ext:" ""
+               (third (split-string sexp)))))
+            (t nil)))))
 
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
