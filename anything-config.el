@@ -2723,6 +2723,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                                      :persistent-action
                                      #'(lambda (candidate)
                                          (describe-function (intern candidate)))
+                                     :persistent-help "Describe this command"
                                      :history extended-command-history)))
     (call-interactively (intern command))
     (setq extended-command-history
@@ -5683,6 +5684,7 @@ See `obarray'."
                                    (requires-pattern 0)
                                    (history nil)
                                    (persistent-action nil)
+                                   (persistent-help "DoNothing")
                                    (name "Anything Completions"))
   "Anything `completing-read' emulation.
 Collection can be a list, vector, obarray or hash-table."
@@ -5695,6 +5697,7 @@ Collection can be a list, vector, obarray or hash-table."
                           (anything-comp-read-get-candidates history)))
           (volatile)
           (persistent-action . ,persistent-action)
+          (persistent-help . ,persistent-help)
           (action . ,'identity))
          ((name . ,name)
           (candidates
@@ -5705,6 +5708,7 @@ Collection can be a list, vector, obarray or hash-table."
                      cands (append (list anything-pattern) cands)))))
           (requires-pattern . ,requires-pattern)
           (persistent-action . ,persistent-action)
+          (persistent-help . ,persistent-help)
           (volatile)
           (action . (("candidate" . ,'identity)))))
        :input initial-input
