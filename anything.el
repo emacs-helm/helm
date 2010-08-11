@@ -2880,7 +2880,9 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
            pattern get-line-fn search-fns limit search-from-end
            start-point endp))))))
 
-(defun anything-search-from-candidate-buffer (pattern get-line-fn search-fns limit search-from-end start-point endp)
+(defun anything-search-from-candidate-buffer (pattern get-line-fn search-fns
+                                              limit search-from-end
+                                              start-point endp)
   (let (buffer-read-only
         matches exit newmatches)
     (anything-search-from-candidate-buffer-internal
@@ -2890,16 +2892,18 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
          (goto-char start-point)
          (setq newmatches nil)
          (loop with item-count = 0
-               with next-line-fn =
-               (if search-from-end
-                   (lambda (x) (goto-char (max (point-at-bol) 1)))
-                 #'forward-line)
-               while (funcall searcher pattern nil t)
-               for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
-               do
-               (anything-accumulate-candidates-internal
-                cand newmatches anything-cib-hash item-count limit)
-               (funcall next-line-fn 1))
+            with next-line-fn =
+            (if search-from-end
+                (lambda (x) (goto-char (max (point-at-bol) 1)))
+                #'forward-line)
+            while (funcall searcher pattern nil t)
+            when (eq (point-at-bol) (point-max)) do (return nil)
+            for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
+            do
+            (anything-accumulate-candidates-internal
+             cand newmatches anything-cib-hash item-count limit)
+            do
+            (funcall next-line-fn 1))
          (setq matches (append matches (nreverse newmatches)))
          (if exit (return)))
        (delq nil matches)))))
