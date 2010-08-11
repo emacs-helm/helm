@@ -4486,7 +4486,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (match identity)
             (volatile)))
          "oo\\+"))
-      (expect '(("a" ("" "a" "b")))     ;FIXME remove ""
+      ;; BUG remain empty string, but the pattern is rare case.
+      (expect '(("a" ("" "a" "b")))
         (anything-test-candidates
          '(((name . "a")
             (init . (lambda ()
@@ -5399,6 +5400,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                         (insert "c1\nc2\n"))))
             (search-from-end)
             (candidates-in-buffer)))))
+      ;; BUG remain empty string, but the pattern is rare case.
       (expect '(("a" ("c" "b" "a" "")))
         (anything-test-candidates
          '(((name . "a")
