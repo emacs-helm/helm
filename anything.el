@@ -4483,6 +4483,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (match identity)
             (volatile)))
          "oo\\+"))
+      (expect '(("a" ("" "a" "b")))     ;FIXME remove ""
+        (anything-test-candidates
+         '(((name . "a")
+            (init . (lambda ()
+                      (with-current-buffer (anything-candidate-buffer 'global)
+                        (insert "a\nb\n"))))
+            (candidates-in-buffer)))
+         "a*"))
       (desc "search attribute")
       (expect '(("TEST" ("foo+")))
         (anything-test-candidates
