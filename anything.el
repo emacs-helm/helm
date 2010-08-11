@@ -2899,7 +2899,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
                 cand newmatches anything-cib-hash item-count limit)
                (let ((prevpt (point)))
                  (if search-from-end
-                     (goto-char (max (point-at-bol) 1))
+                     (goto-char (1- (point-at-bol)))
                    (forward-line 1))
                  (when (= (point) prevpt)
                    (return nil))))
@@ -5388,7 +5388,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (search-from-end)
             (candidate-number-limit . 2)))
          "\\+"))
-      (expect '(("a" ("c1" "c2")))
+      (expect '(("a" ("c2" "c1")))
         (anything-test-candidates
          '(((name . "a")
             (init . (lambda ()
@@ -5396,7 +5396,15 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                         (insert "c1\nc2\n"))))
             (search-from-end)
             (candidates-in-buffer)))))
-
+      (expect '(("a" ("c" "b" "a" "")))
+        (anything-test-candidates
+         '(((name . "a")
+            (init . (lambda ()
+                      (with-current-buffer (anything-candidate-buffer 'global)
+                        (insert "a\nb\nc\n"))))
+            (search-from-end)
+            (candidates-in-buffer)))
+         "a*"))
       (desc "header-name attribute")
       (expect "original is transformed"
         (anything-test-update '(((name . "original")
