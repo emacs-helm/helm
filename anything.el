@@ -5378,6 +5378,14 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
             (search-from-end)
             (candidate-number-limit . 2)))
          "\\+"))
+      (expect '(("a" ("c1" "c2")))
+        (anything-test-candidates
+         '(((name . "a")
+            (init . (lambda ()
+                      (with-current-buffer (anything-candidate-buffer 'global)
+                        (insert "c1\nc2\n"))))
+            (search-from-end)
+            (candidates-in-buffer)))))
 
       (desc "header-name attribute")
       (expect "original is transformed"
