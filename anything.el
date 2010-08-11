@@ -2880,6 +2880,10 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
            pattern get-line-fn search-fns limit search-from-end
            start-point endp))))))
 
+(defun anything-point-is-moved (proc)
+  "If point is moved after executing PROC, return t, otherwise nil."
+  (/= (point) (progn (funcall proc) (point))))
+
 (defun anything-search-from-candidate-buffer (pattern get-line-fn search-fns
                                                       limit search-from-end
                                                       start-point endp)
@@ -2894,15 +2898,14 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
          (loop with item-count = 0
                while (funcall searcher pattern nil t)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
-               do
-               (anything-accumulate-candidates-internal
-                cand newmatches anything-cib-hash item-count limit)
-               (let ((prevpt (point)))
-                 (if search-from-end
-                     (goto-char (1- (point-at-bol)))
-                   (forward-line 1))
-                 (when (= (point) prevpt)
-                   (return nil))))
+               do (anything-accumulate-candidates-internal
+                   cand newmatches anything-cib-hash item-count limit)
+               unless (anything-point-is-moved
+                       (lambda ()
+                         (if search-from-end
+                             (goto-char (1- (point-at-bol)))
+                           (forward-line 1))))
+               return nil)
          (setq matches (append matches (nreverse newmatches)))
          (if exit (return)))
        (delq nil matches)))))
