@@ -2893,14 +2893,16 @@ get-line and search-from-end attributes. See also `anything-sources' docstring.
          (setq newmatches nil)
          (loop with item-count = 0
                while (funcall searcher pattern nil t)
-               when (eq (point-at-bol) (point-max)) do (return nil)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
                do
                (anything-accumulate-candidates-internal
                 cand newmatches anything-cib-hash item-count limit)
-               (if search-from-end
-                   (goto-char (max (point-at-bol) 1))
-                 (forward-line 1)))
+               (let ((prevpt (point)))
+                 (if search-from-end
+                     (goto-char (max (point-at-bol) 1))
+                   (forward-line 1))
+                 (when (= (point) prevpt)
+                   (return nil))))
          (setq matches (append matches (nreverse newmatches)))
          (if exit (return)))
        (delq nil matches)))))
