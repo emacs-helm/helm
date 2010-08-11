@@ -4856,6 +4856,7 @@ Return an alist with elements like (data . number_results)."
                    "-elvi")
      (split-string (buffer-string) "\n"))))
 
+(defvar anything-surfraw-engines-history nil)
 ;;;###autoload
 (defun anything-surfraw (pattern engine)
   "Preconfigured `anything' to search PATTERN with search ENGINE."
@@ -4863,7 +4864,9 @@ Return an alist with elements like (data . number_results)."
                      (anything-comp-read
                       "Engine: "
                       (anything-c-build-elvi-list)
-                      :must-match t)))
+                      :must-match t
+                      :name "Surfraw Search Engines"
+                      :history anything-surfraw-engines-history)))
   (let* ((engine-nodesc (car (split-string engine)))
          (url (with-temp-buffer
                 (apply 'call-process "surfraw" nil t nil
@@ -4872,7 +4875,9 @@ Return an alist with elements like (data . number_results)."
                  "\n" "" (buffer-string)))))
     (if (string= engine-nodesc "W")
         (anything-c-browse-url)
-        (anything-c-browse-url url))))
+        (anything-c-browse-url url)
+        (setq anything-surfraw-engines-history
+              (cons engine (delete engine anything-surfraw-engines-history))))))
 
 ;;; Emms
 
@@ -5765,6 +5770,7 @@ In this case EXE must be provided as \"EXE %s\"."
                                    anything-c-external-commands-list))
                       anything-c-external-commands-list))))))
 
+(defvar anything-external-command-history nil)
 ;;;###autoload
 (defun anything-c-run-external-command (program)
   "Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
@@ -5775,8 +5781,12 @@ You can set your own list of commands with
                 (anything-comp-read
                  "RunProgram: "
                  (anything-c-external-commands-list-1 'sort)
-                 :must-match t)))
-  (anything-run-or-raise program))
+                 :must-match t
+                 :name "External Commands"
+                 :history anything-external-command-history)))
+  (anything-run-or-raise program)
+  (setq anything-external-command-history
+        (cons program (delete program anything-external-command-history))))
 
 (defsubst* anything-c-position (item seq &key (test 'eq))
   "A simple and faster replacement of CL `position'."
@@ -5905,10 +5915,14 @@ If not found or a prefix arg is given query the user which tool to use."
                            def-prog)
                          (concat
                           (anything-comp-read
-                           "Program: "
-                           collection :must-match t)
+                           "Program: " collection
+                           :must-match t
+                           :name "Open file Externally"
+                           :history anything-external-command-history)
                           " %s"))))
-    (anything-run-or-raise program file)))
+    (anything-run-or-raise program file)
+    (setq anything-external-command-history
+          (cons program (delete program anything-external-command-history)))))
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
