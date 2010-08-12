@@ -5491,7 +5491,7 @@ package name - description."
 
 (defun* anything-gentoo-install (candidate &key action)
   (setq anything-c-external-commands-list nil)
-  (ansi-term (getenv "SHELL") "anything gentoo")
+  (ansi-term (getenv "SHELL") "Gentoo emerge")
   (term-line-mode)
   (let ((command (case action
                    ('install "sudo emerge -av ")
