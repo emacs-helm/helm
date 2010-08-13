@@ -2732,10 +2732,14 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                                      #'(lambda (candidate)
                                          (describe-function (intern candidate)))
                                      :persistent-help "Describe this command"
-                                     :history extended-command-history)))
+                                     :history extended-command-history))
+        (history (loop with hist
+                    for i in extended-command-history
+                    for com = (intern i)
+                    when (and (fboundp com) (not (member i hist)))
+                    collect i into hist finally return hist)))
     (call-interactively (intern command))
-    (setq extended-command-history
-          (cons command (delete command extended-command-history)))))
+    (setq extended-command-history (cons command (delete command history)))))
 
 ;;; LaCarte
 (defvar anything-c-source-lacarte
