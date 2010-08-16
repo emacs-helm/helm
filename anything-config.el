@@ -125,6 +125,14 @@
 ;; Preconfigured `anything' for bookmarks	(pretty-printed).
 ;; `anything-register'
 ;; Preconfigured `anything' for Emacs registers.
+;; `anything-man-woman'
+;; Preconfigured `anything' for Man and Woman pages.
+;; `anything-org-keywords'
+;; Preconfigured `anything' for org keywords.
+;; `anything-emms'
+;; Preconfigured `anything' for emms sources.
+;; `anything-eev-anchors'
+;; Preconfigured `anything' for eev anchors.
 ;; `anything-bm-list'
 ;; Preconfigured `anything' for visible bookmarks.
 ;; `anything-timers'
@@ -280,6 +288,8 @@
 ;; Default Value: nil
 ;; `anything-command-map-prefix-key'
 ;; Default Value: "<f5> a"
+;; `anything-c-find-files-show-icons'
+;; Default Value: nil
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -1811,7 +1821,7 @@ If prefix numeric arg is given go ARG level down."
   :group 'anything)
 
 (defun anything-c-find-files-transformer (files sources)
-  (if anything-c-find-files-show-icons
+  (if (and (window-system) anything-c-find-files-show-icons)
       (anything-c-highlight-ffiles1 files sources)
       (anything-c-highlight-ffiles files sources)))
 
@@ -1827,58 +1837,64 @@ If prefix numeric arg is given go ARG level down."
      collect (propertize i 'face anything-c-files-face2) into a
      finally return a))
 
-(defun anything-c-prefix-line-with-image (str image)
-  "Return string STR prefixed with icon IMAGE."
-  (let* ((img-dir (concat (car image-load-path) "tree-widget/folder"))
+(defun anything-c-prefix-filename-with-image (fname image)
+  "Return fname FNAME prefixed with icon IMAGE."
+  (let* ((img-dir  (concat (car image-load-path) "tree-widget/folder"))
          (img-name (expand-file-name image img-dir))
-         (img (create-image img-name))
-         (prefix (propertize " " 'display img)))
-    (concat prefix str)))
+         (img      (create-image img-name))
+         (prefix   (propertize " " 'display img)))
+    (if (file-exists-p fname)
+        (concat prefix fname)
+        (concat prefix "Create file: " fname))))
 
 (defun anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
   (loop for i in files
      for af = (file-name-nondirectory i)
      collect (cond (;; Symlinks
-                    (and (file-directory-p i) (get-buffer af) (file-symlink-p i))
-                    (cons (anything-c-prefix-line-with-image
+                    (and (file-directory-p i) (get-buffer af)
+                         (file-symlink-p i))
+                    (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "open.xpm")
                           i))
                    ((and (file-directory-p i) (file-symlink-p i))
-                    (cons (anything-c-prefix-line-with-image
+                    (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "close.xpm")
                           i))
                    ((file-symlink-p i)
-                    (cons (anything-c-prefix-line-with-image
+                    (cons (anything-c-prefix-filename-with-image
                                    (propertize i 'face 'anything-dired-symlink-face
-                                               'help-echo (file-truename i)) "leaf.xpm")
+                                               'help-echo (file-truename i))
+                                   "leaf.xpm")
                           i))
                    (;; Empty directories
                     (and (file-directory-p i)
-                         (file-readable-p i) ; Be sure to have permission to list content.
-                         (zerop (length (directory-files
-                                         i nil directory-files-no-dot-files-regexp))))
-                    (cons (anything-c-prefix-line-with-image
+                         ;; Be sure to have permission to list content.
+                         (file-readable-p i)
+                         (zerop (length
+                                 (directory-files
+                                  i nil directory-files-no-dot-files-regexp))))
+                    (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "empty.xpm")
                           i)) 
                    (;; Open directories
                     (and (file-directory-p i) (get-buffer af))
-                    (cons (anything-c-prefix-line-with-image
+                    (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "open.xpm")
                           i)) 
                    (;; Closed directories
                     (file-directory-p i)
-                    (cons (anything-c-prefix-line-with-image
+                    (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "close.xpm")
-                          i)) 
+                          i))
                    (;; Files
                     t
-                    (cons (anything-c-prefix-line-with-image
+                    (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face2)
                            "leaf.xpm")
                           i)))))
@@ -1931,11 +1947,12 @@ If CANDIDATE is alone, open file CANDIDATE filename."
 (defun anything-find-files ()
   "Preconfigured `anything' for anything implementation of `find-file'."
   (interactive)
-  (anything :sources 'anything-c-source-find-files
-            :input (anything-find-files-input (ffap-guesser)
-                                              (thing-at-point 'filename))
-            :prompt "Find Files or Url: "
-            :buffer "*Anything Find Files*"))
+  (let ((anything-mp-highlight-delay nil))
+    (anything :sources 'anything-c-source-find-files
+              :input (anything-find-files-input (ffap-guesser)
+                                                (thing-at-point 'filename))
+              :prompt "Find Files or Url: "
+              :buffer "*Anything Find Files*")))
 
 (defun anything-c-current-directory ()
   "Return current-directory name at point.
