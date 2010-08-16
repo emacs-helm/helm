@@ -670,6 +670,11 @@ because it is under discussion."
   :set 'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
 
+(defcustom anything-c-find-files-show-icons nil
+  "*Whether show or hide icons in `anything-find-files'."
+  :type 'boolean
+  :group 'anything-config)
+
 ;;;###autoload
 (defun anything-configuration ()
   "Customize `anything'."
@@ -1663,7 +1668,7 @@ buffer that is not the current buffer."
     (init . (lambda ()
               (setq ffap-newfile-prompt t)))
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -1805,8 +1810,13 @@ If prefix numeric arg is given go ARG level down."
   "*Face used for symlinks in `anything-find-files'."
   :group 'anything)
 
-(defun anything-c-highlight-ffiles (files)
-  "Candidate transformer for `anything-c-source-find-files'."
+(defun anything-c-find-files-transformer (files sources)
+  (if anything-c-find-files-show-icons
+      (anything-c-highlight-ffiles1 files sources)
+      (anything-c-highlight-ffiles files sources)))
+
+(defun anything-c-highlight-ffiles (files sources)
+  "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files
      if (file-symlink-p i)
      collect (propertize i 'face 'anything-dired-symlink-face
@@ -1816,6 +1826,62 @@ If prefix numeric arg is given go ARG level down."
      else
      collect (propertize i 'face anything-c-files-face2) into a
      finally return a))
+
+(defun anything-c-prefix-line-with-image (str image)
+  "Return string STR prefixed with icon IMAGE."
+  (let* ((img-dir (concat (car image-load-path) "tree-widget/folder"))
+         (img-name (expand-file-name image img-dir))
+         (img (create-image img-name))
+         (prefix (propertize " " 'display img)))
+    (concat prefix str)))
+
+(defun anything-c-highlight-ffiles1 (files sources)
+  "Candidate transformer for `anything-c-source-find-files' that show icons."
+  (loop for i in files
+     for af = (file-name-nondirectory i)
+     collect (cond (;; Symlinks
+                    (and (file-directory-p i) (get-buffer af) (file-symlink-p i))
+                    (cons (anything-c-prefix-line-with-image
+                           (propertize i 'face 'anything-dired-symlink-face
+                                       'help-echo (file-truename i)) "open.xpm")
+                          i))
+                   ((and (file-directory-p i) (file-symlink-p i))
+                    (cons (anything-c-prefix-line-with-image
+                           (propertize i 'face 'anything-dired-symlink-face
+                                       'help-echo (file-truename i)) "close.xpm")
+                          i))
+                   ((file-symlink-p i)
+                    (cons (anything-c-prefix-line-with-image
+                                   (propertize i 'face 'anything-dired-symlink-face
+                                               'help-echo (file-truename i)) "leaf.xpm")
+                          i))
+                   (;; Empty directories
+                    (and (file-directory-p i)
+                         (file-readable-p i) ; Be sure to have permission to list content.
+                         (zerop (length (directory-files
+                                         i nil directory-files-no-dot-files-regexp))))
+                    (cons (anything-c-prefix-line-with-image
+                           (propertize i 'face anything-c-files-face1)
+                           "empty.xpm")
+                          i)) 
+                   (;; Open directories
+                    (and (file-directory-p i) (get-buffer af))
+                    (cons (anything-c-prefix-line-with-image
+                           (propertize i 'face anything-c-files-face1)
+                           "open.xpm")
+                          i)) 
+                   (;; Closed directories
+                    (file-directory-p i)
+                    (cons (anything-c-prefix-line-with-image
+                           (propertize i 'face anything-c-files-face1)
+                           "close.xpm")
+                          i)) 
+                   (;; Files
+                    t
+                    (cons (anything-c-prefix-line-with-image
+                           (propertize i 'face anything-c-files-face2)
+                           "leaf.xpm")
+                          i)))))
 
 
 (defun anything-find-files-persistent-action (candidate)
@@ -1919,7 +1985,7 @@ Find inside `require' and `declare-function' sexp."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -1941,7 +2007,7 @@ Find inside `require' and `declare-function' sexp."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -1965,7 +2031,7 @@ Find inside `require' and `declare-function' sexp."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -1983,7 +2049,7 @@ Find inside `require' and `declare-function' sexp."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -2000,7 +2066,7 @@ Find inside `require' and `declare-function' sexp."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -2018,7 +2084,7 @@ Find inside `require' and `declare-function' sexp."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
-    (candidate-transformer anything-c-highlight-ffiles)
+    (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
     (volatile)
@@ -2157,7 +2223,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                 for fname in seq when (funcall test fname)
                                 collect fname)
                              (anything-find-files-get-candidates))))
-         (candidate-transformer anything-c-highlight-ffiles)
+         (filtered-candidate-transformer anything-c-highlight-ffiles)
          (persistent-action . anything-find-files-persistent-action)
          (persistent-help . "Expand Candidate")
          (volatile)
