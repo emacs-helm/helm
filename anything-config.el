@@ -685,6 +685,12 @@ because it is under discussion."
   :type 'boolean
   :group 'anything-config)
 
+(defcustom anything-c-find-files-icons-directory
+  (concat (car image-load-path) "tree-widget/folder")
+  "*Default path where to find files and directory icons."
+  :type 'string
+  :group 'anything-config)
+
 ;;;###autoload
 (defun anything-configuration ()
   "Customize `anything'."
@@ -1839,8 +1845,8 @@ If prefix numeric arg is given go ARG level down."
 
 (defun anything-c-prefix-filename-with-image (fname image)
   "Return fname FNAME prefixed with icon IMAGE."
-  (let* ((img-dir  (concat (car image-load-path) "tree-widget/folder"))
-         (img-name (expand-file-name image img-dir))
+  (let* ((img-name (expand-file-name
+                    image anything-c-find-files-icons-directory))
          (img      (create-image img-name))
          (prefix   (propertize " " 'display img)))
     (if (file-exists-p fname)
