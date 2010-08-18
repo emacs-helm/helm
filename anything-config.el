@@ -686,7 +686,7 @@ because it is under discussion."
   :group 'anything-config)
 
 (defcustom anything-c-find-files-icons-directory
-  (concat (car image-load-path) "tree-widget/folder")
+  (concat (car image-load-path) "tree-widget/default")
   "*Default path where to find files and directory icons."
   :type 'string
   :group 'anything-config)
@@ -1853,47 +1853,51 @@ If prefix numeric arg is given go ARG level down."
         (concat prefix fname)
         (concat prefix "Create file: " fname))))
 
+(defmacro anything-empty-directory-p (dir)
+  "Check if directory DIR is empty or not."
+  `(with-temp-buffer
+     (insert-directory ,dir "--dired" nil t)
+     (eq (point-min) (point-max))))
+
 (defun anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
   (loop for i in files
      for af = (file-name-nondirectory i)
-     collect (cond (;; Symlinks
-                    (and (file-directory-p i) (get-buffer af)
-                         (file-symlink-p i))
+     collect (cond (;; Symlinks 
+                    (and (stringp (car (file-attributes i)))
+                         (file-directory-p i) (get-buffer af))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "open.xpm")
                           i))
-                   ((and (file-directory-p i) (file-symlink-p i))
+                   ((and (stringp (car (file-attributes i))) (file-directory-p i))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "close.xpm")
                           i))
-                   ((file-symlink-p i)
+                   ((stringp (car (file-attributes i)))
                     (cons (anything-c-prefix-filename-with-image
                                    (propertize i 'face 'anything-dired-symlink-face
                                                'help-echo (file-truename i))
                                    "leaf.xpm")
                           i))
                    (;; Empty directories
-                    (and (file-directory-p i)
+                    (and (eq t (car (file-attributes i)))
                          ;; Be sure to have permission to list content.
                          (file-readable-p i)
-                         (zerop (length
-                                 (directory-files
-                                  i nil directory-files-no-dot-files-regexp))))
+                         (anything-empty-directory-p i))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "empty.xpm")
                           i)) 
                    (;; Open directories
-                    (and (file-directory-p i) (get-buffer af))
+                    (and (eq t (car (file-attributes i))) (get-buffer af))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "open.xpm")
                           i)) 
                    (;; Closed directories
-                    (file-directory-p i)
+                    (eq t (car (file-attributes i)))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "close.xpm")
