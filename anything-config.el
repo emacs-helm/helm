@@ -1843,15 +1843,25 @@ If prefix numeric arg is given go ARG level down."
      collect (propertize i 'face anything-c-files-face2) into a
      finally return a))
 
+
 (defun anything-c-prefix-filename-with-image (fname image)
   "Return fname FNAME prefixed with icon IMAGE."
   (let* ((img-name (expand-file-name
                     image anything-c-find-files-icons-directory))
          (img      (create-image img-name))
-         (prefix   (propertize " " 'display img)))
+         (prefix   (propertize " " 'display img))
+         (prefix-str (propertize
+                      " " 'display
+                      (propertize
+                       "[?]"
+                       'face '((:background "yellow" :foreground "black"))))))
     (if (file-exists-p fname)
         (concat prefix fname)
-        (concat prefix "Create file: " fname))))
+        (concat prefix-str
+                (propertize
+                 " Create file: "
+                 'face '((:underline t :background "DarkRed")))
+                fname))))
 
 (defmacro anything-empty-directory-p (dir)
   "Check if directory DIR is empty or not."
