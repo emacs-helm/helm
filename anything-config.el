@@ -714,6 +714,7 @@ because it is under discussion."
 (define-key anything-command-map (kbd "m") 'anything-man-woman)
 (define-key anything-command-map (kbd "t") 'anything-top)
 (define-key anything-command-map (kbd "i") 'anything-imenu)
+(define-key anything-command-map (kbd "p") 'anything-list-emacs-process)
 (define-key anything-command-map (kbd "C-x r b") 'anything-c-pp-bookmarks)
 (define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
 (define-key anything-command-map (kbd "C-c <SPC>") 'anything-all-mark-rings)
@@ -734,6 +735,20 @@ because it is under discussion."
 (define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
 (define-key anything-command-map (kbd "C-x r i") 'anything-register)
 (define-key anything-command-map (kbd "C-c C-x") 'anything-c-run-external-command)
+
+;; In Emacs 23.1.50, minibuffer-local-must-match-filename-map was renamed to
+;; minibuffer-local-filename-must-match-map.
+(defvar minibuffer-local-filename-must-match-map (make-sparse-keymap)) ;; Emacs 23.1.+
+(defvar minibuffer-local-must-match-filename-map (make-sparse-keymap)) ;; Older Emacsen
+(dolist (map (list minibuffer-local-filename-completion-map
+                   minibuffer-local-completion-map
+                   minibuffer-local-must-match-filename-map
+                   minibuffer-local-filename-must-match-map
+                   minibuffer-local-map
+                   minibuffer-local-isearch-map
+                   minibuffer-local-must-match-map
+                   minibuffer-local-ns-map))
+  (define-key map "\C-r" 'anything-minibuffer-history))
 
 ;;; Menu
 (easy-menu-define nil global-map
@@ -768,9 +783,11 @@ because it is under discussion."
      ["Eval expression" anything-eval-expression-with-eldoc t]
      ["Calcul expression" anything-calcul-expression t]
      ["Man pages" anything-man-woman t]
-     ["Top externals process" anything-top t])
+     ["Top externals process" anything-top t]
+     ["Emacs internals process" anything-list-emacs-process t])
     "----"
     ["Prefered Options" anything-configuration t]))
+
 
 ;;; Documentation
 ;; It is replaced by `anything-help'
@@ -926,20 +943,6 @@ You may bind this command to M-y."
   (let ((enable-recursive-minibuffers t))
     (anything-other-buffer 'anything-c-source-minibuffer-history
                            "*anything minibuffer-history*")))
-
-;; In Emacs 23.1.50, minibuffer-local-must-match-filename-map was renamed to
-;; minibuffer-local-filename-must-match-map.
-(defvar minibuffer-local-filename-must-match-map (make-sparse-keymap)) ;; Emacs 23.1.+
-(defvar minibuffer-local-must-match-filename-map (make-sparse-keymap)) ;; Older Emacsen
-(dolist (map (list minibuffer-local-filename-completion-map
-                   minibuffer-local-completion-map
-                   minibuffer-local-must-match-filename-map
-                   minibuffer-local-filename-must-match-map
-                   minibuffer-local-map
-                   minibuffer-local-isearch-map
-                   minibuffer-local-must-match-map
-                   minibuffer-local-ns-map))
-  (define-key map "\C-r" 'anything-minibuffer-history))
 
 ;;;###autoload
 (defun anything-gentoo ()
@@ -1105,6 +1108,12 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
                            anything-c-source-idle-time-timers)
                          "*anything timers*"))
 
+;;;###autoload
+(defun anything-list-emacs-process ()
+  "Preconfigured `anything' for emacs process."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-emacs-process "*anything process*"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
 ;;;###autoload
@@ -1167,8 +1176,8 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
     ;; Though the regexp attribute stay defined (tested with *-attr-defined).
     ;; Can you fix it?
     (regexp . (lambda () anything-input))
-    (action . (("Query Replace Regexp" . anything-c-query-replace-regexp)
-               ("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
+    (action . (("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
+               ("Query Replace Regexp" . anything-c-query-replace-regexp)
                ("Kill Regexp" . anything-c-kill-regexp)))))
 
 (defun anything-c-regexp-get-line (s e)
@@ -5757,7 +5766,12 @@ package name - description."
 (defvar anything-c-source-emacs-process
   '((name . "Emacs Process")
     (candidates . (lambda () (mapcar #'process-name (process-list))))
-    (action ("Kill Process" . (lambda (elm) (delete-process (get-process elm)))))))
+    (persistent-action . (lambda (elm)
+                           (delete-process (get-process elm))
+                           (anything-delete-current-selection)))
+    (persistent-help . "Kill Process")
+    (action ("Kill Process" . (lambda (elm)
+                                (delete-process (get-process elm)))))))
 
 ;; (anything 'anything-c-source-emacs-process)
 
