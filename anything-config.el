@@ -1860,6 +1860,7 @@ If prefix numeric arg is given go ARG level down."
      (insert-directory ,dir "--dired" nil t)
      (eq (point-min) (point-max))))
 
+    
 (defun anything-c-find-files-transformer (files sources)
   (if (and (window-system) anything-c-find-files-show-icons)
       (anything-c-highlight-ffiles1 files sources)
@@ -1868,13 +1869,13 @@ If prefix numeric arg is given go ARG level down."
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files
-     if (file-symlink-p i)
-     collect (propertize i 'face 'anything-dired-symlink-face
-                         'help-echo (file-truename i))
-     if (file-directory-p i)
-     collect (propertize i 'face anything-c-files-face1)
-     else
-     collect (propertize i 'face anything-c-files-face2)))
+     collect (cond ((file-symlink-p i)
+                    (propertize i 'face 'anything-dired-symlink-face
+                                'help-echo (file-truename i)))
+                   ((file-directory-p i)
+                    (propertize i 'face anything-c-files-face1))
+                   (t
+                    (propertize i 'face anything-c-files-face2)))))
 
 (defun anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
@@ -1898,7 +1899,7 @@ If prefix numeric arg is given go ARG level down."
                                                'help-echo (file-truename i))
                                    "leaf.xpm")
                           i))
-                   (;; Empty directories
+                    (;; Empty directories
                     (and (eq t (car (file-attributes i)))
                          ;; Be sure to have permission to list content.
                          (file-readable-p i)
