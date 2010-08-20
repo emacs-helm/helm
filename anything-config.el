@@ -1826,24 +1826,6 @@ If prefix numeric arg is given go ARG level down."
   "*Face used for symlinks in `anything-find-files'."
   :group 'anything)
 
-(defun anything-c-find-files-transformer (files sources)
-  (if (and (window-system) anything-c-find-files-show-icons)
-      (anything-c-highlight-ffiles1 files sources)
-      (anything-c-highlight-ffiles files sources)))
-
-(defun anything-c-highlight-ffiles (files sources)
-  "Candidate transformer for `anything-c-source-find-files' without icons."
-  (loop for i in files
-     if (file-symlink-p i)
-     collect (propertize i 'face 'anything-dired-symlink-face
-                         'help-echo (file-truename i)) into a
-     if (file-directory-p i)
-     collect (propertize i 'face anything-c-files-face1) into a
-     else
-     collect (propertize i 'face anything-c-files-face2) into a
-     finally return a))
-
-
 (defun anything-c-prefix-filename-with-image (fname image)
   "Return fname FNAME prefixed with icon IMAGE."
   (let* ((img-name (expand-file-name
@@ -1868,6 +1850,22 @@ If prefix numeric arg is given go ARG level down."
   `(with-temp-buffer
      (insert-directory ,dir "--dired" nil t)
      (eq (point-min) (point-max))))
+
+(defun anything-c-find-files-transformer (files sources)
+  (if (and (window-system) anything-c-find-files-show-icons)
+      (anything-c-highlight-ffiles1 files sources)
+      (anything-c-highlight-ffiles files sources)))
+
+(defun anything-c-highlight-ffiles (files sources)
+  "Candidate transformer for `anything-c-source-find-files' without icons."
+  (loop for i in files
+     if (file-symlink-p i)
+     collect (propertize i 'face 'anything-dired-symlink-face
+                         'help-echo (file-truename i))
+     if (file-directory-p i)
+     collect (propertize i 'face anything-c-files-face1)
+     else
+     collect (propertize i 'face anything-c-files-face2)))
 
 (defun anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
