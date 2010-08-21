@@ -1854,13 +1854,6 @@ If prefix numeric arg is given go ARG level down."
                  'face '((:underline t :background "DarkRed")))
                 fname))))
 
-(defmacro anything-empty-directory-p (dir)
-  "Check if directory DIR is empty or not."
-  `(with-temp-buffer
-     (insert-directory ,dir "--dired" nil t)
-     (eq (point-min) (point-max))))
-
-    
 (defun anything-c-find-files-transformer (files sources)
   (if (and (window-system) anything-c-find-files-show-icons)
       (anything-c-highlight-ffiles1 files sources)
@@ -1900,14 +1893,15 @@ If prefix numeric arg is given go ARG level down."
                                    "leaf.xpm")
                           i))
                     (;; Empty directories
-                    (and (eq t (car (file-attributes i)))
-                         ;; Be sure to have permission to list content.
-                         (file-readable-p i)
-                         (anything-empty-directory-p i))
+                     (and (eq t (car (file-attributes i)))
+                          ;; Be sure to have permission to list content.
+                          (file-readable-p i)
+                          (eq 0 (length (directory-files
+                                          i nil directory-files-no-dot-files-regexp))))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "empty.xpm")
-                          i)) 
+                          i))
                    (;; Open directories
                     (and (eq t (car (file-attributes i))) (get-buffer af))
                     (cons (anything-c-prefix-filename-with-image
