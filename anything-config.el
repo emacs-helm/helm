@@ -6035,9 +6035,9 @@ If not found or a prefix arg is given query the user which tool to use."
                            :history anything-external-command-history)
                           " %s"))))
     (anything-run-or-raise program file)
+    (setq program (replace-regexp-in-string " %s" "" program))
     (setq anything-external-command-history
-          (cons (replace-regexp-in-string " %s" "" program)
-                (delete program anything-external-command-history)))))
+          (cons program (delete program anything-external-command-history)))))
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
