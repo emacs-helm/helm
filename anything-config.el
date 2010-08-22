@@ -1835,24 +1835,26 @@ If prefix numeric arg is given go ARG level down."
   "*Face used for symlinks in `anything-find-files'."
   :group 'anything)
 
+(defface anything-ffiles-prefix-face
+  '((t (:background "yellow" :foreground "black")))
+  "*Face used to prefix new file or url paths in `anything-find-files'."
+  :group 'anything)
+
 (defun anything-c-prefix-filename-with-image (fname image)
   "Return fname FNAME prefixed with icon IMAGE."
   (let* ((img-name (expand-file-name
                     image anything-c-find-files-icons-directory))
          (img      (create-image img-name))
-         (prefix   (propertize " " 'display img))
-         (prefix-str (propertize
+         (prefix-ic   (propertize " " 'display img))
+         (prefix-new (propertize
                       " " 'display
-                      (propertize
-                       "[?]"
-                       'face '((:background "yellow" :foreground "black"))))))
-    (if (file-exists-p fname)
-        (concat prefix fname)
-        (concat prefix-str
-                (propertize
-                 " Create file: "
-                 'face '((:underline t :background "DarkRed")))
-                fname))))
+                      (propertize "[?]" 'face 'anything-ffiles-prefix-face)))
+         (prefix-url (propertize
+                      " " 'display
+                      (propertize "[@]" 'face 'anything-ffiles-prefix-face))))
+    (cond ((file-exists-p fname) (concat prefix-ic fname))
+          ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
+          (t (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
   (if (and (window-system) anything-c-find-files-show-icons)
@@ -1874,25 +1876,27 @@ If prefix numeric arg is given go ARG level down."
   "Candidate transformer for `anything-c-source-find-files' that show icons."
   (loop for i in files
      for af = (file-name-nondirectory i)
-     collect (cond (;; Symlinks 
+     collect (cond (;; Open Symlinks directories.
                     (and (stringp (car (file-attributes i)))
                          (file-directory-p i) (get-buffer af))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "open.xpm")
                           i))
+                   ;; Closed Symlinks directories.
                    ((and (stringp (car (file-attributes i))) (file-directory-p i))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "close.xpm")
                           i))
+                   ;; Files symlinks.
                    ((stringp (car (file-attributes i)))
                     (cons (anything-c-prefix-filename-with-image
                                    (propertize i 'face 'anything-dired-symlink-face
                                                'help-echo (file-truename i))
                                    "leaf.xpm")
                           i))
-                    (;; Empty directories
+                    (;; Empty directories.
                      (and (eq t (car (file-attributes i)))
                           ;; Be sure to have permission to list content.
                           (file-readable-p i)
@@ -1902,19 +1906,19 @@ If prefix numeric arg is given go ARG level down."
                            (propertize i 'face anything-c-files-face1)
                            "empty.xpm")
                           i))
-                   (;; Open directories
+                   (;; Open directories.
                     (and (eq t (car (file-attributes i))) (get-buffer af))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "open.xpm")
                           i)) 
-                   (;; Closed directories
+                   (;; Closed directories.
                     (eq t (car (file-attributes i)))
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face1)
                            "close.xpm")
                           i))
-                   (;; Files
+                   (;; Files.
                     t
                     (cons (anything-c-prefix-filename-with-image
                            (propertize i 'face anything-c-files-face2)
