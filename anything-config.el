@@ -6886,6 +6886,7 @@ Return nil if bmk is not a valid bookmark."
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))
      ("Open dired in file's directory" . anything-c-open-dired)
+     ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
      ("Open file externally" . anything-c-open-file-externally)
      ("Open file with default tool" . anything-c-open-file-with-default-tool))
