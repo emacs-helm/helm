@@ -6865,6 +6865,7 @@ Return nil if bmk is not a valid bookmark."
      ("Display buffer"   . display-buffer)
      ("Revert buffer" . anything-revert-buffer)
      ("Revert Marked buffers" . anything-revert-marked-buffers)
+     ("Insert buffer" . insert-buffer)
      ("Kill buffer" . kill-buffer)
      ("Kill Marked buffers" . anything-kill-marked-buffers)
      ("Ediff Marked buffers" . anything-ediff-marked-buffers)
