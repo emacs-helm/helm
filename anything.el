@@ -1769,12 +1769,13 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs
 to be handled."
-  (if (or (not anything-input-idle-delay) (anything-action-window))
-      (anything-check-minibuffer-input-1)
-    (anything-new-timer
-     'anything-check-minibuffer-input-timer
-     (run-with-idle-timer anything-input-idle-delay nil
-                          'anything-check-minibuffer-input-1))))
+  (with-current-buffer anything-buffer
+    (if (or (not anything-input-idle-delay) (anything-action-window))
+        (anything-check-minibuffer-input-1)
+      (anything-new-timer
+       'anything-check-minibuffer-input-timer
+       (run-with-idle-timer anything-input-idle-delay nil
+                            'anything-check-minibuffer-input-1)))))
 
 (defun anything-check-minibuffer-input-1 ()
   (with-anything-quittable
