@@ -2100,12 +2100,6 @@ the current pattern."
           (anything-log-run-hook 'anything-after-update-hook))
         (anything-log "end update")))))
 
-(defun anything-get-delay-time-for-delayed-sources ()
-  (if anything-input-idle-delay
-      (max 0 (- anything-idle-delay anything-input-idle-delay))
-    anything-idle-delay)
-  anything-idle-delay)
-
 (defun anything-update-source-p (source)
   (and (or (not anything-source-filter)
            (member (assoc-default 'name source) anything-source-filter))
