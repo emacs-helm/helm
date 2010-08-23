@@ -1842,18 +1842,16 @@ If prefix numeric arg is given go ARG level down."
 
 (defun anything-c-prefix-filename (fname &optional image)
   "Return fname FNAME prefixed with icon IMAGE."
-  (let* ((prefix-new (propertize
+  (let* ((img-name   (and image (expand-file-name
+                                 image anything-c-find-files-icons-directory)))
+         (img        (and image (create-image img-name)))
+         (prefix-img (and image (propertize " " 'display img)))
+         (prefix-new (propertize
                       " " 'display
                       (propertize "[?]" 'face 'anything-ffiles-prefix-face)))
          (prefix-url (propertize
                       " " 'display
-                      (propertize "[@]" 'face 'anything-ffiles-prefix-face)))
-         img-name img prefix-img)
-    (when image
-      (setq img-name   (and image (expand-file-name
-                                   image anything-c-find-files-icons-directory))
-            img        (and image (create-image img-name))
-            prefix-img (and image (propertize " " 'display img))))
+                      (propertize "[@]" 'face 'anything-ffiles-prefix-face))))
     (cond ((file-exists-p fname) (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
           (t (concat prefix-new " " fname)))))
