@@ -1840,19 +1840,21 @@ If prefix numeric arg is given go ARG level down."
   "*Face used to prefix new file or url paths in `anything-find-files'."
   :group 'anything)
 
-(defun anything-c-prefix-filename-with-image (fname image)
+(defun anything-c-prefix-filename (fname &optional image)
   "Return fname FNAME prefixed with icon IMAGE."
-  (let* ((img-name (expand-file-name
-                    image anything-c-find-files-icons-directory))
-         (img      (create-image img-name))
-         (prefix-ic   (propertize " " 'display img))
-         (prefix-new (propertize
+  (let* ((prefix-new (propertize
                       " " 'display
                       (propertize "[?]" 'face 'anything-ffiles-prefix-face)))
          (prefix-url (propertize
                       " " 'display
-                      (propertize "[@]" 'face 'anything-ffiles-prefix-face))))
-    (cond ((file-exists-p fname) (concat prefix-ic fname))
+                      (propertize "[@]" 'face 'anything-ffiles-prefix-face)))
+         img-name img prefix-img)
+    (when image
+      (setq img-name   (and image (expand-file-name
+                                   image anything-c-find-files-icons-directory))
+            img        (and image (create-image img-name))
+            prefix-img (and image (propertize " " 'display img))))
+    (cond ((file-exists-p fname) (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
           (t (concat prefix-new " " fname)))))
 
@@ -1865,12 +1867,15 @@ If prefix numeric arg is given go ARG level down."
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files
      collect (cond ((file-symlink-p i)
-                    (propertize i 'face 'anything-dired-symlink-face
-                                'help-echo (file-truename i)))
+                    (anything-c-prefix-filename
+                     (propertize i 'face 'anything-dired-symlink-face
+                                 'help-echo (file-truename i))))
                    ((file-directory-p i)
-                    (propertize i 'face anything-c-files-face1))
+                    (anything-c-prefix-filename
+                     (propertize i 'face anything-c-files-face1)))
                    (t
-                    (propertize i 'face anything-c-files-face2)))))
+                    (anything-c-prefix-filename
+                     (propertize i 'face anything-c-files-face2))))))
 
 (defsubst anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
@@ -1878,7 +1883,7 @@ If prefix numeric arg is given go ARG level down."
      for af = (file-name-nondirectory i)
      collect (cond ( ;; Files.
                     (eq nil (car (file-attributes i)))
-                    (cons (anything-c-prefix-filename-with-image
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face anything-c-files-face2)
                            "leaf.xpm")
                           i))
@@ -1886,40 +1891,41 @@ If prefix numeric arg is given go ARG level down."
                     (and (eq t (car (file-attributes i)))
                          ;; Be sure to have permission to list content.
                          (file-readable-p i)
-                         (eq 0 (length (directory-files
-                                        i nil directory-files-no-dot-files-regexp t))))
-                    (cons (anything-c-prefix-filename-with-image
+                         (eq 0 (length
+                                (directory-files
+                                 i nil directory-files-no-dot-files-regexp t))))
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face anything-c-files-face1)
                            "empty.xpm")
                           i))
                    ( ;; Open directories.
                     (and (eq t (car (file-attributes i))) (get-buffer af))
-                    (cons (anything-c-prefix-filename-with-image
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face anything-c-files-face1)
                            "open.xpm")
                           i))
                    (;; Closed directories.
                     (eq t (car (file-attributes i)))
-                    (cons (anything-c-prefix-filename-with-image
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face anything-c-files-face1)
                            "close.xpm")
                           i))
                    ( ;; Open Symlinks directories.
                     (and (stringp (car (file-attributes i)))
                          (file-directory-p i) (get-buffer af))
-                    (cons (anything-c-prefix-filename-with-image
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "open.xpm")
                           i))
                    ( ;; Closed Symlinks directories.
                     (and (stringp (car (file-attributes i))) (file-directory-p i))
-                    (cons (anything-c-prefix-filename-with-image
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "close.xpm")
                           i))
                    ( ;; Files symlinks.
                     (stringp (car (file-attributes i)))
-                    (cons (anything-c-prefix-filename-with-image
+                    (cons (anything-c-prefix-filename
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i))
                            "leaf.xpm")
