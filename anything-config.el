@@ -2006,6 +2006,7 @@ Useful in dired buffers when there is inserted subdirs."
 (defun anything-find-library-at-point ()
   "Try to find library path at point.
 Find inside `require' and `declare-function' sexp."
+  (require 'find-func)
   (let* ((beg-sexp (save-excursion (search-backward "(" (point-at-bol) t)))
          (end-sexp (save-excursion (search-forward ")" (point-at-eol) t)))
          (sexp     (and beg-sexp end-sexp
