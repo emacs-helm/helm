@@ -5270,7 +5270,7 @@ Line is parsed for BEG position to END position."
         (regexp   (assoc-default major-mode
                                  anything-c-browse-code-regexp-alist)))
     (when (and regexp (string-match regexp str-line))
-      (format "%4d:%s" (line-number-at-pos beg) str-line))))
+      (format "%4d:%s" (line-number-at-pos (1- beg)) str-line))))
 
 (defvar anything-c-source-browse-code
   '((name . "Browse code")
