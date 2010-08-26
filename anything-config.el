@@ -1865,15 +1865,21 @@ If prefix numeric arg is given go ARG level down."
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files
      collect (cond ((file-symlink-p i)
-                    (anything-c-prefix-filename
-                     (propertize i 'face 'anything-dired-symlink-face
-                                 'help-echo (file-truename i))))
+                    (cons
+                     (anything-c-prefix-filename
+                      (propertize i 'face 'anything-dired-symlink-face
+                                  'help-echo (file-truename i)))
+                     i))
                    ((file-directory-p i)
-                    (anything-c-prefix-filename
-                     (propertize i 'face anything-c-files-face1)))
+                    (cons
+                     (anything-c-prefix-filename
+                      (propertize i 'face anything-c-files-face1))
+                     i))
                    (t
-                    (anything-c-prefix-filename
-                     (propertize i 'face anything-c-files-face2))))))
+                    (cons
+                     (anything-c-prefix-filename
+                      (propertize i 'face anything-c-files-face2))
+                     i)))))
 
 (defsubst anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
