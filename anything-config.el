@@ -691,6 +691,29 @@ because it is under discussion."
   :type 'string
   :group 'anything-config)
 
+(defcustom anything-c-browse-code-regexp-lisp
+  "^ *\(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|\
+type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
+  "*Regexp used to parse lisp buffer when browsing code."
+  :type 'string
+  :group 'anything-config)
+
+(defcustom anything-c-browse-code-regexp-python
+  "\\<def\\>\\|\\<class\\>"
+  "*Regexp used to parse python buffer when browsing code."
+  :type 'string
+  :group 'anything-config)
+
+(defcustom anything-c-browse-code-regexp-alist
+  `((lisp-interaction-mode . ,anything-c-browse-code-regexp-lisp)
+    (emacs-lisp-mode . ,anything-c-browse-code-regexp-lisp)
+    (lisp-mode . ,anything-c-browse-code-regexp-lisp)
+    (python-mode . ,anything-c-browse-code-regexp-python))
+  "*Alist to store regexps for browsing code corresponding \
+to a specific `major-mode'."
+  :type 'string
+  :group 'anything-config)
+
 ;;;###autoload
 (defun anything-configuration ()
   "Customize `anything'."
@@ -733,6 +756,7 @@ because it is under discussion."
 (define-key anything-command-map (kbd "h i") 'anything-info-at-point)
 (define-key anything-command-map (kbd "h r") 'anything-info-emacs)
 (define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
+(define-key anything-command-map (kbd "C-c C-b") 'anything-browse-code)
 (define-key anything-command-map (kbd "C-x r i") 'anything-register)
 (define-key anything-command-map (kbd "C-c C-x") 'anything-c-run-external-command)
 
@@ -774,6 +798,7 @@ because it is under discussion."
      ["Occur" anything-occur t]
      ["Browse Kill ring" anything-show-kill-ring t]
      ["Browse register" anything-register t]
+     ["Browse code" anything-browse-code t]
      ["Mark Ring" anything-all-mark-rings t]
      ["Regexp handler" anything-regexp t]
      ["Colors & Faces" anything-colors t]
@@ -1113,6 +1138,22 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Preconfigured `anything' for emacs process."
   (interactive)
   (anything-other-buffer 'anything-c-source-emacs-process "*anything process*"))
+
+;;;###autoload
+(defun anything-occur ()
+  "Preconfigured Anything for Occur source."
+  (interactive)
+  (let ((anything-compile-source-functions
+         ;; rule out anything-match-plugin because the input is one regexp.
+         (delq 'anything-compile-source--match-plugin
+               (copy-sequence anything-compile-source-functions))))
+  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
+
+;;;###autoload
+(defun anything-browse-code ()
+  "Preconfigured anything to browse code."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-browse-code "*Browse code*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
@@ -5221,15 +5262,26 @@ Return an alist with elements like (data . number_results)."
     (volatile)))
 ;; (anything 'anything-c-source-occur)
 
-;;;###autoload
-(defun anything-occur ()
-  "Preconfigured Anything for Occur source."
-  (interactive)
-  (let ((anything-compile-source-functions
-         ;; rule out anything-match-plugin because the input is one regexp.
-         (delq 'anything-compile-source--match-plugin
-               (copy-sequence anything-compile-source-functions))))
-  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
+;;; Anything browse code.
+(defun anything-c-browse-code-get-line (beg end)
+  "Select line if it match the regexp corresponding to current `major-mode'.
+Line is parsed for BEG position to END position."
+  (let ((str-line (buffer-substring beg end))
+        (regexp   (assoc-default major-mode
+                                 anything-c-browse-code-regexp-alist)))
+    (when (and regexp (string-match regexp str-line))
+      (format "%4d:%s" (line-number-at-pos beg) str-line))))
+
+(defvar anything-c-source-browse-code
+  '((name . "Browse code")
+    (init . (lambda ()
+              (anything-candidate-buffer anything-current-buffer)
+              (with-current-buffer anything-current-buffer
+                (jit-lock-fontify-now))))
+    (candidates-in-buffer)
+    (get-line . anything-c-browse-code-get-line)
+    (type . line)
+    (recenter)))
 
 ;; Do many actions for input
 (defvar anything-c-source-create
