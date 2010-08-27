@@ -5268,9 +5268,11 @@ Return an alist with elements like (data . number_results)."
 Line is parsed for BEG position to END position."
   (let ((str-line (buffer-substring beg end))
         (regexp   (assoc-default major-mode
-                                 anything-c-browse-code-regexp-alist)))
+                                 anything-c-browse-code-regexp-alist))
+        (num-line (if (string= anything-pattern "") beg (1- beg))))
     (when (and regexp (string-match regexp str-line))
-      (format "%4d:%s" (line-number-at-pos beg) str-line))))
+      (format "%4d:%s" (line-number-at-pos num-line) str-line))))
+        
 
 (defvar anything-c-source-browse-code
   '((name . "Browse code")
