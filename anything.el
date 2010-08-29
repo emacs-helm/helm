@@ -978,6 +978,20 @@ The original idea is from `tramp-debug-message'."
     (unless (member msg anything-issued-errors)
       (add-to-list 'anything-issued-errors msg))))
 
+(defvar anything-last-log-file nil)
+(defun anything-log-save-maybe ()
+  (when (stringp anything-debug)
+    (let ((logdir (expand-file-name (format-time-string "%Y%m%d")
+                                    anything-debug)))
+      (make-directory logdir t)
+      (with-current-buffer (get-buffer-create "*Anything Log*")
+        (write-region (point-min) (point-max)
+                      (setq anything-last-log-file
+                            (expand-file-name (format-time-string "%Y%m%d-%H%M%S")
+                                              logdir))
+                      nil 'silent)
+        (erase-buffer)))))
+
 (defun anything-print-error-messages ()
   "Print error messages in `anything-issued-errors'."
   (message "%s" (mapconcat 'identity (reverse anything-issued-errors) "\n")))
@@ -1526,30 +1540,32 @@ source in *buffers* buffer and set
   "Older interface of `anything'. It is called by `anything'."
   (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
-  (condition-case v
-      (let ( ;; It is needed because `anything-source-name' is non-nil
-            ;; when `anything' is invoked by action. Awful global scope.
-            anything-source-name
-            anything-in-persistent-action
-            anything-quit
-            (case-fold-search t)
-            (anything-buffer (or any-buffer anything-buffer))
-            ;; cua-mode ; avoid error when region is selected
-            )
-        (with-anything-restore-variables
-          (anything-initialize-1 any-resume any-input any-sources)
-          (anything-display-buffer anything-buffer)
-          (anything-log "show prompt")
-          (unwind-protect
-              (anything-read-pattern-maybe
-               any-prompt any-input any-preselect any-resume any-keymap)
-            (anything-cleanup)))
-        (prog1 (unless anything-quit (anything-execute-selection-action-1))
-          (anything-log "end session --------------------------------------------")))
-    (quit
-     (anything-on-quit)
-     (anything-log "end session (quit) -------------------------------------")
-     nil)))
+  (unwind-protect
+      (condition-case v
+          (let ( ;; It is needed because `anything-source-name' is non-nil
+                ;; when `anything' is invoked by action. Awful global scope.
+                anything-source-name
+                anything-in-persistent-action
+                anything-quit
+                (case-fold-search t)
+                (anything-buffer (or any-buffer anything-buffer))
+                ;; cua-mode ; avoid error when region is selected
+                )
+            (with-anything-restore-variables
+              (anything-initialize-1 any-resume any-input any-sources)
+              (anything-display-buffer anything-buffer)
+              (anything-log "show prompt")
+              (unwind-protect
+                  (anything-read-pattern-maybe
+                   any-prompt any-input any-preselect any-resume any-keymap)
+                (anything-cleanup)))
+            (prog1 (unless anything-quit (anything-execute-selection-action-1))
+              (anything-log "end session --------------------------------------------")))
+        (quit
+         (anything-on-quit)
+         (anything-log "end session (quit) -------------------------------------")
+         nil))
+    (anything-log-save-maybe)))
 
 
 
