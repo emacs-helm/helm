@@ -82,6 +82,8 @@
 ;;
 ;; Below are complete command list:
 ;;
+;;  `anything-open-last-log'
+;;    Open anything log file of last anything session.
 ;;  `anything'
 ;;    Select anything. In Lisp program, some optional arguments can be used.
 ;;  `anything-resume'
@@ -991,6 +993,13 @@ The original idea is from `tramp-debug-message'."
                                               logdir))
                       nil 'silent)
         (erase-buffer)))))
+
+(defun anything-open-last-log ()
+  "Open anything log file of last anything session."
+  (interactive)
+  (if anything-last-log-file
+      (view-file anything-last-log-file)
+    (switch-to-buffer "*Anything Log*")))
 
 (defun anything-print-error-messages ()
   "Print error messages in `anything-issued-errors'."
