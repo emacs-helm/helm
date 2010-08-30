@@ -1897,7 +1897,7 @@ If prefix numeric arg is given go ARG level down."
                (file-symlink-p fname))
            (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
-          (t (concat prefix-new " " fname))))))
+          (t (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
   (if (and (window-system) anything-c-find-files-show-icons)
