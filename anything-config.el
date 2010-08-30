@@ -714,10 +714,10 @@ to a specific `major-mode'."
   :type 'list
   :group 'anything-config)
 
-(defcustom anything-c-external-programs-associations
-  '(("jpg" . "gqview")
-    ("pdf" . "xpdf"))
-  "*Alist to store externals programs associated with file extension."
+(defcustom anything-c-external-programs-associations nil
+  "*Alist to store externals programs associated with file extension.
+This variable overhide setting in .mailcap file.
+e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
   :type 'list
   :group 'anything-config)
 
