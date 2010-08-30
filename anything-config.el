@@ -714,6 +714,13 @@ to a specific `major-mode'."
   :type 'list
   :group 'anything-config)
 
+(defcustom anything-c-external-programs-associations
+  '(("jpg" . "gqview")
+    ("pdf" . "xpdf"))
+  "*Alist to store externals programs associated with file extension."
+  :type 'list
+  :group 'anything-config)
+
 ;;;###autoload
 (defun anything-configuration ()
   "Customize `anything'."
@@ -6089,12 +6096,23 @@ The command is like <command %s> and is meant to use with `format'."
          (mime (when ext (mailcap-extension-to-mime ext))))
     (when mime (mailcap-mime-info mime))))
 
+(defun anything-get-default-program-for-file (filename)
+  "Try to find a default program to open FILENAME.
+Try first in `anything-c-external-programs-associations' and then in mailcap file
+if nothing found return nil."
+  (let* ((ext      (file-name-extension filename))
+         (def-prog (assoc-default ext anything-c-external-programs-associations)))
+    (if def-prog
+        (concat def-prog " %s")
+        (anything-get-mailcap-for-file filename))))
+
 (defun anything-c-open-file-externally (file)
-  "Open FILE with an external tool found in .mailcap file.
+  "Open FILE with an external program.
+Try to guess which program to use with `anything-get-default-program-for-file'.
 If not found or a prefix arg is given query the user which tool to use."
   (let* ((fname      (expand-file-name file))
          (collection (anything-c-external-commands-list-1 'sort))
-         (def-prog   (anything-get-mailcap-for-file fname))
+         (def-prog   (anything-get-default-program-for-file fname))
          (program    (or (unless (or anything-current-prefix-arg
                                      (not def-prog))
                            def-prog)
@@ -6104,11 +6122,25 @@ If not found or a prefix arg is given query the user which tool to use."
                            :must-match t
                            :name "Open file Externally"
                            :history anything-external-command-history)
-                          " %s"))))
+                          " %s")))
+         (real-prog-name (replace-regexp-in-string " %s" "" program)))
+    (unless def-prog
+      (when
+          (y-or-n-p
+           (format
+            "Do you want to make %s the default program for this kind of files? "
+            real-prog-name))
+        (push (cons (file-name-extension fname)
+                    (read-string
+                     "Program(Add args maybe and confirm): " real-prog-name))
+              anything-c-external-programs-associations)
+        (customize-save-variable 'anything-c-external-programs-associations
+                                 anything-c-external-programs-associations)))
     (anything-run-or-raise program file)
-    (setq program (replace-regexp-in-string " %s" "" program))
     (setq anything-external-command-history
-          (cons program (delete program anything-external-command-history)))))
+          (cons real-prog-name
+                (delete real-prog-name anything-external-command-history)))))
+
 
 ;;;###autoload
 (defun w32-shell-execute-open-file (file)
