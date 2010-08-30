@@ -711,7 +711,7 @@ type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
     (python-mode . ,anything-c-browse-code-regexp-python))
   "*Alist to store regexps for browsing code corresponding \
 to a specific `major-mode'."
-  :type 'string
+  :type 'list
   :group 'anything-config)
 
 ;;;###autoload
@@ -1893,9 +1893,11 @@ If prefix numeric arg is given go ARG level down."
          (prefix-url (propertize
                       " " 'display
                       (propertize "[@]" 'face 'anything-ffiles-prefix-face))))
-    (cond ((file-exists-p fname) (if image (concat prefix-img fname) fname))
+    (cond ((or (file-exists-p fname)
+               (file-symlink-p fname))
+           (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
-          (t (concat prefix-new " " fname)))))
+          (t (concat prefix-new " " fname))))))
 
 (defun anything-c-find-files-transformer (files sources)
   (if (and (window-system) anything-c-find-files-show-icons)
