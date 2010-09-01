@@ -3163,7 +3163,7 @@ http://www.nongnu.org/bm/")
   "Used as `candidate-transformer' to colorize bookmarks.
 Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (loop for i in bookmarks
-     for pred          = (bookmark-get-filename i)
+     for isfile        = (bookmark-get-filename i)
      for bufp          = (and (fboundp 'bmkext-get-buffer-name)
                               (bmkext-get-buffer-name i))
      for handlerp      = (and (fboundp 'bookmark-get-handler)
@@ -3179,31 +3179,31 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      for handlerp      = (bookmark-get-handler i)
      for isannotation  = (bookmark-get-annotation i)
      for isabook       = (string= (bookmark-prop-get i 'type) "addressbook")
+     for isinfo        = (eq handlerp 'Info-bookmark-jump)
      ;; Add a * if bookmark have annotation
      if (and isannotation (not (string-equal isannotation "")))
      do (setq i (concat "*" i))
-     ;; info buffers
-     if (eq handlerp 'Info-bookmark-jump)
-     collect (propertize i 'face 'anything-bmkext-info 'help-echo pred)
-     ;; w3m buffers
-     if isw3m
-     collect (propertize i 'face 'anything-bmkext-w3m 'help-echo pred)
-     ;; gnus buffers
-     if isgnus
-     collect (propertize i 'face 'anything-bmkext-gnus 'help-echo pred)
-     ;; Man Woman
-     if (or iswoman isman)
-     collect (propertize i 'face 'anything-bmkext-man 'help-echo pred)
-     ;; Addressbook
-     if (and (not pred) isabook)
-     collect (propertize i 'face '((:foreground "Tomato")))
-     ;; directories
-     if (and pred (file-directory-p pred))
-     collect (propertize i 'face anything-c-bookmarks-face1 'help-echo pred)
-     ;; regular files
-     if (and pred (not (file-directory-p pred)) (file-exists-p pred)
-             (not (or iswoman isman)))
-     collect (propertize i 'face 'anything-bmkext-file 'help-echo pred)))
+     collect (cond (;; info buffers
+                    isinfo
+                    (propertize i 'face 'anything-bmkext-info 'help-echo isfile))
+                   (;; w3m buffers
+                    isw3m
+                    (propertize i 'face 'anything-bmkext-w3m 'help-echo isfile))
+                   (;; gnus buffers
+                    isgnus
+                    (propertize i 'face 'anything-bmkext-gnus 'help-echo isfile))
+                   (;; Man Woman
+                    (or iswoman isman)
+                    (propertize i 'face 'anything-bmkext-man 'help-echo isfile))
+                   (;; Addressbook
+                    isabook
+                    (propertize i 'face '((:foreground "Tomato"))))
+                   (;; directories
+                    (and isfile (file-directory-p isfile))
+                    (propertize i 'face anything-c-bookmarks-face1 'help-echo isfile))
+                   (;; regular files
+                    t
+                    (propertize i 'face 'anything-bmkext-file 'help-echo isfile)))))
 
 
 ;;; Faces for bookmarks
