@@ -6102,7 +6102,7 @@ Try first in `anything-c-external-programs-associations' and then in mailcap fil
 if nothing found return nil."
   (let* ((ext      (file-name-extension filename))
          (def-prog (assoc-default ext anything-c-external-programs-associations)))
-    (if def-prog
+    (if (and def-prog (not (string= def-prog "")))
         (concat def-prog " %s")
         (anything-get-mailcap-for-file filename))))
 
