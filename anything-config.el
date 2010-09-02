@@ -6032,42 +6032,25 @@ automatically.")
 
 (defun anything-c-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.
-
 If `anything-c-external-commands-list' is non-nil it will
 return its contents.  Else it calculates all external commands
-and sets `anything-c-external-commands-list'.
-
-The code is ripped out of `eshell-complete-commands-list'."
+and sets `anything-c-external-commands-list'."
   (if anything-c-external-commands-list
       anything-c-external-commands-list
       (setq anything-c-external-commands-list
-            (let* ((paths (split-string (getenv "PATH") path-separator))
-                   (cwd (file-name-as-directory
-                         (expand-file-name default-directory)))
-                   (path "") (comps-in-path ())
-                   (file "") (filepath "") (completions ()))
-              ;; Go thru each path in the search path, finding completions.
-              (while paths
-                (setq path (file-name-as-directory
-                            (expand-file-name (or (car paths) ".")))
-                      comps-in-path
-                      (and (file-accessible-directory-p path)
-                           (file-name-all-completions "" path)))
-                ;; Go thru each completion found, to see whether it should be
-                ;; used, e.g. see if it's executable.
-                (while comps-in-path
-                  (setq file (car comps-in-path)
-                        filepath (concat path file))
-                  (if (and (not (member file completions))
-                           (or (string-equal path cwd)
-                               (not (file-directory-p filepath)))
-                           (file-executable-p filepath))
-                      (setq completions (cons file completions)))
-                  (setq comps-in-path (cdr comps-in-path)))
-                (setq paths (cdr paths)))
-              (if sort
-                  (sort completions #'(lambda (x y) (string< x y)))
-                  completions)))))
+            (loop
+               with paths = (split-string (getenv "PATH") path-separator)
+               with completions = ()
+               for dir in paths
+               when (and (file-exists-p dir) (file-accessible-directory-p dir))
+               for lsdir = (loop for i in (directory-files dir t)
+                              when (and (not (member (file-name-nondirectory i) completions))
+                                        (not (file-directory-p i))
+                                        (file-executable-p i))
+                              collect (file-name-nondirectory i))
+               append lsdir into completions
+               finally return (if sort (sort completions 'string-lessp) completions)))))
+
 
 (defun anything-c-file-buffers (filename)
   "Returns a list of buffer names corresponding to FILENAME."
