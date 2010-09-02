@@ -6044,10 +6044,11 @@ and sets `anything-c-external-commands-list'."
                for dir in paths
                when (and (file-exists-p dir) (file-accessible-directory-p dir))
                for lsdir = (loop for i in (directory-files dir t)
-                              when (and (not (member (file-name-nondirectory i) completions))
+                              for bn = (file-name-nondirectory i)
+                              when (and (not (member bn completions))
                                         (not (file-directory-p i))
                                         (file-executable-p i))
-                              collect (file-name-nondirectory i))
+                              collect bn)
                append lsdir into completions
                finally return (if sort (sort completions 'string-lessp) completions)))))
 
