@@ -2312,7 +2312,11 @@ action."
                         (and (assoc 'accept-empty source) "")))
     (unless preserve-saved-action (setq anything-saved-action nil))
     (if (and selection action)
-        (anything-funcall-with-source source  action selection))))
+        (anything-funcall-with-source
+         source action
+         (anything-aif (assoc-default 'coerce source)
+             (anything-funcall-with-source source it selection)
+           selection)))))
 
 (defun anything-get-default-action (action)
   (if (and (listp action) (not (functionp action)))
@@ -3891,6 +3895,16 @@ buffer as BUFFER."
   with TAB). The DISPLAY string is shown in the completions
   buffer and the FUNCTION is invoked when an action is
   selected. The first action of the list is the default. ")
+(anything-document-attribute 'coerce "optional"
+  "  It's a function called with one argument: the selected candidate.
+  
+  This function is intended for type convertion.
+  In normal case, the selected candidate (string) is passed to action function.
+  If coerce function is specified, it is called just before action function.
+
+  Example: converting string to symbol
+    (coerce . intern)
+")
 (anything-document-attribute 'type "optional if action attribute is provided"
   "  Indicates the type of the items the source returns. 
 
@@ -5930,6 +5944,47 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
            '("a" "b") incomplete-line-info)
           (anything-output-filter--collect-candidates
            '("" "c" "") incomplete-line-info)))
+      (desc "coerce attribute")
+      (expect "string"
+        (anything :sources '(((name . "test")
+                              (candidates "string")
+                              (action . identity)))
+                  :execute-action-at-once-if-one t))
+      (expect 'symbol
+        (anything :sources '(((name . "test")
+                              (candidates "symbol")
+                              (coerce . intern)
+                              (action . identity)))
+                  :execute-action-at-once-if-one t))
+      (expect 'real
+        (anything :sources '(((name . "test")
+                              (candidates ("display" . "real"))
+                              (coerce . intern)
+                              (action . identity)))
+                  :execute-action-at-once-if-one t))
+      (expect 'real
+        (anything :sources '(((name . "test")
+                              (candidates)
+                              (candidate-transformer
+                               (lambda (c) '(("display" . "real"))))
+                              (coerce . intern)
+                              (action . identity)))
+                  :execute-action-at-once-if-one t))
+      (expect 'real
+        (anything :sources '(((name . "test")
+                              (candidates)
+                              (filtered-candidate-transformer
+                               (lambda (c s) '(("display" . "real"))))
+                              (coerce . intern)
+                              (action . identity)))
+                  :execute-action-at-once-if-one t))
+      (expect 'real
+        (anything :sources '(((name . "test")
+                              (candidates "dummy")
+                              (display-to-real (lambda (disp) "real"))
+                              (coerce . intern)
+                              (action . identity)))
+                  :execute-action-at-once-if-one t))
       (desc "anything-next-point-in-list")
       (expect 10
         (anything-next-point-in-list 5 '(10 20) nil))
