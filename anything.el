@@ -2314,9 +2314,13 @@ action."
     (if (and selection action)
         (anything-funcall-with-source
          source action
-         (anything-aif (assoc-default 'coerce source)
+         (anything-coerce-selection selection source)))))
+
+(defun anything-coerce-selection (selection source)
+  "Coerce source with coerce function."
+  (anything-aif (assoc-default 'coerce source)
              (anything-funcall-with-source source it selection)
-           selection)))))
+           selection))
 
 (defun anything-get-default-action (action)
   (if (and (listp action) (not (functionp action)))
@@ -3206,7 +3210,7 @@ It is analogous to `dired-get-marked-files'."
                (loop with current-src = (anything-get-current-source)
                      for (source . real) in (reverse anything-marked-candidates)
                      when (equal current-src source)
-                     collect real)
+                     collect (anything-coerce-selection real source))
              (list (anything-get-selection)))))
       (anything-log-eval cands)
       cands)))
@@ -5829,6 +5833,17 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
                (anything-marked-candidates nil))
           (stub anything-get-current-source => source)
           (stub anything-get-selection => "current")
+          (anything-marked-candidates)))
+      (desc "anything-marked-candidates with coerce")
+      (expect '(mark3 mark1)
+        (let* ((source '((name . "mark test")
+                         (coerce . intern)))
+               (anything-marked-candidates
+                `((,source . "mark1")
+                  (((name . "other")) . "mark2")
+                  (,source . "mark3"))))
+          (stub anything-buffer-get => (current-buffer))
+          (stub anything-get-current-source => source)
           (anything-marked-candidates)))
       (desc "anything-let")
       (expect '(1 10000 nil)
