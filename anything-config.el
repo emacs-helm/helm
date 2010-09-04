@@ -5163,8 +5163,7 @@ Return an alist with elements like (data . number_results)."
                ("Add to Playlist and play"
                 . (lambda (candidate)
                     (emms-playlist-new)
-                    (dolist (i (anything-marked-candidates))
-                      (emms-add-playlist-file i))
+                    (mapc 'emms-add-playlist-file (anything-marked-candidates))
                     (unless emms-player-playing-p
                       (anything-c-emms-play-current-playlist))))))))
 
@@ -6815,13 +6814,11 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
     (when (buffer-modified-p)
       (revert-buffer t t))))
 
-(defun anything-revert-marked-buffers (candidate)
-  (dolist (i (anything-marked-candidates))
-    (anything-revert-buffer i)))
+(defun anything-revert-marked-buffers (ignore)
+  (mapc 'anything-revert-buffer (anything-marked-candidates)))
 
-(defun anything-kill-marked-buffers (candidate)
-  (dolist (i (anything-marked-candidates))
-    (kill-buffer i)))
+(defun anything-kill-marked-buffers (ignore)
+  (mapc 'kill-buffer (anything-marked-candidates)))
 
 ;; Plug-in: persistent-help
 (defun anything-compile-source--persistent-help (source)
@@ -6853,7 +6850,7 @@ It also accepts a function or a variable name.")
   "Open file CANDIDATE or open anything marked files in background."
   (let ((marked (anything-marked-candidates)))
     (if (> (length marked) 1)
-        (dolist (i marked) (find-file-noselect i))
+        (mapc 'find-file-noselect marked)
         (find-file-at-point candidate))))
 
 ;; FIXME there is a bug in dired that confuse all dired commands
