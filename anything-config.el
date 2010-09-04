@@ -6988,27 +6988,30 @@ Return nil if bmk is not a valid bookmark."
 
 (define-anything-type-attribute 'command
   `((action ("Call interactively" . anything-c-call-interactively)
-            ("Describe command" . anything-c-describe-function)
+            ("Describe command" . describe-function)
             ("Add command to kill ring" . anything-c-kill-new)
-            ("Go to command's definition" . anything-c-find-function))
+            ("Go to command's definition" . find-function))
     ;; Sort commands according to their usage count.
     (filtered-candidate-transformer . anything-c-adaptive-sort)
-    (persistent-action . anything-c-describe-function))
+    (coerce . anything-c-symbolify)
+    (persistent-action . describe-function))
   "Command. (string or symbol)")
 
 (define-anything-type-attribute 'function
-  '((action ("Describe function" . anything-c-describe-function)
+  '((action ("Describe function" . describe-function)
             ("Add function to kill ring" . anything-c-kill-new)
-            ("Go to function's definition" . anything-c-find-function))
+            ("Go to function's definition" . find-function))
     (action-transformer anything-c-transform-function-call-interactively)
-    (candidate-transformer anything-c-mark-interactive-functions))
+    (candidate-transformer anything-c-mark-interactive-functions)
+    (coerce . anything-c-symbolify))
   "Function. (string or symbol)")
 
 (define-anything-type-attribute 'variable
-  '((action ("Describe variable" . anything-c-describe-variable)
+  '((action ("Describe variable" . describe-variable)
             ("Add variable to kill ring" . anything-c-kill-new)
-            ("Go to variable's definition" . anything-c-find-variable)
-            ("Set variable" . anything-c-set-variable)))
+            ("Go to variable's definition" . find-variable)
+            ("Set variable" . anything-c-set-variable))
+    (coerce . anything-c-symbolify))
   "Variable.")
 
 (define-anything-type-attribute 'sexp
