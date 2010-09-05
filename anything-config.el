@@ -6980,25 +6980,24 @@ Return nil if bmk is not a valid bookmark."
                            anything-c-shorten-home-path))
   "File name.")
 
-(define-anything-type-attribute 'command
-  `((action ("Call interactively" . anything-c-call-interactively)
-            ("Describe command" . describe-function)
-            ("Add command to kill ring" . anything-c-kill-new)
-            ("Go to command's definition" . find-function))
-    ;; Sort commands according to their usage count.
-    (filtered-candidate-transformer . anything-c-adaptive-sort)
-    (coerce . anything-c-symbolify)
-    (persistent-action . describe-function))
-  "Command. (string or symbol)")
+(let ((actions '(("Describe command" . describe-function)
+                 ("Add command to kill ring" . anything-c-kill-new)
+                 ("Go to command's definition" . find-function))))
+  (define-anything-type-attribute 'command
+    `((action ("Call interactively" . anything-c-call-interactively)
+              ,@actions)
+      ;; Sort commands according to their usage count.
+      (filtered-candidate-transformer . anything-c-adaptive-sort)
+      (coerce . anything-c-symbolify)
+      (persistent-action . describe-function))
+    "Command. (string or symbol)")
 
-(define-anything-type-attribute 'function
-  '((action ("Describe function" . describe-function)
-            ("Add function to kill ring" . anything-c-kill-new)
-            ("Go to function's definition" . find-function))
-    (action-transformer anything-c-transform-function-call-interactively)
-    (candidate-transformer anything-c-mark-interactive-functions)
-    (coerce . anything-c-symbolify))
-  "Function. (string or symbol)")
+  (define-anything-type-attribute 'function
+    `((action . ,actions)
+      (action-transformer anything-c-transform-function-call-interactively)
+      (candidate-transformer anything-c-mark-interactive-functions)
+      (coerce . anything-c-symbolify))
+    "Function. (string or symbol)"))
 
 (define-anything-type-attribute 'variable
   '((action ("Describe variable" . describe-variable)
