@@ -6982,7 +6982,12 @@ Return nil if bmk is not a valid bookmark."
 
 (let ((actions '(("Describe command" . describe-function)
                  ("Add command to kill ring" . anything-c-kill-new)
-                 ("Go to command's definition" . find-function))))
+                 ("Go to command's definition" . find-function)
+                 ("Debug on entry" . debug-on-entry)
+                 ("Cancel debug on entry" . cancel-debug-on-entry)
+                 ("Trace function" . trace-function)
+                 ("Trace function (background)" . trace-function-background)
+                 ("Untrace function" . untrace-function))))
   (define-anything-type-attribute 'command
     `((action ("Call interactively" . anything-c-call-interactively)
               ,@actions)
