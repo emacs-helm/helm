@@ -2159,14 +2159,15 @@ If current source has `update' attribute, a function without argument, call it b
       (anything-keep-selection source selection))))
 
 (defun anything-keep-selection (source selection)
-  (with-anything-window
-    (anything-goto-source source)
-    (forward-char -1)                ;back to \n
-    (if (search-forward (concat "\n" selection "\n") nil t)
-        (forward-line -1)
-      (goto-char (point-min))
-      (forward-line 1))
-    (anything-mark-current-line)))
+  (when (and source selection)
+    (with-anything-window
+      (anything-goto-source source)
+      (forward-char -1)                  ;back to \n
+      (if (search-forward (concat "\n" selection "\n") nil t)
+          (forward-line -1)
+        (goto-char (point-min))
+        (forward-line 1))
+      (anything-mark-current-line))))
 
 (defun anything-remove-candidate-cache (source)
   (setq anything-candidate-cache
