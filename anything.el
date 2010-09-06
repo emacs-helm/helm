@@ -2148,15 +2148,24 @@ the current pattern."
 If current source has `update' attribute, a function without argument, call it before update."
   (interactive)
   (let ((source (anything-get-current-source)))
-    (anything-aif (anything-funcall-with-source source 'anything-candidate-buffer)
-        (kill-buffer it))
-    (dolist (attr '(update init))
-      (anything-aif (assoc-default attr source)
-          (anything-funcall-with-source source it)))
-    (anything-remove-candidate-cache source)
+    (if source
+        (anything-force-update--reinit source)
+      (anything-erase-message)
+      (mapc 'anything-force-update--reinit (anything-get-sources)))
     (let ((selection (anything-get-selection nil t)))
       (anything-update)
       (anything-keep-selection source selection))))
+
+(defun anything-force-update--reinit (source)
+  (anything-aif (anything-funcall-with-source source 'anything-candidate-buffer)
+      (kill-buffer it))
+  (dolist (attr '(update init))
+    (anything-aif (assoc-default attr source)
+        (anything-funcall-with-source source it)))
+  (anything-remove-candidate-cache source))
+
+(defun anything-erase-message ()
+  (message ""))
 
 (defun anything-keep-selection (source selection)
   (when (and source selection)
