@@ -2509,8 +2509,10 @@ UNIT and DIRECTION."
      (goto-char (point-min))
      (let ((name (if (stringp source-or-name) source-or-name
                    (assoc-default 'name source-or-name))))
-       (while (not (string= name (anything-current-line-contents)))
-         (goto-char (anything-get-next-header-pos)))))
+       (condition-case err
+           (while (not (string= name (anything-current-line-contents)))
+             (goto-char (anything-get-next-header-pos)))
+         (error (message "")))))
    'source 'next))
 
 (defun anything-mark-current-line ()
