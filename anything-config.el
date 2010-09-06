@@ -6844,6 +6844,45 @@ It also accepts a function or a variable name.")
 
 ;;; (anything '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
 
+;; Plug-in: Type customize
+(defun anything-c-uniq-list (lst)
+  "Like `remove-duplicates' in CL.
+But cut deeper duplicates and test by `equal'. "
+  (reverse (remove-duplicates (reverse lst) :test 'equal)))
+(defvar anything-additional-type-attributes nil)
+(defun anything-c-arrange-type-attribute (type spec)
+  "Override type attributes by `define-anything-type-attribute'.
+
+The SPEC is like source. The symbol `REST' is replaced with original attribute value.
+
+ Example: Set `play-sound-file' as default action
+   (anything-c-arrange-type-attribute 'file
+      '((action (\"Play sound\" . play-sound-file)
+                REST ;; Rest of actions (find-file, find-file-other-window, ...)
+   )))
+"
+  (add-to-list 'anything-additional-type-attributes
+               (cons type
+                     (loop with typeattr = (assoc-default type anything-type-attributes)
+                      for (attr . value) in spec
+                      if (listp value)
+                      collect (cons attr
+                                    (anything-c-uniq-list
+                                     (loop for v in value
+                                           if (eq v 'REST)
+                                           append (assoc-default attr typeattr)
+                                           else
+                                           collect v)))
+                      else
+                      collect (cons attr value)))))
+(put 'anything-c-arrange-type-attribute 'lisp-indent-function 1)
+
+(defun anything-compile-source--type-customize (source)
+  (anything-aif (assoc-default (assoc-default 'type source) anything-additional-type-attributes)
+      (append it source)
+    source))
+(add-to-list 'anything-compile-source-functions 'anything-compile-source--type-customize t)
+
 ;; Plug-in: default-action
 (defun anything-compile-source--default-action (source)
   (anything-aif (assoc-default 'default-action source)
