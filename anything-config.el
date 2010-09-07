@@ -137,6 +137,12 @@
 ;; Preconfigured `anything' for visible bookmarks.
 ;; `anything-timers'
 ;; Preconfigured `anything' for timers.
+;; `anything-list-emacs-process'
+;; Preconfigured `anything' for emacs process.
+;; `anything-occur'
+;; Preconfigured Anything for Occur source.
+;; `anything-browse-code'
+;; Preconfigured anything to browse code.
 ;; `anything-kill-buffers'
 ;; Preconfigured `anything' to kill buffer you selected.
 ;; `anything-regexp'
@@ -225,8 +231,6 @@
 ;; Call anything source within `anything' session.
 ;; `anything-execute-anything-command'
 ;; Preconfigured `anything' to execute preconfigured `anything'.
-;; `anything-occur'
-;; Preconfigured Anything for Occur source.
 ;; `anything-create-from-anything'
 ;; Run `anything-create' from `anything' as a fallback.
 ;; `anything-create'
@@ -289,6 +293,16 @@
 ;; `anything-command-map-prefix-key'
 ;; Default Value: "<f5> a"
 ;; `anything-c-find-files-show-icons'
+;; Default Value: t
+;; `anything-c-find-files-icons-directory'
+;; Default Value: "/usr/share/emacs/24.0.50/etc/images/tree-widget/default"
+;; `anything-c-browse-code-regexp-lisp'
+;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
+;; `anything-c-browse-code-regexp-python'
+;; Default Value: "\\<def\\>\\|\\<class\\>"
+;; `anything-c-browse-code-regexp-alist'
+;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
+;; `anything-c-external-programs-associations'
 ;; Default Value: nil
 
 ;;  * Anything sources defined here:
@@ -427,6 +441,7 @@
 ;; `anything-c-source-call-source'				(Call anything source)
 ;; `anything-c-source-anything-commands'			(Preconfigured Anything)
 ;; `anything-c-source-occur'					(Occur)
+;; `anything-c-source-browse-code'				(Browse code)
 ;; `anything-c-source-create'					(Create)
 ;; `anything-c-source-minibuffer-history'			(Minibuffer History)
 ;; `anything-c-source-elscreen'					(Elscreen)
@@ -801,6 +816,9 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
     ("Info:"
      ["Info at point" anything-info-at-point t]
      ["Emacs Manual index" anything-info-emacs t])
+    ("Org:"
+     ["Org keywords" anything-org-keywords t]
+     ["Org headlines" anything-org-headlines t])
     ("Tools:"
      ["Occur" anything-occur t]
      ["Browse Kill ring" anything-show-kill-ring t]
@@ -1161,6 +1179,12 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Preconfigured anything to browse code."
   (interactive)
   (anything-other-buffer 'anything-c-source-browse-code "*Browse code*"))
+
+;;;###autoload
+(defun anything-org-headlines ()
+  "Preconfigured anything to show org headlines."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-org-headline "*org headlines*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
