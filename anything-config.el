@@ -1526,16 +1526,22 @@ The match is done with `string-match'."
   (kill-new (anything-c-stringify string) replace yank-handler))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO
+;; TODO: This should be integrated in anything.el instead of having
+;; a defadvice here.
+
 (defvar anything-current-prefix-arg nil
-  "`current-prefix-arg' when selecting action.
-It is cleared after executing action.")
+  "Record `current-prefix-arg' when exiting minibuffer.
+It will be cleared at start of next `anything' call when \
+`anything-before-initialize-hook' is called.")
 
 (defadvice anything-exit-minibuffer (before anything-current-prefix-arg activate)
   (unless anything-current-prefix-arg
     (setq anything-current-prefix-arg current-prefix-arg)))
 
-(add-hook 'anything-after-action-hook
+;; using this hook instead of `anything-after-action-hook'
+;; allow to record the prefix args and keep their values
+;; when using `anything-comp-read'.
+(add-hook 'anything-before-initialize-hook
           (lambda () (setq anything-current-prefix-arg nil)))
 
 
@@ -2885,9 +2891,11 @@ To get non-interactive functions listed, use
 `anything-c-source-emacs-functions'.")
 ;; (anything 'anything-c-source-emacs-commands)
 
+
 ;; Another replacement of `M-x' that act exactly like the
 ;; vanilla Emacs one, no problem of windows configuration, prefix args
-;; are passed before calling `M-x' (e.g C-u M-x..).
+;; can be passed before calling `M-x' (e.g C-u M-x..) but also during
+;; anything invocation.
 ;;;###autoload
 (defun anything-M-x ()
   "Preconfigured `anything' for Emacs commands.
@@ -2908,6 +2916,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                     for com = (intern i)
                     when (and (fboundp com) (not (member i hist)))
                     collect i into hist finally return hist)))
+    (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
     (call-interactively (intern command))
     (setq extended-command-history (cons command (delete command history)))))
 
