@@ -5900,7 +5900,23 @@ See `obarray'."
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions"))
   "Anything `completing-read' emulation.
-Collection can be a list, vector, obarray or hash-table."
+PROMPT is the prompt name to use.
+COLLECTION can be a list, vector, obarray or hash-table.
+Keys:
+TEST :a predicate called with one arg i.e candidate.
+INITIAL-INPUT :same as initial-input arg in `anything'.
+BUFFER :name of anything-buffer.
+MUST-MATCH :candidate selected must be one of COLLECTION.
+REQUIRES-PATTERN :Same as anything attribute, default is 0.
+HISTORY :a list containing specific history, default is nil.
+When it is non--nil, all elements of HISTORY are displayed in
+anything-buffer before COLLECTION.
+PERSISTENT-ACTION :a function called with one arg i.e candidate.
+PERSISTENT-HELP :a string to document PERSISTENT-ACTION.
+NAME :The name related to this local source.
+Any prefix args passed during `anything-comp-read' invocation will be recorded
+in `anything-current-prefix-arg', otherwise if prefix args where given before
+`anything-comp-read' invocation, the value of `current-prefix-arg' will be used."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (or (anything
