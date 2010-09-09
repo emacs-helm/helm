@@ -3554,7 +3554,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
 ;; You should have now:
 ;; user_pref("browser.bookmarks.autoExportHTML", true);
 
-(defvar anything-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ ]*")
+(defvar anything-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ \"]*")
 (defvar anything-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 
 (defun anything-get-firefox-user-init-dir ()
@@ -3579,18 +3579,15 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (with-temp-buffer
       (insert-file-contents file)
       (goto-char (point-min))
-      (while (not (eobp))
-        (forward-line)
-        (when (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
-          (beginning-of-line)
+      (while (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
+          (forward-line 0)
           (when (re-search-forward url-regexp nil t)
-            (setq url (concat "\"" (match-string 0))))
-          (beginning-of-line)
+            (setq url (match-string 0)))
           (when (re-search-forward bmk-regexp nil t)
             (setq title (match-string 1)))
-          (push (cons title url) bookmarks-alist))))
+          (push (cons title url) bookmarks-alist)
+          (forward-line)))
     (nreverse bookmarks-alist)))
-
 
 (defvar anything-c-firefox-bookmarks-alist nil)
 (defvar anything-c-source-firefox-bookmarks
@@ -3602,8 +3599,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
                      anything-firefox-bookmark-url-regexp
                      anything-firefox-bookmarks-regexp))))
     (candidates . (lambda ()
-                    (mapcar #'car
-                            anything-c-firefox-bookmarks-alist)))
+                    (mapcar #'car anything-c-firefox-bookmarks-alist)))
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
@@ -3622,16 +3618,12 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
 ;; (anything 'anything-c-source-firefox-bookmarks)
 
 (defun anything-c-firefox-bookmarks-get-value (elm)
-  (replace-regexp-in-string "\"" ""
-                            (cdr (assoc elm
-                                        anything-c-firefox-bookmarks-alist))))
-
+  (assoc-default elm anything-c-firefox-bookmarks-alist))
 
 (defun anything-c-highlight-firefox-bookmarks (bookmarks source)
   (loop for i in bookmarks
         collect (propertize
-                 i
-                 'face '((:foreground "YellowGreen"))
+                 i 'face '((:foreground "YellowGreen"))
                  'help-echo (anything-c-firefox-bookmarks-get-value i))))
 
 ;; W3m bookmark
