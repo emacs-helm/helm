@@ -3563,8 +3563,10 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
          (moz-user-dir
           (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
             (goto-char (point-min))
-            (when (search-forward "Path=" nil t)
-              (buffer-substring-no-properties (point) (point-at-eol))))))
+            (prog1
+                (when (search-forward "Path=" nil t)
+                  (buffer-substring-no-properties (point) (point-at-eol)))
+              (kill-buffer)))))
     (file-name-as-directory (concat moz-dir moz-user-dir))))
 
 (defun anything-guess-firefox-bookmark-file ()
