@@ -6150,7 +6150,8 @@ If not found or a prefix arg is given query the user which tool to use."
                            :history anything-external-command-history)
                           " %s")))
          (real-prog-name (replace-regexp-in-string " %s" "" program)))
-    (unless def-prog
+    (unless (or def-prog ; Association exists, no need to record it.
+                (not (file-exists-p fname))) ; Don't record non--filenames.
       (when
           (y-or-n-p
            (format
