@@ -6020,7 +6020,9 @@ You can set your own list of commands with
                  :history anything-external-command-history)))
   (anything-run-or-raise program)
   (setq anything-external-command-history
-        (cons program (delete program anything-external-command-history))))
+        (cons program (delete program
+                              (loop for i in anything-external-command-history
+                                 when (executable-find i) collect i)))))
 
 (defsubst* anything-c-position (item seq &key (test 'eq))
   "A simple and faster replacement of CL `position'."
@@ -6166,7 +6168,9 @@ If not found or a prefix arg is given query the user which tool to use."
     (anything-run-or-raise program file)
     (setq anything-external-command-history
           (cons real-prog-name
-                (delete real-prog-name anything-external-command-history)))))
+                (delete real-prog-name
+                        (loop for i in anything-external-command-history
+                             when (executable-find i) collect i))))))
 
 
 ;;;###autoload
