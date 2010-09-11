@@ -137,6 +137,12 @@
 ;; Preconfigured `anything' for visible bookmarks.
 ;; `anything-timers'
 ;; Preconfigured `anything' for timers.
+;; `anything-list-emacs-process'
+;; Preconfigured `anything' for emacs process.
+;; `anything-occur'
+;; Preconfigured Anything for Occur source.
+;; `anything-browse-code'
+;; Preconfigured anything to browse code.
 ;; `anything-kill-buffers'
 ;; Preconfigured `anything' to kill buffer you selected.
 ;; `anything-regexp'
@@ -225,8 +231,6 @@
 ;; Call anything source within `anything' session.
 ;; `anything-execute-anything-command'
 ;; Preconfigured `anything' to execute preconfigured `anything'.
-;; `anything-occur'
-;; Preconfigured Anything for Occur source.
 ;; `anything-create-from-anything'
 ;; Run `anything-create' from `anything' as a fallback.
 ;; `anything-create'
@@ -289,6 +293,16 @@
 ;; `anything-command-map-prefix-key'
 ;; Default Value: "<f5> a"
 ;; `anything-c-find-files-show-icons'
+;; Default Value: t
+;; `anything-c-find-files-icons-directory'
+;; Default Value: "/usr/share/emacs/24.0.50/etc/images/tree-widget/default"
+;; `anything-c-browse-code-regexp-lisp'
+;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
+;; `anything-c-browse-code-regexp-python'
+;; Default Value: "\\<def\\>\\|\\<class\\>"
+;; `anything-c-browse-code-regexp-alist'
+;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
+;; `anything-c-external-programs-associations'
 ;; Default Value: nil
 
 ;;  * Anything sources defined here:
@@ -427,6 +441,7 @@
 ;; `anything-c-source-call-source'				(Call anything source)
 ;; `anything-c-source-anything-commands'			(Preconfigured Anything)
 ;; `anything-c-source-occur'					(Occur)
+;; `anything-c-source-browse-code'				(Browse code)
 ;; `anything-c-source-create'					(Create)
 ;; `anything-c-source-minibuffer-history'			(Minibuffer History)
 ;; `anything-c-source-elscreen'					(Elscreen)
@@ -801,6 +816,9 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
     ("Info:"
      ["Info at point" anything-info-at-point t]
      ["Emacs Manual index" anything-info-emacs t])
+    ("Org:"
+     ["Org keywords" anything-org-keywords t]
+     ["Org headlines" anything-org-headlines t])
     ("Tools:"
      ["Occur" anything-occur t]
      ["Browse Kill ring" anything-show-kill-ring t]
@@ -1161,6 +1179,12 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Preconfigured anything to browse code."
   (interactive)
   (anything-other-buffer 'anything-c-source-browse-code "*Browse code*"))
+
+;;;###autoload
+(defun anything-org-headlines ()
+  "Preconfigured anything to show org headlines."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-org-headline "*org headlines*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
@@ -1526,16 +1550,22 @@ The match is done with `string-match'."
   (kill-new (anything-c-stringify string) replace yank-handler))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO
+;; TODO: This should be integrated in anything.el instead of having
+;; a defadvice here.
+
 (defvar anything-current-prefix-arg nil
-  "`current-prefix-arg' when selecting action.
-It is cleared after executing action.")
+  "Record `current-prefix-arg' when exiting minibuffer.
+It will be cleared at start of next `anything' call when \
+`anything-before-initialize-hook' is called.")
 
 (defadvice anything-exit-minibuffer (before anything-current-prefix-arg activate)
   (unless anything-current-prefix-arg
     (setq anything-current-prefix-arg current-prefix-arg)))
 
-(add-hook 'anything-after-action-hook
+;; using this hook instead of `anything-after-action-hook'
+;; allow to record the prefix args and keep their values
+;; when using `anything-comp-read'.
+(add-hook 'anything-before-initialize-hook
           (lambda () (setq anything-current-prefix-arg nil)))
 
 
@@ -2885,9 +2915,11 @@ To get non-interactive functions listed, use
 `anything-c-source-emacs-functions'.")
 ;; (anything 'anything-c-source-emacs-commands)
 
+
 ;; Another replacement of `M-x' that act exactly like the
 ;; vanilla Emacs one, no problem of windows configuration, prefix args
-;; are passed before calling `M-x' (e.g C-u M-x..).
+;; can be passed before calling `M-x' (e.g C-u M-x..) but also during
+;; anything invocation.
 ;;;###autoload
 (defun anything-M-x ()
   "Preconfigured `anything' for Emacs commands.
@@ -2908,6 +2940,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                     for com = (intern i)
                     when (and (fboundp com) (not (member i hist)))
                     collect i into hist finally return hist)))
+    (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
     (call-interactively (intern command))
     (setq extended-command-history (cons command (delete command history)))))
 
@@ -3521,7 +3554,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
 ;; You should have now:
 ;; user_pref("browser.bookmarks.autoExportHTML", true);
 
-(defvar anything-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ ]*")
+(defvar anything-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ \"]*")
 (defvar anything-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 
 (defun anything-get-firefox-user-init-dir ()
@@ -3530,8 +3563,10 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
          (moz-user-dir
           (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
             (goto-char (point-min))
-            (when (search-forward "Path=" nil t)
-              (buffer-substring-no-properties (point) (point-at-eol))))))
+            (prog1
+                (when (search-forward "Path=" nil t)
+                  (buffer-substring-no-properties (point) (point-at-eol)))
+              (kill-buffer)))))
     (file-name-as-directory (concat moz-dir moz-user-dir))))
 
 (defun anything-guess-firefox-bookmark-file ()
@@ -3544,18 +3579,15 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (with-temp-buffer
       (insert-file-contents file)
       (goto-char (point-min))
-      (while (not (eobp))
-        (forward-line)
-        (when (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
-          (beginning-of-line)
+      (while (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
+          (forward-line 0)
           (when (re-search-forward url-regexp nil t)
-            (setq url (concat "\"" (match-string 0))))
-          (beginning-of-line)
+            (setq url (match-string 0)))
           (when (re-search-forward bmk-regexp nil t)
             (setq title (match-string 1)))
-          (push (cons title url) bookmarks-alist))))
+          (push (cons title url) bookmarks-alist)
+          (forward-line)))
     (nreverse bookmarks-alist)))
-
 
 (defvar anything-c-firefox-bookmarks-alist nil)
 (defvar anything-c-source-firefox-bookmarks
@@ -3567,8 +3599,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
                      anything-firefox-bookmark-url-regexp
                      anything-firefox-bookmarks-regexp))))
     (candidates . (lambda ()
-                    (mapcar #'car
-                            anything-c-firefox-bookmarks-alist)))
+                    (mapcar #'car anything-c-firefox-bookmarks-alist)))
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
@@ -3587,16 +3618,12 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
 ;; (anything 'anything-c-source-firefox-bookmarks)
 
 (defun anything-c-firefox-bookmarks-get-value (elm)
-  (replace-regexp-in-string "\"" ""
-                            (cdr (assoc elm
-                                        anything-c-firefox-bookmarks-alist))))
-
+  (assoc-default elm anything-c-firefox-bookmarks-alist))
 
 (defun anything-c-highlight-firefox-bookmarks (bookmarks source)
   (loop for i in bookmarks
         collect (propertize
-                 i
-                 'face '((:foreground "YellowGreen"))
+                 i 'face '((:foreground "YellowGreen"))
                  'help-echo (anything-c-firefox-bookmarks-get-value i))))
 
 ;; W3m bookmark
@@ -5891,7 +5918,23 @@ See `obarray'."
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions"))
   "Anything `completing-read' emulation.
-Collection can be a list, vector, obarray or hash-table."
+PROMPT is the prompt name to use.
+COLLECTION can be a list, vector, obarray or hash-table.
+Keys:
+TEST :a predicate called with one arg i.e candidate.
+INITIAL-INPUT :same as initial-input arg in `anything'.
+BUFFER :name of anything-buffer.
+MUST-MATCH :candidate selected must be one of COLLECTION.
+REQUIRES-PATTERN :Same as anything attribute, default is 0.
+HISTORY :a list containing specific history, default is nil.
+When it is non--nil, all elements of HISTORY are displayed in
+anything-buffer before COLLECTION.
+PERSISTENT-ACTION :a function called with one arg i.e candidate.
+PERSISTENT-HELP :a string to document PERSISTENT-ACTION.
+NAME :The name related to this local source.
+Any prefix args passed during `anything-comp-read' invocation will be recorded
+in `anything-current-prefix-arg', otherwise if prefix args where given before
+`anything-comp-read' invocation, the value of `current-prefix-arg' will be used."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (or (anything
@@ -5977,7 +6020,9 @@ You can set your own list of commands with
                  :history anything-external-command-history)))
   (anything-run-or-raise program)
   (setq anything-external-command-history
-        (cons program (delete program anything-external-command-history))))
+        (cons program (delete program
+                              (loop for i in anything-external-command-history
+                                 when (executable-find i) collect i)))))
 
 (defsubst* anything-c-position (item seq &key (test 'eq))
   "A simple and faster replacement of CL `position'."
@@ -6107,7 +6152,8 @@ If not found or a prefix arg is given query the user which tool to use."
                            :history anything-external-command-history)
                           " %s")))
          (real-prog-name (replace-regexp-in-string " %s" "" program)))
-    (unless def-prog
+    (unless (or def-prog ; Association exists, no need to record it.
+                (not (file-exists-p fname))) ; Don't record non--filenames.
       (when
           (y-or-n-p
            (format
@@ -6122,7 +6168,9 @@ If not found or a prefix arg is given query the user which tool to use."
     (anything-run-or-raise program file)
     (setq anything-external-command-history
           (cons real-prog-name
-                (delete real-prog-name anything-external-command-history)))))
+                (delete real-prog-name
+                        (loop for i in anything-external-command-history
+                             when (executable-find i) collect i))))))
 
 
 ;;;###autoload
