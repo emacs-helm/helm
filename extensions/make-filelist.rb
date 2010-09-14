@@ -69,5 +69,3 @@ def ls_first(dir)
 end
 
 (ARGV.empty? ? $LS_DIRS : ARGV).each {|d| ls_first d }
-# (screen "time sudo ruby -v ~/bin/make-filelist.rb > /log/all0.filelist; cp /log/all0.filelist /tmp/anything/all.filelist")
-
