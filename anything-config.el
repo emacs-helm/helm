@@ -2521,6 +2521,53 @@ It is cleared after jumping line.")
     (type . file)))
 ;; (anything 'anything-c-source-files-in-all-dired)
 
+(defcustom anything-c-filelist-file-name nil
+  "*Filename of file list.
+Accept a list of string for multiple files.
+
+This file tend to be very large (> 100MB) and recommend to be in ramdisk for speed.
+File list is created by make-filelist.rb script.
+
+Usage:
+  ruby make-filelist.rb > /tmp/all.filelist
+
+Then
+ ;; Assume that /tmp is ramdisk or tmpfs
+ (setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\")
+ (setq anything-c-filelist-file-name \"/tmp/all.filelist\")
+"
+  :type 'string  
+  :group 'anything-config)
+(defvar anything-c-source-filelist
+  '((name . "FileList")
+    (grep-candidates . anything-c-filelist-file-name)
+    (candidate-number-limit . 200)
+    (requires-pattern . 4)
+    (type . file)))
+
+;;;###autoload
+(defun anything-filelist ()
+  "Preconfigured `anything' to open files instantly."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-filelist "*anything file list*"))
+
+;;;###autoload
+(defun anything-filelist+ ()
+  "Preconfigured `anything' to open files/buffers/bookmarks instantly.
+
+This is a replacement for `anything-for-files'."
+  (interactive)
+  (anything-other-buffer
+   '(anything-c-source-ffap-line
+     anything-c-source-ffap-guesser
+     anything-c-source-buffers+
+     anything-c-source-recentf
+     anything-c-source-bookmarks
+     anything-c-source-file-cache
+     anything-c-source-filelist)
+   "*anything file list*"))
+
+
 ;;;; <info>
 ;;; Info pages
 (defvar anything-c-info-pages nil
