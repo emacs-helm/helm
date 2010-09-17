@@ -1860,31 +1860,6 @@ If prefix numeric arg is given go ARG level down."
             with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
 
-;; Inlined version (<2010-02-18 Jeu.>.) of `tramp-handle-directory-files'
-;; to fix bug in tramp that doesn't show the dot file names(i.e "." "..")
-;; and sorting.
-(defun tramp-handle-directory-files
-    (directory &optional full match nosort files-only)
-  "Like `directory-files' for Tramp files."
-  ;; FILES-ONLY is valid for XEmacs only.
-  (when (file-directory-p directory)
-    (setq directory (file-name-as-directory (expand-file-name directory)))
-    (let ((temp (nreverse (file-name-all-completions "" directory)))
-          result item)
-      
-      (while temp
-        (setq item (directory-file-name (pop temp)))
-        (when (and (or (null match) (string-match match item))
-                   (or (null files-only)
-                       ;; Files only.
-                       (and (equal files-only t) (file-regular-p item))
-                       ;; Directories only.
-                       (file-directory-p item)))
-          (push (if full (concat directory item) item)
-                result)))
-      (if nosort result (sort result 'string<)))))
-
-
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ( ; Don't try to tramp connect before entering the second ":".
