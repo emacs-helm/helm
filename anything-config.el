@@ -2948,17 +2948,23 @@ To get non-interactive functions listed, use
   "Preconfigured `anything' for Emacs commands.
 It is `anything' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
-  (let ((command (anything-comp-read "M-x " obarray
-                                     :test 'commandp
-                                     :must-match t
-                                     :requires-pattern 2
-                                     :name "Emacs Commands"
-                                     :persistent-action
-                                     #'(lambda (candidate)
-                                         (describe-function (intern candidate)))
-                                     :persistent-help "Describe this command"
-                                     :history extended-command-history
-                                     :sort 'string-lessp))
+  (let* (in-help help-cand
+         (command (anything-comp-read
+                   "M-x " obarray
+                   :test 'commandp
+                   :must-match t
+                   :requires-pattern 2
+                   :name "Emacs Commands"
+                   :persistent-action
+                   #'(lambda (candidate)
+                       (if (and in-help (string= candidate help-cand))
+                           (progn (kill-buffer "*Help*") (setq in-help nil))
+                           (describe-function (intern candidate))
+                           (setq in-help t))
+                       (setq help-cand candidate))
+                   :persistent-help "Describe this command"
+                   :history extended-command-history
+                   :sort 'string-lessp))
         (history (loop with hist
                     for i in extended-command-history
                     for com = (intern i)
