@@ -2957,7 +2957,8 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                                      #'(lambda (candidate)
                                          (describe-function (intern candidate)))
                                      :persistent-help "Describe this command"
-                                     :history extended-command-history))
+                                     :history extended-command-history
+                                     :sort 'string-lessp))
         (history (loop with hist
                     for i in extended-command-history
                     for com = (intern i)
@@ -5909,25 +5910,26 @@ package name - description."
               ,hash-table)
      li-items))
 
-(defun anything-comp-read-get-candidates (collection &optional test)
-  "Convert collection to list.
-If collection is an `obarray', a test is maybe needed, otherwise
-the list would be incomplete.
-See `obarray'."
-  (cond ((and (listp collection) test)
-         (loop for i in collection when (funcall test i) collect i))
-        ((and (eq collection obarray) test)
-         (loop for s being the symbols of collection
-            when (funcall test s) collect s))
-        ((and (vectorp collection) test)
-         (loop for i across collection when (funcall test i) collect i))
-        ((vectorp collection)
-         (loop for i across collection collect i))
-        ((and (hash-table-p collection) test)
-         (anything-comp-hash-get-items collection :test test))
-        ((hash-table-p collection)
-         (anything-comp-hash-get-items collection))
-        (t collection)))
+(defun anything-comp-read-get-candidates (collection &optional test sort-fn)
+  "Convert COLLECTION to list removing elements that don't match TEST.
+SORT-FN is a predicate to sort COLLECTION.
+If collection is an `obarray', a TEST is needed. See `obarray'."
+  (let ((cands
+         (cond ((and (listp collection) test)
+                (loop for i in collection when (funcall test i) collect i))
+               ((and (eq collection obarray) test)
+                (loop for s being the symbols of collection
+                   when (funcall test s) collect s))
+               ((and (vectorp collection) test)
+                (loop for i across collection when (funcall test i) collect i))
+               ((vectorp collection)
+                (loop for i across collection collect i))
+               ((and (hash-table-p collection) test)
+                (anything-comp-hash-get-items collection :test test))
+               ((hash-table-p collection)
+                (anything-comp-hash-get-items collection))
+               (t collection))))
+    (if sort-fn (sort cands sort-fn) cands)))
 
 (defun* anything-comp-read (prompt collection
                                    &key
@@ -5939,25 +5941,31 @@ See `obarray'."
                                    (history nil)
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
-                                   (name "Anything Completions"))
+                                   (name "Anything Completions")
+                                   sort)
   "Anything `completing-read' emulation.
 PROMPT is the prompt name to use.
 COLLECTION can be a list, vector, obarray or hash-table.
 Keys:
-TEST :a predicate called with one arg i.e candidate.
-INITIAL-INPUT :same as initial-input arg in `anything'.
-BUFFER :name of anything-buffer.
-MUST-MATCH :candidate selected must be one of COLLECTION.
-REQUIRES-PATTERN :Same as anything attribute, default is 0.
-HISTORY :a list containing specific history, default is nil.
+
+TEST: A predicate called with one arg i.e candidate.
+INITIAL-INPUT: Same as initial-input arg in `anything'.
+BUFFER: Name of anything-buffer.
+MUST-MATCH: Candidate selected must be one of COLLECTION.
+REQUIRES-PATTERN: Same as anything attribute, default is 0.
+HISTORY: A list containing specific history, default is nil.
 When it is non--nil, all elements of HISTORY are displayed in
 anything-buffer before COLLECTION.
-PERSISTENT-ACTION :a function called with one arg i.e candidate.
-PERSISTENT-HELP :a string to document PERSISTENT-ACTION.
-NAME :The name related to this local source.
+PERSISTENT-ACTION: A function called with one arg i.e candidate.
+PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
+NAME: The name related to this local source.
+SORT: A predicate to give to `sort' e.g `string-lessp'.
+
 Any prefix args passed during `anything-comp-read' invocation will be recorded
 in `anything-current-prefix-arg', otherwise if prefix args where given before
-`anything-comp-read' invocation, the value of `current-prefix-arg' will be used."
+`anything-comp-read' invocation, the value of `current-prefix-arg' will be used.
+That's mean you can pass prefix arg before or after calling
+a command that use `anything-comp-read'."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (or (anything
@@ -5973,7 +5981,7 @@ in `anything-current-prefix-arg', otherwise if prefix args where given before
           (candidates
            . (lambda ()
                (let ((cands (anything-comp-read-get-candidates
-                             collection test)))
+                             collection test sort)))
                  (if (or must-match (string= anything-pattern ""))
                      cands (append (list anything-pattern) cands)))))
           (requires-pattern . ,requires-pattern)
