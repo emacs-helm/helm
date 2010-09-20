@@ -2939,6 +2939,15 @@ To get non-interactive functions listed, use
 ;; (anything 'anything-c-source-emacs-commands)
 
 
+(defun anything-M-x-transformer (candidates sources)
+  "Show global bindings in emacs commands."
+  (loop for i in candidates
+     for cand = (symbol-name i)
+     for key = (substitute-command-keys (format "\\[%s]" cand))
+     collect (cons (if (string-match "^M-x" key) cand
+                       (concat cand " (" (propertize key 'face '((:underline t))) ")"))
+                   cand)))
+
 ;; Another replacement of `M-x' that act exactly like the
 ;; vanilla Emacs one, no problem of windows configuration, prefix args
 ;; can be passed before calling `M-x' (e.g C-u M-x..) but also during
@@ -2964,7 +2973,8 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                        (setq help-cand candidate))
                    :persistent-help "Describe this command"
                    :history extended-command-history
-                   :sort 'string-lessp))
+                   :sort 'string-lessp
+                   :fc-transformer 'anything-M-x-transformer))
         (history (loop with hist
                     for i in extended-command-history
                     for com = (intern i)
@@ -5937,6 +5947,11 @@ If collection is an `obarray', a TEST is needed. See `obarray'."
                (t collection))))
     (if sort-fn (sort cands sort-fn) cands)))
 
+(defun anything-cr-default-transformer (candidates source)
+  "Default filter candidate function for `anything-comp-read'.
+Do nothing, just return candidate list unmodified."
+  candidates)
+
 (defun* anything-comp-read (prompt collection
                                    &key
                                    test
@@ -5948,7 +5963,8 @@ If collection is an `obarray', a TEST is needed. See `obarray'."
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
-                                   sort)
+                                   sort
+                                   (fc-transformer 'anything-cr-default-transformer))
   "Anything `completing-read' emulation.
 PROMPT is the prompt name to use.
 COLLECTION can be a list, vector, obarray or hash-table.
@@ -5990,6 +6006,7 @@ a command that use `anything-comp-read'."
                              collection test sort)))
                  (if (or must-match (string= anything-pattern ""))
                      cands (append (list anything-pattern) cands)))))
+          (filtered-candidate-transformer ,fc-transformer)
           (requires-pattern . ,requires-pattern)
           (persistent-action . ,persistent-action)
           (persistent-help . ,persistent-help)
