@@ -2938,15 +2938,7 @@ To get non-interactive functions listed, use
 `anything-c-source-emacs-functions'.")
 ;; (anything 'anything-c-source-emacs-commands)
 
-
-(defun anything-M-x-transformer (candidates sources)
-  "Show global bindings in emacs commands."
-  (loop for i in candidates
-     for cand = (symbol-name i)
-     for key = (substitute-command-keys (format "\\[%s]" cand))
-     collect (cons (if (string-match "^M-x" key) cand
-                       (concat cand " (" (propertize key 'face '((:underline t))) ")"))
-                   cand)))
+;;; Anything M-x
 
 ;; Another replacement of `M-x' that act exactly like the
 ;; vanilla Emacs one, no problem of windows configuration, prefix args
@@ -2983,6 +2975,39 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
     (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
     (call-interactively (intern command))
     (setq extended-command-history (cons command (delete command history)))))
+
+(defun* anything-M-x-get-major-mode-command-alist (mode-map)
+  "Return alist of MODE-MAP."
+  (loop for key being the key-seqs of mode-map using (key-bindings com)
+     for str-key  = (key-description key)
+     for ismenu   = (string-match "<menu-bar>" str-key)
+     unless ismenu collect (cons str-key com)))
+
+(defun anything-M-x-current-mode-map-alist ()
+  "Return mode-map alist of current `major-mode'."
+  (let ((map (intern (format "%s-map" major-mode))))
+    (when (boundp map)
+      (anything-M-x-get-major-mode-command-alist (symbol-value map)))))
+
+(defun anything-M-x-transformer (candidates sources)
+  "filtered-candidate-transformer to show global bindings in emacs commands."
+  (loop
+     with local-map = (with-current-buffer anything-current-buffer
+                        (anything-M-x-current-mode-map-alist))
+     for i in candidates
+     for cand       = (symbol-name i)
+     for local-key  = (car (rassoc i local-map))
+     for key        = (substitute-command-keys (format "\\[%s]" cand))
+     collect
+       (cons (if (string-match "^M-x" key)
+                 (if local-key
+                     (concat
+                      cand " (" (propertize local-key 'face '((:underline t)))
+                      ")")
+                     cand)
+                 (concat
+                  cand " (" (propertize key 'face '((:underline t))) ")"))
+             cand)))
 
 ;;; LaCarte
 (defvar anything-c-source-lacarte
