@@ -2983,9 +2983,28 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
      for ismenu   = (string-match "<menu-bar>" str-key)
      unless ismenu collect (cons str-key com)))
 
+(defun anything-get-mode-map-from-mode (mode)
+  "Guess the mode-map name according to MODE.
+Some modes don't use conventional mode-map name
+so we need to guess mode-map name. e.g python-mode ==> py-mode-map.
+Return nil if no mode-map found."
+  (loop
+     ;; Start with a conventional mode-map name.
+     with mode-map = (intern (format "%s-map" mode))
+     with mode-string = (symbol-name mode)
+     with mode-name = (replace-regexp-in-string "-mode" "" mode-string)
+     while (not (boundp mode-map))
+     do (unintern mode-map)
+     for count downfrom (length mode-name)
+     ;; Return when no result after parsing entire string.
+     when (eq count 0) return nil 
+     for sub-name = (substring mode-name 0 count)
+     do (setq mode-map (intern (format "%s-map" (concat sub-name "-mode"))))
+     finally return mode-map))
+
 (defun anything-M-x-current-mode-map-alist ()
   "Return mode-map alist of current `major-mode'."
-  (let ((map (intern (format "%s-map" major-mode))))
+  (let ((map (anything-get-mode-map-from-mode major-mode)))
     (when (boundp map)
       (anything-M-x-get-major-mode-command-alist (symbol-value map)))))
 
