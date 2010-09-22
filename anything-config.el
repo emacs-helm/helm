@@ -3005,7 +3005,7 @@ Return nil if no mode-map found."
 (defun anything-M-x-current-mode-map-alist ()
   "Return mode-map alist of current `major-mode'."
   (let ((map (anything-get-mode-map-from-mode major-mode)))
-    (when (boundp map)
+    (when (and map (boundp map))
       (anything-M-x-get-major-mode-command-alist (symbol-value map)))))
 
 (defun anything-M-x-transformer (candidates sources)
