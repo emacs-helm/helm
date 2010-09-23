@@ -1784,14 +1784,69 @@ buffer that is not the current buffer."
                  '("Find file in Elscreen"  . anything-elscreen-find-file))
            ("Complete at point"
             . anything-c-insert-file-name-completion-at-point)
-           ("Delete File(s)" . anything-delete-marked-files)
-           ("Find file as root" . anything-find-file-as-root)
            ("Open file externally (C-u to choose)"
             . anything-c-open-file-externally)
-           ;; ("Create dired buffer on marked"
-           ;;  . anything-c-create-dired-on-marked)
+           ("Delete File(s)" . anything-delete-marked-files)
+           ("Copy file(s)" . anything-find-files-copy)
+           ("Rename file(s)" . anything-find-files-rename)
+           ("Symlink files(s)" . anything-find-files-symlink)
+           ("Relsymlink file(s)" . anything-find-files-relsymlink)
+           ("Hardlink file(s)" . anything-find-files-hardlink)
            ("Find file other window" . find-file-other-window)
-           ("Find file other frame" . find-file-other-frame))))))
+           ("Find file other frame" . find-file-other-frame)
+           ("Find file as root" . anything-find-file-as-root))))))
+
+(defun anything-find-files-set-prompt-for-action (prompt files)
+  "Set prompt for action in `anything-find-files'."
+  (let ((len (length files)))
+    (if (> len 1)
+        (format "%s * %d Files to: " prompt len)
+        (format "%s %s to: " prompt (car files)))))
+         
+(defun anything-find-files-copy (candidate)
+  "Copy files from `anything-find-files'."
+  (let* ((files  (anything-marked-candidates))
+         (prompt (anything-find-files-set-prompt-for-action
+                  "Copy" files)))
+    (anything-dired-action
+     (anything-c-read-file-name prompt)
+     :files files :action 'copy)))
+
+(defun anything-find-files-rename (candidate)
+  "Rename files from `anything-find-files'."
+  (let* ((files  (anything-marked-candidates))
+         (prompt (anything-find-files-set-prompt-for-action
+                  "Rename" files)))
+    (anything-dired-action
+     (anything-c-read-file-name prompt)
+     :files files :action 'rename)))
+
+(defun anything-find-files-symlink (candidate)
+  "Symlink files from `anything-find-files'."
+  (let* ((files  (anything-marked-candidates))
+         (prompt (anything-find-files-set-prompt-for-action
+                  "Symlink" files)))
+    (anything-dired-action 
+     (anything-c-read-file-name prompt)
+     :files files :action 'symlink)))
+
+(defun anything-find-files-relsymlink (candidate)
+  "Relsymlink files from `anything-find-files'."
+  (let* ((files  (anything-marked-candidates))
+         (prompt (anything-find-files-set-prompt-for-action
+                  "Relsymlink" files)))
+    (anything-dired-action
+     (anything-c-read-file-name prompt)
+     :files files :action 'relsymlink)))
+
+(defun anything-find-files-hardlink (candidate)
+  "Hardlink files from `anything-find-files'."
+  (let* ((files  (anything-marked-candidates))
+         (prompt (anything-find-files-set-prompt-for-action
+                  "Hardlink" files)))
+    (anything-dired-action
+     (anything-c-read-file-name prompt)
+     :files files :action 'hardlink)))
 
 ;; (anything 'anything-c-source-find-files)
 
@@ -2203,11 +2258,10 @@ Find inside `require' and `declare-function' sexp."
          . (lambda (candidate)
              (anything-dired-action candidate :action 'hardlink)))))))
 
-(defun* anything-dired-action (candidate &key action follow)
+(defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
-  (let ((files  (dired-get-marked-files))
-        (fn     (case action
+  (let ((fn     (case action
                   ('copy       'dired-copy-file)
                   ('rename     'dired-rename-file)
                   ('symlink    'make-symbolic-link)
@@ -2333,7 +2387,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                 for fname in seq when (funcall test fname)
                                 collect fname)
                              (anything-find-files-get-candidates))))
-         (filtered-candidate-transformer anything-c-highlight-ffiles)
+         (filtered-candidate-transformer anything-c-find-files-transformer)
          (persistent-action . anything-find-files-persistent-action)
          (persistent-help . "Expand Candidate")
          (volatile)
