@@ -1784,11 +1784,11 @@ buffer that is not the current buffer."
                  '("Find file in Elscreen"  . anything-elscreen-find-file))
            ("Complete at point"
             . anything-c-insert-file-name-completion-at-point)
-           ("Open file externally (C-u to choose)"
+           ("Open file externally `C-u to choose'"
             . anything-c-open-file-externally)
            ("Delete File(s)" . anything-delete-marked-files)
-           ("Copy file(s)" . anything-find-files-copy)
-           ("Rename file(s)" . anything-find-files-rename)
+           ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
+           ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
            ("Symlink files(s)" . anything-find-files-symlink)
            ("Relsymlink file(s)" . anything-find-files-relsymlink)
            ("Hardlink file(s)" . anything-find-files-hardlink)
@@ -1805,48 +1805,65 @@ buffer that is not the current buffer."
          
 (defun anything-find-files-copy (candidate)
   "Copy files from `anything-find-files'."
-  (let* ((files  (anything-marked-candidates))
-         (prompt (anything-find-files-set-prompt-for-action
-                  "Copy" files)))
-    (anything-dired-action
-     (anything-c-read-file-name prompt)
-     :files files :action 'copy)))
+  (let* ((files    (anything-marked-candidates))
+         (prompt   (anything-find-files-set-prompt-for-action
+                    "Copy" files))
+         (parg     anything-current-prefix-arg)
+         (win-conf (current-window-configuration)))
+    (with-current-buffer (dired default-directory)
+      (anything-dired-action
+       (anything-c-read-file-name prompt)
+       :files files :action 'copy :follow parg))
+    (unless parg (set-window-configuration win-conf))))
 
 (defun anything-find-files-rename (candidate)
   "Rename files from `anything-find-files'."
-  (let* ((files  (anything-marked-candidates))
-         (prompt (anything-find-files-set-prompt-for-action
-                  "Rename" files)))
-    (anything-dired-action
-     (anything-c-read-file-name prompt)
-     :files files :action 'rename)))
+  (let* ((files    (anything-marked-candidates))
+         (prompt   (anything-find-files-set-prompt-for-action
+                  "Rename" files))
+         (parg     anything-current-prefix-arg)
+         (win-conf (current-window-configuration)))
+    (with-current-buffer (dired default-directory)
+      (anything-dired-action
+       (anything-c-read-file-name prompt)
+       :files files :action 'rename :follow parg))
+    (unless parg (set-window-configuration win-conf))))
 
 (defun anything-find-files-symlink (candidate)
   "Symlink files from `anything-find-files'."
   (let* ((files  (anything-marked-candidates))
          (prompt (anything-find-files-set-prompt-for-action
-                  "Symlink" files)))
-    (anything-dired-action 
-     (anything-c-read-file-name prompt)
-     :files files :action 'symlink)))
+                  "Symlink" files))
+         (win-conf (current-window-configuration)))
+    (with-current-buffer (dired default-directory)
+      (anything-dired-action
+       (anything-c-read-file-name prompt)
+       :files files :action 'symlink))
+    (set-window-configuration win-conf)))
 
 (defun anything-find-files-relsymlink (candidate)
   "Relsymlink files from `anything-find-files'."
-  (let* ((files  (anything-marked-candidates))
-         (prompt (anything-find-files-set-prompt-for-action
-                  "Relsymlink" files)))
-    (anything-dired-action
-     (anything-c-read-file-name prompt)
-     :files files :action 'relsymlink)))
+  (let* ((files    (anything-marked-candidates))
+         (prompt   (anything-find-files-set-prompt-for-action
+                    "Relsymlink" files))
+         (win-conf (current-window-configuration)))
+    (with-current-buffer (dired default-directory)
+      (anything-dired-action
+       (anything-c-read-file-name prompt)
+       :files files :action 'relsymlink))
+    (set-window-configuration win-conf)))
 
 (defun anything-find-files-hardlink (candidate)
   "Hardlink files from `anything-find-files'."
-  (let* ((files  (anything-marked-candidates))
-         (prompt (anything-find-files-set-prompt-for-action
-                  "Hardlink" files)))
-    (anything-dired-action
-     (anything-c-read-file-name prompt)
-     :files files :action 'hardlink)))
+  (let* ((files    (anything-marked-candidates))
+         (prompt   (anything-find-files-set-prompt-for-action
+                    "Hardlink" files))
+         (win-conf (current-window-configuration)))
+    (with-current-buffer (dired default-directory)
+      (anything-dired-action
+       (anything-c-read-file-name prompt)
+       :files files :action 'hardlink))
+    (set-window-configuration win-conf)))
 
 ;; (anything 'anything-c-source-find-files)
 
@@ -2051,11 +2068,11 @@ If prefix numeric arg is given go ARG level down."
   "Open subtree CANDIDATE without quitting anything.
 If CANDIDATE is not a directory expand CANDIDATE filename.
 If CANDIDATE is alone, open file CANDIDATE filename."
-  (flet ((insert-in-minibuffer (elm)
+  (flet ((insert-in-minibuffer (fname)
            (with-selected-window (minibuffer-window)
              (delete-minibuffer-contents)
-             (set-text-properties 0 (length elm) nil elm)
-             (insert elm))))
+             (set-text-properties 0 (length fname) nil fname)
+             (insert fname))))
     (cond ((and (file-directory-p candidate) (file-symlink-p candidate))
            (insert-in-minibuffer (file-name-as-directory
                                   (file-truename
