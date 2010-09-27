@@ -3086,8 +3086,13 @@ Return nil if no mode-map found."
     (when (and map (boundp map))
       (anything-M-x-get-major-mode-command-alist (symbol-value map)))))
 
+(defface anything-M-x-key-face '((t (:foreground "orange" :underline t)))
+  "*Face used in anything-M-x to show keybinding."
+  :group 'anything)
+
 (defun anything-M-x-transformer (candidates sources)
-  "filtered-candidate-transformer to show global bindings in emacs commands."
+  "filtered-candidate-transformer to show bindings in emacs commands.
+Show global bindings and local bindings according to current `major-mode'."
   (loop
      with local-map = (with-current-buffer anything-current-buffer
                         (anything-M-x-current-mode-map-alist))
@@ -3099,11 +3104,11 @@ Return nil if no mode-map found."
        (cons (if (string-match "^M-x" key)
                  (if local-key
                      (concat
-                      cand " (" (propertize local-key 'face '((:underline t)))
+                      cand " (" (propertize local-key 'face 'anything-M-x-key-face)
                       ")")
                      cand)
                  (concat
-                  cand " (" (propertize key 'face '((:underline t))) ")"))
+                  cand " (" (propertize key 'face 'anything-M-x-key-face) ")"))
              cand)))
 
 ;;; LaCarte
