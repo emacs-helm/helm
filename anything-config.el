@@ -1789,12 +1789,15 @@ buffer that is not the current buffer."
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
+           ("Byte compile lisp file `C-u to load'"
+            . anything-find-files-byte-compile)
            ("Symlink files(s)" . anything-find-files-symlink)
            ("Relsymlink file(s)" . anything-find-files-relsymlink)
            ("Hardlink file(s)" . anything-find-files-hardlink)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)
            ("Find file as root" . anything-find-file-as-root))))))
+;; (anything 'anything-c-source-find-files)
 
 (defun anything-find-files-set-prompt-for-action (prompt files)
   "Set prompt for action in `anything-find-files'."
@@ -1820,7 +1823,7 @@ buffer that is not the current buffer."
   "Rename files from `anything-find-files'."
   (let* ((files    (anything-marked-candidates))
          (prompt   (anything-find-files-set-prompt-for-action
-                  "Rename" files))
+                    "Rename" files))
          (parg     anything-current-prefix-arg)
          (win-conf (current-window-configuration)))
     (with-current-buffer (dired default-directory)
@@ -1865,7 +1868,12 @@ buffer that is not the current buffer."
        :files files :action 'hardlink))
     (set-window-configuration win-conf)))
 
-;; (anything 'anything-c-source-find-files)
+(defun anything-find-files-byte-compile (candidate)
+  "Byte compile files from `anything-find-files'."
+  (let ((files    (anything-marked-candidates))
+        (parg     anything-current-prefix-arg))
+    (loop for fname in files
+       do (byte-compile-file fname parg))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
