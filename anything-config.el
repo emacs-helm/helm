@@ -3069,16 +3069,15 @@ so we need to guess mode-map name. e.g python-mode ==> py-mode-map.
 Return nil if no mode-map found."
   (loop
      ;; Start with a conventional mode-map name.
-     with mode-map = (intern (format "%s-map" mode))
+     with mode-map    = (intern-soft (format "%s-map" mode))
      with mode-string = (symbol-name mode)
-     with mode-name = (replace-regexp-in-string "-mode" "" mode-string)
-     while (not (boundp mode-map))
-     do (unintern mode-map)
+     with mode-name   = (replace-regexp-in-string "-mode" "" mode-string)
+     while (not mode-map)
      for count downfrom (length mode-name)
      ;; Return when no result after parsing entire string.
      when (eq count 0) return nil 
      for sub-name = (substring mode-name 0 count)
-     do (setq mode-map (intern (format "%s-map" (concat sub-name "-mode"))))
+     do (setq mode-map (intern-soft (format "%s-map" (concat sub-name "-mode"))))
      finally return mode-map))
 
 (defun anything-M-x-current-mode-map-alist ()
