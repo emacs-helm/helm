@@ -143,6 +143,8 @@
 ;; Preconfigured Anything for Occur source.
 ;; `anything-browse-code'
 ;; Preconfigured anything to browse code.
+;; `anything-org-headlines'
+;; Preconfigured anything to show org headlines.
 ;; `anything-kill-buffers'
 ;; Preconfigured `anything' to kill buffer you selected.
 ;; `anything-regexp'
@@ -195,6 +197,10 @@
 ;; Preconfigured `anything' to hardlink files from dired.
 ;; `anything-dired-bindings'
 ;; Replace usual dired commands `C' and `R' by anything ones.
+;; `anything-filelist'
+;; Preconfigured `anything' to open files instantly.
+;; `anything-filelist+'
+;; Preconfigured `anything' to open files/buffers/bookmarks instantly.
 ;; `anything-M-x'
 ;; Preconfigured `anything' for Emacs commands.
 ;; `anything-manage-advice'
@@ -239,6 +245,8 @@
 ;; Preconfigured `anything' for top command.
 ;; `anything-select-xfont'
 ;; Preconfigured `anything' to select Xfont.
+;; `anything-world-time'
+;; Preconfigured `anything' to show world time.
 ;; `anything-apt'
 ;; Preconfigured `anything' : frontend of APT package manager.
 ;; `anything-c-shell-command-if-needed'
@@ -304,6 +312,8 @@
 ;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
 ;; `anything-c-external-programs-associations'
 ;; Default Value: nil
+;; `anything-c-filelist-file-name'
+;; Default Value: nil
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -327,6 +337,7 @@
 ;; `anything-c-source-ffap-guesser'				(File at point)
 ;; `anything-c-source-ffap-line'				(File/Lineno at point)
 ;; `anything-c-source-files-in-all-dired'			(Files in all dired buffer.)
+;; `anything-c-source-filelist'					(FileList)
 ;; `anything-c-source-info-pages'				(Info Pages)
 ;; `anything-c-source-info-elisp'				(Info index: elisp)
 ;; `anything-c-source-info-cl'					(Info index: cl)
@@ -450,6 +461,7 @@
 ;; `anything-c-source-idle-time-timers'				(Idle Time Timers)
 ;; `anything-c-source-xrandr-change-resolution'			(Change Resolution)
 ;; `anything-c-source-xfonts'					(X Fonts)
+;; `anything-c-source-time-world'				(Time World List)
 ;; `anything-c-source-apt'					(APT)
 ;; `anything-c-source-gentoo'					(Portage sources)
 ;; `anything-c-source-use-flags'				(Use Flags)
@@ -7146,15 +7158,6 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
     (if (> (length marked) 1)
         (mapc 'find-file-noselect marked)
         (find-file-at-point candidate))))
-
-;; FIXME there is a bug in dired that confuse all dired commands
-;; when using this feature, so i suspend it until bug is fixed in emacs.
-;;
-;; (defun anything-c-create-dired-on-marked (candidate)
-;;   "Create a new dired buffer with only marked candidates."
-;;   (let ((marked      (anything-marked-candidates))
-;;         (buffer-name (read-string "New Dired Buffer: ")))
-;;     (dired (cons buffer-name marked))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
