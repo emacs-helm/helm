@@ -5710,7 +5710,7 @@ See also `anything-create--actions'."
 (defun anything-world-time ()
   "Preconfigured `anything' to show world time."
   (interactive)
-  (anything-other-buffer 'anything-c-source-time-world "*anything world time*")))
+  (anything-other-buffer 'anything-c-source-time-world "*anything world time*"))
 
 ;;; Source for Debian/Ubuntu users
 (defvar anything-c-source-apt
