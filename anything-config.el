@@ -5696,6 +5696,22 @@ See also `anything-create--actions'."
 
 ;; (anything 'anything-c-source-xfonts)
 
+;;; World time
+
+(defvar anything-c-source-time-world
+  '((name . "Time World List")
+    (init . (lambda ()
+              (let ((anything-buffer (anything-candidate-buffer 'global)))
+                (with-current-buffer anything-buffer
+                  (display-time-world-display display-time-world-list)))))
+    (candidates-in-buffer)))
+
+;;;###autoload
+(defun anything-world-time ()
+  "Preconfigured `anything' to show world time."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-time-world "*anything world time*")))
+
 ;;; Source for Debian/Ubuntu users
 (defvar anything-c-source-apt
   '((name . "APT")
