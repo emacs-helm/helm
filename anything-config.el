@@ -3098,7 +3098,7 @@ Show global bindings and local bindings according to current `major-mode'."
                         (anything-M-x-current-mode-map-alist))
      for i in candidates
      for cand       = (symbol-name i)
-     for local-key  = (car (rassoc i local-map))
+     for local-key  = (car (rassq i local-map))
      for key        = (substitute-command-keys (format "\\[%s]" cand))
      collect
        (cons (if (string-match "^M-x" key)
