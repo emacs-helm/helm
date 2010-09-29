@@ -2103,7 +2103,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
           ((file-symlink-p candidate)
            (insert-in-minibuffer (file-truename candidate)))
           (t ; First hit on C-z expand CANDIDATE second hit open file.
-           (let ((new-pattern   (anything-get-selection anything-last-buffer))
+           (let ((new-pattern   (anything-get-selection))
                  (num-lines-buf (with-current-buffer anything-last-buffer
                                   (count-lines (point-min) (point-max)))))
              (if (> num-lines-buf 3)
