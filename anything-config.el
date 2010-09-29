@@ -1803,9 +1803,9 @@ buffer that is not the current buffer."
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
            ("Byte compile lisp file `C-u to load'"
             . anything-find-files-byte-compile)
-           ("Symlink files(s)" . anything-find-files-symlink)
-           ("Relsymlink file(s)" . anything-find-files-relsymlink)
-           ("Hardlink file(s)" . anything-find-files-hardlink)
+           ("Symlink files(s) `C-u to follow'" . anything-find-files-symlink)
+           ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
+           ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)
            ("Find file as root" . anything-find-file-as-root))))))
