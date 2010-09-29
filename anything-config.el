@@ -1817,68 +1817,41 @@ buffer that is not the current buffer."
     (if (> len 1)
         (format "%s * %d Files to: " prompt len)
         (format "%s %s to: " prompt (car files)))))
-         
+
+(defun anything-find-files-do-action (action)
+  "Generic function for creating action from `anything-c-source-find-files'.
+ACTION must be an action supported by `anything-dired-action'."
+  (let* ((ifiles   (anything-marked-candidates))
+         (prompt   (anything-find-files-set-prompt-for-action
+                    (capitalize (symbol-name action)) ifiles))
+         (parg     anything-current-prefix-arg)
+         (dest     (anything-c-read-file-name prompt))
+         (win-conf (current-window-configuration)))
+    (unwind-protect
+         (with-current-buffer (dired default-directory)
+           (anything-dired-action
+            dest :files ifiles :action action :follow parg))
+      (unless parg (set-window-configuration win-conf)))))
+
 (defun anything-find-files-copy (candidate)
   "Copy files from `anything-find-files'."
-  (let* ((files    (anything-marked-candidates))
-         (prompt   (anything-find-files-set-prompt-for-action
-                    "Copy" files))
-         (parg     anything-current-prefix-arg)
-         (win-conf (current-window-configuration)))
-    (with-current-buffer (dired default-directory)
-      (anything-dired-action
-       (anything-c-read-file-name prompt)
-       :files files :action 'copy :follow parg))
-    (unless parg (set-window-configuration win-conf))))
+  (anything-find-files-do-action 'copy))
 
 (defun anything-find-files-rename (candidate)
   "Rename files from `anything-find-files'."
-  (let* ((files    (anything-marked-candidates))
-         (prompt   (anything-find-files-set-prompt-for-action
-                    "Rename" files))
-         (parg     anything-current-prefix-arg)
-         (win-conf (current-window-configuration)))
-    (with-current-buffer (dired default-directory)
-      (anything-dired-action
-       (anything-c-read-file-name prompt)
-       :files files :action 'rename :follow parg))
-    (unless parg (set-window-configuration win-conf))))
+  (anything-find-files-do-action 'rename))
 
 (defun anything-find-files-symlink (candidate)
   "Symlink files from `anything-find-files'."
-  (let* ((files  (anything-marked-candidates))
-         (prompt (anything-find-files-set-prompt-for-action
-                  "Symlink" files))
-         (win-conf (current-window-configuration)))
-    (with-current-buffer (dired default-directory)
-      (anything-dired-action
-       (anything-c-read-file-name prompt)
-       :files files :action 'symlink))
-    (set-window-configuration win-conf)))
+  (anything-find-files-do-action 'symlink))
 
 (defun anything-find-files-relsymlink (candidate)
   "Relsymlink files from `anything-find-files'."
-  (let* ((files    (anything-marked-candidates))
-         (prompt   (anything-find-files-set-prompt-for-action
-                    "Relsymlink" files))
-         (win-conf (current-window-configuration)))
-    (with-current-buffer (dired default-directory)
-      (anything-dired-action
-       (anything-c-read-file-name prompt)
-       :files files :action 'relsymlink))
-    (set-window-configuration win-conf)))
+  (anything-find-files-do-action 'relsymlink))
 
 (defun anything-find-files-hardlink (candidate)
   "Hardlink files from `anything-find-files'."
-  (let* ((files    (anything-marked-candidates))
-         (prompt   (anything-find-files-set-prompt-for-action
-                    "Hardlink" files))
-         (win-conf (current-window-configuration)))
-    (with-current-buffer (dired default-directory)
-      (anything-dired-action
-       (anything-c-read-file-name prompt)
-       :files files :action 'hardlink))
-    (set-window-configuration win-conf)))
+  (anything-find-files-do-action 'hardlink))
 
 (defun anything-find-files-byte-compile (candidate)
   "Byte compile files from `anything-find-files'."
