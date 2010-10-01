@@ -5234,10 +5234,8 @@ Return an alist with elements like (data . number_results)."
 
 ;;; Emms
 
-;;;###autoload
 (defun anything-emms-stream-edit-bookmark (elm)
   "Change the information of current emms-stream bookmark from anything."
-  (interactive)
   (let* ((cur-buf anything-current-buffer)
          (bookmark (assoc elm emms-stream-list))
          (name     (read-from-minibuffer "Description: "
@@ -5260,7 +5258,6 @@ Return an alist with elements like (data . number_results)."
 
 (defun anything-emms-stream-delete-bookmark (elm)
   "Delete an emms-stream bookmark from anything."
-  (interactive)
   (let* ((cur-buf anything-current-buffer)
          (bookmark (assoc elm emms-stream-list))
          (name (nth 0 bookmark)))
