@@ -2497,7 +2497,7 @@ The \"-r\" option must be the last option.")
   (anything-match-line-color-current-line))
 
 (defun anything-do-grep (only pwd)
-  (interactive "sSearch in files with ext: \nDDirectory: ")
+  (interactive "sSearch in file(s) (* allowed): \nDDirectory: ")
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
