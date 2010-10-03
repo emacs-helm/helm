@@ -2497,11 +2497,14 @@ The \"-r\" option must be the last option.")
   (anything-match-line-color-current-line))
 
 (defun anything-do-grep (only pwd)
-  (interactive "sSearch in file(s) (* allowed): \nDDirectory: ")
+  (interactive (list
+                (read-string "Search in file(s) (* allowed): ")
+                (anything-c-read-file-name "Directory: " :test 'file-directory-p)))
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions))))
+    (setq pwd (file-name-as-directory pwd))
     (anything
      :sources
      '(((name . "Grep")
