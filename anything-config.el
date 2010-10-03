@@ -783,6 +783,7 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
 (define-key anything-command-map (kbd "C-x C-w") 'anything-write-file)
 (define-key anything-command-map (kbd "C-x i") 'anything-insert-file)
 (define-key anything-command-map (kbd "M-s o") 'anything-occur)
+(define-key anything-command-map (kbd "M-g s") 'anything-do-grep)
 (define-key anything-command-map (kbd "c") 'anything-colors)
 (define-key anything-command-map (kbd "F") 'anything-select-xfont)
 (define-key anything-command-map (kbd "C-c f") 'anything-recentf)
@@ -833,6 +834,7 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
      ["Org headlines" anything-org-headlines t])
     ("Tools:"
      ["Occur" anything-occur t]
+     ["Grep" anything-do-grep t]
      ["Browse Kill ring" anything-show-kill-ring t]
      ["Browse register" anything-register t]
      ["Browse code" anything-browse-code t]
@@ -1911,7 +1913,7 @@ If prefix numeric arg is given go ARG level down."
 ;; `C-.' doesn't work in terms use `C-l' instead.
 (if window-system
     (define-key anything-map (kbd "C-.") 'anything-find-files-down-one-level)
-  (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))
+    (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))
 
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
@@ -2462,6 +2464,107 @@ The \"-r\" option must be the last option.")
   "Find files matching the current input pattern with locate.")
 
 ;; (anything 'anything-c-source-locate)
+
+;;; Grep
+(defvar anything-c-grep-command-w32 "FINDSTR")
+(defvar anything-c-grep-command-args-w32 '("/N" "/R"))
+(defvar anything-c-grep-default-command "grep -nH -e '%s' %s")
+(defvar anything-c-grep-default-function (if (eq system-type 'windows-nt)
+                                             'anything-c-grep-init-w32
+                                             'anything-c-grep-init))
+
+(defun anything-c-grep-init-w32 (only-ext)
+  (when (string= only-ext "") (setq only-ext "*"))
+  (apply #'start-process "grep-process" nil anything-c-grep-command-w32
+         (append anything-c-grep-command-args-w32
+                 (list anything-pattern only-ext))))
+
+(defun* anything-c-grep-init (only-ext)
+  (when (string= only-ext "") (setq only-ext "*"))
+  (start-process-shell-command
+   "grep-process" nil (format anything-c-grep-default-command
+                              anything-pattern
+                              only-ext)))
+
+(defun anything-c-grep-action (candidate)
+  (let* ((split (split-string candidate ":"))
+         (lineno (string-to-number (second split))))
+    (find-file (expand-file-name (car split) default-directory))
+    (anything-goto-line lineno)))
+
+(defun anything-c-grep-persistent-action (candidate)
+  (anything-c-grep-action candidate)
+  (anything-match-line-color-current-line))
+
+(defun anything-do-grep (only pwd)
+  (interactive "sSearch in files with ext: \nDDirectory: ")
+  (let ((anything-compile-source-functions
+         ;; rule out anything-match-plugin because the input is one regexp.
+         (delq 'anything-compile-source--match-plugin
+               (copy-sequence anything-compile-source-functions))))
+    (anything
+     :sources
+     '(((name . "Grep")
+        (init . (lambda ()
+                  (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
+                  (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)))
+        (candidates . (lambda ()
+                        (setq default-directory pwd)
+                        (funcall anything-c-grep-default-function only)))
+        (filtered-candidate-transformer anything-c-grep-cand-transformer)
+        (action . anything-c-grep-action)
+        (persistent-action . anything-c-grep-persistent-action)
+        (requires-pattern . 3)
+        (delayed)))
+     :buffer "*anything grep*")))
+
+(defun anything-c-grep-cand-transformer (candidates sources)
+  (loop for i in candidates
+     for split = (split-string i ":")
+     collect (concat (propertize (nth 0 split) 'face '((:foreground "BlueViolet")))
+                     ":"
+                     (propertize (nth 1 split) 'face '((:foreground "Darkorange1")))
+                     ":"
+                     (nth 2 split))))
+
+(defun anything-c-grep-precedent-file ()
+  (interactive)
+  (anything-c-grep-next-or-prec-file -1))
+
+(defun* anything-c-grep-next-or-prec-file (&optional (n 1))
+  "Go to next or precedent file in anything buffer.
+When search is performed in dired buffer on all files
+this allow to switch from one file to the other.
+If we are in another source just go to next/prec line."
+  (interactive)
+  (let ((cur-source (assoc-default 'name (anything-get-current-source))))
+    (with-anything-window
+      (if (equal cur-source "Grep")
+          (let* ((current-line-list  (split-string
+                                      (buffer-substring
+                                       (point-at-bol)
+                                       (point-at-eol)) ":"))  
+                 (current-fname      (nth 0 current-line-list))
+                 (fn-b-o-f           (if (eq n 1) 'eobp 'bobp))) ; func back or forward
+            (catch 'break
+              (while (not (funcall fn-b-o-f))
+                (forward-line n)
+                (beginning-of-line)
+                (when (not (search-forward current-fname (point-at-eol) t))
+                  (anything-mark-current-line)
+                  (throw 'break nil))))
+            (if (eq n 1)
+                (when (eobp)
+                  (re-search-backward ".")
+                  (beginning-of-line)
+                  (anything-mark-current-line))
+                (when (bobp)
+                  (forward-line)
+                  (beginning-of-line)
+                  (anything-mark-current-line))))
+          (if (eq n 1)
+              (anything-next-line)
+              (anything-previous-line))))))
 
 ;;; Recentf files
 (defvar anything-c-source-recentf
