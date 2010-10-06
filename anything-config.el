@@ -2503,28 +2503,31 @@ The \"-r\" option must be the last option.")
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
-               (copy-sequence anything-compile-source-functions))))
+               (copy-sequence anything-compile-source-functions)))
+        (cur-dir        default-directory)
+        (initial-buffer (current-buffer)))
     (setq pwd (file-name-as-directory pwd))
-    (anything
-     :sources
-     '(((name . "Grep")
-        (init . (lambda ()
-                  (define-key anything-map (kbd "M-<down>")
-                    #'anything-c-grep-next-or-prec-file)
-                  (define-key anything-map (kbd "M-<up>")
-                    #'anything-c-grep-precedent-file)))
-        (candidates . (lambda ()
-                        (setq default-directory pwd)
-                        (funcall anything-c-grep-default-function only)))
-        (filtered-candidate-transformer anything-c-grep-cand-transformer)
-        (action . (lambda (candidate)
-                    (anything-c-grep-action candidate pwd)))
-        (persistent-action . (lambda (candidate)
-                               (anything-c-grep-persistent-action
-                                candidate pwd)))
-        (requires-pattern . 3)
-        (delayed)))
-     :buffer "*anything grep*")))
+    (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
+    (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
+    (unwind-protect
+         (anything
+          :sources
+          '(((name . "Grep")
+             (candidates . (lambda ()
+                             (setq default-directory pwd)
+                             (funcall anything-c-grep-default-function only)))
+             (filtered-candidate-transformer anything-c-grep-cand-transformer)
+             (action . (lambda (candidate)
+                         (anything-c-grep-action candidate pwd)))
+             (persistent-action . (lambda (candidate)
+                                    (anything-c-grep-persistent-action
+                                     candidate pwd)))
+             (requires-pattern . 3)
+             (delayed)))
+          :buffer "*anything grep*")
+      (with-current-buffer initial-buffer
+        (setq default-directory cur-dir)))))
+
 
 (defun anything-c-grep-cand-transformer (candidates sources)
   (loop for i in candidates
