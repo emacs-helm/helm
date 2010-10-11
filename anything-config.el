@@ -6205,7 +6205,8 @@ Do nothing, just return candidate list unmodified."
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
                                    sort
-                                   (fc-transformer 'anything-cr-default-transformer))
+                                   (fc-transformer 'anything-cr-default-transformer)
+                                   (marked-candidates nil))
   "Anything `completing-read' emulation.
 PROMPT is the prompt name to use.
 COLLECTION can be a list, vector, obarray or hash-table.
@@ -6223,6 +6224,8 @@ PERSISTENT-ACTION: A function called with one arg i.e candidate.
 PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
 NAME: The name related to this local source.
 SORT: A predicate to give to `sort' e.g `string-lessp'.
+FC-TRANSFORMER: A `filtered-candidate-transformer' function.
+MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
 
 Any prefix args passed during `anything-comp-read' invocation will be recorded
 in `anything-current-prefix-arg', otherwise if prefix args where given before
@@ -6231,33 +6234,37 @@ That's mean you can pass prefix arg before or after calling
 a command that use `anything-comp-read'."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (or (anything
-       :sources
-       `(((name . ,(format "%s History" name))
-          (candidates . (lambda ()
-                          (anything-comp-read-get-candidates history)))
-          (volatile)
-          (persistent-action . ,persistent-action)
-          (persistent-help . ,persistent-help)
-          (action . ,'identity))
-         ((name . ,name)
-          (candidates
-           . (lambda ()
-               (let ((cands (anything-comp-read-get-candidates
-                             collection test sort)))
-                 (if (or must-match (string= anything-pattern ""))
-                     cands (append (list anything-pattern) cands)))))
-          (filtered-candidate-transformer ,fc-transformer)
-          (requires-pattern . ,requires-pattern)
-          (persistent-action . ,persistent-action)
-          (persistent-help . ,persistent-help)
-          (volatile)
-          (action . (("candidate" . ,'identity)))))
-       :input initial-input
-       :prompt prompt
-       :resume 'noresume
-       :buffer buffer)
-      (keyboard-quit)))
+  (flet ((action-fn (candidate)
+           (if marked-candidates
+               (anything-marked-candidates)
+               (identity candidate))))
+    (or (anything
+         :sources
+         `(((name . ,(format "%s History" name))
+            (candidates . (lambda ()
+                            (anything-comp-read-get-candidates history)))
+            (volatile)
+            (persistent-action . ,persistent-action)
+            (persistent-help . ,persistent-help)
+            (action . ,'action-fn))
+           ((name . ,name)
+            (candidates
+             . (lambda ()
+                 (let ((cands (anything-comp-read-get-candidates
+                               collection test sort)))
+                   (if (or must-match (string= anything-pattern ""))
+                       cands (append (list anything-pattern) cands)))))
+            (filtered-candidate-transformer ,fc-transformer)
+            (requires-pattern . ,requires-pattern)
+            (persistent-action . ,persistent-action)
+            (persistent-help . ,persistent-help)
+            (volatile)
+            (action . ,'action-fn)))
+         :input initial-input
+         :prompt prompt
+         :resume 'noresume
+         :buffer buffer)
+        (keyboard-quit))))
 
 (defun anything-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
