@@ -2383,32 +2383,37 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
 (defun* anything-c-read-file-name (prompt &key
                                           (initial-input (expand-file-name default-directory))
                                           (buffer "*Anything Completions*")
-                                          test)
+                                          test
+                                          (marked-candidates nil))
   "Anything `read-file-name' emulation.
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (or (anything
-       :sources
-       `((name . ,(concat "Read file name" anything-c-find-files-doc-header))
-         ;; It is needed for filenames with capital letters
-         (disable-shortcuts)
-         (candidates . (lambda ()
-                         (if test
-                             (loop with seq = (anything-find-files-get-candidates)
-                                for fname in seq when (funcall test fname)
-                                collect fname)
-                             (anything-find-files-get-candidates))))
-         (filtered-candidate-transformer anything-c-find-files-transformer)
-         (persistent-action . anything-find-files-persistent-action)
-         (persistent-help . "Expand Candidate")
-         (volatile)
-         (action . (("candidate" . ,'identity))))
-       :input initial-input
-       :prompt prompt
-       :resume 'noresume
-       :buffer buffer)
-      (keyboard-quit)))
+    (flet ((action-fn (candidate)
+             (if marked-candidates
+                 (anything-marked-candidates)
+                 (identity candidate))))
+      (or (anything
+           :sources
+           `((name . ,(concat "Read file name" anything-c-find-files-doc-header))
+             ;; It is needed for filenames with capital letters
+             (disable-shortcuts)
+             (candidates . (lambda ()
+                             (if test
+                                 (loop with seq = (anything-find-files-get-candidates)
+                                    for fname in seq when (funcall test fname)
+                                    collect fname)
+                                 (anything-find-files-get-candidates))))
+             (filtered-candidate-transformer anything-c-find-files-transformer)
+             (persistent-action . anything-find-files-persistent-action)
+             (persistent-help . "Expand Candidate")
+             (volatile)
+             (action . ,'action-fn));(("candidate" . ,'identity))))
+           :input initial-input
+           :prompt prompt
+           :resume 'noresume
+           :buffer buffer)
+          (keyboard-quit))))
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
@@ -2501,14 +2506,17 @@ The \"-r\" option must be the last option.")
 
 (defun anything-do-grep (only pwd)
   (interactive (list
-                (read-string "Search in file(s) (* allowed): ")
-                (anything-c-read-file-name "Directory: " :test 'file-directory-p)))
+                (anything-c-read-file-name "Search in file(s): "
+                                           :marked-candidates t)
+                (anything-c-read-file-name "Directory: "
+                                           :test 'file-directory-p)))
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions)))
         (cur-dir        default-directory)
         (initial-buffer (current-buffer)))
+    (setq only (mapconcat 'identity only " "))
     (setq pwd (file-name-as-directory pwd))
     (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
     (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
