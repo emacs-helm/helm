@@ -5430,17 +5430,20 @@ Return an alist with elements like (data . number_results)."
   "*Face used for tracks in current emms playlist."
   :group 'anything)
 
-(defun anything-c-emms-files-modifier (candidates)
+(defun anything-c-emms-files-modifier (candidates source)
   (let ((current-playlist (with-current-emms-playlist
                             (loop
                                with cur-list = (emms-playlist-tracks-in-region
                                                 (point-min) (point-max))
                                for i in cur-list
-                               collect (assoc-default 'info-file i)))))
+                               collect (assoc-default 'name i)))))
     (loop for i in candidates
        if (member i current-playlist)
-       collect (propertize i 'face 'anything-emms-playlist) into lis
-       else collect i into lis finally return lis)))
+       collect (cons (propertize (file-name-nondirectory i)
+                                 'face 'anything-emms-playlist)
+                     i) into lis
+       else collect (cons (file-name-nondirectory i) i) into lis
+       finally return lis)))
 
 (defun anything-c-emms-play-current-playlist ()
   "Play current playlist."
@@ -5454,10 +5457,12 @@ Return an alist with elements like (data . number_results)."
                     (loop for v being the hash-values in emms-cache-db
                        for name = (assoc-default 'name v)
                        unless (string-match "^http:" name) collect name)))
-    (candidate-transformer . anything-c-emms-files-modifier)
+    (filtered-candidate-transformer . anything-c-emms-files-modifier)
     (action . (("Play file" . emms-play-file)
-               ("Add to Playlist and play"
+               ("Add to Playlist and play (C-u clear current)"
                 . (lambda (candidate)
+                    (when anything-current-prefix-arg
+                      (emms-playlist-current-clear))
                     (emms-playlist-new)
                     (mapc 'emms-add-playlist-file (anything-marked-candidates))
                     (unless emms-player-playing-p
