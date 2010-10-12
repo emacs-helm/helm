@@ -2495,7 +2495,7 @@ The \"-r\" option must be the last option.")
                                          grep-find-ignored-files " "))))
 
 (defun anything-c-grep-action (candidate directory)
-  (let* ((split (split-string candidate ":"))
+  (let* ((split  (split-string candidate ":"))
          (lineno (string-to-number (second split))))
     (find-file (expand-file-name (car split) directory))
     (anything-goto-line lineno)))
@@ -2504,6 +2504,7 @@ The \"-r\" option must be the last option.")
   (anything-c-grep-action candidate directory)
   (anything-match-line-color-current-line))
 
+;;;###autoload
 (defun anything-do-grep (only pwd)
   (interactive (list
                 (anything-c-read-file-name "Search in file(s): "
@@ -2523,8 +2524,10 @@ The \"-r\" option must be the last option.")
     (unwind-protect
          (anything
           :sources
-          '(((name . "Grep")
-             (init . (lambda () (require 'grep))) ; Needed to load `grep-find-ignored-files'.
+          '(((name . "Grep (M-up/down - next/prec file)")
+             (init . (lambda ()
+                       ;; Load `grep-find-ignored-files'.
+                       (require 'grep nil t)))
              (candidates . (lambda ()
                              (setq default-directory pwd)
                              (funcall anything-c-grep-default-function only)))
@@ -2540,31 +2543,28 @@ The \"-r\" option must be the last option.")
       (with-current-buffer initial-buffer
         (setq default-directory cur-dir)))))
 
-
 (defun anything-c-grep-cand-transformer (candidates sources)
   (loop for i in candidates
      for split = (split-string i ":")
-     collect (concat (propertize (nth 0 split)
-                                 'face '((:foreground "BlueViolet")))
-                     ":"
-                     (propertize (nth 1 split)
-                                 'face '((:foreground "Darkorange1")))
-                     ":"
-                     (nth 2 split))))
+     collect (cons (concat (propertize (file-relative-name (nth 0 split))
+                                       'face '((:foreground "BlueViolet")))
+                           ":"
+                           (propertize (nth 1 split)
+                                       'face '((:foreground "Darkorange1")))
+                           ":"
+                           (nth 2 split))
+                   i)))
 
 (defun anything-c-grep-precedent-file ()
   (interactive)
   (anything-c-grep-next-or-prec-file -1))
 
 (defun* anything-c-grep-next-or-prec-file (&optional (n 1))
-  "Go to next or precedent file in anything buffer.
-When search is performed in dired buffer on all files
-this allow to switch from one file to the other.
-If we are in another source just go to next/prec line."
+  "Go to next or precedent candidate file in anything grep buffer."
   (interactive)
   (let ((cur-source (assoc-default 'name (anything-get-current-source))))
     (with-anything-window
-      (if (equal cur-source "Grep")
+      (if (equal cur-source "Grep (M-up/down - next/prec file)")
           (let* ((current-line-list  (split-string
                                       (buffer-substring
                                        (point-at-bol)
