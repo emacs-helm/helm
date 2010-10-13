@@ -2478,39 +2478,36 @@ The \"-r\" option must be the last option.")
                                              'anything-c-grep-init-w32
                                              'anything-c-grep-init))
 
-(defun anything-c-grep-init-w32 (only-ext)
-  (when (string= only-ext "") (setq only-ext "*"))
+(defun anything-c-grep-init-w32 (only-files)
   (apply #'start-process "grep-process" nil anything-c-grep-command-w32
          (append anything-c-grep-command-args-w32
-                 (list anything-pattern only-ext))))
+                 (list anything-pattern only-files))))
 
-(defun* anything-c-grep-init (only-ext)
-  (when (string= only-ext "") (setq only-ext "*"))
+(defun* anything-c-grep-init (only-files)
   (start-process-shell-command
-   "grep-process" nil (format anything-c-grep-default-command
-                              anything-pattern
-                              only-ext
-                              (mapconcat #'(lambda (x)
-                                             (concat "--exclude=" x))
-                                         grep-find-ignored-files " "))))
+   "grep-process" nil
+   (format anything-c-grep-default-command
+           anything-pattern
+           only-files
+           (mapconcat #'(lambda (x)
+                          (concat "--exclude=" x))
+                      grep-find-ignored-files " "))))
 
-(defun anything-c-grep-action (candidate directory)
+(defun anything-c-grep-action (candidate)
   (let* ((split  (split-string candidate ":"))
          (lineno (string-to-number (second split))))
-    (find-file (expand-file-name (car split) directory))
+    (find-file (car split))
     (anything-goto-line lineno)))
 
-(defun anything-c-grep-persistent-action (candidate directory)
-  (anything-c-grep-action candidate directory)
+(defun anything-c-grep-persistent-action (candidate)
+  (anything-c-grep-action candidate)
   (anything-match-line-color-current-line))
 
 ;;;###autoload
-(defun anything-do-grep (only pwd)
+(defun anything-do-grep (only)
   (interactive (list
                 (anything-c-read-file-name "Search in file(s): "
-                                           :marked-candidates t)
-                (anything-c-read-file-name "Directory: "
-                                           :test 'file-directory-p)))
+                                           :marked-candidates t)))
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
@@ -2518,7 +2515,6 @@ The \"-r\" option must be the last option.")
         (cur-dir        default-directory)
         (initial-buffer (current-buffer)))
     (setq only (mapconcat 'identity only " "))
-    (setq pwd (file-name-as-directory pwd))
     (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
     (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
     (unwind-protect
@@ -2529,14 +2525,13 @@ The \"-r\" option must be the last option.")
                        ;; Load `grep-find-ignored-files'.
                        (require 'grep nil t)))
              (candidates . (lambda ()
-                             (setq default-directory pwd)
                              (funcall anything-c-grep-default-function only)))
              (filtered-candidate-transformer anything-c-grep-cand-transformer)
              (action . (lambda (candidate)
-                         (anything-c-grep-action candidate pwd)))
+                         (anything-c-grep-action candidate)))
              (persistent-action . (lambda (candidate)
                                     (anything-c-grep-persistent-action
-                                     candidate pwd)))
+                                     candidate)))
              (requires-pattern . 3)
              (delayed)))
           :buffer "*anything grep*")
