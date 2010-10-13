@@ -2512,7 +2512,14 @@ The \"-r\" option must be the last option.")
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions))))
-    (setq only (mapconcat 'identity only " "))
+    ;; If one or more candidate is a directory, search in all files
+    ;; of this candidate e.g /home/user/directory/*
+    (setq only
+          (loop for i in only
+             if (file-directory-p i)
+             collect (concat (file-name-as-directory i) "*") into of
+             else collect i into of
+             finally return (mapconcat 'identity of " ")))
     (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
     (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
     (anything
