@@ -1186,7 +1186,7 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions))))
-  (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
+    (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
 
 ;;;###autoload
 (defun anything-browse-code ()
@@ -1801,7 +1801,7 @@ buffer that is not the current buffer."
            ("Open file externally `C-u to choose'"
             . anything-c-open-file-externally)
            ("Grep File(s)" . (lambda (candidate)
-                             (anything-do-grep (anything-marked-candidates))))
+                               (anything-do-grep (anything-marked-candidates))))
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
@@ -2522,6 +2522,10 @@ The \"-r\" option must be the last option.")
              collect (concat (file-name-as-directory i) "*") into of
              else collect i into of
              finally return (mapconcat 'identity of " ")))
+    ;; When called as action from an other source e.g *-find-files
+    ;; we have to kill action buffer.
+    (when (get-buffer anything-action-buffer)
+      (kill-buffer anything-action-buffer))
     (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
     (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
     (anything
