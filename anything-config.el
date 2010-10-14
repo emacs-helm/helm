@@ -1801,7 +1801,9 @@ buffer that is not the current buffer."
            ("Open file externally `C-u to choose'"
             . anything-c-open-file-externally)
            ("Grep File(s)" . (lambda (candidate)
-                               (anything-do-grep (anything-marked-candidates))))
+                               ;; Restore highlighting disabled in *-find-files.
+                               (let ((anything-mp-highlight-delay 0.7))
+                                 (anything-do-grep (anything-marked-candidates)))))
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
