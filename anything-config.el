@@ -2393,6 +2393,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
+  (let ((anything-mp-highlight-delay nil))
     (flet ((action-fn (candidate)
              (if marked-candidates
                  (anything-marked-candidates)
@@ -2412,12 +2413,12 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
              (persistent-action . anything-find-files-persistent-action)
              (persistent-help . "Expand Candidate")
              (volatile)
-             (action . ,'action-fn));(("candidate" . ,'identity))))
+             (action . ,'action-fn))
            :input initial-input
            :prompt prompt
            :resume 'noresume
            :buffer buffer)
-          (keyboard-quit))))
+          (keyboard-quit)))))
 
 ;;; File Cache
 (defvar anything-c-source-file-cache-initialized nil)
