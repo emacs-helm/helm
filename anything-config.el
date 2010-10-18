@@ -2488,7 +2488,7 @@ The \"-r\" option must be the last option.")
          (append anything-c-grep-command-args-w32
                  (list anything-pattern only-files))))
 
-(defun* anything-c-grep-init (only-files)
+(defun anything-c-grep-init (only-files)
   (start-process-shell-command
    "grep-process" nil
    (format anything-c-grep-default-command
@@ -2498,10 +2498,15 @@ The \"-r\" option must be the last option.")
                           (concat "--exclude=" x))
                       grep-find-ignored-files " "))))
 
-(defun anything-c-grep-action (candidate)
+(defun anything-c-grep-action (candidate &optional where)
   (let* ((split  (split-string candidate ":"))
-         (lineno (string-to-number (second split))))
-    (find-file (car split))
+         (lineno (string-to-number (second split)))
+         (fname  (car split)))
+    (case where
+      (other-window (find-file-other-window fname))
+      (elscreen     (anything-elscreen-find-file fname))
+      (other-frame  (find-file-other-frame fname))
+      (t (find-file fname)))
     (anything-goto-line lineno)))
 
 (defun anything-c-grep-persistent-action (candidate)
@@ -2533,15 +2538,26 @@ The \"-r\" option must be the last option.")
     (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
     (anything
      :sources
-     '(((name . "Grep (M-up/down - next/prec file)")
+     `(((name . "Grep (M-up/down - next/prec file)")
         (init . (lambda ()
                   ;; Load `grep-find-ignored-files'.
                   (require 'grep)))
         (candidates . (lambda ()
                         (funcall anything-c-grep-default-function only)))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
-        (action . (lambda (candidate)
-                    (anything-c-grep-action candidate)))
+        (action . ,(delq
+                    nil
+                    `(("Find File" . anything-c-grep-action)
+                      ("Find file other window"
+                       . (lambda (candidate)
+                           (anything-c-grep-action candidate 'other-window)))
+                      ,(and (locate-library "elscreen")
+                            '("Find file in Elscreen"
+                              . (lambda (candidate)
+                                  (anything-c-grep-action candidate 'elscreen))))
+                      ("Find file other frame"
+                       . (lambda (candidate)
+                           (anything-c-grep-action candidate 'other-frame))))))
         (persistent-action . (lambda (candidate)
                                (anything-c-grep-persistent-action
                                 candidate)))
