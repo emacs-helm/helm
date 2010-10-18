@@ -2484,11 +2484,15 @@ The \"-r\" option must be the last option.")
                                              'anything-c-grep-init))
 
 (defun anything-c-grep-init-w32 (only-files)
+  "Default grep function for windows system.
+It use the dos command FINDSTR defined in `anything-c-grep-command-w32'
+with args defined in `anything-c-grep-command-args-w32'."
   (apply #'start-process "grep-process" nil anything-c-grep-command-w32
          (append anything-c-grep-command-args-w32
                  (list anything-pattern only-files))))
 
 (defun anything-c-grep-init (only-files)
+  "Start an asynchronous grep process in ONLY-FILES list."
   (start-process-shell-command
    "grep-process" nil
    (format anything-c-grep-default-command
@@ -2499,6 +2503,8 @@ The \"-r\" option must be the last option.")
                       grep-find-ignored-files " "))))
 
 (defun anything-c-grep-action (candidate &optional where)
+  "Define a default action for `anything-do-grep' on CANDIDATE.
+WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split  (split-string candidate ":"))
          (lineno (string-to-number (second split)))
          (fname  (car split)))
@@ -2515,6 +2521,14 @@ The \"-r\" option must be the last option.")
 
 ;;;###autoload
 (defun anything-do-grep (only)
+  "Preconfigured anything for grep.
+Contrarily to Emacs `grep' no default directory is given, but
+the full path of candidates in ONLY.
+That allow to grep different files not only in `default-directory' but anywhere
+by marking them (C-<SPACE>). If one or more directory is selected
+grep will search in all files of these directories
+like -d recursive, or -r would do.
+You can use also wildcard in the base name of candidate."
   (interactive (list
                 (anything-c-read-file-name "Search in file(s): "
                                            :marked-candidates t)))
@@ -2566,6 +2580,7 @@ The \"-r\" option must be the last option.")
      :buffer "*anything grep*")))
 
 (defun anything-c-grep-cand-transformer (candidates sources)
+  "Filtered candidate transformer function for `anything-do-grep'."
   (loop for i in candidates
      for split = (split-string i ":")
      collect (cons (concat (propertize (file-relative-name (nth 0 split))
@@ -2577,10 +2592,13 @@ The \"-r\" option must be the last option.")
                            (nth 2 split))
                    i)))
 
+;;;###autoload
 (defun anything-c-grep-precedent-file ()
+  "Go to precedent file in `anything-do-grep'."
   (interactive)
   (anything-c-grep-next-or-prec-file -1))
 
+;;;###autoload
 (defun* anything-c-grep-next-or-prec-file (&optional (n 1))
   "Go to next or precedent candidate file in anything grep buffer."
   (interactive)
