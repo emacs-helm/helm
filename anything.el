@@ -1656,7 +1656,6 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 (defun anything-set-frame/window-configuration (conf)
   (funcall (car anything-save-configuration-functions) conf))
 
-(declare-function 'anything-frame/window-configuration "anything")
 (lexical-let (conf)
   (defun anything-frame/window-configuration (save-or-restore)
     (anything-log-eval anything-save-configuration-functions)
