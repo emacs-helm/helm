@@ -1946,6 +1946,7 @@ If prefix numeric arg is given go ARG level down."
     (set-text-properties 0 (length path) nil path)
     (setq anything-pattern (replace-regexp-in-string " " ".*" path))
     (cond ((or (file-regular-p path)
+               (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
           ((string= anything-pattern "") (directory-files "/" t))
@@ -7307,7 +7308,14 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
   (let ((marked (anything-marked-candidates)))
     (if (> (length marked) 1)
         (mapc 'find-file-noselect marked)
-        (find-file-at-point candidate))))
+        (if (and (not (file-exists-p candidate))
+                 (and ffap-url-regexp
+                      (not (string-match ffap-url-regexp candidate)))
+                 (string-match "/$" candidate))
+            (when (y-or-n-p (format "Create directory `%s'? " candidate))
+              (make-directory candidate 'parent)
+              (find-file candidate))
+            (find-file-at-point candidate)))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
