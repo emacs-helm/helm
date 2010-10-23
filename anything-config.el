@@ -2373,16 +2373,26 @@ When call non--interactively with arg > 0, enable anything bindings.
 You can put (anything-dired-binding 1) in init file to enable anything bindings."
   (interactive)
   (if (or (when arg (> arg 0)) (not anything-dired-bindings))
+      ;; Replace dired bindings.
       (progn
-        (define-key dired-mode-map (kbd "C") 'anything-dired-copy-file)
-        (define-key dired-mode-map (kbd "R") 'anything-dired-rename-file)
-        (define-key dired-mode-map (kbd "S") 'anything-dired-symlink-file)
-        (define-key dired-mode-map (kbd "H") 'anything-dired-hardlink-file)
+        (substitute-key-definition
+         'dired-do-copy 'anything-dired-copy-file dired-mode-map)    
+        (substitute-key-definition
+         'dired-do-rename 'anything-dired-rename-file dired-mode-map)
+        (substitute-key-definition
+         'dired-do-symlink 'anything-dired-symlink-file dired-mode-map) 
+        (substitute-key-definition
+         'dired-do-hardlink 'anything-dired-hardlink-file dired-mode-map)
         (setq anything-dired-bindings t))
-      (define-key dired-mode-map (kbd "C") 'dired-do-copy)
-      (define-key dired-mode-map (kbd "R") 'dired-do-rename)
-      (define-key dired-mode-map (kbd "S") 'dired-do-symlink)
-      (define-key dired-mode-map (kbd "H") 'dired-do-hardlink)
+      ;; Replace anything bindings.
+      (substitute-key-definition
+       'anything-dired-copy-file 'dired-do-copy dired-mode-map)    
+      (substitute-key-definition
+       'anything-dired-rename-file 'dired-do-rename dired-mode-map)
+      (substitute-key-definition
+       'anything-dired-symlink-file 'dired-do-symlink dired-mode-map) 
+      (substitute-key-definition
+       'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)
       (setq anything-dired-bindings nil)))
 
 (defun* anything-c-read-file-name (prompt &key
