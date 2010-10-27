@@ -682,11 +682,8 @@ If you want to have the default tramp messages set it to 3."
 
 (defcustom anything-raise-command nil
   "*A shell command to jump to a window running specific program.
-Stumpwm users could use:
-\"stumpish eval \"\(stumpwm::%s\)\"\".
-With others windows manager you could use:
-\"wmctrl -xa %s\".
-Though wmctrl work also with stumpwm."
+Need external program wmctrl.
+This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :type 'string
   :group 'anything-config)
 
@@ -6363,16 +6360,13 @@ In this case EXE must be provided as \"EXE %s\"."
           (set-process-sentinel
            (get-process real-com)
            #'(lambda (process event)
-               (when (string= event "finished\n")
-                 (when anything-raise-command
-                   (shell-command  (format anything-raise-command "emacs")))
+               (when (and (string= event "finished\n")
+                          anything-raise-command)
+                      (shell-command  (format anything-raise-command "emacs")))
                  (message "%s process...Finished." process))))
           (setq anything-c-external-commands-list
-                (push (pop (nthcdr (anything-c-position
-                                    real-com anything-c-external-commands-list
-                                    :test 'equal)
-                                   anything-c-external-commands-list))
-                      anything-c-external-commands-list))))))
+                (cons real-com (delete real-com anything-c-external-commands-list))))))
+
 
 (defvar anything-external-command-history nil)
 ;;;###autoload
