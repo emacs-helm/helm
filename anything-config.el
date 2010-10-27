@@ -1828,7 +1828,10 @@ ACTION must be an action supported by `anything-dired-action'."
          (prompt   (anything-find-files-set-prompt-for-action
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
-         (dest     (anything-c-read-file-name prompt))
+         (dest     (anything-c-read-file-name
+                    prompt
+                    :persistent-action 'anything-find-files-persistent-action
+                    :persistent-help "Expand candidate"))
          (win-conf (current-window-configuration)))
     (unwind-protect
          (with-current-buffer (dired default-directory)
@@ -2081,7 +2084,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
            (insert-in-minibuffer (file-truename candidate)))
           (t ; First hit on C-z expand CANDIDATE second hit open file.
            (let ((new-pattern   (anything-get-selection))
-                 (num-lines-buf (with-current-buffer anything-last-buffer
+                 (num-lines-buf (with-current-buffer anything-buffer
                                   (count-lines (point-min) (point-max)))))
              (if (> num-lines-buf 3)
                  (insert-in-minibuffer new-pattern) (find-file candidate)))))))
@@ -2396,7 +2399,9 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
                                           (initial-input (expand-file-name default-directory))
                                           (buffer "*Anything Completions*")
                                           test
-                                          (marked-candidates nil))
+                                          (marked-candidates nil)
+                                          (persistent-action nil)
+                                          (persistent-help "DoNothing"))
   "Anything `read-file-name' emulation.
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
@@ -2418,8 +2423,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                     collect fname)
                                  (anything-find-files-get-candidates))))
              (filtered-candidate-transformer anything-c-find-files-transformer)
-             (persistent-action . anything-find-files-persistent-action)
-             (persistent-help . "Expand Candidate")
+             (persistent-action . ,persistent-action)
+             (persistent-help . ,persistent-help)
              (volatile)
              (action . ,'action-fn))
            :input initial-input
