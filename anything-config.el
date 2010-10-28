@@ -2090,7 +2090,8 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                  (insert-in-minibuffer new-pattern)
                  (if (string-match (image-file-name-regexp) candidate)
                      (progn
-                       (kill-buffer "*image-dired-display-image*")
+                       (when (buffer-live-p "*image-dired-display-image*")
+                         (kill-buffer "*image-dired-display-image*"))
                        (image-dired-display-image candidate)
                        (message nil)
                        (display-buffer "*image-dired-display-image*"))
