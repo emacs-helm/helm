@@ -2086,7 +2086,7 @@ If CANDIDATE is alone, open file CANDIDATE filename."
            (let ((new-pattern   (anything-get-selection))
                  (num-lines-buf (with-current-buffer anything-buffer
                                   (count-lines (point-min) (point-max)))))
-             (if (> num-lines-buf 3)
+             (if (and (> num-lines-buf 3) (not current-prefix-arg))
                  (insert-in-minibuffer new-pattern)
                  (if (string-match (image-file-name-regexp) candidate)
                      (progn
