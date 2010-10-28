@@ -2087,7 +2087,14 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                  (num-lines-buf (with-current-buffer anything-buffer
                                   (count-lines (point-min) (point-max)))))
              (if (> num-lines-buf 3)
-                 (insert-in-minibuffer new-pattern) (find-file candidate)))))))
+                 (insert-in-minibuffer new-pattern)
+                 (if (string-match (image-file-name-regexp) candidate)
+                     (progn
+                       (kill-buffer "*image-dired-display-image*")
+                       (image-dired-display-image candidate)
+                       (message nil)
+                       (display-buffer "*image-dired-display-image*"))
+                     (find-file candidate))))))))
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."
