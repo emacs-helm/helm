@@ -1784,7 +1784,7 @@ buffer that is not the current buffer."
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
+    (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (volatile)
     (action
      . ,(delq
