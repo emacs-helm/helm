@@ -1786,6 +1786,7 @@ buffer that is not the current buffer."
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (volatile)
+    (action-transformer . anything-find-files-action-transformer)
     (action
      . ,(delq
          nil
@@ -1804,8 +1805,6 @@ buffer that is not the current buffer."
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
-           ("Byte compile lisp file `C-u to load'"
-            . anything-find-files-byte-compile)
            ("Symlink files(s) `C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
@@ -2063,6 +2062,34 @@ If prefix numeric arg is given go ARG level down."
                            "leaf.xpm")
                           i)))))
 
+(defun anything-find-files-action-transformer (actions candidate)
+  (cond ((string-match (image-file-name-regexp) candidate)
+         (append actions '(("Rotate right" . anything-ff-rotate-image-right)
+                           ("Rotate left" . anything-ff-rotate-image-left))))
+        ((string-match "\.el$" candidate)
+         (append actions '(("Byte compile lisp file `C-u to load'"
+                            . anything-find-files-byte-compile)
+                           ("Load File" . load-file))))
+        (t
+         actions)))
+
+(defun anything-ff-rotate-current-image1 (file &optional num-arg)
+  "Rotate current image at NUM-ARG degrees."
+  (if (executable-find "mogrify")
+      (progn
+        (shell-command (format "mogrify -rotate %s %s" (or num-arg 90) file))
+        (when (buffer-live-p "*image-dired-display-image*")
+          (kill-buffer "*image-dired-display-image*"))
+        (image-dired-display-image file)
+        (message nil)
+        (display-buffer (get-buffer "*image-dired-display-image*")))
+      (error "mogrify not found")))
+
+(defun anything-ff-rotate-image-left (candidate)
+  (anything-ff-rotate-current-image1 candidate -90))
+
+(defun anything-ff-rotate-image-right (candidate)
+  (anything-ff-rotate-current-image1 candidate))
 
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
