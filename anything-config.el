@@ -2064,8 +2064,8 @@ If prefix numeric arg is given go ARG level down."
 
 (defun anything-find-files-action-transformer (actions candidate)
   (cond ((string-match (image-file-name-regexp) candidate)
-         (append actions '(("Rotate right" . anything-ff-rotate-image-right)
-                           ("Rotate left" . anything-ff-rotate-image-left))))
+         (append actions '(("Rotate image right" . anything-ff-rotate-image-right)
+                           ("Rotate image left" . anything-ff-rotate-image-left))))
         ((string-match "\.el$" candidate)
          (append actions '(("Byte compile lisp file `C-u to load'"
                             . anything-find-files-byte-compile)
@@ -2095,34 +2095,38 @@ If prefix numeric arg is given go ARG level down."
   "Open subtree CANDIDATE without quitting anything.
 If CANDIDATE is not a directory expand CANDIDATE filename.
 If CANDIDATE is alone, open file CANDIDATE filename."
-  (flet ((insert-in-minibuffer (fname)
-           (with-selected-window (minibuffer-window)
-             (delete-minibuffer-contents)
-             (set-text-properties 0 (length fname) nil fname)
-             (insert fname))))
-    (cond ((and (file-directory-p candidate) (file-symlink-p candidate))
-           (insert-in-minibuffer (file-name-as-directory
-                                  (file-truename
-                                   (expand-file-name candidate)))))
-           ((file-directory-p candidate)
-            (insert-in-minibuffer (file-name-as-directory
-                                  (expand-file-name candidate))))
-          ((file-symlink-p candidate)
-           (insert-in-minibuffer (file-truename candidate)))
-          (t ; First hit on C-z expand CANDIDATE second hit open file.
-           (let ((new-pattern   (anything-get-selection))
-                 (num-lines-buf (with-current-buffer anything-buffer
-                                  (count-lines (point-min) (point-max)))))
-             (if (and (> num-lines-buf 3) (not current-prefix-arg))
-                 (insert-in-minibuffer new-pattern)
-                 (if (string-match (image-file-name-regexp) candidate)
-                     (progn
-                       (when (buffer-live-p "*image-dired-display-image*")
-                         (kill-buffer "*image-dired-display-image*"))
-                       (image-dired-display-image candidate)
-                       (message nil)
-                       (display-buffer "*image-dired-display-image*"))
-                     (find-file candidate))))))))
+  (let ((follow (buffer-local-value
+                 'anything-follow-mode
+                 (get-buffer-create anything-buffer))))
+    (flet ((insert-in-minibuffer (fname)
+             (with-selected-window (minibuffer-window)
+               (unless follow
+                 (delete-minibuffer-contents)
+                 (set-text-properties 0 (length fname) nil fname)
+                 (insert fname)))))
+      (cond ((and (file-directory-p candidate) (file-symlink-p candidate))
+             (insert-in-minibuffer (file-name-as-directory
+                                    (file-truename
+                                     (expand-file-name candidate)))))
+            ((file-directory-p candidate)
+             (insert-in-minibuffer (file-name-as-directory
+                                    (expand-file-name candidate))))
+            ((file-symlink-p candidate)
+             (insert-in-minibuffer (file-truename candidate)))
+            (t ; First hit on C-z expand CANDIDATE second hit open file.
+             (let ((new-pattern   (anything-get-selection))
+                   (num-lines-buf (with-current-buffer anything-buffer
+                                    (count-lines (point-min) (point-max)))))
+               (if (and (> num-lines-buf 3) (not current-prefix-arg) (not follow))
+                   (insert-in-minibuffer new-pattern)
+                   (if (string-match (image-file-name-regexp) candidate)
+                       (progn
+                         (when (buffer-live-p "*image-dired-display-image*")
+                           (kill-buffer "*image-dired-display-image*"))
+                         (image-dired-display-image candidate)
+                         (message nil)
+                         (display-buffer "*image-dired-display-image*"))
+                       (find-file candidate)))))))))
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."

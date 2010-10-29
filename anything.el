@@ -3327,7 +3327,8 @@ You can paste it by typing C-y."
 
 (defun anything-follow-execute-persistent-action-maybe ()
   "Execute persistent action after `anything-input-idle-delay' secs when `anything-follow-mode' is enabled."
-  (and (buffer-local-value 'anything-follow-mode
+  (and (not (get-buffer-window anything-action-buffer 'visible))
+       (buffer-local-value 'anything-follow-mode
                            (get-buffer-create anything-buffer))
        (sit-for anything-input-idle-delay)
        (anything-window)
