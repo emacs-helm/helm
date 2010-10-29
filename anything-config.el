@@ -197,6 +197,12 @@
 ;; Preconfigured `anything' to hardlink files from dired.
 ;; `anything-dired-bindings'
 ;; Replace usual dired commands `C' and `R' by anything ones.
+;; `anything-do-grep'
+;; Preconfigured anything for grep.
+;; `anything-c-grep-precedent-file'
+;; Go to precedent file in `anything-do-grep'.
+;; `anything-c-grep-next-or-prec-file'
+;; Go to next or precedent candidate file in anything grep buffer.
 ;; `anything-filelist'
 ;; Preconfigured `anything' to open files instantly.
 ;; `anything-filelist+'
@@ -227,10 +233,6 @@
 ;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
 ;; `anything-surfraw'
 ;; Preconfigured `anything' to search PATTERN with search ENGINE.
-;; `anything-emms-stream-edit-bookmark'
-;; Change the information of current emms-stream bookmark from anything.
-;; `anything-emms-stream-delete-bookmark'
-;; Delete an emms-stream bookmark from anything.
 ;; `anything-call-source'
 ;; Preconfigured `anything' to call anything source.
 ;; `anything-call-source-from-anything'
@@ -303,7 +305,7 @@
 ;; `anything-c-find-files-show-icons'
 ;; Default Value: t
 ;; `anything-c-find-files-icons-directory'
-;; Default Value: "/usr/share/emacs/24.0.50/etc/images/tree-widget/default"
+;; Default Value: "/usr/share/emacs/23.2.50/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
 ;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
 ;; `anything-c-browse-code-regexp-python'
@@ -2066,12 +2068,12 @@ If prefix numeric arg is given go ARG level down."
   (cond ((string-match (image-file-name-regexp) candidate)
          (append actions '(("Rotate image right" . anything-ff-rotate-image-right)
                            ("Rotate image left" . anything-ff-rotate-image-left))))
-        ((string-match "\.el$" candidate)
-         (append actions '(("Byte compile lisp file `C-u to load'"
+        ((string-match "\.el$" (anything-aif (anything-marked-candidates)
+                                   (car it) candidate))
+         (append actions '(("Byte compile lisp file(s) `C-u to load'"
                             . anything-find-files-byte-compile)
-                           ("Load File" . load-file))))
-        (t
-         actions)))
+                           ("Load File(s)" . load-file))))
+        (t actions)))
 
 (defun anything-ff-rotate-current-image1 (file &optional num-arg)
   "Rotate current image at NUM-ARG degrees."
@@ -2411,7 +2413,7 @@ When call interactively toggle dired bindings and anything bindings.
 When call non--interactively with arg > 0, enable anything bindings.
 You can put (anything-dired-binding 1) in init file to enable anything bindings."
   (interactive)
-  (if (or (when arg (> arg 0)) (not anything-dired-bindings))
+  (if (or (and arg (> arg 0)) (not anything-dired-bindings))
       ;; Replace dired bindings.
       (progn
         (substitute-key-definition
