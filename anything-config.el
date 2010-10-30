@@ -5540,11 +5540,11 @@ Return an alist with elements like (data . number_results)."
                                for i in cur-list
                                collect (assoc-default 'name i)))))
     (loop for i in candidates
-       if (member i current-playlist)
-       collect (cons (propertize (file-name-nondirectory i)
+       if (member (cdr i) current-playlist)
+       collect (cons (propertize (car i)
                                  'face 'anything-emms-playlist)
-                     i) into lis
-       else collect (cons (file-name-nondirectory i) i) into lis
+                     (cdr i)) into lis
+       else collect i into lis
        finally return lis)))
 
 (defun anything-c-emms-play-current-playlist ()
@@ -5557,8 +5557,13 @@ Return an alist with elements like (data . number_results)."
   '((name . "Emms files")
     (candidates . (lambda ()
                     (loop for v being the hash-values in emms-cache-db
-                       for name = (assoc-default 'name v)
-                       unless (string-match "^http:" name) collect name)))
+                       for name      = (assoc-default 'name v)
+                       for artist    = (or (assoc-default 'info-artist v) "unknown")
+                       for genre     = (or (assoc-default 'info-genre v) "unknown")
+                       for tracknum  = (or (assoc-default 'info-tracknumber v) "unknown")
+                       for song      = (or (assoc-default 'info-title v) "unknown")
+                       for info      = (concat artist " - " genre " - " tracknum ": " song)
+                       unless (string-match "^http:" name) collect (cons info name))))
     (filtered-candidate-transformer . anything-c-emms-files-modifier)
     (action . (("Play file" . emms-play-file)
                ("Add to Playlist and play (C-u clear current)"
