@@ -2080,11 +2080,11 @@ If prefix numeric arg is given go ARG level down."
   (if (executable-find "mogrify")
       (progn
         (shell-command (format "mogrify -rotate %s %s" (or num-arg 90) file))
-        (when (buffer-live-p "*image-dired-display-image*")
-          (kill-buffer "*image-dired-display-image*"))
+        (when (buffer-live-p image-dired-display-image-buffer)
+          (kill-buffer image-dired-display-image-buffer))
         (image-dired-display-image file)
         (message nil)
-        (display-buffer (get-buffer "*image-dired-display-image*")))
+        (display-buffer (get-buffer image-dired-display-image-buffer)))
       (error "mogrify not found")))
 
 (defun anything-ff-rotate-image-left (candidate)
@@ -2123,11 +2123,11 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                    (insert-in-minibuffer new-pattern)
                    (if (string-match (image-file-name-regexp) candidate)
                        (progn
-                         (when (buffer-live-p "*image-dired-display-image*")
-                           (kill-buffer "*image-dired-display-image*"))
+                         (when (buffer-live-p image-dired-display-image-buffer)
+                           (kill-buffer image-dired-display-image-buffer))
                          (image-dired-display-image candidate)
                          (message nil)
-                         (display-buffer "*image-dired-display-image*"))
+                         (display-buffer image-dired-display-image-buffer))
                        (find-file candidate)))))))))
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
