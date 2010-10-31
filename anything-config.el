@@ -2530,20 +2530,8 @@ The \"-r\" option must be the last option.")
 ;; (anything 'anything-c-source-locate)
 
 ;;; Grep
-(defvar anything-c-grep-command-w32 "FINDSTR")
-(defvar anything-c-grep-command-args-w32 '("/N" "/R"))
 (defvar anything-c-grep-default-command "grep -nH -e '%s' %s %s")
-(defvar anything-c-grep-default-function (if (eq system-type 'windows-nt)
-                                             'anything-c-grep-init-w32
-                                             'anything-c-grep-init))
-
-(defun anything-c-grep-init-w32 (only-files)
-  "Default grep function for windows system.
-It use the dos command FINDSTR defined in `anything-c-grep-command-w32'
-with args defined in `anything-c-grep-command-args-w32'."
-  (apply #'start-process "grep-process" nil anything-c-grep-command-w32
-         (append anything-c-grep-command-args-w32
-                 (list anything-pattern only-files))))
+(defvar anything-c-grep-default-function 'anything-c-grep-init)
 
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
