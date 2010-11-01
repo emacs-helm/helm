@@ -2077,7 +2077,9 @@ If prefix numeric arg is given go ARG level down."
                           i)))))
 
 (defun anything-find-files-action-transformer (actions candidate)
-  (cond ((string-match (image-file-name-regexp) candidate)
+  (cond ((string= (buffer-name anything-current-buffer) "*mail*")
+         (append actions '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))))
+        ((string-match (image-file-name-regexp) candidate)
          (append actions '(("Rotate image right" . anything-ff-rotate-image-right)
                            ("Rotate image left" . anything-ff-rotate-image-left))))
         ((string-match "\.el$" (anything-aif (anything-marked-candidates)
@@ -2086,6 +2088,10 @@ If prefix numeric arg is given go ARG level down."
                             . anything-find-files-byte-compile)
                            ("Load File(s)" . load-file))))
         (t actions)))
+
+(defun anything-ff-gnus-attach-files (candidate)
+  (let ((flist (anything-marked-candidates)))
+    (gnus-dired-attach flist)))
 
 (defun anything-ff-rotate-current-image1 (file &optional num-arg)
   "Rotate current image at NUM-ARG degrees."
