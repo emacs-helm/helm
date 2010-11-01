@@ -1945,7 +1945,9 @@ If prefix numeric arg is given go ARG level down."
                      (t anything-pattern)))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
-    (setq anything-pattern (replace-regexp-in-string " " ".*" path))
+    (unless (member 'anything-compile-source--match-plugin
+                    anything-compile-source-functions)
+      (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
     (cond ((or (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
@@ -2149,13 +2151,17 @@ If CANDIDATE is alone, open file CANDIDATE filename."
             (error "Aborting completion: No valid file name at point")))))
 
 ;;;###autoload
-(defun anything-find-files ()
-  "Preconfigured `anything' for anything implementation of `find-file'."
-  (interactive)
+(defun anything-find-files (&optional fname)
+  "Preconfigured `anything' for anything implementation of `find-file'.
+In non--interactive use an argument FNAME can be used.
+This is the starting point for nearly all actions you can do on files."
+  (interactive "i")
   (let ((anything-mp-highlight-delay nil))
     (anything :sources 'anything-c-source-find-files
-              :input (anything-find-files-input (ffap-guesser)
-                                                (thing-at-point 'filename))
+              :input (or (and fname (expand-file-name fname))
+                         (anything-find-files-input
+                          (ffap-guesser)
+                          (thing-at-point 'filename)))
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
 
