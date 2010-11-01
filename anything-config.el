@@ -1804,6 +1804,7 @@ buffer that is not the current buffer."
                                ;; Restore highlighting disabled in *-find-files.
                                (let ((anything-mp-highlight-delay 0.7))
                                  (anything-do-grep (anything-marked-candidates)))))
+           ("Ediff Files" . anything-find-files-ediff-files)
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
@@ -1866,6 +1867,14 @@ ACTION must be an action supported by `anything-dired-action'."
         (parg     anything-current-prefix-arg))
     (loop for fname in files
        do (byte-compile-file fname parg))))
+
+(defun anything-find-files-ediff-files (candidate)
+  "Default action to ediff files in `anything-find-files'."
+  (ediff-files
+   candidate
+   (anything-c-read-file-name
+    (format "Ediff `%s' With File: " (file-name-nondirectory candidate))
+    :persistent-action 'anything-find-files-persistent-action)))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
