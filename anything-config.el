@@ -1954,9 +1954,10 @@ If prefix numeric arg is given go ARG level down."
                      (t anything-pattern)))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
-    (unless (member 'anything-compile-source--match-plugin
-                    anything-compile-source-functions)
-      (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
+    (if (member 'anything-compile-source--match-plugin
+                anything-compile-source-functions)
+        (setq anything-pattern path)
+        (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
     (cond ((or (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
