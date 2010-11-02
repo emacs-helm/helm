@@ -5804,6 +5804,8 @@ See also `anything-create--actions'."
     (candidates-in-buffer)
     (display-to-real . anything-c-top-display-to-real)
     (update . anything-c-top-update)
+    (persistent-action . anything-c-top-sh-persistent-action)
+    (persistent-help . "SIGTERM")
     (action
      ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %s" pid))))
      ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %s" pid))))
@@ -5812,6 +5814,11 @@ See also `anything-create--actions'."
 
 (defun anything-c-top-sh (cmd)
   (message "Executed %s\n%s" cmd (shell-command-to-string cmd)))
+
+(defun anything-c-top-sh-persistent-action (pid)
+  (delete-other-windows)
+  (anything-c-top-sh (format "kill -TERM %s" pid))
+  (anything-force-update))
 
 (defun anything-c-top-init ()
   (with-current-buffer (anything-candidate-buffer 'global)
