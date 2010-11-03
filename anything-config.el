@@ -2575,6 +2575,7 @@ WHERE can be one of other-window, elscreen, other-frame."
       (elscreen     (anything-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
       (t (find-file fname)))
+    (show-all)
     (anything-goto-line lineno)))
 
 (defun anything-c-grep-persistent-action (candidate)
