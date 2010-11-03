@@ -2074,7 +2074,7 @@ If prefix numeric arg is given go ARG level down."
                           i)))))
 
 (defun anything-find-files-action-transformer (actions candidate)
-  (cond ((string= (buffer-name anything-current-buffer) "*mail*")
+  (cond ((with-current-buffer anything-current-buffer (eq major-mode 'message-mode))
          (append actions '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))))
         ((string-match (image-file-name-regexp) candidate)
          (append actions '(("Rotate image right" . anything-ff-rotate-image-right)
