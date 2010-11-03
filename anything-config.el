@@ -1831,9 +1831,7 @@ ACTION must be an action supported by `anything-dired-action'."
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
          (dest     (anything-c-read-file-name
-                    prompt
-                    :persistent-action 'anything-find-files-persistent-action
-                    :persistent-help "Expand candidate"))
+                    prompt))
          (win-conf (current-window-configuration)))
     (unwind-protect
          (with-current-buffer (dired default-directory)
@@ -1873,8 +1871,7 @@ ACTION must be an action supported by `anything-dired-action'."
   (ediff-files
    candidate
    (anything-c-read-file-name
-    (format "Ediff `%s' With File: " (file-name-nondirectory candidate))
-    :persistent-action 'anything-find-files-persistent-action)))
+    (format "Ediff `%s' With File: " (file-name-nondirectory candidate)))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
@@ -2458,13 +2455,14 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
        'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)
       (setq anything-dired-bindings nil)))
 
-(defun* anything-c-read-file-name (prompt &key
-                                          (initial-input (expand-file-name default-directory))
-                                          (buffer "*Anything Completions*")
-                                          test
-                                          (marked-candidates nil)
-                                          (persistent-action nil)
-                                          (persistent-help "DoNothing"))
+(defun* anything-c-read-file-name (prompt
+                                   &key
+                                   (initial-input (expand-file-name default-directory))
+                                   (buffer "*Anything Completions*")
+                                   test
+                                   (marked-candidates nil)
+                                   (persistent-action 'anything-find-files-persistent-action)
+                                   (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
   "Anything `read-file-name' emulation.
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
