@@ -1804,7 +1804,7 @@ buffer that is not the current buffer."
                                ;; Restore highlighting disabled in *-find-files.
                                (let ((anything-mp-highlight-delay 0.7))
                                  (anything-do-grep (anything-marked-candidates)))))
-           ("Ediff Files" . anything-find-files-ediff-files)
+           ("Ediff File" . anything-find-files-ediff-files)
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
@@ -1995,6 +1995,7 @@ If prefix numeric arg is given go ARG level down."
           (t (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
+  "Selector of transformer to use for `anything-c-source-find-files'."
   (if (and (window-system) anything-c-find-files-show-icons)
       (anything-c-highlight-ffiles1 files sources)
       (anything-c-highlight-ffiles files sources)))
@@ -2074,6 +2075,7 @@ If prefix numeric arg is given go ARG level down."
                           i)))))
 
 (defun anything-find-files-action-transformer (actions candidate)
+  "Action transformer for `anything-c-source-find-files'."
   (cond ((with-current-buffer anything-current-buffer (eq major-mode 'message-mode))
          (append actions '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))))
         ((string-match (image-file-name-regexp) candidate)
@@ -2087,6 +2089,7 @@ If prefix numeric arg is given go ARG level down."
         (t actions)))
 
 (defun anything-ff-gnus-attach-files (candidate)
+  "Run `gnus-dired-attach' on `anything-marked-candidates' or CANDIDATE."
   (let ((flist (anything-marked-candidates)))
     (gnus-dired-attach flist)))
 
@@ -2103,15 +2106,22 @@ If prefix numeric arg is given go ARG level down."
       (error "mogrify not found")))
 
 (defun anything-ff-rotate-image-left (candidate)
+  "Rotate image file CANDIDATE left.
+This affect directly file CANDIDATE."
   (anything-ff-rotate-current-image1 candidate -90))
 
 (defun anything-ff-rotate-image-right (candidate)
+  "Rotate image file CANDIDATE right.
+This affect directly file CANDIDATE."
   (anything-ff-rotate-current-image1 candidate))
 
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
 If CANDIDATE is not a directory expand CANDIDATE filename.
-If CANDIDATE is alone, open file CANDIDATE filename."
+If CANDIDATE is alone, open file CANDIDATE filename.
+That's mean:
+First hit on C-z expand CANDIDATE second hit open file.
+If a prefix arg is given or `anything-follow-mode' is on open file."
   (let ((follow (buffer-local-value
                  'anything-follow-mode
                  (get-buffer-create anything-buffer))))
@@ -2130,7 +2140,9 @@ If CANDIDATE is alone, open file CANDIDATE filename."
                                     (expand-file-name candidate))))
             ((file-symlink-p candidate)
              (insert-in-minibuffer (file-truename candidate)))
-            (t ; First hit on C-z expand CANDIDATE second hit open file.
+            (t
+             ;; First hit on C-z expand CANDIDATE second hit open file.
+             ;; If a prefix arg is given or `anything-follow-mode' is on open file.
              (let ((new-pattern   (anything-get-selection))
                    (num-lines-buf (with-current-buffer anything-buffer
                                     (count-lines (point-min) (point-max)))))
