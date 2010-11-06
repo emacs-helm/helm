@@ -1834,9 +1834,11 @@ ACTION must be an action supported by `anything-dired-action'."
                     prompt))
          (win-conf (current-window-configuration)))
     (unwind-protect
+         ;; Create temporarily a dired buffer to call dired functions.
          (with-current-buffer (dired default-directory)
            (anything-dired-action
-            dest :files ifiles :action action :follow parg))
+            dest :files ifiles :action action :follow parg)
+           (kill-buffer))
       (unless parg (set-window-configuration win-conf)))))
 
 (defun anything-find-files-copy (candidate)
@@ -2382,7 +2384,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                                (concat (file-name-as-directory dest)
                                        basename-src)
                                dest)))
-        (anything-c-point-file-in-dired fname)))))
+        (anything-find-files fname)))))
 
 
 (defun* anything-dired-do-action-on-file (&key action)
