@@ -7390,14 +7390,25 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
   "Open file CANDIDATE or open anything marked files in background."
   (let ((marked (anything-marked-candidates)))
     (if (> (length marked) 1)
+        ;; Open all marked files in background.
         (mapc 'find-file-noselect marked)
         (if (and (not (file-exists-p candidate))
                  (and ffap-url-regexp
                       (not (string-match ffap-url-regexp candidate)))
                  (string-match "/$" candidate))
+            ;; A a non--existing filename ending with /
+            ;; Create a directory and jump to it.
             (when (y-or-n-p (format "Create directory `%s'? " candidate))
-              (make-directory candidate 'parent)
-              (find-file candidate))
+              (let ((cur-dir default-directory))
+                (unwind-protect
+                     (progn
+                       (make-directory candidate 'parent)
+                       (when (file-exists-p candidate)
+                         (cd candidate)
+                         (anything-find-files candidate)))
+                  (setq default-directory cur-dir))))
+            ;; A non--existing filename NOT ending with / or
+            ;; an existing filename, create or jump to it.
             (find-file-at-point candidate)))))
 
 (defun anything-delete-marked-files (ignore)
