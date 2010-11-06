@@ -6427,7 +6427,7 @@ If EXE is already running just jump to his window if `anything-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
-  (let ((real-com (car (split-string (replace-regexp-in-string " '%s'" "" exe)))))
+  (let ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe)))))
     (if (or (get-process real-com)
             (anything-c-get-pid-from-process-name real-com))
         (if anything-raise-command
@@ -6583,20 +6583,20 @@ if nothing found return nil."
   "Open FILE with an external program.
 Try to guess which program to use with `anything-get-default-program-for-file'.
 If not found or a prefix arg is given query the user which tool to use."
-  (let* ((fname      (expand-file-name file))
-         (collection (anything-c-external-commands-list-1 'sort))
-         (def-prog   (anything-get-default-program-for-file fname))
-         (program    (or (unless (or anything-current-prefix-arg
-                                     (not def-prog))
-                           def-prog)
-                         (concat
+  (let* ((fname          (expand-file-name file))
+         (collection     (anything-c-external-commands-list-1 'sort))
+         (def-prog       (anything-get-default-program-for-file fname))
+         (real-prog-name (or
+                          ;; No prefix arg, default program exists.
+                          (unless (or anything-current-prefix-arg (not def-prog))
+                            (replace-regexp-in-string " %s" "" def-prog))
+                          ;; Prefix arg or no default program.
                           (anything-comp-read
                            "Program: " collection
                            :must-match t
                            :name "Open file Externally"
-                           :history anything-external-command-history)
-                          " '%s'")))
-         (real-prog-name (replace-regexp-in-string " %s" "" program)))
+                           :history anything-external-command-history)))
+         (program        (concat real-prog-name " '%s'")))
     (unless (or def-prog ; Association exists, no need to record it.
                 (not (file-exists-p fname))) ; Don't record non--filenames.
       (when
