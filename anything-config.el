@@ -6427,7 +6427,7 @@ If EXE is already running just jump to his window if `anything-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
-  (let ((real-com (car (split-string (replace-regexp-in-string " %s" "" exe)))))
+  (let ((real-com (car (split-string (replace-regexp-in-string " '%s'" "" exe)))))
     (if (or (get-process real-com)
             (anything-c-get-pid-from-process-name real-com))
         (if anything-raise-command
