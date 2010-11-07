@@ -2601,14 +2601,23 @@ The \"-r\" option must be the last option.")
 
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (start-process-shell-command
-   "grep-process" nil
-   (format anything-c-grep-default-command
-           anything-pattern
-           only-files
-           (mapconcat #'(lambda (x)
-                          (concat "--exclude=" x))
-                      grep-find-ignored-files " "))))
+  (prog2
+      (message (propertize "Grep process running"
+                           'face '((:foreground "green"))))
+      (start-process-shell-command
+       "grep-process" nil
+       (format anything-c-grep-default-command
+               anything-pattern
+               only-files
+               (mapconcat #'(lambda (x)
+                              (concat "--exclude=" x))
+                          grep-find-ignored-files " ")))
+    (set-process-sentinel (get-process "grep-process")
+                          #'(lambda (process event)
+                              (when (string= event "finished\n")
+                                (message nil)
+                                (with-anything-window
+                                  (anything-update-move-first-line)))))))
 
 (defun anything-c-grep-action (candidate &optional where)
   "Define a default action for `anything-do-grep' on CANDIDATE.
