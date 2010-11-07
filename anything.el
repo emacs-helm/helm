@@ -1232,7 +1232,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
             ;; point-min somewhere else which shouldn't happen.
             (goto-char (overlay-start anything-selection-overlay))
             (let* ((header-pos (or (anything-get-previous-header-pos)
-                                   (anything-get-next-header-pos))))
+                                   (anything-get-next-header-pos)))
                    (source-name
                     (save-excursion
                       (unless header-pos
