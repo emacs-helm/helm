@@ -2349,6 +2349,7 @@ Find inside `require' and `declare-function' sexp."
          . (lambda (candidate)
              (anything-dired-action candidate :action 'hardlink)))))))
 
+
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
@@ -2373,18 +2374,49 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from) candidate))
      marker)
     (when follow
-      (let* ((src          (car files))
-             (dest         (expand-file-name candidate))
-             (basename-src (if (file-directory-p src)
-                               (file-relative-name
-                                (directory-file-name src)
-                                (file-name-directory src))
-                               (file-name-nondirectory src)))
-             (fname        (if (file-directory-p dest)
-                               (concat (file-name-as-directory dest)
-                                       basename-src)
-                               dest)))
-        (anything-find-files fname)))))
+      (let* ((moved-flist  (anything-get-dest-fnames-from-list files candidate))
+             (fname        (car moved-flist)))
+        (unwind-protect
+             (progn
+               (setq anything-ff-cand-to-mark moved-flist)
+               (anything-find-files candidate))
+          (setq anything-ff-cand-to-mark nil))))))
+
+;; Internal
+(defvar anything-ff-cand-to-mark nil)
+
+(defun anything-get-dest-fnames-from-list (flist dest-cand)
+  "Transform filenames of FLIST to abs of DEST-CAND."
+  (loop
+     with dest = (expand-file-name dest-cand)
+     for src in flist
+     for basename-src = (if (file-directory-p src)
+                           (file-relative-name
+                            (directory-file-name src)
+                            (file-name-directory src))
+                           (file-name-nondirectory src))
+     for fname = (if (file-directory-p dest)
+                     (concat (file-name-as-directory dest)
+                             basename-src)
+                     dest)
+     collect fname))
+
+(defun anything-c-maybe-mark-candidates ()
+  "Mark all candidates of list `anything-ff-cand-to-mark'."
+  (when (and (string= (assoc-default 'name (anything-get-current-source))
+                      (assoc-default 'name anything-c-source-find-files))
+             anything-ff-cand-to-mark)
+      (with-anything-window
+        (while anything-ff-cand-to-mark
+          (if (search-forward (car anything-ff-cand-to-mark) (point-at-eol) t)
+              (progn
+                (call-interactively 'anything-toggle-visible-mark)
+                (setq anything-ff-cand-to-mark (cdr anything-ff-cand-to-mark)))
+              (call-interactively 'anything-next-line)))
+        (unless (anything-this-visible-mark)
+          (call-interactively 'anything-prev-visible-mark)))))
+
+(add-hook 'anything-after-update-hook #'anything-c-maybe-mark-candidates)
 
 
 (defun* anything-dired-do-action-on-file (&key action)
