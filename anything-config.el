@@ -2601,9 +2601,7 @@ The \"-r\" option must be the last option.")
 
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (prog2
-      (message (propertize "Grep process running"
-                           'face '((:foreground "green"))))
+  (prog1
       (start-process-shell-command
        "grep-process" nil
        (format anything-c-grep-default-command
@@ -2615,7 +2613,6 @@ The \"-r\" option must be the last option.")
     (set-process-sentinel (get-process "grep-process")
                           #'(lambda (process event)
                               (when (string= event "finished\n")
-                                (message nil)
                                 (with-anything-window
                                   (anything-update-move-first-line)))))))
 

@@ -1236,7 +1236,7 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
                    (source-name
                     (save-excursion
                       (unless header-pos
-                        (message "No candidates")
+                        ;(message "No candidates")
                         (return-from exit nil))
                       (goto-char header-pos)
                       (anything-current-line-contents))))
