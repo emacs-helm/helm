@@ -2581,9 +2581,15 @@ The \"-r\" option must be the last option.")
 
 (defun anything-c-locate-init ()
   "Initialize async locate process for `anything-c-source-locate'."
-  (start-process-shell-command "locate-process" nil
-                               (format anything-c-locate-command
-                                       anything-pattern)))
+  (prog1
+      (start-process-shell-command "locate-process" nil
+                                   (format anything-c-locate-command
+                                           anything-pattern))
+    (set-process-sentinel (get-process "locate-process")
+                          #'(lambda (process event)
+                              (when (string= event "finished\n")
+                                (with-anything-window
+                                  (anything-update-move-first-line)))))))
 
 (defvar anything-c-source-locate
   '((name . "Locate")
