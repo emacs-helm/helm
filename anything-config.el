@@ -1805,6 +1805,7 @@ buffer that is not the current buffer."
                                (let ((anything-mp-highlight-delay 0.7))
                                  (anything-do-grep (anything-marked-candidates)))))
            ("Ediff File" . anything-find-files-ediff-files)
+           ("Ediff Merge File" . anything-find-files-ediff-merge-files)
            ("Delete File(s)" . anything-delete-marked-files)
            ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
@@ -1874,6 +1875,13 @@ ACTION must be an action supported by `anything-dired-action'."
    candidate
    (anything-c-read-file-name
     (format "Ediff `%s' With File: " (file-name-nondirectory candidate)))))
+
+(defun anything-find-files-ediff-merge-files (candidate)
+  "Default action to ediff merge files in `anything-find-files'."
+  (ediff-merge-files
+   candidate
+   (anything-c-read-file-name
+    (format "Ediff Merge `%s' With File: " (file-name-nondirectory candidate)))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
