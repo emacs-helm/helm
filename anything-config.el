@@ -997,7 +997,8 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   "Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
 You may bind this command to M-y."
   (interactive)
-  (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*"))
+  (let ((enable-recursive-minibuffers t))
+    (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*")))
 
 ;;;###autoload
 (defun anything-minibuffer-history ()
