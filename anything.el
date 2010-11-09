@@ -3193,7 +3193,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
         anything-marked-candidates))
 
 (defun anything-toggle-visible-mark ()
-  "Toggle anything visible bookmark at point."
+  "Toggle anything visible mark at point."
   (interactive)
   (with-anything-window
     (anything-aif (anything-this-visible-mark)
@@ -3204,11 +3204,12 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 (defun anything-display-all-visible-marks ()
   "Show all `anything' visible marks strings."
   (interactive)
-  (lexical-let ((overlays (reverse anything-visible-mark-overlays)))
-    (anything-run-after-quit
-     (lambda ()
-       (with-output-to-temp-buffer "*anything visible marks*"
-         (dolist (o overlays) (princ (overlay-get o 'string))))))))
+  (with-anything-window
+    (lexical-let ((overlays (reverse anything-visible-mark-overlays)))
+      (anything-run-after-quit
+       (lambda ()
+         (with-output-to-temp-buffer "*anything visible marks*"
+           (dolist (o overlays) (princ (overlay-get o 'string)))))))))
 
 (defun anything-marked-candidates ()
   "Marked candidates (real value) of current source if any,
