@@ -4644,7 +4644,9 @@ utility mdfind.")
     (last-command)
     (migemo)
     (multiline))
-  "Source for browse and insert contents of kill-ring.")
+  "Source for browse and insert contents of kill-ring.
+
+You should bind enable-recursive-minibuffers = t to use this source in minibuffer.")
 
 (defun anything-c-kill-ring-candidates ()
   (loop for kill in kill-ring
