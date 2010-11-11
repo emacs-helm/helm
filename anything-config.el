@@ -6483,8 +6483,9 @@ is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
   (let ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe)))))
-    (if (or (get-process real-com)
-            (anything-c-get-pid-from-process-name real-com))
+    (if (and (not file)
+             (or (get-process real-com)
+                 (anything-c-get-pid-from-process-name real-com)))
         (if anything-raise-command
             (shell-command  (format anything-raise-command real-com))
             (error "Error: %s is already running" real-com))
@@ -6496,8 +6497,7 @@ In this case EXE must be provided as \"EXE %s\"."
           (set-process-sentinel
            (get-process real-com)
            #'(lambda (process event)
-               (when (and (string= event "finished\n")
-                          anything-raise-command)
+               (when (and (string= event "finished\n") anything-raise-command)
                       (shell-command  (format anything-raise-command "emacs")))
                  (message "%s process...Finished." process))))
           (setq anything-c-external-commands-list
