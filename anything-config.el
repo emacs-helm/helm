@@ -997,8 +997,7 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   "Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
 You may bind this command to M-y."
   (interactive)
-  (let ((enable-recursive-minibuffers t))
-    (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*")))
+  (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*"))
 
 ;;;###autoload
 (defun anything-minibuffer-history ()
@@ -2611,7 +2610,7 @@ The \"-r\" option must be the last option.")
 ;; (anything 'anything-c-source-locate)
 
 ;;; Grep
-(defvar anything-c-grep-default-command "grep -niH -e '%s' %s %s")
+(defvar anything-c-grep-default-command "grep -nH -e %s %s %s")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
 
 (defun anything-c-grep-init (only-files)
@@ -2620,10 +2619,10 @@ The \"-r\" option must be the last option.")
       (start-process-shell-command
        "grep-process" nil
        (format anything-c-grep-default-command
-               anything-pattern
+               (shell-quote-argument anything-pattern)
                only-files
                (mapconcat #'(lambda (x)
-                              (concat "--exclude=" x))
+                              (concat "--exclude=" (shell-quote-argument x)))
                           grep-find-ignored-files " ")))
     (set-process-sentinel (get-process "grep-process")
                           #'(lambda (process event)
@@ -2635,8 +2634,12 @@ The \"-r\" option must be the last option.")
   "Define a default action for `anything-do-grep' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split  (split-string candidate ":"))
-         (lineno (string-to-number (second split)))
-         (fname  (car split)))
+         (lineno (string-to-number (if (eq system-type 'windows-nt)
+                                       (nth 2 split)
+                                       (nth 1 split))))
+         (fname  (if (eq system-type 'windows-nt)
+                     (concat (car split) ":" (second split))
+                     (car split))))
     (case where
       (other-window (find-file-other-window fname))
       (elscreen     (anything-elscreen-find-file fname))
@@ -2668,12 +2671,16 @@ You can use also wildcard in the base name of candidate."
                (copy-sequence anything-compile-source-functions))))
     ;; If one or more candidate is a directory, search in all files
     ;; of this candidate e.g /home/user/directory/*
+    ;; We need here to expand wildcards to support crap windows filenames
+    ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
     (setq only
-          (loop for i in only
-             if (file-directory-p i)
-             collect (concat (file-name-as-directory i) "*") into of
-             else collect i into of
-             finally return (mapconcat 'identity of " ")))
+          (loop for i in only append
+               (cond ((file-directory-p i)
+                      (file-expand-wildcards (concat (file-name-as-directory i) "*")))
+                     ((string-match "\*" i) (file-expand-wildcards i))
+                     (t (list i))) into of
+               finally return
+               (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
@@ -2712,14 +2719,24 @@ You can use also wildcard in the base name of candidate."
 (defun anything-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `anything-do-grep'."
   (loop for i in candidates
-     for split = (split-string i ":")
-     collect (cons (concat (propertize (file-relative-name (nth 0 split))
-                                       'face '((:foreground "BlueViolet")))
+     for split  = (split-string i ":")
+     for fname  = (if (eq system-type 'windows-nt)
+                      (concat (car split) ":" (second split))
+                      (car split))
+     for lineno = (if (eq system-type 'windows-nt)
+                      (nth 2 split)
+                      (nth 1 split))
+     for str    = (if (eq system-type 'windows-nt)
+                      (nth 3 split)
+                      (nth 2 split))
+     collect (cons (concat (propertize (file-name-nondirectory fname)
+                                       'face '((:foreground "BlueViolet"))
+                                       'help-echo fname)
                            ":"
-                           (propertize (nth 1 split)
+                           (propertize lineno
                                        'face '((:foreground "Darkorange1")))
                            ":"
-                           (nth 2 split))
+                           str)
                    i)))
 
 ;;;###autoload
@@ -4644,9 +4661,7 @@ utility mdfind.")
     (last-command)
     (migemo)
     (multiline))
-  "Source for browse and insert contents of kill-ring.
-
-You should bind enable-recursive-minibuffers = t to use this source in minibuffer.")
+  "Source for browse and insert contents of kill-ring.")
 
 (defun anything-c-kill-ring-candidates ()
   (loop for kill in kill-ring
@@ -6483,9 +6498,8 @@ is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
   (let ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe)))))
-    (if (and (not file)
-             (or (get-process real-com)
-                 (anything-c-get-pid-from-process-name real-com)))
+    (if (or (get-process real-com)
+            (anything-c-get-pid-from-process-name real-com))
         (if anything-raise-command
             (shell-command  (format anything-raise-command real-com))
             (error "Error: %s is already running" real-com))
@@ -6497,7 +6511,8 @@ In this case EXE must be provided as \"EXE %s\"."
           (set-process-sentinel
            (get-process real-com)
            #'(lambda (process event)
-               (when (and (string= event "finished\n") anything-raise-command)
+               (when (and (string= event "finished\n")
+                          anything-raise-command)
                       (shell-command  (format anything-raise-command "emacs")))
                  (message "%s process...Finished." process))))
           (setq anything-c-external-commands-list
