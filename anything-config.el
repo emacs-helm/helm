@@ -2610,7 +2610,7 @@ The \"-r\" option must be the last option.")
 ;; (anything 'anything-c-source-locate)
 
 ;;; Grep
-(defvar anything-c-grep-default-command "grep -nH -e %s %s %s")
+(defvar anything-c-grep-default-command "grep -niH -e %s %s %s")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
 
 (defun anything-c-grep-init (only-files)
