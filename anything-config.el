@@ -1828,6 +1828,7 @@ buffer that is not the current buffer."
   "Generic function for creating action from `anything-c-source-find-files'.
 ACTION must be an action supported by `anything-dired-action'."
   (let* ((ifiles   (anything-marked-candidates))
+         (buf      anything-current-buffer)
          (prompt   (anything-find-files-set-prompt-for-action
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
@@ -1839,7 +1840,9 @@ ACTION must be an action supported by `anything-dired-action'."
          (with-current-buffer (dired default-directory)
            (anything-dired-action
             dest :files ifiles :action action :follow parg)
-           (kill-buffer))
+           ;; If we have started in a dired buffer, don't kill it.
+           (unless (eq (current-buffer) (get-buffer buf))
+             (kill-buffer)))
       (unless parg (set-window-configuration win-conf)))))
 
 (defun anything-find-files-copy (candidate)
