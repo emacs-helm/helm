@@ -2615,23 +2615,32 @@ The \"-r\" option must be the last option.")
 ;;; Grep
 (defvar anything-c-grep-default-command "grep -niH -e %s %s %s")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
+(defvar anything-c-grep-ml nil)
 
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
+  (kill-local-variable 'mode-line-format)
+  (setq mode-line-format
+        '(" " mode-line-buffer-identification " "
+          (line-number-mode "%l") " "
+          "(Grep Process Running) " "-%-"))
   (prog1
       (start-process-shell-command
        "grep-process" nil
        (format anything-c-grep-default-command
                (shell-quote-argument anything-pattern)
                only-files
-               (mapconcat #'(lambda (x)
-                              (concat "--exclude=" (shell-quote-argument x)))
-                          grep-find-ignored-files " ")))
-    (set-process-sentinel (get-process "grep-process")
-                          #'(lambda (process event)
-                              (when (string= event "finished\n")
-                                (with-anything-window
-                                  (anything-update-move-first-line)))))))
+               (mapconcat
+                #'(lambda (x)
+                    (concat "--exclude=" (shell-quote-argument x)))
+                grep-find-ignored-files " ")))
+    (set-process-sentinel
+     (get-process "grep-process")
+     #'(lambda (process event)
+         (when (string= event "finished\n")
+           (setq anything-c-grep-ml nil)
+           (with-anything-window
+             (anything-update-move-first-line)))))))
 
 (defun anything-c-grep-action (candidate &optional where)
   "Define a default action for `anything-do-grep' on CANDIDATE.
@@ -2696,6 +2705,7 @@ You can use also wildcard in the base name of candidate."
         (init . (lambda ()
                   ;; Load `grep-find-ignored-files'.
                   (require 'grep)))
+        (mode-line . anything-c-grep-ml)
         (candidates . (lambda ()
                         (funcall anything-c-grep-default-function only)))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
