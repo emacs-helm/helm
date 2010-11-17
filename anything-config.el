@@ -2685,13 +2685,20 @@ You can use also wildcard in the base name of candidate."
     ;; We need here to expand wildcards to support crap windows filenames
     ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
     (setq only
-          (loop for i in only append
-               (cond ((file-directory-p i)
-                      (file-expand-wildcards (concat (file-name-as-directory i) "*")))
-                     ((string-match "\*" i) (file-expand-wildcards i))
-                     (t (list i))) into of
-               finally return
-               (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
+          (loop for i in only
+             for args = (replace-regexp-in-string
+                         "grep" "" anything-c-grep-default-command)
+             append
+             (cond ((and (file-directory-p i)
+                         (string-match "r\\|recurse" args))
+                    (list (file-name-as-directory
+                           (replace-regexp-in-string "[.]$" "" i))))
+                   ((file-directory-p i)
+                    (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
+                   ((string-match "\*" i) (file-expand-wildcards i t))
+                   (t (list i))) into of
+             finally return
+             (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
@@ -2730,16 +2737,20 @@ You can use also wildcard in the base name of candidate."
 (defun anything-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `anything-do-grep'."
   (loop for i in candidates
-     for split  = (split-string i ":")
-     for fname  = (if (eq system-type 'windows-nt)
-                      (concat (car split) ":" (second split))
-                      (car split))
-     for lineno = (if (eq system-type 'windows-nt)
-                      (nth 2 split)
-                      (nth 1 split))
-     for str    = (if (eq system-type 'windows-nt)
-                      (nth 3 split)
-                      (nth 2 split))
+     for split  = (and i (split-string i ":"))
+     for fname  = (and split
+                       (if (eq system-type 'windows-nt)
+                           (concat (car split) ":" (second split))
+                           (car split)))
+     for lineno = (and split
+                       (if (eq system-type 'windows-nt)
+                           (nth 2 split)
+                           (nth 1 split)))
+     for str    = (and split
+                       (if (eq system-type 'windows-nt)
+                           (nth 3 split)
+                           (nth 2 split)))
+     when (and split fname lineno str)
      collect (cons (concat (propertize (file-name-nondirectory fname)
                                        'face '((:foreground "BlueViolet"))
                                        'help-echo fname)
