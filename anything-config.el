@@ -1800,10 +1800,13 @@ buffer that is not the current buffer."
             . anything-c-insert-file-name-completion-at-point)
            ("Open file externally `C-u to choose'"
             . anything-c-open-file-externally)
-           ("Grep File(s)" . (lambda (candidate)
-                               ;; Restore highlighting disabled in *-find-files.
-                               (let ((anything-mp-highlight-delay 0.7))
-                                 (anything-do-grep (anything-marked-candidates)))))
+           ("Grep File(s) `C-u Recurse'"
+            . (lambda (candidate)
+                ;; Restore highlighting disabled in *-find-files.
+                (let ((anything-mp-highlight-delay 0.7))
+                  (if anything-current-prefix-arg
+                      (anything-do-grep (anything-marked-candidates) 'recurse)
+                      (anything-do-grep (anything-marked-candidates))))))
            ("Ediff File" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
            ("Delete File(s)" . anything-delete-marked-files)
@@ -2616,7 +2619,9 @@ The \"-r\" option must be the last option.")
 (defvar anything-c-grep-default-command "grep -niH -e %s %s %s"
   "Default format command for `anything-do-grep'.
 If you want to enable recursion just add the -r option like this:
-\"grep -nirH -e %s %s %s\".")
+\"grep -nirH -e %s %s %s\".
+NOTE: This option is accessible with a prefix arg
+from all anything grep commands without setting it here.")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
 
 (defun anything-c-grep-prepare-candidates (candidates)
@@ -2689,23 +2694,15 @@ WHERE can be one of other-window, elscreen, other-frame."
   (anything-c-grep-action candidate)
   (anything-match-line-color-current-line))
 
-;;;###autoload
-(defun anything-do-grep (only)
-  "Preconfigured anything for grep.
-Contrarily to Emacs `grep' no default directory is given, but
-the full path of candidates in ONLY.
-That allow to grep different files not only in `default-directory' but anywhere
-by marking them (C-<SPACE>). If one or more directory is selected
-grep will search in all files of these directories
-like -d recursive, or -r would do.
-You can use also wildcard in the base name of candidate."
-  (interactive (list
-                (anything-c-read-file-name "Search in file(s): "
-                                           :marked-candidates t)))
+(defun anything-do-grep1 (only &optional recurse)
+  "Launch grep with a list of ONLY files.
+When RECURSE is given use -r option of grep."
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
-               (copy-sequence anything-compile-source-functions))))
+               (copy-sequence anything-compile-source-functions)))
+        (anything-c-grep-default-command (if recurse "grep -nirH -E %s %s %s"
+                                             anything-c-grep-default-command)))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
@@ -2739,6 +2736,22 @@ You can use also wildcard in the base name of candidate."
         (requires-pattern . 3)
         (delayed)))
      :buffer "*anything grep*")))
+
+;;;###autoload
+(defun anything-do-grep (only &optional arg)
+  "Preconfigured anything for grep.
+Contrarily to Emacs `grep' no default directory is given, but
+the full path of candidates in ONLY.
+That allow to grep different files not only in `default-directory' but anywhere
+by marking them (C-<SPACE>). If one or more directory is selected
+grep will search in all files of these directories.
+You can use also wildcard in the base name of candidate.
+If a prefix arg is given use the -r option of grep."
+  (interactive (list
+                (anything-c-read-file-name
+                 "Search in file(s): " :marked-candidates t)
+                "\nP"))
+  (anything-do-grep1 only arg))
 
 (defun anything-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `anything-do-grep'."
