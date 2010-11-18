@@ -2413,7 +2413,8 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                      (concat (file-name-as-directory dest)
                              basename-src)
                      dest)
-     collect fname))
+     collect fname into tmp-list
+     finally return (sort tmp-list 'string<)))
 
 (defun anything-c-maybe-mark-candidates ()
   "Mark all candidates of list `anything-ff-cand-to-mark'."
