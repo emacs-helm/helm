@@ -460,9 +460,10 @@ If (direct-insert-match) is in the source, this function is used."
       (append
        source
        (let ((use-fast-directory
-              (string-match
-               anything-grep-candidates-fast-directory-regexp
-               (or (car (anything-mklist (anything-interpret-value it))) ""))))
+              (and anything-grep-candidates-fast-directory-regexp
+                   (string-match
+                    anything-grep-candidates-fast-directory-regexp
+                    (or (car (anything-mklist (anything-interpret-value it))) "")))))
          (cond ((not (anything-interpret-value it)) nil)
                ((and use-fast-directory (assq 'direct-insert-match source))
                 (anything-log "fastest version (use-fast-directory and direct-insert-match)")
