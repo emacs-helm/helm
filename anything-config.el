@@ -2613,33 +2613,59 @@ The \"-r\" option must be the last option.")
 ;; (anything 'anything-c-source-locate)
 
 ;;; Grep
-(defvar anything-c-grep-default-command "grep -niH -e %s %s %s")
+(defvar anything-c-grep-default-command "grep -niH -e %s %s %s"
+  "Default format command for `anything-do-grep'.
+If you want to enable recursion just add the -r option like this:
+\"grep -nirH -e %s %s %s\".")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
+
+(defun anything-c-grep-prepare-candidates (candidates)
+  "Prepare filenames and directories candidates for grep command line."
+  ;; If one or more candidate is a directory, search in all files
+  ;; of this candidate (e.g /home/user/directory/*).
+  ;; If r option is enabled search also in subdidrectories.
+  ;; We need here to expand wildcards to support crap windows filenames
+  ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
+  (loop for i in candidates
+     for args = (replace-regexp-in-string
+                 "grep" "" anything-c-grep-default-command)
+     append
+     (cond ((and (file-directory-p i)
+                 (string-match "r\\|recurse" args))
+            (list (file-name-as-directory
+                   (replace-regexp-in-string "[.]$" "" i))))
+           ((file-directory-p i)
+            (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
+           ((string-match "\*" i) (file-expand-wildcards i t))
+           (t (list i))) into of
+     finally return
+     (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
 
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (kill-local-variable 'mode-line-format)
-  (setq mode-line-format
-        '(" " mode-line-buffer-identification " "
-          (line-number-mode "%l") " "
-          (:eval (propertize "(Grep Process Running) "
-                  'face '((:foreground "red"))))))
-  (prog1
-      (start-process-shell-command
-       "grep-process" nil
-       (format anything-c-grep-default-command
-               (shell-quote-argument anything-pattern)
-               only-files
-               (mapconcat
-                #'(lambda (x)
-                    (concat "--exclude=" (shell-quote-argument x)))
-                grep-find-ignored-files " ")))
-    (set-process-sentinel
-     (get-process "grep-process")
-     #'(lambda (process event)
-         (when (string= event "finished\n")
-           (with-anything-window
-             (anything-update-move-first-line)))))))
+  (let ((fnargs (anything-c-grep-prepare-candidates only-files)))
+    (kill-local-variable 'mode-line-format)
+    (setq mode-line-format
+          '(" " mode-line-buffer-identification " "
+            (line-number-mode "%l") " "
+            (:eval (propertize "(Grep Process Running) "
+                    'face '((:foreground "red"))))))
+    (prog1
+        (start-process-shell-command
+         "grep-process" nil
+         (format anything-c-grep-default-command
+                 (shell-quote-argument anything-pattern)
+                 fnargs
+                 (mapconcat
+                  #'(lambda (x)
+                      (concat "--exclude=" (shell-quote-argument x)))
+                  grep-find-ignored-files " ")))
+      (set-process-sentinel
+       (get-process "grep-process")
+       #'(lambda (process event)
+           (when (string= event "finished\n")
+             (with-anything-window
+               (anything-update-move-first-line))))))))
 
 (defun anything-c-grep-action (candidate &optional where)
   "Define a default action for `anything-do-grep' on CANDIDATE.
@@ -2680,25 +2706,6 @@ You can use also wildcard in the base name of candidate."
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions))))
-    ;; If one or more candidate is a directory, search in all files
-    ;; of this candidate e.g /home/user/directory/*
-    ;; We need here to expand wildcards to support crap windows filenames
-    ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
-    (setq only
-          (loop for i in only
-             for args = (replace-regexp-in-string
-                         "grep" "" anything-c-grep-default-command)
-             append
-             (cond ((and (file-directory-p i)
-                         (string-match "r\\|recurse" args))
-                    (list (file-name-as-directory
-                           (replace-regexp-in-string "[.]$" "" i))))
-                   ((file-directory-p i)
-                    (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
-                   ((string-match "\*" i) (file-expand-wildcards i t))
-                   (t (list i))) into of
-             finally return
-             (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
@@ -2711,8 +2718,8 @@ You can use also wildcard in the base name of candidate."
         (init . (lambda ()
                   ;; Load `grep-find-ignored-files'.
                   (require 'grep)))
-        (candidates . (lambda ()
-                        (funcall anything-c-grep-default-function only)))
+        (candidates
+         . (lambda () (funcall anything-c-grep-default-function only)))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (action . ,(delq
                     nil
@@ -2728,8 +2735,7 @@ You can use also wildcard in the base name of candidate."
                        . (lambda (candidate)
                            (anything-c-grep-action candidate 'other-frame))))))
         (persistent-action . (lambda (candidate)
-                               (anything-c-grep-persistent-action
-                                candidate)))
+                               (anything-c-grep-persistent-action candidate)))
         (requires-pattern . 3)
         (delayed)))
      :buffer "*anything grep*")))
