@@ -1,5 +1,5 @@
 ;;;; anything-obsolete.el --- obsolete functions of anything
-;; Time-stamp: <2010-11-18 10:53:48 rubikitch>
+;; Time-stamp: <2010-11-18 11:02:25 rubikitch>
 
 ;; Copyright (C) 2010  rubikitch
 
@@ -186,5 +186,5 @@
 (provide 'anything-obsolete)
 
 ;; How to save (DO NOT REMOVE!!)
-;; (progn (git-log-upload) (emacswiki-post "anything-obsolete.el"))
+;; (progn (magit-push) (emacswiki-post "anything-obsolete.el"))
 ;;; anything-obsolete.el ends here
