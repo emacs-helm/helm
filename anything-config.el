@@ -2632,24 +2632,41 @@ from all anything grep commands without setting it here.")
   ;; If r option is enabled search also in subdidrectories.
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
-  (loop for i in candidates
-     for args = (replace-regexp-in-string
-                 "grep" "" anything-c-grep-default-command)
-     append
-     (cond ((and (file-directory-p i)
-                 (string-match "r\\|recurse" args))
-            (list (file-name-as-directory
-                   (replace-regexp-in-string "[.]$" "" i))))
-           ((file-directory-p i)
-            (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
-           ((string-match "\*" i) (file-expand-wildcards i t))
-           (t (list i))) into of
-     finally return
-     (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
+  (loop for i in candidates append
+       (cond ((and (file-directory-p i)
+                   (anything-c-grep-recurse-p))
+              (list (file-name-as-directory
+                     (replace-regexp-in-string "[.]$" "" i))))
+             ((file-directory-p i)
+              (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
+             ((string-match "\*" i) (file-expand-wildcards i t))
+             (t (list i))) into of
+       finally return
+       (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
 
+(defun anything-c-grep-recurse-p ()
+  "Check if `anything-do-grep1' have switched to recursive."
+  (let ((args (replace-regexp-in-string
+               "grep" "" anything-c-grep-default-command)))
+    (string-match-p "r\\|recurse" args)))
+  
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (let ((fnargs (anything-c-grep-prepare-candidates only-files)))
+  (let* ((fnargs        (anything-c-grep-prepare-candidates only-files))
+         (ignored-files (mapconcat
+                         #'(lambda (x)
+                             (concat "--exclude=" (shell-quote-argument x)))
+                         grep-find-ignored-files " "))
+         (ignored-dirs  (mapconcat
+                         #'(lambda (x)
+                             (concat "--exclude-dir=" (shell-quote-argument x)))
+                         grep-find-ignored-directories " "))
+         (exclude       (if (and (anything-c-grep-recurse-p)
+                                 ;; It seem --exclude-dir is not available
+                                 ;; on gnuwin32 grep port so ignore it.
+                                 (not (eq system-type 'windows-nt)))
+                            (concat ignored-files " " ignored-dirs)
+                            ignored-files)))
     (kill-local-variable 'mode-line-format)
     (setq mode-line-format
           '(" " mode-line-buffer-identification " "
@@ -2662,10 +2679,7 @@ from all anything grep commands without setting it here.")
          (format anything-c-grep-default-command
                  (shell-quote-argument anything-pattern)
                  fnargs
-                 (mapconcat
-                  #'(lambda (x)
-                      (concat "--exclude=" (shell-quote-argument x)))
-                  grep-find-ignored-files " ")))
+                 exclude))
       (set-process-sentinel
        (get-process "grep-process")
        #'(lambda (process event)
