@@ -2786,15 +2786,25 @@ If a prefix arg is given use the -r option of grep."
                            (nth 3 split)
                            (nth 2 split)))
      when (and split fname lineno str)
-     collect (cons (concat (propertize (file-name-nondirectory fname)
-                                       'face '((:foreground "BlueViolet"))
-                                       'help-echo fname)
-                           ":"
-                           (propertize lineno
-                                       'face '((:foreground "Darkorange1")))
-                           ":"
-                           str)
-                   i)))
+     collect
+       (cons (concat (propertize (file-name-nondirectory fname)
+                                 'face '((:foreground "BlueViolet"))
+                                 'help-echo fname)
+                     ":"
+                     (propertize lineno
+                                 'face '((:foreground "Darkorange1")))
+                     ":"
+                     (with-temp-buffer
+                       (insert str)
+                       (goto-char (point-min))
+                       (while (and (re-search-forward anything-pattern nil t)
+                                   (> (- (match-end 0) (match-beginning 0)) 0))
+                         (add-text-properties
+                          (match-beginning 0) (match-end 0)
+                          '(face anything-match)))
+                       (buffer-string)))
+             i)))
+
 
 ;;;###autoload
 (defun anything-c-grep-precedent-file ()
