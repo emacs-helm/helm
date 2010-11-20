@@ -2635,8 +2635,10 @@ from all anything grep commands without setting it here.")
   (loop for i in candidates append
        (cond ((and (file-directory-p i)
                    (anything-c-grep-recurse-p))
-              (list (file-name-as-directory
-                     (replace-regexp-in-string "[.]$" "" i))))
+              (if (eq system-type 'windows-nt)
+                  (list i)
+                  (list (file-name-as-directory
+                         (replace-regexp-in-string "[.]$" "" i)))))
              ((file-directory-p i)
               (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
              ((string-match "\*" i) (file-expand-wildcards i t))
@@ -2657,14 +2659,11 @@ from all anything grep commands without setting it here.")
                          #'(lambda (x)
                              (concat "--exclude=" (shell-quote-argument x)))
                          grep-find-ignored-files " "))
-         (ignored-dirs  (mapconcat
+         (ignored-dirs  (mapconcat ; Need grep version 2.5.4 of Gnuwin32 on windoze. 
                          #'(lambda (x)
                              (concat "--exclude-dir=" (shell-quote-argument x)))
                          grep-find-ignored-directories " "))
-         (exclude       (if (and (anything-c-grep-recurse-p)
-                                 ;; It seem --exclude-dir is not available
-                                 ;; on gnuwin32 grep port so ignore it.
-                                 (not (eq system-type 'windows-nt)))
+         (exclude       (if (anything-c-grep-recurse-p)
                             (concat ignored-files " " ignored-dirs)
                             ignored-files)))
     (kill-local-variable 'mode-line-format)
