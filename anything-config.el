@@ -305,7 +305,7 @@
 ;; `anything-c-find-files-show-icons'
 ;; Default Value: t
 ;; `anything-c-find-files-icons-directory'
-;; Default Value: "/usr/share/emacs/23.2.50/etc/images/tree-widget/default"
+;; Default Value: "/usr/share/emacs/24.0.50/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
 ;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
 ;; `anything-c-browse-code-regexp-python'
@@ -2680,7 +2680,6 @@ from all anything grep commands without setting it here.")
          (exclude       (if (anything-c-grep-recurse-p)
                             (concat ignored-files " " ignored-dirs)
                             ignored-files)))
-    (kill-local-variable 'mode-line-format)
     (setq mode-line-format
           '(" " mode-line-buffer-identification " "
             (line-number-mode "%l") " "
@@ -2697,6 +2696,7 @@ from all anything grep commands without setting it here.")
        (get-process "grep-process")
        #'(lambda (process event)
            (when (string= event "finished\n")
+             (kill-local-variable 'mode-line-format)
              (with-anything-window
                (anything-update-move-first-line))))))))
 
