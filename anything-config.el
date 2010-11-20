@@ -1802,11 +1802,9 @@ buffer that is not the current buffer."
             . anything-c-open-file-externally)
            ("Grep File(s) `C-u Recurse'"
             . (lambda (candidate)
-                ;; Restore highlighting disabled in *-find-files.
-                (let ((anything-mp-highlight-delay 0.7))
-                  (if anything-current-prefix-arg
-                      (anything-do-grep (anything-marked-candidates) 'recurse)
-                      (anything-do-grep (anything-marked-candidates))))))
+                (if anything-current-prefix-arg
+                    (anything-do-grep (anything-marked-candidates) 'recurse)
+                    (anything-do-grep (anything-marked-candidates)))))
            ("Ediff File" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
            ("Delete File(s)" . anything-delete-marked-files)
@@ -7673,10 +7671,11 @@ Return nil if bmk is not a valid bookmark."
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))
      ("Open dired in file's directory" . anything-c-open-dired)
-     ("Grep File(s)" . (lambda (candidate)
-                         ;; Restore highlighting disabled in *-find-files.
-                         (let ((anything-mp-highlight-delay 0.7))
-                           (anything-do-grep (anything-marked-candidates)))))
+     ("Grep File(s) `C-u recurse'"
+      . (lambda (candidate)
+          (if anything-current-prefix-arg
+              (anything-do-grep (anything-marked-candidates) 'recurse)
+              (anything-do-grep (anything-marked-candidates)))))
      ("View file" . view-file)
      ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
