@@ -2623,7 +2623,23 @@ If you want to enable recursion just add the -r option like this:
 \"grep -nirH -e %s %s %s\".
 NOTE: This option is accessible with a prefix arg
 from all anything grep commands without setting it here.")
+
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
+
+(defface anything-grep-match
+  '((t (:inherit match)))
+  "Face used to highlight grep matches."
+  :group 'anything)
+
+(defface anything-grep-file
+  '((t (:foreground "BlueViolet" :underline t)))
+  "Face used to highlight grep results filenames."
+  :group 'anything)
+
+(defface anything-grep-lineno
+  '((t (:foreground "Darkorange1")))
+  "Face used to highlight grep number lines."
+  :group 'anything)
 
 (defun anything-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories candidates for grep command line."
@@ -2788,23 +2804,23 @@ If a prefix arg is given use the -r option of grep."
      when (and split fname lineno str)
      collect
        (cons (concat (propertize (file-name-nondirectory fname)
-                                 'face '((:foreground "BlueViolet"))
-                                 'help-echo fname)
-                     ":"
-                     (propertize lineno
-                                 'face '((:foreground "Darkorange1")))
-                     ":"
-                     (with-temp-buffer
-                       (insert str)
-                       (goto-char (point-min))
-                       (while (and (re-search-forward anything-pattern nil t)
-                                   (> (- (match-end 0) (match-beginning 0)) 0))
-                         (add-text-properties
-                          (match-beginning 0) (match-end 0)
-                          '(face anything-match)))
-                       (buffer-string)))
+                                 'face 'anything-grep-file
+                                 'help-echo fname) ":"
+                     (propertize lineno 'face 'anything-grep-lineno) ":"
+                     (anything-c-grep-highlight-match str))
              i)))
 
+(defun anything-c-grep-highlight-match (str)
+  "Highlight in STR all occurences matching `anything-pattern'."
+  (with-temp-buffer
+    (insert str)
+    (goto-char (point-min))
+    (while (and (re-search-forward anything-pattern nil t)
+                (> (- (match-end 0) (match-beginning 0)) 0))
+      (add-text-properties
+       (match-beginning 0) (match-end 0)
+       '(face anything-grep-match)))
+    (buffer-string)))
 
 ;;;###autoload
 (defun anything-c-grep-precedent-file ()
