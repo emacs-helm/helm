@@ -141,7 +141,7 @@
 ;;  `anything-scroll-other-window-down'
 ;;    Scroll other window (not *Anything* window) downward.
 ;;  `anything-toggle-visible-mark'
-;;    Toggle anything visible bookmark at point.
+;;    Toggle anything visible mark at point.
 ;;  `anything-display-all-visible-marks'
 ;;    Show all `anything' visible marks strings.
 ;;  `anything-next-visible-mark'
@@ -2264,7 +2264,12 @@ the real value in a text property."
                        (split-string string "\n")
                        (assoc 'incomplete-line source))
                       source t))
-    (anything-insert-match candidate 'insert-before-markers source)
+    (if (not (assq 'multiline source))
+        (anything-insert-match candidate 'insert-before-markers source)
+      (let ((start (point)))
+        (anything-insert-candidate-separator)
+        (anything-insert-match candidate 'insert-before-markers source)
+        (put-text-property start (point) 'anything-multiline t)))
     (incf (cdr (assoc 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (anything-kill-async-process process)
