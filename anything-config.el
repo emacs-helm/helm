@@ -2616,7 +2616,9 @@ The \"-r\" option must be the last option.")
 ;; (anything 'anything-c-source-locate)
 
 ;;; Grep
-(defvar anything-c-grep-default-command "grep -niH -e %s %s %s"
+;; NOTE: the -d option with skip avoid error on windows.
+;;       It have no effect on GNU/Linux.
+(defvar anything-c-grep-default-command "grep -d skip -niH -e %s %s %s"
   "Default format command for `anything-do-grep'.
 If you want to enable recursion just add the -r option like this:
 \"grep -nirH -e %s %s %s\".
@@ -2650,12 +2652,11 @@ from all anything grep commands without setting it here.")
   (loop for i in candidates append
        (cond ((and (file-directory-p i)
                    (anything-c-grep-recurse-p))
-              (if (eq system-type 'windows-nt)
-                  (list i)
-                  (list (file-name-as-directory
-                         (replace-regexp-in-string "[.]$" "" i)))))
+              (list (expand-file-name i)))
              ((file-directory-p i)
-              (file-expand-wildcards (concat (file-name-as-directory i) "*") t))
+              (file-expand-wildcards (concat (file-name-as-directory
+                                              (expand-file-name i))
+                                             "*") t))
              ((string-match "\*" i) (file-expand-wildcards i t))
              (t (list i))) into of
        finally return
