@@ -1839,11 +1839,12 @@ ACTION must be an action supported by `anything-dired-action'."
     (unwind-protect
          ;; Create temporarily a dired buffer to call dired functions.
          (with-current-buffer (dired default-directory)
-           (anything-dired-action
-            dest :files ifiles :action action :follow parg)
-           ;; If we have started in a dired buffer, don't kill it.
-           (unless (eq (current-buffer) (get-buffer buf))
-             (kill-buffer)))
+           (let ((dir-buf (current-buffer)))
+             (anything-dired-action
+              dest :files ifiles :action action :follow parg)
+             ;; If we have started in a dired buffer, don't kill it.
+             (unless (eq dir-buf (get-buffer buf))
+               (kill-buffer dir-buf))))
       (unless parg (set-window-configuration win-conf)))))
 
 (defun anything-find-files-copy (candidate)
@@ -7562,7 +7563,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
                   (setq default-directory cur-dir))))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
-            (find-file-at-point candidate)))))
+            (find-file-at-point (car marked))))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
