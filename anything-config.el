@@ -2164,14 +2164,29 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                                     (count-lines (point-min) (point-max)))))
                (if (and (> num-lines-buf 3) (not current-prefix-arg) (not follow))
                    (insert-in-minibuffer new-pattern)
-                   (if (string-match (image-file-name-regexp) candidate)
-                       (progn
-                         (when (buffer-live-p image-dired-display-image-buffer)
-                           (kill-buffer image-dired-display-image-buffer))
-                         (image-dired-display-image candidate)
-                         (message nil)
-                         (display-buffer image-dired-display-image-buffer))
-                       (find-file candidate)))))))))
+                   (cond ((string-match (image-file-name-regexp) candidate)
+                          (when (buffer-live-p image-dired-display-image-buffer)
+                            (kill-buffer image-dired-display-image-buffer))
+                          (image-dired-display-image candidate)
+                          (message nil)
+                          (display-buffer image-dired-display-image-buffer))
+                         ;; Allow browsing archive on avfs fs.
+                         ((and anything-ff-avfs-directory
+                               (string-match "\.avfs" (file-name-directory candidate))
+                               (anything-ff-file-compressed-p candidate))
+                          (insert-in-minibuffer (concat candidate "#")))
+                         (t (find-file candidate))))))))))
+
+(defvar anything-ff-avfs-directory nil
+  "*The default avfs directory, usually '.avfs'.
+When this is set you will be able to expand archive filenames with `C-z'.
+See <http://sourceforge.net/projects/avf/>.")
+(defvar anything-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
+  "*Minimal list of compressed files extension.")
+(defun anything-ff-file-compressed-p (candidate)
+  "Whether CANDIDATE is a compressed file or not."
+  (member (file-name-extension candidate)
+          anything-ff-file-compressed-list))
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."
