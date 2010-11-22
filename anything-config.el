@@ -712,7 +712,8 @@ because it is under discussion."
   :group 'anything-config)
 
 (defcustom anything-c-find-files-icons-directory
-  (concat (car image-load-path) "tree-widget/default")
+  (and (window-system)
+       (concat (car image-load-path) "tree-widget/default"))
   "*Default path where to find files and directory icons."
   :type 'string
   :group 'anything-config)
