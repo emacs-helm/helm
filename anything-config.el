@@ -1954,6 +1954,7 @@ If prefix numeric arg is given go ARG level down."
             with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
 
+(defvar anything-ff-default-directory nil)
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ( ; Don't try to tramp connect before entering the second ":".
@@ -1971,6 +1972,7 @@ If prefix numeric arg is given go ARG level down."
                 anything-compile-source-functions)
         (setq anything-pattern path)
         (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
+    (setq anything-ff-default-directory (file-name-directory path))
     (cond ((or (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
@@ -2704,12 +2706,13 @@ from all anything grep commands without setting it here.")
             (:eval (propertize "(Grep Process Running) "
                     'face '((:foreground "red"))))))
     (prog1
-        (start-process-shell-command
-         "grep-process" nil
-         (format anything-c-grep-default-command
-                 (shell-quote-argument anything-pattern)
-                 fnargs
-                 exclude))
+        (let ((default-directory anything-ff-default-directory))
+          (start-file-process-shell-command
+           "grep-process" nil
+           (format anything-c-grep-default-command
+                   (shell-quote-argument anything-pattern)
+                   fnargs
+                   exclude)))
       (set-process-sentinel
        (get-process "grep-process")
        #'(lambda (process event)
@@ -2804,20 +2807,14 @@ If a prefix arg is given use the -r option of grep."
 (defun anything-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `anything-do-grep'."
   (loop for i in candidates
-     for split  = (and i (split-string i ":"))
-     for fname  = (and split
-                       (if (eq system-type 'windows-nt)
-                           (concat (car split) ":" (second split))
-                           (car split)))
-     for lineno = (and split
-                       (if (eq system-type 'windows-nt)
-                           (nth 2 split)
-                           (nth 1 split)))
-     for str    = (and split
-                       (if (eq system-type 'windows-nt)
-                           (nth 3 split)
-                           (nth 2 split)))
-     when (and split fname lineno str)
+     for split  = (and i (string-match "\\(.*\\)\\(:[0-9]+:\\)\\(.*\\)" i)
+                       (list (match-string 1 i)
+                             (replace-regexp-in-string ":" "" (match-string 2 i))
+                             (match-string 3 i)))
+     for fname  = (car split)
+     for lineno = (nth 1 split)
+     for str    = (nth 2 split)
+     when (and fname lineno str)
      collect
        (cons (concat (propertize (file-name-nondirectory fname)
                                  'face 'anything-grep-file
