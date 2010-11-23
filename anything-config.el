@@ -2688,7 +2688,10 @@ from all anything grep commands without setting it here.")
   
 (defun anything-c-grep-init (only-files)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (let* ((fnargs        (anything-c-grep-prepare-candidates only-files))
+  (let* ((fnargs        (anything-c-grep-prepare-candidates
+                         (if (file-remote-p anything-ff-default-directory)
+                             (mapcar #'(lambda (x) (file-remote-p x 'localname)) only-files)
+                             only-files)))
          (ignored-files (mapconcat
                          #'(lambda (x)
                              (concat "--exclude=" (shell-quote-argument x)))
