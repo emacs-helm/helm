@@ -2097,8 +2097,9 @@ If prefix numeric arg is given go ARG level down."
   (cond ((with-current-buffer anything-current-buffer (eq major-mode 'message-mode))
          (append actions '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))))
         ((string-match (image-file-name-regexp) candidate)
-         (append actions '(("Rotate image right" . anything-ff-rotate-image-right)
-                           ("Rotate image left" . anything-ff-rotate-image-left))))
+         (append '(("Rotate image right" . anything-ff-rotate-image-right)
+                   ("Rotate image left" . anything-ff-rotate-image-left))
+                 actions))
         ((string-match "\.el$" (anything-aif (anything-marked-candidates)
                                    (car it) candidate))
          (append actions '(("Byte compile lisp file(s) `C-u to load'"
