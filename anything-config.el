@@ -2117,6 +2117,9 @@ If prefix numeric arg is given go ARG level down."
          (append actions '(("Byte compile lisp file(s) `C-u to load'"
                             . anything-find-files-byte-compile)
                            ("Load File(s)" . load-file))))
+        ((and (string-match "\.html$" candidate)
+              (file-exists-p candidate))
+         (append actions '(("Browse url file" . browse-url-of-file))))
         (t actions)))
 
 (defun anything-ff-gnus-attach-files (candidate)
