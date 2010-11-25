@@ -1891,6 +1891,7 @@ ACTION must be an action supported by `anything-dired-action'."
     (format "Ediff Merge `%s' With File: "
             (file-name-nondirectory candidate)))))
 
+(defvar eshell-command-aliases-list nil)
 (defun anything-find-files-eshell-command-on-file (candidate)
   "Run `eshell-command' on file CANDIDATE possibly with an eshell alias."
   (let ((default-directory anything-ff-default-directory)
