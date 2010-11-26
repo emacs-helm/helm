@@ -2743,13 +2743,13 @@ from all anything grep commands without setting it here.")
 (defun anything-c-grep-action (candidate &optional where)
   "Define a default action for `anything-do-grep' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
-  (let* ((split  (split-string candidate ":"))
-         (lineno (string-to-number (if (eq system-type 'windows-nt)
-                                       (nth 2 split)
-                                       (nth 1 split))))
-         (fname  (if (eq system-type 'windows-nt)
-                     (concat (car split) ":" (second split))
-                     (car split))))
+  (let* ((split        (anything-c-grep-split-line candidate))
+         (lineno       (string-to-number (nth 1 split)))
+         (loc-fname    (car split))
+         (tramp-method (file-remote-p anything-ff-default-directory 'method))
+         (tramp-host   (file-remote-p anything-ff-default-directory 'host))
+         (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
+         (fname        (if tramp-host (concat tramp-prefix loc-fname) loc-fname)))
     (case where
       (other-window (find-file-other-window fname))
       (elscreen     (anything-elscreen-find-file fname))
@@ -2823,13 +2823,17 @@ If a prefix arg is given use the -r option of grep."
                 "\nP"))
   (anything-do-grep1 only arg))
 
+(defun anything-c-grep-split-line (line)
+  "Split a grep output line."
+  (when (string-match "\\(.*\\)\\(:[0-9]+:\\)\\(.*\\)" line)
+    (list (match-string 1 line)
+          (replace-regexp-in-string ":" "" (match-string 2 line))
+          (match-string 3 line))))
+
 (defun anything-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `anything-do-grep'."
   (loop for i in candidates
-     for split  = (and i (string-match "\\(.*\\)\\(:[0-9]+:\\)\\(.*\\)" i)
-                       (list (match-string 1 i)
-                             (replace-regexp-in-string ":" "" (match-string 2 i))
-                             (match-string 3 i)))
+     for split  = (and i (anything-c-grep-split-line i))
      for fname  = (car split)
      for lineno = (nth 1 split)
      for str    = (nth 2 split)
