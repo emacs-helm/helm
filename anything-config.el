@@ -2176,7 +2176,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
              (insert-in-minibuffer (file-truename candidate)))
             (t
              ;; First hit on C-z expand CANDIDATE second hit open file.
-             ;; If a prefix arg is given or `anything-follow-mode' is on open file.
+             ;; If a prefix arg is given or `anything-follow-mode' is on, open file.
              (let ((new-pattern   (anything-get-selection))
                    (num-lines-buf (with-current-buffer anything-buffer
                                     (count-lines (point-min) (point-max)))))
@@ -2189,8 +2189,10 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                           (message nil)
                           (display-buffer image-dired-display-image-buffer))
                          ;; Allow browsing archive on avfs fs.
+                         ;; Assume volume is already mounted with mountavfs.
                          ((and anything-ff-avfs-directory
-                               (string-match "\.avfs" (file-name-directory candidate))
+                               (string-match anything-ff-avfs-directory
+                                             (file-name-directory candidate))
                                (anything-ff-file-compressed-p candidate))
                           (insert-in-minibuffer (concat candidate "#")))
                          (t (find-file candidate))))))))))
