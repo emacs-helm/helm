@@ -2776,10 +2776,7 @@ When RECURSE is given use -r option of grep."
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions)))
-        (anything-c-grep-default-command (if recurse
-                                             (concat "grep -nirH -e %s %s %s"
-                                                     (format " --include=%s"
-                                                             (read-string "OnlyExt: ")))
+        (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
                                              anything-c-grep-default-command))
         ;; FIXME: Remove support for highlighting until fixed in match-plugin.
         (anything-mp-highlight-delay nil))
