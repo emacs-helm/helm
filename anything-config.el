@@ -2790,6 +2790,7 @@ When RECURSE is given use -r option of grep."
         (candidates
          . (lambda () (funcall anything-c-grep-default-function only)))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
+        (candidate-number-limit . 9999)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
