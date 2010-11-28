@@ -1894,15 +1894,17 @@ ACTION must be an action supported by `anything-dired-action'."
 (defvar eshell-command-aliases-list nil)
 (defun anything-find-files-eshell-command-on-file (candidate)
   "Run `eshell-command' on file CANDIDATE possibly with an eshell alias."
-  (let ((default-directory anything-ff-default-directory)
+  (let ((cand-list         (anything-marked-candidates))
+        (default-directory anything-ff-default-directory)
         (command           (anything-comp-read
                             "Command: "
                             (loop for (a . c) in eshell-command-aliases-list
                                when (string-match "\\$1$" (car c))
-                               collect a)))
-        (cand-list         (anything-marked-candidates)))
-    (loop for i in cand-list
-       do (eshell-command (concat command " " i)))))
+                               collect a))))
+    (loop
+       for i in cand-list
+       for com = (concat command " " i)
+       do (eshell-command com))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
@@ -2774,7 +2776,10 @@ When RECURSE is given use -r option of grep."
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions)))
-        (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
+        (anything-c-grep-default-command (if recurse
+                                             (concat "grep -nirH -e %s %s %s"
+                                                     (format " --include=%s"
+                                                             (read-string "OnlyExt: ")))
                                              anything-c-grep-default-command))
         ;; FIXME: Remove support for highlighting until fixed in match-plugin.
         (anything-mp-highlight-delay nil))
