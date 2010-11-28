@@ -1806,7 +1806,7 @@ buffer that is not the current buffer."
                 (if anything-current-prefix-arg
                     (anything-do-grep (anything-marked-candidates) 'recurse)
                     (anything-do-grep (anything-marked-candidates)))))
-           ("Eshell command on file" . anything-find-files-eshell-command-on-file)
+           ("Eshell command on file(s)" . anything-find-files-eshell-command-on-file)
            ("Ediff File" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
            ("Delete File(s)" . anything-delete-marked-files)
@@ -1895,11 +1895,14 @@ ACTION must be an action supported by `anything-dired-action'."
 (defun anything-find-files-eshell-command-on-file (candidate)
   "Run `eshell-command' on file CANDIDATE possibly with an eshell alias."
   (let ((default-directory anything-ff-default-directory)
-        (command (car (anything-comp-read
-                       "Command: " eshell-command-aliases-list
-                       :test #'(lambda (x)
-                                 (string-match "\\$1$" (car (cdr x))))))))
-    (eshell-command (concat command " " candidate))))
+        (command           (anything-comp-read
+                            "Command: "
+                            (loop for (a . c) in eshell-command-aliases-list
+                               when (string-match "\\$1$" (car c))
+                               collect a)))
+        (cand-list         (anything-marked-candidates)))
+    (loop for i in cand-list
+       do (eshell-command (concat command " " i)))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
