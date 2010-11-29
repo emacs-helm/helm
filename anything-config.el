@@ -1893,18 +1893,23 @@ ACTION must be an action supported by `anything-dired-action'."
 
 (defvar eshell-command-aliases-list nil)
 (defun anything-find-files-eshell-command-on-file (candidate)
-  "Run `eshell-command' on file CANDIDATE possibly with an eshell alias."
-  (let ((cand-list         (anything-marked-candidates))
-        (default-directory anything-ff-default-directory)
-        (command           (anything-comp-read
-                            "Command: "
-                            (loop for (a . c) in eshell-command-aliases-list
-                               when (string-match "\\$1$" (car c))
-                               collect a))))
-    (loop
-       for i in cand-list
-       for com = (concat command " " i)
-       do (eshell-command com))))
+  "Run `eshell-command' on file CANDIDATE possibly with an eshell alias.
+NOTE:
+If `eshell' or `eshell-command' have not been run once, `eshell-command-aliases-list'
+will not be loaded first time you use this."
+  (when (or eshell-command-aliases-list
+            (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
+      (let ((cand-list         (anything-marked-candidates))
+            (default-directory anything-ff-default-directory)
+            (command           (anything-comp-read
+                                "Command: "
+                                (loop for (a . c) in eshell-command-aliases-list
+                                   when (string-match "\\$1$" (car c))
+                                   collect a))))
+        (loop
+           for i in cand-list
+           for com = (concat command " " i)
+           do (eshell-command com)))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
@@ -2772,14 +2777,14 @@ WHERE can be one of other-window, elscreen, other-frame."
 (defun anything-do-grep1 (only &optional recurse)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep."
-  (let ((anything-compile-source-functions
-         ;; rule out anything-match-plugin because the input is one regexp.
-         (delq 'anything-compile-source--match-plugin
-               (copy-sequence anything-compile-source-functions)))
-        (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
-                                             anything-c-grep-default-command))
-        ;; FIXME: Remove support for highlighting until fixed in match-plugin.
-        (anything-mp-highlight-delay nil))
+  (let* ((anything-compile-source-functions
+          ;; rule out anything-match-plugin because the input is one regexp.
+          (delq 'anything-compile-source--match-plugin
+                (copy-sequence anything-compile-source-functions)))
+         (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
+                                              anything-c-grep-default-command))
+         ;; FIXME: Remove support for highlighting until fixed in match-plugin.
+         (anything-mp-highlight-delay nil))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
