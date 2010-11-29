@@ -2715,7 +2715,7 @@ from all anything grep commands without setting it here.")
                "grep" "" anything-c-grep-default-command)))
     (string-match-p "r\\|recurse" args)))
   
-(defun anything-c-grep-init (only-files)
+(defun anything-c-grep-init (only-files &optional include)
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((fnargs        (anything-c-grep-prepare-candidates
                          (if (file-remote-p anything-ff-default-directory)
@@ -2730,7 +2730,7 @@ from all anything grep commands without setting it here.")
                              (concat "--exclude-dir=" (shell-quote-argument x)))
                          grep-find-ignored-directories " "))
          (exclude       (if (anything-c-grep-recurse-p)
-                            (concat ignored-files " " ignored-dirs)
+                            (concat (or include ignored-files) " " ignored-dirs)
                             ignored-files)))
     (setq mode-line-format
           '(" " mode-line-buffer-identification " "
@@ -2777,15 +2777,22 @@ WHERE can be one of other-window, elscreen, other-frame."
 
 (defun anything-do-grep1 (only &optional recurse)
   "Launch grep with a list of ONLY files.
-When RECURSE is given use -r option of grep."
+When RECURSE is given use -r option of grep and prompt user
+to set the --include arg of grep.
+If it's not empty use it instead of `grep-find-ignored-files'."
   (let* ((anything-compile-source-functions
           ;; rule out anything-match-plugin because the input is one regexp.
           (delq 'anything-compile-source--match-plugin
                 (copy-sequence anything-compile-source-functions)))
+         (include-files (and recurse (read-string "OnlyExt: ")))
          (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
                                               anything-c-grep-default-command))
          ;; FIXME: Remove support for highlighting until fixed in match-plugin.
          (anything-mp-highlight-delay nil))
+    (when include-files
+      (setq include-files
+            (and (not (string= include-files ""))
+                 (format "--include=%s" (shell-quote-argument include-files)))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
@@ -2799,7 +2806,9 @@ When RECURSE is given use -r option of grep."
                   ;; Load `grep-find-ignored-files'.
                   (require 'grep)))
         (candidates
-         . (lambda () (funcall anything-c-grep-default-function only)))
+         . (lambda () (if include-files
+                          (funcall anything-c-grep-default-function only include-files)
+                          (funcall anything-c-grep-default-function only))))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (action . ,(delq
