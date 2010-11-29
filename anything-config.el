@@ -1899,17 +1899,18 @@ If `eshell' or `eshell-command' have not been run once, `eshell-command-aliases-
 will not be loaded first time you use this."
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
-      (let ((cand-list         (anything-marked-candidates))
-            (default-directory anything-ff-default-directory)
-            (command           (anything-comp-read
-                                "Command: "
-                                (loop for (a . c) in eshell-command-aliases-list
-                                   when (string-match "\\$1$" (car c))
-                                   collect a))))
-        (loop
-           for i in cand-list
-           for com = (concat command " " (shell-quote-argument i))
-           do (eshell-command com)))))
+    (and eshell-command-aliases-list (eshell-read-aliases-list))
+    (let ((cand-list         (anything-marked-candidates))
+          (default-directory anything-ff-default-directory)
+          (command           (anything-comp-read
+                              "Command: "
+                              (loop for (a . c) in eshell-command-aliases-list
+                                 when (string-match "\\$1$" (car c))
+                                 collect a))))
+      (loop
+         for i in cand-list
+         for com = (concat command " " (shell-quote-argument i))
+         do (eshell-command com)))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
