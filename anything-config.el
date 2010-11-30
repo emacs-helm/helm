@@ -2787,7 +2787,7 @@ If it's not empty use it instead of `grep-find-ignored-files'."
          (include-files (and recurse (read-string "OnlyExt: ")))
          (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
                                               anything-c-grep-default-command))
-         ;; FIXME: Remove support for highlighting until fixed in match-plugin.
+         ;; Disable match-plugin and use here own highlighting.
          (anything-mp-highlight-delay nil))
     (when include-files
       (setq include-files
@@ -2846,12 +2846,24 @@ If a prefix arg is given use the -r option of grep."
                 "\nP"))
   (anything-do-grep1 only arg))
 
+
 (defun anything-c-grep-split-line (line)
   "Split a grep output line."
-  (when (string-match "\\(.*\\)\\(:[0-9]+:\\)\\(.*\\)" line)
-    (list (match-string 1 line)
-          (replace-regexp-in-string ":" "" (match-string 2 line))
-          (match-string 3 line))))
+    (let (beg fname lineno str)
+      ;; Don't print until grep line is valid.
+      (when (string-match "\\(.*\\)\\(:[0-9]+:\\)\\(.*\\)" line)
+        (with-temp-buffer
+          (insert line)
+          (goto-char (point-min))
+          (setq beg (point))
+          (forward-char 2)
+          (re-search-forward ":" nil t)
+          (setq fname (buffer-substring-no-properties beg (1- (point))))
+          (setq beg (point))
+          (re-search-forward ":" nil t)
+          (setq lineno (buffer-substring-no-properties beg (1- (point))))
+          (setq str (buffer-substring-no-properties (point) (point-at-eol))))
+        (list fname lineno str))))
 
 (defun anything-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `anything-do-grep'."
@@ -2871,15 +2883,17 @@ If a prefix arg is given use the -r option of grep."
 
 (defun anything-c-grep-highlight-match (str)
   "Highlight in STR all occurences matching `anything-pattern'."
-  (with-temp-buffer
-    (insert str)
-    (goto-char (point-min))
-    (while (and (re-search-forward anything-pattern nil t)
-                (> (- (match-end 0) (match-beginning 0)) 0))
-      (add-text-properties
-       (match-beginning 0) (match-end 0)
-       '(face anything-grep-match)))
-    (buffer-string)))
+  (condition-case nil
+      (with-temp-buffer
+        (insert str)
+        (goto-char (point-min))
+        (while (and (re-search-forward anything-pattern nil t)
+                    (> (- (match-end 0) (match-beginning 0)) 0))
+          (add-text-properties
+           (match-beginning 0) (match-end 0)
+           '(face anything-grep-match)))
+        (buffer-string))
+    (error nil)))
 
 ;;;###autoload
 (defun anything-c-grep-precedent-file ()
