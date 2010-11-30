@@ -1836,11 +1836,11 @@ ACTION must be an action supported by `anything-dired-action'."
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
          (dest     (anything-c-read-file-name
-                    prompt))
+                    prompt :initial-input anything-ff-default-directory))
          (win-conf (current-window-configuration)))
     (unwind-protect
          ;; Create temporarily a dired buffer to call dired functions.
-         (with-current-buffer (dired default-directory)
+         (with-current-buffer (dired anything-ff-default-directory)
            (let ((dir-buf (current-buffer)))
              (anything-dired-action
               dest :files ifiles :action action :follow parg)
