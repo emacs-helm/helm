@@ -1870,11 +1870,17 @@ ACTION must be an action supported by `anything-dired-action'."
   (anything-find-files-do-action 'hardlink))
 
 (defun anything-find-files-byte-compile (candidate)
-  "Byte compile files from `anything-find-files'."
+  "Byte compile elisp files from `anything-find-files'."
   (let ((files    (anything-marked-candidates))
         (parg     anything-current-prefix-arg))
     (loop for fname in files
        do (byte-compile-file fname parg))))
+
+(defun anything-find-files-load-files (candidate)
+  "Load elisp files from `anything-find-files'."
+  (let ((files    (anything-marked-candidates)))
+    (loop for fname in files
+       do (load fname))))
 
 (defun anything-find-files-ediff-files (candidate)
   "Default action to ediff files in `anything-find-files'."
@@ -1892,6 +1898,7 @@ ACTION must be an action supported by `anything-dired-action'."
             (file-name-nondirectory candidate)))))
 
 (defvar eshell-command-aliases-list nil)
+(declare-function eshell-read-aliases-list "em-alias")
 (defun anything-find-files-eshell-command-on-file (candidate)
   "Run `eshell-command' on file CANDIDATE possibly with an eshell alias.
 NOTE:
@@ -2129,7 +2136,7 @@ If prefix numeric arg is given go ARG level down."
                                    (car it) candidate))
          (append actions '(("Byte compile lisp file(s) `C-u to load'"
                             . anything-find-files-byte-compile)
-                           ("Load File(s)" . load-file))))
+                           ("Load File(s)" . anything-find-files-load-files))))
         ((and (string-match "\.html$" candidate)
               (file-exists-p candidate))
          (append actions '(("Browse url file" . browse-url-of-file))))
