@@ -537,6 +537,11 @@ http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
 or  M-x install-elisp-from-emacswiki anything.el")))
 
+;; compatibility
+(unless (fboundp 'window-system)
+  (defun window-system (&optional arg)
+    window-system))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Customize ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgroup anything-config nil
   "Predefined configurations for `anything.el'."
