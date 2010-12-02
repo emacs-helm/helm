@@ -4965,8 +4965,8 @@ replace with STR as yanked string."
   "Preconfigured `anything' for `anything-c-source-global-mark-ring' and \
 `anything-c-source-mark-ring'."
   (interactive)
-  (anything '(anything-c-source-global-mark-ring
-              anything-c-source-mark-ring)))
+  (anything '(anything-c-source-mark-ring
+              anything-c-source-global-mark-ring)))
 
 ;;;; <Register>
 ;;; Insert from register
