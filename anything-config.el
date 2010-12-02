@@ -2651,6 +2651,11 @@ The \"-r\" option must be the last option.")
 
 (defun anything-c-locate-init ()
   "Initialize async locate process for `anything-c-source-locate'."
+  (setq mode-line-format
+        '(" " mode-line-buffer-identification " "
+          (line-number-mode "%l") " "
+          (:eval (propertize "(Locate Process Running) "
+                  'face '((:foreground "red"))))))
   (prog1
       (start-process-shell-command "locate-process" nil
                                    (format anything-c-locate-command
@@ -2658,6 +2663,7 @@ The \"-r\" option must be the last option.")
     (set-process-sentinel (get-process "locate-process")
                           #'(lambda (process event)
                               (when (string= event "finished\n")
+                                (kill-local-variable 'mode-line-format)
                                 (with-anything-window
                                   (anything-update-move-first-line)))))))
 
