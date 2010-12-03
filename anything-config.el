@@ -2770,6 +2770,7 @@ from all anything grep commands without setting it here.")
                    (shell-quote-argument anything-pattern)
                    fnargs
                    exclude)))
+      (message nil)
       (set-process-sentinel
        (get-process "grep-process")
        #'(lambda (process event)
