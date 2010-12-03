@@ -1788,7 +1788,12 @@ buffer that is not the current buffer."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (setq ffap-newfile-prompt t)))
+              (setq ffap-newfile-prompt t)
+              ;; This is needed when connecting with emacsclient -t
+              ;; on remote host that have an anything started on a window-system.
+              ;; i.e when `C-.' is already loaded. 
+              (unless window-system
+                (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
