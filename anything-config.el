@@ -6840,7 +6840,7 @@ If not found or a prefix arg is given query the user which tool to use."
          (real-prog-name (or
                           ;; No prefix arg, default program exists.
                           (unless (or anything-current-prefix-arg (not def-prog))
-                            (replace-regexp-in-string " %s" "" def-prog))
+                            (replace-regexp-in-string " %s\\| '%s'" "" def-prog))
                           ;; Prefix arg or no default program.
                           (anything-comp-read
                            "Program: " collection
