@@ -1814,8 +1814,8 @@ buffer that is not the current buffer."
            ("Grep File(s) `C-u Recurse'"
             . (lambda (candidate)
                 (if anything-current-prefix-arg
-                    (anything-do-grep (anything-marked-candidates) 'recurse)
-                    (anything-do-grep (anything-marked-candidates)))))
+                    (anything-do-grep1 (anything-marked-candidates) 'recurse)
+                    (anything-do-grep1 (anything-marked-candidates)))))
            ("Eshell command on file(s)" . anything-find-files-eshell-command-on-file)
            ("Ediff File" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
@@ -2779,7 +2779,7 @@ from all anything grep commands without setting it here.")
              (with-anything-window
                (anything-update-move-first-line))))))))
 
-(defun anything-c-grep-action (candidate &optional where)
+(defun anything-c-grep-action (candidate &optional where mark)
   "Define a default action for `anything-do-grep' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split        (anything-c-grep-split-line candidate))
@@ -2795,10 +2795,18 @@ WHERE can be one of other-window, elscreen, other-frame."
       (other-frame  (find-file-other-frame fname))
       (t (find-file fname)))
     (show-all)
-    (anything-goto-line lineno)))
+    (anything-goto-line lineno)
+    (set-marker (mark-marker) (point))
+    (when mark
+      (push-mark (point) 'nomsg))))
+              
 
 (defun anything-c-grep-persistent-action (candidate)
-  (anything-c-grep-action candidate)
+  "Persistent action for `anything-do-grep'.
+With a prefix arg record CANDIDATE in `mark-ring'."
+  (if current-prefix-arg
+      (anything-c-grep-action candidate nil 'mark)
+      (anything-c-grep-action candidate))
   (anything-match-line-color-current-line))
 
 (defun anything-do-grep1 (only &optional recurse)
@@ -2852,12 +2860,13 @@ If it's not empty use it instead of `grep-find-ignored-files'."
                            (anything-c-grep-action candidate 'other-frame))))))
         (persistent-action . (lambda (candidate)
                                (anything-c-grep-persistent-action candidate)))
+        (persistent-help . "(`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
      :buffer "*anything grep*")))
 
 ;;;###autoload
-(defun anything-do-grep (only &optional arg)
+(defun anything-do-grep ()
   "Preconfigured anything for grep.
 Contrarily to Emacs `grep' no default directory is given, but
 the full path of candidates in ONLY.
@@ -2866,13 +2875,12 @@ by marking them (C-<SPACE>). If one or more directory is selected
 grep will search in all files of these directories.
 You can use also wildcard in the base name of candidate.
 If a prefix arg is given use the -r option of grep."
-  (interactive (list
-                (anything-c-read-file-name
-                 "Search in file(s): " :marked-candidates t)
-                "\nP"))
-  (anything-do-grep1 only arg))
-
-
+  (interactive)
+  (let ((only    (anything-c-read-file-name
+                  "Search in file(s): " :marked-candidates t))
+        (prefarg current-prefix-arg))
+    (anything-do-grep1 only prefarg)))
+  
 (defun anything-c-grep-split-line (line)
   "Split a grep output line."
     (let (beg fname lineno str)
@@ -7775,8 +7783,8 @@ Return nil if bmk is not a valid bookmark."
      ("Grep File(s) `C-u recurse'"
       . (lambda (candidate)
           (if anything-current-prefix-arg
-              (anything-do-grep (anything-marked-candidates) 'recurse)
-              (anything-do-grep (anything-marked-candidates)))))
+              (anything-do-grep1 (anything-marked-candidates) 'recurse)
+              (anything-do-grep1 (anything-marked-candidates)))))
      ("View file" . view-file)
      ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
