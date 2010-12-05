@@ -3061,7 +3061,16 @@ Acceptable values of CREATE-OR-BUFFER:
   (setq anything-saved-selection (anything-get-selection))
   (unless anything-saved-selection
     (error "Nothing is selected."))
-  (setq anything-saved-action (cdr (elt (anything-get-action) n)))
+  (setq anything-saved-action
+        (let ((action (anything-get-action)))
+          (cond ((and (zerop n) (functionp action))
+                 action)
+                ((listp action)
+                 (cdr (elt action n)))
+                ((and (functionp action) (< 0 n))
+                 (error "Sole action."))
+                (t
+                 (error "Error in `anything-select-nth-action'.")))))
   (anything-exit-minibuffer))
 
 (defun anything-select-2nd-action ()
