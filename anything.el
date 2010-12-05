@@ -3061,17 +3061,18 @@ Acceptable values of CREATE-OR-BUFFER:
   (setq anything-saved-selection (anything-get-selection))
   (unless anything-saved-selection
     (error "Nothing is selected."))
-  (setq anything-saved-action
-        (let ((action (anything-get-action)))
-          (cond ((and (zerop n) (functionp action))
-                 action)
-                ((listp action)
-                 (cdr (elt action n)))
-                ((and (functionp action) (< 0 n))
-                 (error "Sole action."))
-                (t
-                 (error "Error in `anything-select-nth-action'.")))))
+  (setq anything-saved-action (anything-get-nth-action n (anything-get-action)))
   (anything-exit-minibuffer))
+
+(defun anything-get-nth-action (n action)
+  (cond ((and (zerop n) (functionp action))
+         action)
+        ((listp action)
+         (cdr (elt action n)))
+        ((and (functionp action) (< 0 n))
+         (error "Sole action."))
+        (t
+         (error "Error in `anything-select-nth-action'."))))
 
 (defun anything-select-2nd-action ()
   "Select the 2nd action for the currently selected candidate."
@@ -5203,19 +5204,20 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (stub anything-get-selection => "action-transformer is called")
         (anything-get-action))
       (desc "anything-select-nth-action")
-      (expect "selection"
-        (stub anything-get-selection => "selection")
-        (stub anything-exit-minibuffer)
-        (let (anything-saved-selection)
-          (anything-select-nth-action 1)
-          anything-saved-selection))
+      (expect (error error *)
+        (stub anything-get-selection => nil)
+        (anything-select-nth-action 0))
+      (desc "anything-get-nth-action")
       (expect 'cadr
-        (stub anything-get-action => '(("0" . car) ("1" . cdr) ("2" . cadr)))
-        (stub anything-exit-minibuffer)
-        (stub anything-get-selection => "selection")
-        (let (anything-saved-action)
-          (anything-select-nth-action 2)
-          anything-saved-action))
+        (anything-get-nth-action 2 '(("0" . car) ("1" . cdr) ("2" . cadr))))
+      (expect 'identity
+        (anything-get-nth-action 0 'identity))
+      (expect (error error *)
+        (anything-get-nth-action 1 'identity))
+      (expect (error error *)
+        (anything-get-nth-action 0 'unbound-function-xxx))
+      (expect (error error *)
+        (anything-get-nth-action 0 "invalid data"))
       (desc "anything-funcall-foreach")
       (expect (mock (upcase "foo"))
         (stub anything-get-sources => '(((init . (lambda () (upcase "foo"))))))
