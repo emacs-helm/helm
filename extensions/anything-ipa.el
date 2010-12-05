@@ -84,7 +84,7 @@
 (defvar anything-ipa-version "$Id: anything-ipa.el,v 1.6 2009-03-01 22:52:44 rubikitch Exp $")
 (eval-when-compile (require 'cl))
 (require 'anything)
-(require 'ipa)
+(require 'ipa nil t)
 
 ;;;; file-local source
 (defvar anything-c-source-ipa

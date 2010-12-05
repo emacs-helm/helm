@@ -142,7 +142,7 @@
 
 (require 'anything)
 (require 'anything-config nil t)        ; highlight line if available
-(require 'gtags)
+(require 'gtags nil t)
 
 (defgroup anything-gtags nil
   "Gtags Anything interface"
