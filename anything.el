@@ -3068,7 +3068,8 @@ Acceptable values of CREATE-OR-BUFFER:
   (cond ((and (zerop n) (functionp action))
          action)
         ((listp action)
-         (cdr (elt action n)))
+         (or (cdr (elt action n))
+             (error "No such action")))
         ((and (functionp action) (< 0 n))
          (error "Sole action."))
         (t
@@ -5210,6 +5211,8 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
       (desc "anything-get-nth-action")
       (expect 'cadr
         (anything-get-nth-action 2 '(("0" . car) ("1" . cdr) ("2" . cadr))))
+      (expect (error error *)
+        (anything-get-nth-action 2 '(("0" . car))))
       (expect 'identity
         (anything-get-nth-action 0 'identity))
       (expect (error error *)
