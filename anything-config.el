@@ -1788,7 +1788,12 @@ buffer that is not the current buffer."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (setq ffap-newfile-prompt t)))
+              (setq ffap-newfile-prompt t)
+              ;; This is needed when connecting with emacsclient -t
+              ;; on remote host that have an anything started on a window-system.
+              ;; i.e when `C-.' is already loaded. 
+              (unless window-system
+                (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (persistent-action . anything-find-files-persistent-action)
@@ -2765,6 +2770,7 @@ from all anything grep commands without setting it here.")
                    (shell-quote-argument anything-pattern)
                    fnargs
                    exclude)))
+      (message nil)
       (set-process-sentinel
        (get-process "grep-process")
        #'(lambda (process event)
@@ -6835,7 +6841,7 @@ If not found or a prefix arg is given query the user which tool to use."
          (real-prog-name (or
                           ;; No prefix arg, default program exists.
                           (unless (or anything-current-prefix-arg (not def-prog))
-                            (replace-regexp-in-string " %s" "" def-prog))
+                            (replace-regexp-in-string " %s\\| '%s'" "" def-prog))
                           ;; Prefix arg or no default program.
                           (anything-comp-read
                            "Program: " collection
