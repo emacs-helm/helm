@@ -1211,7 +1211,8 @@ If FORCE-DISPLAY-PART is non-nil, return the display string."
           selection)))))
 
 (defun anything-get-action ()
-  "Return the associated action for the selected candidate."
+  "Return the associated action for the selected candidate.
+It is a function symbol (sole action) or list of (action-display . function)."
   (unless (anything-empty-buffer-p (anything-buffer-get))
     (anything-aif (anything-attr 'action-transformer)
         (anything-composed-funcall-with-source
@@ -5176,6 +5177,11 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         (stub buffer-size => 1)
         (stub anything-get-current-source => '((name . "test")
                                                (action ("identity" . identity))))
+        (anything-get-action))
+      (expect 'identity
+        (stub buffer-size => 1)
+        (stub anything-get-current-source => '((name . "test")
+                                               (action . identity)))
         (anything-get-action))
       (expect '((("identity" . identity)) "action-transformer is called")
         (stub buffer-size => 1)
