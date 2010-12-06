@@ -2860,7 +2860,7 @@ If it's not empty use it instead of `grep-find-ignored-files'."
                            (anything-c-grep-action candidate 'other-frame))))))
         (persistent-action . (lambda (candidate)
                                (anything-c-grep-persistent-action candidate)))
-        (persistent-help . "(`C-u' Record in mark ring)")
+        (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
      :buffer "*anything grep*")))
