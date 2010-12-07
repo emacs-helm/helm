@@ -2281,6 +2281,8 @@ See <http://sourceforge.net/projects/avf/>.")
 In non--interactive use an argument FNAME can be used.
 This is the starting point for nearly all actions you can do on files."
   (interactive "i")
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
   (let* ((anything-mp-highlight-delay nil)
          (history (loop with dup for i in anything-ff-history
                      unless (member i dup) collect i into dup
