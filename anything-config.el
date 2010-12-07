@@ -2276,7 +2276,8 @@ This is the starting point for nearly all actions you can do on files."
                          (if (>= (length history) anything-ff-history-max-length)
                              (subseq history 0 anything-ff-history-max-length)
                              history)
-                         :name "Anything Find Files History")
+                         :name "Anything Find Files History"
+                         :must-match t)
                         (or (and fname (expand-file-name fname))
                             (anything-find-files-input
                              (ffap-guesser)
