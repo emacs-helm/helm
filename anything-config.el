@@ -1995,6 +1995,8 @@ If prefix numeric arg is given go ARG level down."
             for i across v collect i)))
 
 (defvar anything-ff-default-directory nil)
+(defvar anything-ff-history nil)
+(defvar anything-ff-history-max-length 30)
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ( ; Don't try to tramp connect before entering the second ":".
@@ -2015,6 +2017,7 @@ If prefix numeric arg is given go ARG level down."
     (setq anything-ff-default-directory (if (string= anything-pattern "")
                                             (if (eq system-type 'windows-nt) "c:/" "/")
                                             (file-name-directory path)))
+    (push anything-ff-default-directory anything-ff-history)
     (cond ((or (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
@@ -2262,12 +2265,24 @@ See <http://sourceforge.net/projects/avf/>.")
 In non--interactive use an argument FNAME can be used.
 This is the starting point for nearly all actions you can do on files."
   (interactive "i")
-  (let ((anything-mp-highlight-delay nil))
+  (let* ((anything-mp-highlight-delay nil)
+         (history (loop with dup for i in anything-ff-history
+                     unless (member i dup) collect i into dup
+                     finally return dup))
+         (any-input (if (and current-prefix-arg
+                             anything-ff-history)
+                        (anything-comp-read
+                         "Switch to Directory: "
+                         (if (>= (length history) anything-ff-history-max-length)
+                             (subseq history 0 anything-ff-history-max-length)
+                             history)
+                         :name "Anything Find Files History")
+                        (or (and fname (expand-file-name fname))
+                            (anything-find-files-input
+                             (ffap-guesser)
+                             (thing-at-point 'filename))))))
     (anything :sources 'anything-c-source-find-files
-              :input (or (and fname (expand-file-name fname))
-                         (anything-find-files-input
-                          (ffap-guesser)
-                          (thing-at-point 'filename)))
+              :input any-input
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
 
