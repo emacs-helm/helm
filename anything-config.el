@@ -1999,14 +1999,29 @@ If prefix numeric arg is given go ARG level down."
 (defvar anything-ff-history-max-length 30)
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let* ( ; Don't try to tramp connect before entering the second ":".
-         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:?")
+  (let* ((unfinished-tramp-name nil)
+         (tramp-file-name-temp-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
+         (methods (mapcar 'car tramp-methods))
          (path (cond ((string-match "^~" anything-pattern)
                       (replace-match (getenv "HOME") nil t anything-pattern))
-                     ((string-match tramp-file-name-regexp anything-pattern)
+                     ;; Match "/method:maybe_hostname:"
+                     ((string-match tramp-file-name-temp-regexp anything-pattern)
                       (let ((tramp-name (anything-create-tramp-name
                                          (match-string 0 anything-pattern))))
                         (replace-match tramp-name nil t anything-pattern)))
+                     ;; Match "/hostname:"
+                     ((and (string-match  tramp-file-name-regexp anything-pattern)
+                           (match-string 1 anything-pattern)
+                           (not (member (match-string 1 anything-pattern) methods)))
+                      (let ((tramp-name (anything-create-tramp-name
+                                         (match-string 0 anything-pattern))))
+                        (replace-match tramp-name nil t anything-pattern)))
+                     ;; Match "/method:" in this case don't try to connect.
+                     ((and (not (string-match tramp-file-name-temp-regexp anything-pattern))
+                           (string-match  tramp-file-name-regexp anything-pattern)
+                           (member (match-string 1 anything-pattern) methods))
+                      (setq unfinished-tramp-name t)
+                      "Unfinished tramp name") ; Write in anything-buffer.
                      (t anything-pattern)))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
@@ -2019,6 +2034,7 @@ If prefix numeric arg is given go ARG level down."
                                             (file-name-directory path)))
     (push anything-ff-default-directory anything-ff-history)
     (cond ((or (file-regular-p path)
+               unfinished-tramp-name
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
