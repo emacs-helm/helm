@@ -6745,26 +6745,27 @@ If EXE is already running just jump to his window if `anything-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
-  (let ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe)))))
-    (if (or (get-process real-com)
-            (anything-c-get-pid-from-process-name real-com))
+  (lexical-let* ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe))))
+                 (proc     (if file (concat real-com " " file) real-com)))
+    (if (get-process proc)
         (if anything-raise-command
             (shell-command  (format anything-raise-command real-com))
             (error "Error: %s is already running" real-com))
         (when (member real-com anything-c-external-commands-list)
           (message "Starting %s..." real-com)
           (if file
-              (start-process-shell-command real-com nil (format exe file))
-              (start-process-shell-command real-com nil real-com))
+              (start-process-shell-command proc nil (format exe file))
+              (start-process-shell-command proc nil real-com))
           (set-process-sentinel
-           (get-process real-com)
+           (get-process proc)
            #'(lambda (process event)
                (when (and (string= event "finished\n")
-                          anything-raise-command)
-                      (shell-command  (format anything-raise-command "emacs")))
-                 (message "%s process...Finished." process))))
-          (setq anything-c-external-commands-list
-                (cons real-com (delete real-com anything-c-external-commands-list))))))
+                          anything-raise-command
+                          (not (anything-c-get-pid-from-process-name real-com)))
+                 (shell-command  (format anything-raise-command "emacs")))
+               (message "%s process...Finished." process))))
+        (setq anything-c-external-commands-list
+              (cons real-com (delete real-com anything-c-external-commands-list))))))
 
 
 (defvar anything-external-command-history nil)
