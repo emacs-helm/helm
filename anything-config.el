@@ -1996,7 +1996,8 @@ If prefix numeric arg is given go ARG level down."
 
 (defvar anything-ff-default-directory nil)
 (defvar anything-ff-history nil)
-(defvar anything-ff-history-max-length 30)
+(defvar anything-ff-history-max-length 30
+  "*Number of elements shown in `anything-find-files' history.")
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((unfinished-tramp-name nil)
@@ -2248,7 +2249,8 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
 
 (defvar anything-ff-avfs-directory nil
   "*The default avfs directory, usually '.avfs'.
-When this is set you will be able to expand archive filenames with `C-z'.
+When this is set you will be able to expand archive filenames with `C-z'
+inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>.")
 (defvar anything-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
   "*Minimal list of compressed files extension.")
@@ -2275,35 +2277,52 @@ See <http://sourceforge.net/projects/avf/>.")
                   (insert (abbreviate-file-name candidate))))
             (error "Aborting completion: No valid file name at point")))))
 
-;;;###autoload
-(defun anything-find-files (&optional fname)
-  "Preconfigured `anything' for anything implementation of `find-file'.
-In non--interactive use an argument FNAME can be used.
-This is the starting point for nearly all actions you can do on files."
-  (interactive "i")
+(defun anything-find-files1 (fname)
+  "Find FNAME with `anything' completion.
+Like `find-file' but with `anything' support.
+Use it for non--interactive calls of `anything-find-files'."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (let* ((anything-mp-highlight-delay nil)
-         (history (loop with dup for i in anything-ff-history
-                     unless (member i dup) collect i into dup
-                     finally return dup))
-         (any-input (if (and current-prefix-arg
-                             anything-ff-history)
-                        (anything-comp-read
-                         "Switch to Directory: "
-                         (if (>= (length history) anything-ff-history-max-length)
-                             (subseq history 0 anything-ff-history-max-length)
-                             history)
-                         :name "Anything Find Files History"
-                         :must-match t)
-                        (or (and fname (expand-file-name fname))
-                            (anything-find-files-input
-                             (ffap-guesser)
-                             (thing-at-point 'filename))))))
+  (let ((anything-mp-highlight-delay nil))
     (anything :sources 'anything-c-source-find-files
-              :input any-input
+              :input fname
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
+
+(defun anything-find-files-history ()
+  "The `anything-find-files' history.
+Show the first `anything-ff-history-max-length' elements of `anything-ff-history'
+in an `anything-comp-read'."
+  (let ((history (loop with dup for i in anything-ff-history
+                    unless (member i dup) collect i into dup
+                    finally return dup))) ; Remove dups.
+    (when anything-ff-history
+      (anything-comp-read
+       "Switch to Directory: "
+       (if (>= (length history) anything-ff-history-max-length)
+           (subseq history 0 anything-ff-history-max-length)
+           history)
+       :name "Anything Find Files History"
+       :must-match t))))
+
+(defun anything-find-files-initial-input (&optional input)
+  "Return INPUT if present, otherwise try to guess it."
+  (or (and input (expand-file-name input))
+      (anything-find-files-input
+       (ffap-guesser)
+       (thing-at-point 'filename))))
+
+;;;###autoload
+(defun anything-find-files ()
+  "Preconfigured `anything' for anything implementation of `find-file'.
+Called with a prefix arg show history if some.
+Don't call it from programs, use `anything-find-files1' instead.
+This is the starting point for nearly all actions you can do on files."
+  (interactive)
+  (let ((any-input (if (and current-prefix-arg anything-ff-history)
+                       (anything-find-files-history)
+                       (anything-find-files-initial-input))))
+    (anything-find-files1 any-input)))
 
 (defun anything-c-current-directory ()
   "Return current-directory name at point.
@@ -2492,7 +2511,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
         (unwind-protect
              (progn
                (setq anything-ff-cand-to-mark moved-flist)
-               (anything-find-files candidate))
+               (anything-find-files1 candidate))
           (setq anything-ff-cand-to-mark nil))))))
 
 ;; Internal
@@ -7701,7 +7720,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
                        (make-directory candidate 'parent)
                        (when (file-exists-p candidate)
                          (cd candidate)
-                         (anything-find-files candidate)))
+                         (anything-find-files1 candidate)))
                   (setq default-directory cur-dir))))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
