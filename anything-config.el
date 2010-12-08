@@ -1990,9 +1990,34 @@ If prefix numeric arg is given go ARG level down."
 (defun anything-create-tramp-name (fname)
   "Build filename for `anything-pattern' like /su:: or /sudo::."
   (apply #'tramp-make-tramp-file-name
-         (loop
-            with v = (tramp-dissect-file-name fname)
+         (loop with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
+
+(defun* anything-ff-set-pattern (&optional (pattern anything-pattern))
+  (let ((methods (mapcar 'car tramp-methods))
+        (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
+        cur-method tramp-name)
+    (cond ((string-match "^~" pattern)
+           (replace-match (getenv "HOME") nil t pattern))
+          ;; Match "/method:maybe_hostname:"
+          ((and (string-match reg pattern)
+               (setq cur-method (match-string 1 pattern))
+               (member cur-method methods))
+          (setq tramp-name (anything-create-tramp-name (match-string 0 pattern)))
+          (replace-match tramp-name nil t pattern))
+          ;; Match "/hostname:"
+          ((and (string-match  tramp-file-name-regexp pattern)
+                (setq cur-method (match-string 1 pattern))
+                (and cur-method (not (member cur-method methods))))
+           (setq tramp-name (anything-create-tramp-name (match-string 0 pattern)))
+           (replace-match tramp-name nil t pattern))
+          ;; Match "/method:" in this case don't try to connect.
+          ((and (not (string-match reg pattern))
+                (string-match  tramp-file-name-regexp pattern)
+                (member (match-string 1 pattern) methods))
+           "Invalid tramp file name") ; Write in anything-buffer.
+          ;; Return PATTERN unchanged.
+          (t pattern))))
 
 (defvar anything-ff-default-directory nil)
 (defvar anything-ff-history nil)
@@ -2000,31 +2025,9 @@ If prefix numeric arg is given go ARG level down."
   "*Number of elements shown in `anything-find-files' history.")
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let* ((unfinished-tramp-name nil)
-         (tramp-file-name-temp-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
-         (methods (mapcar 'car tramp-methods))
-         (path (cond ((string-match "^~" anything-pattern)
-                      (replace-match (getenv "HOME") nil t anything-pattern))
-                     ;; Match "/method:maybe_hostname:"
-                     ((string-match tramp-file-name-temp-regexp anything-pattern)
-                      (let ((tramp-name (anything-create-tramp-name
-                                         (match-string 0 anything-pattern))))
-                        (replace-match tramp-name nil t anything-pattern)))
-                     ;; Match "/hostname:"
-                     ((and (string-match  tramp-file-name-regexp anything-pattern)
-                           (match-string 1 anything-pattern)
-                           (not (member (match-string 1 anything-pattern) methods)))
-                      (let ((tramp-name (anything-create-tramp-name
-                                         (match-string 0 anything-pattern))))
-                        (replace-match tramp-name nil t anything-pattern)))
-                     ;; Match "/method:" in this case don't try to connect.
-                     ((and (not (string-match tramp-file-name-temp-regexp anything-pattern))
-                           (string-match  tramp-file-name-regexp anything-pattern)
-                           (member (match-string 1 anything-pattern) methods))
-                      (setq unfinished-tramp-name t)
-                      "Unfinished tramp name") ; Write in anything-buffer.
-                     (t anything-pattern)))
-         (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
+  (let* ((path          (anything-ff-set-pattern))
+         (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
+         unfinished-tramp-name)
     (set-text-properties 0 (length path) nil path)
     (if (member 'anything-compile-source--match-plugin
                 anything-compile-source-functions)
@@ -2034,6 +2037,8 @@ If prefix numeric arg is given go ARG level down."
                                             (if (eq system-type 'windows-nt) "c:/" "/")
                                             (file-name-directory path)))
     (push anything-ff-default-directory anything-ff-history)
+    (when (string= path "Invalid tramp file name")
+      (setq unfinished-tramp-name t))
     (cond ((or (file-regular-p path)
                unfinished-tramp-name
                (and (not (file-exists-p path)) (string-match "/$" path))
