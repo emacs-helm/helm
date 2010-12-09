@@ -1990,23 +1990,44 @@ If prefix numeric arg is given go ARG level down."
 (defun anything-create-tramp-name (fname)
   "Build filename for `anything-pattern' like /su:: or /sudo::."
   (apply #'tramp-make-tramp-file-name
-         (loop
-            with v = (tramp-dissect-file-name fname)
+         (loop with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
 
+(defun* anything-ff-set-pattern (&optional (pattern anything-pattern))
+  (let ((methods (mapcar 'car tramp-methods))
+        (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
+        cur-method tramp-name)
+    (cond ((string-match "^~" pattern)
+           (replace-match (getenv "HOME") nil t pattern))
+          ;; Match "/method:maybe_hostname:"
+          ((and (string-match reg pattern)
+               (setq cur-method (match-string 1 pattern))
+               (member cur-method methods))
+          (setq tramp-name (anything-create-tramp-name (match-string 0 pattern)))
+          (replace-match tramp-name nil t pattern))
+          ;; Match "/hostname:"
+          ((and (string-match  tramp-file-name-regexp pattern)
+                (setq cur-method (match-string 1 pattern))
+                (and cur-method (not (member cur-method methods))))
+           (setq tramp-name (anything-create-tramp-name (match-string 0 pattern)))
+           (replace-match tramp-name nil t pattern))
+          ;; Match "/method:" in this case don't try to connect.
+          ((and (not (string-match reg pattern))
+                (string-match  tramp-file-name-regexp pattern)
+                (member (match-string 1 pattern) methods))
+           "Invalid tramp file name") ; Write in anything-buffer.
+          ;; Return PATTERN unchanged.
+          (t pattern))))
+
 (defvar anything-ff-default-directory nil)
+(defvar anything-ff-history nil)
+(defvar anything-ff-history-max-length 30
+  "*Number of elements shown in `anything-find-files' history.")
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let* ( ; Don't try to tramp connect before entering the second ":".
-         (tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):.*:?")
-         (path (cond ((string-match "^~" anything-pattern)
-                      (replace-match (getenv "HOME") nil t anything-pattern))
-                     ((string-match tramp-file-name-regexp anything-pattern)
-                      (let ((tramp-name (anything-create-tramp-name
-                                         (match-string 0 anything-pattern))))
-                        (replace-match tramp-name nil t anything-pattern)))
-                     (t anything-pattern)))
-         (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
+  (let* ((path          (anything-ff-set-pattern))
+         (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
+         unfinished-tramp-name)
     (set-text-properties 0 (length path) nil path)
     (if (member 'anything-compile-source--match-plugin
                 anything-compile-source-functions)
@@ -2015,7 +2036,11 @@ If prefix numeric arg is given go ARG level down."
     (setq anything-ff-default-directory (if (string= anything-pattern "")
                                             (if (eq system-type 'windows-nt) "c:/" "/")
                                             (file-name-directory path)))
+    (push anything-ff-default-directory anything-ff-history)
+    (when (string= path "Invalid tramp file name")
+      (setq unfinished-tramp-name t))
     (cond ((or (file-regular-p path)
+               unfinished-tramp-name
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
@@ -2229,7 +2254,8 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
 
 (defvar anything-ff-avfs-directory nil
   "*The default avfs directory, usually '.avfs'.
-When this is set you will be able to expand archive filenames with `C-z'.
+When this is set you will be able to expand archive filenames with `C-z'
+inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>.")
 (defvar anything-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
   "*Minimal list of compressed files extension.")
@@ -2256,20 +2282,52 @@ See <http://sourceforge.net/projects/avf/>.")
                   (insert (abbreviate-file-name candidate))))
             (error "Aborting completion: No valid file name at point")))))
 
-;;;###autoload
-(defun anything-find-files (&optional fname)
-  "Preconfigured `anything' for anything implementation of `find-file'.
-In non--interactive use an argument FNAME can be used.
-This is the starting point for nearly all actions you can do on files."
-  (interactive "i")
+(defun anything-find-files1 (fname)
+  "Find FNAME with `anything' completion.
+Like `find-file' but with `anything' support.
+Use it for non--interactive calls of `anything-find-files'."
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
   (let ((anything-mp-highlight-delay nil))
     (anything :sources 'anything-c-source-find-files
-              :input (or (and fname (expand-file-name fname))
-                         (anything-find-files-input
-                          (ffap-guesser)
-                          (thing-at-point 'filename)))
+              :input fname
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
+
+(defun anything-find-files-history ()
+  "The `anything-find-files' history.
+Show the first `anything-ff-history-max-length' elements of `anything-ff-history'
+in an `anything-comp-read'."
+  (let ((history (loop with dup for i in anything-ff-history
+                    unless (member i dup) collect i into dup
+                    finally return dup))) ; Remove dups.
+    (when anything-ff-history
+      (anything-comp-read
+       "Switch to Directory: "
+       (if (>= (length history) anything-ff-history-max-length)
+           (subseq history 0 anything-ff-history-max-length)
+           history)
+       :name "Anything Find Files History"
+       :must-match t))))
+
+(defun anything-find-files-initial-input (&optional input)
+  "Return INPUT if present, otherwise try to guess it."
+  (or (and input (expand-file-name input))
+      (anything-find-files-input
+       (ffap-guesser)
+       (thing-at-point 'filename))))
+
+;;;###autoload
+(defun anything-find-files ()
+  "Preconfigured `anything' for anything implementation of `find-file'.
+Called with a prefix arg show history if some.
+Don't call it from programs, use `anything-find-files1' instead.
+This is the starting point for nearly all actions you can do on files."
+  (interactive)
+  (let ((any-input (if (and current-prefix-arg anything-ff-history)
+                       (anything-find-files-history)
+                       (anything-find-files-initial-input))))
+    (anything-find-files1 any-input)))
 
 (defun anything-c-current-directory ()
   "Return current-directory name at point.
@@ -2458,7 +2516,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
         (unwind-protect
              (progn
                (setq anything-ff-cand-to-mark moved-flist)
-               (anything-find-files candidate))
+               (anything-find-files1 candidate))
           (setq anything-ff-cand-to-mark nil))))))
 
 ;; Internal
@@ -6687,26 +6745,27 @@ If EXE is already running just jump to his window if `anything-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
-  (let ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe)))))
-    (if (or (get-process real-com)
-            (anything-c-get-pid-from-process-name real-com))
+  (lexical-let* ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe))))
+                 (proc     (if file (concat real-com " " file) real-com)))
+    (if (get-process proc)
         (if anything-raise-command
             (shell-command  (format anything-raise-command real-com))
             (error "Error: %s is already running" real-com))
         (when (member real-com anything-c-external-commands-list)
           (message "Starting %s..." real-com)
           (if file
-              (start-process-shell-command real-com nil (format exe file))
-              (start-process-shell-command real-com nil real-com))
+              (start-process-shell-command proc nil (format exe file))
+              (start-process-shell-command proc nil real-com))
           (set-process-sentinel
-           (get-process real-com)
+           (get-process proc)
            #'(lambda (process event)
                (when (and (string= event "finished\n")
-                          anything-raise-command)
-                      (shell-command  (format anything-raise-command "emacs")))
-                 (message "%s process...Finished." process))))
-          (setq anything-c-external-commands-list
-                (cons real-com (delete real-com anything-c-external-commands-list))))))
+                          anything-raise-command
+                          (not (anything-c-get-pid-from-process-name real-com)))
+                 (shell-command  (format anything-raise-command "emacs")))
+               (message "%s process...Finished." process))))
+        (setq anything-c-external-commands-list
+              (cons real-com (delete real-com anything-c-external-commands-list))))))
 
 
 (defvar anything-external-command-history nil)
@@ -7667,7 +7726,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
                        (make-directory candidate 'parent)
                        (when (file-exists-p candidate)
                          (cd candidate)
-                         (anything-find-files candidate)))
+                         (anything-find-files1 candidate)))
                   (setq default-directory cur-dir))))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
