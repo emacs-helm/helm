@@ -1799,6 +1799,7 @@ buffer that is not the current buffer."
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (volatile)
+    (candidate-number-limit . 9999)
     (action-transformer . anything-find-files-action-transformer)
     (action
      . ,(delq
@@ -6037,6 +6038,7 @@ Line is parsed for BEG position to END position."
               (anything-candidate-buffer anything-current-buffer)
               (with-current-buffer anything-current-buffer
                 (jit-lock-fontify-now))))
+    (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (get-line . anything-c-browse-code-get-line)
     (type . line)
