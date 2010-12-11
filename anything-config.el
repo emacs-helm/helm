@@ -2304,15 +2304,18 @@ Use it for non--interactive calls of `anything-find-files'."
   "The `anything-find-files' history.
 Show the first `anything-ff-history-max-length' elements of `anything-ff-history'
 in an `anything-comp-read'."
-  (let ((history (loop with dup for i in anything-ff-history
+  (let ((history (when anything-ff-history
+                   (loop with dup for i in anything-ff-history
                     unless (member i dup) collect i into dup
-                    finally return dup))) ; Remove dups.
-    (when anything-ff-history
+                    finally return dup)))) ; Remove dups.
+    (when history
+      (setq anything-ff-history
+            (if (>= (length history) anything-ff-history-max-length)
+                (subseq history 0 anything-ff-history-max-length)
+                history))
       (anything-comp-read
        "Switch to Directory: "
-       (if (>= (length history) anything-ff-history-max-length)
-           (subseq history 0 anything-ff-history-max-length)
-           history)
+       anything-ff-history
        :name "Anything Find Files History"
        :must-match t))))
 
