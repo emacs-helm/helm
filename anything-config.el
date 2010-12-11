@@ -2053,7 +2053,8 @@ If prefix numeric arg is given go ARG level down."
 
 (defun anything-ff-save-history ()
   "Store the last value of `anything-ff-default-directory' in `anything-ff-history'."
-  (push anything-ff-default-directory anything-ff-history))
+  (when anything-ff-default-directory
+    (push anything-ff-default-directory anything-ff-history)))
 (add-hook 'anything-cleanup-hook 'anything-ff-save-history)
 
 (defface anything-dired-symlink-face
