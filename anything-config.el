@@ -2037,7 +2037,6 @@ If prefix numeric arg is given go ARG level down."
     (setq anything-ff-default-directory (if (string= anything-pattern "")
                                             (if (eq system-type 'windows-nt) "c:/" "/")
                                             (file-name-directory path)))
-    (push anything-ff-default-directory anything-ff-history)
     (when (string= path "Invalid tramp file name")
       (setq unfinished-tramp-name t))
     (cond ((or (file-regular-p path)
@@ -2051,6 +2050,11 @@ If prefix numeric arg is given go ARG level down."
            (append
             (list path)
             (directory-files (file-name-directory path) t))))))
+
+(defun anything-ff-save-history ()
+  "Store the last value of `anything-ff-default-directory' in `anything-ff-history'."
+  (push anything-ff-default-directory anything-ff-history))
+(add-hook 'anything-cleanup-hook 'anything-ff-save-history)
 
 (defface anything-dired-symlink-face
   '((t (:foreground "DarkOrange")))
