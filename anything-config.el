@@ -5460,7 +5460,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (cond ((string-match "BEGIN" keyword)
          (insert "#+" keyword " ")
          (save-excursion
-           (insert "\n" (replace-regexp-in-string "BEGIN" "END" keyword) "\n")))
+           (insert "\n#+" (replace-regexp-in-string "BEGIN" "END" keyword) "\n")))
         (t
          (insert "#+" keyword " "))))
 
