@@ -2027,20 +2027,21 @@ If prefix numeric arg is given go ARG level down."
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern))
-         (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
-         unfinished-tramp-name)
+         (path-name-dir (file-name-directory path))
+         (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     (if (member 'anything-compile-source--match-plugin
                 anything-compile-source-functions)
         (setq anything-pattern path)
         (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
     (setq anything-ff-default-directory (if (string= anything-pattern "")
-                                            (if (eq system-type 'windows-nt) "c:/" "/")
-                                            (file-name-directory path)))
-    (when (string= path "Invalid tramp file name")
-      (setq unfinished-tramp-name t))
+                                            (if (eq system-type 'windows-nt)
+                                                "c:/" "/")
+                                            ;; Don't record non--filenames.
+                                            (and (file-exists-p path-name-dir)
+                                                 path-name-dir)))
     (cond ((or (file-regular-p path)
-               unfinished-tramp-name
+               (string= path "Invalid tramp file name")
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
