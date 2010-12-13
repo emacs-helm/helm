@@ -446,7 +446,8 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
   "Get symbol name before point."
   (save-excursion
     (let ((beg (point)))
-      (when (re-search-backward "\(\\|\\s-\\|^\\|\r\\|'\\|#'" (point-at-bol) t)
+      ;; older regexp "\(\\|\\s-\\|^\\|\\_<\\|\r\\|'\\|#'"
+      (when (re-search-backward "\\_<" (point-at-bol) t)
         (buffer-substring-no-properties beg (match-end 0))))))
 
 (defun alcs-initial-input (partial-match)
