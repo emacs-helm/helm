@@ -494,7 +494,10 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
       (mapcar 'symbol-name anything-additional-attributes))))
 
 (defvar acaa-anything-commands-regexp
-  (concat "(" (regexp-opt '("anything" "anything-other-buffer")) " "))
+  (concat "(" (regexp-opt
+               '("anything" "anything-other-buffer"
+                 "define-anything-type-attribute" "anything-c-arrange-type-attribute"))
+          " "))
 
 (defun acaa-completing-attribute-p (point)
   (save-excursion
