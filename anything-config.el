@@ -2884,7 +2884,7 @@ If it's not empty use it instead of `grep-find-ignored-files'."
           ;; rule out anything-match-plugin because the input is one regexp.
           (delq 'anything-compile-source--match-plugin
                 (copy-sequence anything-compile-source-functions)))
-         (include-files (and recurse (read-string "OnlyExt: ")))
+         (include-files (and recurse (read-string "OnlyExt(*.[ext]): ")))
          (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
                                               anything-c-grep-default-command))
          ;; Disable match-plugin and use here own highlighting.
