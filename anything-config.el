@@ -1287,11 +1287,26 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
    'anything-realvalue
    (1- s)))
 
-;; Shut up byte compiler
-(defun anything-goto-line (numline)
-  "Replacement of `goto-line'."
-  (goto-char (point-min))
-  (forward-line (1- numline)))
+(defun anything-goto-line (lineno)
+  "Goto LINENO without modifying outline visibility if needed."
+  (flet ((gotoline (numline)
+           (goto-char (point-min)) (forward-line (1- numline))))
+    (if (or (eq major-mode 'org-mode)
+            outline-minor-mode)
+        (progn
+          ;; Open all, goto line LINENO, move to
+          ;; precedent heading and restore precedent state
+          ;; of visibility.
+          (org-save-outline-visibility nil
+            (show-all)
+            (gotoline lineno)
+            (outline-previous-heading))
+          ;; Make heading visible
+          (outline-show-heading)
+          ;; Open heading
+          (show-subtree)
+          (gotoline lineno))
+        (gotoline lineno))))
 
 (defun anything-c-regexp-persistent-action (pt)
   (goto-char pt)
@@ -2860,7 +2875,6 @@ WHERE can be one of other-window, elscreen, other-frame."
       (elscreen     (anything-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
       (t (find-file fname)))
-    (show-all)
     (anything-goto-line lineno)
     (set-marker (mark-marker) (point))
     (when mark
