@@ -261,6 +261,8 @@
 ;; Set value to VAR interactively.
 ;; `anything-c-adaptive-save-history'
 ;; Save history information to file given by `anything-c-adaptive-history-file'.
+;; `anything-c-toggle-match-plugin'
+;; Toggle anything-match-plugin.
 
 ;;  * User variables defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "anything-" :var-value t)
@@ -305,7 +307,7 @@
 ;; `anything-c-find-files-show-icons'
 ;; Default Value: t
 ;; `anything-c-find-files-icons-directory'
-;; Default Value: "/usr/share/emacs/24.0.50/etc/images/tree-widget/default"
+;; Default Value: "/usr/local/share/emacs/23.2.91/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
 ;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
 ;; `anything-c-browse-code-regexp-python'
