@@ -5761,9 +5761,11 @@ Return an alist with elements like (data . number_results)."
 (defvar anything-c-home-url "http://www.google.fr"
   "*Default url to use as home url.")
 
+(defvar browse-url-chromium-program "chromium-bin")
 (defvar anything-browse-url-default-browser-alist
   `((,w3m-command . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
+    (,browse-url-chromium-program . browse-url-chromium)
     (,browse-url-kde-program . browse-url-kde)
     (,browse-url-gnome-moz-program . browse-url-gnome-moz)
     (,browse-url-mozilla-program . browse-url-mozilla)
@@ -5773,11 +5775,29 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-xterm-program . browse-url-text-xterm))
   "*Alist of (executable . function) to try to find a suitable url browser.")
 
+(defun* anything-c-generic-browser (url &key name exe args)
+  (let ((proc (concat name " " url)))
+    (message "Starting %s..." name)
+    (apply 'start-process proc nil exe
+           (append (list url) args))
+    (set-process-sentinel
+     (get-process proc)
+     #'(lambda (process event)
+         (when (string= event "finished\n")
+           (message "%s process %s" process event))))))
+
+(defun browse-url-chromium (url)
+  (interactive "sURL: ")
+  (let ((name (concat "chromium " url))
+        (exe  "chromium-bin")
+        (args '("--enable-plugins")))
+    (anything-c-generic-browser url :name name :exe exe :args args)))
+
 (defun anything-browse-url-default-browser (url &rest args)
   "Find a suitable browser and ask it to load URL."
   (let ((default-browser (loop
                             for i in anything-browse-url-default-browser-alist
-                            when (and (car i) (executable-find (car i))) return (cdr i))))
+                            thereis (and (car i) (executable-find (car i))))))
     (if default-browser
         (apply default-browser url args)
         (error "No usable browser found"))))
@@ -5785,7 +5805,7 @@ Return an alist with elements like (data . number_results)."
 (defun* anything-c-browse-url (&optional (url anything-c-home-url))
   "Default command to browse URL."
   (if browse-url-browser-function
-      (browse-url url)
+      (funcall browse-url-browser-function url)
       (anything-browse-url-default-browser url)))
 
 (defun anything-c-build-elvi-list ()
@@ -5796,6 +5816,9 @@ Return an alist with elements like (data . number_results)."
                    "-elvi")
      (split-string (buffer-string) "\n"))))
 
+(defvar anything-surfraw-default-browser-function nil
+  "*The browse url function you prefer to use with surfraw.
+When nil, fallback to `browse-url-browser-function'.")
 (defvar anything-surfraw-engines-history nil)
 ;;;###autoload
 (defun anything-surfraw (pattern engine)
@@ -5812,7 +5835,9 @@ Return an alist with elements like (data . number_results)."
                 (apply 'call-process "surfraw" nil t nil
                        (list engine-nodesc "-p" pattern))
                 (replace-regexp-in-string
-                 "\n" "" (buffer-string)))))
+                 "\n" "" (buffer-string))))
+         (browse-url-browser-function (or anything-surfraw-default-browser-function
+                                          browse-url-browser-function)))
     (if (string= engine-nodesc "W")
         (anything-c-browse-url)
         (anything-c-browse-url url)
