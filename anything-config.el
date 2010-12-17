@@ -1807,6 +1807,7 @@ buffer that is not the current buffer."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
+              (require 'tramp)
               (setq ffap-newfile-prompt t)
               ;; This is needed when connecting with emacsclient -t
               ;; on remote host that have an anything started on a window-system.
