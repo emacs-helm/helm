@@ -7872,9 +7872,7 @@ Return nil if bmk is not a valid bookmark."
   (elscreen-find-file file))
 
 ;; Toggle anything-match-plugin
-(defvar anything-mp-initial-highlight-delay
-  (when (boundp 'anything-mp-highlight-delay)
-    anything-mp-highlight-delay))
+(defvar anything-mp-initial-highlight-delay nil)
 (defun anything-c-toggle-match-plugin ()
   "Toggle anything-match-plugin."
   (interactive)
@@ -7885,6 +7883,8 @@ Return nil if bmk is not a valid bookmark."
              (setq anything-compile-source-functions
                    (delq 'anything-compile-source--match-plugin
                          anything-compile-source-functions))
+             (setq anything-mp-initial-highlight-delay
+                   anything-mp-highlight-delay)
              (setq anything-mp-highlight-delay nil))
            (enable-match-plugin ()
              (require 'anything-match-plugin)
@@ -7894,8 +7894,9 @@ Return nil if bmk is not a valid bookmark."
              (setq anything-compile-source-functions
                    (cons 'anything-compile-source--match-plugin
                          anything-compile-source-functions))
-             (setq anything-mp-highlight-delay
-                   anything-mp-initial-highlight-delay)))
+             (unless anything-mp-highlight-delay
+               (setq anything-mp-highlight-delay
+                     anything-mp-initial-highlight-delay))))
       (if anything-match-plugin-enabled
           (when (y-or-n-p "Really disable match-plugin? ")
             (disable-match-plugin)
