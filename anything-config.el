@@ -7900,11 +7900,9 @@ Return nil if bmk is not a valid bookmark."
       (if anything-match-plugin-enabled
           (when (y-or-n-p "Really disable match-plugin? ")
             (disable-match-plugin)
-            (setq anything-match-plugin-enabled nil)
             (message "Anything-match-plugin disabled"))
           (when (y-or-n-p "Really enable match-plugin? ")
             (enable-match-plugin)
-            (setq anything-match-plugin-enabled t)
             (message "Anything-match-plugin enabled"))))))
 
 
