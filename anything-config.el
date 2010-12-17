@@ -1808,6 +1808,7 @@ buffer that is not the current buffer."
     (disable-shortcuts)
     (init . (lambda ()
               (require 'tramp)
+              (require 'dired-aux)
               (setq ffap-newfile-prompt t)
               ;; This is needed when connecting with emacsclient -t
               ;; on remote host that have an anything started on a window-system.
@@ -7870,32 +7871,41 @@ Return nil if bmk is not a valid bookmark."
   (anything-require-or-error 'elscreen 'anything-elscreen-find-file)
   (elscreen-find-file file))
 
-(defvar anything-match-plugin-enabled
-  (member 'anything-compile-source--match-plugin
-          anything-compile-source-functions)
-  "whether anything-match-plugin is enabled or not.")
+;; Toggle anything-match-plugin
+(defvar anything-mp-initial-highlight-delay
+  (when (boundp 'anything-mp-highlight-delay)
+    anything-mp-highlight-delay))
 (defun anything-c-toggle-match-plugin ()
   "Toggle anything-match-plugin."
   (interactive)
-  (flet ((disable-match-plugin ()
-           (setq anything-compile-source-functions
-                 (delq 'anything-compile-source--match-plugin
-                       anything-compile-source-functions))
-           (setq anything-mp-highlight-delay nil))
-         (enable-match-plugin ()
-           (setq anything-compile-source-functions
-                 (cons 'anything-compile-source--match-plugin
-                       anything-compile-source-functions))
-           (setq anything-mp-highlight-delay 0.7)))
-    (if anything-match-plugin-enabled
-        (when (y-or-n-p "Really disable match-plugin? ")
-          (disable-match-plugin)
-          (setq anything-match-plugin-enabled nil)
-          (message "Anything-match-plugin disabled"))
-        (when (y-or-n-p "Really enable match-plugin? ")
-          (enable-match-plugin)
-          (setq anything-match-plugin-enabled t)
-          (message "Anything-match-plugin enabled")))))
+  (let ((anything-match-plugin-enabled
+         (member 'anything-compile-source--match-plugin
+                 anything-compile-source-functions)))
+    (flet ((disable-match-plugin ()
+             (setq anything-compile-source-functions
+                   (delq 'anything-compile-source--match-plugin
+                         anything-compile-source-functions))
+             (setq anything-mp-highlight-delay nil))
+           (enable-match-plugin ()
+             (require 'anything-match-plugin)
+             (unless anything-mp-initial-highlight-delay
+               (setq anything-mp-initial-highlight-delay
+                     anything-mp-highlight-delay))
+             (setq anything-compile-source-functions
+                   (cons 'anything-compile-source--match-plugin
+                         anything-compile-source-functions))
+             (setq anything-mp-highlight-delay
+                   anything-mp-initial-highlight-delay)))
+      (if anything-match-plugin-enabled
+          (when (y-or-n-p "Really disable match-plugin? ")
+            (disable-match-plugin)
+            (setq anything-match-plugin-enabled nil)
+            (message "Anything-match-plugin disabled"))
+          (when (y-or-n-p "Really enable match-plugin? ")
+            (enable-match-plugin)
+            (setq anything-match-plugin-enabled t)
+            (message "Anything-match-plugin enabled"))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
