@@ -1,0 +1,494 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+
+\usepackage[pdftex=true,
+           hyperindex=true,
+           colorlinks=true]{hyperref}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{setspace}
+
+
+\begin{document}
+\begin{titlepage}
+\title{Anything User Manual}
+\date{\today}
+\author{ThierryVolpiatto}
+\maketitle
+\tableofcontents
+\end{titlepage}
+
+\section{Install}
+\label{sec:install}
+
+First get the files from git repo:
+
+Anything git repo is at:\\
+\url{http://repo.or.cz/w/anything-config.git}
+
+To get it with git:
+
+\begin{verbatim}
+git clone git://repo.or.cz/anything-config.git
+\end{verbatim}
+
+NOTE: Files are published on Emacswiki, but be aware that it is \underline{unsafe} to get files from Emacswiki.
+          
+You need 2 files:
+\begin{itemize}
+\item anything.el
+\end{itemize}
+Contain the anything engine.
+
+\begin{itemize}
+\item anything-config.el
+\end{itemize}
+Contain all the sources and preconfigured functions ready to use.
+
+and optionally:
+\begin{itemize}
+\item anything-match-plugin.el
+\end{itemize}
+Allow matching multi pattern search when entering a space in prompt.
+
+Once downloaded these files, put them in your `load-path'.
+If you don't know what is your load-path do C-h v load-path.
+
+\section{Config}
+\label{sec:config}
+Edit your ~/.emacs.el file and add:
+
+\begin{verbatim}
+(require 'anything-config)
+\end{verbatim}
+
+Optionally, you can add:
+
+\begin{verbatim}
+(require 'anything-match-plugin)
+\end{verbatim}
+
+Note that if you don't require anything-match-plugin, you can enable/disable it afterward with:
+
+M-x anything-c-toggle-match-plugin
+
+NOTE:
+It is not recommended to use the variable `anything-sources', please use instead the preconfigured anything command
+you will find in anything-config.el or build your own.
+
+Be aware also that making you own anything commands with a lot of sources involved can be very costly and slowdown
+anything a lot.
+  
+\section{Overview of commands}
+\label{sec:overv-comm-avail}
+For starting with anything, a set of commands have been set for you in anything menu.
+The bindings of all these commands are prefixed with `f5-a'.
+
+To discover more anything commands run from menu anything all commands (anything-execute-anything-command).
+Or run anything-M-x (f5-a M-x) and type anything.
+
+When you like a command, e.g f5 a M-x you should bind it to something more convenient like M-x to replace the Emacs
+original keybinding.
+
+\section{Anything Find Files}
+\label{sec:anything-find-files}
+`anything-find-files' provide you a way to navigate in your system file easily.
+All the actions you can do on files from here are described in this section.
+
+It is binded in menu, and in `anything-command-map' to f5-a C-x C-f. \\
+We will assume you have binded `anything-find-files' to C-x C-f.
+To do that put in your .emacs.el:
+\begin{verbatim}
+(global-set-key (kbd "C-x C-f") 'anything-find-files)
+\end{verbatim}
+It is well integrated with tramp, you can enter any tramp filename and it will complete.
+(e.g /su::, /sudo::, /ssh:host:, ... etc)
+
+\subsection{Navigation}
+\label{sec:navigation}
+Anything-find-files is not by default on ~/ but on default-directory or
+thing-at-point as it use ffap.If you are on a url, a mail adress
+etc.. it will do the right thing.
+
+So anything-find-files work like find-file (C-x C-f), but if you use it
+with anything-match-plugin.el, you have to add a space and then the next
+part of pattern you want to match:
+
+Example:
+
+\begin{verbatim}
+Find Files or url: ~/
+That show all ~/ directory.
+
+Find Files or url: ~/des
+will show all what begin with "des"
+
+Find Files or url: ~/ esk
+(Notice the space after ~/) will show all what contain esk.
+
+Find Files or url: ~/ el$
+Will show all what finish with el
+
+\end{verbatim}
+You can move in the anything buffer with C-n C-p or arrow keys, when you
+are on a file, you can hit C-z to show only this file-name in the
+anything buffer.
+On a directory, C-z will switch to this directory to continue searching
+in it.
+On a symlink C-z will expand to the true name of symlink.(moving your
+mouse cursor over a symlink will show the true name of it).
+
+So it is quite easy to navigate in your files with anything-find-files.
+
+Forget to mention C-. that go to root of current dir or to precedent
+level of dir.
+So for example you can hit C-z and then come back immediatly where you
+were with C-. instead of erasing minibuffer input with DEL.
+On non graphic display, it is bound to C-l.
+
+If you like it you can safely bind it to C-x C-f to replace the standard
+find-file:
+
+\begin{verbatim}
+(global-set-key (kbd "C-x C-f") 'anything-find-files)
+\end{verbatim}
+
+NOTE:
+Starting anything-find-files with C-u will show you a little history of the last visited directories.
+
+
+\subsection{Jump with nth commands}
+\label{sec:jump-with-nth}
+Take advantage of the second, third and 4th actions in anything.
+Instead of opening action menu with TAB, just hit:
+
+C-e for 2th action\\
+C-j for 3th action\\
+
+You can bind 4th action to some key like this:
+\begin{verbatim}
+(define-key anything-map (kbd "<C-tab>") 'anything-select-4th-action)
+\end{verbatim}
+ 
+\subsection{Turn in image viewer}
+\label{sec:turn-image-viewer}
+You can turn anything-find-files in a nice image-viewer.
+
+Navigate to your image directory, then type C-u C-z on first image.
+Now turn on `follow-mode' with C-c C-f.
+You can now navigate in your image directory with arrow up and down or C-n C-p.
+Don't forget also to use C-t to split you windows vertically if needed.
+
+NOTE:
+It use image-dired in background, so if image-dired don't work for some reason, this will
+not work too.
+Be sure to have imagemagick package installed.
+
+\subsection{Grep}
+\label{sec:grep}
+We describe here anything-do-grep, an incremental grep.
+It is really convenient as you can start a search just after finding the place or file(s) you want to search in.
+By the nature of incremental stuff, it is faster than original Emacs grep for searching.
+
+As you type the display change (like in all other anything commands).
+This grep is also recursive unlike the emacs implementation that use find/xargs.
+It support wildcard and (re)use the variables `grep-find-ignored-files'
+and `grep-find-ignored-directories'.
+
+NOTE: You will find a file named anything-grep.el in extensions.
+It is NOT needed to use with what is described here.
+It is another implementation of grep but not incremental.
+
+It work fine with tramp on remote files.
+
+Windows users need grep version >=2.5.4 of Gnuwin32 on windoze.
+This version should accept the --exclude-dir option.
+
+\begin{itemize}
+\item NOTE:
+When using it recursively, `grep-find-ignored-files' is not used unless you don't specify
+the only extensions of files where you want to search (you will have a prompt).
+\end{itemize}
+\subsection{Anything do grep}
+\label{sec:anything-do-grep}
+Start with M-x anything-do-grep bound to f5 a M-g s
+A prefix arg will launch recursive grep.
+
+\subsection{Grep from anything-find-files}
+\label{sec:grep-from-anything}
+From anything-find-files (f5 a C-x C-f) Open the action menu with tab and choose grep.
+A prefix arg will launch recursive grep.
+
+\subsection{Grep One file}
+\label{sec:grep-one-file}
+Just launch grep, it will search in file at point.
+if file is a directory, it will search in ALL files of this directory like:
+
+\begin{verbatim}
+grep -nH -e pattern *
+\end{verbatim}
+
+
+\subsection{Grep Marked files}
+\label{sec:grep-marked-files}
+Just mark some files with
+\begin{verbatim}
+C-<SPACE>
+\end{verbatim}
+and launch grep.
+\subsubsection{Grep marked files from differents directories}
+\label{sec:grep-marked-files-1}
+This is a very nice feature of anything grep implementation that allow to search in specific files located not
+only in current directory but anywhere in your file system.
+
+To use navigate in your file system and mark files with 
+\begin{verbatim}
+C-<SPACE> 
+\end{verbatim}
+.When you have marked all files, just launch grep in action menu.
+
+NOTE: using recursive search will have no effect of course!
+
+\subsection{Grep Directory recursively}
+\label{sec:grep-direct-recurs}
+From anything-find-files, reach the root of the directory where you want to search in,
+then hit TAB to open the action menu and choose grep with a prefix arg (i.e C-u RET).
+
+if you want to use grep directly from anything-do-grep, do:
+
+\begin{verbatim}
+C-u f5 a M-g s
+\end{verbatim}
+
+You will be prompted for selecting in which category of files to search:
+Use the wilcard syntax like *.el for example (search in only .el files).
+
+
+\subsection{Grep Using Wildcard}
+\label{sec:grep-using-wildcard}
+You can use wildcard:
+From the root of your directory, if you want for example to search files with .el extension:
+add *.el to prompt
+
+\subsection{Open Files Externally}
+\label{sec:open-files-extern}
+You will find in action menu from anything-find-files an action to open file with external program.
+If you have no entry in .mailcap or /etc/mailcap, you will enter an anything session to choose a program
+to use with this kind of file.
+It will offer to you to save setting to always open this kind of files with this program.
+Once configured, you can however open the files of same extension with some other program by forcing anything
+to choose program with C-u.
+
+\subsection{Eshell command on files}
+\label{sec:eshell-command-files}
+You can run eshell-command on files or marked files, the command you use have to accept
+one file as argument.
+The completion is make on your eshell aliases.
+
+\subsection{Why Eshell}
+\label{sec:why-eshell}
+Because eshell allow you to create aliases.
+You can like that create personal commands for anything-find-files.
+All these command should end with \$1.
+You will have completion against all these aliases once eshell is loaded.
+(start it once before using anything-find-files).
+
+NOTE: Eshell accept shell commands but also elisp functions :-).
+
+\subsection{Setup Aliases}
+\label{sec:setup-aliases}
+Go in eshell, an enter at prompt:
+\begin{verbatim}
+alias my_alias command \$1
+\end{verbatim}
+NOTE: don't forget to escape the \$.
+
+See the documentation of Eshell for more info.
+
+\subsection{Problem starting Eshell}
+\label{sec:probl-start-eshell}
+Eshell code is available (autoloaded) only when you have started once eshell.
+That's annoying like many autoloaded stuff in Emacs.
+ 
+\subsection{Dired Commands}
+\label{sec:dired-commands}
+To enable some of the usual commands of dired, put in .emacs.el
+\begin{verbatim}
+(anything-dired-bindings 1)
+\end{verbatim}
+Or run interactively:
+\begin{verbatim}
+M-x anything-dired-bindings
+\end{verbatim}
+This will replace in dired C, R, S, and H commands.
+That is copy, rename, symlink, hardlink.
+When creating a symlink, you will find relsymlink in actions menu.(TAB).
+
+\subsection{Copy Files}
+\label{sec:copy-files}
+It is a powerfull feature of anything-find-files as you can mark files in very different places in your
+file system and copy them in one place.
+
+Dired is not able to do that, you can mark files only in current dired display and copy them somewhere.
+
+So, easy to use, just mark some files, and hit copy files in the action menu.
+That will open a new anything-find-files where you can choose destination.
+\subsection{Rename Files}
+\label{sec:rename-files}
+Just mark some files, and hit rename files in the action menu.
+That will open a new anything-find-files where you can choose destination.
+\subsection{Symlink Files}
+\label{sec:symlink-files}
+Just mark some files, and hit symlink or relsymlink files in the action menu.
+That will open a new anything-find-files where you can choose destination.
+\subsection{Hardlink}
+\label{sec:hardlink}
+Just mark some files, and hit hardlink files in the action menu.
+That will open a new anything-find-files where you can choose destination.
+
+\subsection{Follow file after action}
+\label{sec:follow-file-after}
+A prefix arg on any of the action above, copy, rename, symlink, hardlink, will
+allow you to follow the file.
+For example, when you want to copy an elisp file somewhere and you want to compile it in this place,
+hitting C-u RET will bring you in this place with the file already marked, you have just to go in action menu to
+compile it.  
+
+\subsection{In Buffer File Completion}
+\label{sec:buff-file-compl}
+In any buffer and even in minibuffer if you have enable recursive-minibuffer
+\begin{verbatim}
+(setq enable-recursive-minibuffers t)
+\end{verbatim}
+You can have completion with C-x C-f and then hit tab to choose action Complete at point \\ 
+once you have found the filename you want.
+\subsection{Create File}
+\label{sec:create-file}
+Navigate to the directory where you want to create your new file, then \\
+continue typing the name of your file and type enter. \\
+NOTE: If your filename ends with a / you will be prompt to create a new directory.
+
+\subsection{Create Directory}
+\label{sec:create-directory}
+Navigate to the directory where you want to create your new directory, \\
+then continue typing the name of new directory - Parents accepted - \\
+and end it with / type enter, you will be prompt to create your new directory (possibly with parents).
+
+\subsection{Ediff files}
+\label{sec:ediff-files}
+Well, that is easy to use, 
+move cursor to a file, hit ediff in action menu, you will jump in
+another anything-find-files to choose second file.
+\subsection{Ediff merge files}
+\label{sec:ediff-merge-files}
+move cursor to a file, hit ediff merge in action menu, you will jump in
+another anything-find-files to choose second file.
+
+
+\section{Anything write buffer}
+\label{sec:anyth-write-buff}
+That is a replacement of standard write-buffer Emacs command with anything completion.
+\section{Anything insert file}
+\label{sec:anything-insert-file}
+That is a replacement of standard insert-file Emacs command with anything completion.
+
+\section{Anything M-x}
+\label{sec:anything-m-x}
+It is binded to f5 a M-x, you should bind it to M-x.
+
+Features:\\
+\begin{itemize}
+\item You can use prefix arguments before or during M-x session
+\end{itemize}
+\begin{itemize}
+\item C-z is a toggle documentation for this command
+\end{itemize}
+\begin{itemize}
+\item The key binding of command are shown.
+\end{itemize}
+
+\section{Anything regexp}
+\label{sec:anything-regexp}
+This is a replacement of regexp-builder.
+The groups are shown in a convenient way.
+
+\subsection{Query replace regexp}
+\label{sec:query-replace-regexp}
+Write your regexp in anything-regexp, when it match what you want,
+you can run query-replace from action menu.
+NOTE:
+Before running anything-regexp, you can select a region to work in, that will narrow this region
+automatically. 
+\subsection{Save regexp as sexp}
+\label{sec:save-regexp-as}
+When you use this, it will save your regexp for further use in lisp code,
+with backslash duplicated.
+
+\subsection{Save regexp as string}
+\label{sec:save-regexp-as-1}
+Save the regexp as you wrote it.
+
+\section{Anything locate}
+\label{sec:anything-locate}
+First be sure you have a locate program installed on your system.
+Most GNU/Linux distro come with locate included, you update or create the data base with
+``updatedb'' command.
+
+\subsection{Search files}
+\label{sec:search-files}
+
+To use, just launch 
+\begin{verbatim}
+M-x anything-locate (f5 a l)
+\end{verbatim}
+
+Then enter filename at prompt.
+It will search this pattern entered also in directory and subdirectory names, to limit your search to basename,
+add ``-b'' after pattern.
+The search is performed on all files known in database, they maybe not exists anymore, so to limit to
+really existing files add after pattern ``-e''.
+To limit you search to specific number of results, use ``-n'' after your pattern with the number of results
+you want.
+
+Example:
+\begin{verbatim}
+Pattern: emacs -b -e -n 12
+\end{verbatim}
+
+\subsection{Launch grep}
+\label{sec:launch-grep}
+
+When search is done, you can search in a specific file or directory with grep you will find in action menu (TAB).
+
+\subsection{Windows specificity}
+\label{sec:windows-specificity}
+
+On Windows you should use Everything program that mimic locate, is very fast and don't need to
+update database manually.
+To use with anything-locate, you will need his command line named ``es''.
+Be sure to modify the PATH environment variable, to include path to the directory that contain ``es''.
+The arguments are the same than the ones in ``locate''.
+
+
+\section{Other tools}
+\label{sec:other-tools}
+
+In addition of what is described above, you will find a bunch of powerfull tools that come with anything-config.el.
+Just browse the anything commands availables with anything-M-x.
+
+Not complete.
+\section{Usefuls extensions}
+\label{sec:usefuls-extensions}
+Not complete.
+
+
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
