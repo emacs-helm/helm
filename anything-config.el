@@ -1983,10 +1983,8 @@ If EXPAND is non--nil expand-file-name."
                       "Hardlink Files" "Write File"
                       "Insert File" "Read file name"))
         (cur-source (cdr (assoc 'name (anything-get-current-source)))))
-    (catch 'break
-      (dolist (i ff-sources)
-        (when (equal cur-source (concat i anything-c-find-files-doc-header))
-          (throw 'break t))))))
+    (loop for i in ff-sources
+       thereis (string= cur-source (concat i anything-c-find-files-doc-header)))))
 
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
