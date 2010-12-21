@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  21 DEC 2010 09:11
+This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  21 DEC 2010 12:41
 entering extended mode
  %&-line parsing enabled.
 **\input anything.tex
@@ -633,19 +633,19 @@ Overfull \hbox (36.65945pt too wide) in paragraph at lines 173--173
  []
 
 
-Overfull \hbox (11.02296pt too wide) in paragraph at lines 195--199
+Overfull \hbox (11.02296pt too wide) in paragraph at lines 197--201
 \OT1/cmr/m/n/10.95 This grep is also re-cur-sive un-like the emacs im-ple-men-t
 a-tion that use find/xargs.
  []
 
 [3] [4] [5] [6]
-Overfull \hbox (5.78833pt too wide) in paragraph at lines 361--362
+Overfull \hbox (5.78833pt too wide) in paragraph at lines 363--364
 []\OT1/cmr/m/n/10.95 In any buffer and even in minibuffer if you have en-able r
 ecursive-minibuffer 
  []
 
 [7]
-Underfull \hbox (badness 10000) in paragraph at lines 401--402
+Underfull \hbox (badness 10000) in paragraph at lines 403--404
 
  []
 
@@ -664,7 +664,7 @@ dist/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/blues
 ky/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr12.pfb></usr/s
 hare/texmf-dist/fonts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-dist/fonts/t
 ype1/bluesky/cm/cmtt10.pfb>
-Output written on anything.pdf (11 pages, 108995 bytes).
+Output written on anything.pdf (11 pages, 109056 bytes).
 PDF statistics:
  319 PDF objects out of 1000 (max. 8388607)
  55 named destinations out of 1000 (max. 131072)
