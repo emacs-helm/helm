@@ -31,16 +31,17 @@
 \contentsline {subsection}{\numberline {4.25}Ediff files}{7}{subsection.4.25}
 \contentsline {subsection}{\numberline {4.26}Ediff merge files}{7}{subsection.4.26}
 \contentsline {subsection}{\numberline {4.27}Browse archive with avfs}{8}{subsection.4.27}
+\contentsline {subsection}{\numberline {4.28}Display with icons}{8}{subsection.4.28}
 \contentsline {section}{\numberline {5}Anything write buffer}{8}{section.5}
 \contentsline {section}{\numberline {6}Anything insert file}{8}{section.6}
 \contentsline {section}{\numberline {7}Anything M-x}{8}{section.7}
 \contentsline {section}{\numberline {8}Anything regexp}{8}{section.8}
-\contentsline {subsection}{\numberline {8.1}Query replace regexp}{8}{subsection.8.1}
-\contentsline {subsection}{\numberline {8.2}Save regexp as sexp}{8}{subsection.8.2}
+\contentsline {subsection}{\numberline {8.1}Query replace regexp}{9}{subsection.8.1}
+\contentsline {subsection}{\numberline {8.2}Save regexp as sexp}{9}{subsection.8.2}
 \contentsline {subsection}{\numberline {8.3}Save regexp as string}{9}{subsection.8.3}
 \contentsline {section}{\numberline {9}Anything locate}{9}{section.9}
 \contentsline {subsection}{\numberline {9.1}Search files}{9}{subsection.9.1}
 \contentsline {subsection}{\numberline {9.2}Launch grep}{9}{subsection.9.2}
-\contentsline {subsection}{\numberline {9.3}Windows specificity}{9}{subsection.9.3}
-\contentsline {section}{\numberline {10}Other tools}{9}{section.10}
+\contentsline {subsection}{\numberline {9.3}Windows specificity}{10}{subsection.9.3}
+\contentsline {section}{\numberline {10}Other tools}{10}{section.10}
 \contentsline {section}{\numberline {11}Usefuls extensions}{10}{section.11}

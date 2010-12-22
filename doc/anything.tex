@@ -397,6 +397,15 @@ in your directory .avfs once it is mounted with ``mountavfs''.
 Just move on the archive filename and press C-z (persistent action) and you will see
 in anything buffer the subdirectories of archive, just navigate inside as usual.
 
+\subsection{Display with icons}
+\label{sec:display-with-icons}
+
+You can have a more fancy display showing icons for files and directories.
+Just add in .emacs:
+\begin{verbatim}
+(setq anything-c-find-files-show-icons t)
+\end{verbatim}
+NOTE: This will slowdown anything-find-files unless you have a fast computer.
 
 \section{Anything write buffer}
 \label{sec:anyth-write-buff}

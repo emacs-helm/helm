@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  22 DEC 2010 09:32
+This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  22 DEC 2010 09:50
 entering extended mode
  %&-line parsing enabled.
 **\input anything.tex
@@ -645,16 +645,16 @@ ecursive-minibuffer
  []
 
 [7]
-Underfull \hbox (badness 10000) in paragraph at lines 412--413
+Underfull \hbox (badness 10000) in paragraph at lines 421--422
 
  []
 
 [8] [9] [10] (./anything.aux) ) 
 Here is how much of TeX's memory you used:
- 5342 strings out of 495069
- 75822 string characters out of 1183032
- 150322 words of memory out of 3000000
- 8396 multiletter control sequences out of 10000+50000
+ 5344 strings out of 495069
+ 75868 string characters out of 1183032
+ 150375 words of memory out of 3000000
+ 8397 multiletter control sequences out of 10000+50000
  9320 words of font info for 33 fonts, out of 3000000 for 5000
  28 hyphenation exceptions out of 8191
  36i,6n,36p,239b,466s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -664,9 +664,9 @@ exmf-dist/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/
 bluesky/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr12.pfb></
 usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-dist/fo
 nts/type1/bluesky/cm/cmtt10.pfb>
-Output written on anything.pdf (12 pages, 110597 bytes).
+Output written on anything.pdf (12 pages, 111478 bytes).
 PDF statistics:
- 328 PDF objects out of 1000 (max. 8388607)
- 57 named destinations out of 1000 (max. 131072)
- 377 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 333 PDF objects out of 1000 (max. 8388607)
+ 58 named destinations out of 1000 (max. 131072)
+ 385 words of extra memory for PDF output out of 10000 (max. 10000000)
 
