@@ -32,6 +32,7 @@
      "sec:create-directory"
      "sec:ediff-files"
      "sec:ediff-merge-files"
+     "sec:browse-archive-with"
      "sec:anyth-write-buff"
      "sec:anything-insert-file"
      "sec:anything-m-x"
