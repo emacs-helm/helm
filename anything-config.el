@@ -1293,23 +1293,11 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Goto LINENO without modifying outline visibility if needed."
   (flet ((gotoline (numline)
            (goto-char (point-min)) (forward-line (1- numline))))
-    (if (and (fboundp 'org-save-outline-visibility)
-             (or (eq major-mode 'org-mode)
-                 outline-minor-mode))
+    (if (or (eq major-mode 'org-mode)
+            outline-minor-mode)
         (progn
-          ;; Open all, goto line LINENO, move to
-          ;; precedent heading and restore precedent state
-          ;; of visibility.
-          (org-save-outline-visibility nil
-            (show-all)
-            (gotoline lineno)
-            (outline-previous-heading))
-          ;; Make heading visible
-          (outline-show-heading)
-          ;; Open heading
-          (show-subtree)
-          (gotoline lineno))
-        (show-all)
+          (gotoline lineno)
+          (org-reveal))
         (gotoline lineno))))
 
 (defun anything-c-regexp-persistent-action (pt)
