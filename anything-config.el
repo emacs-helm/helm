@@ -1601,7 +1601,9 @@ The match is done with `string-match'."
               ;; the real value of candidate.
               ;; So for the moment just mark this line.
               (anything-mark-current-line)
-              (anything-make-visible-mark)))
+              ;; Don't mark possibles directories ending with . or ..
+              (unless (string-match "\\.$" (anything-get-selection))
+                (anything-make-visible-mark))))
           (forward-line 1) (end-of-line))))
     (anything-mark-current-line)
     (message "%s candidates marked" (length anything-marked-candidates))))
