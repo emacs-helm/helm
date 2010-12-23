@@ -1575,6 +1575,59 @@ The match is done with `string-match'."
   "STRING is symbol or string."
   (kill-new (anything-c-stringify string) replace yank-handler))
 
+;;; Toggle all marks.
+
+(defun anything-mark-all ()
+  "Mark all visible unmarked candidates in current source."
+  (with-anything-window
+    (save-excursion
+      (goto-char (anything-get-previous-header-pos))
+      (anything-next-line)
+      (let* ((next-head (anything-get-next-header-pos))
+             (end       (and next-head
+                             (save-excursion
+                               (goto-char next-head)
+                               (forward-line -2)
+                               (point))))
+             (maxpoint  (or end (point-max))))
+        (while (< (point) maxpoint)
+          (let ((prefix (get-text-property (point-at-bol) 'display)))
+            (when (and (not (anything-this-visible-mark))
+                       (not (or (string= prefix "[?]")
+                                (string= prefix "[@]"))))
+              ;; FIXME: This is a bug in `anything-make-visible-mark'
+              ;; it should not assume that overlay is on line and
+              ;; BTW not use `anything-get-selection' to get
+              ;; the real value of candidate.
+              ;; So for the moment just mark this line.
+              (anything-mark-current-line)
+              (anything-make-visible-mark)))
+          (forward-line 1) (end-of-line))))
+    (anything-mark-current-line)
+    (message "%s candidates marked" (length anything-marked-candidates))))
+
+(defun anything-unmark-all ()
+  "Unmark all candidates in all sources of current anything session."
+  (with-anything-window
+    (let ((len (length anything-marked-candidates)))
+      (save-excursion
+        (anything-clear-visible-mark))
+      (setq anything-marked-candidates nil)
+      (anything-mark-current-line)
+      (message "%s candidates unmarked" len))))
+
+(defun anything-toggle-all-marks ()
+  "Toggle all marks.
+Mark all visible candidates of current source or unmark all candidates
+visible or invisible in all sources of current anything session"
+  (interactive)
+  (let ((marked (anything-marked-candidates)))
+    (if (> (length marked) 1)
+        (anything-unmark-all)
+        (anything-mark-all))))
+
+(define-key anything-map (kbd "M-m") 'anything-toggle-all-marks)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TODO: This should be integrated in anything.el instead of having
 ;; a defadvice here.
@@ -1591,6 +1644,8 @@ It will be cleared at start of next `anything' call when \
 ;; using this hook instead of `anything-after-action-hook'
 ;; allow to record the prefix args and keep their values
 ;; when using `anything-comp-read'.
+;; i.e when quitting `anything-comp-read' prefix args are preserved
+;; for the following action.
 (add-hook 'anything-before-initialize-hook
           (lambda () (setq anything-current-prefix-arg nil)))
 
