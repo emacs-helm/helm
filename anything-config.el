@@ -1911,7 +1911,9 @@ ACTION must be an action supported by `anything-dired-action'."
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
          (dest     (anything-c-read-file-name
-                    prompt :initial-input anything-ff-default-directory))
+                    prompt
+                    :initial-input (car anything-ff-history)
+                    :history (anything-find-files-history :comp-read nil)))
          (win-conf (current-window-configuration)))
     (unwind-protect
          ;; Create temporarily a dired buffer to call dired functions.
@@ -2022,6 +2024,7 @@ If EXPAND is non--nil expand-file-name."
 (defun anything-file-completion-source-p ()
   "Test if current source is a dired or find-files source."
   (let ((ff-sources '("Find Files" "Copy Files"
+                      "Read File Name History"
                       "Rename Files" "Symlink Files"
                       "Hardlink Files" "Write File"
                       "Insert File" "Read file name"))
@@ -2361,24 +2364,26 @@ Use it for non--interactive calls of `anything-find-files'."
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
 
-(defun anything-find-files-history ()
+(defun* anything-find-files-history (&key (comp-read t))
   "The `anything-find-files' history.
 Show the first `anything-ff-history-max-length' elements of `anything-ff-history'
 in an `anything-comp-read'."
   (let ((history (when anything-ff-history
                    (loop with dup for i in anything-ff-history
-                    unless (member i dup) collect i into dup
-                    finally return dup)))) ; Remove dups.
+                      unless (member i dup) collect i into dup
+                      finally return dup)))) ; Remove dups.
     (when history
       (setq anything-ff-history
             (if (>= (length history) anything-ff-history-max-length)
                 (subseq history 0 anything-ff-history-max-length)
                 history))
-      (anything-comp-read
-       "Switch to Directory: "
-       anything-ff-history
-       :name "Anything Find Files History"
-       :must-match t))))
+      (if comp-read
+          (anything-comp-read
+           "Switch to Directory: "
+           anything-ff-history
+           :name "Anything Find Files History"
+           :must-match t)
+          anything-ff-history))))
 
 (defun anything-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
@@ -2714,6 +2719,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
                                    (initial-input (expand-file-name default-directory))
                                    (buffer "*Anything Completions*")
                                    test
+                                   (history nil)
                                    (marked-candidates nil)
                                    (persistent-action 'anything-find-files-persistent-action)
                                    (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
@@ -2728,7 +2734,14 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                  (identity candidate))))
       (or (anything
            :sources
-           `((name . ,(concat "Read file name" anything-c-find-files-doc-header))
+           `(((name . ,(concat "Read File Name History" anything-c-find-files-doc-header))
+              (candidates . (lambda ()
+                              (anything-comp-read-get-candidates history)))
+              (volatile)
+              (persistent-action . ,persistent-action)
+              (persistent-help . ,persistent-help)
+              (action . ,'action-fn))
+             ((name . ,(concat "Read file name" anything-c-find-files-doc-header))
              ;; It is needed for filenames with capital letters
              (disable-shortcuts)
              (candidates . (lambda ()
@@ -2741,7 +2754,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
              (persistent-action . ,persistent-action)
              (persistent-help . ,persistent-help)
              (volatile)
-             (action . ,'action-fn))
+             (action . ,'action-fn)))
            :input initial-input
            :prompt prompt
            :resume 'noresume
