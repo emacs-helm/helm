@@ -4442,10 +4442,15 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
               'help-echo (anything-c-firefox-bookmarks-get-value i))))
 
 ;; W3m bookmark
-(eval-when-compile (require 'w3m-bookmark nil t))
-(unless (and (require 'w3m nil t)
-             (require 'w3m-bookmark nil t))
-  (defvar w3m-bookmark-file "~/.w3m/bookmark.html"))
+;; Bugfix:
+;; Some users have the emacs-w3m library in load-path
+;; without having the w3m executable :-;
+;; So check if w3m program is present before trying to load
+;; emacs-w3m.
+(eval-when-compile
+  (when (executable-find "w3m")
+    (require 'w3m-bookmark nil t)))
+(defvar w3m-bookmark-file "~/.w3m/bookmark.html")
 
 
 (defface anything-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
