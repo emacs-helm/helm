@@ -78,7 +78,7 @@ NOTE:
 It is not recommended to use the variable `anything-sources', please use instead the preconfigured anything command
 you will find in anything-config.el or build your own.
 
-Be aware also that making you own anything commands with a lot of sources involved can be very costly and slowdown
+Be aware also that making your own anything commands with a lot of sources involved can be very costly and slowdown
 anything a lot.
   
 \section{Overview of commands}
@@ -205,7 +205,11 @@ It is another implementation of grep but not incremental.
 
 It work fine with tramp on remote files.
 
-Windows users need grep version >=2.5.4 of Gnuwin32 on windoze.
+Windows users need grep version 
+\begin{math}
+\geq2.5.4
+\end{math}
+of Gnuwin32 on windoze.
 This version should accept the --exclude-dir option.
 
 \begin{itemize}

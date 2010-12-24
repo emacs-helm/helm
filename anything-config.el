@@ -1127,6 +1127,12 @@ After closing firefox, you will be able to browse you bookmarks.
                          "*anything pp bookmarks*"))
 
 ;;;###autoload
+(defun anything-c-insert-latex-math ()
+  "Preconfigured anything for latex math symbols completion."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-latex-math "*anything latex*"))
+
+;;;###autoload
 (defun anything-register ()
   "Preconfigured `anything' for Emacs registers."
   (interactive)
@@ -5251,6 +5257,24 @@ replace with STR as yanked string."
      collect (cdr cell)))
 
 ;; (anything 'anything-c-source-register)
+
+;;; Latex completion
+(defun anything-c-latex-math-candidates ()
+  "Collect candidates for latex math completion."
+  (loop for i in (cddr LaTeX-math-menu)
+     for elm = (loop for s in i when (vectorp s)
+                  collect (cons (aref s 0) (aref s 1)))
+     append elm))
+
+(defvar anything-c-source-latex-math
+  '((name . "Latex Math Menu")
+    (init . (lambda ()
+              (with-current-buffer anything-current-buffer
+                (LaTeX-math-mode 1))))
+    (candidate-number-limit . 9999)
+    (candidates . anything-c-latex-math-candidates)
+    (action . (lambda (candidate)
+                (call-interactively candidate))))) 
 
 ;;;; <Headline Extraction>
 (defvar anything-c-source-fixme

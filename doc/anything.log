@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  22 DEC 2010 09:50
+This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  24 DEC 2010 12:06
 entering extended mode
  %&-line parsing enabled.
 **\input anything.tex
@@ -639,13 +639,13 @@ a-tion that use find/xargs.
  []
 
 [3] [4] [5] [6]
-Overfull \hbox (5.78833pt too wide) in paragraph at lines 363--364
+Overfull \hbox (5.78833pt too wide) in paragraph at lines 367--368
 []\OT1/cmr/m/n/10.95 In any buffer and even in minibuffer if you have en-able r
 ecursive-minibuffer 
  []
 
 [7]
-Underfull \hbox (badness 10000) in paragraph at lines 421--422
+Underfull \hbox (badness 10000) in paragraph at lines 425--426
 
  []
 
@@ -661,12 +661,13 @@ Here is how much of TeX's memory you used:
  <//var/cache/fonts/pk/ljfour/jknappen/ec/tcrm10
 95.600pk></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share/t
 exmf-dist/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/
-bluesky/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr12.pfb></
-usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-dist/fo
-nts/type1/bluesky/cm/cmtt10.pfb>
-Output written on anything.pdf (12 pages, 111478 bytes).
+bluesky/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr10.pfb><
+/usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf-dist/f
+onts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/c
+msy10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmtt10.pfb>
+Output written on anything.pdf (12 pages, 115173 bytes).
 PDF statistics:
- 333 PDF objects out of 1000 (max. 8388607)
+ 341 PDF objects out of 1000 (max. 8388607)
  58 named destinations out of 1000 (max. 131072)
  385 words of extra memory for PDF output out of 10000 (max. 10000000)
 
