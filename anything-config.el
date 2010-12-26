@@ -5880,11 +5880,11 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-xterm-program . browse-url-text-xterm))
   "*Alist of (executable . function) to try to find a suitable url browser.")
 
-(defun* anything-c-generic-browser (url &key name exe args)
+(defun* anything-c-generic-browser (url name &rest args)
   (let ((proc (concat name " " url)))
     (message "Starting %s..." name)
-    (apply 'start-process proc nil exe
-           (append (list url) args))
+    (apply 'start-process proc nil name
+           (append args (list url)))
     (set-process-sentinel
      (get-process proc)
      #'(lambda (process event)
@@ -5893,10 +5893,9 @@ Return an alist with elements like (data . number_results)."
 
 (defun browse-url-chromium (url)
   (interactive "sURL: ")
-  (let ((name (concat "chromium " url))
-        (exe  "chromium-bin")
-        (args '("--enable-plugins")))
-    (anything-c-generic-browser url :name name :exe exe :args args)))
+  (anything-c-generic-browser
+   url browse-url-chromium-program
+   "--enable-plugins"))
 
 (defun anything-browse-url-default-browser (url &rest args)
   "Find a suitable browser and ask it to load URL."

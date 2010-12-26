@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  24 DEC 2010 12:06
+This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.11.27)  24 DEC 2010 13:25
 entering extended mode
  %&-line parsing enabled.
 **\input anything.tex
@@ -665,7 +665,7 @@ bluesky/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr10.pfb><
 /usr/share/texmf-dist/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf-dist/f
 onts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/c
 msy10.pfb></usr/share/texmf-dist/fonts/type1/bluesky/cm/cmtt10.pfb>
-Output written on anything.pdf (12 pages, 115173 bytes).
+Output written on anything.pdf (12 pages, 115180 bytes).
 PDF statistics:
  341 PDF objects out of 1000 (max. 8388607)
  58 named destinations out of 1000 (max. 131072)
