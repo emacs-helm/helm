@@ -2067,7 +2067,7 @@ If prefix numeric arg is given go ARG level down."
          (loop with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
 
-(defun* anything-ff-set-pattern (&optional (pattern anything-pattern))
+(defun* anything-ff-set-pattern (pattern)
   (let ((methods (mapcar 'car tramp-methods))
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
@@ -2099,9 +2099,13 @@ If prefix numeric arg is given go ARG level down."
   "*Number of elements shown in `anything-find-files' history.")
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
-  (let* ((path          (anything-ff-set-pattern))
+  (let* ((path          (anything-ff-set-pattern anything-pattern))
          (path-name-dir (file-name-directory path))
-         (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
+         (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
+         (tramp-default-method-alist '(("\\`localhost\\'" "\\`root\\'" "su")))
+         (tramp-default-user-alist `(("\\`su\\(do\\)?\\'" nil "root")
+                                     ("\\`r\\(em\\)?\\(cp\\|sh\\)\\|telnet\\|plink1?\\'"
+                                      nil ,(user-login-name)))))
     (set-text-properties 0 (length path) nil path)
     (if (member 'anything-compile-source--match-plugin
                 anything-compile-source-functions)
