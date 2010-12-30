@@ -1889,6 +1889,7 @@ buffer that is not the current buffer."
                 (if anything-current-prefix-arg
                     (anything-do-grep1 (anything-marked-candidates) 'recurse)
                     (anything-do-grep1 (anything-marked-candidates)))))
+           ("Switch to Eshell" . anything-ff-switch-to-eshell)
            ("Eshell command on file(s)" . anything-find-files-eshell-command-on-file)
            ("Ediff File" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
@@ -2003,6 +2004,23 @@ will not be loaded first time you use this."
          for i in cand-list
          for com = (concat command " " (shell-quote-argument i))
          do (eshell-command com)))))
+
+
+(declare-function 'eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
+(defun anything-ff-switch-to-eshell (candidate)
+  "Switch to eshell and cd to `anything-ff-default-directory'."
+  (flet ((cd-eshell ()
+           (goto-char (point-max))
+           (insert
+            (format "cd %s" (shell-quote-argument
+                             anything-ff-default-directory)))
+           (eshell-send-input)))
+    (if (get-buffer "*eshell*")
+        (progn
+          (switch-to-buffer "*eshell*")
+          (cd-eshell))
+        (call-interactively 'eshell)
+        (cd-eshell))))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
