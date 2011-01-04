@@ -3648,7 +3648,12 @@ source.")
                     (if (> (length wfiles) 1)
                         (woman-find-file (anything-comp-read "ManFile: " wfiles
                                                              :must-match t))
-                        (woman candidate))))))
+                        ;; If woman is unable to format correctly
+                        ;; use man instead.
+                        (condition-case err
+                            (woman candidate)
+                          (error (kill-buffer) ; Kill woman buffer.
+                                 (man candidate))))))))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)
