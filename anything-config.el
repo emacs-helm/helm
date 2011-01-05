@@ -2608,6 +2608,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                   ('hardlink       dired-keep-marker-hardlink))))
     (dired-create-files
      fn (symbol-name action) files
+     ;; CANDIDATE is the destination.
      (if (file-directory-p candidate)
          ;; When CANDIDATE is a directory, build file-name in this directory.
          ;; Else we use CANDIDATE.
@@ -2629,6 +2630,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
 
 (defun anything-get-dest-fnames-from-list (flist dest-cand)
   "Transform filenames of FLIST to abs of DEST-CAND."
+  ;; At this point files have been renamed/copied at destination.
   (loop
      with dest = (expand-file-name dest-cand)
      for src in flist
@@ -2641,6 +2643,8 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                      (concat (file-name-as-directory dest)
                              basename-src)
                      dest)
+     ;; Needed in case we rename a dir on itself. (e.g foo=>foo1)
+     when (file-exists-p fname) 
      collect fname into tmp-list
      finally return (sort tmp-list 'string<)))
 
