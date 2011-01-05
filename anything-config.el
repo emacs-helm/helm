@@ -2633,10 +2633,10 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
      with dest = (expand-file-name dest-cand)
      for src in flist
      for basename-src = (if (file-directory-p src)
-                           (file-relative-name
-                            (directory-file-name src)
-                            (file-name-directory src))
-                           (file-name-nondirectory src))
+                            (file-relative-name
+                             (directory-file-name src)
+                             (file-name-directory src))
+                            (file-name-nondirectory src))
      for fname = (if (file-directory-p dest)
                      (concat (file-name-as-directory dest)
                              basename-src)
@@ -2649,15 +2649,15 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
   (when (and (string= (assoc-default 'name (anything-get-current-source))
                       (assoc-default 'name anything-c-source-find-files))
              anything-ff-cand-to-mark)
-      (with-anything-window
-        (while anything-ff-cand-to-mark
-          (if (search-forward (car anything-ff-cand-to-mark) (point-at-eol) t)
-              (progn
-                (call-interactively 'anything-toggle-visible-mark)
-                (setq anything-ff-cand-to-mark (cdr anything-ff-cand-to-mark)))
-              (call-interactively 'anything-next-line)))
-        (unless (anything-this-visible-mark)
-          (call-interactively 'anything-prev-visible-mark)))))
+    (with-anything-window
+      (while anything-ff-cand-to-mark
+        (if (search-forward (car anything-ff-cand-to-mark) (point-at-eol) t)
+            (progn
+              (call-interactively 'anything-toggle-visible-mark)
+              (setq anything-ff-cand-to-mark (cdr anything-ff-cand-to-mark)))
+            (call-interactively 'anything-next-line)))
+      (unless (anything-this-visible-mark)
+        (call-interactively 'anything-prev-visible-mark)))))
 
 (add-hook 'anything-after-update-hook #'anything-c-maybe-mark-candidates)
 
@@ -7901,14 +7901,8 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
             ;; A a non--existing filename ending with /
             ;; Create a directory and jump to it.
             (when (y-or-n-p (format "Create directory `%s'? " candidate))
-              (let ((cur-dir default-directory))
-                (unwind-protect
-                     (progn
-                       (make-directory candidate 'parent)
-                       (when (file-exists-p candidate)
-                         (cd candidate)
-                         (anything-find-files1 candidate)))
-                  (setq default-directory cur-dir))))
+              (make-directory candidate 'parent)
+              (anything-find-files1 candidate))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
             (find-file-at-point (car marked))))))
