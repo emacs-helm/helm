@@ -524,6 +524,9 @@
 (require 'thingatpt)
 (require 'ffap)
 (require 'cl)
+(require 'dired-aux)
+(require 'tramp)
+(require 'grep)
 
 ;;; Code:
 
@@ -1858,8 +1861,8 @@ buffer that is not the current buffer."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (require 'tramp)
-              (require 'dired-aux)
+              ;(require 'tramp)
+              ;(require 'dired-aux)
               (setq ffap-newfile-prompt t)
               ;; This is needed when connecting with emacsclient -t
               ;; on remote host that have an anything started on a window-system.
@@ -2006,7 +2009,7 @@ will not be loaded first time you use this."
          do (eshell-command com)))))
 
 
-(declare-function 'eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
+(declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (defun anything-ff-switch-to-eshell (candidate)
   "Switch to eshell and cd to `anything-ff-default-directory'."
   (flet ((cd-eshell ()
@@ -2119,11 +2122,7 @@ If prefix numeric arg is given go ARG level down."
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern anything-pattern))
          (path-name-dir (file-name-directory path))
-         (tramp-verbose anything-tramp-verbose) ; No tramp message when 0.
-         (tramp-default-method-alist '(("\\`localhost\\'" "\\`root\\'" "su")))
-         (tramp-default-user-alist `(("\\`su\\(do\\)?\\'" nil "root")
-                                     ("\\`r\\(em\\)?\\(cp\\|sh\\)\\|telnet\\|plink1?\\'"
-                                      nil ,(user-login-name)))))
+         (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     (if (member 'anything-compile-source--match-plugin
                 anything-compile-source-functions)
@@ -3010,9 +3009,6 @@ If it's not empty use it instead of `grep-find-ignored-files'."
     (anything
      :sources
      `(((name . "Grep (M-up/down - next/prec file)")
-        (init . (lambda ()
-                  ;; Load `grep-find-ignored-files'.
-                  (require 'grep)))
         (candidates
          . (lambda () (if include-files
                           (funcall anything-c-grep-default-function only include-files)
@@ -4759,6 +4755,8 @@ http://ctags.sourceforge.net/")
 (declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
 (declare-function semantic-tag-components "ext:tag.el" (tag) t)
 (declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
+(declare-function semantic-tag-type "ext:tag-file.el" (tag) t)
+(declare-function semantic-tag-class "ext:tag-file.el" (tag) t)
 (defvar anything-semantic-candidates nil)
 
 (defun anything-semantic-construct-candidates (tags depth)
