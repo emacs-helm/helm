@@ -2345,8 +2345,9 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                          ;; Allow browsing archive on avfs fs.
                          ;; Assume volume is already mounted with mountavfs.
                          ((and anything-ff-avfs-directory
-                               (string-match anything-ff-avfs-directory
-                                             (file-name-directory candidate))
+                               (string-match
+                                (regexp-quote (expand-file-name anything-ff-avfs-directory))
+                                (file-name-directory candidate))
                                (anything-ff-file-compressed-p candidate))
                           (insert-in-minibuffer (concat candidate "#")))
                          (t (find-file candidate))))))))))
