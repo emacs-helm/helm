@@ -2310,47 +2310,51 @@ If CANDIDATE is alone, open file CANDIDATE filename.
 That's mean:
 First hit on C-z expand CANDIDATE second hit open file.
 If a prefix arg is given or `anything-follow-mode' is on open file."
-  (let ((follow (buffer-local-value
-                 'anything-follow-mode
-                 (get-buffer-create anything-buffer))))
+  (let ((follow        (buffer-local-value
+                        'anything-follow-mode
+                        (get-buffer-create anything-buffer)))
+        (new-pattern   (anything-get-selection))
+        (num-lines-buf (with-current-buffer anything-buffer
+                         (count-lines (point-min) (point-max)))))
     (flet ((insert-in-minibuffer (fname)
              (with-selected-window (minibuffer-window)
                (unless follow
                  (delete-minibuffer-contents)
                  (set-text-properties 0 (length fname) nil fname)
                  (insert fname)))))
-      (cond ((and (file-directory-p candidate) (file-symlink-p candidate))
+      (cond (;; A symlink directory, expand it's truename.
+             (and (file-directory-p candidate) (file-symlink-p candidate))
              (insert-in-minibuffer (file-name-as-directory
                                     (file-truename
                                      (expand-file-name candidate)))))
+            ;; A directory, open it.
             ((file-directory-p candidate)
              (insert-in-minibuffer (file-name-as-directory
                                     (expand-file-name candidate))))
+            ;; A symlink file, expand to it's true name. (first hit)
             ((file-symlink-p candidate)
              (insert-in-minibuffer (file-truename candidate)))
-            (t
-             ;; First hit on C-z expand CANDIDATE second hit open file.
-             ;; If a prefix arg is given or `anything-follow-mode' is on, open file.
-             (let ((new-pattern   (anything-get-selection))
-                   (num-lines-buf (with-current-buffer anything-buffer
-                                    (count-lines (point-min) (point-max)))))
-               (if (and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
-                   (insert-in-minibuffer new-pattern)
-                   (cond ((string-match (image-file-name-regexp) candidate)
-                          (when (buffer-live-p image-dired-display-image-buffer)
-                            (kill-buffer image-dired-display-image-buffer))
-                          (image-dired-display-image candidate)
-                          (message nil)
-                          (display-buffer image-dired-display-image-buffer))
-                         ;; Allow browsing archive on avfs fs.
-                         ;; Assume volume is already mounted with mountavfs.
-                         ((and anything-ff-avfs-directory
-                               (string-match
-                                (regexp-quote (expand-file-name anything-ff-avfs-directory))
-                                (file-name-directory candidate))
-                               (anything-ff-file-compressed-p candidate))
-                          (insert-in-minibuffer (concat candidate "#")))
-                         (t (find-file candidate))))))))))
+            ;; A regular file, expand it, (first hit)
+            ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
+             (insert-in-minibuffer new-pattern))
+            ;; An image file and it is the second hit on C-z,
+            ;; show the file in `image-dired'.
+            ((string-match (image-file-name-regexp) candidate)
+             (when (buffer-live-p image-dired-display-image-buffer)
+               (kill-buffer image-dired-display-image-buffer))
+             (image-dired-display-image candidate)
+             (message nil)
+             (display-buffer image-dired-display-image-buffer))
+            ;; Allow browsing archive on avfs fs.
+            ;; Assume volume is already mounted with mountavfs.
+            ((and anything-ff-avfs-directory
+                  (string-match
+                   (regexp-quote (expand-file-name anything-ff-avfs-directory))
+                   (file-name-directory candidate))
+                  (anything-ff-file-compressed-p candidate))
+             (insert-in-minibuffer (concat candidate "#")))
+            ;; On second hit we open file.
+            (t (find-file candidate))))))
 
 (defvar anything-ff-avfs-directory nil
   "*The default avfs directory, usually '.avfs'.
