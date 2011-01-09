@@ -197,8 +197,11 @@ See headers of traverselisp.el for example."
   (interactive)
   (goto-char (point-min))
   (while (re-search-forward "^;; +\\[EVAL\\]" nil t)
-    (end-of-line) (eval-last-sexp t)
-    (while (not (bolp)) (delete-char -1))))
+    (end-of-line)
+    ;; Avoid infinite loop if one write an eval followed by autodoc-update-all.
+    (unless (save-excursion (search-backward "autodoc-update-all" (point-at-bol) t))
+      (eval-last-sexp t)
+      (while (not (bolp)) (delete-char -1)))))
 
 
 (defun autodoc-document-default-prefix ()
@@ -244,7 +247,7 @@ See headers of `autodoc.el' for example."
                                (y-or-n-p "Insert variable Default value?"))
                       " :var-value t")
                     (when docstring " :docstring t") ")")
-            (if (save-excursion (re-search-forward "^;; +\\*+ .*" nil t))
+            (if (save-excursion (search-forward "*** END auto-documentation" nil t))
                 "" "\n\n\n;;  *** END auto-documentation"))))
 
 
