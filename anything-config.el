@@ -2334,7 +2334,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
              (let ((new-pattern   (anything-get-selection))
                    (num-lines-buf (with-current-buffer anything-buffer
                                     (count-lines (point-min) (point-max)))))
-               (if (and (> num-lines-buf 3) (not current-prefix-arg) (not follow))
+               (if (and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
                    (insert-in-minibuffer new-pattern)
                    (cond ((string-match (image-file-name-regexp) candidate)
                           (when (buffer-live-p image-dired-display-image-buffer)
