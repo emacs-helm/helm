@@ -771,7 +771,7 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
 
 ;; rubikitch: Please change it freely because it is in discussion. I'll track from git.
 (define-key anything-command-map (kbd "<SPC>") 'anything-execute-anything-command)
-(define-key anything-command-map (kbd "e") 'anything-etags-maybe-at-point)
+(define-key anything-command-map (kbd "e") 'anything-c-etags-select)
 (define-key anything-command-map (kbd "l") 'anything-locate)
 (define-key anything-command-map (kbd "s") 'anything-surfraw)
 (define-key anything-command-map (kbd "r") 'anything-regexp)
@@ -845,6 +845,7 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
     ("Tools:"
      ["Occur" anything-occur t]
      ["Grep" anything-do-grep t]
+     ["Etags" anything-c-etags-select t]
      ["Browse Kill ring" anything-show-kill-ring t]
      ["Browse register" anything-register t]
      ["Browse code" anything-browse-code t]
@@ -3142,6 +3143,156 @@ If a prefix arg is given use the -r option of grep."
           (if (eq n 1)
               (anything-next-line)
               (anything-previous-line))))))
+
+;;; Etags
+(eval-when-compile
+  (when (locate-library "anything-etags.el")
+    (display-warning
+     '(anything-config)
+     "You are using obsolete library `anything-etags.el' and should remove it."
+     :warning)))
+
+(require 'etags)
+
+(defcustom anything-c-etags-tag-file-name "TAGS"
+  "Etags tag file name."
+  :type 'string
+  :group 'anything-config)
+
+(defcustom anything-c-etags-tag-file-search-limit 10
+  "The limit level of directory to search tag file.
+Don't search tag file deeply if outside this value."
+  :type 'number
+  :group 'anything-config)
+
+(defvar anything-c-etags-tag-file-dir nil
+  "Etags file directory.")
+(defvar anything-c-etags-mtime-alist nil)
+(defvar anything-c-etags-cache (make-hash-table :test 'equal))
+
+(defun anything-c-etags-get-tag-file ()
+  "Get Etags tag file."
+  ;; Get tag file from `default-directory' or upper directory.
+  (let ((current-dir (anything-c-etags-find-tag-file default-directory)))
+    ;; Return nil if not find tag file.
+    (when current-dir
+      (setq anything-c-etags-tag-file-dir current-dir) ;set tag file directory
+      (expand-file-name anything-c-etags-tag-file-name current-dir))))
+
+(defun anything-c-etags-find-tag-file (current-dir)
+  "Find tag file.
+Try to find tag file in upper directory if haven't found in CURRENT-DIR."
+  (flet ((file-exists? (dir)
+           (let ((tag-path (expand-file-name anything-c-etags-tag-file-name dir)))
+             (and (stringp tag-path)
+                  (file-exists-p tag-path)
+                  (file-readable-p tag-path)))))
+    (loop with count = 0
+       until (file-exists? current-dir)
+       ;; Return nil if outside the value of
+       ;; `anything-c-etags-tag-file-search-limit'.
+       if (= count anything-c-etags-tag-file-search-limit)
+       do (return nil)
+       ;; Or search upper directories.
+       else
+       do (incf count)
+         (setq current-dir (expand-file-name (concat current-dir "../")))
+       finally return current-dir)))
+
+(defun anything-c-source-etags-header-name (x)
+  (concat "Etags in "
+          (with-current-buffer anything-current-buffer
+            (anything-c-etags-get-tag-file))))
+
+(defmacro anything-c-etags-create-buffer (file)
+  `(let* ((tag-fname ,file)
+          max
+          (split (with-current-buffer (find-file-noselect tag-fname)
+                   (prog1
+                       (split-string (buffer-string) "\n" 'omit-nulls)
+                     (setq max (line-number-at-pos (point-max)))
+                     (kill-buffer))))
+          (progress-reporter (make-progress-reporter "Loading tag file..." 0 max)))
+     (loop
+        with fname
+        with cand
+        for i in split for count from 0
+        for elm = (unless (string-match "^\x0c" i)
+                    (anything-aif (string-match "\177" i)
+                        (substring i 0 it)
+                      i))
+        do (cond ((and elm (string-match "\\(.+\\),[0-9]+" elm))
+                  (setq fname (match-string 1 elm)))
+                 (elm (setq cand (concat fname ": " elm)))
+                 (t (setq cand nil)))
+        when cand do (progn
+                       (insert (concat cand "\n"))
+                       (progress-reporter-update progress-reporter count)))))
+
+(defun anything-c-etags-init ()
+  (let ((tagfile (anything-c-etags-get-tag-file))) 
+    (with-current-buffer (anything-candidate-buffer 'global)
+      (anything-aif (gethash tagfile anything-c-etags-cache)
+          (insert it)
+        (anything-c-etags-create-buffer tagfile)
+        (puthash tagfile (buffer-string) anything-c-etags-cache)
+        (anything-aif (assoc tagfile anything-c-etags-mtime-alist)
+            ;; If an entry exists modify it.
+            (setcdr it (anything-c-etags-mtime tagfile))
+          ;; No entry create a new one.
+          (add-to-list 'anything-c-etags-mtime-alist
+                       (cons tagfile (anything-c-etags-mtime tagfile))))))))
+
+(defvar anything-c-source-etags-select
+  '((name . "Etags")
+    (header-name . anything-c-source-etags-header-name)
+    (init . anything-c-etags-init)
+    (candidates-in-buffer)
+    (action . anything-c-etags-default-action)
+    (persistent-action . (lambda (candidate)
+                           (anything-c-etags-default-action candidate)
+                           (anything-match-line-color-current-line)))))
+
+(defun anything-c-etags-default-action (candidate)
+  (let* ((split (split-string candidate ": "))
+         (fname (expand-file-name
+                 (car split) anything-c-etags-tag-file-dir))
+         (elm   (cadr split)))
+    (find-file fname)
+    (goto-char (point-min))
+    (search-forward elm nil t)
+    (goto-char (match-beginning 0))))
+
+(defun anything-c-etags-select (arg)
+  "Preconfigured anything for etags.
+Called with one prefix arg use symbol at point as initial input.
+Called with two prefix arg reinitialize cache.
+If tag file have been modified reinitialize cache."
+  (interactive "P")
+  (let ((tag  (anything-c-etags-get-tag-file))
+        (init (and arg (equal current-prefix-arg '(4))
+                   (thing-at-point 'symbol))))
+    (when (or (equal current-prefix-arg '(16))
+              (and anything-c-etags-mtime-alist
+                   (anything-c-etags-file-modified-p tag)))
+      (remhash tag anything-c-etags-cache))
+    (if (and tag (file-exists-p tag))
+        (anything :sources 'anything-c-source-etags-select
+                  :input init
+                  :buffer "*anything etags*")
+        (message "Error: No tag file found, please create one with etags shell command."))))
+
+(defun anything-c-etags-mtime (file)
+  "Last modification time of FILE."
+  (cadr (nth 5 (file-attributes file))))
+
+(defun anything-c-etags-file-modified-p (file)
+  "Check if tag FILE have been modified in this session.
+If FILE is nil return nil."
+  (let ((last-modif (and file
+                         (assoc-default file anything-c-etags-mtime-alist))))
+    (and last-modif
+         (/= last-modif (anything-c-etags-mtime file)))))
 
 ;;; Recentf files
 (defvar anything-c-source-recentf
