@@ -772,6 +772,27 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
   :type 'list
   :group 'anything-config)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TODO: This should be integrated in anything.el instead of having
+;; a defadvice here.
+
+(defvar anything-current-prefix-arg nil
+  "Record `current-prefix-arg' when exiting minibuffer.
+It will be cleared at start of next `anything' call when \
+`anything-before-initialize-hook' is called.")
+
+(defadvice anything-exit-minibuffer (before anything-current-prefix-arg activate)
+  (unless anything-current-prefix-arg
+    (setq anything-current-prefix-arg current-prefix-arg)))
+
+;; using this hook instead of `anything-after-action-hook'
+;; allow to record the prefix args and keep their values
+;; when using `anything-comp-read'.
+;; i.e when quitting `anything-comp-read' prefix args are preserved
+;; for the following action.
+(add-hook 'anything-before-initialize-hook
+          (lambda () (setq anything-current-prefix-arg nil)))
+
 ;;;###autoload
 (defun anything-configuration ()
   "Customize `anything'."
@@ -1653,28 +1674,6 @@ visible or invisible in all sources of current anything session"
         (anything-mark-all))))
 
 (define-key anything-map (kbd "M-m") 'anything-toggle-all-marks)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO: This should be integrated in anything.el instead of having
-;; a defadvice here.
-
-(defvar anything-current-prefix-arg nil
-  "Record `current-prefix-arg' when exiting minibuffer.
-It will be cleared at start of next `anything' call when \
-`anything-before-initialize-hook' is called.")
-
-(defadvice anything-exit-minibuffer (before anything-current-prefix-arg activate)
-  (unless anything-current-prefix-arg
-    (setq anything-current-prefix-arg current-prefix-arg)))
-
-;; using this hook instead of `anything-after-action-hook'
-;; allow to record the prefix args and keep their values
-;; when using `anything-comp-read'.
-;; i.e when quitting `anything-comp-read' prefix args are preserved
-;; for the following action.
-(add-hook 'anything-before-initialize-hook
-          (lambda () (setq anything-current-prefix-arg nil)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Hacks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defadvice eval-defun (after anything-source-hack activate)
