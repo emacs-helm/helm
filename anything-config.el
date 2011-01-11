@@ -84,7 +84,7 @@
 ;; `anything-c-describe-anything-bindings'
 ;; [OBSOLETE] Describe `anything' bindings.
 ;; `anything-mini'
-;; Preconfigured `anything' lightweight version (buffer -> recentf).
+;; Preconfigured `anything' lightweight version		(buffer -> recentf).
 ;; `anything-for-files'
 ;; Preconfigured `anything' for opening files.
 ;; `anything-recentf'
@@ -122,7 +122,9 @@
 ;; `anything-bookmarks'
 ;; Preconfigured `anything' for bookmarks.
 ;; `anything-c-pp-bookmarks'
-;; Preconfigured `anything' for bookmarks	(pretty-printed).
+;; Preconfigured `anything' for bookmarks		(pretty-printed).
+;; `anything-c-insert-latex-math'
+;; Preconfigured anything for latex math symbols completion.
 ;; `anything-register'
 ;; Preconfigured `anything' for Emacs registers.
 ;; `anything-man-woman'
@@ -179,6 +181,8 @@
 ;; List all anything sources for test.
 ;; `anything-select-source'
 ;; Select source.
+;; `anything-toggle-all-marks'
+;; Toggle all marks.
 ;; `anything-find-files-down-one-level'
 ;; Go down one level like unix command `cd ..'.
 ;; `anything-find-files'
@@ -203,10 +207,14 @@
 ;; Go to precedent file in `anything-do-grep'.
 ;; `anything-c-grep-next-or-prec-file'
 ;; Go to next or precedent candidate file in anything grep buffer.
+;; `anything-c-etags-select'
+;; Preconfigured anything for etags.
 ;; `anything-filelist'
 ;; Preconfigured `anything' to open files instantly.
 ;; `anything-filelist+'
 ;; Preconfigured `anything' to open files/buffers/bookmarks instantly.
+;; `anything-c-describe-attributes'
+;; Display the full documentation of ANYTHING-ATTRIBUTE (a symbol).
 ;; `anything-M-x'
 ;; Preconfigured `anything' for Emacs commands.
 ;; `anything-manage-advice'
@@ -305,7 +313,7 @@
 ;; `anything-command-map-prefix-key'
 ;; Default Value: "<f5> a"
 ;; `anything-c-find-files-show-icons'
-;; Default Value: t
+;; Default Value: nil
 ;; `anything-c-find-files-icons-directory'
 ;; Default Value: "/usr/local/share/emacs/23.2.91/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
@@ -316,6 +324,10 @@
 ;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
 ;; `anything-c-external-programs-associations'
 ;; Default Value: nil
+;; `anything-c-etags-tag-file-name'
+;; Default Value: "TAGS"
+;; `anything-c-etags-tag-file-search-limit'
+;; Default Value: 10
 ;; `anything-c-filelist-file-name'
 ;; Default Value: nil
 
@@ -337,6 +349,7 @@
 ;; `anything-c-source-file-cache-initialized'			()
 ;; `anything-c-source-file-cache'				(File Cache)
 ;; `anything-c-source-locate'					(Locate)
+;; `anything-c-source-etags-select'				(Etags)
 ;; `anything-c-source-recentf'					(Recentf)
 ;; `anything-c-source-ffap-guesser'				(File at point)
 ;; `anything-c-source-ffap-line'				(File/Lineno at point)
@@ -432,6 +445,7 @@
 ;; `anything-c-source-mark-ring'				(mark-ring)
 ;; `anything-c-source-global-mark-ring'				(global-mark-ring)
 ;; `anything-c-source-register'					(Registers)
+;; `anything-c-source-latex-math'				(Latex Math Menu)
 ;; `anything-c-source-fixme'					(TODO/FIXME/DRY comments)
 ;; `anything-c-source-rd-headline'				(RD HeadLine)
 ;; `anything-c-source-oddmuse-headline'				(Oddmuse HeadLine)
@@ -497,7 +511,7 @@
 ;;     Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;;     rubikitch <rubikitch@ruby-lang.org>
 ;;     Scott Vokes <vokes.s@gmail.com>
-;;
+;;     Kenichirou Oyama <k1lowxb@gmail.com>
 
 ;;; For Maintainers:
 ;;
