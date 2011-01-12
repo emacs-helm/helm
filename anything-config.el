@@ -3165,8 +3165,6 @@ If a prefix arg is given use the -r option of grep."
      "You are using obsolete library `anything-etags.el' and should remove it."
      :warning)))
 
-(require 'etags)
-
 (defcustom anything-c-etags-tag-file-name "TAGS"
   "Etags tag file name."
   :type 'string
