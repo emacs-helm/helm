@@ -3284,7 +3284,9 @@ If tag file have been modified reinitialize cache."
   (interactive "P")
   (let ((tag  (anything-c-etags-get-tag-file))
         (init (and arg (equal current-prefix-arg '(4))
-                   (thing-at-point 'symbol))))
+                   (thing-at-point 'symbol)))
+        (anything-quit-if-no-candidate t)
+        (anything-execute-action-at-once-if-one t))
     (when (or (equal current-prefix-arg '(16))
               (and anything-c-etags-mtime-alist
                    (anything-c-etags-file-modified-p tag)))
