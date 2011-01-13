@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  30 DEC 2010 22:10
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  13 JAN 2011 09:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -621,7 +621,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 20.
  (./anything.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 6.
+(Font)              <10.95> on input line 7.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -638,62 +638,61 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.92 W
-      hen you like a command, e.g f5 a M-x you should bind it to something m...
-[1]pdfTeX warning (ext4): destination with the same identifier (name{page.2}) h
-as been already used, duplicate ignored
+l.94 \item A
+            ccess to action menu with [1]pdfTeX warning (ext4): destination wit
+h the same identifier (name{page.2}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.142 
+l.151 
        [2]
-Underfull \hbox (badness 10000) in paragraph at lines 167--169
+Underfull \hbox (badness 10000) in paragraph at lines 204--206
 
  []
 
-
-Overfull \hbox (36.65945pt too wide) in paragraph at lines 173--173
+[3]
+Overfull \hbox (36.65945pt too wide) in paragraph at lines 210--210
 []\OT1/cmtt/m/n/10.95 (define-key anything-map (kbd "<C-tab>") 'anything-select
 -4th-action)[] 
  []
 
 
-Overfull \hbox (11.02296pt too wide) in paragraph at lines 197--201
+Overfull \hbox (11.02296pt too wide) in paragraph at lines 234--238
 \OT1/cmr/m/n/10.95 This grep is also re-cur-sive un-like the emacs im-ple-men-t
 a-tion that use find/xargs.
  []
 
-[3] [4] [5] [6]
-Overfull \hbox (5.78833pt too wide) in paragraph at lines 367--368
+[4] [5] [6]
+Overfull \hbox (5.78833pt too wide) in paragraph at lines 404--405
 []\OT1/cmr/m/n/10.95 In any buffer and even in minibuffer if you have en-able r
 ecursive-minibuffer 
  []
 
-[7]
-Underfull \hbox (badness 10000) in paragraph at lines 425--426
+[7] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
 
  []
 
-[8] [9] [10] (./anything.aux) ) 
+[9] [10] [11] (./anything.aux) ) 
 Here is how much of TeX's memory you used:
- 5847 strings out of 495061
- 83129 string characters out of 1182620
- 158679 words of memory out of 3000000
- 8891 multiletter control sequences out of 15000+50000
+ 5862 strings out of 495061
+ 83372 string characters out of 1182620
+ 158949 words of memory out of 3000000
+ 8900 multiletter control sequences out of 15000+50000
  9320 words of font info for 33 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  38i,6n,36p,276b,485s stack positions out of 5000i,500n,10000p,200000b,50000s
- </home/thierry/.texmf-var/fonts/pk/ljfour/jknap
-pen/ec/tcrm1095.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/
-cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
-</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share
-/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/typ
-e1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/am
-sfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/c
-mtt10.pfb>
-Output written on anything.pdf (12 pages, 166958 bytes).
+ </home/thierry/.texmf-var/fonts/pk/ljfour/jkna
+ppen/ec/tcrm1095.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
+/cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb
+></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/shar
+e/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texl
+ive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/a
+msfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/
+cmtt10.pfb>
+Output written on anything.pdf (13 pages, 172639 bytes).
 PDF statistics:
- 337 PDF objects out of 1000 (max. 8388607)
- 58 named destinations out of 1000 (max. 500000)
- 369 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 369 PDF objects out of 1000 (max. 8388607)
+ 64 named destinations out of 1000 (max. 500000)
+ 409 words of extra memory for PDF output out of 10000 (max. 10000000)
 

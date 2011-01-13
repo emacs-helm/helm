@@ -3,6 +3,7 @@
     (LaTeX-add-labels
      "sec:install"
      "sec:config"
+     "sec:gener-anyth-comm"
      "sec:overv-comm-avail"
      "sec:anything-find-files"
      "sec:navigation"
@@ -45,8 +46,12 @@
      "sec:search-files"
      "sec:launch-grep"
      "sec:windows-specificity"
+     "sec:anything-etags"
+     "sec:create-tag-file"
+     "sec:start-anything-etags"
      "sec:other-tools"
-     "sec:usefuls-extensions")
+     "sec:usefuls-extensions"
+     "sec:usefuls-links")
     (TeX-run-style-hooks
      "setspace"
      "natbib"
