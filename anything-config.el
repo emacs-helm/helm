@@ -3799,6 +3799,19 @@ Same as `anything-describe-anything-attribute' but with anything completion."
 Will be calculated the first time you invoke anything with this
 source.")
 
+(defun anything-c-man-default-action (candidate)
+  "Default action for jumping to a woman or man page from anything."
+  (let ((wfiles (woman-file-name-all-completions candidate)))
+    (condition-case err
+        (if (> (length wfiles) 1)
+            (woman-find-file (anything-comp-read "ManFile: " wfiles
+                                                 :must-match t))
+            ;; If woman is unable to format correctly
+            ;; use man instead.
+            (woman candidate))
+      (error (kill-buffer) ; Kill woman buffer.
+             (man candidate)))))
+
 (defvar anything-c-source-man-pages
   `((name . "Manual Pages")
     (candidates . (lambda ()
@@ -3811,18 +3824,7 @@ source.")
                                 (woman-file-name "")
                                 (sort (mapcar 'car woman-topic-all-completions)
                                       'string-lessp))))))
-    (action  ("Show with Woman"
-              . (lambda (candidate)
-                  (let ((wfiles (woman-file-name-all-completions candidate)))
-                    (if (> (length wfiles) 1)
-                        (woman-find-file (anything-comp-read "ManFile: " wfiles
-                                                             :must-match t))
-                        ;; If woman is unable to format correctly
-                        ;; use man instead.
-                        (condition-case err
-                            (woman candidate)
-                          (error (kill-buffer) ; Kill woman buffer.
-                                 (man candidate))))))))
+    (action  ("Show with Woman" . anything-c-man-default-action))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)

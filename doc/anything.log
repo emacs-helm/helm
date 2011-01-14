@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  13 JAN 2011 09:03
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  13 JAN 2011 09:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -672,27 +672,32 @@ Underfull \hbox (badness 10000) in paragraph at lines 462--463
 
  []
 
-[9] [10] [11] (./anything.aux) ) 
+[9] [10]
+Underfull \hbox (badness 10000) in paragraph at lines 586--588
+
+ []
+
+[11] (./anything.aux) ) 
 Here is how much of TeX's memory you used:
- 5862 strings out of 495061
- 83372 string characters out of 1182620
+ 5861 strings out of 495061
+ 83362 string characters out of 1182620
  158949 words of memory out of 3000000
- 8900 multiletter control sequences out of 15000+50000
+ 8899 multiletter control sequences out of 15000+50000
  9320 words of font info for 33 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  38i,6n,36p,276b,485s stack positions out of 5000i,500n,10000p,200000b,50000s
- </home/thierry/.texmf-var/fonts/pk/ljfour/jkna
-ppen/ec/tcrm1095.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
-/cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb
-></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/shar
-e/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texl
-ive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/
-cmtt10.pfb>
-Output written on anything.pdf (13 pages, 172639 bytes).
+ </home/thierry/.texmf-var/fonts/pk/ljfour/jknappen/ec/t
+crm1095.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.p
+fb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/sh
+are/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-t
+exlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts
+/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/publi
+c/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
+m/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmtt10.pf
+b>
+Output written on anything.pdf (13 pages, 172880 bytes).
 PDF statistics:
- 369 PDF objects out of 1000 (max. 8388607)
+ 370 PDF objects out of 1000 (max. 8388607)
  64 named destinations out of 1000 (max. 500000)
  409 words of extra memory for PDF output out of 10000 (max. 10000000)
 
