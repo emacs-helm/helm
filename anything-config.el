@@ -3018,7 +3018,9 @@ If it's not empty use it instead of `grep-find-ignored-files'."
     (when include-files
       (setq include-files
             (and (not (string= include-files ""))
-                 (format "--include=%s" (shell-quote-argument include-files)))))
+                 (mapconcat #'(lambda (x)
+                                (concat "--include=" (shell-quote-argument x)))
+                            (split-string include-files) " "))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
