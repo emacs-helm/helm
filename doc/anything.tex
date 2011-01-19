@@ -80,8 +80,43 @@ you will find in anything-config.el or build your own.
 
 Be aware also that making your own anything commands with a lot of sources involved can be very costly and slowdown
 anything a lot.
-  
-\section{Overview of commands}
+
+\section{General anything commands}
+\label{sec:gener-anyth-comm}
+Anything allow you to have few binding to remember unlike all others Emacs applications.
+
+Anything show you by default in mode-line the most useful bindings, you will see in headers of anything buffer some more specific
+commands.
+
+So when anything start what you have to remember:
+
+\begin{itemize}
+\item Access to action menu with 
+\begin{verbatim}
+TAB
+\end{verbatim}
+\end{itemize}
+\begin{itemize}
+\item Use persistent actions with
+\begin{verbatim}
+C-z
+\end{verbatim}
+\end{itemize}
+\begin{itemize}
+\item Mark candidate with
+\begin{verbatim}
+M-<SPACE>
+\end{verbatim}
+\end{itemize}
+
+So three bindings to remember and they are anyway documented in mode-line.
+For more, hitting
+\begin{verbatim}
+C-h m
+\end{verbatim}
+while in anything session will show you all other bindings.
+
+\section{Overview of preconfigured anything commands}
 \label{sec:overv-comm-avail}
 For starting with anything, a set of commands have been set for you in anything menu.
 The bindings of all these commands are prefixed with `f5-a'.
@@ -105,6 +140,8 @@ To do that put in your .emacs.el:
 \end{verbatim}
 It is well integrated with tramp, you can enter any tramp filename and it will complete.
 (e.g /su::, /sudo::, /ssh:host:, ... etc)
+
+Called with a prefix arg, (C-u) anything-find-files will show you also history of last visited directories.
 
 \subsection{Navigation}
 \label{sec:navigation}
@@ -495,6 +532,42 @@ To use with anything-locate, you will need his command line named ``es''.
 Be sure to modify the PATH environment variable, to include path to the directory that contain ``es''.
 The arguments are the same than the ones in ``locate''.
 
+\section{Anything Etags}
+\label{sec:anything-etags}
+
+\subsection{Create the tag file}
+\label{sec:create-tag-file}
+
+
+To use etags in Emacs you have first to create a TAGS file for your project with the etags shell command.
+If your directory contains subdirectories use someting like:(e.g .el files)
+\begin{verbatim}
+etag find . -iregex .*\.el$ | xargs etags
+\end{verbatim}
+Otherwise
+\begin{verbatim}
+etags *.el
+\end{verbatim}
+is enought
+
+For more infos see the man page of etags.
+
+\subsection{Start anything etags}
+\label{sec:start-anything-etags}
+
+
+Now just using f5 a e will show you all entries.
+If the project is big it take some time to load tag file but when it is done, next search will be very fast.
+If you modify the TAGS file, use
+\begin{verbatim}
+C-u C-u f5 a e
+\end{verbatim}
+to refresh the tag cache.
+
+To search the definition at point use just
+\begin{verbatim}
+C-u f5 a e
+\end{verbatim}
 
 \section{Other tools}
 \label{sec:other-tools}
@@ -507,8 +580,14 @@ Not complete.
 \label{sec:usefuls-extensions}
 Not complete.
 
+\section{Usefuls links}
+\label{sec:usefuls-links}
 
+You can have info about anything on Emacswiki (Sometime deprecated).\\
+\url{http://www.emacswiki.org/emacs/Anything}\\
 
+You can ask on the anything mailing-list by subscribing at:\\
+\url{https://groups.google.com/group/emacs-anything?hl=en}
 
 \end{document}
 

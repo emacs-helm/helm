@@ -1,46 +1,51 @@
 \BOOKMARK [1][-]{section.1}{Install}{}
 \BOOKMARK [1][-]{section.2}{Config}{}
-\BOOKMARK [1][-]{section.3}{Overview of commands}{}
-\BOOKMARK [1][-]{section.4}{Anything Find Files}{}
-\BOOKMARK [2][-]{subsection.4.1}{Navigation}{section.4}
-\BOOKMARK [2][-]{subsection.4.2}{Jump with nth commands}{section.4}
-\BOOKMARK [2][-]{subsection.4.3}{Turn in image viewer}{section.4}
-\BOOKMARK [2][-]{subsection.4.4}{Grep}{section.4}
-\BOOKMARK [2][-]{subsection.4.5}{Anything do grep}{section.4}
-\BOOKMARK [2][-]{subsection.4.6}{Grep from anything-find-files}{section.4}
-\BOOKMARK [2][-]{subsection.4.7}{Grep One file}{section.4}
-\BOOKMARK [2][-]{subsection.4.8}{Grep Marked files}{section.4}
-\BOOKMARK [3][-]{subsubsection.4.8.1}{Grep marked files from differents directories}{subsection.4.8}
-\BOOKMARK [2][-]{subsection.4.9}{Grep Directory recursively}{section.4}
-\BOOKMARK [2][-]{subsection.4.10}{Grep Using Wildcard}{section.4}
-\BOOKMARK [2][-]{subsection.4.11}{Open Files Externally}{section.4}
-\BOOKMARK [2][-]{subsection.4.12}{Eshell command on files}{section.4}
-\BOOKMARK [2][-]{subsection.4.13}{Why Eshell}{section.4}
-\BOOKMARK [2][-]{subsection.4.14}{Setup Aliases}{section.4}
-\BOOKMARK [2][-]{subsection.4.15}{Problem starting Eshell}{section.4}
-\BOOKMARK [2][-]{subsection.4.16}{Dired Commands}{section.4}
-\BOOKMARK [2][-]{subsection.4.17}{Copy Files}{section.4}
-\BOOKMARK [2][-]{subsection.4.18}{Rename Files}{section.4}
-\BOOKMARK [2][-]{subsection.4.19}{Symlink Files}{section.4}
-\BOOKMARK [2][-]{subsection.4.20}{Hardlink}{section.4}
-\BOOKMARK [2][-]{subsection.4.21}{Follow file after action}{section.4}
-\BOOKMARK [2][-]{subsection.4.22}{In Buffer File Completion}{section.4}
-\BOOKMARK [2][-]{subsection.4.23}{Create File}{section.4}
-\BOOKMARK [2][-]{subsection.4.24}{Create Directory}{section.4}
-\BOOKMARK [2][-]{subsection.4.25}{Ediff files}{section.4}
-\BOOKMARK [2][-]{subsection.4.26}{Ediff merge files}{section.4}
-\BOOKMARK [2][-]{subsection.4.27}{Browse archive with avfs}{section.4}
-\BOOKMARK [2][-]{subsection.4.28}{Display with icons}{section.4}
-\BOOKMARK [1][-]{section.5}{Anything write buffer}{}
-\BOOKMARK [1][-]{section.6}{Anything insert file}{}
-\BOOKMARK [1][-]{section.7}{Anything M-x}{}
-\BOOKMARK [1][-]{section.8}{Anything regexp}{}
-\BOOKMARK [2][-]{subsection.8.1}{Query replace regexp}{section.8}
-\BOOKMARK [2][-]{subsection.8.2}{Save regexp as sexp}{section.8}
-\BOOKMARK [2][-]{subsection.8.3}{Save regexp as string}{section.8}
-\BOOKMARK [1][-]{section.9}{Anything locate}{}
-\BOOKMARK [2][-]{subsection.9.1}{Search files}{section.9}
-\BOOKMARK [2][-]{subsection.9.2}{Launch grep}{section.9}
-\BOOKMARK [2][-]{subsection.9.3}{Windows specificity}{section.9}
-\BOOKMARK [1][-]{section.10}{Other tools}{}
-\BOOKMARK [1][-]{section.11}{Usefuls extensions}{}
+\BOOKMARK [1][-]{section.3}{General anything commands}{}
+\BOOKMARK [1][-]{section.4}{Overview of preconfigured anything commands}{}
+\BOOKMARK [1][-]{section.5}{Anything Find Files}{}
+\BOOKMARK [2][-]{subsection.5.1}{Navigation}{section.5}
+\BOOKMARK [2][-]{subsection.5.2}{Jump with nth commands}{section.5}
+\BOOKMARK [2][-]{subsection.5.3}{Turn in image viewer}{section.5}
+\BOOKMARK [2][-]{subsection.5.4}{Grep}{section.5}
+\BOOKMARK [2][-]{subsection.5.5}{Anything do grep}{section.5}
+\BOOKMARK [2][-]{subsection.5.6}{Grep from anything-find-files}{section.5}
+\BOOKMARK [2][-]{subsection.5.7}{Grep One file}{section.5}
+\BOOKMARK [2][-]{subsection.5.8}{Grep Marked files}{section.5}
+\BOOKMARK [3][-]{subsubsection.5.8.1}{Grep marked files from differents directories}{subsection.5.8}
+\BOOKMARK [2][-]{subsection.5.9}{Grep Directory recursively}{section.5}
+\BOOKMARK [2][-]{subsection.5.10}{Grep Using Wildcard}{section.5}
+\BOOKMARK [2][-]{subsection.5.11}{Open Files Externally}{section.5}
+\BOOKMARK [2][-]{subsection.5.12}{Eshell command on files}{section.5}
+\BOOKMARK [2][-]{subsection.5.13}{Why Eshell}{section.5}
+\BOOKMARK [2][-]{subsection.5.14}{Setup Aliases}{section.5}
+\BOOKMARK [2][-]{subsection.5.15}{Problem starting Eshell}{section.5}
+\BOOKMARK [2][-]{subsection.5.16}{Dired Commands}{section.5}
+\BOOKMARK [2][-]{subsection.5.17}{Copy Files}{section.5}
+\BOOKMARK [2][-]{subsection.5.18}{Rename Files}{section.5}
+\BOOKMARK [2][-]{subsection.5.19}{Symlink Files}{section.5}
+\BOOKMARK [2][-]{subsection.5.20}{Hardlink}{section.5}
+\BOOKMARK [2][-]{subsection.5.21}{Follow file after action}{section.5}
+\BOOKMARK [2][-]{subsection.5.22}{In Buffer File Completion}{section.5}
+\BOOKMARK [2][-]{subsection.5.23}{Create File}{section.5}
+\BOOKMARK [2][-]{subsection.5.24}{Create Directory}{section.5}
+\BOOKMARK [2][-]{subsection.5.25}{Ediff files}{section.5}
+\BOOKMARK [2][-]{subsection.5.26}{Ediff merge files}{section.5}
+\BOOKMARK [2][-]{subsection.5.27}{Browse archive with avfs}{section.5}
+\BOOKMARK [2][-]{subsection.5.28}{Display with icons}{section.5}
+\BOOKMARK [1][-]{section.6}{Anything write buffer}{}
+\BOOKMARK [1][-]{section.7}{Anything insert file}{}
+\BOOKMARK [1][-]{section.8}{Anything M-x}{}
+\BOOKMARK [1][-]{section.9}{Anything regexp}{}
+\BOOKMARK [2][-]{subsection.9.1}{Query replace regexp}{section.9}
+\BOOKMARK [2][-]{subsection.9.2}{Save regexp as sexp}{section.9}
+\BOOKMARK [2][-]{subsection.9.3}{Save regexp as string}{section.9}
+\BOOKMARK [1][-]{section.10}{Anything locate}{}
+\BOOKMARK [2][-]{subsection.10.1}{Search files}{section.10}
+\BOOKMARK [2][-]{subsection.10.2}{Launch grep}{section.10}
+\BOOKMARK [2][-]{subsection.10.3}{Windows specificity}{section.10}
+\BOOKMARK [1][-]{section.11}{Anything Etags}{}
+\BOOKMARK [2][-]{subsection.11.1}{Create the tag file}{section.11}
+\BOOKMARK [2][-]{subsection.11.2}{Start anything etags}{section.11}
+\BOOKMARK [1][-]{section.12}{Other tools}{}
+\BOOKMARK [1][-]{section.13}{Usefuls extensions}{}
+\BOOKMARK [1][-]{section.14}{Usefuls links}{}
