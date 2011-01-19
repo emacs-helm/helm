@@ -3025,8 +3025,6 @@ If it's not empty use it instead of `grep-find-ignored-files'."
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
       (kill-buffer anything-action-buffer))
-    (define-key anything-map (kbd "M-<down>") #'anything-c-grep-next-or-prec-file)
-    (define-key anything-map (kbd "M-<up>") #'anything-c-grep-precedent-file)
     (anything
      :sources
      `(((name . "Grep (M-up/down - next/prec file)")
@@ -3120,44 +3118,52 @@ If a prefix arg is given use the -r option of grep."
         (buffer-string))
     (error nil)))
 
-;;;###autoload
-(defun anything-c-grep-precedent-file ()
-  "Go to precedent file in `anything-do-grep'."
-  (interactive)
-  (anything-c-grep-next-or-prec-file -1))
-
-;;;###autoload
-(defun* anything-c-grep-next-or-prec-file (&optional (n 1))
-  "Go to next or precedent candidate file in anything grep buffer."
-  (interactive)
+;; Go to next or precedent file (common to etags and grep).
+(defun anything-c-goto-next-or-prec-file (n)
+  "Go to next or precedent candidate file in anything grep/etags buffers."
   (let ((cur-source (assoc-default 'name (anything-get-current-source))))
     (with-anything-window
-      (if (equal cur-source "Grep (M-up/down - next/prec file)")
+      (if (or (string= cur-source "Grep (M-up/down - next/prec file)")
+              (string-match "^Etags.*" cur-source))
           (let* ((current-line-list  (split-string
                                       (buffer-substring
                                        (point-at-bol)
                                        (point-at-eol)) ":"))  
                  (current-fname      (nth 0 current-line-list))
-                 (fn-b-o-f           (if (eq n 1) 'eobp 'bobp))) ; func back or forward
+                 (fn-b-o-f           (if (eq n 1) 'eobp 'bobp)))
             (catch 'break
               (while (not (funcall fn-b-o-f))
-                (forward-line n)
-                (beginning-of-line)
-                (when (not (search-forward current-fname (point-at-eol) t))
+                (forward-line n) ; Go forward or backward depending of n value.
+                (unless (search-forward current-fname (point-at-eol) t)
                   (anything-mark-current-line)
                   (throw 'break nil))))
-            (if (eq n 1)
-                (when (eobp)
-                  (re-search-backward ".")
-                  (beginning-of-line)
-                  (anything-mark-current-line))
-                (when (bobp)
-                  (forward-line)
-                  (beginning-of-line)
-                  (anything-mark-current-line))))
+            (cond ((and (eq n 1) (eobp))
+                   (re-search-backward ".")
+                   (forward-line 0)
+                   (anything-mark-current-line))
+                  ((and (< n 1) (bobp))
+                   (forward-line 1)
+                   (anything-mark-current-line))))
           (if (eq n 1)
               (anything-next-line)
               (anything-previous-line))))))
+
+;;;###autoload
+(defun anything-c-goto-precedent-file ()
+  "Go to precedent file in anything grep/etags buffers."
+  (interactive)
+  (anything-c-goto-next-or-prec-file -1))
+
+;;;###autoload
+(defun anything-c-goto-next-file ()
+  "Go to precedent file in anything grep/etags buffers."
+  (interactive)
+  (anything-c-goto-next-or-prec-file 1))
+
+;; This keys affect etags and grep only.
+;; in other sources they do nothing, just going next or precedent line.
+(define-key anything-map (kbd "M-<down>") #'anything-c-goto-next-file)
+(define-key anything-map (kbd "M-<up>") #'anything-c-goto-precedent-file)
 
 ;;; Etags
 (eval-when-compile
@@ -3234,7 +3240,7 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
                     (anything-aif (string-match "\177" i)
                         (substring i 0 it)
                       i))
-        do (cond ((and elm (string-match "\\(.+\\),[0-9]+" elm))
+        do (cond ((and elm (string-match "^\\(.+\\),[0-9]+" elm))
                   (setq fname (match-string 1 elm)))
                  (elm (setq cand (concat fname ": " elm)))
                  (t (setq cand nil)))
