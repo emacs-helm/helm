@@ -6071,4 +6071,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 (provide 'anything)
 ;; How to save (DO NOT REMOVE!!)
 ;; (progn (magit-push) (emacswiki-post "anything.el"))
+;; Local Variables:
+;; coding: utf-8
+;; End:
 ;;; anything.el ends here
