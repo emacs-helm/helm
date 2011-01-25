@@ -1875,8 +1875,6 @@ buffer that is not the current buffer."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              ;(require 'tramp)
-              ;(require 'dired-aux)
               (setq ffap-newfile-prompt t)
               ;; This is needed when connecting with emacsclient -t
               ;; on remote host that have an anything started on a window-system.
@@ -3164,6 +3162,35 @@ If a prefix arg is given use the -r option of grep."
 ;; in other sources they do nothing, just going next or precedent line.
 (define-key anything-map (kbd "M-<down>") #'anything-c-goto-next-file)
 (define-key anything-map (kbd "M-<up>") #'anything-c-goto-precedent-file)
+
+;; Yank text at point.
+(defvar anything-yank-point nil)
+;;;###autoload
+(defun anything-yank-text-at-point ()
+  "Yank text at point in minibuffer."
+  (interactive)
+  (let (input)
+    (flet ((insert-in-minibuffer (word)
+             (with-selected-window (minibuffer-window)
+               (let ((str anything-pattern))
+                 (delete-minibuffer-contents)
+                 (set-text-properties 0 (length word) nil word)
+                 (insert (concat str word))))))
+      (with-current-buffer anything-current-buffer
+        ;; Start to initial point if C-w have never been hit.
+        (unless anything-yank-point (setq anything-yank-point (point)))
+        (and anything-yank-point (goto-char anything-yank-point))
+        (forward-word 1)
+        (setq input (buffer-substring-no-properties anything-yank-point (point)))
+        (setq anything-yank-point (point))) ; End of last forward-word
+      (insert-in-minibuffer input))))
+
+(defun anything-reset-yank-point ()
+  (setq anything-yank-point nil))
+
+(add-hook 'anything-after-persistent-action-hook 'anything-reset-yank-point)
+(add-hook 'anything-cleanup-hook 'anything-reset-yank-point)
+(define-key anything-map (kbd "C-w") 'anything-yank-text-at-point)
 
 ;;; Etags
 (eval-when-compile
