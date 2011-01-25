@@ -199,8 +199,16 @@ If it is other symbol, display file name in candidates even if classification is
 (defvar aggs-buffer "*anything gtags select*")
 
 (defun aggs-candidate-display (s e)
-  ;; 16 = length of symbol
-  (buffer-substring-no-properties (+ s 16) e))
+  (buffer-substring-no-properties (aggs-search-not-space-point s e) e))
+
+(defun aggs-search-not-space-point (s e)
+  (save-excursion
+    (goto-char s)
+    (let ((space-point (search-forward " " e t)))
+      (if (and space-point (> (- space-point s) 16))
+          (- space-point 1) ; for buffer-substring
+        (+ s 16)))))
+
 (defun aggs-set-anything-current-position ()
   (declare (special c-source-file))
   ;; It's needed because `anything' saves
