@@ -930,7 +930,6 @@ It is disabled by default because *Anything Log* grows quickly.")
 (defvar anything-once-called-functions nil)
 (defvar anything-follow-mode nil)
 (defvar anything-let-variables nil)
-(defvar anything-persistent-action-display-window nil)
 
 ;; (@* "Utility: logging")
 (defun anything-log (format-string &rest args)
@@ -1733,7 +1732,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
     (set (make-local-variable 'anything-follow-mode) nil)
     (set (make-local-variable 'anything-display-function) anything-display-function)
-    (set (make-local-variable 'anything-persistent-action-display-window) nil)
+    (anything-initialize-persistent-action)
     (anything-log-eval anything-display-function anything-let-variables)
     (loop for (var . val) in anything-let-variables
           do (set (make-local-variable var) val))
@@ -3106,6 +3105,10 @@ Otherwise goto the end of minibuffer."
   `(let ((display-buffer-function 'anything-persistent-action-display-buffer))
      ,@body))
 (put 'with-anything-display-same-window 'lisp-indent-function 0)
+
+(defvar anything-persistent-action-display-window nil)
+(defun anything-initialize-persistent-action ()
+  (set (make-local-variable 'anything-persistent-action-display-window) nil))
 
 (defun* anything-execute-persistent-action (&optional (attr 'persistent-action))
   "If a candidate is selected then perform the associated action without quitting anything."
