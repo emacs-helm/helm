@@ -14,24 +14,25 @@
 \BOOKMARK [3][-]{subsubsection.5.8.1}{Grep marked files from differents directories}{subsection.5.8}
 \BOOKMARK [2][-]{subsection.5.9}{Grep Directory recursively}{section.5}
 \BOOKMARK [2][-]{subsection.5.10}{Grep Using Wildcard}{section.5}
-\BOOKMARK [2][-]{subsection.5.11}{Open Files Externally}{section.5}
-\BOOKMARK [2][-]{subsection.5.12}{Eshell command on files}{section.5}
-\BOOKMARK [2][-]{subsection.5.13}{Why Eshell}{section.5}
-\BOOKMARK [2][-]{subsection.5.14}{Setup Aliases}{section.5}
-\BOOKMARK [2][-]{subsection.5.15}{Problem starting Eshell}{section.5}
-\BOOKMARK [2][-]{subsection.5.16}{Dired Commands}{section.5}
-\BOOKMARK [2][-]{subsection.5.17}{Copy Files}{section.5}
-\BOOKMARK [2][-]{subsection.5.18}{Rename Files}{section.5}
-\BOOKMARK [2][-]{subsection.5.19}{Symlink Files}{section.5}
-\BOOKMARK [2][-]{subsection.5.20}{Hardlink}{section.5}
-\BOOKMARK [2][-]{subsection.5.21}{Follow file after action}{section.5}
-\BOOKMARK [2][-]{subsection.5.22}{In Buffer File Completion}{section.5}
-\BOOKMARK [2][-]{subsection.5.23}{Create File}{section.5}
-\BOOKMARK [2][-]{subsection.5.24}{Create Directory}{section.5}
-\BOOKMARK [2][-]{subsection.5.25}{Ediff files}{section.5}
-\BOOKMARK [2][-]{subsection.5.26}{Ediff merge files}{section.5}
-\BOOKMARK [2][-]{subsection.5.27}{Browse archive with avfs}{section.5}
-\BOOKMARK [2][-]{subsection.5.28}{Display with icons}{section.5}
+\BOOKMARK [2][-]{subsection.5.11}{Grep thing at point}{section.5}
+\BOOKMARK [2][-]{subsection.5.12}{Open Files Externally}{section.5}
+\BOOKMARK [2][-]{subsection.5.13}{Eshell command on files}{section.5}
+\BOOKMARK [2][-]{subsection.5.14}{Why Eshell}{section.5}
+\BOOKMARK [2][-]{subsection.5.15}{Setup Aliases}{section.5}
+\BOOKMARK [2][-]{subsection.5.16}{Problem starting Eshell}{section.5}
+\BOOKMARK [2][-]{subsection.5.17}{Dired Commands}{section.5}
+\BOOKMARK [2][-]{subsection.5.18}{Copy Files}{section.5}
+\BOOKMARK [2][-]{subsection.5.19}{Rename Files}{section.5}
+\BOOKMARK [2][-]{subsection.5.20}{Symlink Files}{section.5}
+\BOOKMARK [2][-]{subsection.5.21}{Hardlink}{section.5}
+\BOOKMARK [2][-]{subsection.5.22}{Follow file after action}{section.5}
+\BOOKMARK [2][-]{subsection.5.23}{In Buffer File Completion}{section.5}
+\BOOKMARK [2][-]{subsection.5.24}{Create File}{section.5}
+\BOOKMARK [2][-]{subsection.5.25}{Create Directory}{section.5}
+\BOOKMARK [2][-]{subsection.5.26}{Ediff files}{section.5}
+\BOOKMARK [2][-]{subsection.5.27}{Ediff merge files}{section.5}
+\BOOKMARK [2][-]{subsection.5.28}{Browse archive with avfs}{section.5}
+\BOOKMARK [2][-]{subsection.5.29}{Display with icons}{section.5}
 \BOOKMARK [1][-]{section.6}{Anything write buffer}{}
 \BOOKMARK [1][-]{section.7}{Anything insert file}{}
 \BOOKMARK [1][-]{section.8}{Anything M-x}{}

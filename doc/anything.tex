@@ -219,6 +219,7 @@ You can now navigate in your image directory with arrow up and down or C-n C-p.
 Don't forget also to use C-t to split you windows vertically if needed.
 
 You will find also two actions to rotate image in action menu. 
+To use these actions whitout quitting, use C-z, then TAB to exit action menu.
 
 NOTE:
 It use image-dired in background, so if image-dired don't work for some reason, this will
@@ -233,27 +234,40 @@ By the nature of incremental stuff, it is faster than original Emacs grep for se
 
 As you type the display change (like in all other anything commands).
 This grep is also recursive unlike the emacs implementation that use find/xargs.
+
 It support wildcard and (re)use the variables `grep-find-ignored-files'
 and `grep-find-ignored-directories'.
 
-NOTE: You will find a file named anything-grep.el in extensions.
+It have full tramp integration.
+(you can grep file on a remote host or in su/sudo methods).
+
+
+\begin{itemize}
+\item NOTE: 
+You will find a file named anything-grep.el in extensions.
 It is NOT needed to use with what is described here.
 It is another implementation of grep but not incremental.
+\end{itemize}
 
-It work fine with tramp on remote files.
-
-Windows users need grep version 
-\begin{math}
-\geq2.5.4
-\end{math}
-of Gnuwin32 on windoze.
-This version should accept the --exclude-dir option.
 
 \begin{itemize}
 \item NOTE:
 When using it recursively, `grep-find-ignored-files' is not used unless you don't specify
 the only extensions of files where you want to search (you will have a prompt).
+You can now specify more than one extension to search.\\
+e.g *.el *.py *.tex \\
+will search only in files with these extensions.
 \end{itemize}
+
+\begin{itemize}
+\item NOTE: Windows users need grep version 
+\begin{math}
+\geq2.5.4
+\end{math}
+of Gnuwin32 on windoze.
+This version should accept the --exclude-dir option.
+\end{itemize}
+
 \subsection{Anything do grep}
 \label{sec:anything-do-grep}
 Start with M-x anything-do-grep bound to f5 a M-g s
@@ -314,6 +328,12 @@ Use the wilcard syntax like *.el for example (search in only .el files).
 You can use wildcard:
 From the root of your directory, if you want for example to search files with .el extension:
 add *.el to prompt
+
+\subsection{Grep thing at point}
+\label{sec:grep-thing-at}
+Before lauching anything, put your cursor on the start of symbol or sexp you will want to grep.
+Then launch anything-do-grep or anything-find-files, and when in the grep prompt hit C-w as many time as needed.
+
 
 \subsection{Open Files Externally}
 \label{sec:open-files-extern}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  13 JAN 2011 09:08
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  29 JAN 2011 14:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -656,33 +656,33 @@ Overfull \hbox (36.65945pt too wide) in paragraph at lines 210--210
  []
 
 
-Overfull \hbox (11.02296pt too wide) in paragraph at lines 234--238
+Overfull \hbox (11.02296pt too wide) in paragraph at lines 235--237
 \OT1/cmr/m/n/10.95 This grep is also re-cur-sive un-like the emacs im-ple-men-t
-a-tion that use find/xargs.
+a-tion that use find/xargs. 
  []
 
 [4] [5] [6]
-Overfull \hbox (5.78833pt too wide) in paragraph at lines 404--405
+Overfull \hbox (5.78833pt too wide) in paragraph at lines 424--425
 []\OT1/cmr/m/n/10.95 In any buffer and even in minibuffer if you have en-able r
 ecursive-minibuffer 
  []
 
 [7] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 462--463
+Underfull \hbox (badness 10000) in paragraph at lines 482--483
 
  []
 
 [9] [10]
-Underfull \hbox (badness 10000) in paragraph at lines 586--588
+Underfull \hbox (badness 10000) in paragraph at lines 606--608
 
  []
 
 [11] (./anything.aux) ) 
 Here is how much of TeX's memory you used:
- 5861 strings out of 495061
- 83362 string characters out of 1182620
- 158949 words of memory out of 3000000
- 8899 multiletter control sequences out of 15000+50000
+ 5864 strings out of 495061
+ 83413 string characters out of 1182620
+ 159003 words of memory out of 3000000
+ 8901 multiletter control sequences out of 15000+50000
  9320 words of font info for 33 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  38i,6n,36p,276b,485s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -695,9 +695,9 @@ exlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts
 c/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmtt10.pf
 b>
-Output written on anything.pdf (13 pages, 172880 bytes).
+Output written on anything.pdf (13 pages, 173859 bytes).
 PDF statistics:
- 370 PDF objects out of 1000 (max. 8388607)
- 64 named destinations out of 1000 (max. 500000)
- 409 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 375 PDF objects out of 1000 (max. 8388607)
+ 65 named destinations out of 1000 (max. 500000)
+ 417 words of extra memory for PDF output out of 10000 (max. 10000000)
 

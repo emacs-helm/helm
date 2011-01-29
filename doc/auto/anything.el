@@ -17,6 +17,7 @@
      "sec:grep-marked-files-1"
      "sec:grep-direct-recurs"
      "sec:grep-using-wildcard"
+     "sec:grep-thing-at"
      "sec:open-files-extern"
      "sec:eshell-command-files"
      "sec:why-eshell"
