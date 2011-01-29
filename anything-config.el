@@ -1883,6 +1883,8 @@ buffer that is not the current buffer."
                 (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
+    (image-action1 . anything-ff-rotate-image-left)
+    (image-action2 . anything-ff-rotate-image-right)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (volatile)
@@ -2294,16 +2296,19 @@ If prefix numeric arg is given go ARG level down."
     (gnus-dired-attach flist)))
 
 (defun anything-ff-rotate-current-image1 (file &optional num-arg)
-  "Rotate current image at NUM-ARG degrees."
-  (if (executable-find "mogrify")
-      (progn
-        (shell-command (format "mogrify -rotate %s %s" (or num-arg 90) file))
-        (when (buffer-live-p image-dired-display-image-buffer)
-          (kill-buffer image-dired-display-image-buffer))
-        (image-dired-display-image file)
-        (message nil)
-        (display-buffer (get-buffer image-dired-display-image-buffer)))
-      (error "mogrify not found")))
+  "Rotate current image at NUM-ARG degrees.
+This is a destructive operation on FILE made by external tool mogrify."
+  ;; When FILE is not an image-file, do nothing.
+  (when (string-match (image-file-name-regexp) file)
+    (if (executable-find "mogrify")
+        (progn
+          (shell-command (format "mogrify -rotate %s %s" (or num-arg 90) file))
+          (when (buffer-live-p image-dired-display-image-buffer)
+            (kill-buffer image-dired-display-image-buffer))
+          (image-dired-display-image file)
+          (message nil)
+          (display-buffer (get-buffer image-dired-display-image-buffer)))
+        (error "mogrify not found"))))
 
 (defun anything-ff-rotate-image-left (candidate)
   "Rotate image file CANDIDATE left.
@@ -2314,6 +2319,20 @@ This affect directly file CANDIDATE."
   "Rotate image file CANDIDATE right.
 This affect directly file CANDIDATE."
   (anything-ff-rotate-current-image1 candidate))
+
+(defun anything-ff-rotate-left-persistent ()
+  "Rotate image left without quitting anything."
+  (interactive)
+  (anything-execute-persistent-action 'image-action1))
+
+(defun anything-ff-rotate-right-persistent ()
+  "Rotate image right without quitting anything."
+  (interactive)
+  (anything-execute-persistent-action 'image-action2))
+
+;; Have no effect if candidate is not an image file.
+(define-key anything-map (kbd "M-l") 'anything-ff-rotate-left-persistent)
+(define-key anything-map (kbd "M-r") 'anything-ff-rotate-right-persistent)
 
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
