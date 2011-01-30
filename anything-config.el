@@ -2901,11 +2901,7 @@ The \"-r\" option must be the last option.")
 ;; NOTE: the -d option with skip avoid error on windows.
 ;;       It have no effect on GNU/Linux.
 (defvar anything-c-grep-default-command "grep -d skip -niH -e %s %s %s"
-  "Default format command for `anything-do-grep'.
-If you want to enable recursion just add the -r option like this:
-\"grep -nirH -e %s %s %s\".
-NOTE: This option is accessible with a prefix arg
-from all anything grep commands without setting it here.")
+  "Default format command for `anything-do-grep'.")
 
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
 
@@ -2925,7 +2921,7 @@ from all anything grep commands without setting it here.")
   :group 'anything)
 
 (defun anything-c-grep-prepare-candidates (candidates)
-  "Prepare filenames and directories candidates for grep command line."
+  "Prepare filenames and directories CANDIDATES for grep command line."
   ;; If one or more candidate is a directory, search in all files
   ;; of this candidate (e.g /home/user/directory/*).
   ;; If r option is enabled search also in subdidrectories.
@@ -3021,8 +3017,10 @@ With a prefix arg record CANDIDATE in `mark-ring'."
 (defun anything-do-grep1 (only &optional recurse)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep and prompt user
-to set the --include arg of grep.
-If it's not empty use it instead of `grep-find-ignored-files'."
+to set the --include args of grep.
+You can give more than one arg separated by space.
+e.g *.el *.py *.tex.
+If it's empty --exclude `grep-find-ignored-files' is used instead."
   (let* ((anything-compile-source-functions
           ;; rule out anything-match-plugin because the input is one regexp.
           (delq 'anything-compile-source--match-plugin
@@ -3080,7 +3078,8 @@ That allow to grep different files not only in `default-directory' but anywhere
 by marking them (C-<SPACE>). If one or more directory is selected
 grep will search in all files of these directories.
 You can use also wildcard in the base name of candidate.
-If a prefix arg is given use the -r option of grep."
+If a prefix arg is given use the -r option of grep.
+See also `anything-do-grep1'."
   (interactive)
   (let ((only    (anything-c-read-file-name
                   "Search in file(s): " :marked-candidates t))
@@ -3122,7 +3121,7 @@ If a prefix arg is given use the -r option of grep."
              i)))
 
 (defun anything-c-grep-highlight-match (str)
-  "Highlight in STR all occurences matching `anything-pattern'."
+  "Highlight in string STR all occurences matching `anything-pattern'."
   (condition-case nil
       (with-temp-buffer
         (insert str)
@@ -3137,7 +3136,8 @@ If a prefix arg is given use the -r option of grep."
 
 ;; Go to next or precedent file (common to etags and grep).
 (defun anything-c-goto-next-or-prec-file (n)
-  "Go to next or precedent candidate file in anything grep/etags buffers."
+  "Go to next or precedent candidate file in anything grep/etags buffers.
+If N is positive go forward otherwise go backward."
   (let ((cur-source (assoc-default 'name (anything-get-current-source))))
     (with-anything-window
       (if (or (string= cur-source "Grep (M-up/down - next/prec file)")
