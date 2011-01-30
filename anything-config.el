@@ -1818,6 +1818,24 @@ buffer that is not the current buffer."
 
 ;; (anything 'anything-c-source-buffers+)
 
+(defadvice anything-quit-and-find-file (around use-anything-find-files activate)
+  "Let `anything-quit-and-find-file' take advantage of `anything-find-files'."
+  (interactive)
+  (anything-run-after-quit
+   (lambda (f)
+     (anything-find-files1 f))
+   (anything-aif (get-buffer (anything-get-selection))
+       (or (buffer-file-name it)
+           (car (rassoc it dired-buffers))
+           (and (with-current-buffer it
+                  (eq major-mode 'org-agenda-mode))
+                org-directory
+                (expand-file-name org-directory))
+           default-directory)
+     (let ((sel (anything-get-selection)))
+       (if (file-exists-p sel)
+           (expand-file-name sel)
+           default-directory)))))
 
 ;;;; <File>
 ;;; File name history
