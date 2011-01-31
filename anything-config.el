@@ -2684,7 +2684,8 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
 (defmacro anything-c-basename (fname)
   "Resolve basename of file or directory named FNAME."
   `(progn
-     (if (file-directory-p ,fname)
+     (if (or (file-directory-p ,fname)
+             (string-match "/$" ,fname))
          (let ((dirname (directory-file-name ,fname))) 
            (file-name-nondirectory dirname))
          (file-name-nondirectory ,fname))))
