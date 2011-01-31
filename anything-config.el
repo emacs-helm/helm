@@ -2681,17 +2681,21 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
 ;; Internal
 (defvar anything-ff-cand-to-mark nil)
 
+(defmacro anything-c-basename (fname)
+  "Resolve basename of file or directory named FNAME."
+  `(progn
+     (if (file-directory-p ,fname)
+         (let ((dirname (directory-file-name ,fname))) 
+           (file-name-nondirectory dirname))
+         (file-name-nondirectory ,fname))))
+
 (defun anything-get-dest-fnames-from-list (flist dest-cand)
   "Transform filenames of FLIST to abs of DEST-CAND."
   ;; At this point files have been renamed/copied at destination.
   (loop
      with dest = (expand-file-name dest-cand)
      for src in flist
-     for basename-src = (if (file-directory-p src)
-                            (file-relative-name
-                             (directory-file-name src)
-                             (file-name-directory src))
-                            (file-name-nondirectory src))
+     for basename-src = (anything-c-basename src)
      for fname = (if (file-directory-p dest)
                      (concat (file-name-as-directory dest)
                              basename-src)
