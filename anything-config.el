@@ -2645,6 +2645,83 @@ Find inside `require' and `declare-function' sexp."
              (anything-dired-action candidate :action 'hardlink)))))))
 
 
+;; Emacs bugfix for version > 23.2.91 waiting the fix upstream.
+;; This fix copying directory recursively from dired.
+;; (corrupted structure when overwriting).
+(unless (and (fboundp 'version<) (version< emacs-version "23.2.92"))
+  (defun copy-directory1 (directory newname &optional keep-time parents create-struct)
+    ;; If default-directory is a remote directory, make sure we find its
+    ;; copy-directory handler.
+    (let ((handler (or (find-file-name-handler directory 'copy-directory)
+                       (find-file-name-handler newname 'copy-directory))))
+      (if handler
+          (funcall handler 'copy-directory directory newname keep-time parents)
+
+          ;; Compute target name.
+          (setq directory (directory-file-name (expand-file-name directory))
+                newname   (directory-file-name (expand-file-name newname)))
+
+          (if (not (file-directory-p newname))
+              ;; If NEWNAME is not an existing directory, create it; that
+              ;; is where we will copy the files of DIRECTORY.
+              (make-directory newname parents)
+              ;; If NEWNAME is an existing directory, we will copy into
+              ;; NEWNAME/[DIRECTORY-BASENAME].
+              (when create-struct
+                (setq newname (expand-file-name
+                               (file-name-nondirectory
+                                (directory-file-name directory))
+                               newname))
+                (and (file-exists-p newname)
+                     (not (file-directory-p newname))
+                     (error "Cannot overwrite non-directory %s with a directory"
+                            newname))
+                (make-directory newname t)))
+
+          ;; Copy recursively.
+          (dolist (file
+                    ;; We do not want to copy "." and "..".
+                    (directory-files directory 'full
+                                     directory-files-no-dot-files-regexp))
+            (let ((target (expand-file-name (file-name-nondirectory file) newname))
+                  (attrs (file-attributes file)))
+              (cond ((and (file-directory-p file) create-struct)
+                     (copy-directory1 file newname keep-time parents create-struct))
+                    ((file-directory-p file)
+                     (copy-directory1 file target keep-time parents create-struct))
+                    ((stringp (car attrs)) ; Symbolic link
+                     (make-symbolic-link (car attrs) target t))
+                    (t (copy-file file target t keep-time)))))
+
+          ;; Set directory attributes.
+          (set-file-modes newname (file-modes directory))
+          (when keep-time
+            (set-file-times newname (nth 5 (file-attributes directory)))))))
+
+  ;; Use copy-directory1
+  (defun dired-copy-file-recursive (from to ok-flag &optional
+                                    preserve-time top recursive)
+    (let ((attrs (file-attributes from))
+          dirfailed)
+      (if (and recursive
+               (eq t (car attrs))
+               (or (eq recursive 'always)
+                   (yes-or-no-p (format "Recursive copies of %s? " from))))
+          ;; This is a directory.
+          (copy-directory1 from to dired-copy-preserve-time)
+          ;; Not a directory.
+          (or top (dired-handle-overwrite to))
+          (condition-case err
+              (if (stringp (car attrs))
+                  ;; It is a symlink
+                  (make-symbolic-link (car attrs) to ok-flag)
+                  (copy-file from to ok-flag dired-copy-preserve-time))
+            (file-date-error
+             (push (dired-make-relative from)
+                   dired-create-files-failures)
+             (dired-log "Can't set date on %s:\n%s\n" from err)))))))
+
+  
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
@@ -2681,14 +2758,9 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
 ;; Internal
 (defvar anything-ff-cand-to-mark nil)
 
-(defmacro anything-c-basename (fname)
+(defun anything-c-basename (fname)
   "Resolve basename of file or directory named FNAME."
-  `(progn
-     (if (or (file-directory-p ,fname)
-             (string-match "/$" ,fname))
-         (let ((dirname (directory-file-name ,fname))) 
-           (file-name-nondirectory dirname))
-         (file-name-nondirectory ,fname))))
+  (file-name-nondirectory (directory-file-name fname)))
 
 (defun anything-get-dest-fnames-from-list (flist dest-cand)
   "Transform filenames of FLIST to abs of DEST-CAND."
