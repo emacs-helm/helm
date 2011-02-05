@@ -1,7 +1,7 @@
 ;;; anything-complete.el --- completion with anything
 ;; $Id: anything-complete.el,v 1.86 2010-03-31 23:14:13 rubikitch Exp $
 
-;; Copyright (C) 2008, 2009, 2010 rubikitch
+;; Copyright (C) 2008, 2009, 2010, 2011 rubikitch
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: matching, convenience, anything
