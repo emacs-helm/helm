@@ -2649,7 +2649,35 @@ Find inside `require' and `declare-function' sexp."
 ;; This fix copying directory recursively from dired.
 ;; (corrupted structure when overwriting).
 (unless (and (fboundp 'version<) (version< emacs-version "23.2.92"))
-  (defun copy-directory1 (directory newname &optional keep-time parents create-struct)
+  (defun copy-directory (directory newname &optional keep-time parents create-struct)
+    "Copy DIRECTORY to NEWNAME.  Both args must be strings.
+If NEWNAME names an existing directory, copy DIRECTORY as subdirectory there.
+
+This function always sets the file modes of the output files to match
+the corresponding input file.
+
+The third arg KEEP-TIME non-nil means give the output files the same
+last-modified time as the old ones.  (This works on only some systems.)
+
+A prefix arg makes KEEP-TIME non-nil.
+
+Noninteractively, the argument PARENTS says whether to
+create parent directories if they don't exist.  Interactively,
+this happens by default.
+
+Non--interactively, the argument CREATE-STRUCT says whether to
+create the directory structure of NEWNAME. Interactively,
+this happens by default. When called from dired code this argument
+should not be used as dired already create directory structure."
+    (interactive
+     (let ((dir (read-directory-name
+                 "Copy directory: " default-directory default-directory t nil)))
+       (list dir
+             (read-file-name
+              (format "Copy directory %s to: " dir)
+              default-directory default-directory nil nil)
+             current-prefix-arg t t)))
+
     ;; If default-directory is a remote directory, make sure we find its
     ;; copy-directory handler.
     (let ((handler (or (find-file-name-handler directory 'copy-directory)
@@ -2686,9 +2714,9 @@ Find inside `require' and `declare-function' sexp."
             (let ((target (expand-file-name (file-name-nondirectory file) newname))
                   (attrs (file-attributes file)))
               (cond ((and (file-directory-p file) create-struct)
-                     (copy-directory1 file newname keep-time parents create-struct))
+                     (copy-directory file newname keep-time parents create-struct))
                     ((file-directory-p file)
-                     (copy-directory1 file target keep-time parents create-struct))
+                     (copy-directory file target keep-time parents create-struct))
                     ((stringp (car attrs)) ; Symbolic link
                      (make-symbolic-link (car attrs) target t))
                     (t (copy-file file target t keep-time)))))
@@ -2696,30 +2724,7 @@ Find inside `require' and `declare-function' sexp."
           ;; Set directory attributes.
           (set-file-modes newname (file-modes directory))
           (when keep-time
-            (set-file-times newname (nth 5 (file-attributes directory)))))))
-
-  ;; Use copy-directory1
-  (defun dired-copy-file-recursive (from to ok-flag &optional
-                                    preserve-time top recursive)
-    (let ((attrs (file-attributes from))
-          dirfailed)
-      (if (and recursive
-               (eq t (car attrs))
-               (or (eq recursive 'always)
-                   (yes-or-no-p (format "Recursive copies of %s? " from))))
-          ;; This is a directory.
-          (copy-directory1 from to dired-copy-preserve-time)
-          ;; Not a directory.
-          (or top (dired-handle-overwrite to))
-          (condition-case err
-              (if (stringp (car attrs))
-                  ;; It is a symlink
-                  (make-symbolic-link (car attrs) to ok-flag)
-                  (copy-file from to ok-flag dired-copy-preserve-time))
-            (file-date-error
-             (push (dired-make-relative from)
-                   dired-create-files-failures)
-             (dired-log "Can't set date on %s:\n%s\n" from err)))))))
+            (set-file-times newname (nth 5 (file-attributes directory))))))))
 
   
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
