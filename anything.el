@@ -3128,13 +3128,16 @@ Otherwise goto the end of minibuffer."
 
 (defun anything-select-persistent-action-window ()
   (select-window (get-buffer-window (anything-buffer-get)))
-  (select-window (setq minibuffer-scroll-window
-                       (setq anything-persistent-action-display-window
-                             (or anything-persistent-action-display-window
-                                 (if anything-samewindow
-                                     (if (one-window-p t) (split-window)
-                                       (next-window (selected-window) 1))
-                                   (get-buffer-window anything-current-buffer)))))))
+  (select-window
+   (setq minibuffer-scroll-window
+         (setq anything-persistent-action-display-window
+               (cond ((window-live-p anything-persistent-action-display-window)
+                      anything-persistent-action-display-window)
+                     ((and anything-samewindow (one-window-p t))
+                      (split-window))
+                     ((get-buffer-window anything-current-buffer))
+                     (t
+                      (next-window (selected-window) 1)))))))
 
 (defun anything-persistent-action-display-buffer (buf &optional not-this-window)
   "Make `pop-to-buffer' and `display-buffer' display in the same window in persistent action.
