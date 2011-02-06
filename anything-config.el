@@ -2093,16 +2093,34 @@ If EXPAND is non--nil expand-file-name."
     (loop for i in ff-sources
        thereis (string= cur-source (concat i anything-c-find-files-doc-header)))))
 
+(defvar anything-ff-lastdir nil)
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
+  ;; When going to precedent level we want to be at the line
+  ;; corresponding to actual directory, so store this info
+  ;; in `anything-ff-lastdir'.
+  (setq anything-ff-lastdir anything-ff-default-directory)
   (when (anything-file-completion-source-p)
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg
                                                   :unix-close t :expand t)))
       (with-selected-window (minibuffer-window)
         (delete-minibuffer-contents)
         (insert new-pattern)))))
+
+(defun anything-ff-restore-pos ()
+  "Move overlay to last visited directory `anything-ff-lastdir'.
+This happen after using `anything-find-files-down-one-level'."
+  (when (and anything-ff-lastdir
+             (anything-file-completion-source-p))
+    (let ((dirname (directory-file-name anything-ff-lastdir)))
+      (with-anything-window
+        (when (search-forward dirname nil t)
+          (forward-line 0)
+          (anything-mark-current-line)))
+      (setq anything-ff-lastdir nil))))
+(add-hook 'anything-after-update-hook 'anything-ff-restore-pos)
 
 ;; `C-.' doesn't work in terms use `C-l' instead.
 (if window-system
