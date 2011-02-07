@@ -7396,7 +7396,9 @@ and sets `anything-c-external-commands-list'."
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
   (let ((buffers (anything-c-file-buffers file)))
-    (dired-delete-file file 'dired-recursive-deletes)
+    (dired-delete-file file 'dired-recursive-deletes
+                       (and (boundp 'delete-by-moving-to-trash)
+                            delete-by-moving-to-trash))
     (when buffers
       (dolist (buf buffers)
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
