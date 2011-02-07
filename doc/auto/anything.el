@@ -58,6 +58,7 @@
      "natbib"
      "url"
      "hyperref"
+     "graphicx"
      "textcomp"
      "inputenc"
      "utf8"
