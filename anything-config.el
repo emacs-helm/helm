@@ -3412,17 +3412,18 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
 
 (defun anything-c-etags-init ()
   (let ((tagfile (anything-c-etags-get-tag-file))) 
-    (with-current-buffer (anything-candidate-buffer 'global)
-      (anything-aif (gethash tagfile anything-c-etags-cache)
-          (insert it)
-        (anything-c-etags-create-buffer tagfile)
-        (puthash tagfile (buffer-string) anything-c-etags-cache)
-        (anything-aif (assoc tagfile anything-c-etags-mtime-alist)
-            ;; If an entry exists modify it.
-            (setcdr it (anything-c-etags-mtime tagfile))
-          ;; No entry create a new one.
-          (add-to-list 'anything-c-etags-mtime-alist
-                       (cons tagfile (anything-c-etags-mtime tagfile))))))))
+    (when tagfile
+      (with-current-buffer (anything-candidate-buffer 'global)
+       (anything-aif (gethash tagfile anything-c-etags-cache)
+           (insert it)
+         (anything-c-etags-create-buffer tagfile)
+         (puthash tagfile (buffer-string) anything-c-etags-cache)
+         (anything-aif (assoc tagfile anything-c-etags-mtime-alist)
+             ;; If an entry exists modify it.
+             (setcdr it (anything-c-etags-mtime tagfile))
+           ;; No entry create a new one.
+           (add-to-list 'anything-c-etags-mtime-alist
+                        (cons tagfile (anything-c-etags-mtime tagfile)))))))))
 
 (defvar anything-c-source-etags-select
   '((name . "Etags")
