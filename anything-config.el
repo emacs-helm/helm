@@ -2116,7 +2116,8 @@ This happen after using `anything-find-files-down-one-level'."
              (anything-file-completion-source-p))
     (let ((dirname (directory-file-name anything-ff-lastdir)))
       (with-anything-window
-        (when (search-forward dirname nil t)
+        (when (or (re-search-forward (concat dirname "$") nil t)
+                  (re-search-forward (concat anything-ff-lastdir "$") nil t))
           (forward-line 0)
           (anything-mark-current-line)))
       (setq anything-ff-lastdir nil))))
