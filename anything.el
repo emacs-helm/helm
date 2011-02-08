@@ -2291,10 +2291,11 @@ the real value in a text property."
 (defun anything-output-filter--post-process ()
   (anything-maybe-fit-frame)
   (anything-log-run-hook 'anything-update-hook)
-  (save-selected-window
-    (select-window (get-buffer-window anything-buffer 'visible))
-    (anything-skip-noncandidate-line 'next)
-    (anything-mark-current-line)))
+  (anything-aif (get-buffer-window anything-buffer 'visible)
+      (save-selected-window
+        (select-window it)
+        (anything-skip-noncandidate-line 'next)
+        (anything-mark-current-line))))
 
 
 (defun anything-kill-async-processes ()
