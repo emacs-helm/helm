@@ -4347,7 +4347,7 @@ http://www.nongnu.org/bm/")
               (require 'bookmark)))
     (candidates . (lambda () (anything-c-collect-bookmarks :local t)))
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -4502,7 +4502,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
            (bookmark--jump-via bmk 'pop-to-buffer))))
     (persistent-help . "Show contact - Prefix with C-u to append")
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (action . (("Show person's data"
                 . (lambda (candidate)
@@ -4566,7 +4566,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-w3m-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-w3m)
@@ -4583,7 +4583,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-images-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-images)
@@ -4600,7 +4600,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-man-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-man)
@@ -4618,7 +4618,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-gnus-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-gnus)
@@ -4635,7 +4635,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-info-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-info)
@@ -4652,7 +4652,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-local-files-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-files&dirs)
@@ -4669,7 +4669,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-su-files-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark-su)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-su-files&dirs)
@@ -4695,7 +4695,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-ssh-files-setup-alist)
-    (filtered-candidate-transformer . anything-c-adaptive-sort)
+    ;(filtered-candidate-transformer . anything-c-adaptive-sort)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-ssh-files&dirs)
 
@@ -4793,7 +4793,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (candidates . (lambda ()
                     (mapcar #'car anything-c-firefox-bookmarks-alist)))
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
     (action . (("Browse Url Firefox"
                 . (lambda (candidate)
@@ -4847,7 +4847,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (candidates . (lambda ()
                     (mapcar #'car anything-c-w3m-bookmarks-alist)))
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;anything-c-adaptive-sort
      anything-c-highlight-w3m-bookmarks)
     (action . (("Browse Url"
                 . (lambda (candidate)
@@ -6368,8 +6368,8 @@ When nil, fallback to `browse-url-browser-function'.")
                                   (url (second stream)))
                              (funcall fn url))))
                ("Delete" . anything-emms-stream-delete-bookmark)
-               ("Edit" . anything-emms-stream-edit-bookmark)))
-    (filtered-candidate-transformer . anything-c-adaptive-sort)))
+               ("Edit" . anything-emms-stream-edit-bookmark)))))
+    ;(filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-streams)
 
 ;; Don't forget to set `emms-source-file-default-directory'
@@ -6387,8 +6387,8 @@ When nil, fallback to `browse-url-browser-function'.")
                                             (anything-c-open-dired
                                              (expand-file-name
                                               item
-                                              emms-source-file-default-directory))))))
-    (filtered-candidate-transformer . anything-c-adaptive-sort)))
+                                              emms-source-file-default-directory))))))))
+    ;(filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-dired)
 
 (defface anything-emms-playlist
@@ -8438,7 +8438,7 @@ Return nil if bmk is not a valid bookmark."
     `((action ("Call interactively" . anything-c-call-interactively)
               ,@actions)
       ;; Sort commands according to their usage count.
-      (filtered-candidate-transformer . anything-c-adaptive-sort)
+      ;(filtered-candidate-transformer . anything-c-adaptive-sort)
       (coerce . anything-c-symbolify)
       (persistent-action . describe-function))
     "Command. (string or symbol)")
