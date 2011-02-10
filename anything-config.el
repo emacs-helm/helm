@@ -2399,6 +2399,8 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                                      (expand-file-name candidate)))))
             ;; A directory, open it.
             ((file-directory-p candidate)
+             (when (string= (anything-c-basename candidate) "..")
+               (setq anything-ff-lastdir anything-ff-default-directory))
              (insert-in-minibuffer (file-name-as-directory
                                     (expand-file-name candidate))))
             ;; A symlink file, expand to it's true name. (first hit)
