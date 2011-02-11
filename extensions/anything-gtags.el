@@ -224,9 +224,9 @@ If it is other symbol, display file name in candidates even if classification is
   (let* ((c-source-file save)
          (gtags-select-buffer buffer)
          (anything-candidate-number-limit 9999)
-         (pwd (with-current-buffer gtags-select-buffer (expand-file-name default-directory)))
-         (basename (substring (with-current-buffer c-source-file buffer-file-name)
-                              (length pwd)))
+         (bfn (with-current-buffer c-source-file buffer-file-name))
+         (pwd (with-current-buffer gtags-select-buffer (file-name-directory bfn)))
+         (basename (substring bfn (length pwd)))
          (lineno (with-current-buffer c-source-file
                    (save-restriction
                      (widen)
