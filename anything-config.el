@@ -2399,6 +2399,8 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                                      (expand-file-name candidate)))))
             ;; A directory, open it.
             ((file-directory-p candidate)
+             (when (string= (anything-c-basename candidate) "..")
+               (setq anything-ff-lastdir anything-ff-default-directory))
              (insert-in-minibuffer (file-name-as-directory
                                     (expand-file-name candidate))))
             ;; A symlink file, expand to it's true name. (first hit)
@@ -2670,8 +2672,30 @@ Find inside `require' and `declare-function' sexp."
 ;; This fix copying directory recursively from dired.
 ;; (corrupted structure when overwriting).
 (unless (and (fboundp 'version<) (version< emacs-version "23.2.92"))
-  (defun copy-directory1 (directory newname &optional keep-time
-                          parents copy-as-subdir)
+
+  (defun copy-directory (directory newname &optional keep-time parents)
+    "Copy DIRECTORY to NEWNAME.  Both args must be strings.
+If NEWNAME names an existing directory, copy DIRECTORY as subdirectory there.
+
+This function always sets the file modes of the output files to match
+the corresponding input file.
+
+The third arg KEEP-TIME non-nil means give the output files the same
+last-modified time as the old ones.  (This works on only some systems.)
+
+A prefix arg makes KEEP-TIME non-nil.
+
+Noninteractively, the last argument PARENTS says whether to
+create parent directories if they don't exist.  Interactively,
+this happens by default."
+    (interactive
+     (let ((dir (read-directory-name
+                 "Copy directory: " default-directory default-directory t nil)))
+       (list dir
+             (read-file-name
+              (format "Copy directory %s to: " dir)
+              default-directory default-directory nil nil)
+             current-prefix-arg t)))
     ;; If default-directory is a remote directory, make sure we find its
     ;; copy-directory handler.
     (let ((handler (or (find-file-name-handler directory 'copy-directory)
@@ -2683,47 +2707,144 @@ Find inside `require' and `declare-function' sexp."
           (setq directory (directory-file-name (expand-file-name directory))
                 newname   (directory-file-name (expand-file-name newname)))
 
-          (unless (file-directory-p directory)
-            (error "%s is not a directory" directory))
-
-          (cond
-            ((not (file-directory-p newname))
-             ;; If NEWNAME is not an existing directory, create it;
-             ;; that is where we will copy the files of DIRECTORY.
-             (make-directory newname parents))
-            (copy-as-subdir
-             ;; If NEWNAME is an existing directory, and we are copying as
-             ;; a subdirectory, the target is NEWNAME/[DIRECTORY-BASENAME].
-             (setq newname (expand-file-name
-                            (file-name-nondirectory
-                             (directory-file-name directory))
-                            newname))
-             (and (file-exists-p newname)
-                  (not (file-directory-p newname))
-                  (error "Cannot overwrite non-directory %s with a directory"
-                         newname))
-             (make-directory newname t)))
+          (if (not (file-directory-p newname))
+              ;; If NEWNAME is not an existing directory, create it; that
+              ;; is where we will copy the files of DIRECTORY.
+              (make-directory newname parents)
+              ;; If NEWNAME is an existing directory, we will copy into
+              ;; NEWNAME/[DIRECTORY-BASENAME].
+              (setq newname (expand-file-name
+                             (file-name-nondirectory
+                              (directory-file-name directory))
+                             newname))
+              (and (file-exists-p newname)
+                   (not (file-directory-p newname))
+                   (error "Cannot overwrite non-directory %s with a directory"
+                          newname))
+              (make-directory newname t))
 
           ;; Copy recursively.
           (dolist (file
                     ;; We do not want to copy "." and "..".
                     (directory-files directory 'full
                                      directory-files-no-dot-files-regexp))
-            (let ((target (expand-file-name
-                           (file-name-nondirectory file) newname))
-                  (attrs (file-attributes file)))
-              (cond ((file-directory-p file)
-                     (copy-directory1 file target keep-time parents nil))
-                    ((stringp (car attrs)) ; Symbolic link
-                     (make-symbolic-link (car attrs) target t))
-                    (t
-                     (copy-file file target t keep-time)))))
+            (if (file-directory-p file)
+                (copy-directory file newname keep-time parents)
+                (let ((target (expand-file-name (file-name-nondirectory file) newname))
+                      (attrs (file-attributes file)))
+                  (if (stringp (car attrs)) ; Symbolic link
+                      (make-symbolic-link (car attrs) target t)
+                      (copy-file file target t keep-time)))))
 
           ;; Set directory attributes.
           (set-file-modes newname (file-modes directory))
-          (when keep-time
-            (set-file-times newname (nth 5 (file-attributes directory)))))))
+          (if keep-time
+              (set-file-times newname (nth 5 (file-attributes directory)))))))
 
+  (defun dired-create-files (file-creator operation fn-list name-constructor
+                             &optional marker-char)
+
+    ;; Create a new file for each from a list of existing files.  The user
+    ;; is queried, dired buffers are updated, and at the end a success or
+    ;; failure message is displayed
+
+    ;; FILE-CREATOR must accept three args: oldfile newfile ok-if-already-exists
+
+    ;; It is called for each file and must create newfile, the entry of
+    ;; which will be added.  The user will be queried if the file already
+    ;; exists.  If oldfile is removed by FILE-CREATOR (i.e, it is a
+    ;; rename), it is FILE-CREATOR's responsibility to update dired
+    ;; buffers.  FILE-CREATOR must abort by signaling a file-error if it
+    ;; could not create newfile.  The error is caught and logged.
+
+    ;; OPERATION (a capitalized string, e.g. `Copy') describes the
+    ;; operation performed.  It is used for error logging.
+
+    ;; FN-LIST is the list of files to copy (full absolute file names).
+
+    ;; NAME-CONSTRUCTOR returns a newfile for every oldfile, or nil to
+    ;; skip.  If it skips files for other reasons than a direct user
+    ;; query, it is supposed to tell why (using dired-log).
+
+    ;; Optional MARKER-CHAR is a character with which to mark every
+    ;; newfile's entry, or t to use the current marker character if the
+    ;; oldfile was marked.
+
+    (let (dired-create-files-failures failures
+                                      skipped (success-count 0) (total (length fn-list)))
+      (let (to overwrite-query
+               overwrite-backup-query)	; for dired-handle-overwrite
+        (dolist (from fn-list)
+          (setq to (funcall name-constructor from))
+          (if (equal to from)
+              (progn
+                (setq to nil)
+                (dired-log "Cannot %s to same file: %s\n"
+                           (downcase operation) from)))
+          (if (not to)
+              (setq skipped (cons (dired-make-relative from) skipped))
+              (let* ((overwrite (file-exists-p to))
+                     (dired-overwrite-confirmed ; for dired-handle-overwrite
+                      (and overwrite
+                           (let ((help-form '(format "\
+Type SPC or `y' to overwrite file `%s',
+DEL or `n' to skip to next,
+ESC or `q' to not overwrite any of the remaining files,
+`!' to overwrite all remaining files with no more questions." to)))
+                             (dired-query 'overwrite-query
+                                          "Overwrite `%s'?" to))))
+                     ;; must determine if FROM is marked before file-creator
+                     ;; gets a chance to delete it (in case of a move).
+                     (actual-marker-char
+                      (cond  ((integerp marker-char) marker-char)
+                             (marker-char (dired-file-marker from)) ; slow
+                             (t nil))))
+                (when (and (file-directory-p from) (eq file-creator 'dired-copy-file))
+                  (setq to (file-name-directory to)))
+                (condition-case err
+                    (progn
+                      (funcall file-creator from to dired-overwrite-confirmed)
+                      (if overwrite
+                          ;; If we get here, file-creator hasn't been aborted
+                          ;; and the old entry (if any) has to be deleted
+                          ;; before adding the new entry.
+                          (dired-remove-file to))
+                      (setq success-count (1+ success-count))
+                      (message "%s: %d of %d" operation success-count total)
+                      (dired-add-file to actual-marker-char))
+                  (file-error		; FILE-CREATOR aborted
+                   (progn
+                     (push (dired-make-relative from)
+                           failures)
+                     (dired-log "%s `%s' to `%s' failed:\n%s\n"
+                                operation from to err))))))))
+      (cond
+        (dired-create-files-failures
+         (setq failures (nconc failures dired-create-files-failures))
+         (dired-log-summary
+          (format "%s failed for %d file%s in %d requests"
+                  operation (length failures)
+                  (dired-plural-s (length failures))
+                  total)
+          failures))
+        (failures
+         (dired-log-summary
+          (format "%s failed for %d of %d file%s"
+                  operation (length failures)
+                  total (dired-plural-s total))
+          failures))
+        (skipped
+         (dired-log-summary
+          (format "%s: %d of %d file%s skipped"
+                  operation (length skipped) total
+                  (dired-plural-s total))
+          skipped))
+        (t
+         (message "%s: %s file%s"
+                  operation success-count (dired-plural-s success-count)))))
+    (dired-move-to-filename))
+
+  
   (defun dired-copy-file-recursive (from to ok-flag &optional
                                     preserve-time top recursive)
     (let ((attrs (file-attributes from))
@@ -2733,7 +2854,7 @@ Find inside `require' and `declare-function' sexp."
                (or (eq recursive 'always)
                    (yes-or-no-p (format "Recursive copies of %s? " from))))
           ;; This is a directory.
-          (copy-directory1 from to dired-copy-preserve-time)
+          (copy-directory from to dired-copy-preserve-time)
           ;; Not a directory.
           (or top (dired-handle-overwrite to))
           (condition-case err
@@ -2745,6 +2866,7 @@ Find inside `require' and `declare-function' sexp."
              (push (dired-make-relative from)
                    dired-create-files-failures)
              (dired-log "Can't set date on %s:\n%s\n" from err)))))))
+
   
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
@@ -4347,7 +4469,7 @@ http://www.nongnu.org/bm/")
               (require 'bookmark)))
     (candidates . (lambda () (anything-c-collect-bookmarks :local t)))
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -4502,7 +4624,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
            (bookmark--jump-via bmk 'pop-to-buffer))))
     (persistent-help . "Show contact - Prefix with C-u to append")
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (action . (("Show person's data"
                 . (lambda (candidate)
@@ -4566,7 +4688,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-w3m-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-w3m)
@@ -4583,7 +4705,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-images-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-images)
@@ -4600,7 +4722,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-man-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-man)
@@ -4618,7 +4740,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-gnus-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-gnus)
@@ -4635,7 +4757,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-info-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-info)
@@ -4652,7 +4774,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-local-files-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-files&dirs)
@@ -4669,7 +4791,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-su-files-setup-alist)
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;;anything-c-adaptive-sort
      anything-c-highlight-bookmark-su)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-su-files&dirs)
@@ -4695,7 +4817,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)))
     (candidates . anything-c-bookmark-ssh-files-setup-alist)
-    (filtered-candidate-transformer . anything-c-adaptive-sort)
+    ;(filtered-candidate-transformer . anything-c-adaptive-sort)
     (type . bookmark)))
 ;; (anything 'anything-c-source-bookmark-ssh-files&dirs)
 
@@ -4793,7 +4915,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (candidates . (lambda ()
                     (mapcar #'car anything-c-firefox-bookmarks-alist)))
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
     (action . (("Browse Url Firefox"
                 . (lambda (candidate)
@@ -4847,7 +4969,7 @@ http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
     (candidates . (lambda ()
                     (mapcar #'car anything-c-w3m-bookmarks-alist)))
     (filtered-candidate-transformer
-     anything-c-adaptive-sort
+     ;anything-c-adaptive-sort
      anything-c-highlight-w3m-bookmarks)
     (action . (("Browse Url"
                 . (lambda (candidate)
@@ -6368,8 +6490,8 @@ When nil, fallback to `browse-url-browser-function'.")
                                   (url (second stream)))
                              (funcall fn url))))
                ("Delete" . anything-emms-stream-delete-bookmark)
-               ("Edit" . anything-emms-stream-edit-bookmark)))
-    (filtered-candidate-transformer . anything-c-adaptive-sort)))
+               ("Edit" . anything-emms-stream-edit-bookmark)))))
+    ;(filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-streams)
 
 ;; Don't forget to set `emms-source-file-default-directory'
@@ -6387,8 +6509,8 @@ When nil, fallback to `browse-url-browser-function'.")
                                             (anything-c-open-dired
                                              (expand-file-name
                                               item
-                                              emms-source-file-default-directory))))))
-    (filtered-candidate-transformer . anything-c-adaptive-sort)))
+                                              emms-source-file-default-directory))))))))
+    ;(filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-dired)
 
 (defface anything-emms-playlist
@@ -8438,7 +8560,7 @@ Return nil if bmk is not a valid bookmark."
     `((action ("Call interactively" . anything-c-call-interactively)
               ,@actions)
       ;; Sort commands according to their usage count.
-      (filtered-candidate-transformer . anything-c-adaptive-sort)
+      ;(filtered-candidate-transformer . anything-c-adaptive-sort)
       (coerce . anything-c-symbolify)
       (persistent-action . describe-function))
     "Command. (string or symbol)")
