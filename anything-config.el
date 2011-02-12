@@ -2740,11 +2740,38 @@ this happens by default."
 
           ;; Set directory attributes.
           (set-file-modes newname (file-modes directory))
-          (when keep-time
-            (set-file-times newname (nth 5 (file-attributes directory)))))))
+          (if keep-time
+              (set-file-times newname (nth 5 (file-attributes directory)))))))
 
   (defun dired-create-files (file-creator operation fn-list name-constructor
                              &optional marker-char)
+
+    ;; Create a new file for each from a list of existing files.  The user
+    ;; is queried, dired buffers are updated, and at the end a success or
+    ;; failure message is displayed
+
+    ;; FILE-CREATOR must accept three args: oldfile newfile ok-if-already-exists
+
+    ;; It is called for each file and must create newfile, the entry of
+    ;; which will be added.  The user will be queried if the file already
+    ;; exists.  If oldfile is removed by FILE-CREATOR (i.e, it is a
+    ;; rename), it is FILE-CREATOR's responsibility to update dired
+    ;; buffers.  FILE-CREATOR must abort by signaling a file-error if it
+    ;; could not create newfile.  The error is caught and logged.
+
+    ;; OPERATION (a capitalized string, e.g. `Copy') describes the
+    ;; operation performed.  It is used for error logging.
+
+    ;; FN-LIST is the list of files to copy (full absolute file names).
+
+    ;; NAME-CONSTRUCTOR returns a newfile for every oldfile, or nil to
+    ;; skip.  If it skips files for other reasons than a direct user
+    ;; query, it is supposed to tell why (using dired-log).
+
+    ;; Optional MARKER-CHAR is a character with which to mark every
+    ;; newfile's entry, or t to use the current marker character if the
+    ;; oldfile was marked.
+
     (let (dired-create-files-failures failures
                                       skipped (success-count 0) (total (length fn-list)))
       (let (to overwrite-query
@@ -2817,9 +2844,32 @@ ESC or `q' to not overwrite any of the remaining files,
         (t
          (message "%s: %s file%s"
                   operation success-count (dired-plural-s success-count)))))
-    (dired-move-to-filename)))
+    (dired-move-to-filename))
 
   
+  (defun dired-copy-file-recursive (from to ok-flag &optional
+                                    preserve-time top recursive)
+    (let ((attrs (file-attributes from))
+          dirfailed)
+      (if (and recursive
+               (eq t (car attrs))
+               (or (eq recursive 'always)
+                   (yes-or-no-p (format "Recursive copies of %s? " from))))
+          ;; This is a directory.
+          (copy-directory from to dired-copy-preserve-time)
+          ;; Not a directory.
+          (or top (dired-handle-overwrite to))
+          (condition-case err
+              (if (stringp (car attrs))
+                  ;; It is a symlink
+                  (make-symbolic-link (car attrs) to ok-flag)
+                  (copy-file from to ok-flag dired-copy-preserve-time))
+            (file-date-error
+             (push (dired-make-relative from)
+                   dired-create-files-failures)
+             (dired-log "Can't set date on %s:\n%s\n" from err)))))))
+
+
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
