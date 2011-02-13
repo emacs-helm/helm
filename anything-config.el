@@ -2675,7 +2675,7 @@ Find inside `require' and `declare-function' sexp."
 ;; (copy only contents of directory whithout subdir).
 (when (< emacs-major-version 24)
 
-  (defun copy-directory (directory newname &optional keep-time parents)
+  (defun copy-directory (directory newname &optional keep-time parents copy-contents-only)
     "Copy DIRECTORY to NEWNAME.  Both args must be strings.
 If NEWNAME names an existing directory, copy DIRECTORY as subdirectory there.
 
@@ -2715,15 +2715,16 @@ this happens by default."
               (make-directory newname parents)
               ;; If NEWNAME is an existing directory, we will copy into
               ;; NEWNAME/[DIRECTORY-BASENAME].
-              (setq newname (expand-file-name
-                             (file-name-nondirectory
-                              (directory-file-name directory))
-                             newname))
-              (and (file-exists-p newname)
-                   (not (file-directory-p newname))
-                   (error "Cannot overwrite non-directory %s with a directory"
-                          newname))
-              (make-directory newname t))
+              (unless copy-contents-only
+                (setq newname (expand-file-name
+                               (file-name-nondirectory
+                                (directory-file-name directory))
+                               newname))
+                (and (file-exists-p newname)
+                     (not (file-directory-p newname))
+                     (error "Cannot overwrite non-directory %s with a directory"
+                            newname))
+                (make-directory newname t)))
 
           ;; Copy recursively.
           (dolist (file
@@ -2740,8 +2741,8 @@ this happens by default."
 
           ;; Set directory attributes.
           (set-file-modes newname (file-modes directory))
-          (if keep-time
-              (set-file-times newname (nth 5 (file-attributes directory)))))))
+          (when keep-time
+            (set-file-times newname (nth 5 (file-attributes directory)))))))
 
   (defun dired-create-files (file-creator operation fn-list name-constructor
                              &optional marker-char)
@@ -2801,7 +2802,9 @@ ESC or `q' to not overwrite any of the remaining files,
                       (cond  ((integerp marker-char) marker-char)
                              (marker-char (dired-file-marker from)) ; slow
                              (t nil))))
-                (when (and (file-directory-p from) (eq file-creator 'dired-copy-file))
+                (when (and (file-directory-p from)
+                           (file-directory-p to)
+                           (eq file-creator 'dired-copy-file))
                   (setq to (file-name-directory to)))
                 (condition-case err
                     (progn
