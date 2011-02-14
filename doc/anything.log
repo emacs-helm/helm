@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  7 FEB 2011 15:53
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.12.30)  14 FEB 2011 10:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -433,6 +433,14 @@ File: pdftex.def 2010/03/12 v0.04p Graphics/color for pdfTeX
 \Gin@req@height=\dimen106
 \Gin@req@width=\dimen107
 )
+(/usr/share/texmf-texlive/tex/latex/tools/array.sty
+Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
+\col@sep=\dimen108
+\extrarowheight=\dimen109
+\NC@list=\toks17
+\extratabsurround=\skip43
+\backup@length=\skip44
+)
 (/usr/share/texmf-texlive/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2009/10/09 v6.79a Hypertext links for LaTeX
 
@@ -454,7 +462,7 @@ O)
 (/usr/share/texmf-texlive/tex/latex/oberdiek/xcolor-patch.sty
 Package: xcolor-patch 2009/10/02 xcolor patch
 ))
-\@linkdim=\dimen108
+\@linkdim=\dimen110
 \Hy@linkcounter=\count91
 \Hy@pagecounter=\count92
 
@@ -526,9 +534,9 @@ Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 )))
 \Fld@menulength=\count93
-\Field@Width=\dimen109
-\Fld@charsize=\dimen110
-\Field@toks=\toks17
+\Field@Width=\dimen111
+\Fld@charsize=\dimen112
+\Field@toks=\toks18
 Package hyperref Info: Hyper figures OFF on input line 4377.
 Package hyperref Info: Link nesting OFF on input line 4382.
 Package hyperref Info: Hyper index ON on input line 4385.
@@ -551,8 +559,8 @@ File: hpdftex.def 2009/10/09 v6.79a Hyperref driver for pdfTeX
 )
 (/usr/share/texmf-texlive/tex/latex/natbib/natbib.sty
 Package: natbib 2009/07/16 8.31 (PWD, AO)
-\bibhang=\skip43
-\bibsep=\skip44
+\bibhang=\skip45
+\bibsep=\skip46
 LaTeX Info: Redefining \cite on input line 694.
 \c@NAT@ctr=\count98
 )
@@ -595,15 +603,15 @@ Package frenchb.ldf Warning: OT1 encoding should not be used for French.
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count99
-\scratchdimen=\dimen111
+\scratchdimen=\dimen113
 \scratchbox=\box26
 \nofMPsegments=\count100
 \nofMParguments=\count101
-\everyMPshowfont=\toks18
+\everyMPshowfont=\toks19
 \MPscratchCnt=\count102
-\MPscratchDim=\dimen112
+\MPscratchDim=\dimen114
 \MPnumerator=\count103
-\everyMPtoPDFconversion=\toks19
+\everyMPtoPDFconversion=\toks20
 ) (/usr/share/texmf-texlive/tex/latex/graphics/color.sty
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 
@@ -638,7 +646,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 21.
  (./anything.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 7.
+(Font)              <10.95> on input line 5.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -656,77 +664,88 @@ been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.95 \item A
-            ccess to action menu with [1]pdfTeX warning (ext4): destination wit
-h the same identifier (name{page.2}) has been already used, duplicate ignored
+            ccess to action menu with [1]
+Overfull \hbox (17.70105pt too wide) in paragraph at lines 123--202
+[][] 
+ []
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has 
+been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.152 
-       [2]
-Underfull \hbox (badness 10000) in paragraph at lines 205--207
+l.202 \section
+              {Overview of preconfigured anything commands} [2] [3] [4]
+Underfull \hbox (badness 10000) in paragraph at lines 287--289
 
  []
 
-[3]
-Overfull \hbox (36.65945pt too wide) in paragraph at lines 211--211
+
+Overfull \hbox (36.65945pt too wide) in paragraph at lines 293--293
 []\OT1/cmtt/m/n/10.95 (define-key anything-map (kbd "<C-tab>") 'anything-select
 -4th-action)[] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 222--225
+Underfull \hbox (badness 10000) in paragraph at lines 304--307
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--230
+Underfull \hbox (badness 10000) in paragraph at lines 308--312
 
  []
 
-<image-viewer1.png, id=290, 1284.8pt x 803.0pt>
+<image-viewer1.png, id=299, 1284.8pt x 803.0pt> [5]
 File: image-viewer1.png Graphic file (type png)
  <use image-viewer1.png>
-Overfull \hbox (83.79134pt too wide) in paragraph at lines 231--232
+Overfull \hbox (83.79134pt too wide) in paragraph at lines 313--314
 [][] 
  []
 
-[4 <./image-viewer1.png (PNG copy)>]
-Overfull \hbox (11.02296pt too wide) in paragraph at lines 239--241
+[6 <./image-viewer1.png (PNG copy)>]
+Overfull \hbox (11.02296pt too wide) in paragraph at lines 321--323
 \OT1/cmr/m/n/10.95 This grep is also re-cur-sive un-like the emacs im-ple-men-t
 a-tion that use find/xargs. 
  []
 
-<grep-screenshot2.png, id=295, 1284.8pt x 803.0pt>
+[7] <grep-screenshot2.png, id=315, 1284.8pt x 803.0pt>
 File: grep-screenshot2.png Graphic file (type png)
- <use grep-screenshot2.png>
-Overfull \hbox (83.79134pt too wide) in paragraph at lines 274--275
-[][] 
+
+<use grep-screenshot2.png>
+Underfull \hbox (badness 10000) in paragraph at lines 357--360
+
  []
 
-[5 <./grep-screenshot2.png (PNG copy)>] [6] [7]
-Overfull \hbox (5.78833pt too wide) in paragraph at lines 429--430
+
+Overfull \hbox (66.79134pt too wide) in paragraph at lines 357--360
+[] 
+ []
+
+[8 <./grep-screenshot2.png (PNG copy)>] [9] [10]
+Overfull \hbox (5.78833pt too wide) in paragraph at lines 514--515
 []\OT1/cmr/m/n/10.95 In any buffer and even in minibuffer if you have en-able r
 ecursive-minibuffer 
  []
 
-[8] [9]
-Underfull \hbox (badness 10000) in paragraph at lines 487--488
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 572--573
 
  []
 
-[10] [11]
-Underfull \hbox (badness 10000) in paragraph at lines 611--613
+[12] [13] [14]
+Underfull \hbox (badness 10000) in paragraph at lines 696--698
 
  []
 
-[12] (./anything.aux) ) 
+[15] (./anything.aux) ) 
 Here is how much of TeX's memory you used:
- 6032 strings out of 495061
- 85693 string characters out of 1182620
- 162868 words of memory out of 3000000
- 9054 multiletter control sequences out of 15000+50000
+ 6081 strings out of 495061
+ 86286 string characters out of 1182620
+ 165631 words of memory out of 3000000
+ 9096 multiletter control sequences out of 15000+50000
  9320 words of font info for 33 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 38i,6n,36p,276b,485s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 38i,10n,36p,276b,485s stack positions out of 5000i,500n,10000p,200000b,50000s
  </home/thierry/.texmf-var/fonts/pk/ljfour/jknappen/ec/t
 crm1095.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.p
 fb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/sh
@@ -736,9 +755,9 @@ exlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts
 c/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmtt10.pf
 b>
-Output written on anything.pdf (14 pages, 1202988 bytes).
+Output written on anything.pdf (17 pages, 1208007 bytes).
 PDF statistics:
- 381 PDF objects out of 1000 (max. 8388607)
- 66 named destinations out of 1000 (max. 500000)
- 427 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 399 PDF objects out of 1000 (max. 8388607)
+ 70 named destinations out of 1000 (max. 500000)
+ 435 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{textcomp}
 \usepackage{graphicx}
-
+\usepackage{array}
 \usepackage[pdftex=true,
            hyperindex=true,
            colorlinks=true]{hyperref}
@@ -117,6 +117,88 @@ C-h m
 \end{verbatim}
 while in anything session will show you all other bindings.
 
+\subsection{All anything bindings}
+\label{sec:all-anyth-bind}
+
+\begin{tabular}{| l | m{5cm} |}
+  \hline
+  Command & Key \\
+  \hline
+  anything-next-line & down or C-n \\
+  \hline
+  anything-previous-line & up or C-p \\
+  \hline
+  anything-previous-page & prior or M-v \\
+  \hline
+  anything-next-page & next or C-v \\
+  \hline
+  anything-beginning-of-buffer &
+\begin{verbatim}
+M-<
+\end{verbatim}
+  \\
+  \hline
+  anything-end-of-buffer &
+\begin{verbatim}
+M->
+\end{verbatim}
+  \\
+  \hline
+  anything-next-source & right or C-o \\
+  \hline
+  anything-previous-source & left \\
+  \hline
+  anything-exit-minibuffer & RET \\
+  \hline
+  anything-select-with-digit-shortcut & C-1/9/A/Z \\
+  \hline
+  anything-select-action & TAB or C-i \\
+  \hline
+  anything-execute-persistent-action & C-z \\
+  \hline
+  anything-select-2nd-action-or-end-of-line & C-e \\
+  \hline
+  anything-select-3rd-action & C-j \\
+  \hline
+  anything-scroll-other-window & M-next or C-M-v \\
+  \hline
+  anything-scroll-other-window-down & M-prior or C-M-y \\
+  \hline
+  anything-toggle-visible-mark & C-SPACE \\
+  \hline
+  anything-prev-visible-mark & M-[ \\
+  \hline
+  anything-next-visible-mark & M-] \\
+  \hline
+  anything-delete-minibuffer-contents & C-k \\
+  \hline
+  anything-isearch & C-s \\
+  \hline
+  anything-toggle-resplit-window & C-t \\
+  \hline
+  anything-quit-and-find-file & C-x C-f \\
+  \hline
+  anything-delete-current-selection & C-c C-d \\
+  \hline
+  anything-yank-selection & C-c C-y \\
+  \hline
+  anything-kill-selection-and-quit & C-c C-k \\
+  \hline
+  anything-follow-mode & C-c C-f \\
+  \hline
+  anything-force-update & C-c C-u \\
+  \hline
+  anything-debug-output & C-c C-x C-d \\
+  \hline
+  anything-display-all-visible-marks & C-c C-x C-m \\
+  \hline
+  anything-send-bug-report-from-anything & C-c C-x C-b \\
+  \hline
+  anything-previous-history-element & M-p \\
+  \hline
+  anything-next-history-element & M-n \\
+  \hline
+\end{tabular}
 \section{Overview of preconfigured anything commands}
 \label{sec:overv-comm-avail}
 For starting with anything, a set of commands have been set for you in anything menu.
@@ -229,7 +311,7 @@ not work too.
 Be sure to have Imagemagick package installed.\\
 
 \includegraphics[width=15cm]{image-viewer1}
-
+\newpage
 \subsection{Grep}
 \label{sec:grep}
 We describe here anything-do-grep, an incremental grep.
@@ -271,6 +353,9 @@ of Gnuwin32 on windoze.
 This version should accept the --exclude-dir option.
 \end{itemize}
 
+\newpage
+Grep in action on current file: \\
+\\
 \includegraphics[width=15cm]{grep-screenshot2}
 
 \subsection{Anything do grep}

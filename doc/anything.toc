@@ -2,52 +2,53 @@
 \contentsline {section}{\numberline {1}Install}{1}{section.1}
 \contentsline {section}{\numberline {2}Config}{1}{section.2}
 \contentsline {section}{\numberline {3}General anything commands}{2}{section.3}
-\contentsline {section}{\numberline {4}Overview of preconfigured anything commands}{2}{section.4}
-\contentsline {section}{\numberline {5}Anything Find Files}{2}{section.5}
-\contentsline {subsection}{\numberline {5.1}Navigation}{3}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}Jump with nth commands}{3}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}Turn in image viewer}{4}{subsection.5.3}
-\contentsline {subsection}{\numberline {5.4}Grep}{5}{subsection.5.4}
-\contentsline {subsection}{\numberline {5.5}Anything do grep}{6}{subsection.5.5}
-\contentsline {subsection}{\numberline {5.6}Grep from anything-find-files}{6}{subsection.5.6}
-\contentsline {subsection}{\numberline {5.7}Grep One file}{6}{subsection.5.7}
-\contentsline {subsection}{\numberline {5.8}Grep Marked files}{6}{subsection.5.8}
-\contentsline {subsubsection}{\numberline {5.8.1}Grep marked files from differents directories}{6}{subsubsection.5.8.1}
-\contentsline {subsection}{\numberline {5.9}Grep Directory recursively}{6}{subsection.5.9}
-\contentsline {subsection}{\numberline {5.10}Grep Using Wildcard}{7}{subsection.5.10}
-\contentsline {subsection}{\numberline {5.11}Grep thing at point}{7}{subsection.5.11}
-\contentsline {subsection}{\numberline {5.12}Open Files Externally}{7}{subsection.5.12}
-\contentsline {subsection}{\numberline {5.13}Eshell command on files}{7}{subsection.5.13}
-\contentsline {subsection}{\numberline {5.14}Why Eshell}{7}{subsection.5.14}
-\contentsline {subsection}{\numberline {5.15}Setup Aliases}{7}{subsection.5.15}
-\contentsline {subsection}{\numberline {5.16}Problem starting Eshell}{7}{subsection.5.16}
-\contentsline {subsection}{\numberline {5.17}Dired Commands}{8}{subsection.5.17}
-\contentsline {subsection}{\numberline {5.18}Copy Files}{8}{subsection.5.18}
-\contentsline {subsection}{\numberline {5.19}Rename Files}{8}{subsection.5.19}
-\contentsline {subsection}{\numberline {5.20}Symlink Files}{8}{subsection.5.20}
-\contentsline {subsection}{\numberline {5.21}Hardlink}{8}{subsection.5.21}
-\contentsline {subsection}{\numberline {5.22}Follow file after action}{8}{subsection.5.22}
-\contentsline {subsection}{\numberline {5.23}In Buffer File Completion}{9}{subsection.5.23}
-\contentsline {subsection}{\numberline {5.24}Create File}{9}{subsection.5.24}
-\contentsline {subsection}{\numberline {5.25}Create Directory}{9}{subsection.5.25}
-\contentsline {subsection}{\numberline {5.26}Ediff files}{9}{subsection.5.26}
-\contentsline {subsection}{\numberline {5.27}Ediff merge files}{9}{subsection.5.27}
-\contentsline {subsection}{\numberline {5.28}Browse archive with avfs}{9}{subsection.5.28}
-\contentsline {subsection}{\numberline {5.29}Display with icons}{10}{subsection.5.29}
-\contentsline {section}{\numberline {6}Anything write buffer}{10}{section.6}
-\contentsline {section}{\numberline {7}Anything insert file}{10}{section.7}
-\contentsline {section}{\numberline {8}Anything M-x}{10}{section.8}
-\contentsline {section}{\numberline {9}Anything regexp}{10}{section.9}
-\contentsline {subsection}{\numberline {9.1}Query replace regexp}{10}{subsection.9.1}
-\contentsline {subsection}{\numberline {9.2}Save regexp as sexp}{10}{subsection.9.2}
-\contentsline {subsection}{\numberline {9.3}Save regexp as string}{11}{subsection.9.3}
-\contentsline {section}{\numberline {10}Anything locate}{11}{section.10}
-\contentsline {subsection}{\numberline {10.1}Search files}{11}{subsection.10.1}
-\contentsline {subsection}{\numberline {10.2}Launch grep}{11}{subsection.10.2}
-\contentsline {subsection}{\numberline {10.3}Windows specificity}{11}{subsection.10.3}
-\contentsline {section}{\numberline {11}Anything Etags}{11}{section.11}
-\contentsline {subsection}{\numberline {11.1}Create the tag file}{11}{subsection.11.1}
-\contentsline {subsection}{\numberline {11.2}Start anything etags}{12}{subsection.11.2}
-\contentsline {section}{\numberline {12}Other tools}{12}{section.12}
-\contentsline {section}{\numberline {13}Usefuls extensions}{12}{section.13}
-\contentsline {section}{\numberline {14}Usefuls links}{12}{section.14}
+\contentsline {subsection}{\numberline {3.1}All anything bindings}{3}{subsection.3.1}
+\contentsline {section}{\numberline {4}Overview of preconfigured anything commands}{4}{section.4}
+\contentsline {section}{\numberline {5}Anything Find Files}{4}{section.5}
+\contentsline {subsection}{\numberline {5.1}Navigation}{4}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Jump with nth commands}{5}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Turn in image viewer}{5}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Grep}{7}{subsection.5.4}
+\contentsline {subsection}{\numberline {5.5}Anything do grep}{8}{subsection.5.5}
+\contentsline {subsection}{\numberline {5.6}Grep from anything-find-files}{8}{subsection.5.6}
+\contentsline {subsection}{\numberline {5.7}Grep One file}{8}{subsection.5.7}
+\contentsline {subsection}{\numberline {5.8}Grep Marked files}{8}{subsection.5.8}
+\contentsline {subsubsection}{\numberline {5.8.1}Grep marked files from differents directories}{9}{subsubsection.5.8.1}
+\contentsline {subsection}{\numberline {5.9}Grep Directory recursively}{9}{subsection.5.9}
+\contentsline {subsection}{\numberline {5.10}Grep Using Wildcard}{9}{subsection.5.10}
+\contentsline {subsection}{\numberline {5.11}Grep thing at point}{9}{subsection.5.11}
+\contentsline {subsection}{\numberline {5.12}Open Files Externally}{9}{subsection.5.12}
+\contentsline {subsection}{\numberline {5.13}Eshell command on files}{10}{subsection.5.13}
+\contentsline {subsection}{\numberline {5.14}Why Eshell}{10}{subsection.5.14}
+\contentsline {subsection}{\numberline {5.15}Setup Aliases}{10}{subsection.5.15}
+\contentsline {subsection}{\numberline {5.16}Problem starting Eshell}{10}{subsection.5.16}
+\contentsline {subsection}{\numberline {5.17}Dired Commands}{10}{subsection.5.17}
+\contentsline {subsection}{\numberline {5.18}Copy Files}{10}{subsection.5.18}
+\contentsline {subsection}{\numberline {5.19}Rename Files}{11}{subsection.5.19}
+\contentsline {subsection}{\numberline {5.20}Symlink Files}{11}{subsection.5.20}
+\contentsline {subsection}{\numberline {5.21}Hardlink}{11}{subsection.5.21}
+\contentsline {subsection}{\numberline {5.22}Follow file after action}{11}{subsection.5.22}
+\contentsline {subsection}{\numberline {5.23}In Buffer File Completion}{11}{subsection.5.23}
+\contentsline {subsection}{\numberline {5.24}Create File}{11}{subsection.5.24}
+\contentsline {subsection}{\numberline {5.25}Create Directory}{11}{subsection.5.25}
+\contentsline {subsection}{\numberline {5.26}Ediff files}{12}{subsection.5.26}
+\contentsline {subsection}{\numberline {5.27}Ediff merge files}{12}{subsection.5.27}
+\contentsline {subsection}{\numberline {5.28}Browse archive with avfs}{12}{subsection.5.28}
+\contentsline {subsection}{\numberline {5.29}Display with icons}{12}{subsection.5.29}
+\contentsline {section}{\numberline {6}Anything write buffer}{12}{section.6}
+\contentsline {section}{\numberline {7}Anything insert file}{12}{section.7}
+\contentsline {section}{\numberline {8}Anything M-x}{12}{section.8}
+\contentsline {section}{\numberline {9}Anything regexp}{13}{section.9}
+\contentsline {subsection}{\numberline {9.1}Query replace regexp}{13}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}Save regexp as sexp}{13}{subsection.9.2}
+\contentsline {subsection}{\numberline {9.3}Save regexp as string}{13}{subsection.9.3}
+\contentsline {section}{\numberline {10}Anything locate}{13}{section.10}
+\contentsline {subsection}{\numberline {10.1}Search files}{13}{subsection.10.1}
+\contentsline {subsection}{\numberline {10.2}Launch grep}{14}{subsection.10.2}
+\contentsline {subsection}{\numberline {10.3}Windows specificity}{14}{subsection.10.3}
+\contentsline {section}{\numberline {11}Anything Etags}{14}{section.11}
+\contentsline {subsection}{\numberline {11.1}Create the tag file}{14}{subsection.11.1}
+\contentsline {subsection}{\numberline {11.2}Start anything etags}{14}{subsection.11.2}
+\contentsline {section}{\numberline {12}Other tools}{14}{section.12}
+\contentsline {section}{\numberline {13}Usefuls extensions}{15}{section.13}
+\contentsline {section}{\numberline {14}Usefuls links}{15}{section.14}
