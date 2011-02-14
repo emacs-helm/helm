@@ -2095,15 +2095,21 @@ If EXPAND is non--nil expand-file-name."
     (loop for i in ff-sources
        thereis (string= cur-source (concat i anything-c-find-files-doc-header)))))
 
-(defvar anything-ff-lastdir nil)
+;; Internal.
+(defvar anything-ff-last-expanded nil
+  "Store last expanded directory or file in `anything-find-files'.")
+
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
   ;; When going to precedent level we want to be at the line
   ;; corresponding to actual directory, so store this info
-  ;; in `anything-ff-lastdir'.
-  (setq anything-ff-lastdir anything-ff-default-directory)
+  ;; in `anything-ff-last-expanded'.
+  (if (and (not (file-directory-p anything-pattern))
+           (file-exists-p anything-pattern))
+      (setq anything-ff-last-expanded anything-pattern)
+      (setq anything-ff-last-expanded anything-ff-default-directory))
   (when (anything-file-completion-source-p)
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg
                                                   :unix-close t :expand t)))
@@ -2111,20 +2117,20 @@ If prefix numeric arg is given go ARG level down."
         (delete-minibuffer-contents)
         (insert new-pattern)))))
 
-(defun anything-ff-restore-pos ()
-  "Move overlay to last visited directory `anything-ff-lastdir'.
+(defun anything-ff-retrieve-last-expanded ()
+  "Move overlay to last visited directory `anything-ff-last-expanded'.
 This happen after using `anything-find-files-down-one-level',
 or hitting C-z on \"..\"."
-  (when (and anything-ff-lastdir
+  (when (and anything-ff-last-expanded
              (anything-file-completion-source-p))
-    (let ((dirname (directory-file-name anything-ff-lastdir)))
+    (let ((dirname (directory-file-name anything-ff-last-expanded)))
       (with-anything-window
         (when (or (re-search-forward (concat dirname "$") nil t)
-                  (re-search-forward (concat anything-ff-lastdir "$") nil t))
+                  (re-search-forward (concat anything-ff-last-expanded "$") nil t))
           (forward-line 0)
           (anything-mark-current-line)))
-      (setq anything-ff-lastdir nil))))
-(add-hook 'anything-after-update-hook 'anything-ff-restore-pos)
+      (setq anything-ff-last-expanded nil))))
+(add-hook 'anything-after-update-hook 'anything-ff-retrieve-last-expanded)
 
 ;; `C-.' doesn't work in terms use `C-l' instead.
 (if window-system
@@ -2168,7 +2174,7 @@ or hitting C-z on \"..\"."
           ;; PATTERN is a directory, end it with "/".
           ;; This will make PATTERN not ending yet with "/"
           ;; candidate for `anything-ff-default-directory',
-          ;; allowing `anything-ff-restore-pos' to retrieve it
+          ;; allowing `anything-ff-retrieve-last-expanded' to retrieve it
           ;; when descending level.
           ((file-directory-p pattern)
            (file-name-as-directory pattern))
@@ -2408,7 +2414,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
             ;; A directory, open it.
             ((file-directory-p candidate)
              (when (string= (anything-c-basename candidate) "..")
-               (setq anything-ff-lastdir anything-ff-default-directory))
+               (setq anything-ff-last-expanded anything-ff-default-directory))
              (insert-in-minibuffer (file-name-as-directory
                                     (expand-file-name candidate))))
             ;; A symlink file, expand to it's true name. (first hit)
