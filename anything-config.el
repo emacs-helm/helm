@@ -2761,133 +2761,14 @@ this happens by default."
           (when keep-time
             (set-file-times newname (nth 5 (file-attributes directory)))))))
 
-  (defun dired-create-files (file-creator operation fn-list name-constructor
-                             &optional marker-char)
+  (defun dired-copy-file (from to ok-flag)
+    (when (and (file-directory-p from)
+               (file-directory-p to))
+      (setq to (file-name-directory to)))
+    (dired-handle-overwrite to)
+    (dired-copy-file-recursive from to ok-flag dired-copy-preserve-time t
+                               dired-recursive-copies)))
 
-    ;; Create a new file for each from a list of existing files.  The user
-    ;; is queried, dired buffers are updated, and at the end a success or
-    ;; failure message is displayed
-
-    ;; FILE-CREATOR must accept three args: oldfile newfile ok-if-already-exists
-
-    ;; It is called for each file and must create newfile, the entry of
-    ;; which will be added.  The user will be queried if the file already
-    ;; exists.  If oldfile is removed by FILE-CREATOR (i.e, it is a
-    ;; rename), it is FILE-CREATOR's responsibility to update dired
-    ;; buffers.  FILE-CREATOR must abort by signaling a file-error if it
-    ;; could not create newfile.  The error is caught and logged.
-
-    ;; OPERATION (a capitalized string, e.g. `Copy') describes the
-    ;; operation performed.  It is used for error logging.
-
-    ;; FN-LIST is the list of files to copy (full absolute file names).
-
-    ;; NAME-CONSTRUCTOR returns a newfile for every oldfile, or nil to
-    ;; skip.  If it skips files for other reasons than a direct user
-    ;; query, it is supposed to tell why (using dired-log).
-
-    ;; Optional MARKER-CHAR is a character with which to mark every
-    ;; newfile's entry, or t to use the current marker character if the
-    ;; oldfile was marked.
-
-    (let (dired-create-files-failures failures
-                                      skipped (success-count 0) (total (length fn-list)))
-      (let (to overwrite-query
-               overwrite-backup-query)	; for dired-handle-overwrite
-        (dolist (from fn-list)
-          (setq to (funcall name-constructor from))
-          (if (equal to from)
-              (progn
-                (setq to nil)
-                (dired-log "Cannot %s to same file: %s\n"
-                           (downcase operation) from)))
-          (if (not to)
-              (setq skipped (cons (dired-make-relative from) skipped))
-              (let* ((overwrite (file-exists-p to))
-                     (dired-overwrite-confirmed ; for dired-handle-overwrite
-                      (and overwrite
-                           (let ((help-form '(format "\
-Type SPC or `y' to overwrite file `%s',
-DEL or `n' to skip to next,
-ESC or `q' to not overwrite any of the remaining files,
-`!' to overwrite all remaining files with no more questions." to)))
-                             (dired-query 'overwrite-query
-                                          "Overwrite `%s'?" to))))
-                     ;; must determine if FROM is marked before file-creator
-                     ;; gets a chance to delete it (in case of a move).
-                     (actual-marker-char
-                      (cond  ((integerp marker-char) marker-char)
-                             (marker-char (dired-file-marker from)) ; slow
-                             (t nil))))
-                (when (and (file-directory-p from)
-                           (file-directory-p to)
-                           (eq file-creator 'dired-copy-file))
-                  (setq to (file-name-directory to)))
-                (condition-case err
-                    (progn
-                      (funcall file-creator from to dired-overwrite-confirmed)
-                      (if overwrite
-                          ;; If we get here, file-creator hasn't been aborted
-                          ;; and the old entry (if any) has to be deleted
-                          ;; before adding the new entry.
-                          (dired-remove-file to))
-                      (setq success-count (1+ success-count))
-                      (message "%s: %d of %d" operation success-count total)
-                      (dired-add-file to actual-marker-char))
-                  (file-error		; FILE-CREATOR aborted
-                   (progn
-                     (push (dired-make-relative from)
-                           failures)
-                     (dired-log "%s `%s' to `%s' failed:\n%s\n"
-                                operation from to err))))))))
-      (cond
-        (dired-create-files-failures
-         (setq failures (nconc failures dired-create-files-failures))
-         (dired-log-summary
-          (format "%s failed for %d file%s in %d requests"
-                  operation (length failures)
-                  (dired-plural-s (length failures))
-                  total)
-          failures))
-        (failures
-         (dired-log-summary
-          (format "%s failed for %d of %d file%s"
-                  operation (length failures)
-                  total (dired-plural-s total))
-          failures))
-        (skipped
-         (dired-log-summary
-          (format "%s: %d of %d file%s skipped"
-                  operation (length skipped) total
-                  (dired-plural-s total))
-          skipped))
-        (t
-         (message "%s: %s file%s"
-                  operation success-count (dired-plural-s success-count)))))
-    (dired-move-to-filename))
-
-  
-  (defun dired-copy-file-recursive (from to ok-flag &optional
-                                    preserve-time top recursive)
-    (let ((attrs (file-attributes from))
-          dirfailed)
-      (if (and recursive
-               (eq t (car attrs))
-               (or (eq recursive 'always)
-                   (yes-or-no-p (format "Recursive copies of %s? " from))))
-          ;; This is a directory.
-          (copy-directory from to dired-copy-preserve-time)
-          ;; Not a directory.
-          (or top (dired-handle-overwrite to))
-          (condition-case err
-              (if (stringp (car attrs))
-                  ;; It is a symlink
-                  (make-symbolic-link (car attrs) to ok-flag)
-                  (copy-file from to ok-flag dired-copy-preserve-time))
-            (file-date-error
-             (push (dired-make-relative from)
-                   dired-create-files-failures)
-             (dired-log "Can't set date on %s:\n%s\n" from err)))))))
 
 
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
