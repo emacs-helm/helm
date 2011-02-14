@@ -2479,8 +2479,12 @@ Use it for non--interactive calls of `anything-find-files'."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (let ((anything-mp-highlight-delay nil))
+    (when (and (eq major-mode 'org-agenda-mode)
+               org-directory)
+      (setq fname (expand-file-name org-directory)))
     (anything :sources 'anything-c-source-find-files
               :input fname
+              :preselect (buffer-file-name (current-buffer))
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
 
