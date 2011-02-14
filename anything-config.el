@@ -2472,22 +2472,6 @@ See <http://sourceforge.net/projects/avf/>.")
                   (insert (abbreviate-file-name candidate))))
             (error "Aborting completion: No valid file name at point")))))
 
-(defun anything-find-files1 (fname)
-  "Find FNAME with `anything' completion.
-Like `find-file' but with `anything' support.
-Use it for non--interactive calls of `anything-find-files'."
-  (when (get-buffer anything-action-buffer)
-    (kill-buffer anything-action-buffer))
-  (let ((anything-mp-highlight-delay nil))
-    (when (and (eq major-mode 'org-agenda-mode)
-               org-directory)
-      (setq fname (expand-file-name org-directory)))
-    (anything :sources 'anything-c-source-find-files
-              :input fname
-              :preselect (buffer-file-name (current-buffer))
-              :prompt "Find Files or Url: "
-              :buffer "*Anything Find Files*")))
-
 (defun* anything-find-files-history (&key (comp-read t))
   "The `anything-find-files' history.
 Show the first `anything-ff-history-max-length' elements of `anything-ff-history'
@@ -2526,26 +2510,45 @@ This is the starting point for nearly all actions you can do on files."
   (let ((any-input (if (and current-prefix-arg anything-ff-history)
                        (anything-find-files-history)
                        (anything-find-files-initial-input))))
-    (anything-find-files1 any-input)))
+    (when (and (eq major-mode 'org-agenda-mode)
+               org-directory
+               (not any-input))
+      (setq any-input (expand-file-name org-directory)))
+    (if any-input
+        (anything-find-files1 any-input)
+        (setq any-input (anything-c-current-directory))
+        (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
 
-(defun anything-c-current-directory ()
-  "Return current-directory name at point.
-Useful in dired buffers when there is inserted subdirs."
-  (if (eq major-mode 'dired-mode)
-      (dired-current-directory)
-      default-directory))
-  
+(defun anything-find-files1 (fname &optional preselect)
+  "Find FNAME with `anything' completion.
+Like `find-file' but with `anything' support.
+Use it for non--interactive calls of `anything-find-files'."
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
+  (let ((anything-mp-highlight-delay nil))
+    (anything :sources 'anything-c-source-find-files
+              :input fname
+              :preselect preselect
+              :prompt "Find Files or Url: "
+              :buffer "*Anything Find Files*")))
+
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
   (let* ((def-dir (anything-c-current-directory))
          (lib     (anything-find-library-at-point))
          (file-p  (and fap (file-exists-p fap)
                        (file-exists-p
-                        (file-name-directory (expand-file-name tap def-dir)))))
-         (input   (cond (lib)
-                        (file-p (expand-file-name tap def-dir))
-                        (t fap))))
-    (or input (expand-file-name def-dir))))
+                        (file-name-directory (expand-file-name tap def-dir))))))
+    (cond (lib)
+          (file-p (expand-file-name tap def-dir))
+          (t fap))))
+    
+(defun anything-c-current-directory ()
+  "Return current-directory name at point.
+Useful in dired buffers when there is inserted subdirs."
+  (if (eq major-mode 'dired-mode)
+      (dired-current-directory)
+      default-directory))
 
 (defun anything-find-library-at-point ()
   "Try to find library path at point.
