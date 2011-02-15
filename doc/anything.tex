@@ -679,6 +679,63 @@ To search the definition at point use just
 C-u f5 a e
 \end{verbatim}
 
+\section{Firefox bookmarks}
+\label{sec:firefox-bookmarks}
+
+You will have to set firefox to import bookmarks in his html file book-marks.html. 
+\begin{verbatim}
+(only for firefox versions >=3)
+\end{verbatim}
+To achieve that, open ``about:config'' in firefox and double click on this line to enable value to true :
+\begin{verbatim}
+user_pref("browser.bookmarks.autoExportHTML", false);
+\end{verbatim}
+You should have now :
+\begin{verbatim}
+user_pref("browser.bookmarks.autoExportHTML", true);
+\end{verbatim}
+Now you can use
+\begin{verbatim}
+M-x anything-firefox-bookmarks
+\end{verbatim}
+To see your firefox bookmarks from Emacs.
+When you are in firefox things are a little more complicated. You will
+need wmctrl program and a script named ffbookmarks :
+\begin{verbatim}
+#!/bin/bash
+
+wmctrl -xa emacs
+emacsclient -e "(progn (anything-firefox-bookmarks) nil)" > /dev/null
+wmctrl -xa firefox
+exit 0
+\end{verbatim}
+Put this script somewhere in PATH and make it executable :
+\begin{verbatim}
+chmod +x ffbookmarks
+\end{verbatim}
+
+Firefox is not aware about this new protocol, you will have to instruct
+it. See Firefox documentation or use firefox-protocol.el package you can get
+here: \\
+\url{http://mercurial.intuxication.org/hg/emacs-bookmark-extension/} \\
+Install new protocol: \\
+\begin{verbatim}
+M-x firefox-protocol-installer-install
+\end{verbatim}
+to install new protocol ffbookmarks
+Then install a bookmarklet in firefox : Right click on the bookmark
+toolbar in firefox and add a new bookmark called ffbookmarks. Add this
+instead of url: \\
+\begin{verbatim}
+javascript:location.href='ffbookmarks://localhost'
+\end{verbatim}
+
+Now when you click on ffbookmarks it will bring you in Emacs and allow
+you to browse your bookmarks with anything.
+\\
+NOTE : emacs server need to be started in the running Emacs, see Emacs
+documentation.
+
 \section{Other tools}
 \label{sec:other-tools}
 
