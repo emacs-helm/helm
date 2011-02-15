@@ -8047,8 +8047,9 @@ candidate can be in (DISPLAY . REAL) format."
        (cons (format "(%s)%s" (anything-attr 'info-file) (match-string 2 line))
              (string-to-number (or (match-string 3 line) "1")))))
 
-(defun anything-c-make-info-source (file)
-  `((name . ,(concat "Info Index: " file))
+(defun anything-c-make-info-source (source file)
+  `(,@source
+    (name . ,(concat "Info Index: " file))
     (info-file . ,file)
     (init . anything-c-info-init)
     (display-to-real . anything-c-info-display-to-real)
@@ -8058,7 +8059,7 @@ candidate can be in (DISPLAY . REAL) format."
 
 (defun anything-compile-source--info-index (source)
   (anything-aif (anything-interpret-value (assoc-default 'info-index source))
-      (anything-c-make-info-source it)
+      (anything-c-make-info-source source it)
     source))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--info-index)
 
