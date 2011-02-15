@@ -2516,7 +2516,7 @@ This is the starting point for nearly all actions you can do on files."
       (setq any-input (expand-file-name org-directory)))
     (if any-input
         (anything-find-files1 any-input)
-        (setq any-input (anything-c-current-directory))
+        (setq any-input (expand-file-name (anything-c-current-directory)))
         (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
 
 (defun anything-find-files1 (fname &optional preselect)
