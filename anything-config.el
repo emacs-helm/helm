@@ -2230,6 +2230,54 @@ or hitting C-z on \"..\"."
   "*Face used to prefix new file or url paths in `anything-find-files'."
   :group 'anything)
 
+(defun* anything-ff-attributes
+    (file &key type links uid gid access-time modif-time status size mode gid-change inode device-num dired)
+  "Easy interface for `file-attributes'."
+  (let ((all (destructuring-bind
+                   (type links uid gid access-time modif-time status size mode gid-change inode device-num)
+                 (file-attributes file 'string)
+               (list :type        type
+                     :links       links
+                     :uid         uid
+                     :gid         gid
+                     :access-time access-time
+                     :modif-time  modif-time
+                     :status      status
+                     :size        size
+                     :mode        mode
+                     :gid-change  gid-change
+                     :inode       inode
+                     :device-num  device-num))))
+    (cond (type
+           (let ((result (getf all :type)))
+             (cond ((stringp result)
+                    "symlink")
+                   (result "directory")
+                   (t "file"))))
+          (links (getf all :links))
+          (uid   (getf all :uid))
+          (gid   (getf all :gid))
+          (access-time
+           (format-time-string "%Y-%m-%d %R" (getf all :access-time)))
+          (modif-time
+           (format-time-string "%Y-%m-%d %R" (getf all :modif-time)))
+          (status
+           (format-time-string "%Y-%m-%d %R" (getf all :status)))
+          (size (getf all :size))
+          (mode (getf all :mode))
+          (gid-change (getf all :gid-change))
+          (inode (getf all :inode))
+          (device-num (getf all :device-num))
+          (dired
+           (concat
+            (getf all :mode) " "
+            (number-to-string (getf all :links)) " "
+            (getf all :uid) ":"
+            (getf all :gid) " "
+            (number-to-string (getf all :size)) " "
+            (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
+          (t all))))
+
 (defun anything-c-prefix-filename (fname &optional image)
   "Return fname FNAME prefixed with icon IMAGE."
   (let* ((img-name   (and image (expand-file-name
@@ -2266,12 +2314,18 @@ or hitting C-z on \"..\"."
                    ((file-directory-p i)
                     (cons
                      (anything-c-prefix-filename
-                      (propertize i 'face anything-c-files-face1))
+                      (propertize i 'face anything-c-files-face1
+                                  'help-echo (condition-case nil
+                                                 (anything-ff-attributes i :dired t)
+                                               (error nil))))
                      i))
                    (t
                     (cons
                      (anything-c-prefix-filename
-                      (propertize i 'face anything-c-files-face2))
+                      (propertize i 'face anything-c-files-face2
+                                  'help-echo (condition-case nil
+                                                 (anything-ff-attributes i :dired t)
+                                               (error nil))))
                      i)))))
 
 (defsubst anything-c-highlight-ffiles1 (files sources)
