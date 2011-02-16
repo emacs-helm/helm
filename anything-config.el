@@ -2152,7 +2152,8 @@ or hitting C-z on \"..\"."
   (let ((methods (mapcar 'car tramp-methods))
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
-    (cond ((string-match "^~" pattern)
+    (cond ((string= pattern "") "")
+          ((string-match "^~" pattern)
            (replace-match (getenv "HOME") nil t pattern))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
@@ -2204,7 +2205,9 @@ or hitting C-z on \"..\"."
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
-          ((string= anything-pattern "") (directory-files "/" t))
+          ((string= path "") (directory-files "/" t))
+          ((and (file-directory-p path) (not (file-readable-p path)))
+           (list (format "Opening directory: access denied, `%s'" path)))
           ((file-directory-p path) (directory-files path t))
           (t
            (append
