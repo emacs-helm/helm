@@ -2335,7 +2335,10 @@ or hitting C-z on \"..\"."
      collect (cond ( ;; Files.
                     (eq nil (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face2)
+                           (propertize i 'face anything-c-files-face2
+                                       'help-echo (condition-case nil
+                                                      (anything-ff-attributes i :dired t)
+                                                    (error nil)))
                            "leaf.xpm")
                           i))
                    ( ;; Empty directories.
@@ -2346,19 +2349,28 @@ or hitting C-z on \"..\"."
                                 (directory-files
                                  i nil directory-files-no-dot-files-regexp t))))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face1)
+                           (propertize i 'face anything-c-files-face1
+                                       'help-echo (condition-case nil
+                                                      (anything-ff-attributes i :dired t)
+                                                    (error nil)))
                            "empty.xpm")
                           i))
                    ( ;; Open directories.
                     (and (eq t (car (file-attributes i))) (get-buffer af))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face1)
+                           (propertize i 'face anything-c-files-face1
+                                       'help-echo (condition-case nil
+                                                      (anything-ff-attributes i :dired t)
+                                                    (error nil)))
                            "open.xpm")
                           i))
                    (;; Closed directories.
                     (eq t (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face1)
+                           (propertize i 'face anything-c-files-face1
+                                       'help-echo (condition-case nil
+                                                      (anything-ff-attributes i :dired t)
+                                                    (error nil)))
                            "close.xpm")
                           i))
                    ( ;; Open Symlinks directories.
