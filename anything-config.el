@@ -2126,7 +2126,8 @@ or hitting C-z on \"..\"."
     (let ((dirname (directory-file-name anything-ff-last-expanded)))
       (with-anything-window
         (when (or (re-search-forward (concat dirname "$") nil t)
-                  (re-search-forward (concat anything-ff-last-expanded "$") nil t))
+                  (re-search-forward
+                   (concat anything-ff-last-expanded "$") nil t))
           (forward-line 0)
           (anything-mark-current-line)))
       (setq anything-ff-last-expanded nil))))
@@ -2159,13 +2160,15 @@ or hitting C-z on \"..\"."
           ((and (string-match reg pattern)
                (setq cur-method (match-string 1 pattern))
                (member cur-method methods))
-          (setq tramp-name (anything-create-tramp-name (match-string 0 pattern)))
+          (setq tramp-name (anything-create-tramp-name
+                            (match-string 0 pattern)))
           (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
           ((and (string-match  tramp-file-name-regexp pattern)
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
-           (setq tramp-name (anything-create-tramp-name (match-string 0 pattern)))
+           (setq tramp-name (anything-create-tramp-name
+                             (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
           ((and (not (string-match reg pattern))
@@ -2196,10 +2199,11 @@ or hitting C-z on \"..\"."
                 anything-compile-source-functions)
         (setq anything-pattern path)
         (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
-    (setq anything-ff-default-directory (if (string= anything-pattern "")
-                                            (if (eq system-type 'windows-nt) "c:/" "/")
-                                            (unless (string-match ffap-url-regexp path)
-                                              path-name-dir)))
+    (setq anything-ff-default-directory
+          (if (string= anything-pattern "")
+              (if (eq system-type 'windows-nt) "c:/" "/")
+              (unless (string-match ffap-url-regexp path)
+                path-name-dir)))
     (cond ((or (string= path "Invalid tramp file name")
                (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
@@ -2215,7 +2219,8 @@ or hitting C-z on \"..\"."
             (directory-files (file-name-directory path) t))))))
 
 (defun anything-ff-save-history ()
-  "Store the last value of `anything-ff-default-directory' in `anything-ff-history'."
+  "Store the last value of `anything-ff-default-directory' \
+in `anything-ff-history'."
   (when anything-ff-default-directory
     (push anything-ff-default-directory anything-ff-history)))
 (add-hook 'anything-cleanup-hook 'anything-ff-save-history)
@@ -2231,10 +2236,12 @@ or hitting C-z on \"..\"."
   :group 'anything)
 
 (defun* anything-ff-attributes
-    (file &key type links uid gid access-time modif-time status size mode gid-change inode device-num dired)
+    (file &key type links uid gid access-time modif-time
+          status size mode gid-change inode device-num dired)
   "Easy interface for `file-attributes'."
   (let ((all (destructuring-bind
-                   (type links uid gid access-time modif-time status size mode gid-change inode device-num)
+                   (type links uid gid access-time modif-time
+                         status size mode gid-change inode device-num)
                  (file-attributes file 'string)
                (list :type        type
                      :links       links
@@ -2308,24 +2315,27 @@ or hitting C-z on \"..\"."
      collect (cond ((file-symlink-p i)
                     (cons
                      (anything-c-prefix-filename
-                      (propertize i 'face 'anything-dired-symlink-face
-                                  'help-echo (file-truename i)))
+                      (propertize
+                       i 'face 'anything-dired-symlink-face
+                       'help-echo (file-truename i)))
                      i))
                    ((file-directory-p i)
                     (cons
                      (anything-c-prefix-filename
-                      (propertize i 'face anything-c-files-face1
-                                  'help-echo (condition-case nil
-                                                 (anything-ff-attributes i :dired t)
-                                               (error nil))))
+                      (propertize
+                       i 'face anything-c-files-face1
+                       'help-echo (condition-case nil
+                                      (anything-ff-attributes i :dired t)
+                                    (error nil))))
                      i))
                    (t
                     (cons
                      (anything-c-prefix-filename
-                      (propertize i 'face anything-c-files-face2
-                                  'help-echo (condition-case nil
-                                                 (anything-ff-attributes i :dired t)
-                                               (error nil))))
+                      (propertize
+                       i 'face anything-c-files-face2
+                       'help-echo (condition-case nil
+                                      (anything-ff-attributes i :dired t)
+                                    (error nil))))
                      i)))))
 
 (defsubst anything-c-highlight-ffiles1 (files sources)
@@ -2335,10 +2345,11 @@ or hitting C-z on \"..\"."
      collect (cond ( ;; Files.
                     (eq nil (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face2
-                                       'help-echo (condition-case nil
-                                                      (anything-ff-attributes i :dired t)
-                                                    (error nil)))
+                           (propertize
+                            i 'face anything-c-files-face2
+                            'help-echo (condition-case nil
+                                           (anything-ff-attributes i :dired t)
+                                         (error nil)))
                            "leaf.xpm")
                           i))
                    ( ;; Empty directories.
@@ -2349,28 +2360,31 @@ or hitting C-z on \"..\"."
                                 (directory-files
                                  i nil directory-files-no-dot-files-regexp t))))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face1
-                                       'help-echo (condition-case nil
-                                                      (anything-ff-attributes i :dired t)
-                                                    (error nil)))
+                           (propertize
+                            i 'face anything-c-files-face1
+                            'help-echo (condition-case nil
+                                           (anything-ff-attributes i :dired t)
+                                         (error nil)))
                            "empty.xpm")
                           i))
                    ( ;; Open directories.
                     (and (eq t (car (file-attributes i))) (get-buffer af))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face1
-                                       'help-echo (condition-case nil
-                                                      (anything-ff-attributes i :dired t)
-                                                    (error nil)))
+                           (propertize
+                            i 'face anything-c-files-face1
+                            'help-echo (condition-case nil
+                                           (anything-ff-attributes i :dired t)
+                                         (error nil)))
                            "open.xpm")
                           i))
                    (;; Closed directories.
                     (eq t (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face anything-c-files-face1
-                                       'help-echo (condition-case nil
-                                                      (anything-ff-attributes i :dired t)
-                                                    (error nil)))
+                           (propertize
+                            i 'face anything-c-files-face1
+                            'help-echo (condition-case nil
+                                           (anything-ff-attributes i :dired t)
+                                         (error nil)))
                            "close.xpm")
                           i))
                    ( ;; Open Symlinks directories.
@@ -2381,7 +2395,8 @@ or hitting C-z on \"..\"."
                                        'help-echo (file-truename i)) "open.xpm")
                           i))
                    ( ;; Closed Symlinks directories.
-                    (and (stringp (car (file-attributes i))) (file-directory-p i))
+                    (and (stringp (car (file-attributes i)))
+                         (file-directory-p i))
                     (cons (anything-c-prefix-filename
                            (propertize i 'face 'anything-dired-symlink-face
                                        'help-echo (file-truename i)) "close.xpm")
@@ -2396,20 +2411,28 @@ or hitting C-z on \"..\"."
 
 (defun anything-find-files-action-transformer (actions candidate)
   "Action transformer for `anything-c-source-find-files'."
-  (cond ((with-current-buffer anything-current-buffer (eq major-mode 'message-mode))
-         (append actions '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))))
+  (cond ((with-current-buffer anything-current-buffer
+           (eq major-mode 'message-mode))
+         (append (list (car actions))
+                 '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))
+                 (cdr actions)))
         ((string-match (image-file-name-regexp) candidate)
-         (append actions
+         (append (list (car actions))
                  '(("Rotate image right" . anything-ff-rotate-image-right)
-                   ("Rotate image left" . anything-ff-rotate-image-left))))
+                   ("Rotate image left" . anything-ff-rotate-image-left))
+                 (cdr actions)))
         ((string-match "\.el$" (anything-aif (anything-marked-candidates)
                                    (car it) candidate))
-         (append actions '(("Byte compile lisp file(s) `C-u to load'"
-                            . anything-find-files-byte-compile)
-                           ("Load File(s)" . anything-find-files-load-files))))
+         (append (list (car actions))
+                 '(("Byte compile lisp file(s) `C-u to load'"
+                    . anything-find-files-byte-compile)
+                   ("Load File(s)" . anything-find-files-load-files))
+                 (cdr actions)))
         ((and (string-match "\.html$" candidate)
               (file-exists-p candidate))
-         (append actions '(("Browse url file" . browse-url-of-file))))
+         (append (list (car actions))
+                 '(("Browse url file" . browse-url-of-file))
+                 (cdr actions)))
         (t actions)))
 
 (defun anything-ff-gnus-attach-files (candidate)
