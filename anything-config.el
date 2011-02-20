@@ -2865,7 +2865,6 @@ this happens by default."
                                dired-recursive-copies)))
 
 
-
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
@@ -2879,7 +2878,10 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                   ((copy rename)   dired-keep-marker-copy)
                   ('symlink        dired-keep-marker-symlink)
                   ('relsymlink     dired-keep-marker-relsymlink)
-                  ('hardlink       dired-keep-marker-hardlink))))
+                  ('hardlink       dired-keep-marker-hardlink)))
+        (dirflag (and (= (length files) 1)
+                      (file-directory-p (car files))
+                      (not (file-directory-p candidate)))))
     (dired-create-files
      fn (symbol-name action) files
      ;; CANDIDATE is the destination.
@@ -2891,11 +2893,14 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from) candidate))
      marker)
     (when follow
-      (let ((moved-flist  (anything-get-dest-fnames-from-list files candidate)))
+      (let ((moved-flist (anything-get-dest-fnames-from-list files candidate dirflag))
+            (target      (directory-file-name candidate)))
         (unwind-protect
              (progn
                (setq anything-ff-cand-to-mark moved-flist)
-               (anything-find-files1 candidate))
+               (if (and dirflag (eq action 'rename))
+                   (anything-find-files1 (file-name-directory target) target)
+                   (anything-find-files1 candidate)))
           (setq anything-ff-cand-to-mark nil))))))
 
 ;; Internal
@@ -2905,7 +2910,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
   "Resolve basename of file or directory named FNAME."
   (file-name-nondirectory (directory-file-name fname)))
 
-(defun anything-get-dest-fnames-from-list (flist dest-cand)
+(defun anything-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
   "Transform filenames of FLIST to abs of DEST-CAND."
   ;; At this point files have been renamed/copied at destination.
   ;; That's mean DEST-CAND exists.
@@ -2913,9 +2918,10 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
      with dest = (expand-file-name dest-cand)
      for src in flist
      for basename-src = (anything-c-basename src)
-     for fname = (if (file-directory-p dest)
-                     (concat (file-name-as-directory dest) basename-src)
-                     dest)
+     for fname = (cond (rename-dir-flag (directory-file-name dest))
+                       ((file-directory-p dest)
+                        (concat (file-name-as-directory dest) basename-src))
+                       (t dest))
      when (file-exists-p fname)
      collect fname into tmp-list
      finally return (sort tmp-list 'string<)))
