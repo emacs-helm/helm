@@ -261,10 +261,11 @@ For example, to list candidats of \"foo\" source, input pattern as \"foo .\".")
           (anything-mp-3-get-patterns-internal pattern)))
   anything-mp-3-pattern-list)
 (defun anything-mp-3-get-patterns-internal (pattern)
-  (loop for pat in (amp-mp-make-regexps pattern)
-        collect (if (string= "!" (substring pat 0 1))
-                            (cons 'not (substring pat 1))
-                          (cons 'identity pat))))
+  (unless (string= pattern "")
+    (loop for pat in (amp-mp-make-regexps pattern)
+          collect (if (string= "!" (substring pat 0 1))
+                      (cons 'not (substring pat 1))
+                    (cons 'identity pat)))))
 (defun anything-mp-handle-source-name-maybe (pattern self else)
   (when (stringp pattern)
     (setq pattern (anything-mp-3-get-patterns pattern)))
@@ -408,13 +409,17 @@ The smaller  this value is, the slower highlight is.")
 (defun agp-candidates (&optional filter)
   "Normal version of grep-candidates candidates function.
 Grep is run by asynchronous process."
-  (start-process-shell-command "anything-grep-candidates" nil
-                               (agp-command-line-2 filter)))
+  (start-process-shell-command
+   "anything-grep-candidates" nil
+   (agp-command-line-2 filter (anything-attr-defined 'search-from-end))))
 (defun agp-candidates-synchronous-grep (&optional filter)
   "Faster version of grep-candidates candidates function.
 Grep is run by synchronous process.
 It is faster when candidate files are in ramdisk."
-  (split-string (shell-command-to-string (agp-command-line-2 filter)) "\n"))
+  (split-string
+   (shell-command-to-string
+    (agp-command-line-2 filter (anything-attr-defined 'search-from-end)))
+   "\n"))
 (defun agp-candidates-synchronous-grep--direct-insert-match (&optional filter)
   "[EXPERIMENTAL]Fastest version of grep-candidates candidates function at the cost of absense of transformers.
 Grep is run by synchronous process.
@@ -422,39 +427,42 @@ It is faster when candidate files are in ramdisk.
 
 If (direct-insert-match) is in the source, this function is used."
   (with-current-buffer (anything-candidate-buffer 'global)
-    (call-process-shell-command (agp-command-line-2 filter) nil t)))
+    (call-process-shell-command
+     (agp-command-line-2 filter (anything-attr-defined 'search-from-end))
+     nil t)))
 
-(defun agp-command-line (query files &optional limit filter)
+(defun agp-command-line (query files &optional limit filter search-from-end)
   "Build command line used by grep-candidates from QUERY, FILES, LIMIT, and FILTER."
-  (with-temp-buffer
-    (if (string= query "")
-        (insert "cat "
-                (mapconcat
-                 (lambda (f) (shell-quote-argument (expand-file-name f)))
-                 files " "))
-      (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
-            for i from 0
-            do
-            (setq re (replace-regexp-in-string "^-" "\\-" re))
-            (unless (zerop i) (insert " | ")) 
-            (insert "grep -ih "
-                    (if (eq flag 'identity) "" "-v ")
-                    (shell-quote-argument re))
-            (when (zerop i)
-              (insert " "
-                      (mapconcat (lambda (f) (shell-quote-argument
-                                              (expand-file-name f)))
-                                 files " ")))))
-    (when limit (insert (format " | head -n %d" limit)))
-    (when filter (insert " | " filter))
-    (buffer-string)))
-(defun agp-command-line-2 (filter)
+  (let ((allfiles (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f)))
+                             files " ")))
+    (with-temp-buffer
+      (when search-from-end
+        (insert "tac " allfiles))
+      (if (string= query "")
+          (unless search-from-end
+            (insert "cat " allfiles))
+        (when search-from-end (insert " | "))
+        (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
+              for i from 0
+              do
+              (setq re (replace-regexp-in-string "^-" "\\-" re))
+              (unless (zerop i) (insert " | ")) 
+              (insert "grep -ih "
+                      (if (eq flag 'identity) "" "-v ")
+                      (shell-quote-argument re))
+              (when (and (not search-from-end) (zerop i))
+                (insert " " allfiles))))
+      
+      (when limit (insert (format " | head -n %d" limit)))
+      (when filter (insert " | " filter))
+      (buffer-string))))
+(defun agp-command-line-2 (filter &optional search-from-end)
   "Build command line used by grep-candidates from FILTER and current source."
   (agp-command-line
    anything-pattern
    (anything-mklist (anything-interpret-value (anything-attr 'grep-candidates)))
    (anything-candidate-number-limit (anything-get-current-source))
-   filter))
+   filter search-from-end))
 (defun anything-compile-source--grep-candidates (source)
   (anything-aif (assoc-default 'grep-candidates source)
       (append
@@ -553,6 +561,14 @@ was called."
         (agp-command-line "foo" '("/f1") 5))
       (expect "grep -ih foo /f1 | head -n 5 | nkf -w"
         (agp-command-line "foo" '("/f1") 5 "nkf -w"))
+      (expect "cat /f1 | head -n 5 | nkf -w"
+        (agp-command-line "" '("/f1") 5 "nkf -w"))
+      (expect "tac /f1 | grep -ih foo"
+        (agp-command-line "foo" '("/f1") nil nil t))
+      (expect "tac /f1 | grep -ih foo | head -n 5 | nkf -w"
+        (agp-command-line "foo" '("/f1") 5 "nkf -w" t))
+      (expect "tac /f1 | head -n 5 | nkf -w"
+        (agp-command-line "" '("/f1") 5 "nkf -w" t))
       (desc "anything-exact-match")
       (expect (non-nil)
         (anything-exact-match "thunder" "thunder"))
