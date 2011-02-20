@@ -2891,8 +2891,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from) candidate))
      marker)
     (when follow
-      (let* ((moved-flist  (anything-get-dest-fnames-from-list files candidate))
-             (fname        (car moved-flist)))
+      (let ((moved-flist  (anything-get-dest-fnames-from-list files candidate)))
         (unwind-protect
              (progn
                (setq anything-ff-cand-to-mark moved-flist)
@@ -2909,16 +2908,15 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
 (defun anything-get-dest-fnames-from-list (flist dest-cand)
   "Transform filenames of FLIST to abs of DEST-CAND."
   ;; At this point files have been renamed/copied at destination.
+  ;; That's mean DEST-CAND exists.
   (loop
      with dest = (expand-file-name dest-cand)
      for src in flist
      for basename-src = (anything-c-basename src)
      for fname = (if (file-directory-p dest)
-                     (concat (file-name-as-directory dest)
-                             basename-src)
+                     (concat (file-name-as-directory dest) basename-src)
                      dest)
-     ;; Needed in case we rename a dir on itself. (e.g foo=>foo1)
-     when (file-exists-p fname) 
+     when (file-exists-p fname)
      collect fname into tmp-list
      finally return (sort tmp-list 'string<)))
 
@@ -2931,14 +2929,15 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
       (while anything-ff-cand-to-mark
         (if (search-forward (car anything-ff-cand-to-mark) (point-at-eol) t)
             (progn
-              (call-interactively 'anything-toggle-visible-mark)
+              (anything-mark-current-line)
+              (anything-make-visible-mark)
+              (forward-line 1)
               (setq anything-ff-cand-to-mark (cdr anything-ff-cand-to-mark)))
-            (call-interactively 'anything-next-line)))
+            (forward-line 1)))
       (unless (anything-this-visible-mark)
-        (call-interactively 'anything-prev-visible-mark)))))
+        (anything-prev-visible-mark)))))
 
 (add-hook 'anything-after-update-hook #'anything-c-maybe-mark-candidates)
-
 
 (defun* anything-dired-do-action-on-file (&key action)
   (let* ((files     (dired-get-marked-files))
