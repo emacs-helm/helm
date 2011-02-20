@@ -261,10 +261,11 @@ For example, to list candidats of \"foo\" source, input pattern as \"foo .\".")
           (anything-mp-3-get-patterns-internal pattern)))
   anything-mp-3-pattern-list)
 (defun anything-mp-3-get-patterns-internal (pattern)
-  (loop for pat in (amp-mp-make-regexps pattern)
-        collect (if (string= "!" (substring pat 0 1))
-                            (cons 'not (substring pat 1))
-                          (cons 'identity pat))))
+  (unless (string= pattern "")
+    (loop for pat in (amp-mp-make-regexps pattern)
+          collect (if (string= "!" (substring pat 0 1))
+                      (cons 'not (substring pat 1))
+                    (cons 'identity pat)))))
 (defun anything-mp-handle-source-name-maybe (pattern self else)
   (when (stringp pattern)
     (setq pattern (anything-mp-3-get-patterns pattern)))
@@ -436,22 +437,22 @@ If (direct-insert-match) is in the source, this function is used."
                              files " ")))
     (with-temp-buffer
       (when search-from-end
-        (insert "tac " allfiles " | "))
-      (cond ((and (not search-from-end) (string= query ""))
-             (insert "cat " allfiles))
-            ((and search-from-end (string= query ""))
-             (delete-backward-char 3))
-            (t
-             (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
-                   for i from 0
-                   do
-                   (setq re (replace-regexp-in-string "^-" "\\-" re))
-                   (unless (zerop i) (insert " | ")) 
-                   (insert "grep -ih "
-                           (if (eq flag 'identity) "" "-v ")
-                           (shell-quote-argument re))
-                   (when (and (not search-from-end) (zerop i))
-                     (insert " " allfiles)))))
+        (insert "tac " allfiles))
+      (if (string= query "")
+          (unless search-from-end
+            (insert "cat " allfiles))
+        (when search-from-end (insert " | "))
+        (loop for (flag . re) in (anything-mp-3-get-patterns-internal query)
+              for i from 0
+              do
+              (setq re (replace-regexp-in-string "^-" "\\-" re))
+              (unless (zerop i) (insert " | ")) 
+              (insert "grep -ih "
+                      (if (eq flag 'identity) "" "-v ")
+                      (shell-quote-argument re))
+              (when (and (not search-from-end) (zerop i))
+                (insert " " allfiles))))
+      
       (when limit (insert (format " | head -n %d" limit)))
       (when filter (insert " | " filter))
       (buffer-string))))
