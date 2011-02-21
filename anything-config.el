@@ -1671,7 +1671,8 @@ Mark all visible candidates of current source or unmark all candidates
 visible or invisible in all sources of current anything session"
   (interactive)
   (let ((marked (anything-marked-candidates)))
-    (if (> (length marked) 1)
+    (if (and (>= (length marked) 1)
+             (with-anything-window anything-visible-mark-overlays))
         (anything-unmark-all)
         (anything-mark-all))))
 
