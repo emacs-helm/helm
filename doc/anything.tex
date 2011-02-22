@@ -15,7 +15,7 @@
 \begin{document}
 \begin{titlepage}
 \title{Anything User Manual}
-\date{\today}
+\date{Last update: \today}
 \author{ThierryVolpiatto}
 \maketitle
 \tableofcontents
@@ -132,7 +132,7 @@ while in anything session will show you all other bindings.
   \hline
   anything-next-page & next or C-v \\
   \hline
-  anything-beginning-of-buffer &
+  anything-beginning-of-buffer & 
 \begin{verbatim}
 M-<
 \end{verbatim}
@@ -197,6 +197,8 @@ M->
   anything-previous-history-element & M-p \\
   \hline
   anything-next-history-element & M-n \\
+  \hline
+  anything-toggle-all-marks & M-m \\
   \hline
 \end{tabular}
 \section{Overview of preconfigured anything commands}
@@ -439,16 +441,19 @@ to choose program with C-u.
 You can run eshell-command on files or marked files, the command you use have to accept
 one file as argument.
 The completion is make on your eshell aliases.
+This allow you creating personal actions for ``anything-find-files''.
 
 \subsection{Why Eshell}
 \label{sec:why-eshell}
-Because eshell allow you to create aliases.
-You can like that create personal commands for anything-find-files.
+\begin{itemize}
+\item Because eshell allow you to create aliases.
+\end{itemize}
+\begin{itemize}
+\item Because eshell accept shell commands but also elisp functions.
+\end{itemize}
 All these command should end with \$1.
 You will have completion against all these aliases once eshell is loaded.
 (start it once before using anything-find-files).
-
-NOTE: Eshell accept shell commands but also elisp functions :-).
 
 \subsection{Setup Aliases}
 \label{sec:setup-aliases}
@@ -652,13 +657,13 @@ The arguments are the same than the ones in ``locate''.
 To use etags in Emacs you have first to create a TAGS file for your project with the etags shell command.
 If your directory contains subdirectories use someting like:(e.g .el files)
 \begin{verbatim}
-etag find . -iregex .*\.el$ | xargs etags
+find . -iregex .*\.el$ | xargs etags
 \end{verbatim}
 Otherwise
 \begin{verbatim}
 etags *.el
 \end{verbatim}
-is enought
+is enough
 
 For more infos see the man page of etags.
 
