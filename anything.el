@@ -1694,6 +1694,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (anything-create-anything-buffer)
   (anything-log-run-hook 'anything-after-initialize-hook))
 
+(defvar anything-reading-pattern nil
+  "Whether in `read-string' in anything or not.")
 (defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume any-keymap)
   (if (anything-resume-p any-resume)
       (anything-mark-current-line)
@@ -1716,7 +1718,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
            (and (functionp anything-quit-if-no-candidate)
                 (funcall anything-quit-if-no-candidate)))
           (t
-           (read-string (or any-prompt "pattern: ") any-input)))))
+           (let ((anything-reading-pattern t))
+             (read-string (or any-prompt "pattern: ") any-input))))))
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
