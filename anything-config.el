@@ -7530,15 +7530,17 @@ Ask to kill buffers associated with that file, too."
         ;; doesn't support delete-by-moving-to-trash
         ;; so use `delete-directory' and `delete-file'
         ;; that handle it.
-        (if (file-directory-p file)
-            (if (directory-files file t dired-re-no-dot)     
-                (when (y-or-n-p (format "Recursive delete of `%s'? " file))
-                  (delete-directory file 'recursive))
-                (delete-directory file))
-            (delete-file file))
-        (dired-delete-file file 'dired-recursive-deletes
-                           (and (boundp 'delete-by-moving-to-trash)
-                                delete-by-moving-to-trash)))
+        (cond ((and (not (file-symlink-p file))
+                    (file-directory-p file)
+                    (directory-files file t dired-re-no-dot))
+               (when (y-or-n-p (format "Recursive delete of `%s'? " file))
+                 (delete-directory file 'recursive)))
+              ((and (not (file-symlink-p file))
+                    (file-directory-p file))
+               (delete-directory file))
+              (t (delete-file file)))
+        (dired-delete-file
+         file 'dired-recursive-deletes delete-by-moving-to-trash))
     (when buffers
       (dolist (buf buffers)
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
