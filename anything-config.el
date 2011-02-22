@@ -6246,6 +6246,12 @@ http://bbdb.sourceforge.net/")
     (action ("Copy result to kill-ring" . kill-new))))
 ;; (anything 'anything-c-source-calculation-result)
 
+;;;###autoload
+(defun anything-calcul-expression ()
+  "Preconfigured anything for `anything-c-source-calculation-result'."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-calculation-result "*anything calcul*"))
+
 ;;; Google Suggestions
 (defvar anything-gg-sug-lgh-flag 0)
 (defun anything-c-google-suggest-fetch (input)
