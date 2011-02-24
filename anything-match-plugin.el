@@ -477,14 +477,12 @@ If (direct-insert-match) is in the source, this function is used."
                 (anything-log "fastest version (use-fast-directory and direct-insert-match)")
                 `((candidates . agp-candidates-synchronous-grep--direct-insert-match)
                   (match identity)
-                  (volatile)
-                  (requires-pattern)))
+                  (volatile)))
                (use-fast-directory
                 (anything-log "faster version (use-fast-directory)")
                 `((candidates . agp-candidates-synchronous-grep)
                   (match identity)
-                  (volatile)
-                  (requires-pattern)))
+                  (volatile)))
                (t
                 (anything-log "normal version")
                 '((candidates . agp-candidates)
