@@ -3729,11 +3729,15 @@ Then
     (grep-candidates . anything-c-filelist-file-name)
     (candidate-number-limit . 200)
     (requires-pattern . 4)
-    (type . file)))
+    (type . file))
+  "Source to find files instantly.
+See `anything-c-filelist-file-name' docstring for usage.")
 
 ;;;###autoload
 (defun anything-filelist ()
-  "Preconfigured `anything' to open files instantly."
+  "Preconfigured `anything' to open files instantly.
+
+See `anything-c-filelist-file-name' docstring for usage."
   (interactive)
   (anything-other-buffer 'anything-c-source-filelist "*anything file list*"))
 
@@ -3741,7 +3745,8 @@ Then
 (defun anything-filelist+ ()
   "Preconfigured `anything' to open files/buffers/bookmarks instantly.
 
-This is a replacement for `anything-for-files'."
+This is a replacement for `anything-for-files'.
+See `anything-c-filelist-file-name' docstring for usage."
   (interactive)
   (anything-other-buffer
    '(anything-c-source-ffap-line
@@ -8552,8 +8557,10 @@ Return nil if bmk is not a valid bookmark."
   `((action
      ,@(if pop-up-frames
            '(("Switch to buffer other window" . switch-to-buffer-other-window)
+             ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
              ("Switch to buffer" . switch-to-buffer))
          '(("Switch to buffer" . switch-to-buffer)
+           ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
            ("Switch to buffer other window" . switch-to-buffer-other-window)
            ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
@@ -8576,9 +8583,11 @@ Return nil if bmk is not a valid bookmark."
   `((action
      ,@(if pop-up-frames
            '(("Find file other window" . find-file-other-window)
+             ,(and (locate-library "popwin") '("Find file in popup window" . popwin:find-file))
              ("Find file(s)" . anything-find-many-files)
              ("Find file as root" . anything-find-file-as-root))
          '(("Find file" . anything-find-many-files)
+           ,(and (locate-library "popwin") '("Find file in popup window" . popwin:find-file))
            ("Find file as root" . anything-find-file-as-root)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))

@@ -116,6 +116,8 @@
 ;;    Invoke default action with digit/alphabet shortcut.
 ;;  `anything-exit-minibuffer'
 ;;    Select the current candidate by exiting the minibuffer.
+;;  `anything-keyboard-quit'
+;;    Quit minibuffer in anything.
 ;;  `anything-help'
 ;;    Help of `anything'.
 ;;  `anything-debug-output'
@@ -623,6 +625,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-v")     'anything-next-page)
     (define-key map (kbd "M-<")     'anything-beginning-of-buffer)
     (define-key map (kbd "M->")     'anything-end-of-buffer)
+    (define-key map (kbd "C-g")     'anything-keyboard-quit)
     (define-key map (kbd "<right>") 'anything-next-source)
     (define-key map (kbd "<left>") 'anything-previous-source)
     (define-key map (kbd "<RET>") 'anything-exit-minibuffer)
@@ -1694,6 +1697,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (anything-create-anything-buffer)
   (anything-log-run-hook 'anything-after-initialize-hook))
 
+(defvar anything-reading-pattern nil
+  "Whether in `read-string' in anything or not.")
 (defun anything-read-pattern-maybe (any-prompt any-input any-preselect any-resume any-keymap)
   (if (anything-resume-p any-resume)
       (anything-mark-current-line)
@@ -1716,7 +1721,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
            (and (functionp anything-quit-if-no-candidate)
                 (funcall anything-quit-if-no-candidate)))
           (t
-           (read-string (or any-prompt "pattern: ") any-input)))))
+           (let ((anything-reading-pattern t))
+             (read-string (or any-prompt "pattern: ") any-input))))))
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
@@ -2592,6 +2598,14 @@ UNIT and DIRECTION."
   (setq anything-iswitchb-candidate-selected (anything-get-selection))
   (exit-minibuffer))
 
+(defun anything-keyboard-quit ()
+  "Quit minibuffer in anything.
+
+If action buffer is displayed, kill it."
+  (interactive)
+  (when (get-buffer-window anything-action-buffer 'visible)
+    (kill-buffer anything-action-buffer))
+  (abort-recursive-edit))
 
 (defun anything-get-next-header-pos ()
   "Return the position of the next header from point."
@@ -3128,18 +3142,21 @@ Otherwise goto the end of minibuffer."
          t)
         (anything-log-run-hook 'anything-after-persistent-action-hook)))))
 
+(defun anything-persistent-action-display-window ()
+  (with-current-buffer anything-buffer
+    (setq anything-persistent-action-display-window
+          (cond ((window-live-p anything-persistent-action-display-window)
+                 anything-persistent-action-display-window)
+                ((and anything-samewindow (one-window-p t))
+                 (split-window))
+                ((get-buffer-window anything-current-buffer))
+                (t
+                 (next-window (selected-window) 1))))))
+
 (defun anything-select-persistent-action-window ()
   (select-window (get-buffer-window (anything-buffer-get)))
   (select-window
-   (setq minibuffer-scroll-window
-         (setq anything-persistent-action-display-window
-               (cond ((window-live-p anything-persistent-action-display-window)
-                      anything-persistent-action-display-window)
-                     ((and anything-samewindow (one-window-p t))
-                      (split-window))
-                     ((get-buffer-window anything-current-buffer))
-                     (t
-                      (next-window (selected-window) 1)))))))
+   (setq minibuffer-scroll-window (anything-persistent-action-display-window))))
 
 (defun anything-persistent-action-display-buffer (buf &optional not-this-window)
   "Make `pop-to-buffer' and `display-buffer' display in the same window in persistent action.
@@ -3161,11 +3178,7 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun anything-scroll-other-window-base (command)
-  (save-selected-window
-    (select-window
-     (some-window
-      (lambda (w) (not (string= anything-buffer (buffer-name (window-buffer w)))))
-      'no-minibuffer 'current-frame))
+  (with-selected-window (anything-persistent-action-display-window)
     (funcall command anything-scroll-amount)))
 
 (defun anything-scroll-other-window ()

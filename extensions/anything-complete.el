@@ -268,7 +268,11 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
             (with-current-buffer anything-current-buffer
               (save-excursion
                 (backward-char (string-width anything-complete-target))
-                (alcs-current-physical-column)))))
+                (max 0
+                     (- (alcs-current-physical-column)
+                        (if (buffer-local-value 'anything-enable-shortcuts (get-buffer anything-buffer))
+                            4           ;length of shortcut overlay
+                          0)))))))
   (mapcar (lambda (cand) (cons (concat (make-string alcs-physical-column-at-startup ? ) cand) cand))
           candidates))
 
