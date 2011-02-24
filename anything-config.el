@@ -8523,8 +8523,10 @@ Return nil if bmk is not a valid bookmark."
   `((action
      ,@(if pop-up-frames
            '(("Switch to buffer other window" . switch-to-buffer-other-window)
+             ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
              ("Switch to buffer" . switch-to-buffer))
          '(("Switch to buffer" . switch-to-buffer)
+           ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
            ("Switch to buffer other window" . switch-to-buffer-other-window)
            ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
@@ -8547,9 +8549,11 @@ Return nil if bmk is not a valid bookmark."
   `((action
      ,@(if pop-up-frames
            '(("Find file other window" . find-file-other-window)
+             ,(and (locate-library "popwin") '("Find file in popup window" . popwin:find-file))
              ("Find file(s)" . anything-find-many-files)
              ("Find file as root" . anything-find-file-as-root))
          '(("Find file" . anything-find-many-files)
+           ,(and (locate-library "popwin") '("Find file in popup window" . popwin:find-file))
            ("Find file as root" . anything-find-file-as-root)
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))
