@@ -116,6 +116,8 @@
 ;;    Invoke default action with digit/alphabet shortcut.
 ;;  `anything-exit-minibuffer'
 ;;    Select the current candidate by exiting the minibuffer.
+;;  `anything-keyboard-quit'
+;;    Quit minibuffer in anything.
 ;;  `anything-help'
 ;;    Help of `anything'.
 ;;  `anything-debug-output'
@@ -623,6 +625,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-v")     'anything-next-page)
     (define-key map (kbd "M-<")     'anything-beginning-of-buffer)
     (define-key map (kbd "M->")     'anything-end-of-buffer)
+    (define-key map (kbd "C-g")     'anything-keyboard-quit)
     (define-key map (kbd "<right>") 'anything-next-source)
     (define-key map (kbd "<left>") 'anything-previous-source)
     (define-key map (kbd "<RET>") 'anything-exit-minibuffer)
@@ -2595,6 +2598,14 @@ UNIT and DIRECTION."
   (setq anything-iswitchb-candidate-selected (anything-get-selection))
   (exit-minibuffer))
 
+(defun anything-keyboard-quit ()
+  "Quit minibuffer in anything.
+
+If action buffer is displayed, kill it."
+  (interactive)
+  (when (get-buffer-window anything-action-buffer 'visible)
+    (kill-buffer anything-action-buffer))
+  (abort-recursive-edit))
 
 (defun anything-get-next-header-pos ()
   "Return the position of the next header from point."
