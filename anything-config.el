@@ -3726,11 +3726,15 @@ Then
     (grep-candidates . anything-c-filelist-file-name)
     (candidate-number-limit . 200)
     (requires-pattern . 4)
-    (type . file)))
+    (type . file))
+  "Source to find files instantly.
+See `anything-c-filelist-file-name' docstring for usage.")
 
 ;;;###autoload
 (defun anything-filelist ()
-  "Preconfigured `anything' to open files instantly."
+  "Preconfigured `anything' to open files instantly.
+
+See `anything-c-filelist-file-name' docstring for usage."
   (interactive)
   (anything-other-buffer 'anything-c-source-filelist "*anything file list*"))
 
@@ -3738,7 +3742,8 @@ Then
 (defun anything-filelist+ ()
   "Preconfigured `anything' to open files/buffers/bookmarks instantly.
 
-This is a replacement for `anything-for-files'."
+This is a replacement for `anything-for-files'.
+See `anything-c-filelist-file-name' docstring for usage."
   (interactive)
   (anything-other-buffer
    '(anything-c-source-ffap-line
