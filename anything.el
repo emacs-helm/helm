@@ -1278,7 +1278,7 @@ The action is to call FUNCTION with arguments ARGS."
 DOC is displayed in `anything-type-attributes' docstring.
 
 Use this function is better than setting `anything-type-attributes' directly."
-  (delq nil (car definition))
+  (loop for i in definition do (setf i (delete nil i)))
   (anything-add-type-attribute type definition)
   (and doc (anything-document-type-attribute type doc))
   nil)
