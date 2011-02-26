@@ -2479,6 +2479,27 @@ This affect directly file CANDIDATE."
   (interactive)
   (anything-execute-persistent-action 'image-action2))
 
+(defcustom anything-ff-exif-data-program "exiftran"
+  "*Program used to extract exif data of an image file."
+  :group 'anything-config
+  :type 'string)
+
+(defcustom anything-ff-exif-data-program-args "-d"
+  "*Arguments used for `anything-ff-exif-data-program'."
+  :group 'anything-config
+  :type 'string)
+
+(defun anything-ff-exif-data (candidate)
+  "Extract exif data from file CANDIDATE using `anything-ff-exif-data-program'."
+  (if (and anything-ff-exif-data-program
+           (executable-find anything-ff-exif-data-program))
+      (shell-command-to-string (format "%s %s %s"
+                                       anything-ff-exif-data-program
+                                       anything-ff-exif-data-program-args
+                                       candidate))
+      (format "No program %s found to extract exif"
+              anything-ff-exif-data-program)))
+
 ;; Have no effect if candidate is not an image file.
 (define-key anything-map (kbd "M-l") 'anything-ff-rotate-left-persistent)
 (define-key anything-map (kbd "M-r") 'anything-ff-rotate-right-persistent)
@@ -2526,7 +2547,10 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                (kill-buffer image-dired-display-image-buffer))
              (image-dired-display-image candidate)
              (message nil)
-             (display-buffer image-dired-display-image-buffer))
+             (display-buffer image-dired-display-image-buffer)
+             (with-current-buffer image-dired-display-image-buffer
+               (let ((exif-data (anything-ff-exif-data candidate)))
+                 (image-dired-update-property 'help-echo exif-data))))
             ;; Allow browsing archive on avfs fs.
             ;; Assume volume is already mounted with mountavfs.
             ((and anything-ff-avfs-directory
