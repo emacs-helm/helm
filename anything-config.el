@@ -3208,9 +3208,9 @@ The \"-r\" option must be the last option.")
                                               (expand-file-name i))
                                              "*") t))
              ((string-match "\*" i) (file-expand-wildcards i t))
-             (t (list i))) into of
+             (t (list i))) into all-files
        finally return
-       (mapconcat #'(lambda (x) (shell-quote-argument x)) of " ")))
+       (mapconcat 'shell-quote-argument all-files " ")))
 
 (defun anything-c-grep-recurse-p ()
   "Check if `anything-do-grep1' have switched to recursive."
@@ -3222,13 +3222,16 @@ The \"-r\" option must be the last option.")
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((fnargs        (anything-c-grep-prepare-candidates
                          (if (file-remote-p anything-ff-default-directory)
-                             (mapcar #'(lambda (x) (file-remote-p x 'localname)) only-files)
+                             (mapcar #'(lambda (x)
+                                         (file-remote-p x 'localname))
+                                     only-files)
                              only-files)))
          (ignored-files (mapconcat
                          #'(lambda (x)
                              (concat "--exclude=" (shell-quote-argument x)))
                          grep-find-ignored-files " "))
-         (ignored-dirs  (mapconcat ; Need grep version 2.5.4 of Gnuwin32 on windoze. 
+         (ignored-dirs  (mapconcat
+                         ;; Need grep version 2.5.4 of Gnuwin32 on windoze.
                          #'(lambda (x)
                              (concat "--exclude-dir=" (shell-quote-argument x)))
                          grep-find-ignored-directories " "))
@@ -3266,7 +3269,8 @@ WHERE can be one of other-window, elscreen, other-frame."
          (tramp-method (file-remote-p anything-ff-default-directory 'method))
          (tramp-host   (file-remote-p anything-ff-default-directory 'host))
          (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-         (fname        (if tramp-host (concat tramp-prefix loc-fname) loc-fname)))
+         (fname        (if tramp-host
+                           (concat tramp-prefix loc-fname) loc-fname)))
     (case where
       (other-window (find-file-other-window fname))
       (elscreen     (anything-elscreen-find-file fname))
@@ -3316,9 +3320,10 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
      :sources
      `(((name . "Grep (M-up/down - next/prec file)")
         (candidates
-         . (lambda () (if include-files
-                          (funcall anything-c-grep-default-function only include-files)
-                          (funcall anything-c-grep-default-function only))))
+         . (lambda ()
+             (if include-files
+                 (funcall anything-c-grep-default-function only include-files)
+                 (funcall anything-c-grep-default-function only))))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (action . ,(delq
@@ -3330,7 +3335,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                       ,(and (locate-library "elscreen")
                             '("Find file in Elscreen"
                               . (lambda (candidate)
-                                  (anything-c-grep-action candidate 'elscreen))))
+                                  (anything-c-grep-action
+                                   candidate 'elscreen))))
                       ("Find file other frame"
                        . (lambda (candidate)
                            (anything-c-grep-action candidate 'other-frame))))))
@@ -7433,13 +7439,14 @@ If EXE is already running just jump to his window if `anything-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
-  (lexical-let* ((real-com (car (split-string (replace-regexp-in-string "'%s'" "" exe))))
+  (lexical-let* ((real-com (car (split-string (replace-regexp-in-string
+                                               "'%s'" "" exe))))
                  (proc     (if file (concat real-com " " file) real-com)))
     (if (get-process proc)
         (if anything-raise-command
             (shell-command  (format anything-raise-command real-com))
             (error "Error: %s is already running" real-com))
-        (when (member real-com anything-c-external-commands-list)
+        (when (loop for i in anything-c-external-commands-list thereis real-com)
           (message "Starting %s..." real-com)
           (if file
               (start-process-shell-command proc nil (format exe file))
@@ -7453,7 +7460,8 @@ In this case EXE must be provided as \"EXE %s\"."
                  (shell-command  (format anything-raise-command "emacs")))
                (message "%s process...Finished." process))))
         (setq anything-c-external-commands-list
-              (cons real-com (delete real-com anything-c-external-commands-list))))))
+              (cons real-com
+                    (delete real-com anything-c-external-commands-list))))))
 
 
 (defvar anything-external-command-history nil)
