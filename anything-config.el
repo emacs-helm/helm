@@ -7920,6 +7920,30 @@ evaluate it and put it onto the `command-history'."
 displayed with the `file-name-shadow' face if available."
   (anything-c-shadow-entries buffers anything-c-boring-buffer-regexp))
 
+(defvar anything-c-buffer-display-string-functions
+  '(anything-c-buffer-display-string--compilation)
+  "Functions to setup display string for buffer.
+
+Function has one argument, buffer name.
+If it returns string, use it.
+If it returns nil, display buffer name.
+See `anything-c-buffer-display-string--compilation' for example.")
+
+(defun anything-c-transform-buffer-display-string (buffers)
+  "Setup display string for buffer candidates
+using `anything-c-buffer-display-string-functions'."
+  (loop for buf in buffers 
+        if (consp buf)
+        collect buf
+        else
+        for disp = (progn (set-buffer buf)
+                          (run-hook-with-args-until-success
+                           'anything-c-buffer-display-string-functions buf))
+        collect (if disp (cons disp buf) buf)))
+
+(defun anything-c-buffer-display-string--compilation (buf)
+  (anything-aif (car compilation-arguments)
+      (format "%s: %s [%s]" buf it default-directory)))
 ;;; Files
 (defun anything-c-shadow-boring-files (files)
   "Files matching `anything-c-boring-file-regexp' will be
@@ -8608,7 +8632,9 @@ Return nil if bmk is not a valid bookmark."
      ("Ediff Merge marked buffers" . (lambda (candidate)
                                        (anything-ediff-marked-buffers candidate t))))
     (persistent-help . "Show this buffer")
-    (candidate-transformer anything-c-skip-current-buffer anything-c-skip-boring-buffers))
+    (candidate-transformer anything-c-skip-current-buffer
+                           anything-c-skip-boring-buffers
+                           anything-c-transform-buffer-display-string))
   "Buffer or buffer name.")
 
 (define-anything-type-attribute 'file
