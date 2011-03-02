@@ -2010,18 +2010,19 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
     matches))
 
 (defun anything-compute-matches-internal (source)
-  (let ((matchfns (anything-match-functions source))
-        (anything-source-name (assoc-default 'name source))
-        (limit (anything-candidate-number-limit source))
-        (anything-pattern (anything-process-pattern-transformer
-                           anything-pattern source)))
-    (anything-process-filtered-candidate-transformer
-     (if (or (equal anything-pattern "") (equal matchfns '(identity)))
-         (anything-take-first-elements
-          (anything-get-cached-candidates source) limit)
-       (anything-match-from-candidates
-        (anything-get-cached-candidates source) matchfns limit))
-     source)))
+  (save-current-buffer
+    (let ((matchfns (anything-match-functions source))
+          (anything-source-name (assoc-default 'name source))
+          (limit (anything-candidate-number-limit source))
+          (anything-pattern (anything-process-pattern-transformer
+                             anything-pattern source)))
+      (anything-process-filtered-candidate-transformer
+       (if (or (equal anything-pattern "") (equal matchfns '(identity)))
+           (anything-take-first-elements
+            (anything-get-cached-candidates source) limit)
+         (anything-match-from-candidates
+          (anything-get-cached-candidates source) matchfns limit))
+       source))))
 
 ;; (anything '(((name . "error")(candidates . (lambda () (hage))) (action . identity))))
 
