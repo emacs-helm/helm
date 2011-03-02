@@ -7921,7 +7921,9 @@ displayed with the `file-name-shadow' face if available."
   (anything-c-shadow-entries buffers anything-c-boring-buffer-regexp))
 
 (defvar anything-c-buffer-display-string-functions
-  '(anything-c-buffer-display-string--compilation)
+  '(anything-c-buffer-display-string--compilation
+    anything-c-buffer-display-string--shell
+    anything-c-buffer-display-string--eshell)
   "Functions to setup display string for buffer.
 
 Function has one argument, buffer name.
@@ -7944,6 +7946,17 @@ using `anything-c-buffer-display-string-functions'."
 (defun anything-c-buffer-display-string--compilation (buf)
   (anything-aif (car compilation-arguments)
       (format "%s: %s [%s]" buf it default-directory)))
+(defun anything-c-buffer-display-string--eshell (buf)
+  (when (eq major-mode 'eshell-mode)
+    (format "%s: %s [%s]" buf
+            (ignore-errors (ring-ref eshell-history-ring 0))
+            default-directory)))
+(defun anything-c-buffer-display-string--shell (buf)
+  (when (eq major-mode 'shell-mode)
+    (format "%s: %s [%s]" buf
+            (ignore-errors (ring-ref comint-input-ring 0))
+            default-directory)))
+
 ;;; Files
 (defun anything-c-shadow-boring-files (files)
   "Files matching `anything-c-boring-file-regexp' will be
