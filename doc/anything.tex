@@ -200,6 +200,8 @@ M->
   \hline
   anything-toggle-all-marks & M-m \\
   \hline
+  anything-yank-text-at-point & C-w \\
+  \hline
 \end{tabular}
 \section{Overview of preconfigured anything commands}
 \label{sec:overv-comm-avail}
@@ -412,21 +414,45 @@ C-u f5 a M-g s
 \end{verbatim}
 
 You will be prompted for selecting in which category of files to search:
-Use the wilcard syntax like *.el for example (search in only .el files).
+Use the wilcard syntax like *.el for example (search in only ``.el'' files).
+\\
+\begin{itemize}
+\item NOTE: Be sure to be at the root of directory, of course grepping recursively with cursor
+on a filename candidate will find nothing.
 
-
+\end{itemize}
 \subsection{Grep Using Wildcard}
 \label{sec:grep-using-wildcard}
 You can use wildcard:
 From the root of your directory, if you want for example to search files with .el extension:
-add *.el to prompt
+add *.el to prompt.
 
 \subsection{Grep thing at point}
 \label{sec:grep-thing-at}
 Before lauching anything, put your cursor on the start of symbol or sexp you will want to grep.
 Then launch anything-do-grep or anything-find-files, and when in the grep prompt hit C-w as many time as needed.
 
+\subsection{Grep persistent action}
+\label{sec:grep-pers-acti}
+As always, C-z will bring you in the buffer corresponding to the file you are grepping. \\
+Well nothing new, but using C-u C-z will record this place in the mark-ring.
+So if you want to come back later to these places no need to grep again, you will find all these 
+places in the mark-ring.\\
+Accessing the mark-ring in Emacs is really inconvenient, fortunately, you will find in anything-config 
+``anything-all-mark-ring'' which is a mark-ring browser (f5-a C-c SPACE).
+\newpage
+``anything-all-mark-ring'' is in anything menu also, in the tool section.\\
 
+\begin{itemize}
+\item TIP: Bind ``anything-all-mark-ring'' to C-c SPACE.
+\begin{verbatim}
+(global-set-key (kbd "C-c <SPC>") 'anything-all-mark-rings)
+\end{verbatim}
+\end{itemize}
+
+\begin{itemize}
+\item NOTE: ``anything-all-mark-ring'' handle global-mark-ring also.
+\end{itemize}
 \subsection{Open Files Externally}
 \label{sec:open-files-extern}
 You will find in action menu from anything-find-files an action to open file with external program.
