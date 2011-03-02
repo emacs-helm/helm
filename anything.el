@@ -1707,24 +1707,24 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
     (anything-update))
   (select-frame-set-input-focus (window-frame (minibuffer-window)))
   (anything-preselect any-preselect)
-  (let ((minibuffer-local-map
-         (with-current-buffer (anything-buffer-get)
-           (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
-           anything-map)))
-    (anything-log-eval (anything-approximate-candidate-number)
-                       anything-execute-action-at-once-if-one
-                       anything-quit-if-no-candidate)
-    (cond ((and anything-execute-action-at-once-if-one
-                (= (anything-approximate-candidate-number) 1))
-           (ignore))
-          ((and anything-quit-if-no-candidate
-                (= (anything-approximate-candidate-number) 0))
-           (setq anything-quit t)
-           (and (functionp anything-quit-if-no-candidate)
-                (funcall anything-quit-if-no-candidate)))
-          (t
-           (let ((anything-reading-pattern t))
-             (read-string (or any-prompt "pattern: ") any-input))))))
+  (with-current-buffer (anything-buffer-get)
+    (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
+    (let ((minibuffer-local-map
+           anything-map))
+      (anything-log-eval (anything-approximate-candidate-number)
+                         anything-execute-action-at-once-if-one
+                         anything-quit-if-no-candidate)
+      (cond ((and anything-execute-action-at-once-if-one
+                  (= (anything-approximate-candidate-number) 1))
+             (ignore))
+            ((and anything-quit-if-no-candidate
+                  (= (anything-approximate-candidate-number) 0))
+             (setq anything-quit t)
+             (and (functionp anything-quit-if-no-candidate)
+                  (funcall anything-quit-if-no-candidate)))
+            (t
+             (let ((anything-reading-pattern t))
+               (read-string (or any-prompt "pattern: ") any-input)))))))
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
