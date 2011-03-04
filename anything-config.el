@@ -3200,14 +3200,21 @@ The \"-r\" option must be the last option.")
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
   (loop for i in candidates append
-       (cond ((and (file-directory-p i)
+       (cond (;; Candidate is a directory and we use recursion.
+              (and (file-directory-p i)
                    (anything-c-grep-recurse-p))
               (list (expand-file-name i)))
+             ;; Candidate is a directory, search in all files.
              ((file-directory-p i)
-              (file-expand-wildcards (concat (file-name-as-directory
-                                              (expand-file-name i))
-                                             "*") t))
+              (file-expand-wildcards
+               (concat (file-name-as-directory (expand-file-name i)) "*") t))
+             ;; Candidate use wildcard.
              ((string-match "\*" i) (file-expand-wildcards i t))
+             ;; Candidate is a file and we use recursion, use the
+             ;; current directory instead of candidate.
+             ((and (file-exists-p i) (anything-c-grep-recurse-p))
+              (list (file-name-directory (directory-file-name i))))
+             ;; Else should be one or more file.
              (t (list i))) into all-files
        finally return
        (mapconcat 'shell-quote-argument all-files " ")))
