@@ -3297,6 +3297,26 @@ With a prefix arg record CANDIDATE in `mark-ring'."
       (anything-c-grep-action candidate))
   (anything-match-line-color-current-line))
 
+(defun anything-c-grep-guess-extensions (files)
+  "Try to guess file extensions in FILES list when using grep recurse.
+These extensions will be added to command line with --include arg of grep."
+  (loop
+     with glob-list = nil
+     with lst = (if (file-directory-p (car files))
+                    (directory-files
+                     (car files) nil
+                     directory-files-no-dot-files-regexp)
+                    files)
+     for i in lst
+     for ext = (file-name-extension i t)
+     for glob = (and ext (not (string= ext ""))
+                     (concat "*" ext))
+     unless (or (not glob)
+                (member glob glob-list)
+                (member glob grep-find-ignored-files))
+     collect glob into glob-list
+     finally return glob-list))
+
 (defun anything-do-grep1 (only &optional recurse)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep and prompt user
@@ -3308,11 +3328,14 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
           ;; rule out anything-match-plugin because the input is one regexp.
           (delq 'anything-compile-source--match-plugin
                 (copy-sequence anything-compile-source-functions)))
-         (include-files (and recurse (read-string "OnlyExt(*.[ext]): ")))
+         (exts (anything-c-grep-guess-extensions only))
+         (globs (mapconcat 'identity exts " "))
+         (include-files (and recurse (read-string "OnlyExt(*.[ext]): "
+                                                  globs)))
          (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
                                               anything-c-grep-default-command))
          ;; Disable match-plugin and use here own highlighting.
-         (anything-mp-highlight-delay nil))
+         (anything-mp-highlight-delay     nil))
     (when include-files
       (setq include-files
             (and (not (string= include-files ""))
