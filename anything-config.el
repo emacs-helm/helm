@@ -3174,8 +3174,9 @@ The \"-r\" option must be the last option.")
 ;;       It have no effect on GNU/Linux.
 (defvar anything-c-grep-default-command "grep -d skip -niH -e %s %s %s"
   "Default format command for `anything-do-grep'.")
-
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
+(defvar anything-c-grep-debug-command-line nil
+  "Turn on anything grep command-line debugging when non--nil.")
 
 (defface anything-grep-match
   '((t (:inherit match)))
@@ -3244,7 +3245,15 @@ The \"-r\" option must be the last option.")
                          grep-find-ignored-directories " "))
          (exclude       (if (anything-c-grep-recurse-p)
                             (concat (or include ignored-files) " " ignored-dirs)
-                            ignored-files)))
+                            ignored-files))
+         (cmd-line      (format anything-c-grep-default-command
+                                (shell-quote-argument anything-pattern)
+                                fnargs
+                                exclude)))
+    (when anything-c-grep-debug-command-line
+      (with-current-buffer (get-buffer-create "*any grep debug*")
+        (goto-char (point-max))
+        (insert (concat ">>> " cmd-line "\n\n"))))
     (setq mode-line-format
           '(" " mode-line-buffer-identification " "
             (line-number-mode "%l") " "
@@ -3254,10 +3263,7 @@ The \"-r\" option must be the last option.")
         (let ((default-directory anything-ff-default-directory))
           (start-file-process-shell-command
            "grep-process" nil
-           (format anything-c-grep-default-command
-                   (shell-quote-argument anything-pattern)
-                   fnargs
-                   exclude)))
+           cmd-line))
       (message nil)
       (set-process-sentinel
        (get-process "grep-process")
