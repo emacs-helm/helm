@@ -3060,6 +3060,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
                                    (initial-input (expand-file-name default-directory))
                                    (buffer "*Anything Completions*")
                                    test
+                                   (preselect nil)
                                    (history nil)
                                    (marked-candidates nil)
                                    (persistent-action 'anything-find-files-persistent-action)
@@ -3099,7 +3100,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            :input initial-input
            :prompt prompt
            :resume 'noresume
-           :buffer buffer)
+           :buffer buffer
+           :preselect preselect)
           (keyboard-quit)))))
 
 ;;; File Cache
@@ -3261,9 +3263,7 @@ The \"-r\" option must be the last option.")
                     'face '((:foreground "red"))))))
     (prog1
         (let ((default-directory anything-ff-default-directory))
-          (start-file-process-shell-command
-           "grep-process" nil
-           cmd-line))
+          (start-file-process-shell-command "grep-process" nil cmd-line))
       (message nil)
       (set-process-sentinel
        (get-process "grep-process")
@@ -3396,7 +3396,9 @@ If a prefix arg is given use the -r option of grep.
 See also `anything-do-grep1'."
   (interactive)
   (let ((only    (anything-c-read-file-name
-                  "Search in file(s): " :marked-candidates t))
+                  "Search in file(s): "
+                  :marked-candidates t
+                  :preselect (buffer-file-name (current-buffer))))
         (prefarg current-prefix-arg))
     (anything-do-grep1 only prefarg)))
   
