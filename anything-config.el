@@ -3393,13 +3393,14 @@ by marking them (C-<SPACE>). If one or more directory is selected
 grep will search in all files of these directories.
 You can use also wildcard in the base name of candidate.
 If a prefix arg is given use the -r option of grep.
+The prefix arg can be passed before or after start.
 See also `anything-do-grep1'."
   (interactive)
   (let ((only    (anything-c-read-file-name
                   "Search in file(s): "
                   :marked-candidates t
                   :preselect (buffer-file-name (current-buffer))))
-        (prefarg current-prefix-arg))
+        (prefarg (or current-prefix-arg anything-current-prefix-arg)))
     (anything-do-grep1 only prefarg)))
   
 (defun anything-c-grep-split-line (line)
