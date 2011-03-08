@@ -3084,19 +3084,20 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (persistent-help . ,persistent-help)
               (action . ,'action-fn))
              ((name . ,(concat "Read file name" anything-c-find-files-doc-header))
-             ;; It is needed for filenames with capital letters
-             (disable-shortcuts)
-             (candidates . (lambda ()
-                             (if test
-                                 (loop with seq = (anything-find-files-get-candidates)
-                                    for fname in seq when (funcall test fname)
-                                    collect fname)
-                                 (anything-find-files-get-candidates))))
-             (filtered-candidate-transformer anything-c-find-files-transformer)
-             (persistent-action . ,persistent-action)
-             (persistent-help . ,persistent-help)
-             (volatile)
-             (action . ,'action-fn)))
+              ;; It is needed for filenames with capital letters
+              (disable-shortcuts)
+              (candidates . (lambda ()
+                              (if test
+                                  (loop with seq = (anything-find-files-get-candidates)
+                                     for fname in seq when (funcall test fname)
+                                     collect fname)
+                                  (anything-find-files-get-candidates))))
+              (filtered-candidate-transformer anything-c-find-files-transformer)
+              (persistent-action . ,persistent-action)
+              (candidate-number-limit . 9999)
+              (persistent-help . ,persistent-help)
+              (volatile)
+              (action . ,'action-fn)))
            :input initial-input
            :prompt prompt
            :resume 'noresume
