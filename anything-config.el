@@ -3353,6 +3353,10 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
     ;; we have to kill action buffer.
     (when (get-buffer anything-action-buffer)
       (kill-buffer anything-action-buffer))
+    ;; `anything-find-files' haven't already started,
+    ;; give a default value to `anything-ff-default-directory'.
+    (setq anything-ff-default-directory (or anything-ff-default-directory
+                                            default-directory))
     (anything
      :sources
      `(((name . "Grep (M-up/down - next/prec file)")
@@ -3499,6 +3503,31 @@ If N is positive go forward otherwise go backward."
 ;; in other sources they do nothing, just going next or precedent line.
 (define-key anything-map (kbd "M-<down>") #'anything-c-goto-next-file)
 (define-key anything-map (kbd "M-<up>") #'anything-c-goto-precedent-file)
+
+;; Grep buffers
+(defun anything-c-grep-buffers (candidate)
+  "Run grep on all file--buffers or CANDIDATE if it is a file--buffer.
+If one of selected buffers is not a file--buffer,
+it is ignored and grep will run on all others file--buffers.
+If only one candidate is selected and it is not a file--buffer,
+switch to this buffer and run `anything-occur'.
+If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
+  (let* ((prefarg (or current-prefix-arg anything-current-prefix-arg))
+         (cands (if prefarg
+                    (buffer-list)
+                    (anything-marked-candidates)))
+         (bufs (loop for buf in cands
+                  for fname = (buffer-file-name (get-buffer buf))
+                  when fname
+                  collect (expand-file-name fname))))
+    (if bufs
+        (anything-do-grep1 bufs)
+        ;; bufs is empty, thats mean we have only CANDIDATE
+        ;; and it is not a buffer-filename, fallback to occur.
+        (switch-to-buffer candidate)
+        (when (get-buffer anything-action-buffer)
+          (kill-buffer anything-action-buffer))
+        (anything-occur))))
 
 ;; Yank text at point.
 (defvar anything-yank-point nil)
@@ -8675,6 +8704,7 @@ Return nil if bmk is not a valid bookmark."
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
      ("View buffer" . view-buffer)
      ("Display buffer"   . display-buffer)
+     ("Grep buffers (C-u grep all buffers)" . anything-c-grep-buffers)
      ("Revert buffer" . anything-revert-buffer)
      ("Revert Marked buffers" . anything-revert-marked-buffers)
      ("Insert buffer" . insert-buffer)
