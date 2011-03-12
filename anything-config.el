@@ -1949,12 +1949,14 @@ buffer that is not the current buffer."
   "Generic function for creating action from `anything-c-source-find-files'.
 ACTION must be an action supported by `anything-dired-action'."
   (let* ((ifiles   (anything-marked-candidates))
+         (cand     (anything-get-selection))
          (buf      anything-current-buffer)
          (prompt   (anything-find-files-set-prompt-for-action
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
          (dest     (anything-c-read-file-name
                     prompt
+                    :preselect cand
                     :initial-input (car anything-ff-history)
                     :history (anything-find-files-history :comp-read nil)))
          (win-conf (current-window-configuration)))
