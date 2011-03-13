@@ -1900,7 +1900,8 @@ buffer that is not the current buffer."
               ;; on remote host that have an anything started on a window-system.
               ;; i.e when `C-.' is already loaded. 
               (unless window-system
-                (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))))
+                (define-key anything-find-files-map (kbd "C-l")
+                  'anything-find-files-down-one-level))))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (image-action1 . anything-ff-rotate-image-left)
@@ -2064,6 +2065,59 @@ will not be loaded first time you use this."
         (call-interactively 'eshell)
         (cd-eshell))))
 
+(defvar anything-find-files-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-g") 'anything-ff-run-grep)
+    (define-key map (kbd "M-r") 'anything-ff-run-rename-file)
+    (define-key map (kbd "M-c") 'anything-ff-run-copy-file)
+    (define-key map (kbd "M-b") 'anything-ff-run-byte-compile-file)
+    (define-key map (kbd "M-s") 'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-e") 'anything-ff-run-switch-to-eshell)
+    ;; Next 2 have no effect if candidate is not an image file.
+    (define-key map (kbd "M-l") 'anything-ff-rotate-left-persistent)
+    (define-key map (kbd "M-r") 'anything-ff-rotate-right-persistent)
+    (if window-system ; `C-.' doesn't work in terms use `C-l' instead.
+        (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
+        (define-key map (kbd "C-l") 'anything-find-files-down-one-level))
+    map)
+  "Keymap for `anything-find-files'.")
+
+(defun anything-c-quit-and-execute-action (action)
+  "Quit current anything session and execute ACTION.
+ACTION must be one of the actions of current source."
+  (setq anything-saved-action action)
+  (anything-exit-minibuffer))
+    
+(defun anything-ff-run-grep ()
+  "Run Grep action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-grep))
+
+(defun anything-ff-run-copy-file ()
+  "Run Copy file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-copy))
+
+(defun anything-ff-run-rename-file ()
+  "Run Rename file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-rename))
+
+(defun anything-ff-run-byte-compile-file ()
+  "Run Byte compile file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-byte-compile))
+
+(defun anything-ff-run-symlink-file ()
+  "Run Symlink file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-symlink))
+
+(defun anything-ff-run-switch-to-eshell ()
+  "Run switch to eshell action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-switch-to-eshell))
+
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
 If LEVEL is positive reduce from end else from beginning.
@@ -2137,11 +2191,6 @@ or hitting C-z on \"..\"."
           (anything-mark-current-line)))
       (setq anything-ff-last-expanded nil))))
 (add-hook 'anything-after-update-hook 'anything-ff-retrieve-last-expanded)
-
-;; `C-.' doesn't work in terms use `C-l' instead.
-(if window-system
-    (define-key anything-map (kbd "C-.") 'anything-find-files-down-one-level)
-    (define-key anything-map (kbd "C-l") 'anything-find-files-down-one-level))
 
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
@@ -2501,10 +2550,6 @@ This affect directly file CANDIDATE."
       (format "No program %s found to extract exif"
               anything-ff-exif-data-program)))
 
-;; Have no effect if candidate is not an image file.
-(define-key anything-map (kbd "M-l") 'anything-ff-rotate-left-persistent)
-(define-key anything-map (kbd "M-r") 'anything-ff-rotate-right-persistent)
-
 (defun anything-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting anything.
 If CANDIDATE is not a directory expand CANDIDATE filename.
@@ -2640,6 +2685,7 @@ This is the starting point for nearly all actions you can do on files."
         (setq any-input (expand-file-name (anything-c-current-directory)))
         (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
 
+
 (defun anything-find-files1 (fname &optional preselect)
   "Find FNAME with `anything' completion.
 Like `find-file' but with `anything' support.
@@ -2650,6 +2696,7 @@ Use it for non--interactive calls of `anything-find-files'."
     (anything :sources 'anything-c-source-find-files
               :input fname
               :preselect preselect
+              :keymap anything-find-files-map
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
 
@@ -3101,6 +3148,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (action . ,'action-fn)))
            :input initial-input
            :prompt prompt
+           :keymap anything-find-files-map
            :resume 'noresume
            :buffer buffer
            :preselect preselect)
