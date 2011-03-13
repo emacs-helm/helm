@@ -2067,9 +2067,9 @@ will not be loaded first time you use this."
 
 (defun anything-ff-help ()
   (interactive)
-  (let ((anything-help-message "== Anything Find Files ==\\<anything-find-files-map>
+  (let ((anything-help-message "== Anything Find Files ==\
 \nSpecific commands for `anything-find-files':
-
+\\<anything-find-files-map>
 \\[anything-ff-run-grep] : Run Grep (C-u Recursive).
 \\[anything-ff-run-rename-file] : Rename File (C-u Follow).
 \\[anything-ff-run-copy-file] : Copy File (C-u Follow).
@@ -3614,8 +3614,7 @@ If N is positive go forward otherwise go backward."
 \\[anything-c-goto-precedent-file] : Precedent File.
 \\[anything-yank-text-at-point] : Yank Text at point in minibuffer.
 \\[anything-grep-help] : Show this help.
-
-== Anything Map ==
+\n== Anything Map ==
 \\{anything-map}"))
     (anything-help)))
 
