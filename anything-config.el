@@ -2072,7 +2072,9 @@ will not be loaded first time you use this."
     (define-key map (kbd "M-c") 'anything-ff-run-copy-file)
     (define-key map (kbd "M-b") 'anything-ff-run-byte-compile-file)
     (define-key map (kbd "M-s") 'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-d") 'anything-ff-run-delete-file)
     (define-key map (kbd "M-e") 'anything-ff-run-switch-to-eshell)
+    (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l") 'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r") 'anything-ff-rotate-right-persistent)
@@ -2112,6 +2114,17 @@ ACTION must be one of the actions of current source."
   "Run Symlink file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-symlink))
+
+(defun anything-ff-run-delete-file ()
+  "Run Delete file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-delete-marked-files))
+
+(defun anything-ff-run-complete-fn-at-point ()
+  "Run complete file name action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action
+   'anything-c-insert-file-name-completion-at-point))
 
 (defun anything-ff-run-switch-to-eshell ()
   "Run switch to eshell action from `anything-c-source-find-files'."
