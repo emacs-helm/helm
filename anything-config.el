@@ -1918,23 +1918,23 @@ buffer that is not the current buffer."
            ("Find file in Dired" . anything-c-point-file-in-dired)
            ,(and (locate-library "elscreen")
                  '("Find file in Elscreen"  . anything-elscreen-find-file))
-           ("Complete at point"
+           ("Complete at point `M-tab'"
             . anything-c-insert-file-name-completion-at-point)
-           ("Open file externally `C-u to choose'"
+           ("Open file externally `C-c C-x, C-u to choose'"
             . anything-c-open-file-externally)
-           ("Grep File(s) `C-u Recurse'" . anything-find-files-grep)
-           ("Switch to Eshell" . anything-ff-switch-to-eshell)
+           ("Grep File(s) `M-g s, C-u Recurse'" . anything-find-files-grep)
+           ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
            ("Eshell command on file(s)"
             . anything-find-files-eshell-command-on-file)
            ("Ediff File" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
-           ("Delete File(s)" . anything-delete-marked-files)
-           ("Copy file(s) `C-u to follow'" . anything-find-files-copy)
-           ("Rename file(s) `C-u to follow'" . anything-find-files-rename)
-           ("Symlink files(s) `C-u to follow'" . anything-find-files-symlink)
+           ("Delete File(s) `M-D'" . anything-delete-marked-files)
+           ("Copy file(s) `M-C, C-u to follow'" . anything-find-files-copy)
+           ("Rename file(s) `M-R, C-u to follow'" . anything-find-files-rename)
+           ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
-           ("Find file other window" . find-file-other-window)
+           ("Find file other window `C-o'" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)
            ("Find file as root" . anything-find-file-as-root))))))
 ;; (anything 'anything-c-source-find-files)
@@ -2067,14 +2067,17 @@ will not be loaded first time you use this."
 
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-g") 'anything-ff-run-grep)
-    (define-key map (kbd "M-r") 'anything-ff-run-rename-file)
-    (define-key map (kbd "M-c") 'anything-ff-run-copy-file)
-    (define-key map (kbd "M-b") 'anything-ff-run-byte-compile-file)
-    (define-key map (kbd "M-s") 'anything-ff-run-symlink-file)
-    (define-key map (kbd "M-d") 'anything-ff-run-delete-file)
+    (define-key map (kbd "M-g s") 'anything-ff-run-grep)
+    (define-key map (kbd "M-R") 'anything-ff-run-rename-file)
+    (define-key map (kbd "M-C") 'anything-ff-run-copy-file)
+    (define-key map (kbd "M-B") 'anything-ff-run-byte-compile-file)
+    (define-key map (kbd "M-L") 'anything-ff-run-load-file)
+    (define-key map (kbd "M-S") 'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-D") 'anything-ff-run-delete-file)
     (define-key map (kbd "M-e") 'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
+    (define-key map (kbd "C-o") 'anything-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l") 'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r") 'anything-ff-rotate-right-persistent)
@@ -2110,6 +2113,11 @@ ACTION must be one of the actions of current source."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-byte-compile))
 
+(defun anything-ff-run-load-file ()
+  "Run Load file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-load-files))
+
 (defun anything-ff-run-symlink-file ()
   "Run Symlink file action from `anything-c-source-find-files'."
   (interactive)
@@ -2130,6 +2138,16 @@ ACTION must be one of the actions of current source."
   "Run switch to eshell action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-switch-to-eshell))
+
+(defun anything-ff-run-switch-other-window ()
+  "Run switch to other window action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'find-file-other-window))
+
+(defun anything-ff-run-open-file-externally ()
+  "Run open file externally command action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-open-file-externally))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
@@ -2485,15 +2503,15 @@ in `anything-ff-history'."
                  (subseq actions 4)))
         ((string-match (image-file-name-regexp) candidate)
          (append (subseq actions 0 4)
-                 '(("Rotate image right" . anything-ff-rotate-image-right)
-                   ("Rotate image left" . anything-ff-rotate-image-left))
+                 '(("Rotate image right `M-r'" . anything-ff-rotate-image-right)
+                   ("Rotate image left `M-l'" . anything-ff-rotate-image-left))
                  (subseq actions 4)))
         ((string-match "\.el$" (anything-aif (anything-marked-candidates)
                                    (car it) candidate))
          (append (subseq actions 0 4);(list (car actions))
-                 '(("Byte compile lisp file(s) `C-u to load'"
+                 '(("Byte compile lisp file(s) `M-B, C-u to load'"
                     . anything-find-files-byte-compile)
-                   ("Load File(s)" . anything-find-files-load-files))
+                   ("Load File(s) `M-L'" . anything-find-files-load-files))
                  (subseq actions 4)))
         ((and (string-match "\.html$" candidate)
               (file-exists-p candidate))
