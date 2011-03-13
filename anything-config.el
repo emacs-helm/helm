@@ -3435,6 +3435,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
+     :keymap anything-c-grep-map
      :buffer "*anything grep*")))
 
 ;;;###autoload
@@ -3550,8 +3551,15 @@ If N is positive go forward otherwise go backward."
 
 ;; This keys affect etags and grep only.
 ;; in other sources they do nothing, just going next or precedent line.
-(define-key anything-map (kbd "M-<down>") #'anything-c-goto-next-file)
-(define-key anything-map (kbd "M-<up>") #'anything-c-goto-precedent-file)
+;; (define-key anything-map (kbd "M-<down>") #'anything-c-goto-next-file)
+;; (define-key anything-map (kbd "M-<up>") #'anything-c-goto-precedent-file)
+
+(defvar anything-c-grep-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
+    (define-key map (kbd "M-<up>") 'anything-c-goto-precedent-file)
+    map)
+  "Keymap used in Grep and Etags sources.")
 
 ;; Grep buffers
 (defun anything-c-grep-buffers (candidate)
@@ -3741,6 +3749,7 @@ If tag file have been modified reinitialize cache."
       (remhash tag anything-c-etags-cache))
     (if (and tag (file-exists-p tag))
         (anything :sources 'anything-c-source-etags-select
+                  :keymap anything-c-grep-map
                   :input init
                   :buffer "*anything etags*")
         (message "Error: No tag file found, please create one with etags shell command."))))
