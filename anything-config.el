@@ -2065,6 +2065,30 @@ will not be loaded first time you use this."
         (call-interactively 'eshell)
         (cd-eshell))))
 
+(defun anything-ff-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything Find Files ==\\<anything-find-files-map>
+\nSpecific commands for `anything-find-files':
+
+\\[anything-ff-run-grep] : Run Grep (C-u Recursive).
+\\[anything-ff-run-rename-file] : Rename File (C-u Follow).
+\\[anything-ff-run-copy-file] : Copy File (C-u Follow).
+\\[anything-ff-run-byte-compile-file] : Byte Compile File (C-u Load).
+\\[anything-ff-run-load-file] : Load File.
+\\[anything-ff-run-symlink-file] : Symlink File.
+\\[anything-ff-run-delete-file] : Delete File.
+\\[anything-ff-run-switch-to-eshell] : Switch to Eshell.
+\\[anything-ff-run-complete-fn-at-point] : Complete file name at point.
+\\[anything-ff-run-switch-other-window] : Switch other window.
+\\[anything-ff-run-open-file-externally] : Open file with external program.
+\\[anything-ff-rotate-left-persistent] : Rotate Image Left.
+\\[anything-ff-rotate-right-persistent] : Rotate Image Right.
+\\[anything-find-files-down-one-level] : Go down precedent directory.
+\n== Anything Map ==
+\\{anything-map}
+"))
+    (anything-help)))
+
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s") 'anything-ff-run-grep)
@@ -2078,6 +2102,7 @@ will not be loaded first time you use this."
     (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o") 'anything-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
+    (define-key map (kbd "C-c ?") 'anything-ff-help)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l") 'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r") 'anything-ff-rotate-right-persistent)
@@ -3580,15 +3605,26 @@ If N is positive go forward otherwise go backward."
   (interactive)
   (anything-c-goto-next-or-prec-file 1))
 
-;; This keys affect etags and grep only.
-;; in other sources they do nothing, just going next or precedent line.
-;; (define-key anything-map (kbd "M-<down>") #'anything-c-goto-next-file)
-;; (define-key anything-map (kbd "M-<up>") #'anything-c-goto-precedent-file)
+(defun anything-grep-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything Grep/Etags Map ==\
+\nSpecific commands for Grep and Etags:
+\\<anything-c-grep-map>
+\\[anything-c-goto-next-file] : Next File.
+\\[anything-c-goto-precedent-file] : Precedent File.
+\\[anything-yank-text-at-point] : Yank Text at point in minibuffer.
+\\[anything-grep-help] : Show this help.
+
+== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
 
 (defvar anything-c-grep-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
-    (define-key map (kbd "M-<up>") 'anything-c-goto-precedent-file)
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)     
+    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)   
+    (define-key map (kbd "C-c ?")    'anything-grep-help)            
     map)
   "Keymap used in Grep and Etags sources.")
 
