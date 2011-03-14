@@ -3572,7 +3572,8 @@ See also `anything-do-grep1'."
   (let ((only    (anything-c-read-file-name
                   "Search in file(s): "
                   :marked-candidates t
-                  :preselect (buffer-file-name (current-buffer))))
+                  :preselect (or (dired-get-filename nil t)
+                                 (buffer-file-name (current-buffer)))))
         (prefarg (or current-prefix-arg anything-current-prefix-arg)))
     (anything-do-grep1 only prefarg)))
   
