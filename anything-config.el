@@ -3662,6 +3662,7 @@ If N is positive go forward otherwise go backward."
 \\[anything-c-goto-next-file] : Next File.
 \\[anything-c-goto-precedent-file] : Precedent File.
 \\[anything-yank-text-at-point] : Yank Text at point in minibuffer.
+\\[anything-c-grep-run-other-window-action] : Jump other window.
 \\[anything-grep-help] : Show this help.
 \n== Anything Map ==
 \\{anything-map}"))
