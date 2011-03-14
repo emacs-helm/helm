@@ -1093,7 +1093,8 @@ You may bind this command to M-y."
 (defun anything-buffers+ ()
   "Enhanced preconfigured `anything' for buffer."
   (interactive)
-  (anything-other-buffer 'anything-c-source-buffers+ "*anything buffers*"))
+  (anything :sources 'anything-c-source-buffers+
+            :buffer "*anything buffers*" :keymap anything-c-buffer-map))
 
 ;;;###autoload
 (defun anything-bbdb ()
@@ -1800,6 +1801,30 @@ buffer that is not the current buffer."
                            anything-c-skip-boring-buffers)
     (persistent-action . anything-c-buffers+-persistent-action)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
+
+(defvar anything-c-buffer-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-g s") 'anything-buffer-run-grep)
+    (define-key map (kbd "C-o") 'anything-buffer-switch-other-window)
+    (when (locate-library "elscreen")
+      (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
+    (delq nil map))
+  "Keymap for buffer sources in anything.")
+
+(defun anything-buffer-run-grep ()
+  "Run Grep action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-grep-buffers))
+
+(defun anything-buffer-switch-other-window ()
+  "Run switch to other window action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'switch-to-buffer-other-window))
+
+(defun anything-buffer-switch-to-elscreen ()
+  "Run switch to elscreen  action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-buffer-on-elscreen))
 
 (defun anything-c-buffers+-persistent-action (name)
   (flet ((kill (item)
