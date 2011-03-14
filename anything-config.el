@@ -1112,7 +1112,9 @@ http://bbdb.sourceforge.net/"
 Note you can add locate command after entering pattern.
 See man locate for more infos."
   (interactive)
-  (anything-other-buffer 'anything-c-source-locate "*anything locate*"))
+  (anything :sources 'anything-c-source-locate
+            :buffer "*anything locate*"
+            :keymap anything-generic-files-map))
 
 ;;;###autoload
 (defun anything-w3m-bookmarks ()
@@ -3325,6 +3327,15 @@ The \"-r\" option must be the last option.")
   "Find files matching the current input pattern with locate.")
 
 ;; (anything 'anything-c-source-locate)
+
+(defvar anything-generic-files-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-g s")   'anything-ff-run-grep)
+    (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
+    (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
+    map)
+  "Generic Keymap for files.")
 
 ;;; Grep
 ;; NOTE: the -d option with skip avoid error on windows.
@@ -8907,11 +8918,7 @@ Return nil if bmk is not a valid bookmark."
            ("Find file other window" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)))
      ("Open dired in file's directory" . anything-c-open-dired)
-     ("Grep File(s) `C-u recurse'"
-      . (lambda (candidate)
-          (if anything-current-prefix-arg
-              (anything-do-grep1 (anything-marked-candidates) 'recurse)
-              (anything-do-grep1 (anything-marked-candidates)))))
+     ("Grep File(s) `C-u recurse'" . anything-find-files-grep)
      ("View file" . view-file)
      ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
