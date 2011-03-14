@@ -1890,6 +1890,16 @@ buffer that is not the current buffer."
                                                  (if window-system "C-." "C-l"))
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 
+(defvar anything-ff-mode-line-string
+  "\\<anything-find-files-map>\
+\\[anything-ff-help]:Help, \
+\\[anything-select-action]:Acts, \
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct, \
+\\<anything-map>\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-c-source-find-files'")
+
 (defvar anything-c-source-find-files
   `((name . ,(concat "Find Files" anything-c-find-files-doc-header))
     ;; It is needed for filenames with capital letters
@@ -1908,6 +1918,7 @@ buffer that is not the current buffer."
     (image-action2 . anything-ff-rotate-image-right)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
+    (mode-line . anything-ff-mode-line-string)
     (volatile)
     (candidate-number-limit . 9999)
     (action-transformer . anything-find-files-action-transformer)
@@ -2080,7 +2091,7 @@ will not be loaded first time you use this."
 \\[anything-ff-run-switch-to-eshell] : Switch to Eshell.
 \\[anything-ff-run-complete-fn-at-point] : Complete file name at point.
 \\[anything-ff-run-switch-other-window] : Switch other window.
-\\[anything-ff-run-open-file-externally] : Open file with external program.
+\\[anything-ff-run-open-file-externally] : Open file with external program (C-u to choose).
 \\[anything-ff-rotate-left-persistent] : Rotate Image Left.
 \\[anything-ff-rotate-right-persistent] : Rotate Image Right.
 \\[anything-find-files-down-one-level] : Go down precedent directory.
@@ -2091,21 +2102,21 @@ will not be loaded first time you use this."
 
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-g s") 'anything-ff-run-grep)
-    (define-key map (kbd "M-R") 'anything-ff-run-rename-file)
-    (define-key map (kbd "M-C") 'anything-ff-run-copy-file)
-    (define-key map (kbd "M-B") 'anything-ff-run-byte-compile-file)
-    (define-key map (kbd "M-L") 'anything-ff-run-load-file)
-    (define-key map (kbd "M-S") 'anything-ff-run-symlink-file)
-    (define-key map (kbd "M-D") 'anything-ff-run-delete-file)
-    (define-key map (kbd "M-e") 'anything-ff-run-switch-to-eshell)
+    (define-key map (kbd "M-g s")   'anything-ff-run-grep)
+    (define-key map (kbd "M-R")     'anything-ff-run-rename-file)
+    (define-key map (kbd "M-C")     'anything-ff-run-copy-file)
+    (define-key map (kbd "M-B")     'anything-ff-run-byte-compile-file)
+    (define-key map (kbd "M-L")     'anything-ff-run-load-file)
+    (define-key map (kbd "M-S")     'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
+    (define-key map (kbd "M-e")     'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
-    (define-key map (kbd "C-o") 'anything-ff-run-switch-other-window)
+    (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
-    (define-key map (kbd "C-c ?") 'anything-ff-help)
+    (define-key map (kbd "C-c ?")   'anything-ff-help)
     ;; Next 2 have no effect if candidate is not an image file.
-    (define-key map (kbd "M-l") 'anything-ff-rotate-left-persistent)
-    (define-key map (kbd "M-r") 'anything-ff-rotate-right-persistent)
+    (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
+    (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
     (if window-system ; `C-.' doesn't work in terms use `C-l' instead.
         (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
         (define-key map (kbd "C-l") 'anything-find-files-down-one-level))
