@@ -3170,6 +3170,14 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
        'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)
       (setq anything-dired-bindings nil)))
 
+(defvar anything-c-read-file-map
+  (let ((map (copy-keymap anything-map)))
+    (if window-system ; `C-.' doesn't work in terms use `C-l' instead.
+        (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
+        (define-key map (kbd "C-l") 'anything-find-files-down-one-level))
+    map)
+  "Keymap for `anything-c-read-file-name'.")
+
 (defun* anything-c-read-file-name (prompt
                                    &key
                                    (initial-input (expand-file-name default-directory))
@@ -3199,6 +3207,11 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (persistent-help . ,persistent-help)
               (action . ,'action-fn))
              ((name . ,(concat "Read file name" anything-c-find-files-doc-header))
+              (init . (lambda ()
+                        ;; For emacsclient (see `anything-c-source-find-files')
+                        (unless window-system
+                          (define-key anything-find-files-map (kbd "C-l")
+                            'anything-find-files-down-one-level))))
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (candidates . (lambda ()
@@ -3215,7 +3228,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (action . ,'action-fn)))
            :input initial-input
            :prompt prompt
-           :keymap anything-find-files-map
+           :keymap anything-c-read-file-map
            :resume 'noresume
            :buffer buffer
            :preselect preselect)
