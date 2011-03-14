@@ -3135,13 +3135,16 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                       ('copy     "*Anything Copy Files*")
                       ('rename   "*Anything Rename Files*")
                       ('symlink  "*Anything Symlink Files*")
-                      ('hardlink "*Anything Hardlink Files*"))))
-    (anything source
-              (or (dired-dwim-target-directory)
-                  (expand-file-name (anything-c-current-directory)))
-              (format prompt-fm fname) nil nil buffer)))
-
-
+                      ('hardlink "*Anything Hardlink Files*")))
+         (anything-mp-highlight-delay     nil))
+    (anything :sources source
+              :input (or (dired-dwim-target-directory)
+                         (expand-file-name (anything-c-current-directory)))
+              :preselect (dired-get-filename)
+              :prompt (format prompt-fm fname)
+              :keymap anything-c-read-file-map
+              :buffer buffer)))
+    
 ;;;###autoload
 (defun anything-dired-rename-file ()
   "Preconfigured `anything' to rename files from dired."
@@ -3325,7 +3328,6 @@ The \"-r\" option must be the last option.")
     (requires-pattern . 3)
     (delayed))
   "Find files matching the current input pattern with locate.")
-
 ;; (anything 'anything-c-source-locate)
 
 (defvar anything-generic-files-map
