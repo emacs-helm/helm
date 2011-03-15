@@ -3474,6 +3474,17 @@ WHERE can be one of other-window, elscreen, other-frame."
   "Jump to result in elscreen from anything grep."
   (anything-c-grep-action candidate 'elscreen))
 
+(defun anything-c-grep-save-results (candidate)
+  "Save anything grep result in a grep buffer."
+  (with-current-buffer (get-buffer-create "*grep*")
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (insert "-*- mode: grep -*-\n\n")
+      (insert (with-current-buffer anything-buffer
+                (forward-line 1)
+                (buffer-substring (point) (point-max))))
+      (grep-mode))))
+
 (defun anything-c-grep-persistent-action (candidate)
   "Persistent action for `anything-do-grep'.
 With a prefix arg record CANDIDATE in `mark-ring'."
@@ -3552,6 +3563,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                       ,(and (locate-library "elscreen")
                             '("Find file in Elscreen"
                               . anything-c-grep-jump-elscreen))
+                      ("Save results in grep buffer" . anything-c-grep-save-results)
                       ("Find file other window" . anything-c-grep-other-window))))
         (persistent-action . (lambda (candidate)
                                (anything-c-grep-persistent-action candidate)))
