@@ -6686,7 +6686,7 @@ Return an alist with elements like (data . number_results)."
 (defvar anything-c-home-url "http://www.google.fr"
   "*Default url to use as home url.")
 
-(defvar browse-url-chromium-program "chromium-bin")
+(defvar browse-url-chromium-program "chromium-browser")
 (defvar anything-browse-url-default-browser-alist
   `((,w3m-command . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
@@ -6714,11 +6714,10 @@ Return an alist with elements like (data . number_results)."
 (defun browse-url-chromium (url)
   (interactive "sURL: ")
   (anything-c-generic-browser
-   url browse-url-chromium-program
-   "--enable-plugins"))
+   url browse-url-chromium-program))
 
 (defun anything-browse-url-default-browser (url &rest args)
-  "Find a suitable browser and ask it to load URL."
+  "Find the first available browser and ask it to load URL."
   (let ((default-browser (loop
                             for i in anything-browse-url-default-browser-alist
                             thereis (and (car i) (executable-find (car i))))))
