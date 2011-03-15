@@ -6618,12 +6618,18 @@ Return an alist with elements like (data . number_results)."
          (list (cons (concat "Search for " "'" anything-input "'" " on Google")
                      anything-input))))))
 
+(defvar anything-c-google-suggest-default-browser-function nil
+  "*The browse url function you prefer to use with google suggest.
+When nil, use the first browser function available
+See `anything-browse-url-default-browser-alist'.")
 
 (defun anything-c-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
-  (anything-c-browse-url (concat anything-c-google-suggest-search-url
+  (let ((arg (concat anything-c-google-suggest-search-url
                                  (url-hexify-string candidate))))
-
+    (anything-aif anything-c-google-suggest-default-browser-function
+        (funcall it arg)
+      (anything-c-browse-url arg))))
 
 (defvar anything-c-source-google-suggest
   '((name . "Google Suggest")
