@@ -3462,6 +3462,17 @@ WHERE can be one of other-window, elscreen, other-frame."
     (when mark
       (push-mark (point) 'nomsg))))
               
+(defun anything-c-grep-other-window (candidate)
+  "Jump to result in other window from anything grep."
+  (anything-c-grep-action candidate 'other-window))
+
+(defun anything-c-grep-other-frame (candidate)
+  "Jump to result in other frame from anything grep."
+  (anything-c-grep-action candidate 'other-frame))
+
+(defun anything-c-grep-jump-elscreen (candidate)
+  "Jump to result in elscreen from anything grep."
+  (anything-c-grep-action candidate 'elscreen))
 
 (defun anything-c-grep-persistent-action (candidate)
   "Persistent action for `anything-do-grep'.
@@ -3537,17 +3548,11 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
-                      ("Find file other window"
-                       . (lambda (candidate)
-                           (anything-c-grep-action candidate 'other-window)))
+                      ("Find file other frame" . anything-c-grep-other-frame)
                       ,(and (locate-library "elscreen")
                             '("Find file in Elscreen"
-                              . (lambda (candidate)
-                                  (anything-c-grep-action
-                                   candidate 'elscreen))))
-                      ("Find file other frame"
-                       . (lambda (candidate)
-                           (anything-c-grep-action candidate 'other-frame))))))
+                              . anything-c-grep-jump-elscreen))
+                      ("Find file other window" . anything-c-grep-other-window))))
         (persistent-action . (lambda (candidate)
                                (anything-c-grep-persistent-action candidate)))
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
@@ -3686,10 +3691,16 @@ If N is positive go forward otherwise go backward."
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)     
     (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
-    (define-key map (kbd "C-w")      'anything-yank-text-at-point)   
+    (define-key map (kbd "C-o")      'anything-c-grep-run-other-window-action)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
     (define-key map (kbd "C-c ?")    'anything-grep-help)            
     map)
   "Keymap used in Grep and Etags sources.")
+
+(defun anything-c-grep-run-other-window-action ()
+  "Run grep goto other window action from `anything-do-grep1'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-grep-other-window))
 
 ;; Grep buffers
 (defun anything-c-grep-buffers (candidate)
