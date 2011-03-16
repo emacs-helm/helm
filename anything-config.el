@@ -2108,20 +2108,20 @@ will not be loaded first time you use this."
   (let ((anything-help-message "== Anything Find Files ==\
 \nSpecific commands for `anything-find-files':
 \\<anything-find-files-map>
-\\[anything-ff-run-grep] : Run Grep (C-u Recursive).
-\\[anything-ff-run-rename-file] : Rename File (C-u Follow).
-\\[anything-ff-run-copy-file] : Copy File (C-u Follow).
-\\[anything-ff-run-byte-compile-file] : Byte Compile File (C-u Load).
-\\[anything-ff-run-load-file] : Load File.
-\\[anything-ff-run-symlink-file] : Symlink File.
-\\[anything-ff-run-delete-file] : Delete File.
-\\[anything-ff-run-switch-to-eshell] : Switch to Eshell.
-\\[anything-ff-run-complete-fn-at-point] : Complete file name at point.
-\\[anything-ff-run-switch-other-window] : Switch other window.
-\\[anything-ff-run-open-file-externally] : Open file with external program (C-u to choose).
-\\[anything-ff-rotate-left-persistent] : Rotate Image Left.
-\\[anything-ff-rotate-right-persistent] : Rotate Image Right.
-\\[anything-find-files-down-one-level] : Go down precedent directory.
+\\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
+\\[anything-ff-run-rename-file]\t\t->Rename File (C-u Follow).
+\\[anything-ff-run-copy-file]\t\t->Copy File (C-u Follow).
+\\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
+\\[anything-ff-run-load-file]\t\t->Load File.
+\\[anything-ff-run-symlink-file]\t\t->Symlink File.
+\\[anything-ff-run-delete-file]\t\t->Delete File.
+\\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
+\\[anything-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
+\\[anything-ff-run-switch-other-window]\t\t->Switch other window.
+\\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
+\\[anything-ff-rotate-left-persistent]\t\t->Rotate Image Left.
+\\[anything-ff-rotate-right-persistent]\t\t->Rotate Image Right.
+\\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
 \n== Anything Map ==
 \\{anything-map}
 "))
@@ -3690,11 +3690,11 @@ If N is positive go forward otherwise go backward."
   (let ((anything-help-message "== Anything Grep/Etags Map ==\
 \nSpecific commands for Grep and Etags:
 \\<anything-c-grep-map>
-\\[anything-c-goto-next-file] : Next File.
-\\[anything-c-goto-precedent-file] : Precedent File.
-\\[anything-yank-text-at-point] : Yank Text at point in minibuffer.
-\\[anything-c-grep-run-other-window-action] : Jump other window.
-\\[anything-grep-help] : Show this help.
+\\[anything-c-goto-next-file]\t->Next File.
+\\[anything-c-goto-precedent-file]\t\t->Precedent File.
+\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[anything-c-grep-run-other-window-action]\t\t->Jump other window.
+\\[anything-grep-help]\t\t->Show this help.
 \n== Anything Map ==
 \\{anything-map}"))
     (anything-help)))
