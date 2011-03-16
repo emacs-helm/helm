@@ -7073,10 +7073,14 @@ See also `anything-create--actions'."
 (defvar anything-c-source-minibuffer-history
   '((name . "Minibuffer History")
     (header-name . (lambda (name) (format "%s (%s)" name minibuffer-history-variable)))
-    (candidates . (lambda () (let ((history (symbol-value minibuffer-history-variable)))
-                               (if (consp (car history))
-                                   (mapcar 'prin1-to-string history)
-                                   history))))
+    (candidates
+     . (lambda ()
+         (let ((history (loop
+                           for i in (symbol-value minibuffer-history-variable)
+                           unless (string= "" i) collect i)))
+           (if (consp (car history))
+               (mapcar 'prin1-to-string history)
+               history))))
     (migemo)
     (action . insert)))
 ;; (anything 'anything-c-source-minibuffer-history)
