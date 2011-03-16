@@ -1027,13 +1027,15 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   (anything-other-buffer 'anything-c-source-recentf "*anything recentf*"))
 
 ;;;###autoload
-(defun anything-info-at-point ()
-  "Preconfigured `anything' for searching info at point."
-  (interactive)
-  (anything '(anything-c-source-info-elisp
-              anything-c-source-info-cl
-              anything-c-source-info-pages)
-            (thing-at-point 'symbol) nil nil nil "*anything info*"))
+(defun anything-info-at-point (arg)
+  "Preconfigured `anything' for searching info at point.
+With a prefix-arg insert symbol at point."
+  (interactive "P")
+  (anything :sources'(anything-c-source-info-elisp
+                      anything-c-source-info-cl
+                      anything-c-source-info-pages)
+            :input (and arg (thing-at-point 'symbol))
+            :buffer "*anything info*"))
 
 ;;;###autoload
 (defun anything-info-emacs ()
