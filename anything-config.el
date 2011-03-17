@@ -3485,11 +3485,13 @@ WHERE can be one of other-window, elscreen, other-frame."
   (with-current-buffer (get-buffer-create "*grep*")
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (insert "-*- mode: grep -*-\n\n")
-      (insert (with-current-buffer anything-buffer
-                (forward-line 1)
-                (buffer-substring (point) (point-max))))
-      (grep-mode))))
+      (insert "-*- mode: grep -*-\n\n"
+              (format "Grep Results for `%s':\n\n" anything-pattern))
+      (save-excursion
+        (insert (with-current-buffer anything-buffer
+                  (forward-line 1)
+                  (buffer-substring (point) (point-max))))
+        (grep-mode)))))
 
 (defun anything-c-grep-persistent-action (candidate)
   "Persistent action for `anything-do-grep'.
@@ -3711,6 +3713,7 @@ If N is positive go forward otherwise go backward."
     (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
     (define-key map (kbd "C-o")      'anything-c-grep-run-other-window-action)
     (define-key map (kbd "C-w")      'anything-yank-text-at-point)
+    (define-key map (kbd "C-x C-s")  'anything-c-grep-run-save-buffer)
     (define-key map (kbd "C-c ?")    'anything-grep-help)            
     map)
   "Keymap used in Grep and Etags sources.")
@@ -3719,6 +3722,11 @@ If N is positive go forward otherwise go backward."
   "Run grep goto other window action from `anything-do-grep1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-other-window))
+
+(defun anything-c-grep-run-save-buffer ()
+  "Run grep save results action from `anything-do-grep1'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-grep-save-results))
 
 ;; Grep buffers
 (defun anything-c-grep-buffers (candidate)
