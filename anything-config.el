@@ -2085,7 +2085,8 @@ will not be loaded first time you use this."
                               "Command: "
                               (loop for (a . c) in eshell-command-aliases-list
                                  when (string-match "\\$1$" (car c))
-                                 collect a))))
+                                 collect a into ls
+                                 finally return (sort ls 'string<)))))
       (loop
          for i in cand-list
          for com = (concat command " " (shell-quote-argument i))
