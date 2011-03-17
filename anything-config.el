@@ -1958,6 +1958,8 @@ buffer that is not the current buffer."
            ("Find file in Dired" . anything-c-point-file-in-dired)
            ,(and (locate-library "elscreen")
                  '("Find file in Elscreen"  . anything-elscreen-find-file))
+           ,(and (locate-library "popwin")
+                 '("Find file in popup window" . popwin:find-file))
            ("Complete at point `M-tab'"
             . anything-c-insert-file-name-completion-at-point)
            ("Open file externally `C-c C-x, C-u to choose'"
@@ -1974,6 +1976,7 @@ buffer that is not the current buffer."
            ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
+           ("Find file in hex dump" . hexl-find-file)
            ("Find file other window `C-o'" . find-file-other-window)
            ("Find file other frame" . find-file-other-frame)
            ("Find file as root" . anything-find-file-as-root))))))
