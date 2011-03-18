@@ -183,8 +183,42 @@
 ;; Select source.
 ;; `anything-toggle-all-marks'
 ;; Toggle all marks.
+;; `anything-buffer-run-grep'
+;; Run Grep action from `anything-c-source-buffer+'.
+;; `anything-buffer-switch-other-window'
+;; Run switch to other window action from `anything-c-source-buffer+'.
+;; `anything-buffer-switch-to-elscreen'
+;; Run switch to elscreen  action from `anything-c-source-buffer+'.
+;; `anything-ff-help'
+;; Not documented.
+;; `anything-ff-run-grep'
+;; Run Grep action from `anything-c-source-find-files'.
+;; `anything-ff-run-copy-file'
+;; Run Copy file action from `anything-c-source-find-files'.
+;; `anything-ff-run-rename-file'
+;; Run Rename file action from `anything-c-source-find-files'.
+;; `anything-ff-run-byte-compile-file'
+;; Run Byte compile file action from `anything-c-source-find-files'.
+;; `anything-ff-run-load-file'
+;; Run Load file action from `anything-c-source-find-files'.
+;; `anything-ff-run-symlink-file'
+;; Run Symlink file action from `anything-c-source-find-files'.
+;; `anything-ff-run-delete-file'
+;; Run Delete file action from `anything-c-source-find-files'.
+;; `anything-ff-run-complete-fn-at-point'
+;; Run complete file name action from `anything-c-source-find-files'.
+;; `anything-ff-run-switch-to-eshell'
+;; Run switch to eshell action from `anything-c-source-find-files'.
+;; `anything-ff-run-switch-other-window'
+;; Run switch to other window action from `anything-c-source-find-files'.
+;; `anything-ff-run-open-file-externally'
+;; Run open file externally command action from `anything-c-source-find-files'.
 ;; `anything-find-files-down-one-level'
 ;; Go down one level like unix command `cd ..'.
+;; `anything-ff-rotate-left-persistent'
+;; Rotate image left without quitting anything.
+;; `anything-ff-rotate-right-persistent'
+;; Rotate image right without quitting anything.
 ;; `anything-find-files'
 ;; Preconfigured `anything' for anything implementation of `find-file'.
 ;; `anything-write-file'
@@ -203,10 +237,18 @@
 ;; Replace usual dired commands `C' and `R' by anything ones.
 ;; `anything-do-grep'
 ;; Preconfigured anything for grep.
-;; `anything-c-grep-precedent-file'
-;; Go to precedent file in `anything-do-grep'.
-;; `anything-c-grep-next-or-prec-file'
-;; Go to next or precedent candidate file in anything grep buffer.
+;; `anything-c-goto-precedent-file'
+;; Go to precedent file in anything grep/etags buffers.
+;; `anything-c-goto-next-file'
+;; Go to precedent file in anything grep/etags buffers.
+;; `anything-grep-help'
+;; Not documented.
+;; `anything-c-grep-run-other-window-action'
+;; Run grep goto other window action from `anything-do-grep1'.
+;; `anything-c-grep-run-save-buffer'
+;; Run grep save results action from `anything-do-grep1'.
+;; `anything-yank-text-at-point'
+;; Yank text at point in minibuffer.
 ;; `anything-c-etags-select'
 ;; Preconfigured anything for etags.
 ;; `anything-filelist'
@@ -239,6 +281,8 @@
 ;; Preconfigured anything for `anything-c-source-evaluation-result'.
 ;; `anything-eval-expression-with-eldoc'
 ;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
+;; `anything-calcul-expression'
+;; Preconfigured anything for `anything-c-source-calculation-result'.
 ;; `anything-surfraw'
 ;; Preconfigured `anything' to search PATTERN with search ENGINE.
 ;; `anything-call-source'
@@ -269,6 +313,8 @@
 ;; Set value to VAR interactively.
 ;; `anything-c-adaptive-save-history'
 ;; Save history information to file given by `anything-c-adaptive-history-file'.
+;; `anything-c-reset-adaptative-history'
+;; Delete all `anything-c-adaptive-history' and his file.
 ;; `anything-c-toggle-match-plugin'
 ;; Toggle anything-match-plugin.
 
@@ -315,7 +361,7 @@
 ;; `anything-c-find-files-show-icons'
 ;; Default Value: nil
 ;; `anything-c-find-files-icons-directory'
-;; Default Value: "/usr/local/share/emacs/23.2.91/etc/images/tree-widget/default"
+;; Default Value: "/usr/local/share/emacs/23.3.50/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
 ;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
 ;; `anything-c-browse-code-regexp-python'
@@ -324,11 +370,17 @@
 ;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
 ;; `anything-c-external-programs-associations'
 ;; Default Value: nil
+;; `anything-ff-exif-data-program'
+;; Default Value: "exiftran"
+;; `anything-ff-exif-data-program-args'
+;; Default Value: "-d"
 ;; `anything-c-etags-tag-file-name'
 ;; Default Value: "TAGS"
 ;; `anything-c-etags-tag-file-search-limit'
 ;; Default Value: 10
 ;; `anything-c-filelist-file-name'
+;; Default Value: nil
+;; `anything-c-use-adaptative-sorting'
 ;; Default Value: nil
 
 ;;  * Anything sources defined here:
@@ -9099,79 +9151,7 @@ the center of window, otherwise at the top of window.
         anything-c-source-recentf
         anything-c-source-files-in-current-dir+))
 
-;;;; unit test
-;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
-;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el")
-(dont-compile
-  (when (fboundp 'expectations)
-    (expectations
-      (desc "candidates-file plug-in")
-      (expect '(anything-p-candidats-file-init)
-        (assoc-default 'init
-                       (car (anything-compile-sources
-                             '(((name . "test")
-                                (candidates-file . "test.txt")))
-                             '(anything-compile-source--candidates-file)))))
-      (expect '(anything-p-candidats-file-init
-                (lambda () 1))
-        (assoc-default 'init
-                       (car (anything-compile-sources
-                             '(((name . "test")
-                                (candidates-file . "test.txt")
-                                (init . (lambda () 1))))
-                             '(anything-compile-source--candidates-file)))))
-      (expect '(anything-p-candidats-file-init
-                (lambda () 1))
-        (assoc-default 'init
-                       (car (anything-compile-sources
-                             '(((name . "test")
-                                (candidates-file . "test.txt")
-                                (init (lambda () 1))))
-                             '(anything-compile-source--candidates-file)))))
-      ;; FIXME error
-      ;; (desc "anything-c-source-buffers")
-      ;; (expect '(("Buffers" ("foo" "curbuf")))
-      ;;   (stub buffer-list => '("curbuf" " hidden" "foo" "*anything*"))
-      ;;   (let ((anything-c-boring-buffer-regexp
-      ;;          (rx (or
-      ;;               (group bos  " ")
-      ;;               "*anything"
-      ;;               ;; echo area
-      ;;               " *Echo Area" " *Minibuf"))))
-      ;;     (flet ((buffer-name (&optional x) x))
-      ;;       (anything-test-candidates 'anything-c-source-buffers))))
-      (desc "anything-c-stringify")
-      (expect "str1"
-        (anything-c-stringify "str1"))
-      (expect "str2"
-        (anything-c-stringify 'str2))
-      (desc "anything-c-symbolify")
-      (expect 'sym1
-        (anything-c-symbolify "sym1"))
-      (expect 'sym2
-        (anything-c-symbolify 'sym2))
-      (desc "plug-in:default-action")
-      (expect '(((action ("default" . default) ("original" . original))
-                 (default-action . ("default" . default))
-                 (action ("original" . original))))
-        (anything-compile-sources
-         '(((default-action . ("default" . default))
-            (action ("original" . original))))
-         '(anything-compile-source--default-action)))
-      (expect '(((action ("a1" . a1) ("a2" . a2))
-                 (default-action . ("a1" . a1))
-                 (action ("a1" . a1) ("a2" . a2))))
-        (anything-compile-sources
-         '(((default-action . ("a1" . a1))
-            (action ("a1" . a1) ("a2" . a2))))
-         '(anything-compile-source--default-action)))
-      (expect '(((action ("a2" . a2) ("a1" . a1))
-                 (default-action . ("a2" . a2))
-                 (action ("a1" . a1) ("a2" . a2))))
-        (anything-compile-sources
-         '(((default-action . ("a2" . a2))
-            (action ("a1" . a1) ("a2" . a2))))
-         '(anything-compile-source--default-action))))))
+;; Unit tests are now in ../developer-tools/unit-test-anything-config.el.
 
 (provide 'anything-config)
 
