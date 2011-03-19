@@ -1867,16 +1867,19 @@ buffer that is not the current buffer."
     (delq nil map))
   "Keymap for buffer sources in anything.")
 
+;;;###autoload
 (defun anything-buffer-run-grep ()
   "Run Grep action from `anything-c-source-buffer+'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-buffers))
 
+;;;###autoload
 (defun anything-buffer-switch-other-window ()
   "Run switch to other window action from `anything-c-source-buffer+'."
   (interactive)
   (anything-c-quit-and-execute-action 'switch-to-buffer-other-window))
 
+;;;###autoload
 (defun anything-buffer-switch-to-elscreen ()
   "Run switch to elscreen  action from `anything-c-source-buffer+'."
   (interactive)
@@ -2030,6 +2033,7 @@ buffer that is not the current buffer."
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
            ("Find file in hex dump" . hexl-find-file)
            ("Find file other window `C-o'" . find-file-other-window)
+           ("Switch to history `M-p'" . anything-find-files-switch-to-hist)
            ("Find file other frame" . find-file-other-frame)
            ("Find file as root" . anything-find-file-as-root))))))
 ;; (anything 'anything-c-source-find-files)
@@ -2121,6 +2125,10 @@ ACTION must be an action supported by `anything-dired-action'."
       (anything-do-grep1 (anything-marked-candidates) 'recurse)
       (anything-do-grep1 (anything-marked-candidates))))
 
+(defun anything-find-files-switch-to-hist (candidate)
+  "Switch to anything-find-files history."
+  (anything-find-files t))
+
 (defvar eshell-command-aliases-list nil)
 (declare-function eshell-read-aliases-list "em-alias")
 (defun anything-find-files-eshell-command-on-file (candidate)
@@ -2180,6 +2188,7 @@ will not be loaded first time you use this."
 \\[anything-ff-rotate-left-persistent]\t\t->Rotate Image Left.
 \\[anything-ff-rotate-right-persistent]\t\t->Rotate Image Right.
 \\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
+\\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
 \n== Anything Map ==
 \\{anything-map}
 "))
@@ -2198,6 +2207,7 @@ will not be loaded first time you use this."
     (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
+    (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
@@ -2213,58 +2223,75 @@ will not be loaded first time you use this."
 ACTION must be one of the actions of current source."
   (setq anything-saved-action action)
   (anything-exit-minibuffer))
-    
+
+;;;###autoload
+(defun anything-ff-run-switch-to-history ()
+  "Run Switch to history action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-switch-to-hist))
+
+;;;###autoload
 (defun anything-ff-run-grep ()
   "Run Grep action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-grep))
 
+;;;###autoload
 (defun anything-ff-run-copy-file ()
   "Run Copy file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-copy))
 
+;;;###autoload
 (defun anything-ff-run-rename-file ()
   "Run Rename file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-rename))
 
+;;;###autoload
 (defun anything-ff-run-byte-compile-file ()
   "Run Byte compile file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-byte-compile))
 
+;;;###autoload
 (defun anything-ff-run-load-file ()
   "Run Load file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-load-files))
 
+;;;###autoload
 (defun anything-ff-run-symlink-file ()
   "Run Symlink file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-symlink))
 
+;;;###autoload
 (defun anything-ff-run-delete-file ()
   "Run Delete file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-delete-marked-files))
 
+;;;###autoload
 (defun anything-ff-run-complete-fn-at-point ()
   "Run complete file name action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action
    'anything-c-insert-file-name-completion-at-point))
 
+;;;###autoload
 (defun anything-ff-run-switch-to-eshell ()
   "Run switch to eshell action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-switch-to-eshell))
 
+;;;###autoload
 (defun anything-ff-run-switch-other-window ()
   "Run switch to other window action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'find-file-other-window))
 
+;;;###autoload
 (defun anything-ff-run-open-file-externally ()
   "Run open file externally command action from `anything-c-source-find-files'."
   (interactive)
@@ -2819,13 +2846,13 @@ in an `anything-comp-read'."
        (thing-at-point 'filename))))
 
 ;;;###autoload
-(defun anything-find-files ()
+(defun anything-find-files (arg)
   "Preconfigured `anything' for anything implementation of `find-file'.
 Called with a prefix arg show history if some.
 Don't call it from programs, use `anything-find-files1' instead.
 This is the starting point for nearly all actions you can do on files."
-  (interactive)
-  (let ((any-input (if (and current-prefix-arg anything-ff-history)
+  (interactive "P")
+  (let ((any-input (if (and arg anything-ff-history)
                        (anything-find-files-history)
                        (anything-find-files-initial-input))))
     (when (and (eq major-mode 'org-agenda-mode)
