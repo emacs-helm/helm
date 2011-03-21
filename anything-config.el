@@ -2000,6 +2000,7 @@ buffer that is not the current buffer."
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (image-action1 . anything-ff-rotate-image-left)
     (image-action2 . anything-ff-rotate-image-right)
+    (properties-action . anything-ff-properties)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . anything-ff-mode-line-string)
@@ -2189,6 +2190,7 @@ will not be loaded first time you use this."
 \\[anything-ff-rotate-right-persistent]\t\t->Rotate Image Right.
 \\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
 \\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
+\\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
 \n== Anything Map ==
 \\{anything-map}
 "))
@@ -2208,6 +2210,7 @@ will not be loaded first time you use this."
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
     (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
+    (define-key map (kbd "<M-f1>")  'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
@@ -2468,9 +2471,44 @@ in `anything-ff-history'."
   "*Face used to prefix new file or url paths in `anything-find-files'."
   :group 'anything)
 
+(defun anything-ff-properties (candidate)
+  "Show file properties of CANDIDATE in a tooltip."
+  (let ((type (anything-ff-attributes candidate :type t)))
+    (tooltip-show
+     (concat
+      (anything-c-basename candidate) ": \n"
+      "Type: " type "\n"
+      (when (string= type "symlink")
+        (format "True name: %s\n" (file-truename candidate)))
+      (anything-ff-attributes candidate :dired t :human-size t)))))
+
+(defun anything-ff-properties-persistent ()
+  "Show properties without quitting anything."
+  (interactive)
+  (anything-execute-persistent-action 'properties-action))
+
+(defmacro anything-ff-human-size (size)
+  "Return the string byte size SIZE of a file in human readable form."
+  `(let ((M (cons "M" (calc-eval (format "%s/1024^2" ,size))))
+         (G (cons "G" (calc-eval (format "%s/1024^3" ,size))))
+         (K (cons "K" (calc-eval (format "%s/1024" ,size))))
+         (B (cons "B" ,size)))
+     (loop
+        with result = B
+        for (a . b) in (loop for i in (list M G K B)
+                          unless (string= (calc-eval (format "%s<1" (cdr i))) "1")
+                          collect i)
+        when (string= (calc-eval (format "%s<%s" b (cdr result))) "1")
+        do (setq result (cons a b))
+        finally return
+          (if (string= (car result) "B") (int-to-string ,size)
+              (format "%s%s"
+                      (/ (round (* 10 (string-to-number (cdr result)))) 10.0)
+                      (car result))))))
+
 (defun* anything-ff-attributes
     (file &key type links uid gid access-time modif-time
-          status size mode gid-change inode device-num dired)
+          status size mode gid-change inode device-num dired human-size)
   "Easy interface for `file-attributes'."
   (let ((all (destructuring-bind
                    (type links uid gid access-time modif-time
@@ -2503,7 +2541,8 @@ in `anything-ff-history'."
            (format-time-string "%Y-%m-%d %R" (getf all :modif-time)))
           (status
            (format-time-string "%Y-%m-%d %R" (getf all :status)))
-          (size (getf all :size))
+          (size (if human-size (anything-ff-human-size (getf all :size))
+                    (getf all :size)))
           (mode (getf all :mode))
           (gid-change (getf all :gid-change))
           (inode (getf all :inode))
@@ -2514,7 +2553,8 @@ in `anything-ff-history'."
             (number-to-string (getf all :links)) " "
             (getf all :uid) ":"
             (getf all :gid) " "
-            (number-to-string (getf all :size)) " "
+            (if human-size (anything-ff-human-size (getf all :size))
+                (int-to-string (getf all :size))) " "
             (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
           (t all))))
 
