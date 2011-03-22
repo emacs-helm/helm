@@ -3651,7 +3651,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                                             default-directory))
     (anything
      :sources
-     `(((name . "Grep (M-up/down - next/prec file)")
+     `(((name . "Grep (C-c ? Help)")
         (candidates
          . (lambda ()
              (if include-files
@@ -3659,6 +3659,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                  (funcall anything-c-grep-default-function only))))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
+        (mode-line . anything-ff-mode-line-string)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
@@ -3749,32 +3750,26 @@ See also `anything-do-grep1'."
 (defun anything-c-goto-next-or-prec-file (n)
   "Go to next or precedent candidate file in anything grep/etags buffers.
 If N is positive go forward otherwise go backward."
-  (let ((cur-source (assoc-default 'name (anything-get-current-source))))
-    (with-anything-window
-      (if (or (string= cur-source "Grep (M-up/down - next/prec file)")
-              (string-match "^Etags.*" cur-source))
-          (let* ((current-line-list  (split-string
-                                      (buffer-substring
-                                       (point-at-bol)
-                                       (point-at-eol)) ":"))  
-                 (current-fname      (nth 0 current-line-list))
-                 (fn-b-o-f           (if (eq n 1) 'eobp 'bobp)))
-            (catch 'break
-              (while (not (funcall fn-b-o-f))
-                (forward-line n) ; Go forward or backward depending of n value.
-                (unless (search-forward current-fname (point-at-eol) t)
-                  (anything-mark-current-line)
-                  (throw 'break nil))))
-            (cond ((and (eq n 1) (eobp))
-                   (re-search-backward ".")
-                   (forward-line 0)
-                   (anything-mark-current-line))
-                  ((and (< n 1) (bobp))
-                   (forward-line 1)
-                   (anything-mark-current-line))))
-          (if (eq n 1)
-              (anything-next-line)
-              (anything-previous-line))))))
+  (with-anything-window
+    (let* ((current-line-list  (split-string
+                                (buffer-substring
+                                 (point-at-bol)
+                                 (point-at-eol)) ":"))  
+           (current-fname      (nth 0 current-line-list))
+           (fn-b-o-f           (if (eq n 1) 'eobp 'bobp)))
+      (catch 'break
+        (while (not (funcall fn-b-o-f))
+          (forward-line n) ; Go forward or backward depending of n value.
+          (unless (search-forward current-fname (point-at-eol) t)
+            (anything-mark-current-line)
+            (throw 'break nil))))
+      (cond ((and (eq n 1) (eobp))
+             (re-search-backward ".")
+             (forward-line 0)
+             (anything-mark-current-line))
+            ((and (< n 1) (bobp))
+             (forward-line 1)
+             (anything-mark-current-line))))))
 
 ;;;###autoload
 (defun anything-c-goto-precedent-file ()
@@ -3933,7 +3928,8 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
 (defun anything-c-source-etags-header-name (x)
   (concat "Etags in "
           (with-current-buffer anything-current-buffer
-            (anything-c-etags-get-tag-file))))
+            (anything-c-etags-get-tag-file))
+          " (C-c ? Help)"))
 
 (defmacro anything-c-etags-create-buffer (file)
   `(let* ((tag-fname ,file)
@@ -3980,6 +3976,7 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
     (header-name . anything-c-source-etags-header-name)
     (init . anything-c-etags-init)
     (candidates-in-buffer)
+    (mode-line . anything-ff-mode-line-string)
     (action . anything-c-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (anything-c-etags-default-action candidate)
