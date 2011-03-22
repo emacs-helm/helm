@@ -2210,7 +2210,7 @@ will not be loaded first time you use this."
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
     (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
-    (define-key map (kbd "<M-f1>")  'anything-ff-properties-persistent)
+    (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
@@ -2472,15 +2472,18 @@ in `anything-ff-history'."
   :group 'anything)
 
 (defun anything-ff-properties (candidate)
-  "Show file properties of CANDIDATE in a tooltip."
-  (let ((type (anything-ff-attributes candidate :type t)))
-    (tooltip-show
-     (concat
-      (anything-c-basename candidate) ": \n"
-      "Type: " type "\n"
-      (when (string= type "symlink")
-        (format "True name: %s\n" (file-truename candidate)))
-      (anything-ff-attributes candidate :dired t :human-size t)))))
+  "Show file properties of CANDIDATE in a tooltip or message."
+  (let ((type       (anything-ff-attributes candidate :type t))
+        (dired-line (anything-ff-attributes candidate :dired t :human-size t)))
+    (if (window-system)
+        (tooltip-show
+         (concat
+          (anything-c-basename candidate) ": \n"
+          "Type: " type "\n"
+          (when (string= type "symlink")
+            (format "True name: %s\n" (file-truename candidate)))
+          dired-line))
+        (message dired-line) (sit-for 5))))
 
 (defun anything-ff-properties-persistent ()
   "Show properties without quitting anything."
