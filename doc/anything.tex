@@ -295,7 +295,47 @@ You can bind 4th action to some key like this:
 \begin{verbatim}
 (define-key anything-map (kbd "<C-tab>") 'anything-select-4th-action)
 \end{verbatim}
- 
+\newpage
+\subsection{Anything find files action shortcuts}
+\label{sec:anything-find-files-1}
+Instead of having to open action pannel with TAB, 
+you have some convenients shortcuts to quickly run actions.\\
+
+\begin{tabular}{| l | l |}
+  \hline
+  Command & Key \\
+  \hline
+  anything-ff-run-grep & M-g s (C-u recurse)\\
+  \hline
+  anything-ff-run-rename-file & M-R (C-u Follow)\\
+\hline
+  anything-ff-run-copy-file & M-C (C-u Follow)\\
+\hline
+  anything-ff-run-byte-compile-file & M-B (C-u Load)\\
+\hline
+  anything-ff-run-load-file & M-L \\
+\hline
+  anything-ff-run-symlink-file & M-S (C-u Follow)\\
+\hline
+  anything-ff-run-delete-file & M-D \\
+\hline
+  anything-ff-run-switch-to-eshell & M-e \\
+\hline
+  anything-ff-run-complete-fn-at-point & M-tab \\
+\hline
+  anything-ff-run-switch-other-window & C-o \\
+\hline
+  anything-ff-run-open-file-externally & C-c C-x (C-u choose)\\
+\hline
+  anything-ff-help & C-c ? \\
+\hline
+  anything-ff-rotate-left-persistent & M-l \\
+\hline
+  anything-ff-rotate-right-persistent & M-r \\
+\hline
+  anything-find-files-down-one-level & C-. or C-l \\
+\hline
+\end{tabular}
 \subsection{Turn in image viewer}
 \label{sec:turn-image-viewer}
 You can turn anything-find-files in a nice image-viewer.
@@ -370,7 +410,11 @@ A prefix arg will launch recursive grep.
 \subsection{Grep from anything-find-files}
 \label{sec:grep-from-anything}
 From anything-find-files (f5 a C-x C-f) Open the action menu with tab and choose grep.
-A prefix arg will launch recursive grep.
+A prefix arg will launch recursive grep.\\
+
+\begin{itemize}
+\item NOTE:You can now launch grep with (C-u) M-g s without switching to the action pannel.
+\end{itemize}
 
 \subsection{Grep One file}
 \label{sec:grep-one-file}
@@ -662,7 +706,11 @@ Pattern: emacs -b -e -n 12
 \subsection{Launch grep}
 \label{sec:launch-grep}
 
-When search is done, you can search in a specific file or directory with grep that you will find in action menu (TAB).
+When search is done, you can search in a specific file or directory with grep that you will find in action menu (TAB).\\
+
+\begin{itemize}
+\item NOTE:You can now launch grep with (C-u) M-g s without switching to the action pannel.
+\end{itemize}
 
 \subsection{Windows specificity}
 \label{sec:windows-specificity}
