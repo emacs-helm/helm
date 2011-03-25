@@ -2423,7 +2423,7 @@ or hitting C-z on \"..\"."
 
 (defvar anything-ff-default-directory nil)
 (defvar anything-ff-history nil)
-(defvar anything-ff-history-max-length 30
+(defvar anything-ff-history-max-length 100
   "*Number of elements shown in `anything-find-files' history.")
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
@@ -2670,12 +2670,12 @@ in `anything-ff-history'."
                  (subseq actions 4)))
         ((string-match "\.el$" (anything-aif (anything-marked-candidates)
                                    (car it) candidate))
-         (append (subseq actions 0 4);(list (car actions))
+         (append (subseq actions 0 4)
                  '(("Byte compile lisp file(s) `M-B, C-u to load'"
                     . anything-find-files-byte-compile)
                    ("Load File(s) `M-L'" . anything-find-files-load-files))
                  (subseq actions 4)))
-        ((and (string-match "\.html$" candidate)
+        ((and (string-match "\.html?$" candidate)
               (file-exists-p candidate))
          (append (subseq actions 0 4)
                  '(("Browse url file" . browse-url-of-file))
