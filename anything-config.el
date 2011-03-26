@@ -1399,7 +1399,7 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (when (or (eq major-mode 'org-mode) outline-minor-mode)
     (org-reveal))
   (anything-match-line-color-current-line) (sit-for 0.3)
-  (anything-match-line-cleanup)))
+  (anything-match-line-cleanup))
 
 (defun anything-c-regexp-persistent-action (pt)
   (goto-char pt)
