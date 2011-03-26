@@ -1395,13 +1395,11 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
 
 (defun anything-goto-line (lineno)
   "Goto LINENO opening only outline headline if needed."
-  (flet ((gotoline (numline)
-           (goto-char (point-min)) (forward-line (1- numline))
-           (when (or (eq major-mode 'org-mode) outline-minor-mode)
-             (org-reveal))
-           (anything-match-line-color-current-line) (sit-for 0.3)
-           (anything-match-line-cleanup)))
-    (gotoline lineno)))
+  (goto-char (point-min)) (forward-line (1- lineno))
+  (when (or (eq major-mode 'org-mode) outline-minor-mode)
+    (org-reveal))
+  (anything-match-line-color-current-line) (sit-for 0.3)
+  (anything-match-line-cleanup)))
 
 (defun anything-c-regexp-persistent-action (pt)
   (goto-char pt)
