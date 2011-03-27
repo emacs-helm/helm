@@ -4622,29 +4622,30 @@ To get non-interactive functions listed, use
   "Preconfigured `anything' for Emacs commands.
 It is `anything' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
-  (let* (in-help help-cand
-                 (command (anything-comp-read
-                           "M-x " obarray
-                           :test 'commandp
-                           :must-match t
-                           :requires-pattern 2
-                           :name "Emacs Commands"
-                           :persistent-action
-                           #'(lambda (candidate)
-                               (if (and in-help (string= candidate help-cand))
-                                   (progn (kill-buffer "*Help*") (setq in-help nil))
-                                   (describe-function (intern candidate))
-                                   (setq in-help t))
-                               (setq help-cand candidate))
-                           :persistent-help "Describe this command"
-                           :history extended-command-history
-                           :sort 'string-lessp
-                           :fc-transformer 'anything-M-x-transformer))
-                 (history (loop with hist
-                             for i in extended-command-history
-                             for com = (intern i)
-                             when (and (fboundp com) (not (member i hist)))
-                             collect i into hist finally return hist)))
+  (let* (in-help
+         help-cand
+         (history (loop with hist
+                     for i in extended-command-history
+                     for com = (intern i)
+                     when (and (fboundp com) (not (member i hist)))
+                     collect i into hist finally return hist))
+         (command (anything-comp-read
+                   "M-x " obarray
+                   :test 'commandp
+                   :must-match t
+                   :requires-pattern 2
+                   :name "Emacs Commands"
+                   :persistent-action
+                   #'(lambda (candidate)
+                       (if (and in-help (string= candidate help-cand))
+                           (progn (kill-buffer "*Help*") (setq in-help nil))
+                           (describe-function (intern candidate))
+                           (setq in-help t))
+                       (setq help-cand candidate))
+                   :persistent-help "Describe this command"
+                   :history history
+                   :sort 'string-lessp
+                   :fc-transformer 'anything-M-x-transformer)))
     (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
     (call-interactively (intern command))
     (setq extended-command-history (cons command (delete command history)))))
