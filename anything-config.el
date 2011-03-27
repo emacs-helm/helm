@@ -7468,32 +7468,35 @@ package name - description."
   (interactive "sShell command: ")
   (if (get-buffer command)		; if the buffer already exists
       (switch-to-buffer command)	; then just switch to it
-      (switch-to-buffer command)		; otherwise create it
+      (switch-to-buffer command)	; otherwise create it
       (insert (shell-command-to-string command))))
 
 (defun anything-c-apt-cache-show (package)
   (anything-c-shell-command-if-needed (format anything-c-apt-show-command package)))
 
 (defun anything-c-apt-install (package)
-  (anything-c-apt-install1 package :action 'install))
+  (anything-c-apt-install1 :action 'install))
 
 (defun anything-c-apt-uninstall (package)
-  (anything-c-apt-install1 package :action 'uninstall))
+  (anything-c-apt-install1 :action 'uninstall))
 
 (defun anything-c-apt-purge (package)
-  (anything-c-apt-install1 package :action 'purge))
+  (anything-c-apt-install1 :action 'purge))
 
-(defun* anything-c-apt-install1 (candidate &key action)
+(defun* anything-c-apt-install1 (&key action)
   (ansi-term (getenv "SHELL") "anything apt")
   (term-line-mode)
-  (let ((command (case action
-                   ('install "sudo apt-get install '%s'")
-                   ('uninstall "sudo apt-get remove '%s'")
-                   ('purge "sudo apt-get purge '%s'")
-                   (t (error "Unknow action"))))
-        (beg (point)) end)
+  (let ((command   (case action
+                   ('install   "sudo apt-get install ")
+                   ('uninstall "sudo apt-get remove ")
+                   ('purge     "sudo apt-get purge ")
+                   (t          (error "Unknow action"))))
+        (beg       (point))
+        end
+        (cand-list (mapconcat #'(lambda (x) (format "'%s'" x))
+                              (anything-marked-candidates) " ")))
     (goto-char (point-max))
-    (insert (format command candidate))
+    (insert (concat command cand-list))
     (setq end (point))
     (if (y-or-n-p (format "%s package" (symbol-name action)))
         (progn
