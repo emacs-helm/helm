@@ -299,7 +299,8 @@ You can bind 4th action to some key like this:
 \subsection{Anything find files action shortcuts}
 \label{sec:anything-find-files-1}
 Instead of having to open action pannel with TAB, 
-you have some convenients shortcuts to quickly run actions.\\
+you have some convenients shortcuts to quickly run actions.
+Use C-c ? from an anything-find-files session to have a description.\\
 
 \begin{tabular}{| l | l |}
   \hline
@@ -308,33 +309,35 @@ you have some convenients shortcuts to quickly run actions.\\
   anything-ff-run-grep & M-g s (C-u recurse)\\
   \hline
   anything-ff-run-rename-file & M-R (C-u Follow)\\
-\hline
+  \hline
   anything-ff-run-copy-file & M-C (C-u Follow)\\
-\hline
+  \hline
   anything-ff-run-byte-compile-file & M-B (C-u Load)\\
-\hline
+  \hline
   anything-ff-run-load-file & M-L \\
-\hline
+  \hline
   anything-ff-run-symlink-file & M-S (C-u Follow)\\
-\hline
+  \hline
   anything-ff-run-delete-file & M-D \\
-\hline
+  \hline
   anything-ff-run-switch-to-eshell & M-e \\
-\hline
+  \hline
   anything-ff-run-complete-fn-at-point & M-tab \\
-\hline
+  \hline
   anything-ff-run-switch-other-window & C-o \\
-\hline
+  \hline
   anything-ff-run-open-file-externally & C-c C-x (C-u choose)\\
-\hline
+  \hline
   anything-ff-help & C-c ? \\
-\hline
+  \hline
   anything-ff-rotate-left-persistent & M-l \\
-\hline
+  \hline
   anything-ff-rotate-right-persistent & M-r \\
-\hline
+  \hline
   anything-find-files-down-one-level & C-. or C-l \\
-\hline
+  \hline
+  anything-ff-properties-persistent & M-i \\
+  \hline
 \end{tabular}
 \subsection{Turn in image viewer}
 \label{sec:turn-image-viewer}
@@ -442,9 +445,10 @@ To use navigate in your file system and mark files with
 \begin{verbatim}
 C-<SPACE> 
 \end{verbatim}
-.When you have marked all files, just launch grep in action menu.
+When you have marked all files, just launch grep in action menu.
 
-NOTE: using recursive search will have no effect of course!
+NOTE: Using prefix-arg (C-u) will start a recursive search with the extensions of the marked files
+except if those are one of ``grep-find-ignored-files''.  
 
 \subsection{Grep Directory recursively}
 \label{sec:grep-direct-recurs}
@@ -497,6 +501,12 @@ Accessing the mark-ring in Emacs is really inconvenient, fortunately, you will f
 \begin{itemize}
 \item NOTE: ``anything-all-mark-ring'' handle global-mark-ring also.
 \end{itemize}
+
+\subsection{Save grep session}
+\label{sec:save-grep-session}
+If you want to save the results of your grep session, doing ``C-x C-s'' will save your grep results
+in a *grep* buffer. 
+
 \subsection{Open Files Externally}
 \label{sec:open-files-extern}
 You will find in action menu from anything-find-files an action to open file with external program.
@@ -504,7 +514,9 @@ If you have no entry in .mailcap or /etc/mailcap, you will enter an anything ses
 to use with this kind of file.
 It will offer to you to save setting to always open this kind of files with this program.
 Once configured, you can however open the files of same extension with some other program by forcing anything
-to choose program with C-u.
+to choose program with C-u.\\
+
+NOTE: You can now open files externally with ``C-c C-x'' from anything-find-files.
 
 \subsection{Eshell command on files}
 \label{sec:eshell-command-files}
