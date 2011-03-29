@@ -1161,14 +1161,21 @@ http://bbdb.sourceforge.net/"
   (anything-other-buffer 'anything-c-source-bbdb "*anything bbdb*"))
 
 ;;;###autoload
-(defun anything-locate ()
+(defun anything-locate (arg)
   "Preconfigured `anything' for Locate.
 Note you can add locate command after entering pattern.
-See man locate for more infos."
-  (interactive)
-  (anything :sources 'anything-c-source-locate
-            :buffer "*anything locate*"
-            :keymap anything-generic-files-map))
+See man locate for more infos.
+You can specify a specific database with prefix argument (C-u)."
+  (interactive "P")
+  (let* ((db (and arg (anything-c-read-file-name "LocateDBFile: ")))
+         (anything-c-locate-command (if db 
+                                       (replace-regexp-in-string
+                                        "locate" (format "locate -d %s" db)
+                                        anything-c-locate-command)
+                                       anything-c-locate-command)))
+    (anything :sources 'anything-c-source-locate
+              :buffer "*anything locate*"
+              :keymap anything-generic-files-map)))
 
 ;;;###autoload
 (defun anything-w3m-bookmarks ()
