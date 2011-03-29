@@ -1164,13 +1164,28 @@ http://bbdb.sourceforge.net/"
 (defun anything-locate (arg)
   "Preconfigured `anything' for Locate.
 Note you can add locate command after entering pattern.
-See man locate for more infos.
-You can specify a specific database with prefix argument (C-u)."
+
+You can specify a specific database with prefix argument ARG \(C-u\).
+Many databases can be used: navigate and mark them.
+
+To create a user specific db, use
+\"updatedb -l 0 -o db_path -U directory\".
+
+See man locate for more infos."
   (interactive "P")
-  (let* ((db (and arg (anything-c-read-file-name "LocateDBFile: ")))
+  (let* ((db (and arg
+                  (anything-c-read-file-name
+                   "LocateDBFile: "
+                   :marked-candidates t
+                   :test #'(lambda (x)
+                             (if anything-locate-db-file-regexp
+                                 (string-match anything-locate-db-file-regexp x)
+                                 x)))))
          (anything-c-locate-command (if db 
                                        (replace-regexp-in-string
-                                        "locate" (format "locate -d %s" db)
+                                        "locate"
+                                        (format "locate -d %s"
+                                                (mapconcat 'identity db ":"))
                                         anything-c-locate-command)
                                        anything-c-locate-command)))
     (anything :sources 'anything-c-source-locate
@@ -3406,6 +3421,10 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
     (t "locate %s"))
   "A list of arguments for locate program.
 The \"-r\" option must be the last option.")
+
+(defvar anything-locate-db-file-regexp "m?locate\.db$"
+  "Default regexp to match locate database.
+If nil Search in all files.")
 
 (defun anything-c-locate-init ()
   "Initialize async locate process for `anything-c-source-locate'."
