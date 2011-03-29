@@ -3530,7 +3530,8 @@ See Man locate for more infos.
              ;; Candidate is a file and we use recursion, use the
              ;; current directory instead of candidate.
              ((and (file-exists-p i) (anything-c-grep-recurse-p))
-              (list (file-name-directory (directory-file-name i))))
+              (list (directory-file-name ; Needed for windoze.
+                     (file-name-directory (directory-file-name i)))))
              ;; Else should be one or more file.
              (t (list i))) into all-files
        finally return
