@@ -1177,17 +1177,26 @@ See man locate for more infos."
                   (anything-c-read-file-name
                    "LocateDBFile: "
                    :marked-candidates t
+                   :preselect anything-locate-db-file-regexp
                    :test #'(lambda (x)
                              (if anything-locate-db-file-regexp
-                                 (string-match anything-locate-db-file-regexp x)
+                                 ;; Select only locate db files and directories
+                                 ;; to allow navigation.
+                                 (or (string-match
+                                      anything-locate-db-file-regexp x)
+                                     (file-directory-p x))
                                  x)))))
-         (anything-c-locate-command (if db 
-                                       (replace-regexp-in-string
-                                        "locate"
-                                        (format "locate -d %s"
-                                                (mapconcat 'identity db ":"))
-                                        anything-c-locate-command)
-                                       anything-c-locate-command)))
+         (anything-c-locate-command
+          (if db
+              (replace-regexp-in-string
+               "locate"
+               (format "locate -d %s"
+                       (mapconcat 'identity
+                                  ;; Remove eventually marked directories by error.
+                                  (loop for i in db unless
+                                       (file-directory-p i) collect i) ":"))
+               anything-c-locate-command)
+              anything-c-locate-command)))
     (anything :sources 'anything-c-source-locate
               :buffer "*anything locate*"
               :keymap anything-generic-files-map)))
