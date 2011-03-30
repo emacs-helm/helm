@@ -34,7 +34,7 @@ $LS_DIRS = ["~", "/"]
 begin load "~/.make-filelist.rb"; rescue LoadError; end # Load configuration file
 $done = []                                              # Already collected directory
 def ls(dir)
-  if $done.include? dir
+  if $done.include? dir or not File.readable? dir
     $stderr.puts "skipped #{dir}" if $VERBOSE
     return
   end
