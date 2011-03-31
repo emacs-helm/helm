@@ -2051,9 +2051,9 @@ buffer that is not the current buffer."
             . anything-c-open-file-externally)
            ("Grep File(s) `M-g s, C-u Recurse'" . anything-find-files-grep)
            ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
-           ("Eshell command on file(s)"
+           ("Eshell command on file(s) `M-!'"
             . anything-find-files-eshell-command-on-file)
-           ("Ediff File" . anything-find-files-ediff-files)
+           ("Ediff File `C-='" . anything-find-files-ediff-files)
            ("Ediff Merge File" . anything-find-files-ediff-merge-files)
            ("Delete File(s) `M-D'" . anything-delete-marked-files)
            ("Copy file(s) `M-C, C-u to follow'" . anything-find-files-copy)
@@ -2064,7 +2064,7 @@ buffer that is not the current buffer."
            ("Find file in hex dump" . hexl-find-file)
            ("Find file other window `C-o'" . find-file-other-window)
            ("Switch to history `M-p'" . anything-find-files-switch-to-hist)
-           ("Find file other frame" . find-file-other-frame)
+           ("Find file other frame `C-c C-o'" . find-file-other-frame)
            ("Find file as root" . anything-find-file-as-root))))))
 ;; (anything 'anything-c-source-find-files)
 
@@ -2212,8 +2212,11 @@ will not be loaded first time you use this."
 \\[anything-ff-run-symlink-file]\t\t->Symlink File.
 \\[anything-ff-run-delete-file]\t\t->Delete File.
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
+\\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file.
+\\[anything-ff-run-ediff-file]\t\t->Ediff file.
 \\[anything-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
 \\[anything-ff-run-switch-other-window]\t\t->Switch other window.
+\\[anything-ff-run-switch-other-frame]\t\t->Switch other frame.
 \\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[anything-ff-rotate-left-persistent]\t\t->Rotate Image Left.
 \\[anything-ff-rotate-right-persistent]\t\t->Rotate Image Right.
@@ -2237,7 +2240,10 @@ will not be loaded first time you use this."
     (define-key map (kbd "M-e")     'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-o") 'anything-ff-run-switch-other-frame)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
+    (define-key map (kbd "M-!")     'anything-ff-run-eshell-command-on-file)
+    (define-key map (kbd "C-=")     'anything-ff-run-ediff-file)
     (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
@@ -2293,6 +2299,18 @@ ACTION must be one of the actions of current source."
   (anything-c-quit-and-execute-action 'anything-find-files-load-files))
 
 ;;;###autoload
+(defun anything-ff-run-eshell-command-on-file ()
+  "Run eshell command on file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-eshell-command-on-file))
+
+;;;###autoload
+(defun anything-ff-run-ediff-file ()
+  "Run Load file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-ediff-files))
+
+;;;###autoload
 (defun anything-ff-run-symlink-file ()
   "Run Symlink file action from `anything-c-source-find-files'."
   (interactive)
@@ -2322,6 +2340,12 @@ ACTION must be one of the actions of current source."
   "Run switch to other window action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'find-file-other-window))
+
+;;;###autoload
+(defun anything-ff-run-switch-other-frame ()
+  "Run switch to other frame action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'find-file-other-frame))
 
 ;;;###autoload
 (defun anything-ff-run-open-file-externally ()
