@@ -2189,8 +2189,7 @@ will not be loaded first time you use this."
   (flet ((cd-eshell ()
            (goto-char (point-max))
            (insert
-            (format "cd %s" (shell-quote-argument
-                             anything-ff-default-directory)))
+            (format "cd '%s'" anything-ff-default-directory))
            (eshell-send-input)))
     (if (get-buffer "*eshell*")
         (progn
