@@ -2058,6 +2058,7 @@ buffer that is not the current buffer."
            ("Delete File(s) `M-D'" . anything-delete-marked-files)
            ("Copy file(s) `M-C, C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `M-R, C-u to follow'" . anything-find-files-rename)
+           ("Serial rename files" . anything-ff-serial-rename)
            ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
@@ -2197,6 +2198,37 @@ will not be loaded first time you use this."
           (cd-eshell))
         (call-interactively 'eshell)
         (cd-eshell))))
+
+(defun anything-ff-serial-rename-1 (directory collection new-name start-at-num)
+  "rename files in COLLECTION to DIRECTORY with the prefix name NEW-NAME.
+Rename start at number START-AT-NUM - ex: prefixname-01.jpg."
+  (let* ((tmp-dir  (file-name-as-directory
+                    (concat (file-name-as-directory directory)
+                            (symbol-name (gensym "tmp")))))
+         (new-list (loop with len = (length collection)
+                        repeat len for count from start-at-num
+                        for fnum = (if (< start-at-num 10) "0%s" "%s")
+                        collect (concat tmp-dir new-name (format fnum count)))))
+    (make-directory tmp-dir)
+    ;; We rename in tmp-dir first to avoid clash with possible same fnames.
+    (loop for i in collection for index from 0
+       for new-name = (nth index new-list)
+       do (rename-file i (concat new-name (file-name-extension i 'dot))))
+  (loop with dirlist = (directory-files
+                        tmp-dir t directory-files-no-dot-files-regexp)
+       for f in dirlist do
+       (rename-file f directory))
+  (delete-directory tmp-dir t)))
+
+(defun anything-ff-serial-rename (candidate)
+  "Serial rename all marked files to `anything-ff-default-directory'.
+See `anything-ff-serial-rename-1'."
+  (let ((cands (anything-marked-candidates))
+        (name  (read-string "NewName: "))
+        (start (read-number "StartAtNumber: "))
+        (dir anything-ff-default-directory))
+    (anything-ff-serial-rename-1 dir cands name start)
+    (anything-find-files1 dir)))
 
 (defun anything-ff-help ()
   (interactive)
