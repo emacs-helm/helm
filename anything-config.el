@@ -2234,8 +2234,10 @@ See `anything-ff-serial-rename-1'."
         (name  (read-string "NewName: "))
         (start (read-number "StartAtNumber: "))
         (dir anything-ff-default-directory))
-    (anything-ff-serial-rename-1 dir cands name start)
-    (anything-find-files1 dir)))
+    (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
+                            (length cands) dir name))
+      (anything-ff-serial-rename-1 dir cands name start)
+      (anything-find-files1 dir))))
 
 (defun anything-ff-help ()
   (interactive)
