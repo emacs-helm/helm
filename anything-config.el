@@ -1709,8 +1709,10 @@ The match is done with `string-match'."
 
 ;;; Toggle all marks.
 
+;;;###autoload
 (defun anything-mark-all ()
   "Mark all visible unmarked candidates in current source."
+  (interactive)
   (with-anything-window
     (save-excursion
       (goto-char (anything-get-previous-header-pos))
@@ -1740,8 +1742,10 @@ The match is done with `string-match'."
     (anything-mark-current-line)
     (message "%s candidates marked" (length anything-marked-candidates))))
 
+;;;###autoload
 (defun anything-unmark-all ()
   "Unmark all candidates in all sources of current anything session."
+  (interactive)
   (with-anything-window
     (let ((len (length anything-marked-candidates)))
       (save-excursion
@@ -1750,6 +1754,7 @@ The match is done with `string-match'."
       (anything-mark-current-line)
       (message "%s candidates unmarked" len))))
 
+;;;###autoload
 (defun anything-toggle-all-marks ()
   "Toggle all marks.
 Mark all visible candidates of current source or unmark all candidates
@@ -2254,6 +2259,8 @@ See `anything-ff-serial-rename-1'."
 \\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
 \\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
 \\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
+\\[anything-mark-all]\t\t->Mark all visibles candidates.
+\\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \n== Anything Map ==
 \\{anything-map}
 "))
@@ -2278,6 +2285,8 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
+    (define-key map (kbd "M-a")     'anything-mark-all)
+    (define-key map (kbd "M-u")     'anything-unmark-all)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
