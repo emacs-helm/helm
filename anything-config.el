@@ -2207,6 +2207,8 @@ will not be loaded first time you use this."
 (defun anything-ff-serial-rename-1 (directory collection new-name start-at-num)
   "rename files in COLLECTION to DIRECTORY with the prefix name NEW-NAME.
 Rename start at number START-AT-NUM - ex: prefixname-01.jpg."
+  ;; Maybe remove directories selected by error in collection.
+  (setq collection (remove-if 'file-directory-p collection))
   (let* ((tmp-dir  (file-name-as-directory
                     (concat (file-name-as-directory directory)
                             (symbol-name (gensym "tmp")))))
