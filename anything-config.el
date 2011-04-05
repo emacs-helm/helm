@@ -2211,21 +2211,17 @@ Rename start at number START-AT-NUM - ex: prefixname-01.jpg."
   (setq collection (remove-if 'file-directory-p collection))
   (let* ((tmp-dir  (file-name-as-directory
                     (concat (file-name-as-directory directory)
-                            (symbol-name (gensym "tmp")))))
-         (new-list (loop with len = (length collection)
-                        repeat len for count from start-at-num
-                        for fnum = (if (< start-at-num 10) "0%s" "%s")
-                        collect (concat tmp-dir new-name (format fnum count)))))
+                            (symbol-name (gensym "tmp"))))))
     (make-directory tmp-dir)
-    ;; We rename in tmp-dir first to avoid clash with possible same fnames.
-    (loop for i in collection for index from 0
-       for new-name = (nth index new-list)
-       do (rename-file i (concat new-name (file-name-extension i 'dot))))
-  (loop with dirlist = (directory-files
-                        tmp-dir t directory-files-no-dot-files-regexp)
+    (loop for i in collection
+       for count from start-at-num
+       for fnum = (if (< count 10) "0%s" "%s")
+       do (rename-file i (concat tmp-dir new-name (format fnum count)
+                                 (file-name-extension i 'dot))))
+    (loop with dirlist = (directory-files tmp-dir t directory-files-no-dot-files-regexp)
        for f in dirlist do
-       (rename-file f directory))
-  (delete-directory tmp-dir t)))
+         (rename-file f directory))
+    (delete-directory tmp-dir t)))
 
 (defun anything-ff-serial-rename (candidate)
   "Serial rename all marked files to `anything-ff-default-directory'.
