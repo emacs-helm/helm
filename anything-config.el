@@ -2059,7 +2059,7 @@ buffer that is not the current buffer."
            ("Eshell command on file(s) `M-!'"
             . anything-find-files-eshell-command-on-file)
            ("Ediff File `C-='" . anything-find-files-ediff-files)
-           ("Ediff Merge File" . anything-find-files-ediff-merge-files)
+           ("Ediff Merge File `C-c ='" . anything-find-files-ediff-merge-files)
            ("Delete File(s) `M-D'" . anything-delete-marked-files)
            ("Copy file(s) `M-C, C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `M-R, C-u to follow'" . anything-find-files-rename)
@@ -2250,6 +2250,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
 \\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file.
 \\[anything-ff-run-ediff-file]\t\t->Ediff file.
+\\[anything-ff-run-ediff-merge-file]\t\t->Ediff merge file.
 \\[anything-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
 \\[anything-ff-run-switch-other-window]\t\t->Switch other window.
 \\[anything-ff-run-switch-other-frame]\t\t->Switch other frame.
@@ -2282,6 +2283,7 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
     (define-key map (kbd "M-!")     'anything-ff-run-eshell-command-on-file)
     (define-key map (kbd "C-=")     'anything-ff-run-ediff-file)
+    (define-key map (kbd "C-c =")   'anything-ff-run-ediff-merge-file)
     (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
@@ -2346,9 +2348,15 @@ ACTION must be one of the actions of current source."
 
 ;;;###autoload
 (defun anything-ff-run-ediff-file ()
-  "Run Load file action from `anything-c-source-find-files'."
+  "Run Ediff file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-ediff-files))
+
+;;;###autoload
+(defun anything-ff-run-ediff-merge-file ()
+  "Run Ediff merge file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-ediff-merge-files))
 
 ;;;###autoload
 (defun anything-ff-run-symlink-file ()
