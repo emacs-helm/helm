@@ -2064,6 +2064,7 @@ buffer that is not the current buffer."
            ("Copy file(s) `M-C, C-u to follow'" . anything-find-files-copy)
            ("Rename file(s) `M-R, C-u to follow'" . anything-find-files-rename)
            ("Serial rename files" . anything-ff-serial-rename)
+           ("Serial rename by symlinking files" . anything-ff-serial-rename-by-symlink)
            ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
@@ -2204,24 +2205,66 @@ will not be loaded first time you use this."
         (call-interactively 'eshell)
         (cd-eshell))))
 
-(defun anything-ff-serial-rename-1 (directory collection new-name start-at-num)
+(defun anything-ff-member-directory-p (file directory)
+  (let ((dir-file (expand-file-name (file-name-as-directory (file-name-directory file))))
+        (cur-dir  (expand-file-name (file-name-as-directory directory))))
+    (string= dir-file cur-dir)))
+
+(defun* anything-ff-serial-rename-1
+    (directory collection new-name start-at-num &key (method 'rename))
   "rename files in COLLECTION to DIRECTORY with the prefix name NEW-NAME.
-Rename start at number START-AT-NUM - ex: prefixname-01.jpg."
+Rename start at number START-AT-NUM - ex: prefixname-01.jpg.
+METHOD can be one of rename, copy or symlink.
+Files will be renamed if they are files of current directory, otherwise they
+will be treated with METHOD.
+Default METHOD is rename."
   ;; Maybe remove directories selected by error in collection.
   (setq collection (remove-if 'file-directory-p collection))
-  (let* ((tmp-dir  (file-name-as-directory
-                    (concat (file-name-as-directory directory)
-                            (symbol-name (gensym "tmp"))))))
-    (make-directory tmp-dir)
-    (loop for i in collection
-       for count from start-at-num
-       for fnum = (if (< count 10) "0%s" "%s")
-       do (rename-file i (concat tmp-dir new-name (format fnum count)
-                                 (file-name-extension i 'dot))))
-    (loop with dirlist = (directory-files tmp-dir t directory-files-no-dot-files-regexp)
-       for f in dirlist do
-         (rename-file f directory))
-    (delete-directory tmp-dir t)))
+  (flet ((symlink-file (file dest)
+           (let ((flist (list file)))
+             (anything-dired-action
+              dest :action 'symlink :files flist))))
+
+    (let* ((tmp-dir  (file-name-as-directory
+                      (concat (file-name-as-directory directory)
+                              (symbol-name (gensym "tmp")))))
+           (fn       (case method
+                       (copy    'copy-file)
+                       (symlink 'symlink-file)
+                       (rename  'rename-file)
+                       (t (error "Error: Unknow method %s" method)))))
+      (make-directory tmp-dir)
+      (loop for i in collection
+         for count from start-at-num
+         for fnum = (if (< count 10) "0%s" "%s")
+         for nname = (concat tmp-dir new-name (format fnum count)
+                             (file-name-extension i 'dot))
+         do (if (anything-ff-member-directory-p i directory)
+                (rename-file i nname)
+                (funcall fn i nname)))
+      (loop with dirlist = (directory-files
+                            tmp-dir t directory-files-no-dot-files-regexp)
+         for f in dirlist do
+         (if (file-symlink-p f)
+             (symlink-file (file-truename f)
+                           (concat (file-name-as-directory directory)
+                                   (anything-c-basename f)))
+             (rename-file f directory)))
+      (delete-directory tmp-dir t))))
+
+(defun anything-ff-serial-rename-by-symlink (candidate)
+  "Serial rename all marked files to `anything-ff-default-directory'.
+Rename only file of current directory, and symlink files coming from
+other directories.
+See `anything-ff-serial-rename-1'."
+  (let ((cands (anything-marked-candidates))
+        (name  (read-string "NewName: "))
+        (start (read-number "StartAtNum: "))
+        (dir anything-ff-default-directory))
+    (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
+                            (length cands) dir name))
+      (anything-ff-serial-rename-1 dir cands name start :method 'symlink)
+      (anything-find-files1 dir))))
 
 (defun anything-ff-serial-rename (candidate)
   "Serial rename all marked files to `anything-ff-default-directory'.
