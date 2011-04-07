@@ -2205,6 +2205,21 @@ will not be loaded first time you use this."
         (call-interactively 'eshell)
         (cd-eshell))))
 
+(defun anything-ff-serial-rename-action (method)
+  "Rename all marked files to `anything-ff-default-directory' with METHOD.
+See `anything-ff-serial-rename-1'."
+  (let ((cands (anything-marked-candidates))
+        (name  (read-string "NewName: "))
+        (start (read-number "StartAtNumber: "))
+        (dir   (expand-file-name
+                (anything-c-read-file-name
+                 "Serial Rename to directory: " :initial-input
+                 (expand-file-name anything-ff-default-directory)))))
+    (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
+                            (length cands) dir name))
+      (anything-ff-serial-rename-1 dir cands name start :method method)
+      (anything-find-files1 dir))))
+
 (defun anything-ff-member-directory-p (file directory)
   (let ((dir-file (expand-file-name (file-name-as-directory (file-name-directory file))))
         (cur-dir  (expand-file-name (file-name-as-directory directory))))
@@ -2252,31 +2267,19 @@ Default METHOD is rename."
              (rename-file f directory)))
       (delete-directory tmp-dir t))))
 
+(defun anything-ff-serial-rename (candidate)
+  "Serial rename all marked files to `anything-ff-default-directory'.
+Rename only file of current directory, and symlink files coming from
+other directories.
+See `anything-ff-serial-rename-1'."
+  (anything-ff-serial-rename-action 'rename))
+
 (defun anything-ff-serial-rename-by-symlink (candidate)
   "Serial rename all marked files to `anything-ff-default-directory'.
 Rename only file of current directory, and symlink files coming from
 other directories.
 See `anything-ff-serial-rename-1'."
-  (let ((cands (anything-marked-candidates))
-        (name  (read-string "NewName: "))
-        (start (read-number "StartAtNum: "))
-        (dir anything-ff-default-directory))
-    (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
-                            (length cands) dir name))
-      (anything-ff-serial-rename-1 dir cands name start :method 'symlink)
-      (anything-find-files1 dir))))
-
-(defun anything-ff-serial-rename (candidate)
-  "Serial rename all marked files to `anything-ff-default-directory'.
-See `anything-ff-serial-rename-1'."
-  (let ((cands (anything-marked-candidates))
-        (name  (read-string "NewName: "))
-        (start (read-number "StartAtNumber: "))
-        (dir anything-ff-default-directory))
-    (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
-                            (length cands) dir name))
-      (anything-ff-serial-rename-1 dir cands name start)
-      (anything-find-files1 dir))))
+  (anything-ff-serial-rename-action 'symlink))
 
 (defun anything-ff-help ()
   (interactive)
