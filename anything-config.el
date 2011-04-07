@@ -2875,7 +2875,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
              (insert-in-minibuffer (file-name-as-directory
                                     (expand-file-name candidate))))
             ;; A symlink file, expand to it's true name. (first hit)
-            ((file-symlink-p candidate)
+            ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
              (insert-in-minibuffer (file-truename candidate)))
             ;; A regular file, expand it, (first hit)
             ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
