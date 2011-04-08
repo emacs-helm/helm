@@ -2837,6 +2837,7 @@ in `anything-ff-history'."
 (defun anything-ff-rotate-current-image1 (file &optional num-arg)
   "Rotate current image at NUM-ARG degrees.
 This is a destructive operation on FILE made by external tool mogrify."
+  (setq file (file-truename file)) ; For symlinked images.
   ;; When FILE is not an image-file, do nothing.
   (when (string-match (image-file-name-regexp) file)
     (if (executable-find "mogrify")
