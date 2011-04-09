@@ -2308,6 +2308,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
 \\[anything-mark-all]\t\t->Mark all visibles candidates.
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
+\\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
 \n== Anything Map ==
 \\{anything-map}
 "))
@@ -2335,6 +2336,7 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "C-c ?")   'anything-ff-help)
     (define-key map (kbd "M-a")     'anything-mark-all)
     (define-key map (kbd "M-u")     'anything-unmark-all)
+    (define-key map (kbd "C-c C-a") 'anything-ff-run-gnus-attach-files)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
@@ -2446,6 +2448,12 @@ ACTION must be one of the actions of current source."
   "Run open file externally command action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-open-file-externally))
+
+;;;###autoload
+(defun anything-ff-run-gnus-attach-files ()
+  "Run gnus attach files command action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-gnus-attach-files))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
