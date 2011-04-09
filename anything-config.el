@@ -2645,24 +2645,24 @@ in `anything-ff-history'."
   (interactive)
   (anything-execute-persistent-action 'properties-action))
 
-(defmacro anything-ff-human-size (size)
-  "Return the string byte size SIZE of a file in human readable form."
-  `(let ((M (cons "M" (calc-eval (format "%s/1024^2" ,size))))
-         (G (cons "G" (calc-eval (format "%s/1024^3" ,size))))
-         (K (cons "K" (calc-eval (format "%s/1024" ,size))))
+(defvar anything-ff-default-kbsize 1024.0)
+(defmacro* anything-ff-human-size
+    (size &optional (kbsize anything-ff-default-kbsize))
+  "Return a string showing SIZE of a file in human readable form.
+SIZE can be an integer or a float depending it's value.
+`file-attributes' will take care of that to avoid overflow error.
+KBSIZE if a floating point number, default value is 1024.0."
+  `(let ((M (cons "M" (/ ,size (expt ,kbsize 2))))
+         (G (cons "G" (/ ,size (expt ,kbsize 3))))
+         (K (cons "K" (/ ,size ,kbsize)))
          (B (cons "B" ,size)))
-     (loop
-        with result = B
-        for (a . b) in (loop for i in (list M G K B)
-                          unless (string= (calc-eval (format "%s<1" (cdr i))) "1")
-                          collect i)
-        when (string= (calc-eval (format "%s<%s" b (cdr result))) "1")
-        do (setq result (cons a b))
-        finally return
-          (if (string= (car result) "B") (int-to-string ,size)
-              (format "%s%s"
-                      (/ (round (* 10 (string-to-number (cdr result)))) 10.0)
-                      (car result))))))
+     (loop with result = B
+        for (a . b) in
+          (loop for (x . y) in (list M G K B)
+             unless (< y 1) collect (cons x y))
+        when (< b (cdr result)) do (setq result (cons a b))
+        finally return (if (string= (car result) "B") ,size
+                           (format "%.1f%s" (cdr result) (car result))))))
 
 (defun* anything-ff-attributes
     (file &key type links uid gid access-time modif-time
