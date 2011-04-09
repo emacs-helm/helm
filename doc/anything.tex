@@ -363,16 +363,34 @@ Be sure to have Imagemagick package installed.\\
 \subsection{Serial rename}
 \label{sec:serial-rename}
 You can rename files with a new prefix name and by incremental number.
-This will happen in the directory where you are when you launch serial rename,
-that is ``anything-ff-default-directory''.
-The marked files will be renamed in this directory with a new prefix name and starting
+The marked files will be renamed with a new prefix name and starting
 at the start-number you have choosen.\\
 Note that the marked files are in the order of the selection you did, this allow to reorder
 files.\\
-If you mark files in other directories than the current one, these files will be moved to current one.\\
+If you mark files in other directories than the current one, these files will be moved or symlinked to current one.\\
 
 TIP: If you have more than 100 files to serial rename, start at 100 instead of one to have your directory
-sorted correctly.
+sorted correctly.\\
+
+You have to ways to serial rename:\\
+\begin{itemize}
+\item By renaming: All the file of others directories are moved in directory where renaming happen.\\ 
+\end{itemize}
+\begin{itemize}
+\item By symlinking: All the files that are not files of the directory where you want to rename will be symlinked,
+others will be renamed.\\
+\end{itemize}
+
+Example of Use:\\
+I want to create a directory with many symlinked images coming from various directories.\\
+1) C-x C-f (launch anything-find-files)\\
+2) Navigate to the place of your choice and write new directory name ending with ``/'' and press RET.\\
+3) Navigate and browse images, when you want an image mark it, you can mark all in a directory with M-a.\\
+4) When you have marked all files, choose ``serial rename by symlinking'' in action menu.\\
+5) Choose new name and start number.\\
+6) Navigate to initial directory (where files will be renamed/symlinked) and RET.\\
+7) Say yes to confirm, that's done.\\
+8) Start viewing your pictures.\\
 
 \subsection{Grep}
 \label{sec:grep}
