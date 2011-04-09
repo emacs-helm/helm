@@ -2065,6 +2065,7 @@ buffer that is not the current buffer."
            ("Rename file(s) `M-R, C-u to follow'" . anything-find-files-rename)
            ("Serial rename files" . anything-ff-serial-rename)
            ("Serial rename by symlinking files" . anything-ff-serial-rename-by-symlink)
+           ("Serial rename by copying files" . anything-ff-serial-rename-by-copying)
            ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
@@ -2280,6 +2281,13 @@ Rename only file of current directory, and symlink files coming from
 other directories.
 See `anything-ff-serial-rename-1'."
   (anything-ff-serial-rename-action 'symlink))
+
+(defun anything-ff-serial-rename-by-copying (candidate)
+  "Serial rename all marked files to `anything-ff-default-directory'.
+Rename only file of current directory, and copy files coming from
+other directories.
+See `anything-ff-serial-rename-1'."
+  (anything-ff-serial-rename-action 'copy))
 
 (defun anything-ff-help ()
   (interactive)
