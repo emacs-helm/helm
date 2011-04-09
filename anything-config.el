@@ -2661,7 +2661,8 @@ KBSIZE if a floating point number, default value is 1024.0."
           (loop for (x . y) in (list M G K B)
              unless (< y 1) collect (cons x y))
         when (< b (cdr result)) do (setq result (cons a b))
-        finally return (if (string= (car result) "B") ,size
+        finally return (if (string= (car result) "B")
+                           (format "%s" ,size)
                            (format "%.1f%s" (cdr result) (car result))))))
 
 (defun* anything-ff-attributes
