@@ -3002,7 +3002,12 @@ Show the first `anything-ff-history-max-length' elements of `anything-ff-history
 in an `anything-comp-read'."
   (let ((history (when anything-ff-history
                    (loop with dup for i in anything-ff-history
-                      unless (member i dup) collect i into dup
+                      ;; Remove duplicate and not existing files.
+                      ;; Keep remote files.
+                      unless (or (member i dup)
+                                 (and (not (file-remote-p i))
+                                      (not (file-exists-p i))))
+                      collect i into dup
                       finally return dup)))) ; Remove dups.
     (when history
       (setq anything-ff-history
