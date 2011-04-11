@@ -1873,9 +1873,10 @@ buffer that is not the current buffer."
               (propertize i
                           'face anything-c-buffers-face1
                           'help-echo (car (rassoc buf dired-buffers))))
-             ((and (buffer-file-name buf)
-                   (or (buffer-modified-p buf)
-                       (not (verify-visited-file-modtime buf))))
+             ((and (buffer-file-name buf) (not (verify-visited-file-modtime buf)))
+              (propertize i 'face '((:foreground "red"))
+                          'help-echo (buffer-file-name buf)))
+             ((and (buffer-file-name buf) (buffer-modified-p buf))
               (propertize i 'face 'anything-dired-symlink-face
                           'help-echo (buffer-file-name buf)))
              ((buffer-file-name buf)
