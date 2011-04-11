@@ -1888,6 +1888,9 @@ buffer that is not the current buffer."
                            anything-c-highlight-buffers
                            anything-c-skip-boring-buffers)
     (match . (anything-c-buffer-match-major-mode))
+    (diff-action . anything-buffer-toggle-diff)
+    (revert-action . anything-buffer-revert-and-update)
+    (save-action . anything-buffer-save-and-update)
     (mode-line . anything-ff-mode-line-string)
     (persistent-action . anything-c-buffers+-persistent-action)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
@@ -1933,6 +1936,9 @@ with name matching pattern."
 \\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
 \\[anything-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
+\\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer without quitting.
+\\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
+\\[anything-buffer-save-persistent]\t\t->Save buffer without quitting.
 \\[anything-c-buffer-help]\t\t->Display this help.
 \n== Anything Map ==
 \\{anything-map}
@@ -1945,11 +1951,47 @@ with name matching pattern."
     (define-key map (kbd "M-g s")     'anything-buffer-run-grep)
     (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
+    (define-key map (kbd "C-=")       'anything-buffer-diff-persistent)
+    (define-key map (kbd "M-U")       'anything-buffer-revert-persistent)
+    (define-key map (kbd "C-x C-s")   'anything-buffer-save-persistent)
     (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
     (delq nil map))
   "Keymap for buffer sources in anything.")
+
+(defun anything-buffer-toggle-diff (candidate)
+  "Toggle diff buffer CANDIDATE with it's file."
+  (if (get-buffer-window "*Diff*")
+      (kill-buffer "*Diff*")
+      (diff-buffer-with-file (get-buffer candidate))))
+
+;;;###autoload
+(defun anything-buffer-diff-persistent ()
+  "Toggle diff buffer without quitting anything."
+  (interactive)
+  (anything-execute-persistent-action 'diff-action))
+
+(defun anything-buffer-revert-and-update (candidate)
+  (anything-revert-marked-buffers candidate)
+  (anything-force-update))
+
+;;;###autoload
+(defun anything-buffer-revert-persistent ()
+  "Toggle diff buffer without quitting anything."
+  (interactive)
+  (anything-execute-persistent-action 'revert-action))
+
+(defun anything-buffer-save-and-update (candidate)
+  (with-current-buffer (get-buffer candidate)
+    (save-buffer))
+  (anything-force-update))
+
+;;;###autoload
+(defun anything-buffer-save-persistent ()
+  "Save buffer without quitting anything."
+  (interactive)
+  (anything-execute-persistent-action 'save-action))
 
 ;;;###autoload
 (defun anything-buffer-run-grep ()
@@ -9294,11 +9336,9 @@ Return nil if bmk is not a valid bookmark."
      ("View buffer" . view-buffer)
      ("Display buffer"   . display-buffer)
      ("Grep buffers (C-u grep all buffers)" . anything-c-grep-buffers)
-     ("Revert buffer" . anything-revert-buffer)
-     ("Revert Marked buffers" . anything-revert-marked-buffers)
+     ("Revert buffer(s)" . anything-revert-marked-buffers)
      ("Insert buffer" . insert-buffer)
-     ("Kill buffer" . kill-buffer)
-     ("Kill Marked buffers" . anything-kill-marked-buffers)
+     ("Kill buffer(s)" . anything-kill-marked-buffers)
      ("Diff with file" . diff-buffer-with-file)
      ("Ediff Marked buffers" . anything-ediff-marked-buffers)
      ("Ediff Merge marked buffers" . (lambda (candidate)
