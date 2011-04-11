@@ -1867,20 +1867,18 @@ buffer that is not the current buffer."
 (defvar anything-c-buffers-face3 'italic)
 (eval-when-compile (require 'dired))
 (defun anything-c-highlight-buffers (buffers)
-  (require 'dired)
-  (loop for i in buffers
-        if (rassoc (get-buffer i) dired-buffers)
-        collect (propertize i
-                            'face anything-c-buffers-face1
-                            'help-echo (car (rassoc (get-buffer i) dired-buffers)))
-        if (buffer-file-name (get-buffer i))
-        collect (propertize i
-                            'face anything-c-buffers-face2
-                            'help-echo (buffer-file-name (get-buffer i)))
-        if (and (not (rassoc (get-buffer i) dired-buffers))
-                (not (buffer-file-name (get-buffer i))))
-        collect (propertize i
-                            'face anything-c-buffers-face3)))
+  (loop for i in buffers collect
+       (cond ((rassoc (get-buffer i) dired-buffers)
+              (propertize i
+                          'face anything-c-buffers-face1
+                          'help-echo (car (rassoc (get-buffer i) dired-buffers))))
+             ((and (buffer-file-name (get-buffer i)) (buffer-modified-p (get-buffer i)))
+              (propertize i 'face 'anything-dired-symlink-face
+                          'help-echo (buffer-file-name (get-buffer i))))
+             ((buffer-file-name (get-buffer i))
+              (propertize i 'face anything-c-buffers-face2
+                          'help-echo (buffer-file-name (get-buffer i))))
+        (t (propertize i 'face anything-c-buffers-face3)))))
 
 (defvar anything-c-source-buffers+
   '((name . "Buffers")
@@ -1943,11 +1941,11 @@ with name matching pattern."
 
 (defvar anything-c-buffer-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "C-c ?") 'anything-c-buffer-help)
-    (define-key map (kbd "M-g s") 'anything-buffer-run-grep)
-    (define-key map (kbd "C-o") 'anything-buffer-switch-other-window)
-    (define-key map (kbd "C-c C-o") 'anything-buffer-switch-other-frame)
-    (define-key map (kbd "C-M-%") 'anything-buffer-run-query-replace-regexp)
+    (define-key map (kbd "C-c ?")     'anything-c-buffer-help)
+    (define-key map (kbd "M-g s")     'anything-buffer-run-grep)
+    (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
+    (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
+    (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
     (delq nil map))
