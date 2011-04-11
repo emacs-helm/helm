@@ -1890,6 +1890,7 @@ buffer that is not the current buffer."
                            anything-c-highlight-buffers
                            anything-c-skip-boring-buffers)
     (match . (anything-c-buffer-match-major-mode))
+    (mode-line . anything-ff-mode-line-string)
     (persistent-action . anything-c-buffers+-persistent-action)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
 
@@ -1924,10 +1925,28 @@ with name matching pattern."
                (goto-char (point-min))
                (apply #'query-replace-regexp (list regexp tostring))))))))
 
+(defun anything-c-buffer-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything Buffer ==\
+\nSpecific commands for `anything-buffer+':
+\\<anything-c-buffer-map>
+\\[anything-buffer-run-grep]\t\t->Run Grep (C-u all buffers).
+\\[anything-buffer-switch-other-window]\t\t->Switch other window.
+\\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
+\\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
+\\[anything-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
+\\[anything-c-buffer-help]\t\t->Display this help.
+\n== Anything Map ==
+\\{anything-map}
+"))
+    (anything-help)))
+
 (defvar anything-c-buffer-map
   (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-c ?") 'anything-c-buffer-help)
     (define-key map (kbd "M-g s") 'anything-buffer-run-grep)
     (define-key map (kbd "C-o") 'anything-buffer-switch-other-window)
+    (define-key map (kbd "C-c C-o") 'anything-buffer-switch-other-frame)
     (define-key map (kbd "C-M-%") 'anything-buffer-run-query-replace-regexp)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
@@ -1951,6 +1970,12 @@ with name matching pattern."
   "Run switch to other window action from `anything-c-source-buffer+'."
   (interactive)
   (anything-c-quit-and-execute-action 'switch-to-buffer-other-window))
+
+;;;###autoload
+(defun anything-buffer-switch-other-frame ()
+  "Run switch to other frame action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'switch-to-buffer-other-frame))
 
 ;;;###autoload
 (defun anything-buffer-switch-to-elscreen ()
