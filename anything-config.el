@@ -1867,17 +1867,20 @@ buffer that is not the current buffer."
 (defvar anything-c-buffers-face3 'italic)
 (eval-when-compile (require 'dired))
 (defun anything-c-highlight-buffers (buffers)
-  (loop for i in buffers collect
-       (cond ((rassoc (get-buffer i) dired-buffers)
+  (loop for i in buffers
+     for buf = (get-buffer i) collect
+       (cond ((rassoc buf dired-buffers)
               (propertize i
                           'face anything-c-buffers-face1
-                          'help-echo (car (rassoc (get-buffer i) dired-buffers))))
-             ((and (buffer-file-name (get-buffer i)) (buffer-modified-p (get-buffer i)))
+                          'help-echo (car (rassoc buf dired-buffers))))
+             ((and (buffer-file-name buf)
+                   (or (buffer-modified-p buf)
+                       (not (verify-visited-file-modtime buf))))
               (propertize i 'face 'anything-dired-symlink-face
-                          'help-echo (buffer-file-name (get-buffer i))))
-             ((buffer-file-name (get-buffer i))
+                          'help-echo (buffer-file-name buf)))
+             ((buffer-file-name buf)
               (propertize i 'face anything-c-buffers-face2
-                          'help-echo (buffer-file-name (get-buffer i))))
+                          'help-echo (buffer-file-name buf)))
         (t (propertize i 'face anything-c-buffers-face3)))))
 
 (defvar anything-c-source-buffers+
@@ -9111,7 +9114,9 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 (defun anything-revert-buffer (candidate)
   (with-current-buffer candidate
-    (when (buffer-modified-p)
+    (when (or (buffer-modified-p)
+              (not (verify-visited-file-modtime
+                    (get-buffer candidate))))
       (revert-buffer t t))))
 
 (defun anything-revert-marked-buffers (ignore)
