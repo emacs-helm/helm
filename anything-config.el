@@ -1889,8 +1889,24 @@ buffer that is not the current buffer."
     (candidate-transformer anything-c-skip-current-buffer
                            anything-c-highlight-buffers
                            anything-c-skip-boring-buffers)
+    (match . (anything-c-buffer-match-major-mode))
     (persistent-action . anything-c-buffers+-persistent-action)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
+
+(defun anything-c-buffer-match-major-mode (candidate)
+  "Match maybe buffer by major-mode.
+If you give a major-mode or partial major-mode, a space and
+a pattern, it will match all buffer of major-mode matching pattern.
+If you give a pattern which don't match a major-mode, it will search buffer
+with name matching pattern."
+  (with-current-buffer (get-buffer candidate)
+    (let ((mjm   (symbol-name major-mode))
+          (split (split-string anything-pattern)))
+      (if (string-match-p " " anything-pattern)
+          (and (string-match-p (car split) mjm)
+               (string-match-p (cadr split) candidate))
+          (or (string-match-p anything-pattern mjm)
+              (string-match-p anything-pattern candidate))))))
 
 (defvar anything-c-buffer-map
   (let ((map (copy-keymap anything-map)))
