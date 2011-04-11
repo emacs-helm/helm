@@ -1908,10 +1908,27 @@ with name matching pattern."
           (or (string-match-p anything-pattern mjm)
               (string-match-p anything-pattern candidate))))))
 
+(defun anything-c-buffer-query-replace-regexp (candidate)
+  "Query replace regexp in marked buffers."
+  (let ((bufs (anything-marked-candidates)))
+    (loop 
+       with regexp = (read-string "Query replace regexp: ")
+       with tostring = (read-string
+                       (format "Query replace regexp %s with: " regexp))
+       for buf in bufs
+       do
+         (save-window-excursion
+           (switch-to-buffer buf)
+           (save-excursion
+             (let ((case-fold-search t))
+               (goto-char (point-min))
+               (apply #'query-replace-regexp (list regexp tostring))))))))
+
 (defvar anything-c-buffer-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s") 'anything-buffer-run-grep)
     (define-key map (kbd "C-o") 'anything-buffer-switch-other-window)
+    (define-key map (kbd "C-M-%") 'anything-buffer-run-query-replace-regexp)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
     (delq nil map))
@@ -1922,6 +1939,12 @@ with name matching pattern."
   "Run Grep action from `anything-c-source-buffer+'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-buffers))
+
+;;;###autoload
+(defun anything-buffer-run-query-replace-regexp ()
+  "Run Query replace regexp action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-buffer-query-replace-regexp))
 
 ;;;###autoload
 (defun anything-buffer-switch-other-window ()
@@ -9244,6 +9267,7 @@ Return nil if bmk is not a valid bookmark."
            ("Switch to buffer other window" . switch-to-buffer-other-window)
            ("Switch to buffer other frame" . switch-to-buffer-other-frame)))
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
+     ("Query replace regexp" . anything-c-buffer-query-replace-regexp)
      ("View buffer" . view-buffer)
      ("Display buffer"   . display-buffer)
      ("Grep buffers (C-u grep all buffers)" . anything-c-grep-buffers)
