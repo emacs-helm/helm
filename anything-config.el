@@ -1884,6 +1884,17 @@ buffer that is not the current buffer."
                           'help-echo (buffer-file-name buf)))
         (t (propertize i 'face anything-c-buffers-face3)))))
 
+
+(defvar anything-buffer-mode-line-string
+  "\\<anything-c-buffer-map>\
+\\[anything-c-buffer-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-c-source-buffers+'")
+
 (defvar anything-c-source-buffers+
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
@@ -1891,12 +1902,12 @@ buffer that is not the current buffer."
     (candidate-transformer anything-c-skip-current-buffer
                            anything-c-highlight-buffers
                            anything-c-skip-boring-buffers)
-    (match . (anything-c-buffer-match-major-mode))
+    (match anything-c-buffer-match-major-mode)
     (diff-action . anything-buffer-toggle-diff)
     (revert-action . anything-buffer-revert-and-update)
     (save-action . anything-buffer-save-and-update)
-    (mode-line . anything-ff-mode-line-string)
     (persistent-action . anything-c-buffers+-persistent-action)
+    (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
 
 (defun anything-c-buffer-match-major-mode (candidate)
@@ -2119,10 +2130,10 @@ with name matching pattern."
 (defvar anything-ff-mode-line-string
   "\\<anything-find-files-map>\
 \\[anything-ff-help]:Help, \
-\\[anything-select-action]:Acts, \
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct, \
 \\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
 \\[anything-send-bug-report-from-anything]:BugReport."
   "String displayed in mode-line in `anything-c-source-find-files'")
 
@@ -3708,11 +3719,20 @@ If nil Search in all files.")
     (type . file)
     (properties-action . anything-ff-properties)
     (requires-pattern . 3)
-    (mode-line . anything-ff-mode-line-string)
+    (mode-line . anything-generic-file-mode-line-string)
     (delayed))
   "Find files matching the current input pattern with locate.")
 ;; (anything 'anything-c-source-locate)
 
+(defvar anything-generic-file-mode-line-string
+  "\\<anything-generic-files-map>\
+\\[anything-generic-file-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-c-source-find-files'")
 
 (defun anything-generic-file-help ()
   (interactive)
@@ -3920,6 +3940,17 @@ These extensions will be added to command line with --include arg of grep."
      collect glob into glob-list
      finally return glob-list))
 
+
+(defvar anything-grep-mode-line-string
+  "\\<anything-c-grep-map>\
+\\[anything-grep-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-do-grep'.")
+
 (defun anything-do-grep1 (only &optional recurse)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep and prompt user
@@ -3963,7 +3994,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                  (funcall anything-c-grep-default-function only))))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
-        (mode-line . anything-ff-mode-line-string)
+        (mode-line . anything-grep-mode-line-string)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
