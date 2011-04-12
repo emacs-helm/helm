@@ -1866,23 +1866,22 @@ buffer that is not the current buffer."
 (defvar anything-c-buffers-face2 'font-lock-type-face)
 (defvar anything-c-buffers-face3 'italic)
 (eval-when-compile (require 'dired))
-(defun anything-c-highlight-buffers (buffers sources)
+(defun anything-c-highlight-buffers (buffers)
   (loop for i in buffers
      for buf = (get-buffer i) collect
-       (cond ((rassoc buf dired-buffers)
-              (propertize i
-                          'face anything-c-buffers-face1
-                          'help-echo (car (rassoc buf dired-buffers))))
-             ((and (buffer-file-name buf) (not (verify-visited-file-modtime buf)))
-              (propertize i 'face '((:foreground "red"))
-                          'help-echo (buffer-file-name buf)))
-             ((and (buffer-file-name buf) (buffer-modified-p buf))
-              (propertize i 'face 'anything-dired-symlink-face
-                          'help-echo (buffer-file-name buf)))
-             ((buffer-file-name buf)
-              (propertize i 'face anything-c-buffers-face2
-                          'help-echo (buffer-file-name buf)))
-        (t (propertize i 'face anything-c-buffers-face3)))))
+     (cond ((rassoc buf dired-buffers)
+            (propertize i 'face anything-c-buffers-face1
+                        'help-echo (car (rassoc buf dired-buffers))))
+           ((and (buffer-file-name buf) (not (verify-visited-file-modtime buf)))
+            (propertize i 'face '((:foreground "red"))
+                        'help-echo (buffer-file-name buf)))
+           ((and (buffer-file-name buf) (buffer-modified-p buf))
+            (propertize i 'face 'anything-dired-symlink-face
+                        'help-echo (buffer-file-name buf)))
+           ((buffer-file-name buf)
+            (propertize i 'face anything-c-buffers-face2
+                        'help-echo (buffer-file-name buf)))
+           (t (propertize i 'face anything-c-buffers-face3)))))
 
 
 (defvar anything-buffer-mode-line-string
@@ -1899,7 +1898,6 @@ buffer that is not the current buffer."
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
     (type . buffer)
-    (filtered-candidate-transformer . anything-c-highlight-buffers)
     (match anything-c-buffer-match-major-mode)
     (diff-action . anything-buffer-toggle-diff)
     (revert-action . anything-buffer-revert-and-update)
@@ -9381,6 +9379,7 @@ Return nil if bmk is not a valid bookmark."
     (persistent-help . "Show this buffer")
     (candidate-transformer anything-c-skip-current-buffer
                            anything-c-skip-boring-buffers
+                           anything-c-highlight-buffers
                            anything-c-transform-buffer-display-string))
   "Buffer or buffer name.")
 
