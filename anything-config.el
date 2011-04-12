@@ -1919,11 +1919,11 @@ with name matching pattern."
   (with-current-buffer (get-buffer candidate)
     (let ((mjm   (symbol-name major-mode))
           (split (split-string anything-pattern)))
-      (if (string-match-p " " anything-pattern)
-          (and (string-match-p (car split) mjm)
-               (string-match-p (cadr split) candidate))
-          (or (string-match-p anything-pattern mjm)
-              (string-match-p anything-pattern candidate))))))
+      (if (string-match " " anything-pattern)
+          (and (string-match (car split) mjm)
+               (string-match (cadr split) candidate))
+          (or (string-match anything-pattern mjm)
+              (string-match anything-pattern candidate))))))
 
 (defun anything-c-buffer-query-replace-regexp (candidate)
   "Query replace regexp in marked buffers."
