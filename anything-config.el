@@ -1902,6 +1902,9 @@ buffer that is not the current buffer."
     (diff-action . anything-buffer-toggle-diff)
     (revert-action . anything-buffer-revert-and-update)
     (save-action . anything-buffer-save-and-update)
+    (candidate-transformer anything-c-skip-current-buffer
+                           anything-c-skip-boring-buffers
+                           anything-c-highlight-buffers)
     (persistent-action . anything-c-buffers+-persistent-action)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
@@ -9379,7 +9382,6 @@ Return nil if bmk is not a valid bookmark."
     (persistent-help . "Show this buffer")
     (candidate-transformer anything-c-skip-current-buffer
                            anything-c-skip-boring-buffers
-                           anything-c-highlight-buffers
                            anything-c-transform-buffer-display-string))
   "Buffer or buffer name.")
 
