@@ -1866,7 +1866,7 @@ buffer that is not the current buffer."
 (defvar anything-c-buffers-face2 'font-lock-type-face)
 (defvar anything-c-buffers-face3 'italic)
 (eval-when-compile (require 'dired))
-(defun anything-c-highlight-buffers (buffers)
+(defun anything-c-highlight-buffers (buffers sources)
   (loop for i in buffers
      for buf = (get-buffer i) collect
        (cond ((rassoc buf dired-buffers)
@@ -1899,9 +1899,7 @@ buffer that is not the current buffer."
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
     (type . buffer)
-    (candidate-transformer anything-c-skip-current-buffer
-                           anything-c-highlight-buffers
-                           anything-c-skip-boring-buffers)
+    (filtered-candidate-transformer . anything-c-highlight-buffers)
     (match anything-c-buffer-match-major-mode)
     (diff-action . anything-buffer-toggle-diff)
     (revert-action . anything-buffer-revert-and-update)
