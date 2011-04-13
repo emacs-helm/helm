@@ -2305,7 +2305,9 @@ will not be loaded first time you use this."
                                  finally return (sort ls 'string<)))))
       (loop
          for i in cand-list
-         for com = (concat command " " (shell-quote-argument i))
+         for com = (if (string-match "%s" command)
+                       (format command (shell-quote-argument i))
+                       (format "%s %s" command (shell-quote-argument i)))
          do (eshell-command com)))))
 
 
