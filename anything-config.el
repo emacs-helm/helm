@@ -1992,7 +1992,7 @@ with name matching pattern."
 
 ;;;###autoload
 (defun anything-buffer-revert-persistent ()
-  "Toggle diff buffer without quitting anything."
+  "Revert buffer without quitting anything."
   (interactive)
   (anything-execute-persistent-action 'revert-action))
 
