@@ -2044,22 +2044,20 @@ with name matching pattern."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-buffer-on-elscreen))
 
-(defun anything-c-buffers+-persistent-action (name)
-  (flet ((kill (item)
-           (with-current-buffer item
-             (if (and (buffer-modified-p)
-                      (buffer-file-name (current-buffer)))
-                 (progn
-                   (save-buffer)
-                   (kill-buffer item))
-                 (kill-buffer item))))
-         (goto (item)
-           (switch-to-buffer item)))
-    (if current-prefix-arg
+(defun anything-c-buffers-persistent-kill (buffer)
+  (with-current-buffer (get-buffer buffer)
+    (if (and (buffer-modified-p)
+             (buffer-file-name (current-buffer)))
         (progn
-          (kill name)
-          (anything-delete-current-selection))
-        (goto name))))
+          (save-buffer)
+          (kill-buffer buffer))
+        (kill-buffer buffer)))
+  (anything-delete-current-selection))
+
+(defun anything-c-buffers+-persistent-action (candidate)
+    (if current-prefix-arg
+        (anything-c-buffers-persistent-kill candidate)
+        (switch-to-buffer candidate)))
 
 ;; (anything 'anything-c-source-buffers+)
 
