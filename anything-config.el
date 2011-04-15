@@ -1967,6 +1967,7 @@ with name matching pattern."
     (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
     (define-key map (kbd "C-=")       'anything-buffer-diff-persistent)
     (define-key map (kbd "M-U")       'anything-buffer-revert-persistent)
+    (define-key map (kbd "M-D")       'anything-buffer-run-kill-buffers)
     (define-key map (kbd "C-x C-s")   'anything-buffer-save-persistent)
     (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
     (when (locate-library "elscreen")
@@ -2008,6 +2009,12 @@ with name matching pattern."
   (anything-execute-persistent-action 'save-action))
 
 ;;;###autoload
+(defun anything-buffer-run-kill-buffers ()
+  "Run kill buffer action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-kill-marked-buffers))
+
+;;;###autoload
 (defun anything-buffer-run-grep ()
   "Run Grep action from `anything-c-source-buffer+'."
   (interactive)
@@ -2039,20 +2046,20 @@ with name matching pattern."
 
 (defun anything-c-buffers+-persistent-action (name)
   (flet ((kill (item)
-               (with-current-buffer item
-                 (if (and (buffer-modified-p)
-                          (buffer-file-name (current-buffer)))
-                     (progn
-                       (save-buffer)
-                       (kill-buffer item))
-                   (kill-buffer item))))
+           (with-current-buffer item
+             (if (and (buffer-modified-p)
+                      (buffer-file-name (current-buffer)))
+                 (progn
+                   (save-buffer)
+                   (kill-buffer item))
+                 (kill-buffer item))))
          (goto (item)
-               (switch-to-buffer item)))
+           (switch-to-buffer item)))
     (if current-prefix-arg
         (progn
           (kill name)
           (anything-delete-current-selection))
-      (goto name))))
+        (goto name))))
 
 ;; (anything 'anything-c-source-buffers+)
 
