@@ -2778,25 +2778,29 @@ in `anything-ff-history'."
   (interactive)
   (anything-execute-persistent-action 'properties-action))
 
-(defvar anything-ff-default-kbsize 1024.0)
-(defmacro* anything-ff-human-size
-    (size &optional (kbsize anything-ff-default-kbsize))
+(defcustom anything-ff-default-kbsize 1024.0
+  "Default Kbsize to use for showing files size.
+It is a float, usually 1024.0 but could be 1000.0 on some systems."
+  :group 'anything-config
+  :type 'float)
+
+(defun anything-ff-human-size (size)
   "Return a string showing SIZE of a file in human readable form.
 SIZE can be an integer or a float depending it's value.
 `file-attributes' will take care of that to avoid overflow error.
 KBSIZE if a floating point number, default value is 1024.0."
-  `(let ((M (cons "M" (/ ,size (expt ,kbsize 2))))
-         (G (cons "G" (/ ,size (expt ,kbsize 3))))
-         (K (cons "K" (/ ,size ,kbsize)))
-         (B (cons "B" ,size)))
-     (loop with result = B
-        for (a . b) in
-          (loop for (x . y) in (list M G K B)
-             unless (< y 1) collect (cons x y))
-        when (< b (cdr result)) do (setq result (cons a b))
-        finally return (if (string= (car result) "B")
-                           (format "%s" ,size)
-                           (format "%.1f%s" (cdr result) (car result))))))
+  (let ((M (cons "M" (/ size (expt anything-ff-default-kbsize 2))))
+        (G (cons "G" (/ size (expt anything-ff-default-kbsize 3))))
+        (K (cons "K" (/ size anything-ff-default-kbsize)))
+        (B (cons "B" size)))
+    (loop with result = B
+       for (a . b) in
+       (loop for (x . y) in (list M G K B)
+          unless (< y 1) collect (cons x y))
+       when (< b (cdr result)) do (setq result (cons a b))
+       finally return (if (string= (car result) "B")
+                          (format "%s" size)
+                          (format "%.1f%s" (cdr result) (car result))))))
 
 (defun* anything-ff-attributes
     (file &key type links uid gid access-time modif-time
