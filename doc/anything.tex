@@ -860,6 +860,62 @@ you to browse your bookmarks with anything.
 NOTE : emacs server need to be started in the running Emacs, see Emacs
 documentation.
 
+\section{Anything for buffers}
+\label{sec:anything-buffers}
+
+\begin{verbatim}
+M-x anything-buffer+
+\end{verbatim}
+
+\subsection{Borring buffers}
+\label{sec:borring-buffers}
+
+Will show you your buffers list without borring buffers defined by regexp in
+``anything-c-boring-buffer-regexp''.
+Just use customize to set that for your need.\\
+
+\subsection{Search buffers by major-mode}
+\label{sec:search-buffers-major}
+
+
+Once in this anything session, you can narrow your buffer list by ``major mode'', regexp as usual or the both:\\
+
+Example:\\
+
+I want to show all my buffer that are in emacs-lisp mode:\\
+
+Pattern: lisp \\
+
+will show all emacs-lisp and lisp related buffers.\\
+
+Now i want to limit these buffers to the one that match ``any''\\
+
+Pattern: lisp any \\
+ 
+I want to match buffers that match ``any'' but not limited to lisp buffers:\\
+
+Pattern: any \\
+
+\subsection{Different colors for buffers}
+\label{sec:diff-colors-buff}
+
+\begin{itemize}
+\item If a buffer is modified, it will showup in orange.
+\end{itemize}
+\begin{itemize}
+\item If a buffer have been modified by some external program (e.g sed) in the back of emacs, it will showup in red.  
+\end{itemize}
+\begin{itemize}
+\item Non--buffer file, Directory and files have differents face.
+\end{itemize}
+
+\subsection{Special commands}
+\label{sec:special-commands}
+Not complete.\\
+
+C-c ? will show you all commands available.
+
+
 \section{Other tools}
 \label{sec:other-tools}
 
@@ -879,6 +935,8 @@ You can have info about anything on Emacswiki (Sometime deprecated).\\
 
 You can ask on the anything mailing-list by subscribing at:\\
 \url{https://groups.google.com/group/emacs-anything?hl=en}
+
+Or at gmane: gmane.emacs.anything
 
 \end{document}
 

@@ -1945,7 +1945,7 @@ with name matching pattern."
   (let ((anything-help-message "== Anything Buffer ==\
 \nSpecific commands for `anything-buffer+':
 \\<anything-c-buffer-map>
-\\[anything-buffer-run-grep]\t\t->Run Grep (C-u all buffers).
+\\[anything-buffer-run-grep]\t\t->Grep Buffer(s) (C-u grep all buffers linked to a file).
 \\[anything-buffer-switch-other-window]\t\t->Switch other window.
 \\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
@@ -1953,6 +1953,7 @@ with name matching pattern."
 \\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer without quitting.
 \\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
 \\[anything-buffer-save-persistent]\t\t->Save buffer without quitting.
+\\[anything-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
 \\[anything-c-buffer-help]\t\t->Display this help.
 \n== Anything Map ==
 \\{anything-map}
@@ -2125,6 +2126,9 @@ with name matching pattern."
 
 ;; (anything 'anything-c-source-files-in-current-dir+)
 
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Anything-find-files
+;;;
 ;;; Anything replacement of file name completion for `find-file' and friends.
 
 (defvar anything-c-find-files-doc-header (format " (`%s':Go to precedent level)"
@@ -2709,10 +2713,15 @@ or hitting C-z on \"..\"."
           ;; Return PATTERN unchanged.
           (t pattern))))
 
+;; Internal.
 (defvar anything-ff-default-directory nil)
 (defvar anything-ff-history nil)
-(defvar anything-ff-history-max-length 100
-  "*Number of elements shown in `anything-find-files' history.")
+
+(defcustom anything-ff-history-max-length 100
+  "*Number of elements shown in `anything-find-files' history."
+  :group 'anything-config
+  :type 'integer)
+
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern anything-pattern))
