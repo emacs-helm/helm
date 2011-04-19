@@ -5409,19 +5409,30 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
-    (action . (("Show person's data"
+    (action . (("Show Contact(s)"
                 . (lambda (candidate)
-                    (let ((bmk (anything-bookmark-get-bookmark-from-name
-                                candidate))
-                          (current-prefix-arg anything-current-prefix-arg))
-                      (bookmark-jump bmk))))
+                    (let* ((contacts (anything-marked-candidates))
+                           (current-prefix-arg (or anything-current-prefix-arg
+                                                   (> (length contacts) 1))))
+                      (bookmark-jump
+                       (anything-bookmark-get-bookmark-from-name (car contacts)))
+                      (anything-aif (cdr contacts)
+                        (loop for bmk in it do
+                             (bookmark-jump
+                              (anything-bookmark-get-bookmark-from-name bmk)))))))
                ("Send Mail"
                 . (lambda (candidate)
-                    (let ((bmk (anything-bookmark-get-bookmark-from-name
-                                candidate)))
-                      (if anything-current-prefix-arg
+                    (let* ((contacts (anything-marked-candidates))
+                           (bmk      (anything-bookmark-get-bookmark-from-name
+                                      (car contacts)))
+                           (append   (message-buffers)))
+                      (if append
                           (addressbook-set-mail-buffer1 bmk 'append)
-                          (addressbook-set-mail-buffer1 bmk)))))
+                          (addressbook-set-mail-buffer1 bmk))
+                      (setq contacts (cdr contacts))
+                      (when contacts
+                        (loop for bmk in contacts do
+                             (addressbook-set-mail-buffer1 bmk 'append))))))
                ("Edit Bookmark"
                 . (lambda (candidate)
                     (let ((bmk (anything-bookmark-get-bookmark-from-name
