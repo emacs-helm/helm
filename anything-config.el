@@ -1911,9 +1911,13 @@ buffer that is not the current buffer."
 
 (defun anything-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
-If you give a major-mode or partial major-mode, a space and
-a pattern, it will match all buffer of major-mode matching pattern.
-If you give a pattern which don't match a major-mode, it will search buffer
+If you give a major-mode or partial major-mode,
+it will list all buffers of this major-mode and/or buffers with name
+matching this major-mode.
+If you add a space after major-mode and then a space,
+it will match all buffers of the major-mode
+before space matching pattern after space.
+If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
   (with-current-buffer (get-buffer candidate)
     (let ((mjm   (symbol-name major-mode))
@@ -3782,7 +3786,13 @@ See Man locate for more infos.
     map)
   "Generic Keymap for files.")
 
-;;; Grep
+;;; Anything Incremental Grep.
+;; This allow to grep incrementally with anything interface.
+;; It allow also to Grep files recursively without using 'find' shell command.
+;; On Windows you will need at least Grep version 2.5.4 of Gnuwin32.
+;;
+;;
+
 ;; NOTE: the -d option with skip avoid error on windows.
 ;;       It have no effect on GNU/Linux.
 (defvar anything-c-grep-default-command "grep -d skip -niH -e %s %s %s"
