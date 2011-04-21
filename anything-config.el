@@ -2057,7 +2057,8 @@ with name matching pattern."
           (save-buffer)
           (kill-buffer buffer))
         (kill-buffer buffer)))
-  (anything-delete-current-selection))
+  (anything-delete-current-selection)
+  (anything-force-update))
 
 (defun anything-c-buffers+-persistent-action (candidate)
     (if current-prefix-arg
