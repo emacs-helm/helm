@@ -3793,11 +3793,12 @@ See Man locate for more infos.
 ;; On Windows you will need at least Grep version 2.5.4 of Gnuwin32.
 ;;
 ;;
-
-;; NOTE: the -d option with skip avoid error on windows.
-;;       It have no effect on GNU/Linux.
-(defvar anything-c-grep-default-command "grep -d skip -niH -e %s %s %s"
-  "Default format command for `anything-do-grep'.")
+(defvar anything-c-grep-default-command
+  "grep -d skip -niH -e %s %s %s"
+  "Default grep format command for `anything-do-grep1'.")
+(defvar anything-c-grep-default-recurse-command
+  "grep -d recurse -niH -e %s %s %s"
+  "Default recursive grep format command for `anything-do-grep1'.")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
 (defvar anything-c-grep-debug-command-line nil
   "Turn on anything grep command-line debugging when non--nil.")
@@ -3996,7 +3997,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
          (globs (mapconcat 'identity exts " "))
          (include-files (and recurse (read-string "OnlyExt(*.[ext]): "
                                                   globs)))
-         (anything-c-grep-default-command (if recurse "grep -nirH -e %s %s %s"
+         (anything-c-grep-default-command (if recurse
+                                              anything-c-grep-default-recurse-command
                                               anything-c-grep-default-command))
          ;; Disable match-plugin and use here own highlighting.
          (anything-mp-highlight-delay     nil))
