@@ -1930,10 +1930,11 @@ with name matching pattern."
               (string-match anything-pattern candidate))))))
 
 (defun anything-c-buffer-query-replace-1 (&optional regexp-flag)
-  "Query replace regexp in marked buffers."
-  (let* ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
-         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
-         (bufs   (anything-marked-candidates)))
+  "Query replace in marked buffers.
+If REGEXP-FLAG is given use `query-replace-regexp'."
+  (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
+        (prompt (if regexp-flag "Query replace regexp" "Query replace"))
+        (bufs   (anything-marked-candidates)))
     (loop 
        with replace = (query-replace-read-from prompt regexp-flag)
        with tostring = (unless (consp replace)
@@ -1941,14 +1942,14 @@ with name matching pattern."
                           replace prompt regexp-flag))
        for buf in bufs
        do
-         (save-window-excursion
-           (switch-to-buffer buf)
-           (save-excursion
-             (let ((case-fold-search t))
-               (goto-char (point-min))
-               (if (consp replace)
-                   (apply fn (list (car replace) (cdr replace)))
-                   (apply fn (list replace tostring)))))))))
+       (save-window-excursion
+         (switch-to-buffer buf)
+         (save-excursion
+           (let ((case-fold-search t))
+             (goto-char (point-min))
+             (if (consp replace)
+                 (apply fn (list (car replace) (cdr replace)))
+                 (apply fn (list replace tostring)))))))))
 
 (defun anything-c-buffer-query-replace-regexp (candidate)
   (anything-c-buffer-query-replace-1 'regexp))
@@ -8397,15 +8398,26 @@ The command is like <command %s> and is meant to use with `format'."
          (mime (when ext (mailcap-extension-to-mime ext))))
     (when mime (mailcap-mime-info mime))))
 
+(defcustom anything-c-default-external-file-browser "nautilus"
+  "Default external file browser for your system.
+Directories will be opened externally with it.
+Set to nil if you do not have external file browser
+or do not want to use it."
+  :group 'anything-config
+  :type  'string)
+
 (defun anything-get-default-program-for-file (filename)
   "Try to find a default program to open FILENAME.
 Try first in `anything-c-external-programs-associations' and then in mailcap file
 if nothing found return nil."
   (let* ((ext      (file-name-extension filename))
          (def-prog (assoc-default ext anything-c-external-programs-associations)))
-    (if (and def-prog (not (string= def-prog "")))
-        (concat def-prog " %s")
-        (anything-get-mailcap-for-file filename))))
+    (cond ((and def-prog (not (string= def-prog "")))
+           (concat def-prog " %s"))
+          ((and anything-c-default-external-file-browser
+                (file-directory-p filename))
+           (concat anything-c-default-external-file-browser " %s"))
+          (t (anything-get-mailcap-for-file filename)))))
 
 (defun anything-c-open-file-externally (file)
   "Open FILE with an external program.
