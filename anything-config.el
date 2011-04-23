@@ -1725,7 +1725,7 @@ The match is done with `string-match'."
                                (point))))
              (maxpoint  (or end (point-max))))
         (while (< (point) maxpoint)
-          (let ((prefix (get-text-property (point-at-bol) 'display)))
+          (let ((prefix       (get-text-property (point-at-bol) 'display)))
             (when (and (not (anything-this-visible-mark))
                        (not (or (string= prefix "[?]")
                                 (string= prefix "[@]"))))
@@ -1736,7 +1736,16 @@ The match is done with `string-match'."
               ;; So for the moment just mark this line.
               (anything-mark-current-line)
               ;; Don't mark possibles directories ending with . or ..
-              (unless (string-match "\\.$" (anything-get-selection))
+              (unless
+                  (let ((current-cand (anything-get-selection)))
+                    (and (or (anything-file-completion-source-p)
+                             (equal (assoc-default
+                                     'name (anything-get-current-source))
+                                    "Files from Current Directory"))
+                         (or (string-match "\\.$" current-cand)
+                             (string-match
+                              "^\\.#.*\\|^#.*#$"
+                              (anything-c-basename current-cand)))))
                 (anything-make-visible-mark))))
           (forward-line 1) (end-of-line))))
     (anything-mark-current-line)
