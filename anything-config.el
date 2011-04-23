@@ -1933,7 +1933,6 @@ with name matching pattern."
   "Query replace regexp in marked buffers."
   (let* ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
          (prompt (if regexp-flag "Query replace regexp" "Query replace"))
-         (fn     (if regexp-flag 'query-replace-regexp 'query-replace))
          (bufs   (anything-marked-candidates)))
     (loop 
        with replace = (query-replace-read-from prompt regexp-flag)
