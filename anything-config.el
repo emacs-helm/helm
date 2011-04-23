@@ -1929,13 +1929,17 @@ with name matching pattern."
           (or (string-match anything-pattern mjm)
               (string-match anything-pattern candidate))))))
 
-(defun anything-c-buffer-query-replace-regexp (candidate)
+(defun anything-c-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace regexp in marked buffers."
-  (let ((bufs (anything-marked-candidates)))
+  (let* ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
+         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
+         (fn     (if regexp-flag 'query-replace-regexp 'query-replace))
+         (bufs   (anything-marked-candidates)))
     (loop 
-       with regexp = (read-string "Query replace regexp: ")
-       with tostring = (read-string
-                       (format "Query replace regexp %s with: " regexp))
+       with replace = (query-replace-read-from prompt regexp-flag)
+       with tostring = (unless (consp replace)
+                         (query-replace-read-to
+                          replace prompt regexp-flag))
        for buf in bufs
        do
          (save-window-excursion
@@ -1943,7 +1947,15 @@ with name matching pattern."
            (save-excursion
              (let ((case-fold-search t))
                (goto-char (point-min))
-               (apply #'query-replace-regexp (list regexp tostring))))))))
+               (if (consp replace)
+                   (apply fn (list (car replace) (cdr replace)))
+                   (apply fn (list replace tostring)))))))))
+
+(defun anything-c-buffer-query-replace-regexp (candidate)
+  (anything-c-buffer-query-replace-1 'regexp))
+
+(defun anything-c-buffer-query-replace (candidate)
+  (anything-c-buffer-query-replace-1))
 
 (defun anything-c-buffer-help ()
   (interactive)
@@ -1954,6 +1966,7 @@ with name matching pattern."
 \\[anything-buffer-switch-other-window]\t\t->Switch other window.
 \\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
+\\[anything-buffer-run-query-replace]\t\t->Query replace in marked buffers.
 \\[anything-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
 \\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer without quitting.
 \\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
@@ -1976,6 +1989,7 @@ with name matching pattern."
     (define-key map (kbd "M-D")       'anything-buffer-run-kill-buffers)
     (define-key map (kbd "C-x C-s")   'anything-buffer-save-persistent)
     (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
+    (define-key map (kbd "M-%")       'anything-buffer-run-query-replace)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
     (delq nil map))
@@ -2031,6 +2045,12 @@ with name matching pattern."
   "Run Query replace regexp action from `anything-c-source-buffer+'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-buffer-query-replace-regexp))
+
+;;;###autoload
+(defun anything-buffer-run-query-replace ()
+  "Run Query replace action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-buffer-query-replace))
 
 ;;;###autoload
 (defun anything-buffer-switch-other-window ()
