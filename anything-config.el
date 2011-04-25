@@ -8395,8 +8395,11 @@ Ask to kill buffers associated with that file, too."
 The command is like <command %s> and is meant to use with `format'."
   (mailcap-parse-mailcaps)
   (let* ((ext  (file-name-extension filename))
-         (mime (when ext (mailcap-extension-to-mime ext))))
-    (when mime (mailcap-mime-info mime))))
+         (mime (when ext (mailcap-extension-to-mime ext)))
+         (result (when mime (mailcap-mime-info mime))))
+    ;; If elisp file have no associations in .mailcap
+    ;; `mailcap-maybe-eval' is returned, in this case just return nil.
+    (when (stringp result) result)))
 
 (defcustom anything-c-default-external-file-browser "nautilus"
   "Default external file browser for your system.
