@@ -2211,6 +2211,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
            ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
            ("Eshell command on file(s) `M-!'"
             . anything-find-files-eshell-command-on-file)
+           ("Find file as root" . anything-find-file-as-root)
+           ("Find file in hex dump" . hexl-find-file)
            ("Ediff File `C-='" . anything-find-files-ediff-files)
            ("Ediff Merge File `C-c ='" . anything-find-files-ediff-merge-files)
            ("Delete File(s) `M-D'" . anything-delete-marked-files)
@@ -2222,11 +2224,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
            ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
            ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
-           ("Find file in hex dump" . hexl-find-file)
            ("Find file other window `C-o'" . find-file-other-window)
            ("Switch to history `M-p'" . anything-find-files-switch-to-hist)
            ("Find file other frame `C-c C-o'" . find-file-other-frame)
-           ("Find file as root" . anything-find-file-as-root))))))
+           ("Print File `C-c p'" . anything-ff-print))))))
 ;; (anything 'anything-c-source-find-files)
 
 (defun anything-find-files-set-prompt-for-action (prompt files)
@@ -2472,6 +2473,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-mark-all]\t\t->Mark all visibles candidates.
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
+\\[anything-ff-run-print-file]\t\t->Print file with default printer.
 \n== Anything Map ==
 \\{anything-map}
 "))
@@ -2500,6 +2502,7 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "M-a")     'anything-mark-all)
     (define-key map (kbd "M-u")     'anything-unmark-all)
     (define-key map (kbd "C-c C-a") 'anything-ff-run-gnus-attach-files)
+    (define-key map (kbd "C-c p")   'anything-ff-run-print-file)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
@@ -2617,6 +2620,32 @@ ACTION must be one of the actions of current source."
   "Run gnus attach files command action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-gnus-attach-files))
+
+(defun anything-ff-print (candidate)
+  "Print marked files.
+Uses the shell command coming from variables `lpr-command' and
+`lpr-switches' as default.
+Same as `dired-do-print' but for anything."
+  (let* ((file-list (anything-marked-candidates))
+	 (command (read-string
+		   "Print %s with: "
+ 		   (mapconcat 'identity
+			      (cons lpr-command
+				    (if (stringp lpr-switches)
+					(list lpr-switches)
+                                        lpr-switches))
+			      " ")))
+         (file-args (mapconcat #'(lambda (x)
+                                   (format "'%s'" x))
+                               file-list " "))
+         (cmd-line (concat command " " file-args)))
+    (start-process-shell-command "anything-print" nil cmd-line)))
+
+;;;###autoload
+(defun anything-ff-run-print-file ()
+  "Run Print file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-print))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
