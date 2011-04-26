@@ -2176,13 +2176,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (setq ffap-newfile-prompt t)
-              ;; This is needed when connecting with emacsclient -t
-              ;; on remote host that have an anything started on a window-system.
-              ;; i.e when `C-.' is already loaded.
-              (unless window-system
-                (define-key anything-find-files-map (kbd "C-l")
-                  'anything-find-files-down-one-level))))
+              (setq ffap-newfile-prompt t)))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (image-action1 . anything-ff-rotate-image-left)
@@ -2506,9 +2500,8 @@ See `anything-ff-serial-rename-1'."
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
-    (if window-system ; `C-.' doesn't work in terms use `C-l' instead.
-        (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
-        (define-key map (kbd "C-l") 'anything-find-files-down-one-level))
+    (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l") 'anything-find-files-down-one-level)
     map)
   "Keymap for `anything-find-files'.")
 
