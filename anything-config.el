@@ -3860,11 +3860,15 @@ See Man locate for more infos.
 ;;
 ;;
 (defvar anything-c-grep-default-command
-  "grep -d skip -niH -e %s %s %s"
-  "Default grep format command for `anything-do-grep1'.")
+  "grep -d skip %s -niH -e %s %s"
+  "Default grep format command for `anything-do-grep1'.
+First format spec is for --exclude or --include grep options.
+Second format spec is for pattern.
+Third format spec is for filenames.")
 (defvar anything-c-grep-default-recurse-command
-  "grep -d recurse -niH -e %s %s %s"
-  "Default recursive grep format command for `anything-do-grep1'.")
+  "grep -d recurse %s -niH -e %s %s"
+  "Default recursive grep format command for `anything-do-grep1'.
+See `anything-c-grep-default-command' for format specs.")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
 (defvar anything-c-grep-debug-command-line nil
   "Turn on anything grep command-line debugging when non--nil.")
@@ -3939,9 +3943,9 @@ See Man locate for more infos.
                             (concat (or include ignored-files) " " ignored-dirs)
                             ignored-files))
          (cmd-line      (format anything-c-grep-default-command
+                                exclude
                                 (shell-quote-argument anything-pattern)
-                                fnargs
-                                exclude)))
+                                fnargs)))
     (when anything-c-grep-debug-command-line
       (with-current-buffer (get-buffer-create "*any grep debug*")
         (goto-char (point-max))
