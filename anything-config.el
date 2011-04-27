@@ -2311,6 +2311,16 @@ ACTION must be an action supported by `anything-dired-action'."
       (anything-do-grep1 (anything-marked-candidates) 'recurse)
       (anything-do-grep1 (anything-marked-candidates))))
 
+(defun anything-ff-pdfgrep (candidate)
+  "Default action to pdfgrep files from `anything-find-files'."
+  (let ((cands (loop for file in (anything-marked-candidates)
+                  if (or (string= (file-name-extension file) "pdf")
+                         (string= (file-name-extension file) "PDF"))
+                  collect file))
+        (anything-c-pdfgrep-default-function 'anything-c-pdfgrep-init))
+    (when cands
+      (anything-do-pdfgrep-1 cands))))
+
 (defun anything-find-files-switch-to-hist (candidate)
   "Switch to anything-find-files history."
   (anything-find-files t))
@@ -2445,6 +2455,7 @@ See `anything-ff-serial-rename-1'."
 \nSpecific commands for `anything-find-files':
 \\<anything-find-files-map>
 \\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
+\\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[anything-ff-run-rename-file]\t\t->Rename File (C-u Follow).
 \\[anything-ff-run-copy-file]\t\t->Copy File (C-u Follow).
 \\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
@@ -2476,6 +2487,7 @@ See `anything-ff-serial-rename-1'."
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s")   'anything-ff-run-grep)
+    (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
     (define-key map (kbd "M-R")     'anything-ff-run-rename-file)
     (define-key map (kbd "M-C")     'anything-ff-run-copy-file)
     (define-key map (kbd "M-B")     'anything-ff-run-byte-compile-file)
@@ -2522,6 +2534,12 @@ ACTION must be one of the actions of current source."
   "Run Grep action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-grep))
+
+;;;###autoload
+(defun anything-ff-run-pdfgrep ()
+  "Run Pdfgrep action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-pdfgrep))
 
 ;;;###autoload
 (defun anything-ff-run-copy-file ()
@@ -3029,6 +3047,11 @@ KBSIZE if a floating point number, default value is 1024.0."
               (file-exists-p candidate))
          (append (subseq actions 0 4)
                  '(("Browse url file" . browse-url-of-file))
+                 (subseq actions 5)))
+        ((or (string= (file-name-extension candidate) "pdf")
+             (string= (file-name-extension candidate) "PDF"))
+         (append (subseq actions 0 4)
+                 '(("Pdfgrep File(s)" . anything-ff-pdfgrep))
                  (subseq actions 5)))
         (t actions)))
 
@@ -4252,6 +4275,134 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (when (get-buffer anything-action-buffer)
           (kill-buffer anything-action-buffer))
         (anything-occur))))
+
+;;; Anything interface for pdfgrep
+;;  pdfgrep program <http://pdfgrep.sourceforge.net/>
+;;  and xpdf are needed.
+;;
+(defvar anything-c-pdfgrep-default-command "pdfgrep --color never -niH %s %s")
+(defvar anything-c-pdfgrep-default-function 'anything-c-pdfgrep-init)
+(defvar anything-c-pdfgrep-debug-command-line nil)
+
+(defun anything-c-pdfgrep-init (only-files)
+  "Start an asynchronous pdfgrep process in ONLY-FILES list."
+  (let* ((fnargs   (anything-c-grep-prepare-candidates
+                    (if (file-remote-p anything-ff-default-directory)
+                        (mapcar #'(lambda (x)
+                                    (file-remote-p x 'localname))
+                                only-files)
+                        only-files)))
+         (cmd-line (format anything-c-pdfgrep-default-command
+                           anything-pattern
+                           fnargs)))
+    (when anything-c-pdfgrep-debug-command-line
+      (with-current-buffer (get-buffer-create "*any pdfgrep debug*")
+        (goto-char (point-max))
+        (insert (concat ">>> " cmd-line "\n\n"))))
+    (setq mode-line-format
+          '(" " mode-line-buffer-identification " "
+            (line-number-mode "%l") " "
+            (:eval (propertize "(Pdfgrep Process Running) "
+                    'face '((:foreground "red"))))))
+    (prog1
+        (let ((default-directory anything-ff-default-directory))
+          (start-file-process-shell-command "pdfgrep-process" nil cmd-line))
+      (message nil)
+      (set-process-sentinel
+       (get-process "pdfgrep-process")
+       #'(lambda (process event)
+           (when (string= event "finished\n")
+             (kill-local-variable 'mode-line-format)
+             (with-anything-window
+               (anything-update-move-first-line))))))))
+
+
+(defun anything-do-pdfgrep-1 (only)
+  "Launch pdfgrep with a list of ONLY files."
+  (unless (executable-find "pdfgrep")
+    (error "Error: No such program `pdfgrep'."))
+  (let* ((anything-compile-source-functions
+          ;; rule out anything-match-plugin because the input is one regexp.
+          (delq 'anything-compile-source--match-plugin
+                (copy-sequence anything-compile-source-functions)))
+         ;; Disable match-plugin and use here own highlighting.
+         (anything-mp-highlight-delay nil))
+    ;; When called as action from an other source e.g *-find-files
+    ;; we have to kill action buffer.
+    (when (get-buffer anything-action-buffer)
+      (kill-buffer anything-action-buffer))
+    ;; If `anything-find-files' haven't already started,
+    ;; give a default value to `anything-ff-default-directory'.
+    (setq anything-ff-default-directory (or anything-ff-default-directory
+                                            default-directory))
+    (anything
+     :sources
+     `(((name . "PdfGrep")
+        (candidates
+         . (lambda ()
+             (funcall anything-c-pdfgrep-default-function only)))
+        (filtered-candidate-transformer anything-c-grep-cand-transformer)
+        (candidate-number-limit . 9999)
+        (mode-line . anything-pdfgrep-mode-line-string)
+        (action . anything-c-pdf-grep-action)
+        (persistent-help . "Jump to PDF Page")
+        (requires-pattern . 3)
+        (delayed)))
+     :keymap anything-c-pdfgrep-map
+     :buffer "*anything grep*")))
+
+(defvar anything-pdfgrep-mode-line-string
+  "\\<anything-c-pdfgrep-map>\
+\\[anything-pdfgrep-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-do-pdfgrep'.")
+
+(defun anything-pdfgrep-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything PdfGrep Map ==\
+\nSpecific commands for Pdf Grep:
+\\<anything-c-pdfgrep-map>
+\\[anything-c-goto-next-file]\t\t->Next File.
+\\[anything-c-goto-precedent-file]\t\t->Precedent File.
+\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[anything-grep-help]\t\t->Show this help.
+\n== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
+
+(defvar anything-c-pdfgrep-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
+    (define-key map (kbd "C-c ?")    'anything-pdfgrep-help)
+    map)
+  "Keymap used in pdfgrep.")
+
+(defun anything-c-pdf-grep-action (candidate)
+  (let* ((split  (anything-c-grep-split-line candidate))
+         (lineno (nth 1 split))
+         (fname  (car split)))
+    (start-file-process-shell-command "xpdf" nil (format "xpdf '%s' %s" fname lineno))))
+
+(defun anything-do-pdfgrep ()
+  (interactive)
+  (let ((only (anything-c-read-file-name
+               "Search in file(s): "
+               :marked-candidates t
+               :test #'(lambda (file)
+                         (or (string= (file-name-extension file) "pdf")
+                             (string= (file-name-extension file) "PDF")
+                             (file-directory-p file)))
+               :preselect (or (dired-get-filename nil t)
+                              (buffer-file-name (current-buffer)))))
+        (anything-c-grep-default-function 'anything-c-pdfgrep-init))
+    (anything-do-pdfgrep-1 only)))
+
 
 ;; Yank text at point.
 (defvar anything-yank-point nil)
