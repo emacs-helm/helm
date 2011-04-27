@@ -3830,6 +3830,7 @@ If nil Search in all files.")
 \nSpecific commands for anything locate and others files sources:
 \\<anything-generic-files-map>
 \\[anything-ff-run-grep]\t\t->Run grep (C-u recurse).
+\\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[anything-ff-run-delete-file]\t\t->Delete file.
 \\[anything-ff-run-switch-other-window]\t\t->Switch other window.
 \\[anything-ff-properties-persistent]\t\t->Show file properties.
@@ -3845,6 +3846,7 @@ See Man locate for more infos.
 (defvar anything-generic-files-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s")   'anything-ff-run-grep)
+    (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
     (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
@@ -9655,6 +9657,7 @@ Return nil if bmk is not a valid bookmark."
            ("Find file other frame" . find-file-other-frame)))
      ("Open dired in file's directory" . anything-c-open-dired)
      ("Grep File(s) `C-u recurse'" . anything-find-files-grep)
+     ("Pdfgrep File(s)" . anything-ff-pdfgrep)
      ("View file" . view-file)
      ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
