@@ -4284,11 +4284,16 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 ;;; Anything interface for pdfgrep
 ;;  pdfgrep program <http://pdfgrep.sourceforge.net/>
-;;  and xpdf are needed.
+;;  and a pdf-reader (e.g xpdf) are needed.
 ;;
 (defvar anything-c-pdfgrep-default-command "pdfgrep --color never -niH %s %s")
 (defvar anything-c-pdfgrep-default-function 'anything-c-pdfgrep-init)
 (defvar anything-c-pdfgrep-debug-command-line nil)
+(defcustom anything-c-pdfgrep-default-read-command "xpdf '%f' %p"
+  "Default command to read pdf files from pdfgrep.
+Where '%f' format spec is filename and '%p' is page number"
+  :group 'anything-config
+  :type 'string)
 
 (defun anything-c-pdfgrep-init (only-files)
   "Start an asynchronous pdfgrep process in ONLY-FILES list."
@@ -4350,7 +4355,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-pdfgrep-mode-line-string)
-        (action . anything-c-pdf-grep-action)
+        (action . anything-c-pdfgrep-action)
         (persistent-help . "Jump to PDF Page")
         (requires-pattern . 3)
         (delayed)))
@@ -4389,11 +4394,14 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     map)
   "Keymap used in pdfgrep.")
 
-(defun anything-c-pdf-grep-action (candidate)
+(defun anything-c-pdfgrep-action (candidate)
   (let* ((split  (anything-c-grep-split-line candidate))
-         (lineno (nth 1 split))
+         (pageno (nth 1 split))
          (fname  (car split)))
-    (start-file-process-shell-command "xpdf" nil (format "xpdf '%s' %s" fname lineno))))
+    (start-file-process-shell-command
+     "pdf-reader" nil
+     (format-spec anything-c-pdfgrep-default-read-command
+                  (list (cons ?f fname) (cons ?p pageno))))))
 
 (defun anything-do-pdfgrep ()
   (interactive)
