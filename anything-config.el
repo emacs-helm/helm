@@ -3862,13 +3862,14 @@ See Man locate for more infos.
 ;;
 ;;
 (defvar anything-c-grep-default-command
-  "grep -d skip %s -niH -e %s %s"
+  "grep -d skip %e -niH -e %p %f"
   "Default grep format command for `anything-do-grep1'.
-First format spec is for --exclude or --include grep options.
-Second format spec is for pattern.
-Third format spec is for filenames.")
+Where:
+'%e' format spec is for --exclude or --include grep options.
+'%p' format spec is for pattern.
+'%f' format spec is for filenames.")
 (defvar anything-c-grep-default-recurse-command
-  "grep -d recurse %s -niH -e %s %s"
+  "grep -d recurse %e -niH -e %p %f"
   "Default recursive grep format command for `anything-do-grep1'.
 See `anything-c-grep-default-command' for format specs.")
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
@@ -3944,10 +3945,11 @@ See `anything-c-grep-default-command' for format specs.")
          (exclude       (if (anything-c-grep-recurse-p)
                             (concat (or include ignored-files) " " ignored-dirs)
                             ignored-files))
-         (cmd-line      (format anything-c-grep-default-command
-                                exclude
-                                (shell-quote-argument anything-pattern)
-                                fnargs)))
+         (cmd-line      (format-spec
+                         anything-c-grep-default-command
+                         (list (cons ?e exclude)
+                               (cons ?p (shell-quote-argument anything-pattern))
+                               (cons ?f fnargs)))))
     (when anything-c-grep-debug-command-line
       (with-current-buffer (get-buffer-create "*any grep debug*")
         (goto-char (point-max))
