@@ -1920,14 +1920,16 @@ it will match all buffers of the major-mode
 before space matching pattern after space.
 If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
-  (with-current-buffer (get-buffer candidate)
-    (let ((mjm   (symbol-name major-mode))
-          (split (split-string anything-pattern)))
-      (if (string-match " " anything-pattern)
-          (and (string-match (car split) mjm)
-               (string-match (cadr split) candidate))
-          (or (string-match anything-pattern mjm)
-              (string-match anything-pattern candidate))))))
+  (let ((buf (get-buffer candidate)))
+    (when buf
+      (with-current-buffer buf
+        (let ((mjm   (symbol-name major-mode))
+              (split (split-string anything-pattern)))
+          (if (string-match " " anything-pattern)
+              (and (string-match (car split) mjm)
+                   (string-match (cadr split) candidate))
+              (or (string-match anything-pattern mjm)
+                  (string-match anything-pattern candidate))))))))
 
 (defun anything-c-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace in marked buffers.
@@ -2078,8 +2080,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
           (save-buffer)
           (kill-buffer buffer))
         (kill-buffer buffer)))
-  (anything-delete-current-selection)
-  (anything-force-update))
+  (anything-delete-current-selection))
 
 (defun anything-c-buffers+-persistent-action (candidate)
     (if current-prefix-arg
