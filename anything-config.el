@@ -181,18 +181,42 @@
 ;; List all anything sources for test.
 ;; `anything-select-source'
 ;; Select source.
+;; `anything-mark-all'
+;; Mark all visible unmarked candidates in current source.
+;; `anything-unmark-all'
+;; Unmark all candidates in all sources of current anything session.
 ;; `anything-toggle-all-marks'
 ;; Toggle all marks.
+;; `anything-c-buffer-help'
+;; Not documented.
+;; `anything-buffer-diff-persistent'
+;; Toggle diff buffer without quitting anything.
+;; `anything-buffer-revert-persistent'
+;; Revert buffer without quitting anything.
+;; `anything-buffer-save-persistent'
+;; Save buffer without quitting anything.
+;; `anything-buffer-run-kill-buffers'
+;; Run kill buffer action from `anything-c-source-buffer+'.
 ;; `anything-buffer-run-grep'
 ;; Run Grep action from `anything-c-source-buffer+'.
+;; `anything-buffer-run-query-replace-regexp'
+;; Run Query replace regexp action from `anything-c-source-buffer+'.
+;; `anything-buffer-run-query-replace'
+;; Run Query replace action from `anything-c-source-buffer+'.
 ;; `anything-buffer-switch-other-window'
 ;; Run switch to other window action from `anything-c-source-buffer+'.
+;; `anything-buffer-switch-other-frame'
+;; Run switch to other frame action from `anything-c-source-buffer+'.
 ;; `anything-buffer-switch-to-elscreen'
 ;; Run switch to elscreen  action from `anything-c-source-buffer+'.
 ;; `anything-ff-help'
 ;; Not documented.
+;; `anything-ff-run-switch-to-history'
+;; Run Switch to history action from `anything-c-source-find-files'.
 ;; `anything-ff-run-grep'
 ;; Run Grep action from `anything-c-source-find-files'.
+;; `anything-ff-run-pdfgrep'
+;; Run Pdfgrep action from `anything-c-source-find-files'.
 ;; `anything-ff-run-copy-file'
 ;; Run Copy file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-rename-file'
@@ -201,6 +225,12 @@
 ;; Run Byte compile file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-load-file'
 ;; Run Load file action from `anything-c-source-find-files'.
+;; `anything-ff-run-eshell-command-on-file'
+;; Run eshell command on file action from `anything-c-source-find-files'.
+;; `anything-ff-run-ediff-file'
+;; Run Ediff file action from `anything-c-source-find-files'.
+;; `anything-ff-run-ediff-merge-file'
+;; Run Ediff merge file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-symlink-file'
 ;; Run Symlink file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-delete-file'
@@ -211,10 +241,18 @@
 ;; Run switch to eshell action from `anything-c-source-find-files'.
 ;; `anything-ff-run-switch-other-window'
 ;; Run switch to other window action from `anything-c-source-find-files'.
+;; `anything-ff-run-switch-other-frame'
+;; Run switch to other frame action from `anything-c-source-find-files'.
 ;; `anything-ff-run-open-file-externally'
 ;; Run open file externally command action from `anything-c-source-find-files'.
+;; `anything-ff-run-gnus-attach-files'
+;; Run gnus attach files command action from `anything-c-source-find-files'.
+;; `anything-ff-run-print-file'
+;; Run Print file action from `anything-c-source-find-files'.
 ;; `anything-find-files-down-one-level'
 ;; Go down one level like unix command `cd ..'.
+;; `anything-ff-properties-persistent'
+;; Show properties without quitting anything.
 ;; `anything-ff-rotate-left-persistent'
 ;; Rotate image left without quitting anything.
 ;; `anything-ff-rotate-right-persistent'
@@ -235,6 +273,8 @@
 ;; Preconfigured `anything' to hardlink files from dired.
 ;; `anything-dired-bindings'
 ;; Replace usual dired commands `C' and `R' by anything ones.
+;; `anything-generic-file-help'
+;; Not documented.
 ;; `anything-do-grep'
 ;; Preconfigured anything for grep.
 ;; `anything-c-goto-precedent-file'
@@ -247,6 +287,10 @@
 ;; Run grep goto other window action from `anything-do-grep1'.
 ;; `anything-c-grep-run-save-buffer'
 ;; Run grep save results action from `anything-do-grep1'.
+;; `anything-pdfgrep-help'
+;; Not documented.
+;; `anything-do-pdfgrep'
+;; Not documented.
 ;; `anything-yank-text-at-point'
 ;; Yank text at point in minibuffer.
 ;; `anything-c-etags-select'
@@ -280,7 +324,7 @@
 ;; `anything-eval-expression'
 ;; Preconfigured anything for `anything-c-source-evaluation-result'.
 ;; `anything-eval-expression-with-eldoc'
-;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support.
+;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
 ;; `anything-calcul-expression'
 ;; Preconfigured anything for `anything-c-source-calculation-result'.
 ;; `anything-surfraw'
@@ -361,7 +405,7 @@
 ;; `anything-c-find-files-show-icons'
 ;; Default Value: nil
 ;; `anything-c-find-files-icons-directory'
-;; Default Value: "/usr/local/share/emacs/23.3.50/etc/images/tree-widget/default"
+;; Default Value: "/usr/local/share/emacs/24.0.50/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
 ;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
 ;; `anything-c-browse-code-regexp-python'
@@ -370,16 +414,24 @@
 ;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
 ;; `anything-c-external-programs-associations'
 ;; Default Value: nil
+;; `anything-ff-history-max-length'
+;; Default Value: 100
+;; `anything-ff-default-kbsize'
+;; Default Value: 1024.0
 ;; `anything-ff-exif-data-program'
 ;; Default Value: "exiftran"
 ;; `anything-ff-exif-data-program-args'
 ;; Default Value: "-d"
+;; `anything-c-pdfgrep-default-read-command'
+;; Default Value: "xpdf '%f' %p"
 ;; `anything-c-etags-tag-file-name'
 ;; Default Value: "TAGS"
 ;; `anything-c-etags-tag-file-search-limit'
 ;; Default Value: 10
 ;; `anything-c-filelist-file-name'
 ;; Default Value: nil
+;; `anything-c-default-external-file-browser'
+;; Default Value: "nautilus"
 ;; `anything-c-use-adaptative-sorting'
 ;; Default Value: nil
 
