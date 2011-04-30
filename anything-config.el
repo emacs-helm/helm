@@ -3277,10 +3277,12 @@ Use it for non--interactive calls of `anything-find-files'."
   "Default input of `anything-find-files'."
   (let* ((def-dir (anything-c-current-directory))
          (lib     (anything-find-library-at-point))
+         (url     (anything-ff-find-url-at-point))
          (file-p  (and fap (file-exists-p fap)
                        (file-exists-p
                         (file-name-directory (expand-file-name tap def-dir))))))
-    (cond (lib)
+    (cond (lib) ; e.g we are inside a require sexp.
+          (url) ; String at point is an hyperlink.
           (file-p (expand-file-name tap def-dir))
           (t fap))))
 
@@ -3290,6 +3292,19 @@ Useful in dired buffers when there is inserted subdirs."
   (if (eq major-mode 'dired-mode)
       (dired-current-directory)
       default-directory))
+
+(defun anything-ff-find-url-at-point ()
+  "Try to find link to an url in text-property at point."
+  (let* ((he    (get-text-property (point) 'help-echo))
+         (ov    (overlays-at (point)))
+         (ov-he (and ov (overlay-get
+                         (car (overlays-at (point))) 'help-echo)))
+         (w3m-l (get-text-property (point) 'w3m-href-anchor)))
+    ;; Org link.
+    (when (and (stringp he) (string-match "LINK: " he))
+      (setq he (replace-match "" t t he)))
+    (loop for i in (list he ov-he w3m-l)
+       thereis (and (stringp i) (string-match ffap-url-regexp i) i))))
 
 (defun anything-find-library-at-point ()
   "Try to find library path at point.
