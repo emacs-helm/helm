@@ -7155,7 +7155,18 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
        (anything-attr 'keywords)))
 
 (defun anything-c-org-keywords-insert (keyword)
-  (cond ((string-match "BEGIN" keyword)
+  (cond ((and (string-match "BEGIN" keyword)
+              (anything-region-active-p))
+         (let ((beg (region-beginning))
+               (end (region-end)))
+           (goto-char beg)
+           (insert "#+" keyword " ")
+           (save-excursion
+             (insert "\n")
+             (goto-char end)
+             (forward-line 1)
+             (insert "\n#+" (replace-regexp-in-string "BEGIN" "END" keyword) "\n"))))
+        ((string-match "BEGIN" keyword)
          (insert "#+" keyword " ")
          (save-excursion
            (insert "\n#+" (replace-regexp-in-string "BEGIN" "END" keyword) "\n")))
