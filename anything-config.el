@@ -2537,6 +2537,11 @@ See `anything-ff-serial-rename-1'."
 "))
     (anything-help)))
 
+(defcustom anything-ff-lynx-style-map t
+  "Use arrow keys to navigate with `anything-find-files'."
+  :group 'anything-config
+  :type 'boolean)
+
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s")   'anything-ff-run-grep)
@@ -2567,7 +2572,10 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
     (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
     (define-key map (kbd "C-l") 'anything-find-files-down-one-level)
-    map)
+    (when anything-ff-lynx-style-map
+      (define-key map (kbd "<left>") 'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>") 'anything-execute-persistent-action))
+    (delq nil map))
   "Keymap for `anything-find-files'.")
 
 (defun anything-c-quit-and-execute-action (action)
@@ -3748,10 +3756,12 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
 
 (defvar anything-c-read-file-map
   (let ((map (copy-keymap anything-map)))
-    (if window-system ; `C-.' doesn't work in terms use `C-l' instead.
-        (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
-        (define-key map (kbd "C-l") 'anything-find-files-down-one-level))
-    map)
+    (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l") 'anything-find-files-down-one-level)
+    (when anything-ff-lynx-style-map
+      (define-key map (kbd "<left>") 'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>") 'anything-execute-persistent-action))
+    (delq nil map))
   "Keymap for `anything-c-read-file-name'.")
 
 (defun* anything-c-read-file-name (prompt
