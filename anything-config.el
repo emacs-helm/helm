@@ -2763,6 +2763,8 @@ If EXPAND is non--nil expand-file-name."
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
+  (with-anything-window
+    (setq anything-follow-mode nil))
   ;; When going to precedent level we want to be at the line
   ;; corresponding to actual directory, so store this info
   ;; in `anything-ff-last-expanded'.
