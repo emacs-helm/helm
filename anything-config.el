@@ -4304,9 +4304,10 @@ If N is positive go forward otherwise go backward."
   (interactive)
   (anything-c-goto-next-or-prec-file 1))
 
+;;;###autoload
 (defun anything-grep-help ()
   (interactive)
-  (let ((anything-help-message "== Anything Grep/Etags Map ==\
+  (let ((anything-help-message "== Anything Grep Map ==\
 \nSpecific commands for Grep and Etags:
 \\<anything-c-grep-map>
 \\[anything-c-goto-next-file]\t->Next File.
@@ -4327,7 +4328,7 @@ If N is positive go forward otherwise go backward."
     (define-key map (kbd "C-x C-s")  'anything-c-grep-run-save-buffer)
     (define-key map (kbd "C-c ?")    'anything-grep-help)
     map)
-  "Keymap used in Grep and Etags sources.")
+  "Keymap used in Grep sources.")
 
 (defun anything-c-grep-run-other-window-action ()
   "Run grep goto other window action from `anything-do-grep1'."
@@ -4454,15 +4455,16 @@ Where '%f' format spec is filename and '%p' is page number"
 \\[anything-send-bug-report-from-anything]:BugReport."
   "String displayed in mode-line in `anything-do-pdfgrep'.")
 
+;;;###autoload
 (defun anything-pdfgrep-help ()
   (interactive)
   (let ((anything-help-message "== Anything PdfGrep Map ==\
 \nSpecific commands for Pdf Grep:
 \\<anything-c-pdfgrep-map>
-\\[anything-c-goto-next-file]\t\t->Next File.
+\\[anything-c-goto-next-file]\t->Next File.
 \\[anything-c-goto-precedent-file]\t\t->Precedent File.
 \\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[anything-grep-help]\t\t->Show this help.
+\\[anything-pdfgrep-help]\t\t->Show this help.
 \n== Anything Map ==
 \\{anything-map}"))
     (anything-help)))
@@ -4501,6 +4503,7 @@ Where '%f' format spec is filename and '%p' is page number"
 
 
 ;; Yank text at point.
+;;
 (defvar anything-yank-point nil)
 ;;;###autoload
 (defun anything-yank-text-at-point ()
@@ -4530,12 +4533,36 @@ Where '%f' format spec is filename and '%p' is page number"
 (define-key anything-map (kbd "C-w") 'anything-yank-text-at-point)
 
 ;;; Etags
+;;
 (eval-when-compile
   (when (locate-library "anything-etags.el")
     (display-warning
      '(anything-config)
      "You are using obsolete library `anything-etags.el' and should remove it."
      :warning)))
+
+;;;###autoload
+(defun anything-etags-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything Etags Map ==\
+\nSpecific commands for Etags:
+\\<anything-c-etags-map>
+\\[anything-c-goto-next-file]\t->Next File.
+\\[anything-c-goto-precedent-file]\t\t->Precedent File.
+\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[anything-etags-help]\t\t->Show this help.
+\n== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
+
+(defvar anything-c-etags-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
+    (define-key map (kbd "C-c ?")    'anything-etags-help)
+    map)
+  "Keymap used in Etags.")
 
 (defcustom anything-c-etags-tag-file-name "TAGS"
   "Etags tag file name."
@@ -4665,7 +4692,7 @@ If tag file have been modified reinitialize cache."
       (remhash tag anything-c-etags-cache))
     (if (and tag (file-exists-p tag))
         (anything :sources 'anything-c-source-etags-select
-                  :keymap anything-c-grep-map
+                  :keymap anything-c-etags-map
                   :input init
                   :buffer "*anything etags*")
         (message "Error: No tag file found, please create one with etags shell command."))))
