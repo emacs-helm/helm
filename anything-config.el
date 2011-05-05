@@ -3987,13 +3987,14 @@ See `anything-c-grep-default-command' for format specs.")
              ((file-directory-p i)
               (file-expand-wildcards
                (concat (file-name-as-directory (expand-file-name i)) "*") t))
-             ;; Candidate use wildcard.
-             ((string-match "\*" i) (file-expand-wildcards i t))
-             ;; Candidate is a file and we use recursion, use the
+             ;; Candidate is a file or wildcard and we use recursion, use the
              ;; current directory instead of candidate.
-             ((and (file-exists-p i) (anything-c-grep-recurse-p))
+             ((and (or (file-exists-p i) (string-match "\*" i))
+                   (anything-c-grep-recurse-p))
               (list (directory-file-name ; Needed for windoze.
                      (file-name-directory (directory-file-name i)))))
+             ;; Candidate use wildcard.
+             ((string-match "\*" i) (file-expand-wildcards i t))
              ;; Else should be one or more file.
              (t (list i))) into all-files
        finally return
