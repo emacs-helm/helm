@@ -4175,9 +4175,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
      `(((name . "Grep (C-c ? Help)")
         (candidates
          . (lambda ()
-             (if include-files
-                 (funcall anything-c-grep-default-function only include-files)
-                 (funcall anything-c-grep-default-function only))))
+             (funcall anything-c-grep-default-function only include-files)))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-grep-mode-line-string)
@@ -4190,8 +4188,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                               . anything-c-grep-jump-elscreen))
                       ("Save results in grep buffer" . anything-c-grep-save-results)
                       ("Find file other window" . anything-c-grep-other-window))))
-        (persistent-action . (lambda (candidate)
-                               (anything-c-grep-persistent-action candidate)))
+        (persistent-action . anything-c-grep-persistent-action)
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
