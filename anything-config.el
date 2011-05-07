@@ -4180,6 +4180,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-grep-mode-line-string)
+        (jump-persistent . anything-c-grep-persistent-action)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
@@ -4312,10 +4313,17 @@ If N is positive go forward otherwise go backward."
 \\[anything-c-goto-precedent-file]\t\t->Precedent File.
 \\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[anything-c-grep-run-other-window-action]\t\t->Jump other window.
+\\[anything-c-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
+\\[anything-c-grep-run-default-action]\t\t->Run default action (Same as RET).
 \\[anything-grep-help]\t\t->Show this help.
 \n== Anything Map ==
 \\{anything-map}"))
     (anything-help)))
+
+(defcustom anything-c-grep-use-ioccur-style-keys t
+  "Use Arrow keys to jump to occurences."
+  :group 'anything-config
+  :type 'boolean)
 
 (defvar anything-c-grep-map
   (let ((map (copy-keymap anything-map)))
@@ -4324,9 +4332,22 @@ If N is positive go forward otherwise go backward."
     (define-key map (kbd "C-o")      'anything-c-grep-run-other-window-action)
     (define-key map (kbd "C-w")      'anything-yank-text-at-point)
     (define-key map (kbd "C-x C-s")  'anything-c-grep-run-save-buffer)
+    (when anything-c-grep-use-ioccur-style-keys
+      (define-key map (kbd "<right>")  'anything-c-grep-run-persistent-action)
+      (define-key map (kbd "<left>")  'anything-c-grep-run-default-action))
     (define-key map (kbd "C-c ?")    'anything-grep-help)
-    map)
+    (delq nil map))
   "Keymap used in Grep sources.")
+
+(defun anything-c-grep-run-persistent-action ()
+  "Run grep persistent action from `anything-do-grep1'."
+  (interactive)
+  (anything-execute-persistent-action 'jump-persistent))
+
+(defun anything-c-grep-run-default-action ()
+  "Run grep default action from `anything-do-grep1'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-grep-action))
 
 (defun anything-c-grep-run-other-window-action ()
   "Run grep goto other window action from `anything-do-grep1'."
