@@ -3294,13 +3294,6 @@ in an `anything-comp-read'."
            :must-match t)
           anything-ff-history))))
 
-(defun anything-find-files-initial-input (&optional input)
-  "Return INPUT if present, otherwise try to guess it."
-  (or (and input (expand-file-name input))
-      (anything-find-files-input
-       (ffap-guesser)
-       (thing-at-point 'filename))))
-
 ;;;###autoload
 (defun anything-find-files (arg)
   "Preconfigured `anything' for anything implementation of `find-file'.
@@ -3335,6 +3328,14 @@ Use it for non--interactive calls of `anything-find-files'."
               :prompt "Find Files or Url: "
               :buffer "*Anything Find Files*")))
 
+
+(defun anything-find-files-initial-input (&optional input)
+  "Return INPUT if present, otherwise try to guess it."
+  (or (and input (expand-file-name input))
+      (anything-find-files-input
+       (ffap-guesser)
+       (thing-at-point 'filename))))
+
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
   (let* ((def-dir (anything-c-current-directory))
@@ -3357,15 +3358,16 @@ Useful in dired buffers when there is inserted subdirs."
 
 (defun anything-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
-  (let* ((he    (get-text-property (point) 'help-echo))
-         (ov    (overlays-at (point)))
-         (ov-he (and ov (overlay-get
-                         (car (overlays-at (point))) 'help-echo)))
-         (w3m-l (get-text-property (point) 'w3m-href-anchor)))
+  (let* ((he      (get-text-property (point) 'help-echo))
+         (ov      (overlays-at (point)))
+         (ov-he   (and ov (overlay-get
+                           (car (overlays-at (point))) 'help-echo)))
+         (w3m-l   (get-text-property (point) 'w3m-href-anchor))
+         (nt-prop (get-text-property (point) 'nt-link)))
     ;; Org link.
     (when (and (stringp he) (string-match "LINK: " he))
       (setq he (replace-match "" t t he)))
-    (loop for i in (list he ov-he w3m-l)
+    (loop for i in (list he ov-he w3m-l nt-prop)
        thereis (and (stringp i) (string-match ffap-url-regexp i) i))))
 
 (defun anything-find-library-at-point ()
