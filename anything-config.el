@@ -3016,6 +3016,11 @@ KBSIZE if a floating point number, default value is 1024.0."
       (anything-c-highlight-ffiles1 files sources)
       (anything-c-highlight-ffiles files sources)))
 
+(defface anything-ff-executable
+  '((t (:foreground "green")))
+  "*Face used for executable files in `anything-find-files'."
+  :group 'anything-config)
+
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files collect
@@ -3027,6 +3032,10 @@ KBSIZE if a floating point number, default value is 1024.0."
               (cons (anything-c-prefix-filename
                      (propertize i 'face anything-c-files-face1))
                     i))
+             ((file-executable-p i)
+              (cons (anything-c-prefix-filename
+                     (propertize i 'face 'anything-ff-executable))
+                    i))
              (t (cons (anything-c-prefix-filename
                        (propertize i 'face anything-c-files-face2))
                       i)))))
@@ -3037,11 +3046,12 @@ KBSIZE if a floating point number, default value is 1024.0."
      for af = (file-name-nondirectory i)
      collect (cond ( ;; Files.
                     (eq nil (car (file-attributes i)))
-                    (cons (anything-c-prefix-filename
-                           (propertize
-                            i 'face anything-c-files-face2)
-                           "leaf.xpm")
-                          i))
+                    (let ((face (if (file-executable-p i)
+                                    'anything-ff-executable
+                                    anything-c-files-face2)))
+                      (cons (anything-c-prefix-filename
+                             (propertize i 'face face) "leaf.xpm")
+                            i)))
                    ( ;; Empty directories.
                     (and (eq t (car (file-attributes i)))
                          ;; Be sure to have permission to list content.
@@ -3061,7 +3071,7 @@ KBSIZE if a floating point number, default value is 1024.0."
                             i 'face anything-c-files-face1)
                            "open.xpm")
                           i))
-                   (;; Closed directories.
+                   ( ;; Closed directories.
                     (eq t (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
                            (propertize
@@ -3365,7 +3375,7 @@ Useful in dired buffers when there is inserted subdirs."
          (w3m-l   (get-text-property (point) 'w3m-href-anchor))
          (nt-prop (get-text-property (point) 'nt-link)))
     ;; Org link.
-    (when (and (stringp he) (string-match "LINK: " he))
+    (when (and (stringp he) (string-match "^LINK: " he))
       (setq he (replace-match "" t t he)))
     (loop for i in (list he ov-he w3m-l nt-prop)
        thereis (and (stringp i) (string-match ffap-url-regexp i) i))))
