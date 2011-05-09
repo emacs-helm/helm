@@ -2215,6 +2215,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "*Face used for symlinks in `anything-find-files'."
   :group 'anything-config)
 
+
+(defface anything-ff-invalid-symlink
+  '((t (:foreground "black" :background "red")))
+  "*Face used for invalid symlinks in `anything-find-files'."
+  :group 'anything-config)
+
 (defface anything-ff-file
   '((t (:foreground "CadetBlue" :underline t)))
   "*Face used for file names in `anything-find-files'."
@@ -2896,6 +2902,9 @@ in `anything-ff-history'."
     (push anything-ff-default-directory anything-ff-history)))
 (add-hook 'anything-cleanup-hook 'anything-ff-save-history)
 
+(defun anything-ff-valid-symlink-p (file)
+  (file-exists-p (file-truename file)))
+
 (defun anything-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
   (let ((type       (anything-ff-attributes candidate :type t))
@@ -2906,7 +2915,12 @@ in `anything-ff-history'."
           (anything-c-basename candidate) ": \n"
           "Type: " type "\n"
           (when (string= type "symlink")
-            (format "True name: %s\n" (file-truename candidate)))
+            (format "True name: '%s'\n"
+                    (cond ((string-match "^\.#" (anything-c-basename candidate))
+                           "Autosave symlink")
+                          ((anything-ff-valid-symlink-p candidate)
+                           (file-truename candidate))
+                          (t "Invalid Symlink"))))
           dired-line))
         (message dired-line) (sit-for 5))))
 
@@ -3018,7 +3032,12 @@ KBSIZE if a floating point number, default value is 1024.0."
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files collect
-       (cond ((file-symlink-p i)
+       (cond ((and (file-symlink-p i) (not (anything-ff-valid-symlink-p i))
+                   (not (string-match "^\.#" (anything-c-basename i))))
+              (cons (anything-c-prefix-filename
+                     (propertize i 'face 'anything-ff-invalid-symlink))
+                    i))
+             ((file-symlink-p i)
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-symlink))
                     i))
@@ -3083,6 +3102,14 @@ KBSIZE if a floating point number, default value is 1024.0."
                          (file-directory-p i))
                     (cons (anything-c-prefix-filename
                            (propertize i 'face 'anything-ff-symlink))
+                          i))
+                   ( ;; Invalid Symlinks 
+                    (and (stringp (car (file-attributes i)))
+                         (not (anything-ff-valid-symlink-p i))
+                         (not (string-match "^\.#" (anything-c-basename i))))
+                    (cons (anything-c-prefix-filename
+                           (propertize i 'face 'anything-ff-invalid-symlink)
+                           "leaf.xpm")
                           i))
                    ( ;; Files symlinks.
                     (stringp (car (file-attributes i)))
