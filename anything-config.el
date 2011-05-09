@@ -1901,41 +1901,29 @@ buffer that is not the current buffer."
 ;; (anything 'anything-c-source-buffer-not-found)
 
 ;;; Buffers+
-(defface anything-dir-heading '((t (:foreground "Blue" :background "Pink")))
-  "*Face used for directory headings in dired buffers."
-  :group 'anything)
 
-(defface anything-file-name
-  '((t (:foreground "Blue")))
-  "*Face used for file names (without suffixes) in dired buffers."
-  :group 'anything)
+(defface anything-buffer-saved-out
+    '((t (:foreground "red")))
+  "*Face used for buffer files modified outside of emacs."
+  :group 'anything-config)
 
-(defface anything-dir-priv
-  '((t (:foreground "DarkRed" :background "LightGray")))
-  "*Face used for directory privilege indicator (d) in dired buffers."
-  :group 'anything)
-
-(defvar anything-c-buffers-face1 'anything-dir-priv)
-(defvar anything-c-buffers-face2 'font-lock-type-face)
-(defvar anything-c-buffers-face3 'italic)
 (eval-when-compile (require 'dired))
 (defun anything-c-highlight-buffers (buffers)
   (loop for i in buffers
      for buf = (get-buffer i) collect
      (cond ((rassoc buf dired-buffers)
-            (propertize i 'face anything-c-buffers-face1
+            (propertize i 'face 'anything-ff-directory
                         'help-echo (car (rassoc buf dired-buffers))))
            ((and (buffer-file-name buf) (not (verify-visited-file-modtime buf)))
-            (propertize i 'face '((:foreground "red"))
+            (propertize i 'face 'anything-buffer-saved-out
                         'help-echo (buffer-file-name buf)))
            ((and (buffer-file-name buf) (buffer-modified-p buf))
-            (propertize i 'face 'anything-dired-symlink-face
+            (propertize i 'face 'anything-ff-symlink
                         'help-echo (buffer-file-name buf)))
            ((buffer-file-name buf)
-            (propertize i 'face anything-c-buffers-face2
+            (propertize i 'face 'font-lock-type-face
                         'help-echo (buffer-file-name buf)))
-           (t (propertize i 'face anything-c-buffers-face3)))))
-
+           (t (propertize i 'face 'italic)))))
 
 (defvar anything-buffer-mode-line-string
   "\\<anything-c-buffer-map>\
@@ -2180,19 +2168,16 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (type . file)))
 ;; (anything 'anything-c-source-files-in-current-dir)
 
-(defvar anything-c-files-face1 'anything-dir-priv)
-(defvar anything-c-files-face2 'anything-file-name)
 (defun anything-c-highlight-files (files)
   (loop for i in files
         if (file-directory-p i)
         collect (propertize (file-name-nondirectory i)
-                            'face anything-c-files-face1
+                            'face 'anything-ff-directory
                             'help-echo (expand-file-name i))
         else
         collect (propertize (file-name-nondirectory i)
-                            'face anything-c-files-face2
+                            'face 'anything-ff-file
                             'help-echo (expand-file-name i))))
-
 
 (defvar anything-c-source-files-in-current-dir+
   '((name . "Files from Current Directory")
@@ -2209,6 +2194,31 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 ;;; Anything-find-files
 ;;;
 ;;; Anything replacement of file name completion for `find-file' and friends.
+
+(defface anything-ff-prefix
+  '((t (:background "yellow" :foreground "black")))
+  "*Face used to prefix new file or url paths in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-executable
+  '((t (:foreground "green")))
+  "*Face used for executable files in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-directory
+  '((t (:foreground "DarkRed" :background "LightGray")))
+  "*Face used for directories in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-symlink
+  '((t (:foreground "DarkOrange")))
+  "*Face used for symlinks in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-file
+  '((t (:foreground "CadetBlue" :underline t)))
+  "*Face used for file names in `anything-find-files'."
+  :group 'anything-config)
 
 (defvar anything-c-find-files-doc-header (format " (`%s':Go to precedent level)"
                                                  (if window-system "C-." "C-l"))
@@ -2402,7 +2412,6 @@ will not be loaded first time you use this."
                        (format command (shell-quote-argument i))
                        (format "%s %s" command (shell-quote-argument i)))
          do (eshell-command com)))))
-
 
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (defun anything-ff-switch-to-eshell (candidate)
@@ -2887,16 +2896,6 @@ in `anything-ff-history'."
     (push anything-ff-default-directory anything-ff-history)))
 (add-hook 'anything-cleanup-hook 'anything-ff-save-history)
 
-(defface anything-dired-symlink-face
-  '((t (:foreground "DarkOrange")))
-  "*Face used for symlinks in `anything-find-files'."
-  :group 'anything)
-
-(defface anything-ffiles-prefix-face
-  '((t (:background "yellow" :foreground "black")))
-  "*Face used to prefix new file or url paths in `anything-find-files'."
-  :group 'anything)
-
 (defun anything-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
   (let ((type       (anything-ff-attributes candidate :type t))
@@ -3000,10 +2999,10 @@ KBSIZE if a floating point number, default value is 1024.0."
          (prefix-img (and image (propertize " " 'display img)))
          (prefix-new (propertize
                       " " 'display
-                      (propertize "[?]" 'face 'anything-ffiles-prefix-face)))
+                      (propertize "[?]" 'face 'anything-ff-prefix)))
          (prefix-url (propertize
                       " " 'display
-                      (propertize "[@]" 'face 'anything-ffiles-prefix-face))))
+                      (propertize "[@]" 'face 'anything-ff-prefix))))
     (cond ((or (file-exists-p fname)
                (file-symlink-p fname))
            (if image (concat prefix-img fname) fname))
@@ -3016,31 +3015,26 @@ KBSIZE if a floating point number, default value is 1024.0."
       (anything-c-highlight-ffiles1 files sources)
       (anything-c-highlight-ffiles files sources)))
 
-(defface anything-ff-executable
-  '((t (:foreground "green")))
-  "*Face used for executable files in `anything-find-files'."
-  :group 'anything-config)
-
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files collect
        (cond ((file-symlink-p i)
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-dired-symlink-face))
+                     (propertize i 'face 'anything-ff-symlink))
                     i))
              ((file-directory-p i)
               (cons (anything-c-prefix-filename
-                     (propertize i 'face anything-c-files-face1))
+                     (propertize i 'face 'anything-ff-directory))
                     i))
              ((file-executable-p i)
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-executable))
                     i))
              (t (cons (anything-c-prefix-filename
-                       (propertize i 'face anything-c-files-face2))
+                       (propertize i 'face 'anything-ff-file))
                       i)))))
 
-(defsubst anything-c-highlight-ffiles1 (files sources)
+(defun anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
   (loop for i in files
      for af = (file-name-nondirectory i)
@@ -3048,7 +3042,7 @@ KBSIZE if a floating point number, default value is 1024.0."
                     (eq nil (car (file-attributes i)))
                     (let ((face (if (file-executable-p i)
                                     'anything-ff-executable
-                                    anything-c-files-face2)))
+                                    'anything-ff-file)))
                       (cons (anything-c-prefix-filename
                              (propertize i 'face face) "leaf.xpm")
                             i)))
@@ -3061,39 +3055,39 @@ KBSIZE if a floating point number, default value is 1024.0."
                                  i nil directory-files-no-dot-files-regexp t))))
                     (cons (anything-c-prefix-filename
                            (propertize
-                            i 'face anything-c-files-face1)
+                            i 'face 'anything-ff-directory)
                            "empty.xpm")
                           i))
                    ( ;; Open directories.
                     (and (eq t (car (file-attributes i))) (get-buffer af))
                     (cons (anything-c-prefix-filename
                            (propertize
-                            i 'face anything-c-files-face1)
+                            i 'face 'anything-ff-directory)
                            "open.xpm")
                           i))
                    ( ;; Closed directories.
                     (eq t (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
                            (propertize
-                            i 'face anything-c-files-face1)
+                            i 'face 'anything-ff-directory)
                            "close.xpm")
                           i))
                    ( ;; Open Symlinks directories.
                     (and (stringp (car (file-attributes i)))
                          (file-directory-p i) (get-buffer af))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-dired-symlink-face))
+                           (propertize i 'face 'anything-ff-symlink))
                           i))
                    ( ;; Closed Symlinks directories.
                     (and (stringp (car (file-attributes i)))
                          (file-directory-p i))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-dired-symlink-face))
+                           (propertize i 'face 'anything-ff-symlink))
                           i))
                    ( ;; Files symlinks.
                     (stringp (car (file-attributes i)))
                     (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-dired-symlink-face)
+                           (propertize i 'face 'anything-ff-symlink)
                            "leaf.xpm")
                           i)))))
 
@@ -5732,8 +5726,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   "Face for su/sudo bookmarks."
   :group 'anything)
 
-(defvar anything-c-bookmarks-face1 'anything-dir-heading)
-(defvar anything-c-bookmarks-face2 'anything-file-name)
+(defvar anything-c-bookmarks-face1 'anything-ff-directory)
+(defvar anything-c-bookmarks-face2 'anything-ff-file)
 (defvar anything-c-bookmarks-face3 'anything-bookmarks-su-face)
 
 
