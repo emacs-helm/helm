@@ -4071,8 +4071,9 @@ See `anything-c-grep-default-command' for format specs.")
     (setq mode-line-format
           '(" " mode-line-buffer-identification " "
             (line-number-mode "%l") " "
-            (:eval (propertize "(Grep Process Running) "
-                    'face '((:foreground "red"))))))
+            (:eval (when (get-process "grep-process")
+                     (propertize "[Grep Process Running] "
+                                 'face '((:foreground "red")))))))
     (prog1
         (let ((default-directory anything-ff-default-directory))
           (start-file-process-shell-command "grep-process" nil cmd-line))
@@ -4081,9 +4082,19 @@ See `anything-c-grep-default-command' for format specs.")
        (get-process "grep-process")
        #'(lambda (process event)
            (when (string= event "finished\n")
-             (kill-local-variable 'mode-line-format)
              (with-anything-window
-               (anything-update-move-first-line))))))))
+               (anything-update-move-first-line)
+               (kill-local-variable 'mode-line-format)
+               (setq mode-line-format
+                     '(" " mode-line-buffer-identification " "
+                       (line-number-mode "%l") " "
+                       (:eval (propertize
+                               (format "[Grep Process Finished - (%s results)] "
+                                       (let ((nlines (1- (count-lines
+                                                          (point-min)
+                                                          (point-max)))))
+                                         (if (> nlines 0) nlines 0)))
+                               'face '((:foreground "Green")))))))))))))
 
 (defun anything-c-grep-action (candidate &optional where mark)
   "Define a default action for `anything-do-grep' on CANDIDATE.
