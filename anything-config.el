@@ -1935,9 +1935,12 @@ buffer that is not the current buffer."
 \\[anything-send-bug-report-from-anything]:BugReport."
   "String displayed in mode-line in `anything-c-source-buffers+'")
 
+(defvar anything-c-buffers-cache nil)
 (defvar anything-c-source-buffers+
   '((name . "Buffers")
-    (candidates . anything-c-buffer-list)
+    (init . (lambda ()
+              (setq anything-c-buffers-cache (anything-c-buffer-list))))
+    (candidates . anything-c-buffers-cache)
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
     (diff-action . anything-buffer-toggle-diff)
@@ -2051,7 +2054,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun anything-buffer-revert-and-update (candidate)
   (anything-revert-marked-buffers candidate)
-  (anything-force-update))
+  (anything-force-update)
+  (anything-c-recenter-window))
 
 ;;;###autoload
 (defun anything-buffer-revert-persistent ()
@@ -2062,7 +2066,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-save-and-update (candidate)
   (with-current-buffer (get-buffer candidate)
     (save-buffer))
-  (anything-force-update))
+  (anything-force-update)
+  (anything-c-recenter-window))
 
 ;;;###autoload
 (defun anything-buffer-save-persistent ()
@@ -2120,7 +2125,13 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
           (save-buffer)
           (kill-buffer buffer))
         (kill-buffer buffer)))
-  (anything-delete-current-selection))
+  (anything-delete-current-selection)
+  (anything-force-update)
+  (anything-c-recenter-window))
+
+(defun anything-c-recenter-window ()
+  "Make visible current selection by recentering anything window."
+  (with-anything-window (recenter)))
 
 (defun anything-c-buffers+-persistent-action (candidate)
     (if current-prefix-arg
