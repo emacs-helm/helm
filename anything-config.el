@@ -4130,17 +4130,29 @@ WHERE can be one of other-window, elscreen, other-frame."
   (anything-c-grep-action candidate 'elscreen))
 
 (defun anything-c-grep-save-results (candidate)
-  "Save anything grep result in a grep buffer."
-  (with-current-buffer (get-buffer-create "*grep*")
-    (let ((inhibit-read-only t))
-      (erase-buffer)
-      (insert "-*- mode: grep -*-\n\n"
-              (format "Grep Results for `%s':\n\n" anything-pattern))
-      (save-excursion
-        (insert (with-current-buffer anything-buffer
-                  (forward-line 1)
-                  (buffer-substring (point) (point-max))))
-        (grep-mode)))))
+  "Save anything grep result in a `grep-mode' buffer."
+  (let ((buf "*grep*")
+        new-buf)
+    (when (get-buffer buf)
+      (setq new-buf (read-string "GrepBufferName: " buf))
+      (loop for b in (anything-c-buffer-list)
+         when (and (string= new-buf b)
+                   (not (y-or-n-p
+                         (format "Buffer `%s' already exists overwrite? "
+                                 new-buf))))
+         do (setq new-buf (read-string "GrepBufferName: " "*grep ")))
+      (setq buf new-buf))
+    (with-current-buffer (get-buffer-create buf)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert "-*- mode: grep -*-\n\n"
+                (format "Grep Results for `%s':\n\n" anything-pattern))
+        (save-excursion
+          (insert (with-current-buffer anything-buffer
+                    (forward-line 1)
+                    (buffer-substring (point) (point-max))))
+          (grep-mode))))
+    (message "Anything Grep Results saved in `%s' buffer" buf)))
 
 (defun anything-c-grep-persistent-action (candidate)
   "Persistent action for `anything-do-grep'.
