@@ -1215,19 +1215,21 @@ http://bbdb.sourceforge.net/"
 ;;;###autoload
 (defun anything-locate (arg)
   "Preconfigured `anything' for Locate.
-Note you can add locate command after entering pattern.
+Note: you can add locate options after entering pattern.
+See 'man locate' for valid options.
 
 You can specify a specific database with prefix argument ARG \(C-u\).
 Many databases can be used: navigate and mark them.
+See also `anything-locate-with-db'.
 
 To create a user specific db, use
 \"updatedb -l 0 -o db_path -U directory\".
-
-See man locate for more infos."
+Where db_path is a filename matched by
+`anything-locate-db-file-regexp'."
   (interactive "P")
   (let* ((db (and arg
                   (anything-c-read-file-name
-                   "LocateDBFile: "
+                   "LocateDBFiles: "
                    :marked-candidates t
                    :preselect anything-locate-db-file-regexp
                    :test #'(lambda (x)
@@ -1237,8 +1239,16 @@ See man locate for more infos."
                                  (or (string-match
                                       anything-locate-db-file-regexp x)
                                      (file-directory-p x))
-                                 x)))))
-         (anything-c-locate-command
+                                 x))))))
+    (anything-locate-with-db db)))
+
+(defun anything-locate-with-db (&optional db)
+  "Run locate -d DB.
+If DB is not given or nil use locate without -d option.
+DB can be given as a string or list of db files.
+See also `anything-locate'."
+  (when (and db (stringp db)) (setq db (list db)))
+  (let ((anything-c-locate-command
           (if db
               (replace-regexp-in-string
                "locate"
@@ -1252,6 +1262,7 @@ See man locate for more infos."
     (anything :sources 'anything-c-source-locate
               :buffer "*anything locate*"
               :keymap anything-generic-files-map)))
+;; (anything-locate-with-db "~/locate.db")
 
 ;;;###autoload
 (defun anything-w3m-bookmarks ()
