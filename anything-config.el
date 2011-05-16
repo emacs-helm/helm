@@ -4014,17 +4014,27 @@ See `anything-c-grep-default-command' for format specs.")
 (defface anything-grep-match
   '((t (:inherit match)))
   "Face used to highlight grep matches."
-  :group 'anything)
+  :group 'anything-config)
 
 (defface anything-grep-file
   '((t (:foreground "BlueViolet" :underline t)))
   "Face used to highlight grep results filenames."
-  :group 'anything)
+  :group 'anything-config)
 
 (defface anything-grep-lineno
   '((t (:foreground "Darkorange1")))
   "Face used to highlight grep number lines."
-  :group 'anything)
+  :group 'anything-config)
+
+(defface anything-grep-running
+  '((t (:foreground "Red")))
+  "Face used in mode line when grep is running."
+  :group 'anything-config)
+
+(defface anything-grep-finish
+  '((t (:foreground "Green")))
+  "Face used in mode line when grep is finish."
+  :group 'anything-config)
 
 (defun anything-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories CANDIDATES for grep command line."
@@ -4095,7 +4105,7 @@ See `anything-c-grep-default-command' for format specs.")
             (line-number-mode "%l") " "
             (:eval (when (get-process "grep-process")
                      (propertize "[Grep Process Running] "
-                                 'face '((:foreground "red")))))))
+                                 'face 'anything-grep-running)))))
     (prog1
         (let ((default-directory anything-ff-default-directory))
           (start-file-process-shell-command "grep-process" nil cmd-line))
@@ -4116,7 +4126,7 @@ See `anything-c-grep-default-command' for format specs.")
                                                           (point-min)
                                                           (point-max)))))
                                          (if (> nlines 0) nlines 0)))
-                               'face '((:foreground "Green")))))))))))))
+                               'face 'anything-grep-finish)))))))))))
 
 (defun anything-c-grep-action (candidate &optional where mark)
   "Define a default action for `anything-do-grep' on CANDIDATE.
