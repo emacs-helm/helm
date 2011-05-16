@@ -4137,8 +4137,18 @@ WHERE can be one of other-window, elscreen, other-frame."
     (anything-goto-line lineno)
     (set-marker (mark-marker) (point))
     (when mark
-      (push-mark (point) 'nomsg))))
-
+      (push-mark (point) 'nomsg))
+    ;; Save history
+    (unless anything-in-persistent-action
+      (setq anything-c-grep-history
+            (cons anything-pattern
+                  (delete anything-pattern anything-c-grep-history)))
+      (when (> (length anything-c-grep-history)
+               anything-c-grep-max-length-history)
+        (setq anything-c-grep-history
+              (delete (car (last anything-c-grep-history))
+                      anything-c-grep-history))))))
+      
 (defun anything-c-grep-other-window (candidate)
   "Jump to result in other window from anything grep."
   (anything-c-grep-action candidate 'other-window))
@@ -4215,6 +4225,9 @@ These extensions will be added to command line with --include arg of grep."
 \\[anything-send-bug-report-from-anything]:BugReport."
   "String displayed in mode-line in `anything-do-grep'.")
 
+(defvar anything-c-grep-history nil)
+(defvar anything-c-grep-max-length-history 100
+  "*Max number of elements to save in `anything-c-grep-history'.")
 (defun anything-do-grep1 (only &optional recurse)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep and prompt user
@@ -4228,6 +4241,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                 (copy-sequence anything-compile-source-functions)))
          (exts (anything-c-grep-guess-extensions only))
          (globs (mapconcat 'identity exts " "))
+         (minibuffer-history anything-c-grep-history)
          (include-files (and recurse (read-string "OnlyExt(*.[ext]): "
                                                   globs)))
          (anything-c-grep-default-command (if recurse
