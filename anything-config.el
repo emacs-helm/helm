@@ -4241,9 +4241,11 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                 (copy-sequence anything-compile-source-functions)))
          (exts (anything-c-grep-guess-extensions only))
          (globs (mapconcat 'identity exts " "))
-         (minibuffer-history anything-c-grep-history)
          (include-files (and recurse (read-string "OnlyExt(*.[ext]): "
                                                   globs)))
+         ;; Set `minibuffer-history' AFTER includes-files
+         ;; to avoid storing wild-cards here.
+         (minibuffer-history anything-c-grep-history)
          (anything-c-grep-default-command (if recurse
                                               anything-c-grep-default-recurse-command
                                               anything-c-grep-default-command))
