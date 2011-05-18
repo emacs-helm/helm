@@ -7467,13 +7467,11 @@ http://bbdb.sourceforge.net/")
 (defun anything-eval-expression-with-eldoc ()
   "Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. "
   (interactive)
-  (if (window-system)
-      (let ((timer (run-with-idle-timer eldoc-idle-delay
-                                        'repeat 'anything-eldoc-show-in-eval)))
-        (unwind-protect
-             (call-interactively 'anything-eval-expression)
-          (cancel-timer timer)))
-      (call-interactively 'anything-eval-expression)))
+  (let ((timer (run-with-idle-timer eldoc-idle-delay
+                                    'repeat 'anything-eldoc-show-in-eval)))
+    (unwind-protect
+         (call-interactively 'anything-eval-expression)
+      (cancel-timer timer))))
 
 (defun anything-eldoc-show-in-eval ()
   "Return eldoc in a tooltip for current minibuffer input."
