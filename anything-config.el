@@ -7487,7 +7487,22 @@ http://bbdb.sourceforge.net/")
          (doc     (or (eldoc-get-var-docstring sym)
                       (eldoc-get-fnsym-args-string
                        (car (eldoc-fnsym-in-current-sexp))))))
-    (when doc (tooltip-show doc))))
+    (when doc (anything-c-eldoc-show-in-mode-line doc))))
+
+(defcustom eldoc-in-minibuffer-show-fn 'eldoc-show-in-mode-line
+  "A function to display eldoc info.
+Should take one arg: the string to display."
+  :group 'anything-config
+  :type  'symbol)
+
+(defvar anything-c-eldoc-show-in-mode-line-delay 12)
+(defun anything-c-eldoc-show-in-mode-line (str)
+  "Show string STR in mode-line."
+  (with-anything-window
+    (let ((mode-line-format (concat " " str)))
+      (force-mode-line-update)
+      (sit-for anything-c-eldoc-show-in-mode-line-delay))
+    (force-mode-line-update)))
 
 ;;; Calculation Result
 (defvar anything-c-source-calculation-result
