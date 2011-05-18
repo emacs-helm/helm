@@ -7487,9 +7487,9 @@ http://bbdb.sourceforge.net/")
          (doc     (or (eldoc-get-var-docstring sym)
                       (eldoc-get-fnsym-args-string
                        (car (eldoc-fnsym-in-current-sexp))))))
-    (when doc (funcall eldoc-in-minibuffer-show-fn doc))))
+    (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))
 
-(defcustom eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
+(defcustom anything-c-eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
   "A function to display eldoc info.
 Should take one arg: the string to display."
   :group 'anything-config
