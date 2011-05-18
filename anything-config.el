@@ -4149,7 +4149,8 @@ WHERE can be one of other-window, elscreen, other-frame."
     (when mark
       (push-mark (point) 'nomsg))
     ;; Save history
-    (unless anything-in-persistent-action
+    (unless (or anything-in-persistent-action
+                (string= anything-pattern ""))
       (setq anything-c-grep-history
             (cons anything-pattern
                   (delete anything-pattern anything-c-grep-history)))
