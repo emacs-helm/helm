@@ -2570,6 +2570,8 @@ See `anything-ff-serial-rename-1'."
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
 \\[anything-ff-run-print-file]\t\t->Print file with default printer.
+\\[anything-send-bug-report-from-anything]\t\t->Send Bug report.
+\\[anything-ff-help]\t\t->Display this help info.
 \n== Anything Map ==
 \\{anything-map}
 "))
