@@ -2255,11 +2255,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defvar anything-ff-mode-line-string
   "\\<anything-find-files-map>\
 \\[anything-ff-help]:Help, \
+\\[anything-send-bug-report-from-anything]:BugReport, \
 \\<anything-map>\
-\\[anything-select-action]:Acts,\
+\\[anything-select-action]:Acts, \
 \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
+\\[anything-select-3rd-action]:NthAct"
+
   "String displayed in mode-line in `anything-c-source-find-files'")
 
 (defvar anything-c-source-find-files
@@ -2607,10 +2608,11 @@ See `anything-ff-serial-rename-1'."
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
-    (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
-    (define-key map (kbd "C-l") 'anything-find-files-down-one-level)
+    (define-key map (kbd "C-.")     'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l")     'anything-find-files-down-one-level)
+    (define-key map (kbd "C-h C-b") 'anything-send-bug-report-from-anything)
     (when anything-ff-lynx-style-map
-      (define-key map (kbd "<left>") 'anything-find-files-down-one-level)
+      (define-key map (kbd "<left>")  'anything-find-files-down-one-level)
       (define-key map (kbd "<right>") 'anything-execute-persistent-action))
     (delq nil map))
   "Keymap for `anything-find-files'.")
