@@ -3398,13 +3398,15 @@ Use it for non--interactive calls of `anything-find-files'."
   (let* ((def-dir (anything-c-current-directory))
          (lib     (anything-find-library-at-point))
          (url     (anything-ff-find-url-at-point))
-         (file-p  (and fap (file-exists-p fap)
+         (file-p  (and fap (not (string= fap ""))
+                       (file-exists-p fap)
+                       tap (not (string= tap ""))
                        (file-exists-p
                         (file-name-directory (expand-file-name tap def-dir))))))
     (cond (lib) ; e.g we are inside a require sexp.
           (url) ; String at point is an hyperlink.
           (file-p (expand-file-name tap def-dir))
-          (t fap))))
+          (t (and (not (string= fap "")) fap)))))
 
 (defun anything-c-current-directory ()
   "Return current-directory name at point.
