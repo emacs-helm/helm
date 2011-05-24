@@ -283,6 +283,10 @@
 ;; Go to precedent file in anything grep/etags buffers.
 ;; `anything-grep-help'
 ;; Not documented.
+;; `anything-c-grep-run-persistent-action'
+;; Run grep persistent action from `anything-do-grep1'.
+;; `anything-c-grep-run-default-action'
+;; Run grep default action from `anything-do-grep1'.
 ;; `anything-c-grep-run-other-window-action'
 ;; Run grep goto other window action from `anything-do-grep1'.
 ;; `anything-c-grep-run-save-buffer'
@@ -293,6 +297,8 @@
 ;; Not documented.
 ;; `anything-yank-text-at-point'
 ;; Yank text at point in minibuffer.
+;; `anything-etags-help'
+;; Not documented.
 ;; `anything-c-etags-select'
 ;; Preconfigured anything for etags.
 ;; `anything-filelist'
@@ -414,6 +420,8 @@
 ;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
 ;; `anything-c-external-programs-associations'
 ;; Default Value: nil
+;; `anything-ff-lynx-style-map'
+;; Default Value: t
 ;; `anything-ff-history-max-length'
 ;; Default Value: 100
 ;; `anything-ff-default-kbsize'
@@ -422,6 +430,8 @@
 ;; Default Value: "exiftran"
 ;; `anything-ff-exif-data-program-args'
 ;; Default Value: "-d"
+;; `anything-c-grep-use-ioccur-style-keys'
+;; Default Value: t
 ;; `anything-c-pdfgrep-default-read-command'
 ;; Default Value: "xpdf '%f' %p"
 ;; `anything-c-etags-tag-file-name'
@@ -430,6 +440,8 @@
 ;; Default Value: 10
 ;; `anything-c-filelist-file-name'
 ;; Default Value: nil
+;; `anything-c-eldoc-in-minibuffer-show-fn'
+;; Default Value: anything-c-eldoc-show-in-mode-line
 ;; `anything-c-default-external-file-browser'
 ;; Default Value: "nautilus"
 ;; `anything-c-use-adaptative-sorting'
