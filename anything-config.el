@@ -3582,6 +3582,7 @@ Find inside `require' and `declare-function' sexp."
 (defun* anything-dired-action (candidate &key action follow (files (dired-get-marked-files)))
   "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
 ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
+  (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
   (let ((fn     (case action
                   ('copy       'dired-copy-file)
                   ('rename     'dired-rename-file)
@@ -3606,7 +3607,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
              (expand-file-name (file-name-nondirectory from) candidate))
          #'(lambda (from) candidate))
      marker)
-    (when follow
+    (when (and follow (not (get-buffer dired-log-buffer)))
       (let ((moved-flist (anything-get-dest-fnames-from-list files candidate dirflag))
             (target      (directory-file-name candidate)))
         (unwind-protect
