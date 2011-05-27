@@ -2315,6 +2315,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
            ("Ediff Merge File `C-c ='" . anything-find-files-ediff-merge-files)
            ("Delete File(s) `M-D'" . anything-delete-marked-files)
            ("Copy file(s) `M-C, C-u to follow'" . anything-find-files-copy)
+           ("Copy file(s) Async" . anything-ff-copy-async)
            ("Rename file(s) `M-R, C-u to follow'" . anything-find-files-rename)
            ("Serial rename files" . anything-ff-serial-rename)
            ("Serial rename by symlinking files" . anything-ff-serial-rename-by-symlink)
@@ -2428,6 +2429,76 @@ ACTION must be an action supported by `anything-dired-action'."
 (defun anything-find-files-switch-to-hist (candidate)
   "Switch to anything-find-files history."
   (anything-find-files t))
+
+;; Asynchronous copy of files.
+(defvar anything-c-copy-files-async-log-file "/tmp/dired.log")
+(defun anything-c-copy-files-async-1 (flist dest)
+  "Copy a list of Files FLIST to DEST asynchronously.
+It use another emacs process to do the job."
+  (start-file-process "emacs-batch" nil "emacs"
+                      "-Q" "--batch" "--eval"
+                      (format "(progn
+  (require 'dired) (require 'cl)
+  (let ((dired-recursive-copies 'always)
+        failures success
+        (ovw-count 0)
+        (cpf-count 0))
+    (dolist (f '%S)
+       (condition-case err
+             (let ((file-exists (file-exists-p
+                                 (expand-file-name
+                                  (file-name-nondirectory (directory-file-name f))
+                                   (file-name-directory
+                                     (file-name-as-directory \"%s\"))))))
+                (dired-copy-file f \"%s\" t)
+                (if file-exists
+                    (progn (push (cons \"Overwriting\" f) success)
+                           (incf ovw-count))
+                    (push (cons \"Copying\" f) success)
+                    (incf cpf-count)))
+          (file-error
+           (push (dired-make-relative
+                   (expand-file-name
+                     (file-name-nondirectory (directory-file-name f))
+                     (file-name-directory \"%s\")))
+                 failures))))
+    (with-current-buffer (find-file-noselect \"%s\")
+       (goto-char (point-max))
+       (when failures
+         (dolist (fail (reverse failures))
+           (insert (concat \"Failed to copy \" fail \"\n\"))))
+       (when success
+         (loop for (a . s) in (reverse success) do
+           (insert (concat a \" \" s  \" to %s done\n\"))))
+       (and (/= cpf-count 0) (insert (concat (int-to-string cpf-count) \" File(s) Copied\n\")))
+       (and (/= ovw-count 0) (insert (concat (int-to-string ovw-count) \" File(s) Overwrited\n\")))
+       (and failures (insert (concat (int-to-string (length failures)) \" File(s) Failed to copy\n\")))
+       (save-buffer))))"
+                              flist dest dest dest anything-c-copy-files-async-log-file dest)))
+
+(defun anything-c-copy-async-with-log (flist dest)
+  "Copy file list FLIST to DEST showing log.
+Log is send to `anything-c-copy-files-async-log-file'."
+  (pop-to-buffer (find-file-noselect anything-c-copy-files-async-log-file))
+  (set (make-local-variable 'auto-revert-interval) 1)
+  (erase-buffer) (insert "Wait copying files...\n") (sit-for 0.5)
+  (erase-buffer) (insert "Sending output...\n") (save-buffer)
+  (goto-char (point-max))
+  (auto-revert-mode 1)
+  (anything-c-copy-files-async-1 flist dest))
+
+(defun anything-ff-copy-async (candidate)
+  "Anything find files action to copy files async."
+  (let ((flist (anything-marked-candidates))
+        (dest  (anything-c-read-file-name "Copy File(s) async To: ")))
+    (anything-c-copy-async-with-log flist dest)))
+
+(defun anything-c-copy-files-async (flist dest)
+  "Preconfigured anything to copy files async."
+  (interactive (list (anything-c-read-file-name "Copy File async: "
+                                                :marked-candidates t)
+                     (anything-c-read-file-name "Copy File async To: ")))
+  (anything-c-copy-async-with-log flist dest))
 
 (defvar eshell-command-aliases-list nil)
 (declare-function eshell-read-aliases-list "em-alias")
