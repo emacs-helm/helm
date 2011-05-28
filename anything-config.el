@@ -2490,14 +2490,20 @@ Log is send to `anything-c-copy-files-async-log-file'."
 (defun anything-ff-copy-async (candidate)
   "Anything find files action to copy files async."
   (let ((flist (anything-marked-candidates))
-        (dest  (anything-c-read-file-name "Copy File(s) async To: ")))
+        (dest  (anything-c-read-file-name "Copy File(s) async To: "
+                                          :preselect candidate
+                                          :initial-input (car anything-ff-history)
+                                          :history (anything-find-files-history :comp-read nil))))
     (anything-c-copy-async-with-log flist dest)))
 
 (defun anything-c-copy-files-async (flist dest)
   "Preconfigured anything to copy files async."
   (interactive (list (anything-c-read-file-name "Copy File async: "
                                                 :marked-candidates t)
-                     (anything-c-read-file-name "Copy File async To: ")))
+                     (anything-c-read-file-name "Copy File async To: "
+                                          :preselect candidate
+                                          :initial-input (car anything-ff-history)
+                                          :history (anything-find-files-history :comp-read nil))))
   (anything-c-copy-async-with-log flist dest))
 
 (defvar eshell-command-aliases-list nil)
