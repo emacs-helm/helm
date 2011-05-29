@@ -2430,11 +2430,14 @@ ACTION must be an action supported by `anything-dired-action'."
   "Switch to anything-find-files history."
   (anything-find-files t))
 
-;; Asynchronous copy of files.
+;;; Asynchronous copy of files.
+;;
 (defvar anything-c-copy-files-async-log-file "/tmp/dired.log")
 (defun anything-c-copy-files-async-1 (flist dest)
   "Copy a list of Files FLIST to DEST asynchronously.
-It use another emacs process to do the job."
+It use another emacs process to do the job.
+Communication with background emacs is done with temp file
+`anything-c-copy-files-async-log-file'."
   (start-file-process "emacs-batch" nil "emacs"
                       "-Q" "--batch" "--eval"
                       (format "(progn
@@ -2490,20 +2493,24 @@ Log is send to `anything-c-copy-files-async-log-file'."
 (defun anything-ff-copy-async (candidate)
   "Anything find files action to copy files async."
   (let ((flist (anything-marked-candidates))
-        (dest  (anything-c-read-file-name "Copy File(s) async To: "
-                                          :preselect candidate
-                                          :initial-input (car anything-ff-history)
-                                          :history (anything-find-files-history :comp-read nil))))
+        (dest  (anything-c-read-file-name
+                "Copy File(s) async To: "
+                :preselect candidate
+                :initial-input (car anything-ff-history)
+                :history (anything-find-files-history :comp-read nil))))
     (anything-c-copy-async-with-log flist dest)))
 
 (defun anything-c-copy-files-async (flist dest)
-  "Preconfigured anything to copy files async."
-  (interactive (list (anything-c-read-file-name "Copy File async: "
-                                                :marked-candidates t)
-                     (anything-c-read-file-name "Copy File async To: "
-                                          :preselect candidate
-                                          :initial-input (car anything-ff-history)
-                                          :history (anything-find-files-history :comp-read nil))))
+  "Preconfigured anything to copy file list FLIST to DEST asynchronously."
+  (interactive
+   (list (anything-c-read-file-name
+          "Copy File async: "
+          :marked-candidates t)
+         (anything-c-read-file-name
+          "Copy File async To: "
+          :preselect candidate
+          :initial-input (car anything-ff-history)
+          :history (anything-find-files-history :comp-read nil))))
   (anything-c-copy-async-with-log flist dest))
 
 (defvar eshell-command-aliases-list nil)
@@ -7325,7 +7332,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
     (anything-attrset 'keywords (mapcar 'car (anything-attr 'keywords-examples)))))
 
 (defun anything-c-org-keywords-candidates ()
-  (and (eq (buffer-local-value 'major-mode anything-current-buffer) 'org-mode)
+  (and (or (eq (buffer-local-value 'major-mode anything-current-buffer) 'org-mode)
+           (eq (buffer-local-value 'major-mode anything-current-buffer) 'message-mode))
        (anything-attr 'keywords)))
 
 (defun anything-c-org-keywords-insert (keyword)
