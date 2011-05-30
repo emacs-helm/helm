@@ -2306,6 +2306,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
            ("Open file externally `C-c C-x, C-u to choose'"
             . anything-c-open-file-externally)
            ("Grep File(s) `M-g s, C-u Recurse'" . anything-find-files-grep)
+           ("Zgrep File(s) `C-u Recurse'" . anything-ff-zgrep)
            ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
            ("Eshell command on file(s) `M-!'"
             . anything-find-files-eshell-command-on-file)
@@ -2643,6 +2644,7 @@ See `anything-ff-serial-rename-1'."
 \\<anything-find-files-map>
 \\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
+\\[anything-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
 \\[anything-ff-run-rename-file]\t\t->Rename File (C-u Follow).
 \\[anything-ff-run-copy-file]\t\t->Copy File (C-u Follow).
 \\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
@@ -2682,6 +2684,7 @@ See `anything-ff-serial-rename-1'."
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s")   'anything-ff-run-grep)
     (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
+    (define-key map (kbd "M-g z")   'anything-ff-run-zgrep)
     (define-key map (kbd "M-R")     'anything-ff-run-rename-file)
     (define-key map (kbd "M-C")     'anything-ff-run-copy-file)
     (define-key map (kbd "M-B")     'anything-ff-run-byte-compile-file)
@@ -2738,6 +2741,12 @@ ACTION must be one of the actions of current source."
   "Run Pdfgrep action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-pdfgrep))
+
+;;;###autoload
+(defun anything-ff-run-zgrep ()
+  "Run Grep action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-zgrep))
 
 ;;;###autoload
 (defun anything-ff-run-copy-file ()
@@ -4021,13 +4030,36 @@ Where:
 '%e' format spec is for --exclude or --include grep options.
 '%p' format spec is for pattern.
 '%f' format spec is for filenames.")
+
 (defvar anything-c-grep-default-recurse-command
   "grep -d recurse %e -niH -e %p %f"
   "Default recursive grep format command for `anything-do-grep1'.
 See `anything-c-grep-default-command' for format specs.")
+
+(defvar anything-c-default-zgrep-command "zgrep -niH -e %p %f")
+
+(defvar anything-c-rzgrep-cache (make-hash-table :test 'equal))
+
 (defvar anything-c-grep-default-function 'anything-c-grep-init)
+
 (defvar anything-c-grep-debug-command-line nil
   "Turn on anything grep command-line debugging when non--nil.")
+
+(defvar anything-c-zgrep-recurse-flag nil)
+
+(defvar anything-grep-mode-line-string
+  "\\<anything-c-grep-map>\
+\\[anything-grep-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-do-grep'.")
+(defvar anything-c-grep-history nil)
+
+(defvar anything-c-grep-max-length-history 100
+  "*Max number of elements to save in `anything-c-grep-history'.")
 
 (defface anything-grep-match
   '((t (:inherit match)))
@@ -4061,35 +4093,36 @@ See `anything-c-grep-default-command' for format specs.")
   ;; If r option is enabled search also in subdidrectories.
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
-  (loop for i in candidates append
-       (cond (;; Candidate is a directory and we use recursion.
-              (and (file-directory-p i)
-                   (anything-c-grep-recurse-p))
-              (list (expand-file-name i)))
-             ;; Candidate is a directory, search in all files.
-             ((file-directory-p i)
-              (file-expand-wildcards
-               (concat (file-name-as-directory (expand-file-name i)) "*") t))
-             ;; Candidate is a file or wildcard and we use recursion, use the
-             ;; current directory instead of candidate.
-             ((and (or (file-exists-p i) (string-match "\*" i))
-                   (anything-c-grep-recurse-p))
-              (list (directory-file-name ; Needed for windoze.
-                     (file-name-directory (directory-file-name i)))))
-             ;; Candidate use wildcard.
-             ((string-match "\*" i) (file-expand-wildcards i t))
-             ;; Else should be one or more file.
-             (t (list i))) into all-files
-       finally return
-       (mapconcat 'shell-quote-argument all-files " ")))
+  (if anything-c-zgrep-recurse-flag
+      (mapconcat 'shell-quote-argument candidates " ")
+      (loop for i in candidates append
+           (cond ( ;; Candidate is a directory and we use recursion.
+                  (and (file-directory-p i)
+                       (anything-c-grep-recurse-p))
+                  (list (expand-file-name i)))
+                 ;; Candidate is a directory, search in all files.
+                 ((file-directory-p i)
+                  (file-expand-wildcards
+                   (concat (file-name-as-directory (expand-file-name i)) "*") t))
+                 ;; Candidate is a file or wildcard and we use recursion, use the
+                 ;; current directory instead of candidate.
+                 ((and (or (file-exists-p i) (string-match "\*" i))
+                       (anything-c-grep-recurse-p))
+                  (list (directory-file-name ; Needed for windoze.
+                         (file-name-directory (directory-file-name i)))))
+                 ;; Candidate use wildcard.
+                 ((string-match "\*" i) (file-expand-wildcards i t))
+                 ;; Else should be one or more file.
+                 (t (list i))) into all-files
+           finally return
+           (mapconcat 'shell-quote-argument all-files " "))))
 
 (defun anything-c-grep-recurse-p ()
   "Check if `anything-do-grep1' have switched to recursive."
   (let ((args (replace-regexp-in-string
                "grep" "" anything-c-grep-default-command)))
     (string-match-p "r\\|recurse" args)))
-
-(defun anything-c-grep-init (only-files &optional include)
+(defun anything-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((fnargs        (anything-c-grep-prepare-candidates
                          (if (file-remote-p anything-ff-default-directory)
@@ -4109,11 +4142,16 @@ See `anything-c-grep-default-command' for format specs.")
          (exclude       (if (anything-c-grep-recurse-p)
                             (concat (or include ignored-files) " " ignored-dirs)
                             ignored-files))
-         (cmd-line      (format-spec
-                         anything-c-grep-default-command
-                         (list (cons ?e exclude)
-                               (cons ?p (shell-quote-argument anything-pattern))
-                               (cons ?f fnargs)))))
+         (cmd-line      (if zgrep
+                            (format-spec
+                             anything-c-default-zgrep-command
+                             (list (cons ?p (shell-quote-argument anything-pattern))
+                                   (cons ?f fnargs)))
+                            (format-spec
+                             anything-c-grep-default-command
+                             (list (cons ?e exclude)
+                                   (cons ?p (shell-quote-argument anything-pattern))
+                                   (cons ?f fnargs))))))
     (when anything-c-grep-debug-command-line
       (with-current-buffer (get-buffer-create "*any grep debug*")
         (goto-char (point-max))
@@ -4243,21 +4281,7 @@ These extensions will be added to command line with --include arg of grep."
      collect glob into glob-list
      finally return glob-list))
 
-
-(defvar anything-grep-mode-line-string
-  "\\<anything-c-grep-map>\
-\\[anything-grep-help]:Help,\
-\\<anything-map>\
-\\[anything-select-action]:Acts,\
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-do-grep'.")
-
-(defvar anything-c-grep-history nil)
-(defvar anything-c-grep-max-length-history 100
-  "*Max number of elements to save in `anything-c-grep-history'.")
-(defun anything-do-grep1 (only &optional recurse)
+(defun anything-do-grep1 (only &optional recurse zgrep)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep and prompt user
 to set the --include args of grep.
@@ -4269,15 +4293,17 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
           (delq 'anything-compile-source--match-plugin
                 (copy-sequence anything-compile-source-functions)))
          (exts (anything-c-grep-guess-extensions only))
-         (globs (mapconcat 'identity exts " "))
-         (include-files (and recurse (read-string "OnlyExt(*.[ext]): "
-                                                  globs)))
+         (globs (and (not zgrep) (mapconcat 'identity exts " ")))
+         (include-files (and recurse (not zgrep)
+                             (read-string "OnlyExt(*.[ext]): "
+                                          globs)))
          ;; Set `minibuffer-history' AFTER includes-files
          ;; to avoid storing wild-cards here.
          (minibuffer-history anything-c-grep-history)
-         (anything-c-grep-default-command (if recurse
-                                              anything-c-grep-default-recurse-command
-                                              anything-c-grep-default-command))
+         (anything-c-grep-default-command (cond ((and recurse zgrep) anything-c-default-zgrep-command)
+                                                (recurse anything-c-grep-default-recurse-command)
+                                                (zgrep anything-c-default-zgrep-command)
+                                                (t anything-c-grep-default-command)))
          ;; Disable match-plugin and use here own highlighting.
          (anything-mp-highlight-delay     nil))
     (when include-files
@@ -4299,7 +4325,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
      `(((name . "Grep (C-c ? Help)")
         (candidates
          . (lambda ()
-             (funcall anything-c-grep-default-function only include-files)))
+             (funcall anything-c-grep-default-function only include-files zgrep)))
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-grep-mode-line-string)
@@ -4340,6 +4366,76 @@ See also `anything-do-grep1'."
                                  (buffer-file-name (current-buffer)))))
         (prefarg (or current-prefix-arg anything-current-prefix-arg)))
     (anything-do-grep1 only prefarg)))
+
+(defun* anything-c-walk-directory (directory &key (path 'basename) (directories t) match)
+  "Walk through DIRECTORY tree.
+PATH can be one of basename, relative, or full.
+DIRECTORIES when non--nil (default) return also directories names, otherwise
+skip directories names.
+MATCH match only filenames matching regexp MATCH."
+  (let (result
+        (fn (case path
+              (basename 'file-name-nondirectory)
+              (relative 'file-relative-name)
+              (full     'identity)
+              (t (error "Error: Invalid path spec `%s', must be one of basename, relative or full." path)))))
+    (labels ((ls-R (dir)
+               (loop with ls = (directory-files dir t directory-files-no-dot-files-regexp)
+                  for f in ls
+                  if (file-directory-p f)
+                  do (progn (when directories
+                              (push (funcall fn f) result))
+                            ;; Don't recurse in directory symlink.
+                            (unless (file-symlink-p f)
+                              (ls-R f)))
+                  else do 
+                    (unless (and match (not (string-match match (file-name-nondirectory f))))
+                      (push (funcall fn f) result)))))
+      (ls-R directory)
+      (nreverse result))))
+
+;;;###autoload
+(defun anything-do-zgrep (&optional arg)
+  "Preconfigured anything for zgrep."
+  (interactive "P")
+  (unwind-protect
+       (let* ((prefarg (or current-prefix-arg anything-current-prefix-arg))
+              (only    (if prefarg
+                           (or (gethash def-dir anything-c-rzgrep-cache)
+                               (puthash
+                                def-dir
+                                (anything-c-walk-directory
+                                 def-dir
+                                 :path 'full
+                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)")
+                                anything-c-rzgrep-cache))
+                           (anything-c-read-file-name
+                            "Search in file(s): "
+                            :marked-candidates t
+                            :preselect (or (dired-get-filename nil t)
+                                           (buffer-file-name (current-buffer)))))))
+         (when prefarg (setq anything-c-zgrep-recurse-flag t))
+         (anything-do-grep1 only prefarg 'zgrep))
+    (setq anything-c-zgrep-recurse-flag nil)))
+
+(defun anything-ff-zgrep (candidate)
+  (unwind-protect
+       (let* ((prefarg (or current-prefix-arg anything-current-prefix-arg))
+              (def-dir (or anything-ff-default-directory
+                           default-directory))
+              (only    (if prefarg
+                           (or (gethash def-dir anything-c-rzgrep-cache)
+                               (puthash
+                                def-dir
+                                (anything-c-walk-directory
+                                 def-dir
+                                 :path 'full
+                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)")
+                                anything-c-rzgrep-cache))
+                           (anything-marked-candidates))))
+         (when prefarg (setq anything-c-zgrep-recurse-flag t))
+         (anything-do-grep1 only prefarg 'zgrep))
+    (setq anything-c-zgrep-recurse-flag nil)))
 
 (defun anything-c-grep-split-line (line)
   "Split a grep output line."
