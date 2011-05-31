@@ -6927,7 +6927,7 @@ replace with STR as yanked string."
                (format "%7d: %s" (line-number-at-pos) line)))))
     (with-current-buffer anything-current-buffer
       (loop
-         with marks = mark-ring
+         with marks = (if (mark) (cons (mark-marker) mark-ring) mark-ring)
          with recip = nil
          for i in marks
          for m = (get-marks i)
