@@ -4201,8 +4201,8 @@ WHERE can be one of other-window, elscreen, other-frame."
       (other-frame  (find-file-other-frame fname))
       (t (find-file fname)))
     (anything-goto-line lineno)
-    (set-marker (mark-marker) (point))
     (when mark
+      (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))
     ;; Save history
     (unless (or anything-in-persistent-action
