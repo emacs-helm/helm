@@ -2413,9 +2413,14 @@ ACTION must be an action supported by `anything-dired-action'."
 
 (defun anything-find-files-grep (candidate)
   "Default action to grep files from `anything-find-files'."
-  (if anything-current-prefix-arg
-      (anything-do-grep1 (anything-marked-candidates) 'recurse)
-      (anything-do-grep1 (anything-marked-candidates))))
+  (anything-do-grep1 (anything-marked-candidates)
+                     anything-current-prefix-arg))
+
+(defun anything-ff-zgrep (candidate)
+  "Default action to zgrep files from `anything-find-files'."
+  (let ((prefarg anything-current-prefix-arg)
+        (ls      (anything-marked-candidates)))
+    (anything-ff-zgrep-1 ls prefarg)))
 
 (defun anything-ff-pdfgrep (candidate)
   "Default action to pdfgrep files from `anything-find-files'."
@@ -4394,13 +4399,11 @@ MATCH match only filenames matching regexp MATCH."
        (ls-R ,directory)
        (nreverse result))))
 
-;;;###autoload
-(defun anything-do-zgrep (&optional arg)
-  "Preconfigured anything for zgrep."
-  (interactive "P")
+(defun anything-ff-zgrep-1 (flist recursive)
   (unwind-protect
-       (let* ((prefarg (or current-prefix-arg anything-current-prefix-arg))
-              (only    (if prefarg
+       (let* ((def-dir (or anything-ff-default-directory
+                           default-directory))
+              (only    (if recursive
                            (or (gethash def-dir anything-c-rzgrep-cache)
                                (puthash
                                 def-dir
@@ -4410,34 +4413,21 @@ MATCH match only filenames matching regexp MATCH."
                                  :path 'full
                                  :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$")
                                 anything-c-rzgrep-cache))
-                           (anything-c-read-file-name
-                            "Search in file(s): "
-                            :marked-candidates t
-                            :preselect (or (dired-get-filename nil t)
-                                           (buffer-file-name (current-buffer)))))))
+                           flist)))
          (when prefarg (setq anything-c-zgrep-recurse-flag t))
          (anything-do-grep1 only prefarg 'zgrep))
     (setq anything-c-zgrep-recurse-flag nil)))
 
-(defun anything-ff-zgrep (candidate)
-  (unwind-protect
-       (let* ((prefarg (or current-prefix-arg anything-current-prefix-arg))
-              (def-dir (or anything-ff-default-directory
-                           default-directory))
-              (only    (if prefarg
-                           (or (gethash def-dir anything-c-rzgrep-cache)
-                               (puthash
-                                def-dir
-                                (anything-c-walk-directory
-                                 def-dir
-                                 :directories nil
-                                 :path 'full
-                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$")
-                                anything-c-rzgrep-cache))
-                           (anything-marked-candidates))))
-         (when prefarg (setq anything-c-zgrep-recurse-flag t))
-         (anything-do-grep1 only prefarg 'zgrep))
-    (setq anything-c-zgrep-recurse-flag nil)))
+;;;###autoload
+(defun anything-do-zgrep (candidate)
+  "Preconfigured anything for zgrep."
+  (let ((prefarg (or current-prefix-arg anything-current-prefix-arg))
+        (ls (anything-c-read-file-name
+             "Search in file(s): "
+             :marked-candidates t
+             :preselect (or (dired-get-filename nil t)
+                            (buffer-file-name (current-buffer))))))
+    (anything-ff-zgrep-1 ls prefarg)))
 
 (defun anything-c-grep-split-line (line)
   "Split a grep output line."
