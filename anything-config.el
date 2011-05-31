@@ -4367,32 +4367,32 @@ See also `anything-do-grep1'."
         (prefarg (or current-prefix-arg anything-current-prefix-arg)))
     (anything-do-grep1 only prefarg)))
 
-(defun* anything-c-walk-directory (directory &key (path 'basename) (directories t) match)
+(defmacro* anything-c-walk-directory (directory &key (path 'basename) (directories t) match)
   "Walk through DIRECTORY tree.
 PATH can be one of basename, relative, or full.
 DIRECTORIES when non--nil (default) return also directories names, otherwise
 skip directories names.
 MATCH match only filenames matching regexp MATCH."
-  (let (result
-        (fn (case path
-              (basename 'file-name-nondirectory)
-              (relative 'file-relative-name)
-              (full     'identity)
-              (t (error "Error: Invalid path spec `%s', must be one of basename, relative or full." path)))))
-    (labels ((ls-R (dir)
-               (loop with ls = (directory-files dir t directory-files-no-dot-files-regexp)
-                  for f in ls
-                  if (file-directory-p f)
-                  do (progn (when directories
-                              (push (funcall fn f) result))
-                            ;; Don't recurse in directory symlink.
-                            (unless (file-symlink-p f)
-                              (ls-R f)))
-                  else do 
-                    (unless (and match (not (string-match match (file-name-nondirectory f))))
-                      (push (funcall fn f) result)))))
-      (ls-R directory)
-      (nreverse result))))
+  `(let (result
+         (fn (case ,path
+               (basename 'file-name-nondirectory)
+               (relative 'file-relative-name)
+               (full     'identity)
+               (t (error "Error: Invalid path spec `%s', must be one of basename, relative or full." ,path)))))
+     (labels ((ls-R (dir)
+                (loop with ls = (directory-files dir t directory-files-no-dot-files-regexp)
+                   for f in ls
+                   if (file-directory-p f)
+                   do (progn (when ,directories
+                               (push (funcall fn f) result))
+                             ;; Don't recurse in directory symlink.
+                             (unless (file-symlink-p f)
+                               (ls-R f)))
+                   else do 
+                   (unless (and ,match (not (string-match ,match (file-name-nondirectory f))))
+                     (push (funcall fn f) result)))))
+       (ls-R ,directory)
+       (nreverse result))))
 
 ;;;###autoload
 (defun anything-do-zgrep (&optional arg)
@@ -4406,8 +4406,9 @@ MATCH match only filenames matching regexp MATCH."
                                 def-dir
                                 (anything-c-walk-directory
                                  def-dir
+                                 :directories nil
                                  :path 'full
-                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)")
+                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$")
                                 anything-c-rzgrep-cache))
                            (anything-c-read-file-name
                             "Search in file(s): "
@@ -4429,8 +4430,9 @@ MATCH match only filenames matching regexp MATCH."
                                 def-dir
                                 (anything-c-walk-directory
                                  def-dir
+                                 :directories nil
                                  :path 'full
-                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)")
+                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$")
                                 anything-c-rzgrep-cache))
                            (anything-marked-candidates))))
          (when prefarg (setq anything-c-zgrep-recurse-flag t))
