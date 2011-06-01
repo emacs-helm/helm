@@ -2441,13 +2441,19 @@ ACTION must be an action supported by `anything-dired-action'."
 
 ;;; Asynchronous copy of files.
 ;;
+(defcustom anything-c-copy-async-prefered-emacs "emacs"
+  "Path to the emacs you want to use for copying async.
+Emacs versions < 24 fail to copy directory due to a bug not fixed
+in `copy-directory'."
+  :group 'anything-config
+  :type 'string)
 (defvar anything-c-copy-files-async-log-file "/tmp/dired.log")
 (defun anything-c-copy-files-async-1 (flist dest)
   "Copy a list of Files FLIST to DEST asynchronously.
 It use another emacs process to do the job.
 Communication with background emacs is done with temp file
 `anything-c-copy-files-async-log-file'."
-  (start-file-process "emacs-batch" nil "emacs"
+  (start-file-process "emacs-batch" nil anything-c-copy-async-prefered-emacs
                       "-Q" "--batch" "--eval"
                       (format "(progn
   (require 'dired) (require 'cl)
