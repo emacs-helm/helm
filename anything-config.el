@@ -2481,7 +2481,7 @@ Communication with background emacs is done with temp file
                      (file-name-directory \"%s\")))
                  failures))))
     (with-current-buffer (find-file-noselect \"%s\")
-       (goto-char (point-max))
+       (erase-buffer)
        (when failures
          (dolist (fail (reverse failures))
            (insert (concat \"Failed to copy \" fail \"\n\"))))
@@ -2499,8 +2499,9 @@ Communication with background emacs is done with temp file
 Log is send to `anything-c-copy-files-async-log-file'."
   (pop-to-buffer (find-file-noselect anything-c-copy-files-async-log-file))
   (set (make-local-variable 'auto-revert-interval) 1)
-  (erase-buffer) (insert "Wait copying files...\n") (sit-for 0.5)
-  (erase-buffer) (insert "Sending output...\n") (save-buffer)
+  (erase-buffer)
+  (insert "Wait copying files...\n")
+  (sit-for 0.5) (save-buffer)
   (goto-char (point-max))
   (auto-revert-mode 1)
   (anything-c-copy-files-async-1 flist dest))
