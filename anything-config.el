@@ -2076,9 +2076,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (anything-execute-persistent-action 'diff-action))
 
 (defun anything-buffer-revert-and-update (candidate)
-  (anything-revert-marked-buffers candidate)
-  (anything-force-update)
-  (anything-c-recenter-window))
+  (let ((marked (anything-marked-candidates)))
+    (loop for buf in marked do (anything-revert-buffer buf))
+    (anything-force-update)
+    (anything-c-recenter-window)))
 
 ;;;###autoload
 (defun anything-buffer-revert-persistent ()
@@ -2087,10 +2088,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (anything-execute-persistent-action 'revert-action))
 
 (defun anything-buffer-save-and-update (candidate)
-  (with-current-buffer (get-buffer candidate)
-    (save-buffer))
-  (anything-force-update)
-  (anything-c-recenter-window))
+  (let ((marked (anything-marked-candidates)))
+    (loop for buf in marked do
+         (with-current-buffer (get-buffer buf)
+           (save-buffer)))
+    (anything-force-update)
+    (anything-c-recenter-window)))
 
 ;;;###autoload
 (defun anything-buffer-save-persistent ()
