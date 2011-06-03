@@ -2309,7 +2309,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
            ("Open file externally `C-c C-x, C-u to choose'"
             . anything-c-open-file-externally)
            ("Grep File(s) `M-g s, C-u Recurse'" . anything-find-files-grep)
-           ("Zgrep File(s) `C-u Recurse'" . anything-ff-zgrep)
+           ("Zgrep File(s) `M-g z, C-u Recurse'" . anything-ff-zgrep)
            ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
            ("Eshell command on file(s) `M-!'"
             . anything-find-files-eshell-command-on-file)
@@ -2496,7 +2496,8 @@ Communication with background emacs is done with temp file
 
 (defun anything-c-copy-async-with-log (flist dest)
   "Copy file list FLIST to DEST showing log.
-Log is send to `anything-c-copy-files-async-log-file'."
+Log is send to `anything-c-copy-files-async-log-file'.
+Copying is done asynchronously with `anything-c-copy-files-async-1'."
   (pop-to-buffer (find-file-noselect anything-c-copy-files-async-log-file))
   (set (make-local-variable 'auto-revert-interval) 1)
   (erase-buffer)
@@ -2507,7 +2508,8 @@ Log is send to `anything-c-copy-files-async-log-file'."
   (anything-c-copy-files-async-1 flist dest))
 
 (defun anything-ff-copy-async (candidate)
-  "Anything find files action to copy files async."
+  "Anything find files action to copy files async.
+Copying is done asynchronously with `anything-c-copy-files-async-1'."
   (let ((flist (anything-marked-candidates))
         (dest  (anything-c-read-file-name
                 "Copy File(s) async To: "
@@ -5453,9 +5455,9 @@ source.")
         (if (> (length wfiles) 1)
             (woman-find-file (anything-comp-read "ManFile: " wfiles
                                                  :must-match t))
+            (woman candidate))
             ;; If woman is unable to format correctly
             ;; use man instead.
-            (woman candidate))
       (error (kill-buffer) ; Kill woman buffer.
              (man candidate)))))
 
@@ -5676,8 +5678,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
     (candidates . anything-c-advice-candidates)
     (action ("Toggle Enable/Disable" . anything-c-advice-toggle))
     ;;    (real-to-display . anything-c-advice-real-to-display)
-
-
     (persistent-action . anything-c-advice-persistent-action)
     (persistent-help . "Describe function / C-u C-z: Toggle advice")))
 ;; (anything 'anything-c-source-advice)
