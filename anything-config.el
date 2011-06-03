@@ -1930,22 +1930,38 @@ buffer that is not the current buffer."
   "*Face used for buffer files modified outside of emacs."
   :group 'anything-config)
 
+(defface anything-buffer-not-saved
+    '((t (:foreground "Indianred2")))
+  "*Face used for buffer files not already saved on disk."
+  :group 'anything-config)
+
 (eval-when-compile (require 'dired))
 (defun anything-c-highlight-buffers (buffers)
   (loop for i in buffers
-     for buf = (get-buffer i) collect
-     (cond ((rassoc buf dired-buffers)
+     for buf = (get-buffer i)
+     for bfname = (buffer-file-name buf)
+     collect
+     (cond (;; A dired buffer.
+            (rassoc buf dired-buffers)
             (propertize i 'face 'anything-ff-directory
                         'help-echo (car (rassoc buf dired-buffers))))
-           ((and (buffer-file-name buf) (not (verify-visited-file-modtime buf)))
+           ;; A buffer file modified somewhere outside of emacs.
+           ((and bfname (file-exists-p bfname) (not (verify-visited-file-modtime buf)))
             (propertize i 'face 'anything-buffer-saved-out
-                        'help-echo (buffer-file-name buf)))
-           ((and (buffer-file-name buf) (buffer-modified-p buf))
+                        'help-echo bfname))
+           ;; A new buffer file not already saved on disk.
+           ((and bfname (not (verify-visited-file-modtime buf)))
+            (propertize i 'face 'anything-buffer-not-saved
+                        'help-echo bfname))
+           ;; A buffer file modified and not saved on disk.
+           ((and bfname (buffer-modified-p buf))
             (propertize i 'face 'anything-ff-symlink
-                        'help-echo (buffer-file-name buf)))
-           ((buffer-file-name buf)
+                        'help-echo bfname))
+           ;; A buffer file not modified and saved on disk.
+           (bfname
             (propertize i 'face 'font-lock-type-face
-                        'help-echo (buffer-file-name buf)))
+                        'help-echo bfname))
+           ;; Any non--file buffer.
            (t (propertize i 'face 'italic)))))
 
 (defvar anything-buffer-mode-line-string
