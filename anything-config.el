@@ -4445,8 +4445,8 @@ MATCH match only filenames matching regexp MATCH."
                                  :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$")
                                 anything-c-rzgrep-cache))
                            flist)))
-         (when prefarg (setq anything-c-zgrep-recurse-flag t))
-         (anything-do-grep1 only prefarg 'zgrep))
+         (when recursive (setq anything-c-zgrep-recurse-flag t))
+         (anything-do-grep1 only recursive 'zgrep))
     (setq anything-c-zgrep-recurse-flag nil)))
 
 ;;;###autoload
