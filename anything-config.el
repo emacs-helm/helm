@@ -1946,11 +1946,14 @@ buffer that is not the current buffer."
             (propertize i 'face 'anything-ff-directory
                         'help-echo (car (rassoc buf dired-buffers))))
            ;; A buffer file modified somewhere outside of emacs.
-           ((and bfname (file-exists-p bfname) (not (verify-visited-file-modtime buf)))
+           ((and bfname (not (file-remote-p bfname))
+                 (file-exists-p bfname)
+                 (not (verify-visited-file-modtime buf)))
             (propertize i 'face 'anything-buffer-saved-out
                         'help-echo bfname))
            ;; A new buffer file not already saved on disk.
-           ((and bfname (not (verify-visited-file-modtime buf)))
+           ((and bfname (not (file-remote-p bfname))
+                 (not (verify-visited-file-modtime buf)))
             (propertize i 'face 'anything-buffer-not-saved
                         'help-echo bfname))
            ;; A buffer file modified and not saved on disk.
