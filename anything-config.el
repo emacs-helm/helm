@@ -2066,6 +2066,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 \nSpecific commands for `anything-buffer+':
 \\<anything-c-buffer-map>
 \\[anything-buffer-run-grep]\t\t->Grep Buffer(s) (C-u grep all buffers linked to a file).
+\\[anything-buffer-run-zgrep]\t\t->Zgrep Buffer(s) (C-u grep all buffers linked to a file).
 \\[anything-buffer-switch-other-window]\t\t->Switch other window.
 \\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
@@ -2085,6 +2086,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "C-c ?")     'anything-c-buffer-help)
     (define-key map (kbd "M-g s")     'anything-buffer-run-grep)
+    (define-key map (kbd "M-g z")     'anything-buffer-run-zgrep)
     (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
     (define-key map (kbd "C-=")       'anything-buffer-diff-persistent)
@@ -2147,6 +2149,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Run Grep action from `anything-c-source-buffer+'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-buffers))
+
+;;;###autoload
+(defun anything-buffer-run-zgrep ()
+  "Run Grep action from `anything-c-source-buffer+'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-c-zgrep-buffers))
 
 ;;;###autoload
 (defun anything-buffer-run-query-replace-regexp ()
@@ -4618,7 +4626,7 @@ If N is positive go forward otherwise go backward."
   (anything-c-quit-and-execute-action 'anything-c-grep-save-results))
 
 ;; Grep buffers
-(defun anything-c-grep-buffers (candidate)
+(defun anything-c-grep-buffers-1 (candidate &optional zgrep)
   "Run grep on all file--buffers or CANDIDATE if it is a file--buffer.
 If one of selected buffers is not a file--buffer,
 it is ignored and grep will run on all others file--buffers.
@@ -4634,13 +4642,23 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                   when fname
                   collect (expand-file-name fname))))
     (if bufs
-        (anything-do-grep1 bufs)
+        (if zgrep
+            (anything-do-grep1 bufs nil 'zgrep)
+            (anything-do-grep1 bufs))
         ;; bufs is empty, thats mean we have only CANDIDATE
         ;; and it is not a buffer-filename, fallback to occur.
         (switch-to-buffer candidate)
         (when (get-buffer anything-action-buffer)
           (kill-buffer anything-action-buffer))
         (anything-occur))))
+
+(defun anything-c-grep-buffers (candidate)
+  "Action to grep buffers."
+  (anything-c-grep-buffers-1 candidate))
+
+(defun anything-c-zgrep-buffers (candidate)
+  "Action to zgrep buffers."
+  (anything-c-grep-buffers-1 candidate 'zgrep))
 
 ;;; Anything interface for pdfgrep
 ;;  pdfgrep program <http://pdfgrep.sourceforge.net/>
