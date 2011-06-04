@@ -4182,6 +4182,7 @@ See `anything-c-grep-default-command' for format specs.")
   (let ((args (replace-regexp-in-string
                "grep" "" anything-c-grep-default-command)))
     (string-match-p "r\\|recurse" args)))
+
 (defun anything-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((fnargs        (anything-c-grep-prepare-candidates
@@ -4202,16 +4203,12 @@ See `anything-c-grep-default-command' for format specs.")
          (exclude       (if (anything-c-grep-recurse-p)
                             (concat (or include ignored-files) " " ignored-dirs)
                             ignored-files))
-         (cmd-line      (if zgrep
-                            (format-spec
-                             anything-c-default-zgrep-command
-                             (list (cons ?p (shell-quote-argument anything-pattern))
-                                   (cons ?f fnargs)))
-                            (format-spec
-                             anything-c-grep-default-command
-                             (list (cons ?e exclude)
-                                   (cons ?p (shell-quote-argument anything-pattern))
-                                   (cons ?f fnargs))))))
+         (cmd-line      (format-spec
+                         anything-c-grep-default-command
+                         (delq nil
+                               (list (unless zgrep (cons ?e exclude))
+                                     (cons ?p (shell-quote-argument anything-pattern))
+                                     (cons ?f fnargs))))))
     (when anything-c-grep-debug-command-line
       (with-current-buffer (get-buffer-create "*any grep debug*")
         (goto-char (point-max))
