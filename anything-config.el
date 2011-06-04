@@ -1936,6 +1936,7 @@ buffer that is not the current buffer."
   :group 'anything-config)
 
 (eval-when-compile (require 'dired))
+
 (defun anything-c-highlight-buffers (buffers)
   (loop for i in buffers
      for buf = (get-buffer i)
@@ -1956,10 +1957,24 @@ buffer that is not the current buffer."
                  (not (verify-visited-file-modtime buf)))
             (propertize i 'face 'anything-buffer-not-saved
                         'help-echo bfname))
+           ;; A Remote buffer file modified and not saved on disk.
+           ((and bfname (file-remote-p bfname) (buffer-modified-p buf))
+            (let ((prefix (propertize
+                           " " 'display
+                           (propertize "@ " 'face 'anything-ff-prefix))))
+              (cons (concat prefix (propertize i 'face 'anything-ff-symlink
+                                             'help-echo bfname)) i)))
            ;; A buffer file modified and not saved on disk.
            ((and bfname (buffer-modified-p buf))
             (propertize i 'face 'anything-ff-symlink
                         'help-echo bfname))
+           ;; A remote buffer file not modified and saved on disk.
+           ((and bfname (file-remote-p bfname))
+            (let ((prefix (propertize
+                           " " 'display
+                           (propertize "@ " 'face 'anything-ff-prefix))))
+              (cons (concat prefix (propertize i 'face 'font-lock-type-face
+                                               'help-echo bfname)) i)))
            ;; A buffer file not modified and saved on disk.
            (bfname
             (propertize i 'face 'font-lock-type-face
@@ -2005,16 +2020,17 @@ it will match all buffers of the major-mode
 before space matching pattern after space.
 If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
-  (let ((buf (get-buffer candidate)))
+  (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
+         (buf  (get-buffer cand)))
     (when buf
       (with-current-buffer buf
         (let ((mjm   (symbol-name major-mode))
               (split (split-string anything-pattern)))
           (if (string-match " " anything-pattern)
               (and (string-match (car split) mjm)
-                   (string-match (cadr split) candidate))
+                   (string-match (cadr split) cand))
               (or (string-match anything-pattern mjm)
-                  (string-match anything-pattern candidate))))))))
+                  (string-match anything-pattern cand))))))))
 
 (defun anything-c-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace in marked buffers.
