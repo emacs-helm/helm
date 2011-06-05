@@ -9938,7 +9938,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
               (anything-find-files1 candidate))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
-            (find-file-at-point (car marked))))))
+            (find-file (car marked))))))
 
 (defun anything-delete-marked-files (ignore)
   (let* ((files (anything-marked-candidates))
