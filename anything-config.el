@@ -3914,6 +3914,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
                                    (buffer "*Anything Completions*")
                                    test
                                    (preselect nil)
+                                   must-match
                                    (history nil)
                                    (marked-candidates nil)
                                    (persistent-action 'anything-find-files-persistent-action)
@@ -3948,7 +3949,10 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                               (if test
                                   (loop with seq = (anything-find-files-get-candidates)
                                      for fname in seq when (funcall test fname)
-                                     collect fname)
+                                     collect fname into ls
+                                     finally return (if must-match
+                                                        ls
+                                                        (append (list anything-pattern) ls)))
                                   (anything-find-files-get-candidates))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
