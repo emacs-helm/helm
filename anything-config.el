@@ -3768,7 +3768,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                (setq anything-ff-cand-to-mark moved-flist)
                (if (and dirflag (eq action 'rename))
                    (anything-find-files1 (file-name-directory target) target)
-                   (anything-find-files1 candidate)))
+                   (anything-find-files1 (expand-file-name candidate))))
           (setq anything-ff-cand-to-mark nil))))))
 
 ;; Internal
