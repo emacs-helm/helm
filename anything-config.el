@@ -2590,11 +2590,13 @@ will not be loaded first time you use this."
                               "Command: "
                               (loop for (a . c) in eshell-command-aliases-list
                                  when (string-match "\\$1$" (car c))
-                                 collect a into ls
-                                 finally return (sort ls 'string<)))))
+                                 collect (propertize a 'help-echo (car c)))
+                              :sort 'string<)))
       (loop
          for i in cand-list
          for com = (if (string-match "%s" command)
+                       ;; This allow to enter other args AFTER filename
+                       ;; i.e <command %s some_more_args>
                        (format command (shell-quote-argument i))
                        (format "%s %s" command (shell-quote-argument i)))
          do (eshell-command com)))))
