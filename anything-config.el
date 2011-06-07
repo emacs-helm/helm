@@ -2585,7 +2585,10 @@ will not be loaded first time you use this."
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
     (let ((cand-list         (anything-marked-candidates))
-          (default-directory anything-ff-default-directory)
+          (default-directory (or anything-ff-default-directory
+                                 ;; If candidate is an url *-ff-default-directory is nil
+                                 ;; so keep value of default-directory.
+                                 default-directory))
           (command           (anything-comp-read
                               "Command: "
                               (loop for (a . c) in eshell-command-aliases-list
@@ -2597,8 +2600,8 @@ will not be loaded first time you use this."
          for com = (if (string-match "%s" command)
                        ;; This allow to enter other args AFTER filename
                        ;; i.e <command %s some_more_args>
-                       (format command (shell-quote-argument i))
-                       (format "%s %s" command (shell-quote-argument i)))
+                       (format command i) ; Don't forget to quote if needed i.e '%s'
+                       (format "%s '%s'" command i))
          do (eshell-command com)))))
 
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
