@@ -3905,11 +3905,13 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
 
 (defvar anything-c-read-file-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "C-.") 'anything-find-files-down-one-level)
-    (define-key map (kbd "C-l") 'anything-find-files-down-one-level)
+    (define-key map (kbd "C-.")         'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l")         'anything-find-files-down-one-level)
     (when anything-ff-lynx-style-map
-      (define-key map (kbd "<left>") 'anything-find-files-down-one-level)
-      (define-key map (kbd "<right>") 'anything-execute-persistent-action))
+      (define-key map (kbd "<left>")    'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>")   'anything-execute-persistent-action)
+      (define-key map (kbd "<M-left>")  'anything-previous-source)
+      (define-key map (kbd "<M-right>") 'anything-next-source))
     (delq nil map))
   "Keymap for `anything-c-read-file-name'.")
 
