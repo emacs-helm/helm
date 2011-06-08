@@ -2597,7 +2597,7 @@ will not be loaded first time you use this."
                               :sort 'string<)))
       (loop
          for i in cand-list
-         for com = (if (string-match "%s" command)
+         for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                        ;; This allow to enter other args AFTER filename
                        ;; i.e <command %s some_more_args>
                        (format command i) ; Don't forget to quote if needed i.e '%s'
