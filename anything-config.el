@@ -2354,7 +2354,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
            ("Grep File(s) `M-g s, C-u Recurse'" . anything-find-files-grep)
            ("Zgrep File(s) `M-g z, C-u Recurse'" . anything-ff-zgrep)
            ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
-           ("Eshell command on file(s) `M-!'"
+           ("Eshell command on file(s) `M-!, C-u run on all marked at once.'"
             . anything-find-files-eshell-command-on-file)
            ("Find file as root" . anything-find-file-as-root)
            ("Find file in hex dump" . hexl-find-file)
@@ -2576,11 +2576,15 @@ Copying is done asynchronously with `anything-c-copy-files-async-1'."
 
 (defvar eshell-command-aliases-list nil)
 (declare-function eshell-read-aliases-list "em-alias")
-(defun anything-find-files-eshell-command-on-file (candidate)
-  "Run `eshell-command' on file CANDIDATE possibly with an eshell alias.
-NOTE:
-If `eshell' or `eshell-command' have not been run once, `eshell-command-aliases-list'
-will not be loaded first time you use this."
+(defun anything-find-files-eshell-command-on-file-1 (candidate &optional map)
+  "Run `eshell-command' on CANDIDATE or marked candidates possibly with an eshell alias.
+
+Basename of CANDIDATE can be a wild-card.
+If MAP is given run `eshell-command' on all marked files at once,
+Otherwise, run `eshell-command' on each marked files.
+
+If `eshell' or `eshell-command' have not been run once, or if you have no eshell aliases
+`eshell-command-aliases-list' will not be loaded first time you use this."
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
@@ -2595,14 +2599,32 @@ will not be loaded first time you use this."
                                  when (string-match "\\$1$" (car c))
                                  collect (propertize a 'help-echo (car c)))
                               :sort 'string<)))
-      (loop
-         for i in cand-list
-         for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
-                       ;; This allow to enter other args AFTER filename
-                       ;; i.e <command %s some_more_args>
-                       (format command i) ; Don't forget to quote if needed i.e '%s'
-                       (format "%s '%s'" command i))
-         do (eshell-command com)))))
+      (if (and map (> (length cand-list) 1))
+          ;; Run eshell-command with ALL marked files as arguments.
+          (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
+            (eshell-command (format "%s %s" command mapfiles)))
+          ;; Run eshell-command on EACH marked files.
+          (loop
+             for i in cand-list
+             for files = (if (string-match "\*" i)
+                             ;; Assume if fname is a wildcard
+                             ;; cand-list have a length of 1.
+                             (mapconcat
+                              'shell-quote-argument
+                              (file-expand-wildcards i t) " ")
+                             (format "'%s'" i))
+             for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
+                           ;; This allow to enter other args AFTER filename
+                           ;; i.e <command %s some_more_args>
+                           (format command files)
+                           (format "%s %s" command files))
+             do (eshell-command com))))))
+
+(defun anything-find-files-eshell-command-on-file (candidate)
+  "Run `eshell-command' on CANDIDATE or marked candidates.
+See `anything-find-files-eshell-command-on-file-1' for more info."
+  (anything-find-files-eshell-command-on-file-1
+   candidate anything-current-prefix-arg))
 
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (defun anything-ff-switch-to-eshell (candidate)
@@ -2717,7 +2739,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-ff-run-symlink-file]\t\t->Symlink File.
 \\[anything-ff-run-delete-file]\t\t->Delete File.
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
-\\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file.
+\\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
 \\[anything-ff-run-ediff-file]\t\t->Ediff file.
 \\[anything-ff-run-ediff-merge-file]\t\t->Ediff merge file.
 \\[anything-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
