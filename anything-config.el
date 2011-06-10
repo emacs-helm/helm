@@ -2597,8 +2597,8 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
                               "Command: "
                               (loop for (a . c) in eshell-command-aliases-list
                                  when (string-match "\\$1$" (car c))
-                                 collect (propertize a 'help-echo (car c)))
-                              :sort 'string<)))
+                                 collect (propertize a 'help-echo (car c)) into ls
+                                 finally return (sort ls 'string<)))))
       (if (and map (> (length cand-list) 1))
           ;; Run eshell-command with ALL marked files as arguments.
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
