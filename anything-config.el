@@ -2606,7 +2606,7 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
           ;; Run eshell-command on EACH marked files.
           (loop
              for i in cand-list
-             for files = (if (string-match "\*" i)
+             for files = (if (string-match "^\*" (anything-c-basename i))
                              ;; Assume if fname is a wildcard
                              ;; cand-list have a length of 1.
                              (mapconcat
@@ -4204,7 +4204,8 @@ See `anything-c-grep-default-command' for format specs.")
                   (list (directory-file-name ; Needed for windoze.
                          (file-name-directory (directory-file-name i)))))
                  ;; Candidate use wildcard.
-                 ((string-match "\*" i) (file-expand-wildcards i t))
+                 ((string-match "^\*" (anything-c-basename i))
+                  (file-expand-wildcards i t))
                  ;; Else should be one or more file.
                  (t (list i))) into all-files
            finally return
