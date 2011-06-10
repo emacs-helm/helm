@@ -2600,7 +2600,7 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
                                   collect (propertize a 'help-echo (car c)) into ls
                                   finally return (sort ls 'string<))))
            (com-value         (car (assoc-default command eshell-command-aliases-list))))
-      (if (and (or map (string-match "\\$\\*$" com-value))
+      (if (and (or map (and com-value (string-match "\\$\\*$" com-value)))
                (> (length cand-list) 1))
           ;; Run eshell-command with ALL marked files as arguments.
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
@@ -2608,7 +2608,8 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
           ;; Run eshell-command on EACH marked files.
           (loop
              for i in cand-list
-             for files = (if (string-match "^\*" (anything-c-basename i))
+             for bn = (anything-c-basename i)
+             for files = (if (and bn (string-match "^\*" bn))
                              ;; Assume if fname is a wildcard
                              ;; cand-list have a length of 1.
                              (mapconcat
