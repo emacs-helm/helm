@@ -7526,19 +7526,18 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
               (anything-region-active-p))
          (let ((beg (region-beginning))
                (end (region-end)))
+           (goto-char end)
+           (insert "\n#+" (replace-regexp-in-string
+                           "BEGIN" "END" keyword) "\n")
            (goto-char beg)
            (insert "#+" keyword " ")
-           (save-excursion
-             (insert "\n")
-             (goto-char end)
-             (forward-line 1)
-             (insert "\n#+" (replace-regexp-in-string "BEGIN" "END" keyword) "\n"))))
+           (save-excursion (insert "\n"))))
         ((string-match "BEGIN" keyword)
          (insert "#+" keyword " ")
          (save-excursion
-           (insert "\n#+" (replace-regexp-in-string "BEGIN" "END" keyword) "\n")))
-        (t
-         (insert "#+" keyword " "))))
+           (insert "\n#+" (replace-regexp-in-string
+                           "BEGIN" "END" keyword) "\n")))
+        (t (insert "#+" keyword " "))))
 
 (defun anything-c-org-keywords-show-help (keyword)
   (info (or (assoc-default (concat "#+" keyword) anything-c-org-keywords-info-location)
