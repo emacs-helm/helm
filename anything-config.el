@@ -2588,18 +2588,20 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
-    (let ((cand-list         (anything-marked-candidates))
-          (default-directory (or anything-ff-default-directory
-                                 ;; If candidate is an url *-ff-default-directory is nil
-                                 ;; so keep value of default-directory.
-                                 default-directory))
-          (command           (anything-comp-read
-                              "Command: "
-                              (loop for (a . c) in eshell-command-aliases-list
-                                 when (string-match "\\$1$" (car c))
-                                 collect (propertize a 'help-echo (car c)) into ls
-                                 finally return (sort ls 'string<)))))
-      (if (and map (> (length cand-list) 1))
+    (let* ((cand-list         (anything-marked-candidates))
+           (default-directory (or anything-ff-default-directory
+                                  ;; If candidate is an url *-ff-default-directory is nil
+                                  ;; so keep value of default-directory.
+                                  default-directory))
+           (command           (anything-comp-read
+                               "Command: "
+                               (loop for (a . c) in eshell-command-aliases-list
+                                  when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
+                                  collect (propertize a 'help-echo (car c)) into ls
+                                  finally return (sort ls 'string<))))
+           (com-value         (car (assoc-default command eshell-command-aliases-list))))
+      (if (and (or map (string-match "\\$\\*$" com-value))
+               (> (length cand-list) 1))
           ;; Run eshell-command with ALL marked files as arguments.
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (eshell-command (format "%s %s" command mapfiles)))
