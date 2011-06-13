@@ -2321,12 +2321,23 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
   "String displayed in mode-line in `anything-c-source-find-files'")
 
+(defcustom anything-ff-auto-update-initial-value t
+  "Auto update when only one candidate directory is matched.
+This is the default value when starting `anything-find-files'."
+  :group 'anything-config
+  :type  'boolean)
+
+(defvar anything-ff-auto-update-flag anything-ff-auto-update-initial-value
+  "Internal, flag to turn on/off auto-update in `anything-find-files'.
+Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
+
 (defvar anything-c-source-find-files
   `((name . ,(concat "Find Files" anything-c-find-files-doc-header))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (setq ffap-newfile-prompt t)))
+              (setq ffap-newfile-prompt t)
+              (setq anything-ff-auto-update-flag anything-ff-auto-update-initial-value)))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (image-action1 . anything-ff-rotate-image-left)
@@ -2818,7 +2829,7 @@ ACTION must be one of the actions of current source."
   (anything-exit-minibuffer))
 
 (defun anything-ff-toggle-auto-update (candidate)
-  (setq anything-ff-auto-update (not anything-ff-auto-update)))
+  (setq anything-ff-auto-update-flag (not anything-ff-auto-update-flag)))
 
 ;;;###autoload
 (defun anything-ff-run-toggle-auto-update ()
@@ -3042,14 +3053,11 @@ or hitting C-z on \"..\"."
       (setq anything-ff-last-expanded nil))))
 (add-hook 'anything-after-update-hook 'anything-ff-retrieve-last-expanded)
 
-(defcustom anything-ff-auto-update t
-  "Auto update when only one candidate directory is matched."
-  :group 'anything-config
-  :type  'boolean)
-
+;; anything-find-files auto expansion of directories.
+;; Internal
 (defun anything-ff-update-when-only-one-matched ()
   (when (and (anything-file-completion-source-p)
-             anything-ff-auto-update)
+             anything-ff-auto-update-flag)
     (with-anything-window
       (when (<= (anything-approximate-candidate-number) 2)
         (anything-next-line)
