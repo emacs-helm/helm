@@ -3031,6 +3031,24 @@ or hitting C-z on \"..\"."
       (setq anything-ff-last-expanded nil))))
 (add-hook 'anything-after-update-hook 'anything-ff-retrieve-last-expanded)
 
+(defcustom anything-ff-auto-update t
+  "Auto update when only one candidate directory is matched."
+  :group 'anything-config
+  :type  'boolean)
+
+(defun anything-ff-update-when-only-one-matched ()
+  (when (and (anything-file-completion-source-p)
+             anything-ff-auto-update)
+    (with-anything-window
+      (when (<= (anything-approximate-candidate-number) 2)
+        (anything-next-line)
+        (let ((cur-cand (anything-get-selection)))
+          (when (and (file-directory-p cur-cand)
+                     (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)))
+            (anything-set-pattern (file-name-as-directory cur-cand)))
+            (anything-check-minibuffer-input))))))
+(add-hook 'anything-after-update-hook 'anything-ff-update-when-only-one-matched)
+
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
   (dired (file-name-directory file))
