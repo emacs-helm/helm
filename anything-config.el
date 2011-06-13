@@ -2332,6 +2332,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (image-action1 . anything-ff-rotate-image-left)
     (image-action2 . anything-ff-rotate-image-right)
     (properties-action . anything-ff-properties)
+    (toggle-auto-update . anything-ff-toggle-auto-update)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . anything-ff-mode-line-string)
@@ -2755,6 +2756,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
 \\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
 \\[anything-mark-all]\t\t->Mark all visibles candidates.
+\\[anything-ff-run-toggle-auto-update]\t\t->Toggle auto expansion of directories.
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
 \\[anything-ff-run-print-file]\t\t->Print file with default printer.
@@ -2792,6 +2794,7 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")   'anything-ff-help)
+    (define-key map (kbd "M-U")     'anything-ff-run-toggle-auto-update)
     (define-key map (kbd "M-a")     'anything-mark-all)
     (define-key map (kbd "M-u")     'anything-unmark-all)
     (define-key map (kbd "C-c C-a") 'anything-ff-run-gnus-attach-files)
@@ -2813,6 +2816,14 @@ See `anything-ff-serial-rename-1'."
 ACTION must be one of the actions of current source."
   (setq anything-saved-action action)
   (anything-exit-minibuffer))
+
+(defun anything-ff-toggle-auto-update (candidate)
+  (setq anything-ff-auto-update (not anything-ff-auto-update)))
+
+;;;###autoload
+(defun anything-ff-run-toggle-auto-update ()
+  (interactive)
+  (anything-execute-persistent-action 'toggle-auto-update))
 
 ;;;###autoload
 (defun anything-ff-run-switch-to-history ()
