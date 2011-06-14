@@ -5577,13 +5577,15 @@ source.")
   (let ((wfiles (woman-file-name-all-completions candidate)))
     (condition-case err
         (if (> (length wfiles) 1)
-            (woman-find-file (anything-comp-read "ManFile: " wfiles
-                                                 :must-match t))
+            (woman-find-file
+             (anything-comp-read
+              "ManFile: " wfiles :must-match t))
             (woman candidate))
             ;; If woman is unable to format correctly
             ;; use man instead.
       (error (kill-buffer) ; Kill woman buffer.
-             (man candidate)))))
+             (let ((Man-notify-method 'meek))
+               (Man-getpage-in-background candidate))))))
 
 (defvar anything-c-source-man-pages
   `((name . "Manual Pages")
