@@ -7883,10 +7883,12 @@ Return an alist with elements like (data . number_results)."
   "*Default url to use as home url.")
 
 (defvar browse-url-chromium-program "chromium-browser")
+(defvar browse-url-uzbl-program "uzbl-browser")
 (defvar anything-browse-url-default-browser-alist
   `((,w3m-command . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
     (,browse-url-chromium-program . browse-url-chromium)
+    (,browse-url-uzbl-program . browse-url-uzbl)
     (,browse-url-kde-program . browse-url-kde)
     (,browse-url-gnome-moz-program . browse-url-gnome-moz)
     (,browse-url-mozilla-program . browse-url-mozilla)
@@ -7897,6 +7899,7 @@ Return an alist with elements like (data . number_results)."
   "*Alist of (executable . function) to try to find a suitable url browser.")
 
 (defun* anything-c-generic-browser (url name &rest args)
+  "Browse URL with NAME browser."
   (let ((proc (concat name " " url)))
     (message "Starting %s..." name)
     (apply 'start-process proc nil name
@@ -7908,9 +7911,15 @@ Return an alist with elements like (data . number_results)."
            (message "%s process %s" process event))))))
 
 (defun browse-url-chromium (url)
+  "Browse URL with google chrome browser."
   (interactive "sURL: ")
   (anything-c-generic-browser
    url browse-url-chromium-program))
+
+(defun browse-url-uzbl (url)
+  "Browse URL with uzbl browser."
+  (interactive "sURL: ")
+  (anything-c-generic-browser url browse-url-uzbl-program "-u"))
 
 (defun anything-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
