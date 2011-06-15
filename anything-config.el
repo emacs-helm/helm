@@ -8855,7 +8855,6 @@ Do nothing, just return candidate list unmodified."
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
-                                   volatile
                                    sort
                                    (fc-transformer 'anything-cr-default-transformer)
                                    (marked-candidates nil))
@@ -8910,7 +8909,7 @@ a command that use `anything-comp-read'."
             (requires-pattern . ,requires-pattern)
             (persistent-action . ,persistent-action)
             (persistent-help . ,persistent-help)
-            (and (not ,sort) ,volatile (volatile))
+            (volatile)
             (action . ,'action-fn)))
          :input initial-input
          :prompt prompt
