@@ -2767,7 +2767,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
 \\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
 \\[anything-mark-all]\t\t->Mark all visibles candidates.
-\\[anything-ff-run-toggle-auto-update]\t\t->Toggle auto expansion of directories.
+\\[anything-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
 \\[anything-ff-run-print-file]\t\t->Print file with default printer.
@@ -2785,40 +2785,40 @@ See `anything-ff-serial-rename-1'."
 
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-g s")   'anything-ff-run-grep)
-    (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
-    (define-key map (kbd "M-g z")   'anything-ff-run-zgrep)
-    (define-key map (kbd "M-R")     'anything-ff-run-rename-file)
-    (define-key map (kbd "M-C")     'anything-ff-run-copy-file)
-    (define-key map (kbd "M-B")     'anything-ff-run-byte-compile-file)
-    (define-key map (kbd "M-L")     'anything-ff-run-load-file)
-    (define-key map (kbd "M-S")     'anything-ff-run-symlink-file)
-    (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
-    (define-key map (kbd "M-e")     'anything-ff-run-switch-to-eshell)
-    (define-key map (kbd "<M-tab>") 'anything-ff-run-complete-fn-at-point)
-    (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
-    (define-key map (kbd "C-c C-o") 'anything-ff-run-switch-other-frame)
-    (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
-    (define-key map (kbd "M-!")     'anything-ff-run-eshell-command-on-file)
-    (define-key map (kbd "C-=")     'anything-ff-run-ediff-file)
-    (define-key map (kbd "C-c =")   'anything-ff-run-ediff-merge-file)
-    (define-key map (kbd "M-p")     'anything-ff-run-switch-to-history)
-    (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
-    (define-key map (kbd "C-c ?")   'anything-ff-help)
-    (define-key map (kbd "M-U")     'anything-ff-run-toggle-auto-update)
-    (define-key map (kbd "M-a")     'anything-mark-all)
-    (define-key map (kbd "M-u")     'anything-unmark-all)
-    (define-key map (kbd "C-c C-a") 'anything-ff-run-gnus-attach-files)
-    (define-key map (kbd "C-c p")   'anything-ff-run-print-file)
+    (define-key map (kbd "M-g s")         'anything-ff-run-grep)
+    (define-key map (kbd "M-g p")         'anything-ff-run-pdfgrep)
+    (define-key map (kbd "M-g z")         'anything-ff-run-zgrep)
+    (define-key map (kbd "M-R")           'anything-ff-run-rename-file)
+    (define-key map (kbd "M-C")           'anything-ff-run-copy-file)
+    (define-key map (kbd "M-B")           'anything-ff-run-byte-compile-file)
+    (define-key map (kbd "M-L")           'anything-ff-run-load-file)
+    (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
+    (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
+    (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
+    (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-o")       'anything-ff-run-switch-other-frame)
+    (define-key map (kbd "C-c C-x")       'anything-ff-run-open-file-externally)
+    (define-key map (kbd "M-!")           'anything-ff-run-eshell-command-on-file)
+    (define-key map (kbd "C-=")           'anything-ff-run-ediff-file)
+    (define-key map (kbd "C-c =")         'anything-ff-run-ediff-merge-file)
+    (define-key map (kbd "M-p")           'anything-ff-run-switch-to-history)
+    (define-key map (kbd "M-i")           'anything-ff-properties-persistent)
+    (define-key map (kbd "C-c ?")         'anything-ff-help)
+    (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
+    (define-key map (kbd "M-a")           'anything-mark-all)
+    (define-key map (kbd "M-u")           'anything-unmark-all)
+    (define-key map (kbd "C-c C-a")       'anything-ff-run-gnus-attach-files)
+    (define-key map (kbd "C-c p")         'anything-ff-run-print-file)
     ;; Next 2 have no effect if candidate is not an image file.
-    (define-key map (kbd "M-l")     'anything-ff-rotate-left-persistent)
-    (define-key map (kbd "M-r")     'anything-ff-rotate-right-persistent)
-    (define-key map (kbd "C-.")     'anything-find-files-down-one-level)
-    (define-key map (kbd "C-l")     'anything-find-files-down-one-level)
-    (define-key map (kbd "C-h C-b") 'anything-send-bug-report-from-anything)
+    (define-key map (kbd "M-l")           'anything-ff-rotate-left-persistent)
+    (define-key map (kbd "M-r")           'anything-ff-rotate-right-persistent)
+    (define-key map (kbd "C-.")           'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l")           'anything-find-files-down-one-level)
+    (define-key map (kbd "C-h C-b")       'anything-send-bug-report-from-anything)
     (when anything-ff-lynx-style-map
-      (define-key map (kbd "<left>")  'anything-find-files-down-one-level)
-      (define-key map (kbd "<right>") 'anything-execute-persistent-action))
+      (define-key map (kbd "<left>")      'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>")     'anything-execute-persistent-action))
     (delq nil map))
   "Keymap for `anything-find-files'.")
 
@@ -2829,7 +2829,9 @@ ACTION must be one of the actions of current source."
   (anything-exit-minibuffer))
 
 (defun anything-ff-toggle-auto-update (candidate)
-  (setq anything-ff-auto-update-flag (not anything-ff-auto-update-flag)))
+  (setq anything-ff-auto-update-flag (not anything-ff-auto-update-flag))
+  (message "[Auto expansion %s]"
+           (if anything-ff-auto-update-flag "enabled" "disabled")))
 
 ;;;###autoload
 (defun anything-ff-run-toggle-auto-update ()
@@ -3053,7 +3055,7 @@ or hitting C-z on \"..\"."
       (setq anything-ff-last-expanded nil))))
 (add-hook 'anything-after-update-hook 'anything-ff-retrieve-last-expanded)
 
-;; anything-find-files auto expansion of directories.
+;; Auto-update: anything-find-files auto expansion of directories.
 ;; Internal
 (defun anything-ff-update-when-only-one-matched ()
   (when (and (anything-file-completion-source-p)
