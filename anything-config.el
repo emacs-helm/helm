@@ -3065,7 +3065,7 @@ or hitting C-z on \"..\"."
           (when (and (file-directory-p cur-cand)
                      (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)))
             (anything-set-pattern (file-name-as-directory cur-cand)))
-            (anything-check-minibuffer-input))))))
+            (anything-check-minibuffer-input-1))))))
 (add-hook 'anything-after-update-hook 'anything-ff-update-when-only-one-matched)
 
 (defun anything-c-point-file-in-dired (file)
