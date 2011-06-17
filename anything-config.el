@@ -8857,6 +8857,7 @@ Do nothing, just return candidate list unmodified."
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
+                                   (volatile t)
                                    sort
                                    (fc-transformer 'anything-cr-default-transformer)
                                    (marked-candidates nil))
@@ -8891,33 +8892,33 @@ a command that use `anything-comp-read'."
            (if marked-candidates
                (anything-marked-candidates)
                (identity candidate))))
-    (or (anything
-         :sources
-         `(((name . ,(format "%s History" name))
-            (candidates . (lambda ()
-                            (anything-comp-read-get-candidates history)))
-            (volatile)
-            (persistent-action . ,persistent-action)
-            (persistent-help . ,persistent-help)
-            (action . ,'action-fn))
-           ((name . ,name)
-            (candidates
-             . (lambda ()
-                 (let ((cands (anything-comp-read-get-candidates
-                               collection test sort)))
-                   (if (or must-match (string= anything-pattern ""))
-                       cands (append (list anything-pattern) cands)))))
-            (filtered-candidate-transformer ,fc-transformer)
-            (requires-pattern . ,requires-pattern)
-            (persistent-action . ,persistent-action)
-            (persistent-help . ,persistent-help)
-            (volatile)
-            (action . ,'action-fn)))
-         :input initial-input
-         :prompt prompt
-         :resume 'noresume
-         :buffer buffer)
-        (keyboard-quit))))
+    (let ((hist `((name . ,(format "%s History" name))
+                  (candidates . (lambda ()
+                                  (anything-comp-read-get-candidates history)))
+                  (persistent-action . ,persistent-action)
+                  (persistent-help . ,persistent-help)
+                  (action . ,'action-fn)))
+          (src `((name . ,name)
+                 (candidates
+                  . (lambda ()
+                      (let ((cands (anything-comp-read-get-candidates
+                                    collection test sort)))
+                        (if (or must-match (string= anything-pattern ""))
+                            cands (append (list anything-pattern) cands)))))
+                 (filtered-candidate-transformer ,fc-transformer)
+                 (requires-pattern . ,requires-pattern)
+                 (persistent-action . ,persistent-action)
+                 (persistent-help . ,persistent-help)
+                 (action . ,'action-fn))))
+      (when volatile (setq src (append src '((volatile)))))
+      (or (anything
+           :sources `(,hist ,src)
+           :input initial-input
+           :prompt prompt
+           :resume 'noresume
+           :buffer buffer)
+          (keyboard-quit)))))
+
 
 (defun anything-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
