@@ -3514,7 +3514,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                (kill-buffer image-dired-display-image-buffer))
              (image-dired-display-image candidate)
              (message nil)
-             (display-buffer image-dired-display-image-buffer)
+             (switch-to-buffer image-dired-display-image-buffer)
              (with-current-buffer image-dired-display-image-buffer
                (let ((exif-data (anything-ff-exif-data candidate)))
                  (image-dired-update-property 'help-echo exif-data))))
