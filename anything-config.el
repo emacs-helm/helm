@@ -2344,6 +2344,7 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
     (image-action2 . anything-ff-rotate-image-right)
     (properties-action . anything-ff-properties)
     (toggle-auto-update . anything-ff-toggle-auto-update)
+    (kill-buffer-fname . anything-ff-kill-buffer-fname)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . anything-ff-mode-line-string)
@@ -2753,6 +2754,7 @@ See `anything-ff-serial-rename-1'."
 \\[anything-ff-run-load-file]\t\t->Load File.
 \\[anything-ff-run-symlink-file]\t\t->Symlink File.
 \\[anything-ff-run-delete-file]\t\t->Delete File.
+\\[anything-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
 \\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
 \\[anything-ff-run-ediff-file]\t\t->Ediff file.
@@ -2794,6 +2796,7 @@ See `anything-ff-serial-rename-1'."
     (define-key map (kbd "M-L")           'anything-ff-run-load-file)
     (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
     (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
+    (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
     (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
@@ -3184,10 +3187,26 @@ in `anything-ff-history'."
           dired-line))
         (message dired-line) (sit-for 5))))
 
+;;;###autoload
 (defun anything-ff-properties-persistent ()
   "Show properties without quitting anything."
   (interactive)
   (anything-execute-persistent-action 'properties-action))
+
+(defun anything-ff-kill-buffer-fname (candidate)
+  (if (loop with ls = (mapcar 'buffer-name (buffer-list))
+         for buf in ls
+         thereis (string-match (anything-c-basename candidate) buf))
+      (with-current-buffer (find-file-noselect candidate)
+        (let ((buf (buffer-name (current-buffer))))
+          (kill-buffer)
+          (message "Buffer `%s' killed" buf)))
+      (message "No buffer to kill")))
+
+;;;###autoload
+(defun anything-ff-run-kill-buffer-persistent ()
+  (interactive)
+  (anything-execute-persistent-action 'kill-buffer-fname))
 
 (defcustom anything-ff-default-kbsize 1024.0
   "Default Kbsize to use for showing files size.
