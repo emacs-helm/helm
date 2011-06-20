@@ -7962,7 +7962,7 @@ Return an alist with elements like (data . number_results)."
   (anything-c-generic-browser
    url browse-url-chromium-program))
 
-(defun browse-url-uzbl (url)
+(defun browse-url-uzbl (url &optional ignore)
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
   (anything-c-generic-browser url browse-url-uzbl-program "-u"))
