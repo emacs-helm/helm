@@ -3129,6 +3129,12 @@ or hitting C-z on \"..\"."
   :group 'anything-config
   :type 'integer)
 
+(defcustom anything-ff-smart-completion t
+  "Try to complete filenames smarter when non--nil.
+See `anything-ff-transform-fname-for-completion' for more info."
+  :group 'anything-config
+  :type 'bolean)
+
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern anything-pattern))
@@ -3139,6 +3145,7 @@ or hitting C-z on \"..\"."
                 anything-compile-source-functions)
         (setq anything-pattern path)
         (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
+    (setq anything-pattern (anything-ff-transform-fname-for-completion path))
     (setq anything-ff-default-directory
           (if (string= anything-pattern "")
               (if (eq system-type 'windows-nt) "c:/" "/")
@@ -3157,6 +3164,22 @@ or hitting C-z on \"..\"."
            (append
             (list path)
             (directory-files (file-name-directory path) t))))))
+
+(defun anything-ff-transform-fname-for-completion (fname)
+  "Return FNAME with it's basename modified as a regexp.
+e.g foo => f.*o.*o .
+If basename contain one or more space or FNAME is a valid directory name
+return FNAME unchanged."
+  (if (or (not anything-ff-smart-completion)
+          (string-match "\\s-" (anything-c-basename fname))
+          (file-directory-p fname))
+      fname ; Fall back to match-plugin.
+      (let* ((bn     (anything-c-basename fname))
+             (new-bn (loop for c across bn
+                        collect (string c) into ls
+                        finally return
+                          (mapconcat 'identity ls ".*"))))
+        (concat (file-name-directory fname) new-bn))))
 
 (defun anything-ff-save-history ()
   "Store the last value of `anything-ff-default-directory' \
