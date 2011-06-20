@@ -3175,10 +3175,7 @@ return FNAME unchanged."
           (file-directory-p fname))
       fname ; Fall back to match-plugin.
       (let* ((bn     (anything-c-basename fname))
-             (new-bn (loop for c across bn
-                        collect (string c) into ls
-                        finally return
-                          (mapconcat 'identity ls ".*"))))
+             (new-bn (mapconcat 'identity (split-string bn "" t) ".*")))
         (concat (file-name-directory fname) new-bn))))
 
 (defun anything-ff-save-history ()
