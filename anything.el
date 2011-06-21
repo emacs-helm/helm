@@ -3179,6 +3179,10 @@ Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
                             (lambda (x) (string-match (or (car-safe x) x) name))
                             special-display-regexps)))
             '("."))))
+    ;; [Emacs-24 bugfix] When `display-buffer-alist' is available use it.
+    (when (boundp 'display-buffer-alist)
+      (setq not-this-window '((reuse-window same other nil)
+                              (pop-up-window (other)))))
     (display-buffer buf not-this-window)))
 
 ;; scroll-other-window(-down)? for persistent-action
