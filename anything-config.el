@@ -3170,14 +3170,15 @@ See `anything-ff-transform-fname-for-completion' for more info."
 e.g foo => f.*o.*o .
 If basename contain one or more space or FNAME is a valid directory name
 return FNAME unchanged."
-  (if (or (not anything-ff-smart-completion)
-          (string-match "\\s-" (anything-c-basename fname))
-          (file-directory-p fname))
-      fname ; Fall back to match-plugin.
-      (let* ((bn     (anything-c-basename fname))
-             (new-bn (if (> (length bn) 2) ; Normal completion on first 2 char.
-                         (mapconcat 'identity (split-string bn "" t) ".*") bn)))
-        (concat (file-name-directory fname) new-bn))))
+  (let ((bn (anything-c-basename fname)))
+    (if (or (not anything-ff-smart-completion)
+            (string-match "\\s-" bn)
+            (string-match "/$" fname) ; Allow mkdir.
+            (file-directory-p fname))
+        fname ; Fall back to match-plugin.
+        (setq bn (if (> (length bn) 2) ; Normal completion on first 2 char.
+                     (mapconcat 'identity (split-string bn "" t) ".*") bn))
+        (concat (file-name-directory fname) bn))))
 
 (defun anything-ff-save-history ()
   "Store the last value of `anything-ff-default-directory' \
@@ -10061,7 +10062,11 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
             ;; A a non--existing filename ending with /
             ;; Create a directory and jump to it.
             (when (y-or-n-p (format "Create directory `%s'? " candidate))
-              (make-directory candidate 'parent)
+              (let ((dirfname (directory-file-name candidate)))
+                (if (file-exists-p dirfname)
+                    (error "Mkdir: Unable to create directory `%s': file exists."
+                           (anything-c-basename dirfname))
+                    (make-directory candidate 'parent)))
               (anything-find-files1 candidate))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
