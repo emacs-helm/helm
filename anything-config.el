@@ -5713,11 +5713,14 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    :name "Emacs Commands"
                    :persistent-action
                    #'(lambda (candidate)
-                       (if (and in-help (string= candidate help-cand))
-                           (progn (kill-buffer "*Help*") (setq in-help nil))
-                           (describe-function (intern candidate))
-                           (setq in-help t))
-                       (setq help-cand candidate))
+                       (let ((buf (get-buffer (help-buffer))))
+                         (if (and in-help (string= candidate help-cand))
+                             (progn (kill-buffer buf) (setq in-help nil))
+                             (set-window-dedicated-p
+                              (get-buffer-window buf) nil)
+                             (describe-function (intern candidate))
+                             (setq in-help t))
+                         (setq help-cand candidate)))
                    :persistent-help "Describe this command"
                    :history history
                    :sort 'string-lessp
