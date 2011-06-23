@@ -1674,7 +1674,8 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 ;; (@* "Core: Display *anything* buffer")
 (defun anything-display-buffer (buf)
   "Display *anything* buffer."
-  (funcall (with-current-buffer buf anything-display-function) buf))
+  (let (pop-up-frames)
+    (funcall (with-current-buffer buf anything-display-function) buf)))
 
 (defun anything-default-display-buffer (buf)
   (funcall (if anything-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
@@ -3169,7 +3170,7 @@ If `anything-persistent-action-use-special-display' is non-nil and
 BUF is to be displayed by `special-display-function', use it.
 Otherwise ignores `special-display-buffer-names' and `special-display-regexps'."
   (let* ((name (buffer-name buf))
-         display-buffer-function pop-up-windows
+         display-buffer-function pop-up-windows pop-up-frames
          (same-window-regexps
           (unless (and anything-persistent-action-use-special-display
                        (or (member name
