@@ -5767,23 +5767,24 @@ Return nil if no mode-map found."
 (defun anything-M-x-transformer (candidates sources)
   "filtered-candidate-transformer to show bindings in emacs commands.
 Show global bindings and local bindings according to current `major-mode'."
-  (loop
-     with local-map = (with-current-buffer anything-current-buffer
-                        (anything-M-x-current-mode-map-alist))
-     for i in candidates
-     for cand       = (symbol-name i)
-     for local-key  = (car (rassq i local-map))
-     for key        = (substitute-command-keys (format "\\[%s]" cand))
-     collect
-       (cons (if (string-match "^M-x" key)
-                 (if local-key
-                     (concat
-                      cand " (" (propertize local-key 'face 'anything-M-x-key-face)
-                      ")")
-                     cand)
-                 (concat
-                  cand " (" (propertize key 'face 'anything-M-x-key-face) ")"))
-             cand)))
+  (with-current-buffer anything-current-buffer
+    (loop
+       with local-map = (anything-M-x-current-mode-map-alist)
+       for i in candidates
+       for cand       = (symbol-name i)
+       for local-key  = (car (rassq i local-map))
+       for key        = (substitute-command-keys (format "\\[%s]" cand))
+       collect
+         (cons (cond ((and (string-match "^M-x" key) local-key)
+                      (format "%s (%s)"
+                              cand (propertize
+                                    local-key
+                                    'face 'anything-M-x-key-face)))
+                     ((string-match "^M-x" key) cand)
+                     (t (format "%s (%s)"
+                                cand (propertize
+                                      key
+                                      'face 'anything-M-x-key-face)))) cand))))
 
 ;;; LaCarte
 (defvar anything-c-source-lacarte
