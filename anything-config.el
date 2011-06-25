@@ -1161,10 +1161,19 @@ With a prefix-arg insert symbol at point."
 
 ;;;###autoload
 (defun anything-show-kill-ring ()
-  "Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
-You may bind this command to M-y."
+  "Preconfigured `anything' for `kill-ring'.
+It is drop-in replacement of `yank-pop'.
+You may bind this command to M-y.
+First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (anything-other-buffer 'anything-c-source-kill-ring "*anything kill-ring*"))
+  (let ((buf "*anything kill-ring*"))
+    (if (get-buffer-window buf)
+        (with-anything-window
+          (if (eq (point) (save-excursion
+                            (anything-end-of-buffer) (point)))
+              (anything-beginning-of-buffer)
+              (anything-next-line)))
+        (anything-other-buffer 'anything-c-source-kill-ring buf))))
 
 ;;;###autoload
 (defun anything-minibuffer-history ()
