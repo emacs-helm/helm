@@ -1411,19 +1411,29 @@ FUNC can be function list. Return the result of last function call."
         (sources)
         (t anything-sources)))  
 
-(defun anything-approximate-candidate-number ()
+(defun anything-approximate-candidate-number (&optional in-current-source)
   "Approximate Number of candidates.
 It is used to check if candidate number is 0, 1, or 2+."
   (with-current-buffer anything-buffer
-    (let ((lines (1- (line-number-at-pos (1- (point-max))))))
-      (if (zerop lines)
-          0
-        (save-excursion
-          (goto-char (point-min))
-          (forward-line 1)
-          (if (anything-pos-multiline-p)
-              (if (search-forward anything-candidate-separator nil t) 2 1)
-            lines))))))
+    (save-excursion
+      (if in-current-source
+          (goto-char (anything-get-previous-header-pos))
+          (goto-char (point-min)))
+      (forward-line 1)
+      (let ((lines (save-excursion
+                     (loop with ln = 0
+                        while (not (if in-current-source
+                                       (or (anything-pos-header-line-p) (eobp))
+                                       (eobp)))
+                        unless (anything-pos-header-line-p)
+                        do (incf ln)
+                        do (forward-line 1) finally return ln)))
+            (count-multi 1))
+        (if (anything-pos-multiline-p)
+            (save-excursion
+              (loop while (search-forward anything-candidate-separator nil t)
+                 do (incf count-multi) finally return count-multi))
+            lines)))))
 
 (defmacro with-anything-quittable (&rest body)
   `(let (inhibit-quit)
@@ -2467,7 +2477,7 @@ UNIT and DIRECTION."
     (with-anything-window
       (propertize
        (format "[%s %s]"
-               (anything-approximate-candidate-number)
+               (anything-approximate-candidate-number 'in-current-source)
                (or name "Candidate(s)"))
        'face 'anything-candidate-number))))
 
