@@ -2463,12 +2463,13 @@ UNIT and DIRECTION."
 
 (defun anything-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line."
-  (with-anything-window
-    (propertize
-     (format "[%s %s]"
-             (anything-approximate-candidate-number)
-             (or name "Candidate(s)"))
-     'face 'anything-candidate-number)))
+  (save-window-excursion
+    (with-anything-window
+      (propertize
+       (format "[%s %s]"
+               (anything-approximate-candidate-number)
+               (or name "Candidate(s)"))
+       'face 'anything-candidate-number))))
 
 (defun anything-previous-line ()
   "Move selection to the previous line."
