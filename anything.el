@@ -715,6 +715,9 @@ See `anything-iswitchb-setup-keys'.")
 (defface anything-isearch-match '((t (:background "Yellow")))
   "Face for isearch in the anything buffer." :group 'anything)
 
+(defface anything-candidate-number '((t (:background "Yellow" :foreground "black")))
+  "Face for candidate number in mode-line." :group 'anything)
+
 (defvar anything-isearch-match-face 'anything-isearch-match
   "Face for matches during incremental search.")
 
@@ -885,8 +888,15 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
 
 (defvar anything-delayed-init-executed nil)
 
-(defvar anything-mode-line-string "\\<anything-map>\\[anything-help]:help \\[anything-select-action]:Acts \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\\[anything-select-3rd-action]:NthAct \\[anything-send-bug-report-from-anything]:BugReport"
+(defvar anything-mode-line-string "\\<anything-map>\\[anything-help]:help \
+\\[anything-select-action]:Acts \
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct \
+\\[anything-send-bug-report-from-anything]:BugReport"
   "Help string displayed in mode-line in `anything'.
+It can be a string or a list of two args, in this case,
+first arg is a string that will be used as name for candidates number,
+second arg any string to display in mode line.
 If nil, use default `mode-line-format'.")
 
 (defvar anything-help-message
@@ -2437,14 +2447,28 @@ UNIT and DIRECTION."
   (if anything-mode-line-string
       (setq mode-line-format
             '(" " mode-line-buffer-identification " "
-              (line-number-mode "%l") " " (anything-follow-mode "(F)")
+              (line-number-mode "L%l") " " (anything-follow-mode "(F) ")
+              (:eval (anything-show-candidate-number
+                      (when (listp anything-mode-line-string)
+                        (car anything-mode-line-string))))
               " " anything-mode-line-string-real "-%-")
             anything-mode-line-string-real
-            (substitute-command-keys anything-mode-line-string))
+            (substitute-command-keys (if (listp anything-mode-line-string)
+                                         (cadr anything-mode-line-string)
+                                         anything-mode-line-string)))
     (setq mode-line-format
           (default-value 'mode-line-format)))
   (setq header-line-format
         (anything-interpret-value (assoc-default 'header-line source) source)))
+
+(defun anything-show-candidate-number (&optional name)
+  "Used to display candidate number in mode-line."
+  (with-anything-window
+    (propertize
+     (format "[%s %s]"
+             (anything-approximate-candidate-number)
+             (or name "Candidate(s)"))
+     'face 'anything-candidate-number)))
 
 (defun anything-previous-line ()
   "Move selection to the previous line."

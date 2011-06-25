@@ -1992,14 +1992,15 @@ buffer that is not the current buffer."
            (t (propertize i 'face 'italic)))))
 
 (defvar anything-buffer-mode-line-string
-  "\\<anything-c-buffer-map>\
+  '("Buffer(s)"
+    "\\<anything-c-buffer-map>\
 \\[anything-c-buffer-help]:Help, \
 \\<anything-map>\
 \\[anything-select-action]:Acts,\
 \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
 \\[anything-select-3rd-action]:NthAct,\
 \\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-c-source-buffers+'")
+    "String displayed in mode-line in `anything-c-source-buffers+'"))
 
 (defvar anything-c-buffers-cache nil)
 (defvar anything-c-source-buffers+
