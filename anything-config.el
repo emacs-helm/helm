@@ -7739,6 +7739,7 @@ http://bbdb.sourceforge.net/")
   '((name . "Evaluation Result")
     (disable-shortcuts)
     (dummy)
+    (multiline)
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
@@ -7746,21 +7747,24 @@ http://bbdb.sourceforge.net/")
                                                (pp-to-string
                                                 (eval (read anything-pattern))))
                                            (error "Error")))))
-    (action ("Copy result to kill-ring" . (lambda (candidate)
-                                            (with-current-buffer anything-buffer
-                                              (let ((end (save-excursion
-                                                           (goto-char (point-max))
-                                                           (search-backward "\n")
-                                                           (point))))
-                                                (kill-region (point) end))))))))
+    (action . (("Copy result to kill-ring" . (lambda (candidate)
+                                               (with-current-buffer anything-buffer
+                                                 (let ((end (save-excursion
+                                                              (goto-char (point-max))
+                                                              (search-backward "\n")
+                                                              (point))))
+                                                   (kill-region (point) end)))))
+               ("copy sexp to kill-ring" . (lambda (candidate)
+                                             (kill-new anything-input)))))))
 ;; (anything 'anything-c-source-evaluation-result)
 
 ;;;###autoload
 (defun anything-eval-expression (arg)
   "Preconfigured anything for `anything-c-source-evaluation-result'."
   (interactive "P")
-  (anything 'anything-c-source-evaluation-result (when arg (thing-at-point 'sexp))
-            nil nil nil "*anything eval*"))
+  (anything :sources 'anything-c-source-evaluation-result
+            :input (when arg (thing-at-point 'sexp))
+            :buffer "*anything eval*"))
 
 ;;;###autoload
 (defun anything-eval-expression-with-eldoc ()
