@@ -3226,17 +3226,32 @@ in `anything-ff-history'."
   (anything-execute-persistent-action 'properties-action))
 
 (defun anything-ff-kill-buffer-fname (candidate)
-  (if (loop with ls = (mapcar 'buffer-name (buffer-list))
-         for buf in ls
-         thereis (string-match (anything-c-basename candidate) buf))
-      (with-current-buffer (find-file-noselect candidate)
-        (let ((buf (buffer-name (current-buffer))))
-          (kill-buffer)
-          (message "Buffer `%s' killed" buf)))
-      (message "No buffer to kill")))
+  (let* ((buf (get-file-buffer candidate))
+         (buf-name (buffer-name buf)))
+    (if buf
+        (progn
+          (kill-buffer buf) (message "Buffer `%s' killed" buf))
+        (message "No buffer to kill"))))
+
+(defun anything-ff-kill-or-find-buffer-fname (candidate)
+  "Find file CANDIDATE or kill it's buffer if it is visible.
+Never kill `anything-current-buffer'.
+Never kill buffer modified.
+This is called normally on third hit of \
+\\<anything-map>\\[anything-execute-persistent-action]
+in `anything-find-files-persistent-action'."
+  (let* ((buf      (get-file-buffer candidate))
+         (buf-name (buffer-name buf)))
+    (if (and buf (get-buffer-window buf)
+             (not (eq buf (get-buffer anything-current-buffer)))
+             (not (buffer-modified-p buf)))
+        (progn
+          (kill-buffer buf) (message "Buffer `%s' killed" buf-name))
+        (find-file candidate))))
 
 ;;;###autoload
 (defun anything-ff-run-kill-buffer-persistent ()
+  "Execute `anything-ff-kill-buffer-fname' whitout quitting."
   (interactive)
   (anything-execute-persistent-action 'kill-buffer-fname))
 
@@ -3578,7 +3593,9 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                   (anything-ff-file-compressed-p candidate))
              (insert-in-minibuffer (concat candidate "#")))
             ;; On second hit we open file.
-            (t (find-file candidate))))))
+            ;; On Third hit we kill it's buffer maybe.
+            (t
+             (anything-ff-kill-or-find-buffer-fname candidate))))))
 
 (defvar anything-ff-avfs-directory nil
   "*The default avfs directory, usually '.avfs'.
