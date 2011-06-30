@@ -3078,6 +3078,7 @@ or hitting C-z on \"..\"."
         (anything-next-line)
         (let ((cur-cand (anything-get-selection)))
           (when (and (file-directory-p cur-cand)
+                     (>= (length (anything-c-basename anything-pattern)) 2)
                      (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)))
             (anything-set-pattern (file-name-as-directory cur-cand)))
             (anything-check-minibuffer-input-1))))))
@@ -3349,25 +3350,34 @@ KBSIZE if a floating point number, default value is 1024.0."
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
           (t (concat prefix-new " " fname)))))
 
+(defcustom anything-ff-tramp-not-fancy t
+  "No colors when listing remote files when set to non--nil.
+This make listing much faster, specially on slow machines."
+  :group 'anything-config
+  :type  'bolean)
+
 (defun anything-c-find-files-transformer (files sources)
   "Selector of transformer to use for `anything-c-source-find-files'."
-  (if (and (window-system) anything-c-find-files-show-icons)
-      (anything-c-highlight-ffiles1 files sources)
-      (anything-c-highlight-ffiles files sources)))
+  (if (and (string-match tramp-file-name-regexp anything-pattern)
+           anything-ff-tramp-not-fancy)
+      files
+      (if (and (window-system) anything-c-find-files-show-icons)
+          (anything-c-highlight-ffiles1 files sources)
+          (anything-c-highlight-ffiles files sources))))
 
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files collect
-       (cond ((and (file-symlink-p i) (not (anything-ff-valid-symlink-p i))
+       (cond ((and (stringp (car (file-attributes i))) (not (anything-ff-valid-symlink-p i))
                    (not (string-match "^\.#" (anything-c-basename i))))
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-invalid-symlink))
                     i))
-             ((file-symlink-p i)
+             ((stringp (car (file-attributes i)))
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-symlink))
                     i))
-             ((file-directory-p i)
+             ((eq t (car (file-attributes i)))
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-directory))
                     i))
@@ -3375,9 +3385,10 @@ KBSIZE if a floating point number, default value is 1024.0."
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-executable))
                     i))
-             (t (cons (anything-c-prefix-filename
-                       (propertize i 'face 'anything-ff-file))
-                      i)))))
+             (t
+              (cons (anything-c-prefix-filename
+                     (propertize i 'face 'anything-ff-file))
+                    i)))))
 
 (defun anything-c-highlight-ffiles1 (files sources)
   "Candidate transformer for `anything-c-source-find-files' that show icons."
