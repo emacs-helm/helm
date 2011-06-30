@@ -3332,7 +3332,8 @@ KBSIZE if a floating point number, default value is 1024.0."
             (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
           (t all))))
 
-(defun anything-c-prefix-filename (fname &optional image)
+
+(defun anything-c-prefix-filename (fname &optional image file-or-symlinkp)
   "Return fname FNAME prefixed with icon IMAGE."
   (let* ((img-name   (and image (expand-file-name
                                  image anything-c-find-files-icons-directory)))
@@ -3344,7 +3345,8 @@ KBSIZE if a floating point number, default value is 1024.0."
          (prefix-url (propertize
                       " " 'display
                       (propertize "[@]" 'face 'anything-ff-prefix))))
-    (cond ((or (file-exists-p fname)
+    (cond ((or file-or-symlinkp
+               (file-exists-p fname)
                (file-symlink-p fname))
            (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
@@ -3371,19 +3373,19 @@ This make listing much faster, specially on slow machines."
        (cond ((and (stringp (car (file-attributes i))) (not (anything-ff-valid-symlink-p i))
                    (not (string-match "^\.#" (anything-c-basename i))))
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-invalid-symlink))
+                     (propertize i 'face 'anything-ff-invalid-symlink) nil t)
                     i))
              ((stringp (car (file-attributes i)))
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-symlink))
+                     (propertize i 'face 'anything-ff-symlink) nil t)
                     i))
              ((eq t (car (file-attributes i)))
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-directory))
+                     (propertize i 'face 'anything-ff-directory) nil t)
                     i))
              ((file-executable-p i)
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-executable))
+                     (propertize i 'face 'anything-ff-executable) nil t)
                     i))
              (t
               (cons (anything-c-prefix-filename
