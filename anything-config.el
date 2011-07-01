@@ -7803,10 +7803,6 @@ http://bbdb.sourceforge.net/")
   (interactive)
   (newline) (lisp-indent-line))
 
-(defun anything-eval-reindent ()
-  (interactive)
-  (lisp-indent-line))
-
 (defvar anything-eval-expression-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
