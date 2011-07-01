@@ -7771,6 +7771,7 @@ http://bbdb.sourceforge.net/")
     (disable-shortcuts)
     (dummy)
     (multiline)
+    (mode-line . "C-RET: nl-and-indent, C-tab: reindent, C-p/n: next/prec-line.")
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
@@ -7795,7 +7796,24 @@ http://bbdb.sourceforge.net/")
   (interactive "P")
   (anything :sources 'anything-c-source-evaluation-result
             :input (when arg (thing-at-point 'sexp))
-            :buffer "*anything eval*"))
+            :buffer "*anything eval*"
+            :keymap anything-eval-expression-map))
+
+(defun anything-eval-new-line-and-indent ()
+  (interactive)
+  (newline) (lisp-indent-line))
+
+(defun anything-eval-reindent ()
+  (interactive)
+  (lisp-indent-line))
+
+(defvar anything-eval-expression-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
+    (define-key map (kbd "<C-tab>")    'lisp-indent-line)
+    (define-key map (kbd "C-p")        'previous-line)
+    (define-key map (kbd "C-n")        'next-line)
+    map))
 
 ;;;###autoload
 (defun anything-eval-expression-with-eldoc ()
