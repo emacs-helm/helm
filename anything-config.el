@@ -3370,7 +3370,8 @@ This make listing much faster, specially on slow machines."
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files collect
-       (cond ((and (stringp (car (file-attributes i))) (not (anything-ff-valid-symlink-p i))
+       (cond ((and (stringp (car (file-attributes i)))
+                   (not (anything-ff-valid-symlink-p i))
                    (not (string-match "^\.#" (anything-c-basename i))))
               (cons (anything-c-prefix-filename
                      (propertize i 'face 'anything-ff-invalid-symlink) nil t)
@@ -7829,11 +7830,12 @@ Should take one arg: the string to display."
 (defvar anything-c-eldoc-show-in-mode-line-delay 12)
 (defun anything-c-eldoc-show-in-mode-line (str)
   "Show string STR in mode-line."
-  (with-anything-window
-    (let ((mode-line-format (concat " " str)))
-      (force-mode-line-update)
-      (sit-for anything-c-eldoc-show-in-mode-line-delay))
-    (force-mode-line-update)))
+  (save-window-excursion
+    (with-current-buffer anything-buffer
+      (let ((mode-line-format (concat " " str)))
+        (force-mode-line-update)
+        (sit-for anything-c-eldoc-show-in-mode-line-delay))
+      (force-mode-line-update))))
 
 ;;; Calculation Result
 (defvar anything-c-source-calculation-result
