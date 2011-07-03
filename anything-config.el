@@ -7829,7 +7829,9 @@ http://bbdb.sourceforge.net/")
          (minibuffer-with-setup-hook
              'anything-eldoc-store-minibuffer
            (call-interactively 'anything-eval-expression))
-      (cancel-timer timer))))
+      (and timer (cancel-timer timer))
+      (setq anything-eldoc-active-minibuffers-list
+            (cdr anything-eldoc-active-minibuffers-list)))))
 
 (defun anything-eldoc-show-in-eval ()
   "Return eldoc in a tooltip for current minibuffer input."
