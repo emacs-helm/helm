@@ -7813,6 +7813,12 @@ http://bbdb.sourceforge.net/")
     (define-key map (kbd "<left>")     'backward-char)
     map))
 
+(defvar anything-eldoc-active-minibuffers-list nil)
+(defun anything-eldoc-store-minibuffer ()
+  "Store minibuffer buffer name in `anything-eldoc-active-minibuffers-list'."
+  (with-selected-window (minibuffer-window)
+    (push (buffer-name) anything-eldoc-active-minibuffers-list)))
+
 ;;;###autoload
 (defun anything-eval-expression-with-eldoc ()
   "Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. "
@@ -7820,22 +7826,28 @@ http://bbdb.sourceforge.net/")
   (let ((timer (run-with-idle-timer eldoc-idle-delay
                                     'repeat 'anything-eldoc-show-in-eval)))
     (unwind-protect
-         (call-interactively 'anything-eval-expression)
+         (minibuffer-with-setup-hook
+             'anything-eldoc-store-minibuffer
+           (call-interactively 'anything-eval-expression))
       (cancel-timer timer))))
 
 (defun anything-eldoc-show-in-eval ()
   "Return eldoc in a tooltip for current minibuffer input."
-  (let* ((str-all (minibuffer-completion-contents))
-         (sym     (when str-all
-                    (with-temp-buffer
-                      (insert str-all)
-                      (goto-char (point-max))
-                      (unless (looking-back ")\\|\"") (forward-char -1))
-                      (eldoc-current-symbol))))
-         (doc     (or (eldoc-get-var-docstring sym)
-                      (eldoc-get-fnsym-args-string
-                       (car (eldoc-fnsym-in-current-sexp))))))
-    (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))
+  (let ((buf (with-selected-window (minibuffer-window)
+               (buffer-name))))
+    (when (member buf anything-eldoc-active-minibuffers-list)  
+      (let* ((str-all (with-current-buffer buf
+                        (minibuffer-completion-contents)))
+             (sym     (when str-all
+                        (with-temp-buffer
+                          (insert str-all)
+                          (goto-char (point-max))
+                          (unless (looking-back ")\\|\"") (forward-char -1))
+                          (eldoc-current-symbol))))
+             (doc     (or (eldoc-get-var-docstring sym)
+                          (eldoc-get-fnsym-args-string
+                           (car (eldoc-fnsym-in-current-sexp))))))
+        (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))))
 
 (defcustom anything-c-eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
   "A function to display eldoc info.
