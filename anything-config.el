@@ -5811,9 +5811,8 @@ Show global bindings and local bindings according to current `major-mode'."
   (with-current-buffer anything-current-buffer
     (loop
        with local-map = (anything-M-x-current-mode-map-alist)
-       for i in candidates
-       for cand       = (symbol-name i)
-       for local-key  = (car (rassq i local-map))
+       for cand in candidates
+       for local-key  = (car (rassq cand local-map))
        for key        = (substitute-command-keys (format "\\[%s]" cand))
        collect
          (cons (cond ((and (string-match "^M-x" key) local-key)
@@ -8948,20 +8947,15 @@ package name - description."
 SORT-FN is a predicate to sort COLLECTION.
 If collection is an `obarray', a TEST is needed. See `obarray'."
   (let ((cands
-         (cond ((and (listp collection) test)
-                (loop for i in collection when (funcall test i) collect i))
-               ((and (eq collection obarray) test)
-                (loop for s being the symbols of collection
-                   when (funcall test s) collect s))
+         (cond ((and (eq collection obarray) test)
+                (all-completions "" collection test))
                ((and (vectorp collection) test)
                 (loop for i across collection when (funcall test i) collect i))
                ((vectorp collection)
                 (loop for i across collection collect i))
-               ((and (hash-table-p collection) test)
-                (anything-comp-hash-get-items collection :test test))
-               ((hash-table-p collection)
-                (anything-comp-hash-get-items collection))
-               (t collection))))
+               ((and collection test)
+                (all-completions "" collection test))
+               (t (all-completions "" collection)))))
     (if sort-fn (sort cands sort-fn) cands)))
 
 (defun anything-cr-default-transformer (candidates source)
@@ -9008,7 +9002,8 @@ Any prefix args passed during `anything-comp-read' invocation will be recorded
 in `anything-current-prefix-arg', otherwise if prefix args where given before
 `anything-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix arg before or after calling
-a command that use `anything-comp-read'."
+a command that use `anything-comp-read'.
+It support now also a function as argument, See `all-completions' for more details."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (flet ((action-fn (candidate)
@@ -9041,6 +9036,63 @@ a command that use `anything-comp-read'."
            :resume 'noresume
            :buffer buffer)
           (keyboard-quit)))))
+
+;; Generic completing-read
+;;
+;; Support also function as collection.
+;; e.g M-x man is supported.
+;; Support hash-table and vectors as collection.
+(defun anything-completing-read-default
+    (prompt collection &optional
+                         predicate require-match
+                         initial-input hist def
+                         inherit-input-method)
+    "An anything replacement of `completing-read'.
+In addition to `completing-read' it support also vectors.
+Don't use it directly, use instead `anything-comp-read' in your programs.
+See documentation of `completing-read' and `all-completions' for details."
+  (let ((init (or def initial-input)))
+    (anything-comp-read
+     prompt collection
+     :test predicate
+     :fc-transformer #'(lambda (candidates source)
+                         (loop for i in candidates
+                            if (consp i) collect (car i)
+                            else collect i))
+     :history (eval hist)
+     :must-match require-match
+     :initial-input init)))
+  
+(defun anything-generic-read-file-name
+    (prompt &optional dir default-filename mustmatch initial predicate)
+  "An anything replacement of `read-file-name'."
+  (let* ((default (and default-filename
+                      (if (listp default-filename)
+                          (car default-filename)
+                          default-filename)))
+         (init (or default initial dir default-directory))
+         (ini-input (and init (expand-file-name init))))
+    (anything-c-read-file-name prompt
+                               :initial-input init
+                               :must-match mustmatch
+                               :test predicate)))
+
+
+;;;###autoload
+(defun anything-toggle-anything-completion-everywhere ()
+  "Turn on anything completion in all emacs.
+This is done by setting `completing-read-function' \
+to `anything-completing-read-default' and \
+`read-file-name-function' to `anything-generic-read-file-name'."
+  (interactive)
+  (if (and (eq completing-read-function 'anything-completing-read-default)
+           (eq read-file-name-function 'anything-generic-read-file-name))
+      (progn (setq completing-read-function 'completing-read-default
+                   read-file-name-function  'read-file-name-default)
+             (message "Anything completion disabled"))
+      (setq completing-read-function 'anything-completing-read-default
+            read-file-name-function  'anything-generic-read-file-name)
+      (message "Anything completion enabled")))
 
 
 (defun anything-c-get-pid-from-process-name (process-name)
