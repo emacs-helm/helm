@@ -6417,14 +6417,15 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;;;###autoload
 (defun anything-bookmark-ext ()
   "Preconfigured `anything' for bookmark-extensions sources.
-Needs bookmark-ext.el
-
-http://mercurial.intuxication.org/hg/emacs-bookmark-extension"
+Needs bookmark-ext.el:
+<http://mercurial.intuxication.org/hg/emacs-bookmark-extension>.
+Contain also `anything-c-source-google-suggest'."
   (interactive)
   (anything
    :sources
    '(anything-c-source-bookmark-files&dirs
      anything-c-source-bookmark-w3m
+     anything-c-source-google-suggest
      anything-c-source-bmkext-addressbook
      anything-c-source-bookmark-gnus
      anything-c-source-bookmark-info
