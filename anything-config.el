@@ -9042,6 +9042,10 @@ It support now also a function as argument, See `all-completions' for more detai
 ;; Support also function as collection.
 ;; e.g M-x man is supported.
 ;; Support hash-table and vectors as collection.
+;; NOTE:
+;; Some crap emacs functions may not be supported
+;; like ffap-alternate-file (bad use of completing-read)
+;; and maybe others.
 (defun anything-completing-read-default
     (prompt collection &optional
                          predicate require-match
@@ -9059,7 +9063,7 @@ See documentation of `completing-read' and `all-completions' for details."
                          (loop for i in candidates
                             if (consp i) collect (car i)
                             else collect i))
-     :history (eval hist)
+     :history (eval (or (car-safe hist) hist))
      :must-match require-match
      :initial-input init)))
   
