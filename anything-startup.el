@@ -1,4 +1,4 @@
-;;; anything-startup.el --- anything.el startup file
+;;; anything-startup.el --- Minimal configuration for anything.
 
 ;;; $Id: anything-startup.el,v 1.10 2010-02-04 19:57:31 rubikitch Exp $
 
@@ -19,34 +19,15 @@
 ;;; If you use Japanese, you should install Migemo and anything-migemo.el.
 ;;;
 ;;; Migemo  http://0xcc.net/migemo/
+;;; http://www.emacswiki.org/emacs/anything-migemo.el
 (and (equal current-language-environment "Japanese")
      (require 'anything-migemo nil t))
 
-;;; anything-complete.el replaces various completion with anything
-;;; (like Icicles). Use Anything power for normal completion.
+;;; Completion for lisp symbols and apropos.
 (when (require 'anything-complete nil t)
   ;; Automatically collect symbols by 150 secs
-  (anything-lisp-complete-symbol-set-timer 150)
-  (define-key emacs-lisp-mode-map "\C-\M-i" 'anything-lisp-complete-symbol-partial-match)
-  (define-key lisp-interaction-mode-map "\C-\M-i" 'anything-lisp-complete-symbol-partial-match)
-  ;; Comment if you do not want to replace completion commands with `anything'.
-  (anything-read-string-mode 1)
-  )
+  (anything-lisp-complete-symbol-set-timer 150))
 
-;;; anything-show-completion.el shows current selection prettily.
-(require 'anything-show-completion)
-
-;;; anything-auto-install.el integrates auto-install.el with anything.
-(require 'anything-auto-install nil t)
-
-;;; descbinds-anything.el replaces describe-bindings with anything interface.
-(when (require 'descbinds-anything nil t)
-  ;; Comment if you do not want to replace `describe-bindings' with `anything'.
-  (descbinds-anything-install)
-  )
-
-;;; `anything-grep' replaces standard `grep' command.
-(require 'anything-grep nil t)
 
 (provide 'anything-startup)
 
