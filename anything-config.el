@@ -9053,6 +9053,7 @@ It support now also a function as argument, See `all-completions' for more detai
 ;; and maybe others.
 ;; Provide a mode `anything-completion-mode' which turn on
 ;; anything in all `completing-read' and `read-file-name' in Emacs.
+;;
 (defun anything-completing-read-default
     (prompt collection &optional
                          predicate require-match
@@ -9096,7 +9097,9 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;;###autoload
 (define-minor-mode anything-completion-mode
     "Toggle generic anything completion."
-  :group 'anything :lighter anything-completion-mode-string
+  :group 'anything
+  :global t
+  :lighter anything-completion-mode-string
   (if anything-completion-mode
       (progn
         (setq completing-read-function 'anything-completing-read-default
