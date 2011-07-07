@@ -4070,6 +4070,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
                                    must-match
                                    (history nil)
                                    (marked-candidates nil)
+                                   (alistp t)
                                    (persistent-action 'anything-find-files-persistent-action)
                                    (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
   "Anything `read-file-name' emulation.
@@ -4085,7 +4086,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            :sources
            `(((name . ,(concat "Read File Name History" anything-c-find-files-doc-header))
               (candidates . (lambda ()
-                              (anything-comp-read-get-candidates history)))
+                              (anything-comp-read-get-candidates history nil nil alistp)))
               (volatile)
               (persistent-action . ,persistent-action)
               (persistent-help . ,persistent-help)
@@ -4178,8 +4179,8 @@ If nil Search in all files.")
     (set-process-sentinel (get-process "locate-process")
                           #'(lambda (process event)
                               (when (string= event "finished\n")
-                                (kill-local-variable 'mode-line-format)
                                 (with-anything-window
+                                  (force-mode-line-update nil)
                                   (anything-update-move-first-line)))))))
 
 (defvar anything-c-source-locate
@@ -4377,6 +4378,7 @@ See `anything-c-grep-default-command' for format specs.")
             (:eval (when (get-process "grep-process")
                      (propertize "[Grep Process Running] "
                                  'face 'anything-grep-running)))))
+    (force-mode-line-update nil)
     (prog1
         (let ((default-directory anything-ff-default-directory))
           (start-file-process-shell-command "grep-process" nil cmd-line))
@@ -4387,7 +4389,6 @@ See `anything-c-grep-default-command' for format specs.")
            (when (string= event "finished\n")
              (with-anything-window
                (anything-update-move-first-line)
-               (kill-local-variable 'mode-line-format)
                (setq mode-line-format
                      '(" " mode-line-buffer-identification " "
                        (line-number-mode "%l") " "
@@ -4397,7 +4398,8 @@ See `anything-c-grep-default-command' for format specs.")
                                                           (point-min)
                                                           (point-max)))))
                                          (if (> nlines 0) nlines 0)))
-                               'face 'anything-grep-finish)))))))))))
+                               'face 'anything-grep-finish))))
+               (force-mode-line-update nil))))))))
 
 (defun anything-c-grep-action (candidate &optional where mark)
   "Define a default action for `anything-do-grep' on CANDIDATE.
@@ -8931,21 +8933,14 @@ package name - description."
 
 ;; (anything 'anything-c-source-emacs-process)
 
-;; Run Externals commands within Emacs
-(defmacro* anything-comp-hash-get-items (hash-table &key test)
-  "Get the list of all keys/values of hash-table."
-  `(let ((li-items ()))
-     (maphash #'(lambda (x y)
-                  (if ,test
-                      (when (funcall ,test y)
-                        (push (list x y) li-items))
-                      (push (list x y) li-items)))
-              ,hash-table)
-     li-items))
-
-(defun anything-comp-read-get-candidates (collection &optional test sort-fn)
+;;; Anything `completing-read' replacement
+;;
+;;
+(defun anything-comp-read-get-candidates (collection &optional test sort-fn alistp)
   "Convert COLLECTION to list removing elements that don't match TEST.
 SORT-FN is a predicate to sort COLLECTION.
+ALISTP is a flag to not use `all-completions' which doesn't handle alists correctly\
+for anything.
 If collection is an `obarray', a TEST is needed. See `obarray'."
   (let ((cands
          (cond ((and (eq collection obarray) test)
@@ -8954,6 +8949,9 @@ If collection is an `obarray', a TEST is needed. See `obarray'."
                 (loop for i across collection when (funcall test i) collect i))
                ((vectorp collection)
                 (loop for i across collection collect i))
+               ((and alistp test)
+                (loop for i in collection when (funcall test i) collect i))
+               (alistp collection)
                ((and collection test)
                 (all-completions "" collection test))
                (t (all-completions "" collection)))))
@@ -8978,7 +8976,8 @@ Do nothing, just return candidate list unmodified."
                                    (volatile t)
                                    sort
                                    (fc-transformer 'anything-cr-default-transformer)
-                                   (marked-candidates nil))
+                                   (marked-candidates nil)
+                                   (alistp t))
   "Anything `completing-read' emulation.
 PROMPT is the prompt name to use.
 COLLECTION can be a list, vector, obarray or hash-table.
@@ -8995,9 +8994,11 @@ anything-buffer before COLLECTION.
 PERSISTENT-ACTION: A function called with one arg i.e candidate.
 PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
 NAME: The name related to this local source.
+VOLATILE: Use volatile attribute.
 SORT: A predicate to give to `sort' e.g `string-lessp'.
 FC-TRANSFORMER: A `filtered-candidate-transformer' function.
 MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
+ALISTP: when non--nil \(default\) cdr of alist is returned otherwise it is the car.
 
 Any prefix args passed during `anything-comp-read' invocation will be recorded
 in `anything-current-prefix-arg', otherwise if prefix args where given before
@@ -9013,7 +9014,8 @@ It support now also a function as argument, See `all-completions' for more detai
                (identity candidate))))
     (let ((hist `((name . ,(format "%s History" name))
                   (candidates . (lambda ()
-                                  (anything-comp-read-get-candidates history)))
+                                  (anything-comp-read-get-candidates
+                                   history nil nil ,alistp)))
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (action . ,'action-fn)))
@@ -9021,7 +9023,7 @@ It support now also a function as argument, See `all-completions' for more detai
                  (candidates
                   . (lambda ()
                       (let ((cands (anything-comp-read-get-candidates
-                                    collection test sort)))
+                                    collection test sort alistp)))
                         (if (or must-match (string= anything-pattern ""))
                             cands (append (list anything-pattern) cands)))))
                  (filtered-candidate-transformer ,fc-transformer)
@@ -9066,6 +9068,7 @@ See documentation of `completing-read' and `all-completions' for details."
                             else collect i))
      :history (eval (or (car-safe hist) hist))
      :must-match require-match
+     :alistp nil
      :initial-input init)))
   
 (defun anything-generic-read-file-name
@@ -9079,6 +9082,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (ini-input (and init (expand-file-name init))))
     (anything-c-read-file-name prompt
                                :initial-input init
+                               :alistp nil
                                :must-match mustmatch
                                :test predicate)))
 
@@ -9099,6 +9103,8 @@ to `anything-completing-read-default' and \
             read-file-name-function  'anything-generic-read-file-name)
       (message "Anything completion enabled")))
 
+
+;;; Run Externals commands within Emacs with anything completion
 
 (defun anything-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
