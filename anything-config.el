@@ -4021,7 +4021,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
 (defvar anything-dired-bindings nil)
 ;;;###autoload
 (defun anything-dired-bindings (&optional arg)
-  "Replace usual dired commands `C' and `R' by anything ones.
+  "Replace usual dired commands `C', `R', `S', and `H' by anything ones.
 When call interactively toggle dired bindings and anything bindings.
 When call non--interactively with arg > 0, enable anything bindings.
 You can put (anything-dired-binding 1) in init file to enable anything bindings."
@@ -4037,7 +4037,8 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
          'dired-do-symlink 'anything-dired-symlink-file dired-mode-map)
         (substitute-key-definition
          'dired-do-hardlink 'anything-dired-hardlink-file dired-mode-map)
-        (setq anything-dired-bindings t))
+        (setq anything-dired-bindings t)
+        (when (called-interactively-p) (message "Anything Dired bindings enabled")))
       ;; Replace anything bindings.
       (substitute-key-definition
        'anything-dired-copy-file 'dired-do-copy dired-mode-map)
@@ -4047,7 +4048,8 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
        'anything-dired-symlink-file 'dired-do-symlink dired-mode-map)
       (substitute-key-definition
        'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)
-      (setq anything-dired-bindings nil)))
+      (setq anything-dired-bindings nil)
+      (when (called-interactively-p) (message "Anything Dired bindings disabled"))))
 
 (defvar anything-c-read-file-map
   (let ((map (copy-keymap anything-map)))
@@ -9049,14 +9051,18 @@ It support now also a function as argument, See `all-completions' for more detai
 ;; Some crap emacs functions may not be supported
 ;; like ffap-alternate-file (bad use of completing-read)
 ;; and maybe others.
+;; Provide a mode `anything-completion-mode' which turn on
+;; anything in all `completing-read' and `read-file-name' in Emacs.
 (defun anything-completing-read-default
     (prompt collection &optional
                          predicate require-match
                          initial-input hist def
                          inherit-input-method)
     "An anything replacement of `completing-read'.
-In addition to `completing-read' it support also vectors.
-Don't use it directly, use instead `anything-comp-read' in your programs.
+
+Don't use it directly, use instead `anything-comp-read' in your programs \
+which is more powerful.
+
 See documentation of `completing-read' and `all-completions' for details."
   (let ((init (or def initial-input)))
     (anything-comp-read
@@ -9086,23 +9092,19 @@ See documentation of `completing-read' and `all-completions' for details."
                                :must-match mustmatch
                                :test predicate)))
 
-
+(defvar anything-completion-mode-string " AC")
 ;;;###autoload
-(defun anything-toggle-anything-completion-everywhere ()
-  "Turn on anything completion in all emacs.
-This is done by setting `completing-read-function' \
-to `anything-completing-read-default' and \
-`read-file-name-function' to `anything-generic-read-file-name'."
-  (interactive)
-  (if (and (eq completing-read-function 'anything-completing-read-default)
-           (eq read-file-name-function 'anything-generic-read-file-name))
-      (progn (setq completing-read-function 'completing-read-default
-                   read-file-name-function  'read-file-name-default)
-             (message "Anything completion disabled"))
-      (setq completing-read-function 'anything-completing-read-default
-            read-file-name-function  'anything-generic-read-file-name)
-      (message "Anything completion enabled")))
-
+(define-minor-mode anything-completion-mode
+    "Toggle generic anything completion."
+  :group 'anything :lighter anything-completion-mode-string
+  (if anything-completion-mode
+      (progn
+        (setq completing-read-function 'anything-completing-read-default
+              read-file-name-function  'anything-generic-read-file-name)
+        (message "Anything completion enabled"))
+      (setq completing-read-function 'completing-read-default
+            read-file-name-function  'read-file-name-default)
+      (message "Anything completion disabled")))
 
 ;;; Run Externals commands within Emacs with anything completion
 
