@@ -7775,7 +7775,7 @@ http://bbdb.sourceforge.net/")
     (disable-shortcuts)
     (dummy)
     (multiline)
-    (mode-line . "C-RET: nl-and-indent, C-tab: reindent, C-p/n: next/prec-line.")
+    (mode-line . "C-RET: nl-and-indent, tab: reindent, C-tab:complete, C-p/n: next/prec-line.")
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
@@ -7810,7 +7810,8 @@ http://bbdb.sourceforge.net/")
 (defvar anything-eval-expression-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
-    (define-key map (kbd "<C-tab>")    'lisp-indent-line)
+    (define-key map (kbd "<tab>")      'lisp-indent-line)
+    (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
     (define-key map (kbd "C-p")        'previous-line)
     (define-key map (kbd "C-n")        'next-line)
     (define-key map (kbd "<up>")       'previous-line)
@@ -7830,7 +7831,9 @@ http://bbdb.sourceforge.net/")
   "Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. "
   (interactive)
   (let ((timer (run-with-idle-timer eldoc-idle-delay
-                                    'repeat 'anything-eldoc-show-in-eval)))
+                                    'repeat 'anything-eldoc-show-in-eval))
+        (minibuffer-completing-symbol t) ; Enable lisp completion.
+        (completion-cycle-threshold t))  ; Always cycle, no pesty completion buffer (emacs24 only).
     (unwind-protect
          (minibuffer-with-setup-hook
              'anything-eldoc-store-minibuffer
