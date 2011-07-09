@@ -7840,7 +7840,7 @@ http://bbdb.sourceforge.net/")
             (cdr anything-eldoc-active-minibuffers-list)))))
 
 (defun anything-eldoc-show-in-eval ()
-  "Return eldoc in a tooltip for current minibuffer input."
+  "Return eldoc in mode-line for current minibuffer input."
   (let ((buf (with-selected-window (minibuffer-window)
                (buffer-name))))
     (when (member buf anything-eldoc-active-minibuffers-list)  
@@ -7852,9 +7852,10 @@ http://bbdb.sourceforge.net/")
                           (goto-char (point-max))
                           (unless (looking-back ")\\|\"") (forward-char -1))
                           (eldoc-current-symbol))))
+             (info-fn (eldoc-fnsym-in-current-sexp))
              (doc     (or (eldoc-get-var-docstring sym)
                           (eldoc-get-fnsym-args-string
-                           (car (eldoc-fnsym-in-current-sexp))))))
+                           (car info-fn) (cadr info-fn)))))
         (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))))
 
 (defcustom anything-c-eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
