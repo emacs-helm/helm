@@ -9191,7 +9191,9 @@ This is the same as `ac-insert', just inlined here for compatibility."
          (end    (cadr data))
          (plist  (nthcdr 3 data))
          (pred   (plist-get plist :predicate))
-         (target (and beg end (buffer-substring-no-properties beg end))))
+         (target (and beg end (buffer-substring-no-properties beg end)))
+         (anything-quit-if-no-candidate t)
+         (anything-execute-action-at-once-if-one t))
     (when data
       (anything
        :sources
