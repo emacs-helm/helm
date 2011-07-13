@@ -2836,8 +2836,7 @@ See `anything-ff-serial-rename-1'."
   "Keymap for `anything-find-files'.")
 
 (defun anything-c-quit-and-execute-action (action)
-  "Quit current anything session and execute ACTION.
-ACTION must be one of the actions of current source."
+  "Quit current anything session and execute ACTION." 
   (setq anything-saved-action action)
   (anything-exit-minibuffer))
 
@@ -9113,8 +9112,76 @@ See documentation of `completing-read' and `all-completions' for details."
             read-file-name-function  'read-file-name-default)
       (message "Anything completion disabled")))
 
-;;; Run Externals commands within Emacs with anything completion
+;;; Eshell completion.
+;;
+;; Enable like this in .emacs:
+;;
+;; (add-hook 'eshell-mode-hook
+;;           #'(lambda ()
+;;               (define-key eshell-mode-map [remap pcomplete] 'anything-esh-pcomplete)))
+;;
+(defvar anything-c-source-esh
+  '((name . "Eshell completions")
+    (init . (lambda ()
+              (setq anything-ec-target (thing-at-point 'symbol)
+                    pcomplete-current-completions nil
+                    pcomplete-last-completion-raw nil)))
+    (candidates . anything-esh-get-candidates)
+    (action . anything-ec-insert))
+  "Anything source for Eshell completion.")
 
+;; Internal.
+(defvar anything-ec-target "")
+(defun anything-ec-insert (candidate)
+  "Insert CANDIDATE at point.
+This is the same as `ac-insert', just inlined here for compatibility."
+  (let ((pt (point)))
+    (when (and (search-backward anything-ec-target nil t)
+               (string= (buffer-substring (point) pt) anything-ec-target))
+      (delete-region (point) pt)))
+  (insert candidate))
+
+(defun anything-esh-get-candidates ()
+  "Get candidates for eshell completion using `pcomplete'."
+  (catch 'pcompleted
+    (let* (pcomplete-stub
+           pcomplete-seen pcomplete-norm-func
+           pcomplete-args pcomplete-last pcomplete-index
+           (pcomplete-autolist pcomplete-autolist)
+           (pcomplete-suffix-list pcomplete-suffix-list))
+      (with-current-buffer anything-current-buffer
+        (loop
+           with table  = (pcomplete-completions)
+           with entry  = (condition-case nil
+                             ;; For Emacs24
+                             (funcall (pcomplete-entries) anything-pattern nil nil)
+                           ;; Fall back to this in Emacs23 as pcomplete-entries seem broken.
+                           (error
+                            nil
+                            (let ((fc (car (last (pcomplete-parse-arguments)))))
+                              ;; Check if last arg require fname completion.
+                              (and (file-name-directory fc) fc))))
+           for i in (if (listp table) table ; Emacs23 or commands.
+                        (all-completions pcomplete-stub table)) ; Emacs24
+           for file-cand = (and entry (expand-file-name i (file-name-directory entry)))
+           if (and file-cand (file-exists-p file-cand)) collect file-cand into ls
+           else collect i into ls
+           finally return
+           (if (and entry (not (string= entry "")) (file-exists-p entry))
+               (append (list (expand-file-name entry default-directory)) ls) ls))))))
+
+(defun anything-esh-pcomplete ()
+  "Preconfigured anything to provide anything completion in eshell."
+  (interactive)
+  (let ((anything-quit-if-no-candidate t)
+        (anything-execute-action-at-once-if-one t))
+    (anything :sources 'anything-c-source-esh
+              :input (car (last (ignore-errors ; Needed in lisp symbols completion.
+                                  (pcomplete-parse-arguments)))))))
+
+      
+;;; Run Externals commands within Emacs with anything completion
+;;
 (defun anything-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
   (loop with process-list = (list-system-processes)
