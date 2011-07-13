@@ -9170,6 +9170,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
            (if (and entry (not (string= entry "")) (file-exists-p entry))
                (append (list (expand-file-name entry default-directory)) ls) ls))))))
 
+;;;###autoload
 (defun anything-esh-pcomplete ()
   "Preconfigured anything to provide anything completion in eshell."
   (interactive)
@@ -9179,7 +9180,58 @@ This is the same as `ac-insert', just inlined here for compatibility."
               :input (car (last (ignore-errors ; Needed in lisp symbols completion.
                                   (pcomplete-parse-arguments)))))))
 
-      
+;;; Lisp symbol completion.
+;;
+;;;###autoload
+(defun anything-lisp-completion-at-point ()
+  "Anything lisp symbol completion at point."
+  (interactive)
+  (let* ((data   (lisp-completion-at-point))
+         (beg    (car data))
+         (end    (cadr data))
+         (plist  (nthcdr 3 data))
+         (pred   (plist-get plist :predicate))
+         (target (and beg end (buffer-substring-no-properties beg end))))
+    (when data
+      (anything
+       :sources
+       '((name . "Lisp completion")
+         (init . (lambda ()
+                   (with-current-buffer (anything-candidate-buffer 'global)
+                     (loop for sym in (all-completions target (nth 2 data) pred)
+                        do (insert (concat sym "\n"))))))
+         (candidates-in-buffer)
+         (action . (lambda (candidate)
+                     (delete-region beg end)
+                     (insert candidate))))
+       :input target))))
+
+(defcustom anything-lisp-completion-or-indent-delay 3
+  "After this delay `anything-lisp-completion-counter' is reset to 0.
+This allow to indent again without completing lisp symbol after this delay.
+Default is 3 seconds."
+  :group 'anything-config
+  :type 'integer)
+
+;; Internal
+(defvar anything-lisp-completion-counter 0)
+;;;###autoload
+(defun anything-lisp-completion-at-point-or-indent ()
+  (interactive)
+  (incf anything-lisp-completion-counter)
+  (unwind-protect
+       (if (> anything-lisp-completion-counter 1)
+           (anything-lisp-completion-at-point)
+           (indent-for-tab-command))
+    ;; After 3 seconds reset to 0.
+    (run-with-timer anything-lisp-completion-or-indent-delay nil
+                    #'(lambda ()
+                        (setq anything-lisp-completion-counter 0)))
+    ;; Always reset to 0 at second hit.
+    (when (eq anything-lisp-completion-counter 2)
+      (setq anything-lisp-completion-counter 0))))
+
+
 ;;; Run Externals commands within Emacs with anything completion
 ;;
 (defun anything-c-get-pid-from-process-name (process-name)
