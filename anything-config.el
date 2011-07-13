@@ -4017,16 +4017,13 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
   (interactive)
   (anything-dired-do-action-on-file :action 'hardlink))
 
-(defvar anything-dired-bindings nil)
 ;;;###autoload
-(defun anything-dired-bindings (&optional arg)
-  "Replace usual dired commands `C', `R', `S', and `H' by anything ones.
-When call interactively toggle dired bindings and anything bindings.
-When call non--interactively with arg > 0, enable anything bindings.
-You can put (anything-dired-binding 1) in init file to enable anything bindings."
-  (interactive)
-  (if (or (and arg (> arg 0)) (not anything-dired-bindings))
-      ;; Replace dired bindings.
+(define-minor-mode anything-dired-mode ()
+  "Enable anything completion in Dired functions.
+Bindings affected are C, R, S, H."
+  :group 'anything-config
+  :global t
+  (if anything-dired-mode
       (progn
         (substitute-key-definition
          'dired-do-copy 'anything-dired-copy-file dired-mode-map)
@@ -4036,9 +4033,7 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
          'dired-do-symlink 'anything-dired-symlink-file dired-mode-map)
         (substitute-key-definition
          'dired-do-hardlink 'anything-dired-hardlink-file dired-mode-map)
-        (setq anything-dired-bindings t)
-        (when (called-interactively-p) (message "Anything Dired bindings enabled")))
-      ;; Replace anything bindings.
+        (setq anything-dired-bindings t))
       (substitute-key-definition
        'anything-dired-copy-file 'dired-do-copy dired-mode-map)
       (substitute-key-definition
@@ -4047,8 +4042,9 @@ You can put (anything-dired-binding 1) in init file to enable anything bindings.
        'anything-dired-symlink-file 'dired-do-symlink dired-mode-map)
       (substitute-key-definition
        'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)
-      (setq anything-dired-bindings nil)
-      (when (called-interactively-p) (message "Anything Dired bindings disabled"))))
+      (setq anything-dired-bindings nil)))
+      
+(defalias 'anything-dired-bindings 'anything-dired-mode)
 
 (defvar anything-c-read-file-map
   (let ((map (copy-keymap anything-map)))
