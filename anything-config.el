@@ -9185,6 +9185,14 @@ This is the same as `ac-insert', just inlined here for compatibility."
 
 ;;; Lisp symbol completion.
 ;;
+
+;; Internal.
+;; Allow user to enable anything-show-completion.
+;; i.e use '(length anything-lisp-completion-target)
+;; as second arg of `use-anything-show-completion'.
+;; Otherwise it is unused.
+(defvar anything-lisp-completion-target nil)
+
 ;;;###autoload
 (defun anything-lisp-completion-at-point ()
   "Anything lisp symbol completion at point."
@@ -9198,6 +9206,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
          (anything-quit-if-no-candidate t)
          (anything-execute-action-at-once-if-one t))
     (when data
+      (setq anything-lisp-completion-target target)
       (anything
        :sources
        '((name . "Lisp completion")
@@ -9210,7 +9219,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
                      (delete-region beg end)
                      (insert candidate))))
        :input target))))
-
+ 
 (defcustom anything-lisp-completion-or-indent-delay 3
   "After this delay `anything-lisp-completion-counter' is reset to 0.
 This allow to indent again without completing lisp symbol after this delay.
