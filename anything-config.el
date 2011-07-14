@@ -5753,12 +5753,19 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    :name "Emacs Commands"
                    :persistent-action
                    #'(lambda (candidate)
-                       (let ((buf (get-buffer (help-buffer))))
+                       (let ((hbuf (get-buffer (help-buffer))))
                          (if (and in-help (string= candidate help-cand))
-                             (progn (kill-buffer buf) (setq in-help nil))
+                             (progn
+                               ;; When M-x is started from a help buffer,
+                               ;; Don't kill it as it is anything-current-buffer.
+                               (unless (equal hbuf anything-current-buffer)
+                                 (kill-buffer hbuf))
+                               (setq in-help nil))
+                             ;; Be sure anything-current-buffer have not a dedicated window.
                              (set-window-dedicated-p
-                              (get-buffer-window buf) nil)
+                              (get-buffer-window anything-current-buffer) nil)
                              (describe-function (intern candidate))
+                             (message nil) ; Erase the new stupid message Type "q"[...]
                              (setq in-help t))
                          (setq help-cand candidate)))
                    :persistent-help "Describe this command"
