@@ -9231,6 +9231,10 @@ Default is 3 seconds."
 (defvar anything-lisp-completion-counter 0)
 ;;;###autoload
 (defun anything-lisp-completion-at-point-or-indent ()
+  "First call indent and second call complete lisp symbol.
+The second call should happen before `anything-lisp-completion-or-indent-delay',
+after this delay, next call will indent again.
+After completion, next call is always indent."
   (interactive)
   (incf anything-lisp-completion-counter)
   (unwind-protect
