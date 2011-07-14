@@ -2056,7 +2056,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
        for buf in bufs
        do
        (save-window-excursion
-         (switch-to-buffer buf)
+         (anything-c-switch-to-buffer buf)
          (save-excursion
            (let ((case-fold-search t))
              (goto-char (point-min))
@@ -2182,13 +2182,13 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-switch-other-window ()
   "Run switch to other window action from `anything-c-source-buffer+'."
   (interactive)
-  (anything-c-quit-and-execute-action 'switch-to-buffer-other-window))
+  (anything-c-quit-and-execute-action 'anything-c-switch-to-buffer-other-window))
 
 ;;;###autoload
 (defun anything-buffer-switch-other-frame ()
   "Run switch to other frame action from `anything-c-source-buffer+'."
   (interactive)
-  (anything-c-quit-and-execute-action 'switch-to-buffer-other-frame))
+  (anything-c-quit-and-execute-action 'anything-c-switch-to-buffer-other-frame))
 
 ;;;###autoload
 (defun anything-buffer-switch-to-elscreen ()
@@ -2215,7 +2215,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-c-buffers+-persistent-action (candidate)
     (if current-prefix-arg
         (anything-c-buffers-persistent-kill candidate)
-        (switch-to-buffer candidate)))
+        (anything-c-switch-to-buffer candidate)))
 
 ;; (anything 'anything-c-source-buffers+)
 
@@ -2662,7 +2662,7 @@ See `anything-find-files-eshell-command-on-file-1' for more info."
            (eshell-send-input)))
     (if (get-buffer "*eshell*")
         (progn
-          (switch-to-buffer "*eshell*")
+          (anything-c-switch-to-buffer "*eshell*")
           (cd-eshell))
         (call-interactively 'eshell)
         (cd-eshell))))
@@ -3593,7 +3593,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                (kill-buffer image-dired-display-image-buffer))
              (image-dired-display-image candidate)
              (message nil)
-             (switch-to-buffer image-dired-display-image-buffer)
+             (anything-c-switch-to-buffer image-dired-display-image-buffer)
              (with-current-buffer image-dired-display-image-buffer
                (let ((exif-data (anything-ff-exif-data candidate)))
                  (image-dired-update-property 'help-echo exif-data))))
@@ -4801,7 +4801,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
             (anything-do-grep1 bufs))
         ;; bufs is empty, thats mean we have only CANDIDATE
         ;; and it is not a buffer-filename, fallback to occur.
-        (switch-to-buffer candidate)
+        (anything-c-switch-to-buffer candidate)
         (when (get-buffer anything-action-buffer)
           (kill-buffer anything-action-buffer))
         (anything-occur))))
@@ -5873,7 +5873,7 @@ Only for internal use.")
 
 Abbreviations are made by taking the first character from each
 word in the function's name, e.g. \"bb\" is an abbrev for
-`bury-buffer', \"stb\" is an abbrev for `switch-to-buffer'."
+`bury-buffer', \"stb\" is an abbrev for `anything-c-switch-to-buffer'."
   (string-match anything-c-function-abbrev-regexp candidate))
 
 (defvar anything-c-source-emacs-functions-with-abbrevs
@@ -7189,11 +7189,11 @@ replace with STR as yanked string."
     (action . (("Goto line"
                 . (lambda (candidate)
                     (let ((items (split-string candidate ":")))
-                      (switch-to-buffer (second items))
+                      (anything-c-switch-to-buffer (second items))
                       (anything-goto-line (string-to-number (car items))))))))
     (persistent-action . (lambda (candidate)
                            (let ((items (split-string candidate ":")))
-                             (switch-to-buffer (second items))
+                             (anything-c-switch-to-buffer (second items))
                              (anything-goto-line (string-to-number (car items)))
                              (anything-match-line-color-current-line))))
     (persistent-help . "Show this line")))
@@ -8131,7 +8131,7 @@ When nil, fallback to `browse-url-browser-function'.")
         (emms-stream-add-bookmark name url (string-to-number fd) type)
         (emms-stream-save-bookmarks-file)
         (emms-stream-quit)
-        (switch-to-buffer cur-buf)))))
+        (anything-c-switch-to-buffer cur-buf)))))
 
 (defun anything-emms-stream-delete-bookmark (elm)
   "Delete an emms-stream bookmark from anything."
@@ -8145,7 +8145,7 @@ When nil, fallback to `browse-url-browser-function'.")
         (emms-stream-delete-bookmark)
         (emms-stream-save-bookmarks-file)
         (emms-stream-quit)
-        (switch-to-buffer cur-buf)))))
+        (anything-c-switch-to-buffer cur-buf)))))
 
 (defvar anything-c-source-emms-streams
   '((name . "Emms Streams")
@@ -8391,8 +8391,8 @@ See also `anything-create--actions'."
    (append anything-create--actions-private
            '(("find-file" . find-file)
              ("find-file other window" . find-file-other-window)
-             ("New buffer" . switch-to-buffer)
-             ("New buffer other window" . switch-to-buffer-other-window)
+             ("New buffer" . anything-c-switch-to-buffer)
+             ("New buffer other window" . anything-c-switch-to-buffer-other-window)
              ("Bookmark Set" . bookmark-set)
              ("Set Register" .
               (lambda (x) (set-register (read-char "Register: ") x)))
@@ -8677,8 +8677,8 @@ package name - description."
 (defun anything-c-shell-command-if-needed (command)
   (interactive "sShell command: ")
   (if (get-buffer command)		; if the buffer already exists
-      (switch-to-buffer command)	; then just switch to it
-      (switch-to-buffer command)	; otherwise create it
+      (anything-c-switch-to-buffer command)	; then just switch to it
+      (anything-c-switch-to-buffer command)	; otherwise create it
       (insert (shell-command-to-string command))))
 
 (defun anything-c-apt-cache-show (package)
@@ -8788,7 +8788,7 @@ package name - description."
   "Gentoo default action that use `anything-c-gentoo-buffer'."
   (if (member elm anything-c-cache-world)
       (progn
-        (switch-to-buffer anything-c-gentoo-buffer)
+        (anything-c-switch-to-buffer anything-c-gentoo-buffer)
         (erase-buffer)
         (let ((com-list (append args (list elm))))
           (apply #'call-process command nil t nil
@@ -8806,7 +8806,7 @@ package name - description."
     (candidate-transformer anything-c-highlight-local-use)
     (action . (("Description"
                 . (lambda (elm)
-                    (switch-to-buffer anything-c-gentoo-buffer)
+                    (anything-c-switch-to-buffer anything-c-gentoo-buffer)
                     (erase-buffer)
                     (apply #'call-process "euse" nil t nil
                            `("-i"
@@ -8824,7 +8824,7 @@ package name - description."
                     (anything-c-gentoo-eshell-action elm "*sudo -p Password: euse -P")))
                ("Show which dep use this flag"
                 . (lambda (elm)
-                    (switch-to-buffer anything-c-gentoo-buffer)
+                    (anything-c-switch-to-buffer anything-c-gentoo-buffer)
                     (erase-buffer)
                     (apply #'call-process "equery" nil t nil
                            `("-C"
@@ -10466,16 +10466,23 @@ Return nil if bmk is not a valid bookmark."
             (enable-match-plugin)
             (message "Anything-match-plugin enabled"))))))
 
+;; anything switch to buffer
+;; Shut up byte compiler in emacs24.
+;;
+(defun anything-c-switch-to-buffer (buffer-or-name)
+  "Same as `switch-to-buffer' whithout warnings at compile time."
+  (with-no-warnings
+    (switch-to-buffer buffer-or-name)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Type Attributes
 (define-anything-type-attribute 'buffer
   `((action
-     ("Switch to buffer" . switch-to-buffer)
+     ("Switch to buffer" . anything-c-switch-to-buffer)
      ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
-     ("Switch to buffer other window" . switch-to-buffer-other-window)
-     ("Switch to buffer other frame" . switch-to-buffer-other-frame)
+     ("Switch to buffer other window" . anything-c-switch-to-buffer-other-window)
+     ("Switch to buffer other frame" . anything-c-switch-to-buffer-other-frame)
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
      ("Query replace regexp" . anything-c-buffer-query-replace-regexp)
      ("View buffer" . view-buffer)
