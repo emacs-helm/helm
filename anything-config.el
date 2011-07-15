@@ -8075,7 +8075,7 @@ Return an alist with elements like (data . number_results)."
 (defun* anything-c-browse-url (&optional (url anything-c-home-url))
   "Default command to browse URL."
   (if browse-url-browser-function
-      (funcall browse-url-browser-function url)
+      (browse-url url)
       (anything-browse-url-default-browser url)))
 
 (defun anything-c-build-elvi-list ()
