@@ -804,6 +804,12 @@ It is useful to select a particular object instead of the first one. ")
 (defvar anything-after-persistent-action-hook nil
   "Run after executing persistent action.")
 
+(defvar anything-move-selection-before-hook nil
+  "Run before moving selection in `anything-buffer'.")
+
+(defvar anything-move-selection-after-hook nil
+  "Run after moving selection in `anything-buffer'.")
+
 (defvar anything-restored-variables
   '( anything-candidate-number-limit
      anything-source-filter
@@ -2421,12 +2427,14 @@ UNIT and DIRECTION."
   (unless (or (anything-empty-buffer-p (anything-buffer-get))
               (not (anything-window)))
     (with-anything-window
+      (run-hooks 'anything-move-selection-before-hook)
       (funcall move-func)
       (anything-skip-noncandidate-line direction)
       (anything-display-source-at-screen-top-maybe unit)
       (when (anything-get-previous-header-pos)
         (anything-mark-current-line))
-      (anything-display-mode-line (anything-get-current-source)))))
+      (anything-display-mode-line (anything-get-current-source))
+      (run-hooks 'anything-move-selection-after-hook))))
 
 (defun anything-display-source-at-screen-top-maybe (unit)
   (when (and anything-display-source-at-screen-top (eq unit 'source))

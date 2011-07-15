@@ -9185,13 +9185,37 @@ This is the same as `ac-insert', just inlined here for compatibility."
 
 ;;; Lisp symbol completion.
 ;;
+;;
+(defcustom anything-lisp-completion-or-indent-delay 3
+  "After this delay `anything-lisp-completion-counter' is reset to 0.
+This allow to indent again without completing lisp symbol after this delay.
+Default is 3 seconds."
+  :group 'anything-config
+  :type 'integer)
 
-;; Internal.
-;; Allow user to enable anything-show-completion.
-;; i.e use '(length anything-lisp-completion-target)
-;; as second arg of `use-anything-show-completion'.
-;; Otherwise it is unused.
-(defvar anything-lisp-completion-target nil)
+(defcustom anything-lisp-completion-show-completion t
+  "Display candidate in buffer while moving selection when non--nil."
+  :group 'anything-config
+  :type 'bolean)
+
+(defface anything-lisp-completion-face
+  '((t (:background "DarkSlateGray")))
+  "*Face used for showing candidates in `anything-lisp-completion'."
+  :group 'anything-config)
+
+;; Internal
+(defvar anything-lisp-completion-overlay nil)
+(defvar anything-lisp-completion-counter 0)
+
+(defun anything-lisp-completion-show-completion ()
+  (overlay-put anything-lisp-completion-overlay
+               'display (anything-get-selection)))
+
+(defun anything-lisp-completion-init-overlay (beg end)
+  (and anything-lisp-completion-show-completion
+       (setq anything-lisp-completion-overlay (make-overlay beg end))
+       (overlay-put anything-lisp-completion-overlay
+                    'face 'anything-lisp-completion-face)))
 
 ;;;###autoload
 (defun anything-lisp-completion-at-point ()
@@ -9204,31 +9228,29 @@ This is the same as `ac-insert', just inlined here for compatibility."
          (pred   (plist-get plist :predicate))
          (target (and beg end (buffer-substring-no-properties beg end)))
          (anything-quit-if-no-candidate t)
-         (anything-execute-action-at-once-if-one t))
-    (when data
-      (setq anything-lisp-completion-target target)
-      (anything
-       :sources
-       '((name . "Lisp completion")
-         (init . (lambda ()
-                   (with-current-buffer (anything-candidate-buffer 'global)
-                     (loop for sym in (all-completions target (nth 2 data) pred)
-                        do (insert (concat sym "\n"))))))
-         (candidates-in-buffer)
-         (action . (lambda (candidate)
-                     (delete-region beg end)
-                     (insert candidate))))
-       :input target))))
- 
-(defcustom anything-lisp-completion-or-indent-delay 3
-  "After this delay `anything-lisp-completion-counter' is reset to 0.
-This allow to indent again without completing lisp symbol after this delay.
-Default is 3 seconds."
-  :group 'anything-config
-  :type 'integer)
+         (anything-execute-action-at-once-if-one t)
+         (anything-move-selection-after-hook
+          (and anything-lisp-completion-show-completion
+               (append (list 'anything-lisp-completion-show-completion)
+                       anything-move-selection-after-hook))))
+    (unwind-protect
+         (when data
+           (anything-lisp-completion-init-overlay beg end)
+           (anything
+            :sources
+            '((name . "Lisp completion")
+              (init . (lambda ()
+                        (with-current-buffer (anything-candidate-buffer 'global)
+                          (loop for sym in (all-completions target (nth 2 data) pred)
+                             do (insert (concat sym "\n"))))))
+              (candidates-in-buffer)
+              (action . (lambda (candidate)
+                          (delete-region beg end)
+                          (insert candidate))))
+            :input target))
+      (and anything-lisp-completion-show-completion
+           (delete-overlay anything-lisp-completion-overlay)))))
 
-;; Internal
-(defvar anything-lisp-completion-counter 0)
 ;;;###autoload
 (defun anything-lisp-completion-at-point-or-indent ()
   "First call indent and second call complete lisp symbol.
