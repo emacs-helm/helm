@@ -1220,7 +1220,8 @@ First call open the kill-ring browser, next calls move to next line."
 (defun anything-buffers+ ()
   "Enhanced preconfigured `anything' for buffer."
   (interactive)
-  (anything :sources 'anything-c-source-buffers+
+  (anything :sources '(anything-c-source-buffers+
+                       anything-c-source-buffer-not-found)
             :buffer "*anything buffers*" :keymap anything-c-buffer-map))
 
 ;;;###autoload
@@ -1929,7 +1930,10 @@ buffer that is not the current buffer."
 (defvar anything-c-source-buffer-not-found
   '((name . "Create buffer")
     (dummy)
-    (type . buffer)))
+    (filtered-candidate-transformer (lambda (cands source)
+                                      (list anything-pattern)))
+    (action . (lambda (candidate)
+                (anything-c-switch-to-buffer (get-buffer-create candidate))))))
 ;; (anything 'anything-c-source-buffer-not-found)
 
 ;;; Buffers+
