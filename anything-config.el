@@ -3125,10 +3125,10 @@ or hitting C-z on \"..\"."
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
     (cond ((string= pattern "") "")
+          ((string-match ".*\\(~//\\|//\\)$" pattern) "/")
           ((or (string-match "^~" pattern)
                (string-match ".*/~/$" pattern))
            (replace-match (getenv "HOME") nil t pattern))
-          ((string-match "//" pattern) "/")
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
                 (setq cur-method (match-string 1 pattern))
