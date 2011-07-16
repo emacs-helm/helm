@@ -9253,12 +9253,12 @@ This is the same as `ac-insert', just inlined here for compatibility."
 ;;; Lisp symbol completion.
 ;;
 ;;
-(defcustom anything-lisp-completion-or-indent-delay 3
+(defcustom anything-lisp-completion-or-indent-delay 0.6
   "After this delay `anything-lisp-completion-counter' is reset to 0.
 This allow to indent again without completing lisp symbol after this delay.
-Default is 3 seconds."
+Default is 0.6 seconds."
   :group 'anything-config
-  :type 'integer)
+  :type  'number)
 
 (defcustom anything-lisp-completion-show-completion t
   "Display candidate in buffer while moving selection when non--nil."
