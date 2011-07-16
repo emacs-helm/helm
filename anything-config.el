@@ -3089,6 +3089,26 @@ or hitting C-z on \"..\"."
             (anything-check-minibuffer-input-1))))))
 (add-hook 'anything-after-update-hook 'anything-ff-update-when-only-one-matched)
 
+;; Allow expanding to home directory or root
+;; when entering respectively "~/" or "//" at end of pattern.
+;; e.g /home/thierry/labo/anything-config-qp/~/
+;; will expand to "~/"
+;; and /home/thierry/labo/anything-config-qp//
+;; will expand to "/"
+(defun anything-ff-auto-expand-to-home-or-root ()
+  (when (and (anything-file-completion-source-p)
+             (string-match ".*\\(/~/\\|/\\{2\\}\\)$" anything-pattern))
+    (let ((match (match-string 1 anything-pattern)))
+      (cond ((string= match "//")
+             (setq anything-pattern "/"))
+            ((string= match "/~/")
+             (setq anything-pattern "~/"))))
+    (setq anything-ff-default-directory anything-pattern)
+    (with-current-buffer (window-buffer (minibuffer-window))
+      (delete-minibuffer-contents)
+      (insert anything-pattern))))
+(add-hook 'anything-after-update-hook 'anything-ff-auto-expand-to-home-or-root)
+
 (defun anything-c-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
   (dired (file-name-directory file))
@@ -3105,8 +3125,10 @@ or hitting C-z on \"..\"."
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
     (cond ((string= pattern "") "")
-          ((string-match "^~" pattern)
+          ((or (string-match "^~" pattern)
+               (string-match ".*/~/$" pattern))
            (replace-match (getenv "HOME") nil t pattern))
+          ((string-match "//" pattern) "/")
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
                (setq cur-method (match-string 1 pattern))
