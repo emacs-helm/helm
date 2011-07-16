@@ -3131,11 +3131,11 @@ or hitting C-z on \"..\"."
           ((string-match "//" pattern) "/")
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
-               (setq cur-method (match-string 1 pattern))
-               (member cur-method methods))
-          (setq tramp-name (anything-create-tramp-name
-                            (match-string 0 pattern)))
-          (replace-match tramp-name nil t pattern))
+                (setq cur-method (match-string 1 pattern))
+                (member cur-method methods))
+           (setq tramp-name (anything-create-tramp-name
+                             (match-string 0 pattern)))
+           (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
           ((and (string-match  tramp-file-name-regexp pattern)
                 (setq cur-method (match-string 1 pattern))
@@ -3147,7 +3147,7 @@ or hitting C-z on \"..\"."
           ((and (not (string-match reg pattern))
                 (string-match  tramp-file-name-regexp pattern)
                 (member (match-string 1 pattern) methods))
-           "Invalid tramp file name") ; Write in anything-buffer.
+           "Invalid tramp file name")   ; Write in anything-buffer.
           ;; PATTERN is a directory, end it with "/".
           ;; This will make PATTERN not ending yet with "/"
           ;; candidate for `anything-ff-default-directory',
