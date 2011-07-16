@@ -7927,24 +7927,33 @@ Should take one arg: the string to display."
   (anything-other-buffer 'anything-c-source-calculation-result "*anything calcul*"))
 
 ;;; Google Suggestions
-(defvar anything-gg-sug-lgh-flag 0)
+(defvar anything-ggs-max-length-real-flag 0)
+(defvar anything-ggs-max-length-num-flag 0)
 (defun anything-c-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
+  (setq anything-ggs-max-length-real-flag 0
+        anything-ggs-max-length-num-flag 0)
   (let ((request (concat anything-c-google-suggest-url
                          (url-hexify-string input))))
     (flet ((fetch ()
              (loop
                 with result-alist = (xml-get-children
-                                     (car (xml-parse-region (point-min) (point-max)))
+                                     (car (xml-parse-region
+                                           (point-min) (point-max)))
                                      'CompleteSuggestion)
                 for i in result-alist
                 for data = (cdr (caadr (assoc 'suggestion i)))
                 for nqueries = (cdr (caadr (assoc 'num_queries i)))
+                for lqueries = (length (anything-c-ggs-set-number-result
+                                        nqueries))
                 for ldata = (length data)
                 do
-                  (when (> ldata anything-gg-sug-lgh-flag)
-                    (setq anything-gg-sug-lgh-flag ldata))
+                  (progn
+                    (when (> ldata anything-ggs-max-length-real-flag)
+                      (setq anything-ggs-max-length-real-flag ldata))
+                    (when (> lqueries anything-ggs-max-length-num-flag)
+                      (setq anything-ggs-max-length-num-flag lqueries)))
                 collect (cons data nqueries) into cont
                 finally return cont)))
       (if anything-google-suggest-use-curl-p
@@ -7955,17 +7964,31 @@ Return an alist with elements like (data . number_results)."
               (url-retrieve-synchronously request)
             (fetch))))))
 
-
 (defun anything-c-google-suggest-set-candidates ()
   "Set candidates with result and number of google results found."
-  (let ((suggestions (anything-c-google-suggest-fetch anything-input)))
-    (setq suggestions (loop for i in suggestions
-                         for interval = (- anything-gg-sug-lgh-flag (length (car i)))
-                         for elm = (concat (car i)
-                                           (make-string (+ 2 interval) ? )
-                                           "(" (cdr i) " results)")
-                         collect (cons elm (car i))))
-    (if (some (lambda (data) (equal (cdr data) anything-input)) suggestions)
+  (let ((suggestions
+         (loop with suggested-results = (anything-c-google-suggest-fetch
+                                         anything-pattern)
+            for (real . numresult) in suggested-results
+            ;; Prepare number of results with ","
+            for fnumresult = (anything-c-ggs-set-number-result numresult)
+            ;; Calculate number of spaces to add before fnumresult
+            ;; if it is smaller than longest result
+            ;; `anything-ggs-max-length-num-flag'.
+            ;; e.g 1,234,567
+            ;;       345,678
+            ;; To be sure it is aligned properly.
+            for nspaces = (if (< (length fnumresult) anything-ggs-max-length-num-flag)
+                              (- anything-ggs-max-length-num-flag (length fnumresult))
+                              0)
+            ;; Add now the spaces before fnumresult.
+            for align-fnumresult = (concat (make-string nspaces ? ) fnumresult)
+            for interval = (- anything-ggs-max-length-real-flag (length real))
+            for spaces   = (make-string (+ 2 interval) ? )
+            for display = (format "%s%s(%s results)" real spaces align-fnumresult)
+            collect (cons display real))))
+    (if (loop for (disp . dat) in suggestions
+           thereis (equal dat anything-pattern))
         suggestions
         ;; if there is no suggestion exactly matching the input then
         ;; prepend a Search on Google item to the list
@@ -7973,6 +7996,21 @@ Return an alist with elements like (data . number_results)."
          suggestions
          (list (cons (concat "Search for " "'" anything-input "'" " on Google")
                      anything-input))))))
+
+(defun anything-c-ggs-set-number-result (num)
+  (if num
+      (progn
+        (and (numberp num) (setq num (number-to-string num)))
+        (loop for i in (reverse (split-string num "" t))
+           for count from 1
+           append (list i) into C
+           when (= count 3)
+           append (list ",") into C
+           and do (setq count 0)
+           finally return
+             (replace-regexp-in-string
+              "^," "" (mapconcat 'identity (reverse C) ""))))
+      "?"))
 
 (defvar anything-c-google-suggest-default-browser-function nil
   "*The browse url function you prefer to use with google suggest.
