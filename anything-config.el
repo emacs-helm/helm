@@ -2188,13 +2188,13 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-switch-other-window ()
   "Run switch to other window action from `anything-c-source-buffer+'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-c-switch-to-buffer-other-window))
+  (anything-c-quit-and-execute-action 'switch-to-buffer-other-window))
 
 ;;;###autoload
 (defun anything-buffer-switch-other-frame ()
   "Run switch to other frame action from `anything-c-source-buffer+'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-c-switch-to-buffer-other-frame))
+  (anything-c-quit-and-execute-action 'switch-to-buffer-other-frame))
 
 ;;;###autoload
 (defun anything-buffer-switch-to-elscreen ()
@@ -8459,7 +8459,7 @@ See also `anything-create--actions'."
            '(("find-file" . find-file)
              ("find-file other window" . find-file-other-window)
              ("New buffer" . anything-c-switch-to-buffer)
-             ("New buffer other window" . anything-c-switch-to-buffer-other-window)
+             ("New buffer other window" . switch-to-buffer-other-window)
              ("Bookmark Set" . bookmark-set)
              ("Set Register" .
               (lambda (x) (set-register (read-char "Register: ") x)))
@@ -10570,8 +10570,8 @@ Return nil if bmk is not a valid bookmark."
   `((action
      ("Switch to buffer" . anything-c-switch-to-buffer)
      ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
-     ("Switch to buffer other window" . anything-c-switch-to-buffer-other-window)
-     ("Switch to buffer other frame" . anything-c-switch-to-buffer-other-frame)
+     ("Switch to buffer other window" . switch-to-buffer-other-window)
+     ("Switch to buffer other frame" . switch-to-buffer-other-frame)
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
      ("Query replace regexp" . anything-c-buffer-query-replace-regexp)
      ("View buffer" . view-buffer)
