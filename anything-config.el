@@ -925,40 +925,42 @@ It will be cleared at start of next `anything' call when \
 (define-prefix-command 'anything-command-map)
 
 ;; rubikitch: Please change it freely because it is in discussion. I'll track from git.
-(define-key anything-command-map (kbd "<SPC>") 'anything-execute-anything-command)
-(define-key anything-command-map (kbd "e") 'anything-c-etags-select)
-(define-key anything-command-map (kbd "l") 'anything-locate)
-(define-key anything-command-map (kbd "s") 'anything-surfraw)
-(define-key anything-command-map (kbd "r") 'anything-regexp)
-(define-key anything-command-map (kbd "w") 'anything-w3m-bookmarks)
-(define-key anything-command-map (kbd "x") 'anything-firefox-bookmarks)
-(define-key anything-command-map (kbd "#") 'anything-emms)
-(define-key anything-command-map (kbd "m") 'anything-man-woman)
-(define-key anything-command-map (kbd "t") 'anything-top)
-(define-key anything-command-map (kbd "i") 'anything-imenu)
-(define-key anything-command-map (kbd "p") 'anything-list-emacs-process)
-(define-key anything-command-map (kbd "C-x r b") 'anything-c-pp-bookmarks)
-(define-key anything-command-map (kbd "M-y") 'anything-show-kill-ring)
+(define-key anything-command-map (kbd "<SPC>")     'anything-execute-anything-command)
+(define-key anything-command-map (kbd "e")         'anything-c-etags-select)
+(define-key anything-command-map (kbd "l")         'anything-locate)
+(define-key anything-command-map (kbd "s")         'anything-surfraw)
+(define-key anything-command-map (kbd "r")         'anything-regexp)
+(define-key anything-command-map (kbd "w")         'anything-w3m-bookmarks)
+(define-key anything-command-map (kbd "x")         'anything-firefox-bookmarks)
+(define-key anything-command-map (kbd "#")         'anything-emms)
+(define-key anything-command-map (kbd "m")         'anything-man-woman)
+(define-key anything-command-map (kbd "t")         'anything-top)
+(define-key anything-command-map (kbd "i")         'anything-imenu)
+(define-key anything-command-map (kbd "<tab>")     'anything-lisp-completion-at-point)
+(define-key anything-command-map (kbd "p")         'anything-list-emacs-process)
+(define-key anything-command-map (kbd "C-x r b")   'anything-c-pp-bookmarks)
+(define-key anything-command-map (kbd "M-y")       'anything-show-kill-ring)
 (define-key anything-command-map (kbd "C-c <SPC>") 'anything-all-mark-rings)
-(define-key anything-command-map (kbd "C-x C-f") 'anything-find-files)
-(define-key anything-command-map (kbd "f") 'anything-for-files)
-(define-key anything-command-map (kbd "C-:") 'anything-eval-expression-with-eldoc)
-(define-key anything-command-map (kbd "C-,") 'anything-calcul-expression)
-(define-key anything-command-map (kbd "M-x") 'anything-M-x)
-(define-key anything-command-map (kbd "C-x C-w") 'anything-write-file)
-(define-key anything-command-map (kbd "C-x i") 'anything-insert-file)
-(define-key anything-command-map (kbd "M-s o") 'anything-occur)
-(define-key anything-command-map (kbd "M-g s") 'anything-do-grep)
-(define-key anything-command-map (kbd "c") 'anything-colors)
-(define-key anything-command-map (kbd "F") 'anything-select-xfont)
-(define-key anything-command-map (kbd "C-c f") 'anything-recentf)
-(define-key anything-command-map (kbd "C-c g") 'anything-google-suggest)
-(define-key anything-command-map (kbd "h i") 'anything-info-at-point)
-(define-key anything-command-map (kbd "h r") 'anything-info-emacs)
-(define-key anything-command-map (kbd "C-x C-b") 'anything-buffers+)
-(define-key anything-command-map (kbd "C-c C-b") 'anything-browse-code)
-(define-key anything-command-map (kbd "C-x r i") 'anything-register)
-(define-key anything-command-map (kbd "C-c C-x") 'anything-c-run-external-command)
+(define-key anything-command-map (kbd "C-x C-f")   'anything-find-files)
+(define-key anything-command-map (kbd "f")         'anything-for-files)
+(define-key anything-command-map (kbd "C-:")       'anything-eval-expression-with-eldoc)
+(define-key anything-command-map (kbd "C-,")       'anything-calcul-expression)
+(define-key anything-command-map (kbd "M-x")       'anything-M-x)
+(define-key anything-command-map (kbd "C-x C-w")   'anything-write-file)
+(define-key anything-command-map (kbd "C-x i")     'anything-insert-file)
+(define-key anything-command-map (kbd "M-s o")     'anything-occur)
+(define-key anything-command-map (kbd "M-g s")     'anything-do-grep)
+(define-key anything-command-map (kbd "c")         'anything-colors)
+(define-key anything-command-map (kbd "F")         'anything-select-xfont)
+(define-key anything-command-map (kbd "C-c f")     'anything-recentf)
+(define-key anything-command-map (kbd "C-c g")     'anything-google-suggest)
+(define-key anything-command-map (kbd "h i")       'anything-info-at-point)
+(define-key anything-command-map (kbd "h r")       'anything-info-emacs)
+(define-key anything-command-map (kbd "h g")       'anything-info-gnus)
+(define-key anything-command-map (kbd "C-x C-b")   'anything-buffers+)
+(define-key anything-command-map (kbd "C-c C-b")   'anything-browse-code)
+(define-key anything-command-map (kbd "C-x r i")   'anything-register)
+(define-key anything-command-map (kbd "C-c C-x")   'anything-c-run-external-command)
 
 ;; In Emacs 23.1.50, minibuffer-local-must-match-filename-map was renamed to
 ;; minibuffer-local-filename-must-match-map.
@@ -993,7 +995,8 @@ It will be cleared at start of next `anything' call when \
      ["Externals Commands" anything-c-run-external-command t])
     ("Info:"
      ["Info at point" anything-info-at-point t]
-     ["Emacs Manual index" anything-info-emacs t])
+     ["Emacs Manual index" anything-info-emacs t]
+     ["Gnus Manual index" anything-info-gnus t])
     ("Org:"
      ["Org keywords" anything-org-keywords t]
      ["Org headlines" anything-org-headlines t])
@@ -1001,6 +1004,7 @@ It will be cleared at start of next `anything' call when \
      ["Occur" anything-occur t]
      ["Grep" anything-do-grep t]
      ["Etags" anything-c-etags-select t]
+     ["Lisp complete at point" anything-lisp-completion-at-point t]
      ["Browse Kill ring" anything-show-kill-ring t]
      ["Browse register" anything-register t]
      ["Browse code" anything-browse-code t]
@@ -1428,6 +1432,12 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Preconfigured anything to show org headlines."
   (interactive)
   (anything-other-buffer 'anything-c-source-org-headline "*org headlines*"))
+
+;;;###autoload
+(defun anything-info-gnus ()
+  "Preconfigured anything to browse Gnus Manual."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-info-gnus "*info Gnus*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; kill buffers
