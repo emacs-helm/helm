@@ -3171,7 +3171,7 @@ or hitting C-z on \"..\"."
   "Try to complete filenames smarter when non--nil.
 See `anything-ff-transform-fname-for-completion' for more info."
   :group 'anything-config
-  :type 'bolean)
+  :type 'boolean)
 
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
@@ -3383,7 +3383,7 @@ KBSIZE if a floating point number, default value is 1024.0."
   "No colors when listing remote files when set to non--nil.
 This make listing much faster, specially on slow machines."
   :group 'anything-config
-  :type  'bolean)
+  :type  'boolean)
 
 (defun anything-c-find-files-transformer (files sources)
   "Selector of transformer to use for `anything-c-source-find-files'."
@@ -9263,7 +9263,7 @@ Default is 0.6 seconds."
 (defcustom anything-lisp-completion-show-completion t
   "Display candidate in buffer while moving selection when non--nil."
   :group 'anything-config
-  :type 'bolean)
+  :type 'boolean)
 
 (defface anything-lisp-completion-face
   '((t (:background "DarkSlateGray")))
