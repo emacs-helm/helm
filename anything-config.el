@@ -6554,7 +6554,6 @@ Contain also `anything-c-source-google-suggest'."
               'help-echo (anything-c-firefox-bookmarks-get-value i))))
 
 ;; W3m bookmark
-;; Bugfix:
 ;; Some users have the emacs-w3m library in load-path
 ;; without having the w3m executable :-;
 ;; So check if w3m program is present before trying to load
@@ -6562,6 +6561,7 @@ Contain also `anything-c-source-google-suggest'."
 (eval-when-compile
   (when (executable-find "w3m")
     (require 'w3m-bookmark nil t)))
+
 (defvar w3m-bookmark-file "~/.w3m/bookmark.html")
 
 
@@ -8082,7 +8082,10 @@ Return an alist with elements like (data . number_results)."
 ;;; http://surfraw.alioth.debian.org/
 ;; user variables
 (require 'browse-url)
-(defvar w3m-command nil)
+;; If default setting of `w3m-command' is not
+;; what you want you and you modify it, you will have to reeval
+;; also `anything-browse-url-default-browser-alist'.
+(defvar w3m-command "/usr/bin/w3m")
 (defvar anything-c-home-url "http://www.google.fr"
   "*Default url to use as home url.")
 
@@ -8127,11 +8130,11 @@ Return an alist with elements like (data . number_results)."
 
 (defun anything-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
-  (let ((default-browser (loop
-                            for i in anything-browse-url-default-browser-alist
-                            thereis (and (car i) (executable-find (car i))))))
-    (if default-browser
-        (apply default-browser url args)
+  (let ((default-browser-fn
+         (loop for (exe . fn) in anything-browse-url-default-browser-alist
+            thereis (and exe (executable-find exe) fn))))
+    (if default-browser-fn
+        (apply default-browser-fn url args)
         (error "No usable browser found"))))
 
 (defun* anything-c-browse-url (&optional (url anything-c-home-url))
