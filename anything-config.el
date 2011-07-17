@@ -657,6 +657,8 @@
 (require 'dired-aux)
 (require 'tramp)
 (require 'grep)
+(require 'url)
+(require 'xml)
 
 ;;; Code:
 
