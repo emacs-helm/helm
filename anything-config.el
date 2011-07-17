@@ -9229,7 +9229,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
 (defun anything-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
   (catch 'pcompleted
-    (let* (pcomplete-stub
+    (let* ((pcomplete-stub)
            pcomplete-seen pcomplete-norm-func
            pcomplete-args pcomplete-last pcomplete-index
            (pcomplete-autolist pcomplete-autolist)
@@ -9246,7 +9246,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
                             (let ((fc (car (last (pcomplete-parse-arguments)))))
                               ;; Check if last arg require fname completion.
                               (and (file-name-directory fc) fc))))
-           for i in (if (listp table) table ; Emacs23 or commands.
+           for i in (if (listp table) table                     ; Emacs23 or commands.
                         (all-completions pcomplete-stub table)) ; Emacs24
            for file-cand = (and entry (expand-file-name i (file-name-directory entry)))
            if (and file-cand (file-exists-p file-cand)) collect file-cand into ls
@@ -9262,8 +9262,9 @@ This is the same as `ac-insert', just inlined here for compatibility."
   (let ((anything-quit-if-no-candidate t)
         (anything-execute-action-at-once-if-one t))
     (anything :sources 'anything-c-source-esh
-              :input (car (last (ignore-errors ; Needed in lisp symbols completion.
-                                  (pcomplete-parse-arguments)))))))
+              :input (anything-ff-set-pattern   ; Handle tramp filenames.
+                      (car (last (ignore-errors ; Needed in lisp symbols completion.
+                                   (pcomplete-parse-arguments))))))))
 
 ;;; Lisp symbol completion.
 ;;
