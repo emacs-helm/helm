@@ -9281,9 +9281,14 @@ Default is 0.6 seconds."
   :group 'anything-config
   :type 'boolean)
 
-(defface anything-lisp-completion-face
+(defface anything-lisp-show-completion
   '((t (:background "DarkSlateGray")))
   "*Face used for showing candidates in `anything-lisp-completion'."
+  :group 'anything-config)
+
+(defface anything-lisp-completion-info
+  '((t (:foreground "red")))
+  "*Face used for showing info in `anything-lisp-completion'."
   :group 'anything-config)
 
 ;; Internal
@@ -9298,7 +9303,7 @@ Default is 0.6 seconds."
   (and anything-lisp-completion-show-completion
        (setq anything-lisp-completion-overlay (make-overlay beg end))
        (overlay-put anything-lisp-completion-overlay
-                    'face 'anything-lisp-completion-face)))
+                    'face 'anything-lisp-show-completion)))
 
 ;;;###autoload
 (defun anything-lisp-completion-at-point ()
@@ -9327,6 +9332,14 @@ Default is 0.6 seconds."
                           (loop for sym in (all-completions target (nth 2 data) pred)
                              do (insert (concat sym "\n"))))))
               (candidates-in-buffer)
+              (persistent-action . (lambda (candidate)
+                                     (let (mode-line-in-non-selected-windows)
+                                       (anything-c-eldoc-show-in-mode-line
+                                        (propertize
+                                         (anything-c-get-first-line-documentation
+                                           (intern candidate))
+                                         'face 'anything-lisp-completion-info)))))
+              (persistent-help . "Show brief doc in mode-line")
               (action . (lambda (candidate)
                           (delete-region beg end)
                           (insert candidate))))
@@ -9334,12 +9347,31 @@ Default is 0.6 seconds."
       (and anything-lisp-completion-show-completion
            (delete-overlay anything-lisp-completion-overlay)))))
 
+;; A bug in `documentation' make documentation of the defun*'s
+;; return the args list, so such functions when not documented
+;; will return a first line of spaces instead of nil. :-(
+(defun anything-c-get-first-line-documentation (sym)
+  "Return first line documentation of symbol SYM.
+If SYM is not documented, return \"Not documented\"."
+  (let ((doc (cond ((fboundp sym)
+                    (documentation sym t))
+                   ((boundp sym)
+                    (documentation-property sym 'variable-documentation t))
+                   ((facep sym)
+                    (face-documentation sym))
+                   (t nil))))
+    (if (and doc (not (string= doc "")))
+        (car (split-string doc "\n"))
+        "Not documented")))
+
 ;;;###autoload
 (defun anything-lisp-completion-at-point-or-indent ()
   "First call indent and second call complete lisp symbol.
 The second call should happen before `anything-lisp-completion-or-indent-delay',
 after this delay, next call will indent again.
-After completion, next call is always indent."
+After completion, next call is always indent.
+See that like click and double mouse click.
+One hit indent, two quick hits complete."
   (interactive)
   (incf anything-lisp-completion-counter)
   (unwind-protect
