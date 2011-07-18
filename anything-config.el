@@ -3112,9 +3112,14 @@ or hitting C-z on \"..\"."
              (string-match ".*\\(/~/\\|/\\{2\\}\\)$" anything-pattern))
     (let ((match (match-string 1 anything-pattern)))
       (cond ((string= match "//")
-             (setq anything-pattern "/"))
+             (if (eq system-type 'windows-nt)
+                 (setq anything-pattern "c:/")
+                 (setq anything-pattern "/")))
             ((string= match "/~/")
-             (setq anything-pattern "~/"))))
+             (if (eq system-type 'windows-nt)
+                 (setq anything-pattern (replace-regexp-in-string
+                                         "\\\\" "/" (getenv "HOME")))
+                 (setq anything-pattern "~/")))))
     (setq anything-ff-default-directory anything-pattern)
     (with-current-buffer (window-buffer (minibuffer-window))
       (delete-minibuffer-contents)
@@ -3133,14 +3138,21 @@ or hitting C-z on \"..\"."
             for i across v collect i)))
 
 (defun anything-ff-set-pattern (pattern)
+  "Handle tramp filenames in `anything-pattern'."
   (let ((methods (mapcar 'car tramp-methods))
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
     (cond ((string= pattern "") "")
-          ((string-match ".*\\(~//\\|//\\)$" pattern) "/")
+          ((string-match ".*\\(~//\\|//\\)$" pattern)
+           (if (eq system-type 'windows-nt) "c:/" "/"))
           ((or (string-match "^~" pattern)
                (string-match ".*/~/$" pattern))
-           (replace-match (getenv "HOME") nil t pattern))
+           (let* ((home    (getenv "HOME"))
+                  (replace (if (eq system-type 'windows-nt)
+                               (replace-regexp-in-string
+                                "\\\\" "/" home)
+                               home)))
+             (replace-match replace nil t pattern)))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
                 (setq cur-method (match-string 1 pattern))
@@ -3169,6 +3181,45 @@ or hitting C-z on \"..\"."
            (file-name-as-directory pattern))
           ;; Return PATTERN unchanged.
           (t pattern))))
+
+;; (defun anything-ff-set-pattern (pattern)
+;;   (let ((methods (mapcar 'car tramp-methods))
+;;         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
+;;         cur-method tramp-name)
+;;     (cond ((string= pattern "") "")
+;;           ((string-match ".*\\(~//\\|//\\)$" pattern)
+;;            (if (eq system-type 'windows-nt) "c:/" "/"))
+;;           ((or (string-match "^~" pattern)
+;;                (string-match ".*/~/$" pattern))
+;;            (replace-match (getenv "HOME") nil t pattern))
+;;           ;; Match "/method:maybe_hostname:"
+;;           ((and (string-match reg pattern)
+;;                 (setq cur-method (match-string 1 pattern))
+;;                 (member cur-method methods))
+;;            (setq tramp-name (anything-create-tramp-name
+;;                              (match-string 0 pattern)))
+;;            (replace-match tramp-name nil t pattern))
+;;           ;; Match "/hostname:"
+;;           ((and (string-match  tramp-file-name-regexp pattern)
+;;                 (setq cur-method (match-string 1 pattern))
+;;                 (and cur-method (not (member cur-method methods))))
+;;            (setq tramp-name (anything-create-tramp-name
+;;                              (match-string 0 pattern)))
+;;            (replace-match tramp-name nil t pattern))
+;;           ;; Match "/method:" in this case don't try to connect.
+;;           ((and (not (string-match reg pattern))
+;;                 (string-match  tramp-file-name-regexp pattern)
+;;                 (member (match-string 1 pattern) methods))
+;;            "Invalid tramp file name")   ; Write in anything-buffer.
+;;           ;; PATTERN is a directory, end it with "/".
+;;           ;; This will make PATTERN not ending yet with "/"
+;;           ;; candidate for `anything-ff-default-directory',
+;;           ;; allowing `anything-ff-retrieve-last-expanded' to retrieve it
+;;           ;; when descending level.
+;;           ((file-directory-p pattern)
+;;            (file-name-as-directory pattern))
+;;           ;; Return PATTERN unchanged.
+;;           (t pattern))))
 
 ;; Internal.
 (defvar anything-ff-default-directory nil)
