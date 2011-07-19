@@ -4085,8 +4085,7 @@ Bindings affected are C, R, S, H."
         (substitute-key-definition
          'dired-do-symlink 'anything-dired-symlink-file dired-mode-map)
         (substitute-key-definition
-         'dired-do-hardlink 'anything-dired-hardlink-file dired-mode-map)
-        (setq anything-dired-bindings t))
+         'dired-do-hardlink 'anything-dired-hardlink-file dired-mode-map))
       (substitute-key-definition
        'anything-dired-copy-file 'dired-do-copy dired-mode-map)
       (substitute-key-definition
@@ -4094,8 +4093,7 @@ Bindings affected are C, R, S, H."
       (substitute-key-definition
        'anything-dired-symlink-file 'dired-do-symlink dired-mode-map)
       (substitute-key-definition
-       'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)
-      (setq anything-dired-bindings nil)))
+       'anything-dired-hardlink-file 'dired-do-hardlink dired-mode-map)))
       
 (defalias 'anything-dired-bindings 'anything-dired-mode)
 
