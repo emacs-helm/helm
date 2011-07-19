@@ -9362,7 +9362,7 @@ Default is 0.6 seconds."
   (interactive)
   (let* ((data   (lisp-completion-at-point))
          (beg    (car data))
-         (end    (cadr data))
+         (end    (point)) ; 'cadr data' is wrong when no space after point.
          (plist  (nthcdr 3 data))
          (pred   (plist-get plist :predicate))
          (target (and beg end (buffer-substring-no-properties beg end)))
@@ -9371,7 +9371,10 @@ Default is 0.6 seconds."
          (anything-move-selection-after-hook
           (and anything-lisp-completion-show-completion
                (append (list 'anything-lisp-completion-show-completion)
-                       anything-move-selection-after-hook))))
+                       anything-move-selection-after-hook)))
+         (anything-match-plugin-enabled
+         (member 'anything-compile-source--match-plugin
+                 anything-compile-source-functions)))
     (unwind-protect
          (when data
            (anything-lisp-completion-init-overlay beg end)
@@ -9394,7 +9397,7 @@ Default is 0.6 seconds."
               (action . (lambda (candidate)
                           (delete-region beg end)
                           (insert candidate))))
-            :input target))
+            :input (if anything-match-plugin-enabled (concat target " ") target)))
       (and anything-lisp-completion-show-completion
            (delete-overlay anything-lisp-completion-overlay)))))
 
