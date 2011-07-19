@@ -2602,18 +2602,18 @@ Copying is done asynchronously with `anything-c-copy-files-async-1'."
                 :history (anything-find-files-history :comp-read nil))))
     (anything-c-copy-async-with-log flist dest)))
 
-(defun anything-c-copy-files-async (flist dest)
+(defun anything-c-copy-files-async ()
   "Preconfigured anything to copy file list FLIST to DEST asynchronously."
-  (interactive
-   (list (anything-c-read-file-name
-          "Copy File async: "
-          :marked-candidates t)
-         (anything-c-read-file-name
-          "Copy File async To: "
-          :preselect candidate
-          :initial-input (car anything-ff-history)
-          :history (anything-find-files-history :comp-read nil))))
-  (anything-c-copy-async-with-log flist dest))
+  (interactive)
+  (let* ((flist (anything-c-read-file-name
+                 "Copy File async: "
+                 :marked-candidates t))
+         (dest  (anything-c-read-file-name
+                 "Copy File async To: "
+                 :preselect (car flist)
+                 :initial-input (car anything-ff-history)
+                 :history (anything-find-files-history :comp-read nil))))
+    (anything-c-copy-async-with-log flist dest)))
 
 (defvar eshell-command-aliases-list nil)
 (declare-function eshell-read-aliases-list "em-alias")
