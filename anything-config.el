@@ -1153,11 +1153,14 @@ ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> l
   "Preconfigured `anything' for searching info at point.
 With a prefix-arg insert symbol at point."
   (interactive "P")
-  (anything :sources'(anything-c-source-info-elisp
-                      anything-c-source-info-cl
-                      anything-c-source-info-pages)
-            :input (and arg (thing-at-point 'symbol))
-            :buffer "*anything info*"))
+  (let ((anything-c-google-suggest-default-function
+         'anything-c-google-suggest-emacs-lisp))
+    (anything :sources'(anything-c-source-info-elisp
+                        anything-c-source-info-cl
+                        anything-c-source-info-pages
+                        anything-c-source-google-suggest)
+              :input (and arg (thing-at-point 'symbol))
+              :buffer "*anything info*")))
 
 ;;;###autoload
 (defun anything-info-emacs ()
@@ -7987,11 +7990,13 @@ Return an alist with elements like (data . number_results)."
               (url-retrieve-synchronously request)
             (fetch))))))
 
-(defun anything-c-google-suggest-set-candidates ()
+(defun anything-c-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
   (let ((suggestions
          (loop with suggested-results = (anything-c-google-suggest-fetch
-                                         anything-pattern)
+                                         (or (and request-prefix
+                                                  (concat request-prefix " " anything-pattern))
+                                             anything-pattern))
             for (real . numresult) in suggested-results
             ;; Prepare number of results with ","
             for fnumresult = (anything-c-ggs-set-number-result numresult)
@@ -8048,13 +8053,22 @@ See `anything-browse-url-default-browser-alist'.")
         (funcall it arg)
       (anything-c-browse-url arg))))
 
+(defvar anything-c-google-suggest-default-function
+  'anything-c-google-suggest-set-candidates
+  "Default function to use in anything google suggest.")
+
 (defvar anything-c-source-google-suggest
   '((name . "Google Suggest")
-    (candidates . anything-c-google-suggest-set-candidates)
+    (candidates . (lambda ()
+                    (funcall anything-c-google-suggest-default-function)))
     (action . (("Google Search" . anything-c-google-suggest-action)))
     (volatile)
     (requires-pattern . 3)
     (delayed)))
+
+(defun anything-c-google-suggest-emacs-lisp ()
+  "Try to emacs lisp complete with google suggestions."
+  (anything-c-google-suggest-set-candidates "emacs lisp"))
 
 ;; (anything 'anything-c-source-google-suggest)
 
