@@ -9398,9 +9398,6 @@ Default is 0.6 seconds."
       (and anything-lisp-completion-show-completion
            (delete-overlay anything-lisp-completion-overlay)))))
 
-;; A bug in `documentation' make documentation of the defun*'s
-;; return the args list, so such functions when not documented
-;; will return a first line of spaces instead of nil. :-(
 (defun anything-c-get-first-line-documentation (sym)
   "Return first line documentation of symbol SYM.
 If SYM is not documented, return \"Not documented\"."
@@ -9411,7 +9408,10 @@ If SYM is not documented, return \"Not documented\"."
                    ((facep sym)
                     (face-documentation sym))
                    (t nil))))
-    (if (and doc (not (string= doc "")))
+    (if (and doc (not (string= doc ""))
+             ;; `documentation' return "\n\n(args...)"
+             ;; for CL-style functions.
+             (not (string-match-p "^\n\n" doc)))
         (car (split-string doc "\n"))
         "Not documented")))
 
