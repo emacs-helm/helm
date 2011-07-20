@@ -4918,9 +4918,9 @@ Where '%f' format spec is filename and '%p' is page number"
        (get-process "pdfgrep-process")
        #'(lambda (process event)
            (when (string= event "finished\n")
-             (kill-local-variable 'mode-line-format)
              (with-anything-window
-               (anything-update-move-first-line))))))))
+               (anything-update-move-first-line))
+             (force-mode-line-update nil)))))))
 
 
 (defun anything-do-pdfgrep-1 (only)
