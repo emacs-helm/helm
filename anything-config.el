@@ -2092,8 +2092,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (anything-c-buffer-query-replace-1))
 
 (defun anything-c-buffer-help ()
+  "Help command for anything buffers."
   (interactive)
-  (let ((anything-help-message "== Anything Buffer ==\
+  (let ((anything-help-message "== Anything Buffer ==
+\nTips:
+You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
+Enter then a space and a pattern to narrow down to buffers matching this pattern. 
 \nSpecific commands for `anything-buffer+':
 \\<anything-c-buffer-map>
 \\[anything-buffer-run-grep]\t\t->Grep Buffer(s) (C-u grep all buffers linked to a file).
@@ -2772,8 +2776,13 @@ See `anything-ff-serial-rename-1'."
   (anything-ff-serial-rename-action 'copy))
 
 (defun anything-ff-help ()
+  "Help command for `anything-find-files'."
   (interactive)
-  (let ((anything-help-message "== Anything Find Files ==\
+  (let ((anything-help-message "== Anything Find Files ==
+\nTips:
+\nEnter \"~/\" at anytime to reach home directory.
+Enter \"/\" at anytime to reach root of your file system.
+You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 \nSpecific commands for `anything-find-files':
 \\<anything-find-files-map>
 \\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
