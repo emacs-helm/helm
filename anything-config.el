@@ -4274,6 +4274,7 @@ If nil Search in all files.")
 \\[anything-ff-run-delete-file]\t\t->Delete file.
 \\[anything-ff-run-switch-other-window]\t\t->Switch other window.
 \\[anything-ff-properties-persistent]\t\t->Show file properties.
+\\[anything-yank-text-at-point]\t\t->Yank text at point.
 \\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \nLocate tips:
 You can add after writing search pattern any of the locate command line options.
@@ -4291,6 +4292,7 @@ See Man locate for more infos.
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
+    (define-key map (kbd "C-w")     'anything-yank-text-at-point)
     (define-key map (kbd "C-c ?")   'anything-generic-file-help)
     map)
   "Generic Keymap for files.")
