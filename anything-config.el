@@ -9402,26 +9402,30 @@ If SYM is not documented, return \"Not documented\"."
         "Not documented")))
 
 ;;;###autoload
-(defun anything-lisp-completion-at-point-or-indent ()
+(defun anything-lisp-completion-at-point-or-indent (arg)
   "First call indent and second call complete lisp symbol.
 The second call should happen before `anything-lisp-completion-or-indent-delay',
 after this delay, next call will indent again.
 After completion, next call is always indent.
 See that like click and double mouse click.
 One hit indent, two quick hits complete."
-  (interactive)
-  (incf anything-lisp-completion-counter)
-  (unwind-protect
-       (if (> anything-lisp-completion-counter 1)
-           (anything-lisp-completion-at-point)
-           (indent-for-tab-command))
-    ;; After 3 seconds reset to 0.
-    (run-with-timer anything-lisp-completion-or-indent-delay nil
-                    #'(lambda ()
-                        (setq anything-lisp-completion-counter 0)))
-    ;; Always reset to 0 at second hit.
-    (when (eq anything-lisp-completion-counter 2)
-      (setq anything-lisp-completion-counter 0))))
+  (interactive "P")
+  ;; Be sure `indent-for-tab-command' will not try
+  ;; to use `completion-at-point'.
+  (let ((tab-always-indent (if (eq tab-always-indent 'complete)
+                               t tab-always-indent)))
+    (incf anything-lisp-completion-counter)
+    (unwind-protect
+         (if (> anything-lisp-completion-counter 1)
+             (anything-lisp-completion-at-point)
+             (indent-for-tab-command arg))
+      ;; After 3 seconds reset to 0.
+      (run-with-timer anything-lisp-completion-or-indent-delay nil
+                      #'(lambda ()
+                          (setq anything-lisp-completion-counter 0)))
+      ;; Always reset to 0 at second hit.
+      (when (eq anything-lisp-completion-counter 2)
+        (setq anything-lisp-completion-counter 0)))))
 
 
 ;;; Run Externals commands within Emacs with anything completion
