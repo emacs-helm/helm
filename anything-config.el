@@ -9408,7 +9408,7 @@ The second call should happen before `anything-lisp-completion-or-indent-delay',
 after this delay, next call will indent again.
 After completion, next call is always indent.
 See that like click and double mouse click.
-One hit indent, two quick hits complete."
+One hit indent, two quick hits maybe indent and complete."
   (interactive "P")
   ;; Be sure `indent-for-tab-command' will not try
   ;; to use `completion-at-point'.
@@ -9419,7 +9419,8 @@ One hit indent, two quick hits complete."
          (if (> anything-lisp-completion-counter 1)
              (anything-lisp-completion-at-point)
              (indent-for-tab-command arg))
-      ;; After 3 seconds reset to 0.
+      ;; After `anything-lisp-completion-or-indent-delay' seconds
+      ;; reset to 0.
       (run-with-timer anything-lisp-completion-or-indent-delay nil
                       #'(lambda ()
                           (setq anything-lisp-completion-counter 0)))
