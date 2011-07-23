@@ -2589,6 +2589,7 @@ Communication with background emacs is done with temp file
   "Copy file list FLIST to DEST showing log.
 Log is send to `anything-c-copy-files-async-log-file'.
 Copying is done asynchronously with `anything-c-copy-files-async-1'."
+  (declare (special auto-revert-interval))
   (pop-to-buffer (find-file-noselect anything-c-copy-files-async-log-file))
   (set (make-local-variable 'auto-revert-interval) 1)
   (erase-buffer)
