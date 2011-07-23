@@ -9348,6 +9348,7 @@ Default is 0.6 seconds."
          (end    (point)) ; 'cadr data' is wrong when no space after point.
          (plist  (nthcdr 3 data))
          (pred   (plist-get plist :predicate))
+         (lgst-len 0)
          (target (and beg end (buffer-substring-no-properties beg end)))
          (anything-quit-if-no-candidate t)
          (anything-execute-action-at-once-if-one t)
@@ -9367,6 +9368,8 @@ Default is 0.6 seconds."
               (init . (lambda ()
                         (with-current-buffer (anything-candidate-buffer 'global)
                           (loop for sym in (all-completions target (nth 2 data) pred)
+                             for len = (length sym)
+                             when (> len lgst-len) do (setq lgst-len len)
                              do (insert (concat sym "\n"))))))
               (candidates-in-buffer)
               (persistent-action . (lambda (candidate)
@@ -9377,12 +9380,25 @@ Default is 0.6 seconds."
                                            (intern candidate))
                                          'face 'anything-lisp-completion-info)))))
               (persistent-help . "Show brief doc in mode-line")
+              (filtered-candidate-transformer anything-lisp-completion-transformer)
               (action . (lambda (candidate)
                           (delete-region beg end)
                           (insert candidate))))
             :input (if anything-match-plugin-enabled (concat target " ") target)))
       (and anything-lisp-completion-show-completion
            (delete-overlay anything-lisp-completion-overlay)))))
+
+(defun anything-lisp-completion-transformer (candidates source)
+  "Anything candidates transformer for lisp completion."
+  (declare (special lgst-len))
+  (loop for c in candidates
+     for sym = (intern c)
+     for annot = (cond ((commandp sym) " (Com)")
+                       ((fboundp sym)  " (Fun)")
+                       ((boundp sym)   " (Var)")
+                       ((facep sym)    " (Face)"))
+     for spaces = (make-string (- lgst-len (length c)) ? )
+     collect (cons (concat c spaces annot) c)))
 
 (defun anything-c-get-first-line-documentation (sym)
   "Return first line documentation of symbol SYM.
