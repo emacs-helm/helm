@@ -82,4 +82,13 @@
                  :input "a"
                  :execute-action-at-once-if-one t)
             (anything-c-adaptive-store-selection))
-          anything-c-adaptive-history)))))
+          anything-c-adaptive-history))
+      (desc "anything-ff-human-size")
+      (expect "6.7G"
+        (anything-ff-human-size 7141892608.0))
+      (expect "1.2M"
+        (anything-ff-human-size 1221554))
+      (expect "386.6K"
+        (anything-ff-human-size 395897))
+      (expect "456"
+        (anything-ff-human-size 456)))))
