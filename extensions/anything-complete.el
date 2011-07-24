@@ -376,7 +376,9 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
     anything-c-source-complete-emacs-faces))
 
 (defvar anything-apropos-sources
-  '(anything-c-source-apropos-emacs-commands
+  '(anything-c-source-emacs-function-at-point
+    anything-c-source-emacs-variable-at-point
+    anything-c-source-apropos-emacs-commands
     anything-c-source-apropos-emacs-functions
     anything-c-source-apropos-emacs-variables
     anything-c-source-apropos-emacs-faces))
