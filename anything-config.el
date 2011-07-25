@@ -9311,7 +9311,7 @@ Default is 0.6 seconds."
   :group 'anything-config
   :type  'number)
 
-(defcustom anything-lisp-completion-show-completion t
+(defcustom anything-c-turn-on-show-completion t
   "Display candidate in buffer while moving selection when non--nil."
   :group 'anything-config
   :type 'boolean)
@@ -9326,19 +9326,39 @@ Default is 0.6 seconds."
   "*Face used for showing info in `anything-lisp-completion'."
   :group 'anything-config)
 
-;; Internal
-(defvar anything-lisp-completion-overlay nil)
-(defvar anything-lisp-completion-counter 0)
+;; Show completion - an alternative of anything-show-completion.el.
+;;
+;; Provide show completion with macro `with-anything-show-completion'.
 
-(defun anything-lisp-completion-show-completion ()
-  (overlay-put anything-lisp-completion-overlay
+;; Internal
+(defvar anything-c-show-completion-overlay nil)
+
+(defun anything-c-show-completion ()
+  (overlay-put anything-c-show-completion-overlay
                'display (anything-get-selection)))
 
-(defun anything-lisp-completion-init-overlay (beg end)
-  (and anything-lisp-completion-show-completion
-       (setq anything-lisp-completion-overlay (make-overlay beg end))
-       (overlay-put anything-lisp-completion-overlay
+(defun anything-c-completion-init-overlay (beg end)
+  (and anything-c-turn-on-show-completion
+       (setq anything-c-show-completion-overlay (make-overlay beg end))
+       (overlay-put anything-c-show-completion-overlay
                     'face 'anything-lisp-show-completion)))
+
+(defmacro with-anything-show-completion (beg end &rest body)
+  "Show anything candidate in an overlay at point.
+BEG and END are the beginning and end position of the current completion
+in `anything-current-buffer'.
+BODY is an anything call where we want to enable show completion.
+If `anything-c-turn-on-show-completion' is nil just do nothing."
+  (declare (indent 2) (debug t))
+  `(let ((anything-move-selection-after-hook
+          (and anything-c-turn-on-show-completion
+               (append (list 'anything-c-show-completion)
+                       anything-move-selection-after-hook))))
+     (unwind-protect
+          (progn (anything-c-completion-init-overlay ,beg ,end)
+                 ,@body)
+       (and anything-c-turn-on-show-completion
+            (delete-overlay anything-c-show-completion-overlay)))))
 
 ;;;###autoload
 (defun anything-lisp-completion-at-point ()
@@ -9353,41 +9373,35 @@ Default is 0.6 seconds."
          (target (and beg end (buffer-substring-no-properties beg end)))
          (anything-quit-if-no-candidate t)
          (anything-execute-action-at-once-if-one t)
-         (anything-move-selection-after-hook
-          (and anything-lisp-completion-show-completion
-               (append (list 'anything-lisp-completion-show-completion)
-                       anything-move-selection-after-hook)))
          (anything-match-plugin-enabled
          (member 'anything-compile-source--match-plugin
                  anything-compile-source-functions)))
     (unwind-protect
          (when data
-           (anything-lisp-completion-init-overlay beg end)
-           (anything
-            :sources
-            '((name . "Lisp completion")
-              (init . (lambda ()
-                        (with-current-buffer (anything-candidate-buffer 'global)
-                          (loop for sym in (all-completions target (nth 2 data) pred)
-                             for len = (length sym)
-                             when (> len lgst-len) do (setq lgst-len len)
-                             do (insert (concat sym "\n"))))))
-              (candidates-in-buffer)
-              (persistent-action . (lambda (candidate)
-                                     (let (mode-line-in-non-selected-windows)
-                                       (anything-c-eldoc-show-in-mode-line
-                                        (propertize
-                                         (anything-c-get-first-line-documentation
-                                           (intern candidate))
-                                         'face 'anything-lisp-completion-info)))))
-              (persistent-help . "Show brief doc in mode-line")
-              (filtered-candidate-transformer anything-lisp-completion-transformer)
-              (action . (lambda (candidate)
-                          (delete-region beg end)
-                          (insert candidate))))
-            :input (if anything-match-plugin-enabled (concat target " ") target)))
-      (and anything-lisp-completion-show-completion
-           (delete-overlay anything-lisp-completion-overlay)))))
+           (with-anything-show-completion beg end
+             (anything
+              :sources
+              '((name . "Lisp completion")
+                (init . (lambda ()
+                          (with-current-buffer (anything-candidate-buffer 'global)
+                            (loop for sym in (all-completions target (nth 2 data) pred)
+                               for len = (length sym)
+                               when (> len lgst-len) do (setq lgst-len len)
+                               do (insert (concat sym "\n"))))))
+                (candidates-in-buffer)
+                (persistent-action . (lambda (candidate)
+                                       (let (mode-line-in-non-selected-windows)
+                                         (anything-c-eldoc-show-in-mode-line
+                                          (propertize
+                                           (anything-c-get-first-line-documentation
+                                            (intern candidate))
+                                           'face 'anything-lisp-completion-info)))))
+                (persistent-help . "Show brief doc in mode-line")
+                (filtered-candidate-transformer anything-lisp-completion-transformer)
+                (action . (lambda (candidate)
+                            (delete-region beg end)
+                            (insert candidate))))
+              :input (if anything-match-plugin-enabled (concat target " ") target)))))))
 
 (defun anything-lisp-completion-transformer (candidates source)
   "Anything candidates transformer for lisp completion."
@@ -9417,6 +9431,9 @@ If SYM is not documented, return \"Not documented\"."
              (not (string-match-p "^\n\n" doc)))
         (car (split-string doc "\n"))
         "Not documented")))
+
+;; Internal
+(defvar anything-lisp-completion-counter 0)
 
 ;;;###autoload
 (defun anything-lisp-completion-at-point-or-indent (arg)
