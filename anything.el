@@ -2793,14 +2793,22 @@ You can set user options `fit-frame-max-width-percent' and
              ;; last candidate
              (goto-char (anything-get-previous-candidate-separator-pos))
              (delete-region (point-at-bol) (point-max)))
-           (when (eobp)
+           (when (anything-end-of-source-p)
              (goto-char (or (anything-get-previous-candidate-separator-pos)
                             (point-min)))
              (forward-line 1)))
           (t
            (delete-region (point-at-bol) (1+ (point-at-eol)))
-           (when (eobp) (forward-line -1))))
+           (when (anything-end-of-source-p) (forward-line -1))))
     (anything-mark-current-line)))
+
+(defun anything-end-of-source-p ()
+  "Return t if we are at eob or end of source."
+  (save-excursion
+    (forward-line 1)
+    (or (eq (point-at-bol) (point-at-eol))
+        (anything-pos-header-line-p)
+        (eobp))))
 
 (defun anything-edit-current-selection-internal (func)
   (with-anything-window

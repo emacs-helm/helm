@@ -2222,6 +2222,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
   (anything-c-quit-and-execute-action 'anything-find-buffer-on-elscreen))
 
 (defun anything-c-buffers-persistent-kill (buffer)
+  "Persistent action to kill buffer."
   (with-current-buffer (get-buffer buffer)
     (if (and (buffer-modified-p)
              (buffer-file-name (current-buffer)))
@@ -2229,9 +2230,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
           (save-buffer)
           (kill-buffer buffer))
         (kill-buffer buffer)))
-  (anything-delete-current-selection)
-  (anything-force-update)
-  (anything-c-recenter-window))
+  (anything-delete-current-selection))
 
 (defun anything-c-recenter-window ()
   "Make visible current selection by recentering anything window."
