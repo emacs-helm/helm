@@ -9462,6 +9462,22 @@ One hit indent, two quick hits maybe indent and complete."
       (when (eq anything-lisp-completion-counter 2)
         (setq anything-lisp-completion-counter 0)))))
 
+;;; File completion.
+;;
+;; Complete file name at point.
+
+;;;###autoload
+(defun anything-c-complete-file-name-at-point ()
+  "Complete file name at point."
+  (interactive)
+  (let* ((init (thing-at-point 'filename))
+         (end  (point))
+         (beg  (- (point) (length init)))
+         completion)
+  (with-anything-show-completion beg end
+    (setq completion (anything-c-read-file-name "FileName: "
+                                                :initial-input init)))
+  (anything-c-insert-file-name-completion-at-point completion)))
 
 ;;; Run Externals commands within Emacs with anything completion
 ;;
