@@ -3692,17 +3692,17 @@ See <http://sourceforge.net/projects/avf/>.")
   (if buffer-read-only
       (error "Error: Buffer `%s' is read-only" (buffer-name))
       (let* ((end         (point))
-             (guess       (thing-at-point 'filename))
-             (full-path-p (or (string-match (concat "^" (getenv "HOME")) guess)
-                              (string-match "^[^\~]" guess))))
+             (guess       (substring-no-properties (thing-at-point 'filename)))
+             (beg         (- (point) (length guess)))
+             (full-path-p (or (string-match-p (concat "^" (getenv "HOME")) guess)
+                              (string-match-p "^[^\~]" guess))))
         (set-text-properties 0 (length candidate) nil candidate)
-        (if (and guess (not (string= guess "")) (string-match "^~\\|/.*" guess))
+        (if (and guess (not (string= guess "")) (string-match-p "^~\\|/.*" guess))
             (progn
-              (search-backward guess (- (point) (length guess)))
-              (delete-region (point) end)
-              (if full-path-p
-                  (insert (expand-file-name candidate))
-                  (insert (abbreviate-file-name candidate))))
+              (delete-region beg end)
+              (insert (if full-path-p
+                          (expand-file-name candidate)
+                          (abbreviate-file-name candidate))))
             (error "Aborting completion: No valid file name at point")))))
 
 (defun* anything-find-files-history (&key (comp-read t))
@@ -9469,7 +9469,7 @@ One hit indent, two quick hits maybe indent and complete."
 (defun anything-c-complete-file-name-at-point ()
   "Complete file name at point."
   (interactive)
-  (let* ((init (thing-at-point 'filename))
+  (let* ((init (substring-no-properties (thing-at-point 'filename)))
          (end  (point))
          (beg  (- (point) (length init)))
          completion)
