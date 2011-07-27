@@ -3100,17 +3100,17 @@ or hitting C-z on \"..\"."
 ;; Auto-update: anything-find-files auto expansion of directories.
 ;; Internal
 (defun anything-ff-update-when-only-one-matched ()
-  (when (and (anything-file-completion-source-p)
-             anything-ff-auto-update-flag)
-    (with-anything-window
-      (when (<= (anything-approximate-candidate-number) 2)
-        (anything-next-line)
-        (let ((cur-cand (anything-get-selection)))
-          (when (and (file-directory-p cur-cand)
-                     (>= (length (anything-c-basename anything-pattern)) 2)
-                     (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)))
-            (anything-set-pattern (file-name-as-directory cur-cand)))
-            (anything-check-minibuffer-input-1))))))
+  (with-anything-window
+    (when (and (anything-file-completion-source-p)
+               anything-ff-auto-update-flag
+               (<= (anything-approximate-candidate-number) 2)
+               (>= (length (anything-c-basename anything-pattern)) 2))
+      (forward-line 1) (anything-mark-current-line)
+      (let ((cur-cand (anything-get-selection)))
+        (when (and (file-directory-p cur-cand)
+                   (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)))
+          (anything-set-pattern (file-name-as-directory cur-cand))
+          (anything-check-minibuffer-input-1))))))
 (add-hook 'anything-after-update-hook 'anything-ff-update-when-only-one-matched)
 
 ;; Allow expanding to home directory or root
@@ -3157,8 +3157,7 @@ or hitting C-z on \"..\"."
     (cond ((string= pattern "") "")
           ((string-match ".*\\(~//\\|//\\)$" pattern)
            (if (eq system-type 'windows-nt) "c:/" "/"))
-          ((or (string-match "^~" pattern)
-               (string-match ".*/~/$" pattern))
+          ((string-match "^~\\|.*/~/$" pattern)
            (let* ((home    (getenv "HOME"))
                   (replace (if (eq system-type 'windows-nt)
                                (replace-regexp-in-string
@@ -3215,10 +3214,6 @@ See `anything-ff-transform-fname-for-completion' for more info."
          (path-name-dir (file-name-directory path))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
-    (if (member 'anything-compile-source--match-plugin
-                anything-compile-source-functions)
-        (setq anything-pattern path)
-        (setq anything-pattern (replace-regexp-in-string " " ".*" path)))
     (setq anything-pattern (anything-ff-transform-fname-for-completion path))
     (setq anything-ff-default-directory
           (if (string= anything-pattern "")
