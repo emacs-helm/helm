@@ -3747,9 +3747,11 @@ This is the starting point for nearly all actions you can do on files."
         ;; yield indefinitely this directory name in minibuffer
         ;; for unknow reasons, so disable auto-expansion for now
         ;; when any-input is an incomplete file/dir name.
-        (let ((anything-ff-auto-update-initial-value
-               (and anything-ff-auto-update-initial-value
-                    (file-exists-p any-input))))
+        (let* ((anything-ff-auto-update-initial-value
+                (and anything-ff-auto-update-initial-value
+                     (file-exists-p any-input)))
+               (anything-ff-auto-update-flag
+                anything-ff-auto-update-initial-value))
           (anything-find-files1 any-input))
         (setq any-input (expand-file-name (anything-c-current-directory)))
         (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
@@ -4141,7 +4143,12 @@ Bindings affected are C, R, S, H."
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (let ((anything-mp-highlight-delay nil))
+  (let* ((anything-mp-highlight-delay nil)
+         (anything-ff-auto-update-initial-value
+          (and anything-ff-auto-update-initial-value
+               (file-exists-p initial-input)))
+         (anything-ff-auto-update-flag
+          anything-ff-auto-update-initial-value))
     (flet ((action-fn (candidate)
              (if marked-candidates
                  (anything-marked-candidates)
