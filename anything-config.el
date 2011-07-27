@@ -3741,7 +3741,11 @@ This is the starting point for nearly all actions you can do on files."
                (not any-input))
       (setq any-input (expand-file-name org-directory)))
     (if any-input
-        (anything-find-files1 any-input)
+        ;; auto-expanding on a partial directory name as input
+        ;; yield indefinitely this directory name in minibuffer
+        ;; for unknow reasons, so disable auto-expansion for now.
+        (let ((anything-ff-auto-update-initial-value nil))
+          (anything-find-files1 any-input))
         (setq any-input (expand-file-name (anything-c-current-directory)))
         (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
 
