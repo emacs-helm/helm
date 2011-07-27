@@ -3105,7 +3105,7 @@ or hitting C-z on \"..\"."
                anything-ff-auto-update-flag
                (<= (anything-approximate-candidate-number) 2)
                (>= (length (anything-c-basename anything-pattern)) 2))
-      (forward-line 1) (anything-mark-current-line)
+      (anything-next-line)
       (let ((cur-cand (anything-get-selection)))
         (when (and (file-directory-p cur-cand)
                    (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)))
