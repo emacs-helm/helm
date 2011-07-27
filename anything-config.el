@@ -3740,11 +3740,16 @@ This is the starting point for nearly all actions you can do on files."
                org-directory
                (not any-input))
       (setq any-input (expand-file-name org-directory)))
+    (set-text-properties 0 (length any-input) nil any-input)
     (if any-input
+        ;; [Emacs-bug work around]
         ;; auto-expanding on a partial directory name as input
         ;; yield indefinitely this directory name in minibuffer
-        ;; for unknow reasons, so disable auto-expansion for now.
-        (let ((anything-ff-auto-update-initial-value nil))
+        ;; for unknow reasons, so disable auto-expansion for now
+        ;; when any-input is an incomplete file/dir name.
+        (let ((anything-ff-auto-update-initial-value
+               (and anything-ff-auto-update-initial-value
+                    (file-exists-p any-input))))
           (anything-find-files1 any-input))
         (setq any-input (expand-file-name (anything-c-current-directory)))
         (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
