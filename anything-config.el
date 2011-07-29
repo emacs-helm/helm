@@ -4156,18 +4156,13 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
       (or (anything
            :sources
            `(((name . ,(concat "Read File Name History" anything-c-find-files-doc-header))
+              (disable-shortcuts)
               (candidates . (lambda ()
                               (anything-comp-read-get-candidates history nil nil alistp)))
-              (volatile)
               (persistent-action . ,persistent-action)
               (persistent-help . ,persistent-help)
               (action . ,'action-fn))
              ((name . ,(concat "Read file name" anything-c-find-files-doc-header))
-              (init . (lambda ()
-                        ;; For emacsclient (see `anything-c-source-find-files')
-                        (unless window-system
-                          (define-key anything-find-files-map (kbd "C-l")
-                            'anything-find-files-down-one-level))))
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (candidates . (lambda ()
