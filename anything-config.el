@@ -3100,11 +3100,14 @@ or hitting C-z on \"..\"."
 ;; Auto-update: anything-find-files auto expansion of directories.
 ;; Internal
 (defun anything-ff-update-when-only-one-matched ()
-  (with-anything-window
-    (when (and (anything-file-completion-source-p)
-               anything-ff-auto-update-flag
-               (<= (anything-approximate-candidate-number) 2)
-               (>= (length (anything-c-basename anything-pattern)) 2))
+  "Expand to directory when sole completion.
+When only one cndidate is remaining and it is a directory,
+expand to this directory."
+  (when (and (anything-file-completion-source-p)
+             anything-ff-auto-update-flag
+             (<= (anything-approximate-candidate-number) 2)
+             (>= (length (anything-c-basename anything-pattern)) 2))
+    (with-anything-window
       (anything-next-line)
       (let ((cur-cand (anything-get-selection)))
         (when (and (file-directory-p cur-cand)
