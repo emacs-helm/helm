@@ -4171,14 +4171,15 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (candidates . (lambda ()
-                              (if test
-                                  (loop with seq = (anything-find-files-get-candidates)
-                                     for fname in seq when (funcall test fname)
-                                     collect fname into ls
-                                     finally return (if must-match
-                                                        ls
-                                                        (append (list anything-pattern) ls)))
-                                  (anything-find-files-get-candidates))))
+                              (let ((seq (anything-find-files-get-candidates)))
+                                (if test
+                                    (loop 
+                                       for fname in seq when (funcall test fname)
+                                       collect fname into ls
+                                       finally return
+                                         (if must-match ls
+                                             (append (list anything-pattern) ls)))
+                                    (if must-match (cdr seq) seq)))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
@@ -9483,10 +9484,13 @@ One hit indent, two quick hits maybe indent and complete."
   (let* ((init (substring-no-properties (thing-at-point 'filename)))
          (end  (point))
          (beg  (- (point) (length init)))
+         (anything-quit-if-no-candidate t)
+         (anything-execute-action-at-once-if-one t)
          completion)
   (with-anything-show-completion beg end
     (setq completion (anything-c-read-file-name "FileName: "
-                                                :initial-input init)))
+                                                :initial-input init
+                                                :must-match t)))
   (anything-c-insert-file-name-completion-at-point completion)))
 
 ;;; Run Externals commands within Emacs with anything completion
