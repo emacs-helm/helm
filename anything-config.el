@@ -2435,7 +2435,6 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
 ACTION must be an action supported by `anything-dired-action'."
   (let* ((ifiles   (anything-marked-candidates))
          (cand     (anything-get-selection))
-         (buf      anything-current-buffer)
          (prompt   (anything-find-files-set-prompt-for-action
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
@@ -2446,14 +2445,10 @@ ACTION must be an action supported by `anything-dired-action'."
                     :history (anything-find-files-history :comp-read nil)))
          (win-conf (current-window-configuration)))
     (unwind-protect
-         ;; Create temporarily a dired buffer to call dired functions.
-         (with-current-buffer (dired anything-ff-default-directory)
-           (let ((dir-buf (current-buffer)))
-             (anything-dired-action
-              dest :files ifiles :action action :follow parg)
-             ;; If we have started in a dired buffer, don't kill it.
-             (unless (eq dir-buf (get-buffer buf))
-               (kill-buffer dir-buf))))
+         (let ((default-directory anything-ff-default-directory))
+           (anything-dired-action
+            dest :files ifiles :action action :follow parg))
+      ;; Don't reset win-conf when following.
       (unless parg (set-window-configuration win-conf)))))
 
 (defun anything-find-files-copy (candidate)
