@@ -9394,7 +9394,8 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
                           do (insert (concat sym "\n"))))))
            (candidates-in-buffer)
            (persistent-action . (lambda (candidate)
-                                  (let (mode-line-in-non-selected-windows)
+                                  (let ((cursor-in-echo-area t)
+                                        mode-line-in-non-selected-windows)
                                     (anything-c-eldoc-show-in-mode-line
                                      (propertize
                                       (anything-c-get-first-line-documentation
