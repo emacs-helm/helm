@@ -9385,32 +9385,32 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
          (anything-match-plugin-enabled
          (member 'anything-compile-source--match-plugin
                  anything-compile-source-functions)))
-    (unwind-protect
-         (when data
-           (with-anything-show-completion beg end
-             (anything
-              :sources
-              '((name . "Lisp completion")
-                (init . (lambda ()
-                          (with-current-buffer (anything-candidate-buffer 'global)
-                            (loop for sym in (all-completions target (nth 2 data) pred)
-                               for len = (length sym)
-                               when (> len lgst-len) do (setq lgst-len len)
-                               do (insert (concat sym "\n"))))))
-                (candidates-in-buffer)
-                (persistent-action . (lambda (candidate)
-                                       (let (mode-line-in-non-selected-windows)
-                                         (anything-c-eldoc-show-in-mode-line
-                                          (propertize
-                                           (anything-c-get-first-line-documentation
-                                            (intern candidate))
-                                           'face 'anything-lisp-completion-info)))))
-                (persistent-help . "Show brief doc in mode-line")
-                (filtered-candidate-transformer anything-lisp-completion-transformer)
-                (action . (lambda (candidate)
-                            (delete-region beg end)
-                            (insert candidate))))
-              :input (if anything-match-plugin-enabled (concat target " ") target)))))))
+    (when data
+      (with-anything-show-completion beg end
+        ;; Overlay is initialized now in anything-current-buffer.
+        (anything
+         :sources
+         '((name . "Lisp completion")
+           (init . (lambda ()
+                     (with-current-buffer (anything-candidate-buffer 'global)
+                       (loop for sym in (all-completions target (nth 2 data) pred)
+                          for len = (length sym)
+                          when (> len lgst-len) do (setq lgst-len len)
+                          do (insert (concat sym "\n"))))))
+           (candidates-in-buffer)
+           (persistent-action . (lambda (candidate)
+                                  (let (mode-line-in-non-selected-windows)
+                                    (anything-c-eldoc-show-in-mode-line
+                                     (propertize
+                                      (anything-c-get-first-line-documentation
+                                       (intern candidate))
+                                      'face 'anything-lisp-completion-info)))))
+           (persistent-help . "Show brief doc in mode-line")
+           (filtered-candidate-transformer anything-lisp-completion-transformer)
+           (action . (lambda (candidate)
+                       (delete-region beg end)
+                       (insert candidate))))
+         :input (if anything-match-plugin-enabled (concat target " ") target))))))
 
 (defun anything-lisp-completion-transformer (candidates source)
   "Anything candidates transformer for lisp completion."
