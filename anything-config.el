@@ -9247,8 +9247,7 @@ See documentation of `completing-read' and `all-completions' for details."
 (defvar anything-c-source-esh
   '((name . "Eshell completions")
     (init . (lambda ()
-              (setq anything-ec-target (thing-at-point 'symbol)
-                    pcomplete-current-completions nil
+              (setq pcomplete-current-completions nil
                     pcomplete-last-completion-raw nil)))
     (candidates . anything-esh-get-candidates)
     (action . anything-ec-insert))
@@ -9260,7 +9259,8 @@ See documentation of `completing-read' and `all-completions' for details."
   "Insert CANDIDATE at point.
 This is the same as `ac-insert', just inlined here for compatibility."
   (let ((pt (point)))
-    (when (and (search-backward anything-ec-target nil t)
+    (when (and anything-ec-target
+               (search-backward anything-ec-target nil t)
                (string= (buffer-substring (point) pt) anything-ec-target))
       (delete-region (point) pt)))
   (insert candidate))
@@ -9300,8 +9300,12 @@ This is the same as `ac-insert', just inlined here for compatibility."
   (interactive)
   (let* ((anything-quit-if-no-candidate t)
          (anything-execute-action-at-once-if-one t)
+         (target (thing-at-point 'symbol))
          (end (point))
-         (beg (- end (length (thing-at-point 'symbol)))))
+         (beg (or (and target (- end (length target)))
+                  ;; Nothing at point.
+                  (progn (insert " ") (point)))))
+    (setq anything-ec-target (or target " "))
     (with-anything-show-completion beg end
       (anything :sources 'anything-c-source-esh
                 :input (anything-ff-set-pattern   ; Handle tramp filenames.
