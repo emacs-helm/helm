@@ -2021,12 +2021,9 @@ buffer that is not the current buffer."
 \\[anything-send-bug-report-from-anything]:BugReport."
     "String displayed in mode-line in `anything-c-source-buffers+'"))
 
-(defvar anything-c-buffers-cache nil)
 (defvar anything-c-source-buffers+
   '((name . "Buffers")
-    (init . (lambda ()
-              (setq anything-c-buffers-cache (anything-c-buffer-list))))
-    (candidates . anything-c-buffers-cache)
+    (candidates . anything-c-buffer-list)
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
     (diff-action . anything-buffer-toggle-diff)
@@ -2036,6 +2033,7 @@ buffer that is not the current buffer."
                            anything-c-skip-boring-buffers
                            anything-c-highlight-buffers)
     (persistent-action . anything-c-buffers+-persistent-action)
+    (volatile)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
 
@@ -9311,6 +9309,28 @@ This is the same as `ac-insert', just inlined here for compatibility."
                 :input (anything-ff-set-pattern   ; Handle tramp filenames.
                         (car (last (ignore-errors ; Needed in lisp symbols completion.
                                      (pcomplete-parse-arguments)))))))))
+
+;;; Eshell history.
+;;
+;;
+(defvar anything-c-source-eshell-history
+  '((name . "Eshell history")
+    (init . (lambda ()
+              (with-current-buffer (anything-candidate-buffer 'global)
+                (insert-file-contents eshell-history-file-name))))
+    (candidates-in-buffer)
+    (action . (lambda (candidate)
+                (insert candidate))))
+  "Anything source for Eshell history.")
+
+;;;###autoload
+(defun anything-eshell-history ()
+  "Preconfigured anything for eshell history."
+  (interactive)
+  (let* ((end (point))
+         (beg (progn (save-excursion (insert " ") (point)))))
+    (with-anything-show-completion beg end
+      (anything-other-buffer anything-c-source-eshell-history "*Eshell history*"))))
 
 ;;; Lisp symbol completion.
 ;;
