@@ -9298,12 +9298,15 @@ This is the same as `ac-insert', just inlined here for compatibility."
 (defun anything-esh-pcomplete ()
   "Preconfigured anything to provide anything completion in eshell."
   (interactive)
-  (let ((anything-quit-if-no-candidate t)
-        (anything-execute-action-at-once-if-one t))
-    (anything :sources 'anything-c-source-esh
-              :input (anything-ff-set-pattern   ; Handle tramp filenames.
-                      (car (last (ignore-errors ; Needed in lisp symbols completion.
-                                   (pcomplete-parse-arguments))))))))
+  (let* ((anything-quit-if-no-candidate t)
+         (anything-execute-action-at-once-if-one t)
+         (end (point))
+         (beg (- end (length (thing-at-point 'symbol)))))
+    (with-anything-show-completion beg end
+      (anything :sources 'anything-c-source-esh
+                :input (anything-ff-set-pattern   ; Handle tramp filenames.
+                        (car (last (ignore-errors ; Needed in lisp symbols completion.
+                                     (pcomplete-parse-arguments)))))))))
 
 ;;; Lisp symbol completion.
 ;;
