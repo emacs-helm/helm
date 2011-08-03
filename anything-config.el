@@ -9332,15 +9332,9 @@ This is the same as `ac-insert', just inlined here for compatibility."
     (with-anything-show-completion beg end
       (anything-other-buffer anything-c-source-eshell-history "*Eshell history*"))))
 
-;;; Lisp symbol completion.
+;;; Show completion - an alternative of anything-show-completion.el.
 ;;
-;;
-(defcustom anything-lisp-completion-or-indent-delay 0.6
-  "After this delay `anything-lisp-completion-counter' is reset to 0.
-This allow to indent again without completing lisp symbol after this delay.
-Default is 0.6 seconds."
-  :group 'anything-config
-  :type  'number)
+;; Provide show completion with macro `with-anything-show-completion'.
 
 (defcustom anything-c-turn-on-show-completion t
   "Display candidate in buffer while moving selection when non--nil."
@@ -9352,18 +9346,10 @@ Default is 0.6 seconds."
   "*Face used for showing candidates in `anything-lisp-completion'."
   :group 'anything-config)
 
-(defface anything-lisp-completion-info
-  '((t (:foreground "red")))
-  "*Face used for showing info in `anything-lisp-completion'."
-  :group 'anything-config)
-
-;; Show completion - an alternative of anything-show-completion.el.
-;;
-;; Provide show completion with macro `with-anything-show-completion'.
-
 ;; Internal
 (defvar anything-c-show-completion-overlay nil)
 
+;; Called each time cursor move in anything-buffer.
 (defun anything-c-show-completion ()
   (overlay-put anything-c-show-completion-overlay
                'display (anything-get-selection)))
@@ -9390,6 +9376,21 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
                  ,@body)
        (and anything-c-turn-on-show-completion
             (delete-overlay anything-c-show-completion-overlay)))))
+
+;;; Lisp symbol completion.
+;;
+;;
+(defcustom anything-lisp-completion-or-indent-delay 0.6
+  "After this delay `anything-lisp-completion-counter' is reset to 0.
+This allow to indent again without completing lisp symbol after this delay.
+Default is 0.6 seconds."
+  :group 'anything-config
+  :type  'number)
+
+(defface anything-lisp-completion-info
+  '((t (:foreground "red")))
+  "*Face used for showing info in `anything-lisp-completion'."
+  :group 'anything-config)
 
 ;;;###autoload
 (defun anything-lisp-completion-at-point ()
