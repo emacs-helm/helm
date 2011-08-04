@@ -892,6 +892,136 @@ e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
   :type 'list
   :group 'anything-config)
 
+(defcustom anything-ff-auto-update-initial-value t
+  "Auto update when only one candidate directory is matched.
+This is the default value when starting `anything-find-files'."
+  :group 'anything-config
+  :type  'boolean)
+
+(defcustom anything-c-copy-async-prefered-emacs "emacs"
+  "Path to the emacs you want to use for copying async.
+Emacs versions < 24 fail to copy directory due to a bug not fixed
+in `copy-directory'."
+  :group 'anything-config
+  :type 'string)
+
+(defcustom anything-ff-lynx-style-map t
+  "Use arrow keys to navigate with `anything-find-files'."
+  :group 'anything-config
+  :type 'boolean)
+
+(defcustom anything-ff-history-max-length 100
+  "*Number of elements shown in `anything-find-files' history."
+  :group 'anything-config
+  :type 'integer)
+
+(defcustom anything-ff-smart-completion t
+  "Try to complete filenames smarter when non--nil.
+See `anything-ff-transform-fname-for-completion' for more info."
+  :group 'anything-config
+  :type 'boolean)
+
+(defcustom anything-ff-default-kbsize 1024.0
+  "Default Kbsize to use for showing files size.
+It is a float, usually 1024.0 but could be 1000.0 on some systems."
+  :group 'anything-config
+  :type 'float)
+
+(defcustom anything-ff-tramp-not-fancy t
+  "No colors when listing remote files when set to non--nil.
+This make listing much faster, specially on slow machines."
+  :group 'anything-config
+  :type  'boolean)
+
+(defcustom anything-ff-exif-data-program "exiftran"
+  "*Program used to extract exif data of an image file."
+  :group 'anything-config
+  :type 'string)
+
+(defcustom anything-ff-exif-data-program-args "-d"
+  "*Arguments used for `anything-ff-exif-data-program'."
+  :group 'anything-config
+  :type 'string)
+
+(defcustom anything-c-grep-use-ioccur-style-keys t
+  "Use Arrow keys to jump to occurences."
+  :group 'anything-config
+  :type 'boolean)
+
+(defcustom anything-c-pdfgrep-default-read-command "xpdf '%f' %p"
+  "Default command to read pdf files from pdfgrep.
+Where '%f' format spec is filename and '%p' is page number"
+  :group 'anything-config
+  :type 'string)
+
+(defcustom anything-c-etags-tag-file-name "TAGS"
+  "Etags tag file name."
+  :type 'string
+  :group 'anything-config)
+
+(defcustom anything-c-etags-tag-file-search-limit 10
+  "The limit level of directory to search tag file.
+Don't search tag file deeply if outside this value."
+  :type 'number
+  :group 'anything-config)
+
+(defcustom anything-c-filelist-file-name nil
+  "*Filename of file list.
+Accept a list of string for multiple files.
+
+This file tend to be very large (> 100MB) and recommend to be in ramdisk for speed.
+File list is created by make-filelist.rb script.
+
+Usage:
+  ruby make-filelist.rb > /tmp/all.filelist
+
+Then
+ ;; Assume that /tmp is ramdisk or tmpfs
+ (setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\")
+ (setq anything-c-filelist-file-name \"/tmp/all.filelist\")
+"
+  :type 'string
+  :group 'anything-config)
+
+(defcustom anything-c-eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
+  "A function to display eldoc info.
+Should take one arg: the string to display."
+  :group 'anything-config
+  :type  'symbol)
+
+(defcustom anything-c-turn-on-show-completion t
+  "Display candidate in buffer while moving selection when non--nil."
+  :group 'anything-config
+  :type 'boolean)
+
+(defcustom anything-lisp-completion-or-indent-delay 0.6
+  "After this delay `anything-lisp-completion-counter' is reset to 0.
+This allow to indent again without completing lisp symbol after this delay.
+Default is 0.6 seconds."
+  :group 'anything-config
+  :type  'number)
+
+(defcustom anything-c-default-external-file-browser "nautilus"
+  "Default external file browser for your system.
+Directories will be opened externally with it.
+Set to nil if you do not have external file browser
+or do not want to use it."
+  :group 'anything-config
+  :type  'string)
+
+(defcustom anything-c-use-adaptative-sorting nil
+  "*Wheter to use or not adaptative sorting.
+Even if a source use it, it will have no effect when set to nil."
+  :type 'boolean
+  :group 'anything-config)
+
+(defcustom anything-ff-newfile-prompt-p t
+  "Whether Prompt or not when creating new file.
+This set `ffap-newfile-prompt'."
+  :type  'boolean
+  :group 'anything-config)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TODO: This should be integrated in anything.el instead of having
 ;; a defadvice here.
@@ -2353,12 +2483,6 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 
   "String displayed in mode-line in `anything-c-source-find-files'")
 
-(defcustom anything-ff-auto-update-initial-value t
-  "Auto update when only one candidate directory is matched.
-This is the default value when starting `anything-find-files'."
-  :group 'anything-config
-  :type  'boolean)
-
 (defvar anything-ff-auto-update-flag anything-ff-auto-update-initial-value
   "Internal, flag to turn on/off auto-update in `anything-find-files'.
 Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
@@ -2523,12 +2647,6 @@ ACTION must be an action supported by `anything-dired-action'."
 
 ;;; Asynchronous copy of files.
 ;;
-(defcustom anything-c-copy-async-prefered-emacs "emacs"
-  "Path to the emacs you want to use for copying async.
-Emacs versions < 24 fail to copy directory due to a bug not fixed
-in `copy-directory'."
-  :group 'anything-config
-  :type 'string)
 (defvar anything-c-copy-files-async-log-file "/tmp/dired.log")
 (defun anything-c-copy-files-async-1 (flist dest)
   "Copy a list of Files FLIST to DEST asynchronously.
@@ -2811,11 +2929,6 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 \\{anything-map}
 "))
     (anything-help)))
-
-(defcustom anything-ff-lynx-style-map t
-  "Use arrow keys to navigate with `anything-find-files'."
-  :group 'anything-config
-  :type 'boolean)
 
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
@@ -3192,17 +3305,6 @@ expand to this directory."
 (defvar anything-ff-default-directory nil)
 (defvar anything-ff-history nil)
 
-(defcustom anything-ff-history-max-length 100
-  "*Number of elements shown in `anything-find-files' history."
-  :group 'anything-config
-  :type 'integer)
-
-(defcustom anything-ff-smart-completion t
-  "Try to complete filenames smarter when non--nil.
-See `anything-ff-transform-fname-for-completion' for more info."
-  :group 'anything-config
-  :type 'boolean)
-
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern anything-pattern))
@@ -3310,12 +3412,6 @@ in `anything-find-files-persistent-action'."
   (interactive)
   (anything-execute-persistent-action 'kill-buffer-fname))
 
-(defcustom anything-ff-default-kbsize 1024.0
-  "Default Kbsize to use for showing files size.
-It is a float, usually 1024.0 but could be 1000.0 on some systems."
-  :group 'anything-config
-  :type 'float)
-
 (defun anything-ff-human-size (size)
   "Return a string showing SIZE of a file in human readable form.
 SIZE can be an integer or a float depending it's value.
@@ -3405,12 +3501,6 @@ KBSIZE if a floating point number, default value is 1024.0."
            (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
           (t (concat prefix-new " " fname)))))
-
-(defcustom anything-ff-tramp-not-fancy t
-  "No colors when listing remote files when set to non--nil.
-This make listing much faster, specially on slow machines."
-  :group 'anything-config
-  :type  'boolean)
 
 (defun anything-c-find-files-transformer (files sources)
   "Selector of transformer to use for `anything-c-source-find-files'."
@@ -3583,16 +3673,6 @@ This affect directly file CANDIDATE."
   "Rotate image right without quitting anything."
   (interactive)
   (anything-execute-persistent-action 'image-action2))
-
-(defcustom anything-ff-exif-data-program "exiftran"
-  "*Program used to extract exif data of an image file."
-  :group 'anything-config
-  :type 'string)
-
-(defcustom anything-ff-exif-data-program-args "-d"
-  "*Arguments used for `anything-ff-exif-data-program'."
-  :group 'anything-config
-  :type 'string)
 
 (defun anything-ff-exif-data (candidate)
   "Extract exif data from file CANDIDATE using `anything-ff-exif-data-program'."
@@ -4807,11 +4887,6 @@ If N is positive go forward otherwise go backward."
 \\{anything-map}"))
     (anything-help)))
 
-(defcustom anything-c-grep-use-ioccur-style-keys t
-  "Use Arrow keys to jump to occurences."
-  :group 'anything-config
-  :type 'boolean)
-
 (defvar anything-c-grep-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
@@ -4888,11 +4963,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 (defvar anything-c-pdfgrep-default-command "pdfgrep --color never -niH %s %s")
 (defvar anything-c-pdfgrep-default-function 'anything-c-pdfgrep-init)
 (defvar anything-c-pdfgrep-debug-command-line nil)
-(defcustom anything-c-pdfgrep-default-read-command "xpdf '%f' %p"
-  "Default command to read pdf files from pdfgrep.
-Where '%f' format spec is filename and '%p' is page number"
-  :group 'anything-config
-  :type 'string)
 
 (defun anything-c-pdfgrep-init (only-files)
   "Start an asynchronous pdfgrep process in ONLY-FILES list."
@@ -5079,17 +5149,6 @@ Where '%f' format spec is filename and '%p' is page number"
     (define-key map (kbd "C-c ?")    'anything-etags-help)
     map)
   "Keymap used in Etags.")
-
-(defcustom anything-c-etags-tag-file-name "TAGS"
-  "Etags tag file name."
-  :type 'string
-  :group 'anything-config)
-
-(defcustom anything-c-etags-tag-file-search-limit 10
-  "The limit level of directory to search tag file.
-Don't search tag file deeply if outside this value."
-  :type 'number
-  :group 'anything-config)
 
 (defvar anything-c-etags-tag-file-dir nil
   "Etags file directory.")
@@ -5323,23 +5382,6 @@ It is cleared after jumping line.")
     (type . file)))
 ;; (anything 'anything-c-source-files-in-all-dired)
 
-(defcustom anything-c-filelist-file-name nil
-  "*Filename of file list.
-Accept a list of string for multiple files.
-
-This file tend to be very large (> 100MB) and recommend to be in ramdisk for speed.
-File list is created by make-filelist.rb script.
-
-Usage:
-  ruby make-filelist.rb > /tmp/all.filelist
-
-Then
- ;; Assume that /tmp is ramdisk or tmpfs
- (setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\")
- (setq anything-c-filelist-file-name \"/tmp/all.filelist\")
-"
-  :type 'string
-  :group 'anything-config)
 (defvar anything-c-source-filelist
   '((name . "FileList")
     (grep-candidates . anything-c-filelist-file-name)
@@ -7931,12 +7973,6 @@ http://bbdb.sourceforge.net/")
                            (car info-fn) (cadr info-fn)))))
         (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))))
 
-(defcustom anything-c-eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
-  "A function to display eldoc info.
-Should take one arg: the string to display."
-  :group 'anything-config
-  :type  'symbol)
-
 (defvar anything-c-eldoc-show-in-mode-line-delay 12)
 (defun anything-c-eldoc-show-in-mode-line (str)
   "Show string STR in mode-line."
@@ -9335,11 +9371,6 @@ This is the same as `ac-insert', just inlined here for compatibility."
 ;;
 ;; Provide show completion with macro `with-anything-show-completion'.
 
-(defcustom anything-c-turn-on-show-completion t
-  "Display candidate in buffer while moving selection when non--nil."
-  :group 'anything-config
-  :type 'boolean)
-
 (defface anything-lisp-show-completion
   '((t (:background "DarkSlateGray")))
   "*Face used for showing candidates in `anything-lisp-completion'."
@@ -9379,12 +9410,6 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
 ;;; Lisp symbol completion.
 ;;
 ;;
-(defcustom anything-lisp-completion-or-indent-delay 0.6
-  "After this delay `anything-lisp-completion-counter' is reset to 0.
-This allow to indent again without completing lisp symbol after this delay.
-Default is 0.6 seconds."
-  :group 'anything-config
-  :type  'number)
 
 (defface anything-lisp-completion-info
   '((t (:foreground "red")))
@@ -9694,14 +9719,6 @@ The command is like <command %s> and is meant to use with `format'."
     ;; If elisp file have no associations in .mailcap
     ;; `mailcap-maybe-eval' is returned, in this case just return nil.
     (when (stringp result) result)))
-
-(defcustom anything-c-default-external-file-browser "nautilus"
-  "Default external file browser for your system.
-Directories will be opened externally with it.
-Set to nil if you do not have external file browser
-or do not want to use it."
-  :group 'anything-config
-  :type  'string)
 
 (defun anything-get-default-program-for-file (filename)
   "Try to find a default program to open FILENAME.
@@ -10119,12 +10136,6 @@ selection.")
 (defvar anything-c-adaptive-history nil
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
-
-(defcustom anything-c-use-adaptative-sorting nil
-  "*Wheter to use or not adaptative sorting.
-Even if a source use it, it will have no effect when set to nil."
-  :type 'boolean
-  :group 'anything-config)
 
 (defadvice anything-initialize (before anything-c-adaptive-initialize activate)
   "Advise `anything-initialize' to reset `anything-c-adaptive-done'
@@ -10603,12 +10614,6 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
   "Default action.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defcustom anything-ff-newfile-prompt-p t
-  "Whether Prompt or not when creating new file.
-This set `ffap-newfile-prompt'."
-  :type  'boolean
-  :group 'anything-config)
 
 (defun anything-c-find-file-or-marked (candidate)
   "Open file CANDIDATE or open anything marked files in background."
