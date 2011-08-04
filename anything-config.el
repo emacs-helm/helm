@@ -2368,7 +2368,6 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (setq ffap-newfile-prompt t)
               (setq anything-ff-auto-update-flag anything-ff-auto-update-initial-value)))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
@@ -10605,12 +10604,22 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defcustom anything-ff-newfile-prompt-p t
+  "Whether Prompt or not when creating new file.
+This set `ffap-newfile-prompt'."
+  :type  'boolean
+  :group 'anything-config)
+
 (defun anything-c-find-file-or-marked (candidate)
   "Open file CANDIDATE or open anything marked files in background."
-  (let ((marked (anything-marked-candidates)))
+  (let ((marked (anything-marked-candidates))
+        (ffap-newfile-prompt anything-ff-newfile-prompt-p)
+        (find-file-wildcards nil))
     (if (> (length marked) 1)
-        ;; Open all marked files in background.
-        (mapc 'find-file-noselect marked)
+        ;; Open all marked files in background and display
+        ;; the first one.
+        (progn (mapc 'find-file-noselect (cdr marked))
+               (find-file (car marked)))
         (if (and (not (file-exists-p candidate))
                  (and ffap-url-regexp
                       (not (string-match ffap-url-regexp candidate)))
