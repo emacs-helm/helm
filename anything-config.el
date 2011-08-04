@@ -5155,6 +5155,16 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 (defvar anything-c-etags-mtime-alist nil)
 (defvar anything-c-etags-cache (make-hash-table :test 'equal))
 
+(defvar anything-etags-mode-line-string
+  "\\<anything-c-etags-map>\
+\\[anything-etags-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-c-etags-select'.")
+
 (defun anything-c-etags-get-tag-file ()
   "Get Etags tag file."
   ;; Get tag file from `default-directory' or upper directory.
@@ -5235,7 +5245,7 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
     (header-name . anything-c-source-etags-header-name)
     (init . anything-c-etags-init)
     (candidates-in-buffer)
-    (mode-line . anything-ff-mode-line-string)
+    (mode-line . anything-etags-mode-line-string)
     (action . anything-c-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (anything-c-etags-default-action candidate)
