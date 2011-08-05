@@ -94,7 +94,7 @@
 ;; `anything-info-emacs'
 ;; Preconfigured anything for Emacs manual index.
 ;; `anything-show-kill-ring'
-;; Preconfigured `anything' for `kill-ring'. It is drop-in replacement of `yank-pop'.
+;; Preconfigured `anything' for `kill-ring'.
 ;; `anything-minibuffer-history'
 ;; Preconfigured `anything' for `minibuffer-history'.
 ;; `anything-gentoo'
@@ -147,6 +147,8 @@
 ;; Preconfigured anything to browse code.
 ;; `anything-org-headlines'
 ;; Preconfigured anything to show org headlines.
+;; `anything-info-gnus'
+;; Preconfigured anything to browse Gnus Manual.
 ;; `anything-kill-buffers'
 ;; Preconfigured `anything' to kill buffer you selected.
 ;; `anything-regexp'
@@ -188,7 +190,7 @@
 ;; `anything-toggle-all-marks'
 ;; Toggle all marks.
 ;; `anything-c-buffer-help'
-;; Not documented.
+;; Help command for anything buffers.
 ;; `anything-buffer-diff-persistent'
 ;; Toggle diff buffer without quitting anything.
 ;; `anything-buffer-revert-persistent'
@@ -198,6 +200,8 @@
 ;; `anything-buffer-run-kill-buffers'
 ;; Run kill buffer action from `anything-c-source-buffer+'.
 ;; `anything-buffer-run-grep'
+;; Run Grep action from `anything-c-source-buffer+'.
+;; `anything-buffer-run-zgrep'
 ;; Run Grep action from `anything-c-source-buffer+'.
 ;; `anything-buffer-run-query-replace-regexp'
 ;; Run Query replace regexp action from `anything-c-source-buffer+'.
@@ -209,7 +213,11 @@
 ;; Run switch to other frame action from `anything-c-source-buffer+'.
 ;; `anything-buffer-switch-to-elscreen'
 ;; Run switch to elscreen  action from `anything-c-source-buffer+'.
+;; `anything-c-copy-files-async'
+;; Preconfigured anything to copy file list FLIST to DEST asynchronously.
 ;; `anything-ff-help'
+;; Help command for `anything-find-files'.
+;; `anything-ff-run-toggle-auto-update'
 ;; Not documented.
 ;; `anything-ff-run-switch-to-history'
 ;; Run Switch to history action from `anything-c-source-find-files'.
@@ -217,6 +225,8 @@
 ;; Run Grep action from `anything-c-source-find-files'.
 ;; `anything-ff-run-pdfgrep'
 ;; Run Pdfgrep action from `anything-c-source-find-files'.
+;; `anything-ff-run-zgrep'
+;; Run Grep action from `anything-c-source-find-files'.
 ;; `anything-ff-run-copy-file'
 ;; Run Copy file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-rename-file'
@@ -247,12 +257,16 @@
 ;; Run open file externally command action from `anything-c-source-find-files'.
 ;; `anything-ff-run-gnus-attach-files'
 ;; Run gnus attach files command action from `anything-c-source-find-files'.
+;; `anything-ff-run-etags'
+;; Run Etags command action from `anything-c-source-find-files'.
 ;; `anything-ff-run-print-file'
 ;; Run Print file action from `anything-c-source-find-files'.
 ;; `anything-find-files-down-one-level'
 ;; Go down one level like unix command `cd ..'.
 ;; `anything-ff-properties-persistent'
 ;; Show properties without quitting anything.
+;; `anything-ff-run-kill-buffer-persistent'
+;; Execute `anything-ff-kill-buffer-fname' whitout quitting.
 ;; `anything-ff-rotate-left-persistent'
 ;; Rotate image left without quitting anything.
 ;; `anything-ff-rotate-right-persistent'
@@ -271,8 +285,6 @@
 ;; Preconfigured `anything' to symlink files from dired.
 ;; `anything-dired-hardlink-file'
 ;; Preconfigured `anything' to hardlink files from dired.
-;; `anything-dired-bindings'
-;; Replace usual dired commands `C' and `R' by anything ones.
 ;; `anything-generic-file-help'
 ;; Not documented.
 ;; `anything-do-grep'
@@ -298,7 +310,7 @@
 ;; `anything-yank-text-at-point'
 ;; Yank text at point in minibuffer.
 ;; `anything-etags-help'
-;; Not documented.
+;; The help function for etags.
 ;; `anything-c-etags-select'
 ;; Preconfigured anything for etags.
 ;; `anything-filelist'
@@ -329,6 +341,8 @@
 ;; Preconfigured `anything' to post library to EmacsWiki.
 ;; `anything-eval-expression'
 ;; Preconfigured anything for `anything-c-source-evaluation-result'.
+;; `anything-eval-new-line-and-indent'
+;; Not documented.
 ;; `anything-eval-expression-with-eldoc'
 ;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
 ;; `anything-calcul-expression'
@@ -355,6 +369,16 @@
 ;; Preconfigured `anything' : frontend of APT package manager.
 ;; `anything-c-shell-command-if-needed'
 ;; Not documented.
+;; `anything-esh-pcomplete'
+;; Preconfigured anything to provide anything completion in eshell.
+;; `anything-eshell-history'
+;; Preconfigured anything for eshell history.
+;; `anything-lisp-completion-at-point'
+;; Anything lisp symbol completion at point.
+;; `anything-lisp-completion-at-point-or-indent'
+;; First call indent and second call complete lisp symbol.
+;; `anything-c-complete-file-name-at-point'
+;; Complete file name at point.
 ;; `anything-c-run-external-command'
 ;; Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
 ;; `anything-ratpoison-commands'
@@ -420,12 +444,20 @@
 ;; Default Value:	((lisp-interaction-mode . "^ *(def\\(un\\|subst\\|macro\\|face\\|alias\\|a [...]
 ;; `anything-c-external-programs-associations'
 ;; Default Value: nil
+;; `anything-ff-auto-update-initial-value'
+;; Default Value: t
+;; `anything-c-copy-async-prefered-emacs'
+;; Default Value: "emacs"
 ;; `anything-ff-lynx-style-map'
 ;; Default Value: t
 ;; `anything-ff-history-max-length'
 ;; Default Value: 100
+;; `anything-ff-smart-completion'
+;; Default Value: t
 ;; `anything-ff-default-kbsize'
 ;; Default Value: 1024.0
+;; `anything-ff-tramp-not-fancy'
+;; Default Value: t
 ;; `anything-ff-exif-data-program'
 ;; Default Value: "exiftran"
 ;; `anything-ff-exif-data-program-args'
@@ -442,10 +474,16 @@
 ;; Default Value: nil
 ;; `anything-c-eldoc-in-minibuffer-show-fn'
 ;; Default Value: anything-c-eldoc-show-in-mode-line
+;; `anything-c-turn-on-show-completion'
+;; Default Value: t
+;; `anything-lisp-completion-or-indent-delay'
+;; Default Value: 0.6
 ;; `anything-c-default-external-file-browser'
 ;; Default Value: "nautilus"
 ;; `anything-c-use-adaptative-sorting'
 ;; Default Value: nil
+;; `anything-ff-newfile-prompt-p'
+;; Default Value: t
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -462,7 +500,6 @@
 ;; `anything-c-source-copy-files'				(Copy Files (`C-.':Go to precedent level))
 ;; `anything-c-source-symlink-files'				(Symlink Files (`C-.':Go to precedent level))
 ;; `anything-c-source-hardlink-files'				(Hardlink Files (`C-.':Go to precedent level))
-;; `anything-c-source-file-cache-initialized'			()
 ;; `anything-c-source-file-cache'				(File Cache)
 ;; `anything-c-source-locate'					(Locate)
 ;; `anything-c-source-etags-select'				(Etags)
@@ -600,6 +637,8 @@
 ;; `anything-c-source-gentoo'					(Portage sources)
 ;; `anything-c-source-use-flags'				(Use Flags)
 ;; `anything-c-source-emacs-process'				(Emacs Process)
+;; `anything-c-source-esh'					(Eshell completions)
+;; `anything-c-source-eshell-history'				(Eshell history)
 ;; `anything-c-source-ratpoison-commands'			(Ratpoison Commands)
 
 ;;  *** END auto-documentation
@@ -4281,7 +4320,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
           (keyboard-quit)))))
 
 ;;; File Cache
-(defvar anything-c-source-file-cache-initialized nil)
+(defvar anything-c-file-cache-initialized-p nil)
 
 (defvar anything-c-file-cache-files nil)
 
@@ -4290,7 +4329,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
     (init
      . (lambda ()
          (require 'filecache nil t)
-         (unless anything-c-source-file-cache-initialized
+         (unless anything-c-file-cache-initialized-p
            (setq anything-c-file-cache-files
                  (loop for item in file-cache-alist append
                        (destructuring-bind (base &rest dirs) item
@@ -4298,7 +4337,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                (concat dir base)))))
            (defadvice file-cache-add-file (after file-cache-list activate)
              (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
-           (setq anything-c-source-file-cache-initialized t))))
+           (setq anything-c-file-cache-initialized-p t))))
     (candidates . anything-c-file-cache-files)
     (match anything-c-match-on-file-name
            anything-c-match-on-directory-name)
