@@ -2522,6 +2522,7 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
            ("Grep File(s) `M-g s, C-u Recurse'" . anything-find-files-grep)
            ("Zgrep File(s) `M-g z, C-u Recurse'" . anything-ff-zgrep)
            ("Switch to Eshell `M-e'" . anything-ff-switch-to-eshell)
+           ("Etags `M-., C-u tap, C-u C-u reload tag file'" . anything-ff-etags-select)
            ("Eshell command on file(s) `M-!, C-u run on all marked at once.'"
             . anything-find-files-eshell-command-on-file)
            ("Find file as root" . anything-find-file-as-root)
@@ -2640,6 +2641,13 @@ ACTION must be an action supported by `anything-dired-action'."
         (anything-c-pdfgrep-default-function 'anything-c-pdfgrep-init))
     (when cands
       (anything-do-pdfgrep-1 cands))))
+
+(defun anything-ff-etags-select (candidate)
+  "Default action to jump to etags from `anything-find-files'."
+  (when (get-buffer anything-action-buffer)
+    (kill-buffer anything-action-buffer))
+  (let ((default-directory anything-ff-default-directory))
+    (anything-c-etags-select anything-current-prefix-arg)))
 
 (defun anything-find-files-switch-to-hist (candidate)
   "Switch to anything-find-files history."
@@ -2898,6 +2906,7 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 \\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[anything-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
+\\[anything-ff-run-etags]\t\t->Run Etags (C-u use thing-at-point `C-u C-u' reload cache)
 \\[anything-ff-run-rename-file]\t\t->Rename File (C-u Follow).
 \\[anything-ff-run-copy-file]\t\t->Copy File (C-u Follow).
 \\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
@@ -2935,6 +2944,7 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
     (define-key map (kbd "M-g s")         'anything-ff-run-grep)
     (define-key map (kbd "M-g p")         'anything-ff-run-pdfgrep)
     (define-key map (kbd "M-g z")         'anything-ff-run-zgrep)
+    (define-key map (kbd "M-.")           'anything-ff-run-etags)
     (define-key map (kbd "M-R")           'anything-ff-run-rename-file)
     (define-key map (kbd "M-C")           'anything-ff-run-copy-file)
     (define-key map (kbd "M-B")           'anything-ff-run-byte-compile-file)
@@ -3099,6 +3109,12 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
   "Run gnus attach files command action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-gnus-attach-files))
+
+;;;###autoload
+(defun anything-ff-run-etags ()
+  "Run Etags command action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-etags-select))
 
 (defun anything-ff-print (candidate)
   "Print marked files.
@@ -5174,11 +5190,11 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 \\[anything-send-bug-report-from-anything]:BugReport."
   "String displayed in mode-line in `anything-c-etags-select'.")
 
-(defun anything-c-etags-get-tag-file ()
+(defun anything-c-etags-get-tag-file (&optional directory)
   "Return the path of etags file if found."
   ;; Get tag file from `default-directory' or upper directory.
   (let ((current-dir (anything-c-etags-find-tag-file-directory
-                      default-directory)))
+                      (or directory default-directory))))
     ;; Return nil if not find tag file.
     (when current-dir
       ;; Set tag file directory.
