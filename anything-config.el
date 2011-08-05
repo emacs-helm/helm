@@ -5090,7 +5090,10 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 ;; Yank text at point.
 ;;
+;;
+;; Internal
 (defvar anything-yank-point nil)
+
 ;;;###autoload
 (defun anything-yank-text-at-point ()
   "Yank text at point in minibuffer."
@@ -5120,6 +5123,9 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 ;;; Etags
 ;;
+;;
+;; anything-etags.el is deprecated, if this file is found,
+;; warn user at compile time.
 (eval-when-compile
   (when (locate-library "anything-etags.el")
     (display-warning
@@ -5129,6 +5135,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 ;;;###autoload
 (defun anything-etags-help ()
+  "The help function for etags."
   (interactive)
   (let ((anything-help-message "== Anything Etags Map ==\
 \nSpecific commands for Etags:
@@ -5152,8 +5159,10 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 (defvar anything-c-etags-tag-file-dir nil
   "Etags file directory.")
-(defvar anything-c-etags-mtime-alist nil)
-(defvar anything-c-etags-cache (make-hash-table :test 'equal))
+(defvar anything-c-etags-mtime-alist nil
+  "Store the last modification time of etags files here.")
+(defvar anything-c-etags-cache (make-hash-table :test 'equal)
+  "Cache content of etags files used here for faster access.")
 
 (defvar anything-etags-mode-line-string
   "\\<anything-c-etags-map>\
@@ -5166,19 +5175,22 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
   "String displayed in mode-line in `anything-c-etags-select'.")
 
 (defun anything-c-etags-get-tag-file ()
-  "Get Etags tag file."
+  "Return the path of etags file if found."
   ;; Get tag file from `default-directory' or upper directory.
-  (let ((current-dir (anything-c-etags-find-tag-file default-directory)))
+  (let ((current-dir (anything-c-etags-find-tag-file-directory
+                      default-directory)))
     ;; Return nil if not find tag file.
     (when current-dir
-      (setq anything-c-etags-tag-file-dir current-dir) ;set tag file directory
+      ;; Set tag file directory.
+      (setq anything-c-etags-tag-file-dir current-dir)
       (expand-file-name anything-c-etags-tag-file-name current-dir))))
 
-(defun anything-c-etags-find-tag-file (current-dir)
-  "Find tag file.
-Try to find tag file in upper directory if haven't found in CURRENT-DIR."
+(defun anything-c-etags-find-tag-file-directory (current-dir)
+  "Try to find the directory containing tag file.
+If not found in CURRENT-DIR search in upper directory."
   (flet ((file-exists? (dir)
-           (let ((tag-path (expand-file-name anything-c-etags-tag-file-name dir)))
+           (let ((tag-path (expand-file-name
+                            anything-c-etags-tag-file-name dir)))
              (and (stringp tag-path)
                   (file-exists-p tag-path)
                   (file-readable-p tag-path)))))
@@ -5195,12 +5207,13 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
        finally return current-dir)))
 
 (defun anything-c-source-etags-header-name (x)
+  "Create header name for this anything etags session."
   (concat "Etags in "
           (with-current-buffer anything-current-buffer
-            (anything-c-etags-get-tag-file))
-          " (C-c ? Help)"))
+            (anything-c-etags-get-tag-file))))
 
 (defmacro anything-c-etags-create-buffer (file)
+  "Create the `anything-buffer' based on contents of etags tag FILE."
   `(let* ((tag-fname ,file)
           max
           (split (with-current-buffer (find-file-noselect tag-fname)
@@ -5226,13 +5239,19 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
                        (progress-reporter-update progress-reporter count)))))
 
 (defun anything-c-etags-init ()
+  "Feed `anything-buffer' using `anything-c-etags-cache' or tag file.
+If no entry in cache, create one."
   (let ((tagfile (anything-c-etags-get-tag-file)))
     (when tagfile
       (with-current-buffer (anything-candidate-buffer 'global)
        (anything-aif (gethash tagfile anything-c-etags-cache)
+           ;; An entry is present in cache, insert it.
            (insert it)
+         ;; No entry, create a new buffer using content of tag file (slower).
          (anything-c-etags-create-buffer tagfile)
+         ;; Store content of buffer in cache.
          (puthash tagfile (buffer-string) anything-c-etags-cache)
+         ;; Store or set the last modification of tag file.
          (anything-aif (assoc tagfile anything-c-etags-mtime-alist)
              ;; If an entry exists modify it.
              (setcdr it (anything-c-etags-mtime tagfile))
@@ -5249,9 +5268,11 @@ Try to find tag file in upper directory if haven't found in CURRENT-DIR."
     (action . anything-c-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (anything-c-etags-default-action candidate)
-                           (anything-match-line-color-current-line)))))
+                           (anything-match-line-color-current-line))))
+  "Anything source for Etags.")
 
 (defun anything-c-etags-default-action (candidate)
+  "Anything default action to jump to an etags entry."
   (let* ((split (split-string candidate ": "))
          (fname (expand-file-name
                  (car split) anything-c-etags-tag-file-dir))
@@ -5283,7 +5304,7 @@ If tag file have been modified reinitialize cache."
         (message "Error: No tag file found, please create one with etags shell command."))))
 
 (defun anything-c-etags-mtime (file)
-  "Last modification time of FILE."
+  "Last modification time of etags tag FILE."
   (cadr (nth 5 (file-attributes file))))
 
 (defun anything-c-etags-file-modified-p (file)
@@ -5295,6 +5316,8 @@ If FILE is nil return nil."
          (/= last-modif (anything-c-etags-mtime file)))))
 
 ;;; Recentf files
+;;
+;;
 (defvar anything-c-source-recentf
   '((name . "Recentf")
     (init . (lambda ()
