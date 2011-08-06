@@ -3205,8 +3205,7 @@ Otherwise goto the end of minibuffer."
 (defun anything-persistent-action-display-window ()
   (with-current-buffer anything-buffer
     (setq anything-persistent-action-display-window
-          (cond ((and anything-persistent-action-display-window
-                      (window-live-p anything-persistent-action-display-window))
+          (cond ((window-live-p anything-persistent-action-display-window)
                  anything-persistent-action-display-window)
                 ((and anything-samewindow (one-window-p t))
                  (split-window))
