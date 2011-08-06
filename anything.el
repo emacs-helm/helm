@@ -1734,7 +1734,11 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
   (if (anything-resume-p any-resume)
       (anything-mark-current-line)
     (anything-update))
-  (select-frame-set-input-focus (window-frame (minibuffer-window)))
+  ;; FIXME: This make anything write in minibuffer
+  ;; When using a minibuffer frame independent config.
+  ;; Is it really needed and why?
+  ;; I leave it commented for now.
+  ;(select-frame-set-input-focus (window-frame (minibuffer-window)))
   (anything-preselect any-preselect)
   (with-current-buffer (anything-buffer-get)
     (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
@@ -3185,22 +3189,24 @@ Otherwise goto the end of minibuffer."
   "If a candidate is selected then perform the associated action without quitting anything."
   (interactive)
   (anything-log "executing persistent-action")
-  (save-selected-window
-    (anything-select-persistent-action-window)
-    (anything-log-eval (current-buffer))
-    (let ((anything-in-persistent-action t))
-      (with-anything-display-same-window
-        (anything-execute-selection-action
-         nil
-         (or (assoc-default attr (anything-get-current-source))
-             (anything-get-action))
-         t)
-        (anything-log-run-hook 'anything-after-persistent-action-hook)))))
+  (with-anything-window
+    (save-selected-window
+      (anything-select-persistent-action-window)
+      (anything-log-eval (current-buffer))
+      (let ((anything-in-persistent-action t))
+        (with-anything-display-same-window
+          (anything-execute-selection-action
+           nil
+           (or (assoc-default attr (anything-get-current-source))
+               (anything-get-action))
+           t)
+          (anything-log-run-hook 'anything-after-persistent-action-hook))))))
 
 (defun anything-persistent-action-display-window ()
   (with-current-buffer anything-buffer
     (setq anything-persistent-action-display-window
-          (cond ((window-live-p anything-persistent-action-display-window)
+          (cond ((and anything-persistent-action-display-window
+                      (window-live-p anything-persistent-action-display-window))
                  anything-persistent-action-display-window)
                 ((and anything-samewindow (one-window-p t))
                  (split-window))
