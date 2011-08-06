@@ -1442,28 +1442,6 @@ Where db_path is a filename matched by
                                  x))))))
     (anything-locate-with-db db)))
 
-(defun anything-locate-with-db (&optional db)
-  "Run locate -d DB.
-If DB is not given or nil use locate without -d option.
-DB can be given as a string or list of db files.
-See also `anything-locate'."
-  (when (and db (stringp db)) (setq db (list db)))
-  (let ((anything-c-locate-command
-          (if db
-              (replace-regexp-in-string
-               "locate"
-               (format "locate -d %s"
-                       (mapconcat 'identity
-                                  ;; Remove eventually marked directories by error.
-                                  (loop for i in db unless
-                                       (file-directory-p i) collect i) ":"))
-               anything-c-locate-command)
-              anything-c-locate-command)))
-    (anything :sources 'anything-c-source-locate
-              :buffer "*anything locate*"
-              :keymap anything-generic-files-map)))
-;; (anything-locate-with-db "~/locate.db")
-
 ;;;###autoload
 (defun anything-w3m-bookmarks ()
   "Preconfigured `anything' for w3m bookmark.
@@ -4361,6 +4339,28 @@ The \"-r\" option must be the last option.")
 (defvar anything-locate-db-file-regexp "m?locate\.db$"
   "Default regexp to match locate database.
 If nil Search in all files.")
+
+(defun anything-locate-with-db (&optional db)
+  "Run locate -d DB.
+If DB is not given or nil use locate without -d option.
+DB can be given as a string or list of db files.
+See also `anything-locate'."
+  (when (and db (stringp db)) (setq db (list db)))
+  (let ((anything-c-locate-command
+          (if db
+              (replace-regexp-in-string
+               "locate"
+               (format "locate -d %s"
+                       (mapconcat 'identity
+                                  ;; Remove eventually marked directories by error.
+                                  (loop for i in db unless
+                                       (file-directory-p i) collect i) ":"))
+               anything-c-locate-command)
+              anything-c-locate-command)))
+    (anything :sources 'anything-c-source-locate
+              :buffer "*anything locate*"
+              :keymap anything-generic-files-map)))
+;; (anything-locate-with-db "~/locate.db")
 
 (defun anything-c-locate-init ()
   "Initialize async locate process for `anything-c-source-locate'."
