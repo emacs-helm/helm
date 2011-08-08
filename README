@@ -1,0 +1,20 @@
+* To install anything:
+
+1) Put following files somewhere in your load-path:
+ - anything.el
+ - anything-config.el
+ - anything-match-plugin.el (optional)
+
+2) Byte-compile these files.
+
+3) Add this code to .emacs.el:
+ (require 'anything-config)
+ (require 'anything-match-plugin) ; Optional
+
+* Note to Distribution maintainers:(Ubuntu etc...)
+
+Use only the files mentioned above in [1] for your packages, other files
+contained in this directory contain deprecated or unmaintained code.
+Most of the features provided in these files are present in anything-config.el.
+
+Thanks.
