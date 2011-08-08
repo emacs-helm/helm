@@ -8787,6 +8787,8 @@ See also `anything-create--actions'."
 ;; (anything 'anything-c-source-xrandr-change-resolution)
 
 ;;; Xfont selection
+;;
+;;
 (defun anything-c-persistent-xfont-action (elm)
   "Show current font temporarily"
   (let ((current-font (cdr (assoc 'font (frame-parameters))))
@@ -8821,7 +8823,8 @@ See also `anything-create--actions'."
 ;; (anything 'anything-c-source-xfonts)
 
 ;;; World time
-
+;;
+;;
 (defvar anything-c-source-time-world
   '((name . "Time World List")
     (init . (lambda ()
@@ -8836,14 +8839,17 @@ See also `anything-create--actions'."
   (interactive)
   (anything-other-buffer 'anything-c-source-time-world "*anything world time*"))
 
-;;; Source for Debian/Ubuntu users
+;;; Anything interface for Debian/Ubuntu packages (apt-*)
+;;
+;;
 (defvar anything-c-source-apt
   '((name . "APT")
     (init . anything-c-apt-init)
     (candidates-in-buffer)
     (candidate-transformer anything-c-apt-candidate-transformer)
     (display-to-real . anything-c-apt-display-to-real)
-    (candidate-number-limit . 9999)
+    (requires-pattern . 2)
+    (delayed)
     (action
      ("Show package description" . anything-c-apt-cache-show)
      ("Install package" . anything-c-apt-install)
@@ -8857,6 +8863,7 @@ See also `anything-create--actions'."
 (defvar anything-c-apt-search-command "apt-cache search '%s'")
 (defvar anything-c-apt-show-command "apt-cache show '%s'")
 (defvar anything-c-apt-installed-packages nil)
+(defvar anything-c-apt-all-packages nil)
 
 (defface anything-apt-installed
     '((t (:foreground "green")))
@@ -8866,6 +8873,7 @@ See also `anything-create--actions'."
 (defun anything-c-apt-refresh ()
   "Refresh installed candidates list."
   (setq anything-c-apt-installed-packages nil)
+  (setq anything-c-apt-all-packages nil)
   (anything-force-update))
 
 (defun anything-c-apt-persistent-action (candidate)
@@ -8875,11 +8883,15 @@ See also `anything-create--actions'."
       (anything-c-apt-cache-show candidate)))
 
 ;;;###autoload
-(defun anything-apt (query)
-  "Preconfigured `anything' : frontend of APT package manager."
-  (interactive "sAPT search: ")
-  (let ((anything-c-apt-query query))
-    (anything 'anything-c-source-apt)))
+(defun anything-apt (arg query)
+  "Preconfigured `anything' : frontend of APT package manager.
+With a prefix arg reload cache."
+  (interactive "P\nsSearch Package: ")
+  (when arg
+    (setq anything-c-apt-installed-packages nil)
+    (setq anything-c-apt-all-packages nil))
+  (anything :sources 'anything-c-source-apt
+            :prompt "Search Package: " :input query))
 
 (defun anything-c-apt-candidate-transformer (candidates)
   "Show installed candidates in a different color."
@@ -8893,22 +8905,26 @@ See also `anything-create--actions'."
 
 (defun anything-c-apt-init ()
   "Initialize list of debian packages."
-  (unless anything-c-apt-installed-packages
-    (message "Updating installed candidate list...")
-    (setq anything-c-apt-installed-packages
-          (with-temp-buffer
-            (call-process-shell-command "dpkg --get-selections"
-                                        nil (current-buffer))
-            (loop for i in (split-string (buffer-string) "\n" t)
-               collect (car (split-string i))))))
-  (with-current-buffer
-      (anything-candidate-buffer
-       (get-buffer-create (format "*anything-apt:%s*" anything-c-apt-query)))
-    (erase-buffer)
-    (call-process-shell-command
-     (format anything-c-apt-search-command anything-c-apt-query)
-     nil (current-buffer)))
-  (message "Updating installed candidate list...done"))
+  (let ((query ""))
+    (unless (and anything-c-apt-installed-packages
+                 anything-c-apt-all-packages)
+      (message "Loading package list...")
+      (setq anything-c-apt-installed-packages
+            (with-temp-buffer
+              (call-process-shell-command "dpkg --get-selections"
+                                          nil (current-buffer))
+              (loop for i in (split-string (buffer-string) "\n" t)
+                 collect (car (split-string i)))))
+      (setq anything-c-apt-all-packages
+            (with-current-buffer
+                (anything-candidate-buffer
+                 (get-buffer-create (format "*anything-apt*")))
+              (erase-buffer)
+              (call-process-shell-command
+               (format anything-c-apt-search-command query)
+               nil (current-buffer))))
+      (message "Loading package list done")
+      (sit-for 0.5))))
 
 (defun anything-c-apt-display-to-real (line)
   "Return only name of a debian package.
@@ -8916,27 +8932,33 @@ LINE is displayed like:
 package name - description."
   (car (split-string line " - ")))
 
-;;;###autoload
 (defun anything-c-shell-command-if-needed (command)
-  (interactive "sShell command: ")
-  (if (get-buffer command)		; if the buffer already exists
-      (anything-c-switch-to-buffer command)	; then just switch to it
-      (anything-c-switch-to-buffer command)	; otherwise create it
-      (insert (shell-command-to-string command))))
+  "Run shell command COMMAND to describe package.
+If a buffer named COMMAND already exists, just switch to it."
+  (let ((buf (get-buffer command)))
+    (anything-c-switch-to-buffer (get-buffer-create command))
+    (unless buf (insert (shell-command-to-string command)))))
 
 (defun anything-c-apt-cache-show (package)
-  (anything-c-shell-command-if-needed (format anything-c-apt-show-command package)))
+  "Show information on apt package PACKAGE."
+  (anything-c-shell-command-if-needed
+   (format anything-c-apt-show-command package)))
 
 (defun anything-c-apt-install (package)
-  (anything-c-apt-install1 :action 'install))
+  "Run 'apt-get install' shell command on PACKAGE."
+  (anything-c-apt-generic-action :action 'install))
 
 (defun anything-c-apt-uninstall (package)
-  (anything-c-apt-install1 :action 'uninstall))
+  "Run 'apt-get remove' shell command on PACKAGE."
+  (anything-c-apt-generic-action :action 'uninstall))
 
 (defun anything-c-apt-purge (package)
-  (anything-c-apt-install1 :action 'purge))
+  "Run 'apt-get purge' shell command on PACKAGE."
+  (anything-c-apt-generic-action :action 'purge))
 
-(defun* anything-c-apt-install1 (&key action)
+(defun* anything-c-apt-generic-action (&key action)
+  "Run 'apt-get ACTION'.
+Support install, remove and purge actions."
   (ansi-term (getenv "SHELL") "anything apt")
   (term-line-mode)
   (let ((command   (case action
