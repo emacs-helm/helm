@@ -2306,7 +2306,8 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
   (anything-execute-persistent-action 'revert-action))
 
 (defun anything-buffer-save-and-update (candidate)
-  (let ((marked (anything-marked-candidates)))
+  (let ((marked (anything-marked-candidates))
+        (enable-recursive-minibuffers t))
     (loop for buf in marked do
          (with-current-buffer (get-buffer buf)
            (save-buffer)))
@@ -3966,9 +3967,11 @@ Find inside `require' and `declare-function' sexp."
 (defun anything-write-file ()
   "Preconfigured `anything' providing completion for `write-file'."
   (interactive)
-  (anything 'anything-c-source-write-file
-            (expand-file-name default-directory)
-            "Write buffer to file: " nil nil "*Anything write file*"))
+  (let ((anything-mp-highlight-delay nil))
+    (anything :sources 'anything-c-source-write-file
+              :input (expand-file-name default-directory)
+              :prompt "Write buffer to file: "
+              :buffer "*Anything write file*")))
 
 ;;; Anything completion for `insert-file'.==> C-x i
 (defvar anything-c-source-insert-file
@@ -3990,9 +3993,11 @@ Find inside `require' and `declare-function' sexp."
 (defun anything-insert-file ()
   "Preconfigured `anything' providing completion for `insert-file'."
   (interactive)
-  (anything 'anything-c-source-insert-file
-            (expand-file-name default-directory)
-            "Insert file: " nil nil "*Anything insert file*"))
+  (let ((anything-mp-highlight-delay nil))
+    (anything :sources 'anything-c-source-insert-file
+              :input (expand-file-name default-directory)
+              :prompt "Insert file: "
+              :buffer "*Anything insert file*")))
 
 ;;; Anything completion for copy, rename and (rel)sym/hard/link files from dired.
 (defvar anything-c-source-copy-files
@@ -6799,29 +6804,31 @@ http://emacs-w3m.namazu.org/")
 
 
 (defun anything-c-w3m-delete-bookmark (elm)
-  (save-excursion
-    (find-file-literally w3m-bookmark-file)
+  "Delete w3m bookmark from `w3m-bookmark-file'."
+  (with-current-buffer
+      (find-file-literally w3m-bookmark-file)
     (goto-char (point-min))
     (when (re-search-forward elm nil t)
       (beginning-of-line)
       (delete-region (point)
                      (line-end-position))
       (delete-blank-lines))
-    (save-buffer (current-buffer))
-    (kill-buffer (current-buffer))))
+    (save-buffer)
+    (kill-buffer)))
 
 (defun anything-c-w3m-rename-bookmark (elm)
+  "Rename w3m bookmark in `w3m-bookmark-file'."
   (let* ((old-title (replace-regexp-in-string ">" "" elm))
          (new-title (read-string "NewTitle: " old-title)))
-    (save-excursion
-      (find-file-literally w3m-bookmark-file)
+    (with-current-buffer
+        (find-file-literally w3m-bookmark-file)
       (goto-char (point-min))
       (when (re-search-forward (concat elm "<") nil t)
         (goto-char (1- (point)))
         (delete-char (- (length old-title)))
         (insert new-title))
-      (save-buffer (current-buffer))
-      (kill-buffer (current-buffer)))))
+      (save-buffer)
+      (kill-buffer))))
 
 ;;;; <Library>
 ;;; Elisp library scan
