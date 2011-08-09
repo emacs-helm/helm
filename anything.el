@@ -3203,7 +3203,7 @@ Otherwise goto the end of minibuffer."
           (anything-log-run-hook 'anything-after-persistent-action-hook))))))
 
 (defun anything-persistent-action-display-window ()
-  (with-current-buffer anything-buffer
+  (with-anything-window
     (setq anything-persistent-action-display-window
           (cond ((window-live-p anything-persistent-action-display-window)
                  anything-persistent-action-display-window)
