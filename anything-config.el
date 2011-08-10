@@ -81,8 +81,6 @@
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'command :prefix "anything-" :docstring t)
 ;; `anything-configuration'
 ;; Customize `anything'.
-;; `anything-c-describe-anything-bindings'
-;; [OBSOLETE] Describe `anything' bindings.
 ;; `anything-mini'
 ;; Preconfigured `anything' lightweight version		(buffer -> recentf).
 ;; `anything-for-files'
@@ -149,36 +147,8 @@
 ;; Preconfigured anything to show org headlines.
 ;; `anything-info-gnus'
 ;; Preconfigured anything to browse Gnus Manual.
-;; `anything-kill-buffers'
-;; Preconfigured `anything' to kill buffer you selected.
 ;; `anything-regexp'
 ;; Preconfigured anything to build regexps and run query-replace-regexp against.
-;; `anything-insert-buffer-name'
-;; Insert buffer name.
-;; `anything-insert-symbol'
-;; Insert current symbol.
-;; `anything-insert-selection'
-;; Insert current selection.
-;; `anything-show-buffer-only'
-;; [OBSOLETE] Only show sources about buffer.
-;; `anything-show-bbdb-only'
-;; [OBSOLETE] Only show sources about BBDB.
-;; `anything-show-locate-only'
-;; [OBSOLETE] Only show sources about Locate.
-;; `anything-show-info-only'
-;; [OBSOLETE] Only show sources about Info.
-;; `anything-show-imenu-only'
-;; [OBSOLETE] Only show sources about Imenu.
-;; `anything-show-files-only'
-;; [OBSOLETE] Only show sources about File.
-;; `anything-show-w3m-bookmarks-only'
-;; [OBSOLETE] Only show source about w3m bookmark.
-;; `anything-show-colors-only'
-;; [OBSOLETE] Only show source about color.
-;; `anything-show-kill-ring-only'
-;; [OBSOLETE] Only show source about kill ring.
-;; `anything-show-this-source-only'
-;; Only show this source.
 ;; `anything-test-sources'
 ;; List all anything sources for test.
 ;; `anything-select-source'
@@ -367,8 +337,6 @@
 ;; Preconfigured `anything' to show world time.
 ;; `anything-apt'
 ;; Preconfigured `anything' : frontend of APT package manager.
-;; `anything-c-shell-command-if-needed'
-;; Not documented.
 ;; `anything-esh-pcomplete'
 ;; Preconfigured anything to provide anything completion in eshell.
 ;; `anything-eshell-history'
@@ -1194,26 +1162,9 @@ It will be cleared at start of next `anything' call when \
 
 
 ;;; Documentation
-;; It is replaced by `anything-help'
-(defun anything-c-describe-anything-bindings ()
-  "[OBSOLETE] Describe `anything' bindings."
-  (interactive)
-  (anything-run-after-quit
-   #'(lambda ()
-       (with-current-buffer (get-buffer-create "*Anything Help*")
-         (erase-buffer)
-         (insert
-          (substitute-command-keys
-           "The keys that are defined for `anything' are:
-       \\{anything-map}")))
-       (pop-to-buffer "*Anything Help*")
-       (goto-char (point-min)))))
-
-;; Use `describe-mode' key in `global-map'
-;; (dolist (k (where-is-internal 'describe-mode global-map))
-;;   (define-key anything-map k 'anything-c-describe-anything-bindings))
-
-;;; Help message
+;;
+;;
+;; Help message
 (defun anything-c-list-preconfigured-anything ()
   (loop with doc
         with sym
@@ -1591,22 +1542,10 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (anything-other-buffer 'anything-c-source-info-gnus "*info Gnus*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; kill buffers
-;;;###autoload
-(defun anything-kill-buffers ()
-  "Preconfigured `anything' to kill buffer you selected."
-  (interactive)
-  (anything
-   '(((name . "Kill Buffers")
-      (candidates . anything-c-buffer-list)
-      (action
-       ("Kill Buffer" . (lambda (candidate)
-                          (kill-buffer candidate)
-                          (anything-kill-buffers)
-                          )))))
-   nil nil))
 
-;;; Regexp
+;;; Anything regexp.
+;;
+;;
 (defun anything-c-query-replace-regexp (candidate)
   (let ((regexp (funcall (anything-attr 'regexp))))
     (apply 'query-replace-regexp
@@ -1645,12 +1584,6 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
     (delayed)
     (requires-pattern . 2)
     (mode-line . "Press TAB to select action.")
-    ;; RUBIKITCH:
-    ;; I use here `anything-input' because `anything-pattern' is lost when
-    ;; using actions from action buffer (otherwise no e.g from RET, C-e or C-j).
-    ;; It seem `anything-select-action' reset `anything-pattern' to empty too early.
-    ;; Though the regexp attribute stay defined (tested with *-attr-defined).
-    ;; Can you fix it?
     (regexp . (lambda () anything-input))
     (action . (("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
                ("Query Replace Regexp" . anything-c-query-replace-regexp)
@@ -1721,97 +1654,7 @@ against."
                 :prompt "Regexp: "))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun anything-insert-buffer-name ()
-  "Insert buffer name."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (if buffer-file-name (file-name-nondirectory buffer-file-name)
-       (buffer-name)))))
-
-(defun anything-insert-symbol ()
-  "Insert current symbol."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (save-excursion
-       (buffer-substring (beginning-of-thing 'symbol)
-                         (end-of-thing 'symbol))))))
-
-(defun anything-insert-selection ()
-  "Insert current selection."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (anything-get-selection))))
-
-(defun anything-show-buffer-only ()
-  "[OBSOLETE] Only show sources about buffer.
-Use `anything-for-buffers' instead."
-  (interactive)
-  (anything-set-source-filter '("Buffers")))
-
-(defun anything-show-bbdb-only ()
-  "[OBSOLETE] Only show sources about BBDB.
-Use `anything-bbdb' instead."
-  (interactive)
-  (anything-set-source-filter '("BBDB")))
-
-(defun anything-show-locate-only ()
-  "[OBSOLETE] Only show sources about Locate.
-Use `anything-locate' instead."
-  (interactive)
-  (anything-set-source-filter '("Locate")))
-
-(defun anything-show-info-only ()
-  "[OBSOLETE] Only show sources about Info.
-Use `anything-info-at-point' instead."
-  (interactive)
-  (anything-set-source-filter '("Info Pages"
-                                "Info Elisp"
-                                "Info Common-Lisp")))
-
-(defun anything-show-imenu-only ()
-  "[OBSOLETE] Only show sources about Imenu.
-Use `anything-imenu' instead."
-  (interactive)
-  (anything-set-source-filter '("Imenu")))
-
-(defun anything-show-files-only ()
-  "[OBSOLETE] Only show sources about File.
-Use `anything-for-files' instead."
-  (interactive)
-  (anything-set-source-filter '("File Name History"
-                                "Files from Current Directory"
-                                "Recentf")))
-
-(defun anything-show-w3m-bookmarks-only ()
-  "[OBSOLETE] Only show source about w3m bookmark.
-Use `anything-w3m-bookmarks' instead."
-  (interactive)
-  (anything-set-source-filter '("W3m Bookmarks")))
-
-(defun anything-show-colors-only ()
-  "[OBSOLETE] Only show source about color.
-Use `anything-colors' instead."
-  (interactive)
-  (anything-set-source-filter '("Colors"
-                                "Customize Faces")))
-
-(defun anything-show-kill-ring-only ()
-  "[OBSOLETE] Only show source about kill ring.
-Use `anything-show-kill-ring' instead."
-  (interactive)
-  (anything-set-source-filter '("Kill Ring")))
-
-(defun anything-show-this-source-only ()
-  "Only show this source."
-  (interactive)
-  (setq anything-candidate-number-limit 9999)
-  (anything-set-source-filter
-   (list (assoc-default 'name (anything-get-current-source)))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilities Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun anything-test-sources ()
   "List all anything sources for test.
@@ -1822,7 +1665,6 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
           (apropos-internal "^anything-c-source" #'boundp))
     (pop-to-buffer standard-output)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilities Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; For compatibility
 (unless (fboundp 'region-active-p)
   (defun region-active-p ()
@@ -1883,17 +1725,12 @@ checks the value of `use-empty-active-region' as well."
         (anything-set-source-filter (list it))
       (anything-set-source-filter nil))))
 
-(defun anything-insert-string (str)
-  "Insert STR."
-  (delete-minibuffer-contents)
-  (insert str))
-
 (defun anything-c-match-on-file-name (candidate)
-  "Return non-nil if `anything-pattern' match the filename (without directory part) of CANDIDATE."
+  "Return non-nil if `anything-pattern' match basename of filename CANDIDATE."
   (string-match anything-pattern (file-name-nondirectory candidate)))
 
 (defun anything-c-match-on-directory-name (candidate)
-  "Return non-nil if `anything-pattern' match the directory part of CANDIDATE (a file)."
+  "Return non-nil if `anything-pattern' match directory part of CANDIDATE."
   (anything-aif (file-name-directory candidate)
       (string-match anything-pattern it)))
 
@@ -1911,7 +1748,7 @@ The match is done with `string-match'."
              list))
 
 (defun anything-c-shadow-entries (list regexp)
-  "Elements of LIST matching REGEXP will be displayed with the `file-name-shadow' face if available."
+  "Display elements of LIST matching REGEXP with the `file-name-shadow' face."
   (mapcar (lambda (file)
             ;; Add shadow face property to boring files.
             (let ((face (if (facep 'file-name-shadow)
@@ -1956,7 +1793,8 @@ The match is done with `string-match'."
   (kill-new (anything-c-stringify string) replace yank-handler))
 
 ;;; Toggle all marks.
-
+;;
+;;
 ;;;###autoload
 (defun anything-mark-all ()
   "Mark all visible unmarked candidates in current source."
@@ -2673,6 +2511,7 @@ ACTION must be an action supported by `anything-dired-action'."
   (anything-find-files t))
 
 ;;; Asynchronous copy of files.
+;;
 ;;
 (defvar anything-c-copy-files-async-log-file "/tmp/dired.log")
 (defun anything-c-copy-files-async-1 (flist dest)
