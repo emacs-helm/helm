@@ -1868,49 +1868,6 @@ visible or invisible in all sources of current anything session"
         (anything varsym)))))
 ;; (progn (ad-disable-advice 'eval-defun 'after 'anything-source-hack) (ad-update 'eval-defun))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Document Generator ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defconst anything-c-create-summary-index-regexp
-  "^;;;; <\\(.+?\\)>$\\|^;; (anything '\\(.+?\\))$\\|^ *;; (anything '\\(.+?\\))$")
-(defun anything-c-create-summary ()
-  "Create `anything' summary."
-  (save-excursion
-    (goto-char (point-min))
-    (loop with it
-          while (re-search-forward anything-c-create-summary-index-regexp nil t)
-          collect
-          (cond ((setq it (match-string-no-properties 1))
-                 (cons 'section it))
-                ((setq it (match-string-no-properties 2))
-                 `(source ,it .
-                          ,(assoc-default 'name (symbol-value (intern it)))))
-                ((setq it (match-string-no-properties 3))
-                 `(source ,it .
-                          ,(assoc-default 'name (symbol-value (intern it)))))))))
-
-;; (find-epp (anything-c-create-summary))
-
-(defun anything-c-insert-summary ()
-  "Insert `anything' summary."
-  (save-excursion
-    (goto-char (point-min))
-    (search-forward ";; Below are complete source list you can setup in")
-    (forward-line 1)
-    (delete-region (point)
-                   (progn (search-forward ";;; Change log:" nil t)
-                          (forward-line -1) (point)))
-    (insert ";;\n")
-    (loop with beg
-          for (kind . value) in (anything-c-create-summary)
-          for i from 0
-          do (cond ((eq kind 'section)
-                    (unless (zerop i)
-                      (align-regexp beg (point) "\\(\\s-*\\)(" 1 1 nil))
-                    (insert ";;  " value ":\n")
-                    (setq beg (point)))
-                   (t
-                    (insert ";;     `" (car value) "'    (" (cdr value) ")\n")))
-          finally (align-regexp beg (point) "\\(\\s-*\\)(" 1 1 nil))))
-;; (anything-c-insert-summary)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Sources ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; <Buffer>
@@ -5399,8 +5356,11 @@ Same as `anything-describe-anything-attribute' but with anything completion."
   (with-output-to-temp-buffer "*Help*"
     (princ (get anything-attribute 'anything-attrdoc))))
 
-;;; Use info-index plug-in. Note that `name' attribute is
-;;; not needed but `anything-c-insert-summary' uses it.
+;;; Use info-index plug-in.
+;;
+;;
+;; Note that `name' attribute is not needed since
+;; `anything-c-insert-summary' have been removed.
 ;; Info Elisp
 (defvar anything-c-source-info-elisp
   '((name . "Info index: elisp")
