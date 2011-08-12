@@ -9406,36 +9406,6 @@ If SYM is not documented, return \"Not documented\"."
         (car (split-string doc "\n"))
         "Not documented")))
 
-;; Internal
-(defvar anything-lisp-completion-counter 0)
-
-;;;###autoload
-(defun anything-lisp-completion-at-point-or-indent (arg)
-  "First call indent and second call complete lisp symbol.
-The second call should happen before `anything-lisp-completion-or-indent-delay',
-after this delay, next call will indent again.
-After completion, next call is always indent.
-See that like click and double mouse click.
-One hit indent, two quick hits maybe indent and complete."
-  (interactive "P")
-  ;; Be sure `indent-for-tab-command' will not try
-  ;; to use `completion-at-point'.
-  (let ((tab-always-indent (if (eq tab-always-indent 'complete)
-                               t tab-always-indent)))
-    (incf anything-lisp-completion-counter)
-    (unwind-protect
-         (if (> anything-lisp-completion-counter 1)
-             (anything-lisp-completion-at-point)
-             (indent-for-tab-command arg))
-      ;; After `anything-lisp-completion-or-indent-delay' seconds
-      ;; reset to 0.
-      (run-with-timer anything-lisp-completion-or-indent-delay nil
-                      #'(lambda ()
-                          (setq anything-lisp-completion-counter 0)))
-      ;; Always reset to 0 at second hit.
-      (when (eq anything-lisp-completion-counter 2)
-        (setq anything-lisp-completion-counter 0)))))
-
 ;;; File completion.
 ;;
 ;; Complete file name at point.
@@ -9455,6 +9425,47 @@ One hit indent, two quick hits maybe indent and complete."
                                                 :initial-input init
                                                 :must-match t)))
   (anything-c-insert-file-name-completion-at-point completion)))
+
+;; Internal
+(defvar anything-lisp-completion-counter 0)
+;;;###autoload
+(defun anything-lisp-completion-at-point-or-indent (arg)
+  "First call indent and second call complete lisp symbol.
+The second call should happen before `anything-lisp-completion-or-indent-delay',
+after this delay, next call will indent again.
+After completion, next call is always indent.
+See that like click and double mouse click.
+One hit indent, two quick hits maybe indent and complete."
+  (interactive "P")
+  ;; Be sure `indent-for-tab-command' will not try
+  ;; to use `completion-at-point'.
+  (let ((tab-always-indent (if (eq tab-always-indent 'complete)
+                               t tab-always-indent)))
+    (incf anything-lisp-completion-counter)
+    (unwind-protect
+         (if (> anything-lisp-completion-counter 1)
+             (anything-lisp-completion-or-file-name-at-point)
+             (indent-for-tab-command arg))
+      ;; After `anything-lisp-completion-or-indent-delay' seconds
+      ;; reset to 0.
+      (run-with-timer anything-lisp-completion-or-indent-delay nil
+                      #'(lambda ()
+                          (setq anything-lisp-completion-counter 0)))
+      ;; Always reset to 0 at second hit.
+      (when (eq anything-lisp-completion-counter 2)
+        (setq anything-lisp-completion-counter 0)))))
+
+;;;###autoload
+(defun anything-lisp-completion-or-file-name-at-point ()
+  "Complete lisp symbol or filename at point.
+Filename completion happen if filename is started in
+or between double quotes."
+  (interactive)
+  (let ((tap (thing-at-point 'filename)))
+    (if (and tap (string-match "^\\(~/\\|/\\|[a-zA-Z]\:/\\).*" tap)
+             (save-excursion (search-backward "\"" (point-at-bol) t)))
+        (anything-c-complete-file-name-at-point)
+        (anything-lisp-completion-at-point))))
 
 ;;; Run Externals commands within Emacs with anything completion
 ;;
