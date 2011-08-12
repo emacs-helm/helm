@@ -266,13 +266,13 @@
 ;; `anything-grep-help'
 ;; Not documented.
 ;; `anything-c-grep-run-persistent-action'
-;; Run grep persistent action from `anything-do-grep1'.
+;; Run grep persistent action from `anything-do-grep-1'.
 ;; `anything-c-grep-run-default-action'
-;; Run grep default action from `anything-do-grep1'.
+;; Run grep default action from `anything-do-grep-1'.
 ;; `anything-c-grep-run-other-window-action'
-;; Run grep goto other window action from `anything-do-grep1'.
+;; Run grep goto other window action from `anything-do-grep-1'.
 ;; `anything-c-grep-run-save-buffer'
-;; Run grep save results action from `anything-do-grep1'.
+;; Run grep save results action from `anything-do-grep-1'.
 ;; `anything-pdfgrep-help'
 ;; Not documented.
 ;; `anything-do-pdfgrep'
@@ -2190,7 +2190,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
   (interactive)
   (anything-run-after-quit
    (lambda (f)
-     (anything-find-files1 f))
+     (anything-find-files-1 f))
    (anything-aif (get-buffer (anything-get-selection))
        (or (buffer-file-name it)
            (car (rassoc it dired-buffers))
@@ -2437,7 +2437,7 @@ ACTION must be an action supported by `anything-dired-action'."
 
 (defun anything-find-files-grep (candidate)
   "Default action to grep files from `anything-find-files'."
-  (anything-do-grep1 (anything-marked-candidates)
+  (anything-do-grep-1 (anything-marked-candidates)
                      anything-current-prefix-arg))
 
 (defun anything-ff-zgrep (candidate)
@@ -2638,7 +2638,7 @@ See `anything-ff-serial-rename-1'."
     (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
                             (length cands) dir name))
       (anything-ff-serial-rename-1 dir cands name start :method method)
-      (anything-find-files1 dir))))
+      (anything-find-files-1 dir))))
 
 (defun anything-ff-member-directory-p (file directory)
   (let ((dir-file (expand-file-name (file-name-as-directory (file-name-directory file))))
@@ -3636,7 +3636,7 @@ in an `anything-comp-read'."
 (defun anything-find-files (arg)
   "Preconfigured `anything' for anything implementation of `find-file'.
 Called with a prefix arg show history if some.
-Don't call it from programs, use `anything-find-files1' instead.
+Don't call it from programs, use `anything-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
   (let ((any-input (if (and arg anything-ff-history)
@@ -3658,12 +3658,12 @@ This is the starting point for nearly all actions you can do on files."
                      (file-exists-p any-input)))
                (anything-ff-auto-update-flag
                 anything-ff-auto-update-initial-value))
-          (anything-find-files1 any-input))
+          (anything-find-files-1 any-input))
         (setq any-input (expand-file-name (anything-c-current-directory)))
-        (anything-find-files1 any-input (buffer-file-name (current-buffer))))))
+        (anything-find-files-1 any-input (buffer-file-name (current-buffer))))))
 
 
-(defun anything-find-files1 (fname &optional preselect)
+(defun anything-find-files-1 (fname &optional preselect)
   "Find FNAME with `anything' completion.
 Like `find-file' but with `anything' support.
 Use it for non--interactive calls of `anything-find-files'."
@@ -3898,8 +3898,8 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
              (progn
                (setq anything-ff-cand-to-mark moved-flist)
                (if (and dirflag (eq action 'rename))
-                   (anything-find-files1 (file-name-directory target) target)
-                   (anything-find-files1 (expand-file-name candidate))))
+                   (anything-find-files-1 (file-name-directory target) target)
+                   (anything-find-files-1 (expand-file-name candidate))))
           (setq anything-ff-cand-to-mark nil))))))
 
 ;; Internal
@@ -4244,7 +4244,7 @@ See Man locate for more infos.
 ;;
 (defvar anything-c-grep-default-command
   "grep -d skip %e -niH -e %p %f"
-  "Default grep format command for `anything-do-grep1'.
+  "Default grep format command for `anything-do-grep-1'.
 Where:
 '%e' format spec is for --exclude or --include grep options.
 '%p' format spec is for pattern.
@@ -4252,7 +4252,7 @@ Where:
 
 (defvar anything-c-grep-default-recurse-command
   "grep -d recurse %e -niH -e %p %f"
-  "Default recursive grep format command for `anything-do-grep1'.
+  "Default recursive grep format command for `anything-do-grep-1'.
 See `anything-c-grep-default-command' for format specs.")
 
 (defvar anything-c-default-zgrep-command "zgrep -niH -e %p %f")
@@ -4338,7 +4338,7 @@ See `anything-c-grep-default-command' for format specs.")
            (mapconcat 'shell-quote-argument all-files " "))))
 
 (defun anything-c-grep-recurse-p ()
-  "Check if `anything-do-grep1' have switched to recursive."
+  "Check if `anything-do-grep-1' have switched to recursive."
   (let ((args (replace-regexp-in-string
                "grep" "" anything-c-grep-default-command)))
     (string-match-p "r\\|recurse" args)))
@@ -4499,7 +4499,7 @@ These extensions will be added to command line with --include arg of grep."
      collect glob into glob-list
      finally return glob-list))
 
-(defun anything-do-grep1 (only &optional recurse zgrep)
+(defun anything-do-grep-1 (only &optional recurse zgrep)
   "Launch grep with a list of ONLY files.
 When RECURSE is given use -r option of grep and prompt user
 to set the --include args of grep.
@@ -4575,7 +4575,7 @@ grep will search in all files of these directories.
 You can use also wildcard in the base name of candidate.
 If a prefix arg is given use the -r option of grep.
 The prefix arg can be passed before or after start.
-See also `anything-do-grep1'."
+See also `anything-do-grep-1'."
   (interactive)
   (let ((only    (anything-c-read-file-name
                   "Search in file(s): "
@@ -4583,7 +4583,7 @@ See also `anything-do-grep1'."
                   :preselect (or (dired-get-filename nil t)
                                  (buffer-file-name (current-buffer)))))
         (prefarg (or current-prefix-arg anything-current-prefix-arg)))
-    (anything-do-grep1 only prefarg)))
+    (anything-do-grep-1 only prefarg)))
 
 (defmacro* anything-c-walk-directory (directory &key (path 'basename) (directories t) match)
   "Walk through DIRECTORY tree.
@@ -4628,7 +4628,7 @@ MATCH match only filenames matching regexp MATCH."
                                 anything-c-rzgrep-cache))
                            flist)))
          (when recursive (setq anything-c-zgrep-recurse-flag t))
-         (anything-do-grep1 only recursive 'zgrep))
+         (anything-do-grep-1 only recursive 'zgrep))
     (setq anything-c-zgrep-recurse-flag nil)))
 
 ;;;###autoload
@@ -4759,22 +4759,22 @@ If N is positive go forward otherwise go backward."
   "Keymap used in Grep sources.")
 
 (defun anything-c-grep-run-persistent-action ()
-  "Run grep persistent action from `anything-do-grep1'."
+  "Run grep persistent action from `anything-do-grep-1'."
   (interactive)
   (anything-execute-persistent-action 'jump-persistent))
 
 (defun anything-c-grep-run-default-action ()
-  "Run grep default action from `anything-do-grep1'."
+  "Run grep default action from `anything-do-grep-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-action))
 
 (defun anything-c-grep-run-other-window-action ()
-  "Run grep goto other window action from `anything-do-grep1'."
+  "Run grep goto other window action from `anything-do-grep-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-other-window))
 
 (defun anything-c-grep-run-save-buffer ()
-  "Run grep save results action from `anything-do-grep1'."
+  "Run grep save results action from `anything-do-grep-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-save-results))
 
@@ -4796,8 +4796,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                   collect (expand-file-name fname))))
     (if bufs
         (if zgrep
-            (anything-do-grep1 bufs nil 'zgrep)
-            (anything-do-grep1 bufs))
+            (anything-do-grep-1 bufs nil 'zgrep)
+            (anything-do-grep-1 bufs))
         ;; bufs is empty, thats mean we have only CANDIDATE
         ;; and it is not a buffer-filename, fallback to occur.
         (anything-c-switch-to-buffer candidate)
@@ -10565,7 +10565,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
                     (error "Mkdir: Unable to create directory `%s': file exists."
                            (anything-c-basename dirfname))
                     (make-directory candidate 'parent)))
-              (anything-find-files1 candidate))
+              (anything-find-files-1 candidate))
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
             (find-file-at-point (car marked))))))
