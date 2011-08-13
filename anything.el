@@ -862,14 +862,17 @@ This flag makes `anything' a bit faster with many sources.")
 (defvar anything-last-buffer nil
   "`anything-buffer' of previously `anything' session.")
 
-(defvar anything-save-configuration-functions
+ (defvar anything-save-configuration-functions
   '(set-window-configuration . current-window-configuration)
-  "If you want to save and restore frame configuration, set this variable to
- '(set-frame-configuration . current-frame-configuration)
+  "The functions used to restore/save window or frame configurations.
+It is a pair where the car is the function to restore window or frame config,
+and the cdr is the function to save the window or frame config.
 
-Older version saves/restores frame configuration, but the default is changed now,
-because flickering is occurred in some environment.
-")
+If you want to save and restore frame configuration, set this variable to
+ '\(set-frame-configuration . current-frame-configuration\)
+
+Older version saves/restores frame configuration, but the default is changed now
+because flickering can occur in some environment. ")
 
 (defvar anything-persistent-action-use-special-display nil
   "If non-nil, use `special-display-function' in persistent action.")
@@ -1633,7 +1636,7 @@ source in *buffers* buffer and set
 This function name should be `anything-initialize', but anything
 extensions may advice `anything-initalize'. I cannot rename, sigh."
   (anything-log "start initialization: any-resume=%S any-input=%S" any-resume any-input)
-  (anything-frame/window-configuration 'save)
+  (anything-frame-or-window-configuration 'save)
   (setq anything-sources (anything-normalize-sources any-sources))
   (anything-log "sources = %S" anything-sources)
   (anything-hooks 'setup)
@@ -1687,15 +1690,34 @@ It is needed because restoring position when `anything' is keyboard-quitted.")
 ;;; FIXME I want to remove them. But anything-iswitchb uses them.
 (defun anything-current-frame/window-configuration ()
   (funcall (cdr anything-save-configuration-functions)))
-(defun anything-set-frame/window-configuration (conf)
-  (funcall (car anything-save-configuration-functions) conf))
+(defun anything-set-frame/window-configuration (&optional win-or-frame-config)
+  (funcall (car anything-save-configuration-functions)
+           (or win-or-frame-config
+               anything-last-frame-or-window-configuration)))
 
-(lexical-let (conf)
-  (defun anything-frame/window-configuration (save-or-restore)
-    (anything-log-eval anything-save-configuration-functions)
-    (case save-or-restore
-      (save    (setq conf (funcall (cdr anything-save-configuration-functions))))
-      (restore (funcall (car anything-save-configuration-functions) conf)))))
+;; Internal.
+(defvar anything-last-frame-or-window-configuration nil
+  "Used to store window or frame configuration when anything start.")
+(defun anything-frame-or-window-configuration (save-or-restore)
+  "Save or restore last frame or window configuration.
+Possible value of SAVE-OR-RESTORE are 'save and 'restore.
+window or frame configuration is saved/restored according to values of
+`anything-save-configuration-functions'."
+  (anything-log-eval anything-save-configuration-functions)
+  (case save-or-restore
+    (save    (setq anything-last-frame-or-window-configuration
+                   (funcall (cdr anything-save-configuration-functions))))
+    (restore (funcall (car anything-save-configuration-functions)
+                      anything-last-frame-or-window-configuration)
+             ;; Restore frame focus.
+             (let ((frame (and (listp anything-last-frame-or-window-configuration)
+                               (caadr anything-last-frame-or-window-configuration))))
+               ;; If `anything-save-configuration-functions' are window functions
+               ;; frame should be nil, use current frame.
+               (unless (framep frame)
+                 (setq frame (selected-frame)))
+               (select-frame-set-input-focus frame)))))
+
 
 ;; (@* "Core: Display *anything* buffer")
 (defun anything-display-buffer (buf)
@@ -1824,14 +1846,17 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   "Clean up the mess."
   (anything-log "start cleanup")
   (with-current-buffer anything-buffer
-    (setq cursor-type t))
-  (bury-buffer anything-buffer)
-  (anything-funcall-foreach 'cleanup)
+    (setq cursor-type t)
+    ;; Call burry-buffer whithout arg
+    ;; to remove anything-buffer from window.
+    (bury-buffer)
+    ;; Be sure we call this from anything-buffer.
+    (anything-funcall-foreach 'cleanup))
   (anything-new-timer 'anything-check-minibuffer-input-timer nil)
   (anything-kill-async-processes)
   (anything-log-run-hook 'anything-cleanup-hook)
   (anything-hooks 'cleanup)
-  (anything-frame/window-configuration 'restore))
+  (anything-frame-or-window-configuration 'restore))
 
 ;; (@* "Core: input handling")
 (defun anything-check-minibuffer-input ()
