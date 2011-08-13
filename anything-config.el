@@ -9337,45 +9337,47 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
 (defun anything-lisp-completion-at-point ()
   "Anything lisp symbol completion at point."
   (interactive)
-  (let* ((data   (lisp-completion-at-point))
-         (beg    (car data))
-         (end    (point)) ; 'cadr data' is wrong when no space after point.
-         (plist  (nthcdr 3 data))
-         (pred   (plist-get plist :predicate))
-         (lgst-len 0)
-         (target (and beg end (buffer-substring-no-properties beg end)))
+  (let* ((data       (lisp-completion-at-point))
+         (beg        (car data))
+         (end        (point)) ; 'cadr data' is wrong when no space after point.
+         (plist      (nthcdr 3 data))
+         (pred       (plist-get plist :predicate))
+         (lgst-len   0)
+         (target     (and beg end (buffer-substring-no-properties beg end)))
+         (candidates (all-completions target (nth 2 data) pred))
          (anything-quit-if-no-candidate t)
          (anything-execute-action-at-once-if-one t)
          (anything-match-plugin-enabled
          (member 'anything-compile-source--match-plugin
                  anything-compile-source-functions)))
-    (when data
-      (with-anything-show-completion beg end
-        ;; Overlay is initialized now in anything-current-buffer.
-        (anything
-         :sources
-         '((name . "Lisp completion")
-           (init . (lambda ()
-                     (with-current-buffer (anything-candidate-buffer 'global)
-                       (loop for sym in (all-completions target (nth 2 data) pred)
-                          for len = (length sym)
-                          when (> len lgst-len) do (setq lgst-len len)
-                          do (insert (concat sym "\n"))))))
-           (candidates-in-buffer)
-           (persistent-action . (lambda (candidate)
-                                  (let ((cursor-in-echo-area t)
-                                        mode-line-in-non-selected-windows)
-                                    (anything-c-eldoc-show-in-mode-line
-                                     (propertize
-                                      (anything-c-get-first-line-documentation
-                                       (intern candidate))
-                                      'face 'anything-lisp-completion-info)))))
-           (persistent-help . "Show brief doc in mode-line")
-           (filtered-candidate-transformer anything-lisp-completion-transformer)
-           (action . (lambda (candidate)
-                       (delete-region beg end)
-                       (insert candidate))))
-         :input (if anything-match-plugin-enabled (concat target " ") target))))))
+    (if candidates
+        (with-anything-show-completion beg end
+          ;; Overlay is initialized now in anything-current-buffer.
+          (anything
+           :sources
+           '((name . "Lisp completion")
+             (init . (lambda ()
+                       (with-current-buffer (anything-candidate-buffer 'global)
+                         (loop for sym in candidates
+                            for len = (length sym)
+                            when (> len lgst-len) do (setq lgst-len len)
+                            do (insert (concat sym "\n"))))))
+             (candidates-in-buffer)
+             (persistent-action . (lambda (candidate)
+                                    (let ((cursor-in-echo-area t)
+                                          mode-line-in-non-selected-windows)
+                                      (anything-c-eldoc-show-in-mode-line
+                                       (propertize
+                                        (anything-c-get-first-line-documentation
+                                         (intern candidate))
+                                        'face 'anything-lisp-completion-info)))))
+             (persistent-help . "Show brief doc in mode-line")
+             (filtered-candidate-transformer anything-lisp-completion-transformer)
+             (action . (lambda (candidate)
+                         (delete-region beg end)
+                         (insert candidate))))
+           :input (if anything-match-plugin-enabled (concat target " ") target)))
+        (message "[No Match]"))))
 
 (defun anything-lisp-completion-transformer (candidates source)
   "Anything candidates transformer for lisp completion."
