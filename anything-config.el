@@ -4084,7 +4084,9 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                        finally return
                                          (if must-match ls
                                              (append (list anything-pattern) ls)))
-                                    (if must-match (cdr seq) seq)))))
+                                    (if must-match
+                                        (if (file-exists-p (car seq)) seq (cdr seq))
+                                        seq)))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
