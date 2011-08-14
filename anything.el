@@ -2456,14 +2456,14 @@ UNIT and DIRECTION."
   (unless (or (anything-empty-buffer-p (anything-buffer-get))
               (not (anything-window)))
     (with-anything-window
-      (run-hooks 'anything-move-selection-before-hook)
+      (anything-log-run-hook 'anything-move-selection-before-hook)
       (funcall move-func)
       (anything-skip-noncandidate-line direction)
       (anything-display-source-at-screen-top-maybe unit)
       (when (anything-get-previous-header-pos)
         (anything-mark-current-line))
       (anything-display-mode-line (anything-get-current-source))
-      (run-hooks 'anything-move-selection-after-hook))))
+      (anything-log-run-hook 'anything-move-selection-after-hook))))
 
 (defun anything-display-source-at-screen-top-maybe (unit)
   (when (and anything-display-source-at-screen-top (eq unit 'source))
