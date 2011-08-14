@@ -1029,8 +1029,146 @@ This set `ffap-newfile-prompt'."
   :type  'boolean
   :group 'anything-config)
 
+;;; Faces
+;;
+;;
+(defface anything-buffer-saved-out
+    '((t (:foreground "red")))
+  "*Face used for buffer files modified outside of emacs."
+  :group 'anything-config)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Prefix argument in action ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defface anything-buffer-not-saved
+    '((t (:foreground "Indianred2")))
+  "*Face used for buffer files not already saved on disk."
+  :group 'anything-config)
+
+(defface anything-ff-prefix
+  '((t (:background "yellow" :foreground "black")))
+  "*Face used to prefix new file or url paths in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-executable
+  '((t (:foreground "green")))
+  "*Face used for executable files in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-directory
+  '((t (:foreground "DarkRed" :background "LightGray")))
+  "*Face used for directories in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-symlink
+  '((t (:foreground "DarkOrange")))
+  "*Face used for symlinks in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-invalid-symlink
+  '((t (:foreground "black" :background "red")))
+  "*Face used for invalid symlinks in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-ff-file
+  '((t (:foreground "CadetBlue" :underline t)))
+  "*Face used for file names in `anything-find-files'."
+  :group 'anything-config)
+
+(defface anything-grep-match
+  '((t (:inherit match)))
+  "Face used to highlight grep matches."
+  :group 'anything-config)
+
+(defface anything-grep-file
+  '((t (:foreground "BlueViolet" :underline t)))
+  "Face used to highlight grep results filenames."
+  :group 'anything-config)
+
+(defface anything-grep-lineno
+  '((t (:foreground "Darkorange1")))
+  "Face used to highlight grep number lines."
+  :group 'anything-config)
+
+(defface anything-grep-running
+  '((t (:foreground "Red")))
+  "Face used in mode line when grep is running."
+  :group 'anything-config)
+
+(defface anything-grep-finish
+  '((t (:foreground "Green")))
+  "Face used in mode line when grep is finish."
+  :group 'anything-config)
+
+(defface anything-M-x-key-face '((t (:foreground "orange" :underline t)))
+  "*Face used in anything-M-x to show keybinding."
+  :group 'anything)
+
+(defface anything-bmkext-info
+    '((t (:foreground "green")))
+  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'anything)
+
+(defface anything-bmkext-w3m
+    '((t (:foreground "yellow")))
+  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'anything)
+
+(defface anything-bmkext-gnus
+    '((t (:foreground "magenta")))
+  "*Face used for Gnus bookmarks."
+  :group 'anything)
+
+(defface anything-bmkext-man
+    '((t (:foreground "Orange4")))
+  "*Face used for Woman/man bookmarks."
+  :group 'anything)
+
+(defface anything-bmkext-no--file
+    '((t (:foreground "grey")))
+  "*Face used for non--file bookmarks."
+  :group 'anything)
+
+(defface anything-bmkext-file
+    '((t (:foreground "Deepskyblue2")))
+  "*Face used for non--file bookmarks."
+  :group 'anything)
+
+(defface anything-bookmarks-su-face '((t (:foreground "red")))
+  "Face for su/sudo bookmarks."
+  :group 'anything)
+
+(defface anything-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
+  "Face for w3m bookmarks" :group 'anything)
+
+(defface anything-emms-playlist
+    '((t (:foreground "Springgreen4" :underline t)))
+  "*Face used for tracks in current emms playlist."
+  :group 'anything)
+
+(defface anything-apt-installed
+    '((t (:foreground "green")))
+  "*Face used for apt installed candidates."
+  :group 'anything)
+
+(defface anything-gentoo-match-face '((t (:foreground "red")))
+  "Face for anything-gentoo installed packages."
+  :group 'traverse-faces)
+
+(defface anything-lisp-show-completion
+  '((t (:background "DarkSlateGray")))
+  "*Face used for showing candidates in `anything-lisp-completion'."
+  :group 'anything-config)
+
+(defface anything-lisp-completion-info
+  '((t (:foreground "red")))
+  "*Face used for showing info in `anything-lisp-completion'."
+  :group 'anything-config)
+
+(defface anything-overlay-line-face '((t (:background "IndianRed4" :underline t)))
+  "Face for source header in the anything buffer." :group 'anything)
+
+
+;;; Prefix argument in action.
+;;
+;;
 ;; TODO: This should be integrated in anything.el instead of having
 ;; a defadvice here.
 
@@ -1895,17 +2033,8 @@ buffer that is not the current buffer."
 ;; (anything 'anything-c-source-buffer-not-found)
 
 ;;; Buffers+
-
-(defface anything-buffer-saved-out
-    '((t (:foreground "red")))
-  "*Face used for buffer files modified outside of emacs."
-  :group 'anything-config)
-
-(defface anything-buffer-not-saved
-    '((t (:foreground "Indianred2")))
-  "*Face used for buffer files not already saved on disk."
-  :group 'anything-config)
-
+;;
+;;
 (eval-when-compile (require 'dired))
 
 (defun anything-c-highlight-buffers (buffers)
@@ -2205,6 +2334,8 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
            default-directory)))))
 
 ;;;; <File>
+;;
+;;
 ;;; File name history
 (defvar anything-c-source-file-name-history
   '((name . "File Name History")
@@ -2215,6 +2346,8 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 ;; (anything 'anything-c-source-file-name-history)
 
 ;;; Files in current dir
+;;
+;;
 (defvar anything-c-source-files-in-current-dir
   '((name . "Files from Current Directory")
     (candidates . (lambda ()
@@ -2243,45 +2376,11 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
     (candidate-transformer anything-c-highlight-files)
     ;; volatile is not needed, I think.
     (type . file)))
-
 ;; (anything 'anything-c-source-files-in-current-dir+)
 
-;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Anything-find-files
-;;;
-;;; Anything replacement of file name completion for `find-file' and friends.
-
-(defface anything-ff-prefix
-  '((t (:background "yellow" :foreground "black")))
-  "*Face used to prefix new file or url paths in `anything-find-files'."
-  :group 'anything-config)
-
-(defface anything-ff-executable
-  '((t (:foreground "green")))
-  "*Face used for executable files in `anything-find-files'."
-  :group 'anything-config)
-
-(defface anything-ff-directory
-  '((t (:foreground "DarkRed" :background "LightGray")))
-  "*Face used for directories in `anything-find-files'."
-  :group 'anything-config)
-
-(defface anything-ff-symlink
-  '((t (:foreground "DarkOrange")))
-  "*Face used for symlinks in `anything-find-files'."
-  :group 'anything-config)
-
-
-(defface anything-ff-invalid-symlink
-  '((t (:foreground "black" :background "red")))
-  "*Face used for invalid symlinks in `anything-find-files'."
-  :group 'anything-config)
-
-(defface anything-ff-file
-  '((t (:foreground "CadetBlue" :underline t)))
-  "*Face used for file names in `anything-find-files'."
-  :group 'anything-config)
-
+;;
+;;
 (defvar anything-c-find-files-doc-header (format " (`%s':Go to precedent level)"
                                                  (if window-system "C-." "C-l"))
   "*The doc that is inserted in the Name header of a find-files or dired source.")
@@ -4239,11 +4338,11 @@ See Man locate for more infos.
   "Generic Keymap for files.")
 
 ;;; Anything Incremental Grep.
-;; This allow to grep incrementally with anything interface.
+;;
+;;
+;; Allow to grep incrementally with anything interface.
 ;; It allow also to Grep files recursively without using 'find' shell command.
 ;; On Windows you will need at least Grep version 2.5.4 of Gnuwin32.
-;;
-;;
 (defvar anything-c-grep-default-command
   "grep -d skip %e -niH -e %p %f"
   "Default grep format command for `anything-do-grep-1'.
@@ -4281,31 +4380,6 @@ See `anything-c-grep-default-command' for format specs.")
 
 (defvar anything-c-grep-max-length-history 100
   "*Max number of elements to save in `anything-c-grep-history'.")
-
-(defface anything-grep-match
-  '((t (:inherit match)))
-  "Face used to highlight grep matches."
-  :group 'anything-config)
-
-(defface anything-grep-file
-  '((t (:foreground "BlueViolet" :underline t)))
-  "Face used to highlight grep results filenames."
-  :group 'anything-config)
-
-(defface anything-grep-lineno
-  '((t (:foreground "Darkorange1")))
-  "Face used to highlight grep number lines."
-  :group 'anything-config)
-
-(defface anything-grep-running
-  '((t (:foreground "Red")))
-  "Face used in mode line when grep is running."
-  :group 'anything-config)
-
-(defface anything-grep-finish
-  '((t (:foreground "Green")))
-  "Face used in mode line when grep is finish."
-  :group 'anything-config)
 
 (defun anything-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories CANDIDATES for grep command line."
@@ -5812,9 +5886,6 @@ Return nil if no mode-map found."
     (when (and map (boundp map))
       (anything-M-x-get-major-mode-command-alist (symbol-value map)))))
 
-(defface anything-M-x-key-face '((t (:foreground "orange" :underline t)))
-  "*Face used in anything-M-x to show keybinding."
-  :group 'anything)
 
 (defun anything-M-x-transformer (candidates sources)
   "filtered-candidate-transformer to show bindings in emacs commands.
@@ -6129,48 +6200,14 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                     t
                     (propertize i 'face 'anything-bmkext-file 'help-echo isfile)))))
 
-
-;;; Faces for bookmarks
-(defface anything-bmkext-info
-    '((t (:foreground "green")))
-  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
-  :group 'anything)
-
-(defface anything-bmkext-w3m
-    '((t (:foreground "yellow")))
-  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
-  :group 'anything)
-
-(defface anything-bmkext-gnus
-    '((t (:foreground "magenta")))
-  "*Face used for Gnus bookmarks."
-  :group 'anything)
-
-(defface anything-bmkext-man
-    '((t (:foreground "Orange4")))
-  "*Face used for Woman/man bookmarks."
-  :group 'anything)
-
-(defface anything-bmkext-no--file
-    '((t (:foreground "grey")))
-  "*Face used for non--file bookmarks."
-  :group 'anything)
-
-(defface anything-bmkext-file
-    '((t (:foreground "Deepskyblue2")))
-  "*Face used for non--file bookmarks."
-  :group 'anything)
-
-(defface anything-bookmarks-su-face '((t (:foreground "red")))
-  "Face for su/sudo bookmarks."
-  :group 'anything)
-
+;; Bind some faces for bookmarks.
 (defvar anything-c-bookmarks-face1 'anything-ff-directory)
 (defvar anything-c-bookmarks-face2 'anything-ff-file)
 (defvar anything-c-bookmarks-face3 'anything-bookmarks-su-face)
 
-
 ;;; Sources to filter bookmark-extensions bookmarks.
+;;
+;;
 ;; Dependency: http://mercurial.intuxication.org/hg/emacs-bookmark-extension
 ;; If you want to enable google-maps in addressbook you will need
 ;; Julien Danjou google-maps-el package available here:
@@ -6187,7 +6224,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      collect b into sa
      finally return (sort sa 'string-lessp)))
 
-;; Addressbook
+;;; Addressbook.
+;;
+;;
 (defvar anything-c-source-bmkext-addressbook
   '((name . "Bookmark Addressbook")
     (init . (lambda ()
@@ -6268,7 +6307,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   "Specialized filter function for bookmarks w3m."
   (anything-c-bmkext-filter-setup-alist 'bmkext-addressbook-alist-only))
 
-;; W3m
+;; W3m bookmarks from bookmark-extensions.
 (defvar anything-c-source-bookmark-w3m
   '((name . "Bookmark W3m")
     (init . (lambda ()
@@ -6448,7 +6487,9 @@ Contain also `anything-c-source-google-suggest'."
    :buffer "*anything bmkext*"))
 
 
-;; Firefox bookmarks
+;;; Firefox bookmarks
+;;
+;;
 ;; You will have to set firefox to import bookmarks in his html file bookmarks.html.
 ;; (only for firefox versions >=3)
 ;; To achieve that, open about:config in firefox and double click on this line to enable value
@@ -6529,7 +6570,9 @@ Contain also `anything-c-source-google-suggest'."
               i 'face '((:foreground "YellowGreen"))
               'help-echo (anything-c-firefox-bookmarks-get-value i))))
 
-;; W3m bookmark
+;;; W3m bookmark - anything interface.
+;;
+;;
 ;; Some users have the emacs-w3m library in load-path
 ;; without having the w3m executable :-;
 ;; So check if w3m program is present before trying to load
@@ -6539,11 +6582,6 @@ Contain also `anything-c-source-google-suggest'."
     (require 'w3m-bookmark nil t)))
 
 (defvar w3m-bookmark-file "~/.w3m/bookmark.html")
-
-
-(defface anything-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
-  "Face for w3m bookmarks" :group 'anything)
-
 (defvar anything-w3m-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 (defvar anything-w3m-bookmark-url-regexp "\\(https\\|http\\|ftp\\|file\\)://[^>]*")
 (defvar anything-c-w3m-bookmarks-alist nil)
@@ -6683,7 +6721,12 @@ STRING is string to match."
     names))
 
 ;;;; <Programming>
+;;
+;;
+
 ;;; Imenu
+;;
+;;
 (defvar anything-c-imenu-delimiter " / ")
 
 (defvar anything-c-imenu-index-filter nil)
@@ -6762,6 +6805,8 @@ STRING is string to match."
     (imenu alist)))
 
 ;;; Ctags
+;;
+;;
 (defvar anything-c-ctags-modes
   '( c-mode c++-mode awk-mode csharp-mode java-mode javascript-mode lua-mode
     makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
@@ -6804,7 +6849,9 @@ STRING is string to match."
 http://ctags.sourceforge.net/")
 ;; (anything 'anything-c-source-ctags)
 
-;; Semantic
+;;; Semantic
+;;
+;; 
 (eval-when-compile (require 'semantic nil t))
 (declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
 (declare-function semantic-tag-components "ext:tag.el" (tag) t)
@@ -8233,10 +8280,6 @@ When nil, fallback to `browse-url-browser-function'.")
     (filtered-candidate-transformer . anything-c-adaptive-sort)))
 ;; (anything 'anything-c-source-emms-dired)
 
-(defface anything-emms-playlist
-    '((t (:foreground "Springgreen4" :underline t)))
-  "*Face used for tracks in current emms playlist."
-  :group 'anything)
 
 (defun anything-c-emms-files-modifier (candidates source)
   (let ((current-playlist (with-current-emms-playlist
@@ -8673,10 +8716,6 @@ See also `anything-create--actions'."
 (defvar anything-c-apt-installed-packages nil)
 (defvar anything-c-apt-all-packages nil)
 
-(defface anything-apt-installed
-    '((t (:foreground "green")))
-  "*Face used for apt installed candidates."
-  :group 'anything)
 
 (defun anything-c-apt-refresh ()
   "Refresh installed candidates list."
@@ -8982,9 +9021,6 @@ Support install, remove and purge actions."
                                 "USE")
                   (buffer-string))))
 
-(defface anything-gentoo-match-face '((t (:foreground "red")))
-  "Face for anything-gentoo installed packages."
-  :group 'traverse-faces)
 
 (defun anything-c-highlight-world (eix)
   "Highlight all installed package."
@@ -9290,10 +9326,6 @@ This is the same as `ac-insert', just inlined here for compatibility."
 ;;
 ;; Provide show completion with macro `with-anything-show-completion'.
 
-(defface anything-lisp-show-completion
-  '((t (:background "DarkSlateGray")))
-  "*Face used for showing candidates in `anything-lisp-completion'."
-  :group 'anything-config)
 
 ;; Internal
 (defvar anything-c-show-completion-overlay nil)
@@ -9329,11 +9361,6 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
 ;;; Lisp symbol completion.
 ;;
 ;;
-
-(defface anything-lisp-completion-info
-  '((t (:foreground "red")))
-  "*Face used for showing info in `anything-lisp-completion'."
-  :group 'anything-config)
 
 ;;;###autoload
 (defun anything-lisp-completion-at-point ()
@@ -9898,8 +9925,6 @@ It is added to `extended-command-history'.
 
 (defalias 'anything-persistent-highlight-point 'anything-match-line-color-current-line)
 
-(defface anything-overlay-line-face '((t (:background "IndianRed4" :underline t)))
-  "Face for source header in the anything buffer." :group 'anything)
 
 (setq anything-match-line-overlay-face 'anything-overlay-line-face)
 
