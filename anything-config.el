@@ -5456,6 +5456,11 @@ Same as `anything-describe-anything-attribute' but with anything completion."
     (info-index . "org")))
 ;; (anything 'anything-c-source-info-org)
 
+;; Info Index gnus
+(defvar anything-c-source-info-gnus
+  '((name . "Info index: Gnus")
+    (info-index . "gnus")))
+
 ;; Info Index ratpoison
 (defvar anything-c-source-info-ratpoison
   '((name . "Info index: ratpoison")
