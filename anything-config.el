@@ -105,7 +105,7 @@
 ;; Preconfigured `anything' for Yahoo searching with Yahoo suggest.
 ;; `anything-for-buffers'
 ;; Preconfigured `anything' for buffer.
-;; `anything-buffers+'
+;; `anything-buffers-list'
 ;; Enhanced preconfigured `anything' for buffer.
 ;; `anything-bbdb'
 ;; Preconfigured `anything' for BBDB.
@@ -458,7 +458,7 @@
 ;; `anything-c-source-regexp'					(Regexp Builder)
 ;; `anything-c-source-buffers'					(Buffers)
 ;; `anything-c-source-buffer-not-found'				(Create buffer)
-;; `anything-c-source-buffers+'					(Buffers)
+;; `anything-c-source-buffers-list'					(Buffers)
 ;; `anything-c-source-file-name-history'			(File Name History)
 ;; `anything-c-source-files-in-current-dir'			(Files from Current Directory)
 ;; `anything-c-source-files-in-current-dir+'			(Files from Current Directory)
@@ -794,7 +794,7 @@ they will be displayed with face `file-name-shadow' if
 (defcustom anything-for-files-prefered-list
   '(anything-c-source-ffap-line
     anything-c-source-ffap-guesser
-    anything-c-source-buffers+
+    anything-c-source-buffers-list
     anything-c-source-recentf
     anything-c-source-bookmarks
     anything-c-source-file-cache
@@ -1233,7 +1233,7 @@ It will be cleared at start of next `anything' call when \
 (define-key anything-command-map (kbd "h i")       'anything-info-at-point)
 (define-key anything-command-map (kbd "h r")       'anything-info-emacs)
 (define-key anything-command-map (kbd "h g")       'anything-info-gnus)
-(define-key anything-command-map (kbd "C-x C-b")   'anything-buffers+)
+(define-key anything-command-map (kbd "C-x C-b")   'anything-buffers-list)
 (define-key anything-command-map (kbd "C-c C-b")   'anything-browse-code)
 (define-key anything-command-map (kbd "C-x r i")   'anything-register)
 (define-key anything-command-map (kbd "C-c C-x")   'anything-c-run-external-command)
@@ -1265,7 +1265,7 @@ It will be cleared at start of next `anything' call when \
      ["Locate" anything-locate t]
      ["Bookmarks" anything-c-pp-bookmarks t])
     ("Buffers:"
-     ["Find buffers" anything-buffers+ t])
+     ["Find buffers" anything-buffers-list t])
     ("Commands:"
      ["Emacs Commands" anything-M-x t]
      ["Externals Commands" anything-c-run-external-command t])
@@ -1392,7 +1392,7 @@ Enjoy!")))
 (defun anything-mini ()
   "Preconfigured `anything' lightweight version (buffer -> recentf)."
   (interactive)
-  (anything-other-buffer '(anything-c-source-buffers+ anything-c-source-recentf)
+  (anything-other-buffer '(anything-c-source-buffers-list anything-c-source-recentf)
                          "*anything mini*"))
 ;;;###autoload
 (defun anything-for-files ()
@@ -1485,10 +1485,10 @@ First call open the kill-ring browser, next calls move to next line."
   (anything-other-buffer 'anything-c-source-buffers "*anything for buffers*"))
 
 ;;;###autoload
-(defun anything-buffers+ ()
+(defun anything-buffers-list ()
   "Enhanced preconfigured `anything' for buffer."
   (interactive)
-  (anything :sources '(anything-c-source-buffers+
+  (anything :sources '(anything-c-source-buffers-list
                        anything-c-source-buffer-not-found)
             :buffer "*anything buffers*" :keymap anything-c-buffer-map))
 
@@ -2091,9 +2091,9 @@ buffer that is not the current buffer."
 \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
 \\[anything-select-3rd-action]:NthAct,\
 \\[anything-send-bug-report-from-anything]:BugReport."
-    "String displayed in mode-line in `anything-c-source-buffers+'"))
+    "String displayed in mode-line in `anything-c-source-buffers-list'"))
 
-(defvar anything-c-source-buffers+
+(defvar anything-c-source-buffers-list
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
     (type . buffer)
@@ -2104,7 +2104,7 @@ buffer that is not the current buffer."
     (candidate-transformer anything-c-skip-current-buffer
                            anything-c-skip-boring-buffers
                            anything-c-highlight-buffers)
-    (persistent-action . anything-c-buffers+-persistent-action)
+    (persistent-action . anything-c-buffers-list-persistent-action)
     (volatile)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
@@ -2307,12 +2307,12 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
   "Make visible current selection by recentering anything window."
   (with-anything-window (recenter)))
 
-(defun anything-c-buffers+-persistent-action (candidate)
+(defun anything-c-buffers-list-persistent-action (candidate)
     (if current-prefix-arg
         (anything-c-buffers-persistent-kill candidate)
         (anything-c-switch-to-buffer candidate)))
 
-;; (anything 'anything-c-source-buffers+)
+;; (anything 'anything-c-source-buffers-list)
 
 (defadvice anything-quit-and-find-file (around use-anything-find-files activate)
   "Let `anything-quit-and-find-file' take advantage of `anything-find-files'."
@@ -2888,6 +2888,7 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
     (define-key map (kbd "C-.")           'anything-find-files-down-one-level)
     (define-key map (kbd "C-l")           'anything-find-files-down-one-level)
     (define-key map (kbd "C-h C-b")       'anything-send-bug-report-from-anything)
+    (define-key map (kbd "C-h C-d")       'anything-debug-output)
     (when anything-ff-lynx-style-map
       (define-key map (kbd "<left>")      'anything-find-files-down-one-level)
       (define-key map (kbd "<right>")     'anything-execute-persistent-action))
@@ -5375,7 +5376,7 @@ See `anything-c-filelist-file-name' docstring for usage."
   (anything-other-buffer
    '(anything-c-source-ffap-line
      anything-c-source-ffap-guesser
-     anything-c-source-buffers+
+     anything-c-source-buffers-list
      anything-c-source-recentf
      anything-c-source-bookmarks
      anything-c-source-file-cache
@@ -10607,10 +10608,10 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
                       len
                       (mapconcat (lambda (f) (format "- %s\n" f)) files ""))))
         (message "(No deletions performed)")
-      (dolist (i files)
-        (set-text-properties 0 (length i) nil i)
-        (anything-c-delete-file i))
-      (message "%s File(s) deleted" len))))
+        (dolist (i files)
+          (set-text-properties 0 (length i) nil i)
+          (anything-c-delete-file i))
+          (message "%s File(s) deleted" len))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
   "Ediff 2 marked buffers or 1 marked buffer and current-buffer.
@@ -10874,7 +10875,7 @@ the center of window, otherwise at the top of window.
 ;; Setting `anything-sources' is DEPRECATED, but it seems that newbies
 ;; tend to invoke M-x anything directly. So I offer default setting.
 (setq anything-sources
-      '(anything-c-source-buffers+
+      '(anything-c-source-buffers-list
         anything-c-source-recentf
         anything-c-source-files-in-current-dir+))
 
