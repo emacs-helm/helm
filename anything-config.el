@@ -4404,8 +4404,9 @@ See `anything-c-grep-default-command' for format specs.")
                  ;; current directory instead of candidate.
                  ((and (or (file-exists-p i) (string-match "\*" i))
                        (anything-c-grep-recurse-p))
-                  (list (directory-file-name ; Needed for windoze.
-                         (file-name-directory (directory-file-name i)))))
+                  (list (expand-file-name
+                         (directory-file-name ; Needed for windoze.
+                          (file-name-directory (directory-file-name i))))))
                  ;; Candidate use wildcard.
                  ((string-match "^\*" (anything-c-basename i))
                   (file-expand-wildcards i t))
