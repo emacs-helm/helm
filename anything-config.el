@@ -2190,7 +2190,10 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 (defvar anything-c-buffer-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "C-c ?")     'anything-c-buffer-help)
-    (define-key map (kbd "M-g s")     'anything-buffer-run-grep)
+    ;; No need to have separate command for grep and zgrep
+    ;; as we don't use recursivity for buffers.
+    ;; So use zgrep for both as it is capable to handle non--compressed files.
+    (define-key map (kbd "M-g s")     'anything-buffer-run-zgrep)
     (define-key map (kbd "M-g z")     'anything-buffer-run-zgrep)
     (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
