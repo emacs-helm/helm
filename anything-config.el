@@ -1653,7 +1653,9 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
 
 ;;;###autoload
 (defun anything-occur ()
-  "Preconfigured Anything for Occur source."
+  "Preconfigured Anything for Occur source.
+If region is active, search only in region,
+otherwise search in whole buffer."
   (interactive)
   (let ((anything-compile-source-functions
          ;; rule out anything-match-plugin because the input is one regexp.
@@ -8427,19 +8429,33 @@ When nil, fallback to `browse-url-browser-function'.")
   (anything-other-buffer 'anything-c-source-anything-commands
                          "*anything commands*"))
 
-;; Occur
+;;; Occur
+;;
+;;
 (defun anything-c-occur-init ()
-  (anything-candidate-buffer anything-current-buffer))
+  "Create the initial anything occur buffer.
+If region is active use region as buffer contents
+instead of whole buffer."
+  (with-current-buffer (anything-candidate-buffer 'global)
+    (erase-buffer)
+    (let ((buf-contents
+           (with-current-buffer anything-current-buffer
+             (if (anything-region-active-p)
+                 (buffer-substring (region-beginning) (region-end))
+                 (buffer-substring (point-min) (point-max))))))
+      (insert buf-contents))))
 
 (defun anything-c-occur-get-line (s e)
   (format "%7d:%s" (line-number-at-pos (1- s)) (buffer-substring s e)))
 
 (defun anything-c-occur-query-replace-regexp (candidate)
   "Query replace regexp starting from CANDIDATE.
+If region is active ignore CANDIDATE and replace only in region.
 With a prefix arg replace only matches surrounded by word boundaries,
 i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((regexp anything-input))
-    (anything-c-action-line-goto candidate)
+    (unless (anything-region-active-p)
+      (anything-c-action-line-goto candidate))
     (apply 'query-replace-regexp
            (anything-c-query-replace-args regexp))))
 
