@@ -4140,6 +4140,7 @@ Bindings affected are C, R, S, H."
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "C-.")         'anything-find-files-down-one-level)
     (define-key map (kbd "C-l")         'anything-find-files-down-one-level)
+    (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
     (when anything-ff-lynx-style-map
       (define-key map (kbd "<left>")    'anything-find-files-down-one-level)
       (define-key map (kbd "<right>")   'anything-execute-persistent-action)
@@ -4201,6 +4202,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
+              (toggle-auto-update . anything-ff-toggle-auto-update)
               (persistent-help . ,persistent-help)
               (volatile)
               (action . ,'action-fn)))
