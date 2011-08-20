@@ -1685,15 +1685,20 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
 ;;
 ;;
 (defun anything-c-query-replace-regexp (candidate)
+  "Query replace regexp from `anything-regexp'.
+With a prefix arg replace only matches surrounded by word boundaries,
+i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((regexp (funcall (anything-attr 'regexp))))
     (apply 'query-replace-regexp
            (anything-c-query-replace-args regexp))))
 
 (defun anything-c-kill-regexp-as-sexp (candidate)
+  "Kill regexp in a format usable in lisp code."
   (anything-c-regexp-kill-new
    (prin1-to-string (funcall (anything-attr 'regexp)))))
 
 (defun anything-c-kill-regexp (candidate)
+  "Kill regexp as it is in `anything-pattern'."
   (anything-c-regexp-kill-new (funcall (anything-attr 'regexp))))
 
 (defun anything-c-query-replace-args (regexp)
@@ -1702,7 +1707,7 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
     (list
      regexp
      (query-replace-read-to regexp
-                            (format "Query replace %s regexp %s"
+                            (format "Query replace %sregexp %s"
                                     (if anything-current-prefix-arg "word " "")
                                     (if region-only "in region " ""))
                             t)
@@ -1724,7 +1729,8 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
     (mode-line . "Press TAB to select action.")
     (regexp . (lambda () anything-input))
     (action . (("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
-               ("Query Replace Regexp" . anything-c-query-replace-regexp)
+               ("Query Replace Regexp (C-u Not inside word.)"
+                . anything-c-query-replace-regexp)
                ("Kill Regexp" . anything-c-kill-regexp)))))
 
 (defun anything-c-regexp-get-line (s e)
@@ -8424,13 +8430,25 @@ When nil, fallback to `browse-url-browser-function'.")
 (defun anything-c-occur-get-line (s e)
   (format "%7d:%s" (line-number-at-pos (1- s)) (buffer-substring s e)))
 
+(defun anything-c-occur-query-replace-regexp (candidate)
+  "Query replace regexp starting from CANDIDATE.
+With a prefix arg replace only matches surrounded by word boundaries,
+i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
+  (let ((regexp anything-input))
+    (anything-c-action-line-goto candidate)
+    (apply 'query-replace-regexp
+           (anything-c-query-replace-args regexp))))
+
 (defvar anything-c-source-occur
   '((name . "Occur")
     (init . anything-c-occur-init)
     (candidates-in-buffer)
     (migemo)
     (get-line . anything-c-occur-get-line)
-    (type . line)
+    (display-to-real . anything-c-display-to-real-line)
+    (action . (("Go to Line" . anything-c-action-line-goto)
+               ("Query replace regexp (C-u Not inside word.)"
+                . anything-c-occur-query-replace-regexp)))
     (recenter)
     (requires-pattern . 1)
     (delayed)
