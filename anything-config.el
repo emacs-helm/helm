@@ -4877,6 +4877,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
          (cands (if prefarg
                     (buffer-list)
                     (anything-marked-candidates)))
+         (win-conf (current-window-configuration))
+         ;; Non--fname buffers are ignored.
          (bufs (loop for buf in cands
                   for fname = (buffer-file-name (get-buffer buf))
                   when fname
@@ -4890,7 +4892,9 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (anything-c-switch-to-buffer candidate)
         (when (get-buffer anything-action-buffer)
           (kill-buffer anything-action-buffer))
-        (anything-occur))))
+        (anything-occur)
+        (when (eq anything-exit-status 1)
+          (set-window-configuration win-conf)))))
 
 (defun anything-c-grep-buffers (candidate)
   "Action to grep buffers."

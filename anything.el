@@ -2673,11 +2673,20 @@ UNIT and DIRECTION."
 ;; (define-key anything-map "@" 'anything-select-with-prefix-shortcut)
 ;; (define-key anything-map (kbd "<f18>") 'anything-select-with-prefix-shortcut)
 
+(defvar anything-exit-status 0
+  "Flag to inform whether anything have aborted or quitted.
+Exit with 0 mean anything exit executing an action.
+Exit with 1 mean anything abort with \\[keyboard-quit]
+It is useful for example to restore a window config if anything abort
+in special cases.
+See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
+
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
   (interactive)
   (declare (special anything-iswitchb-candidate-selected))
   (setq anything-iswitchb-candidate-selected (anything-get-selection))
+  (setq anything-exit-status 0)
   (exit-minibuffer))
 
 (defun anything-keyboard-quit ()
@@ -2687,6 +2696,7 @@ If action buffer is displayed, kill it."
   (interactive)
   (when (get-buffer-window anything-action-buffer 'visible)
     (kill-buffer anything-action-buffer))
+  (setq anything-exit-status 1)
   (abort-recursive-edit))
 
 (defun anything-get-next-header-pos ()
