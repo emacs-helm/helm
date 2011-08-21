@@ -1,19 +1,26 @@
 * To install anything:
 
-1) Put following files somewhere in your load-path:
- - anything.el
- - anything-config.el
- - anything-match-plugin.el (optional but advised)
+A) The easiest way:
 
-2) Byte-compile these files:
- You can now run make to byte-compile.
+  1) Put the anything directory in load-path.
+  2) Run make from this directory.
+  3) Add to .emacs.el:
+     (add-to-list 'load-path "/path/to/anything/directory")
+     (require 'anything-config)
 
-3) Add this code to .emacs.el:
- (require 'anything-config)
- (require 'anything-match-plugin) ; Optional but advised
+B) By copying files from anything directory
 
+  1) Put following files somewhere in your load-path:
+     - anything.el
+     - anything-config.el
+     - anything-match-plugin.el
+
+  2) Byte-compile these files
+
+  3) Add this code to .emacs.el:
+     (require 'anything-config)
  
-* Note to Distribution maintainers:(Ubuntu etc...)
+* NOTE to Distribution maintainers:(Ubuntu etc...)
 
 Use only the files mentioned above in [1] for your packages, other files
 contained in contrib directory contain deprecated or unmaintained code.
@@ -25,3 +32,4 @@ Thanks.
 
 Additionaly, if you want to install extensions/anything-complete.el,
 you will have also to add to your load-path anything-obsolete.el.
+You may want also to add anything-show-completion.el to your load-path.

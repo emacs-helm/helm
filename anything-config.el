@@ -667,6 +667,7 @@
 (require 'url)
 (require 'xml)
 (eval-when-compile (require 'org)) ; Shut up byte compiler about org-directory.
+(require 'anything-match-plugin)
 
 ;;; Code:
 
