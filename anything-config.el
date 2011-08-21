@@ -2413,7 +2413,9 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
 
 (defvar anything-c-source-find-files
-  `((name . ,(concat "Find Files" anything-c-find-files-doc-header))
+  `((name . "Find Files")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
@@ -3102,8 +3104,7 @@ If EXPAND is non--nil expand-file-name."
                       "Hardlink Files" "Write File"
                       "Insert File" "Read file name"))
         (cur-source (cdr (assoc 'name (anything-get-current-source)))))
-    (loop for i in ff-sources
-       thereis (string= cur-source (concat i anything-c-find-files-doc-header)))))
+    (loop for i in ff-sources thereis (string= cur-source i))))
 
 ;; Internal.
 (defvar anything-ff-last-expanded nil
@@ -3859,7 +3860,9 @@ Find inside `require' and `declare-function' sexp."
 
 ;;; Anything completion for `write-file'.==> C-x C-w
 (defvar anything-c-source-write-file
-  `((name . ,(concat "Write File" anything-c-find-files-doc-header))
+  `((name . "Write File")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
@@ -3883,7 +3886,9 @@ Find inside `require' and `declare-function' sexp."
 
 ;;; Anything completion for `insert-file'.==> C-x i
 (defvar anything-c-source-insert-file
-  `((name . ,(concat "Insert File" anything-c-find-files-doc-header))
+  `((name . "Insert File")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
@@ -3909,7 +3914,9 @@ Find inside `require' and `declare-function' sexp."
 
 ;;; Anything completion for copy, rename and (rel)sym/hard/link files from dired.
 (defvar anything-c-source-copy-files
-  `((name . ,(concat "Copy Files" anything-c-find-files-doc-header))
+  `((name . "Copy Files")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
@@ -3927,7 +3934,9 @@ Find inside `require' and `declare-function' sexp."
 
 
 (defvar  anything-c-source-rename-files
-  `((name . ,(concat "Rename Files" anything-c-find-files-doc-header))
+  `((name . "Rename Files")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
@@ -3944,7 +3953,9 @@ Find inside `require' and `declare-function' sexp."
            (anything-dired-action candidate :action 'rename :follow t)))))))
 
 (defvar anything-c-source-symlink-files
-  `((name . ,(concat "Symlink Files" anything-c-find-files-doc-header))
+  `((name . "Symlink Files")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
@@ -3962,7 +3973,9 @@ Find inside `require' and `declare-function' sexp."
 
 
 (defvar anything-c-source-hardlink-files
-  `((name . ,(concat "Hardlink Files" anything-c-find-files-doc-header))
+  `((name . "Hardlink Files")
+    (header-name . (lambda (name)
+                     (concat name anything-c-find-files-doc-header)))
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (candidates . anything-find-files-get-candidates)
@@ -4178,14 +4191,18 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                  (identity candidate))))
       (or (anything
            :sources
-           `(((name . ,(concat "Read File Name History" anything-c-find-files-doc-header))
+           `(((name . "Read File Name History")
+              (header-name . (lambda (name)
+                               (concat name anything-c-find-files-doc-header)))
               (disable-shortcuts)
               (candidates . (lambda ()
                               (anything-comp-read-get-candidates history nil nil alistp)))
               (persistent-action . ,persistent-action)
               (persistent-help . ,persistent-help)
               (action . ,'action-fn))
-             ((name . ,(concat "Read file name" anything-c-find-files-doc-header))
+             ((name . "Read file name")
+              (header-name . (lambda (name)
+                               (concat name anything-c-find-files-doc-header)))
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (candidates . (lambda ()
