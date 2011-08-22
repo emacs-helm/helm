@@ -3246,7 +3246,7 @@ expand to this directory."
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
           ((and (not (string-match reg pattern))
-                (string-match  tramp-file-name-regexp pattern)
+                (string-match tramp-file-name-regexp pattern)
                 (member (match-string 1 pattern) methods))
            "Invalid tramp file name")   ; Write in anything-buffer.
           ;; PATTERN is a directory, end it with "/".
@@ -3266,7 +3266,9 @@ expand to this directory."
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern anything-pattern))
-         (path-name-dir (file-name-directory path))
+         (path-name-dir (if (file-directory-p path)
+                            (file-name-as-directory path)
+                            (file-name-directory path)))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     (setq anything-pattern (anything-ff-transform-fname-for-completion path))
@@ -3285,9 +3287,7 @@ expand to this directory."
            (list (format "Opening directory: access denied, `%s'" path)))
           ((file-directory-p path) (directory-files path t))
           (t
-           (append
-            (list path)
-            (directory-files (file-name-directory path) t))))))
+           (append (list path) (directory-files path-name-dir t))))))
 
 (defun anything-ff-transform-fname-for-completion (fname)
   "Return FNAME with it's basename modified as a regexp.
