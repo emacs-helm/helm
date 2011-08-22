@@ -3775,17 +3775,7 @@ This is the starting point for nearly all actions you can do on files."
       (setq any-input (expand-file-name org-directory)))
     (set-text-properties 0 (length any-input) nil any-input)
     (if any-input
-        ;; [Emacs-bug work around]
-        ;; auto-expanding on a partial directory name as input
-        ;; yield indefinitely this directory name in minibuffer
-        ;; for unknow reasons, so disable auto-expansion for now
-        ;; when any-input is an incomplete file/dir name.
-        (let* ((anything-ff-auto-update-initial-value
-                (and anything-ff-auto-update-initial-value
-                     (file-exists-p any-input)))
-               (anything-ff-auto-update-flag
-                anything-ff-auto-update-initial-value))
-          (anything-find-files-1 any-input))
+        (anything-find-files-1 any-input)
         (setq any-input (expand-file-name (anything-c-current-directory)))
         (anything-find-files-1 any-input (buffer-file-name (current-buffer))))))
 
@@ -4193,12 +4183,7 @@ Bindings affected are C, R, S, H."
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (let* ((anything-mp-highlight-delay nil)
-         (anything-ff-auto-update-initial-value
-          (and anything-ff-auto-update-initial-value
-               (file-exists-p initial-input)))
-         (anything-ff-auto-update-flag
-          anything-ff-auto-update-initial-value))
+  (let ((anything-mp-highlight-delay nil))
     (flet ((action-fn (candidate)
              (if marked-candidates
                  (anything-marked-candidates)
@@ -4226,8 +4211,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                        for fname in seq when (funcall test fname)
                                        collect fname into ls
                                        finally return
-                                         (if must-match ls
-                                             (append (list anything-pattern) ls)))
+                                       (if must-match ls
+                                           (append (list anything-pattern) ls)))
                                     (if must-match
                                         (if (file-exists-p (car seq)) seq (cdr seq))
                                         seq)))))
