@@ -1862,7 +1862,16 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
   (anything-kill-async-processes)
   (anything-log-run-hook 'anything-cleanup-hook)
   (anything-hooks 'cleanup)
-  (anything-frame-or-window-configuration 'restore))
+  (anything-frame-or-window-configuration 'restore)
+  ;; For some reasons, text can stay in minibuffer
+  ;; after an anything session, so erase minibuffer contents
+  ;; on exit.
+  (anything-clean-up-minibuffer))
+
+(defun anything-clean-up-minibuffer ()
+  "Remove contents of minibuffer."
+  (with-current-buffer (window-buffer (minibuffer-window))
+    (delete-minibuffer-contents)))
 
 ;; (@* "Core: input handling")
 (defun anything-check-minibuffer-input ()
