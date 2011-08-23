@@ -1370,7 +1370,9 @@ Otherwise, return VALUE itself."
       (push spec anything-once-called-functions))))
 
 ;; (@* "Core: API helper")
-(defun anything-empty-buffer-p (&optional buffer)
+(defun* anything-empty-buffer-p (&optional (buffer anything-buffer))
+  "Check if BUFFER have candidates.
+Default value for BUFFER is `anything-buffer'."
   (zerop (buffer-size (and buffer (get-buffer buffer)))))
 
 (defun anything-let-eval-varlist (varlist)
@@ -1379,6 +1381,7 @@ Otherwise, return VALUE itself."
                 (cons (car pair) (eval (cadr pair)))
               (cons pair nil)))
           varlist))
+
 (defun anything-let*-eval-varlist (varlist)
   (let ((vars (mapcar (lambda (pair) (or (car-safe pair) pair)) varlist)))
     (eval `(let ,vars
@@ -1388,6 +1391,7 @@ Otherwise, return VALUE itself."
                            `(setq ,pair nil)))
                        varlist)
              (mapcar (lambda (v) (cons v (symbol-value v))) ',vars)))))
+
 (defun anything-let-internal (binding bodyfunc)
   "Evaluate BODYFUNC and Set BINDING to anything buffer-local variables.
 BINDING is a list of (VARNAME . VALUE) pair."
