@@ -657,6 +657,8 @@
 ;;
 
 ;;; Require
+;;
+;;
 (require 'anything)
 (require 'thingatpt)
 (require 'ffap)
@@ -671,7 +673,9 @@
 
 ;;; Code:
 
-;; version check
+;;; Version check
+;;
+;;
 (let ((version "1.263"))
   (when (and (string= "1." (substring version 0 2))
              (string-match "1\.\\([0-9]+\\)" anything-version)
@@ -683,31 +687,22 @@ http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
 or  M-x install-elisp-from-emacswiki anything.el")))
 
-;; compatibility
+;;; compatibility
+;;
+;;
 (unless (fboundp 'window-system)
   (defun window-system (&optional arg)
     window-system))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Customize ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Customize
+;;
+;;
 (defgroup anything-config nil
   "Predefined configurations for `anything.el'."
   :group 'anything)
 
-(defcustom anything-c-use-standard-keys nil
-  "Whether use standard keybindings. (no effect)
-
-Key definitions in anything-config.el are removed because
-anything.el uses Emacs-standard keys by default. e.g. M-p/M-n for
-minibuffer history, C-s for isearch, etc.
-
-If you use `iswitchb' with `anything',
-evaluate (anything-iswitchb-setup) .  Then some bindings that
-conflict with `iswitchb', e.g. C-p/C-n for the minibuffer
-history, are removed from `anything-map'. "
-  :type 'boolean
-  :group 'anything-config)
-
-(defcustom anything-c-adaptive-history-file "~/.emacs.d/anything-c-adaptive-history"
+(defcustom anything-c-adaptive-history-file
+  "~/.emacs.d/anything-c-adaptive-history"
   "Path of file where history information is stored."
   :type 'string
   :group 'anything-config)
@@ -975,10 +970,10 @@ Don't search tag file deeply if outside this value."
   :group 'anything-config)
 
 (defcustom anything-c-filelist-file-name nil
-  "*Filename of file list.
+  "Filename of file list.
 Accept a list of string for multiple files.
 
-This file tend to be very large (> 100MB) and recommend to be in ramdisk for speed.
+This file tend to be very large \(> 100MB\) and recommend to be in ramdisk for speed.
 File list is created by make-filelist.rb script.
 
 Usage:
@@ -986,13 +981,14 @@ Usage:
 
 Then
  ;; Assume that /tmp is ramdisk or tmpfs
- (setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\")
- (setq anything-c-filelist-file-name \"/tmp/all.filelist\")
+ \(setq anything-grep-candidates-fast-directory-regexp \"^/tmp/\"\)
+ \(setq anything-c-filelist-file-name \"/tmp/all.filelist\"\)
 "
   :type 'string
   :group 'anything-config)
 
-(defcustom anything-c-eldoc-in-minibuffer-show-fn 'anything-c-eldoc-show-in-mode-line
+(defcustom anything-c-eldoc-in-minibuffer-show-fn
+  'anything-c-eldoc-show-in-mode-line
   "A function to display eldoc info.
 Should take one arg: the string to display."
   :group 'anything-config
@@ -1197,6 +1193,9 @@ It will be cleared at start of next `anything' call when \
   (customize-group "anything-config"))
 
 ;;; Anything-command-map
+;;
+;;
+
 ;;;###autoload
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
@@ -1254,6 +1253,8 @@ It will be cleared at start of next `anything' call when \
   (define-key map "\C-r" 'anything-minibuffer-history))
 
 ;;; Menu
+;;
+;;
 (easy-menu-define nil global-map
   "`anything' menu"
   '("Anything"
@@ -1300,7 +1301,7 @@ It will be cleared at start of next `anything' call when \
     ["Prefered Options" anything-configuration t]))
 
 
-;;; Documentation
+;;; Embeded documentation.
 ;;
 ;;
 ;; Help message
@@ -1388,7 +1389,9 @@ You can use them without configuration.
          "
 Enjoy!")))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Preconfigured Anything ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Preconfigured Anything
+;;
+;;
 ;;;###autoload
 (defun anything-mini ()
   "Preconfigured `anything' lightweight version (buffer -> recentf)."
@@ -1801,8 +1804,9 @@ against."
                 :prompt "Regexp: "))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilities Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;; Utilities Functions
+;;
+;;
 (defun anything-test-sources ()
   "List all anything sources for test.
 The output is sexps which are evaluated by \\[eval-last-sexp]."
@@ -1811,17 +1815,6 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
     (mapc (lambda (s) (princ (format ";; (anything '%s)\n" s)))
           (apropos-internal "^anything-c-source" #'boundp))
     (pop-to-buffer standard-output)))
-
-;;; For compatibility
-(unless (fboundp 'region-active-p)
-  (defun region-active-p ()
-    "Return t if Transient Mark mode is enabled and the mark is active.
-
-Most commands that act on the region if it is active and
-Transient Mark mode is enabled, and on the text near point
-otherwise, should use `use-region-p' instead.  That function
-checks the value of `use-empty-active-region' as well."
-    (and transient-mark-mode mark-active)))
 
 (defun anything-nest (&rest same-as-anything)
   "Nested `anything'. If you use `anything' within `anything', use it."
@@ -2390,11 +2383,10 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
     (type . file)))
 ;; (anything 'anything-c-source-files-in-current-dir+)
 
-;;; Anything-find-files
+;;; Anything-find-files - The anything files browser.
 ;;
 ;;
-(defvar anything-c-find-files-doc-header (format " (`%s':Go to precedent level)"
-                                                 (if window-system "C-." "C-l"))
+(defvar anything-c-find-files-doc-header " (`C-l': Go to precedent level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 
 (defvar anything-ff-mode-line-string
