@@ -1903,9 +1903,10 @@ The match is done with `string-match'."
   "VAR is symbol or string."
   (find-variable (anything-c-symbolify var)))
 
-(defun anything-c-kill-new (string &optional replace yank-handler)
-  "STRING is symbol or string."
-  (kill-new (anything-c-stringify string) replace yank-handler))
+(defun anything-c-kill-new (candidate &optional replace)
+  "CANDIDATE is symbol or string.
+See `kill-new' for argument REPLACE."
+  (kill-new (anything-c-stringify candidate) replace))
 
 ;;; Toggle all marks.
 ;;
