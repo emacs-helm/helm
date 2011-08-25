@@ -1162,30 +1162,6 @@ This set `ffap-newfile-prompt'."
 (defface anything-overlay-line-face '((t (:background "IndianRed4" :underline t)))
   "Face for source header in the anything buffer." :group 'anything)
 
-
-;;; Prefix argument in action.
-;;
-;;
-;; TODO: This should be integrated in anything.el instead of having
-;; a defadvice here.
-
-(defvar anything-current-prefix-arg nil
-  "Record `current-prefix-arg' when exiting minibuffer.
-It will be cleared at start of next `anything' call when \
-`anything-before-initialize-hook' is called.")
-
-(defadvice anything-exit-minibuffer (before anything-current-prefix-arg activate)
-  (unless anything-current-prefix-arg
-    (setq anything-current-prefix-arg current-prefix-arg)))
-
-;; using this hook instead of `anything-after-action-hook'
-;; allow to record the prefix args and keep their values
-;; when using `anything-comp-read'.
-;; i.e when quitting `anything-comp-read' prefix args are preserved
-;; for the following action.
-(add-hook 'anything-before-initialize-hook
-          (lambda () (setq anything-current-prefix-arg nil)))
-
 ;;;###autoload
 (defun anything-configuration ()
   "Customize `anything'."
@@ -1195,12 +1171,11 @@ It will be cleared at start of next `anything' call when \
 ;;; Anything-command-map
 ;;
 ;;
-
 ;;;###autoload
 (defvar anything-command-map)
 (define-prefix-command 'anything-command-map)
 
-;; rubikitch: Please change it freely because it is in discussion. I'll track from git.
+
 (define-key anything-command-map (kbd "<SPC>")     'anything-execute-anything-command)
 (define-key anything-command-map (kbd "e")         'anything-c-etags-select)
 (define-key anything-command-map (kbd "l")         'anything-locate)
