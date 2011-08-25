@@ -2491,7 +2491,7 @@ for current buffer."
           (save-window-excursion
             (other-window 1)
             default-directory)
-          default-directory))))
+          (car anything-ff-history)))))
 
 (defun anything-find-files-do-action (action)
   "Generic function for creating action from `anything-c-source-find-files'.
