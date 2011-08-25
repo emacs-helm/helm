@@ -3988,6 +3988,33 @@ How to send a bug report:
   (interactive)
   (anything-run-after-quit 'anything-send-bug-report))
 
+;; Debugging function.
+(defun* anything-test-candidates
+    (sources &optional (input "")
+             (compile-source-functions
+              anything-compile-source-functions-default))
+  "Test helper function for anything.
+Given pseudo `anything-sources' and `anything-pattern', returns list like
+  ((\"source name1\" (\"candidate1\" \"candidate2\"))
+   (\"source name2\" (\"candidate3\" \"candidate4\")))"
+  (let ((anything-test-mode t)
+        anything-enable-shortcuts
+        anything-candidate-cache
+        (anything-compile-source-functions compile-source-functions)
+        anything-before-initialize-hook
+        anything-after-initialize-hook
+        anything-update-hook
+        anything-test-candidate-list)
+    (get-buffer-create anything-buffer)
+    (anything-initialize nil input sources)
+    (anything-update)
+    ;; test-mode spec: select 1st candidate!
+    (with-current-buffer anything-buffer
+      (forward-line 1)
+      (anything-mark-current-line))
+    (prog1
+        anything-test-candidate-list
+      (anything-cleanup))))
 
 ;; (@* "Unit Tests")
 ;; See developer-tools/unit-test-anything.el
