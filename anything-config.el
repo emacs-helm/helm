@@ -13,9 +13,9 @@
 ;; Copyright (C) 2009 ~ 2011, Thierry Volpiatto, all rights reserved.
 ;; Created: 2009-02-16 21:38:23
 ;; Version: 0.4.1
-;; URL: http://www.emacswiki.org/emacs/download/anything-config.el
+;; X-URL: http://repo.or.cz/w/anything-config.git
 ;; Keywords: anything, anything-config
-;; Compatibility: GNU Emacs 22 ~ 23
+;; Compatibility: GNU Emacs 22 ~ 24
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -719,20 +719,6 @@
 (declare-function bbdb-records "ext:bbdb-com"
                   (&optional dont-check-disk already-in-db-buffer))
 
-
-;;; Version check
-;;
-;;
-(let ((version "1.263"))
-  (when (and (string= "1." (substring version 0 2))
-             (string-match "1\.\\([0-9]+\\)" anything-version)
-             (< (string-to-number (match-string 1 anything-version))
-                (string-to-number (substring version 2))))
-    (error "Please update anything.el!!
-
-http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
-
-or  M-x install-elisp-from-emacswiki anything.el")))
 
 ;;; compatibility
 ;;
@@ -2018,9 +2004,10 @@ visible or invisible in all sources of current anything session"
 
 (define-key anything-map (kbd "M-m") 'anything-toggle-all-marks)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Hacks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defadvice eval-defun (after anything-source-hack activate)
-  "See `anything-c-enable-eval-defun-hack'."
+  "Allow immediate execution of anything source when evaling it.
+See `anything-c-enable-eval-defun-hack'."
   (when anything-c-enable-eval-defun-hack
     (let ((varsym (save-excursion
                     (beginning-of-defun)
@@ -2031,9 +2018,9 @@ visible or invisible in all sources of current anything session"
         (anything varsym)))))
 ;; (progn (ad-disable-advice 'eval-defun 'after 'anything-source-hack) (ad-update 'eval-defun))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Sources ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; <Buffer>
+;;; Buffers
+;;
+;;
 (defun anything-c-buffer-list ()
   "Return the list of names of buffers with boring buffers filtered out.
 Boring buffers is specified by `anything-c-boring-buffer-regexp'.
