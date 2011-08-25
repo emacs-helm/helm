@@ -718,7 +718,16 @@
 (declare-function bbdb-dwim-net-address "ext:bbdb-com")
 (declare-function bbdb-records "ext:bbdb-com"
                   (&optional dont-check-disk already-in-db-buffer))
-
+(declare-function eshell-read-aliases-list "em-alias")
+(declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
+(declare-function eldoc-current-symbol "eldoc")
+(declare-function eldoc-get-fnsym-args-string "eldoc" (sym &optional index))
+(declare-function eldoc-get-var-docstring "eldoc" (sym))
+(declare-function eldoc-fnsym-in-current-sexp "eldoc")
+(declare-function find-library-name "find-func.el" (library))
+(declare-function adoc-construct "ext:auto-document.el" (buf))
+(declare-function adoc-first-line "ext:auto-document.el" (str))
+(declare-function adoc-prin1-to-string "ext:auto-document.el" (object))
 
 ;;; compatibility
 ;;
@@ -869,6 +878,7 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :group 'anything-config)
 
 (defun anything-set-anything-command-map-prefix-key (var key)
+  (declare (special anything-command-map-prefix-key))
   (when (boundp 'anything-command-map-prefix-key)
     (global-unset-key (read-kbd-macro anything-command-map-prefix-key)))
   (setq anything-command-map-prefix-key key)
@@ -1058,6 +1068,39 @@ Even if a source use it, it will have no effect when set to nil."
 This set `ffap-newfile-prompt'."
   :type  'boolean
   :group 'anything-config)
+
+
+(defcustom anything-ff-avfs-directory nil
+  "*The default avfs directory, usually '.avfs'.
+When this is set you will be able to expand archive filenames with `C-z'
+inside an avfs directory mounted with mountavfs.
+See <http://sourceforge.net/projects/avf/>."
+  :type  'boolean
+  :group 'anything-config)
+
+(defcustom anything-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
+  "*Minimal list of compressed files extension."
+  :type  'list
+  :group 'anything-config)
+
+(defcustom anything-locate-db-file-regexp "m?locate\.db$"
+  "Default regexp to match locate database.
+If nil Search in all files."
+  :type  'string
+  :group 'anything-config)
+  
+(defcustom anything-c-eldoc-show-in-mode-line-delay 12
+  "Eldoc will show info in mode-line during this delay if user is idle."
+  :type  'integer
+  :group 'anything-config)
+
+;;; General internal variables
+;;
+;;
+(defvar anything-c-external-commands-list nil
+  "A list of all external commands the user can execute.  If this
+variable is not set by the user, it will be calculated
+automatically.")
 
 ;;; Faces
 ;;
@@ -2396,9 +2439,9 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 ;;; Anything-find-files - The anything files browser.
 ;;
 ;;
+;; Internal.
 (defvar anything-c-find-files-doc-header " (`C-l': Go to precedent level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
-
 (defvar anything-ff-mode-line-string
   "\\<anything-find-files-map>\
 \\[anything-ff-help]:Help, \
@@ -2407,12 +2450,16 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-select-action]:Acts, \
 \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
 \\[anything-select-3rd-action]:NthAct"
-
   "String displayed in mode-line in `anything-c-source-find-files'")
-
 (defvar anything-ff-auto-update-flag anything-ff-auto-update-initial-value
   "Internal, flag to turn on/off auto-update in `anything-find-files'.
 Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
+(defvar anything-ff-last-expanded nil
+  "Store last expanded directory or file.")
+(defvar anything-ff-default-directory nil)
+(defvar anything-ff-history nil)
+(defvar anything-ff-cand-to-mark nil)
+
 
 (defvar anything-c-source-find-files
   `((name . "Find Files")
@@ -2683,7 +2730,6 @@ Copying is done asynchronously with `anything-c-copy-files-async-1'."
     (anything-c-copy-async-with-log flist dest)))
 
 (defvar eshell-command-aliases-list nil)
-(declare-function eshell-read-aliases-list "em-alias")
 (defun anything-find-files-eshell-command-on-file-1 (candidate &optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates possibly with an eshell alias.
 
@@ -2737,7 +2783,6 @@ See `anything-find-files-eshell-command-on-file-1' for more info."
   (anything-find-files-eshell-command-on-file-1
    candidate anything-current-prefix-arg))
 
-(declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (defun anything-ff-switch-to-eshell (candidate)
   "Switch to eshell and cd to `anything-ff-default-directory'."
   (flet ((cd-eshell ()
@@ -3120,10 +3165,6 @@ If EXPAND is non--nil expand-file-name."
         (cur-source (cdr (assoc 'name (anything-get-current-source)))))
     (loop for i in ff-sources thereis (string= cur-source i))))
 
-;; Internal.
-(defvar anything-ff-last-expanded nil
-  "Store last expanded directory or file in `anything-find-files'.")
-
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
@@ -3273,9 +3314,6 @@ expand to this directory."
           ;; Return PATTERN unchanged.
           (t pattern))))
 
-;; Internal.
-(defvar anything-ff-default-directory nil)
-(defvar anything-ff-history nil)
 
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
@@ -3718,13 +3756,6 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
             (t
              (anything-ff-kill-or-find-buffer-fname candidate))))))
 
-(defvar anything-ff-avfs-directory nil
-  "*The default avfs directory, usually '.avfs'.
-When this is set you will be able to expand archive filenames with `C-z'
-inside an avfs directory mounted with mountavfs.
-See <http://sourceforge.net/projects/avf/>.")
-(defvar anything-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
-  "*Minimal list of compressed files extension.")
 (defun anything-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."
   (member (file-name-extension candidate)
@@ -4046,8 +4077,6 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                    (anything-find-files-1 (expand-file-name candidate))))
           (setq anything-ff-cand-to-mark nil))))))
 
-;; Internal
-(defvar anything-ff-cand-to-mark nil)
 
 (defun anything-c-basename (fname)
   "Resolve basename of file or directory named FNAME."
@@ -4284,10 +4313,6 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
     (t "locate %s"))
   "A list of arguments for locate program.
 The \"-r\" option must be the last option.")
-
-(defvar anything-locate-db-file-regexp "m?locate\.db$"
-  "Default regexp to match locate database.
-If nil Search in all files.")
 
 (defun anything-locate-with-db (&optional db)
   "Run locate -d DB.
@@ -6094,8 +6119,14 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   "Source for completing Emacs variables.")
 ;; (anything 'anything-c-source-emacs-variables)
 
-;;;; <Bookmark>
 ;;; Bookmarks
+;;
+;;
+;; Bind some faces for bookmarks.
+(defvar anything-c-bookmarks-face1 'anything-ff-directory)
+(defvar anything-c-bookmarks-face2 'anything-ff-file)
+(defvar anything-c-bookmarks-face3 'anything-bookmarks-su-face)
+
 (eval-when-compile (require 'bookmark))
 (defvar anything-c-source-bookmarks
   '((name . "Bookmarks")
@@ -6256,10 +6287,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                     t
                     (propertize i 'face 'anything-bmkext-file 'help-echo isfile)))))
 
-;; Bind some faces for bookmarks.
-(defvar anything-c-bookmarks-face1 'anything-ff-directory)
-(defvar anything-c-bookmarks-face2 'anything-ff-file)
-(defvar anything-c-bookmarks-face3 'anything-bookmarks-su-face)
 
 ;;; Sources to filter bookmark-extensions bookmarks.
 ;;
@@ -7876,6 +7903,24 @@ http://bbdb.sourceforge.net/")
     (compose-mail address-str)))
 
 ;;; Evaluation Result
+;;
+;;
+(defvar anything-eval-expression-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
+    (define-key map (kbd "<tab>")      'lisp-indent-line)
+    (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
+    (define-key map (kbd "C-p")        'previous-line)
+    (define-key map (kbd "C-n")        'next-line)
+    (define-key map (kbd "<up>")       'previous-line)
+    (define-key map (kbd "<down>")     'next-line)
+    (define-key map (kbd "<right>")    'forward-char)
+    (define-key map (kbd "<left>")     'backward-char)
+    map))
+
+;; Internal
+(defvar anything-eldoc-active-minibuffers-list nil)
+
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
     (disable-shortcuts)
@@ -7913,20 +7958,6 @@ http://bbdb.sourceforge.net/")
   (interactive)
   (newline) (lisp-indent-line))
 
-(defvar anything-eval-expression-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
-    (define-key map (kbd "<tab>")      'lisp-indent-line)
-    (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
-    (define-key map (kbd "C-p")        'previous-line)
-    (define-key map (kbd "C-n")        'next-line)
-    (define-key map (kbd "<up>")       'previous-line)
-    (define-key map (kbd "<down>")     'next-line)
-    (define-key map (kbd "<right>")    'forward-char)
-    (define-key map (kbd "<left>")     'backward-char)
-    map))
-
-(defvar anything-eldoc-active-minibuffers-list nil)
 (defun anything-eldoc-store-minibuffer ()
   "Store minibuffer buffer name in `anything-eldoc-active-minibuffers-list'."
   (with-selected-window (minibuffer-window)
@@ -7936,6 +7967,7 @@ http://bbdb.sourceforge.net/")
 (defun anything-eval-expression-with-eldoc ()
   "Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. "
   (interactive)
+  (declare (special eldoc-idle-delay))
   (let ((timer (run-with-idle-timer eldoc-idle-delay
                                     'repeat 'anything-eldoc-show-in-eval))
         (minibuffer-completing-symbol t) ; Enable lisp completion.
@@ -7967,7 +7999,6 @@ http://bbdb.sourceforge.net/")
                            (car info-fn) (cadr info-fn)))))
         (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))))
 
-(defvar anything-c-eldoc-show-in-mode-line-delay 12)
 (defun anything-c-eldoc-show-in-mode-line (str)
   "Show string STR in mode-line."
   (save-window-excursion
@@ -9683,10 +9714,6 @@ You can set your own list of commands with
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Action Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Files
-(defvar anything-c-external-commands-list nil
-  "A list of all external commands the user can execute.  If this
-variable is not set by the user, it will be calculated
-automatically.")
 
 (defun anything-c-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.
