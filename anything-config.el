@@ -2446,6 +2446,18 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
         (format "%s * %d Files to: " prompt len)
         (format "%s %s to: " prompt (car files)))))
 
+(defun anything-dwim-target-directory ()
+  "Return value of `default-directory' of buffer in other window.
+If there is only one window return the value ot `default-directory'
+for current buffer."
+  (with-current-buffer anything-current-buffer
+    (let ((num-windows (length (window-list))))
+      (if (> num-windows 1)
+          (save-window-excursion
+            (other-window 1)
+            default-directory)
+          default-directory))))
+
 (defun anything-find-files-do-action (action)
   "Generic function for creating action from `anything-c-source-find-files'.
 ACTION must be an action supported by `anything-dired-action'."
@@ -2457,7 +2469,7 @@ ACTION must be an action supported by `anything-dired-action'."
          (dest     (anything-c-read-file-name
                     prompt
                     :preselect cand
-                    :initial-input (car anything-ff-history)
+                    :initial-input (anything-dwim-target-directory)
                     :history (anything-find-files-history :comp-read nil)))
          (win-conf (current-window-configuration)))
     (unwind-protect
