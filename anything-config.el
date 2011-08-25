@@ -656,6 +656,8 @@
 ;; - Fix documentation, now many functions haven't documentations.
 ;;
 
+;;; Code:
+
 ;;; Require
 ;;
 ;;
@@ -664,14 +666,59 @@
 (require 'ffap)
 (require 'cl)
 (require 'dired-aux)
+(require 'dired-x)
 (require 'tramp)
 (require 'grep)
 (require 'url)
 (require 'xml)
 (eval-when-compile (require 'org)) ; Shut up byte compiler about org-directory.
+(eval-when-compile (require 'semantic nil t))
 (require 'anything-match-plugin)
 
-;;; Code:
+;;; Declare external functions
+;;
+;;
+(declare-function gnus-dired-attach "ext:gnus-dired.el" (files-to-attach))
+(declare-function image-dired-display-image "image-dired.el" (file &optional original-size))
+(declare-function image-dired-update-property "image-dired.el" (prop value))
+(declare-function woman-file-name-all-completions "woman.el" (topic))
+(declare-function Man-getpage-in-background "man.el" (topic))
+(declare-function simple-call-tree-analyze "ext:simple-call-tree.el" (&optional test))
+(declare-function yaoddmuse-update-pagename "ext:yaoddmuse.el" (&optional unforced))
+(declare-function yaoddmuse-get-library-list "ext:yaoddmuse.el" (&optional dirs string))
+(declare-function org-get-current-options "ext:org-exp.el")
+(declare-function emms-streams "ext:emms-streams")
+(declare-function emms-stream-delete-bookmark "ext:emms-streams")
+(declare-function emms-stream-add-bookmark "ext:emms-streams" (name url fd type))
+(declare-function emms-stream-save-bookmarks-file "ext:emms-streams")
+(declare-function emms-stream-quit "ext:emms-streams")
+(declare-function with-current-emms-playlist "ext:emms" (&rest body))
+(declare-function emms-playlist-tracks-in-region "ext:emms" (beg end))
+(declare-function emms-playlist-first "ext:emms")
+(declare-function emms-playlist-mode-play-smart "ext:emms-playlist-mode")
+(declare-function term-line-mode "term")
+(declare-function term-char-mode "term")
+(declare-function term-send-input "term")
+(declare-function term-send-eof "term")
+(declare-function Info-index-nodes "info" (&optional file))
+(declare-function Info-goto-node "info" (&optional fork))
+(declare-function elscreen-find-screen-by-buffer "ext:elscreen.el" (buffer &optional create))
+(declare-function elscreen-find-file "ext:elscreen.el" (filename))
+(declare-function elscreen-goto "ext:elscreen.el" (screen))
+(declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
+(declare-function semantic-tag-components "ext:tag.el" (tag) t)
+(declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
+(declare-function semantic-tag-type "ext:tag-file.el" (tag) t)
+(declare-function semantic-tag-class "ext:tag-file.el" (tag) t)
+(declare-function bbdb "ext:bbdb-com")
+(declare-function bbdb-current-record "ext:bbdb-com")
+(declare-function bbdb-redisplay-one-record "ext:bbdb-com")
+(declare-function bbdb-record-net "ext:bbdb-com" (string) t)
+(declare-function bbdb-current-record "ext:bbdb-com")
+(declare-function bbdb-dwim-net-address "ext:bbdb-com")
+(declare-function bbdb-records "ext:bbdb-com"
+                  (&optional dont-check-disk already-in-db-buffer))
+
 
 ;;; Version check
 ;;
@@ -3579,6 +3626,7 @@ KBSIZE if a floating point number, default value is 1024.0."
 (defun anything-ff-rotate-current-image1 (file &optional num-arg)
   "Rotate current image at NUM-ARG degrees.
 This is a destructive operation on FILE made by external tool mogrify."
+  (declare (special image-dired-display-image-buffer))
   (setq file (file-truename file)) ; For symlinked images.
   ;; When FILE is not an image-file, do nothing.
   (when (string-match (image-file-name-regexp) file)
@@ -6446,6 +6494,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 
 (defun anything-c-bookmark-su-files-setup-alist ()
   "Specialized filter function for bookmarks su/sudo files."
+  (declare (special bmkext-su-or-sudo-regexp))
   (loop
      with l = (anything-c-bmkext-filter-setup-alist 'bmkext-remote-file-alist-only)
      for i in l
@@ -6873,12 +6922,6 @@ http://ctags.sourceforge.net/")
 ;;; Semantic
 ;;
 ;; 
-(eval-when-compile (require 'semantic nil t))
-(declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
-(declare-function semantic-tag-components "ext:tag.el" (tag) t)
-(declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
-(declare-function semantic-tag-type "ext:tag-file.el" (tag) t)
-(declare-function semantic-tag-class "ext:tag-file.el" (tag) t)
 (defvar anything-semantic-candidates nil)
 
 (defun anything-semantic-construct-candidates (tags depth)
@@ -7412,6 +7455,7 @@ replace with STR as yanked string."
 ;;; Latex completion
 (defun anything-c-latex-math-candidates ()
   "Collect candidates for latex math completion."
+  (declare (special LaTeX-math-menu))
   (loop for i in (cddr LaTeX-math-menu)
      for elm = (loop for s in i when (vectorp s)
                   collect (cons (aref s 0) (aref s 1)))
@@ -7528,18 +7572,22 @@ See http://orgmode.org for the latest version.")
 (defvar anything-yaoddmuse-use-cache-file nil)
 (defvar anything-c-yaoddmuse-cache-file "~/.emacs.d/yaoddmuse-cache.el")
 (defvar anything-c-yaoddmuse-ew-cache nil)
+
+(defun anything-yaoddmuse-get-candidates ()
+  (declare (special yaoddmuse-pages-hash))
+  (if anything-yaoddmuse-use-cache-file
+      (ignore-errors
+        (unless anything-c-yaoddmuse-ew-cache
+          (load anything-c-yaoddmuse-cache-file)
+          (setq anything-c-yaoddmuse-ew-cache
+                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+        anything-c-yaoddmuse-ew-cache)
+      (yaoddmuse-update-pagename t)
+      (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+
 (defvar anything-c-source-yaoddmuse-emacswiki-edit-or-view
   '((name . "Yaoddmuse Edit or View (EmacsWiki)")
-    (candidates . (lambda ()
-                    (if anything-yaoddmuse-use-cache-file
-                        (ignore-errors
-                          (unless anything-c-yaoddmuse-ew-cache
-                            (load anything-c-yaoddmuse-cache-file)
-                            (setq anything-c-yaoddmuse-ew-cache
-                                  (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                          anything-c-yaoddmuse-ew-cache)
-                        (yaoddmuse-update-pagename t)
-                        (gethash "EmacsWiki" yaoddmuse-pages-hash))))
+    (candidates . anything-yaoddmuse-get-candidates)
     (action . (("Edit page" . (lambda (candidate)
                                 (yaoddmuse-edit "EmacsWiki" candidate)))
                ("Browse page" . (lambda (candidate)
@@ -7762,17 +7810,11 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
     (type . file)))
 ;; (anything 'anything-c-source-picklist)
 
-;;; BBDB
+;;; bbdb
+;;
+;;
 (defvar bbdb-records)
 (defvar bbdb-buffer-name)
-(declare-function bbdb "ext:bbdb-com")
-(declare-function bbdb-current-record "ext:bbdb-com")
-(declare-function bbdb-redisplay-one-record "ext:bbdb-com")
-(declare-function bbdb-record-net "ext:bbdb-com" (string) t)
-(declare-function bbdb-current-record "ext:bbdb-com")
-(declare-function bbdb-dwim-net-address "ext:bbdb-com")
-(declare-function bbdb-records "ext:bbdb-com"
-                  (&optional dont-check-disk already-in-db-buffer))
 
 (defun anything-c-bbdb-candidates ()
   "Return a list of all names in the bbdb database.  The format
@@ -8229,9 +8271,11 @@ When nil, fallback to `browse-url-browser-function'.")
               (cons engine (delete engine anything-surfraw-engines-history))))))
 
 ;;; Emms
-
+;;
+;;
 (defun anything-emms-stream-edit-bookmark (elm)
   "Change the information of current emms-stream bookmark from anything."
+  (declare (special emms-stream-list))
   (let* ((cur-buf anything-current-buffer)
          (bookmark (assoc elm emms-stream-list))
          (name     (read-from-minibuffer "Description: "
@@ -10073,11 +10117,14 @@ using `anything-c-buffer-display-string-functions'."
 (defun anything-c-buffer-display-string--compilation (buf)
   (anything-aif (car compilation-arguments)
       (format "%s: %s [%s]" buf it default-directory)))
+
 (defun anything-c-buffer-display-string--eshell (buf)
+  (declare (special eshell-history-ring))
   (when (eq major-mode 'eshell-mode)
     (format "%s: %s [%s]" buf
             (ignore-errors (ring-ref eshell-history-ring 0))
             default-directory)))
+
 (defun anything-c-buffer-display-string--shell (buf)
   (when (eq major-mode 'shell-mode)
     (format "%s: %s [%s]" buf
