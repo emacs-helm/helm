@@ -661,7 +661,7 @@ few characters to narrow down the list of potential candidates.
 
 Set it to nil if you don't want this limit.")
 
-(defvar anything-idle-delay 0.5
+(defvar anything-idle-delay 0.3
   "*Be idle for this many seconds, before updating in delayed sources.
 This is useful for sources involving heavy operations
 \(like launching external programs\), so that candidates
@@ -671,11 +671,14 @@ It also can be used to declutter the results anything displays,
 so that results from certain sources are not shown with every
 character typed, only if the user hesitates a bit.")
 
-(defvar anything-input-idle-delay 0.1
+(defvar anything-input-idle-delay 0.2
   "Be idle for this many seconds, before updating.
 
 Unlike `anything-idle-delay', it is also effective for non-delayed sources.
-If nil, candidates are collected immediately.")
+If nil, candidates are collected immediately.
+
+Note:  If this value is too low compared to `anything-idle-delay',
+you may have duplicated sources when using multiples sources.")
 
 (defvar anything-samewindow nil
   "Use current window to show the candidates.
