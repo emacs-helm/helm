@@ -1352,6 +1352,144 @@ automatically.")
     ["Prefered Options" anything-configuration t]))
 
 
+;;; Specialized keymaps
+;;
+;;
+(defvar anything-c-buffer-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-c ?")     'anything-c-buffer-help)
+    ;; No need to have separate command for grep and zgrep
+    ;; as we don't use recursivity for buffers.
+    ;; So use zgrep for both as it is capable to handle non--compressed files.
+    (define-key map (kbd "M-g s")     'anything-buffer-run-zgrep)
+    (define-key map (kbd "M-g z")     'anything-buffer-run-zgrep)
+    (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
+    (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
+    (define-key map (kbd "C-=")       'anything-buffer-diff-persistent)
+    (define-key map (kbd "M-U")       'anything-buffer-revert-persistent)
+    (define-key map (kbd "M-D")       'anything-buffer-run-kill-buffers)
+    (define-key map (kbd "C-x C-s")   'anything-buffer-save-persistent)
+    (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
+    (define-key map (kbd "M-%")       'anything-buffer-run-query-replace)
+    (when (locate-library "elscreen")
+      (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
+    (delq nil map))
+  "Keymap for buffer sources in anything.")
+
+(defvar anything-find-files-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-g s")         'anything-ff-run-grep)
+    (define-key map (kbd "M-g p")         'anything-ff-run-pdfgrep)
+    (define-key map (kbd "M-g z")         'anything-ff-run-zgrep)
+    (define-key map (kbd "M-.")           'anything-ff-run-etags)
+    (define-key map (kbd "M-R")           'anything-ff-run-rename-file)
+    (define-key map (kbd "M-C")           'anything-ff-run-copy-file)
+    (define-key map (kbd "M-B")           'anything-ff-run-byte-compile-file)
+    (define-key map (kbd "M-L")           'anything-ff-run-load-file)
+    (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
+    (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
+    (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
+    (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
+    (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-o")       'anything-ff-run-switch-other-frame)
+    (define-key map (kbd "C-c C-x")       'anything-ff-run-open-file-externally)
+    (define-key map (kbd "M-!")           'anything-ff-run-eshell-command-on-file)
+    (define-key map (kbd "C-=")           'anything-ff-run-ediff-file)
+    (define-key map (kbd "C-c =")         'anything-ff-run-ediff-merge-file)
+    (define-key map (kbd "M-p")           'anything-ff-run-switch-to-history)
+    (define-key map (kbd "M-i")           'anything-ff-properties-persistent)
+    (define-key map (kbd "C-c ?")         'anything-ff-help)
+    (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
+    (define-key map (kbd "M-a")           'anything-mark-all)
+    (define-key map (kbd "M-u")           'anything-unmark-all)
+    (define-key map (kbd "C-c C-a")       'anything-ff-run-gnus-attach-files)
+    (define-key map (kbd "C-c p")         'anything-ff-run-print-file)
+    ;; Next 2 have no effect if candidate is not an image file.
+    (define-key map (kbd "M-l")           'anything-ff-rotate-left-persistent)
+    (define-key map (kbd "M-r")           'anything-ff-rotate-right-persistent)
+    (define-key map (kbd "C-.")           'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l")           'anything-find-files-down-one-level)
+    (define-key map (kbd "C-h C-b")       'anything-send-bug-report-from-anything)
+    (define-key map (kbd "C-h C-d")       'anything-debug-output)
+    (when anything-ff-lynx-style-map
+      (define-key map (kbd "<left>")      'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>")     'anything-execute-persistent-action))
+    (delq nil map))
+  "Keymap for `anything-find-files'.")
+
+(defvar anything-c-read-file-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-.")         'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l")         'anything-find-files-down-one-level)
+    (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
+    (when anything-ff-lynx-style-map
+      (define-key map (kbd "<left>")    'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>")   'anything-execute-persistent-action)
+      (define-key map (kbd "<M-left>")  'anything-previous-source)
+      (define-key map (kbd "<M-right>") 'anything-next-source))
+    (delq nil map))
+  "Keymap for `anything-c-read-file-name'.")
+
+(defvar anything-generic-files-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-g s")   'anything-ff-run-grep)
+    (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
+    (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
+    (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
+    (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
+    (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
+    (define-key map (kbd "C-w")     'anything-yank-text-at-point)
+    (define-key map (kbd "C-c ?")   'anything-generic-file-help)
+    map)
+  "Generic Keymap for files.")
+
+(defvar anything-c-grep-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
+    (define-key map (kbd "C-o")      'anything-c-grep-run-other-window-action)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
+    (define-key map (kbd "C-x C-s")  'anything-c-grep-run-save-buffer)
+    (when anything-c-grep-use-ioccur-style-keys
+      (define-key map (kbd "<right>")  'anything-c-grep-run-persistent-action)
+      (define-key map (kbd "<left>")  'anything-c-grep-run-default-action))
+    (define-key map (kbd "C-c ?")    'anything-grep-help)
+    (delq nil map))
+  "Keymap used in Grep sources.")
+
+(defvar anything-c-pdfgrep-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
+    (define-key map (kbd "C-c ?")    'anything-pdfgrep-help)
+    map)
+  "Keymap used in pdfgrep.")
+
+(defvar anything-c-etags-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
+    (define-key map (kbd "C-c ?")    'anything-etags-help)
+    map)
+  "Keymap used in Etags.")
+
+(defvar anything-eval-expression-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
+    (define-key map (kbd "<tab>")      'lisp-indent-line)
+    (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
+    (define-key map (kbd "C-p")        'previous-line)
+    (define-key map (kbd "C-n")        'next-line)
+    (define-key map (kbd "<up>")       'previous-line)
+    (define-key map (kbd "<down>")     'next-line)
+    (define-key map (kbd "<right>")    'forward-char)
+    (define-key map (kbd "<left>")     'backward-char)
+    map))
+
+
 ;;; Embeded documentation.
 ;;
 ;;
@@ -2242,27 +2380,6 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 "))
     (anything-help)))
 
-(defvar anything-c-buffer-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "C-c ?")     'anything-c-buffer-help)
-    ;; No need to have separate command for grep and zgrep
-    ;; as we don't use recursivity for buffers.
-    ;; So use zgrep for both as it is capable to handle non--compressed files.
-    (define-key map (kbd "M-g s")     'anything-buffer-run-zgrep)
-    (define-key map (kbd "M-g z")     'anything-buffer-run-zgrep)
-    (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
-    (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
-    (define-key map (kbd "C-=")       'anything-buffer-diff-persistent)
-    (define-key map (kbd "M-U")       'anything-buffer-revert-persistent)
-    (define-key map (kbd "M-D")       'anything-buffer-run-kill-buffers)
-    (define-key map (kbd "C-x C-s")   'anything-buffer-save-persistent)
-    (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
-    (define-key map (kbd "M-%")       'anything-buffer-run-query-replace)
-    (when (locate-library "elscreen")
-      (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
-    (delq nil map))
-  "Keymap for buffer sources in anything.")
-
 (defun anything-buffer-toggle-diff (candidate)
   "Toggle diff buffer CANDIDATE with it's file."
   (if (get-buffer-window "*Diff*")
@@ -2925,48 +3042,6 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 \\{anything-map}
 "))
     (anything-help)))
-
-(defvar anything-find-files-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-g s")         'anything-ff-run-grep)
-    (define-key map (kbd "M-g p")         'anything-ff-run-pdfgrep)
-    (define-key map (kbd "M-g z")         'anything-ff-run-zgrep)
-    (define-key map (kbd "M-.")           'anything-ff-run-etags)
-    (define-key map (kbd "M-R")           'anything-ff-run-rename-file)
-    (define-key map (kbd "M-C")           'anything-ff-run-copy-file)
-    (define-key map (kbd "M-B")           'anything-ff-run-byte-compile-file)
-    (define-key map (kbd "M-L")           'anything-ff-run-load-file)
-    (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
-    (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
-    (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
-    (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
-    (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
-    (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
-    (define-key map (kbd "C-c C-o")       'anything-ff-run-switch-other-frame)
-    (define-key map (kbd "C-c C-x")       'anything-ff-run-open-file-externally)
-    (define-key map (kbd "M-!")           'anything-ff-run-eshell-command-on-file)
-    (define-key map (kbd "C-=")           'anything-ff-run-ediff-file)
-    (define-key map (kbd "C-c =")         'anything-ff-run-ediff-merge-file)
-    (define-key map (kbd "M-p")           'anything-ff-run-switch-to-history)
-    (define-key map (kbd "M-i")           'anything-ff-properties-persistent)
-    (define-key map (kbd "C-c ?")         'anything-ff-help)
-    (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
-    (define-key map (kbd "M-a")           'anything-mark-all)
-    (define-key map (kbd "M-u")           'anything-unmark-all)
-    (define-key map (kbd "C-c C-a")       'anything-ff-run-gnus-attach-files)
-    (define-key map (kbd "C-c p")         'anything-ff-run-print-file)
-    ;; Next 2 have no effect if candidate is not an image file.
-    (define-key map (kbd "M-l")           'anything-ff-rotate-left-persistent)
-    (define-key map (kbd "M-r")           'anything-ff-rotate-right-persistent)
-    (define-key map (kbd "C-.")           'anything-find-files-down-one-level)
-    (define-key map (kbd "C-l")           'anything-find-files-down-one-level)
-    (define-key map (kbd "C-h C-b")       'anything-send-bug-report-from-anything)
-    (define-key map (kbd "C-h C-d")       'anything-debug-output)
-    (when anything-ff-lynx-style-map
-      (define-key map (kbd "<left>")      'anything-find-files-down-one-level)
-      (define-key map (kbd "<right>")     'anything-execute-persistent-action))
-    (delq nil map))
-  "Keymap for `anything-find-files'.")
 
 (defun anything-c-quit-and-execute-action (action)
   "Quit current anything session and execute ACTION." 
@@ -4198,19 +4273,6 @@ Bindings affected are C, R, S, H."
       
 (defalias 'anything-dired-bindings 'anything-dired-mode)
 
-(defvar anything-c-read-file-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "C-.")         'anything-find-files-down-one-level)
-    (define-key map (kbd "C-l")         'anything-find-files-down-one-level)
-    (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
-    (when anything-ff-lynx-style-map
-      (define-key map (kbd "<left>")    'anything-find-files-down-one-level)
-      (define-key map (kbd "<right>")   'anything-execute-persistent-action)
-      (define-key map (kbd "<M-left>")  'anything-previous-source)
-      (define-key map (kbd "<M-right>") 'anything-next-source))
-    (delq nil map))
-  "Keymap for `anything-c-read-file-name'.")
-
 (defun* anything-c-read-file-name (prompt
                                    &key
                                    (initial-input (expand-file-name default-directory))
@@ -4394,19 +4456,6 @@ See Man locate for more infos.
 \n== Anything Map ==
 \\{anything-map}"))
     (anything-help)))
-
-(defvar anything-generic-files-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-g s")   'anything-ff-run-grep)
-    (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
-    (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
-    (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
-    (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
-    (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
-    (define-key map (kbd "C-w")     'anything-yank-text-at-point)
-    (define-key map (kbd "C-c ?")   'anything-generic-file-help)
-    map)
-  "Generic Keymap for files.")
 
 ;;; Anything Incremental Grep.
 ;;
@@ -4892,20 +4941,6 @@ If N is positive go forward otherwise go backward."
 \\{anything-map}"))
     (anything-help)))
 
-(defvar anything-c-grep-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
-    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
-    (define-key map (kbd "C-o")      'anything-c-grep-run-other-window-action)
-    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
-    (define-key map (kbd "C-x C-s")  'anything-c-grep-run-save-buffer)
-    (when anything-c-grep-use-ioccur-style-keys
-      (define-key map (kbd "<right>")  'anything-c-grep-run-persistent-action)
-      (define-key map (kbd "<left>")  'anything-c-grep-run-default-action))
-    (define-key map (kbd "C-c ?")    'anything-grep-help)
-    (delq nil map))
-  "Keymap used in Grep sources.")
-
 (defun anything-c-grep-run-persistent-action ()
   "Run grep persistent action from `anything-do-grep-1'."
   (interactive)
@@ -5064,15 +5099,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 \\{anything-map}"))
     (anything-help)))
 
-(defvar anything-c-pdfgrep-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
-    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
-    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
-    (define-key map (kbd "C-c ?")    'anything-pdfgrep-help)
-    map)
-  "Keymap used in pdfgrep.")
-
 (defun anything-c-pdfgrep-action (candidate)
   (let* ((split  (anything-c-grep-split-line candidate))
          (pageno (nth 1 split))
@@ -5156,15 +5182,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 \n== Anything Map ==
 \\{anything-map}"))
     (anything-help)))
-
-(defvar anything-c-etags-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "M-<down>") 'anything-c-goto-next-file)
-    (define-key map (kbd "M-<up>")   'anything-c-goto-precedent-file)
-    (define-key map (kbd "C-w")      'anything-yank-text-at-point)
-    (define-key map (kbd "C-c ?")    'anything-etags-help)
-    map)
-  "Keymap used in Etags.")
 
 (defvar anything-c-etags-tag-file-dir nil
   "Etags file directory.")
@@ -7905,19 +7922,6 @@ http://bbdb.sourceforge.net/")
 ;;; Evaluation Result
 ;;
 ;;
-(defvar anything-eval-expression-map
-  (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "<C-return>") 'anything-eval-new-line-and-indent)
-    (define-key map (kbd "<tab>")      'lisp-indent-line)
-    (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
-    (define-key map (kbd "C-p")        'previous-line)
-    (define-key map (kbd "C-n")        'next-line)
-    (define-key map (kbd "<up>")       'previous-line)
-    (define-key map (kbd "<down>")     'next-line)
-    (define-key map (kbd "<right>")    'forward-char)
-    (define-key map (kbd "<left>")     'backward-char)
-    map))
-
 ;; Internal
 (defvar anything-eldoc-active-minibuffers-list nil)
 
