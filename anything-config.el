@@ -7606,43 +7606,8 @@ linkd.el is optional because linkd stars are extracted by regexp.
 http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;; (anything 'anything-c-source-emacs-lisp-toplevels)
 
-(defvar anything-c-source-org-headline
-  '((name . "Org HeadLine")
-    (headline
-     "^\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-     "^\\*\\*\\*\\*\\*\\*\\*\\* \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
-    (condition . (eq major-mode 'org-mode))
-    (migemo)
-    (subexp . 1)
-    (persistent-action . (lambda (elm)
-                           (anything-c-action-line-goto elm)
-                           (org-cycle)))
-    (action-transformer
-     . (lambda (actions candidate)
-         '(("Go to Line" . anything-c-action-line-goto)
-           ("Insert Link to This Headline" . anything-c-org-headline-insert-link-to-headline)))))
-  "Show Org headlines.
-org-mode is very very much extended text-mode/outline-mode.
-
-See (find-library \"org.el\")
-See http://orgmode.org for the latest version.")
-
-(defun anything-c-org-headline-insert-link-to-headline (lineno-and-content)
-  (insert
-   (save-excursion
-     (anything-goto-line (car lineno-and-content))
-     (and (looking-at org-complex-heading-regexp)
-          (org-make-link-string (concat "*" (match-string 4)))))))
-
-;; (anything 'anything-c-source-org-headline)
-
 ;;; Anything yaoddmuse
+;;
 ;; Be sure to have yaoddmuse.el installed
 ;; install-elisp may be required if you want to install elisp file from here.
 (defvar anything-yaoddmuse-use-cache-file nil)
@@ -7790,8 +7755,40 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
     (action . (("Goto link" . ee-to)))))
 ;; (anything 'anything-c-source-eev-anchor)
 
-;;;; <Misc>
+;;; Org headlines
+;;
+;;
+(defvar anything-c-source-org-headline
+  '((name . "Org HeadLine")
+    (headline "^\\*\\{1,8\\} \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
+    (condition . (eq major-mode 'org-mode))
+    (migemo)
+    (subexp . 1)
+    (persistent-action . (lambda (elm)
+                           (anything-c-action-line-goto elm)
+                           (org-cycle)))
+    (action-transformer
+     . (lambda (actions candidate)
+         '(("Go to Line" . anything-c-action-line-goto)
+           ("Insert Link to This Headline"
+            . anything-c-org-headline-insert-link-to-headline)))))
+  "Show Org headlines.
+org-mode is very very much extended text-mode/outline-mode.
+
+See (find-library \"org.el\")
+See http://orgmode.org for the latest version.")
+
+(defun anything-c-org-headline-insert-link-to-headline (lineno-and-content)
+  (insert
+   (save-excursion
+     (anything-goto-line (car lineno-and-content))
+     (and (looking-at org-complex-heading-regexp)
+          (org-make-link-string (concat "*" (match-string 4)))))))
+;; (anything 'anything-c-source-org-headline)
+
 ;;; Org keywords
+;;
+;;
 (defvar anything-c-source-org-keywords
   '((name . "Org Keywords")
     (init . anything-c-org-keywords-init)
@@ -7802,6 +7799,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
     (keywords-examples)
     (keywords)))
 ;; (anything 'anything-c-source-org-keywords)
+
 (defvar anything-c-org-keywords-info-location
   '(("#+TITLE:" . "(org)Export options")
     ("#+AUTHOR:" . "(org)Export options")
@@ -8058,6 +8056,8 @@ http://bbdb.sourceforge.net/")
       (force-mode-line-update))))
 
 ;;; Calculation Result
+;;
+;;
 (defvar anything-c-source-calculation-result
   '((name . "Calculation Result")
     (dummy)
@@ -8076,8 +8076,12 @@ http://bbdb.sourceforge.net/")
   (anything-other-buffer 'anything-c-source-calculation-result "*anything calcul*"))
 
 ;;; Google Suggestions
+;;
+;;
+;; Internal
 (defvar anything-ggs-max-length-real-flag 0)
 (defvar anything-ggs-max-length-num-flag 0)
+
 (defun anything-c-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
@@ -8196,7 +8200,8 @@ See `anything-browse-url-default-browser-alist'.")
 ;; (anything 'anything-c-source-google-suggest)
 
 ;;; Yahoo suggestions
-
+;;
+;;
 (defun anything-c-yahoo-suggest-fetch (input)
   "Fetch Yahoo suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
@@ -8237,10 +8242,9 @@ Return an alist with elements like (data . number_results)."
 
 ;; (anything 'anything-c-source-yahoo-suggest)
 
-;;; Surfraw
-;;; Need external program surfraw.
-;;; http://surfraw.alioth.debian.org/
-;; user variables
+;;; Web browser functions.
+;;
+;;
 (require 'browse-url)
 ;; If default setting of `w3m-command' is not
 ;; what you want you and you modify it, you will have to reeval
@@ -8303,6 +8307,18 @@ Return an alist with elements like (data . number_results)."
       (browse-url url)
       (anything-browse-url-default-browser url)))
 
+;;; Surfraw
+;;
+;; Need external program surfraw.
+;; <http://surfraw.alioth.debian.org/>
+
+(defvar anything-surfraw-default-browser-function nil
+  "*The browse url function you prefer to use with surfraw.
+When nil, fallback to `browse-url-browser-function'.")
+
+;; Internal
+(defvar anything-surfraw-engines-history nil)
+
 (defun anything-c-build-elvi-list ()
   "Return list of all engines and descriptions handled by surfraw."
   (cdr
@@ -8311,10 +8327,6 @@ Return an alist with elements like (data . number_results)."
                    "-elvi")
      (split-string (buffer-string) "\n"))))
 
-(defvar anything-surfraw-default-browser-function nil
-  "*The browse url function you prefer to use with surfraw.
-When nil, fallback to `browse-url-browser-function'.")
-(defvar anything-surfraw-engines-history nil)
 ;;;###autoload
 (defun anything-surfraw (pattern engine)
   "Preconfigured `anything' to search PATTERN with search ENGINE."
@@ -8325,12 +8337,13 @@ When nil, fallback to `browse-url-browser-function'.")
                       :must-match t
                       :name "Surfraw Search Engines"
                       :history anything-surfraw-engines-history)))
-  (let* ((engine-nodesc               (car (split-string engine)))
-         (url                         (shell-command-to-string
-                                       (format "surfraw %s -p %s"
-                                               engine-nodesc pattern)))
-         (browse-url-browser-function (or anything-surfraw-default-browser-function
-                                          browse-url-browser-function)))
+  (let* ((engine-nodesc (car (split-string engine)))
+         (url           (shell-command-to-string
+                         (format "surfraw %s -p %s"
+                                 engine-nodesc pattern)))
+         (browse-url-browser-function
+          (or anything-surfraw-default-browser-function
+              browse-url-browser-function)))
     (if (string= engine-nodesc "W")
         (anything-c-browse-url)
         (anything-c-browse-url url)
