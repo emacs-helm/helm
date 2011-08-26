@@ -1407,6 +1407,7 @@ automatically.")
     (define-key map (kbd "C-c ?")         'anything-ff-help)
     (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
     (define-key map (kbd "M-a")           'anything-mark-all)
+    (define-key map (kbd "M-m")           'anything-toggle-all-marks)
     (define-key map (kbd "M-u")           'anything-unmark-all)
     (define-key map (kbd "C-c C-a")       'anything-ff-run-gnus-attach-files)
     (define-key map (kbd "C-c p")         'anything-ff-run-print-file)
@@ -2849,8 +2850,9 @@ for current buffer."
 (defun anything-find-files-do-action (action)
   "Generic function for creating action from `anything-c-source-find-files'.
 ACTION must be an action supported by `anything-dired-action'."
-  (let* ((ifiles   (anything-marked-candidates))
-         (cand     (anything-get-selection))
+  (let* ((ifiles   (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
+                           (anything-marked-candidates)))
+         (cand     (anything-get-selection)) ; Target
          (prompt   (anything-find-files-set-prompt-for-action
                     (capitalize (symbol-name action)) ifiles))
          (parg     anything-current-prefix-arg)
