@@ -1094,6 +1094,11 @@ If nil Search in all files."
   :type  'integer
   :group 'anything-config)
 
+(defcustom anything-c-copy-files-async-log-file "/tmp/dired.log"
+  "The file used to communicate with two emacs when copying files async."
+  :type  'string
+  :group 'anything-config)
+  
 ;;; General internal variables
 ;;
 ;;
@@ -1493,8 +1498,8 @@ automatically.")
 ;;; Embeded documentation.
 ;;
 ;;
-;; Help message
 (defun anything-c-list-preconfigured-anything ()
+  "Collect preconfigured anything functions in this file."
   (loop with doc
         with sym
         for entry in (cdr (assoc
@@ -1511,6 +1516,9 @@ automatically.")
   (mapcar (lambda (x) (format "\\[%s] : %s\n" (car x) (cdr x)))
           (anything-c-list-preconfigured-anything)))
 
+;;; Global help message - Used by `anything-help'
+;;
+;;
 (setq anything-help-message
       (lambda ()
         (concat
@@ -1578,19 +1586,245 @@ You can use them without configuration.
          "
 Enjoy!")))
 
+;;; `anything-buffer-list' help
+;;
+;;
+;;;###autoload
+(defun anything-c-buffer-help ()
+  "Help command for anything buffers."
+  (interactive)
+  (let ((anything-help-message "== Anything Buffer ==
+\nTips:
+You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
+Enter then a space and a pattern to narrow down to buffers matching this pattern. 
+\nSpecific commands for `anything-buffers-list':
+\\<anything-c-buffer-map>
+\\[anything-buffer-run-grep]\t\t->Grep Buffer(s) (C-u grep all buffers linked to a file).
+\\[anything-buffer-run-zgrep]\t\t->Zgrep Buffer(s) (C-u grep all buffers linked to a file).
+\\[anything-buffer-switch-other-window]\t\t->Switch other window.
+\\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
+\\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
+\\[anything-buffer-run-query-replace]\t\t->Query replace in marked buffers.
+\\[anything-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
+\\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer without quitting.
+\\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
+\\[anything-buffer-save-persistent]\t\t->Save buffer without quitting.
+\\[anything-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
+\\[anything-c-buffer-help]\t\t->Display this help.
+\n== Anything Map ==
+\\{anything-map}
+"))
+    (anything-help)))
+
+
+;;; Find files help (`anything-find-files')
+;;
+;;
+;;;###autoload
+(defun anything-ff-help ()
+  "Help command for `anything-find-files'."
+  (interactive)
+  (let ((anything-help-message "== Anything Find Files ==
+\nTips:
+\nEnter \"~/\" at anytime to reach home directory.
+Enter \"/\" at anytime to reach root of your file system.
+You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
+\nSpecific commands for `anything-find-files':
+\\<anything-find-files-map>
+\\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
+\\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
+\\[anything-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
+\\[anything-ff-run-etags]\t\t->Run Etags (C-u use thing-at-point `C-u C-u' reload cache)
+\\[anything-ff-run-rename-file]\t\t->Rename File (C-u Follow).
+\\[anything-ff-run-copy-file]\t\t->Copy File (C-u Follow).
+\\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
+\\[anything-ff-run-load-file]\t\t->Load File.
+\\[anything-ff-run-symlink-file]\t\t->Symlink File.
+\\[anything-ff-run-delete-file]\t\t->Delete File.
+\\[anything-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
+\\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
+\\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
+\\[anything-ff-run-ediff-file]\t\t->Ediff file.
+\\[anything-ff-run-ediff-merge-file]\t\t->Ediff merge file.
+\\[anything-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
+\\[anything-ff-run-switch-other-window]\t\t->Switch other window.
+\\[anything-ff-run-switch-other-frame]\t\t->Switch other frame.
+\\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
+\\[anything-ff-rotate-left-persistent]\t\t->Rotate Image Left.
+\\[anything-ff-rotate-right-persistent]\t\t->Rotate Image Right.
+\\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
+\\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
+\\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
+\\[anything-mark-all]\t\t->Mark all visibles candidates.
+\\[anything-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
+\\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
+\\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
+\\[anything-ff-run-print-file]\t\t->Print file with default printer.
+\\[anything-send-bug-report-from-anything]\t\t->Send Bug report.
+\\[anything-ff-help]\t\t->Display this help info.
+\n== Anything Map ==
+\\{anything-map}
+"))
+    (anything-help)))
+
+;;; Generic file help - Used by locate.
+;;
+;;
+;;;###autoload
+(defun anything-generic-file-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything Generic files Map ==\
+\nSpecific commands for anything locate and others files sources:
+\\<anything-generic-files-map>
+\\[anything-ff-run-grep]\t\t->Run grep (C-u recurse).
+\\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
+\\[anything-ff-run-delete-file]\t\t->Delete file.
+\\[anything-ff-run-switch-other-window]\t\t->Switch other window.
+\\[anything-ff-properties-persistent]\t\t->Show file properties.
+\\[anything-yank-text-at-point]\t\t->Yank text at point.
+\\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
+\nLocate tips:
+You can add after writing search pattern any of the locate command line options.
+e.g -b, -e, -n <number>...etc.
+See Man locate for more infos.
+\n== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
+
+
+;;; Grep help
+;;
+;;
+;;;###autoload
+(defun anything-grep-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything Grep Map ==\
+\nSpecific commands for Grep and Etags:
+\\<anything-c-grep-map>
+\\[anything-c-goto-next-file]\t->Next File.
+\\[anything-c-goto-precedent-file]\t\t->Precedent File.
+\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[anything-c-grep-run-other-window-action]\t\t->Jump other window.
+\\[anything-c-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
+\\[anything-c-grep-run-default-action]\t\t->Run default action (Same as RET).
+\\[anything-grep-help]\t\t->Show this help.
+\n== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
+
+;;; Pdf grep help
+;;
+;;
+;;;###autoload
+(defun anything-pdfgrep-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything PdfGrep Map ==\
+\nSpecific commands for Pdf Grep:
+\\<anything-c-pdfgrep-map>
+\\[anything-c-goto-next-file]\t->Next File.
+\\[anything-c-goto-precedent-file]\t\t->Precedent File.
+\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[anything-pdfgrep-help]\t\t->Show this help.
+\n== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
+
+;;; Etags help
+;;
+;;
+;;;###autoload
+(defun anything-etags-help ()
+  "The help function for etags."
+  (interactive)
+  (let ((anything-help-message "== Anything Etags Map ==\
+\nSpecific commands for Etags:
+\\<anything-c-etags-map>
+\\[anything-c-goto-next-file]\t->Next File.
+\\[anything-c-goto-precedent-file]\t\t->Precedent File.
+\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[anything-etags-help]\t\t->Show this help.
+\n== Anything Map ==
+\\{anything-map}"))
+    (anything-help)))
+
+;;; Mode line strings
+;;
+;;
+(defvar anything-buffer-mode-line-string
+  '("Buffer(s)"
+    "\\<anything-c-buffer-map>\
+\\[anything-c-buffer-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+    "String displayed in mode-line in `anything-c-source-buffers-list'"))
+
+(defvar anything-ff-mode-line-string
+  "\\<anything-find-files-map>\
+\\[anything-ff-help]:Help, \
+\\[anything-send-bug-report-from-anything]:BugReport, \
+\\<anything-map>\
+\\[anything-select-action]:Acts, \
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct"
+  "String displayed in mode-line in `anything-c-source-find-files'")
+
+(defvar anything-generic-file-mode-line-string
+  "\\<anything-generic-files-map>\
+\\[anything-generic-file-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-c-source-find-files'")
+
+(defvar anything-grep-mode-line-string
+  "\\<anything-c-grep-map>\
+\\[anything-grep-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-do-grep'.")
+
+(defvar anything-pdfgrep-mode-line-string
+  "\\<anything-c-pdfgrep-map>\
+\\[anything-pdfgrep-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-do-pdfgrep'.")
+
+(defvar anything-etags-mode-line-string
+  "\\<anything-c-etags-map>\
+\\[anything-etags-help]:Help,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+  "String displayed in mode-line in `anything-c-etags-select'.")
+
+
 ;;; Preconfigured Anything
 ;;
 ;;
 ;;;###autoload
 (defun anything-mini ()
-  "Preconfigured `anything' lightweight version (buffer -> recentf)."
+  "Preconfigured `anything' lightweight version \(buffer -> recentf\)."
   (interactive)
   (anything-other-buffer '(anything-c-source-buffers-list anything-c-source-recentf)
                          "*anything mini*"))
 ;;;###autoload
 (defun anything-for-files ()
   "Preconfigured `anything' for opening files.
-ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate"
+ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate."
   (interactive)
   (anything-other-buffer anything-for-files-prefered-list "*anything for files*"))
 
@@ -2275,16 +2509,6 @@ buffer that is not the current buffer."
            ;; Any non--file buffer.
            (t (propertize i 'face 'italic)))))
 
-(defvar anything-buffer-mode-line-string
-  '("Buffer(s)"
-    "\\<anything-c-buffer-map>\
-\\[anything-c-buffer-help]:Help, \
-\\<anything-map>\
-\\[anything-select-action]:Acts,\
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
-    "String displayed in mode-line in `anything-c-source-buffers-list'"))
 
 (defvar anything-c-source-buffers-list
   '((name . "Buffers")
@@ -2353,32 +2577,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun anything-c-buffer-query-replace (candidate)
   (anything-c-buffer-query-replace-1))
-
-(defun anything-c-buffer-help ()
-  "Help command for anything buffers."
-  (interactive)
-  (let ((anything-help-message "== Anything Buffer ==
-\nTips:
-You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
-Enter then a space and a pattern to narrow down to buffers matching this pattern. 
-\nSpecific commands for `anything-buffer+':
-\\<anything-c-buffer-map>
-\\[anything-buffer-run-grep]\t\t->Grep Buffer(s) (C-u grep all buffers linked to a file).
-\\[anything-buffer-run-zgrep]\t\t->Zgrep Buffer(s) (C-u grep all buffers linked to a file).
-\\[anything-buffer-switch-other-window]\t\t->Switch other window.
-\\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
-\\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
-\\[anything-buffer-run-query-replace]\t\t->Query replace in marked buffers.
-\\[anything-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
-\\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer without quitting.
-\\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
-\\[anything-buffer-save-persistent]\t\t->Save buffer without quitting.
-\\[anything-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
-\\[anything-c-buffer-help]\t\t->Display this help.
-\n== Anything Map ==
-\\{anything-map}
-"))
-    (anything-help)))
 
 (defun anything-buffer-toggle-diff (candidate)
   "Toggle diff buffer CANDIDATE with it's file."
@@ -2559,15 +2757,6 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 ;; Internal.
 (defvar anything-c-find-files-doc-header " (`C-l': Go to precedent level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
-(defvar anything-ff-mode-line-string
-  "\\<anything-find-files-map>\
-\\[anything-ff-help]:Help, \
-\\[anything-send-bug-report-from-anything]:BugReport, \
-\\<anything-map>\
-\\[anything-select-action]:Acts, \
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct"
-  "String displayed in mode-line in `anything-c-source-find-files'")
 (defvar anything-ff-auto-update-flag anything-ff-auto-update-initial-value
   "Internal, flag to turn on/off auto-update in `anything-find-files'.
 Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
@@ -2761,7 +2950,6 @@ ACTION must be an action supported by `anything-dired-action'."
 ;;; Asynchronous copy of files.
 ;;
 ;;
-(defvar anything-c-copy-files-async-log-file "/tmp/dired.log")
 (defun anything-c-copy-files-async-1 (flist dest)
   "Copy a list of Files FLIST to DEST asynchronously.
 It use another emacs process to do the job.
@@ -2996,52 +3184,6 @@ Rename only file of current directory, and copy files coming from
 other directories.
 See `anything-ff-serial-rename-1'."
   (anything-ff-serial-rename-action 'copy))
-
-(defun anything-ff-help ()
-  "Help command for `anything-find-files'."
-  (interactive)
-  (let ((anything-help-message "== Anything Find Files ==
-\nTips:
-\nEnter \"~/\" at anytime to reach home directory.
-Enter \"/\" at anytime to reach root of your file system.
-You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
-\nSpecific commands for `anything-find-files':
-\\<anything-find-files-map>
-\\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
-\\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
-\\[anything-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
-\\[anything-ff-run-etags]\t\t->Run Etags (C-u use thing-at-point `C-u C-u' reload cache)
-\\[anything-ff-run-rename-file]\t\t->Rename File (C-u Follow).
-\\[anything-ff-run-copy-file]\t\t->Copy File (C-u Follow).
-\\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
-\\[anything-ff-run-load-file]\t\t->Load File.
-\\[anything-ff-run-symlink-file]\t\t->Symlink File.
-\\[anything-ff-run-delete-file]\t\t->Delete File.
-\\[anything-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
-\\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
-\\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
-\\[anything-ff-run-ediff-file]\t\t->Ediff file.
-\\[anything-ff-run-ediff-merge-file]\t\t->Ediff merge file.
-\\[anything-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
-\\[anything-ff-run-switch-other-window]\t\t->Switch other window.
-\\[anything-ff-run-switch-other-frame]\t\t->Switch other frame.
-\\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
-\\[anything-ff-rotate-left-persistent]\t\t->Rotate Image Left.
-\\[anything-ff-rotate-right-persistent]\t\t->Rotate Image Right.
-\\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
-\\[anything-ff-run-switch-to-history]\t\t->Switch to anything find-files history.
-\\[anything-ff-properties-persistent]\t\t->Show file properties in a tooltip.
-\\[anything-mark-all]\t\t->Mark all visibles candidates.
-\\[anything-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
-\\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
-\\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
-\\[anything-ff-run-print-file]\t\t->Print file with default printer.
-\\[anything-send-bug-report-from-anything]\t\t->Send Bug report.
-\\[anything-ff-help]\t\t->Display this help info.
-\n== Anything Map ==
-\\{anything-map}
-"))
-    (anything-help)))
 
 (defun anything-c-quit-and-execute-action (action)
   "Quit current anything session and execute ACTION." 
@@ -4427,35 +4569,6 @@ See also `anything-locate'."
   "Find files matching the current input pattern with locate.")
 ;; (anything 'anything-c-source-locate)
 
-(defvar anything-generic-file-mode-line-string
-  "\\<anything-generic-files-map>\
-\\[anything-generic-file-help]:Help, \
-\\<anything-map>\
-\\[anything-select-action]:Acts,\
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-c-source-find-files'")
-
-(defun anything-generic-file-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything Generic files Map ==\
-\nSpecific commands for anything locate and others files sources:
-\\<anything-generic-files-map>
-\\[anything-ff-run-grep]\t\t->Run grep (C-u recurse).
-\\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
-\\[anything-ff-run-delete-file]\t\t->Delete file.
-\\[anything-ff-run-switch-other-window]\t\t->Switch other window.
-\\[anything-ff-properties-persistent]\t\t->Show file properties.
-\\[anything-yank-text-at-point]\t\t->Yank text at point.
-\\[anything-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
-\nLocate tips:
-You can add after writing search pattern any of the locate command line options.
-e.g -b, -e, -n <number>...etc.
-See Man locate for more infos.
-\n== Anything Map ==
-\\{anything-map}"))
-    (anything-help)))
 
 ;;; Anything Incremental Grep.
 ;;
@@ -4487,15 +4600,6 @@ See `anything-c-grep-default-command' for format specs.")
 
 (defvar anything-c-zgrep-recurse-flag nil)
 
-(defvar anything-grep-mode-line-string
-  "\\<anything-c-grep-map>\
-\\[anything-grep-help]:Help,\
-\\<anything-map>\
-\\[anything-select-action]:Acts,\
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-do-grep'.")
 (defvar anything-c-grep-history nil)
 
 (defvar anything-c-grep-max-length-history 100
@@ -4925,37 +5029,24 @@ If N is positive go forward otherwise go backward."
   (anything-c-goto-next-or-prec-file 1))
 
 ;;;###autoload
-(defun anything-grep-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything Grep Map ==\
-\nSpecific commands for Grep and Etags:
-\\<anything-c-grep-map>
-\\[anything-c-goto-next-file]\t->Next File.
-\\[anything-c-goto-precedent-file]\t\t->Precedent File.
-\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[anything-c-grep-run-other-window-action]\t\t->Jump other window.
-\\[anything-c-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
-\\[anything-c-grep-run-default-action]\t\t->Run default action (Same as RET).
-\\[anything-grep-help]\t\t->Show this help.
-\n== Anything Map ==
-\\{anything-map}"))
-    (anything-help)))
-
 (defun anything-c-grep-run-persistent-action ()
   "Run grep persistent action from `anything-do-grep-1'."
   (interactive)
   (anything-execute-persistent-action 'jump-persistent))
 
+;;;###autoload
 (defun anything-c-grep-run-default-action ()
   "Run grep default action from `anything-do-grep-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-action))
 
+;;;###autoload
 (defun anything-c-grep-run-other-window-action ()
   "Run grep goto other window action from `anything-do-grep-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-other-window))
 
+;;;###autoload
 (defun anything-c-grep-run-save-buffer ()
   "Run grep save results action from `anything-do-grep-1'."
   (interactive)
@@ -5075,29 +5166,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      :keymap anything-c-pdfgrep-map
      :buffer "*anything grep*")))
 
-(defvar anything-pdfgrep-mode-line-string
-  "\\<anything-c-pdfgrep-map>\
-\\[anything-pdfgrep-help]:Help,\
-\\<anything-map>\
-\\[anything-select-action]:Acts,\
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-do-pdfgrep'.")
-
-;;;###autoload
-(defun anything-pdfgrep-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything PdfGrep Map ==\
-\nSpecific commands for Pdf Grep:
-\\<anything-c-pdfgrep-map>
-\\[anything-c-goto-next-file]\t->Next File.
-\\[anything-c-goto-precedent-file]\t\t->Precedent File.
-\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[anything-pdfgrep-help]\t\t->Show this help.
-\n== Anything Map ==
-\\{anything-map}"))
-    (anything-help)))
 
 (defun anything-c-pdfgrep-action (candidate)
   (let* ((split  (anything-c-grep-split-line candidate))
@@ -5168,37 +5236,12 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      "You are using obsolete library `anything-etags.el' and should remove it."
      :warning)))
 
-;;;###autoload
-(defun anything-etags-help ()
-  "The help function for etags."
-  (interactive)
-  (let ((anything-help-message "== Anything Etags Map ==\
-\nSpecific commands for Etags:
-\\<anything-c-etags-map>
-\\[anything-c-goto-next-file]\t->Next File.
-\\[anything-c-goto-precedent-file]\t\t->Precedent File.
-\\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[anything-etags-help]\t\t->Show this help.
-\n== Anything Map ==
-\\{anything-map}"))
-    (anything-help)))
-
 (defvar anything-c-etags-tag-file-dir nil
   "Etags file directory.")
 (defvar anything-c-etags-mtime-alist nil
   "Store the last modification time of etags files here.")
 (defvar anything-c-etags-cache (make-hash-table :test 'equal)
   "Cache content of etags files used here for faster access.")
-
-(defvar anything-etags-mode-line-string
-  "\\<anything-c-etags-map>\
-\\[anything-etags-help]:Help,\
-\\<anything-map>\
-\\[anything-select-action]:Acts,\
-\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
-\\[anything-select-3rd-action]:NthAct,\
-\\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-c-etags-select'.")
 
 (defun anything-c-etags-get-tag-file (&optional directory)
   "Return the path of etags file if found."
