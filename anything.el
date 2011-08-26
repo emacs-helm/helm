@@ -671,14 +671,16 @@ It also can be used to declutter the results anything displays,
 so that results from certain sources are not shown with every
 character typed, only if the user hesitates a bit.")
 
-(defvar anything-input-idle-delay 0.2
+(defvar anything-input-idle-delay 0.3
   "Be idle for this many seconds, before updating.
 
 Unlike `anything-idle-delay', it is also effective for non-delayed sources.
 If nil, candidates are collected immediately.
 
 Note:  If this value is too low compared to `anything-idle-delay',
-you may have duplicated sources when using multiples sources.")
+you may have duplicated sources when using multiples sources.
+Safe value is always >= `anything-idle-delay'.
+Default settings are equal value for both.")
 
 (defvar anything-samewindow nil
   "Use current window to show the candidates.
