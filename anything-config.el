@@ -3424,7 +3424,7 @@ or hitting C-z on \"..\"."
 ;; Internal
 (defun anything-ff-update-when-only-one-matched ()
   "Expand to directory when sole completion.
-When only one cndidate is remaining and it is a directory,
+When only one candidate is remaining and it is a directory,
 expand to this directory."
   (let ((history-p   (string= (assoc-default
                                'name (anything-get-current-source))
@@ -3448,8 +3448,9 @@ expand to this directory."
                 ;; The candidate is one of "." or ".." (it should be "..").
                 ;; that mean we have entered the last letter of the directory name
                 ;; in prompt, so expansion is already done, just add the "/" at end
-                ;; of name.
-                (anything-set-pattern (file-name-as-directory anything-pattern)))
+                ;; of name unless anything-pattern ends with "."
+                (unless (string-match "^.*[.]\\{1\\}$" anything-pattern)
+                  (anything-set-pattern (file-name-as-directory anything-pattern))))
             (anything-check-minibuffer-input-1)))))))
 (add-hook 'anything-after-update-hook 'anything-ff-update-when-only-one-matched)
 
