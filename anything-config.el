@@ -10374,9 +10374,9 @@ when the user goes to the action list with TAB."
 (add-hook 'emacs-startup-hook 'anything-c-adaptative-maybe-load-history)
 (add-hook 'kill-emacs-hook 'anything-c-adaptive-save-history)
 
-(defun anything-c-adaptive-save-history ()
+(defun anything-c-adaptive-save-history (&optional arg)
   "Save history information to file given by `anything-c-adaptive-history-file'."
-  (interactive)
+  (interactive "p")
   (when anything-c-use-adaptative-sorting
     (with-temp-buffer
       (insert
@@ -10386,7 +10386,7 @@ when the user goes to the action list with TAB."
              (current-buffer))
       (insert ?\n)
       (write-region (point-min) (point-max) anything-c-adaptive-history-file nil
-                    (unless (interactive-p) 'quiet)))))
+                    (unless arg 'quiet)))))
 
 (defun anything-c-adaptive-sort (candidates source)
   "Sort the CANDIDATES for SOURCE by usage frequency.
