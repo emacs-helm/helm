@@ -319,7 +319,7 @@ For example, to list candidats of \"foo\" source, input pattern as \"foo .\".")
   (anything-mp-handle-source-name-maybe
    pattern (apply-partially 'anything-mp-3p-match str)
    (lambda ()
-     (declare (special first-pred first-re))
+     (declare (special first-pred first-re rest))
      (and (funcall first-pred (anything-prefix-match str first-re))
           (loop for (pred . re) in rest
                 always (funcall pred (string-match re str)))))))
