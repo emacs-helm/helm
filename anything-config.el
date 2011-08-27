@@ -9382,7 +9382,16 @@ See documentation of `completing-read' and `all-completions' for details."
 (defvar anything-completion-mode-string " AC")
 ;;;###autoload
 (define-minor-mode anything-completion-mode
-    "Toggle generic anything completion."
+    "Toggle generic anything completion.
+All functions in Emacs that use `completing-read'
+or `read-file-name' and friends will use anything interface
+when this mode is turned on.
+Called with a positive arg, turn on inconditionnaly, with a
+negative arg turn off.
+You can turn it on with `ac-mode'.
+
+Some crap emacs functions may not be supported,
+e.g `ffap-alternate-file' and maybe others."
   :group 'anything
   :global t
   :lighter anything-completion-mode-string
@@ -9394,6 +9403,8 @@ See documentation of `completing-read' and `all-completions' for details."
       (setq completing-read-function 'completing-read-default
             read-file-name-function  'read-file-name-default)
       (message "Anything completion disabled")))
+
+(defalias 'ac-mode 'anything-completion-mode)
 
 ;;; Eshell completion.
 ;;
