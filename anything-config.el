@@ -3983,21 +3983,23 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."
-  (if buffer-read-only
-      (error "Error: Buffer `%s' is read-only" (buffer-name))
-      (let* ((end         (point))
-             (guess       (substring-no-properties (thing-at-point 'filename)))
-             (beg         (- (point) (length guess)))
-             (full-path-p (or (string-match-p (concat "^" (getenv "HOME")) guess)
-                              (string-match-p "^[^\~]" guess))))
-        (set-text-properties 0 (length candidate) nil candidate)
-        (if (and guess (not (string= guess "")) (string-match-p "^~\\|/.*" guess))
-            (progn
-              (delete-region beg end)
-              (insert (if full-path-p
-                          (expand-file-name candidate)
-                          (abbreviate-file-name candidate))))
-            (error "Aborting completion: No valid file name at point")))))
+  (with-current-buffer anything-current-buffer
+    (if buffer-read-only
+        (error "Error: Buffer `%s' is read-only" (buffer-name))
+        (let* ((end         (point))
+               (guess       (anything-c-thing-at-point))
+               (beg         (- (point) (length guess)))
+               (full-path-p (or (string-match-p (concat "^" (getenv "HOME")) guess)
+                                (string-match-p "^[^\~]" guess))))
+          (set-text-properties 0 (length candidate) nil candidate)
+          (if (and guess (not (string= guess ""))
+                   (string-match-p "^~\\|/.*" guess))
+              (progn
+                (delete-region beg end)
+                (insert (if full-path-p
+                            (expand-file-name candidate)
+                            (abbreviate-file-name candidate))))
+              (error "Aborting completion: No valid file name at point"))))))
 
 (defun* anything-find-files-history (&key (comp-read t))
   "The `anything-find-files' history.
@@ -4066,7 +4068,7 @@ Use it for non--interactive calls of `anything-find-files'."
   (or (and input (expand-file-name input))
       (anything-find-files-input
        (ffap-guesser)
-       (thing-at-point 'filename))))
+       (anything-c-thing-at-point))))
 
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
@@ -9624,11 +9626,21 @@ If SYM is not documented, return \"Not documented\"."
 ;;
 ;; Complete file name at point.
 
+(defun anything-c-thing-at-point ()
+  "Get symbol name before point.
+Borrowed from anything-complete.el, inlined here for compatibility."
+  (save-excursion
+    (let ((beg (point)))
+      ;; older regexp "\(\\|\\s-\\|^\\|\\_<\\|\r\\|'\\|#'"
+      (when (re-search-backward
+             "\\_<" (field-beginning nil nil (point-at-bol)) t)
+        (buffer-substring-no-properties beg (match-end 0))))))
+
 ;;;###autoload
 (defun anything-c-complete-file-name-at-point ()
   "Complete file name at point."
   (interactive)
-  (let* ((init (substring-no-properties (thing-at-point 'filename)))
+  (let* ((init (anything-c-thing-at-point))
          (end  (point))
          (beg  (- (point) (length init)))
          (anything-quit-if-no-candidate t)
@@ -9675,7 +9687,7 @@ One hit indent, two quick hits maybe indent and complete."
 Filename completion happen if filename is started in
 or between double quotes."
   (interactive)
-  (let ((tap (thing-at-point 'filename)))
+  (let ((tap (anything-c-thing-at-point)))
     (if (and tap (string-match "^\\(~/\\|/\\|[a-zA-Z]\:/\\).*" tap)
              (save-excursion (search-backward "\"" (point-at-bol) t)))
         (anything-c-complete-file-name-at-point)
