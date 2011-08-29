@@ -1405,6 +1405,8 @@ automatically.")
     (define-key map (kbd "M-p")           'anything-ff-run-switch-to-history)
     (define-key map (kbd "M-i")           'anything-ff-properties-persistent)
     (define-key map (kbd "C-c ?")         'anything-ff-help)
+    (define-key map (kbd "C-}")           'anything-narrow-window)
+    (define-key map (kbd "C-{")           'anything-enlarge-window)
     (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
     (define-key map (kbd "M-a")           'anything-mark-all)
     (define-key map (kbd "M-m")           'anything-toggle-all-marks)
@@ -1630,6 +1632,8 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \nEnter \"~/\" at anytime to reach home directory.
 Enter \"/\" at anytime to reach root of your file system.
 You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
+Use `C-u C-z' to watch an image.
+To browse images directories turn on `anything-follow-mode'.
 \nSpecific commands for `anything-find-files':
 \\<anything-find-files-map>
 \\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
@@ -1661,6 +1665,8 @@ You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
 \\[anything-ff-run-print-file]\t\t->Print file with default printer.
+\\[anything-enlarge-window]\t\t->Enlarge anything window.
+\\[anything-narrow-window]\t\t->Narrow anything window.
 \\[anything-send-bug-report-from-anything]\t\t->Send Bug report.
 \\[anything-ff-help]\t\t->Display this help info.
 \n== Anything Map ==

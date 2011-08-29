@@ -738,6 +738,8 @@ See also `anything-set-source-filter'.")
 
     (define-key map (kbd "C-r")             'undefined)
     (define-key map (kbd "C-t")             'anything-toggle-resplit-window)
+    (define-key map (kbd "C-}")             'anything-narrow-window)
+    (define-key map (kbd "C-{")             'anything-enlarge-window)
     (define-key map (kbd "C-x C-f")         'anything-quit-and-find-file)
 
     (define-key map (kbd "C-c C-d")         'anything-delete-current-selection)
@@ -1754,10 +1756,11 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
 ;;; (@* "Core: Accessors")
 ;;; rubikitch: I love to create functions to control variables.
 (defvar anything-current-position nil
-  "Cons of (point) and (window-start) when `anything' is invoked.
-It is needed because restoring position when `anything' is keyboard-quitted.")
+  "Cons of \(point . window-start\)  when `anything' is invoked.
+It is needed to restore position in `anything-current-buffer'
+when `anything' is keyboard-quitted.")
 (defun anything-current-position (save-or-restore)
-  "Restore or save current position in `anything-buffer'.
+  "Restore or save current position in `anything-current-buffer'.
 Argument SAVE-OR-RESTORE is one of save or restore."
   (case save-or-restore
     (save
@@ -1805,6 +1808,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (funcall (if anything-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
 
 ;; (@* "Core: initialize")
+(defvar anything-split-window-state nil)
 (defun anything-initial-setup ()
   "Initialize anything settings and set up the anything buffer."
   (anything-log-run-hook 'anything-before-initialize-hook)
@@ -1816,6 +1820,11 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (setq anything-issued-errors nil)
   (setq anything-compiled-sources nil)
   (setq anything-saved-current-source nil)
+  (if (or (not split-width-threshold)
+          (and (integerp split-width-threshold)
+               (>= split-width-threshold (+ (frame-width) 4))))
+      (setq anything-split-window-state 'vertical)
+      (setq anything-split-window-state 'horizontal))
   ;; Call the init function for sources where appropriate
   (anything-funcall-foreach 'init)
   (setq anything-pattern "")
@@ -3248,9 +3257,32 @@ Acceptable values of CREATE-OR-BUFFER:
       (delete-window)
       (set-window-buffer
        (select-window (if (= (window-height) before-height)
-                          (split-window-vertically)
-                        (split-window-horizontally)))
+                          (prog1
+                            (split-window-vertically)
+                            (setq anything-split-window-state 'vertical))
+                          (setq anything-split-window-state 'horizontal)
+                          (split-window-horizontally)))
        anything-buffer))))
+
+;; (@* "Utility: Resize anything window.")
+(defvar anything-split-window-state nil)
+(defun anything-enlarge-window-1 (n)
+  "Enlarge or narrow anything window.
+If N is positive enlarge, if negative narrow."
+  (unless anything-samewindow
+    (let ((horizontal-p (eq anything-split-window-state 'horizontal)))
+      (with-anything-window
+        (enlarge-window n horizontal-p)))))
+
+(defun anything-narrow-window ()
+  "Narrow anything window."
+  (interactive)
+  (anything-enlarge-window-1 -1))
+
+(defun anything-enlarge-window ()
+  "Enlarge anything window."
+  (interactive)
+  (anything-enlarge-window-1 1))
 
 ;; (@* "Utility: select another action by key")
 (defun anything-select-nth-action (n)
