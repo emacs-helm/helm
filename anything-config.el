@@ -3987,7 +3987,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
     (if buffer-read-only
         (error "Error: Buffer `%s' is read-only" (buffer-name))
         (let* ((end         (point))
-               (guess       (anything-c-thing-at-point))
+               (guess       (substring-no-properties (thing-at-point 'filename)))
                (beg         (- (point) (length guess)))
                (full-path-p (or (string-match-p (concat "^" (getenv "HOME")) guess)
                                 (string-match-p "^[^\~]" guess))))
@@ -4068,7 +4068,7 @@ Use it for non--interactive calls of `anything-find-files'."
   (or (and input (expand-file-name input))
       (anything-find-files-input
        (ffap-guesser)
-       (anything-c-thing-at-point))))
+       (thing-at-point 'filename))))
 
 (defun anything-find-files-input (fap tap)
   "Default input of `anything-find-files'."
@@ -9520,7 +9520,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
   (overlay-put anything-c-show-completion-overlay
                'display (anything-get-selection)))
 
-(defun anything-c-completion-init-overlay (beg end)
+(defun anything-c-show-completion-init-overlay (beg end)
   (and anything-c-turn-on-show-completion
        (setq anything-c-show-completion-overlay (make-overlay beg end))
        (overlay-put anything-c-show-completion-overlay
@@ -9538,7 +9538,7 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
                (append (list 'anything-c-show-completion)
                        anything-move-selection-after-hook))))
      (unwind-protect
-          (progn (anything-c-completion-init-overlay ,beg ,end)
+          (progn (anything-c-show-completion-init-overlay ,beg ,end)
                  ,@body)
        (and anything-c-turn-on-show-completion
             (delete-overlay anything-c-show-completion-overlay)))))
@@ -9626,7 +9626,7 @@ If SYM is not documented, return \"Not documented\"."
 ;;
 ;; Complete file name at point.
 
-(defun anything-c-thing-at-point ()
+(defun anything-c-thing-before-point ()
   "Get symbol name before point.
 Borrowed from anything-complete.el, inlined here for compatibility."
   (save-excursion
@@ -9640,7 +9640,7 @@ Borrowed from anything-complete.el, inlined here for compatibility."
 (defun anything-c-complete-file-name-at-point ()
   "Complete file name at point."
   (interactive)
-  (let* ((init (anything-c-thing-at-point))
+  (let* ((init (substring-no-properties (thing-at-point 'filename)))
          (end  (point))
          (beg  (- (point) (length init)))
          (anything-quit-if-no-candidate t)
@@ -9687,7 +9687,7 @@ One hit indent, two quick hits maybe indent and complete."
 Filename completion happen if filename is started in
 or between double quotes."
   (interactive)
-  (let ((tap (anything-c-thing-at-point)))
+  (let ((tap (substring-no-properties (thing-at-point 'filename))))
     (if (and tap (string-match "^\\(~/\\|/\\|[a-zA-Z]\:/\\).*" tap)
              (save-excursion (search-backward "\"" (point-at-bol) t)))
         (anything-c-complete-file-name-at-point)
