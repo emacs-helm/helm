@@ -1937,12 +1937,18 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   (anything-log-run-hook 'anything-cleanup-hook)
   (anything-hooks 'cleanup)
   (anything-frame-or-window-configuration 'restore)
+  ;; This is needed in some cases where last input
+  ;; is yielded indefinitely in minibuffer after anything session.
   (anything-clean-up-minibuffer))
 
 (defun anything-clean-up-minibuffer ()
   "Remove contents of minibuffer."
-  (with-current-buffer (window-buffer (minibuffer-window))
-    (delete-minibuffer-contents)))
+  (let ((miniwin (minibuffer-window)))
+    ;; Clean only current minibuffer used by anything.
+    ;; i.e The precedent one is active.
+    (unless (minibuffer-window-active-p miniwin)
+      (with-current-buffer (window-buffer miniwin)
+        (delete-minibuffer-contents)))))
 
 ;; (@* "Core: input handling")
 (defun anything-check-minibuffer-input ()
