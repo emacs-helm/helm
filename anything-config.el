@@ -10294,21 +10294,18 @@ selection.")
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
 
-(defadvice anything-initialize (before anything-c-adaptive-initialize activate)
-  "Advise `anything-initialize' to reset `anything-c-adaptive-done'
-when anything is started."
+(defadvice anything-initial-setup (before anything-c-adaptive-initialize activate)
+  "Reset `anything-c-adaptive-done' when anything is started."
   (when anything-c-use-adaptative-sorting
     (setq anything-c-adaptive-done nil)))
 
 (defadvice anything-exit-minibuffer (before anything-c-adaptive-exit-minibuffer activate)
-  "Advise `anything-exit-minibuffer' to store history information
-when a candidate is selected with RET."
+  "Store history information when action is executed on selected candidate."
   (when anything-c-use-adaptative-sorting
     (anything-c-adaptive-store-selection)))
 
 (defadvice anything-select-action (before anything-c-adaptive-select-action activate)
-  "Advise `anything-select-action' to store history information
-when the user goes to the action list with TAB."
+  "Store history information when the user goes to the action buffer."
   (when anything-c-use-adaptative-sorting
     (anything-c-adaptive-store-selection)))
 

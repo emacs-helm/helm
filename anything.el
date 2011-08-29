@@ -1764,9 +1764,14 @@ when `anything' is keyboard-quitted.")
 Argument SAVE-OR-RESTORE is one of save or restore."
   (case save-or-restore
     (save
+     (anything-log "Save position at %S" (cons (point) (window-start)))
      (setq anything-current-position (cons (point) (window-start))))
     (restore
+     (anything-log "Restore position at  %S in buffer %s"
+                   anything-current-position
+                   (buffer-name (current-buffer)))
      (goto-char (car anything-current-position))
+     (sit-for 0.1)
      (set-window-start (selected-window) (cdr anything-current-position)))))
 
 
