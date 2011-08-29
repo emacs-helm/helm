@@ -1608,7 +1608,9 @@ to 10 as session local variable."
 (defun* anything-resume (&optional
                          (any-buffer anything-last-buffer)
                          buffer-pattern (any-resume t))
-  "Resurrect previously invoked `anything'."
+  "Resurrect previously invoked `anything'.
+Called with a prefix arg, allow choosing among all existing
+anything buffers.  i.e choose among various anything sessions."
   (interactive)
   (when (or current-prefix-arg buffer-pattern)
     (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
