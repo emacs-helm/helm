@@ -3426,8 +3426,8 @@ or hitting C-z on \"..\"."
       (setq anything-ff-last-expanded nil))))
 (add-hook 'anything-after-update-hook 'anything-ff-retrieve-last-expanded)
 
-;; Auto-update: anything-find-files auto expansion of directories.
-;; Internal
+;; Auto-update - anything-find-files auto expansion of directories.
+;;
 (defun anything-ff-update-when-only-one-matched ()
   "Expand to directory when sole completion.
 When only one candidate is remaining and it is a directory,
@@ -3447,9 +3447,14 @@ expand to this directory."
         (and (not completed-p) (anything-next-line))
         (let ((cur-cand (anything-get-selection)))
           (when (file-directory-p cur-cand)
-            (if (not (string-match "^.*[.]\\{1,2\\}$" cur-cand))
-                ;; If after going to next line the candidate is not "." or ".."
-                ;; we assume candidate is a new directory to expand, so do it.
+            (if (and (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)) ; [1]
+                     ;; Maybe we are here because completed-p is true
+                     ;; So check this again to be sure.
+                     ;; (this happen only on windows dirs)
+                     (<= (anything-approximate-candidate-number) 2))  ; [2]
+                ;; If after going to next line the candidate is not "." or ".." [1]
+                ;; and only one candidate is remaining [2],
+                ;; assume candidate is a new directory to expand, and do it.
                 (anything-set-pattern (file-name-as-directory cur-cand))
                 ;; The candidate is one of "." or ".." (it should be "..").
                 ;; that mean we have entered the last letter of the directory name
