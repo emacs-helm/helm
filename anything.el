@@ -1073,9 +1073,9 @@ ARGS are args given to `format'."
 (defmacro anything-aif (test-form then-form &rest else-forms)
   "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
 THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
+  (declare (indent 2) (debug t))
   `(let ((it ,test-form))
      (if it ,then-form ,@else-forms)))
-(put 'anything-aif 'lisp-indent-function 2)
 
 (defun anything-mklist (obj)
   "If OBJ is a list \(but not lambda\), return itself.
@@ -1102,17 +1102,18 @@ Otherwise make a list with one element."
 
 (defmacro with-anything-window (&rest body)
   "Be sure BODY is excuted in the anything window."
+  (declare (indent 0) (debug t))
   `(let ((--tmpfunc-- (lambda () ,@body)))
      (if anything-test-mode
          (with-current-buffer (anything-buffer-get)
            (funcall --tmpfunc--))
        (with-selected-window (anything-window)
          (funcall --tmpfunc--)))))
-(put 'with-anything-window 'lisp-indent-function 0)
 
 (defmacro with-anything-restore-variables(&rest body)
   "Restore `anything-restored-variables' after executing BODY.
 `post-command-hook' is handled specially."
+  (declare (indent 0) (debug t))
   `(let ((--orig-vars (mapcar (lambda (v)
                                 (cons v (symbol-value v)))
                               anything-restored-variables))
@@ -1126,7 +1127,6 @@ Otherwise make a list with one element."
        (setq post-command-hook (car --post-command-hook-pair))
        (setq-default post-command-hook (cdr --post-command-hook-pair))
        (anything-log "restore variables"))))
-(put 'with-anything-restore-variables 'lisp-indent-function 0)
 
 (defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
   "Get the value of ATTRIBUTE-NAME of SRC.
@@ -1347,6 +1347,7 @@ Use this function is better than setting `anything-type-attributes' directly."
   "Register ATTRIBUTE documentation introduced by plug-in.
 SHORT-DOC is displayed beside attribute name.
 LONG-DOC is displayed below attribute name and short documentation."
+  (declare (indent 2) (debug t))
   (if long-doc
       (setq short-doc (concat "(" short-doc ")"))
     (setq long-doc short-doc
@@ -1355,7 +1356,6 @@ LONG-DOC is displayed below attribute name and short documentation."
   (put attribute 'anything-attrdoc
        (concat "- " (symbol-name attribute)
                " " short-doc "\n\n" long-doc "\n")))
-(put 'anything-document-attribute 'lisp-indent-function 2)
 
 (defun anything-require-at-least-version (version)
   "Output error message unless anything.el is older than VERSION.
@@ -1498,13 +1498,13 @@ It is used to check if candidate number is 0, 1, or 2+."
 
 (defmacro with-anything-quittable (&rest body)
   "If an error occur in execution of BODY, quit anything safely."
+  (declare (indent 0) (debug t))
   `(let (inhibit-quit)
      (condition-case v
          (progn ,@body)
        (quit (setq anything-quit t)
              (exit-minibuffer)
              (keyboard-quit)))))
-(put 'with-anything-quittable 'lisp-indent-function 0)
 
 (defun anything-compose (arg-lst func-lst)
   "Apply arguments specified in ARG-LST with each function of FUNC-LST.
@@ -2962,9 +2962,9 @@ to a list of forms.\n\n")
 (defmacro anything-edit-current-selection (&rest forms)
   "Evaluate FORMS at current selection in the anything buffer.
 You can edit the line."
+  (declare (indent 0) (debug t))
   `(anything-edit-current-selection-internal
     (lambda () ,@forms)))
-(put 'anything-edit-current-selection 'lisp-indent-function 0)
 
 (defun anything-set-pattern (pattern &optional noupdate)
   "Set minibuffer contents to PATTERN.
@@ -3337,9 +3337,9 @@ Otherwise goto the end of minibuffer."
 (defmacro with-anything-display-same-window (&rest body)
   "Execute BODY in the window used for persistent action.
 Make `pop-to-buffer' and `display-buffer' display in the same window."
+  (declare (indent 0) (debug t))
   `(let ((display-buffer-function 'anything-persistent-action-display-buffer))
      ,@body))
-(put 'with-anything-display-same-window 'lisp-indent-function 0)
 
 (defvar anything-persistent-action-display-window nil)
 (defun anything-initialize-persistent-action ()
