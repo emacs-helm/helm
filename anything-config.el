@@ -2731,7 +2731,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defvar anything-c-source-files-in-current-dir
   '((name . "Files from Current Directory")
     (candidates . (lambda ()
-                    (with-current-buffer anything-current-buffer
+                    (with-anything-current-buffer
                       (directory-files (anything-c-current-directory)))))
     ;; volatile is not needed, I think.
     (type . file)))
@@ -2751,7 +2751,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defvar anything-c-source-files-in-current-dir+
   '((name . "Files from Current Directory")
     (candidates . (lambda ()
-                    (with-current-buffer anything-current-buffer
+                    (with-anything-current-buffer
                       (directory-files (anything-c-current-directory) t))))
     (candidate-transformer anything-c-highlight-files)
     ;; volatile is not needed, I think.
@@ -2845,7 +2845,7 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
   "Return value of `default-directory' of buffer in other window.
 If there is only one window return the value ot `default-directory'
 for current buffer."
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (let ((num-windows (length (window-list))))
       (if (> num-windows 1)
           (save-window-excursion
@@ -3845,7 +3845,7 @@ KBSIZE if a floating point number, default value is 1024.0."
 
 (defun anything-find-files-action-transformer (actions candidate)
   "Action transformer for `anything-c-source-find-files'."
-  (cond ((with-current-buffer anything-current-buffer
+  (cond ((with-anything-current-buffer
            (eq major-mode 'message-mode))
          (append (subseq actions 0 4)
                  '(("Gnus attach file(s)" . anything-ff-gnus-attach-files))
@@ -3994,7 +3994,7 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
 
 (defun anything-c-insert-file-name-completion-at-point (candidate)
   "Insert file name completion at point."
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (if buffer-read-only
         (error "Error: Buffer `%s' is read-only" (buffer-name))
         (let* ((end         (point))
@@ -5224,7 +5224,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                  (delete-minibuffer-contents)
                  (set-text-properties 0 (length word) nil word)
                  (insert (concat str word))))))
-      (with-current-buffer anything-current-buffer
+      (with-anything-current-buffer
         ;; Start to initial point if C-w have never been hit.
         (unless anything-yank-point (setq anything-yank-point (point)))
         (and anything-yank-point (goto-char anything-yank-point))
@@ -5294,7 +5294,7 @@ If not found in CURRENT-DIR search in upper directory."
 (defun anything-c-source-etags-header-name (x)
   "Create header name for this anything etags session."
   (concat "Etags in "
-          (with-current-buffer anything-current-buffer
+          (with-anything-current-buffer
             (anything-c-etags-get-tag-file))))
 
 (defmacro anything-c-etags-create-buffer (file)
@@ -5427,7 +5427,7 @@ if `recentf-max-saved-items' is too small, set it to 500.")
     (init . (lambda () (require 'ffap)))
     (candidates . (lambda ()
                     (anything-aif
-                        (with-current-buffer anything-current-buffer
+                        (with-anything-current-buffer
                           (ffap-guesser))
                         (list it))))
     (type . file)))
@@ -5448,7 +5448,7 @@ if `recentf-max-saved-items' is too small, set it to 500.")
 It is cleared after jumping line.")
 
 (defun anything-c-ffap-line-candidates ()
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (setq anything-c-ffap-line-location (anything-c-ffap-file-line-at-point)))
   (when anything-c-ffap-line-location
     (destructuring-bind (file . line) anything-c-ffap-line-location
@@ -6047,7 +6047,7 @@ Return nil if no mode-map found."
 (defun anything-M-x-transformer (candidates sources)
   "filtered-candidate-transformer to show bindings in emacs commands.
 Show global bindings and local bindings according to current `major-mode'."
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (loop
        with local-map = (anything-M-x-current-mode-map-alist)
        for cand in candidates
@@ -6933,7 +6933,7 @@ STRING is string to match."
 ;; (anything 'anything-c-source-imenu)
 
 (defun anything-c-imenu-candidates ()
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (let ((tick (buffer-modified-tick)))
       (if (eq anything-c-cached-imenu-tick tick)
           anything-c-cached-imenu-candidates
@@ -7174,7 +7174,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
 
 (eval-when-compile (require 'auto-document nil t))
 (defun anything-command-and-options-candidates ()
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (when (and (require 'auto-document nil t)
                (eq major-mode 'emacs-lisp-mode)
                (or (anything-current-buffer-is-modified)
@@ -7237,10 +7237,10 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
      ("Copy RGB" . (lambda (candidate)
                      (kill-new (anything-c-colors-get-rgb candidate))))
      ("Insert Name" . (lambda (candidate)
-                        (with-current-buffer anything-current-buffer
+                        (with-anything-current-buffer
                           (insert (anything-c-colors-get-name candidate)))))
      ("Insert RGB" . (lambda (candidate)
-                       (with-current-buffer anything-current-buffer
+                       (with-anything-current-buffer
                          (insert (anything-c-colors-get-rgb candidate))))))))
 ;; (anything 'anything-c-source-colors)
 
@@ -7355,7 +7355,7 @@ replace with STR as yanked string."
                (when (string= "" line)
                  (setq line  "<EMPTY LINE>"))
                (format "%7d: %s" (line-number-at-pos) line)))))
-    (with-current-buffer anything-current-buffer
+    (with-anything-current-buffer
       (loop
          with marks = (if (mark) (cons (mark-marker) mark-ring) mark-ring)
          with recip = nil
@@ -7554,7 +7554,7 @@ replace with STR as yanked string."
 (defvar anything-c-source-latex-math
   '((name . "Latex Math Menu")
     (init . (lambda ()
-              (with-current-buffer anything-current-buffer
+              (with-anything-current-buffer
                 (LaTeX-math-mode 1))))
     (candidate-number-limit . 9999)
     (candidates . anything-c-latex-math-candidates)
@@ -7755,7 +7755,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
     (candidates
      . (lambda ()
          (ignore-errors
-           (with-current-buffer anything-current-buffer
+           (with-anything-current-buffer
              (loop initially (goto-char (point-min))
                 while (re-search-forward (format ee-anchor-format "\\([^\.].+\\)") nil t)
                 for anchor = (match-string-no-properties 1)
@@ -7991,7 +7991,7 @@ http://bbdb.sourceforge.net/")
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (list
                                          (condition-case nil
-                                             (with-current-buffer anything-current-buffer
+                                             (with-anything-current-buffer
                                                (pp-to-string
                                                 (eval (read anything-pattern))))
                                            (error "Error")))))
@@ -8576,7 +8576,7 @@ instead of whole buffer."
   (with-current-buffer (anything-candidate-buffer 'global)
     (erase-buffer)
     (let ((buf-contents
-           (with-current-buffer anything-current-buffer
+           (with-anything-current-buffer
              (if (anything-region-active-p)
                  (buffer-substring (region-beginning) (region-end))
                  (buffer-substring (point-min) (point-max))))))
@@ -8628,7 +8628,7 @@ Line is parsed for BEG position to END position."
   '((name . "Browse code")
     (init . (lambda ()
               (anything-candidate-buffer anything-current-buffer)
-              (with-current-buffer anything-current-buffer
+              (with-anything-current-buffer
                 (jit-lock-fontify-now))))
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
@@ -9457,7 +9457,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
            pcomplete-args pcomplete-last pcomplete-index
            (pcomplete-autolist pcomplete-autolist)
            (pcomplete-suffix-list pcomplete-suffix-list))
-      (with-current-buffer anything-current-buffer
+      (with-anything-current-buffer
         (loop
            with table  = (pcomplete-completions)
            with entry  = (condition-case nil
@@ -10495,7 +10495,7 @@ candidate can be in (DISPLAY . REAL) format."
     ;; TODO need consideration whether to update position by every input.
     (when t ; (equal anything-pattern "")
       (anything-goto-line 2)
-      (let ((lineno (with-current-buffer anything-current-buffer
+      (let ((lineno (with-anything-current-buffer
                       (line-number-at-pos (car anything-current-position)))))
         (block exit
           (while (<= (progn (skip-chars-forward " ")
@@ -10616,7 +10616,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 (defun anything-headline-init ()
   (when (and (anything-current-buffer-is-modified)
-             (with-current-buffer anything-current-buffer
+             (with-anything-current-buffer
                (eval (or (anything-attr 'condition) t))))
     (anything-headline-make-candidate-buffer
      (anything-interpret-value (anything-attr 'headline))
@@ -10631,7 +10631,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
 
 
 (defun anything-headline-get-candidates (regexp subexp)
-  (with-current-buffer anything-current-buffer
+  (with-anything-current-buffer
     (save-excursion
       (goto-char (point-min))
       (if (functionp regexp) (setq regexp (funcall regexp)))
@@ -10677,7 +10677,7 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
     (loop for (content . pos) in (anything-headline-get-candidates regexp subexp)
           do (insert
               (format "%5d:%s\n"
-                      (with-current-buffer anything-current-buffer
+                      (with-anything-current-buffer
                         (line-number-at-pos pos))
                       content)))))
 
