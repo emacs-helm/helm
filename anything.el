@@ -1103,12 +1103,17 @@ Otherwise make a list with one element."
 (defmacro with-anything-window (&rest body)
   "Be sure BODY is excuted in the anything window."
   (declare (indent 0) (debug t))
-  `(let ((--tmpfunc-- (lambda () ,@body)))
-     (if anything-test-mode
-         (with-current-buffer (anything-buffer-get)
-           (funcall --tmpfunc--))
+  `(if anything-test-mode
+       (with-current-buffer (anything-buffer-get)
+         ,@body)
        (with-selected-window (anything-window)
-         (funcall --tmpfunc--)))))
+         ,@body)))
+
+(defmacro with-anything-current-buffer (&rest body)
+  "Eval BODY inside `anything-current-buffer'."
+  (declare (indent 0) (debug t))
+  `(with-current-buffer anything-current-buffer
+    ,@body))
 
 (defmacro with-anything-restore-variables(&rest body)
   "Restore `anything-restored-variables' after executing BODY.
