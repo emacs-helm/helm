@@ -1601,8 +1601,6 @@ means starting anything session with `anything-c-source-buffers'
 source in *buffers* buffer and set variable `anything-candidate-number-limit'
 to 10 as session local variable."
   (interactive)
-  (iswitchb-mode -1)
-  (ido-mode -1)
   (if (keywordp (car plist))
       (anything-let-internal
        (anything-parse-keys plist)
