@@ -9386,9 +9386,10 @@ See documentation of `completing-read' and `all-completions' for details."
                           (car default-filename)
                           default-filename)))
          (init (or default initial dir default-directory))
-         (ini-input (and init (expand-file-name init))))
+         (ini-input (and init (expand-file-name init)))
+         (anything-ff-auto-update-flag nil))
     (anything-c-read-file-name prompt
-                               :initial-input init
+                               :initial-input (expand-file-name init dir)
                                :alistp nil
                                :must-match mustmatch
                                :test predicate)))
