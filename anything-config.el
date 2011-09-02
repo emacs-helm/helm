@@ -2368,6 +2368,19 @@ The match is done with `string-match'."
 See `kill-new' for argument REPLACE."
   (kill-new (anything-c-stringify candidate) replace))
 
+(defun* anything-fast-remove-dups (seq &key (test 'eq))
+  "Remove duplicates elements in list SEQ.
+This is same as `remove-duplicates' but with memoisation.
+It is much faster, especially in large lists.
+A test function can be provided with TEST argument key.
+Default is `eq'."
+  (let ((cont (make-hash-table :test test)))
+    (loop for elm in seq
+       unless (gethash elm cont)
+       do (puthash elm elm cont)
+       finally return
+         (loop for i being the hash-values in cont collect i))))
+
 ;;; Toggle all marks.
 ;;
 ;;
@@ -7313,7 +7326,7 @@ utility mdfind.")
   "Source for browse and insert contents of kill-ring.")
 
 (defun anything-c-kill-ring-candidates ()
-  (loop for kill in kill-ring
+  (loop for kill in (anything-fast-remove-dups kill-ring :test 'equal)
      unless (or (< (length kill) anything-kill-ring-threshold)
                 (string-match "^[\\s\\t]+$" kill))
      collect kill))
