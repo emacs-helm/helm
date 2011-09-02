@@ -824,6 +824,12 @@ they will be displayed with face `file-name-shadow' if
   :type 'integer
   :group 'anything-config)
 
+(defcustom anything-c-kill-ring-max-lines-number nil
+  "Max number of lines displayed per candidate in kill-ring browser.
+If nil or zero, don't truncate candidate, show all."
+  :type 'integer
+  :group 'anything-config)
+
 (defcustom anything-su-or-sudo "su"
   "What command to use for root access."
   :type 'string
@@ -1098,7 +1104,7 @@ If nil Search in all files."
   "The file used to communicate with two emacs when copying files async."
   :type  'string
   :group 'anything-config)
-  
+
 ;;; General internal variables
 ;;
 ;;
@@ -1871,8 +1877,7 @@ First call open the kill-ring browser, next calls move to next line."
   (let ((buf "*anything kill-ring*"))
     (if (get-buffer-window buf)
         (with-anything-window
-          (if (eq (point) (save-excursion
-                            (anything-end-of-buffer) (point)))
+          (if (eq (overlay-end anything-selection-overlay) (point-max))
               (anything-beginning-of-buffer)
               (anything-next-line)))
         (anything-other-buffer 'anything-c-source-kill-ring buf))))
@@ -7300,6 +7305,7 @@ utility mdfind.")
   '((name . "Kill Ring")
     (init . (lambda () (anything-attrset 'last-command last-command)))
     (candidates . anything-c-kill-ring-candidates)
+    (filtered-candidate-transformer anything-c-kill-ring-transformer)
     (action . anything-c-kill-ring-action)
     (last-command)
     (migemo)
@@ -7311,6 +7317,25 @@ utility mdfind.")
      unless (or (< (length kill) anything-kill-ring-threshold)
                 (string-match "^[\\s\\t]+$" kill))
      collect kill))
+
+(defun anything-c-kill-ring-transformer (candidates source)
+  "Display only the `anything-c-kill-ring-max-lines-number' lines of candidate."
+  (loop for i in candidates
+     for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
+     if (and anything-c-kill-ring-max-lines-number
+             (> nlines anything-c-kill-ring-max-lines-number))
+     collect (cons
+              (with-temp-buffer
+               (insert i)
+               (goto-char (point-min))
+               (concat
+                (buffer-substring
+                 (point-min)
+                 (save-excursion
+                   (forward-line anything-c-kill-ring-max-lines-number)
+                   (point)))
+                "[...]")) i)
+     else collect i))
 
 (defun anything-c-kill-ring-action (str)
   "Insert STR in `kill-ring' and set STR to the head.
