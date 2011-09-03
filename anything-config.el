@@ -4416,7 +4416,7 @@ KBSIZE if a floating point number, default value is 1024.0."
   (let ((flist (anything-marked-candidates)))
     (gnus-dired-attach flist)))
 
-(defun anything-ff-rotate-current-image1 (file &optional num-arg)
+(defun anything-ff-rotate-current-image-1 (file &optional num-arg)
   "Rotate current image at NUM-ARG degrees.
 This is a destructive operation on FILE made by external tool mogrify."
   (declare (special image-dired-display-image-buffer))
@@ -4425,7 +4425,9 @@ This is a destructive operation on FILE made by external tool mogrify."
   (when (string-match (image-file-name-regexp) file)
     (if (executable-find "mogrify")
         (progn
-          (shell-command (format "mogrify -rotate %s %s" (or num-arg 90) file))
+          (shell-command (format "mogrify -rotate %s %s"
+                                 (or num-arg 90)
+                                 (shell-quote-argument file)))
           (when (buffer-live-p image-dired-display-image-buffer)
             (kill-buffer image-dired-display-image-buffer))
           (image-dired-display-image file)
@@ -4436,12 +4438,12 @@ This is a destructive operation on FILE made by external tool mogrify."
 (defun anything-ff-rotate-image-left (candidate)
   "Rotate image file CANDIDATE left.
 This affect directly file CANDIDATE."
-  (anything-ff-rotate-current-image1 candidate -90))
+  (anything-ff-rotate-current-image-1 candidate -90))
 
 (defun anything-ff-rotate-image-right (candidate)
   "Rotate image file CANDIDATE right.
 This affect directly file CANDIDATE."
-  (anything-ff-rotate-current-image1 candidate))
+  (anything-ff-rotate-current-image-1 candidate))
 
 (defun anything-ff-rotate-left-persistent ()
   "Rotate image left without quitting anything."
