@@ -168,21 +168,21 @@
 ;; `anything-buffer-save-persistent'
 ;; Save buffer without quitting anything.
 ;; `anything-buffer-run-kill-buffers'
-;; Run kill buffer action from `anything-c-source-buffer+'.
+;; Run kill buffer action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-run-grep'
-;; Run Grep action from `anything-c-source-buffer+'.
+;; Run Grep action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-run-zgrep'
-;; Run Grep action from `anything-c-source-buffer+'.
+;; Run Grep action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-run-query-replace-regexp'
-;; Run Query replace regexp action from `anything-c-source-buffer+'.
+;; Run Query replace regexp action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-run-query-replace'
-;; Run Query replace action from `anything-c-source-buffer+'.
+;; Run Query replace action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-switch-other-window'
-;; Run switch to other window action from `anything-c-source-buffer+'.
+;; Run switch to other window action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-switch-other-frame'
-;; Run switch to other frame action from `anything-c-source-buffer+'.
+;; Run switch to other frame action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-switch-to-elscreen'
-;; Run switch to elscreen  action from `anything-c-source-buffer+'.
+;; Run switch to elscreen  action from `anything-c-source-buffers-list'.
 ;; `anything-c-copy-files-async'
 ;; Preconfigured anything to copy file list FLIST to DEST asynchronously.
 ;; `anything-ff-help'
@@ -658,6 +658,7 @@
 
 ;;; Code:
 
+
 ;;; Require
 ;;
 ;;
@@ -675,6 +676,8 @@
 (eval-when-compile (require 'semantic nil t))
 (require 'anything-match-plugin)
 
+
+
 ;;; Declare external functions
 ;;
 ;;
@@ -729,6 +732,8 @@
 (declare-function adoc-first-line "ext:auto-document.el" (str))
 (declare-function adoc-prin1-to-string "ext:auto-document.el" (object))
 
+
+
 ;;; compatibility
 ;;
 ;;
@@ -736,6 +741,8 @@
   (defun window-system (&optional arg)
     window-system))
 
+
+
 ;;; Customize
 ;;
 ;;
@@ -1105,6 +1112,8 @@ If nil Search in all files."
   :type  'string
   :group 'anything-config)
 
+
+
 ;;; General internal variables
 ;;
 ;;
@@ -1113,6 +1122,7 @@ If nil Search in all files."
 variable is not set by the user, it will be calculated
 automatically.")
 
+
 ;;; Faces
 ;;
 ;;
@@ -1255,6 +1265,8 @@ automatically.")
   (interactive)
   (customize-group "anything-config"))
 
+
+
 ;;; Anything-command-map
 ;;
 ;;
@@ -1314,6 +1326,8 @@ automatically.")
                    minibuffer-local-ns-map))
   (define-key map "\C-r" 'anything-minibuffer-history))
 
+
+
 ;;; Menu
 ;;
 ;;
@@ -1363,6 +1377,7 @@ automatically.")
     ["Prefered Options" anything-configuration t]))
 
 
+
 ;;; Specialized keymaps
 ;;
 ;;
@@ -1373,9 +1388,10 @@ automatically.")
     ;; as we don't use recursivity for buffers.
     ;; So use zgrep for both as it is capable to handle non--compressed files.
     (define-key map (kbd "M-g s")     'anything-buffer-run-zgrep)
-    (define-key map (kbd "M-g z")     'anything-buffer-run-zgrep)
     (define-key map (kbd "C-o")       'anything-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'anything-buffer-switch-other-frame)
+    (define-key map (kbd "C-c =")     'anything-buffer-run-ediff)
+    (define-key map (kbd "M-=")       'anything-buffer-run-ediff-merge)
     (define-key map (kbd "C-=")       'anything-buffer-diff-persistent)
     (define-key map (kbd "M-U")       'anything-buffer-revert-persistent)
     (define-key map (kbd "M-D")       'anything-buffer-run-kill-buffers)
@@ -1504,6 +1520,7 @@ automatically.")
     map))
 
 
+
 ;;; Embeded documentation.
 ;;
 ;;
@@ -1608,14 +1625,15 @@ You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers
 Enter then a space and a pattern to narrow down to buffers matching this pattern. 
 \nSpecific commands for `anything-buffers-list':
 \\<anything-c-buffer-map>
-\\[anything-buffer-run-grep]\t\t->Grep Buffer(s) (C-u grep all buffers linked to a file).
-\\[anything-buffer-run-zgrep]\t\t->Zgrep Buffer(s) (C-u grep all buffers linked to a file).
+\\[anything-buffer-run-zgrep]\t\t->Grep Buffer(s) works as zgrep too. (C-u grep all buffers but non--file buffers).
 \\[anything-buffer-switch-other-window]\t\t->Switch other window.
 \\[anything-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[anything-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
 \\[anything-buffer-run-query-replace]\t\t->Query replace in marked buffers.
 \\[anything-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
-\\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer without quitting.
+\\[anything-buffer-run-ediff]\t\t->Ediff current buffer with candidate.  If two marked buffers ediff those buffers.
+\\[anything-buffer-run-ediff-merge]\t\t->Ediff merge current buffer with candidate.  If two marked buffers ediff merge those buffers.
+\\[anything-buffer-diff-persistent]\t\t->Toggle Diff buffer with saved file without quitting.
 \\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
 \\[anything-buffer-save-persistent]\t\t->Save buffer without quitting.
 \\[anything-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
@@ -1760,6 +1778,8 @@ See Man locate for more infos.
 \\{anything-map}"))
     (anything-help)))
 
+
+
 ;;; Mode line strings
 ;;
 ;;
@@ -1825,6 +1845,7 @@ See Man locate for more infos.
   "String displayed in mode-line in `anything-c-etags-select'.")
 
 
+
 ;;; Preconfigured Anything
 ;;
 ;;
@@ -2588,85 +2609,8 @@ You can set your own list of commands with
                          "*anything ratpoison commands*"))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; Anything regexp.
-;;
-;;
-(defun anything-c-query-replace-regexp (candidate)
-  "Query replace regexp from `anything-regexp'.
-With a prefix arg replace only matches surrounded by word boundaries,
-i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
-  (let ((regexp (funcall (anything-attr 'regexp))))
-    (apply 'query-replace-regexp
-           (anything-c-query-replace-args regexp))))
-
-(defun anything-c-kill-regexp-as-sexp (candidate)
-  "Kill regexp in a format usable in lisp code."
-  (anything-c-regexp-kill-new
-   (prin1-to-string (funcall (anything-attr 'regexp)))))
-
-(defun anything-c-kill-regexp (candidate)
-  "Kill regexp as it is in `anything-pattern'."
-  (anything-c-regexp-kill-new (funcall (anything-attr 'regexp))))
-
-(defun anything-c-query-replace-args (regexp)
-  "create arguments of `query-replace-regexp' action in `anything-regexp'."
-  (let ((region-only (anything-region-active-p)))
-    (list
-     regexp
-     (query-replace-read-to regexp
-                            (format "Query replace %sregexp %s"
-                                    (if anything-current-prefix-arg "word " "")
-                                    (if region-only "in region " ""))
-                            t)
-     anything-current-prefix-arg
-     (when region-only (region-beginning))
-     (when region-only (region-end)))))
-
-(defvar anything-c-source-regexp
-  '((name . "Regexp Builder")
-    (init . (lambda ()
-              (anything-candidate-buffer anything-current-buffer)))
-    (candidates-in-buffer)
-    (get-line . anything-c-regexp-get-line)
-    (persistent-action . anything-c-regexp-persistent-action)
-    (persistent-help . "Show this line")
-    (multiline)
-    (delayed)
-    (requires-pattern . 2)
-    (mode-line . "Press TAB to select action.")
-    (regexp . (lambda () anything-input))
-    (action . (("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
-               ("Query Replace Regexp (C-u Not inside word.)"
-                . anything-c-query-replace-regexp)
-               ("Kill Regexp" . anything-c-kill-regexp)))))
-
-(defun anything-c-regexp-get-line (s e)
-  (propertize
-   (apply 'concat
-          ;; Line contents
-          (format "%5d: %s" (line-number-at-pos (1- s)) (buffer-substring s e))
-          ;; subexps
-          (loop for i from 0 to (1- (/ (length (match-data)) 2))
-             collect (format "\n         %s'%s'"
-                             (if (zerop i) "Group 0: " (format "Group %d: " i))
-                             (match-string i))))
-   ;; match beginning
-   ;; KLUDGE: point of anything-candidate-buffer is +1 than that of anything-current-buffer.
-   ;; It is implementation problem of candidates-in-buffer.
-   'anything-realvalue
-   (1- s)))
-
-(defun anything-c-regexp-persistent-action (pt)
-  (goto-char pt)
-  (anything-persistent-highlight-point))
-
-(defun anything-c-regexp-kill-new (input)
-  (kill-new input)
-  (message "Killed: %s" input))
-
-
+
 ;;; Utilities Functions
 ;;
 ;;
@@ -2907,6 +2851,86 @@ MATCH match only filenames matching regexp MATCH."
        (ls-R ,directory)
        (nreverse result))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Anything Applications ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Anything regexp.
+;;
+;;
+(defun anything-c-query-replace-regexp (candidate)
+  "Query replace regexp from `anything-regexp'.
+With a prefix arg replace only matches surrounded by word boundaries,
+i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
+  (let ((regexp (funcall (anything-attr 'regexp))))
+    (apply 'query-replace-regexp
+           (anything-c-query-replace-args regexp))))
+
+(defun anything-c-kill-regexp-as-sexp (candidate)
+  "Kill regexp in a format usable in lisp code."
+  (anything-c-regexp-kill-new
+   (prin1-to-string (funcall (anything-attr 'regexp)))))
+
+(defun anything-c-kill-regexp (candidate)
+  "Kill regexp as it is in `anything-pattern'."
+  (anything-c-regexp-kill-new (funcall (anything-attr 'regexp))))
+
+(defun anything-c-query-replace-args (regexp)
+  "create arguments of `query-replace-regexp' action in `anything-regexp'."
+  (let ((region-only (anything-region-active-p)))
+    (list
+     regexp
+     (query-replace-read-to regexp
+                            (format "Query replace %sregexp %s"
+                                    (if anything-current-prefix-arg "word " "")
+                                    (if region-only "in region " ""))
+                            t)
+     anything-current-prefix-arg
+     (when region-only (region-beginning))
+     (when region-only (region-end)))))
+
+(defvar anything-c-source-regexp
+  '((name . "Regexp Builder")
+    (init . (lambda ()
+              (anything-candidate-buffer anything-current-buffer)))
+    (candidates-in-buffer)
+    (get-line . anything-c-regexp-get-line)
+    (persistent-action . anything-c-regexp-persistent-action)
+    (persistent-help . "Show this line")
+    (multiline)
+    (delayed)
+    (requires-pattern . 2)
+    (mode-line . "Press TAB to select action.")
+    (regexp . (lambda () anything-input))
+    (action . (("Kill Regexp as sexp" . anything-c-kill-regexp-as-sexp)
+               ("Query Replace Regexp (C-u Not inside word.)"
+                . anything-c-query-replace-regexp)
+               ("Kill Regexp" . anything-c-kill-regexp)))))
+
+(defun anything-c-regexp-get-line (s e)
+  (propertize
+   (apply 'concat
+          ;; Line contents
+          (format "%5d: %s" (line-number-at-pos (1- s)) (buffer-substring s e))
+          ;; subexps
+          (loop for i from 0 to (1- (/ (length (match-data)) 2))
+             collect (format "\n         %s'%s'"
+                             (if (zerop i) "Group 0: " (format "Group %d: " i))
+                             (match-string i))))
+   ;; match beginning
+   ;; KLUDGE: point of anything-candidate-buffer is +1 than that of anything-current-buffer.
+   ;; It is implementation problem of candidates-in-buffer.
+   'anything-realvalue
+   (1- s)))
+
+(defun anything-c-regexp-persistent-action (pt)
+  (goto-char pt)
+  (anything-persistent-highlight-point))
+
+(defun anything-c-regexp-kill-new (input)
+  (kill-new input)
+  (message "Killed: %s" input))
+
+
+
 ;;; Toggle all marks.
 ;;
 ;;
@@ -2971,6 +2995,7 @@ visible or invisible in all sources of current anything session"
 (define-key anything-map (kbd "M-m") 'anything-toggle-all-marks)
 
 
+
 ;;; Buffers
 ;;
 ;;
@@ -3063,6 +3088,7 @@ buffer that is not the current buffer."
     (volatile)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
+;; (anything 'anything-c-source-buffers-list)
 
 (defun anything-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -3157,51 +3183,62 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 ;;;###autoload
 (defun anything-buffer-run-kill-buffers ()
-  "Run kill buffer action from `anything-c-source-buffer+'."
+  "Run kill buffer action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-kill-marked-buffers))
 
 ;;;###autoload
 (defun anything-buffer-run-grep ()
-  "Run Grep action from `anything-c-source-buffer+'."
+  "Run Grep action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-grep-buffers))
 
 ;;;###autoload
 (defun anything-buffer-run-zgrep ()
-  "Run Grep action from `anything-c-source-buffer+'."
+  "Run Grep action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-zgrep-buffers))
 
 ;;;###autoload
 (defun anything-buffer-run-query-replace-regexp ()
-  "Run Query replace regexp action from `anything-c-source-buffer+'."
+  "Run Query replace regexp action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-buffer-query-replace-regexp))
 
 ;;;###autoload
 (defun anything-buffer-run-query-replace ()
-  "Run Query replace action from `anything-c-source-buffer+'."
+  "Run Query replace action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-buffer-query-replace))
 
 ;;;###autoload
 (defun anything-buffer-switch-other-window ()
-  "Run switch to other window action from `anything-c-source-buffer+'."
+  "Run switch to other window action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'switch-to-buffer-other-window))
 
 ;;;###autoload
 (defun anything-buffer-switch-other-frame ()
-  "Run switch to other frame action from `anything-c-source-buffer+'."
+  "Run switch to other frame action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'switch-to-buffer-other-frame))
 
 ;;;###autoload
 (defun anything-buffer-switch-to-elscreen ()
-  "Run switch to elscreen  action from `anything-c-source-buffer+'."
+  "Run switch to elscreen  action from `anything-c-source-buffers-list'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-buffer-on-elscreen))
+
+;;;###autoload
+(defun anything-buffer-run-ediff ()
+  "Run ediff action from `anything-c-source-buffers-list'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ediff-marked-buffers))
+
+(defun anything-buffer-run-ediff-merge ()
+  "Run ediff action from `anything-c-source-buffers-list'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ediff-marked-buffers-merge))
 
 (defun anything-c-buffers-persistent-kill (buffer)
   "Persistent action to kill buffer."
@@ -3223,9 +3260,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (anything-c-buffers-persistent-kill candidate)
         (anything-c-switch-to-buffer candidate)))
 
-;; (anything 'anything-c-source-buffers-list)
-
-
+
 ;;;; <File>
 ;;
 ;;
@@ -10145,8 +10180,8 @@ If not found or a prefix arg is given query the user which tool to use."
           (message "%s File(s) deleted" len))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
-  "Ediff 2 marked buffers or 1 marked buffer and current-buffer.
-With optional arg `merge' call `ediff-merge-buffers'."
+  "Ediff 2 marked buffers or CANDIDATE and `anything-current-buffer'.
+With optional arg MERGE call `ediff-merge-buffers'."
   (let ((lg-lst (length (anything-marked-candidates)))
         buf1 buf2)
     (case lg-lst
@@ -10163,6 +10198,11 @@ With optional arg `merge' call `ediff-merge-buffers'."
     (if merge
         (ediff-merge-buffers buf1 buf2)
         (ediff-buffers buf1 buf2))))
+
+(defun anything-ediff-marked-buffers-merge (candidate)
+  "Ediff merge `anything-current-buffer' with CANDIDATE.
+See `anything-ediff-marked-buffers'."
+  (anything-ediff-marked-buffers candidate t))
 
 (defun anything-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.
