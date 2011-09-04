@@ -3845,7 +3845,10 @@ See `anything-ff-serial-rename-1'."
 
 (defun anything-ff-locate (candidate)
   "Locate action function for `anything-find-files'."
-  (let ((input (concat (anything-c-basename candidate) " -b"))
+  (let ((input (concat (anything-c-basename
+                        (expand-file-name
+                         candidate
+                         anything-ff-default-directory)) " -b"))
         (anything-mp-highlight-delay 0.7))
     (anything-locate-1 anything-current-prefix-arg input)))
 
