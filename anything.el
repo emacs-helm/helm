@@ -1774,8 +1774,10 @@ Argument SAVE-OR-RESTORE is one of save or restore."
                    anything-current-position
                    (buffer-name (current-buffer)))
      (goto-char (car anything-current-position))
-     (sit-for 0.1)
-     (set-window-start (selected-window) (cdr anything-current-position)))))
+     ;; Fix this position with the NOFORCE arg of `set-window-start'
+     ;; otherwise, if there is some other buffer than `anything-current-buffer'
+     ;; one, position will be lost.
+     (set-window-start (selected-window) (cdr anything-current-position) t))))
 
 
 ;; Internal.
