@@ -1405,6 +1405,7 @@ automatically.")
 
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-x C-f")       'anything-ff-run-locate)
     (define-key map (kbd "M-g s")         'anything-ff-run-grep)
     (define-key map (kbd "M-g p")         'anything-ff-run-pdfgrep)
     (define-key map (kbd "M-g z")         'anything-ff-run-zgrep)
@@ -1660,6 +1661,7 @@ Use `C-u C-z' to watch an image.
 To browse images directories turn on `anything-follow-mode'.
 \nSpecific commands for `anything-find-files':
 \\<anything-find-files-map>
+\\[anything-ff-run-locate]\t\t->Run Locate on basename of candidate (C-u to specify locate db).
 \\[anything-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[anything-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
@@ -1977,20 +1979,7 @@ To create a user specific db, use
 Where db_path is a filename matched by
 `anything-locate-db-file-regexp'."
   (interactive "P")
-  (let* ((db (and arg
-                  (anything-c-read-file-name
-                   "LocateDBFiles: "
-                   :marked-candidates t
-                   :preselect anything-locate-db-file-regexp
-                   :test #'(lambda (x)
-                             (if anything-locate-db-file-regexp
-                                 ;; Select only locate db files and directories
-                                 ;; to allow navigation.
-                                 (or (string-match
-                                      anything-locate-db-file-regexp x)
-                                     (file-directory-p x))
-                                 x))))))
-    (anything-locate-with-db db)))
+  (anything-locate-1 arg))
 
 ;;;###autoload
 (defun anything-w3m-bookmarks ()
@@ -3854,6 +3843,18 @@ See `anything-ff-serial-rename-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-c-open-file-externally))
 
+(defun anything-ff-locate (candidate)
+  "Locate action function for `anything-find-files'."
+  (let ((input (concat (anything-c-basename candidate) " -b"))
+        (anything-mp-highlight-delay 0.7))
+    (anything-locate-1 anything-current-prefix-arg input)))
+
+;;;###autoload
+(defun anything-ff-run-locate ()
+  "Run locate action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-ff-locate))
+
 ;;;###autoload
 (defun anything-ff-run-gnus-attach-files ()
   "Run gnus attach files command action from `anything-c-source-find-files'."
@@ -4262,7 +4263,9 @@ KBSIZE if a floating point number, default value is 1024.0."
 
 
 (defun anything-c-prefix-filename (fname &optional image file-or-symlinkp)
-  "Return fname FNAME prefixed with icon IMAGE."
+  "Return filename FNAME maybe prefixed with icon IMAGE.
+If FILE-OR-SYMLINKP is non--nil this mean we assume FNAME is an
+existing filename or valid symlink and there is no need to test it."
   (let* ((img-name   (and image (expand-file-name
                                  image anything-c-find-files-icons-directory)))
          (img        (and image (create-image img-name)))
@@ -4281,7 +4284,9 @@ KBSIZE if a floating point number, default value is 1024.0."
           (t (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
-  "Selector of transformer to use for `anything-c-source-find-files'."
+  "Transformer for `anything-c-source-find-files'.
+It will choose which transformer function to use according to
+`anything-c-find-files-show-icons' or `anything-ff-tramp-not-fancy'."
   (if (and (string-match tramp-file-name-regexp anything-pattern)
            anything-ff-tramp-not-fancy)
       files
@@ -4997,6 +5002,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
 
 
 ;;; Locate
+;;
+;;
 ;; NOTE for WINDOZE users:
 ;; You have to install Everything with his command line interface here:
 ;; http://www.voidtools.com/download.php
@@ -5010,10 +5017,33 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   "A list of arguments for locate program.
 The \"-r\" option must be the last option.")
 
-(defun anything-locate-with-db (&optional db)
+(defun anything-locate-1 (&optional localdb init)
+  "Generic function to run Locate.
+if LOCALDB is non--nil search and use a local locate db file.
+INIT is a string to use as initial input in prompt.
+See `anything-locate-with-db' and `anything-locate'."
+  (anything-locate-with-db
+   (and localdb
+        (anything-c-read-file-name
+         "LocateDBFiles: "
+         :marked-candidates t
+         :preselect anything-locate-db-file-regexp
+         :test #'(lambda (x)
+                   (if anything-locate-db-file-regexp
+                       ;; Select only locate db files and directories
+                       ;; to allow navigation.
+                       (or (string-match
+                            anything-locate-db-file-regexp x)
+                           (file-directory-p x))
+                       x))))
+   init))
+;; (anything-locate-1 t)
+
+(defun anything-locate-with-db (&optional db initial-input)
   "Run locate -d DB.
 If DB is not given or nil use locate without -d option.
-DB can be given as a string or list of db files.
+Argument DB can be given as a string or list of db files.
+Argument INITIAL-INPUT is a string to use as initial-input.
 See also `anything-locate'."
   (when (and db (stringp db)) (setq db (list db)))
   (let ((anything-c-locate-command
@@ -5022,13 +5052,16 @@ See also `anything-locate'."
                "locate"
                (format "locate -d %s"
                        (mapconcat 'identity
-                                  ;; Remove eventually marked directories by error.
-                                  (loop for i in db unless
-                                       (file-directory-p i) collect i) ":"))
+                                  ;; Remove eventually
+                                  ;; marked directories by error.
+                                  (loop for i in db
+                                     unless (file-directory-p i)
+                                     collect i) ":"))
                anything-c-locate-command)
               anything-c-locate-command)))
     (anything :sources 'anything-c-source-locate
               :buffer "*anything locate*"
+              :input initial-input
               :keymap anything-generic-files-map)))
 ;; (anything-locate-with-db "~/locate.db")
 
