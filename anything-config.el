@@ -2799,7 +2799,9 @@ See `anything-c-enable-eval-defun-hack'."
   (interactive)
   (anything-run-after-quit
    (lambda (f)
-     (anything-find-files-1 f))
+     (if (file-exists-p f)
+         (anything-find-files-1 (file-name-directory f) f)
+         (anything-find-files-1 f)))
    (anything-aif (get-buffer (anything-get-selection))
        (or (buffer-file-name it)
            (car (rassoc it dired-buffers))
