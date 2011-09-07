@@ -1486,20 +1486,25 @@ It is used to check if candidate number is 0, 1, or 2+."
           (goto-char (anything-get-previous-header-pos))
           (goto-char (point-min)))
       (forward-line 1)
-      (let ((lines (save-excursion
-                     (loop with ln = 0
-                        while (not (if in-current-source
-                                       (or (anything-pos-header-line-p) (eobp))
-                                       (eobp)))
-                        unless (anything-pos-header-line-p)
-                        do (incf ln)
-                        do (forward-line 1) finally return ln)))
-            (count-multi 1))
+      (let ((count-multi 1))
         (if (anything-pos-multiline-p)
             (save-excursion
-              (loop while (search-forward anything-candidate-separator nil t)
-                 do (incf count-multi) finally return count-multi))
-            lines)))))
+              (loop while (and (not (if in-current-source
+                                        (save-excursion
+                                          (forward-line 2)
+                                          (or (anything-pos-header-line-p) (eobp)))
+                                        (eobp)))
+                               (search-forward anything-candidate-separator nil t))
+                 do (incf count-multi)
+                 finally return count-multi))
+            (save-excursion
+              (loop with ln = 0
+                 while (not (if in-current-source
+                                (or (anything-pos-header-line-p) (eobp))
+                                (eobp)))
+                 unless (anything-pos-header-line-p)
+                 do (incf ln)
+                 do (forward-line 1) finally return ln)))))))
 
 (defmacro with-anything-quittable (&rest body)
   "If an error occur in execution of BODY, quit anything safely."
