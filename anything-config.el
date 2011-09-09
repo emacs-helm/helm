@@ -1398,6 +1398,8 @@ automatically.")
     (define-key map (kbd "C-x C-s")   'anything-buffer-save-persistent)
     (define-key map (kbd "C-M-%")     'anything-buffer-run-query-replace-regexp)
     (define-key map (kbd "M-%")       'anything-buffer-run-query-replace)
+    (define-key map (kbd "M-m")       'anything-toggle-all-marks)
+    (define-key map (kbd "M-a")       'anything-mark-all)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'anything-buffer-switch-to-elscreen))
     (delq nil map))
@@ -1638,6 +1640,8 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-buffer-revert-persistent]\t\t->Revert buffer without quitting.
 \\[anything-buffer-save-persistent]\t\t->Save buffer without quitting.
 \\[anything-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
+\\[anything-toggle-all-marks]\t\t->Toggle all marks.
+\\[anything-mark-all]\t\t->Mark all.
 \\[anything-c-buffer-help]\t\t->Display this help.
 \n== Anything Map ==
 \\{anything-map}
@@ -2937,7 +2941,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
              (end       (and next-head
                              (save-excursion
                                (goto-char next-head)
-                               (forward-line -2)
+                               (forward-line -1)
                                (point))))
              (maxpoint  (or end (point-max))))
         (while (< (point) maxpoint)
