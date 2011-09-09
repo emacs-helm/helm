@@ -118,17 +118,6 @@
 (require 'thingatpt)
 (require 'anything-obsolete)
 
-;; version check
-(let ((version "1.263"))
-  (when (and (string= "1." (substring version 0 2))
-             (string-match "1\.\\([0-9]+\\)" anything-version)
-             (< (string-to-number (match-string 1 anything-version))
-                (string-to-number (substring version 2))))
-    (error "Please update anything.el!!
-
-http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
-
-or  M-x install-elisp-from-emacswiki anything.el")))
 
 ;; (@* "overlay")
 (when (require 'anything-show-completion nil t)
