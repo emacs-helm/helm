@@ -3879,8 +3879,13 @@ Uses the shell command coming from variables `lpr-command' and
 `lpr-switches' as default.
 Same as `dired-do-print' but for anything."
   (let* ((file-list (anything-marked-candidates))
+         (len (length file-list))
 	 (command (read-string
-		   "Print %s with: "
+                   (format "Print *%s File(s):\n%s with: "
+                           len
+                           (mapconcat
+                            (lambda (f) (format "- %s\n" f))
+                            file-list ""))
  		   (mapconcat 'identity
 			      (cons lpr-command
 				    (if (stringp lpr-switches)
