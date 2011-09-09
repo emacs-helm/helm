@@ -598,7 +598,7 @@
 ;;; Code:
 
 (defvar anything-version nil)
-(setq anything-version "2.0")
+(setq anything-version "1.3")
 
 (require 'cl)
 
@@ -1362,20 +1362,6 @@ LONG-DOC is displayed below attribute name and short documentation."
        (concat "- " (symbol-name attribute)
                " " short-doc "\n\n" long-doc "\n")))
 
-(defun anything-require-at-least-version (version)
-  "Output error message unless anything.el is older than VERSION.
-This is suitable for anything applications."
-  (when (and (string= "1." (substring version 0 2))
-             (string-match "1\.\\([0-9]+\\)" anything-version)
-             (< (string-to-number (match-string 1 anything-version))
-                (string-to-number (substring version 2))))
-    (error "Please update anything.el!!
-
-M-x auto-install-batch anything
-
-You must have auto-install.el too.
-http://www.emacswiki.org/cgi-bin/wiki/download/auto-install.el
-")))
 
 (defun anything-interpret-value (value &optional source)
   "Interpret VALUE as variable, function or literal.
