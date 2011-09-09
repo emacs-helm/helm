@@ -1,12 +1,13 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
 
 ;; Copyright (C) 2007              Tamas Patrovics
-;;               2008, 2009, 2010  rubikitch <rubikitch@ruby-lang.org>
+;;               2008 ~ 2011       rubikitch <rubikitch@ruby-lang.org>
+;;               2011              Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Tamas Patrovics
 ;; Maintainer: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
-;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
+;; X-URL: http://repo.or.cz/w/anything-config.git
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
 
 ;; This file is free software; you can redistribute it and/or modify
