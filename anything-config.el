@@ -1112,6 +1112,15 @@ If nil Search in all files."
   :type  'string
   :group 'anything-config)
 
+(defcustom anything-ff-printer-list nil
+  "A list of available printers on your system.
+When non--nil let you choose a printer to print file.
+Otherwise when nil the variable `printer-name' will be used.
+On Unix based systems you can use `anything-ff-find-printers' to
+find a list of available printers."
+  :type 'list
+  :group 'anything-config)
+
 
 
 ;;; General internal variables
@@ -2607,6 +2616,16 @@ You can set your own list of commands with
 ;;; Utilities Functions
 ;;
 ;;
+(defun anything-ff-find-printers ()
+  "Return a list of available printers on Unix systems."
+  (let ((printer-list (with-temp-buffer
+                        (call-process "lpstat" nil t nil "-a")
+                        (split-string (buffer-string) "\n"))))
+    (loop for p in printer-list
+       for printer = (car (split-string p))
+       when printer
+       collect printer)))
+
 ;; Shut up byte compiler in emacs24*.
 (defun anything-c-switch-to-buffer (buffer-or-name)
   "Same as `switch-to-buffer' whithout warnings at compile time."
@@ -3878,30 +3897,47 @@ See `anything-ff-serial-rename-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-etags-select))
 
+
 (defun anything-ff-print (candidate)
   "Print marked files.
-Uses the shell command coming from variables `lpr-command' and
-`lpr-switches' as default.
+You have to set in order
+variables `lpr-command',`lpr-switches' and/or `printer-name'.
+
+e.g:
+\(setq lpr-command \"gtklp\"\)
+\(setq lpr-switches '(\"-P\")\)
+\(setq printer-name \"Epson-Stylus-Photo-R265\"\)
+
 Same as `dired-do-print' but for anything."
   (let* ((file-list (anything-marked-candidates))
          (len (length file-list))
+         (printer-name (if anything-ff-printer-list
+                           (anything-comp-read
+                            "Printer: " anything-ff-printer-list)
+                           printer-name))
 	 (command (read-string
                    (format "Print *%s File(s):\n%s with: "
                            len
                            (mapconcat
                             (lambda (f) (format "- %s\n" f))
                             file-list ""))
- 		   (mapconcat 'identity
-			      (cons lpr-command
-				    (if (stringp lpr-switches)
-					(list lpr-switches)
-                                        lpr-switches))
-			      " ")))
+                   (when (and lpr-command
+                              (or lpr-switches
+                                  printer-name))
+                     (mapconcat 'identity
+                                (cons lpr-command
+                                      (append (if (stringp lpr-switches)
+                                                  (list lpr-switches)
+                                                  lpr-switches)
+                                              (list printer-name)))
+                                " "))))
          (file-args (mapconcat #'(lambda (x)
                                    (format "'%s'" x))
                                file-list " "))
          (cmd-line (concat command " " file-args)))
-    (start-process-shell-command "anything-print" nil cmd-line)))
+    (if command
+        (start-process-shell-command "anything-print" nil cmd-line)
+        (error "Error: Please verify your printer settings in Emacs."))))
 
 ;;;###autoload
 (defun anything-ff-run-print-file ()
