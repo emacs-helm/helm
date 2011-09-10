@@ -3349,6 +3349,7 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
                  '("Find file in Elscreen"  . anything-elscreen-find-file))
            ,(and (locate-library "popwin")
                  '("Find file in popup window" . popwin:find-file))
+           ("Checksum File" . anything-ff-checksum)
            ("Complete at point `M-tab'"
             . anything-c-insert-file-name-completion-at-point)
            ("Open file externally `C-c C-x, C-u to choose'"
@@ -3907,6 +3908,17 @@ Same as `dired-do-print' but for anything."
   "Run Print file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-print))
+
+(defun* anything-ff-checksum (file)
+  "Calculate the checksum of FILE with completion on algorithms to use.
+The checksum is copied to kill-ring."
+  (let ((algo-list '(md5 sha1 sha224 sha256 sha384 sha512)))
+    (kill-new
+     (secure-hash (intern
+                   (anything-comp-read
+                    "Algorithm: " algo-list))
+                  file))
+    (message "Checksum copied to kill-ring.")))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
@@ -11208,6 +11220,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
      ("Open dired in file's directory" . anything-c-open-dired)
      ("Grep File(s) `C-u recurse'" . anything-find-files-grep)
      ("Pdfgrep File(s)" . anything-ff-pdfgrep)
+     ("Checksum File" . anything-ff-checksum)
      ("View file" . view-file)
      ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
