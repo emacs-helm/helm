@@ -3875,7 +3875,12 @@ See `anything-ff-serial-rename-1'."
   (let ((input (concat (anything-c-basename
                         (expand-file-name
                          candidate
-                         anything-ff-default-directory)) " -b"))
+                         anything-ff-default-directory))
+                       ;; The locate '-b' option doesn't exists
+                       ;; in everything.
+                       (unless (and (eq system-type 'windows-nt)
+                                    (string-match "^es" anything-c-locate-command))
+                         " -b")))
         (anything-mp-highlight-delay 0.7))
     (anything-locate-1 anything-current-prefix-arg input)))
 
