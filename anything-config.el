@@ -8103,26 +8103,32 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
     (candidates . anything-yaoddmuse-get-candidates)
     (action . (("Edit page" . (lambda (candidate)
                                 (yaoddmuse-edit "EmacsWiki" candidate)))
-               ("Browse page" . (lambda (candidate)
-                                  (yaoddmuse-browse-page "EmacsWiki" candidate)))
-               ("Browse page other window" . (lambda (candidate)
-                                               (if (one-window-p)
-                                                   (split-window-vertically))
-                                               (yaoddmuse-browse-page "EmacsWiki" candidate)))
-               ("Browse diff" . (lambda (candidate)
-                                  (yaoddmuse-browse-page-diff "EmacsWiki" candidate)))
-               ("Copy URL" . (lambda (candidate)
-                               (kill-new (yaoddmuse-url "EmacsWiki" candidate))
-                               (message "Have copy page %s's URL to yank." candidate)))
-               ("Create page" . (lambda (candidate)
-                                  (yaoddmuse-edit "EmacsWiki" anything-input)))
-               ("Update cache" . (lambda (candidate)
-                                   (if anything-yaoddmuse-use-cache-file
-                                       (progn
-                                         (anything-yaoddmuse-cache-pages t)
-                                         (setq anything-c-yaoddmuse-ew-cache
-                                               (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                                       (yaoddmuse-update-pagename))))))
+               ("Browse page"
+                . (lambda (candidate)
+                    (yaoddmuse-browse-page "EmacsWiki" candidate)))
+               ("Browse page other window"
+                . (lambda (candidate)
+                    (if (one-window-p)
+                        (split-window-vertically))
+                    (yaoddmuse-browse-page "EmacsWiki" candidate)))
+               ("Browse diff"
+                . (lambda (candidate)
+                    (yaoddmuse-browse-page-diff "EmacsWiki" candidate)))
+               ("Copy URL"
+                . (lambda (candidate)
+                    (kill-new (yaoddmuse-url "EmacsWiki" candidate))
+                    (message "Have copy page %s's URL to yank." candidate)))
+               ("Create page"
+                . (lambda (candidate)
+                    (yaoddmuse-edit "EmacsWiki" anything-input)))
+               ("Update cache"
+                . (lambda (candidate)
+                    (if anything-yaoddmuse-use-cache-file
+                        (progn
+                          (anything-yaoddmuse-cache-pages t)
+                          (setq anything-c-yaoddmuse-ew-cache
+                                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+                        (yaoddmuse-update-pagename))))))
     (action-transformer anything-c-yaoddmuse-action-transformer))
   "Needs yaoddmuse.el.
 
@@ -8134,15 +8140,20 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
   '((name . "Yaoddmuse Post library (EmacsWiki)")
     (init . (anything-yaoddmuse-init))
     (candidates-in-buffer)
-    (action . (("Post library and Browse" . (lambda (candidate)
-                                              (yaoddmuse-post-file (find-library-name candidate)
-                                                                   "EmacsWiki"
-                                                                   (file-name-nondirectory (find-library-name candidate))
-                                                                   nil t)))
-               ("Post library" . (lambda (candidate)
-                                   (yaoddmuse-post-file (find-library-name candidate)
-                                                        "EmacsWiki"
-                                                        (file-name-nondirectory (find-library-name candidate))))))))
+    (action . (("Post library and Browse"
+                . (lambda (candidate)
+                    (yaoddmuse-post-file
+                     (find-library-name candidate)
+                     "EmacsWiki"
+                     (file-name-nondirectory (find-library-name candidate))
+                     nil t)))
+               ("Post library"
+                . (lambda (candidate)
+                    (yaoddmuse-post-file
+                     (find-library-name candidate)
+                     "EmacsWiki"
+                     (file-name-nondirectory
+                      (find-library-name candidate))))))))
   "Needs yaoddmuse.el.
 
 http://www.emacswiki.org/emacs/download/yaoddmuse.el")
@@ -8152,8 +8163,9 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
 (defun anything-c-yaoddmuse-action-transformer (actions candidate)
   "Allow the use of `install-elisp' only on elisp files."
   (if (string-match "\.el$" candidate)
-      (append actions '(("Install Elisp" . (lambda (elm)
-                                             (install-elisp-from-emacswiki elm)))))
+      (append actions '(("Install Elisp"
+                         . (lambda (elm)
+                             (install-elisp-from-emacswiki elm)))))
       actions))
 
 ;;;###autoload
@@ -8161,6 +8173,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
   "Fetch the list of files on emacswiki and create cache file.
 If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
   (interactive)
+  (declare (special yaoddmuse-pages-hash))
   (yaoddmuse-update-pagename)
   (save-excursion
     (find-file anything-c-yaoddmuse-cache-file)
@@ -8196,11 +8209,13 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
          (ignore-errors
            (with-anything-current-buffer
              (loop initially (goto-char (point-min))
-                while (re-search-forward (format ee-anchor-format "\\([^\.].+\\)") nil t)
+                while (re-search-forward
+                       (format ee-anchor-format "\\([^\.].+\\)") nil t)
                 for anchor = (match-string-no-properties 1)
                 collect (cons (format "%5d:%s"
                                       (line-number-at-pos (match-beginning 0))
-                                      (format ee-anchor-format anchor)) anchor))))))
+                                      (format ee-anchor-format anchor))
+                              anchor))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
                            (anything-match-line-color-current-line)))
@@ -8793,8 +8808,10 @@ When nil, fallback to `browse-url-browser-function'.")
     (init . (lambda ()
               (emms-stream-init)))
     (candidates . (lambda ()
+                    (declare (special emms-stream-list))
                     (mapcar 'car emms-stream-list)))
     (action . (("Play" . (lambda (elm)
+                           (declare (special emms-stream-list))
                            (let* ((stream (assoc elm emms-stream-list))
                                   (fn (intern (concat "emms-play-" (symbol-name (car (last stream))))))
                                   (url (second stream)))
@@ -9791,6 +9808,7 @@ e.g `ffap-alternate-file' and maybe others."
   :group 'anything
   :global t
   :lighter anything-completion-mode-string
+  (declare (special completing-read-function))
   (if anything-completion-mode
       (progn
         (setq completing-read-function 'anything-completing-read-default
