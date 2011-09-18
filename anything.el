@@ -3342,14 +3342,17 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
 (defun anything-initialize-persistent-action ()
   (set (make-local-variable 'anything-persistent-action-display-window) nil))
 
-(defun* anything-execute-persistent-action (&optional (attr 'persistent-action))
+(defun* anything-execute-persistent-action (&optional (attr 'persistent-action) onewindow)
   "Perform the associated action ATTR without quitting anything.
-ATTR default is persistent-action, but it can be anything else."
+ATTR default is 'persistent-action', but it can be anything else.
+In this case you have to add this new attribute to your source.
+When `anything-samewindow' and ONEWINDOW are non--nil,
+the anything window is never split in persistent action."
   (interactive)
   (anything-log "executing persistent-action")
   (with-anything-window
     (save-selected-window
-      (anything-select-persistent-action-window)
+      (anything-select-persistent-action-window onewindow)
       (anything-log-eval (current-buffer))
       (let ((anything-in-persistent-action t))
         (with-anything-display-same-window
@@ -3360,21 +3363,28 @@ ATTR default is persistent-action, but it can be anything else."
            t)
           (anything-log-run-hook 'anything-after-persistent-action-hook))))))
 
-(defun anything-persistent-action-display-window ()
+
+(defun anything-persistent-action-display-window (&optional onewindow)
+  "Return the window that will be used for presistent action.
+If ONEWINDOW is non--nil window will not be splitted in persistent action
+if `anything-samewindow' is non--nil also."
   (with-anything-window
     (setq anything-persistent-action-display-window
           (cond ((window-live-p anything-persistent-action-display-window)
                  anything-persistent-action-display-window)
-                ((and anything-samewindow (one-window-p t))
+                ((and anything-samewindow (one-window-p t) (not onewindow))
                  (split-window))
                 ((get-buffer-window anything-current-buffer))
                 (t
                  (next-window (selected-window) 1))))))
 
-(defun anything-select-persistent-action-window ()
+(defun anything-select-persistent-action-window (&optional onewindow)
+  "Select the window that will be used for persistent action.
+See `anything-persistent-action-display-window' for how to use ONEWINDOW."
   (select-window (get-buffer-window (anything-buffer-get)))
   (select-window
-   (setq minibuffer-scroll-window (anything-persistent-action-display-window))))
+   (setq minibuffer-scroll-window
+         (anything-persistent-action-display-window onewindow))))
 
 (defun anything-persistent-action-display-buffer (buf &optional not-this-window)
   "Make `pop-to-buffer' and `display-buffer' display in the same window.

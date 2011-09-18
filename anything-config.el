@@ -3178,7 +3178,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-revert-persistent ()
   "Revert buffer without quitting anything."
   (interactive)
-  (anything-execute-persistent-action 'revert-action))
+  (anything-execute-persistent-action 'revert-action 'onewindow))
 
 (defun anything-buffer-save-and-update (candidate)
   (let ((marked (anything-marked-candidates))
@@ -3193,7 +3193,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-save-persistent ()
   "Save buffer without quitting anything."
   (interactive)
-  (anything-execute-persistent-action 'save-action))
+  (anything-execute-persistent-action 'save-action 'onewindow))
 
 ;;;###autoload
 (defun anything-buffer-run-kill-buffers ()
@@ -4656,7 +4656,8 @@ Like `find-file' but with `anything' support.
 Use it for non--interactive calls of `anything-find-files'."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (let ((anything-mp-highlight-delay nil))
+  (let ((anything-mp-highlight-delay nil)
+        anything-samewindow)
     (anything :sources 'anything-c-source-find-files
               :input fname
               :preselect preselect
@@ -4994,7 +4995,8 @@ Bindings affected are C, R, S, H."
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
-  (let ((anything-mp-highlight-delay nil))
+  (let ((anything-mp-highlight-delay nil)
+        anything-same-window)
     (flet ((action-fn (candidate)
              (if marked-candidates
                  (anything-marked-candidates)
