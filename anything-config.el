@@ -1416,6 +1416,7 @@ automatically.")
 
 (defvar anything-find-files-map
   (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-]")           'anything-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'anything-ff-run-locate)
     (define-key map (kbd "M-g s")         'anything-ff-run-grep)
     (define-key map (kbd "M-g p")         'anything-ff-run-pdfgrep)
@@ -2193,7 +2194,9 @@ This is the starting point for nearly all actions you can do on files."
     (if any-input
         (anything-find-files-1 any-input)
         (setq any-input (expand-file-name (anything-c-current-directory)))
-        (anything-find-files-1 any-input (buffer-file-name (current-buffer))))))
+        (anything-find-files-1 any-input (if anything-ff-transformer-show-only-basename
+                                             (anything-c-basename (buffer-file-name (current-buffer)))
+                                             (buffer-file-name (current-buffer)))))))
 
 ;;;###autoload
 (defun anything-write-file ()
@@ -3350,6 +3353,7 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (image-action1 . anything-ff-rotate-image-left)
     (image-action2 . anything-ff-rotate-image-right)
+    (toggle-basename . anything-ff-toggle-basename)
     (properties-action . anything-ff-properties)
     (toggle-auto-update . anything-ff-toggle-auto-update)
     (kill-buffer-fname . anything-ff-kill-buffer-fname)
@@ -3430,7 +3434,8 @@ ACTION must be an action supported by `anything-dired-action'."
          (parg     anything-current-prefix-arg)
          (dest     (anything-c-read-file-name
                     prompt
-                    :preselect cand
+                    :preselect (if anything-ff-transformer-show-only-basename
+                                   (anything-c-basename cand) cand)
                     :initial-input (anything-dwim-target-directory)
                     :history (anything-find-files-history :comp-read nil)))
          (win-conf (current-window-configuration)))
@@ -3961,6 +3966,16 @@ The checksum is copied to kill-ring."
                   file))
     (message "Checksum copied to kill-ring.")))
 
+(defun anything-ff-toggle-basename (candidate)
+  (setq anything-ff-transformer-show-only-basename
+        (not anything-ff-transformer-show-only-basename))
+  (save-excursion
+    (anything-force-update)))
+
+(defun anything-ff-run-toggle-basename ()
+  (interactive)
+  (anything-execute-persistent-action 'toggle-basename))
+
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
     "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
 If LEVEL is positive reduce from end else from beginning.
@@ -4022,7 +4037,10 @@ This happen after using `anything-find-files-down-one-level',
 or hitting C-z on \"..\"."
   (when (and anything-ff-last-expanded
              (anything-file-completion-source-p))
-    (let ((dirname (directory-file-name anything-ff-last-expanded)))
+    (let ((dirname (if anything-ff-transformer-show-only-basename
+                       (anything-c-basename
+                        (directory-file-name anything-ff-last-expanded))
+                       (directory-file-name anything-ff-last-expanded))))
       (with-anything-window
         (when (or (re-search-forward (concat dirname "$") nil t)
                   (re-search-forward
@@ -4330,7 +4348,7 @@ KBSIZE if a floating point number, default value is 1024.0."
           (t all))))
 
 
-(defun anything-c-prefix-filename (fname &optional image file-or-symlinkp)
+(defun anything-c-prefix-filename (fname &optional image file-or-symlinkp new-file)
   "Return filename FNAME maybe prefixed with icon IMAGE.
 If FILE-OR-SYMLINKP is non--nil this mean we assume FNAME is an
 existing filename or valid symlink and there is no need to test it."
@@ -4344,12 +4362,9 @@ existing filename or valid symlink and there is no need to test it."
          (prefix-url (propertize
                       " " 'display
                       (propertize "[@]" 'face 'anything-ff-prefix))))
-    (cond ((or file-or-symlinkp
-               (file-exists-p fname)
-               (file-symlink-p fname))
-           (if image (concat prefix-img fname) fname))
+    (cond (file-or-symlinkp (if image (concat prefix-img fname) fname))
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
-          (t (concat prefix-new " " fname)))))
+          (new-file (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
   "Transformer for `anything-c-source-find-files'.
@@ -4362,30 +4377,40 @@ It will choose which transformer function to use according to
           (anything-c-highlight-ffiles1 files sources)
           (anything-c-highlight-ffiles files sources))))
 
+(defvar anything-ff-transformer-show-only-basename nil)
 (defun anything-c-highlight-ffiles (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
-  (loop for i in files collect
+  (loop for i in files
+     for disp = (if (and anything-ff-transformer-show-only-basename
+                         (not (string-match "[.]\\{1,2\\}$" i))
+                         (not (string-match ffap-url-regexp fname)))
+                    (anything-c-basename i) i)
+     collect
        (cond ((and (stringp (car (file-attributes i)))
                    (not (anything-ff-valid-symlink-p i))
                    (not (string-match "^\.#" (anything-c-basename i))))
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-invalid-symlink) nil t)
+                     (propertize disp 'face 'anything-ff-invalid-symlink) nil t)
                     i))
              ((stringp (car (file-attributes i)))
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-symlink) nil t)
+                     (propertize disp 'face 'anything-ff-symlink) nil t)
                     i))
              ((eq t (car (file-attributes i)))
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-directory) nil t)
+                     (propertize disp 'face 'anything-ff-directory) nil t)
                     i))
              ((file-executable-p i)
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-executable) nil t)
+                     (propertize disp 'face 'anything-ff-executable) nil t)
+                    i))
+             ((file-exists-p i)
+              (cons (anything-c-prefix-filename
+                     (propertize disp 'face 'anything-ff-file) nil t)
                     i))
              (t
               (cons (anything-c-prefix-filename
-                     (propertize i 'face 'anything-ff-file))
+                     (propertize disp 'face 'anything-ff-file) nil nil 'new-file)
                     i)))))
 
 (defun anything-c-highlight-ffiles1 (files sources)
@@ -4872,13 +4897,15 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
          #'(lambda (from) candidate))
      marker)
     (when (and follow (not (get-buffer dired-log-buffer)))
-      (let ((moved-flist (anything-get-dest-fnames-from-list files candidate dirflag))
-            (target      (directory-file-name candidate)))
+      (let ((target (directory-file-name candidate)))
         (unwind-protect
              (progn
-               (setq anything-ff-cand-to-mark moved-flist)
+               (setq anything-ff-cand-to-mark
+                     (anything-get-dest-fnames-from-list files candidate dirflag))
                (if (and dirflag (eq action 'rename))
-                   (anything-find-files-1 (file-name-directory target) target)
+                   (anything-find-files-1 (file-name-directory target)
+                                          (if anything-ff-transformer-show-only-basename
+                                              (anything-c-basename target) target))
                    (anything-find-files-1 (expand-file-name candidate))))
           (setq anything-ff-cand-to-mark nil))))))
 
@@ -4888,7 +4915,9 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
   (file-name-nondirectory (directory-file-name fname)))
 
 (defun anything-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
-  "Transform filenames of FLIST to abs of DEST-CAND."
+  "Transform filenames of FLIST to abs of DEST-CAND.
+If RENAME-DIR-FLAG is non--nil collect the `directory-file-name' of transformed
+members of FLIST."
   ;; At this point files have been renamed/copied at destination.
   ;; That's mean DEST-CAND exists.
   (loop
@@ -4910,13 +4939,12 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
              anything-ff-cand-to-mark)
     (with-anything-window
       (while anything-ff-cand-to-mark
-        (if (search-forward (car anything-ff-cand-to-mark) (point-at-eol) t)
+        (if (string= (car anything-ff-cand-to-mark) (anything-get-selection))
             (progn
-              (anything-mark-current-line)
               (anything-make-visible-mark)
-              (forward-line 1)
+              (anything-next-line)
               (setq anything-ff-cand-to-mark (cdr anything-ff-cand-to-mark)))
-            (forward-line 1)))
+            (anything-next-line)))
       (unless (anything-this-visible-mark)
         (anything-prev-visible-mark)))))
 

@@ -3459,9 +3459,10 @@ second argument of `display-buffer'."
 
 (defun anything-make-visible-mark ()
   (let ((o (make-overlay (point-at-bol) (1+ (point-at-eol)))))
-    (overlay-put o 'face anything-visible-mark-face)
+    (overlay-put o 'face   anything-visible-mark-face)
     (overlay-put o 'source (assoc-default 'name (anything-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
+    (overlay-put o 'real   (anything-get-selection))
     (add-to-list 'anything-visible-mark-overlays o))
   (push (cons (anything-get-current-source) (anything-get-selection))
         anything-marked-candidates))
@@ -3519,8 +3520,15 @@ It is analogous to `dired-get-marked-files'."
       (goto-char (point-min))
       (while (and (search-forward (overlay-get o 'string) nil t)
                   (anything-current-source-name= (overlay-get o 'source)))
-        ;; Now the next line of visible mark
-        (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))
+        ;; Calculate real value of candidate.
+        ;; It can be nil if candidate have only a display value.
+        (let ((real (get-text-property (point-at-bol 0) 'anything-realvalue)))
+          (if real
+              ;; Check if real value of current candidate is the same
+              ;; that the one stored in overlay.
+              (and (string= (overlay-get o 'real) real)
+                   (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
+              (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))))
 (add-hook 'anything-update-hook 'anything-revive-visible-mark)
 
 (defun anything-next-point-in-list (curpos points &optional prev)
