@@ -4383,7 +4383,7 @@ It will choose which transformer function to use according to
   (loop for i in files
      for disp = (if (and anything-ff-transformer-show-only-basename
                          (not (string-match "[.]\\{1,2\\}$" i))
-                         (not (string-match ffap-url-regexp fname)))
+                         (not (string-match ffap-url-regexp i)))
                     (anything-c-basename i) i)
      collect
        (cond ((and (stringp (car (file-attributes i)))
