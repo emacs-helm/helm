@@ -5187,6 +5187,7 @@ See also `anything-locate'."
     (type . file)
     (properties-action . anything-ff-properties)
     (requires-pattern . 3)
+    (candidate-number-limit . 9999)
     (mode-line . anything-generic-file-mode-line-string)
     (delayed))
   "Find files matching the current input pattern with locate.")
