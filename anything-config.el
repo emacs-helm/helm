@@ -1707,6 +1707,7 @@ To browse images directories turn on `anything-follow-mode'.
 \\[anything-ff-run-print-file]\t\t->Print file with default printer.
 \\[anything-enlarge-window]\t\t->Enlarge anything window.
 \\[anything-narrow-window]\t\t->Narrow anything window.
+\\[anything-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
 \\[anything-send-bug-report-from-anything]\t\t->Send Bug report.
 \\[anything-ff-help]\t\t->Display this help info.
 \n== Anything Map ==
@@ -4932,7 +4933,7 @@ members of FLIST."
      collect fname into tmp-list
      finally return (sort tmp-list 'string<)))
 
-(defun anything-c-maybe-mark-candidates ()
+(defun anything-ff-maybe-mark-candidates ()
   "Mark all candidates of list `anything-ff-cand-to-mark'."
   (when (and (string= (assoc-default 'name (anything-get-current-source))
                       (assoc-default 'name anything-c-source-find-files))
@@ -4948,7 +4949,7 @@ members of FLIST."
       (unless (anything-this-visible-mark)
         (anything-prev-visible-mark)))))
 
-(add-hook 'anything-after-update-hook #'anything-c-maybe-mark-candidates)
+(add-hook 'anything-after-update-hook #'anything-ff-maybe-mark-candidates)
 
 (defun* anything-dired-do-action-on-file (&key action)
   (let* ((files     (dired-get-marked-files))
