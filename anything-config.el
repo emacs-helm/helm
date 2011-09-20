@@ -908,20 +908,6 @@ because it is under discussion."
   :set 'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
 
-(defcustom anything-c-find-files-show-icons nil
-  "*Whether show or hide icons in `anything-find-files'."
-  :type 'boolean
-  :group 'anything-config)
-
-(defcustom anything-c-find-files-icons-directory
-  (and (window-system)
-       (dolist (i image-load-path)
-         (if (file-directory-p (expand-file-name "tree-widget/default" (eval i)))
-             (return (expand-file-name "tree-widget/default" (eval i))))))
-  "*Default path where to find files and directory icons."
-  :type 'string
-  :group 'anything-config)
-
 (defcustom anything-c-browse-code-regexp-lisp
   "^ *\(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|\
 type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
@@ -4348,35 +4334,28 @@ KBSIZE if a floating point number, default value is 1024.0."
             (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
           (t all))))
 
-
-(defun anything-c-prefix-filename (fname &optional image file-or-symlinkp new-file)
+(defun anything-c-prefix-filename (fname &optional file-or-symlinkp new-file)
   "Return filename FNAME maybe prefixed with icon IMAGE.
 If FILE-OR-SYMLINKP is non--nil this mean we assume FNAME is an
 existing filename or valid symlink and there is no need to test it."
-  (let* ((img-name   (and image (expand-file-name
-                                 image anything-c-find-files-icons-directory)))
-         (img        (and image (create-image img-name)))
-         (prefix-img (and image (propertize " " 'display img)))
-         (prefix-new (propertize
+  (let* ((prefix-new (propertize
                       " " 'display
                       (propertize "[?]" 'face 'anything-ff-prefix)))
          (prefix-url (propertize
                       " " 'display
                       (propertize "[@]" 'face 'anything-ff-prefix))))
-    (cond (file-or-symlinkp (if image (concat prefix-img fname) fname))
+    (cond (file-or-symlinkp fname)
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
           (new-file (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
   "Transformer for `anything-c-source-find-files'.
-It will choose which transformer function to use according to
-`anything-c-find-files-show-icons' or `anything-ff-tramp-not-fancy'."
+Tramp files are not highlighted unless `anything-ff-tramp-not-fancy'
+is non--nil."
   (if (and (string-match tramp-file-name-regexp anything-pattern)
            anything-ff-tramp-not-fancy)
       files
-      (if (and (window-system) anything-c-find-files-show-icons)
-          (anything-c-highlight-ffiles1 files sources)
-          (anything-c-highlight-ffiles files sources))))
+      (anything-c-highlight-ffiles files sources)))
 
 (defvar anything-ff-transformer-show-only-basename nil)
 (defun anything-c-highlight-ffiles (files sources)
@@ -4391,93 +4370,28 @@ It will choose which transformer function to use according to
                    (not (anything-ff-valid-symlink-p i))
                    (not (string-match "^\.#" (anything-c-basename i))))
               (cons (anything-c-prefix-filename
-                     (propertize disp 'face 'anything-ff-invalid-symlink) nil t)
+                     (propertize disp 'face 'anything-ff-invalid-symlink) t)
                     i))
              ((stringp (car (file-attributes i)))
               (cons (anything-c-prefix-filename
-                     (propertize disp 'face 'anything-ff-symlink) nil t)
+                     (propertize disp 'face 'anything-ff-symlink) t)
                     i))
              ((eq t (car (file-attributes i)))
               (cons (anything-c-prefix-filename
-                     (propertize disp 'face 'anything-ff-directory) nil t)
+                     (propertize disp 'face 'anything-ff-directory) t)
                     i))
              ((file-executable-p i)
               (cons (anything-c-prefix-filename
-                     (propertize disp 'face 'anything-ff-executable) nil t)
+                     (propertize disp 'face 'anything-ff-executable) t)
                     i))
              ((file-exists-p i)
               (cons (anything-c-prefix-filename
-                     (propertize disp 'face 'anything-ff-file) nil t)
+                     (propertize disp 'face 'anything-ff-file) t)
                     i))
              (t
               (cons (anything-c-prefix-filename
-                     (propertize disp 'face 'anything-ff-file) nil nil 'new-file)
+                     (propertize disp 'face 'anything-ff-file) nil 'new-file)
                     i)))))
-
-(defun anything-c-highlight-ffiles1 (files sources)
-  "Candidate transformer for `anything-c-source-find-files' that show icons."
-  (loop for i in files
-     for af = (file-name-nondirectory i)
-     collect (cond ( ;; Files.
-                    (eq nil (car (file-attributes i)))
-                    (let ((face (if (file-executable-p i)
-                                    'anything-ff-executable
-                                    'anything-ff-file)))
-                      (cons (anything-c-prefix-filename
-                             (propertize i 'face face) "leaf.xpm")
-                            i)))
-                   ( ;; Empty directories.
-                    (and (eq t (car (file-attributes i)))
-                         ;; Be sure to have permission to list content.
-                         (file-readable-p i)
-                         (eq 0 (length
-                                (directory-files
-                                 i nil directory-files-no-dot-files-regexp t))))
-                    (cons (anything-c-prefix-filename
-                           (propertize
-                            i 'face 'anything-ff-directory)
-                           "empty.xpm")
-                          i))
-                   ( ;; Open directories.
-                    (and (eq t (car (file-attributes i))) (get-buffer af))
-                    (cons (anything-c-prefix-filename
-                           (propertize
-                            i 'face 'anything-ff-directory)
-                           "open.xpm")
-                          i))
-                   ( ;; Closed directories.
-                    (eq t (car (file-attributes i)))
-                    (cons (anything-c-prefix-filename
-                           (propertize
-                            i 'face 'anything-ff-directory)
-                           "close.xpm")
-                          i))
-                   ( ;; Open Symlinks directories.
-                    (and (stringp (car (file-attributes i)))
-                         (file-directory-p i) (get-buffer af))
-                    (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-ff-symlink))
-                          i))
-                   ( ;; Closed Symlinks directories.
-                    (and (stringp (car (file-attributes i)))
-                         (file-directory-p i))
-                    (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-ff-symlink))
-                          i))
-                   ( ;; Invalid Symlinks 
-                    (and (stringp (car (file-attributes i)))
-                         (not (anything-ff-valid-symlink-p i))
-                         (not (string-match "^\.#" (anything-c-basename i))))
-                    (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-ff-invalid-symlink)
-                           "leaf.xpm")
-                          i))
-                   ( ;; Files symlinks.
-                    (stringp (car (file-attributes i)))
-                    (cons (anything-c-prefix-filename
-                           (propertize i 'face 'anything-ff-symlink)
-                           "leaf.xpm")
-                          i)))))
 
 (defun anything-find-files-action-transformer (actions candidate)
   "Action transformer for `anything-c-source-find-files'."
