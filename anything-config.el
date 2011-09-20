@@ -4334,10 +4334,12 @@ KBSIZE if a floating point number, default value is 1024.0."
             (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
           (t all))))
 
-(defun anything-c-prefix-filename (fname &optional file-or-symlinkp new-file)
-  "Return filename FNAME maybe prefixed with icon IMAGE.
+(defun anything-ff-prefix-filename (fname &optional file-or-symlinkp new-file)
+  "Return filename FNAME maybe prefixed with [?] or [@].
 If FILE-OR-SYMLINKP is non--nil this mean we assume FNAME is an
-existing filename or valid symlink and there is no need to test it."
+existing filename or valid symlink and there is no need to test it.
+NEW-FILE when non--nil mean FNAME is a non existing file and
+return FNAME prefixed with [?]."
   (let* ((prefix-new (propertize
                       " " 'display
                       (propertize "[?]" 'face 'anything-ff-prefix)))
@@ -4346,7 +4348,8 @@ existing filename or valid symlink and there is no need to test it."
                       (propertize "[@]" 'face 'anything-ff-prefix))))
     (cond (file-or-symlinkp fname)
           ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
-          (new-file (concat prefix-new " " fname)))))
+          (new-file (concat prefix-new " " fname))
+          (t fname))))
 
 (defun anything-c-find-files-transformer (files sources)
   "Transformer for `anything-c-source-find-files'.
@@ -4355,10 +4358,10 @@ is non--nil."
   (if (and (string-match tramp-file-name-regexp anything-pattern)
            anything-ff-tramp-not-fancy)
       files
-      (anything-c-highlight-ffiles files sources)))
+      (anything-ff-highlight-files files sources)))
 
 (defvar anything-ff-transformer-show-only-basename nil)
-(defun anything-c-highlight-ffiles (files sources)
+(defun anything-ff-highlight-files (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files
      for disp = (if (and anything-ff-transformer-show-only-basename
@@ -4369,27 +4372,27 @@ is non--nil."
        (cond ((and (stringp (car (file-attributes i)))
                    (not (anything-ff-valid-symlink-p i))
                    (not (string-match "^\.#" (anything-c-basename i))))
-              (cons (anything-c-prefix-filename
+              (cons (anything-ff-prefix-filename
                      (propertize disp 'face 'anything-ff-invalid-symlink) t)
                     i))
              ((stringp (car (file-attributes i)))
-              (cons (anything-c-prefix-filename
+              (cons (anything-ff-prefix-filename
                      (propertize disp 'face 'anything-ff-symlink) t)
                     i))
              ((eq t (car (file-attributes i)))
-              (cons (anything-c-prefix-filename
+              (cons (anything-ff-prefix-filename
                      (propertize disp 'face 'anything-ff-directory) t)
                     i))
              ((file-executable-p i)
-              (cons (anything-c-prefix-filename
+              (cons (anything-ff-prefix-filename
                      (propertize disp 'face 'anything-ff-executable) t)
                     i))
              ((file-exists-p i)
-              (cons (anything-c-prefix-filename
+              (cons (anything-ff-prefix-filename
                      (propertize disp 'face 'anything-ff-file) t)
                     i))
              (t
-              (cons (anything-c-prefix-filename
+              (cons (anything-ff-prefix-filename
                      (propertize disp 'face 'anything-ff-file) nil 'new-file)
                     i)))))
 
