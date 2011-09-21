@@ -2474,12 +2474,14 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
                       :name "Surfraw Search Engines"
                       :history anything-surfraw-engines-history)))
   (let* ((engine-nodesc (car (split-string engine)))
-         (url           (shell-command-to-string
-                         (format "surfraw %s -p %s"
-                                 engine-nodesc pattern)))
-         (browse-url-browser-function
-          (or anything-surfraw-default-browser-function
-              browse-url-browser-function)))
+         (url (with-temp-buffer
+                (apply 'call-process "surfraw" nil t nil
+		       ;;JAVE
+                       (append  (list engine-nodesc "-p") (split-string pattern)))
+                (replace-regexp-in-string
+                 "\n" "" (buffer-string))))
+         (browse-url-browser-function (or anything-surfraw-default-browser-function
+                                          browse-url-browser-function)))
     (if (string= engine-nodesc "W")
         (anything-c-browse-url)
         (anything-c-browse-url url)
