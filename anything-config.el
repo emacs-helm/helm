@@ -4358,7 +4358,11 @@ Tramp files are not highlighted unless `anything-ff-tramp-not-fancy'
 is non--nil."
   (if (and (string-match tramp-file-name-regexp anything-pattern)
            anything-ff-tramp-not-fancy)
-      files
+      (if anything-ff-transformer-show-only-basename
+          (loop for i in files collect 
+               (if (string-match "[.]\\{1,2\\}$" i)
+                   i (cons (anything-c-basename i) i)))
+          files)
       (anything-ff-highlight-files files sources)))
 
 (defvar anything-ff-transformer-show-only-basename nil)
