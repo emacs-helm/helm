@@ -4346,10 +4346,11 @@ return FNAME prefixed with [?]."
          (prefix-url (propertize
                       " " 'display
                       (propertize "[@]" 'face 'anything-ff-prefix))))
-    (cond (file-or-symlinkp fname)
-          ((string-match ffap-url-regexp fname) (concat prefix-url " " fname))
-          (new-file (concat prefix-new " " fname))
-          (t fname))))
+    (cond ((or file-or-symlinkp (file-exists-p fname)) fname)
+          ((string-match ffap-url-regexp fname)
+           (concat prefix-url " " fname))
+          ((or new-file (not (file-exists-p fname)))
+           (concat prefix-new " " fname)))))
 
 (defun anything-c-find-files-transformer (files sources)
   "Transformer for `anything-c-source-find-files'.
