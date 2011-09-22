@@ -982,6 +982,7 @@ It is disabled by default because *Anything Log* grows quickly.")
 (defvar anything-once-called-functions nil)
 (defvar anything-follow-mode nil)
 (defvar anything-let-variables nil)
+(defvar anything-split-window-state nil)
 
 ;; (@* "Utility: logging")
 (defun anything-log (format-string &rest args)
@@ -1810,7 +1811,6 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (funcall (if anything-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
 
 ;; (@* "Core: initialize")
-(defvar anything-split-window-state nil)
 (defun anything-initial-setup ()
   "Initialize anything settings and set up the anything buffer."
   (anything-log-run-hook 'anything-before-initialize-hook)
@@ -3269,7 +3269,6 @@ Acceptable values of CREATE-OR-BUFFER:
        anything-buffer))))
 
 ;; (@* "Utility: Resize anything window.")
-(defvar anything-split-window-state nil)
 (defun anything-enlarge-window-1 (n)
   "Enlarge or narrow anything window.
 If N is positive enlarge, if negative narrow."
