@@ -2725,7 +2725,7 @@ it is \"Candidate\(s\)\" by default."
    'source 'next))
 
 (defun anything-goto-source (source-or-name)
-  "Move the selection to the source (SOURCE-OR-NAME)."
+  "Move the selection to the source SOURCE-OR-NAME."
   (anything-move-selection-common
    (lambda ()
      (goto-char (point-min))
@@ -2738,7 +2738,9 @@ it is \"Candidate\(s\)\" by default."
    'source 'next))
 
 (defun anything-mark-current-line ()
-  "Move selection overlay to current line."
+  "Move `anything-selection-overlay' to current line.
+Note that this is not related with visibles marks, which are used
+to mark candidates."
   (move-overlay
    anything-selection-overlay (point-at-bol)
    (if (anything-pos-multiline-p)
@@ -3515,6 +3517,7 @@ It is analogous to `dired-get-marked-files'."
     (equal name (anything-current-line-contents))))
 
 (defun anything-revive-visible-mark ()
+  "Restore marked candidates when anything update display."
   (with-current-buffer anything-buffer
     (dolist (o anything-visible-mark-overlays)
       (goto-char (point-min))
