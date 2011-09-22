@@ -2172,7 +2172,8 @@ This is the starting point for nearly all actions you can do on files."
   (interactive "P")
   (let ((any-input (if (and arg anything-ff-history)
                        (anything-find-files-history)
-                       (anything-find-files-initial-input))))
+                       (anything-find-files-initial-input)))
+        (presel    (buffer-file-name (current-buffer))))
     (when (and (eq major-mode 'org-agenda-mode)
                org-directory
                (not any-input))
@@ -2181,9 +2182,10 @@ This is the starting point for nearly all actions you can do on files."
     (if any-input
         (anything-find-files-1 any-input)
         (setq any-input (expand-file-name (anything-c-current-directory)))
-        (anything-find-files-1 any-input (if anything-ff-transformer-show-only-basename
-                                             (anything-c-basename (buffer-file-name (current-buffer)))
-                                             (buffer-file-name (current-buffer)))))))
+        (anything-find-files-1
+         any-input (if anything-ff-transformer-show-only-basename
+                       (and presel (anything-c-basename presel))
+                       presel)))))
 
 ;;;###autoload
 (defun anything-write-file ()
