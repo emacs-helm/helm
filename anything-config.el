@@ -4096,9 +4096,7 @@ expand to this directory."
                  (setq anything-pattern "/")))
             ((string= match "/~/")
              (if (eq system-type 'windows-nt)
-                 (setq anything-pattern
-                       (replace-regexp-in-string
-                        "\\\\" "/" (file-name-as-directory (getenv "HOME"))))
+                 (setq anything-pattern (file-name-as-directory (getenv "HOME")))
                  (setq anything-pattern "~/")))))
     (setq anything-ff-default-directory anything-pattern)
     (with-current-buffer (window-buffer (minibuffer-window))
