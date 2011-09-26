@@ -1867,8 +1867,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
              (and (functionp anything-quit-if-no-candidate)
                   (funcall anything-quit-if-no-candidate)))
             (t
-             (let ((anything-reading-pattern t))
-               (read-string (or any-prompt "pattern: ") any-input)))))))
+             (let ((anything-reading-pattern t)
+                   (tap (with-anything-current-buffer (thing-at-point 'symbol))))
+               (read-string (or any-prompt "pattern: ") any-input nil tap)))))))
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
