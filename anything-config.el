@@ -3322,7 +3322,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 ;; Internal.
 (defvar anything-c-find-files-doc-header " (`C-l': Go to precedent level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
-(defvar anything-ff-auto-update-flag anything-ff-auto-update-initial-value
+(defvar anything-ff-auto-update-flag nil
   "Internal, flag to turn on/off auto-update in `anything-find-files'.
 Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
 (defvar anything-ff-last-expanded nil
@@ -4018,9 +4018,7 @@ If prefix numeric arg is given go ARG level down."
   (when (anything-file-completion-source-p)
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg
                                                   :unix-close t :expand t)))
-      (with-selected-window (minibuffer-window)
-        (delete-minibuffer-contents)
-        (insert new-pattern)))))
+      (anything-set-pattern new-pattern))))
 
 (defun anything-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `anything-ff-last-expanded'.
@@ -4099,9 +4097,7 @@ expand to this directory."
                  (setq anything-pattern (file-name-as-directory (getenv "HOME")))
                  (setq anything-pattern "~/")))))
     (setq anything-ff-default-directory anything-pattern)
-    (with-current-buffer (window-buffer (minibuffer-window))
-      (delete-minibuffer-contents)
-      (insert anything-pattern))))
+    (anything-set-pattern anything-pattern)))
 (add-hook 'anything-after-update-hook 'anything-ff-auto-expand-to-home-or-root)
 
 (defun anything-c-point-file-in-dired (file)

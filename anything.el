@@ -1817,7 +1817,12 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (setq anything-current-prefix-arg nil)
   (setq anything-once-called-functions nil)
   (setq anything-delayed-init-executed nil)
-  (setq anything-current-buffer (current-buffer))
+  (setq anything-current-buffer
+        (if (minibuffer-window-active-p (minibuffer-window))
+            ;; If minibuffer is active be sure to use it's buffer
+            ;; as `anything-current-buffer'.
+            (window-buffer (active-minibuffer-window))
+            (current-buffer)))
   (setq anything-buffer-file-name buffer-file-name)
   (setq anything-issued-errors nil)
   (setq anything-compiled-sources nil)
@@ -1952,7 +1957,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   (anything-hooks 'cleanup)
   (anything-frame-or-window-configuration 'restore)
   ;; This is needed in some cases where last input
-  ;; is yielded indefinitely in minibuffer after anything session.
+  ;; is yielded infinitely in minibuffer after anything session.
   (anything-clean-up-minibuffer))
 
 (defun anything-clean-up-minibuffer ()
@@ -1977,7 +1982,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
 (defun anything-check-minibuffer-input-1 ()
   "Check minibuffer content."
   (with-anything-quittable
-    (with-selected-window (minibuffer-window)
+    (with-selected-window (or (active-minibuffer-window) (minibuffer-window))
       (anything-check-new-input (minibuffer-contents)))))
 
 (defun anything-check-new-input (input)
@@ -2969,7 +2974,7 @@ You can edit the line."
 (defun anything-set-pattern (pattern &optional noupdate)
   "Set minibuffer contents to PATTERN.
 if optional NOUPDATE is non-nil, anything buffer is not changed."
-  (with-selected-window (minibuffer-window)
+  (with-selected-window (or (active-minibuffer-window) (minibuffer-window))
     (delete-minibuffer-contents)
     (insert pattern))
   (when noupdate
