@@ -4097,7 +4097,10 @@ expand to this directory."
                  (setq anything-pattern (file-name-as-directory (getenv "HOME")))
                  (setq anything-pattern "~/")))))
     (setq anything-ff-default-directory anything-pattern)
-    (anything-set-pattern anything-pattern)))
+    (with-current-buffer (window-buffer (minibuffer-window))
+      (delete-minibuffer-contents)
+      (insert anything-pattern))))
+    
 (add-hook 'anything-after-update-hook 'anything-ff-auto-expand-to-home-or-root)
 
 (defun anything-c-point-file-in-dired (file)
