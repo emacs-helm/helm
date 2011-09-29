@@ -1449,20 +1449,22 @@ automatically.")
 
 (defvar anything-c-read-file-map
   (let ((map (copy-keymap anything-map)))
-    (define-key map (kbd "C-.")         'anything-find-files-down-one-level)
-    (define-key map (kbd "C-l")         'anything-find-files-down-one-level)
+    (define-key map (kbd "C-.")           'anything-find-files-down-one-level)
+    (define-key map (kbd "C-l")           'anything-find-files-down-one-level)
     (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
+    (define-key map (kbd "C-c ?")         'anything-read-file-name-help)
     (when anything-ff-lynx-style-map
-      (define-key map (kbd "<left>")    'anything-find-files-down-one-level)
-      (define-key map (kbd "<right>")   'anything-execute-persistent-action)
-      (define-key map (kbd "<M-left>")  'anything-previous-source)
-      (define-key map (kbd "<M-right>") 'anything-next-source))
+      (define-key map (kbd "<left>")      'anything-find-files-down-one-level)
+      (define-key map (kbd "<right>")     'anything-execute-persistent-action)
+      (define-key map (kbd "<M-left>")    'anything-previous-source)
+      (define-key map (kbd "<M-right>")   'anything-next-source))
     (delq nil map))
   "Keymap for `anything-c-read-file-name'.")
 
 (defvar anything-generic-files-map
   (let ((map (copy-keymap anything-map)))
     (define-key map (kbd "M-g s")   'anything-ff-run-grep)
+    (define-key map (kbd "M-g z")   'anything-ff-run-zgrep)
     (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
     (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
@@ -1701,6 +1703,25 @@ To browse images directories turn on `anything-follow-mode'.
 "))
     (anything-help)))
 
+;;; Help for `anything-c-read-file-name'
+;;
+;;
+;;;###autoload
+(defun anything-read-file-name-help ()
+  (interactive)
+  (let ((anything-help-message "== Anything read file name Map ==\
+\nSpecific commands for anything-c-read-file-name:
+\\<anything-c-read-file-map>
+\\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
+\\[anything-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
+\\[anything-next-source]\t\t->Goto next source.
+\\[anything-previous-source]\t->Goto previous source.
+\\[anything-read-file-name-help]\t\t->Display this help info.
+\n== Anything Map ==
+\\{anything-map}
+"))
+    (anything-help)))
+
 ;;; Generic file help - Used by locate.
 ;;
 ;;
@@ -1807,6 +1828,15 @@ See Man locate for more infos.
 \\[anything-select-3rd-action]:NthAct"
   "String displayed in mode-line in `anything-c-source-find-files'")
 
+(defvar anything-read-file-name-mode-line-string
+  "\\<anything-c-read-file-map>\
+\\[anything-read-file-name-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct"
+  "String displayed in mode-line in `anything-c-source-find-files'")
+
 (defvar anything-generic-file-mode-line-string
   "\\<anything-generic-files-map>\
 \\[anything-generic-file-help]:Help, \
@@ -1815,7 +1845,7 @@ See Man locate for more infos.
 \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
 \\[anything-select-3rd-action]:NthAct,\
 \\[anything-send-bug-report-from-anything]:BugReport."
-  "String displayed in mode-line in `anything-c-source-find-files'")
+  "String displayed in mode-line in Locate.")
 
 (defvar anything-grep-mode-line-string
   "\\<anything-c-grep-map>\
@@ -4972,6 +5002,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (header-name . (lambda (name)
                                (concat name anything-c-find-files-doc-header)))
               (disable-shortcuts)
+              (mode-line . anything-read-file-name-mode-line-string)
               (candidates . (lambda ()
                               (anything-comp-read-get-candidates history nil nil alistp)))
               (persistent-action . ,persistent-action)
@@ -4982,6 +5013,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                (concat name anything-c-find-files-doc-header)))
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
+              (mode-line . anything-read-file-name-mode-line-string)
               (candidates . (lambda ()
                               (let ((seq (anything-find-files-get-candidates)))
                                 (if test
@@ -11247,6 +11279,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
      ("Find file other frame" . find-file-other-frame)
      ("Open dired in file's directory" . anything-c-open-dired)
      ("Grep File(s) `C-u recurse'" . anything-find-files-grep)
+     ("Zgrep File(s) `C-u Recurse'" . anything-ff-zgrep)
      ("Pdfgrep File(s)" . anything-ff-pdfgrep)
      ("Checksum File" . anything-ff-checksum)
      ("View file" . view-file)
