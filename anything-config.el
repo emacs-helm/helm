@@ -2661,9 +2661,9 @@ Default is `anything-current-buffer'."
   (anything-match-line-cleanup))
 
 (defun anything-show-this-source-only ()
-  "Only show this source."
+  "Show all candidates of this source."
   (interactive)
-  (setq anything-candidate-number-limit 9999)
+  (setq anything-candidate-number-limit nil)
   (anything-set-source-filter
    (list (assoc-default 'name (anything-get-current-source)))))
 
