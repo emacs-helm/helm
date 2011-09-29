@@ -2854,7 +2854,9 @@ See `anything-c-enable-eval-defun-hack'."
   (anything-run-after-quit
    (lambda (f)
      (if (file-exists-p f)
-         (anything-find-files-1 (file-name-directory f) f)
+         (anything-find-files-1 (file-name-directory f)
+                                (if anything-ff-transformer-show-only-basename
+                                    (anything-c-basename f) f))
          (anything-find-files-1 f)))
    (anything-aif (get-buffer (anything-get-selection))
        (or (buffer-file-name it)
