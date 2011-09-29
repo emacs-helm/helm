@@ -3507,20 +3507,28 @@ ACTION must be an action supported by `anything-dired-action'."
     (loop for fname in files
        do (load fname))))
 
+(defun anything-find-files-ediff-files-1 (candidate &optional merge)
+  "Generic function to ediff/merge files in `anything-find-files'."
+  (let ((bname  (anything-c-basename candidate))
+        (prompt (if merge "Ediff Merge `%s' With File: "
+                    "Ediff `%s' With File: "))
+        (fun    (if merge 'ediff-merge-files 'ediff-files))) 
+    (funcall fun
+             candidate
+             (condition-case quit
+                 (anything-c-read-file-name
+                  (format prompt bname))
+               (quit
+                (if (y-or-n-p "Search file for ediff with locate? ")
+                    (anything-c-locate-read-file-name
+                     (format prompt bname) (concat bname " -b"))
+                    (error "Error: Ediff Operation aborted")))))))
+
 (defun anything-find-files-ediff-files (candidate)
-  "Default action to ediff files in `anything-find-files'."
-  (ediff-files
-   candidate
-   (anything-c-read-file-name
-    (format "Ediff `%s' With File: " (file-name-nondirectory candidate)))))
+  (anything-find-files-ediff-files-1 candidate))
 
 (defun anything-find-files-ediff-merge-files (candidate)
-  "Default action to ediff merge files in `anything-find-files'."
-  (ediff-merge-files
-   candidate
-   (anything-c-read-file-name
-    (format "Ediff Merge `%s' With File: "
-            (file-name-nondirectory candidate)))))
+  (anything-find-files-ediff-files-1 candidate 'merge))
 
 (defun anything-find-files-grep (candidate)
   "Default action to grep files from `anything-find-files'."
@@ -5161,6 +5169,24 @@ See also `anything-locate'."
     (delayed))
   "Find files matching the current input pattern with locate.")
 ;; (anything 'anything-c-source-locate)
+
+(defun anything-c-locate-read-file-name (prompt &optional init)
+  "Search a file with locate and return it's filename.
+Use argument PROMPT and INIT for `anything' arguments
+prompt and input."
+  (anything :sources
+            '((name . "Locate")
+              (candidates . anything-c-locate-init)
+              (action . identity)
+              (properties-action . anything-ff-properties)
+              (requires-pattern . 3)
+              (candidate-number-limit . 9999)
+              (mode-line . anything-generic-file-mode-line-string)
+              (delayed))
+            :prompt prompt
+            :input init
+            :buffer "*anything locate rfn*"))
+
 
 
 ;;; Anything Incremental Grep.
