@@ -11221,6 +11221,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
      ("Switch to buffer other frame" . switch-to-buffer-other-frame)
      ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . anything-find-buffer-on-elscreen))
      ("Query replace regexp" . anything-c-buffer-query-replace-regexp)
+     ("Query replace" . anything-c-buffer-query-replace)
      ("View buffer" . view-buffer)
      ("Display buffer"   . display-buffer)
      ("Grep buffers (C-u grep all buffers)" . anything-c-grep-buffers)
