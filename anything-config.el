@@ -4092,6 +4092,9 @@ expand to this directory."
 ;; and /home/thierry/labo/anything-config-qp//
 ;; will expand to "/"
 (defun anything-ff-auto-expand-to-home-or-root ()
+  "Goto home or root directory when adding ~/ or / at end of pattern.
+This happen only in function using sources that are
+`anything-file-completion-source-p' compliant."
   (when (and (anything-file-completion-source-p)
              (string-match ".*\\(/~/\\|/\\{2\\}\\)$" anything-pattern))
     (let ((match (match-string 1 anything-pattern)))
@@ -4104,6 +4107,8 @@ expand to this directory."
                  (setq anything-pattern (file-name-as-directory (getenv "HOME")))
                  (setq anything-pattern "~/")))))
     (setq anything-ff-default-directory anything-pattern)
+    ;; For some reasons, i must use here with-current-buffer => mini buffer
+    ;; and not `anything-set-pattern' that use with-selected-window => mini win.
     (with-current-buffer (window-buffer (minibuffer-window))
       (delete-minibuffer-contents)
       (insert anything-pattern))))
