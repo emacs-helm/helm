@@ -2660,6 +2660,13 @@ Default is `anything-current-buffer'."
   (anything-match-line-color-current-line) (sit-for 0.3)
   (anything-match-line-cleanup))
 
+(defun anything-show-this-source-only ()
+  "Only show this source."
+  (interactive)
+  (setq anything-candidate-number-limit 9999)
+  (anything-set-source-filter
+   (list (assoc-default 'name (anything-get-current-source)))))
+
 ;;;###autoload
 (defun anything-test-sources ()
   "List all anything sources for test.
