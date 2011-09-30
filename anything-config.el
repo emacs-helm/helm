@@ -3382,7 +3382,8 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
     ;; It is needed for filenames with capital letters
     (disable-shortcuts)
     (init . (lambda ()
-              (setq anything-ff-auto-update-flag anything-ff-auto-update-initial-value)))
+              (setq anything-ff-auto-update-flag
+                    anything-ff-auto-update-initial-value)))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
     (image-action1 . anything-ff-rotate-image-left)
@@ -4663,6 +4664,9 @@ Use it for non--interactive calls of `anything-find-files'."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (let ((anything-mp-highlight-delay nil)
+        ;; Be sure we don't erase the precedent minibuffer if some.
+        (anything-ff-auto-update-initial-value
+         (not (minibuffer-window-active-p (minibuffer-window))))
         anything-samewindow)
     (anything :sources 'anything-c-source-find-files
               :input fname
@@ -5005,6 +5009,9 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (let ((anything-mp-highlight-delay nil)
+        ;; Be sure we don't erase the underlying minibuffer if some.
+        (anything-ff-auto-update-initial-value
+         (not (minibuffer-window-active-p (minibuffer-window))))
         anything-same-window)
     (flet ((action-fn (candidate)
              (if marked-candidates
