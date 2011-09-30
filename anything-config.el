@@ -1011,6 +1011,14 @@ Don't search tag file deeply if outside this value."
   :type 'number
   :group 'anything-config)
 
+(defcustom anything-c-etags-use-regexp-search nil
+  "When non--nil search etags candidates by regexp.
+This disable anything-match-plugin when enabled.
+When nil search is performed literally and *match-plugin is used
+if available."
+  :group 'anything-config
+  :type 'boolean)
+
 (defcustom anything-c-filelist-file-name nil
   "Filename of file list.
 Accept a list of string for multiple files.
@@ -2304,9 +2312,11 @@ If tag file have been modified reinitialize cache."
         (anything-quit-if-no-candidate t)
         (anything-execute-action-at-once-if-one t)
         (anything-compile-source-functions
-         ;; rule out anything-match-plugin because the input is one regexp.
-         (delq 'anything-compile-source--match-plugin
-               (copy-sequence anything-compile-source-functions))))
+         (if anything-c-etags-use-regexp-search
+             ;; rule out anything-match-plugin because the input is one regexp.
+             (delq 'anything-compile-source--match-plugin
+               (copy-sequence anything-compile-source-functions))
+             anything-compile-source-functions)))
     (when (or (equal arg '(16))
               (and anything-c-etags-mtime-alist
                    (anything-c-etags-file-modified-p tag)))
@@ -7463,8 +7473,10 @@ If no entry in cache, create one."
 
 (defun anything-c-etags-search-fn (pattern bound noerror)
   "Search function for `anything-c-source-etags-select'."
-  (re-search-forward (concat "\\_<" pattern) bound noerror))
-
+  (re-search-forward
+   (if anything-c-etags-use-regexp-search (concat "\\_<" pattern) pattern)
+   bound noerror))
+      
 (defun anything-c-etags-default-action (candidate)
   "Anything default action to jump to an etags entry."
   (let* ((split (split-string candidate ": "))
