@@ -3115,7 +3115,7 @@ To customize `anything-candidates-in-buffer' behavior, use search,
 get-line and search-from-end attributes. See also `anything-sources' docstring."
   (declare (special source))
   (anything-candidates-in-buffer-1 (anything-candidate-buffer)
-                                   (concat "\\<" anything-pattern)
+                                   anything-pattern
                                    (or (assoc-default 'get-line source)
                                        #'buffer-substring-no-properties)
                                    ;; use external variable `source'.

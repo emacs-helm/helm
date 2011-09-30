@@ -2302,7 +2302,11 @@ If tag file have been modified reinitialize cache."
   (let ((tag  (anything-c-etags-get-tag-file))
         (init (and (equal arg '(4)) (thing-at-point 'symbol)))
         (anything-quit-if-no-candidate t)
-        (anything-execute-action-at-once-if-one t))
+        (anything-execute-action-at-once-if-one t)
+        (anything-compile-source-functions
+         ;; rule out anything-match-plugin because the input is one regexp.
+         (delq 'anything-compile-source--match-plugin
+               (copy-sequence anything-compile-source-functions))))
     (when (or (equal arg '(16))
               (and anything-c-etags-mtime-alist
                    (anything-c-etags-file-modified-p tag)))
@@ -7442,12 +7446,17 @@ If no entry in cache, create one."
     (header-name . anything-c-source-etags-header-name)
     (init . anything-c-etags-init)
     (candidates-in-buffer)
+    (search . (anything-c-etags-search-fn))
     (mode-line . anything-etags-mode-line-string)
     (action . anything-c-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (anything-c-etags-default-action candidate)
                            (anything-match-line-color-current-line))))
   "Anything source for Etags.")
+
+(defun anything-c-etags-search-fn (pattern bound noerror)
+  "Search function for `anything-c-source-etags-select'."
+  (re-search-forward (concat "\\_<" pattern) bound noerror))
 
 (defun anything-c-etags-default-action (candidate)
   "Anything default action to jump to an etags entry."
