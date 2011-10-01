@@ -1369,6 +1369,7 @@ automatically.")
      ["Regexp handler" anything-regexp t]
      ["Colors & Faces" anything-colors t]
      ["Show xfonts" anything-select-xfont t]
+     ["Ucs Symbols" anything-ucs t]
      ["Imenu" anything-imenu t]
      ["Google Suggest" anything-google-suggest t]
      ["Eval expression" anything-eval-expression-with-eldoc t]
@@ -1527,6 +1528,16 @@ automatically.")
     (define-key map (kbd "<right>")    'forward-char)
     (define-key map (kbd "<left>")     'backward-char)
     map))
+
+(defvar anything-c-ucs-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "<C-backspace>") 'anything-c-ucs-persistent-delete)
+    (define-key map (kbd "<C-left>")      'anything-c-ucs-persistent-backward)
+    (define-key map (kbd "<C-right>")     'anything-c-ucs-persistent-forward)
+    (define-key map (kbd "<C-return>")    'anything-c-ucs-persistent-insert)
+    (define-key map (kbd "C-c ?")         'anything-c-ucs-help)
+    map)
+  "Keymap for `anything-ucs'.")
 
 
 
@@ -1810,6 +1821,26 @@ See Man locate for more infos.
 \\{anything-map}"))
     (anything-help)))
 
+;;; Ucs help
+;;
+;;
+(defun anything-c-ucs-help ()
+  "Help command for `anything-ucs'."
+  (interactive)
+  (let ((anything-help-message "== Anything Ucs ==
+\nSpecific commands for `anything-ucs':
+\\<anything-c-ucs-map>
+\\[anything-c-ucs-persistent-insert]\t->Insert char.
+\\[anything-c-ucs-persistent-forward]\t->Forward char.
+\\[anything-c-ucs-persistent-backward]\t->Backward char.
+\\[anything-c-ucs-persistent-delete]\t->Delete char backward.
+\\[anything-c-ucs-help]\t\t->Show this help.
+
+\n== Anything Map ==
+\\{anything-map}
+"))
+    (anything-help)))
+
 
 
 ;;; Mode line strings
@@ -1884,6 +1915,16 @@ See Man locate for more infos.
 \\[anything-select-3rd-action]:NthAct,\
 \\[anything-send-bug-report-from-anything]:BugReport."
   "String displayed in mode-line in `anything-c-etags-select'.")
+
+
+(defvar anything-c-ucs-mode-line-string
+  "\\<anything-c-ucs-map>\
+\\[anything-c-ucs-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct."
+  "String displayed in mode-line in `anything-ucs'.")
 
 
 
@@ -2648,6 +2689,12 @@ You can set your own list of commands with
   (anything-other-buffer 'anything-c-source-ratpoison-commands
                          "*anything ratpoison commands*"))
 
+;;;###autoload
+(defun anything-ucs ()
+  "Preconfigured anything for `ucs-names' math symbols."
+  (interactive)
+  (anything :sources 'anything-c-source-ucs
+            :keymap  anything-c-ucs-map))
 
 
 
@@ -9284,9 +9331,99 @@ See also `anything-create--actions'.")
                                (message "New font have been copied to kill ring")))))
     (persistent-action . anything-c-persistent-xfont-action)
     (persistent-help . "Switch to this font temporarily")))
-
 ;; (anything 'anything-c-source-xfonts)
 
+;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
+;;
+;;
+(defvar anything-c-ucs-max-len 0)
+(defun anything-c-calculate-ucs-max-len ()
+  "Calculate the length of longest `ucs-names' candidate."
+  (loop with count = 0
+     for (n . v) in (ucs-names)
+     for len = (length n)
+     if (and (> len count)
+             (string-match "^MATH" n))
+     do (setq count len)
+     finally return count))
+
+(defun anything-c-ucs-init ()
+  "Initialize an anything buffer with ucs symbols.
+Only math* symbols are collected."
+  (unless (> anything-c-ucs-max-len 0)
+    (setq anything-c-ucs-max-len
+          (anything-c-calculate-ucs-max-len)))
+  (with-current-buffer (anything-candidate-buffer
+                        (get-buffer-create "*anything ucs*"))
+    ;; `ucs-names' fn will not run again, data is cached in
+    ;; var `ucs-names'.
+    (loop for (n . v) in (ucs-names)
+       for len = (length n)
+       for diff = (+ (- anything-c-ucs-max-len len) 2)
+       unless (or (string= "" n)
+                  (not (string-match "^MATH" n)))
+       do (progn (insert (concat
+                          n ":"
+                          (make-string
+                           diff ? )))
+                 (ucs-insert v)
+                 (insert "\n")))))
+
+(defun anything-c-ucs-forward-char (candidate)
+  (with-anything-current-buffer
+    (forward-char 1)))
+
+(defun anything-c-ucs-backward-char (candidate)
+  (with-anything-current-buffer
+    (forward-char -1)))
+
+(defun anything-c-ucs-delete-backward (candidate)
+  (with-anything-current-buffer
+    (delete-char -1)))
+  
+(defun anything-c-ucs-insert-char (candidate)
+  (with-anything-current-buffer
+    (insert
+     (replace-regexp-in-string
+    " " ""
+    (cadr (split-string candidate ":"))))))
+
+(defun anything-c-ucs-persistent-insert ()
+  (interactive)
+  (anything-execute-persistent-action 'action-insert))
+
+(defun anything-c-ucs-persistent-forward ()
+  (interactive)
+  (anything-execute-persistent-action 'action-forward))
+
+(defun anything-c-ucs-persistent-backward ()
+  (interactive)
+  (anything-execute-persistent-action 'action-back))
+
+(defun anything-c-ucs-persistent-delete ()
+  (interactive)
+  (anything-execute-persistent-action 'action-delete))
+
+(defvar anything-c-source-ucs
+  '((name . "Ucs names")
+    (init . anything-c-ucs-init)
+    (candidate-number-limit . 9999)
+    (candidates-in-buffer)
+    (mode-line . anything-c-ucs-mode-line-string)
+    (action-insert . anything-c-ucs-insert-char)
+    (action-forward . anything-c-ucs-forward-char)
+    (action-back . anything-c-ucs-backward-char)
+    (action-delete . anything-c-ucs-delete-backward)
+    (action . (("Insert" . anything-c-ucs-insert-char)
+               ("Forward char" . anything-c-ucs-forward-char)
+               ("Backward char" . anything-c-ucs-backward-char)
+               ("Delete char backward" . anything-c-ucs-delete-backward))))
+  "Source for collecting `ucs-names' math symbols.")
+
+
+;;; Emacs process
+;;
+;;
 (defvar anything-c-source-emacs-process
   '((name . "Emacs Process")
     (candidates . (lambda () (mapcar #'process-name (process-list))))
@@ -9960,14 +10097,16 @@ This is the same as `ac-insert', just inlined here for compatibility."
 
 ;; Called each time cursor move in anything-buffer.
 (defun anything-c-show-completion ()
-  (overlay-put anything-c-show-completion-overlay
-               'display (anything-get-selection)))
+  (with-anything-current-buffer
+    (overlay-put anything-c-show-completion-overlay
+                 'display (anything-get-selection))))
 
 (defun anything-c-show-completion-init-overlay (beg end)
-  (and anything-c-turn-on-show-completion
-       (setq anything-c-show-completion-overlay (make-overlay beg end))
-       (overlay-put anything-c-show-completion-overlay
-                    'face 'anything-lisp-show-completion)))
+  (with-anything-current-buffer
+    (and anything-c-turn-on-show-completion
+         (setq anything-c-show-completion-overlay (make-overlay beg end))
+         (overlay-put anything-c-show-completion-overlay
+                      'face 'anything-lisp-show-completion))))
 
 (defmacro with-anything-show-completion (beg end &rest body)
   "Show anything candidate in an overlay at point.
