@@ -9342,8 +9342,7 @@ See also `anything-create--actions'.")
   (loop with count = 0
      for (n . v) in (ucs-names)
      for len = (length n)
-     if (and (> len count)
-             (string-match "^MATH" n))
+     if (> len count)
      do (setq count len)
      finally return count))
 
@@ -9360,8 +9359,7 @@ Only math* symbols are collected."
     (loop for (n . v) in (ucs-names)
        for len = (length n)
        for diff = (+ (- anything-c-ucs-max-len len) 2)
-       unless (or (string= "" n)
-                  (not (string-match "^MATH" n)))
+       unless (string= "" n)
        do (progn (insert (concat
                           n ":"
                           (make-string
