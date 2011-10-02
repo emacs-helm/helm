@@ -9857,6 +9857,8 @@ Do nothing, just return candidate list unmodified."
                                    &key
                                    test
                                    initial-input
+                                   default
+                                   preselect
                                    (buffer "*Anything Completions*")
                                    must-match
                                    (requires-pattern 0)
@@ -9926,6 +9928,8 @@ It support now also a function as argument, See `all-completions' for more detai
       (or (anything
            :sources `(,hist ,src)
            :input initial-input
+           :default default
+           :preselect preselect
            :prompt prompt
            :resume 'noresume
            :buffer buffer)
@@ -9954,7 +9958,7 @@ Don't use it directly, use instead `anything-comp-read' in your programs \
 which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
-  (let ((init (or def initial-input)))
+  (let ((init initial-input))
     (anything-comp-read
      prompt collection
      :test predicate
@@ -9965,6 +9969,8 @@ See documentation of `completing-read' and `all-completions' for details."
      :history (eval (or (car-safe hist) hist))
      :must-match require-match
      :alistp nil
+     :default def
+     :preselect def
      :initial-input init)))
   
 (defun anything-generic-read-file-name

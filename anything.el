@@ -1531,7 +1531,8 @@ This is used in transformers to modify candidates list."
 
 ;; (@* "Core: entry point")
 (defconst anything-argument-keys
-  '(:sources :input :prompt :resume :preselect :buffer :keymap))
+  '(:sources :input :prompt :resume :preselect :buffer :keymap :default))
+
 ;;;###autoload
 (defun anything (&rest plist)
   "Main function to execute anything sources.
@@ -1654,12 +1655,13 @@ Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
 (defun anything-internal (&optional
                             any-sources any-input
                             any-prompt any-resume
-                            any-preselect any-buffer any-keymap)
+                            any-preselect any-buffer
+                            any-keymap any-default)
   "The internal anything function called by `anything'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP See `anything'."
   (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  (anything-log-eval any-prompt any-preselect any-buffer any-keymap)
+  (anything-log-eval any-prompt any-preselect any-buffer any-keymap any-default)
   (unwind-protect
       (condition-case v
           (let ( ;; It is needed because `anything-source-name' is non-nil
@@ -1677,7 +1679,7 @@ ANY-KEYMAP See `anything'."
               (anything-log "show prompt")
               (unwind-protect
                   (anything-read-pattern-maybe
-                   any-prompt any-input any-preselect any-resume any-keymap)
+                   any-prompt any-input any-preselect any-resume any-keymap any-default)
                 (anything-cleanup)))
             (prog1 (unless anything-quit (anything-execute-selection-action-1))
               (anything-log "end session --------------------------------------------")))
@@ -1844,7 +1846,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 (defvar anything-reading-pattern nil
   "Whether in `read-string' in anything or not.")
 (defun anything-read-pattern-maybe (any-prompt any-input
-                                    any-preselect any-resume any-keymap)
+                                    any-preselect any-resume any-keymap any-default)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
@@ -1873,7 +1875,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
                   (funcall anything-quit-if-no-candidate)))
             (t
              (let ((anything-reading-pattern t)
-                   (tap (with-anything-current-buffer (thing-at-point 'symbol))))
+                   (tap (or any-default
+                            (with-anything-current-buffer
+                              (thing-at-point 'symbol)))))
                (read-string (or any-prompt "pattern: ") any-input nil tap)))))))
 
 (defun anything-create-anything-buffer (&optional test-mode)
