@@ -2746,7 +2746,9 @@ Default is `anything-current-buffer'."
 (defun anything-goto-line (lineno)
   "Goto LINENO opening only outline headline if needed."
   (goto-char (point-min)) (forward-line (1- lineno))
-  (when (or (eq major-mode 'org-mode) outline-minor-mode)
+  (when (or (eq major-mode 'org-mode)
+            (and (boundp 'outline-minor-mode)
+                 outline-minor-mode))
     (org-reveal))
   (anything-match-line-color-current-line) (sit-for 0.3)
   (anything-match-line-cleanup))
@@ -9959,7 +9961,7 @@ which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
   (let ((init initial-input)
-        (anything-candidate-number-limit 9999))
+        (anything-candidate-number-limit 99999))
     (anything-comp-read
      prompt collection
      :test predicate
