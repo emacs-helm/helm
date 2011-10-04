@@ -9926,8 +9926,11 @@ It support now also a function as argument, See `all-completions' for more detai
                   . (lambda ()
                       (let ((cands (anything-comp-read-get-candidates
                                     collection test sort alistp)))
-                        (if (or must-match (string= anything-pattern ""))
-                            cands (append (list anything-pattern) cands)))))
+                        (unless (or must-match (string= anything-pattern ""))
+                          (setq cands (append (list anything-pattern) cands)))
+                        (if (and default (not (string= default "")))
+                            (delq nil (cons default (delete default cands)))
+                            cands))))
                  (filtered-candidate-transformer ,fc-transformer)
                  (requires-pattern . ,requires-pattern)
                  (persistent-action . ,persistent-action)
@@ -9976,11 +9979,7 @@ See documentation of `completing-read' and `all-completions' for details."
      :fc-transformer #'(lambda (candidates source)
                          (loop for i in candidates
                             if (consp i) collect (car i)
-                            else collect i into all
-                            finally return
-                              (if (and def (not (string= def "")))
-                                  (delq nil (cons def (delete def all)))
-                                  all)))
+                            else collect i))
      :history (eval (or (car-safe hist) hist))
      :must-match require-match
      :alistp nil
