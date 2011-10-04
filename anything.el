@@ -1577,6 +1577,11 @@ Basic keywords are the following:
 
   `anything-map' for current `anything' session.
 
+- :default
+
+ A default argument that will be inserted in minibuffer with \
+ \\<minibuffer-local-map>\\[next-history-element].
+ When nil of not present `thing-at-point' will be used instead.
 
 Of course, conventional arguments are supported, the two are same.
 

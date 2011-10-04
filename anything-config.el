@@ -9881,6 +9881,9 @@ Keys:
 
 TEST: A predicate called with one arg i.e candidate.
 INITIAL-INPUT: Same as initial-input arg in `anything'.
+PRESELECT: See preselect arg of `anything'.
+DEFAULT: This option is used only for compatibility with regular
+Emacs `completing-read'.
 BUFFER: Name of anything-buffer.
 MUST-MATCH: Candidate selected must be one of COLLECTION.
 REQUIRES-PATTERN: Same as anything attribute, default is 0.
@@ -9910,8 +9913,11 @@ It support now also a function as argument, See `all-completions' for more detai
                (identity candidate))))
     (let ((hist `((name . ,(format "%s History" name))
                   (candidates . (lambda ()
-                                  (anything-comp-read-get-candidates
-                                   history nil nil ,alistp)))
+                                  (let ((all (anything-comp-read-get-candidates
+                                              history nil nil ,alistp)))
+                                    (if (or default (not (string= default "")))
+                                        (delq nil (cons default (delete default all)))
+                                        all))))
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (action . ,'action-fn)))
@@ -9956,20 +9962,25 @@ It support now also a function as argument, See `all-completions' for more detai
                          initial-input hist def
                          inherit-input-method)
     "An anything replacement of `completing-read'.
-
+This function should be used only as a `completing-read-function'.
+ 
 Don't use it directly, use instead `anything-comp-read' in your programs \
 which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
   (let ((init initial-input)
-        (anything-candidate-number-limit 99999))
+        (anything-candidate-number-limit 9999))
     (anything-comp-read
      prompt collection
      :test predicate
      :fc-transformer #'(lambda (candidates source)
                          (loop for i in candidates
                             if (consp i) collect (car i)
-                            else collect i))
+                            else collect i into all
+                            finally return
+                              (if (or def (not (string= def "")))
+                                  (delq nil (cons def (delete def all)))
+                                  all)))
      :history (eval (or (car-safe hist) hist))
      :must-match require-match
      :alistp nil
