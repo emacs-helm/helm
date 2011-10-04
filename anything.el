@@ -1851,13 +1851,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
       (anything-mark-current-line)
-    (anything-update))
-  ;; FIXME: This make anything write in minibuffer
-  ;; When using a minibuffer frame independent config.
-  ;; Is it really needed and why?
-  ;; I leave it commented for now.
-  ;(select-frame-set-input-focus (window-frame (minibuffer-window)))
-  (anything-preselect any-preselect)
+      (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
     (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
     (let ((minibuffer-local-map
@@ -2288,7 +2282,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
 (defvar anything-process-delayed-sources-timer nil)
-(defun anything-update ()
+(defun anything-update (&optional preselect)
   "Update candidates list in `anything-buffer' according to `anything-pattern'."
   (anything-log "start update")
   (setq anything-digit-shortcut-count 0)
@@ -2320,6 +2314,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
           ;; FIXME I want to execute anything-after-update-hook
           ;; AFTER processing delayed sources
           (anything-log-run-hook 'anything-after-update-hook))
+        (and preselect (anything-preselect preselect))
         (anything-log "end update")))))
 
 (defun anything-update-source-p (source)
@@ -2329,6 +2324,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
            (anything-aif (assoc 'requires-pattern source)
                (or (cdr it) 1)
              0))))
+
 (defun anything-delayed-source-p (source)
   (or (assoc 'delayed source)
       (and anything-quick-update
@@ -2915,6 +2911,7 @@ to a list of forms.\n\n")
 (add-hook 'kill-buffer-hook 'anything-kill-buffer-hook)
 
 (defun anything-preselect (candidate-or-regexp)
+  "Move `anything-selection-overlay' to CANDIDATE-OR-REGEXP on startup."
   (with-anything-window
     (when candidate-or-regexp
       (goto-char (point-min))

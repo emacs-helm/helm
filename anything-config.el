@@ -9177,7 +9177,8 @@ See also `anything-create--actions'.")
 ;;
 (defvar anything-c-source-minibuffer-history
   '((name . "Minibuffer History")
-    (header-name . (lambda (name) (format "%s (%s)" name minibuffer-history-variable)))
+    (header-name . (lambda (name)
+                     (format "%s (%s)" name minibuffer-history-variable)))
     (candidates
      . (lambda ()
          (let ((history (loop
