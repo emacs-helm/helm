@@ -9915,7 +9915,7 @@ It support now also a function as argument, See `all-completions' for more detai
                   (candidates . (lambda ()
                                   (let ((all (anything-comp-read-get-candidates
                                               history nil nil ,alistp)))
-                                    (if (or default (not (string= default "")))
+                                    (if (and default (not (string= default "")))
                                         (delq nil (cons default (delete default all)))
                                         all))))
                   (persistent-action . ,persistent-action)
@@ -9978,7 +9978,7 @@ See documentation of `completing-read' and `all-completions' for details."
                             if (consp i) collect (car i)
                             else collect i into all
                             finally return
-                              (if (or def (not (string= def "")))
+                              (if (and def (not (string= def "")))
                                   (delq nil (cons def (delete def all)))
                                   all)))
      :history (eval (or (car-safe hist) hist))
