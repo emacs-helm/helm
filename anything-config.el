@@ -1115,6 +1115,13 @@ find a list of available printers."
   :type 'list
   :group 'anything-config)
 
+(defcustom anything-ff-transformer-show-only-basename nil
+  "Show only basename of candidates in `anything-find-files'.
+This can be toggled at anytime from `anything-find-files' with \
+\\<anything-find-files-map>0\\[anything-ff-run-toggle-basename]."
+  :type 'boolean
+  :group 'anything-config)
+
 
 
 ;;; General internal variables
@@ -1124,6 +1131,7 @@ find a list of available printers."
   "A list of all external commands the user can execute.  If this
 variable is not set by the user, it will be calculated
 automatically.")
+
 
 
 ;;; Faces
@@ -4499,7 +4507,6 @@ is non--nil."
           files)
       (anything-ff-highlight-files files sources)))
 
-(defvar anything-ff-transformer-show-only-basename nil)
 (defun anything-ff-highlight-files (files sources)
   "Candidate transformer for `anything-c-source-find-files' without icons."
   (loop for i in files
