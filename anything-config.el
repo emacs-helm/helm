@@ -8333,8 +8333,11 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 ;;
 ;;
 (defvar anything-c-source-org-headline
-  '((name . "Org HeadLine")
-    (headline "^\\*\\{1,8\\} \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$")
+  `((name . "Org HeadLine")
+    (headline ,@(mapcar (lambda (num)
+                          (format "^\\*\\{%d\\} \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+                                  num))
+                        (number-sequence 1 8)))
     (condition . (eq major-mode 'org-mode))
     (migemo)
     (subexp . 1)
@@ -11285,6 +11288,16 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   "A sexp representing the condition to use anything-headline.")
 (anything-document-attribute 'subexp "Headline plug-in"
   "Display (match-string-no-properties subexp).")
+
+;; Le Wang: Note on how `anything-head-line-get-candidates' works with a list
+;; of regexps.
+;;
+;;   1. Create list of ((title . start-of-match) . hiearchy)
+;;   2. Sort this list by start-of-match.
+;;   3. Go through sorted list and return titles that reflect full hiearchy.
+;;
+;; It's quite brilliantly written.
+;;
 
 
 (defun anything-headline-get-candidates (regexp subexp)
