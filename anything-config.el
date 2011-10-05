@@ -4057,15 +4057,22 @@ Same as `dired-do-print' but for anything."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-print))
 
-(defun* anything-ff-checksum (file)
-  "Calculate the checksum of FILE with completion on algorithms to use.
+(defun anything-ff-checksum (file)
+  "Calculate the checksum of FILE.
+Provide completion on different algorithms to use on Emacs24.
+On Emacs23 only 'sha1' is available.
 The checksum is copied to kill-ring."
-  (let ((algo-list '(md5 sha1 sha224 sha256 sha384 sha512)))
+  (let ((algo-list (and (fboundp 'secure-hash)
+                       '(md5 sha1 sha224 sha256 sha384 sha512))))
     (kill-new
-     (secure-hash (intern
-                   (anything-comp-read
-                    "Algorithm: " algo-list))
-                  file))
+     (if algo-list
+         (secure-hash (intern
+                       (anything-comp-read
+                        "Algorithm: " algo-list))
+                      file)
+         (sha1 (with-temp-buffer
+                 (insert-file-contents file)
+                 (buffer-string)))))
     (message "Checksum copied to kill-ring.")))
 
 (defun anything-ff-toggle-basename (candidate)
