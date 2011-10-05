@@ -1476,6 +1476,8 @@ automatically.")
     (define-key map (kbd "M-g z")   'anything-ff-run-zgrep)
     (define-key map (kbd "M-g p")   'anything-ff-run-pdfgrep)
     (define-key map (kbd "M-D")     'anything-ff-run-delete-file)
+    (define-key map (kbd "C-=")     'anything-ff-run-ediff-file)
+    (define-key map (kbd "C-c =")   'anything-ff-run-ediff-merge-file)
     (define-key map (kbd "C-o")     'anything-ff-run-switch-other-window)
     (define-key map (kbd "M-i")     'anything-ff-properties-persistent)
     (define-key map (kbd "C-c C-x") 'anything-ff-run-open-file-externally)
@@ -1753,6 +1755,8 @@ To browse images directories turn on `anything-follow-mode'.
 \\[anything-ff-run-grep]\t\t->Run grep (C-u recurse).
 \\[anything-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[anything-ff-run-delete-file]\t\t->Delete file.
+\\[anything-ff-run-ediff-file]\t\t->Ediff file.
+\\[anything-ff-run-ediff-merge-file]\t\t->Ediff merge file.
 \\[anything-ff-run-switch-other-window]\t\t->Switch other window.
 \\[anything-ff-properties-persistent]\t\t->Show file properties.
 \\[anything-yank-text-at-point]\t\t->Yank text at point.
@@ -11518,6 +11522,8 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
      ("Zgrep File(s) `C-u Recurse'" . anything-ff-zgrep)
      ("Pdfgrep File(s)" . anything-ff-pdfgrep)
      ("Checksum File" . anything-ff-checksum)
+     ("Ediff File" . anything-find-files-ediff-files)
+     ("Ediff Merge File" . anything-find-files-ediff-merge-files)
      ("View file" . view-file)
      ("Insert file" . insert-file)
      ("Delete file(s)" . anything-delete-marked-files)
