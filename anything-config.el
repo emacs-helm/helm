@@ -2417,7 +2417,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
          (history (loop with hist
                      for i in extended-command-history
                      for com = (intern i)
-                     when (and (fboundp com) (not (member i hist)))
+                     when (fboundp com)
                      collect i into hist finally return hist))
          (command (anything-comp-read
                    "M-x " obarray
@@ -9941,9 +9941,11 @@ It support now also a function as argument, See `all-completions' for more detai
                   (candidates . (lambda ()
                                   (let ((all (anything-comp-read-get-candidates
                                               history nil nil ,alistp)))
-                                    (if (and default (not (string= default "")))
-                                        (delq nil (cons default (delete default all)))
-                                        all))))
+                                    (anything-fast-remove-dups
+                                     (if (and default (not (string= default "")))
+                                         (delq nil (cons default (delete default all)))
+                                         all)
+                                     :test 'equal))))
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (action . ,'action-fn)))
