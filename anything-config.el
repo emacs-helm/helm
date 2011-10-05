@@ -3588,10 +3588,15 @@ ACTION must be an action supported by `anything-dired-action'."
              (condition-case quit
                  (anything-c-read-file-name
                   (format prompt bname))
-               (quit
+               (quit ;; Hit C-g ask user to fallback to locate.
                 (if (y-or-n-p "Search file for ediff with locate? ")
                     (anything-c-locate-read-file-name
-                     (format prompt bname) (concat bname " -b"))
+                     (format prompt bname)
+                     ;; Check if -b option is available.
+                     (if (and (eq system-type 'windows-nt)
+                              (string-match "^es" anything-c-locate-command))
+                         bname
+                         (concat bname " -b")))
                     (error "Error: Ediff Operation aborted")))))))
 
 (defun anything-find-files-ediff-files (candidate)
