@@ -10011,8 +10011,9 @@ See documentation of `completing-read' and `all-completions' for details."
      :history (eval (or (car-safe hist) hist))
      :must-match require-match
      :alistp nil
-     :default def
-     :preselect def
+     ;; If DEF is not provided, fallback to empty string
+     ;; to avoid `thing-at-point' to be appended on top of list
+     :default (or def "")
      :initial-input init)))
   
 (defun anything-generic-read-file-name
