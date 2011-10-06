@@ -5,11 +5,18 @@
 ;;               2011              Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Tamas Patrovics
-;; Maintainer: rubikitch <rubikitch@ruby-lang.org>
+
+;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
+;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
+
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
 ;; X-URL: http://repo.or.cz/w/anything-config.git
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
 
+;;; This file is NOT part of GNU Emacs
+
+;;; License
+;;
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -79,6 +86,10 @@
 ;; Same as `delete-minibuffer-contents' but this is a command.
 ;; `anything-toggle-resplit-window'
 ;; Toggle resplit anything window, vertically or horizontally.
+;; `anything-narrow-window'
+;; Narrow anything window.
+;; `anything-enlarge-window'
+;; Enlarge anything window.
 ;; `anything-select-2nd-action'
 ;; Select the 2nd action for the currently selected candidate.
 ;; `anything-select-3rd-action'
@@ -90,9 +101,9 @@
 ;; `anything-execute-persistent-action'
 ;; Perform the associated action ATTR without quitting anything.
 ;; `anything-scroll-other-window'
-;; Scroll other window (not *Anything* window) upward.
+;; Scroll other window	(not *Anything* window) upward.
 ;; `anything-scroll-other-window-down'
-;; Scroll other window (not *Anything* window) downward.
+;; Scroll other window	(not *Anything* window) downward.
 ;; `anything-toggle-visible-mark'
 ;; Toggle anything visible mark at point.
 ;; `anything-display-all-visible-marks'
@@ -123,9 +134,9 @@
 ;; `anything-version'
 ;; Not documented.
 ;; `anything-sources'
-;; The source of candidates for anything.
+;; A list of sources to use with `anything'.
 ;; `anything-type-attributes'
-;; It's a list of                                      (TYPE ATTRIBUTES ...).
+;; It's a list of					(TYPE ATTRIBUTES ...).
 ;; `anything-enable-shortcuts'
 ;; *Whether to use digit/alphabet shortcut to select the first nine matches.
 ;; `anything-shortcut-keys-alist'
@@ -133,7 +144,7 @@
 ;; `anything-display-source-at-screen-top'
 ;; *Display candidates at the top of screen.
 ;; `anything-candidate-number-limit'
-;; `anything-candidate-number-limit' variable may be overridden by SOURCE.
+;; Apply candidate-number-limit attribute value.
 ;; `anything-idle-delay'
 ;; *Be idle for this many seconds, before updating in delayed sources.
 ;; `anything-input-idle-delay'
@@ -145,9 +156,9 @@
 ;; `anything-map'
 ;; Keymap for anything.
 ;; `anything-header-face'
-;; Face for header lines in the anything buffer.
+;; *Face for header lines in the anything buffer.
 ;; `anything-selection-face'
-;; Face for currently selected item.
+;; *Face for currently selected item.
 ;; `anything-buffer'
 ;; Buffer showing completions.
 ;; `anything-action-buffer'
@@ -155,7 +166,7 @@
 ;; `anything-selection-overlay'
 ;; Overlay used to highlight the currently selected item.
 ;; `anything-digit-overlays'
-;; Overlays for digit shortcuts. See `anything-enable-shortcuts'.
+;; Overlays for digit shortcuts.  See `anything-enable-shortcuts'.
 ;; `anything-candidate-cache'
 ;; Holds the available candidate withing a single anything invocation.
 ;; `anything-pattern'
@@ -188,12 +199,14 @@
 ;; Variables which are restored after `anything' invocation.
 ;; `anything-saved-selection'
 ;; Value of the currently selected object when the action list is shown.
+;; `anything-current-prefix-arg'
+;; Record `current-prefix-arg' when exiting minibuffer.
 ;; `anything-candidate-separator'
 ;; Candidates separator of `multiline' source.
 ;; `anything-current-buffer'
 ;; Current buffer when `anything' is invoked.
 ;; `anything-buffer-file-name'
-;; `buffer-file-name' when `anything' is invoked.
+;; Variable `buffer-file-name' when `anything' is invoked.
 ;; `anything-saved-action'
 ;; Saved value of the currently selected action by key.
 ;; `anything-last-sources'
@@ -227,7 +240,7 @@
 ;; `anything-help-message'
 ;; Detailed help message string for `anything'.
 ;; `anything-source-in-each-line-flag'
-;; If non-nil, add anything-source text-property in each candidate.
+;; Non-nil means add anything-source text-property in each candidate.
 ;; `anything-debug-forms'
 ;; Forms to show in `anything-debug-output'.
 ;; `anything-debug'
@@ -258,10 +271,12 @@
 ;; If this mode is on, persistent action is executed everytime the cursor is moved.
 ;; `anything-let-variables'
 ;; Not documented.
+;; `anything-split-window-state'
+;; Not documented.
 ;; `anything-last-log-file'
 ;; Not documented.
 ;; `anything-compile-source-functions'
-;; Functions to compile elements of `anything-sources' (plug-in).
+;; Functions to compile elements of `anything-sources'	(plug-in).
 ;; `anything-quit'
 ;; Not documented.
 ;; `anything-additional-attributes'
@@ -269,7 +284,7 @@
 ;; `anything-buffers'
 ;; All of `anything-buffer' in most recently used order.
 ;; `anything-current-position'
-;; Not documented.
+;; Restore or save current position in `anything-current-buffer'.
 ;; `anything-last-frame-or-window-configuration'
 ;; Used to store window or frame configuration when anything start.
 ;; `anything-reading-pattern'
@@ -289,7 +304,7 @@
 ;; `anything-orig-enable-shortcuts'
 ;; Not documented.
 ;; `anything-persistent-action-display-window'
-;; Not documented.
+;; Return the window that will be used for presistent action.
 ;; `anything-visible-mark-face'
 ;; Not documented.
 ;; `anything-visible-mark-overlays'

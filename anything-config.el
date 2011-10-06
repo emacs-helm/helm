@@ -81,6 +81,22 @@
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'command :prefix "anything-" :docstring t)
 ;; `anything-configuration'
 ;; Customize `anything'.
+;; `anything-c-buffer-help'
+;; Help command for anything buffers.
+;; `anything-ff-help'
+;; Help command for `anything-find-files'.
+;; `anything-read-file-name-help'
+;; Not documented.
+;; `anything-generic-file-help'
+;; Not documented.
+;; `anything-grep-help'
+;; Not documented.
+;; `anything-pdfgrep-help'
+;; Not documented.
+;; `anything-etags-help'
+;; The help function for etags.
+;; `anything-c-ucs-help'
+;; Help command for `anything-ucs'.
 ;; `anything-mini'
 ;; Preconfigured `anything' lightweight version		(buffer -> recentf).
 ;; `anything-for-files'
@@ -149,18 +165,92 @@
 ;; Preconfigured anything to browse Gnus Manual.
 ;; `anything-regexp'
 ;; Preconfigured anything to build regexps and run query-replace-regexp against.
+;; `anything-c-copy-files-async'
+;; Preconfigured anything to copy file list FLIST to DEST asynchronously.
+;; `anything-find-files'
+;; Preconfigured `anything' for anything implementation of `find-file'.
+;; `anything-write-file'
+;; Preconfigured `anything' providing completion for `write-file'.
+;; `anything-insert-file'
+;; Preconfigured `anything' providing completion for `insert-file'.
+;; `anything-dired-rename-file'
+;; Preconfigured `anything' to rename files from dired.
+;; `anything-dired-copy-file'
+;; Preconfigured `anything' to copy files from dired.
+;; `anything-dired-symlink-file'
+;; Preconfigured `anything' to symlink files from dired.
+;; `anything-dired-hardlink-file'
+;; Preconfigured `anything' to hardlink files from dired.
+;; `anything-do-grep'
+;; Preconfigured anything for grep.
+;; `anything-c-etags-select'
+;; Preconfigured anything for etags.
+;; `anything-filelist'
+;; Preconfigured `anything' to open files instantly.
+;; `anything-filelist+'
+;; Preconfigured `anything' to open files/buffers/bookmarks instantly.
+;; `anything-M-x'
+;; Preconfigured `anything' for Emacs commands.
+;; `anything-manage-advice'
+;; Preconfigured `anything' to disable/enable function advices.
+;; `anything-bookmark-ext'
+;; Preconfigured `anything' for bookmark-extensions sources.
+;; `anything-simple-call-tree'
+;; Preconfigured `anything' for simple-call-tree. List function relationships.
+;; `anything-mark-ring'
+;; Preconfigured `anything' for `anything-c-source-mark-ring'.
+;; `anything-global-mark-ring'
+;; Preconfigured `anything' for `anything-c-source-global-mark-ring'.
+;; `anything-all-mark-rings'
+;; Preconfigured `anything' for `anything-c-source-global-mark-ring' and `anything-c-source-mark-ring'.
+;; `anything-yaoddmuse-emacswiki-edit-or-view'
+;; Preconfigured `anything' to edit or view EmacsWiki page.
+;; `anything-yaoddmuse-emacswiki-post-library'
+;; Preconfigured `anything' to post library to EmacsWiki.
+;; `anything-eval-expression'
+;; Preconfigured anything for `anything-c-source-evaluation-result'.
+;; `anything-eval-expression-with-eldoc'
+;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
+;; `anything-calcul-expression'
+;; Preconfigured anything for `anything-c-source-calculation-result'.
+;; `anything-surfraw'
+;; Preconfigured `anything' to search PATTERN with search ENGINE.
+;; `anything-call-source'
+;; Preconfigured `anything' to call anything source.
+;; `anything-execute-anything-command'
+;; Preconfigured `anything' to execute preconfigured `anything'.
+;; `anything-create'
+;; Preconfigured `anything' to do many create actions from STRING.
+;; `anything-top'
+;; Preconfigured `anything' for top command.
+;; `anything-select-xfont'
+;; Preconfigured `anything' to select Xfont.
+;; `anything-world-time'
+;; Preconfigured `anything' to show world time.
+;; `anything-apt'
+;; Preconfigured `anything' : frontend of APT package manager.
+;; `anything-esh-pcomplete'
+;; Preconfigured anything to provide anything completion in eshell.
+;; `anything-eshell-history'
+;; Preconfigured anything for eshell history.
+;; `anything-c-run-external-command'
+;; Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
+;; `anything-ratpoison-commands'
+;; Preconfigured `anything' to execute ratpoison commands.
+;; `anything-ucs'
+;; Preconfigured anything for `ucs-names' math symbols.
+;; `anything-show-this-source-only'
+;; Show all candidates of this source.
 ;; `anything-test-sources'
 ;; List all anything sources for test.
 ;; `anything-select-source'
-;; Select source.
+;; [OBSOLETE] Select source.
 ;; `anything-mark-all'
 ;; Mark all visible unmarked candidates in current source.
 ;; `anything-unmark-all'
 ;; Unmark all candidates in all sources of current anything session.
 ;; `anything-toggle-all-marks'
 ;; Toggle all marks.
-;; `anything-c-buffer-help'
-;; Help command for anything buffers.
 ;; `anything-buffer-diff-persistent'
 ;; Toggle diff buffer without quitting anything.
 ;; `anything-buffer-revert-persistent'
@@ -183,10 +273,10 @@
 ;; Run switch to other frame action from `anything-c-source-buffers-list'.
 ;; `anything-buffer-switch-to-elscreen'
 ;; Run switch to elscreen  action from `anything-c-source-buffers-list'.
-;; `anything-c-copy-files-async'
-;; Preconfigured anything to copy file list FLIST to DEST asynchronously.
-;; `anything-ff-help'
-;; Help command for `anything-find-files'.
+;; `anything-buffer-run-ediff'
+;; Run ediff action from `anything-c-source-buffers-list'.
+;; `anything-buffer-run-ediff-merge'
+;; Run ediff action from `anything-c-source-buffers-list'.
 ;; `anything-ff-run-toggle-auto-update'
 ;; Not documented.
 ;; `anything-ff-run-switch-to-history'
@@ -225,12 +315,16 @@
 ;; Run switch to other frame action from `anything-c-source-find-files'.
 ;; `anything-ff-run-open-file-externally'
 ;; Run open file externally command action from `anything-c-source-find-files'.
+;; `anything-ff-run-locate'
+;; Run locate action from `anything-c-source-find-files'.
 ;; `anything-ff-run-gnus-attach-files'
 ;; Run gnus attach files command action from `anything-c-source-find-files'.
 ;; `anything-ff-run-etags'
 ;; Run Etags command action from `anything-c-source-find-files'.
 ;; `anything-ff-run-print-file'
 ;; Run Print file action from `anything-c-source-find-files'.
+;; `anything-ff-run-toggle-basename'
+;; Not documented.
 ;; `anything-find-files-down-one-level'
 ;; Go down one level like unix command `cd ..'.
 ;; `anything-ff-properties-persistent'
@@ -241,30 +335,10 @@
 ;; Rotate image left without quitting anything.
 ;; `anything-ff-rotate-right-persistent'
 ;; Rotate image right without quitting anything.
-;; `anything-find-files'
-;; Preconfigured `anything' for anything implementation of `find-file'.
-;; `anything-write-file'
-;; Preconfigured `anything' providing completion for `write-file'.
-;; `anything-insert-file'
-;; Preconfigured `anything' providing completion for `insert-file'.
-;; `anything-dired-rename-file'
-;; Preconfigured `anything' to rename files from dired.
-;; `anything-dired-copy-file'
-;; Preconfigured `anything' to copy files from dired.
-;; `anything-dired-symlink-file'
-;; Preconfigured `anything' to symlink files from dired.
-;; `anything-dired-hardlink-file'
-;; Preconfigured `anything' to hardlink files from dired.
-;; `anything-generic-file-help'
-;; Not documented.
-;; `anything-do-grep'
-;; Preconfigured anything for grep.
 ;; `anything-c-goto-precedent-file'
 ;; Go to precedent file in anything grep/etags buffers.
 ;; `anything-c-goto-next-file'
 ;; Go to precedent file in anything grep/etags buffers.
-;; `anything-grep-help'
-;; Not documented.
 ;; `anything-c-grep-run-persistent-action'
 ;; Run grep persistent action from `anything-do-grep-1'.
 ;; `anything-c-grep-run-default-action'
@@ -273,84 +347,36 @@
 ;; Run grep goto other window action from `anything-do-grep-1'.
 ;; `anything-c-grep-run-save-buffer'
 ;; Run grep save results action from `anything-do-grep-1'.
-;; `anything-pdfgrep-help'
-;; Not documented.
 ;; `anything-do-pdfgrep'
 ;; Not documented.
 ;; `anything-yank-text-at-point'
 ;; Yank text at point in minibuffer.
-;; `anything-etags-help'
-;; The help function for etags.
-;; `anything-c-etags-select'
-;; Preconfigured anything for etags.
-;; `anything-filelist'
-;; Preconfigured `anything' to open files instantly.
-;; `anything-filelist+'
-;; Preconfigured `anything' to open files/buffers/bookmarks instantly.
 ;; `anything-c-describe-attributes'
 ;; Display the full documentation of ANYTHING-ATTRIBUTE (a symbol).
-;; `anything-M-x'
-;; Preconfigured `anything' for Emacs commands.
-;; `anything-manage-advice'
-;; Preconfigured `anything' to disable/enable function advices.
-;; `anything-bookmark-ext'
-;; Preconfigured `anything' for bookmark-extensions sources.
-;; `anything-simple-call-tree'
-;; Preconfigured `anything' for simple-call-tree. List function relationships.
-;; `anything-mark-ring'
-;; Preconfigured `anything' for `anything-c-source-mark-ring'.
-;; `anything-global-mark-ring'
-;; Preconfigured `anything' for `anything-c-source-global-mark-ring'.
-;; `anything-all-mark-rings'
-;; Preconfigured `anything' for `anything-c-source-global-mark-ring' and `anything-c-source-mark-ring'.
 ;; `anything-yaoddmuse-cache-pages'
 ;; Fetch the list of files on emacswiki and create cache file.
-;; `anything-yaoddmuse-emacswiki-edit-or-view'
-;; Preconfigured `anything' to edit or view EmacsWiki page.
-;; `anything-yaoddmuse-emacswiki-post-library'
-;; Preconfigured `anything' to post library to EmacsWiki.
-;; `anything-eval-expression'
-;; Preconfigured anything for `anything-c-source-evaluation-result'.
 ;; `anything-eval-new-line-and-indent'
 ;; Not documented.
-;; `anything-eval-expression-with-eldoc'
-;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
-;; `anything-calcul-expression'
-;; Preconfigured anything for `anything-c-source-calculation-result'.
-;; `anything-surfraw'
-;; Preconfigured `anything' to search PATTERN with search ENGINE.
-;; `anything-call-source'
-;; Preconfigured `anything' to call anything source.
 ;; `anything-call-source-from-anything'
 ;; Call anything source within `anything' session.
-;; `anything-execute-anything-command'
-;; Preconfigured `anything' to execute preconfigured `anything'.
 ;; `anything-create-from-anything'
 ;; Run `anything-create' from `anything' as a fallback.
-;; `anything-create'
-;; Preconfigured `anything' to do many create actions from STRING.
-;; `anything-top'
-;; Preconfigured `anything' for top command.
-;; `anything-select-xfont'
-;; Preconfigured `anything' to select Xfont.
-;; `anything-world-time'
-;; Preconfigured `anything' to show world time.
-;; `anything-apt'
-;; Preconfigured `anything' : frontend of APT package manager.
-;; `anything-esh-pcomplete'
-;; Preconfigured anything to provide anything completion in eshell.
-;; `anything-eshell-history'
-;; Preconfigured anything for eshell history.
+;; `anything-c-ucs-persistent-insert'
+;; Not documented.
+;; `anything-c-ucs-persistent-forward'
+;; Not documented.
+;; `anything-c-ucs-persistent-backward'
+;; Not documented.
+;; `anything-c-ucs-persistent-delete'
+;; Not documented.
 ;; `anything-lisp-completion-at-point'
 ;; Anything lisp symbol completion at point.
-;; `anything-lisp-completion-at-point-or-indent'
-;; First call indent and second call complete lisp symbol.
 ;; `anything-c-complete-file-name-at-point'
 ;; Complete file name at point.
-;; `anything-c-run-external-command'
-;; Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
-;; `anything-ratpoison-commands'
-;; Preconfigured `anything' to execute ratpoison commands.
+;; `anything-lisp-completion-at-point-or-indent'
+;; First call indent and second call complete lisp symbol.
+;; `anything-lisp-completion-or-file-name-at-point'
+;; Complete lisp symbol or filename at point.
 ;; `anything-c-set-variable'
 ;; Set value to VAR interactively.
 ;; `anything-c-adaptive-save-history'
@@ -362,8 +388,6 @@
 
 ;;  * User variables defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "anything-" :var-value t)
-;; `anything-c-use-standard-keys'
-;; Default Value: nil
 ;; `anything-c-adaptive-history-file'
 ;; Default Value: "~/.emacs.d/anything-c-adaptive-history"
 ;; `anything-c-adaptive-history-length'
@@ -384,6 +408,8 @@
 ;; Default Value: "/\\	(?:\\(?:\\.\\(?:git\\|hg\\|svn\\)\\|CVS\\|_darcs\\)\\)\\(?:/\\|$\\)\\| [...]
 ;; `anything-kill-ring-threshold'
 ;; Default Value: 10
+;; `anything-c-kill-ring-max-lines-number'
+;; Default Value: nil
 ;; `anything-su-or-sudo'
 ;; Default Value: "su"
 ;; `anything-for-files-prefered-list'
@@ -400,10 +426,6 @@
 ;; Default Value: nil
 ;; `anything-command-map-prefix-key'
 ;; Default Value: "<f5> a"
-;; `anything-c-find-files-show-icons'
-;; Default Value: nil
-;; `anything-c-find-files-icons-directory'
-;; Default Value: "/usr/local/share/emacs/24.0.50/etc/images/tree-widget/default"
 ;; `anything-c-browse-code-regexp-lisp'
 ;; Default Value: "^ *	(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|type\\|th [...]
 ;; `anything-c-browse-code-regexp-python'
@@ -438,6 +460,8 @@
 ;; Default Value: "TAGS"
 ;; `anything-c-etags-tag-file-search-limit'
 ;; Default Value: 10
+;; `anything-c-etags-use-regexp-search'
+;; Default Value: nil
 ;; `anything-c-filelist-file-name'
 ;; Default Value: nil
 ;; `anything-c-eldoc-in-minibuffer-show-fn'
@@ -452,25 +476,38 @@
 ;; Default Value: nil
 ;; `anything-ff-newfile-prompt-p'
 ;; Default Value: t
+;; `anything-ff-avfs-directory'
+;; Default Value: nil
+;; `anything-ff-file-compressed-list'
+;; Default Value:	("gz" "bz2" "zip" "7z") 
+;; `anything-locate-db-file-regexp'
+;; Default Value: "m?locate.db$"
+;; `anything-c-eldoc-show-in-mode-line-delay'
+;; Default Value: 12
+;; `anything-c-copy-files-async-log-file'
+;; Default Value: "/tmp/dired.log"
+;; `anything-ff-printer-list'
+;; Default Value: nil
+;; `anything-ff-transformer-show-only-basename'
+;; Default Value: nil
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
 ;; `anything-c-source-regexp'					(Regexp Builder)
 ;; `anything-c-source-buffers'					(Buffers)
 ;; `anything-c-source-buffer-not-found'				(Create buffer)
-;; `anything-c-source-buffers-list'					(Buffers)
+;; `anything-c-source-buffers-list'				(Buffers)
 ;; `anything-c-source-file-name-history'			(File Name History)
 ;; `anything-c-source-files-in-current-dir'			(Files from Current Directory)
 ;; `anything-c-source-files-in-current-dir+'			(Files from Current Directory)
-;; `anything-c-source-find-files'				(Find Files (`C-.':Go to precedent level))
-;; `anything-c-source-write-file'				(Write File (`C-.':Go to precedent level))
-;; `anything-c-source-insert-file'				(Insert File (`C-.':Go to precedent level))
-;; `anything-c-source-copy-files'				(Copy Files (`C-.':Go to precedent level))
-;; `anything-c-source-symlink-files'				(Symlink Files (`C-.':Go to precedent level))
-;; `anything-c-source-hardlink-files'				(Hardlink Files (`C-.':Go to precedent level))
+;; `anything-c-source-find-files'				(Find Files)
+;; `anything-c-source-write-file'				(Write File)
+;; `anything-c-source-insert-file'				(Insert File)
+;; `anything-c-source-copy-files'				(Copy Files)
+;; `anything-c-source-symlink-files'				(Symlink Files)
+;; `anything-c-source-hardlink-files'				(Hardlink Files)
 ;; `anything-c-source-file-cache'				(File Cache)
 ;; `anything-c-source-locate'					(Locate)
-;; `anything-c-source-etags-select'				(Etags)
 ;; `anything-c-source-recentf'					(Recentf)
 ;; `anything-c-source-ffap-guesser'				(File at point)
 ;; `anything-c-source-ffap-line'				(File/Lineno at point)
@@ -480,6 +517,7 @@
 ;; `anything-c-source-info-elisp'				(Info index: elisp)
 ;; `anything-c-source-info-cl'					(Info index: cl)
 ;; `anything-c-source-info-org'					(Info index: org)
+;; `anything-c-source-info-gnus'				(Info index: Gnus)
 ;; `anything-c-source-info-ratpoison'				(Info index: ratpoison)
 ;; `anything-c-source-info-zsh'					(Info index: zsh)
 ;; `anything-c-source-info-bash'				(Info index: bash)
@@ -554,6 +592,7 @@
 ;; `anything-c-source-elisp-library-scan'			(Elisp libraries (Scan))
 ;; `anything-c-source-imenu'					(Imenu)
 ;; `anything-c-source-ctags'					(Exuberant ctags)
+;; `anything-c-source-etags-select'				(Etags)
 ;; `anything-c-source-semantic'					(Semantic Tags)
 ;; `anything-c-source-simple-call-tree-functions-callers'	(Function is called by)
 ;; `anything-c-source-simple-call-tree-callers-functions'	(Function calls)
@@ -562,6 +601,7 @@
 ;; `anything-c-source-colors'					(Colors)
 ;; `anything-c-source-tracker-search'				(Tracker Search)
 ;; `anything-c-source-mac-spotlight'				(mdfind)
+;; `anything-c-source-picklist'					(Picklist)
 ;; `anything-c-source-kill-ring'				(Kill Ring)
 ;; `anything-c-source-mark-ring'				(mark-ring)
 ;; `anything-c-source-global-mark-ring'				(global-mark-ring)
@@ -573,12 +613,11 @@
 ;; `anything-c-source-emacs-source-defun'			(Emacs Source DEFUN)
 ;; `anything-c-source-emacs-lisp-expectations'			(Emacs Lisp Expectations)
 ;; `anything-c-source-emacs-lisp-toplevels'			(Emacs Lisp Toplevel / Level 4 Comment / Linkd Star)
-;; `anything-c-source-org-headline'				(Org HeadLine)
 ;; `anything-c-source-yaoddmuse-emacswiki-edit-or-view'		(Yaoddmuse Edit or View (EmacsWiki))
 ;; `anything-c-source-yaoddmuse-emacswiki-post-library'		(Yaoddmuse Post library (EmacsWiki))
 ;; `anything-c-source-eev-anchor'				(Anchors)
+;; `anything-c-source-org-headline'				(Org HeadLine)
 ;; `anything-c-source-org-keywords'				(Org Keywords)
-;; `anything-c-source-picklist'					(Picklist)
 ;; `anything-c-source-bbdb'					(BBDB)
 ;; `anything-c-source-evaluation-result'			(Evaluation Result)
 ;; `anything-c-source-calculation-result'			(Calculation Result)
@@ -600,14 +639,15 @@
 ;; `anything-c-source-idle-time-timers'				(Idle Time Timers)
 ;; `anything-c-source-xrandr-change-resolution'			(Change Resolution)
 ;; `anything-c-source-xfonts'					(X Fonts)
+;; `anything-c-source-ucs'					(Ucs names)
+;; `anything-c-source-emacs-process'				(Emacs Process)
 ;; `anything-c-source-time-world'				(Time World List)
 ;; `anything-c-source-apt'					(APT)
 ;; `anything-c-source-gentoo'					(Portage sources)
 ;; `anything-c-source-use-flags'				(Use Flags)
-;; `anything-c-source-emacs-process'				(Emacs Process)
+;; `anything-c-source-ratpoison-commands'			(Ratpoison Commands)
 ;; `anything-c-source-esh'					(Eshell completions)
 ;; `anything-c-source-eshell-history'				(Eshell history)
-;; `anything-c-source-ratpoison-commands'			(Ratpoison Commands)
 
 ;;  *** END auto-documentation
 
