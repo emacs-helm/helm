@@ -952,7 +952,9 @@ in `copy-directory'."
   :type 'string)
 
 (defcustom anything-ff-lynx-style-map t
-  "Use arrow keys to navigate with `anything-find-files'."
+  "Use arrow keys to navigate with `anything-find-files'.
+You will have to restart Emacs or reeval `anything-find-files-map'
+and `anything-c-read-file-map' for this take effect."
   :group 'anything-config
   :type 'boolean)
 
