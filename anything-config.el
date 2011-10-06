@@ -3834,16 +3834,17 @@ See `anything-find-files-eshell-command-on-file-1' for more info."
 (defun anything-ff-serial-rename-action (method)
   "Rename all marked files to `anything-ff-default-directory' with METHOD.
 See `anything-ff-serial-rename-1'."
-  (let ((cands (anything-marked-candidates))
-        (name  (read-string "NewName: "))
-        (start (read-number "StartAtNumber: "))
-        (dir   (expand-file-name
-                (anything-c-read-file-name
-                 "Serial Rename to directory: " :initial-input
-                 (expand-file-name anything-ff-default-directory)))))
+  (let* ((cands     (anything-marked-candidates))
+         (name      (read-string "NewName: "))
+         (start     (read-number "StartAtNumber: "))
+         (extension (read-string "Extension: " (file-name-extension (car cands))))
+         (dir       (expand-file-name
+                     (anything-c-read-file-name
+                      "Serial Rename to directory: " :initial-input
+                      (expand-file-name anything-ff-default-directory)))))
     (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
                             (length cands) dir name))
-      (anything-ff-serial-rename-1 dir cands name start :method method)
+      (anything-ff-serial-rename-1 dir cands name start extension :method method)
       (anything-find-files-1 dir))))
 
 (defun anything-ff-member-directory-p (file directory)
@@ -3852,9 +3853,11 @@ See `anything-ff-serial-rename-1'."
     (string= dir-file cur-dir)))
 
 (defun* anything-ff-serial-rename-1
-    (directory collection new-name start-at-num &key (method 'rename))
+    (directory collection new-name start-at-num extension &key (method 'rename))
   "rename files in COLLECTION to DIRECTORY with the prefix name NEW-NAME.
 Rename start at number START-AT-NUM - ex: prefixname-01.jpg.
+EXTENSION is the file extension to use, in empty prompt,
+reuse the original extension of file.
 METHOD can be one of rename, copy or symlink.
 Files will be renamed if they are files of current directory, otherwise they
 will be treated with METHOD.
@@ -3879,7 +3882,10 @@ Default METHOD is rename."
          for count from start-at-num
          for fnum = (if (< count 10) "0%s" "%s")
          for nname = (concat tmp-dir new-name (format fnum count)
-                             (file-name-extension i 'dot))
+                             (if (not (string= extension ""))
+                                 (format ".%s" (replace-regexp-in-string
+                                                "[.]" "" extension))
+                                 (file-name-extension i 'dot)))
          do (if (anything-ff-member-directory-p i directory)
                 (rename-file i nname)
                 (funcall fn i nname)))
