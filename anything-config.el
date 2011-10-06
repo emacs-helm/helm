@@ -1991,7 +1991,9 @@ See Man locate for more infos.
 (defun anything-mini ()
   "Preconfigured `anything' lightweight version \(buffer -> recentf\)."
   (interactive)
-  (anything-other-buffer '(anything-c-source-buffers-list anything-c-source-recentf)
+  (anything-other-buffer '(anything-c-source-buffers-list
+                           anything-c-source-recentf
+                           anything-c-source-buffer-not-found)
                          "*anything mini*"))
 ;;;###autoload
 (defun anything-for-files ()
