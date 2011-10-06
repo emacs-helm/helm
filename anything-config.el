@@ -10076,7 +10076,10 @@ e.g `ffap-alternate-file' and maybe others."
   '((name . "Eshell completions")
     (init . (lambda ()
               (setq pcomplete-current-completions nil
-                    pcomplete-last-completion-raw nil)))
+                    pcomplete-last-completion-raw nil)
+              ;; Eshell-command add this hook in all minibuffers
+              ;; Remove it for the anything one.
+              (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates . anything-esh-get-candidates)
     (action . anything-ec-insert))
   "Anything source for Eshell completion.")
@@ -10129,7 +10132,9 @@ This is the same as `ac-insert', just inlined here for compatibility."
   '((name . "Eshell history")
     (init . (lambda ()
               (with-current-buffer (anything-candidate-buffer 'global)
-                (insert-file-contents eshell-history-file-name))))
+                (insert-file-contents eshell-history-file-name))
+              ;; Same comment as in `anything-c-source-esh'
+              (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . (lambda (candidates sources)
                                          (reverse candidates)))
