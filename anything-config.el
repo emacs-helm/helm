@@ -1126,12 +1126,14 @@ This can be toggled at anytime from `anything-find-files' with \
 
 ;;; General internal variables
 ;;
-;;
+;; Some internals variable that need to be loaded
+;; here to avoid compiler warnings.
 (defvar anything-c-external-commands-list nil
   "A list of all external commands the user can execute.  If this
 variable is not set by the user, it will be calculated
 automatically.")
 
+(defvar anything-c-show-completion-overlay nil)
 
 
 ;;; Faces
@@ -10142,9 +10144,6 @@ This is the same as `ac-insert', just inlined here for compatibility."
 ;; Provide show completion with macro `with-anything-show-completion'.
 
 
-;; Internal
-(defvar anything-c-show-completion-overlay nil)
-
 ;; Called each time cursor move in anything-buffer.
 (defun anything-c-show-completion ()
   (with-anything-current-buffer
@@ -10152,11 +10151,10 @@ This is the same as `ac-insert', just inlined here for compatibility."
                  'display (anything-get-selection))))
 
 (defun anything-c-show-completion-init-overlay (beg end)
-  (with-anything-current-buffer
-    (and anything-c-turn-on-show-completion
-         (setq anything-c-show-completion-overlay (make-overlay beg end))
-         (overlay-put anything-c-show-completion-overlay
-                      'face 'anything-lisp-show-completion))))
+  (and anything-c-turn-on-show-completion
+       (setq anything-c-show-completion-overlay (make-overlay beg end))
+       (overlay-put anything-c-show-completion-overlay
+                    'face 'anything-lisp-show-completion)))
 
 (defmacro with-anything-show-completion (beg end &rest body)
   "Show anything candidate in an overlay at point.
