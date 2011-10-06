@@ -5080,7 +5080,6 @@ Bindings affected are C, R, S, H."
                                    (buffer "*Anything Completions*")
                                    test
                                    (preselect nil)
-                                   must-match
                                    (history nil)
                                    (marked-candidates nil)
                                    (alistp t)
@@ -5124,11 +5123,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                        for fname in seq when (funcall test fname)
                                        collect fname into ls
                                        finally return
-                                       (if must-match ls
-                                           (append (list anything-pattern) ls)))
-                                    (if must-match
-                                        (if (file-exists-p (car seq)) seq (cdr seq))
-                                        seq)))))
+                                         (append (list anything-pattern) ls))
+                                    seq))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
@@ -10025,12 +10021,16 @@ See documentation of `completing-read' and `all-completions' for details."
                           default-filename)))
          (init (or default initial dir default-directory))
          (ini-input (and init (expand-file-name init)))
-         (anything-ff-auto-update-flag nil))
-    (anything-c-read-file-name prompt
-                               :initial-input (expand-file-name init dir)
-                               :alistp nil
-                               :must-match mustmatch
-                               :test predicate)))
+         (anything-ff-auto-update-flag nil)
+         (fname (anything-c-read-file-name
+                 prompt
+                 :initial-input (expand-file-name init dir)
+                 :alistp nil
+                 :test predicate)))
+    (if mustmatch
+        (if (y-or-n-p "File does not exists, create buffer?")
+            fname (error "Abort file does not exists"))
+        fname)))
 
 (defvar anything-completion-mode-string " AC")
 ;;;###autoload
@@ -10279,8 +10279,7 @@ Borrowed from anything-complete.el, inlined here for compatibility."
          completion)
   (with-anything-show-completion beg end
     (setq completion (anything-c-read-file-name "FileName: "
-                                                :initial-input init
-                                                :must-match t)))
+                                                :initial-input init)))
   (anything-c-insert-file-name-completion-at-point completion)))
 
 ;; Internal
