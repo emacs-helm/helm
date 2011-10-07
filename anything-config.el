@@ -10057,8 +10057,7 @@ Don't use it directly, use instead `anything-comp-read' in your programs \
 which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
-  (let ((init initial-input)
-        (anything-candidate-number-limit 9999))
+  (let ((init initial-input))
     (anything-comp-read
      prompt collection
      :test predicate
