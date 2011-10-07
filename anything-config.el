@@ -10181,15 +10181,17 @@ This is the same as `ac-insert', just inlined here for compatibility."
 (defvar anything-c-source-eshell-history
   '((name . "Eshell history")
     (init . (lambda ()
+              (eshell-write-history eshell-history-file-name t)
               (with-current-buffer (anything-candidate-buffer 'global)
                 (insert-file-contents eshell-history-file-name))
               ;; Same comment as in `anything-c-source-esh'
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . (lambda (candidates sources)
-                                         (reverse candidates)))
+                                        (reverse candidates)))
     (candidate-number-limit . 9999)
     (action . (lambda (candidate)
+                (eshell-kill-input)
                 (insert candidate))))
   "Anything source for Eshell history.")
 
