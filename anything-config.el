@@ -6056,7 +6056,7 @@ See `anything-c-filelist-file-name' docstring for usage.")
 Will be calculated the first time you invoke anything with this
 source.")
 
-(defun anything-c-info-pages-get-candidates ()
+(defun anything-c-info-pages-init ()
   "Collect candidates for initial Info node Top."
   (if anything-c-info-pages
       anything-c-info-pages
@@ -6065,17 +6065,16 @@ source.")
         (require 'info)
         (with-temp-buffer
           (Info-find-node "dir" "top")
-          (save-excursion
-            (goto-char (point-min))
-            (while (re-search-forward info-topic-regexp nil t)
-              (push (match-string-no-properties 1) topics))
-            (goto-char (point-min))
-            (kill-buffer)))
-        (setq anything-c-info-pages topics))))
+          (goto-char (point-min))
+          (while (re-search-forward info-topic-regexp nil t)
+            (push (match-string-no-properties 1) topics))
+          (kill-buffer))
+          (setq anything-c-info-pages topics))))
 
 (defvar anything-c-source-info-pages
   `((name . "Info Pages")
-    (candidates . anything-c-info-pages-get-candidates)
+    (init . anything-c-info-pages-init)
+    (candidates . anything-c-info-pages)
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string
                                            "^[^:]+: " "" node-str))))))
