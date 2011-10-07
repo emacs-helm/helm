@@ -2717,9 +2717,19 @@ With a prefix arg reload cache."
   "Preconfigured anything for eshell history."
   (interactive)
   (let* ((end (point))
-         (beg (progn (save-excursion (insert " ") (point)))))
-    (with-anything-show-completion beg end
-      (anything-other-buffer anything-c-source-eshell-history "*Eshell history*"))))
+         (beg (save-excursion (eshell-bol) (point)))
+         flag-empty)
+    (when (eq beg end)
+      (insert " ")
+      (setq flag-empty t)
+      (setq end (point)))
+    (unwind-protect
+         (with-anything-show-completion beg end
+           (anything :sources 'anything-c-source-eshell-history
+                     :buffer "*Eshell history*"))
+      (when (and flag-empty
+                 (looking-back " "))
+        (delete-char -1)))))
 
 ;;;###autoload
 (defun anything-c-run-external-command (program)
