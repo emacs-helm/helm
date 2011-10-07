@@ -2015,10 +2015,10 @@ With a prefix-arg insert symbol at point."
   (interactive "P")
   (let ((anything-c-google-suggest-default-function
          'anything-c-google-suggest-emacs-lisp))
-    (anything :sources'(anything-c-source-info-elisp
-                        anything-c-source-info-cl
-                        anything-c-source-info-pages
-                        anything-c-source-google-suggest)
+    (anything :sources '(anything-c-source-info-elisp
+                         anything-c-source-info-cl
+                         anything-c-source-info-pages
+                         anything-c-source-google-suggest)
               :input (and arg (thing-at-point 'symbol))
               :buffer "*anything info*")))
 
@@ -6056,25 +6056,26 @@ See `anything-c-filelist-file-name' docstring for usage.")
 Will be calculated the first time you invoke anything with this
 source.")
 
+(defun anything-c-info-pages-get-candidates ()
+  "Collect candidates for initial Info node Top."
+  (if anything-c-info-pages
+      anything-c-info-pages
+      (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+            topics)
+        (require 'info)
+        (with-temp-buffer
+          (Info-find-node "dir" "top")
+          (save-excursion
+            (goto-char (point-min))
+            (while (re-search-forward info-topic-regexp nil t)
+              (push (match-string-no-properties 1) topics))
+            (goto-char (point-min))
+            (kill-buffer)))
+        (setq anything-c-info-pages topics))))
+
 (defvar anything-c-source-info-pages
   `((name . "Info Pages")
-    (candidates
-     . (lambda ()
-         (if anything-c-info-pages
-             anything-c-info-pages
-             (setq anything-c-info-pages
-                   (save-window-excursion
-                     (save-excursion
-                       (require 'info)
-                       (Info-find-node "dir" "top")
-                       (goto-char (point-min))
-                       (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-                             topics)
-                         (while (re-search-forward info-topic-regexp nil t)
-                           (add-to-list 'topics (match-string-no-properties 1)))
-                         (goto-char (point-min))
-                         (Info-exit)
-                         topics)))))))
+    (candidates . anything-c-info-pages-get-candidates)
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string
                                            "^[^:]+: " "" node-str))))))
