@@ -10067,7 +10067,10 @@ Don't use it directly, use instead `anything-comp-read' in your programs \
 which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
-  (let ((init initial-input))
+  (let* ((init initial-input)
+         (current-command this-command)
+         (str-command (symbol-name current-command))
+         (buf-name (format "*ac-mode-%s*" str-command)))
     (anything-comp-read
      prompt collection
      :test predicate
@@ -10078,6 +10081,8 @@ See documentation of `completing-read' and `all-completions' for details."
      :history (eval (or (car-safe hist) hist))
      :must-match require-match
      :alistp nil
+     :name str-command
+     :buffer buf-name
      ;; If DEF is not provided, fallback to empty string
      ;; to avoid `thing-at-point' to be appended on top of list
      :default (or def "")
