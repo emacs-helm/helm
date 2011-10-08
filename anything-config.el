@@ -9916,10 +9916,18 @@ Support install, remove and purge actions."
 ;;
 (defun anything-comp-read-get-candidates (collection &optional test sort-fn alistp)
   "Convert COLLECTION to list removing elements that don't match TEST.
+See `anything-comp-read' about supported COLLECTION arguments.
+
 SORT-FN is a predicate to sort COLLECTION.
-ALISTP is a flag to not use `all-completions' which doesn't handle alists correctly\
-for anything.
-If collection is an `obarray', a TEST is needed. See `obarray'."
+
+ALISTP when non--nil will not use `all-completions' to collect
+candidates because it doesn't handle alists correctly for anything.
+i.e In `all-completion' the keys \(cars of elements\)
+are the possible completions. In anything we want to use the cdr instead
+like \(display . real\).
+See docstring of `all-completions' for more info.
+
+If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (let ((cands
          (cond ((and (eq collection obarray) test)
                 (all-completions "" collection test))
@@ -9961,7 +9969,10 @@ Do nothing, just return candidate list unmodified."
   "Anything `completing-read' emulation.
 PROMPT is the prompt name to use.
 COLLECTION can be a list, vector, obarray or hash-table.
-Keys:
+It can be also a function that receives three arguments:
+the values string, predicate and t. See `all-completions' for more details.
+
+Keys description:
 
 TEST: A predicate called with one arg i.e candidate.
 INITIAL-INPUT: Same as initial-input arg in `anything'.
@@ -9973,22 +9984,21 @@ MUST-MATCH: Candidate selected must be one of COLLECTION.
 REQUIRES-PATTERN: Same as anything attribute, default is 0.
 HISTORY: A list containing specific history, default is nil.
 When it is non--nil, all elements of HISTORY are displayed in
-anything-buffer before COLLECTION.
+a special source before COLLECTION.
 PERSISTENT-ACTION: A function called with one arg i.e candidate.
 PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
 NAME: The name related to this local source.
-VOLATILE: Use volatile attribute.
+VOLATILE: Use volatile attribute \(enabled by default\).
 SORT: A predicate to give to `sort' e.g `string-lessp'.
 FC-TRANSFORMER: A `filtered-candidate-transformer' function.
 MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
-ALISTP: when non--nil \(default\) cdr of alist is returned otherwise it is the car.
+ALISTP: \(default is non--nil\) See `anything-comp-read-get-candidates'.
 
 Any prefix args passed during `anything-comp-read' invocation will be recorded
 in `anything-current-prefix-arg', otherwise if prefix args where given before
 `anything-comp-read' invocation, the value of `current-prefix-arg' will be used.
-That's mean you can pass prefix arg before or after calling
-a command that use `anything-comp-read'.
-It support now also a function as argument, See `all-completions' for more details."
+That's mean you can pass prefix args before or after calling a command
+that use `anything-comp-read' See `anything-M-x' for example."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   (flet ((action-fn (candidate)
