@@ -10055,6 +10055,54 @@ that use `anything-comp-read' See `anything-M-x' for example."
 ;; Provide a mode `anything-completion-mode' which turn on
 ;; anything in all `completing-read' and `read-file-name' in Emacs.
 ;;
+(defvar anything-completing-read-handlers-alist
+  '((describe-function . anything-completing-read-symbols)
+    (describe-variable . anything-completing-read-symbols))
+  "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
+Each entry is a cons like \(emacs_command . completing-read_handler\).
+Each key is an Emacs command that use originaly `completing-read'.
+Each value is a function that take same arguments as `completing-read'.
+
+If the value of an entry is nil completion will fall back to
+`anything-comp-read'.
+
+If you want to use Emacs vanilla completion for a specific entry,
+set this entry key to `completing-read'
+e.g If you want to disable anything completion for `describe-function':
+\(describe-function . completing-read\).")
+
+(defvar anything-completion-mode-string " AC")
+
+(defvar anything-completion-mode-quit-message
+  "Anything completion disabled")
+
+(defvar anything-completion-mode-start-message
+  "Anything completion enabled")
+
+(defun anything-completing-read-symbols
+    (prompt collection test require-match init hist default inherit-input-method name buffer)
+    ;(prompt collection test require-match default init name buffer)
+  "Specialized function for fast symbols completion in `ac-mode'."
+  (or
+   (anything
+    :sources `((name . ,name)
+               (init . (lambda ()
+                         (with-current-buffer (anything-candidate-buffer 'global)
+                           (goto-char (point-min))
+                           (when default (insert (concat default "\n")))
+                           (loop with all = (all-completions "" collection test)
+                              for sym in all
+                              unless (and default (eq sym default))
+                              do (insert (concat sym "\n"))))))
+               (candidates-in-buffer)
+               (action . identity))
+    :prompt prompt
+    :buffer buffer
+    :input init
+    :resume 'noresume
+    :default (or default ""))
+   (keyboard-quit)))
+
 (defun anything-completing-read-default
     (prompt collection &optional
                          predicate require-match
@@ -10067,26 +10115,44 @@ Don't use it directly, use instead `anything-comp-read' in your programs \
 which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
-  (let* ((init initial-input)
-         (current-command this-command)
+  (let* ((current-command this-command)
          (str-command (symbol-name current-command))
-         (buf-name (format "*ac-mode-%s*" str-command)))
-    (anything-comp-read
-     prompt collection
-     :test predicate
-     :fc-transformer #'(lambda (candidates source)
-                         (loop for i in candidates
-                            if (consp i) collect (car i)
-                            else collect i))
-     :history (eval (or (car-safe hist) hist))
-     :must-match require-match
-     :alistp nil
-     :name str-command
-     :buffer buf-name
-     ;; If DEF is not provided, fallback to empty string
-     ;; to avoid `thing-at-point' to be appended on top of list
-     :default (or def "")
-     :initial-input init)))
+         (buf-name (format "*ac-mode-%s*" str-command))
+         (def-com  (cdr-safe (assq current-command
+                                   anything-completing-read-handlers-alist)))
+         anything-completion-mode-start-message ; Be quiet
+         anything-completion-mode-quit-message)
+    ;; If we use now `completing-read' we MUST turn off `ac-mode'
+    ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
+    (when (eq def-com 'completing-read) (ac-mode -1))
+    (unwind-protect
+         (cond (;; A specialized function exists, run it.
+                (and def-com anything-completion-mode)
+                (funcall def-com prompt collection predicate require-match
+                         initial-input hist def inherit-input-method
+                         str-command buf-name))
+               (;; Run for this command regular `completing-read'.
+                (and def-com (eq def-com 'completing-read)) ; Double check.
+                (funcall def-com prompt collection predicate require-match
+                         initial-input hist def inherit-input-method))
+               (t ; Fall back to classic `anything-comp-read'.
+                (anything-comp-read
+                 prompt collection
+                 :test predicate
+                 :fc-transformer #'(lambda (candidates source)
+                                     (loop for i in candidates
+                                        if (consp i) collect (car i)
+                                        else collect i))
+                 :history (eval (or (car-safe hist) hist))
+                 :must-match require-match
+                 :alistp nil
+                 :name str-command
+                 :buffer buf-name
+                 ;; If DEF is not provided, fallback to empty string
+                 ;; to avoid `thing-at-point' to be appended on top of list
+                 :default (or def "")
+                 :initial-input initial-input)))
+    (ac-mode 1))))
   
 (defun anything-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
@@ -10108,13 +10174,16 @@ See documentation of `completing-read' and `all-completions' for details."
             fname (error "Abort file does not exists"))
         fname)))
 
-(defvar anything-completion-mode-string " AC")
 ;;;###autoload
 (define-minor-mode anything-completion-mode
     "Toggle generic anything completion.
+
 All functions in Emacs that use `completing-read'
 or `read-file-name' and friends will use anything interface
 when this mode is turned on.
+However you can modify this behavior for functions of your choice
+with `anything-completing-read-handlers-alist'.
+
 Called with a positive arg, turn on inconditionnaly, with a
 negative arg turn off.
 You can turn it on with `ac-mode'.
@@ -10129,10 +10198,10 @@ e.g `ffap-alternate-file' and maybe others."
       (progn
         (setq completing-read-function 'anything-completing-read-default
               read-file-name-function  'anything-generic-read-file-name)
-        (message "Anything completion enabled"))
+        (message anything-completion-mode-start-message))
       (setq completing-read-function 'completing-read-default
             read-file-name-function  'read-file-name-default)
-      (message "Anything completion disabled")))
+      (message anything-completion-mode-quit-message)))
 
 (defalias 'ac-mode 'anything-completion-mode)
 
@@ -10273,8 +10342,8 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
          (anything-quit-if-no-candidate t)
          (anything-execute-action-at-once-if-one t)
          (anything-match-plugin-enabled
-         (member 'anything-compile-source--match-plugin
-                 anything-compile-source-functions)))
+          (member 'anything-compile-source--match-plugin
+                  anything-compile-source-functions)))
     (if candidates
         (with-anything-show-completion beg end
           ;; Overlay is initialized now in anything-current-buffer.
