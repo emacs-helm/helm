@@ -5160,6 +5160,7 @@ Bindings affected are C, R, S, H."
 
 (defun* anything-c-read-file-name (prompt
                                    &key
+                                   (name "Read File Name")
                                    (initial-input (expand-file-name default-directory))
                                    (buffer "*Anything Completions*")
                                    test
@@ -5184,7 +5185,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                  (identity candidate))))
       (or (anything
            :sources
-           `(((name . "Read File Name History")
+           `(((name . ,(format "%s History" name))
               (header-name . (lambda (name)
                                (concat name anything-c-find-files-doc-header)))
               (disable-shortcuts)
@@ -5194,7 +5195,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (persistent-action . ,persistent-action)
               (persistent-help . ,persistent-help)
               (action . ,'action-fn))
-             ((name . "Read file name")
+             ((name . ,name)
               (header-name . (lambda (name)
                                (concat name anything-c-find-files-doc-header)))
               ;; It is needed for filenames with capital letters
@@ -10175,7 +10176,7 @@ See documentation of `completing-read' and `all-completions' for details."
                  :initial-input (expand-file-name init dir)
                  :alistp nil
                  :test predicate)))
-    (if mustmatch
+    (if (and mustmatch (not (file-exists-p fname)))
         (if (y-or-n-p "File does not exists, create buffer?")
             fname (error "Abort file does not exists"))
         fname)))
