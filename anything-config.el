@@ -1164,6 +1164,28 @@ This can be toggled at anytime from `anything-find-files' with \
   :type 'boolean
   :group 'anything-config)
 
+(defcustom anything-completing-read-handlers-alist
+  '((describe-function . anything-completing-read-symbols)
+    (describe-variable . anything-completing-read-symbols))
+  "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
+Each entry is a cons cell like \(emacs_command . completing-read_handler\)
+where key and value are symbols.
+Each key is an Emacs command that use originaly `completing-read'.
+Each value is a function that take same arguments as `completing-read' plus
+NAME and BUFFER, where NAME is the name of the new anything source and BUFFER
+the name of the buffer we will use.
+See `anything-completing-read-symbols' for example.
+
+If the value of an entry is nil completion will fall back to
+`anything-comp-read'.
+
+If you want to use Emacs vanilla completion for a specific entry,
+set value of this entry key to `completing-read'.
+e.g If you want to disable anything completion for `describe-function':
+\(describe-function . completing-read\)."
+  :group 'anything-config
+  :type '(alist :key-type symbol :value-type symbol))
+
 
 
 ;;; General internal variables
@@ -10055,22 +10077,6 @@ that use `anything-comp-read' See `anything-M-x' for example."
 ;; Provide a mode `anything-completion-mode' which turn on
 ;; anything in all `completing-read' and `read-file-name' in Emacs.
 ;;
-(defvar anything-completing-read-handlers-alist
-  '((describe-function . anything-completing-read-symbols)
-    (describe-variable . anything-completing-read-symbols))
-  "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
-Each entry is a cons like \(emacs_command . completing-read_handler\).
-Each key is an Emacs command that use originaly `completing-read'.
-Each value is a function that take same arguments as `completing-read'.
-
-If the value of an entry is nil completion will fall back to
-`anything-comp-read'.
-
-If you want to use Emacs vanilla completion for a specific entry,
-set this entry key to `completing-read'
-e.g If you want to disable anything completion for `describe-function':
-\(describe-function . completing-read\).")
-
 (defvar anything-completion-mode-string " AC")
 
 (defvar anything-completion-mode-quit-message
@@ -10080,8 +10086,8 @@ e.g If you want to disable anything completion for `describe-function':
   "Anything completion enabled")
 
 (defun anything-completing-read-symbols
-    (prompt collection test require-match init hist default inherit-input-method name buffer)
-    ;(prompt collection test require-match default init name buffer)
+    (prompt collection test require-match init
+     hist default inherit-input-method name buffer)
   "Specialized function for fast symbols completion in `ac-mode'."
   (or
    (anything
