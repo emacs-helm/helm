@@ -2513,9 +2513,11 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    :persistent-help "Describe this command"
                    :history history
                    :sort 'string-lessp
-                   :fc-transformer 'anything-M-x-transformer)))
+                   :fc-transformer 'anything-M-x-transformer))
+         (sym-com (intern command)))
     (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
-    (call-interactively (intern command))
+    (setq this-command sym-com) ; Avoid having `this-command' set to *exit-minibuffer.
+    (call-interactively sym-com)
     (setq extended-command-history (cons command (delete command history)))))
 
 ;;;###autoload
@@ -4217,7 +4219,7 @@ If EXPAND is non--nil expand-file-name."
                       "Read File Name History"
                       "Rename Files" "Symlink Files"
                       "Hardlink Files" "Write File"
-                      "Insert File" "Read file name"))
+                      "Insert File" "Read File Name"))
         (cur-source (cdr (assoc 'name (anything-get-current-source)))))
     (loop for i in ff-sources thereis (string= cur-source i))))
 
@@ -10165,14 +10167,19 @@ See documentation of `completing-read' and `all-completions' for details."
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An anything replacement of `read-file-name'."
   (let* ((default (and default-filename
-                      (if (listp default-filename)
-                          (car default-filename)
-                          default-filename)))
+                       (if (listp default-filename)
+                           (car default-filename)
+                           default-filename)))
          (init (or default initial dir default-directory))
          (ini-input (and init (expand-file-name init)))
          (anything-ff-auto-update-flag nil)
+         (current-command this-command)
+         (str-command (symbol-name current-command))
+         (buf-name (format "*ac-mode-%s*" str-command))
          (fname (anything-c-read-file-name
                  prompt
+                 :name str-command
+                 :buffer buf-name
                  :initial-input (expand-file-name init dir)
                  :alistp nil
                  :test predicate)))
