@@ -10129,6 +10129,9 @@ See documentation of `completing-read' and `all-completions' for details."
          (buf-name (format "*ac-mode-%s*" str-command))
          (def-com  (cdr-safe (assq current-command
                                    anything-completing-read-handlers-alist)))
+         (def-args (list prompt collection predicate require-match
+                         initial-input hist def inherit-input-method))
+         (args (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message)
     ;; If we use now `completing-read' we MUST turn off `ac-mode'
@@ -10137,13 +10140,10 @@ See documentation of `completing-read' and `all-completions' for details."
     (unwind-protect
          (cond (;; A specialized function exists, run it.
                 (and def-com anything-completion-mode)
-                (funcall def-com prompt collection predicate require-match
-                         initial-input hist def inherit-input-method
-                         str-command buf-name))
+                (apply def-com args))
                (;; Run for this command regular `completing-read'.
                 (and def-com (eq def-com 'completing-read)) ; Double check.
-                (funcall def-com prompt collection predicate require-match
-                         initial-input hist def inherit-input-method))
+                (apply def-com def-args))
                (t ; Fall back to classic `anything-comp-read'.
                 (anything-comp-read
                  prompt collection
