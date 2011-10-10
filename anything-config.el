@@ -4215,7 +4215,7 @@ If EXPAND is non--nil expand-file-name."
 
 (defun anything-file-completion-source-p ()
   "Test if current source is a dired or find-files source."
-  (let ((ff-sources '("Find Files" "Copy Files"
+  (let ((ff-sources '("Find Files" "find-file" "Copy Files"
                       "Read File Name History"
                       "Rename Files" "Symlink Files"
                       "Hardlink Files" "Write File"
