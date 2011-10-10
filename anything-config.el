@@ -10136,6 +10136,8 @@ See documentation of `completing-read' and `all-completions' for details."
                                    anything-completing-read-handlers-alist)))
          (def-args (list prompt collection predicate require-match
                          initial-input hist def inherit-input-method))
+         ;; Append the two extra args needed to set the buffer and source name
+         ;; in anything specialized functions.
          (args (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message)
@@ -10191,13 +10193,42 @@ See documentation of `completing-read' and `all-completions' for details."
          (current-command this-command)
          (str-command (symbol-name current-command))
          (buf-name (format "*ac-mode-%s*" str-command))
-         (fname (anything-c-read-file-name
-                 prompt
-                 :name str-command
-                 :buffer buf-name
-                 :initial-input (expand-file-name init dir)
-                 :alistp nil
-                 :test predicate)))
+         (def-com  (cdr-safe (assq current-command
+                                   anything-completing-read-handlers-alist)))
+         (def-args (list prompt dir default-filename mustmatch initial predicate))
+         ;; Append the two extra args needed to set the buffer and source name
+         ;; in anything specialized functions.
+         (args (append def-args (list str-command buf-name)))
+         anything-completion-mode-start-message ; Be quiet
+         anything-completion-mode-quit-message  ; Same here
+         fname)
+    ;; If we use now `read-file-name' we MUST turn off `ac-mode'
+    ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
+    (when (eq def-com 'read-file-name) (ac-mode -1))
+    (unwind-protect
+         (setq fname
+               (cond (;; A specialized function exists, run it
+                      ;; with the two extra args specific to anything..
+                      (and def-com anything-completion-mode
+                           (not (eq def-com 'ido-read-file-name)))
+                      (apply def-com args))
+                     (;; Def-com value is `ido-read-file-name'
+                      ;; run it with default args.
+                      (and def-com (eq def-com 'ido-read-file-name))
+                      (apply def-com def-args))
+                     (;; Def-com value is `read-file-name'
+                      ;; run it with default args.
+                      (and def-com (eq def-com 'read-file-name))
+                      (apply def-com def-args))
+                     (t ; Fall back to classic `anything-c-read-file-name'.
+                      (anything-c-read-file-name
+                       prompt
+                       :name str-command
+                       :buffer buf-name
+                       :initial-input (expand-file-name init dir)
+                       :alistp nil
+                       :test predicate))))
+      (ac-mode 1))
     (if (and mustmatch (not (file-exists-p fname)))
         (if (y-or-n-p "File does not exists, create buffer?")
             fname (error "Abort file does not exists"))
