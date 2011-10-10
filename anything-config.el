@@ -9947,7 +9947,7 @@ SORT-FN is a predicate to sort COLLECTION.
 
 ALISTP when non--nil will not use `all-completions' to collect
 candidates because it doesn't handle alists correctly for anything.
-i.e In `all-completion' the keys \(cars of elements\)
+i.e In `all-completions' the keys \(cars of elements\)
 are the possible completions. In anything we want to use the cdr instead
 like \(display . real\).
 See docstring of `all-completions' for more info.
@@ -10154,6 +10154,11 @@ See documentation of `completing-read' and `all-completions' for details."
                  prompt collection
                  :test predicate
                  :fc-transformer #'(lambda (candidates source)
+                                     ;; In regular `completing-read'
+                                     ;; when a candidate is a cons cell
+                                     ;; the car is used. Anything use
+                                     ;; normally the cdr, so modify that
+                                     ;; to fit `completing-read'.
                                      (loop for i in candidates
                                         if (consp i) collect (car i)
                                         else collect i))
