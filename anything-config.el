@@ -10117,7 +10117,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                          predicate require-match
                          initial-input hist def
                          inherit-input-method)
-    "An anything replacement of `completing-read'.
+  "An anything replacement of `completing-read'.
 This function should be used only as a `completing-read-function'.
  
 Don't use it directly, use instead `anything-comp-read' in your programs \
@@ -10138,7 +10138,12 @@ See documentation of `completing-read' and `all-completions' for details."
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (eq def-com 'completing-read) (ac-mode -1))
     (unwind-protect
-         (cond (;; A specialized function exists, run it.
+         (cond (;; Try to handle `ido-completing-read' everywhere.
+                (and def-com (eq def-com 'ido-completing-read))
+                (setcar (memq collection def-args)
+                        (all-completions "" collection predicate))
+                (apply def-com def-args))
+               (;; A specialized function exists, run it.
                 (and def-com anything-completion-mode)
                 (apply def-com args))
                (;; Run for this command regular `completing-read'.
@@ -10161,7 +10166,7 @@ See documentation of `completing-read' and `all-completions' for details."
                  ;; to avoid `thing-at-point' to be appended on top of list
                  :default (or def "")
                  :initial-input initial-input)))
-    (ac-mode 1))))
+      (ac-mode 1))))
   
 (defun anything-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
