@@ -8445,10 +8445,12 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
 ;;
 (defvar anything-c-source-org-headline
   `((name . "Org HeadLine")
-    (headline ,@(mapcar (lambda (num)
-                          (format "^\\*\\{%d\\} \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
-                                  num))
-                        (number-sequence 1 8)))
+    (headline
+     ,@(mapcar
+        (lambda (num)
+          (format "^\\*\\{%d\\} \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+                  num))
+        (number-sequence 1 8)))
     (condition . (eq major-mode 'org-mode))
     (migemo)
     (subexp . 1)
@@ -8458,6 +8460,7 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
     (action-transformer
      . (lambda (actions candidate)
          '(("Go to Line" . anything-c-action-line-goto)
+           ("Refile to this Headline" . anything-c-org-headline-refile)
            ("Insert Link to This Headline"
             . anything-c-org-headline-insert-link-to-headline)))))
   "Show Org headlines.
@@ -8465,6 +8468,7 @@ org-mode is very very much extended text-mode/outline-mode.
 
 See (find-library \"org.el\")
 See http://orgmode.org for the latest version.")
+;; (anything 'anything-c-source-org-headline)
 
 (defun anything-c-org-headline-insert-link-to-headline (lineno-and-content)
   (insert
@@ -8472,7 +8476,15 @@ See http://orgmode.org for the latest version.")
      (anything-goto-line (car lineno-and-content))
      (and (looking-at org-complex-heading-regexp)
           (org-make-link-string (concat "*" (match-string 4)))))))
-;; (anything 'anything-c-source-org-headline)
+
+(defun anything-c-org-headline-refile (lineno-and-content)
+  "Refile current org entry to LINENO-AND-CONTENT."
+  (with-anything-current-buffer
+    (org-cut-subtree)
+    (anything-goto-line (car lineno-and-content))
+    (forward-line 1)
+    (org-yank)))
+
 
 ;;; Org keywords
 ;;
