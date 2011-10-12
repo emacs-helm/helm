@@ -10109,6 +10109,9 @@ that use `anything-comp-read' See `anything-M-x' for example."
 (defvar anything-completion-mode-start-message
   "Anything completion enabled")
 
+;;; Specialized handlers
+;;
+;;
 (defun anything-completing-read-symbols
     (prompt collection test require-match init
      hist default inherit-input-method name buffer)
@@ -10132,6 +10135,35 @@ that use `anything-comp-read' See `anything-M-x' for example."
     :resume 'noresume
     :default (or default ""))
    (keyboard-quit)))
+
+
+;;; Generic completing read
+;;
+;;
+(defun anything-completing-read-default-1 (prompt collection test require-match
+                                           init hist default inherit-input-method
+                                           name buffer)
+  (anything-comp-read
+   prompt collection
+   :test predicate
+   :fc-transformer #'(lambda (candidates source)
+                       ;; In regular `completing-read'
+                       ;; when a candidate is a cons cell
+                       ;; the car is used. Anything use
+                       ;; normally the cdr, so modify that
+                       ;; to fit `completing-read'.
+                       (loop for i in candidates
+                          if (consp i) collect (car i)
+                          else collect i))
+   :history (eval (or (car-safe hist) hist))
+   :must-match require-match
+   :alistp nil
+   :name str-command
+   :buffer buf-name
+   ;; If DEF is not provided, fallback to empty string
+   ;; to avoid `thing-at-point' to be appended on top of list
+   :default (or def "")
+   :initial-input initial-input))
 
 (defun anything-completing-read-default
     (prompt collection &optional
@@ -10173,27 +10205,9 @@ See documentation of `completing-read' and `all-completions' for details."
                 (and def-com (eq def-com 'completing-read)) ; Double check.
                 (apply def-com def-args))
                (t ; Fall back to classic `anything-comp-read'.
-                (anything-comp-read
-                 prompt collection
-                 :test predicate
-                 :fc-transformer #'(lambda (candidates source)
-                                     ;; In regular `completing-read'
-                                     ;; when a candidate is a cons cell
-                                     ;; the car is used. Anything use
-                                     ;; normally the cdr, so modify that
-                                     ;; to fit `completing-read'.
-                                     (loop for i in candidates
-                                        if (consp i) collect (car i)
-                                        else collect i))
-                 :history (eval (or (car-safe hist) hist))
-                 :must-match require-match
-                 :alistp nil
-                 :name str-command
-                 :buffer buf-name
-                 ;; If DEF is not provided, fallback to empty string
-                 ;; to avoid `thing-at-point' to be appended on top of list
-                 :default (or def "")
-                 :initial-input initial-input)))
+                (anything-completing-read-default-1
+                 prompt collection predicate require-match
+                 initial-input hist def inherit-input-method str-command buf-name)))
       (ac-mode 1))))
   
 (defun anything-generic-read-file-name
