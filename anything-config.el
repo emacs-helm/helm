@@ -1751,11 +1751,13 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
   (interactive)
   (let ((anything-help-message "== Anything Find Files ==
 \nTips:
-\nEnter \"~/\" at anytime to reach home directory.
-Enter \"/\" at anytime to reach root of your file system.
-You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
-Use `C-u C-z' to watch an image.
-To browse images directories turn on `anything-follow-mode'.
+\n- Enter \"~/\" at anytime to reach home directory.
+- Enter \"/\" at anytime to reach root of your file system.
+- You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
+- Use `C-u C-z' to watch an image.
+- To browse images directories turn on `anything-follow-mode' and navigate with arrow keys.
+- When entered ediff, hitting `C-g' will ask you to use locate to find the file to ediff with.
+ 
 \nSpecific commands for `anything-find-files':
 \\<anything-find-files-map>
 \\[anything-ff-run-locate]\t\t->Run Locate on basename of candidate (C-u to specify locate db).
