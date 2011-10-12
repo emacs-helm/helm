@@ -2841,6 +2841,7 @@ Default is `anything-current-buffer'."
   (when (or (eq major-mode 'org-mode)
             (and (boundp 'outline-minor-mode)
                  outline-minor-mode))
+    (require 'org) ; On some old Emacs versions org may not be loaded.
     (org-reveal))
   (anything-match-line-color-current-line) (sit-for 0.3)
   (anything-match-line-cleanup))
