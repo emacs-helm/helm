@@ -10145,7 +10145,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                                            name buffer)
   (anything-comp-read
    prompt collection
-   :test predicate
+   :test test
    :fc-transformer #'(lambda (candidates source)
                        ;; In regular `completing-read'
                        ;; when a candidate is a cons cell
@@ -10158,12 +10158,12 @@ that use `anything-comp-read' See `anything-M-x' for example."
    :history (eval (or (car-safe hist) hist))
    :must-match require-match
    :alistp nil
-   :name str-command
-   :buffer buf-name
+   :name name
+   :buffer buffer
    ;; If DEF is not provided, fallback to empty string
    ;; to avoid `thing-at-point' to be appended on top of list
-   :default (or def "")
-   :initial-input initial-input))
+   :default (or default "")
+   :initial-input init))
 
 (defun anything-completing-read-default
     (prompt collection &optional
@@ -10182,6 +10182,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (buf-name (format "*ac-mode-%s*" str-command))
          (def-com  (cdr-safe (assq current-command
                                    anything-completing-read-handlers-alist)))
+         (str-defcom (symbol-name def-com))
          (def-args (list prompt collection predicate require-match
                          initial-input hist def inherit-input-method))
          ;; Append the two extra args needed to set the buffer and source name
@@ -10191,18 +10192,26 @@ See documentation of `completing-read' and `all-completions' for details."
          anything-completion-mode-quit-message)
     ;; If we use now `completing-read' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
-    (when (eq def-com 'completing-read) (ac-mode -1))
+    (when (or (eq def-com 'completing-read)
+              ;; All specialized functions are prefixed by "anything"
+              (not (string-match "^anything" str-defcom)))
+      (ac-mode -1))
     (unwind-protect
          (cond (;; Try to handle `ido-completing-read' everywhere.
                 (and def-com (eq def-com 'ido-completing-read))
                 (setcar (memq collection def-args)
                         (all-completions "" collection predicate))
                 (apply def-com def-args))
-               (;; A specialized function exists, run it.
+               (;; An anything specialized function exists, run it.
                 (and def-com anything-completion-mode)
                 (apply def-com args))
-               (;; Run for this command regular `completing-read'.
-                (and def-com (eq def-com 'completing-read)) ; Double check.
+               (;; Use regular `completing-read' or something else
+                ;; possibly a function that call itself `completing-read'
+                ;; with some specialized bindings
+                ;; e.g `org-olpath-completing-read'.
+                ;; If we are here `anything-completion-mode'
+                ;; should be disabled.
+                def-com
                 (apply def-com def-args))
                (t ; Fall back to classic `anything-comp-read'.
                 (anything-completing-read-default-1
