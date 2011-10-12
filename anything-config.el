@@ -8482,8 +8482,9 @@ See http://orgmode.org for the latest version.")
   (with-anything-current-buffer
     (org-cut-subtree)
     (anything-goto-line (car lineno-and-content))
-    (forward-line 1)
-    (org-yank)))
+    (org-end-of-subtree t t)
+    (let ((org-yank-adjusted-subtrees t))
+      (org-yank))))
 
 
 ;;; Org keywords
