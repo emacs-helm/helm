@@ -1181,11 +1181,14 @@ This function prefix name must start by \"anything\".
 See `anything-completing-read-symbols' for example.
 
 If the value of an entry is nil completion will fall back to
-`anything-comp-read'.
+`completing-read'.
 
 If you want to use Emacs vanilla completion for a specific entry,
-set value of this entry key to `completing-read' or to the original
-completing read function this command use.
+set value of this entry key to either `completing-read', the original
+completing read function this command use, or nil.
+Note that a nil value will fallback to `completing-read'
+but not to original value.
+
 e.g If you want to disable anything completion for `describe-function':
 \(describe-function . completing-read\)."
   :group 'anything-config
@@ -10183,23 +10186,25 @@ which is more powerful.
 
 See documentation of `completing-read' and `all-completions' for details."
   (let* ((current-command this-command)
-         (str-command (symbol-name current-command))
-         (buf-name (format "*ac-mode-%s*" str-command))
-         (def-com  (cdr-safe (assq current-command
-                                   anything-completing-read-handlers-alist)))
-         (str-defcom (symbol-name def-com))
-         (def-args (list prompt collection predicate require-match
-                         initial-input hist def inherit-input-method))
+         (str-command     (symbol-name current-command))
+         (buf-name        (format "*ac-mode-%s*" str-command))
+         (entry           (assq current-command
+                                anything-completing-read-handlers-alist))
+         (def-com         (and entry (or (cdr-safe entry) 'completing-read)))
+         (str-defcom      (and def-com (symbol-name def-com)))
+         (def-args        (list prompt collection predicate require-match
+                                initial-input hist def inherit-input-method))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in anything specialized functions.
-         (args (append def-args (list str-command buf-name)))
+         (args            (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message)
     ;; If we use now `completing-read' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (eq def-com 'completing-read)
               ;; All specialized functions are prefixed by "anything"
-              (not (string-match "^anything" str-defcom)))
+              (and (stringp str-defcom)
+                   (not (string-match "^anything" str-defcom))))
       (ac-mode -1))
     (unwind-protect
          (cond (;; Try to handle `ido-completing-read' everywhere.
@@ -10237,8 +10242,10 @@ See documentation of `completing-read' and `all-completions' for details."
          (current-command this-command)
          (str-command (symbol-name current-command))
          (buf-name (format "*ac-mode-%s*" str-command))
-         (def-com  (cdr-safe (assq current-command
-                                   anything-completing-read-handlers-alist)))
+         (entry (assq current-command
+                      anything-completing-read-handlers-alist))
+         (def-com  (and entry (or (cdr-safe entry) 'read-file-name)))
+         (str-defcom (symbol-name def-com))
          (def-args (list prompt dir default-filename mustmatch initial predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in anything specialized functions.
@@ -10248,7 +10255,10 @@ See documentation of `completing-read' and `all-completions' for details."
          fname)
     ;; If we use now `read-file-name' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
-    (when (eq def-com 'read-file-name) (ac-mode -1))
+    (when (or (eq def-com 'read-file-name)
+              (and (stringp str-defcom)
+                   (not (string-match "^anything" str-defcom))))
+      (ac-mode -1))
     (unwind-protect
          (setq fname
                (cond (;; A specialized function exists, run it
