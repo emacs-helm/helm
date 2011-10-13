@@ -10250,12 +10250,14 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; Append the two extra args needed to set the buffer and source name
          ;; in anything specialized functions.
          (args (append def-args (list str-command buf-name)))
+         (ido-state ido-mode)
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message  ; Same here
          fname)
     ;; If we use now `read-file-name' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (eq def-com 'read-file-name)
+              (eq def-com 'ido-read-file-name)
               (and (stringp str-defcom)
                    (not (string-match "^anything" str-defcom))))
       (ac-mode -1))
@@ -10269,6 +10271,7 @@ See documentation of `completing-read' and `all-completions' for details."
                      (;; Def-com value is `ido-read-file-name'
                       ;; run it with default args.
                       (and def-com (eq def-com 'ido-read-file-name))
+                      (ido-mode 1)
                       (apply def-com def-args))
                      (;; Def-com value is `read-file-name'
                       ;; run it with default args.
@@ -10282,7 +10285,8 @@ See documentation of `completing-read' and `all-completions' for details."
                        :initial-input (expand-file-name init dir)
                        :alistp nil
                        :test predicate))))
-      (ac-mode 1))
+      (ac-mode 1)
+      (ido-mode (if ido-state 1 -1)))
     (if (and mustmatch (not (file-exists-p fname)))
         (if (y-or-n-p "File does not exists, create buffer?")
             fname (error "Abort file does not exists"))
