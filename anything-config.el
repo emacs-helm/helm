@@ -1170,17 +1170,22 @@ This can be toggled at anytime from `anything-find-files' with \
   "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
 where key and value are symbols.
+
 Each key is an Emacs command that use originaly `completing-read'.
-Each value is a function that take same arguments as `completing-read' plus
-NAME and BUFFER, where NAME is the name of the new anything source and BUFFER
-the name of the buffer we will use.
+
+Each value maybe an anything function that take same arguments as
+`completing-read' plus NAME and BUFFER, where NAME is the name of the new
+anything source and BUFFER the name of the buffer we will use.
+This function prefix name must start by \"anything\".
+
 See `anything-completing-read-symbols' for example.
 
 If the value of an entry is nil completion will fall back to
 `anything-comp-read'.
 
 If you want to use Emacs vanilla completion for a specific entry,
-set value of this entry key to `completing-read'.
+set value of this entry key to `completing-read' or to the original
+completing read function this command use.
 e.g If you want to disable anything completion for `describe-function':
 \(describe-function . completing-read\)."
   :group 'anything-config
