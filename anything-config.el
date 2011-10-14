@@ -1166,7 +1166,8 @@ This can be toggled at anytime from `anything-find-files' with \
 
 (defcustom anything-completing-read-handlers-alist
   '((describe-function . anything-completing-read-symbols)
-    (describe-variable . anything-completing-read-symbols))
+    (describe-variable . anything-completing-read-symbols)
+    (debug-on-entry . anything-completing-read-symbols))
   "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
 where key and value are symbols.
@@ -10173,7 +10174,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
    :default (or default "")
    :initial-input init))
 
-(defun anything-completing-read-default
+(defun* anything-completing-read-default
     (prompt collection &optional
                          predicate require-match
                          initial-input hist def
@@ -10190,7 +10191,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (buf-name        (format "*ac-mode-%s*" str-command))
          (entry           (assq current-command
                                 anything-completing-read-handlers-alist))
-         (def-com         (and entry (or (cdr-safe entry) 'completing-read)))
+         (def-com         (cdr-safe entry))
          (str-defcom      (and def-com (symbol-name def-com)))
          (def-args        (list prompt collection predicate require-match
                                 initial-input hist def inherit-input-method))
@@ -10199,6 +10200,17 @@ See documentation of `completing-read' and `all-completions' for details."
          (args            (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message)
+    (unless (or (not entry) def-com)
+      ;; An entry in *read-handlers-alist exists but have
+      ;; a nil value, so we exit from here, disable `ac-mode'
+      ;; and run the command again with it original behavior.
+      ;; `ac-mode' will be restored on exit.
+      (return-from anything-completing-read-default
+        (unwind-protect
+             (progn
+               (ac-mode -1)
+               (call-interactively current-command))
+          (ac-mode 1))))
     ;; If we use now `completing-read' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (eq def-com 'completing-read)
@@ -10207,20 +10219,18 @@ See documentation of `completing-read' and `all-completions' for details."
                    (not (string-match "^anything" str-defcom))))
       (ac-mode -1))
     (unwind-protect
-         (cond (;; Try to handle `ido-completing-read' everywhere.
+         (cond (;; An anything specialized function exists, run it.
+                (and def-com anything-completion-mode)
+                (apply def-com args))
+               (;; Try to handle `ido-completing-read' everywhere.
                 (and def-com (eq def-com 'ido-completing-read))
                 (setcar (memq collection def-args)
                         (all-completions "" collection predicate))
                 (apply def-com def-args))
-               (;; An anything specialized function exists, run it.
-                (and def-com anything-completion-mode)
-                (apply def-com args))
-               (;; Use regular `completing-read' or something else
-                ;; possibly a function that call itself `completing-read'
-                ;; with some specialized bindings
-                ;; e.g `org-olpath-completing-read'.
-                ;; If we are here `anything-completion-mode'
-                ;; should be disabled.
+               (;; User set explicitely `completing-read' or something similar
+                ;; in *read-handlers-alist, use this with exactly the same
+                ;; args as in `completing-read'.
+                ;; If we are here `anything-completion-mode' is now disabled.
                 def-com
                 (apply def-com def-args))
                (t ; Fall back to classic `anything-comp-read'.
@@ -10229,7 +10239,7 @@ See documentation of `completing-read' and `all-completions' for details."
                  initial-input hist def inherit-input-method str-command buf-name)))
       (ac-mode 1))))
   
-(defun anything-generic-read-file-name
+(defun* anything-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An anything replacement of `read-file-name'."
   (let* ((default (and default-filename
@@ -10244,7 +10254,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (buf-name (format "*ac-mode-%s*" str-command))
          (entry (assq current-command
                       anything-completing-read-handlers-alist))
-         (def-com  (and entry (or (cdr-safe entry) 'read-file-name)))
+         (def-com  (cdr-safe entry))
          (str-defcom (symbol-name def-com))
          (def-args (list prompt dir default-filename mustmatch initial predicate))
          ;; Append the two extra args needed to set the buffer and source name
@@ -10254,6 +10264,13 @@ See documentation of `completing-read' and `all-completions' for details."
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message  ; Same here
          fname)
+    (unless (or (not entry) def-com)
+      (return-from anything-completing-read-default
+        (unwind-protect
+             (progn
+               (ac-mode -1)
+               (call-interactively current-command))
+          (ac-mode 1))))
     ;; If we use now `read-file-name' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (eq def-com 'read-file-name)
@@ -10275,7 +10292,7 @@ See documentation of `completing-read' and `all-completions' for details."
                       (apply def-com def-args))
                      (;; Def-com value is `read-file-name'
                       ;; run it with default args.
-                      (and def-com (eq def-com 'read-file-name))
+                      def-com
                       (apply def-com def-args))
                      (t ; Fall back to classic `anything-c-read-file-name'.
                       (anything-c-read-file-name
