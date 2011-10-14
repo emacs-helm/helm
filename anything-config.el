@@ -1182,16 +1182,14 @@ This function prefix name must start by \"anything\".
 See `anything-completing-read-symbols' for example.
 
 If the value of an entry is nil completion will fall back to
-`completing-read'.
-
-If you want to use Emacs vanilla completion for a specific entry,
-set value of this entry key to either `completing-read', the original
-completing read function this command use, or nil.
-Note that a nil value will fallback to `completing-read'
-but not to original value.
-
+emacs vanilla behavior.
 e.g If you want to disable anything completion for `describe-function':
-\(describe-function . completing-read\)."
+\(describe-function . nil\).
+
+Ido is also supported, you can use `ido-completing-read' and
+`ido-read-file-name' as value of an entry.
+e.g ido completion for `find-file':
+\(find-file . ido-read-file-name\)."
   :group 'anything-config
   :type '(alist :key-type symbol :value-type symbol))
 
