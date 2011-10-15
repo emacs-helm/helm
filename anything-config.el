@@ -10134,6 +10134,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
                               for sym in all
                               unless (and default (eq sym default))
                               do (insert (concat sym "\n"))))))
+               (persistent-action . anything-lisp-completion-persistent-action)
+               (persistent-help . "Show brief doc in mode-line")
                (candidates-in-buffer)
                (action . identity))
     :prompt prompt
@@ -10490,14 +10492,7 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
                             when (> len lgst-len) do (setq lgst-len len)
                             do (insert (concat sym "\n"))))))
              (candidates-in-buffer)
-             (persistent-action . (lambda (candidate)
-                                    (let ((cursor-in-echo-area t)
-                                          mode-line-in-non-selected-windows)
-                                      (anything-c-eldoc-show-in-mode-line
-                                       (propertize
-                                        (anything-c-get-first-line-documentation
-                                         (intern candidate))
-                                        'face 'anything-lisp-completion-info)))))
+             (persistent-action . anything-lisp-completion-persistent-action)
              (persistent-help . "Show brief doc in mode-line")
              (filtered-candidate-transformer anything-lisp-completion-transformer)
              (action . (lambda (candidate)
@@ -10505,6 +10500,15 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
                          (insert candidate))))
            :input (if anything-match-plugin-enabled (concat target " ") target)))
         (message "[No Match]"))))
+
+(defun anything-lisp-completion-persistent-action (candidate)
+  (let ((cursor-in-echo-area t)
+        mode-line-in-non-selected-windows)
+    (anything-c-eldoc-show-in-mode-line
+     (propertize
+      (anything-c-get-first-line-documentation
+       (intern candidate))
+      'face 'anything-lisp-completion-info))))
 
 (defun anything-lisp-completion-transformer (candidates source)
   "Anything candidates transformer for lisp completion."
