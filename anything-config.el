@@ -10326,8 +10326,6 @@ See documentation of `completing-read' and `all-completions' for details."
             fname (error "Abort file does not exists"))
         fname)))
 
-(defvar anything-orig-completing-read-function nil)
-(defvar anything-orig-read-file-name-function nil)
 ;;;###autoload
 (define-minor-mode anything-completion-mode
   "Toggle generic anything completion.
@@ -10347,19 +10345,17 @@ e.g `ffap-alternate-file' and maybe others."
   :group 'anything
   :global t
   :lighter anything-completion-mode-string
-  (declare (special completing-read-function))
-  (cond (anything-completion-mode
-         (setq anything-orig-completing-read-function
-               (or anything-orig-completing-read-function completing-read-function))
-         (setq anything-orig-read-file-name-function
-               (or anything-orig-read-file-name-function read-file-name-function))
-         (setq completing-read-function 'anything-completing-read-default
-               read-file-name-function  'anything-generic-read-file-name)
-         (message anything-completion-mode-start-message))
-        (t
-         (setq completing-read-function anything-orig-completing-read-function
-               read-file-name-function  anything-orig-read-file-name-function)
-         (message anything-completion-mode-quit-message))))
+  (if (and (boundp 'completing-read-function)
+           (boundp 'read-file-name-function))
+      (if anything-completion-mode
+          (progn
+            (setq completing-read-function 'anything-completing-read-default
+                  read-file-name-function  'anything-generic-read-file-name)
+            (message anything-completion-mode-start-message))
+          (setq completing-read-function 'completing-read-default
+                read-file-name-function  'read-file-name-default)
+          (message anything-completion-mode-quit-message))
+      (message "Sorry `ac-mode' is available only in Emacs24")))
 
 (defalias 'ac-mode 'anything-completion-mode)
 
