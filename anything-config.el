@@ -4223,20 +4223,26 @@ If EXPAND is non--nil expand-file-name."
                   (t
                    (concat "/" result)))))))
 
+;; Internal
+(defvar anything-file-completion-sources
+  '("Find Files" "find-file" "Copy Files"
+    "dired-do-copy" "dired-do-rename"
+    "dired-do-symlink" "dired-do-hardlink"
+    "write-file" "insert-file" "dired" 
+    "find-alternate-file" "list-directory"
+    "find-file-read-only"
+    "Read File Name History"
+    "Rename Files" "Symlink Files"
+    "Hardlink Files" "Write File"
+    "Insert File" "Read File Name")
+  "Sources that use the *find-files mechanism can be added here.
+You should not modify this yourself and know what you do if you do so.")
+
 (defun anything-file-completion-source-p ()
   "Test if current source is a dired or find-files source."
-  (let ((ff-sources '("Find Files" "find-file" "Copy Files"
-                      "dired-do-copy" "dired-do-rename"
-                      "dired-do-symlink" "dired-do-hardlink"
-                      "write-file" "insert-file"
-                      "find-alternate-file" "list-directory"
-                      "find-file-read-only"
-                      "Read File Name History"
-                      "Rename Files" "Symlink Files"
-                      "Hardlink Files" "Write File"
-                      "Insert File" "Read File Name"))
-        (cur-source (cdr (assoc 'name (anything-get-current-source)))))
-    (loop for i in ff-sources thereis (string= cur-source i))))
+  (let ((cur-source (cdr (assoc 'name (anything-get-current-source)))))
+    (loop for i in anything-file-completion-sources
+       thereis (string= cur-source i))))
 
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
