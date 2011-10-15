@@ -773,6 +773,7 @@
 (declare-function adoc-construct "ext:auto-document.el" (buf))
 (declare-function adoc-first-line "ext:auto-document.el" (str))
 (declare-function adoc-prin1-to-string "ext:auto-document.el" (object))
+(declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
 
 
 
@@ -9565,17 +9566,17 @@ e.g `ffap-alternate-file' and maybe others."
   :group 'anything
   :global t
   :lighter anything-completion-mode-string
-  (if (and (boundp 'completing-read-function)
-           (boundp 'read-file-name-function))
-      (if anything-completion-mode
-          (progn
-            (setq completing-read-function 'anything-completing-read-default
-                  read-file-name-function  'anything-generic-read-file-name)
-            (message anything-completion-mode-start-message))
-          (setq completing-read-function 'completing-read-default
-                read-file-name-function  'read-file-name-default)
-          (message anything-completion-mode-quit-message))
-      (message "Sorry `ac-mode' is available only in Emacs24")))
+  (declare (special completing-read-function))
+  (if anything-completion-mode
+      (progn
+        (setq completing-read-function 'anything-completing-read-default
+              read-file-name-function  'anything-generic-read-file-name)
+        (message anything-completion-mode-start-message))
+      (setq completing-read-function (and (fboundp 'completing-read-default)
+                                          'completing-read-default)
+            read-file-name-function  (and (fboundp 'read-file-name-default)
+                                          'read-file-name-default))
+      (message anything-completion-mode-quit-message)))
 
 (defalias 'ac-mode 'anything-completion-mode)
 
