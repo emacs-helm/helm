@@ -1187,9 +1187,12 @@ e.g If you want to disable anything completion for `describe-function':
 \(describe-function . nil\).
 
 Ido is also supported, you can use `ido-completing-read' and
-`ido-read-file-name' as value of an entry.
+`ido-read-file-name' as value of an entry or just 'ido.
 e.g ido completion for `find-file':
-\(find-file . ido-read-file-name\)."
+\(find-file . ido\)
+same as
+\(find-file . ido-read-file-name\)
+Note that you don't need to enable `ido-mode' for this to work."
   :group 'anything-config
   :type '(alist :key-type symbol :value-type symbol))
 
@@ -5157,7 +5160,8 @@ members of FLIST."
 ;;;###autoload
 (define-minor-mode anything-dired-mode ()
   "Enable anything completion in Dired functions.
-Bindings affected are C, R, S, H."
+Bindings affected are C, R, S, H.
+This is deprecated for Emacs24+ users, use `ac-mode' instead."
   :group 'anything-config
   :global t
   (if anything-dired-mode
@@ -10135,7 +10139,12 @@ that use `anything-comp-read' See `anything-M-x' for example."
                (init . (lambda ()
                          (with-current-buffer (anything-candidate-buffer 'global)
                            (goto-char (point-min))
-                           (when default (insert (concat default "\n")))
+                           (when (and default (stringp default)
+                                      ;; Some defaults args result as
+                                      ;; (symbol-name nil) == "nil".
+                                      ;; e.g debug-on-entry.
+                                      (not (string= default "nil")))
+                             (insert (concat default "\n")))
                            (loop with all = (all-completions "" collection test)
                               for sym in all
                               unless (and default (eq sym default))
@@ -10206,6 +10215,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (args            (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message)
+    (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
       ;; a nil value, so we exit from here, disable `ac-mode'
@@ -10270,6 +10280,7 @@ See documentation of `completing-read' and `all-completions' for details."
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message  ; Same here
          fname)
+    (when (eq def-com 'ido) (setq def-com 'ido-read-file-name))
     (unless (or (not entry) def-com)
       (return-from anything-completing-read-default
         (unwind-protect
