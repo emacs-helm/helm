@@ -1170,7 +1170,8 @@ This can be toggled at anytime from `anything-find-files' with \
 (defcustom anything-completing-read-handlers-alist
   '((describe-function . anything-completing-read-symbols)
     (describe-variable . anything-completing-read-symbols)
-    (debug-on-entry . anything-completing-read-symbols))
+    (debug-on-entry . anything-completing-read-symbols)
+    (ffap-alternate-file . nil))
   "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
 where key and value are symbols.
@@ -9562,7 +9563,11 @@ negative arg turn off.
 You can turn it on with `ac-mode'.
 
 Some crap emacs functions may not be supported,
-e.g `ffap-alternate-file' and maybe others."
+e.g `ffap-alternate-file' and maybe others
+You can add such functions to `anything-completing-read-handlers-alist'
+with a nil value.
+
+Note: This mode will work only partially on Emacs23."
   :group 'anything
   :global t
   :lighter anything-completion-mode-string
