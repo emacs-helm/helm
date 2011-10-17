@@ -9289,14 +9289,20 @@ that use `anything-comp-read' See `anything-M-x' for example."
                (anything-marked-candidates)
                (identity candidate))))
     (let ((hist `((name . ,(format "%s History" name))
-                  (candidates . (lambda ()
-                                  (let ((all (anything-comp-read-get-candidates
-                                              history nil nil ,alistp)))
-                                    (anything-fast-remove-dups
-                                     (if (and default (not (string= default "")))
-                                         (delq nil (cons default (delete default all)))
-                                         all)
-                                     :test 'equal))))
+                  (candidates
+                   . (lambda ()
+                       (let ((all (anything-comp-read-get-candidates
+                                   history nil nil ,alistp)))
+                         (anything-fast-remove-dups
+                          (if (and default (not (string= default "")))
+                              (delq nil (cons default (delete default all)))
+                              all)
+                          :test 'equal))))
+                  (filtered-candidate-transformer
+                   . (lambda (candidates sources)
+                       (loop for i in candidates
+                          do (set-text-properties 0 (length i) nil i)
+                          collect i)))
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (action . ,'action-fn)))
@@ -9384,9 +9390,10 @@ that use `anything-comp-read' See `anything-M-x' for example."
 ;;; Generic completing read
 ;;
 ;;
-(defun anything-completing-read-default-1 (prompt collection test require-match
-                                           init hist default inherit-input-method
-                                           name buffer)
+(defun anything-completing-read-default-1
+    (prompt collection test require-match
+     init hist default inherit-input-method
+     name buffer)
   (anything-comp-read
    prompt collection
    :test test
@@ -9397,8 +9404,9 @@ that use `anything-comp-read' See `anything-M-x' for example."
                        ;; normally the cdr, so modify that
                        ;; to fit `completing-read'.
                        (loop for i in candidates
-                          if (consp i) collect (car i)
-                          else collect i))
+                          for cand = (if (consp i) (car i) i)
+                          do (set-text-properties 0 (length cand) nil cand)
+                          collect cand))
    :history (eval (or (car-safe hist) hist))
    :must-match require-match
    :alistp nil
