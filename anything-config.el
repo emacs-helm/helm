@@ -8159,13 +8159,13 @@ Return an alist with elements like (data . number_results)."
 (defvar anything-c-home-url "http://www.google.fr"
   "*Default url to use as home url.")
 
-(defvar browse-url-chromium-program "chromium-browser")
-(defvar browse-url-uzbl-program "uzbl-browser")
+(defvar ac-browse-url-chromium-program "chromium-browser")
+(defvar ac-browse-url-uzbl-program "uzbl-browser")
 (defvar anything-browse-url-default-browser-alist
   `((,w3m-command . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
-    (,browse-url-chromium-program . browse-url-chromium)
-    (,browse-url-uzbl-program . browse-url-uzbl)
+    (,ac-browse-url-chromium-program . ac-browse-url-chromium)
+    (,ac-browse-url-uzbl-program . ac-browse-url-uzbl)
     (,browse-url-kde-program . browse-url-kde)
     (,browse-url-gnome-moz-program . browse-url-gnome-moz)
     (,browse-url-mozilla-program . browse-url-mozilla)
@@ -8173,7 +8173,7 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-netscape-program . browse-url-netscape)
     (,browse-url-mosaic-program . browse-url-mosaic)
     (,browse-url-xterm-program . browse-url-text-xterm))
-  "*Alist of (executable . function) to try to find a suitable url browser.")
+  "*Alist of \(executable . function\) to try to find a suitable url browser.")
 
 (defun* anything-c-generic-browser (url name &rest args)
   "Browse URL with NAME browser."
@@ -8187,16 +8187,16 @@ Return an alist with elements like (data . number_results)."
          (when (string= event "finished\n")
            (message "%s process %s" process event))))))
 
-(defun browse-url-chromium (url)
+(defun ac-browse-url-chromium (url)
   "Browse URL with google chrome browser."
   (interactive "sURL: ")
   (anything-c-generic-browser
-   url browse-url-chromium-program))
+   url ac-browse-url-chromium-program))
 
-(defun browse-url-uzbl (url &optional ignore)
+(defun ac-browse-url-uzbl (url &optional ignore)
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
-  (anything-c-generic-browser url browse-url-uzbl-program "-u"))
+  (anything-c-generic-browser url ac-browse-url-uzbl-program "-u"))
 
 (defun anything-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
