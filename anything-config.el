@@ -9441,7 +9441,7 @@ See documentation of `completing-read' and `all-completions' for details."
                                 initial-input hist def inherit-input-method))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in anything specialized functions.
-         (args            (append def-args (list str-command buf-name)))
+         (any-args            (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message)
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
@@ -9466,7 +9466,7 @@ See documentation of `completing-read' and `all-completions' for details."
     (unwind-protect
          (cond (;; An anything specialized function exists, run it.
                 (and def-com anything-completion-mode)
-                (apply def-com args))
+                (apply def-com any-args))
                (;; Try to handle `ido-completing-read' everywhere.
                 (and def-com (eq def-com 'ido-completing-read))
                 (setcar (memq collection def-args)
@@ -9505,7 +9505,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (def-args (list prompt dir default-filename mustmatch initial predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in anything specialized functions.
-         (args (append def-args (list str-command buf-name)))
+         (any-args (append def-args (list str-command buf-name)))
          (ido-state ido-mode)
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message  ; Same here
@@ -9531,7 +9531,7 @@ See documentation of `completing-read' and `all-completions' for details."
                       ;; with the two extra args specific to anything..
                       (and def-com anything-completion-mode
                            (not (eq def-com 'ido-read-file-name)))
-                      (apply def-com args))
+                      (apply def-com any-args))
                      (;; Def-com value is `ido-read-file-name'
                       ;; run it with default args.
                       (and def-com (eq def-com 'ido-read-file-name))
