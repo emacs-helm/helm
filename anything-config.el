@@ -3524,7 +3524,10 @@ expand to this directory."
                                  'name (anything-get-current-source))
                                 "Read File Name History"))
           (completed-p (string= (file-name-as-directory anything-pattern)
-                                (expand-file-name anything-ff-default-directory))))
+                                ;; No need to expand *default-directory
+                                ;; here, it have been done in
+                                ;; `anything-find-files-get-candidates'
+                                anything-ff-default-directory)))
       (when (and anything-ff-auto-update-flag
                  (or (and (anything-file-completion-source-p)
                           (<= (anything-approximate-candidate-number) 2)
