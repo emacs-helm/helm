@@ -3519,37 +3519,38 @@ or hitting C-z on \"..\"."
   "Expand to directory when sole completion.
 When only one candidate is remaining and it is a directory,
 expand to this directory."
-  (let ((history-p   (string= (assoc-default
-                               'name (anything-get-current-source))
-                              "Read File Name History"))
-        (completed-p (string= (file-name-as-directory anything-pattern)
-                              (expand-file-name anything-ff-default-directory))))
-    (when (and anything-ff-auto-update-flag
-               (or (and (anything-file-completion-source-p)
-                        (<= (anything-approximate-candidate-number) 2)
-                        (>= (length (anything-c-basename anything-pattern)) 2))
-                   completed-p)
-               (not history-p))
-      (with-anything-window
-        (and (not completed-p) (anything-next-line))
-        (let ((cur-cand (anything-get-selection)))
-          (when (file-directory-p cur-cand)
-            (if (and (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)) ; [1]
-                     ;; Maybe we are here because completed-p is true
-                     ;; So check this again to be sure.
-                     ;; (this happen only on windows dirs)
-                     (<= (anything-approximate-candidate-number) 2))  ; [2]
-                ;; If after going to next line the candidate is not "." or ".." [1]
-                ;; and only one candidate is remaining [2],
-                ;; assume candidate is a new directory to expand, and do it.
-                (anything-set-pattern (file-name-as-directory cur-cand))
-                ;; The candidate is one of "." or ".." (it should be "..").
-                ;; that mean we have entered the last letter of the directory name
-                ;; in prompt, so expansion is already done, just add the "/" at end
-                ;; of name unless anything-pattern ends with "."
-                (unless (string-match "^.*[.]\\{1\\}$" anything-pattern)
-                  (anything-set-pattern (file-name-as-directory anything-pattern))))
-            (anything-check-minibuffer-input-1)))))))
+  (when (anything-file-completion-source-p)
+    (let ((history-p   (string= (assoc-default
+                                 'name (anything-get-current-source))
+                                "Read File Name History"))
+          (completed-p (string= (file-name-as-directory anything-pattern)
+                                (expand-file-name anything-ff-default-directory))))
+      (when (and anything-ff-auto-update-flag
+                 (or (and (anything-file-completion-source-p)
+                          (<= (anything-approximate-candidate-number) 2)
+                          (>= (length (anything-c-basename anything-pattern)) 2))
+                     completed-p)
+                 (not history-p))
+        (with-anything-window
+          (and (not completed-p) (anything-next-line))
+          (let ((cur-cand (anything-get-selection)))
+            (when (file-directory-p cur-cand)
+              (if (and (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)) ; [1]
+                       ;; Maybe we are here because completed-p is true
+                       ;; So check this again to be sure.
+                       ;; (this happen only on windows dirs)
+                       (<= (anything-approximate-candidate-number) 2)) ; [2]
+                  ;; If after going to next line the candidate is not "." or ".." [1]
+                  ;; and only one candidate is remaining [2],
+                  ;; assume candidate is a new directory to expand, and do it.
+                  (anything-set-pattern (file-name-as-directory cur-cand))
+                  ;; The candidate is one of "." or ".." (it should be "..").
+                  ;; that mean we have entered the last letter of the directory name
+                  ;; in prompt, so expansion is already done, just add the "/" at end
+                  ;; of name unless anything-pattern ends with "."
+                  (unless (string-match "^.*[.]\\{1\\}$" anything-pattern)
+                    (anything-set-pattern (file-name-as-directory anything-pattern))))
+              (anything-check-minibuffer-input-1))))))))
 (add-hook 'anything-after-update-hook 'anything-ff-update-when-only-one-matched)
 
 ;; Allow expanding to home directory or root
