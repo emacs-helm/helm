@@ -3523,7 +3523,7 @@ expand to this directory."
                                'name (anything-get-current-source))
                               "Read File Name History"))
         (completed-p (string= (file-name-as-directory anything-pattern)
-                              anything-ff-default-directory)))
+                              (expand-file-name anything-ff-default-directory))))
     (when (and anything-ff-auto-update-flag
                (or (and (anything-file-completion-source-p)
                         (<= (anything-approximate-candidate-number) 2)
@@ -3573,7 +3573,7 @@ This happen only in function using sources that are
              (if (eq system-type 'windows-nt)
                  (setq anything-pattern (file-name-as-directory (getenv "HOME")))
                  (setq anything-pattern "~/")))))
-    (setq anything-ff-default-directory anything-pattern)
+    (setq anything-ff-default-directory (expand-file-name anything-pattern))
     ;; For some reasons, i must use here with-current-buffer => mini buffer
     ;; and not `anything-set-pattern' that use with-selected-window => mini win.
     (with-current-buffer (window-buffer (minibuffer-window))
@@ -3651,7 +3651,7 @@ This happen only in function using sources that are
           (if (string= anything-pattern "")
               (if (eq system-type 'windows-nt) "c:/" "/")
               (unless (string-match ffap-url-regexp path)
-                path-name-dir)))
+                (expand-file-name path-name-dir))))
     (cond ((or (string= path "Invalid tramp file name")
                (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
