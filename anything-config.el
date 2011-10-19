@@ -1172,7 +1172,7 @@ This can be toggled at anytime from `anything-find-files' with \
     (describe-variable . anything-completing-read-symbols)
     (debug-on-entry . anything-completing-read-symbols)
     (ffap-alternate-file . nil))
-  "Alist of handlers to use as a replacement of `completing-read' in `ac-mode'.
+  "Alist of handlers to replace `completing-read', `read-file-name' in `ac-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
 where key and value are symbols.
 
