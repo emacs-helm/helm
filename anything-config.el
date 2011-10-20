@@ -2268,7 +2268,7 @@ See `anything-c-enable-eval-defun-hack'."
            (expand-file-name sel)
            default-directory)))))
 
-(defmacro* anything-c-walk-directory (directory &key (path 'basename) (directories t) match)
+(defmacro* anything-c-walk-directory (directory &key path (directories t) match)
   "Walk through DIRECTORY tree.
 PATH can be one of basename, relative, or full.
 DIRECTORIES when non--nil (default) return also directories names, otherwise
@@ -2279,7 +2279,7 @@ MATCH match only filenames matching regexp MATCH."
                (basename 'file-name-nondirectory)
                (relative 'file-relative-name)
                (full     'identity)
-               (t (error "Error: Invalid path spec `%s', must be one of basename, relative or full." ,path)))))
+               (t        'file-name-nondirectory))))
      (labels ((ls-R (dir)
                 (loop with ls = (directory-files dir t directory-files-no-dot-files-regexp)
                    for f in ls
