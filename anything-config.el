@@ -11694,39 +11694,53 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                      for i in extended-command-history
                      for com = (intern i)
                      when (fboundp com)
-                     collect i into hist finally return hist))
-         (command (anything-comp-read
-                   "M-x " obarray
-                   :test 'commandp
-                   :must-match t
-                   :requires-pattern 2
-                   :name "Emacs Commands"
-                   :persistent-action
-                   #'(lambda (candidate)
-                       (let ((hbuf (get-buffer (help-buffer))))
-                         (if (and in-help (string= candidate help-cand))
-                             (progn
-                               ;; When M-x is started from a help buffer,
-                               ;; Don't kill it as it is anything-current-buffer.
-                               (unless (equal hbuf anything-current-buffer)
-                                 (kill-buffer hbuf))
-                               (setq in-help nil))
-                             ;; Be sure anything-current-buffer have not a dedicated window.
-                             (set-window-dedicated-p
-                              (get-buffer-window anything-current-buffer) nil)
-                             (describe-function (intern candidate))
-                             (message nil) ; Erase the new stupid message Type "q"[...]
-                             (setq in-help t))
-                         (setq help-cand candidate)))
-                   :persistent-help "Describe this command"
-                   :history history
-                   :sort 'string-lessp
-                   :fc-transformer 'anything-M-x-transformer))
-         (sym-com (intern command)))
-    (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
-    (setq this-command sym-com) ; Avoid having `this-command' set to *exit-minibuffer.
-    (call-interactively sym-com)
-    (setq extended-command-history (cons command (delete command history)))))
+                     collect i into hist finally return hist)))
+    (flet ((pers-help (candidate)
+             (let ((hbuf (get-buffer (help-buffer))))
+               (if (and in-help (string= candidate help-cand))
+                   (progn
+                     ;; When M-x is started from a help buffer,
+                     ;; Don't kill it as it is anything-current-buffer.
+                     (unless (equal hbuf anything-current-buffer)
+                       (kill-buffer hbuf))
+                     (setq in-help nil))
+                   ;; Be sure anything-current-buffer have not a dedicated window.
+                   (set-window-dedicated-p
+                    (get-buffer-window anything-current-buffer) nil)
+                   (describe-function (intern candidate))
+                   (message nil) ; Erase the new stupid message Type "q"[...]
+                   (setq in-help t))
+               (setq help-cand candidate))))
+      (let* ((command (or (anything :sources
+                                    `(((name . "Emacs Commands history")
+                                       (candidates . history)
+                                       (filtered-candidate-transformer
+                                        . (lambda (candidates sources)
+                                            (loop for i in candidates
+                                               do (set-text-properties 0 (length i) nil i)
+                                               collect i)))
+                                       (persistent-action . pers-help)
+                                       (persistent-help . "Describe this command")
+                                       (action . identity))
+                                      ((name . "Emacs Commands")
+                                       (init . (lambda ()
+                                                 (with-current-buffer (anything-candidate-buffer 'global)
+                                                   (goto-char (point-min))
+                                                   (loop with all = (all-completions "" obarray 'commandp)
+                                                      for sym in all
+                                                      do (insert (concat sym "\n"))))))
+                                       (persistent-action . pers-help)
+                                       (persistent-help . "Describe this command")
+                                       (filtered-candidate-transformer . anything-M-x-transformer)
+                                       (candidates-in-buffer)
+                                       (action . identity)))
+                                    :buffer "*anything M-x*")
+                          (keyboard-quit)))
+             (sym-com (intern command)))
+        (unless current-prefix-arg (setq current-prefix-arg anything-current-prefix-arg))
+        (setq this-command sym-com) ; Avoid having `this-command' set to *exit-minibuffer.
+        (call-interactively sym-com)
+        (setq extended-command-history (cons command (delete command history)))))))
 
 ;;;###autoload
 (defun anything-manage-advice ()
