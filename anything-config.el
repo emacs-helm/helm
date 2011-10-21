@@ -5824,7 +5824,10 @@ Show global bindings and local bindings according to current `major-mode'."
                      (t (format "%s (%s)"
                                 cand (propertize
                                       key
-                                      'face 'anything-M-x-key-face)))) cand))))
+                                      'face 'anything-M-x-key-face))))
+               cand) into ls
+       finally return
+         (sort ls #'(lambda (x y) (string-lessp (car x) (car y)))))))
 
 
 ;;; LaCarte
