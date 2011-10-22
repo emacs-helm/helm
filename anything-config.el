@@ -9668,8 +9668,11 @@ This is the same as `ac-insert', just inlined here for compatibility."
                               (and (file-name-directory fc) fc))))
            for i in (if (listp table) table                     ; Emacs23 or commands.
                         (all-completions pcomplete-stub table)) ; Emacs24
-           for file-cand = (and entry (expand-file-name i (file-name-directory entry)))
-           if (and file-cand (file-exists-p file-cand)) collect file-cand into ls
+           for file-cand = (and entry
+                                (if (file-remote-p i) i
+                                    (expand-file-name i (file-name-directory entry))))
+           if (and file-cand (or (file-remote-p file-cand) (file-exists-p file-cand)))
+           collect file-cand into ls
            else collect i into ls
            finally return
            (if (and entry (not (string= entry "")) (file-exists-p entry))
