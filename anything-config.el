@@ -9659,7 +9659,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
            with table  = (pcomplete-completions)
            with entry  = (condition-case nil
                              ;; For Emacs24
-                             (funcall (pcomplete-entries) anything-pattern nil nil)
+                             (try-completion anything-pattern (pcomplete-entries))
                            ;; Fall back to this in Emacs23 as pcomplete-entries seem broken.
                            (error
                             nil
