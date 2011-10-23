@@ -74,6 +74,7 @@
 ;; different sources. Each anything command should have own anything
 ;; buffer, because M-x anything-resume revives anything command.
 
+
 ;;; Autodoc documentation:
 ;;  ---------------------
 
@@ -651,7 +652,19 @@
 
 ;;  *** END auto-documentation
 
+;;; For Maintainers:
+;;
+;; Install developer-tools/autodoc.el and
+;; Evaluate (autodoc-update-all) before commit or run it interactively.
+;; This function generates anything-c-source-* / functions / options list.
+;;
+;; [EVAL IT] (autodoc-update-all)
+;;
+;; Please write details documentation about function, then others will
+;; read code more easier.   -- Andy Stewart
+;;
 
+
 ;;; Change log:
 ;;
 ;;  Change log of this file is found at
@@ -676,29 +689,15 @@
 ;;     Scott Vokes <vokes.s@gmail.com>
 ;;     Kenichirou Oyama <k1lowxb@gmail.com>
 
-;;; For Maintainers:
-;;
-;; Evaluate (autodoc-update-all) before commit. This function
-;; generates anything-c-source-* / functions / options list.
-;;
-;; Install also developer-tools/autodoc.el
-;; And eval it or run interactively.
-;;
-;; [EVAL IT] (autodoc-update-all)
-;;
-;; Please write details documentation about function, then others will
-;; read code more easier.   -- Andy Stewart
-;;
-
 
 ;;; TODO
 ;;
 ;; - Fix documentation, now many functions haven't documentations.
 ;;
 
+
 ;;; Code:
 
-
 ;;; Require
 ;;
 ;;
