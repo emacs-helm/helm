@@ -3573,11 +3573,12 @@ expand to this directory."
 ;; and /home/thierry/labo/anything-config-qp//
 ;; will expand to "/"
 (defun anything-ff-auto-expand-to-home-or-root ()
-  "Goto home or root directory when adding ~/ or / at end of pattern.
+  "Goto home, root or default directory when pattern ends with ~/, /, or ./.
 This happen only in function using sources that are
 `anything-file-completion-source-p' compliant."
   (when (and (anything-file-completion-source-p)
-             (string-match ".*\\(/~/\\|/\\{2\\}\\)$" anything-pattern))
+             (string-match ".*\\(/~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)$"
+                           anything-pattern))
     (let ((match (match-string 1 anything-pattern)))
       (cond ((string= match "//")
              (if (eq system-type 'windows-nt)
@@ -3586,7 +3587,11 @@ This happen only in function using sources that are
             ((string= match "/~/")
              (if (eq system-type 'windows-nt)
                  (setq anything-pattern (file-name-as-directory (getenv "HOME")))
-                 (setq anything-pattern "~/")))))
+                 (setq anything-pattern "~/")))
+            ((string= match "/./")
+             (setq anything-pattern
+                   (with-anything-current-buffer
+                     (expand-file-name default-directory))))))
     (setq anything-ff-default-directory anything-pattern)
     ;; For some reasons, i must use here with-current-buffer => mini buffer
     ;; and not `anything-set-pattern' that use with-selected-window => mini win.
@@ -3613,6 +3618,9 @@ This happen only in function using sources that are
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
     (cond ((string= pattern "") "")
+          ((string-match ".*\\(~?/?[.]\\{1\\}/\\)$" pattern)
+           (with-anything-current-buffer
+             (expand-file-name default-directory)))
           ((string-match ".*\\(~//\\|//\\)$" pattern)
            (if (eq system-type 'windows-nt) "c:/" "/"))
           ((string-match "^~\\|.*/~/$" pattern)
