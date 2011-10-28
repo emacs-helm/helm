@@ -3616,12 +3616,8 @@ This happen only in function using sources that are
           ((string-match ".*\\(~//\\|//\\)$" pattern)
            (if (eq system-type 'windows-nt) "c:/" "/"))
           ((string-match "^~\\|.*/~/$" pattern)
-           (let* ((home    (getenv "HOME"))
-                  (replace (if (eq system-type 'windows-nt)
-                               (replace-regexp-in-string
-                                "\\\\" "/" home)
-                               home)))
-             (replace-match replace nil t pattern)))
+           (let* ((home (expand-file-name (getenv "HOME"))))
+             (replace-match home nil t pattern)))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
                 (setq cur-method (match-string 1 pattern))
