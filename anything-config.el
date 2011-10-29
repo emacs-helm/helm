@@ -4479,11 +4479,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (candidates . (lambda ()
                               (let ((seq (anything-find-files-get-candidates)))
                                 (if test
-                                    (loop 
-                                       for fname in seq when (funcall test fname)
-                                       collect fname into ls
-                                       finally return
-                                         (append (list anything-pattern) ls))
+                                    (loop for fname in seq
+                                       when (funcall test fname) collect fname)
                                     seq))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
