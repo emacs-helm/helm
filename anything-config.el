@@ -1773,8 +1773,9 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
   (interactive)
   (let ((anything-help-message "== Anything Find Files ==
 \nTips:
-\n- Enter \"~/\" at anytime to reach home directory.
-- Enter \"/\" at anytime to reach root of your file system.
+\n- Enter `~/' at end of pattern to quickly reach home directory.
+- Enter `/' at end of pattern to quickly reach root of your file system.
+- Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
 - You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 - Use `C-u C-z' to watch an image.
 - To browse images directories turn on `anything-follow-mode' and navigate with arrow keys.
