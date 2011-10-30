@@ -9513,7 +9513,6 @@ See documentation of `completing-read' and `all-completions' for details."
                            default-filename)))
          (init (or default initial dir default-directory))
          (ini-input (and init (expand-file-name init)))
-         (anything-ff-auto-update-flag nil)
          (current-command this-command)
          (str-command (symbol-name current-command))
          (buf-name (format "*ac-mode-%s*" str-command))
