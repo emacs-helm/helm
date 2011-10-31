@@ -52,34 +52,42 @@
 First get the files from git repo:
 
 Anything git repo is at:\\
-\url{http://repo.or.cz/w/anything-config.git}
+\url{http://repo.or.cz/w/anything-config.git}\\
+You will find there tarballs of differents versions.\\
 
 To get it with git:
-
 \begin{verbatim}
 git clone git://repo.or.cz/anything-config.git
 \end{verbatim}
+NOTE: Files are published on Emacswiki, but be aware that it is \underline{unsafe} to get files from Emacswiki,\\
+thus, anything is not maintained anymore on Emacswiki, so files found there should be deprecated.\\
 
-NOTE: Files are published on Emacswiki, but be aware that it is \underline{unsafe} to get files from Emacswiki.
+Once you have the anything directory, `cd' to it and run `make'.\\
+Add it now to your `load-path':
+\begin{verbatim}
+(add-to-list 'load-path "/path/to/anything/directory")
+\end{verbatim}
+
+
+Manual installation:\\
           
-You need 2 files:
+You need 3 files:
 \begin{itemize}
-\item anything.el
+\item 1) anything.el
 \end{itemize}
 Contain the anything engine.
 
 \begin{itemize}
-\item anything-config.el
+\item 2) anything-config.el
 \end{itemize}
 Contain all the sources and preconfigured functions ready to use.
 
-and optionally:
 \begin{itemize}
-\item anything-match-plugin.el
+\item 3) anything-match-plugin.el
 \end{itemize}
 Allow matching multi pattern search when entering a space in prompt.
 
-Once downloaded these files, put them in your `load-path'.
+Once downloaded these files, put them in your `load-path' and byte-compile them.
 If you don't know what is your load-path do C-h v load-path.
 
 \section{Config}
@@ -90,15 +98,6 @@ Edit your ~/.emacs.el file and add:
 (require 'anything-config)
 \end{verbatim}
 
-Optionally, you can add:
-
-\begin{verbatim}
-(require 'anything-match-plugin)
-\end{verbatim}
-
-Note that if you don't require anything-match-plugin, you can enable/disable it afterward with:
-
-M-x anything-c-toggle-match-plugin
 
 NOTE:
 It is not recommended to use the variable `anything-sources', please use instead the preconfigured anything command
@@ -109,7 +108,8 @@ anything a lot.
 
 \section{General anything commands}
 \label{sec:gener-anyth-comm}
-Anything allow you to have few binding to remember unlike all others Emacs applications.
+Anything allow you to have few binding to remember unlike all others Emacs applications.\\
+Thus, all bindings are auto documented.
 
 Anything show you by default in mode-line the most useful bindings, you will see in headers of anything buffer some more specific
 commands.
@@ -140,94 +140,10 @@ For more, hitting
 \begin{verbatim}
 C-h m
 \end{verbatim}
-while in anything session will show you all other bindings.
+while in anything session will show you all other bindings.\\
+NOTE: Some anything commands have a special keymap, you can access infos on these keymap with `C-c ?',
+it should be documented in mode-line.
 
-\subsection{All anything bindings}
-\label{sec:all-anyth-bind}
-
-\begin{tabular}{| l | m{5cm} |}
-  \hline
-  Command & Key \\
-  \hline
-  anything-next-line & down or C-n \\
-  \hline
-  anything-previous-line & up or C-p \\
-  \hline
-  anything-previous-page & prior or M-v \\
-  \hline
-  anything-next-page & next or C-v \\
-  \hline
-  anything-beginning-of-buffer & 
-\begin{verbatim}
-M-<
-\end{verbatim}
-  \\
-  \hline
-  anything-end-of-buffer &
-\begin{verbatim}
-M->
-\end{verbatim}
-  \\
-  \hline
-  anything-next-source & right or C-o \\
-  \hline
-  anything-previous-source & left \\
-  \hline
-  anything-exit-minibuffer & RET \\
-  \hline
-  anything-select-with-digit-shortcut & C-1/9/A/Z \\
-  \hline
-  anything-select-action & TAB or C-i \\
-  \hline
-  anything-execute-persistent-action & C-z \\
-  \hline
-  anything-select-2nd-action-or-end-of-line & C-e \\
-  \hline
-  anything-select-3rd-action & C-j \\
-  \hline
-  anything-scroll-other-window & M-next or C-M-v \\
-  \hline
-  anything-scroll-other-window-down & M-prior or C-M-y \\
-  \hline
-  anything-toggle-visible-mark & C-SPACE \\
-  \hline
-  anything-prev-visible-mark & M-[ \\
-  \hline
-  anything-next-visible-mark & M-] \\
-  \hline
-  anything-delete-minibuffer-contents & C-k \\
-  \hline
-  anything-isearch & C-s \\
-  \hline
-  anything-toggle-resplit-window & C-t \\
-  \hline
-  anything-quit-and-find-file & C-x C-f \\
-  \hline
-  anything-delete-current-selection & C-c C-d \\
-  \hline
-  anything-yank-selection & C-c C-y \\
-  \hline
-  anything-kill-selection-and-quit & C-c C-k \\
-  \hline
-  anything-follow-mode & C-c C-f \\
-  \hline
-  anything-force-update & C-c C-u \\
-  \hline
-  anything-debug-output & C-c C-x C-d \\
-  \hline
-  anything-display-all-visible-marks & C-c C-x C-m \\
-  \hline
-  anything-send-bug-report-from-anything & C-c C-x C-b \\
-  \hline
-  anything-previous-history-element & M-p \\
-  \hline
-  anything-next-history-element & M-n \\
-  \hline
-  anything-toggle-all-marks & M-m \\
-  \hline
-  anything-yank-text-at-point & C-w \\
-  \hline
-\end{tabular}
 \section{Overview of preconfigured anything commands}
 \label{sec:overv-comm-avail}
 For starting with anything, a set of commands have been set for you in anything menu.
@@ -295,9 +211,10 @@ Forget to mention C-. that go to root of current dir or to precedent
 level of dir.
 So for example you can hit C-z and then come back immediatly where you
 were with C-. instead of erasing minibuffer input with DEL.
-On non graphic display, it is bound to C-l.
+On non graphic display, it is bound to C-l.\\
+If `anything-ff-lynx-style-map' is non--nil, you will be able to use `left' instead of C-l and `right' instead of C-z.
 
-If you like it you can safely bind it to C-x C-f to replace the standard
+If you like it, you can safely bind it to C-x C-f to replace the standard
 find-file:
 
 \begin{verbatim}
@@ -376,6 +293,12 @@ Don't forget also to use C-t to split you windows vertically if needed.
 You will find also two actions to rotate image in action menu. 
 To use these actions whitout quitting, use M-l (rotate left) and M-r (rotate right).
 Of course M-l and M-r have no effect if candidate is not an image file.\\
+
+Don't forget to use `C-t' to split windows vertically, and then
+\begin{verbatim}
+`C-}' and `C-{'
+\end{verbatim}
+to narrow/enlarge anything window.\\
 
 NOTE:
 It use image-dired in background, so if image-dired don't work for some reason, this will
@@ -608,7 +531,18 @@ See the documentation of Eshell for more info.
 \subsection{Problem starting Eshell}
 \label{sec:probl-start-eshell}
 Eshell code is available (autoloaded) only when you have started once eshell.
-That's annoying like many autoloaded stuff in Emacs.
+That's annoying like many autoloaded stuff in Emacs.\\
+
+Here how to start Eshell at emacs startup:\\
+
+Add this to your .emacs:
+\begin{verbatim}
+(add-hook 'emacs-startup-hook #'(lambda ()
+                                  (let ((default-directory (getenv "HOME")))
+                                    (command-execute 'eshell)
+                                    (bury-buffer))))
+
+\end{verbatim}
  
 \subsection{Dired Commands}
 \label{sec:dired-commands}
@@ -948,6 +882,26 @@ In addition of what is described above, you will find a bunch of powerfull tools
 Just browse the anything commands availables with anything-M-x.
 
 Not complete.
+
+\section{Anything completion mode}
+\label{sec:anyth-compl-mode}
+`anything-completion-mode' aka `ac-mode' will enable anything completion in all 
+Emacs commands using `completing-read' or `read-file-name'.\\
+To use it:
+\begin{verbatim}
+M-x ac-mode
+\end{verbatim}
+Turn it on in .emacs with:
+\begin{verbatim}
+(ac-mode 1)
+\end{verbatim}
+Customize with:\\
+`anything-completing-read-handlers-alist'
+
+See C-h v `anything-completing-read-handlers-alist' for more infos.
+
+Not complete.
+
 \section{Usefuls extensions}
 \label{sec:usefuls-extensions}
 Not complete.
