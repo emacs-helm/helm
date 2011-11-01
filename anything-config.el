@@ -5693,7 +5693,6 @@ Same as `anything-describe-anything-attribute' but with anything completion."
 ;; (anything 'anything-c-source-info-global)
 
 
-;;;; <Help>
 ;;; Man and woman UI
 ;;
 ;;
@@ -5741,47 +5740,6 @@ source.")
 
 
 ;;;; <Command>
-;;; Complex command history
-;;
-;;
-(defvar anything-c-source-complex-command-history
-  '((name . "Complex Command History")
-    (candidates . (lambda () (mapcar 'prin1-to-string command-history)))
-    (type . sexp)))
-;; (anything 'anything-c-source-complex-command-history)
-
-;;; M-x history (not related to `anything-M-x')
-;;
-;;
-(defvar anything-c-source-extended-command-history
-  '((name . "Emacs Commands History")
-    (candidates . extended-command-history)
-    (type . command)))
-;; (anything 'anything-c-source-extended-command-history)
-
-;;; Emacs commands (Basic source for emacs commands)
-;;
-;;
-(defvar anything-c-source-emacs-commands
-  '((name . "Emacs Commands")
-    (candidates . (lambda ()
-                    (let (commands)
-                      (mapatoms (lambda (a)
-                                  (if (commandp a)
-                                      (push (symbol-name a)
-                                            commands))))
-                      (sort commands 'string-lessp))))
-    (type . command)
-    (requires-pattern . 2))
-  "Source for completing and invoking Emacs commands.
-A command is a function with interactive spec that can
-be invoked with `M-x'.
-
-To get non-interactive functions listed, use
-`anything-c-source-emacs-functions'.")
-;; (anything 'anything-c-source-emacs-commands)
-
-
 ;;; Anything M-x - Enhanced M-x UI
 ;;
 ;;
@@ -5849,17 +5807,45 @@ Show global bindings and local bindings according to current `major-mode'."
          (sort ls #'(lambda (x y) (string-lessp (car x) (car y)))))))
 
 
-;;; LaCarte
-(defvar anything-c-source-lacarte
-  '((name . "Lacarte")
-    (init . (lambda () (require 'lacarte )))
-    (candidates . (lambda () (delete '(nil) (lacarte-get-overall-menu-item-alist))))
-    (candidate-number-limit . 9999)
-    (action . anything-c-call-interactively))
-  "Needs lacarte.el.
+;;; Complex command history
+;;
+;;
+(defvar anything-c-source-complex-command-history
+  '((name . "Complex Command History")
+    (candidates . (lambda () (mapcar 'prin1-to-string command-history)))
+    (type . sexp)))
+;; (anything 'anything-c-source-complex-command-history)
 
-http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
-;; (anything 'anything-c-source-lacarte)
+;;; M-x history (not related to `anything-M-x')
+;;
+;;
+(defvar anything-c-source-extended-command-history
+  '((name . "Emacs Commands History")
+    (candidates . extended-command-history)
+    (type . command)))
+;; (anything 'anything-c-source-extended-command-history)
+
+;;; Emacs commands (Basic source for emacs commands)
+;;
+;;
+(defvar anything-c-source-emacs-commands
+  '((name . "Emacs Commands")
+    (candidates . (lambda ()
+                    (let (commands)
+                      (mapatoms (lambda (a)
+                                  (if (commandp a)
+                                      (push (symbol-name a)
+                                            commands))))
+                      (sort commands 'string-lessp))))
+    (type . command)
+    (requires-pattern . 2))
+  "Source for completing and invoking Emacs commands.
+A command is a function with interactive spec that can
+be invoked with `M-x'.
+
+To get non-interactive functions listed, use
+`anything-c-source-emacs-functions'.")
+;; (anything 'anything-c-source-emacs-commands)
 
 
 ;;;; <Function>
@@ -5978,6 +5964,19 @@ word in the function's name, e.g. \"bb\" is an abbrev for
     (requires-pattern . 2))
   "Source for completing Emacs variables.")
 ;; (anything 'anything-c-source-emacs-variables)
+
+
+;;; LaCarte
+(defvar anything-c-source-lacarte
+  '((name . "Lacarte")
+    (init . (lambda () (require 'lacarte )))
+    (candidates . (lambda () (delete '(nil) (lacarte-get-overall-menu-item-alist))))
+    (candidate-number-limit . 9999)
+    (action . anything-c-call-interactively))
+  "Needs lacarte.el.
+
+http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
+;; (anything 'anything-c-source-lacarte)
 
 
 ;;; Bookmarks
