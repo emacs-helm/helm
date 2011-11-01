@@ -5244,11 +5244,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
   '((name . "Recentf")
     (init . (lambda ()
               (require 'recentf)
-              (or recentf-mode (recentf-mode 1))
-              ;; Big value empowers anything/recentf
-              (when (and (numberp recentf-max-saved-items)
-                         (<= recentf-max-saved-items 20))
-                (setq recentf-max-saved-items 500))))
+              (or recentf-mode (recentf-mode 1))))
     (candidates . recentf-list)
     (match anything-c-match-on-basename)
     (type . file))
