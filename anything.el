@@ -33,6 +33,7 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Autodoc documentation:
@@ -101,9 +102,9 @@
 ;; `anything-execute-persistent-action'
 ;; Perform the associated action ATTR without quitting anything.
 ;; `anything-scroll-other-window'
-;; Scroll other window	(not *Anything* window) upward.
+;; Scroll other window (not *Anything* window) upward.
 ;; `anything-scroll-other-window-down'
-;; Scroll other window	(not *Anything* window) downward.
+;; Scroll other window (not *Anything* window) downward.
 ;; `anything-toggle-visible-mark'
 ;; Toggle anything visible mark at point.
 ;; `anything-display-all-visible-marks'
@@ -112,8 +113,6 @@
 ;; Move next anything visible mark.
 ;; `anything-prev-visible-mark'
 ;; Move previous anything visible mark.
-;; `anything-quit-and-find-file'
-;; Drop into `find-file' from `anything' like `iswitchb-find-file'.
 ;; `anything-yank-selection'
 ;; Set minibuffer contents to current selection.
 ;; `anything-kill-selection-and-quit'
@@ -136,7 +135,7 @@
 ;; `anything-sources'
 ;; A list of sources to use with `anything'.
 ;; `anything-type-attributes'
-;; It's a list of					(TYPE ATTRIBUTES ...).
+;; It's a list of                                      (TYPE ATTRIBUTES ...).
 ;; `anything-enable-shortcuts'
 ;; *Whether to use digit/alphabet shortcut to select the first nine matches.
 ;; `anything-shortcut-keys-alist'
@@ -276,7 +275,7 @@
 ;; `anything-last-log-file'
 ;; Not documented.
 ;; `anything-compile-source-functions'
-;; Functions to compile elements of `anything-sources'	(plug-in).
+;; Functions to compile elements of `anything-sources' (plug-in).
 ;; `anything-quit'
 ;; Not documented.
 ;; `anything-additional-attributes'
@@ -320,6 +319,9 @@
 
 ;;  *** END auto-documentation
 
+;; [EVAL] (autodoc-update-all)
+
+
 ;;; Commentary:
 
 ;;
@@ -345,6 +347,7 @@
 ;; Here is Japanese translation of `anything-sources' attributes.  Thanks.
 ;; http://d.hatena.ne.jp/sirocco634/20091012/1255336649
 
+
 ;;; Bug Report:
 ;;
 ;; If you have problems, send a bug report via C-c C-x C-b in anything session (best)
@@ -370,6 +373,7 @@
 ;;  8) Type C-c C-c to send.
 ;;  # If you are a Japanese, please write in Japanese:-)
 
+
 ;; You can extend `anything' by writing plug-ins. As soon as
 ;; `anything' is invoked, `anything-sources' is compiled into basic
 ;; attributes, then compiled one is used during invocation.
@@ -611,6 +615,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 ;;; Code:
 
 (defvar anything-version nil)
@@ -756,8 +761,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "C-t")             'anything-toggle-resplit-window)
     (define-key map (kbd "C-}")             'anything-narrow-window)
     (define-key map (kbd "C-{")             'anything-enlarge-window)
-    (define-key map (kbd "C-x C-f")         'anything-quit-and-find-file)
-
+    
     (define-key map (kbd "C-c C-d")         'anything-delete-current-selection)
     (define-key map (kbd "C-c C-y")         'anything-yank-selection)
     (define-key map (kbd "C-c C-k")         'anything-kill-selection-and-quit)
@@ -3594,21 +3598,6 @@ If PREV is non-nil move to precedent."
   "Move previous anything visible mark."
   (interactive)
   (anything-next-visible-mark t))
-
-;; (@* "Utility: `find-file' integration")
-(defun anything-quit-and-find-file ()
-  "Drop into `find-file' from `anything' like `iswitchb-find-file'.
-If current selection is a buffer or a file, `find-file' from its directory."
-  (interactive)
-  (anything-run-after-quit
-   (lambda (f)
-     (if (file-exists-p f)
-         (let ((default-directory (file-name-directory f)))
-           (call-interactively 'find-file))
-       (call-interactively 'find-file)))
-   (anything-aif (get-buffer (anything-get-selection))
-       (buffer-file-name it)
-     (expand-file-name (anything-get-selection)))))
 
 ;; (@* "Utility: Selection Paste")
 (defun anything-yank-selection ()

@@ -1476,6 +1476,12 @@ The \"-r\" option must be the last option.")
     "----"
     ["Prefered Options" anything-configuration t]))
 
+;;; Anything map add ons
+;;
+;;
+(define-key anything-map (kbd "C-x C-f") 'anything-quit-and-find-file)
+(define-key anything-map (kbd "M-m")     'anything-toggle-all-marks)
+(define-key anything-map (kbd "C-w")     'anything-yank-text-at-point)
 
 
 ;;; Specialized keymaps
@@ -2245,8 +2251,13 @@ See `anything-c-enable-eval-defun-hack'."
         (anything varsym)))))
 ;; (progn (ad-disable-advice 'eval-defun 'after 'anything-source-hack) (ad-update 'eval-defun))
 
-(defadvice anything-quit-and-find-file (around use-anything-find-files activate)
-  "Let `anything-quit-and-find-file' take advantage of `anything-find-files'."
+
+;; Move this function from anything.el and redefine here
+;; to avoid an unneeded defadvice.
+(defun anything-quit-and-find-file ()
+  "Drop into `anything-find-files' from `anything'.
+If current selection is a buffer or a file, `anything-find-files'
+from its directory."
   (interactive)
   (anything-run-after-quit
    (lambda (f)
@@ -2267,6 +2278,7 @@ See `anything-c-enable-eval-defun-hack'."
        (if (file-exists-p sel)
            (expand-file-name sel)
            default-directory)))))
+
 
 (defmacro* anything-c-walk-directory (directory &key path (directories t) match)
   "Walk through DIRECTORY tree.
@@ -2435,8 +2447,6 @@ visible or invisible in all sources of current anything session"
              (with-anything-window anything-visible-mark-overlays))
         (anything-unmark-all)
         (anything-mark-all))))
-
-(define-key anything-map (kbd "M-m") 'anything-toggle-all-marks)
 
 
 
@@ -5223,7 +5233,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 (add-hook 'anything-after-persistent-action-hook 'anything-reset-yank-point)
 (add-hook 'anything-cleanup-hook 'anything-reset-yank-point)
-(define-key anything-map (kbd "C-w") 'anything-yank-text-at-point)
 
 
 ;;; Recentf files
