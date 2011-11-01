@@ -5245,6 +5245,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     (init . (lambda ()
               (require 'recentf)
               (or recentf-mode (recentf-mode 1))))
+    (disable-shortcuts) ;; Needed for filenames with capitals letters.
     (candidates . recentf-list)
     (match anything-c-match-on-basename)
     (type . file))
