@@ -5249,7 +5249,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     (match anything-c-match-on-basename)
     (type . file))
   "See (info \"(emacs)File Conveniences\").
-if `recentf-max-saved-items' is too small, set it to 500.")
+Set `recentf-max-saved-items' to a bigger value if default is too small.")
 ;; (anything 'anything-c-source-recentf)
 
 ;;; ffap
