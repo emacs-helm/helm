@@ -2169,6 +2169,10 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
   (anything-aif (file-name-directory candidate)
       (string-match anything-pattern it)))
 
+(defun anything-c-match-on-basename (candidate)
+  "Return non-nil if `anything-pattern' match basename of filename CANDIDATE."
+  (string-match anything-pattern (anything-c-basename candidate)))
+
 (defun anything-c-string-match (candidate)
   "Return non-nil if `anything-pattern' match CANDIDATE.
 The match is done with `string-match'."
@@ -2722,8 +2726,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defvar anything-c-source-file-name-history
   '((name . "File Name History")
     (candidates . file-name-history)
-    (match anything-c-match-on-file-name
-           anything-c-match-on-directory-name)
+    (match anything-c-match-on-basename)
     (type . file)))
 ;; (anything 'anything-c-source-file-name-history)
 
@@ -4529,8 +4532,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
              (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
            (setq anything-c-file-cache-initialized-p t))))
     (candidates . anything-c-file-cache-files)
-    (match anything-c-match-on-file-name
-           anything-c-match-on-directory-name)
+    (match anything-c-match-on-basename)
     (type . file)))
 ;; (anything 'anything-c-source-file-cache)
 
@@ -5248,8 +5250,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                          (<= recentf-max-saved-items 20))
                 (setq recentf-max-saved-items 500))))
     (candidates . recentf-list)
-    (match anything-c-match-on-file-name
-     anything-c-match-on-directory-name)
+    (match anything-c-match-on-basename)
     (type . file))
   "See (info \"(emacs)File Conveniences\").
 if `recentf-max-saved-items' is too small, set it to 500.")
