@@ -3493,16 +3493,17 @@ You should not modify this yourself and know what you do if you do so.")
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
-  (with-anything-window
-    (setq anything-follow-mode nil))
-  ;; When going to precedent level we want to be at the line
-  ;; corresponding to actual directory, so store this info
-  ;; in `anything-ff-last-expanded'.
-  (if (and (not (file-directory-p anything-pattern))
-           (file-exists-p anything-pattern))
-      (setq anything-ff-last-expanded anything-pattern)
-      (setq anything-ff-last-expanded anything-ff-default-directory))
-  (when (anything-file-completion-source-p)
+  (when (and (anything-file-completion-source-p)
+             (not (anything-ff-writing-tramp-name-p)))
+    (with-anything-window
+      (setq anything-follow-mode nil))
+    ;; When going to precedent level we want to be at the line
+    ;; corresponding to actual directory, so store this info
+    ;; in `anything-ff-last-expanded'.
+    (if (and (not (file-directory-p anything-pattern))
+             (file-exists-p anything-pattern))
+        (setq anything-ff-last-expanded anything-pattern)
+        (setq anything-ff-last-expanded anything-ff-default-directory))
     (let ((new-pattern (anything-reduce-file-name anything-pattern arg
                                                   :unix-close t :expand t)))
       (anything-set-pattern new-pattern))))
@@ -3534,8 +3535,7 @@ When only one candidate is remaining and it is a directory,
 expand to this directory."
   (when (and anything-ff-auto-update-flag
              (anything-file-completion-source-p)
-             (not (string= (anything-ff-set-pattern anything-pattern)
-                           "Invalid tramp file name")))
+             (not (anything-ff-writing-tramp-name-p)))
     (let* ((history-p   (string= (assoc-default
                                   'name (anything-get-current-source))
                                  "Read File Name History"))
@@ -3643,6 +3643,11 @@ purpose."
                     when (and host (not (member host all-methods)))
                     collect (concat tn host)))
        :test 'equal))))
+
+(defun anything-ff-writing-tramp-name-p ()
+  "Return non--nil when user is currently writing a tramp name in minibuffer."
+  (string= (anything-ff-set-pattern anything-pattern)
+           "Invalid tramp file name"))
 
 (defun anything-ff-set-pattern (pattern)
   "Handle tramp filenames in `anything-pattern'."
