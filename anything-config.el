@@ -3533,7 +3533,9 @@ or hitting C-z on \"..\"."
 When only one candidate is remaining and it is a directory,
 expand to this directory."
   (when (and anything-ff-auto-update-flag
-             (anything-file-completion-source-p))
+             (anything-file-completion-source-p)
+             (not (string= (anything-ff-set-pattern anything-pattern)
+                           "Invalid tramp file name")))
     (let* ((history-p   (string= (assoc-default
                                   'name (anything-get-current-source))
                                  "Read File Name History"))
@@ -3626,6 +3628,22 @@ This happen only in function using sources that are
          (loop with v = (tramp-dissect-file-name fname)
             for i across v collect i)))
 
+(defun* anything-ff-tramp-hostnames (&optional (pattern anything-pattern))
+  "Get a list of hosts for tramp method found in `anything-pattern'.
+Argument PATTERN default to `anything-pattern', it is here only for debugging
+purpose."
+  (when (string-match tramp-file-name-regexp pattern)
+    (let ((method (match-string 1 pattern))
+          (tn (match-string 0 pattern))
+          (all-methods (mapcar 'car tramp-methods)))
+      (remove-duplicates
+       (loop for (f . h) in (tramp-get-completion-function method)
+          append (loop for e in (funcall f (car h))
+                    for host = (and (consp e) (cadr e))
+                    when (and host (not (member host all-methods)))
+                    collect (concat tn host)))
+       :test 'equal))))
+
 (defun anything-ff-set-pattern (pattern)
   "Handle tramp filenames in `anything-pattern'."
   (let ((methods (mapcar 'car tramp-methods))
@@ -3669,7 +3687,6 @@ This happen only in function using sources that are
           ;; Return PATTERN unchanged.
           (t pattern))))
 
-
 (defun anything-find-files-get-candidates ()
   "Create candidate list for `anything-c-source-find-files'."
   (let* ((path          (anything-ff-set-pattern anything-pattern))
@@ -3678,15 +3695,17 @@ This happen only in function using sources that are
                             (file-name-directory path)))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
-    (setq anything-pattern (anything-ff-transform-fname-for-completion path))
+    (unless (string= path "Invalid tramp file name")
+      (setq anything-pattern (anything-ff-transform-fname-for-completion path)))
     (setq anything-ff-default-directory
           (if (string= anything-pattern "")
               (if (eq system-type 'windows-nt) "c:/" "/")
               (unless (string-match ffap-url-regexp path)
                 ;; If path is an url *default-directory have to be nil.
                 path-name-dir)))
-    (cond ((or (string= path "Invalid tramp file name")
-               (file-regular-p path)
+    (cond ((string= path "Invalid tramp file name")
+           (anything-ff-tramp-hostnames))
+          ((or (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
@@ -4019,7 +4038,11 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
                  (delete-minibuffer-contents)
                  (set-text-properties 0 (length fname) nil fname)
                  (insert fname)))))
-      (cond (;; A symlink directory, expand it's truename.
+      (cond ((and (string= (anything-ff-set-pattern anything-pattern)
+                           "Invalid tramp file name")
+                  (string-match tramp-file-name-regexp candidate))
+             (insert-in-minibuffer candidate))
+            (;; A symlink directory, expand it's truename.
              (and (file-directory-p candidate) (file-symlink-p candidate))
              (insert-in-minibuffer (file-name-as-directory
                                     (file-truename
