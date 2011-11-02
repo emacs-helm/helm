@@ -850,6 +850,12 @@ It is useful to select a particular object instead of the first one.")
   "Run after anything minibuffer is closed.
 IOW this hook is executed BEFORE performing action.")
 
+(defvar anything-before-action-hook nil
+  "Run before executing action.
+Contrarily to `anything-cleanup-hook',
+this hook run before anything minibuffer is closed
+and before performing action.")
+
 (defvar anything-after-action-hook nil
   "Run after executing action.")
 
@@ -1749,8 +1755,10 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
   (and (anything-resume-p any-resume) (anything-funcall-foreach 'resume))
   (anything-log "end initialization"))
 
-(defun anything-execute-selection-action-1 ()
+;; Here defun* allow using implicit block `anything-execute-selection-action-1'.
+(defun* anything-execute-selection-action-1 ()
   "Execute current action."
+  (anything-log-run-hook 'anything-before-action-hook)
   (unwind-protect
       (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)

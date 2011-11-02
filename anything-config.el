@@ -3644,6 +3644,13 @@ purpose."
                     collect (concat tn host)))
        :test 'equal))))
 
+(defun anything-ff-before-action-hook-fn ()
+  "Exit anything when user try to execute action on an invalid tramp fname."
+  (when (and (anything-file-completion-source-p)
+             (anything-ff-writing-tramp-name-p))
+    (error "[Invalid tramp file name]")))
+(add-hook 'anything-before-action-hook 'anything-ff-before-action-hook-fn)
+
 (defun anything-ff-writing-tramp-name-p ()
   "Return non--nil when user is currently writing a tramp name in minibuffer."
   (string= (anything-ff-set-pattern anything-pattern)
