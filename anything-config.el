@@ -3707,6 +3707,9 @@ purpose."
                             (file-name-directory path)))
          (tramp-verbose anything-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
+    ;; Don't set now `anything-pattern' if `path' == "Invalid tramp file name"
+    ;; like that the actual value (e.g /ssh:) is passed to
+    ;; `anything-ff-tramp-hostnames'.
     (unless (string= path "Invalid tramp file name")
       (setq anything-pattern (anything-ff-transform-fname-for-completion path)))
     (setq anything-ff-default-directory
@@ -3716,7 +3719,17 @@ purpose."
                 ;; If path is an url *default-directory have to be nil.
                 path-name-dir)))
     (cond ((string= path "Invalid tramp file name")
-           (anything-ff-tramp-hostnames))
+           (or (anything-ff-tramp-hostnames) ; Hostnames completion.
+               (prog2
+                   ;; `anything-pattern' have not been modified yet.
+                   ;; Set it here to the value of `path' that should be now
+                   ;; "Invalid tramp file name" and set the candidates list
+                   ;; to ("Invalid tramp file name") to make `anything-pattern'
+                   ;; match single candidate "Invalid tramp file name".
+                   (setq anything-pattern path)
+                   ;; "Invalid tramp file name" is now printed
+                   ;; in `anything-buffer'.
+                   (list path))))
           ((or (file-regular-p path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
