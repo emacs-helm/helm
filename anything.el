@@ -1966,7 +1966,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   (let ((hooks '((post-command-hook anything-check-minibuffer-input)
                  (minibuffer-setup-hook anything-print-error-messages))))
     (if (eq setup-or-cleanup 'setup)
-        (dolist (args hooks) (apply #'(lambda (h f) (add-hook h f t)) args))
+        (dolist (args hooks) (apply 'add-hook args))
         (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
 
 ;; (@* "Core: clean up")

@@ -3646,10 +3646,11 @@ purpose."
 
 (defun anything-ff-before-action-hook-fn ()
   "Exit anything when user try to execute action on an invalid tramp fname."
-  (when (and (anything-file-completion-source-p)
-             (anything-ff-invalid-tramp-name-p (anything-get-selection))
-             (anything-ff-invalid-tramp-name-p))
-    (error "[Invalid tramp file name]")))
+  (let ((cand (anything-get-selection)))
+    (when (and (anything-file-completion-source-p)
+               (anything-ff-invalid-tramp-name-p cand) ; Check candidate.
+               (anything-ff-invalid-tramp-name-p)) ; check anything-pattern.
+      (error "Error: Unknow file or directory `%s'" cand))))
 (add-hook 'anything-before-action-hook 'anything-ff-before-action-hook-fn)
 
 (defun* anything-ff-invalid-tramp-name-p (&optional (pattern anything-pattern))
