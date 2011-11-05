@@ -2882,7 +2882,7 @@ ACTION must be an action supported by `anything-dired-action'."
          (win-conf (current-window-configuration)))
     (unwind-protect
          (let ((default-directory anything-ff-default-directory))
-           (anything-dired-action
+                (anything-dired-action
             dest :files ifiles :action action :follow parg))
       ;; Don't reset win-conf when following.
       (unless parg (set-window-configuration win-conf)))))
@@ -3494,7 +3494,7 @@ You should not modify this yourself and know what you do if you do so.")
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
   (when (and (anything-file-completion-source-p)
-             (not (anything-ff-writing-tramp-name-p)))
+             (not (anything-ff-invalid-tramp-name-p)))
     (with-anything-window
       (setq anything-follow-mode nil))
     ;; When going to precedent level we want to be at the line
@@ -3535,7 +3535,7 @@ When only one candidate is remaining and it is a directory,
 expand to this directory."
   (when (and anything-ff-auto-update-flag
              (anything-file-completion-source-p)
-             (not (anything-ff-writing-tramp-name-p)))
+             (not (anything-ff-invalid-tramp-name-p)))
     (let* ((history-p   (string= (assoc-default
                                   'name (anything-get-current-source))
                                  "Read File Name History"))
@@ -3647,13 +3647,14 @@ purpose."
 (defun anything-ff-before-action-hook-fn ()
   "Exit anything when user try to execute action on an invalid tramp fname."
   (when (and (anything-file-completion-source-p)
-             (anything-ff-writing-tramp-name-p))
+             (anything-ff-invalid-tramp-name-p (anything-get-selection))
+             (anything-ff-invalid-tramp-name-p))
     (error "[Invalid tramp file name]")))
 (add-hook 'anything-before-action-hook 'anything-ff-before-action-hook-fn)
 
-(defun anything-ff-writing-tramp-name-p ()
-  "Return non--nil when user is currently writing a tramp name in minibuffer."
-  (string= (anything-ff-set-pattern anything-pattern)
+(defun* anything-ff-invalid-tramp-name-p (&optional (pattern anything-pattern))
+  "Return non--nil when PATTERN is an invalid tramp filename."
+  (string= (anything-ff-set-pattern pattern)
            "Invalid tramp file name"))
 
 (defun anything-ff-set-pattern (pattern)
