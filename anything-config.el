@@ -2884,15 +2884,11 @@ ACTION must be an action supported by `anything-dired-action'."
                     prompt
                     :preselect (if anything-ff-transformer-show-only-basename
                                    (anything-c-basename cand) cand)
-                    :initial-input (anything-dwim-target-directory)
-                    :history (anything-find-files-history :comp-read nil)))
-         (win-conf (current-window-configuration)))
-    (unwind-protect
-         (let ((default-directory anything-ff-default-directory))
-                (anything-dired-action
-            dest :files ifiles :action action :follow parg))
-      ;; Don't reset win-conf when following.
-      (unless parg (set-window-configuration win-conf)))))
+                    :initial-input (anything-dwim-target-directory) 
+                    :history (anything-find-files-history :comp-read nil))))
+    (let ((default-directory anything-ff-default-directory))
+      (anything-dired-action
+       dest :files ifiles :action action :follow parg))))
 
 (defun anything-find-files-copy (candidate)
   "Copy files from `anything-find-files'."
