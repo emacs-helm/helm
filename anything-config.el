@@ -1375,6 +1375,7 @@ The \"-r\" option must be the last option.")
 
 
 (define-key anything-command-map (kbd "<SPC>")     'anything-execute-anything-command)
+(define-key anything-command-map (kbd "a")         'anything-c-apropos)
 (define-key anything-command-map (kbd "e")         'anything-c-etags-select)
 (define-key anything-command-map (kbd "l")         'anything-locate)
 (define-key anything-command-map (kbd "s")         'anything-surfraw)
@@ -1435,6 +1436,7 @@ The \"-r\" option must be the last option.")
   '("Anything"
     ["All anything commands" anything-execute-anything-command t]
     ["Find any Files/Buffers" anything-for-files t]
+    ["Anything Everywhere" ac-mode t]
     "----"
     ("Files:"
      ["Find files" anything-find-files t]
@@ -1446,6 +1448,8 @@ The \"-r\" option must be the last option.")
     ("Commands:"
      ["Emacs Commands" anything-M-x t]
      ["Externals Commands" anything-c-run-external-command t])
+    ("Help:"
+     ["Anything Apropos" anything-c-apropos t])
     ("Info:"
      ["Info at point" anything-info-at-point t]
      ["Emacs Manual index" anything-info-emacs t]
@@ -3633,8 +3637,8 @@ This happen only in function using sources that are
 Argument PATTERN default to `anything-pattern', it is here only for debugging
 purpose."
   (when (string-match tramp-file-name-regexp pattern)
-    (let ((method (match-string 1 pattern))
-          (tn (match-string 0 pattern))
+    (let ((method      (match-string 1 pattern))
+          (tn          (match-string 0 pattern))
           (all-methods (mapcar 'car tramp-methods)))
       (remove-duplicates
        (loop for (f . h) in (tramp-get-completion-function method)
@@ -9944,6 +9948,21 @@ or between double quotes."
         (anything-c-complete-file-name-at-point)
         (anything-lisp-completion-at-point))))
 
+(defun anything-c-apropos-init (test default)
+  "Init candidates buffer for `anything-c-apropos' sources."
+  (with-current-buffer (anything-candidate-buffer 'global)
+    (goto-char (point-min))
+    (when (and default (stringp default)
+               ;; Some defaults args result as
+               ;; (symbol-name nil) == "nil".
+               ;; e.g debug-on-entry.
+               (not (string= default "nil"))
+               (funcall test (intern default)))
+      (insert (concat default "\n")))
+    (loop with all = (all-completions "" obarray test)
+       for sym in all
+       unless (and default (eq sym default))
+       do (insert (concat sym "\n")))))
 
 
 ;;; Run Externals commands within Emacs with anything completion
@@ -12096,6 +12115,55 @@ You can set your own list of commands with
   (anything :sources 'anything-c-source-ucs
             :keymap  anything-c-ucs-map))
 
+;;;###autoload
+(defun anything-c-apropos ()
+  "Preconfigured anything to describe commands, functions, variables and faces."
+  (interactive)
+  (let ((default (thing-at-point 'symbol)))
+    (anything :sources
+              `(((name . "Commands")
+                 (init . (lambda ()
+                           (anything-c-apropos-init 'commandp ,default)))
+                 (persistent-action . anything-lisp-completion-persistent-action)
+                 (persistent-help . "Show brief doc in mode-line")
+                 (candidates-in-buffer)
+                 (action . (lambda (candidate)
+                             (describe-function (intern candidate)))))
+                ((name . "Functions")
+                 (init . (lambda ()
+                           (anything-c-apropos-init #'(lambda (x) (and (fboundp x)
+                                                                       (not (commandp x))))
+                                                    ,default)))
+                 (persistent-action . anything-lisp-completion-persistent-action)
+                 (persistent-help . "Show brief doc in mode-line")
+                 (candidates-in-buffer)
+                 (action . (lambda (candidate)
+                             (describe-function (intern candidate)))))
+                ((name . "Variables")
+                 (init . (lambda ()
+                           (anything-c-apropos-init 'boundp ,default)))
+                 (persistent-action . anything-lisp-completion-persistent-action)
+                 (persistent-help . "Show brief doc in mode-line")
+                 (candidates-in-buffer)
+                 (action . (lambda (candidate)
+                             (describe-variable (intern candidate)))))
+                ((name . "Faces")
+                 (init . (lambda ()
+                           (anything-c-apropos-init 'facep ,default)))
+                 (persistent-action . anything-lisp-completion-persistent-action)
+                 (persistent-help . "Show brief doc in mode-line")
+                 (candidates-in-buffer)
+                 (filtered-candidate-transformer . (lambda (candidates source)
+                                                     (loop for c in candidates
+                                                          collect (propertize c 'face (intern c)))))
+                 (action . (lambda (candidate)
+                             (describe-face (intern candidate)))))
+                ((name . "Anything attributes")
+                 (candidates . (lambda ()
+                                 (mapcar 'symbol-name anything-additional-attributes)))
+                 (action . (lambda (candidate)
+                             (with-output-to-temp-buffer "*Help*"
+                               (princ (get (intern candidate) 'anything-attrdoc))))))))))
 
 
 ;;; Unit tests are now in ../developer-tools/unit-test-anything-config.el.
