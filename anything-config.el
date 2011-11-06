@@ -2874,21 +2874,20 @@ for current buffer."
 (defun anything-find-files-do-action (action)
   "Generic function for creating action from `anything-c-source-find-files'.
 ACTION must be an action supported by `anything-dired-action'."
-  (let* ((ifiles   (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
-                           (anything-marked-candidates)))
-         (cand     (anything-get-selection)) ; Target
-         (prompt   (anything-find-files-set-prompt-for-action
-                    (capitalize (symbol-name action)) ifiles))
-         (parg     anything-current-prefix-arg)
-         (dest     (anything-c-read-file-name
-                    prompt
-                    :preselect (if anything-ff-transformer-show-only-basename
-                                   (anything-c-basename cand) cand)
-                    :initial-input (anything-dwim-target-directory) 
-                    :history (anything-find-files-history :comp-read nil))))
-    (let ((default-directory anything-ff-default-directory))
-      (anything-dired-action
-       dest :files ifiles :action action :follow parg))))
+  (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
+                         (anything-marked-candidates)))
+         (cand   (anything-get-selection)) ; Target
+         (prompt (anything-find-files-set-prompt-for-action
+                  (capitalize (symbol-name action)) ifiles))
+         (parg   anything-current-prefix-arg)
+         (dest   (anything-c-read-file-name
+                  prompt
+                  :preselect (if anything-ff-transformer-show-only-basename
+                                 (anything-c-basename cand) cand)
+                  :initial-input (anything-dwim-target-directory) 
+                  :history (anything-find-files-history :comp-read nil))))
+    (anything-dired-action
+     dest :files ifiles :action action :follow parg)))
 
 (defun anything-find-files-copy (candidate)
   "Copy files from `anything-find-files'."
@@ -4140,17 +4139,11 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
 
 (defun* anything-find-files-history (&key (comp-read t))
   "The `anything-find-files' history.
-Show the first `anything-ff-history-max-length' elements of `anything-ff-history'
-in an `anything-comp-read'."
+Show the first `anything-ff-history-max-length' elements of
+`anything-ff-history' in an `anything-comp-read'."
   (let ((history (when anything-ff-history
-                   (loop with dup for i in anything-ff-history
-                      ;; Remove duplicate and not existing files.
-                      ;; Keep remote files.
-                      unless (or (member i dup)
-                                 (and (not (file-remote-p i))
-                                      (not (file-exists-p i))))
-                      collect i into dup
-                      finally return dup)))) ; Remove dups.
+                   (anything-fast-remove-dups anything-ff-history
+                                              :test 'equal))))
     (when history
       (setq anything-ff-history
             (if (>= (length history) anything-ff-history-max-length)
