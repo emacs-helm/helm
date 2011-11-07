@@ -3438,8 +3438,9 @@ The checksum is copied to kill-ring."
 (defun anything-ff-toggle-basename (candidate)
   (setq anything-ff-transformer-show-only-basename
         (not anything-ff-transformer-show-only-basename))
-  (save-excursion
-    (anything-force-update)))
+  (let ((target (if anything-ff-transformer-show-only-basename
+                    (anything-c-basename candidate) candidate)))
+    (anything-force-update target)))
 
 (defun anything-ff-run-toggle-basename ()
   (interactive)

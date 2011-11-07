@@ -2368,7 +2368,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
   (save-excursion (anything-log-run-hook 'anything-update-hook))
   (anything-next-line))
 
-(defun anything-force-update ()
+(defun anything-force-update (&optional preselect)
   "Force recalculation and update of candidates.
 If current source has `update' attribute, a function without argument,
 call it before update."
@@ -2376,37 +2376,40 @@ call it before update."
   (let ((source (anything-get-current-source)))
     (if source
         (anything-force-update--reinit source)
-      (anything-erase-message)
-      (mapc 'anything-force-update--reinit (anything-get-sources)))
+      (message nil)
+      (mapc 'anything-force-update--reinit
+            (anything-get-sources)))
     (let ((selection (anything-get-selection nil t)))
-      (anything-update)
-      (anything-keep-selection source selection))))
+      (anything-update preselect)
+      ;; If preselect arg exists, `anything-update' should
+      ;; have moved to selection, otherwise do it now.
+      (unless preselect
+        (anything-keep-selection source selection)))))
 
 (defun anything-force-update--reinit (source)
-  (anything-aif (anything-funcall-with-source source 'anything-candidate-buffer)
+  (anything-aif (anything-funcall-with-source
+                 source 'anything-candidate-buffer)
       (kill-buffer it))
   (dolist (attr '(update init))
     (anything-aif (assoc-default attr source)
         (anything-funcall-with-source source it)))
   (anything-remove-candidate-cache source))
 
-(defun anything-erase-message ()
-  (message ""))
-
 (defun anything-keep-selection (source selection)
   (when (and source selection)
     (with-anything-window
       (anything-goto-source source)
-      (forward-char -1)                  ;back to \n
-      (if (search-forward (concat "\n" selection "\n") nil t)
+      (forward-char -1)                  ; back to \n
+      (if (re-search-forward (concat "^" selection "$") nil t)
           (forward-line -1)
-        (goto-char (point-min))
-        (forward-line 1))
+          (goto-char (point-min))
+          (forward-line 1))
       (anything-mark-current-line))))
 
 (defun anything-remove-candidate-cache (source)
   (setq anything-candidate-cache
-        (delete (assoc (assoc-default 'name source) anything-candidate-cache)
+        (delete (assoc (assoc-default 'name source)
+                       anything-candidate-cache)
                 anything-candidate-cache)))
 
 (defun anything-insert-match (match insert-function source)
