@@ -4071,7 +4071,11 @@ If a prefix arg is given or `anything-follow-mode' is on open file."
       (cond ((and (string= (anything-ff-set-pattern anything-pattern)
                            "Invalid tramp file name")
                   (string-match tramp-file-name-regexp candidate))
-             (insert-in-minibuffer candidate))
+             ;; First hit insert hostname and
+             ;; second hit insert ":" and expand.
+             (if (string= candidate anything-pattern)
+                 (insert-in-minibuffer (concat candidate ":"))
+                 (insert-in-minibuffer candidate)))
             (;; A symlink directory, expand it's truename.
              (and (file-directory-p candidate) (file-symlink-p candidate))
              (insert-in-minibuffer (file-name-as-directory
