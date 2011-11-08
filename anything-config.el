@@ -3479,7 +3479,7 @@ If EXPAND is non--nil expand-file-name."
     "write-file" "insert-file" "dired" 
     "find-alternate-file" "find-alternate-file-other-window"
     "find-file-read-only" "list-directory"
-    "Read File Name History"
+    "Read File Name History" "mml-attach-file"
     "Rename Files" "Symlink Files"
     "Hardlink Files" "Write File"
     "Insert File" "Read File Name")
