@@ -2373,18 +2373,17 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
 If current source has `update' attribute, a function without argument,
 call it before update."
   (interactive)
-  (let ((source (anything-get-current-source)))
-    (if source
-        (anything-force-update--reinit source)
-      (message nil)
+  (let ((source    (anything-get-current-source))
+        (selection (anything-get-selection nil t)))
+    (when source
       (mapc 'anything-force-update--reinit
             (anything-get-sources)))
-    (let ((selection (anything-get-selection nil t)))
-      (anything-update preselect)
-      ;; If preselect arg exists, `anything-update' should
-      ;; have moved to selection, otherwise do it now.
-      (unless preselect
-        (anything-keep-selection source selection)))))
+    (anything-update preselect)
+    ;; If preselect arg exists, `anything-update' should
+    ;; have moved to selection, otherwise do it now.
+    (unless preselect
+      (anything-keep-selection (assoc-default 'name source) selection))
+    (with-anything-window (recenter))))
 
 (defun anything-force-update--reinit (source)
   (anything-aif (anything-funcall-with-source
@@ -2396,12 +2395,13 @@ call it before update."
   (anything-remove-candidate-cache source))
 
 (defun anything-keep-selection (source selection)
+  "Switch to SOURCE and goto SELECTION."
   (when (and source selection)
     (with-anything-window
       (anything-goto-source source)
-      (forward-char -1)                  ; back to \n
-      (if (re-search-forward (concat "^" selection "$") nil t)
-          (forward-line -1)
+      (forward-char -1)
+      (if (search-forward selection nil t)
+          (forward-line 0)
           (goto-char (point-min))
           (forward-line 1))
       (anything-mark-current-line))))
@@ -2526,7 +2526,6 @@ after the source name by overlay."
 
 (defun anything-kill-async-processes ()
   "Kill all known asynchronous processes of `anything-async-processes'."
-    "Kill locate process."
     (mapc 'anything-kill-async-process (mapcar 'car anything-async-processes))
     (setq anything-async-processes nil))
 
@@ -2850,7 +2849,6 @@ See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
 
 (defun anything-keyboard-quit ()
   "Quit minibuffer in anything.
-
 If action buffer is displayed, kill it."
   (interactive)
   (when (get-buffer-window anything-action-buffer 'visible)
