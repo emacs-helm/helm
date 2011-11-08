@@ -2852,12 +2852,13 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
            ("Locate `C-x C-f, C-u to specify locate db'" . anything-ff-locate))))))
 ;; (anything 'anything-c-source-find-files)
 
-(defun anything-find-files-set-prompt-for-action (prompt files)
-  "Set prompt for action in `anything-find-files'."
+(defun anything-find-files-set-prompt-for-action (action files)
+  "Set prompt for action ACTION for FILES."
   (let ((len (length files)))
-    (if (> len 1)
-        (format "%s * %d Files to: " prompt len)
-        (format "%s %s to: " prompt (car files)))))
+    (format "%s *%s File(s)\n%s to: "
+            action len
+            (mapconcat (lambda (f)
+                         (format "- %s\n" f)) files ""))))
 
 (defun anything-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
