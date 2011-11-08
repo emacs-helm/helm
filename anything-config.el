@@ -3049,9 +3049,10 @@ Copying is done asynchronously with `anything-c-copy-files-async-1'."
 (defun anything-ff-copy-async (candidate)
   "Anything find files action to copy files async.
 Copying is done asynchronously with `anything-c-copy-files-async-1'."
-  (let ((flist (anything-marked-candidates))
+  (let* ((flist (anything-marked-candidates))
         (dest  (anything-c-read-file-name
-                "Copy File(s) async To: "
+                (anything-find-files-set-prompt-for-action
+                 "Copy Async" flist)
                 :preselect candidate
                 :initial-input (car anything-ff-history)
                 :history (anything-find-files-history :comp-read nil))))
