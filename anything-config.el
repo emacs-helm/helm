@@ -2622,8 +2622,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-revert-and-update (candidate)
   (let ((marked (anything-marked-candidates)))
     (loop for buf in marked do (anything-revert-buffer buf))
-    (anything-force-update)
-    (anything-c-recenter-window)))
+    (anything-force-update candidate)))
 
 ;;;###autoload
 (defun anything-buffer-revert-persistent ()
@@ -2637,8 +2636,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (loop for buf in marked do
          (with-current-buffer (get-buffer buf)
            (save-buffer)))
-    (anything-force-update)
-    (anything-c-recenter-window)))
+    (anything-force-update candidate)))
 
 ;;;###autoload
 (defun anything-buffer-save-persistent ()
