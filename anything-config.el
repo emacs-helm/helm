@@ -8904,13 +8904,14 @@ Only math* symbols are collected."
     (display-to-real . anything-c-apt-display-to-real)
     (requires-pattern . 2)
     (delayed)
+    (update . anything-c-apt-refresh)
     (action
      ("Show package description" . anything-c-apt-cache-show)
      ("Install package" . anything-c-apt-install)
      ("Remove package" . anything-c-apt-uninstall)
      ("Purge package" . anything-c-apt-purge))
     (persistent-action . anything-c-apt-persistent-action)
-    (persistent-help . "Show - C-u Refresh")))
+    (persistent-help . "Show package description")))
 ;; (anything 'anything-c-source-apt)
 
 (defvar anything-c-apt-query "emacs")
@@ -8923,14 +8924,11 @@ Only math* symbols are collected."
 (defun anything-c-apt-refresh ()
   "Refresh installed candidates list."
   (setq anything-c-apt-installed-packages nil)
-  (setq anything-c-apt-all-packages nil)
-  (anything-force-update))
+  (setq anything-c-apt-all-packages nil))
 
 (defun anything-c-apt-persistent-action (candidate)
   "Persistent action for APT source."
-  (if current-prefix-arg
-      (anything-c-apt-refresh)
-      (anything-c-apt-cache-show candidate)))
+  (anything-c-apt-cache-show candidate))
 
 (defun anything-c-apt-candidate-transformer (candidates)
   "Show installed candidates in a different color."

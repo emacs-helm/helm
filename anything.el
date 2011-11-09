@@ -2315,7 +2315,10 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
 (defvar anything-input-local nil)
 (defvar anything-process-delayed-sources-timer nil)
 (defun anything-update (&optional preselect)
-  "Update candidates list in `anything-buffer' according to `anything-pattern'."
+  "Update candidates list in `anything-buffer' according to `anything-pattern'.
+Argument PRESELECT is a string or regexp used to move selection to a particular
+place once updating is done.  It should be used on single source because search
+is done on whole `anything-buffer' and not on current source."
   (anything-log "start update")
   (setq anything-digit-shortcut-count 0)
   (anything-kill-async-processes)
@@ -2338,13 +2341,16 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
         (if anything-test-mode
             (mapc 'anything-process-source delayed-sources)
           (when delayed-sources
+            ;; Process delayed sources once outside of timer
+            ;; to be sure `anything-after-update-hook' and preselection
+            ;; are executed effectively AFTER processing delayed sources.
+            (anything-process-delayed-sources delayed-sources)
+            ;; Then start a new timer.
             (anything-new-timer
              'anything-process-delayed-sources-timer
              (run-with-idle-timer
               anything-idle-delay nil
               'anything-process-delayed-sources delayed-sources)))
-          ;; FIXME I want to execute anything-after-update-hook
-          ;; AFTER processing delayed sources
           (anything-log-run-hook 'anything-after-update-hook))
         (and preselect (anything-preselect preselect))
         (anything-log "end update")))))
