@@ -1,9 +1,11 @@
-;;; anything-config.el --- Predefined configurations for `anything.el'
+;;; anything-config.el --- Applications libary for `anything.el'
 
 ;; Filename: anything-config.el
 
-;; Description: Predefined configurations for `anything.el'
+;; Description: Applications libary for `anything.el'
+
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
+
 ;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
 ;;             rubikitch    <rubikitch@ruby-lang.org>
 ;;             Thierry Volpiatto <thierry.volpiatto@gmail.com>
@@ -11,16 +13,18 @@
 ;; Copyright (C) 2009, Andy Stewart, all rights reserved.
 ;; Copyright (C) 2009 ~ 2011, rubikitch, all rights reserved.
 ;; Copyright (C) 2009 ~ 2011, Thierry Volpiatto, all rights reserved.
+
 ;; Created: 2009-02-16 21:38:23
-;; Version: 0.4.1
+
 ;; X-URL: http://repo.or.cz/w/anything-config.git
+
+;; MailingList: https://groups.google.com/group/emacs-anything?hl=en
+
 ;; Keywords: anything, anything-config
+
 ;; Compatibility: GNU Emacs 22 ~ 24
-;;
-;; Features that might be required by this library:
-;;
-;; `anything'
-;;
+
+;; Dependencies: `anything.el'
 
 ;;; This file is NOT part of GNU Emacs
 

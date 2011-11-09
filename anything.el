@@ -10,8 +10,13 @@
 ;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
+
 ;; X-URL: http://repo.or.cz/w/anything-config.git
+
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
+
+;; MailingList: https://groups.google.com/group/emacs-anything?hl=en
+
 
 ;;; This file is NOT part of GNU Emacs
 
@@ -4035,8 +4040,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
   "  Function called with no parameters when `anything-resume' is started.")
 
 ;; (@* "Bug Report")
-(defvar anything-maintainer-mail-address
-  (concat "rubiki" "tch@ru" "by-lang.org"))
+(defvar anything-maintainer-mail-address "emacs-anything@googlegroups.com")
+
 (defvar anything-bug-report-salutation
   "Describe bug below, using a precise recipe.
 
@@ -4047,8 +4052,8 @@ How to send a bug report:
   2) Enable debugger. M-x toggle-debug-on-error or (setq debug-on-error t)
   3) Use Lisp version instead of compiled one: (load \"anything.el\")
   4) If you got an error, please paste *Backtrace* buffer.
-  5) Type C-c C-c to send.
-# If you are a Japanese, please write in Japanese:-)")
+  5) Type C-c C-c to send.")
+
 (defvar anything-no-dump-variables
   '(anything-candidate-buffer-alist
     anything-digit-overlays
