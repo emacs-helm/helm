@@ -9683,7 +9683,7 @@ Note: This mode will work only partially on Emacs23."
               (setq pcomplete-current-completions nil
                     pcomplete-last-completion-raw nil)
               ;; Eshell-command add this hook in all minibuffers
-              ;; Remove it for the anything one.
+              ;; Remove it for the anything one. (Fixed in Emacs24)
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates . anything-esh-get-candidates)
     (action . anything-ec-insert))

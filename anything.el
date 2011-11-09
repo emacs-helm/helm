@@ -1188,41 +1188,37 @@ It is useful to write your sources."
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
 
-;; anything-set-source-filter
-;;
-;;   This function sets a filter for anything sources and it may be
-;;   called while anything is running. It can be used to toggle
-;;   displaying of sources dinamically. For example, additional keys
-;;   can be bound into `anything-map' to display only the file-related
-;;   results if there are too many matches from other sources and
-;;   you're after files only:
-;;
-;;   Shift+F shows only file results from some sources:
-;;
-;;     (define-key anything-map "F" 'anything-my-show-files-only)
-;;
-;;     (defun anything-my-show-files-only ()
-;;       (interactive)
-;;       (anything-set-source-filter '("File Name History"
-;;                                     "Files from Current Directory")))
-;;
-;;   Shift+A shows all results:
-;;
-;;     (define-key anything-map "A" 'anything-my-show-all)
-;;
-;;     (defun anything-my-show-all ()
-;;       (interactive)
-;;       (anything-set-source-filter nil))
-;;
-;;
-;;   Note that you have to prefix the functions with anything- prefix,
-;;   otherwise they won't be bound when Anything is used under
-;;   Iswitchb. The -my- part is added to avoid collisions with
-;;   existing Anything function names.
-;;
 (defun anything-set-source-filter (sources)
-  "Set the value of `anything-source-filter' and update the list of results.
-This apply only on SOURCES."
+  "Set the value of `anything-source-filter' to SOURCES and update.
+
+This function sets a filter for anything sources and it may be
+called while anything is running. It can be used to toggle
+displaying of sources dinamically. For example, additional keys
+can be bound into `anything-map' to display only the file-related
+results if there are too many matches from other sources and
+you're after files only:
+
+Shift+F shows only file results from some sources:
+
+\(define-key anything-map \"F\" 'anything-my-show-files-only)
+
+\(defun anything-my-show-files-only ()
+  (interactive)
+  (anything-set-source-filter '(\"File Name History\"
+                                  \"Files from Current Directory\")))
+
+Shift+A shows all results:
+
+\(define-key anything-map \"A\" 'anything-my-show-all)
+
+\(defun anything-my-show-all ()
+  (interactive)
+  (anything-set-source-filter nil))
+
+Note that you have to prefix the functions with anything- prefix,
+otherwise they won't be bound when Anything is used under
+Iswitchb. The -my- part is added to avoid collisions with
+existing Anything function names."
   (unless (and (listp sources)
                (loop for name in sources always (stringp name)))
     (error "Invalid data in `anything-set-source-filter': %S" sources))
@@ -1464,8 +1460,8 @@ BINDING is a list of \(VARNAME . VALUE\) pair."
   (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
 
 (defun anything-funcall-with-source (source func &rest args)
-  "Call from SOURCE FUNC with ARGS.
-FUNC can be a function list.
+  "Call from SOURCE FUNC list or single function FUNC with ARGS.
+FUNC can be a symbol or a list of functions.
 Return the result of last function call."
   (let ((anything-source-name (assoc-default 'name source))
         result)
@@ -1474,14 +1470,14 @@ Return the result of last function call."
       (setq result (apply func args)))))
 
 (defun anything-funcall-foreach (sym)
-  "Call the SYM function\(s\) for each source if any."
+  "Call the function SYM for each source if any."
   (dolist (source (anything-get-sources))
     (anything-aif (assoc-default sym source)
         (anything-funcall-with-source source it))))
 
 (defun anything-normalize-sources (sources)
-  "If SOURCES is only one source, make a list."
-  (cond ((or (and sources               ; avoid nil
+  "If SOURCES is only one source, make a list of one element."
+  (cond ((or (and sources
                   (symbolp sources))
              (and (listp sources) (assq 'name sources)))
          (list sources))
@@ -1561,64 +1557,64 @@ This is used in transformers to modify candidates list."
 ;;;###autoload
 (defun anything (&rest plist)
   "Main function to execute anything sources.
+
 When call interactively with no arguments deprecated `anything-sources'
 will be used if non--nil.
 
 PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
- \(&optional sources input prompt resume preselect buffer keymap\).
+\(&optional sources input prompt resume preselect buffer keymap\).
 
 Basic keywords are the following:
 
-- :sources
+\:sources
 
-  Temporary value of `anything-sources'.  It also accepts a
-  symbol, interpreted as a variable of an anything source.  It
-  also accepts an alist representing an anything source, which is
-  detected by \(assq 'name ANY-SOURCES\)
+Temporary value of `anything-sources'.  It also accepts a
+symbol, interpreted as a variable of an anything source.  It
+also accepts an alist representing an anything source, which is
+detected by \(assq 'name ANY-SOURCES\)
 
-- :input
+\:input
 
-  Temporary value of `anything-pattern', ie. initial input of minibuffer.
+Temporary value of `anything-pattern', ie. initial input of minibuffer.
 
-- :prompt
+\:prompt
 
-  Prompt other than \"pattern: \".
+Prompt other than \"pattern: \".
 
-- :resume
+\:resume
 
-  If t, Resurrect previously instance of `anything'.  Skip the initialization.
-  If 'noresume, this instance of `anything' cannot be resumed.
+If t, Resurrect previously instance of `anything'.  Skip the initialization.
+If 'noresume, this instance of `anything' cannot be resumed.
 
-- :preselect
+\:preselect
 
-  Initially selected candidate.  Specified by exact candidate or a regexp.
-  Note that it is not working with delayed sources.
+Initially selected candidate.  Specified by exact candidate or a regexp.
+Note that it is not working with delayed sources.
 
-- :buffer
+\:buffer
 
-  `anything-buffer' instead of *anything*.
+`anything-buffer' instead of *anything*.
 
-- :keymap
+\:keymap
 
-  `anything-map' for current `anything' session.
+`anything-map' for current `anything' session.
 
-- :default
+\:default
 
- A default argument that will be inserted in minibuffer with \
- \\<minibuffer-local-map>\\[next-history-element].
- When nil of not present `thing-at-point' will be used instead.
+A default argument that will be inserted in minibuffer \
+with \\<minibuffer-local-map>\\[next-history-element].
+When nil of not present `thing-at-point' will be used instead.
 
 Of course, conventional arguments are supported, the two are same.
 
- \(anything :sources sources :input input :prompt prompt :resume resume
+\(anything :sources sources :input input :prompt prompt :resume resume
            :preselect preselect :buffer buffer :keymap keymap\)
- \(anything sources input prompt resume preselect buffer keymap\)
-
+\(anything sources input prompt resume preselect buffer keymap\)
 
 Other keywords are interpreted as local variables of this anything session.
 The `anything-' prefix can be omitted.  For example,
 
- \(anything :sources 'anything-c-source-buffers
+\(anything :sources 'anything-c-source-buffers
            :buffer \"*buffers*\" :candidate-number-limit 10\)
 
 means starting anything session with `anything-c-source-buffers'
@@ -2356,6 +2352,7 @@ is done on whole `anything-buffer' and not on current source."
         (anything-log "end update")))))
 
 (defun anything-update-source-p (source)
+  "Wheter SOURCE need updating or not."
   (and (or (not anything-source-filter)
            (member (assoc-default 'name source) anything-source-filter))
        (>= (length anything-pattern)
@@ -2364,12 +2361,14 @@ is done on whole `anything-buffer' and not on current source."
              0))))
 
 (defun anything-delayed-source-p (source)
+  "Wheter SOURCE is a delayed source or not."
   (or (assoc 'delayed source)
       (and anything-quick-update
            (< (window-height (get-buffer-window (current-buffer)))
               (line-number-at-pos (point-max))))))
 
 (defun anything-update-move-first-line ()
+  "Goto first line of `anything-buffer'."
   (goto-char (point-min))
   (save-excursion (anything-log-run-hook 'anything-update-hook))
   (anything-next-line))
@@ -2392,6 +2391,7 @@ call it before update."
     (with-anything-window (recenter))))
 
 (defun anything-force-update--reinit (source)
+  "Reinit SOURCE by calling his update and/or init functions."
   (anything-aif (anything-funcall-with-source
                  source 'anything-candidate-buffer)
       (kill-buffer it))
@@ -2413,6 +2413,7 @@ call it before update."
       (anything-mark-current-line))))
 
 (defun anything-remove-candidate-cache (source)
+  "Remove SOURCE from `anything-candidate-cache'."
   (setq anything-candidate-cache
         (delete (assoc (assoc-default 'name source)
                        anything-candidate-cache)
