@@ -8907,7 +8907,6 @@ Only math* symbols are collected."
     (candidate-transformer anything-c-apt-candidate-transformer)
     (display-to-real . anything-c-apt-display-to-real)
     (requires-pattern . 2)
-    (delayed)
     (update . anything-c-apt-refresh)
     (action
      ("Show package description" . anything-c-apt-cache-show)

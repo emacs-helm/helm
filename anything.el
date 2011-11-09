@@ -2329,30 +2329,28 @@ is done on whole `anything-buffer' and not on current source."
     (when anything-enable-shortcuts
       (mapc 'delete-overlay anything-digit-overlays))
     (let (delayed-sources)
-      (unwind-protect
-          (setq delayed-sources
-                (loop for source in (remove-if-not 'anything-update-source-p
-                                                   (anything-get-sources))
-                      if (anything-delayed-source-p source)
-                      collect source
-                      else do (anything-process-source source)))
+      (unwind-protect ; Process normal sources and store delayed one's.
+           (setq delayed-sources
+                 (loop for source in (remove-if-not 'anything-update-source-p
+                                                    (anything-get-sources))
+                    if (anything-delayed-source-p source)
+                    collect source
+                    else do (anything-process-source source)))
         (anything-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-        (anything-update-move-first-line)
+        (anything-update-move-first-line) ; Run anything-update-hook.
         (if anything-test-mode
             (mapc 'anything-process-source delayed-sources)
-          (when delayed-sources
-            ;; Process delayed sources once outside of timer
-            ;; to be sure `anything-after-update-hook' and preselection
-            ;; are executed effectively AFTER processing delayed sources.
-            (anything-process-delayed-sources delayed-sources)
-            ;; Then start a new timer.
-            (anything-new-timer
-             'anything-process-delayed-sources-timer
-             (run-with-idle-timer
-              anything-idle-delay nil
-              'anything-process-delayed-sources delayed-sources)))
-          (anything-log-run-hook 'anything-after-update-hook))
+            (when delayed-sources
+              (anything-new-timer
+               'anything-process-delayed-sources-timer
+               (run-with-idle-timer
+                ;; Be sure anything-idle-delay is >
+                ;; to anything-input-idle-delay
+                ;; otherwise use value of anything-input-idle-delay.
+                (max anything-idle-delay anything-input-idle-delay) nil
+                'anything-process-delayed-sources delayed-sources)))
+            (anything-log-run-hook 'anything-after-update-hook))
         (and preselect (anything-preselect preselect))
         (anything-log "end update")))))
 
