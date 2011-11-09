@@ -2951,12 +2951,10 @@ to a list of forms.\n\n")
       ;; go to first candidate of first source
       (forward-line 1)
       (let ((start (point)))
-        (unless (or (re-search-forward
-                     (concat "^" (regexp-quote candidate-or-regexp) "$")
-                     nil t)
-                    (progn (goto-char start)
-                           (re-search-forward candidate-or-regexp nil t)))
-          (goto-char start))))
+        (or (re-search-forward
+             (concat "^" (regexp-quote candidate-or-regexp) "$") nil t)
+            (search-forward candidate-or-regexp nil t)
+            (goto-char start))))
     (anything-mark-current-line)))
 
 (defun anything-delete-current-selection ()
