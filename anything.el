@@ -2294,8 +2294,11 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
       ;; TODO call anything-put-digit-overlay-maybe with loop
       )))
 
-(defun anything-process-delayed-sources (delayed-sources)
-  "Process DELAYED-SOURCES when idle for `anything-idle-delay' seconds."
+(defun anything-process-delayed-sources (delayed-sources &optional preselect)
+  "Process anything DELAYED-SOURCES.
+Move selection to string or regexp PRESELECT if non--nil.
+This function is called in `anything-process-delayed-sources-timer'
+when emacs is idle for `anything-idle-delay'."
   (with-anything-quittable
     (anything-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
     (with-current-buffer anything-buffer
@@ -2308,9 +2311,11 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                       (overlay-end anything-selection-overlay)))
           (goto-char (point-min))
           (anything-next-line)))
+      (when preselect (anything-preselect preselect))
       (save-excursion
         (goto-char (point-min))
-        (anything-log-run-hook 'anything-update-hook)))))
+        (anything-log-run-hook 'anything-update-hook))
+      (anything-log-run-hook 'anything-after-update-hook))))
 
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
@@ -2341,17 +2346,22 @@ is done on whole `anything-buffer' and not on current source."
         (anything-update-move-first-line) ; Run anything-update-hook.
         (if anything-test-mode
             (mapc 'anything-process-source delayed-sources)
-            (when delayed-sources
-              (anything-new-timer
-               'anything-process-delayed-sources-timer
-               (run-with-idle-timer
-                ;; Be sure anything-idle-delay is >
-                ;; to anything-input-idle-delay
-                ;; otherwise use value of anything-input-idle-delay.
-                (max anything-idle-delay anything-input-idle-delay) nil
-                'anything-process-delayed-sources delayed-sources)))
-            (anything-log-run-hook 'anything-after-update-hook))
-        (and preselect (anything-preselect preselect))
+            (if delayed-sources
+                (anything-new-timer
+                 'anything-process-delayed-sources-timer
+                 (run-with-idle-timer
+                  ;; Be sure anything-idle-delay is >
+                  ;; to anything-input-idle-delay
+                  ;; otherwise use value of anything-input-idle-delay.
+                  (max anything-idle-delay anything-input-idle-delay) nil
+                  'anything-process-delayed-sources delayed-sources preselect))
+                ;; Run `anything-after-update-hook' here only when no
+                ;; delayed sources, otherwise it will run AFTER
+                ;; execution of delayed sources in
+                ;; `anything-process-delayed-sources'.
+                ;; Idem for preselection.
+                (anything-log-run-hook 'anything-after-update-hook)
+                (and preselect (anything-preselect preselect))))
         (anything-log "end update")))))
 
 (defun anything-update-source-p (source)
