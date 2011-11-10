@@ -2963,6 +2963,7 @@ to a list of forms.\n\n")
       (let ((start (point)))
         (or (re-search-forward
              (concat "^" (regexp-quote candidate-or-regexp) "$") nil t)
+            (re-search-forward candidate-or-regexp nil t)
             (search-forward candidate-or-regexp nil t)
             (goto-char start))))
     (anything-mark-current-line)))
