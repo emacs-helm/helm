@@ -623,13 +623,16 @@
 
 ;;; Code:
 
-(defvar anything-version nil)
-(setq anything-version "1.3")
-
 (require 'cl)
+
+(defvar anything-version "1.3.3")
 
 ;; (@* "User Configuration")
 
+
+;;; Variables
+;;
+;;
 ;; [DEPRECATED]
 ;; A default value is provided in anything-config.el
 (defvar anything-sources nil
@@ -718,6 +721,7 @@ Other sources won't appear in the search results.
 If nil then there is no filtering.
 See also `anything-set-source-filter'.")
 
+
 (defvar anything-map
   (let ((map (copy-keymap minibuffer-local-map)))
     (define-key map (kbd "<down>")          'anything-next-line)
@@ -785,6 +789,7 @@ See also `anything-set-source-filter'.")
     map)
   "Keymap for anything.")
 
+
 (defgroup anything nil
   "Open anything."
   :prefix "anything-" :group 'convenience)
@@ -998,6 +1003,7 @@ It is useful for debug.")
 If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because *Anything Log* grows quickly.")
 
+
 ;; (@* "Internal Variables")
 (defvar anything-test-candidate-list nil)
 (defvar anything-test-mode nil)
@@ -1014,6 +1020,7 @@ It is disabled by default because *Anything Log* grows quickly.")
 (defvar anything-let-variables nil)
 (defvar anything-split-window-state nil)
 
+
 ;; (@* "Utility: logging")
 (defun anything-log (format-string &rest args)
   "Log message if `debug-on-error' or `anything-debug' is non-nil.
@@ -1101,6 +1108,7 @@ ARGS are args given to `format'."
 ;; (anything-log "test")
 ;; (switch-to-buffer-other-window "*Anything Log*")
 
+
 ;; (@* "Programming Tools")
 (defmacro anything-aif (test-form then-form &rest else-forms)
   "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
@@ -1116,6 +1124,7 @@ Otherwise make a list with one element."
       obj
     (list obj)))
 
+
 ;; (@* "Anything API")
 
 (defun anything-buffer-get ()
@@ -1419,6 +1428,7 @@ Otherwise, return VALUE itself."
       (apply function args)
       (push spec anything-once-called-functions))))
 
+
 ;; (@* "Core: API helper")
 (defun* anything-empty-buffer-p (&optional (buffer anything-buffer))
   "Check if BUFFER have candidates.
@@ -1458,7 +1468,7 @@ BINDING is a list of \(VARNAME . VALUE\) pair."
       (funcall bodyfunc)
     (setq anything-let-variables nil)))
 
-
+
 ;; (@* "Core: tools")
 (defun anything-current-line-contents ()
   "Current line string without properties."
@@ -1555,6 +1565,7 @@ This is used in transformers to modify candidates list."
       (cancel-timer it))
   (set variable timer))
 
+
 ;; (@* "Core: entry point")
 (defconst anything-argument-keys
   '(:sources :input :prompt :resume :preselect :buffer :keymap :default))
@@ -1682,6 +1693,7 @@ are same args as in `anything'."
 Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
   (anything any-sources nil nil nil nil any-buffer))
 
+
 ;;; (@* "Core: entry point helper")
 (defun anything-internal (&optional
                             any-sources any-input
@@ -1784,6 +1796,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
     (and m (set list-var (delq (car m) (symbol-value list-var))))
     (push elt (symbol-value list-var))))
 
+
 ;;; (@* "Core: Accessors")
 ;;; rubikitch: I love to create functions to control variables.
 (defvar anything-current-position nil
@@ -1831,7 +1844,7 @@ window or frame configuration is saved/restored according to values of
                  (setq frame (selected-frame)))
                (select-frame-set-input-focus frame)))))
 
-
+
 ;; (@* "Core: Display *anything* buffer")
 (defun anything-display-buffer (buf)
   "Display *anything* buffer BUF."
@@ -1845,6 +1858,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 `anything-samewindow'."
   (funcall (if anything-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
 
+
 ;; (@* "Core: initialize")
 (defun anything-initial-setup ()
   "Initialize anything settings and set up the anything buffer."
@@ -1970,6 +1984,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
         (dolist (args hooks) (apply 'add-hook args))
         (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
 
+
 ;; (@* "Core: clean up")
 ;;; TODO move
 (defun anything-cleanup ()
@@ -2000,6 +2015,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
       (with-current-buffer (window-buffer miniwin)
         (delete-minibuffer-contents)))))
 
+
 ;; (@* "Core: input handling")
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs to be handled."
@@ -2025,6 +2041,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
     (anything-log-eval anything-pattern anything-input)
     (anything-update)))
 
+
 ;; (@* "Core: source compiler")
 (defvar anything-compile-source-functions-default anything-compile-source-functions
   "Plug-ins this file provides.")
@@ -2040,6 +2057,7 @@ Anything plug-ins are realized by this function."
            finally (return source)))
    sources))
 
+
 ;; (@* "Core: plug-in attribute documentation hack")
 
 ;; `anything-document-attribute' is public API.
@@ -2055,6 +2073,7 @@ Anything plug-ins are realized by this function."
 ;; (documentation-property 'anything-sources 'variable-documentation)
 ;; (progn (ad-disable-advice 'documentation-property 'after 'anything-document-attribute) (ad-update 'documentation-property))
 
+
 ;; (@* "Core: all candidates")
 (defun anything-process-delayed-init (source)
   "Initialize delayed SOURCE."
@@ -2106,6 +2125,7 @@ Cache the candidates if there is not yet a cached value."
                     (push candidate-cache anything-candidate-cache)))
              candidates)))))
 
+
 ;;; (@* "Core: candidate transformers")
 (defun anything-process-candidate-transformer (candidates source)
   "Execute candidate-transformer function on all CANDIDATES of SOURCE."
@@ -2147,6 +2167,7 @@ This happen if PROCESS-P is non-nil."
     (anything-process-candidate-transformer candidates source) source process-p)
    source))
 
+
 ;; (@* "Core: narrowing candidates")
 (defun anything-candidate-number-limit (source)
   "Apply candidate-number-limit attribute value.
@@ -2316,6 +2337,7 @@ when emacs is idle for `anything-idle-delay'."
         (anything-log-run-hook 'anything-update-hook))
       (anything-log-run-hook 'anything-after-update-hook))))
 
+
 ;; (@* "Core: *anything* buffer contents")
 (defvar anything-input-local nil)
 (defvar anything-process-delayed-sources-timer nil)
@@ -2494,6 +2516,7 @@ after the source name by overlay."
                      (point-at-eol) 'anything-candidate-separator t)
   (insert "\n"))
 
+
 ;; (@* "Core: async process")
 (defun anything-output-filter (process string)
   "From PROCESS process output STRING."
@@ -2561,6 +2584,7 @@ after the source name by overlay."
   (set-process-filter process nil)
   (delete-process process))
 
+
 ;; (@* "Core: action")
 (defun anything-execute-selection-action (&optional
                                             selection action
@@ -2634,6 +2658,7 @@ If action buffer is selected, back to the anything buffer."
     (set (make-local-variable 'anything-digit-overlays) nil)
     (anything-initialize-overlays anything-action-buffer)))
 
+
 ;; (@* "Core: selection")
 (defun anything-move-selection-common (move-func unit direction)
   "Move the selection marker to a new position wit function MOVE-FUNC.
@@ -2912,6 +2937,7 @@ If action buffer is displayed, kill it."
   "Return t if the current line is a candidate separator."
   (get-text-property (point-at-bol) 'anything-candidate-separator))
 
+
 ;; (@* "Core: help")
 (defun anything-help-internal (bufname insert-content-fn)
   "Show long message during `anything' session in BUFNAME.
@@ -2962,6 +2988,7 @@ to a list of forms.\n\n")
             (pp-to-string (eval v)) "\n"))
   (message "Calculating all anything-related values...Done"))
 
+
 ;; (@* "Core: misc")
 (defun anything-kill-buffer-hook ()
   "Remove tick entry from `anything-tick-hash' when killing a buffer."
@@ -3006,7 +3033,7 @@ to a list of forms.\n\n")
     (anything-mark-current-line)))
 
 (defun anything-end-of-source-p ()
-  "Return t if we are at eob or end of source."
+  "Return non--nil if we are at eob or end of source."
   (save-excursion
     (forward-line 1)
     (or (eq (point-at-bol) (point-at-eol))
@@ -3048,6 +3075,9 @@ if optional NOUPDATE is non-nil, anything buffer is not changed."
   (anything-set-pattern ""))
 (defalias 'anything-delete-minibuffer-content 'anything-delete-minibuffer-contents)
 
+
+;;; Plugins
+;;
 ;; (@* "Built-in plug-in: type")
 (defun anything-compile-source--type (source)
   (anything-aif (assoc-default 'type source)
@@ -3318,6 +3348,7 @@ Acceptable values of CREATE-OR-BUFFER:
                 (volatile) (match identity)))
     source))
 
+
 ;; (@* "Utility: resplit anything window")
 (defun anything-toggle-resplit-window ()
   "Toggle resplit anything window, vertically or horizontally."
@@ -3488,6 +3519,7 @@ second argument of `display-buffer'."
   (interactive)
   (anything-scroll-other-window-base 'scroll-down))
 
+
 ;; (@* "Utility: Visible Mark")
 (defface anything-visible-mark
   '((((min-colors 88) (background dark))
@@ -3650,7 +3682,7 @@ You can paste it by typing \\[yank]."
      (message "Killed: %s" sel))
    (anything-get-selection nil t)))
 
-
+
 ;; (@* "Utility: Automatical execution of persistent-action")
 (add-to-list 'minor-mode-alist '(anything-follow-mode " AFollow"))
 (defun anything-follow-mode ()
@@ -3673,6 +3705,7 @@ This happen after `anything-input-idle-delay' secs."
        (save-excursion
          (anything-execute-persistent-action))))
 
+
 ;; (@* "Utility: Migrate `anything-sources' to my-anything command")
 (defun anything-migrate-sources ()
   "Help to migrate to new `anything' way."
@@ -3707,6 +3740,7 @@ It is automatically generated by `anything-migrate-sources'.\"
     (substitute-key-definition 'anything 'my-anything global-map)
     (pop-to-buffer (current-buffer))))
 
+
 ;; (@* "Compatibility")
 
 ;; Copied assoc-default from XEmacs version 21.5.12
@@ -3757,6 +3791,7 @@ buffer as BUFFER."
           (length buffer-undo-list)
         (buffer-modified-tick)))))
 
+
 ;; (@* "CUA workaround")
 (defadvice cua-delete-region (around anything-avoid-cua activate)
   (ignore-errors ad-do-it))
@@ -4055,6 +4090,7 @@ ANYTHING-ATTRIBUTE should be a symbol."
     'resume "optional"
   "  Function called with no parameters when `anything-resume' is started.")
 
+
 ;; (@* "Bug Report")
 (defvar anything-maintainer-mail-address "emacs-anything@googlegroups.com")
 
@@ -4134,6 +4170,7 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
         anything-test-candidate-list
       (anything-cleanup))))
 
+
 ;; (@* "Unit Tests")
 ;; See developer-tools/unit-test-anything.el
 
