@@ -2306,11 +2306,10 @@ when emacs is idle for `anything-idle-delay'."
         (goto-char (point-max))
         (mapc 'anything-process-source delayed-sources)
         (when (and (not (anything-empty-buffer-p))
-                   ;; no selection yet
+                   ;; No selection yet.
                    (= (overlay-start anything-selection-overlay)
                       (overlay-end anything-selection-overlay)))
-          (goto-char (point-min))
-          (anything-next-line)))
+          (anything-update-move-first-line 'without-hook)))
       (when preselect (anything-preselect preselect))
       (save-excursion
         (goto-char (point-min))
@@ -2333,35 +2332,42 @@ is done on whole `anything-buffer' and not on current source."
     (erase-buffer)
     (when anything-enable-shortcuts
       (mapc 'delete-overlay anything-digit-overlays))
-    (let (delayed-sources)
+    (let (delayed-sources
+          normal-sources)
       (unwind-protect ; Process normal sources and store delayed one's.
            (setq delayed-sources
                  (loop for source in (remove-if-not 'anything-update-source-p
                                                     (anything-get-sources))
                     if (anything-delayed-source-p source)
                     collect source
-                    else do (anything-process-source source)))
+                    else do (progn (push source normal-sources)
+                                   (anything-process-source source))))
         (anything-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-        (anything-update-move-first-line) ; Run anything-update-hook.
-        (if anything-test-mode
+        (if anything-test-mode ; Need only to process sources.
             (mapc 'anything-process-source delayed-sources)
-            (if delayed-sources
-                (anything-new-timer
-                 'anything-process-delayed-sources-timer
-                 (run-with-idle-timer
-                  ;; Be sure anything-idle-delay is >
-                  ;; to anything-input-idle-delay
-                  ;; otherwise use value of anything-input-idle-delay.
-                  (max anything-idle-delay anything-input-idle-delay) nil
-                  'anything-process-delayed-sources delayed-sources preselect))
-                ;; Run `anything-after-update-hook' here only when no
-                ;; delayed sources, otherwise it will run AFTER
-                ;; execution of delayed sources in
-                ;; `anything-process-delayed-sources'.
-                ;; Idem for preselection.
-                (anything-log-run-hook 'anything-after-update-hook)
-                (and preselect (anything-preselect preselect))))
+            (cond ((and preselect delayed-sources normal-sources)
+                   ;; Preselection run here when there is
+                   ;; normal AND delayed sources.
+                   (anything-log "Update preselect candidate %s" preselect)
+                   (anything-preselect preselect))
+                  (delayed-sources ; Preselection and hooks will run later.
+                   (anything-update-move-first-line 'without-hook))
+                  (t ; No delayed sources, run the hooks now.
+                   (anything-update-move-first-line)
+                   (anything-log-run-hook 'anything-after-update-hook)
+                   (when preselect
+                     (anything-log "Update preselect candidate %s" preselect)
+                     (anything-preselect preselect))))
+            (when delayed-sources
+              (anything-new-timer
+               'anything-process-delayed-sources-timer
+               (run-with-idle-timer
+                ;; Be sure anything-idle-delay is >
+                ;; to anything-input-idle-delay
+                ;; otherwise use value of anything-input-idle-delay.
+                (max anything-idle-delay anything-input-idle-delay) nil
+                'anything-process-delayed-sources delayed-sources preselect))))
         (anything-log "end update")))))
 
 (defun anything-update-source-p (source)
@@ -2380,10 +2386,11 @@ is done on whole `anything-buffer' and not on current source."
            (< (window-height (get-buffer-window (current-buffer)))
               (line-number-at-pos (point-max))))))
 
-(defun anything-update-move-first-line ()
+(defun anything-update-move-first-line (&optional without-hook)
   "Goto first line of `anything-buffer'."
   (goto-char (point-min))
-  (save-excursion (anything-log-run-hook 'anything-update-hook))
+  (unless without-hook
+    (save-excursion (anything-log-run-hook 'anything-update-hook)))
   (anything-next-line))
 
 (defun anything-force-update (&optional preselect)
