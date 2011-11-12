@@ -9633,7 +9633,9 @@ See documentation of `completing-read' and `all-completions' for details."
                        :alistp nil
                        :test predicate))))
       (ac-mode 1)
-      (ido-mode (if ido-state 1 -1)))
+      (ido-mode (if ido-state 1 -1))
+      ;; Same comment as in `anything-completing-read-default'.
+      (setq this-command current-command))
     (if (and mustmatch (not (file-exists-p fname)))
         (if (y-or-n-p "File does not exists, create buffer?")
             fname (error "Abort file does not exists"))
