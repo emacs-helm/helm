@@ -9559,8 +9559,14 @@ See documentation of `completing-read' and `all-completions' for details."
                (t ; Fall back to classic `anything-comp-read'.
                 (anything-completing-read-default-1
                  prompt collection predicate require-match
-                 initial-input hist def inherit-input-method str-command buf-name)))
-      (ac-mode 1))))
+                 initial-input hist def inherit-input-method
+                 str-command buf-name)))
+      (ac-mode 1)
+      ;; When exiting minibuffer, `this-command' is set to
+      ;; `anything-exit-minibuffer', which is unwanted when starting
+      ;; on another `completing-read', so restore `this-command' to
+      ;; initial value when exiting.
+      (setq this-command current-command))))
   
 (defun* anything-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
