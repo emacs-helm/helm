@@ -9997,7 +9997,7 @@ is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
   (lexical-let* ((real-com (car (split-string (replace-regexp-in-string
-                                               "'%s'" "" exe))))
+                                               "%s" "" exe))))
                  (proc     (if file (concat real-com " " file) real-com)))
     (if (get-process proc)
         (if anything-raise-command
@@ -10006,7 +10006,8 @@ In this case EXE must be provided as \"EXE %s\"."
         (when (loop for i in anything-c-external-commands-list thereis real-com)
           (message "Starting %s..." real-com)
           (if file
-              (start-process-shell-command proc nil (format exe file))
+              (start-process-shell-command
+               proc nil (format exe (shell-quote-argument file)))
               (start-process-shell-command proc nil real-com))
           (set-process-sentinel
            (get-process proc)
@@ -10115,7 +10116,7 @@ If not found or a prefix arg is given query the user which tool to use."
                                (setq def-prog nil))
                              ;; No prefix arg or default program exists.
                              (replace-regexp-in-string " %s\\| '%s'" "" def-prog)))
-         (program        (concat real-prog-name " '%s'")))
+         (program        (concat real-prog-name " %s")))
     (unless (or def-prog ; Association exists, no need to record it.
                 ;; Don't try to record non--filenames associations (e.g urls).
                 (not (file-exists-p fname)))
@@ -10140,7 +10141,6 @@ If not found or a prefix arg is given query the user which tool to use."
                 (delete real-prog-name
                         (loop for i in anything-external-command-history
                              when (executable-find i) collect i))))))
-
 
 (defun anything-c-find-file-or-marked (candidate)
   "Open file CANDIDATE or open anything marked files in background."
