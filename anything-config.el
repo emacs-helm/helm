@@ -9408,6 +9408,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
            :prompt prompt
            :resume 'noresume
            :buffer buffer)
+          (unless must-match default)
           (keyboard-quit)))))
 
 ;; Generic completing-read
