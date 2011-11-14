@@ -1568,7 +1568,7 @@ This is used in transformers to modify candidates list."
 
 ;; (@* "Core: entry point")
 (defconst anything-argument-keys
-  '(:sources :input :prompt :resume :preselect :buffer :keymap :default))
+  '(:sources :input :prompt :resume :preselect :buffer :keymap :default :history))
 
 ;;;###autoload
 (defun anything (&rest plist)
@@ -1620,6 +1620,12 @@ Note that it is not working with delayed sources.
 A default argument that will be inserted in minibuffer \
 with \\<minibuffer-local-map>\\[next-history-element].
 When nil of not present `thing-at-point' will be used instead.
+
+\:history
+
+By default all minibuffer input is pushed to `minibuffer-history',
+if an argument HISTORY is provided, input will be pushed to HISTORY.
+History element should be a symbol.
 
 Of course, conventional arguments are supported, the two are same.
 
@@ -1699,7 +1705,7 @@ Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
                             any-sources any-input
                             any-prompt any-resume
                             any-preselect any-buffer
-                            any-keymap any-default)
+                            any-keymap any-default any-history)
   "The internal anything function called by `anything'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP See `anything'."
@@ -1724,7 +1730,7 @@ ANY-KEYMAP See `anything'."
                   (anything-read-pattern-maybe
                    any-prompt any-input any-preselect any-resume any-keymap any-default)
                 (anything-cleanup)))
-            (prog1 (unless anything-quit (anything-execute-selection-action-1))
+            (prog1 (unless anything-quit (anything-execute-selection-action-1 any-history))
               (anything-log "end session --------------------------------------------")))
         (quit
          (anything-on-quit)
@@ -1769,13 +1775,17 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
   (anything-log "end initialization"))
 
 ;; Here defun* allow using implicit block `anything-execute-selection-action-1'.
-(defun* anything-execute-selection-action-1 ()
-  "Execute current action."
+(defun* anything-execute-selection-action-1 (&optional history)
+  "Execute current action.
+Push current input to HISTORY if present, otherwise
+minibuffer-history will be used instead."
   (anything-log-run-hook 'anything-before-action-hook)
   (unwind-protect
       (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
+    (when (and history (not (string= anything-pattern "")))
+      (set history (cons anything-pattern (symbol-value history))))
     (anything-log-run-hook 'anything-after-action-hook)))
 
 (defun anything-on-quit ()

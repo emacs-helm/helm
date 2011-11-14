@@ -9298,6 +9298,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                 (loop for i across collection collect i))
                ((and alistp test)
                 (loop for i in collection when (funcall test i) collect i))
+               ((and (symbolp collection) (boundp collection))
+                (symbol-value collection))
                (alistp collection)
                ((and collection test)
                 (all-completions "" collection test))
@@ -9407,6 +9409,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
            :preselect preselect
            :prompt prompt
            :resume 'noresume
+           :history history
            :buffer buffer)
           (unless must-match default)
           (keyboard-quit)))))
@@ -9486,7 +9489,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                           for cand = (if (consp i) (car i) i)
                           do (set-text-properties 0 (length cand) nil cand)
                           collect cand))
-   :history (eval (or (car-safe hist) hist))
+   :history (or (car-safe hist) hist)
    :must-match require-match
    :alistp nil
    :name name
