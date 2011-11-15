@@ -2718,10 +2718,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (kill-buffer buffer)))
   (anything-delete-current-selection))
 
-(defun anything-c-recenter-window ()
-  "Make visible current selection by recentering anything window."
-  (with-anything-window (recenter)))
-
 (defun anything-c-buffers-list-persistent-action (candidate)
     (if current-prefix-arg
         (anything-c-buffers-persistent-kill candidate)
@@ -9464,6 +9460,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
     :prompt prompt
     :buffer buffer
     :input init
+    :history hist
     :resume 'noresume
     :default (or default ""))
    (keyboard-quit)))
