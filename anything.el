@@ -1709,11 +1709,12 @@ Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
   "The internal anything function called by `anything'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP See `anything'."
-  (anything-log "++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  (anything-log-eval any-prompt any-preselect any-buffer any-keymap any-default)
+  (anything-log (concat "[Start session] " (make-string 41 ?+)))
+  (anything-log-eval any-prompt any-preselect
+                     any-buffer any-keymap any-default)
   (unwind-protect
       (condition-case v
-          (let ( ;; It is needed because `anything-source-name' is non-nil
+          (let (;; It is needed because `anything-source-name' is non-nil
                 ;; when `anything' is invoked by action. Awful global scope.
                 anything-source-name
                 anything-in-persistent-action
@@ -1728,13 +1729,15 @@ ANY-KEYMAP See `anything'."
               (anything-log "show prompt")
               (unwind-protect
                   (anything-read-pattern-maybe
-                   any-prompt any-input any-preselect any-resume any-keymap any-default)
+                   any-prompt any-input any-preselect
+                   any-resume any-keymap any-default)
                 (anything-cleanup)))
-            (prog1 (unless anything-quit (anything-execute-selection-action-1 any-history))
-              (anything-log "end session --------------------------------------------")))
+            (prog1 (unless anything-quit
+                     (anything-execute-selection-action-1 any-history))
+              (anything-log (concat "[End session] " (make-string 41 ?-)))))
         (quit
          (anything-restore-position-on-quit)
-         (anything-log "end session (quit) -------------------------------------")
+         (anything-log (concat "[End session (quit)] " (make-string 34 ?-)))
          nil))
     (anything-log-save-maybe)))
 
