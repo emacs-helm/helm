@@ -11793,6 +11793,8 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
   (let* (in-help
          help-cand
+         special-display-buffer-names
+         special-display-regexps
          anything-persistent-action-use-special-display
          (history (loop with hist
                      for i in extended-command-history
