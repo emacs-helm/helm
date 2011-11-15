@@ -1733,7 +1733,7 @@ ANY-KEYMAP See `anything'."
             (prog1 (unless anything-quit (anything-execute-selection-action-1 any-history))
               (anything-log "end session --------------------------------------------")))
         (quit
-         (anything-on-quit)
+         (anything-restore-position-on-quit)
          (anything-log "end session (quit) -------------------------------------")
          nil))
     (anything-log-save-maybe)))
@@ -1788,9 +1788,8 @@ minibuffer-history will be used instead."
       (set history (cons anything-pattern (symbol-value history))))
     (anything-log-run-hook 'anything-after-action-hook)))
 
-(defun anything-on-quit ()
-  "Save `minibuffer-history' and current position."
-  (setq minibuffer-history (cons anything-input minibuffer-history))
+(defun anything-restore-position-on-quit ()
+  "Restore position in `anything-current-buffer' when quitting."
   (anything-current-position 'restore))
 
 (defun anything-resume-select-buffer (input)
