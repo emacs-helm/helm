@@ -9398,17 +9398,19 @@ that use `anything-comp-read' See `anything-M-x' for example."
                  (persistent-help . ,persistent-help)
                  (action . ,'action-fn))))
       (when volatile (setq src (append src '((volatile)))))
-      (or (anything
-           :sources `(,hist ,src)
-           :input initial-input
-           :default default
-           :preselect preselect
-           :prompt prompt
-           :resume 'noresume
-           :history history
-           :buffer buffer)
-          (unless must-match default)
-          (keyboard-quit)))))
+      (or
+       (anything
+        :sources `(,hist ,src)
+        :input initial-input
+        :default default
+        :preselect preselect
+        :prompt prompt
+        :resume 'noresume
+        :history history
+        :buffer buffer)
+       (unless (or (eq anything-exit-status 1) must-match)
+         default)
+       (keyboard-quit)))))
 
 ;; Generic completing-read
 ;;
