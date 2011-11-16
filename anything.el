@@ -1663,10 +1663,11 @@ anything buffers.  i.e choose among various anything sessions."
     (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
   (setq anything-compiled-sources nil)
   (anything
-   (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
-       anything-last-sources anything-sources)
-   (buffer-local-value 'anything-input-local (get-buffer any-buffer))
-   nil any-resume nil any-buffer))
+   :sources (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
+                anything-last-sources anything-sources)
+   :input (buffer-local-value 'anything-input-local (get-buffer any-buffer))
+   :resume any-resume
+   :buffer any-buffer))
 
 ;;; rubikitch: experimental
 ;;; I use this and check it whether I am convenient.
@@ -1686,18 +1687,21 @@ anything buffers.  i.e choose among various anything sessions."
 ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
 are same args as in `anything'."
   (interactive)
-  (anything any-sources
-            (if current-prefix-arg
-                (concat "\\b" (thing-at-point 'symbol) "\\b"
-                        (if (featurep 'anything-match-plugin) " " ""))
-              any-input)
-            any-prompt any-resume any-preselect any-buffer))
+  (anything :sources any-sources
+            :input (if current-prefix-arg
+                       (concat "\\b" (thing-at-point 'symbol) "\\b"
+                               (if (featurep 'anything-match-plugin) " " ""))
+                       any-input)
+            :prompt any-prompt
+            :resume any-resume
+            :preselect any-preselect
+            :buffer any-buffer))
 
 ;;;###autoload
 (defun anything-other-buffer (any-sources any-buffer)
   "Simplified interface of `anything' with other `anything-buffer'.
 Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
-  (anything any-sources nil nil nil nil any-buffer))
+  (anything :sources any-sources :buffer any-buffer))
 
 
 ;;; (@* "Core: entry point helper")
@@ -1708,7 +1712,7 @@ Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
                             any-keymap any-default any-history)
   "The internal anything function called by `anything'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
-ANY-KEYMAP See `anything'."
+ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
   (anything-log (concat "[Start session] " (make-string 41 ?+)))
   (anything-log-eval any-prompt any-preselect
                      any-buffer any-keymap any-default)
@@ -1797,10 +1801,12 @@ minibuffer-history will be used instead."
 
 (defun anything-resume-select-buffer (input)
   "Resume precedent anything session with initial input INPUT."
-  (anything '(((name . "Resume anything buffer")
-               (candidates . anything-buffers)
-               (action . identity)))
-            input nil 'noresume nil "*anything resume*"))
+  (anything :sources '(((name . "Resume anything buffer")
+                        (candidates . anything-buffers)
+                        (action . identity)))
+            :input  input
+            :resume 'noresume
+            :buffer "*anything resume*"))
 
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
