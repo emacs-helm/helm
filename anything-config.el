@@ -11590,7 +11590,9 @@ otherwise search in whole buffer."
 (defun anything-browse-code ()
   "Preconfigured anything to browse code."
   (interactive)
-  (anything-other-buffer 'anything-c-source-browse-code "*Browse code*"))
+  (anything :sources 'anything-c-source-browse-code
+            :buffer "*anything browse code*"
+            :default (thing-at-point 'symbol)))
 
 ;;;###autoload
 (defun anything-org-headlines ()
@@ -11847,6 +11849,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    (filtered-candidate-transformer . anything-M-x-transformer)
                    (candidates-in-buffer)
                    (action . identity)))
+                :resume 'noresume
                 :buffer "*anything M-x*")
                (keyboard-quit)))
              (sym-com (intern command)))
