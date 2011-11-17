@@ -3482,7 +3482,7 @@ If EXPAND is non--nil expand-file-name."
     "Read File Name History" "mml-attach-file"
     "Rename Files" "Symlink Files"
     "Hardlink Files" "Write File"
-    "Insert File" "Read File Name")
+    "Insert File" "Read File Name" "visit-tags-table")
   "Sources that use the *find-files mechanism can be added here.
 You should not modify this yourself and know what you do if you do so.")
 
@@ -9321,12 +9321,14 @@ Do nothing, just return candidate list unmodified."
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
+                                   candidates-in-buffer
                                    (volatile t)
                                    sort
                                    (fc-transformer 'anything-cr-default-transformer)
                                    (marked-candidates nil)
                                    (alistp t))
   "Anything `completing-read' emulation.
+
 PROMPT is the prompt name to use.
 COLLECTION can be a list, vector, obarray or hash-table.
 It can be also a function that receives three arguments:
@@ -9353,7 +9355,10 @@ SORT: A predicate to give to `sort' e.g `string-lessp'.
 FC-TRANSFORMER: A `filtered-candidate-transformer' function.
 MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
 ALISTP: \(default is non--nil\) See `anything-comp-read-get-candidates'.
-
+CANDIDATES-IN-BUFFER: when non--nil use a source build with
+`anything-candidates-in-buffer' which is much faster.  It is enabled by default.
+Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
+ 
 Any prefix args passed during `anything-comp-read' invocation will be recorded
 in `anything-current-prefix-arg', otherwise if prefix args where given before
 `anything-comp-read' invocation, the value of `current-prefix-arg' will be used.
@@ -9365,43 +9370,64 @@ that use `anything-comp-read' See `anything-M-x' for example."
            (if marked-candidates
                (anything-marked-candidates)
                (identity candidate))))
-    (let ((hist `((name . ,(format "%s History" name))
+    (let* ((hist `((name . ,(format "%s History" name))
+                   (candidates
+                    . (lambda ()
+                        (let ((all (anything-comp-read-get-candidates
+                                    history nil nil ,alistp)))
+                          (anything-fast-remove-dups
+                           (if (and default (not (string= default "")))
+                               (delq nil (cons default (delete default all)))
+                               all)
+                           :test 'equal))))
+                   (filtered-candidate-transformer
+                    . (lambda (candidates sources)
+                        (loop for i in candidates
+                           do (set-text-properties 0 (length i) nil i)
+                           collect i)))
+                   (persistent-action . ,persistent-action)
+                   (persistent-help . ,persistent-help)
+                   (action . ,'action-fn)))
+           (src `((name . ,name)
                   (candidates
                    . (lambda ()
-                       (let ((all (anything-comp-read-get-candidates
-                                   history nil nil ,alistp)))
-                         (anything-fast-remove-dups
-                          (if (and default (not (string= default "")))
-                              (delq nil (cons default (delete default all)))
-                              all)
-                          :test 'equal))))
-                  (filtered-candidate-transformer
-                   . (lambda (candidates sources)
-                       (loop for i in candidates
-                          do (set-text-properties 0 (length i) nil i)
-                          collect i)))
+                       (let ((cands (anything-comp-read-get-candidates
+                                     collection test sort alistp)))
+                         (unless (or must-match (string= anything-pattern ""))
+                           (setq cands (append (list anything-pattern) cands)))
+                         (if (and default (not (string= default "")))
+                             (delq nil (cons default (delete default cands)))
+                             cands))))
+                  (filtered-candidate-transformer ,fc-transformer)
+                  (requires-pattern . ,requires-pattern)
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (action . ,'action-fn)))
-          (src `((name . ,name)
-                 (candidates
-                  . (lambda ()
-                      (let ((cands (anything-comp-read-get-candidates
-                                    collection test sort alistp)))
-                        (unless (or must-match (string= anything-pattern ""))
-                          (setq cands (append (list anything-pattern) cands)))
-                        (if (and default (not (string= default "")))
-                            (delq nil (cons default (delete default cands)))
-                            cands))))
-                 (filtered-candidate-transformer ,fc-transformer)
-                 (requires-pattern . ,requires-pattern)
-                 (persistent-action . ,persistent-action)
-                 (persistent-help . ,persistent-help)
-                 (action . ,'action-fn))))
+           (src-1 `((name . ,name)
+                    (init
+                     . (lambda ()
+                         (let ((cands (anything-comp-read-get-candidates
+                                       collection test sort alistp)))
+                           (unless (or must-match (string= anything-pattern ""))
+                             (setq cands (append (list anything-pattern) cands)))
+                           (with-current-buffer (anything-candidate-buffer 'global)
+                             (loop for i in
+                                  (if (and default (not (string= default "")))
+                                      (delq nil (cons default (delete default cands)))
+                                      cands)
+                                  do (insert (concat i "\n")))))))
+                    (candidates-in-buffer)
+                    (filtered-candidate-transformer ,fc-transformer)
+                    (requires-pattern . ,requires-pattern)
+                    (persistent-action . ,persistent-action)
+                    (persistent-help . ,persistent-help)
+                    (action . ,'action-fn)))
+           (src-list (list hist (if candidates-in-buffer src-1 src))))
+      ;; Volatile will have no effect if CANDIDATES-IN-BUFFER is non--nil.
       (when volatile (setq src (append src '((volatile)))))
       (or
        (anything-1
-        :sources `(,hist ,src)
+        :sources src-list
         :input initial-input
         :default default
         :preselect preselect
