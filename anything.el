@@ -1570,6 +1570,7 @@ This is used in transformers to modify candidates list."
 (defconst anything-argument-keys
   '(:sources :input :prompt :resume :preselect :buffer :keymap :default :history))
 
+(make-obsolete 'anything 'anything-1 "anything 1.3.5")
 ;;;###autoload
 (defun anything (&rest plist)
   "Main function to execute anything sources.
@@ -1652,58 +1653,23 @@ to 10 as session local variable."
                         anything-argument-keys))))
     (apply 'anything-internal plist)))
 
-(defun* anything-resume (&optional
-                         (any-buffer anything-last-buffer)
-                         buffer-pattern (any-resume t))
-  "Resurrect previously invoked `anything'.
-Called with a prefix arg, allow choosing among all existing
-anything buffers.  i.e choose among various anything sessions."
-  (interactive)
-  (when (or current-prefix-arg buffer-pattern)
-    (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
-  (setq anything-compiled-sources nil)
-  (anything
-   :sources (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
-                anything-last-sources anything-sources)
-   :input (buffer-local-value 'anything-input-local (get-buffer any-buffer))
-   :resume any-resume
-   :buffer any-buffer))
+(defun anything-parse-keys (keys)
+  "Parse the KEYS arguments of `anything'."
+  (loop for (key value &rest _) on keys by #'cddr
+        for symname = (substring (symbol-name key) 1)
+        for sym = (intern (if (string-match "^anything-" symname)
+                              symname
+                            (concat "anything-" symname)))
+        unless (memq key anything-argument-keys)
+        collect (cons sym value)))
 
-;;; rubikitch: experimental
-;;; I use this and check it whether I am convenient.
-;;; I may introduce an option to control the behavior.
-(defun* anything-resume-window-only (&optional
-                                     (any-buffer anything-last-buffer)
-                                     buffer-pattern)
-  (interactive)
-  (anything-resume any-buffer buffer-pattern 'window-only))
+(defun* anything-1 (&key sources input prompt resume
+                         preselect buffer keymap default history)
+  "A simplified version of `anything' non--interactive.
+See documentation of `anything' for more info."
+  (anything-internal sources input prompt resume
+                     preselect buffer keymap default history))
 
-;;;###autoload
-(defun anything-at-point (&optional
-                            any-sources any-input
-                            any-prompt any-resume
-                            any-preselect any-buffer)
-  "Call anything with symbol at point as initial input.
-ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
-are same args as in `anything'."
-  (interactive)
-  (anything :sources any-sources
-            :input (if current-prefix-arg
-                       (concat "\\b" (thing-at-point 'symbol) "\\b"
-                               (if (featurep 'anything-match-plugin) " " ""))
-                       any-input)
-            :prompt any-prompt
-            :resume any-resume
-            :preselect any-preselect
-            :buffer any-buffer))
-
-;;;###autoload
-(defun anything-other-buffer (any-sources any-buffer)
-  "Simplified interface of `anything' with other `anything-buffer'.
-Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
-  (anything :sources any-sources :buffer any-buffer))
-
-
 ;;; (@* "Core: entry point helper")
 (defun anything-internal (&optional
                             any-sources any-input
@@ -1745,21 +1711,80 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
          nil))
     (anything-log-save-maybe)))
 
-(defun anything-parse-keys (keys)
-  "Parse the KEYS arguments of `anything'."
-  (loop for (key value &rest _) on keys by #'cddr
-        for symname = (substring (symbol-name key) 1)
-        for sym = (intern (if (string-match "^anything-" symname)
-                              symname
-                            (concat "anything-" symname)))
-        unless (memq key anything-argument-keys)
-        collect (cons sym value)))
+
+;;; Anything resume
+;;
+;;
+(defun* anything-resume (&optional
+                         (any-buffer anything-last-buffer)
+                         buffer-pattern (any-resume t))
+  "Resurrect previously invoked `anything'.
+Called with a prefix arg, allow choosing among all existing
+anything buffers.  i.e choose among various anything sessions."
+  (interactive)
+  (when (or current-prefix-arg buffer-pattern)
+    (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
+  (setq anything-compiled-sources nil)
+  (anything-1
+   :sources (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
+                anything-last-sources anything-sources)
+   :input (buffer-local-value 'anything-input-local (get-buffer any-buffer))
+   :resume any-resume
+   :buffer any-buffer))
+
+;;; rubikitch: experimental
+;;; I use this and check it whether I am convenient.
+;;; I may introduce an option to control the behavior.
+(defun* anything-resume-window-only (&optional
+                                     (any-buffer anything-last-buffer)
+                                     buffer-pattern)
+  (interactive)
+  (anything-resume any-buffer buffer-pattern 'window-only))
 
 (defun anything-resume-p (any-resume)
   "Whether current anything session is resumed or not.
 Just check if ANY-RESUME value is t or window-only."
   (memq any-resume '(t window-only)))
 
+(defun anything-resume-select-buffer (input)
+  "Resume precedent anything session with initial input INPUT."
+  (anything-1 :sources '(((name . "Resume anything buffer")
+                          (candidates . anything-buffers)
+                          (action . identity)))
+              :input  input
+              :resume 'noresume
+              :buffer "*anything resume*"))
+
+
+;;;###autoload
+(defun anything-at-point (&optional
+                            any-sources any-input
+                            any-prompt any-resume
+                            any-preselect any-buffer)
+  "Call anything with symbol at point as initial input.
+ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
+are same args as in `anything'."
+  (interactive)
+  (anything-1 :sources any-sources
+              :input (if current-prefix-arg
+                         (concat "\\b" (thing-at-point 'symbol) "\\b"
+                                 (if (featurep 'anything-match-plugin) " " ""))
+                         any-input)
+              :prompt any-prompt
+              :resume any-resume
+              :preselect any-preselect
+              :buffer any-buffer))
+
+;;;###autoload
+(defun anything-other-buffer (any-sources any-buffer)
+  "Simplified interface of `anything' with other `anything-buffer'.
+Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
+  (anything-1 :sources any-sources :buffer any-buffer))
+
+
+;;; Initialize
+;;
+;;
 (defvar anything-buffers nil
   "All of `anything-buffer' in most recently used order.")
 (defun anything-initialize (any-resume any-input any-sources)
@@ -1798,15 +1823,6 @@ minibuffer-history will be used instead."
 (defun anything-restore-position-on-quit ()
   "Restore position in `anything-current-buffer' when quitting."
   (anything-current-position 'restore))
-
-(defun anything-resume-select-buffer (input)
-  "Resume precedent anything session with initial input INPUT."
-  (anything :sources '(((name . "Resume anything buffer")
-                        (candidates . anything-buffers)
-                        (action . identity)))
-            :input  input
-            :resume 'noresume
-            :buffer "*anything resume*"))
 
 (defun anything-recent-push (elt list-var)
   "Add ELT to the value of LIST-VAR as most recently used value."
