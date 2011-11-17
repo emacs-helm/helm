@@ -9524,7 +9524,9 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; in anything specialized functions.
          (any-args            (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
-         anything-completion-mode-quit-message)
+         anything-completion-mode-quit-message
+         (minibuffer-completion-table collection)
+         (minibuffer-completion-predicate predicate))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
