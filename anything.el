@@ -1810,13 +1810,13 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
 (defun* anything-execute-selection-action-1 (&optional history)
   "Execute current action.
 Push current input to HISTORY if present, otherwise
-minibuffer-history will be used instead."
+`minibuffer-history' will be used instead."
   (anything-log-run-hook 'anything-before-action-hook)
   (unwind-protect
       (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
-    (when (and history (not (string= anything-pattern "")))
+    (when (and history (symbolp history) (not (string= anything-pattern "")))
       (set history (cons anything-pattern (symbol-value history))))
     (anything-log-run-hook 'anything-after-action-hook)))
 
