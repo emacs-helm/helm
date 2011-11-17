@@ -1748,12 +1748,13 @@ Just check if ANY-RESUME value is t or window-only."
 
 (defun anything-resume-select-buffer (input)
   "Resume precedent anything session with initial input INPUT."
-  (anything-1 :sources '(((name . "Resume anything buffer")
-                          (candidates . anything-buffers)
-                          (action . identity)))
-              :input  input
-              :resume 'noresume
-              :buffer "*anything resume*"))
+  (or (anything-1 :sources '(((name . "Resume anything buffer")
+                              (candidates . anything-buffers)
+                              (action . identity)))
+                  :input  input
+                  :resume 'noresume
+                  :buffer "*anything resume*")
+      (keyboard-quit)))
 
 
 ;;;###autoload
