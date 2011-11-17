@@ -9476,7 +9476,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
                                       ;; Some defaults args result as
                                       ;; (symbol-name nil) == "nil".
                                       ;; e.g debug-on-entry.
-                                      (not (string= default "nil")))
+                                      (not (string= default "nil"))
+                                      (not (string= default "")))
                              (insert (concat default "\n")))
                            (loop with all = (all-completions "" collection test)
                               for sym in all
