@@ -1700,10 +1700,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
               (unwind-protect
                   (anything-read-pattern-maybe
                    any-prompt any-input any-preselect
-                   any-resume any-keymap any-default)
+                   any-resume any-keymap any-default
+                   (when (and any-history (symbolp any-history)) any-history))
                 (anything-cleanup)))
             (prog1 (unless anything-quit
-                     (anything-execute-selection-action-1 any-history))
+                     (anything-execute-selection-action-1))
               (anything-log (concat "[End session] " (make-string 41 ?-)))))
         (quit
          (anything-restore-position-on-quit)
@@ -1808,7 +1809,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
   (anything-log "end initialization"))
 
 ;; Here defun* allow using implicit block `anything-execute-selection-action-1'.
-(defun* anything-execute-selection-action-1 (&optional history)
+(defun* anything-execute-selection-action-1 ()
   "Execute current action.
 Push current input to HISTORY if present, otherwise
 `minibuffer-history' will be used instead."
@@ -1817,8 +1818,8 @@ Push current input to HISTORY if present, otherwise
       (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
-    (when (and history (symbolp history) (not (string= anything-pattern "")))
-      (set history (cons anything-pattern (symbol-value history))))
+    ;; (when (and history (symbolp history) (not (string= anything-pattern "")))
+    ;;   (set history (cons anything-pattern (symbol-value history))))
     (anything-log-run-hook 'anything-after-action-hook)))
 
 (defun anything-restore-position-on-quit ()
@@ -1928,7 +1929,8 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 (defvar anything-reading-pattern nil
   "Whether in `read-string' in anything or not.")
 (defun anything-read-pattern-maybe (any-prompt any-input
-                                    any-preselect any-resume any-keymap any-default)
+                                    any-preselect any-resume any-keymap
+                                    any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
@@ -1954,7 +1956,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
                    (tap (or any-default
                             (with-anything-current-buffer
                               (thing-at-point 'symbol)))))
-               (read-string (or any-prompt "pattern: ") any-input nil tap)))))))
+               (read-string (or any-prompt "pattern: ") any-input any-history tap)))))))
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
