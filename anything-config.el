@@ -1177,6 +1177,7 @@ This can be toggled at anytime from `anything-find-files' with \
     (find-function . anything-completing-read-symbols)
     (trace-function . anything-completing-read-symbols)
     (trace-function-background . anything-completing-read-symbols)
+    (find-tag . anything-completing-read-with-cands-in-buffer)
     (ffap-alternate-file . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `ac-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
@@ -9502,7 +9503,11 @@ that use `anything-comp-read' See `anything-M-x' for example."
 (defun anything-completing-read-default-1
     (prompt collection test require-match
      init hist default inherit-input-method
-     name buffer)
+     name buffer &optional cands-in-buffer)
+  "Call `anything-comp-read' with same args as `completing-read'.
+Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
+method which is faster.
+It should be used when candidate list don't need to rebuild dynamically."
   (anything-comp-read
    prompt collection
    :test test
@@ -9520,11 +9525,21 @@ that use `anything-comp-read' See `anything-M-x' for example."
    :must-match require-match
    :alistp nil
    :name name
+   :candidates-in-buffer cands-in-buffer
    :buffer buffer
    ;; If DEF is not provided, fallback to empty string
    ;; to avoid `thing-at-point' to be appended on top of list
    :default (or default "")
    :initial-input init))
+
+(defun anything-completing-read-with-cands-in-buffer
+    (prompt collection test require-match
+     init hist default inherit-input-method
+     name buffer)
+  "Same as `anything-completing-read-default-1' but use candidates-in-buffer."
+  (anything-completing-read-default-1 prompt collection test require-match
+                                      init hist default inherit-input-method
+                                      name buffer t))
 
 (defun* anything-completing-read-default
     (prompt collection &optional
