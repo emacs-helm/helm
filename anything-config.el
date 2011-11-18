@@ -1444,7 +1444,7 @@ The \"-r\" option must be the last option.")
   '("Anything"
     ["All anything commands" anything-execute-anything-command t]
     ["Find any Files/Buffers" anything-for-files t]
-    ["Anything Everywhere" ac-mode t]
+    ["Anything Everywhere (Toggle)" ac-mode t]
     "----"
     ("Files:"
      ["Find files" anything-find-files t]
@@ -8304,6 +8304,7 @@ When nil, fallback to `browse-url-browser-function'.")
 
 ;; Internal
 (defvar anything-surfraw-engines-history nil)
+(defvar anything-surfraw-input-history nil)
 
 (defun anything-c-build-elvi-list ()
   "Return list of all engines and descriptions handled by surfraw."
@@ -12020,7 +12021,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
 ;;;###autoload
 (defun anything-surfraw (pattern engine)
   "Preconfigured `anything' to search PATTERN with search ENGINE."
-  (interactive (list (read-string "SearchFor: ")
+  (interactive (list (read-string "SearchFor: "
+                                  nil 'anything-surfraw-input-history)
                      (anything-comp-read
                       "Engine: "
                       (anything-c-build-elvi-list)
