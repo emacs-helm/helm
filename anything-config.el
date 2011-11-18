@@ -5803,6 +5803,8 @@ source.")
 ;; Documentation of commands available without quitting,
 ;; Show keybindings of commands.
 ;; Show history.
+(defvar anything-M-x-input-history nil)
+
 (defun* anything-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
   (loop for key being the key-seqs of mode-map using (key-bindings com)
@@ -8921,7 +8923,7 @@ Only math* symbols are collected."
 (defvar anything-c-apt-show-command "apt-cache show '%s'")
 (defvar anything-c-apt-installed-packages nil)
 (defvar anything-c-apt-all-packages nil)
-
+(defvar anything-c-apt-input-history nil)
 
 (defun anything-c-apt-refresh ()
   "Refresh installed candidates list."
@@ -11895,6 +11897,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    (candidates-in-buffer)
                    (action . identity)))
                 :resume 'noresume
+                :history 'anything-M-x-input-history
                 :buffer "*anything M-x*")
                (keyboard-quit)))
              (sym-com (intern command)))
@@ -12095,15 +12098,16 @@ See also `anything-create--actions'."
   (anything-other-buffer 'anything-c-source-time-world "*anything world time*"))
 
 ;;;###autoload
-(defun anything-apt (arg query)
+(defun anything-apt (arg)
   "Preconfigured `anything' : frontend of APT package manager.
 With a prefix arg reload cache."
-  (interactive "P\nsSearch Package: ")
-  (when arg
-    (setq anything-c-apt-installed-packages nil)
-    (setq anything-c-apt-all-packages nil))
-  (anything-1 :sources 'anything-c-source-apt
-              :prompt "Search Package: " :input query))
+  (interactive "P")
+  (let ((query (read-string "Search Package: " nil 'anything-c-apt-input-history)))
+    (when arg (anything-c-apt-refresh))
+    (anything-1 :sources 'anything-c-source-apt
+                :prompt "Search Package: "
+                :input query
+                :history 'anything-c-apt-input-history)))
 
 ;;;###autoload
 (defun anything-esh-pcomplete ()
