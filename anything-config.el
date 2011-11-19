@@ -9644,6 +9644,14 @@ See documentation of `completing-read' and `all-completions' for details."
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message  ; Same here
          fname)
+    ;; Some functions that normally call `completing-read' can switch
+    ;; brutally to `read-file-name' (e.g find-tag), in this case
+    ;; the anything specialized function will fail because it is build
+    ;; for `completing-read', so set it to 'incompatible to be sure
+    ;; we switch to `anything-c-read-file-name' and don't try to call it
+    ;; with wrong number of args.
+    (when (and def-com (> (length (help-function-arglist def-com)) 8))
+      (setq def-com 'incompatible))
     (when (eq def-com 'ido) (setq def-com 'ido-read-file-name))
     (unless (or (not entry) def-com)
       (return-from anything-completing-read-default
@@ -9664,7 +9672,8 @@ See documentation of `completing-read' and `all-completions' for details."
                (cond (;; A specialized function exists, run it
                       ;; with the two extra args specific to anything..
                       (and def-com anything-completion-mode
-                           (not (eq def-com 'ido-read-file-name)))
+                           (not (eq def-com 'ido-read-file-name))
+                           (not (eq def-com 'incompatible)))
                       (apply def-com any-args))
                      (;; Def-com value is `ido-read-file-name'
                       ;; run it with default args.
@@ -9673,7 +9682,7 @@ See documentation of `completing-read' and `all-completions' for details."
                       (apply def-com def-args))
                      (;; Def-com value is `read-file-name'
                       ;; run it with default args.
-                      def-com
+                      (eq def-com 'read-file-name)
                       (apply def-com def-args))
                      (t ; Fall back to classic `anything-c-read-file-name'.
                       (anything-c-read-file-name
@@ -9702,7 +9711,7 @@ when this mode is turned on.
 However you can modify this behavior for functions of your choice
 with `anything-completing-read-handlers-alist'.
 
-Called with a positive arg, turn on inconditionnaly, with a
+Called with a positive arg, turn on unconditionally, with a
 negative arg turn off.
 You can turn it on with `ac-mode'.
 
