@@ -9551,6 +9551,11 @@ It should be used when candidate list don't need to rebuild dynamically."
      init hist default inherit-input-method
      name buffer)
   "Same as `anything-completing-read-default-1' but use candidates-in-buffer."
+  ;; Some commands like find-tag may use `read-file-name' from inside
+  ;; the calculation of collection. in this case it clash with
+  ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
+  ;; So (re)calculate collection outside of main anything-session.
+  (setq collection (all-completions "" collection))
   (anything-completing-read-default-1 prompt collection test require-match
                                       init hist default inherit-input-method
                                       name buffer t))
