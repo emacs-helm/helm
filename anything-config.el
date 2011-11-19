@@ -7994,6 +7994,7 @@ http://bbdb.sourceforge.net/")
 ;;
 ;; Internal
 (defvar anything-eldoc-active-minibuffers-list nil)
+(defvar anything-eval-expression-input-history nil)
 
 (defvar anything-c-source-evaluation-result
   '((name . "Evaluation Result")
@@ -12015,6 +12016,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (anything-1 :sources 'anything-c-source-evaluation-result
               :input (when arg (thing-at-point 'sexp))
               :buffer "*anything eval*"
+              :history 'anything-eval-expression-input-history
               :keymap anything-eval-expression-map))
 
 ;;;###autoload
