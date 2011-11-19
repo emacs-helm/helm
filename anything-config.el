@@ -1040,32 +1040,40 @@ This make listing much faster, specially on slow machines."
 (defcustom anything-c-grep-use-ioccur-style-keys t
   "Use Arrow keys to jump to occurences."
   :group 'anything-config
-  :type 'boolean)
+  :type  'boolean)
 
 (defcustom anything-c-pdfgrep-default-read-command "xpdf '%f' %p"
   "Default command to read pdf files from pdfgrep.
 Where '%f' format spec is filename and '%p' is page number"
   :group 'anything-config
-  :type 'string)
+  :type  'string)
 
 (defcustom anything-c-etags-tag-file-name "TAGS"
   "Etags tag file name."
-  :type 'string
+  :type  'string
   :group 'anything-config)
 
 (defcustom anything-c-etags-tag-file-search-limit 10
   "The limit level of directory to search tag file.
 Don't search tag file deeply if outside this value."
-  :type 'number
+  :type  'number
   :group 'anything-config)
 
 (defcustom anything-c-etags-use-regexp-search nil
   "When non--nil search etags candidates by regexp.
 This disable anything-match-plugin when enabled.
-When nil search is performed literally and *match-plugin is used
-if available."
+When nil search is performed directly on patter and *match-plugin is used
+if available.  You can customize `anything-c-etags-search-regexp'."
   :group 'anything-config
-  :type 'boolean)
+  :type  'boolean)
+
+(defcustom anything-c-etags-search-regexp "\\<%s.*$"
+  "Regexp that match tags in an anything etags buffer.
+The format spec is replaced by pattern.
+This regexp have no effect when `anything-c-etags-use-regexp-search'
+is nil."
+  :group 'anything-config
+  :type  'regexp)
 
 (defcustom anything-c-filelist-file-name nil
   "Filename of file list.
@@ -6955,7 +6963,9 @@ If no entry in cache, create one."
 (defun anything-c-etags-search-fn (pattern bound noerror)
   "Search function for `anything-c-source-etags-select'."
   (re-search-forward
-   (if anything-c-etags-use-regexp-search (concat "\\_<" pattern) pattern)
+   (if anything-c-etags-use-regexp-search
+       (format anything-c-etags-search-regexp pattern)
+       pattern)
    bound noerror))
       
 (defun anything-c-etags-default-action (candidate)
