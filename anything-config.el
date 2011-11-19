@@ -840,8 +840,8 @@ Otherwise `url-retrieve-synchronously' is used."
 (defcustom anything-c-boring-buffer-regexp
   (rx (or
        (group bos  " ")
-       ;; anything-buffer
-       "*anything"
+       ;; anything-buffers
+       "*anything" "*ac-mode"
        ;; echo area
        " *Echo Area" " *Minibuf"))
   "The regexp that match boring buffers.
@@ -2559,9 +2559,10 @@ buffer that is not the current buffer."
     (diff-action . anything-buffer-toggle-diff)
     (revert-action . anything-buffer-revert-and-update)
     (save-action . anything-buffer-save-and-update)
-    (candidate-transformer anything-c-skip-current-buffer
-                           anything-c-skip-boring-buffers
-                           anything-c-highlight-buffers)
+    (candidate-transformer
+     anything-c-skip-current-buffer
+     anything-c-skip-boring-buffers
+     anything-c-highlight-buffers)
     (persistent-action . anything-c-buffers-list-persistent-action)
     (volatile)
     (mode-line . anything-buffer-mode-line-string)
@@ -9568,8 +9569,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   "An anything replacement of `completing-read'.
 This function should be used only as a `completing-read-function'.
  
-Don't use it directly, use instead `anything-comp-read' in your programs \
-which is more powerful.
+Don't use it directly, use instead `anything-comp-read' in your programs.
 
 See documentation of `completing-read' and `all-completions' for details."
   (declare (special anything-completion-mode))
@@ -9584,7 +9584,7 @@ See documentation of `completing-read' and `all-completions' for details."
                                 initial-input hist def inherit-input-method))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in anything specialized functions.
-         (any-args            (append def-args (list str-command buf-name)))
+         (any-args        (append def-args (list str-command buf-name)))
          anything-completion-mode-start-message ; Be quiet
          anything-completion-mode-quit-message
          (minibuffer-completion-table collection)
