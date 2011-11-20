@@ -1818,8 +1818,6 @@ Push current input to HISTORY if present, otherwise
       (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
-    ;; (when (and history (symbolp history) (not (string= anything-pattern "")))
-    ;;   (set history (cons anything-pattern (symbol-value history))))
     (anything-log-run-hook 'anything-after-action-hook)))
 
 (defun anything-restore-position-on-quit ()
