@@ -3080,19 +3080,22 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
-    (let* ((cand-list         (anything-marked-candidates))
+    (let* ((cand-list (anything-marked-candidates))
            (default-directory (or anything-ff-default-directory
                                   ;; If candidate is an url *-ff-default-directory is nil
                                   ;; so keep value of default-directory.
                                   default-directory))
-           (command           (anything-comp-read
-                               "Command: "
-                               (loop for (a . c) in eshell-command-aliases-list
-                                  when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
-                                  collect (propertize a 'help-echo (car c)) into ls
-                                  finally return (sort ls 'string<))
-                               :history 'anything-eshell-command-on-file-input-history))
-           (com-value         (car (assoc-default command eshell-command-aliases-list))))
+           (command (anything-comp-read
+                     "Command: "
+                     (loop for (a . c) in eshell-command-aliases-list
+                        when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
+                        collect (propertize a 'help-echo (car c)) into ls
+                        finally return (sort ls 'string<))
+                     :buffer "*esh command on file*"
+                     :name "Eshell command"
+                     :input-history
+                     'anything-eshell-command-on-file-input-history))
+           (com-value (car (assoc-default command eshell-command-aliases-list))))
       (if (and (or map (and com-value (string-match "\\$\\*$" com-value)))
                (> (length cand-list) 1))
           ;; Run eshell-command with ALL marked files as arguments.
@@ -3492,8 +3495,8 @@ If EXPAND is non--nil expand-file-name."
     "find-alternate-file" "find-alternate-file-other-window"
     "find-file-read-only" "list-directory"
     "Read File Name History" "mml-attach-file"
-    "Rename Files" "Symlink Files"
-    "Hardlink Files" "Write File"
+    "Rename Files" "Symlink Files" "elscreen-find-file"
+    "Hardlink Files" "Write File" "dvc-bookmarks-find-file-in-tree"
     "Insert File" "Read File Name" "visit-tags-table")
   "Sources that use the *find-files mechanism can be added here.
 You should not modify this yourself and know what you do if you do so.")
@@ -9336,6 +9339,7 @@ Do nothing, just return candidate list unmodified."
                                    must-match
                                    (requires-pattern 0)
                                    (history nil)
+                                   input-history
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
@@ -9388,24 +9392,24 @@ that use `anything-comp-read' See `anything-M-x' for example."
            (if marked-candidates
                (anything-marked-candidates)
                (identity candidate))))
-    (let* ((hist `((name . ,(format "%s History" name))
-                   (candidates
-                    . (lambda ()
-                        (let ((all (anything-comp-read-get-candidates
-                                    history nil nil ,alistp)))
-                          (anything-fast-remove-dups
-                           (if (and default (not (string= default "")))
-                               (delq nil (cons default (delete default all)))
-                               all)
-                           :test 'equal))))
-                   (filtered-candidate-transformer
-                    . (lambda (candidates sources)
-                        (loop for i in candidates
-                           do (set-text-properties 0 (length i) nil i)
-                           collect i)))
-                   (persistent-action . ,persistent-action)
-                   (persistent-help . ,persistent-help)
-                   (action . ,'action-fn)))
+    (let* ((src-hist `((name . ,(format "%s History" name))
+                       (candidates
+                        . (lambda ()
+                            (let ((all (anything-comp-read-get-candidates
+                                        history nil nil ,alistp)))
+                              (anything-fast-remove-dups
+                               (if (and default (not (string= default "")))
+                                   (delq nil (cons default (delete default all)))
+                                   all)
+                               :test 'equal))))
+                       (filtered-candidate-transformer
+                        . (lambda (candidates sources)
+                            (loop for i in candidates
+                               do (set-text-properties 0 (length i) nil i)
+                               collect i)))
+                       (persistent-action . ,persistent-action)
+                       (persistent-help . ,persistent-help)
+                       (action . ,'action-fn)))
            (src `((name . ,name)
                   (candidates
                    . (lambda ()
@@ -9440,7 +9444,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
                     (persistent-action . ,persistent-action)
                     (persistent-help . ,persistent-help)
                     (action . ,'action-fn)))
-           (src-list (list hist (if candidates-in-buffer src-1 src))))
+           (src-list (delq nil (list (and history src-hist)
+                                     (if candidates-in-buffer src-1 src)))))
       ;; Volatile will have no effect if CANDIDATES-IN-BUFFER is non--nil.
       (when volatile (setq src (append src '((volatile)))))
       (or
@@ -9451,7 +9456,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :preselect preselect
         :prompt prompt
         :resume 'noresume
-        :history history
+        :history input-history
         :buffer buffer)
        (unless (or (eq anything-exit-status 1) must-match)
          default)
@@ -9525,29 +9530,31 @@ that use `anything-comp-read' See `anything-M-x' for example."
 Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
 method which is faster.
 It should be used when candidate list don't need to rebuild dynamically."
-  (anything-comp-read
-   prompt collection
-   :test test
-   :fc-transformer #'(lambda (candidates source)
-                       ;; In regular `completing-read'
-                       ;; when a candidate is a cons cell
-                       ;; the car is used. Anything use
-                       ;; normally the cdr, so modify that
-                       ;; to fit `completing-read'.
-                       (loop for i in candidates
-                          for cand = (if (consp i) (car i) i)
-                          do (set-text-properties 0 (length cand) nil cand)
-                          collect cand))
-   :history (or (car-safe hist) hist)
-   :must-match require-match
-   :alistp nil
-   :name name
-   :candidates-in-buffer cands-in-buffer
-   :buffer buffer
-   ;; If DEF is not provided, fallback to empty string
-   ;; to avoid `thing-at-point' to be appended on top of list
-   :default (or default "")
-   :initial-input init))
+  (let ((history (or (car-safe hist) hist)))
+    (anything-comp-read
+     prompt collection
+     :test test
+     :fc-transformer #'(lambda (candidates source)
+                         ;; In regular `completing-read'
+                         ;; when a candidate is a cons cell
+                         ;; the car is used. Anything use
+                         ;; normally the cdr, so modify that
+                         ;; to fit `completing-read'.
+                         (loop for i in candidates
+                            for cand = (if (consp i) (car i) i)
+                            do (set-text-properties 0 (length cand) nil cand)
+                            collect cand))
+     :history history
+     :input-history history
+     :must-match require-match
+     :alistp nil
+     :name name
+     :candidates-in-buffer cands-in-buffer
+     :buffer buffer
+     ;; If DEF is not provided, fallback to empty string
+     ;; to avoid `thing-at-point' to be appended on top of list
+     :default (or default "")
+     :initial-input init)))
 
 (defun anything-completing-read-with-cands-in-buffer
     (prompt collection test require-match
