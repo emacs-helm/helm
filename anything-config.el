@@ -9445,9 +9445,11 @@ that use `anything-comp-read' See `anything-M-x' for example."
                     (persistent-help . ,persistent-help)
                     (action . ,'action-fn)))
            (src-list (delq nil (list (and history src-hist)
-                                     (if candidates-in-buffer src-1 src)))))
-      ;; Volatile will have no effect if CANDIDATES-IN-BUFFER is non--nil.
-      (when volatile (setq src (append src '((volatile)))))
+                                     (if candidates-in-buffer
+                                         src-1
+                                         (if volatile
+                                             (append src '((volatile)))
+                                             src))))))
       (or
        (anything-1
         :sources src-list
