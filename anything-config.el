@@ -3067,6 +3067,7 @@ Copying is done asynchronously with `anything-c-copy-files-async-1'."
     (anything-c-copy-async-with-log flist dest)))
 
 (defvar eshell-command-aliases-list nil)
+(defvar anything-eshell-command-on-file-input-history nil)
 (defun anything-find-files-eshell-command-on-file-1 (candidate &optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates possibly with an eshell alias.
 
@@ -3089,7 +3090,8 @@ If `eshell' or `eshell-command' have not been run once, or if you have no eshell
                                (loop for (a . c) in eshell-command-aliases-list
                                   when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
                                   collect (propertize a 'help-echo (car c)) into ls
-                                  finally return (sort ls 'string<))))
+                                  finally return (sort ls 'string<))
+                               :history 'anything-eshell-command-on-file-input-history))
            (com-value         (car (assoc-default command eshell-command-aliases-list))))
       (if (and (or map (and com-value (string-match "\\$\\*$" com-value)))
                (> (length cand-list) 1))
@@ -5966,8 +5968,8 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   '((name . "Function Advice")
     (candidates . anything-c-advice-candidates)
     (action ("Toggle Enable/Disable" . anything-c-advice-toggle))
-    ;;    (real-to-display . anything-c-advice-real-to-display)
     (persistent-action . anything-c-advice-persistent-action)
+    (multiline)
     (persistent-help . "Describe function / C-u C-z: Toggle advice")))
 ;; (anything 'anything-c-source-advice)
 ;; (let ((debug-on-signal t))(anything 'anything-c-source-advice))
