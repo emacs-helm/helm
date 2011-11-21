@@ -1067,7 +1067,7 @@ if available.  You can customize `anything-c-etags-search-regexp'."
   :group 'anything-config
   :type  'boolean)
 
-(defcustom anything-c-etags-search-regexp "\\<%s.*$"
+(defcustom anything-c-etags-search-regexp "^.+: .+ \\<%s"
   "Regexp that match tags in an anything etags buffer.
 The format spec is replaced by pattern.
 This regexp have no effect when `anything-c-etags-use-regexp-search'
@@ -6966,13 +6966,13 @@ If no entry in cache, create one."
                            (anything-match-line-color-current-line))))
   "Anything source for Etags.")
 
-(defun anything-c-etags-search-fn (pattern bound noerror)
+(defun anything-c-etags-search-fn (pattern)
   "Search function for `anything-c-source-etags-select'."
   (re-search-forward
    (if anything-c-etags-use-regexp-search
        (format anything-c-etags-search-regexp pattern)
        pattern)
-   bound noerror))
+   nil t))
       
 (defun anything-c-etags-default-action (candidate)
   "Anything default action to jump to an etags entry."

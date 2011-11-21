@@ -3239,19 +3239,29 @@ function, specifying `(match identity)' makes the source slightly faster.
 To customize `anything-candidates-in-buffer' behavior, use search,
 get-line and search-from-end attributes. See also `anything-sources' docstring."
   (declare (special source))
-  (anything-candidates-in-buffer-1 (anything-candidate-buffer)
-                                   anything-pattern
-                                   (or (assoc-default 'get-line source)
-                                       #'buffer-substring-no-properties)
-                                   ;; use external variable `source'.
-                                   (or (assoc-default 'search source)
-                                       (if (assoc 'search-from-end source)
-                                           '(re-search-backward)
-                                         '(re-search-forward)))
-                                   (anything-candidate-number-limit source)
-                                   (assoc 'search-from-end source)))
+  (anything-candidates-in-buffer-1
+   (anything-candidate-buffer)
+   anything-pattern
+   (or (assoc-default 'get-line source)
+       #'buffer-substring-no-properties)
+   ;; use external variable `source'.
+   (or (assoc-default 'search source)
+       (if (assoc 'search-from-end source)
+           '(anything-candidates-in-buffer-search-from-end)
+           '(anything-candidates-in-buffer-search-from-start)))
+   (anything-candidate-number-limit source)
+   (assoc 'search-from-end source)))
 
-(defun anything-candidates-in-buffer-1 (buffer pattern get-line-fn search-fns limit search-from-end)
+(defun anything-candidates-in-buffer-search-from-start (pattern)
+  "Search PATTERN with `re-search-forward' with bound and noerror args."
+  (re-search-forward pattern nil t))
+
+(defun anything-candidates-in-buffer-search-from-end (pattern)
+  "Search PATTERN with `re-search-backward' with bound and noerror args."
+  (re-search-backward pattern nil t))
+
+(defun anything-candidates-in-buffer-1 (buffer pattern get-line-fn
+                                        search-fns limit search-from-end)
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
@@ -3281,7 +3291,7 @@ get-line and search-from-end attributes. See also `anything-sources' docstring."
          (goto-char start-point)
          (setq newmatches nil)
          (loop with item-count = 0
-               while (funcall searcher pattern nil t)
+               while (funcall searcher pattern)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
                do (anything-accumulate-candidates-internal
                    cand newmatches anything-cib-hash item-count limit)
