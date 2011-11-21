@@ -9574,7 +9574,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; So (re)calculate collection outside of main anything-session.
   (setq collection (all-completions "" collection))
   (anything-completing-read-default-1 prompt collection test require-match
-                                      default hist default inherit-input-method
+                                      init hist default inherit-input-method
                                       name buffer t))
 
 (defun* anything-completing-read-default
