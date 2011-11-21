@@ -2336,6 +2336,7 @@ MATCH match only filenames matching regexp MATCH."
 ;;; Anything regexp.
 ;;
 ;;
+(defvar anything-build-regexp-history nil)
 (defun anything-c-query-replace-regexp (candidate)
   "Query replace regexp from `anything-regexp'.
 With a prefix arg replace only matches surrounded by word boundaries,
@@ -11697,8 +11698,8 @@ otherwise search in whole buffer."
 
 ;;;###autoload
 (defun anything-regexp ()
-  "Preconfigured anything to build regexps and run query-replace-regexp \
-against."
+  "Preconfigured anything to build regexps.
+`query-replace-regexp' can be run from there against found regexp."
   (interactive)
   (save-restriction
     (let ((anything-compile-source-functions
@@ -11711,7 +11712,8 @@ against."
         (narrow-to-region (region-beginning) (region-end)))
       (anything-1 :sources anything-c-source-regexp
                   :buffer "*anything regexp*"
-                  :prompt "Regexp: "))))
+                  :prompt "Regexp: "
+                  :history 'anything-build-regexp-history))))
 
 (defun anything-c-copy-files-async ()
   "Preconfigured anything to copy file list FLIST to DEST asynchronously."
