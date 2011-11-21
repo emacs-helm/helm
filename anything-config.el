@@ -9344,6 +9344,7 @@ Do nothing, just return candidate list unmodified."
                                    (persistent-help "DoNothing")
                                    (name "Anything Completions")
                                    candidates-in-buffer
+                                   exec-when-only-one
                                    (volatile t)
                                    sort
                                    (fc-transformer 'anything-cr-default-transformer)
@@ -9449,7 +9450,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
                                          src-1
                                          (if volatile
                                              (append src '((volatile)))
-                                             src))))))
+                                             src)))))
+           (anything-execute-action-at-once-if-one exec-when-only-one))
       (or
        (anything-1
         :sources src-list
@@ -9527,7 +9529,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
 (defun anything-completing-read-default-1
     (prompt collection test require-match
      init hist default inherit-input-method
-     name buffer &optional cands-in-buffer)
+     name buffer &optional cands-in-buffer exec-when-only-one)
   "Call `anything-comp-read' with same args as `completing-read'.
 Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
 method which is faster.
@@ -9536,27 +9538,30 @@ It should be used when candidate list don't need to rebuild dynamically."
     (anything-comp-read
      prompt collection
      :test test
-     :fc-transformer #'(lambda (candidates source)
-                         ;; In regular `completing-read'
-                         ;; when a candidate is a cons cell
-                         ;; the car is used. Anything use
-                         ;; normally the cdr, so modify that
-                         ;; to fit `completing-read'.
-                         (loop for i in candidates
-                            for cand = (if (consp i) (car i) i)
-                            do (set-text-properties 0 (length cand) nil cand)
-                            collect cand))
+     :fc-transformer 'anything-completing-read-default-transformer
      :history history
      :input-history history
      :must-match require-match
      :alistp nil
      :name name
      :candidates-in-buffer cands-in-buffer
+     :exec-when-only-one exec-when-only-one
      :buffer buffer
      ;; If DEF is not provided, fallback to empty string
      ;; to avoid `thing-at-point' to be appended on top of list
      :default (or default "")
      :initial-input init)))
+
+(defun anything-completing-read-default-transformer (candidates source)
+  ;; In regular `completing-read'
+  ;; when a candidate is a cons cell
+  ;; the car is used. Anything use
+  ;; normally the cdr, so modify that
+  ;; to fit `completing-read'.
+  (loop for i in candidates
+     for cand = (if (consp i) (car i) i)
+     do (set-text-properties 0 (length cand) nil cand)
+     collect cand))
 
 (defun anything-completing-read-with-cands-in-buffer
     (prompt collection test require-match
@@ -9569,7 +9574,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; So (re)calculate collection outside of main anything-session.
   (setq collection (all-completions "" collection))
   (anything-completing-read-default-1 prompt collection test require-match
-                                      init hist default inherit-input-method
+                                      default hist default inherit-input-method
                                       name buffer t))
 
 (defun* anything-completing-read-default
