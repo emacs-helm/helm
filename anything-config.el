@@ -4402,6 +4402,10 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
              (expand-file-name (file-name-nondirectory from) candidate))
          #'(lambda (from) candidate))
      marker)
+    (push (file-name-as-directory
+           (if (file-directory-p candidate)
+               candidate (file-name-directory candidate)))
+           anything-ff-history)
     (when (and follow (not (get-buffer dired-log-buffer)))
       (let ((target (directory-file-name candidate)))
         (unwind-protect
