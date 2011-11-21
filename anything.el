@@ -1653,7 +1653,18 @@ to 10 as session local variable."
       (apply 'anything-internal plist)))
 
 (defun anything-parse-keys (keys)
-  "Parse the KEYS arguments of `anything'."
+  "Parse the KEYS arguments of `anything'.
+Return only the keys that are not in `anything-argument-keys'.
+It is used to set local variables via `anything-let-internal'.
+This allow to add arguments that are not part of `anything-argument-keys',
+but are valid anything attributes.
+i.e :candidate-number-limit will be bound to `anything-candidate-number-limit'
+in source."
+  ;; (anything-parse-keys '(:sources ((name . "test")
+  ;;                                  (candidates . (a b c)))
+  ;;                        :buffer "toto"
+  ;;                        :candidate-number-limit 4))
+  ;; ==> ((anything-candidate-number-limit . 4))
   (loop for (key value &rest _) on keys by #'cddr
         for symname = (substring (symbol-name key) 1)
         for sym = (intern (if (string-match "^anything-" symname)
@@ -2644,6 +2655,7 @@ Coerce source with coerce function."
            selection))
 
 (defun anything-get-default-action (action)
+  "Get the first ACTION value of action list in source."
   (if (and (listp action) (not (functionp action)))
       (cdar action)
     action))
