@@ -1570,7 +1570,6 @@ This is used in transformers to modify candidates list."
 (defconst anything-argument-keys
   '(:sources :input :prompt :resume :preselect :buffer :keymap :default :history))
 
-(make-obsolete 'anything 'anything-1 "anything 1.3.5")
 ;;;###autoload
 (defun anything (&rest plist)
   "Main function to execute anything sources.
@@ -1651,7 +1650,7 @@ to 10 as session local variable."
          (apply 'anything
                 (mapcar (lambda (key) (plist-get plist key))
                         anything-argument-keys))))
-    (apply 'anything-internal plist)))
+      (apply 'anything-internal plist)))
 
 (defun anything-parse-keys (keys)
   "Parse the KEYS arguments of `anything'."
@@ -1662,13 +1661,6 @@ to 10 as session local variable."
                             (concat "anything-" symname)))
         unless (memq key anything-argument-keys)
         collect (cons sym value)))
-
-(defun* anything-1 (&key sources input prompt resume
-                         preselect buffer keymap default history)
-  "A simplified version of `anything' non--interactive.
-See documentation of `anything' for more info."
-  (anything-internal sources input prompt resume
-                     preselect buffer keymap default history))
 
 ;;; (@* "Core: entry point helper")
 (defun anything-internal (&optional
@@ -1726,7 +1718,7 @@ anything buffers.  i.e choose among various anything sessions."
   (when (or current-prefix-arg buffer-pattern)
     (setq any-buffer (anything-resume-select-buffer buffer-pattern)))
   (setq anything-compiled-sources nil)
-  (anything-1
+  (anything
    :sources (or (buffer-local-value 'anything-last-sources-local (get-buffer any-buffer))
                 anything-last-sources anything-sources)
    :input (buffer-local-value 'anything-input-local (get-buffer any-buffer))
@@ -1749,7 +1741,7 @@ Just check if ANY-RESUME value is t or window-only."
 
 (defun anything-resume-select-buffer (input)
   "Resume precedent anything session with initial input INPUT."
-  (or (anything-1 :sources '(((name . "Resume anything buffer")
+  (or (anything :sources '(((name . "Resume anything buffer")
                               (candidates . anything-buffers)
                               (action . identity)))
                   :input  input
@@ -1767,7 +1759,7 @@ Just check if ANY-RESUME value is t or window-only."
 ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
 are same args as in `anything'."
   (interactive)
-  (anything-1 :sources any-sources
+  (anything :sources any-sources
               :input (if current-prefix-arg
                          (concat "\\b" (thing-at-point 'symbol) "\\b"
                                  (if (featurep 'anything-match-plugin) " " ""))
@@ -1781,7 +1773,7 @@ are same args as in `anything'."
 (defun anything-other-buffer (any-sources any-buffer)
   "Simplified interface of `anything' with other `anything-buffer'.
 Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
-  (anything-1 :sources any-sources :buffer any-buffer))
+  (anything :sources any-sources :buffer any-buffer))
 
 
 ;;; Initialize
