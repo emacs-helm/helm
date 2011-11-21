@@ -470,7 +470,7 @@
 ;; `anything-c-filelist-file-name'
 ;; Default Value: nil
 ;; `anything-c-eldoc-in-minibuffer-show-fn'
-;; Default Value: anything-c-eldoc-show-in-mode-line
+;; Default Value: anything-c-show-info-in-mode-line
 ;; `anything-c-turn-on-show-completion'
 ;; Default Value: t
 ;; `anything-lisp-completion-or-indent-delay'
@@ -487,7 +487,7 @@
 ;; Default Value:	("gz" "bz2" "zip" "7z") 
 ;; `anything-locate-db-file-regexp'
 ;; Default Value: "m?locate.db$"
-;; `anything-c-eldoc-show-in-mode-line-delay'
+;; `anything-c-show-info-in-mode-line-delay'
 ;; Default Value: 12
 ;; `anything-c-copy-files-async-log-file'
 ;; Default Value: "/tmp/dired.log"
@@ -1094,7 +1094,7 @@ Then
   :group 'anything-config)
 
 (defcustom anything-c-eldoc-in-minibuffer-show-fn
-  'anything-c-eldoc-show-in-mode-line
+  'anything-c-show-info-in-mode-line
   "A function to display eldoc info.
 Should take one arg: the string to display."
   :group 'anything-config
@@ -1152,7 +1152,7 @@ If nil Search in all files."
   :type  'string
   :group 'anything-config)
   
-(defcustom anything-c-eldoc-show-in-mode-line-delay 12
+(defcustom anything-c-show-info-in-mode-line-delay 12
   "Eldoc will show info in mode-line during this delay if user is idle."
   :type  'integer
   :group 'anything-config)
@@ -8055,13 +8055,13 @@ http://bbdb.sourceforge.net/")
                            (car info-fn) (cadr info-fn)))))
         (when doc (funcall anything-c-eldoc-in-minibuffer-show-fn doc))))))
 
-(defun anything-c-eldoc-show-in-mode-line (str)
-  "Show string STR in mode-line."
+(defun anything-c-show-info-in-mode-line (str)
+  "Display string STR in mode-line."
   (save-window-excursion
     (with-current-buffer anything-buffer
       (let ((mode-line-format (concat " " str)))
         (force-mode-line-update)
-        (sit-for anything-c-eldoc-show-in-mode-line-delay))
+        (sit-for anything-c-show-info-in-mode-line-delay))
       (force-mode-line-update))))
 
 ;;; Calculation Result
@@ -9943,7 +9943,7 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
 (defun anything-lisp-completion-persistent-action (candidate)
   (let ((cursor-in-echo-area t)
         mode-line-in-non-selected-windows)
-    (anything-c-eldoc-show-in-mode-line
+    (anything-c-show-info-in-mode-line
      (propertize
       (anything-c-get-first-line-documentation
        (intern candidate))
