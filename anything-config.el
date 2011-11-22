@@ -9700,6 +9700,9 @@ See documentation of `completing-read' and `all-completions' for details."
          (ini-input (and init (expand-file-name init)))
          (current-command this-command)
          (str-command (symbol-name current-command))
+         (anything-file-completion-sources
+          (cons str-command
+                (remove str-command anything-file-completion-sources)))
          (buf-name (format "*ac-mode-%s*" str-command))
          (entry (assq current-command
                       anything-completing-read-handlers-alist))
