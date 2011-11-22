@@ -102,154 +102,14 @@
 ;; The help function for etags.
 ;; `anything-c-ucs-help'
 ;; Help command for `anything-ucs'.
-;; `anything-mini'
-;; Preconfigured `anything' lightweight version		(buffer -> recentf).
-;; `anything-for-files'
-;; Preconfigured `anything' for opening files.
-;; `anything-recentf'
-;; Preconfigured `anything' for `recentf'.
-;; `anything-info-at-point'
-;; Preconfigured `anything' for searching info at point.
-;; `anything-info-emacs'
-;; Preconfigured anything for Emacs manual index.
-;; `anything-show-kill-ring'
-;; Preconfigured `anything' for `kill-ring'.
-;; `anything-minibuffer-history'
-;; Preconfigured `anything' for `minibuffer-history'.
-;; `anything-gentoo'
-;; Preconfigured `anything' for gentoo linux.
-;; `anything-imenu'
-;; Preconfigured `anything' for `imenu'.
-;; `anything-google-suggest'
-;; Preconfigured `anything' for google search with google suggest.
-;; `anything-yahoo-suggest'
-;; Preconfigured `anything' for Yahoo searching with Yahoo suggest.
-;; `anything-for-buffers'
-;; Preconfigured `anything' for buffer.
-;; `anything-buffers-list'
-;; Enhanced preconfigured `anything' for buffer.
-;; `anything-bbdb'
-;; Preconfigured `anything' for BBDB.
-;; `anything-locate'
-;; Preconfigured `anything' for Locate.
-;; `anything-w3m-bookmarks'
-;; Preconfigured `anything' for w3m bookmark.
-;; `anything-firefox-bookmarks'
-;; Preconfigured `anything' for firefox bookmark.
-;; `anything-colors'
-;; Preconfigured `anything' for color.
-;; `anything-bookmarks'
-;; Preconfigured `anything' for bookmarks.
-;; `anything-c-pp-bookmarks'
-;; Preconfigured `anything' for bookmarks		(pretty-printed).
-;; `anything-c-insert-latex-math'
-;; Preconfigured anything for latex math symbols completion.
-;; `anything-register'
-;; Preconfigured `anything' for Emacs registers.
-;; `anything-man-woman'
-;; Preconfigured `anything' for Man and Woman pages.
-;; `anything-org-keywords'
-;; Preconfigured `anything' for org keywords.
-;; `anything-emms'
-;; Preconfigured `anything' for emms sources.
-;; `anything-eev-anchors'
-;; Preconfigured `anything' for eev anchors.
-;; `anything-bm-list'
-;; Preconfigured `anything' for visible bookmarks.
-;; `anything-timers'
-;; Preconfigured `anything' for timers.
-;; `anything-list-emacs-process'
-;; Preconfigured `anything' for emacs process.
-;; `anything-occur'
-;; Preconfigured Anything for Occur source.
-;; `anything-browse-code'
-;; Preconfigured anything to browse code.
-;; `anything-org-headlines'
-;; Preconfigured anything to show org headlines.
-;; `anything-info-gnus'
-;; Preconfigured anything to browse Gnus Manual.
-;; `anything-regexp'
-;; Preconfigured anything to build regexps and run query-replace-regexp against.
-;; `anything-c-copy-files-async'
-;; Preconfigured anything to copy file list FLIST to DEST asynchronously.
-;; `anything-find-files'
-;; Preconfigured `anything' for anything implementation of `find-file'.
-;; `anything-write-file'
-;; Preconfigured `anything' providing completion for `write-file'.
-;; `anything-insert-file'
-;; Preconfigured `anything' providing completion for `insert-file'.
-;; `anything-dired-rename-file'
-;; Preconfigured `anything' to rename files from dired.
-;; `anything-dired-copy-file'
-;; Preconfigured `anything' to copy files from dired.
-;; `anything-dired-symlink-file'
-;; Preconfigured `anything' to symlink files from dired.
-;; `anything-dired-hardlink-file'
-;; Preconfigured `anything' to hardlink files from dired.
-;; `anything-do-grep'
-;; Preconfigured anything for grep.
-;; `anything-c-etags-select'
-;; Preconfigured anything for etags.
-;; `anything-filelist'
-;; Preconfigured `anything' to open files instantly.
-;; `anything-filelist+'
-;; Preconfigured `anything' to open files/buffers/bookmarks instantly.
-;; `anything-M-x'
-;; Preconfigured `anything' for Emacs commands.
-;; `anything-manage-advice'
-;; Preconfigured `anything' to disable/enable function advices.
-;; `anything-bookmark-ext'
-;; Preconfigured `anything' for bookmark-extensions sources.
-;; `anything-simple-call-tree'
-;; Preconfigured `anything' for simple-call-tree. List function relationships.
-;; `anything-mark-ring'
-;; Preconfigured `anything' for `anything-c-source-mark-ring'.
-;; `anything-global-mark-ring'
-;; Preconfigured `anything' for `anything-c-source-global-mark-ring'.
-;; `anything-all-mark-rings'
-;; Preconfigured `anything' for `anything-c-source-global-mark-ring' and `anything-c-source-mark-ring'.
-;; `anything-yaoddmuse-emacswiki-edit-or-view'
-;; Preconfigured `anything' to edit or view EmacsWiki page.
-;; `anything-yaoddmuse-emacswiki-post-library'
-;; Preconfigured `anything' to post library to EmacsWiki.
-;; `anything-eval-expression'
-;; Preconfigured anything for `anything-c-source-evaluation-result'.
-;; `anything-eval-expression-with-eldoc'
-;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
-;; `anything-calcul-expression'
-;; Preconfigured anything for `anything-c-source-calculation-result'.
-;; `anything-surfraw'
-;; Preconfigured `anything' to search PATTERN with search ENGINE.
-;; `anything-call-source'
-;; Preconfigured `anything' to call anything source.
-;; `anything-execute-anything-command'
-;; Preconfigured `anything' to execute preconfigured `anything'.
-;; `anything-create'
-;; Preconfigured `anything' to do many create actions from STRING.
-;; `anything-top'
-;; Preconfigured `anything' for top command.
-;; `anything-select-xfont'
-;; Preconfigured `anything' to select Xfont.
-;; `anything-world-time'
-;; Preconfigured `anything' to show world time.
-;; `anything-apt'
-;; Preconfigured `anything' : frontend of APT package manager.
-;; `anything-esh-pcomplete'
-;; Preconfigured anything to provide anything completion in eshell.
-;; `anything-eshell-history'
-;; Preconfigured anything for eshell history.
-;; `anything-c-run-external-command'
-;; Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
-;; `anything-ratpoison-commands'
-;; Preconfigured `anything' to execute ratpoison commands.
-;; `anything-ucs'
-;; Preconfigured anything for `ucs-names' math symbols.
 ;; `anything-show-this-source-only'
 ;; Show all candidates of this source.
 ;; `anything-test-sources'
 ;; List all anything sources for test.
 ;; `anything-select-source'
 ;; [OBSOLETE] Select source.
+;; `anything-quit-and-find-file'
+;; Drop into `anything-find-files' from `anything'.
 ;; `anything-mark-all'
 ;; Mark all visible unmarked candidates in current source.
 ;; `anything-unmark-all'
@@ -390,6 +250,150 @@
 ;; Delete all `anything-c-adaptive-history' and his file.
 ;; `anything-c-toggle-match-plugin'
 ;; Toggle anything-match-plugin.
+;; `anything-mini'
+;; Preconfigured `anything' lightweight version		(buffer -> recentf).
+;; `anything-for-files'
+;; Preconfigured `anything' for opening files.
+;; `anything-recentf'
+;; Preconfigured `anything' for `recentf'.
+;; `anything-info-at-point'
+;; Preconfigured `anything' for searching info at point.
+;; `anything-info-emacs'
+;; Preconfigured anything for Emacs manual index.
+;; `anything-show-kill-ring'
+;; Preconfigured `anything' for `kill-ring'.
+;; `anything-minibuffer-history'
+;; Preconfigured `anything' for `minibuffer-history'.
+;; `anything-gentoo'
+;; Preconfigured `anything' for gentoo linux.
+;; `anything-imenu'
+;; Preconfigured `anything' for `imenu'.
+;; `anything-google-suggest'
+;; Preconfigured `anything' for google search with google suggest.
+;; `anything-yahoo-suggest'
+;; Preconfigured `anything' for Yahoo searching with Yahoo suggest.
+;; `anything-for-buffers'
+;; Preconfigured `anything' for buffer.
+;; `anything-buffers-list'
+;; Enhanced preconfigured `anything' for buffer.
+;; `anything-bbdb'
+;; Preconfigured `anything' for BBDB.
+;; `anything-locate'
+;; Preconfigured `anything' for Locate.
+;; `anything-w3m-bookmarks'
+;; Preconfigured `anything' for w3m bookmark.
+;; `anything-firefox-bookmarks'
+;; Preconfigured `anything' for firefox bookmark.
+;; `anything-colors'
+;; Preconfigured `anything' for color.
+;; `anything-bookmarks'
+;; Preconfigured `anything' for bookmarks.
+;; `anything-c-pp-bookmarks'
+;; Preconfigured `anything' for bookmarks		(pretty-printed).
+;; `anything-c-insert-latex-math'
+;; Preconfigured anything for latex math symbols completion.
+;; `anything-register'
+;; Preconfigured `anything' for Emacs registers.
+;; `anything-man-woman'
+;; Preconfigured `anything' for Man and Woman pages.
+;; `anything-org-keywords'
+;; Preconfigured `anything' for org keywords.
+;; `anything-emms'
+;; Preconfigured `anything' for emms sources.
+;; `anything-eev-anchors'
+;; Preconfigured `anything' for eev anchors.
+;; `anything-bm-list'
+;; Preconfigured `anything' for visible bookmarks.
+;; `anything-timers'
+;; Preconfigured `anything' for timers.
+;; `anything-list-emacs-process'
+;; Preconfigured `anything' for emacs process.
+;; `anything-occur'
+;; Preconfigured Anything for Occur source.
+;; `anything-browse-code'
+;; Preconfigured anything to browse code.
+;; `anything-org-headlines'
+;; Preconfigured anything to show org headlines.
+;; `anything-info-gnus'
+;; Preconfigured anything to browse Gnus Manual.
+;; `anything-regexp'
+;; Preconfigured anything to build regexps.
+;; `anything-c-copy-files-async'
+;; Preconfigured anything to copy file list FLIST to DEST asynchronously.
+;; `anything-find-files'
+;; Preconfigured `anything' for anything implementation of `find-file'.
+;; `anything-write-file'
+;; Preconfigured `anything' providing completion for `write-file'.
+;; `anything-insert-file'
+;; Preconfigured `anything' providing completion for `insert-file'.
+;; `anything-dired-rename-file'
+;; Preconfigured `anything' to rename files from dired.
+;; `anything-dired-copy-file'
+;; Preconfigured `anything' to copy files from dired.
+;; `anything-dired-symlink-file'
+;; Preconfigured `anything' to symlink files from dired.
+;; `anything-dired-hardlink-file'
+;; Preconfigured `anything' to hardlink files from dired.
+;; `anything-do-grep'
+;; Preconfigured anything for grep.
+;; `anything-c-etags-select'
+;; Preconfigured anything for etags.
+;; `anything-filelist'
+;; Preconfigured `anything' to open files instantly.
+;; `anything-filelist+'
+;; Preconfigured `anything' to open files/buffers/bookmarks instantly.
+;; `anything-M-x'
+;; Preconfigured `anything' for Emacs commands.
+;; `anything-manage-advice'
+;; Preconfigured `anything' to disable/enable function advices.
+;; `anything-bookmark-ext'
+;; Preconfigured `anything' for bookmark-extensions sources.
+;; `anything-simple-call-tree'
+;; Preconfigured `anything' for simple-call-tree. List function relationships.
+;; `anything-mark-ring'
+;; Preconfigured `anything' for `anything-c-source-mark-ring'.
+;; `anything-global-mark-ring'
+;; Preconfigured `anything' for `anything-c-source-global-mark-ring'.
+;; `anything-all-mark-rings'
+;; Preconfigured `anything' for `anything-c-source-global-mark-ring' and `anything-c-source-mark-ring'.
+;; `anything-yaoddmuse-emacswiki-edit-or-view'
+;; Preconfigured `anything' to edit or view EmacsWiki page.
+;; `anything-yaoddmuse-emacswiki-post-library'
+;; Preconfigured `anything' to post library to EmacsWiki.
+;; `anything-eval-expression'
+;; Preconfigured anything for `anything-c-source-evaluation-result'.
+;; `anything-eval-expression-with-eldoc'
+;; Preconfigured anything for `anything-c-source-evaluation-result' with `eldoc' support. 
+;; `anything-calcul-expression'
+;; Preconfigured anything for `anything-c-source-calculation-result'.
+;; `anything-surfraw'
+;; Preconfigured `anything' to search PATTERN with search ENGINE.
+;; `anything-call-source'
+;; Preconfigured `anything' to call anything source.
+;; `anything-execute-anything-command'
+;; Preconfigured `anything' to execute preconfigured `anything'.
+;; `anything-create'
+;; Preconfigured `anything' to do many create actions from STRING.
+;; `anything-top'
+;; Preconfigured `anything' for top command.
+;; `anything-select-xfont'
+;; Preconfigured `anything' to select Xfont.
+;; `anything-world-time'
+;; Preconfigured `anything' to show world time.
+;; `anything-apt'
+;; Preconfigured `anything' : frontend of APT package manager.
+;; `anything-esh-pcomplete'
+;; Preconfigured anything to provide anything completion in eshell.
+;; `anything-eshell-history'
+;; Preconfigured anything for eshell history.
+;; `anything-c-run-external-command'
+;; Preconfigured `anything' to run External PROGRAM asyncronously from Emacs.
+;; `anything-ratpoison-commands'
+;; Preconfigured `anything' to execute ratpoison commands.
+;; `anything-ucs'
+;; Preconfigured anything for `ucs-names' math symbols.
+;; `anything-c-apropos'
+;; Preconfigured anything to describe commands, functions, variables and faces.
 
 ;;  * User variables defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "anything-" :var-value t)
@@ -408,7 +412,7 @@
 ;; `anything-c-yahoo-suggest-search-url'
 ;; Default Value: "http://search.yahoo.com/search?&ei=UTF-8&fr&h=c&p="
 ;; `anything-c-boring-buffer-regexp'
-;; Default Value: "\\	(\\` \\)\\|\\*anything\\| \\*Echo Area\\| \\*Minibuf"
+;; Default Value: "\\	(\\` \\)\\|\\*anything\\|\\*ac-mode\\| \\*Echo Area\\| \\*Minibuf"
 ;; `anything-c-boring-file-regexp'
 ;; Default Value: "/\\	(?:\\(?:\\.\\(?:git\\|hg\\|svn\\)\\|CVS\\|_darcs\\)\\)\\(?:/\\|$\\)\\| [...]
 ;; `anything-kill-ring-threshold'
@@ -467,6 +471,8 @@
 ;; Default Value: 10
 ;; `anything-c-etags-use-regexp-search'
 ;; Default Value: nil
+;; `anything-c-etags-search-regexp'
+;; Default Value: "^.+: .+ \\<%s"
 ;; `anything-c-filelist-file-name'
 ;; Default Value: nil
 ;; `anything-c-eldoc-in-minibuffer-show-fn'
@@ -495,6 +501,8 @@
 ;; Default Value: nil
 ;; `anything-ff-transformer-show-only-basename'
 ;; Default Value: nil
+;; `anything-completing-read-handlers-alist'
+;; Default Value:	((describe-function . anything-completing-read-symbols)  (describe-variabl [...]
 
 ;;  * Anything sources defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'anything-source :prefix "anything-" :any-sname t)
@@ -572,11 +580,11 @@
 ;; `anything-c-source-complex-command-history'			(Complex Command History)
 ;; `anything-c-source-extended-command-history'			(Emacs Commands History)
 ;; `anything-c-source-emacs-commands'				(Emacs Commands)
-;; `anything-c-source-lacarte'					(Lacarte)
 ;; `anything-c-source-emacs-functions'				(Emacs Functions)
 ;; `anything-c-source-emacs-functions-with-abbrevs'		(Emacs Functions)
 ;; `anything-c-source-advice'					(Function Advice)
 ;; `anything-c-source-emacs-variables'				(Emacs Variables)
+;; `anything-c-source-lacarte'					(Lacarte)
 ;; `anything-c-source-bookmarks'				(Bookmarks)
 ;; `anything-c-source-bookmark-set'				(Set Bookmark)
 ;; `anything-c-source-bm'					(Visible Bookmarks)
@@ -9355,35 +9363,59 @@ Do nothing, just return candidate list unmodified."
                                    (fc-transformer 'anything-cr-default-transformer)
                                    (marked-candidates nil)
                                    (alistp t))
-  "Anything `completing-read' emulation.
+  "Anything `completing-read' replacement.
 
-PROMPT is the prompt name to use.
-COLLECTION can be a list, vector, obarray or hash-table.
-It can be also a function that receives three arguments:
-the values string, predicate and t. See `all-completions' for more details.
+- PROMPT is the prompt name to use.
+
+- COLLECTION can be a list, vector, obarray or hash-table.
+  It can be also a function that receives three arguments:
+  the values string, predicate and t. See `all-completions' for more details.
 
 Keys description:
 
-TEST: A predicate called with one arg i.e candidate.
-INITIAL-INPUT: Same as initial-input arg in `anything'.
-PRESELECT: See preselect arg of `anything'.
-DEFAULT: This option is used only for compatibility with regular
-Emacs `completing-read'.
-BUFFER: Name of anything-buffer.
-MUST-MATCH: Candidate selected must be one of COLLECTION.
-REQUIRES-PATTERN: Same as anything attribute, default is 0.
-HISTORY: A list containing specific history, default is nil.
+- TEST: A predicate called with one arg i.e candidate.
+
+- INITIAL-INPUT: Same as input arg in `anything'.
+
+- PRESELECT: See preselect arg of `anything'.
+
+- DEFAULT: This option is used only for compatibility with regular
+  Emacs `completing-read'.
+ 
+- BUFFER: Name of anything-buffer.
+
+- MUST-MATCH: Candidate selected must be one of COLLECTION.
+
+- REQUIRES-PATTERN: Same as anything attribute, default is 0.
+
+- HISTORY: A list containing specific history, default is nil.
 When it is non--nil, all elements of HISTORY are displayed in
 a special source before COLLECTION.
-PERSISTENT-ACTION: A function called with one arg i.e candidate.
-PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
-NAME: The name related to this local source.
-VOLATILE: Use volatile attribute \(enabled by default\).
-SORT: A predicate to give to `sort' e.g `string-lessp'.
-FC-TRANSFORMER: A `filtered-candidate-transformer' function.
-MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
-ALISTP: \(default is non--nil\) See `anything-comp-read-get-candidates'.
-CANDIDATES-IN-BUFFER: when non--nil use a source build with
+
+- INPUT-HISTORY: A symbol. the minibuffer input history will be
+stored there, if nil or not provided, `minibuffer-history'
+will be used instead.
+
+- PERSISTENT-ACTION: A function called with one arg i.e candidate.
+
+- PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
+
+- NAME: The name related to this local source.
+
+- EXEC-WHEN-ONLY-ONE: Bound `anything-execute-action-at-once-if-one'
+  to non--nil. (possibles values are t or nil).
+
+- VOLATILE: Use volatile attribute \(enabled by default\).
+
+- SORT: A predicate to give to `sort' e.g `string-lessp'.
+
+- FC-TRANSFORMER: A `filtered-candidate-transformer' function.
+
+- MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
+
+- ALISTP: \(default is non--nil\) See `anything-comp-read-get-candidates'.
+
+- CANDIDATES-IN-BUFFER: when non--nil use a source build with
 `anything-candidates-in-buffer' which is much faster.  It is enabled by default.
 Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
  

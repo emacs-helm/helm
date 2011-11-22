@@ -107,9 +107,9 @@
 ;; `anything-execute-persistent-action'
 ;; Perform the associated action ATTR without quitting anything.
 ;; `anything-scroll-other-window'
-;; Scroll other window (not *Anything* window) upward.
+;; Scroll other window	(not *Anything* window) upward.
 ;; `anything-scroll-other-window-down'
-;; Scroll other window (not *Anything* window) downward.
+;; Scroll other window	(not *Anything* window) downward.
 ;; `anything-toggle-visible-mark'
 ;; Toggle anything visible mark at point.
 ;; `anything-display-all-visible-marks'
@@ -140,7 +140,7 @@
 ;; `anything-sources'
 ;; A list of sources to use with `anything'.
 ;; `anything-type-attributes'
-;; It's a list of                                      (TYPE ATTRIBUTES ...).
+;; It's a list of					(TYPE ATTRIBUTES ...).
 ;; `anything-enable-shortcuts'
 ;; *Whether to use digit/alphabet shortcut to select the first nine matches.
 ;; `anything-shortcut-keys-alist'
@@ -191,6 +191,8 @@
 ;; Run after the anything buffer was updated according the new input pattern.
 ;; `anything-cleanup-hook'
 ;; Run after anything minibuffer is closed.
+;; `anything-before-action-hook'
+;; Run before executing action.
 ;; `anything-after-action-hook'
 ;; Run after executing action.
 ;; `anything-after-persistent-action-hook'
@@ -280,7 +282,7 @@
 ;; `anything-last-log-file'
 ;; Not documented.
 ;; `anything-compile-source-functions'
-;; Functions to compile elements of `anything-sources' (plug-in).
+;; Functions to compile elements of `anything-sources'	(plug-in).
 ;; `anything-quit'
 ;; Not documented.
 ;; `anything-additional-attributes'
@@ -625,7 +627,7 @@
 
 (require 'cl)
 
-(defvar anything-version "1.3.4")
+(defvar anything-version "1.3.5")
 
 ;; (@* "User Configuration")
 
