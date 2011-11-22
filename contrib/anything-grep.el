@@ -282,8 +282,9 @@ GNU grep is expected for COMMAND. The grep result is colorized."
     (set (make-local-variable 'agrep-source-local) (anything-get-current-source))
     (add-to-list 'agrep-waiting-source agrep-source-local)
     (set-process-sentinel
-     (start-process-shell-command "anything-grep" (current-buffer)
-                                  (format "cd %s; %s" pwd command))
+     (let ((default-directory (expand-file-name pwd)))
+       (start-process-shell-command "anything-grep" (current-buffer)
+                                    command))
      'agrep-sentinel)))
 
 (defvar agrep-do-after-minibuffer-exit nil)
