@@ -9877,10 +9877,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
   '((name . "Eshell history")
     (init . (lambda ()
               (let (eshell-hist-ignoredups)
-                ;; Dump the content's of hist file
-                ;; to `eshell-history-ring'.
-                (eshell-read-history eshell-history-file-name)
-                ;; And now write the content's of ring to file.
+                ;; Write the content's of ring to file.
                 (eshell-write-history eshell-history-file-name t)
                 (with-current-buffer (anything-candidate-buffer 'global)
                   (insert-file-contents eshell-history-file-name)))
