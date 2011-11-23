@@ -3497,16 +3497,10 @@ If EXPAND is non--nil expand-file-name."
 
 ;; Internal
 (defvar anything-file-completion-sources
-  '("Find Files" "find-file" "Copy Files"
-    "dired-do-copy" "dired-do-rename"
-    "dired-do-symlink" "dired-do-hardlink"
-    "write-file" "insert-file" "dired" 
-    "find-alternate-file" "find-alternate-file-other-window"
-    "find-file-read-only" "list-directory"
-    "Read File Name History" "mml-attach-file"
-    "Rename Files" "Symlink Files" "elscreen-find-file"
-    "Hardlink Files" "Write File" "dvc-bookmarks-find-file-in-tree"
-    "Insert File" "Read File Name" "visit-tags-table")
+  '("Find Files" "Read File Name"
+    "Read File Name History" "Copy Files"
+    "Rename Files" "Symlink Files"
+    "Hardlink Files" "Write File" "Insert File")
   "Sources that use the *find-files mechanism can be added here.
 You should not modify this yourself and know what you do if you do so.")
 
