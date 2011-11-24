@@ -9311,6 +9311,20 @@ candidates because it doesn't handle alists correctly for anything.
 i.e In `all-completions' the keys \(cars of elements\)
 are the possible completions. In anything we want to use the cdr instead
 like \(display . real\).
+
+e.g
+
+\(setq A '((a . 1) (b . 2) (c . 3)))
+==>((a . 1) (b . 2) (c . 3))
+\(anything-comp-read \"test: \" A :alistp nil
+                                  :exec-when-only-one t
+                                  :initial-input \"a\")
+==>\"a\"
+\(anything-comp-read \"test: \" A :alistp t
+                                  :exec-when-only-one t
+                                  :initial-input \"1\")
+==>\"1\"
+
 See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
@@ -9603,10 +9617,10 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; the calculation of collection. in this case it clash with
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
   ;; So (re)calculate collection outside of main anything-session.
-  (setq collection (all-completions "" collection))
-  (anything-completing-read-default-1 prompt collection test require-match
-                                      init hist default inherit-input-method
-                                      name buffer t))
+  (let ((cands (all-completions "" collection)))
+    (anything-completing-read-default-1 prompt cands test require-match
+                                        init hist default inherit-input-method
+                                        name buffer t)))
 
 (defun* anything-completing-read-default
     (prompt collection &optional
