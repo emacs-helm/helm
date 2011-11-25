@@ -9583,11 +9583,10 @@ It should be used when candidate list don't need to rebuild dynamically."
     (anything-comp-read
      prompt collection
      :test test
-     :fc-transformer 'anything-completing-read-default-transformer
      :history history
      :input-history history
      :must-match require-match
-     :alistp nil
+     :alistp nil ; Be sure `all-completions' is used.
      :name name
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
@@ -9596,17 +9595,6 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; to avoid `thing-at-point' to be appended on top of list
      :default (or default "")
      :initial-input init)))
-
-(defun anything-completing-read-default-transformer (candidates source)
-  ;; In regular `completing-read'
-  ;; when a candidate is a cons cell
-  ;; the car is used. Anything use
-  ;; normally the cdr, so modify that
-  ;; to fit `completing-read'.
-  (loop for i in candidates
-        for cand = (if (consp i) (car i) i)
-        do (set-text-properties 0 (length cand) nil cand)
-        collect cand))
 
 (defun anything-completing-read-with-cands-in-buffer
     (prompt collection test require-match
