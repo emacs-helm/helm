@@ -2823,13 +2823,6 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
                     anything-ff-auto-update-initial-value)))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
-    (image-action1 . anything-ff-rotate-image-left)
-    (image-action2 . anything-ff-rotate-image-right)
-    (toggle-basename . anything-ff-toggle-basename)
-    (properties-action . anything-ff-properties)
-    (toggle-auto-update . anything-ff-toggle-auto-update)
-    (kill-buffer-fname . anything-ff-kill-buffer-fname)
-    ;(quick-delete . anything-ff-quick-delete)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . anything-ff-mode-line-string)
@@ -3258,6 +3251,7 @@ See `anything-ff-serial-rename-1'."
 ;;;###autoload
 (defun anything-ff-run-toggle-auto-update ()
   (interactive)
+  (anything-attrset 'toggle-auto-update 'anything-ff-toggle-auto-update)
   (anything-execute-persistent-action 'toggle-auto-update))
 
 ;;;###autoload
@@ -3476,6 +3470,7 @@ The checksum is copied to kill-ring."
 
 (defun anything-ff-run-toggle-basename ()
   (interactive)
+  (anything-attrset 'toggle-basename 'anything-ff-toggle-basename)
   (anything-execute-persistent-action 'toggle-basename))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
@@ -3821,15 +3816,8 @@ in `anything-ff-history'."
 (defun anything-ff-properties-persistent ()
   "Show properties without quitting anything."
   (interactive)
+  (anything-attrset 'properties-action 'anything-ff-properties)
   (anything-execute-persistent-action 'properties-action))
-
-(defun anything-ff-kill-buffer-fname (candidate)
-  (let* ((buf (get-file-buffer candidate))
-         (buf-name (buffer-name buf)))
-    (if buf
-        (progn
-          (kill-buffer buf) (message "Buffer `%s' killed" buf))
-        (message "No buffer to kill"))))
 
 ;;;###autoload
 (defun anything-ff-persistent-delete ()
@@ -3859,6 +3847,14 @@ in `anything-ff-history'."
             (anything-c-delete-file candidate))))
     (anything-force-update presel)))
 
+(defun anything-ff-kill-buffer-fname (candidate)
+  (let* ((buf (get-file-buffer candidate))
+         (buf-name (buffer-name buf)))
+    (if buf
+        (progn
+          (kill-buffer buf) (message "Buffer `%s' killed" buf))
+        (message "No buffer to kill"))))
+
 (defun anything-ff-kill-or-find-buffer-fname (candidate)
   "Find file CANDIDATE or kill it's buffer if it is visible.
 Never kill `anything-current-buffer'.
@@ -3879,6 +3875,7 @@ in `anything-find-files-persistent-action'."
 (defun anything-ff-run-kill-buffer-persistent ()
   "Execute `anything-ff-kill-buffer-fname' whitout quitting."
   (interactive)
+  (anything-attrset 'kill-buffer-fname 'anything-ff-kill-buffer-fname)  
   (anything-execute-persistent-action 'kill-buffer-fname))
 
 (defun anything-ff-human-size (size)
@@ -4085,11 +4082,13 @@ This affect directly file CANDIDATE."
 (defun anything-ff-rotate-left-persistent ()
   "Rotate image left without quitting anything."
   (interactive)
+  (anything-attrset 'image-action1 'anything-ff-rotate-image-left)
   (anything-execute-persistent-action 'image-action1))
 
 (defun anything-ff-rotate-right-persistent ()
   "Rotate image right without quitting anything."
   (interactive)
+  (anything-attrset 'image-action2 'anything-ff-rotate-image-right)
   (anything-execute-persistent-action 'image-action2))
 
 (defun anything-ff-exif-data (candidate)
