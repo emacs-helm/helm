@@ -9683,7 +9683,7 @@ See documentation of `completing-read' and `all-completions' for details."
         (unwind-protect
              (progn
                (ac-mode -1)
-               (call-interactively current-command))
+               (apply completing-read-function def-args))
           (ac-mode 1))))
     ;; If we use now `completing-read' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
@@ -9757,11 +9757,11 @@ See documentation of `completing-read' and `all-completions' for details."
       (setq def-com 'incompatible))
     (when (eq def-com 'ido) (setq def-com 'ido-read-file-name))
     (unless (or (not entry) def-com)
-      (return-from anything-completing-read-default
+      (return-from anything-generic-read-file-name
         (unwind-protect
              (progn
                (ac-mode -1)
-               (call-interactively current-command))
+               (apply read-file-name-function def-args))
           (ac-mode 1))))
     ;; If we use now `read-file-name' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
