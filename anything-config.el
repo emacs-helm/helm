@@ -1186,6 +1186,11 @@ This can be toggled at anytime from `anything-find-files' with \
   :type 'boolean
   :group 'anything-config)
 
+(defcustom anything-ff-quick-delete-dont-prompt-for-deletion nil
+  "Don't ask in persistent deletion of files when non--nil."
+  :group 'anything-config
+  :type 'boolean)
+
 (defcustom anything-completing-read-handlers-alist
   '((describe-function . anything-completing-read-symbols)
     (describe-variable . anything-completing-read-symbols)
@@ -1554,6 +1559,7 @@ The \"-r\" option must be the last option.")
     (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
     (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
     (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
+    (define-key map (kbd "<deletechar>")  'anything-ff-persistent-delete)
     (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
@@ -1829,6 +1835,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-ff-run-symlink-file]\t\t->Symlink File.
 \\[anything-ff-run-delete-file]\t\t->Delete File.
 \\[anything-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
+\\[anything-ff-persistent-delete]\t->Delete file without quitting.
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
 \\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
 \\[anything-ff-run-ediff-file]\t\t->Ediff file.
@@ -2822,6 +2829,7 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
     (properties-action . anything-ff-properties)
     (toggle-auto-update . anything-ff-toggle-auto-update)
     (kill-buffer-fname . anything-ff-kill-buffer-fname)
+    ;(quick-delete . anything-ff-quick-delete)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . anything-ff-mode-line-string)
@@ -3822,6 +3830,29 @@ in `anything-ff-history'."
         (progn
           (kill-buffer buf) (message "Buffer `%s' killed" buf))
         (message "No buffer to kill"))))
+
+;;;###autoload
+(defun anything-ff-persistent-delete ()
+  "Delete current candidate without quitting."
+  (interactive)
+  (anything-attrset 'quick-delete 'anything-ff-quick-delete)
+  (anything-execute-persistent-action 'quick-delete))
+
+(defun anything-ff-quick-delete (candidate)
+  "Delete file CANDIDATE without quitting."
+  (let ((presel (prog1 (save-excursion
+                         (anything-previous-line)
+                         (anything-get-selection))
+                  (anything-mark-current-line))))
+    (setq presel (if (and anything-ff-transformer-show-only-basename
+                          (not (string-match-p "[.]\\{1,2\\}" presel)))
+                     (anything-c-basename presel) presel))
+    (if anything-ff-quick-delete-dont-prompt-for-deletion
+        (anything-c-delete-file candidate)
+        (save-window-excursion
+          (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
+            (anything-c-delete-file candidate))))
+    (anything-force-update presel)))
 
 (defun anything-ff-kill-or-find-buffer-fname (candidate)
   "Find file CANDIDATE or kill it's buffer if it is visible.

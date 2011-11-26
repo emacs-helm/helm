@@ -1176,26 +1176,31 @@ Otherwise make a list with one element."
        (setq-default post-command-hook (cdr --post-command-hook-pair))
        (anything-log "restore variables"))))
 
-(defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
+(defun* anything-attr (attribute-name &optional
+                                      (src (anything-get-current-source)))
   "Get the value of ATTRIBUTE-NAME of SRC.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (anything-aif (assq attribute-name src)
       (cdr it)))
 
-(defun* anything-attr* (attribute-name &optional (src (anything-get-current-source)))
+(defun* anything-attr* (attribute-name
+                        &optional (src (anything-get-current-source)))
   "Pass the value of ATTRIBUTE-NAME of SRC to `anything-interpret-value'.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (anything-interpret-value (anything-attr attribute-name src)))
 
-(defun* anything-attr-defined (attribute-name &optional (src (anything-get-current-source)))
+(defun* anything-attr-defined (attribute-name
+                               &optional (src (anything-get-current-source)))
   "Return non-nil if ATTRIBUTE-NAME of SRC is defined.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (and (assq attribute-name src) t))
 
-(defun* anything-attrset (attribute-name value &optional (src (anything-get-current-source)))
+(defun* anything-attrset (attribute-name value
+                                         &optional
+                                         (src (anything-get-current-source)))
   "Set the value of ATTRIBUTE-NAME of SRC to VALUE.
 if SRC is omitted, use current source.
 It is useful to write your sources."
