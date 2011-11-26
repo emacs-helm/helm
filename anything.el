@@ -1581,11 +1581,15 @@ This is used in transformers to modify candidates list."
 (defun anything (&rest plist)
   "Main function to execute anything sources.
 
+Keywords supported:
+:sources :input :prompt :resume :preselect :buffer :keymap :default :history
+Extra keywords are supported and can be added, see below.
+
 When call interactively with no arguments deprecated `anything-sources'
 will be used if non--nil.
 
 PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
-\(&optional sources input prompt resume preselect buffer keymap\).
+\(&optional sources input prompt resume preselect buffer keymap default history\).
 
 Basic keywords are the following:
 
@@ -1637,8 +1641,9 @@ History element should be a symbol.
 Of course, conventional arguments are supported, the two are same.
 
 \(anything :sources sources :input input :prompt prompt :resume resume
-           :preselect preselect :buffer buffer :keymap keymap\)
-\(anything sources input prompt resume preselect buffer keymap\)
+           :preselect preselect :buffer buffer :keymap keymap :default default
+           :history history\)
+\(anything sources input prompt resume preselect buffer keymap default history\)
 
 Other keywords are interpreted as local variables of this anything session.
 The `anything-' prefix can be omitted.  For example,
