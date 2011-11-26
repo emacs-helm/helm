@@ -11998,8 +11998,8 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                     . (lambda ()
                         (with-current-buffer (anything-candidate-buffer 'global)
                           (goto-char (point-min))
-                          (loop 
-                                for sym in (all-completions "" obarray 'commandp)
+                          (loop for sym in
+                                (all-completions "" obarray 'commandp)
                                 do (insert (concat sym "\n"))))))
                    (persistent-action . pers-help)
                    (persistent-help . "Describe this command")
@@ -12007,6 +12007,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    (candidates-in-buffer)
                    (action . identity)))
                 :resume 'noresume
+                :prompt "M-x "
                 :history 'anything-M-x-input-history
                 :buffer "*anything M-x*")
                (keyboard-quit)))
