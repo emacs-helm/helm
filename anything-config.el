@@ -2188,6 +2188,11 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
         (anything-set-source-filter (list it))
       (anything-set-source-filter nil))))
 
+(defun anything-insert-string (str)
+  "Insert STR."
+  (delete-minibuffer-contents)
+  (insert str))
+
 (defun anything-c-match-on-file-name (candidate)
   "Return non-nil if `anything-pattern' match basename of filename CANDIDATE."
   (string-match anything-pattern (file-name-nondirectory candidate)))
@@ -11753,6 +11758,30 @@ otherwise search in whole buffer."
                 :buffer "*anything regexp*"
                 :prompt "Regexp: "
                 :history 'anything-build-regexp-history))))
+
+(defun anything-insert-buffer-name ()
+  "Insert buffer name."
+  (interactive)
+  (anything-insert-string
+   (with-current-buffer anything-current-buffer
+     (if buffer-file-name (file-name-nondirectory buffer-file-name)
+       (buffer-name)))))
+
+(defun anything-insert-symbol ()
+  "Insert current symbol."
+  (interactive)
+  (anything-insert-string
+   (with-current-buffer anything-current-buffer
+     (save-excursion
+       (buffer-substring (beginning-of-thing 'symbol)
+                         (end-of-thing 'symbol))))))
+
+(defun anything-insert-selection ()
+  "Insert current selection."
+  (interactive)
+  (anything-insert-string
+   (with-current-buffer anything-current-buffer
+     (anything-get-selection))))
 
 (defun anything-c-copy-files-async ()
   "Preconfigured anything to copy file list FLIST to DEST asynchronously."
