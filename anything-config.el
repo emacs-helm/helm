@@ -3841,11 +3841,16 @@ in `anything-ff-history'."
 (defun anything-ff-quick-delete (candidate)
   "Delete file CANDIDATE without quitting."
   (let ((presel (prog1 (save-excursion
-                         (anything-previous-line)
-                         (anything-get-selection))
+                         (let (sel)
+                           (anything-next-line)
+                           (setq sel (anything-get-selection))
+                           (if (string= sel candidate)
+                               (progn (anything-previous-line)
+                                      (anything-get-selection))
+                               sel)))
                   (anything-mark-current-line))))
     (setq presel (if (and anything-ff-transformer-show-only-basename
-                          (not (string-match-p "[.]\\{1,2\\}" presel)))
+                          (not (string-match-p "[.]\\{1,2\\}$" presel)))
                      (anything-c-basename presel) presel))
     (if anything-ff-quick-delete-dont-prompt-for-deletion
         (anything-c-delete-file candidate)
