@@ -1176,26 +1176,31 @@ Otherwise make a list with one element."
        (setq-default post-command-hook (cdr --post-command-hook-pair))
        (anything-log "restore variables"))))
 
-(defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
+(defun* anything-attr (attribute-name &optional
+                                      (src (anything-get-current-source)))
   "Get the value of ATTRIBUTE-NAME of SRC.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (anything-aif (assq attribute-name src)
       (cdr it)))
 
-(defun* anything-attr* (attribute-name &optional (src (anything-get-current-source)))
+(defun* anything-attr* (attribute-name
+                        &optional (src (anything-get-current-source)))
   "Pass the value of ATTRIBUTE-NAME of SRC to `anything-interpret-value'.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (anything-interpret-value (anything-attr attribute-name src)))
 
-(defun* anything-attr-defined (attribute-name &optional (src (anything-get-current-source)))
+(defun* anything-attr-defined (attribute-name
+                               &optional (src (anything-get-current-source)))
   "Return non-nil if ATTRIBUTE-NAME of SRC is defined.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (and (assq attribute-name src) t))
 
-(defun* anything-attrset (attribute-name value &optional (src (anything-get-current-source)))
+(defun* anything-attrset (attribute-name value
+                                         &optional
+                                         (src (anything-get-current-source)))
   "Set the value of ATTRIBUTE-NAME of SRC to VALUE.
 if SRC is omitted, use current source.
 It is useful to write your sources."
@@ -1576,11 +1581,15 @@ This is used in transformers to modify candidates list."
 (defun anything (&rest plist)
   "Main function to execute anything sources.
 
+Keywords supported:
+:sources :input :prompt :resume :preselect :buffer :keymap :default :history
+Extra keywords are supported and can be added, see below.
+
 When call interactively with no arguments deprecated `anything-sources'
 will be used if non--nil.
 
 PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
-\(&optional sources input prompt resume preselect buffer keymap\).
+\(&optional sources input prompt resume preselect buffer keymap default history\).
 
 Basic keywords are the following:
 
@@ -1632,8 +1641,9 @@ History element should be a symbol.
 Of course, conventional arguments are supported, the two are same.
 
 \(anything :sources sources :input input :prompt prompt :resume resume
-           :preselect preselect :buffer buffer :keymap keymap\)
-\(anything sources input prompt resume preselect buffer keymap\)
+           :preselect preselect :buffer buffer :keymap keymap :default default
+           :history history\)
+\(anything sources input prompt resume preselect buffer keymap default history\)
 
 Other keywords are interpreted as local variables of this anything session.
 The `anything-' prefix can be omitted.  For example,

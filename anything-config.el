@@ -1186,6 +1186,11 @@ This can be toggled at anytime from `anything-find-files' with \
   :type 'boolean
   :group 'anything-config)
 
+(defcustom anything-ff-quick-delete-dont-prompt-for-deletion nil
+  "Don't ask in persistent deletion of files when non--nil."
+  :group 'anything-config
+  :type 'boolean)
+
 (defcustom anything-completing-read-handlers-alist
   '((describe-function . anything-completing-read-symbols)
     (describe-variable . anything-completing-read-symbols)
@@ -1554,6 +1559,7 @@ The \"-r\" option must be the last option.")
     (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
     (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
     (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
+    (define-key map (kbd "<deletechar>")  'anything-ff-persistent-delete)
     (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
@@ -1829,6 +1835,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-ff-run-symlink-file]\t\t->Symlink File.
 \\[anything-ff-run-delete-file]\t\t->Delete File.
 \\[anything-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
+\\[anything-ff-persistent-delete]\t->Delete file without quitting.
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
 \\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
 \\[anything-ff-run-ediff-file]\t\t->Ediff file.
@@ -2821,12 +2828,6 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
                     anything-ff-auto-update-initial-value)))
     (candidates . anything-find-files-get-candidates)
     (filtered-candidate-transformer anything-c-find-files-transformer)
-    (image-action1 . anything-ff-rotate-image-left)
-    (image-action2 . anything-ff-rotate-image-right)
-    (toggle-basename . anything-ff-toggle-basename)
-    (properties-action . anything-ff-properties)
-    (toggle-auto-update . anything-ff-toggle-auto-update)
-    (kill-buffer-fname . anything-ff-kill-buffer-fname)
     (persistent-action . anything-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . anything-ff-mode-line-string)
@@ -3255,6 +3256,7 @@ See `anything-ff-serial-rename-1'."
 ;;;###autoload
 (defun anything-ff-run-toggle-auto-update ()
   (interactive)
+  (anything-attrset 'toggle-auto-update 'anything-ff-toggle-auto-update)
   (anything-execute-persistent-action 'toggle-auto-update))
 
 ;;;###autoload
@@ -3473,6 +3475,7 @@ The checksum is copied to kill-ring."
 
 (defun anything-ff-run-toggle-basename ()
   (interactive)
+  (anything-attrset 'toggle-basename 'anything-ff-toggle-basename)
   (anything-execute-persistent-action 'toggle-basename))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
@@ -3502,16 +3505,10 @@ If EXPAND is non--nil expand-file-name."
 
 ;; Internal
 (defvar anything-file-completion-sources
-  '("Find Files" "find-file" "Copy Files"
-    "dired-do-copy" "dired-do-rename"
-    "dired-do-symlink" "dired-do-hardlink"
-    "write-file" "insert-file" "dired" 
-    "find-alternate-file" "find-alternate-file-other-window"
-    "find-file-read-only" "list-directory"
-    "Read File Name History" "mml-attach-file"
-    "Rename Files" "Symlink Files" "elscreen-find-file"
-    "Hardlink Files" "Write File" "dvc-bookmarks-find-file-in-tree"
-    "Insert File" "Read File Name" "visit-tags-table")
+  '("Find Files" "Read File Name"
+    "Read File Name History" "Copy Files"
+    "Rename Files" "Symlink Files"
+    "Hardlink Files" "Write File" "Insert File")
   "Sources that use the *find-files mechanism can be added here.
 You should not modify this yourself and know what you do if you do so.")
 
@@ -3824,7 +3821,36 @@ in `anything-ff-history'."
 (defun anything-ff-properties-persistent ()
   "Show properties without quitting anything."
   (interactive)
+  (anything-attrset 'properties-action 'anything-ff-properties)
   (anything-execute-persistent-action 'properties-action))
+
+;;;###autoload
+(defun anything-ff-persistent-delete ()
+  "Delete current candidate without quitting."
+  (interactive)
+  (anything-attrset 'quick-delete 'anything-ff-quick-delete)
+  (anything-execute-persistent-action 'quick-delete))
+
+(defun anything-ff-quick-delete (candidate)
+  "Delete file CANDIDATE without quitting."
+  (let ((presel (prog1 (save-excursion
+                         (let (sel)
+                           (anything-next-line)
+                           (setq sel (anything-get-selection))
+                           (if (string= sel candidate)
+                               (progn (anything-previous-line)
+                                      (anything-get-selection))
+                               sel)))
+                  (anything-mark-current-line))))
+    (setq presel (if (and anything-ff-transformer-show-only-basename
+                          (not (string-match-p "[.]\\{1,2\\}$" presel)))
+                     (anything-c-basename presel) presel))
+    (if anything-ff-quick-delete-dont-prompt-for-deletion
+        (anything-c-delete-file candidate)
+        (save-window-excursion
+          (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
+            (anything-c-delete-file candidate))))
+    (anything-force-update presel)))
 
 (defun anything-ff-kill-buffer-fname (candidate)
   (let* ((buf (get-file-buffer candidate))
@@ -3854,6 +3880,7 @@ in `anything-find-files-persistent-action'."
 (defun anything-ff-run-kill-buffer-persistent ()
   "Execute `anything-ff-kill-buffer-fname' whitout quitting."
   (interactive)
+  (anything-attrset 'kill-buffer-fname 'anything-ff-kill-buffer-fname)  
   (anything-execute-persistent-action 'kill-buffer-fname))
 
 (defun anything-ff-human-size (size)
@@ -4060,11 +4087,13 @@ This affect directly file CANDIDATE."
 (defun anything-ff-rotate-left-persistent ()
   "Rotate image left without quitting anything."
   (interactive)
+  (anything-attrset 'image-action1 'anything-ff-rotate-image-left)
   (anything-execute-persistent-action 'image-action1))
 
 (defun anything-ff-rotate-right-persistent ()
   "Rotate image right without quitting anything."
   (interactive)
+  (anything-attrset 'image-action2 'anything-ff-rotate-image-right)
   (anything-execute-persistent-action 'image-action2))
 
 (defun anything-ff-exif-data (candidate)
@@ -4572,6 +4601,9 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
              ((name . ,name)
               (header-name . (lambda (name)
                                (concat name anything-c-find-files-doc-header)))
+              (init . (lambda ()
+                        (setq anything-ff-auto-update-flag
+                              anything-ff-auto-update-initial-value)))
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (mode-line . anything-read-file-name-mode-line-string)
@@ -9322,6 +9354,20 @@ candidates because it doesn't handle alists correctly for anything.
 i.e In `all-completions' the keys \(cars of elements\)
 are the possible completions. In anything we want to use the cdr instead
 like \(display . real\).
+
+e.g
+
+\(setq A '((a . 1) (b . 2) (c . 3)))
+==>((a . 1) (b . 2) (c . 3))
+\(anything-comp-read \"test: \" A :alistp nil
+                                  :exec-when-only-one t
+                                  :initial-input \"a\")
+==>\"a\"
+\(anything-comp-read \"test: \" A :alistp t
+                                  :exec-when-only-one t
+                                  :initial-input \"1\")
+==>\"1\"
+
 See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
@@ -9580,11 +9626,10 @@ It should be used when candidate list don't need to rebuild dynamically."
     (anything-comp-read
      prompt collection
      :test test
-     :fc-transformer 'anything-completing-read-default-transformer
      :history history
      :input-history history
      :must-match require-match
-     :alistp nil
+     :alistp nil ; Be sure `all-completions' is used.
      :name name
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
@@ -9593,17 +9638,6 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; to avoid `thing-at-point' to be appended on top of list
      :default (or default "")
      :initial-input init)))
-
-(defun anything-completing-read-default-transformer (candidates source)
-  ;; In regular `completing-read'
-  ;; when a candidate is a cons cell
-  ;; the car is used. Anything use
-  ;; normally the cdr, so modify that
-  ;; to fit `completing-read'.
-  (loop for i in candidates
-        for cand = (if (consp i) (car i) i)
-        do (set-text-properties 0 (length cand) nil cand)
-        collect cand))
 
 (defun anything-completing-read-with-cands-in-buffer
     (prompt collection test require-match
@@ -9614,10 +9648,10 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; the calculation of collection. in this case it clash with
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
   ;; So (re)calculate collection outside of main anything-session.
-  (setq collection (all-completions "" collection))
-  (anything-completing-read-default-1 prompt collection test require-match
-                                      init hist default inherit-input-method
-                                      name buffer t))
+  (let ((cands (all-completions "" collection)))
+    (anything-completing-read-default-1 prompt cands test require-match
+                                        init hist default inherit-input-method
+                                        name buffer t)))
 
 (defun* anything-completing-read-default
     (prompt collection &optional
@@ -9657,7 +9691,7 @@ See documentation of `completing-read' and `all-completions' for details."
         (unwind-protect
              (progn
                (ac-mode -1)
-               (call-interactively current-command))
+               (apply completing-read-function def-args))
           (ac-mode 1))))
     ;; If we use now `completing-read' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
@@ -9731,11 +9765,11 @@ See documentation of `completing-read' and `all-completions' for details."
       (setq def-com 'incompatible))
     (when (eq def-com 'ido) (setq def-com 'ido-read-file-name))
     (unless (or (not entry) def-com)
-      (return-from anything-completing-read-default
+      (return-from anything-generic-read-file-name
         (unwind-protect
              (progn
                (ac-mode -1)
-               (call-interactively current-command))
+               (apply read-file-name-function def-args))
           (ac-mode 1))))
     ;; If we use now `read-file-name' we MUST turn off `ac-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
@@ -9888,10 +9922,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
   '((name . "Eshell history")
     (init . (lambda ()
               (let (eshell-hist-ignoredups)
-                ;; Dump the content's of hist file
-                ;; to `eshell-history-ring'.
-                (eshell-read-history eshell-history-file-name)
-                ;; And now write the content's of ring to file.
+                ;; Write the content's of ring to file.
                 (eshell-write-history eshell-history-file-name t)
                 (with-current-buffer (anything-candidate-buffer 'global)
                   (insert-file-contents eshell-history-file-name)))
@@ -11999,8 +12030,8 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                     . (lambda ()
                         (with-current-buffer (anything-candidate-buffer 'global)
                           (goto-char (point-min))
-                          (loop 
-                                for sym in (all-completions "" obarray 'commandp)
+                          (loop for sym in
+                                (all-completions "" obarray 'commandp)
                                 do (insert (concat sym "\n"))))))
                    (persistent-action . pers-help)
                    (persistent-help . "Describe this command")
@@ -12008,6 +12039,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                    (candidates-in-buffer)
                    (action . identity)))
                 :resume 'noresume
+                :prompt "M-x "
                 :history 'anything-M-x-input-history
                 :buffer "*anything M-x*")
                (keyboard-quit)))
