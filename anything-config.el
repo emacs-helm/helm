@@ -4596,6 +4596,9 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
              ((name . ,name)
               (header-name . (lambda (name)
                                (concat name anything-c-find-files-doc-header)))
+              (init . (lambda ()
+                        (setq anything-ff-auto-update-flag
+                              anything-ff-auto-update-initial-value)))
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (mode-line . anything-read-file-name-mode-line-string)
