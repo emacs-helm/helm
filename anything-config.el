@@ -2275,12 +2275,12 @@ This is same as `remove-duplicates' but with memoisation.
 It is much faster, especially in large lists.
 A test function can be provided with TEST argument key.
 Default is `eq'."
-  (let ((cont (make-hash-table :test test)))
-    (loop for elm in seq
-          unless (gethash elm cont)
-          do (puthash elm elm cont)
-          finally return
-          (loop for i being the hash-values in cont collect i))))
+  (loop with cont = (make-hash-table :test test)
+        for elm in seq
+        unless (gethash elm cont)
+        do (puthash elm elm cont)
+        finally return
+        (loop for i being the hash-values in cont collect i)))
 
 (defadvice eval-defun (after anything-source-hack activate)
   "Allow immediate execution of anything source when evaling it.
