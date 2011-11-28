@@ -1174,8 +1174,8 @@ If nil Search in all files."
   "A list of available printers on your system.
 When non--nil let you choose a printer to print file.
 Otherwise when nil the variable `printer-name' will be used.
-On Unix based systems you can use `anything-ff-find-printers' to
-find a list of available printers."
+On Unix based systems (lpstat command needed) you don't need to set this,
+`anything-ff-find-printers' will find a list of available printers for you."
   :type 'list
   :group 'anything-config)
 
@@ -2077,13 +2077,14 @@ See Man locate for more infos.
 ;;
 (defun anything-ff-find-printers ()
   "Return a list of available printers on Unix systems."
-  (let ((printer-list (with-temp-buffer
-                        (call-process "lpstat" nil t nil "-a")
-                        (split-string (buffer-string) "\n"))))
-    (loop for p in printer-list
-          for printer = (car (split-string p))
-          when printer
-          collect printer)))
+  (when (executable-find "lpstat")
+    (let ((printer-list (with-temp-buffer
+                          (call-process "lpstat" nil t nil "-a")
+                          (split-string (buffer-string) "\n"))))
+      (loop for p in printer-list
+            for printer = (car (split-string p))
+            when printer
+            collect printer))))
 
 ;; Shut up byte compiler in emacs24*.
 (defun anything-c-switch-to-buffer (buffer-or-name)
@@ -3442,6 +3443,9 @@ e.g:
 \(setq printer-name \"Epson-Stylus-Photo-R265\"\)
 
 Same as `dired-do-print' but for anything."
+  (unless anything-ff-printer-list
+    (setq anything-ff-printer-list
+          (anything-ff-find-printers)))
   (let* ((file-list (anything-marked-candidates))
          (len (length file-list))
          (printer-name (if anything-ff-printer-list
