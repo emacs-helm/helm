@@ -2921,7 +2921,7 @@ for current buffer."
   (with-anything-current-buffer
     (let ((num-windows (length (window-list))))
       (if (> num-windows 1)
-          (save-window-excursion
+          (save-selected-window
             (other-window 1)
             default-directory)
           (car anything-ff-history)))))
@@ -3881,7 +3881,7 @@ in `anything-ff-history'."
                      (anything-c-basename presel) presel))
     (if anything-ff-quick-delete-dont-prompt-for-deletion
         (anything-c-delete-file candidate)
-        (save-window-excursion
+        (save-selected-window
           (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
             (anything-c-delete-file candidate))))
     (anything-force-update presel)))
@@ -7291,7 +7291,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
   '((name . "Customize Face")
     (init . (lambda ()
               (unless (anything-candidate-buffer)
-                (save-window-excursion (list-faces-display))
+                (save-selected-window
+                  (list-faces-display))
                 (anything-candidate-buffer (get-buffer "*Faces*")))))
     (candidates-in-buffer)
     (get-line . buffer-substring)
@@ -7307,7 +7308,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
 (defvar anything-c-source-colors
   '((name . "Colors")
     (init . (lambda () (unless (anything-candidate-buffer)
-                         (save-window-excursion (list-colors-display))
+                         (save-selected-window
+                           (list-colors-display))
                          (anything-candidate-buffer (get-buffer "*Colors*")))))
     (candidates-in-buffer)
     (get-line . buffer-substring)
@@ -8140,7 +8142,7 @@ http://bbdb.sourceforge.net/")
 
 (defun anything-c-show-info-in-mode-line (str)
   "Display string STR in mode-line."
-  (save-window-excursion
+  (save-selected-window
     (with-current-buffer anything-buffer
       (let ((mode-line-format (concat " " str)))
         (force-mode-line-update)
