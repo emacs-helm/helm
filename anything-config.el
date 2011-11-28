@@ -5940,7 +5940,9 @@ Show global bindings and local bindings according to current `major-mode'."
 ;;
 (defvar anything-c-source-extended-command-history
   '((name . "Emacs Commands History")
-    (candidates . extended-command-history)
+    (candidates
+     . (lambda ()
+         (anything-fast-remove-dups extended-command-history :test 'equal)))
     (type . command)))
 ;; (anything 'anything-c-source-extended-command-history)
 
