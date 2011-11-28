@@ -2195,10 +2195,40 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
         (anything-set-source-filter (list it))
       (anything-set-source-filter nil))))
 
+;; Same as anything-set-pattern but bad written, please fix.
 (defun anything-insert-string (str)
   "Insert STR."
   (delete-minibuffer-contents)
   (insert str))
+
+;;;###autoload
+(defun anything-insert-buffer-name ()
+  "Insert buffer name."
+  (interactive)
+  (anything-insert-string
+   (with-anything-current-buffer
+     (if buffer-file-name (file-name-nondirectory buffer-file-name)
+       (buffer-name)))))
+
+;; This is not needed because M-n do the same thing now by default
+;; See `anything-read-pattern-maybe'.
+;; (defun anything-insert-symbol ()
+;;   "Insert current symbol."
+;;   (interactive)
+;;   (anything-insert-string
+;;    (with-anything-current-buffer
+;;      (save-excursion
+;;        (buffer-substring (beginning-of-thing 'symbol)
+;;                          (end-of-thing 'symbol))))))
+
+;; Same as `anything-yank-selection' but wrong because it use
+;; `anything-current-buffer' to get selection.
+;; (defun anything-insert-selection ()
+;;   "Insert current selection."
+;;   (interactive)
+;;   (anything-insert-string
+;;    (with-anything-current-buffer
+;;      (anything-get-selection))))
 
 (defun anything-c-match-on-file-name (candidate)
   "Return non-nil if `anything-pattern' match basename of filename CANDIDATE."
@@ -11790,30 +11820,7 @@ otherwise search in whole buffer."
                 :prompt "Regexp: "
                 :history 'anything-build-regexp-history))))
 
-(defun anything-insert-buffer-name ()
-  "Insert buffer name."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (if buffer-file-name (file-name-nondirectory buffer-file-name)
-       (buffer-name)))))
-
-(defun anything-insert-symbol ()
-  "Insert current symbol."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (save-excursion
-       (buffer-substring (beginning-of-thing 'symbol)
-                         (end-of-thing 'symbol))))))
-
-(defun anything-insert-selection ()
-  "Insert current selection."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (anything-get-selection))))
-
+;;;###autoload
 (defun anything-c-copy-files-async ()
   "Preconfigured anything to copy file list FLIST to DEST asynchronously."
   (interactive)
