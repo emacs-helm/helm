@@ -1174,8 +1174,8 @@ If nil Search in all files."
   "A list of available printers on your system.
 When non--nil let you choose a printer to print file.
 Otherwise when nil the variable `printer-name' will be used.
-On Unix based systems you can use `anything-ff-find-printers' to
-find a list of available printers."
+On Unix based systems (lpstat command needed) you don't need to set this,
+`anything-ff-find-printers' will find a list of available printers for you."
   :type 'list
   :group 'anything-config)
 
@@ -2077,13 +2077,14 @@ See Man locate for more infos.
 ;;
 (defun anything-ff-find-printers ()
   "Return a list of available printers on Unix systems."
-  (let ((printer-list (with-temp-buffer
-                        (call-process "lpstat" nil t nil "-a")
-                        (split-string (buffer-string) "\n"))))
-    (loop for p in printer-list
-          for printer = (car (split-string p))
-          when printer
-          collect printer)))
+  (when (executable-find "lpstat")
+    (let ((printer-list (with-temp-buffer
+                          (call-process "lpstat" nil t nil "-a")
+                          (split-string (buffer-string) "\n"))))
+      (loop for p in printer-list
+            for printer = (car (split-string p))
+            when printer
+            collect printer))))
 
 ;; Shut up byte compiler in emacs24*.
 (defun anything-c-switch-to-buffer (buffer-or-name)
@@ -2195,10 +2196,40 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
         (anything-set-source-filter (list it))
       (anything-set-source-filter nil))))
 
+;; Same as anything-set-pattern but bad written, please fix.
 (defun anything-insert-string (str)
   "Insert STR."
   (delete-minibuffer-contents)
   (insert str))
+
+;;;###autoload
+(defun anything-insert-buffer-name ()
+  "Insert buffer name."
+  (interactive)
+  (anything-insert-string
+   (with-anything-current-buffer
+     (if buffer-file-name (file-name-nondirectory buffer-file-name)
+       (buffer-name)))))
+
+;; This is not needed because M-n do the same thing now by default
+;; See `anything-read-pattern-maybe'.
+;; (defun anything-insert-symbol ()
+;;   "Insert current symbol."
+;;   (interactive)
+;;   (anything-insert-string
+;;    (with-anything-current-buffer
+;;      (save-excursion
+;;        (buffer-substring (beginning-of-thing 'symbol)
+;;                          (end-of-thing 'symbol))))))
+
+;; Same as `anything-yank-selection' but wrong because it use
+;; `anything-current-buffer' to get selection.
+;; (defun anything-insert-selection ()
+;;   "Insert current selection."
+;;   (interactive)
+;;   (anything-insert-string
+;;    (with-anything-current-buffer
+;;      (anything-get-selection))))
 
 (defun anything-c-match-on-file-name (candidate)
   "Return non-nil if `anything-pattern' match basename of filename CANDIDATE."
@@ -2890,7 +2921,7 @@ for current buffer."
   (with-anything-current-buffer
     (let ((num-windows (length (window-list))))
       (if (> num-windows 1)
-          (save-window-excursion
+          (save-selected-window
             (other-window 1)
             default-directory)
           (car anything-ff-history)))))
@@ -3412,6 +3443,9 @@ e.g:
 \(setq printer-name \"Epson-Stylus-Photo-R265\"\)
 
 Same as `dired-do-print' but for anything."
+  (unless anything-ff-printer-list
+    (setq anything-ff-printer-list
+          (anything-ff-find-printers)))
   (let* ((file-list (anything-marked-candidates))
          (len (length file-list))
          (printer-name (if anything-ff-printer-list
@@ -3847,7 +3881,7 @@ in `anything-ff-history'."
                      (anything-c-basename presel) presel))
     (if anything-ff-quick-delete-dont-prompt-for-deletion
         (anything-c-delete-file candidate)
-        (save-window-excursion
+        (save-selected-window
           (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
             (anything-c-delete-file candidate))))
     (anything-force-update presel)))
@@ -7259,7 +7293,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
   '((name . "Customize Face")
     (init . (lambda ()
               (unless (anything-candidate-buffer)
-                (save-window-excursion (list-faces-display))
+                (save-selected-window
+                  (list-faces-display))
                 (anything-candidate-buffer (get-buffer "*Faces*")))))
     (candidates-in-buffer)
     (get-line . buffer-substring)
@@ -7275,7 +7310,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
 (defvar anything-c-source-colors
   '((name . "Colors")
     (init . (lambda () (unless (anything-candidate-buffer)
-                         (save-window-excursion (list-colors-display))
+                         (save-selected-window
+                           (list-colors-display))
                          (anything-candidate-buffer (get-buffer "*Colors*")))))
     (candidates-in-buffer)
     (get-line . buffer-substring)
@@ -8108,7 +8144,7 @@ http://bbdb.sourceforge.net/")
 
 (defun anything-c-show-info-in-mode-line (str)
   "Display string STR in mode-line."
-  (save-window-excursion
+  (save-selected-window
     (with-current-buffer anything-buffer
       (let ((mode-line-format (concat " " str)))
         (force-mode-line-update)
@@ -11792,30 +11828,7 @@ otherwise search in whole buffer."
                 :prompt "Regexp: "
                 :history 'anything-build-regexp-history))))
 
-(defun anything-insert-buffer-name ()
-  "Insert buffer name."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (if buffer-file-name (file-name-nondirectory buffer-file-name)
-       (buffer-name)))))
-
-(defun anything-insert-symbol ()
-  "Insert current symbol."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (save-excursion
-       (buffer-substring (beginning-of-thing 'symbol)
-                         (end-of-thing 'symbol))))))
-
-(defun anything-insert-selection ()
-  "Insert current selection."
-  (interactive)
-  (anything-insert-string
-   (with-current-buffer anything-current-buffer
-     (anything-get-selection))))
-
+;;;###autoload
 (defun anything-c-copy-files-async ()
   "Preconfigured anything to copy file list FLIST to DEST asynchronously."
   (interactive)
