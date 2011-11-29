@@ -9452,7 +9452,9 @@ Do nothing, just return candidate list unmodified."
                                    (fc-transformer 'anything-cr-default-transformer)
                                    (marked-candidates nil)
                                    (alistp t))
-  "Anything `completing-read' replacement.
+  "Read a string in the minibuffer, with anything completion.
+
+It is anything `completing-read' equivalent.
 
 - PROMPT is the prompt name to use.
 
@@ -9478,12 +9480,12 @@ Keys description:
 - REQUIRES-PATTERN: Same as anything attribute, default is 0.
 
 - HISTORY: A list containing specific history, default is nil.
-When it is non--nil, all elements of HISTORY are displayed in
-a special source before COLLECTION.
+  When it is non--nil, all elements of HISTORY are displayed in
+  a special source before COLLECTION.
 
 - INPUT-HISTORY: A symbol. the minibuffer input history will be
-stored there, if nil or not provided, `minibuffer-history'
-will be used instead.
+  stored there, if nil or not provided, `minibuffer-history'
+  will be used instead.
 
 - PERSISTENT-ACTION: A function called with one arg i.e candidate.
 
@@ -9505,11 +9507,11 @@ will be used instead.
 - ALISTP: \(default is non--nil\) See `anything-comp-read-get-candidates'.
 
 - CANDIDATES-IN-BUFFER: when non--nil use a source build with
-`anything-candidates-in-buffer' which is much faster.  It is enabled by default.
-Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
+  `anything-candidates-in-buffer' which is much faster.
+  Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
  
 Any prefix args passed during `anything-comp-read' invocation will be recorded
-in `anything-current-prefix-arg', otherwise if prefix args where given before
+in `anything-current-prefix-arg', otherwise if prefix args were given before
 `anything-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix args before or after calling a command
 that use `anything-comp-read' See `anything-M-x' for example."
