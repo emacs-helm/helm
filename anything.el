@@ -3036,7 +3036,7 @@ to a list of forms.\n\n")
                  (apropos-internal "^anything-" 'boundp)))
     (insert "** "
             (pp-to-string v) "\n"
-            (pp-to-string (eval v)) "\n"))
+            (pp-to-string (with-current-buffer anything-buffer (eval v))) "\n"))
   (message "Calculating all anything-related values...Done"))
 
 
