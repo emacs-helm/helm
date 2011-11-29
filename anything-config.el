@@ -2608,9 +2608,6 @@ buffer that is not the current buffer."
     (candidates . anything-c-buffer-list)
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
-    (diff-action . anything-buffer-toggle-diff)
-    (revert-action . anything-buffer-revert-and-update)
-    (save-action . anything-buffer-save-and-update)
     (candidate-transformer
      anything-c-skip-current-buffer
      anything-c-skip-boring-buffers
@@ -2683,6 +2680,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-diff-persistent ()
   "Toggle diff buffer without quitting anything."
   (interactive)
+  (anything-attrset 'diff-action 'anything-buffer-toggle-diff)
   (anything-execute-persistent-action 'diff-action))
 
 (defun anything-buffer-revert-and-update (candidate)
@@ -2694,6 +2692,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-revert-persistent ()
   "Revert buffer without quitting anything."
   (interactive)
+  (anything-attrset 'revert-action 'anything-buffer-revert-and-update)
   (anything-execute-persistent-action 'revert-action 'onewindow))
 
 (defun anything-buffer-save-and-update (candidate)
@@ -2708,6 +2707,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-save-persistent ()
   "Save buffer without quitting anything."
   (interactive)
+  (anything-attrset 'save-action 'anything-buffer-save-and-update)
   (anything-execute-persistent-action 'save-action 'onewindow))
 
 ;;;###autoload
@@ -4765,7 +4765,6 @@ See also `anything-locate'."
   '((name . "Locate")
     (candidates . anything-c-locate-init)
     (type . file)
-    (properties-action . anything-ff-properties)
     (requires-pattern . 3)
     (candidate-number-limit . 9999)
     (mode-line . anything-generic-file-mode-line-string)
@@ -4781,7 +4780,6 @@ prompt and input."
             '((name . "Locate")
               (candidates . anything-c-locate-init)
               (action . identity)
-              (properties-action . anything-ff-properties)
               (requires-pattern . 3)
               (candidate-number-limit . 9999)
               (mode-line . anything-generic-file-mode-line-string)
@@ -5070,7 +5068,6 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-grep-mode-line-string)
-        (jump-persistent . anything-c-grep-persistent-action)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
@@ -5195,6 +5192,7 @@ If N is positive go forward otherwise go backward."
 (defun anything-c-grep-run-persistent-action ()
   "Run grep persistent action from `anything-do-grep-1'."
   (interactive)
+  (anything-attrset 'jump-persistent 'anything-c-grep-persistent-action)
   (anything-execute-persistent-action 'jump-persistent))
 
 ;;;###autoload
@@ -8945,18 +8943,22 @@ Only math* symbols are collected."
 
 (defun anything-c-ucs-persistent-insert ()
   (interactive)
+  (anything-attrset 'action-insert 'anything-c-ucs-insert-char)
   (anything-execute-persistent-action 'action-insert))
 
 (defun anything-c-ucs-persistent-forward ()
   (interactive)
+  (anything-attrset 'action-forward 'anything-c-ucs-forward-char)
   (anything-execute-persistent-action 'action-forward))
 
 (defun anything-c-ucs-persistent-backward ()
   (interactive)
+  (anything-attrset 'action-back 'anything-c-ucs-backward-char)
   (anything-execute-persistent-action 'action-back))
 
 (defun anything-c-ucs-persistent-delete ()
   (interactive)
+  (anything-attrset 'action-delete 'anything-c-ucs-delete-backward)
   (anything-execute-persistent-action 'action-delete))
 
 (defvar anything-c-source-ucs
@@ -8965,10 +8967,6 @@ Only math* symbols are collected."
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (mode-line . anything-c-ucs-mode-line-string)
-    (action-insert . anything-c-ucs-insert-char)
-    (action-forward . anything-c-ucs-forward-char)
-    (action-back . anything-c-ucs-backward-char)
-    (action-delete . anything-c-ucs-delete-backward)
     (action . (("Insert" . anything-c-ucs-insert-char)
                ("Forward char" . anything-c-ucs-forward-char)
                ("Backward char" . anything-c-ucs-backward-char)
