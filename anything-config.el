@@ -1191,6 +1191,12 @@ This can be toggled at anytime from `anything-find-files' with \
   :group 'anything-config
   :type 'boolean)
 
+(defcustom anything-ff-signal-error-on-dot-files t
+  "Signal error when file is `.' or `..' on file deletion when non--nil.
+Default is non--nil."
+  :group 'anything-config
+  :type 'boolean)
+
 (defcustom anything-completing-read-handlers-alist
   '((describe-function . anything-completing-read-symbols)
     (describe-variable . anything-completing-read-symbols)
@@ -1559,7 +1565,7 @@ The \"-r\" option must be the last option.")
     (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
     (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
     (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
-    (define-key map (kbd "<deletechar>")  'anything-ff-persistent-delete)
+    (define-key map (kbd "C-d")           'anything-ff-persistent-delete)
     (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
@@ -3865,26 +3871,33 @@ in `anything-ff-history'."
   (anything-attrset 'quick-delete 'anything-ff-quick-delete)
   (anything-execute-persistent-action 'quick-delete))
 
+(defun anything-ff-dot-file-p (file)
+  "Check if FILE is `.' or `..'."
+  (member (anything-c-basename file) '("." "..")))
+
 (defun anything-ff-quick-delete (candidate)
   "Delete file CANDIDATE without quitting."
-  (let ((presel (prog1 (save-excursion
-                         (let (sel)
-                           (anything-next-line)
-                           (setq sel (anything-get-selection))
-                           (if (string= sel candidate)
-                               (progn (anything-previous-line)
-                                      (anything-get-selection))
-                               sel)))
-                  (anything-mark-current-line))))
-    (setq presel (if (and anything-ff-transformer-show-only-basename
-                          (not (string-match-p "[.]\\{1,2\\}$" presel)))
-                     (anything-c-basename presel) presel))
-    (if anything-ff-quick-delete-dont-prompt-for-deletion
-        (anything-c-delete-file candidate)
-        (save-selected-window
-          (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
-            (anything-c-delete-file candidate))))
-    (anything-force-update presel)))
+  (if (and anything-ff-signal-error-on-dot-files
+           (anything-ff-dot-file-p candidate))
+      (message "Error: Cannot operate on `.' or `..'")
+      (let ((presel (prog1 (save-excursion
+                             (let (sel)
+                               (anything-next-line)
+                               (setq sel (anything-get-selection))
+                               (if (string= sel candidate)
+                                   (progn (anything-previous-line)
+                                          (anything-get-selection))
+                                   sel)))
+                      (anything-mark-current-line))))
+        (setq presel (if (and anything-ff-transformer-show-only-basename
+                              (not (anything-ff-dot-file-p presel)))
+                         (anything-c-basename presel) presel))
+        (if anything-ff-quick-delete-dont-prompt-for-deletion
+            (anything-c-delete-file candidate)
+            (save-selected-window
+              (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
+                (anything-c-delete-file candidate))))
+        (anything-force-update presel))))
 
 (defun anything-ff-kill-buffer-fname (candidate)
   (let* ((buf (get-file-buffer candidate))
@@ -10262,9 +10275,12 @@ In this case EXE must be provided as \"EXE %s\"."
 (defun anything-kill-marked-buffers (ignore)
   (mapc 'kill-buffer (anything-marked-candidates)))
 
-(defun anything-c-delete-file (file)
+(defun anything-c-delete-file (file &optional error-if-dot-file-p)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
+  (when (and error-if-dot-file-p
+             (anything-ff-dot-file-p file))
+    (error "Error: Cannot operate on `.' or `..'"))
   (let ((buffers (anything-c-file-buffers file)))
     (if (< emacs-major-version 24)
         ;; `dired-delete-file' in Emacs versions < 24
@@ -10393,7 +10409,7 @@ If not found or a prefix arg is given query the user which tool to use."
         (message "(No deletions performed)")
         (dolist (i files)
           (set-text-properties 0 (length i) nil i)
-          (anything-c-delete-file i))
+          (anything-c-delete-file i anything-ff-signal-error-on-dot-files))
         (message "%s File(s) deleted" len))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
