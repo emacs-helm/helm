@@ -3606,7 +3606,7 @@ second argument of `display-buffer'."
 (defun anything-this-visible-mark ()
   (loop for o in anything-visible-mark-overlays
         when (equal (point-at-bol) (overlay-start o))
-        do   (return o)))
+        return o))
 
 (defun anything-delete-visible-mark (overlay)
   (setq anything-marked-candidates
@@ -3704,11 +3704,11 @@ It is analogous to `dired-get-marked-files'."
               (loop for pt in points
                     for i from 0
                     if (<= curpos pt)
-                    do (return (1- i)))
+                    return (1- i))
               (loop for pt in points
                     for i from 0
                     if (< curpos pt)
-                    do (return i)))
+                    return i))
           points))))
 
 (defun anything-next-visible-mark (&optional prev)
