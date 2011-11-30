@@ -2069,7 +2069,9 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
 ;; (@* "Core: input handling")
 (defun anything-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs to be handled."
-  (let ((delay (with-current-buffer anything-buffer anything-input-idle-delay)))
+  (let ((delay (with-current-buffer anything-buffer
+                 (and anything-input-idle-delay
+                      (max anything-input-idle-delay 0.1)))))
     (if (or (not delay) (anything-action-window))
         (anything-check-minibuffer-input-1)
         (anything-new-timer
@@ -2437,8 +2439,9 @@ is done on whole `anything-buffer' and not on current source."
                (run-with-idle-timer
                 ;; Be sure anything-idle-delay is >
                 ;; to anything-input-idle-delay
-                ;; otherwise use value of anything-input-idle-delay.
-                (max anything-idle-delay anything-input-idle-delay) nil
+                ;; otherwise use value of anything-input-idle-delay
+                ;; or 0.1 if == to 0.
+                (max anything-idle-delay anything-input-idle-delay 0.1) nil
                 'anything-process-delayed-sources delayed-sources preselect))))
         (anything-log "end update")))))
 
@@ -3760,7 +3763,8 @@ This happen after `anything-input-idle-delay' secs."
   (and (not (get-buffer-window anything-action-buffer 'visible))
        (buffer-local-value 'anything-follow-mode
                            (get-buffer-create anything-buffer))
-       (sit-for anything-input-idle-delay)
+       (sit-for (and anything-input-idle-delay
+                     (max anything-input-idle-delay 0.1)))
        (anything-window)
        (anything-get-selection)
        (save-excursion

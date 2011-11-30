@@ -1191,6 +1191,12 @@ This can be toggled at anytime from `anything-find-files' with \
   :group 'anything-config
   :type 'boolean)
 
+(defcustom anything-ff-signal-error-on-dot-files t
+  "Signal error when file is `.' or `..' on file deletion when non--nil.
+Default is non--nil."
+  :group 'anything-config
+  :type 'boolean)
+
 (defcustom anything-completing-read-handlers-alist
   '((describe-function . anything-completing-read-symbols)
     (describe-variable . anything-completing-read-symbols)
@@ -1559,7 +1565,7 @@ The \"-r\" option must be the last option.")
     (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
     (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
     (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
-    (define-key map (kbd "<deletechar>")  'anything-ff-persistent-delete)
+    (define-key map (kbd "C-d")           'anything-ff-persistent-delete)
     (define-key map (kbd "M-e")           'anything-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>")       'anything-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-o")           'anything-ff-run-switch-other-window)
@@ -2608,9 +2614,6 @@ buffer that is not the current buffer."
     (candidates . anything-c-buffer-list)
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
-    (diff-action . anything-buffer-toggle-diff)
-    (revert-action . anything-buffer-revert-and-update)
-    (save-action . anything-buffer-save-and-update)
     (candidate-transformer
      anything-c-skip-current-buffer
      anything-c-skip-boring-buffers
@@ -2683,6 +2686,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-diff-persistent ()
   "Toggle diff buffer without quitting anything."
   (interactive)
+  (anything-attrset 'diff-action 'anything-buffer-toggle-diff)
   (anything-execute-persistent-action 'diff-action))
 
 (defun anything-buffer-revert-and-update (candidate)
@@ -2694,6 +2698,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-revert-persistent ()
   "Revert buffer without quitting anything."
   (interactive)
+  (anything-attrset 'revert-action 'anything-buffer-revert-and-update)
   (anything-execute-persistent-action 'revert-action 'onewindow))
 
 (defun anything-buffer-save-and-update (candidate)
@@ -2708,6 +2713,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun anything-buffer-save-persistent ()
   "Save buffer without quitting anything."
   (interactive)
+  (anything-attrset 'save-action 'anything-buffer-save-and-update)
   (anything-execute-persistent-action 'save-action 'onewindow))
 
 ;;;###autoload
@@ -3865,26 +3871,33 @@ in `anything-ff-history'."
   (anything-attrset 'quick-delete 'anything-ff-quick-delete)
   (anything-execute-persistent-action 'quick-delete))
 
+(defun anything-ff-dot-file-p (file)
+  "Check if FILE is `.' or `..'."
+  (member (anything-c-basename file) '("." "..")))
+
 (defun anything-ff-quick-delete (candidate)
   "Delete file CANDIDATE without quitting."
-  (let ((presel (prog1 (save-excursion
-                         (let (sel)
-                           (anything-next-line)
-                           (setq sel (anything-get-selection))
-                           (if (string= sel candidate)
-                               (progn (anything-previous-line)
-                                      (anything-get-selection))
-                               sel)))
-                  (anything-mark-current-line))))
-    (setq presel (if (and anything-ff-transformer-show-only-basename
-                          (not (string-match-p "[.]\\{1,2\\}$" presel)))
-                     (anything-c-basename presel) presel))
-    (if anything-ff-quick-delete-dont-prompt-for-deletion
-        (anything-c-delete-file candidate)
-        (save-selected-window
-          (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
-            (anything-c-delete-file candidate))))
-    (anything-force-update presel)))
+  (if (and anything-ff-signal-error-on-dot-files
+           (anything-ff-dot-file-p candidate))
+      (message "Error: Cannot operate on `.' or `..'")
+      (let ((presel (prog1 (save-excursion
+                             (let (sel)
+                               (anything-next-line)
+                               (setq sel (anything-get-selection))
+                               (if (string= sel candidate)
+                                   (progn (anything-previous-line)
+                                          (anything-get-selection))
+                                   sel)))
+                      (anything-mark-current-line))))
+        (setq presel (if (and anything-ff-transformer-show-only-basename
+                              (not (anything-ff-dot-file-p presel)))
+                         (anything-c-basename presel) presel))
+        (if anything-ff-quick-delete-dont-prompt-for-deletion
+            (anything-c-delete-file candidate)
+            (save-selected-window
+              (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
+                (anything-c-delete-file candidate))))
+        (anything-force-update presel))))
 
 (defun anything-ff-kill-buffer-fname (candidate)
   (let* ((buf (get-file-buffer candidate))
@@ -4765,7 +4778,6 @@ See also `anything-locate'."
   '((name . "Locate")
     (candidates . anything-c-locate-init)
     (type . file)
-    (properties-action . anything-ff-properties)
     (requires-pattern . 3)
     (candidate-number-limit . 9999)
     (mode-line . anything-generic-file-mode-line-string)
@@ -4781,7 +4793,6 @@ prompt and input."
             '((name . "Locate")
               (candidates . anything-c-locate-init)
               (action . identity)
-              (properties-action . anything-ff-properties)
               (requires-pattern . 3)
               (candidate-number-limit . 9999)
               (mode-line . anything-generic-file-mode-line-string)
@@ -5070,7 +5081,6 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-grep-mode-line-string)
-        (jump-persistent . anything-c-grep-persistent-action)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
@@ -5195,6 +5205,7 @@ If N is positive go forward otherwise go backward."
 (defun anything-c-grep-run-persistent-action ()
   "Run grep persistent action from `anything-do-grep-1'."
   (interactive)
+  (anything-attrset 'jump-persistent 'anything-c-grep-persistent-action)
   (anything-execute-persistent-action 'jump-persistent))
 
 ;;;###autoload
@@ -8945,18 +8956,22 @@ Only math* symbols are collected."
 
 (defun anything-c-ucs-persistent-insert ()
   (interactive)
+  (anything-attrset 'action-insert 'anything-c-ucs-insert-char)
   (anything-execute-persistent-action 'action-insert))
 
 (defun anything-c-ucs-persistent-forward ()
   (interactive)
+  (anything-attrset 'action-forward 'anything-c-ucs-forward-char)
   (anything-execute-persistent-action 'action-forward))
 
 (defun anything-c-ucs-persistent-backward ()
   (interactive)
+  (anything-attrset 'action-back 'anything-c-ucs-backward-char)
   (anything-execute-persistent-action 'action-back))
 
 (defun anything-c-ucs-persistent-delete ()
   (interactive)
+  (anything-attrset 'action-delete 'anything-c-ucs-delete-backward)
   (anything-execute-persistent-action 'action-delete))
 
 (defvar anything-c-source-ucs
@@ -8965,10 +8980,6 @@ Only math* symbols are collected."
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (mode-line . anything-c-ucs-mode-line-string)
-    (action-insert . anything-c-ucs-insert-char)
-    (action-forward . anything-c-ucs-forward-char)
-    (action-back . anything-c-ucs-backward-char)
-    (action-delete . anything-c-ucs-delete-backward)
     (action . (("Insert" . anything-c-ucs-insert-char)
                ("Forward char" . anything-c-ucs-forward-char)
                ("Backward char" . anything-c-ucs-backward-char)
@@ -9452,7 +9463,9 @@ Do nothing, just return candidate list unmodified."
                                    (fc-transformer 'anything-cr-default-transformer)
                                    (marked-candidates nil)
                                    (alistp t))
-  "Anything `completing-read' replacement.
+  "Read a string in the minibuffer, with anything completion.
+
+It is anything `completing-read' equivalent.
 
 - PROMPT is the prompt name to use.
 
@@ -9478,12 +9491,12 @@ Keys description:
 - REQUIRES-PATTERN: Same as anything attribute, default is 0.
 
 - HISTORY: A list containing specific history, default is nil.
-When it is non--nil, all elements of HISTORY are displayed in
-a special source before COLLECTION.
+  When it is non--nil, all elements of HISTORY are displayed in
+  a special source before COLLECTION.
 
 - INPUT-HISTORY: A symbol. the minibuffer input history will be
-stored there, if nil or not provided, `minibuffer-history'
-will be used instead.
+  stored there, if nil or not provided, `minibuffer-history'
+  will be used instead.
 
 - PERSISTENT-ACTION: A function called with one arg i.e candidate.
 
@@ -9505,11 +9518,11 @@ will be used instead.
 - ALISTP: \(default is non--nil\) See `anything-comp-read-get-candidates'.
 
 - CANDIDATES-IN-BUFFER: when non--nil use a source build with
-`anything-candidates-in-buffer' which is much faster.  It is enabled by default.
-Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
+  `anything-candidates-in-buffer' which is much faster.
+  Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
  
 Any prefix args passed during `anything-comp-read' invocation will be recorded
-in `anything-current-prefix-arg', otherwise if prefix args where given before
+in `anything-current-prefix-arg', otherwise if prefix args were given before
 `anything-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix args before or after calling a command
 that use `anything-comp-read' See `anything-M-x' for example."
@@ -10262,9 +10275,12 @@ In this case EXE must be provided as \"EXE %s\"."
 (defun anything-kill-marked-buffers (ignore)
   (mapc 'kill-buffer (anything-marked-candidates)))
 
-(defun anything-c-delete-file (file)
+(defun anything-c-delete-file (file &optional error-if-dot-file-p)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
+  (when (and error-if-dot-file-p
+             (anything-ff-dot-file-p file))
+    (error "Error: Cannot operate on `.' or `..'"))
   (let ((buffers (anything-c-file-buffers file)))
     (if (< emacs-major-version 24)
         ;; `dired-delete-file' in Emacs versions < 24
@@ -10393,7 +10409,7 @@ If not found or a prefix arg is given query the user which tool to use."
         (message "(No deletions performed)")
         (dolist (i files)
           (set-text-properties 0 (length i) nil i)
-          (anything-c-delete-file i))
+          (anything-c-delete-file i anything-ff-signal-error-on-dot-files))
         (message "%s File(s) deleted" len))))
 
 (defun anything-ediff-marked-buffers (candidate &optional merge)
