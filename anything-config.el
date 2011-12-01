@@ -8797,12 +8797,13 @@ See also `anything-create--actions'.")
     (init . anything-c-top-init)
     (candidates-in-buffer)
     (display-to-real . anything-c-top-display-to-real)
-    (update . anything-c-top-update)
     (persistent-action . anything-c-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
     (action
-     ("kill (TERM)" . (lambda (pid) (anything-c-top-sh (format "kill -TERM %s" pid))))
-     ("kill (KILL)" . (lambda (pid) (anything-c-top-sh (format "kill -KILL %s" pid))))
+     ("kill (TERM)" . (lambda (pid)
+                        (anything-c-top-sh (format "kill -TERM %s" pid))))
+     ("kill (KILL)" . (lambda (pid)
+                        (anything-c-top-sh (format "kill -KILL %s" pid))))
      ("Copy PID" . (lambda (pid) (kill-new pid))))))
 ;; (anything 'anything-c-source-top)
 
@@ -8823,10 +8824,6 @@ See also `anything-create--actions'.")
 
 (defun anything-c-top-display-to-real (line)
   (car (split-string line)))
-
-(defun anything-c-top-update ()
-  (let ((anything-source-name (assoc-default 'name anything-c-source-top))) ;UGLY HACK
-    (anything-c-top-init)))
 
 ;;; Timers
 (defvar anything-c-source-absolute-time-timers
