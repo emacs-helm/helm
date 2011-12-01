@@ -8749,8 +8749,8 @@ See also `anything-create--actions'.")
                      (format "%s (%s)" name minibuffer-history-variable)))
     (candidates
      . (lambda ()
-         (let ((history (loop
-                              for i in (symbol-value minibuffer-history-variable)
+         (let ((history (loop for i in
+                              (symbol-value minibuffer-history-variable)
                               unless (string= "" i) collect i)))
            (if (consp (car history))
                (mapcar 'prin1-to-string history)
@@ -8765,25 +8765,26 @@ See also `anything-create--actions'.")
 ;;
 (defvar anything-c-source-elscreen
   '((name . "Elscreen")
-    (candidates . (lambda ()
-                    (if (cdr (elscreen-get-screen-to-name-alist))
-                        (sort
-                         (loop for sname in (elscreen-get-screen-to-name-alist)
-                               append (list (format "[%d] %s" (car sname) (cdr sname))) into lst
-                               finally (return lst))
-                         #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
-    (action . (("Change Screen".
-                               (lambda (candidate)
-                                 (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
-               ("Kill Screen(s)".
-                                (lambda (candidate)
-                                  (dolist (i (anything-marked-candidates))
-                                    (elscreen-goto (- (aref i 1) (aref "0" 0)))
-                                    (elscreen-kill))))
-               ("Only Screen".
-                             (lambda (candidate)
-                               (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
-                               (elscreen-kill-others)))))))
+    (candidates
+     . (lambda ()
+         (if (cdr (elscreen-get-screen-to-name-alist))
+             (sort
+              (loop for sname in (elscreen-get-screen-to-name-alist)
+                    append (list (format "[%d] %s" (car sname) (cdr sname))))
+              #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
+    (action
+     . (("Change Screen" .
+                         (lambda (candidate)
+                           (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
+        ("Kill Screen(s)" .
+                          (lambda (candidate)
+                            (dolist (i (anything-marked-candidates))
+                              (elscreen-goto (- (aref i 1) (aref "0" 0)))
+                              (elscreen-kill))))
+        ("Only Screen" .
+                       (lambda (candidate)
+                         (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
+                         (elscreen-kill-others)))))))
 ;; (anything 'anything-c-source-elscreen)
 
 
