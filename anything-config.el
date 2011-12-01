@@ -3808,12 +3808,30 @@ purpose."
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
-          ((string= path "") (directory-files "/" t))
+          ((string= path "") (anything-ff-directory-files "/" t))
           ((and (file-directory-p path) (not (file-readable-p path)))
            (list (format "Opening directory: access denied, `%s'" path)))
-          ((file-directory-p path) (directory-files path t))
+          ((file-directory-p path) (anything-ff-directory-files path t))
           (t
-           (append (list path) (directory-files path-name-dir t))))))
+           (append (list path) (anything-ff-directory-files path-name-dir t))))))
+
+(defun anything-ff-directory-files (directory &optional full)
+  "List contents of DIRECTORY.
+Argument FULL mean absolute path.
+It is same as `directory-files' but always returns the
+dotted filename '.' and '..' on root directories on Windows
+systems."
+  (setq directory (expand-file-name directory))
+  (if (string-match "^[a-zA-Z]\\{1\\}:/$" directory)
+      (let* ((dot (concat directory "."))
+             (dot2 (concat directory ".."))
+             (lsdir (remove
+                     dot2
+                     (remove
+                      dot
+                      (directory-files directory full)))))
+        (append (list dot dot2) lsdir))
+      (directory-files directory full)))
 
 (defun anything-ff-transform-fname-for-completion (fname)
   "Return FNAME with it's basename modified as a regexp.
