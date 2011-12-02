@@ -1162,6 +1162,21 @@ If nil Search in all files."
   :type  'string
   :group 'anything-config)
 
+(defcustom anything-c-locate-command nil
+  "A list of arguments for locate program.
+If nil it will be calculated when `anything-locate' startup
+with these default values for different systems:
+
+Gnu/linux: \"locate -i -r %s\"
+berkeley-unix: \"locate -i %s\"
+windows-nt: \"es -i -r %s\"
+Others: \"locate %s\"
+
+This string will be passed to format so it should end with `%s'.
+The \"-r\" option must be the last option."
+  :type 'string
+  :group 'anything-config)
+
 (defcustom anything-c-show-info-in-mode-line-delay 12
   "Eldoc will show info in mode-line during this delay if user is idle."
   :type  'integer
@@ -1249,14 +1264,6 @@ automatically.")
 
 (defvar anything-c-show-completion-overlay nil)
 
-(defvar anything-c-locate-command
-  (case system-type
-    ('gnu/linux "locate -i -r %s")
-    ('berkeley-unix "locate -i %s")
-    ('windows-nt "es -i -r %s")
-    (t "locate %s"))
-  "A list of arguments for locate program.
-The \"-r\" option must be the last option.")
 
 
 ;;; Faces
@@ -4786,6 +4793,13 @@ See also `anything-locate'."
           (line-number-mode "%l") " "
           (:eval (propertize "(Locate Process Running) "
                   'face '((:foreground "red"))))))
+  (unless anything-c-locate-command
+    (setq anything-c-locate-command
+          (case system-type
+            ('gnu/linux "locate -i -r %s")
+            ('berkeley-unix "locate -i %s")
+            ('windows-nt "es -i -r %s")
+            (t "locate %s"))))
   (prog1
       (start-process-shell-command "locate-process" nil
                                    (format anything-c-locate-command
