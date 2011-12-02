@@ -10870,13 +10870,13 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                                                (when anything-c-use-adaptative-sorting
                                                  (setq anything-c-adaptive-done nil))))
 
-(add-hook 'anything-after-action-hook #(lambda ()
-                                        (when anything-c-use-adaptative-sorting
-                                          (anything-c-adaptive-store-selection))))
+(add-hook 'anything-after-action-hook #'(lambda ()
+                                          (when anything-c-use-adaptative-sorting
+                                            (anything-c-adaptive-store-selection))))
 
-(add-hook 'anything-select-action-hook #(lambda ()
-                                         (when anything-c-use-adaptative-sorting
-                                           (anything-c-adaptive-store-selection))))
+(add-hook 'anything-select-action-hook #'(lambda ()
+                                           (when anything-c-use-adaptative-sorting
+                                             (anything-c-adaptive-store-selection))))
 
 (defun anything-c-source-use-adaptative-p (&optional source-name)
   "Return current source only if it use adaptative history, nil otherwise."
