@@ -10866,20 +10866,17 @@ selection.")
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
 
-(defadvice anything-initial-setup (before anything-c-adaptive-initialize activate)
-  "Reset `anything-c-adaptive-done' when anything is started."
-  (when anything-c-use-adaptative-sorting
-    (setq anything-c-adaptive-done nil)))
+(add-hook 'anything-before-initialize-hook #'(lambda ()
+                                               (when anything-c-use-adaptative-sorting
+                                                 (setq anything-c-adaptive-done nil))))
 
-(defadvice anything-exit-minibuffer (before anything-c-adaptive-exit-minibuffer activate)
-  "Store history information when action is executed on selected candidate."
-  (when anything-c-use-adaptative-sorting
-    (anything-c-adaptive-store-selection)))
+(add-hook 'anything-after-action-hook #(lambda ()
+                                        (when anything-c-use-adaptative-sorting
+                                          (anything-c-adaptive-store-selection))))
 
-(defadvice anything-select-action (before anything-c-adaptive-select-action activate)
-  "Store history information when the user goes to the action buffer."
-  (when anything-c-use-adaptative-sorting
-    (anything-c-adaptive-store-selection)))
+(add-hook 'anything-select-action-hook #(lambda ()
+                                         (when anything-c-use-adaptative-sorting
+                                           (anything-c-adaptive-store-selection))))
 
 (defun anything-c-source-use-adaptative-p (&optional source-name)
   "Return current source only if it use adaptative history, nil otherwise."
