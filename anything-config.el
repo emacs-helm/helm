@@ -785,7 +785,7 @@
 (declare-function adoc-first-line "ext:auto-document.el" (str))
 (declare-function adoc-prin1-to-string "ext:auto-document.el" (object))
 (declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
-
+(declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
 
 
 ;;; compatibility
@@ -10510,7 +10510,7 @@ Return nil if bmk is not a valid bookmark."
 (defun anything-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
   (if (eq system-type 'windows-nt)
-      (w32-shell-execute-open-file file)
+      (anything-w32-shell-execute-open-file file)
       (start-process "anything-c-open-file-with-default-tool"
                      nil
                      (cond ((eq system-type 'gnu/linux)
