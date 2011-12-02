@@ -1122,9 +1122,11 @@ Default is 0.6 seconds."
 
 (defcustom anything-c-default-external-file-browser "nautilus"
   "Default external file browser for your system.
-Directories will be opened externally with it.
+Directories will be opened externally with it when
+opening file externally in `anything-find-files'.
 Set to nil if you do not have external file browser
-or do not want to use it."
+or do not want to use it.
+Windows users should set that to \"explorer.exe\"."
   :group 'anything-config
   :type  'string)
 
