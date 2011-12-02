@@ -10882,14 +10882,17 @@ selection.")
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
 
+;; Should run at beginning of `anything-initial-setup'.
 (add-hook 'anything-before-initialize-hook #'(lambda ()
                                                (when anything-c-use-adaptative-sorting
                                                  (setq anything-c-adaptive-done nil))))
 
-(add-hook 'anything-after-action-hook #'(lambda ()
+;; Should run at beginning of `anything-exit-minibuffer'.
+(add-hook 'anything-before-action-hook #'(lambda ()
                                           (when anything-c-use-adaptative-sorting
                                             (anything-c-adaptive-store-selection))))
 
+;; Should run at beginning of `anything-select-action'.
 (add-hook 'anything-select-action-hook #'(lambda ()
                                            (when anything-c-use-adaptative-sorting
                                              (anything-c-adaptive-store-selection))))
