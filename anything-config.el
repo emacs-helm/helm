@@ -9567,7 +9567,15 @@ that use `anything-comp-read' See `anything-M-x' for example."
            (if marked-candidates
                (anything-marked-candidates)
                (identity candidate))))
-    (let* ((src-hist `((name . ,(format "%s History" name))
+    (let* ((minibuffer-completion-confirm (unless (eq must-match t)
+                                            must-match))
+           (keymap (when must-match minibuffer-local-must-match-map))
+           (anything-map (make-composed-keymap
+                          ;; Be sure C-g is bound to `anything-keyboard-quit'.
+                          (list '(keymap (7 . anything-keyboard-quit))
+                                keymap)
+                          anything-map))
+           (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
                             (let ((all (anything-comp-read-get-candidates
@@ -9636,6 +9644,10 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :resume 'noresume
         :history input-history
         :buffer buffer)
+       (when (and (not (string= anything-pattern ""))
+                  (or (eq must-match 'confirm)
+                      (eq must-match 'confirm-after-completion)))
+         (identity anything-pattern))
        (unless (or (eq anything-exit-status 1) must-match)
          default)
        (keyboard-quit)))))
