@@ -9571,8 +9571,12 @@ that use `anything-comp-read' See `anything-M-x' for example."
                                             must-match))
            (keymap (when must-match minibuffer-local-must-match-map))
            (anything-map (make-composed-keymap
-                          ;; Be sure C-g is bound to `anything-keyboard-quit'.
-                          (list '(keymap (7 . anything-keyboard-quit))
+                          ;; Merge some anything bindings
+                          ;; that clash with minibuffer ones.
+                          (list '(keymap
+                                  (7 . anything-keyboard-quit)
+                                  (up . anything-previous-line)
+                                  (down . anything-next-line))
                                 keymap)
                           anything-map))
            (src-hist `((name . ,(format "%s History" name))
