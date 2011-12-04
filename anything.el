@@ -861,6 +861,9 @@ It is useful to select a particular object instead of the first one.")
   "Run after anything minibuffer is closed.
 IOW this hook is executed BEFORE performing action.")
 
+(defvar anything-select-action-hook nil
+  "Run when opening the action buffer.")
+
 (defvar anything-before-action-hook nil
   "Run before executing action.
 Contrarily to `anything-cleanup-hook',
@@ -2682,6 +2685,7 @@ Coerce source with coerce function."
   "Select an action for the currently selected candidate.
 If action buffer is selected, back to the anything buffer."
   (interactive)
+  (anything-log-run-hook 'anything-select-action-hook)
   (cond ((get-buffer-window anything-action-buffer 'visible)
          (set-window-buffer (get-buffer-window anything-action-buffer)
                             anything-buffer)
