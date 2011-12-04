@@ -378,7 +378,6 @@
 ;;     then M-x insert-buffer *Backtrace* (if you got error)
 ;;  7) Describe the bug using a precise recipe.
 ;;  8) Type C-c C-c to send.
-;;  # If you are a Japanese, please write in Japanese:-)
 
 
 ;; You can extend `anything' by writing plug-ins. As soon as
