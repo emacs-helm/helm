@@ -2217,16 +2217,7 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
      (if buffer-file-name (file-name-nondirectory buffer-file-name)
        (buffer-name)))))
 
-;; This is not needed because M-n do the same thing now by default
-;; See `anything-read-pattern-maybe'.
-;; (defun anything-insert-symbol ()
-;;   "Insert current symbol."
-;;   (interactive)
-;;   (anything-insert-string
-;;    (with-anything-current-buffer
-;;      (save-excursion
-;;        (buffer-substring (beginning-of-thing 'symbol)
-;;                          (end-of-thing 'symbol))))))
+(defalias 'anything-insert-symbol 'next-history-element)
 
 ;; Same as `anything-yank-selection' but wrong because it use
 ;; `anything-current-buffer' to get selection.
