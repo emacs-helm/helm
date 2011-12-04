@@ -1020,6 +1020,7 @@ It is disabled by default because *Anything Log* grows quickly.")
 (defvar anything-follow-mode nil)
 (defvar anything-let-variables nil)
 (defvar anything-split-window-state nil)
+(defvar anything-selection-point nil)
 
 
 ;; (@* "Utility: logging")
@@ -1946,7 +1947,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
-      (anything-mark-current-line)
+      (anything-mark-current-line t)
       (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
     (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
@@ -1985,6 +1986,7 @@ If TEST-MODE is non-nil, clear `anything-candidate-cache'."
     (set (make-local-variable 'anything-last-sources-local) anything-sources)
     (set (make-local-variable 'anything-follow-mode) nil)
     (set (make-local-variable 'anything-display-function) anything-display-function)
+    (set (make-local-variable 'anything-selection-point) nil)
     (anything-initialize-persistent-action)
     (anything-log-eval anything-display-function anything-let-variables)
     (loop for (var . val) in anything-let-variables
@@ -2882,21 +2884,26 @@ it is \"Candidate\(s\)\" by default."
          (error (message "")))))
    'source 'next))
 
-(defun anything-mark-current-line ()
+(defun anything-mark-current-line (&optional resumep)
   "Move `anything-selection-overlay' to current line.
 Note that this is not related with visibles marks, which are used
 to mark candidates."
-  (move-overlay
-   anything-selection-overlay (point-at-bol)
-   (if (anything-pos-multiline-p)
-       (let ((header-pos (anything-get-next-header-pos))
-             (separator-pos (anything-get-next-candidate-separator-pos)))
-         (or (and (null header-pos) separator-pos)
-             (and header-pos separator-pos (< separator-pos header-pos)
-                  separator-pos)
-             header-pos
-             (point-max)))
+  (when resumep
+    (with-anything-window
+      (goto-char anything-selection-point)))
+  (with-current-buffer anything-buffer
+    (move-overlay
+     anything-selection-overlay (point-at-bol)
+     (if (anything-pos-multiline-p)
+         (let ((header-pos (anything-get-next-header-pos))
+               (separator-pos (anything-get-next-candidate-separator-pos)))
+           (or (and (null header-pos) separator-pos)
+               (and header-pos separator-pos (< separator-pos header-pos)
+                    separator-pos)
+               header-pos
+               (point-max)))
        (1+ (point-at-eol))))
+    (setq anything-selection-point (overlay-start anything-selection-overlay)))
   (anything-follow-execute-persistent-action-maybe))
 
 (defun anything-this-command-key ()
