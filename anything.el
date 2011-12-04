@@ -2042,7 +2042,9 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   "Clean up the mess when anything exit or quit."
   (anything-log "start cleanup")
   (with-current-buffer anything-buffer
-    (setq cursor-type t)
+    ;; rubikitch: I think it is not needed.
+    ;; (setq cursor-type t)
+
     ;; Call burry-buffer whithout arg
     ;; to remove anything-buffer from window.
     (bury-buffer)
