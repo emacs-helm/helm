@@ -2888,10 +2888,9 @@ it is \"Candidate\(s\)\" by default."
   "Move `anything-selection-overlay' to current line.
 Note that this is not related with visibles marks, which are used
 to mark candidates."
-  (when resumep
-    (with-anything-window
-      (goto-char anything-selection-point)))
-  (with-current-buffer anything-buffer
+  (with-anything-window
+    (when resumep
+      (goto-char anything-selection-point))
     (move-overlay
      anything-selection-overlay (point-at-bol)
      (if (anything-pos-multiline-p)
