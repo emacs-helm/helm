@@ -9567,6 +9567,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
            (if marked-candidates
                (anything-marked-candidates)
                (identity candidate))))
+    (when (eq must-match 'confirm-after-completion)
+      (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm (unless (eq must-match t)
                                             must-match))
            (keymap (when must-match minibuffer-local-must-match-map))
@@ -9649,8 +9651,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :history input-history
         :buffer buffer)
        (when (and (not (string= anything-pattern ""))
-                  (or (eq must-match 'confirm)
-                      (eq must-match 'confirm-after-completion)))
+                  (eq must-match 'confirm))
          (identity anything-pattern))
        (unless (or (eq anything-exit-status 1) must-match)
          default)
