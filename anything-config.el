@@ -10284,7 +10284,10 @@ In this case EXE must be provided as \"EXE %s\"."
           (message "Starting %s..." real-com)
           (if file
               (start-process-shell-command
-               proc nil (format exe (shell-quote-argument file)))
+               proc nil (format exe (shell-quote-argument
+                                     (if (eq system-type 'windows-nt)
+                                         (anything-w32-prepare-filename file)
+                                         file))))
               (start-process-shell-command proc nil real-com))
           (set-process-sentinel
            (get-process proc)
@@ -10523,15 +10526,19 @@ Return nil if bmk is not a valid bookmark."
   (anything-require-or-error 'elscreen 'anything-elscreen-find-file)
   (elscreen-find-file file))
 
+(defun anything-w32-prepare-filename (file)
+  "Convert filename FILE to something usable by external w32 executables."
+  (replace-regexp-in-string ; For UNC paths
+   "/" "\\"
+   (replace-regexp-in-string ; Strip cygdrive paths
+    "/cygdrive/\\(.\\)" "\\1:"
+    file nil nil) nil t))
+
 ;;;###autoload
-(defun w32-shell-execute-open-file (file)
+(defun anything-w32-shell-execute-open-file (file)
   (interactive "fOpen file:")
   (with-no-warnings
-    (w32-shell-execute "open" (replace-regexp-in-string ;for UNC paths
-                               "/" "\\"
-                               (replace-regexp-in-string ; strip cygdrive paths
-                                "/cygdrive/\\(.\\)" "\\1:"
-                                file nil nil) nil t))))
+    (w32-shell-execute "open" (anything-w32-prepare-filename file))))
 
 (defun anything-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
