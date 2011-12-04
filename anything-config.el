@@ -2212,7 +2212,7 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
 (defun anything-insert-buffer-name ()
   "Insert buffer name."
   (interactive)
-  (anything-insert-string
+  (anything-set-pattern
    (with-anything-current-buffer
      (if buffer-file-name (file-name-nondirectory buffer-file-name)
        (buffer-name)))))
