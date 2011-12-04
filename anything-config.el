@@ -2218,15 +2218,7 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
        (buffer-name)))))
 
 (defalias 'anything-insert-symbol 'next-history-element)
-
-;; Same as `anything-yank-selection' but wrong because it use
-;; `anything-current-buffer' to get selection.
-;; (defun anything-insert-selection ()
-;;   "Insert current selection."
-;;   (interactive)
-;;   (anything-insert-string
-;;    (with-anything-current-buffer
-;;      (anything-get-selection))))
+(defalias 'anything-insert-selection 'anything-yank-selection)
 
 (defun anything-c-match-on-file-name (candidate)
   "Return non-nil if `anything-pattern' match basename of filename CANDIDATE."
