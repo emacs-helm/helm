@@ -2606,6 +2606,7 @@ buffer that is not the current buffer."
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
 ;; (anything 'anything-c-source-buffers-list)
+(defvaralias 'anything-c-source-buffers+ 'anything-c-source-buffers-list)
 
 (defun anything-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -11630,7 +11631,7 @@ First call open the kill-ring browser, next calls move to next line."
   (anything :sources '(anything-c-source-buffers-list
                        anything-c-source-buffer-not-found)
             :buffer "*anything buffers*" :keymap anything-c-buffer-map))
-
+(defalias 'anything-buffers+ 'anything-buffer-list)
 ;;;###autoload
 (defun anything-bbdb ()
   "Preconfigured `anything' for BBDB.
