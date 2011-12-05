@@ -9570,11 +9570,14 @@ that use `anything-comp-read' See `anything-M-x' for example."
                         . (lambda ()
                             (let ((all (anything-comp-read-get-candidates
                                         history nil nil ,alistp)))
-                              (anything-fast-remove-dups
-                               (if (and default (not (string= default "")))
-                                   (delq nil (cons default (delete default all)))
-                                   all)
-                               :test 'equal))))
+                              (delete
+                               ""
+                               (anything-fast-remove-dups
+                                (if (and default (not (string= default "")))
+                                    (delq nil (cons default
+                                                    (delete default all)))
+                                    all)
+                                :test 'equal)))))
                        (filtered-candidate-transformer
                         . (lambda (candidates sources)
                             (loop for i in candidates
