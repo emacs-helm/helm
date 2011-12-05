@@ -3730,10 +3730,11 @@ It is analogous to `dired-get-marked-files'."
 If PREV is non-nil move to precedent."
   (interactive)
   (with-anything-window
-    (goto-char (anything-next-point-in-list
-                (point)
-                (sort (mapcar 'overlay-start anything-visible-mark-overlays) '<)
-                prev))
+    (ignore-errors
+      (goto-char (anything-next-point-in-list
+                  (point)
+                  (sort (mapcar 'overlay-start anything-visible-mark-overlays) '<)
+                  prev)))
     (anything-mark-current-line)))
 
 (defun anything-prev-visible-mark ()
