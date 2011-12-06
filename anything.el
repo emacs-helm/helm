@@ -1826,17 +1826,19 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
   (and (anything-resume-p any-resume) (anything-funcall-foreach 'resume))
   (anything-log "end initialization"))
 
-;; Here defun* allow using implicit block `anything-execute-selection-action-1'.
-(defun* anything-execute-selection-action-1 ()
-  "Execute current action.
-Push current input to HISTORY if present, otherwise
-`minibuffer-history' will be used instead."
+(defun anything-execute-selection-action-1 ()
+  "Execute current action."
   (anything-log-run-hook 'anything-before-action-hook)
   (unwind-protect
        (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
-    (anything-log-run-hook 'anything-after-action-hook)))
+    (anything-log-run-hook 'anything-after-action-hook)
+    ;; Depending the keymap used, i.e `minibuffer-local-must-match-map'
+    ;; we can exit minibuffer with `exit-minibuffer'
+    ;; instead of `anything-exit-minibuffer',
+    ;; so set exit status here instead of in `anything-exit-minibuffer'.
+    (setq anything-exit-status 0)))
 
 (defun anything-restore-position-on-quit ()
   "Restore position in `anything-current-buffer' when quitting."
@@ -2961,7 +2963,6 @@ See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
   (interactive)
   (unless anything-current-prefix-arg
     (setq anything-current-prefix-arg current-prefix-arg))
-  (setq anything-exit-status 0)
   (exit-minibuffer))
 
 (defun anything-keyboard-quit ()

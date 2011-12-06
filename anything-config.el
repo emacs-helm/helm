@@ -9551,6 +9551,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
            (if marked-candidates
                (anything-marked-candidates)
                (identity candidate))))
+    ;; Assume completion have been already required,
+    ;; so always use 'confirm.
     (when (eq must-match 'confirm-after-completion)
       (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm (unless (eq must-match t)
@@ -9638,6 +9640,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :history (and (symbolp input-history) input-history)
         :buffer buffer)
        (when (and (not (string= anything-pattern ""))
+                  (eq anything-exit-status 0)
                   (eq must-match 'confirm))
          (identity anything-pattern))
        (unless (or (eq anything-exit-status 1) must-match)
