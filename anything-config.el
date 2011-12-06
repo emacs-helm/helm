@@ -4638,33 +4638,37 @@ This is deprecated for Emacs24+ users, use `ac-mode' instead."
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
+  
   ;; Assume completion have been already required,
   ;; so always use 'confirm.
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
-  (let* ((anything-mp-highlight-delay nil)
-         ;; Be sure we don't erase the underlying minibuffer if some.
-         (anything-ff-auto-update-initial-value
-          (not (minibuffer-window-active-p (minibuffer-window))))
-         anything-same-window
-         (hist (and history (anything-comp-read-get-candidates
-                             history nil nil alistp)))
-         (minibuffer-completion-confirm (unless (eq must-match t)
-                                          must-match))
-         (keymap (when must-match minibuffer-local-must-match-map))
-         (anything-map (make-composed-keymap
-                        ;; Merge some anything bindings
-                        ;; that clash with minibuffer ones.
-                        (list '(keymap
-                                (7 . anything-keyboard-quit)
-                                (up . anything-previous-line)
-                                (down . anything-next-line))
-                              keymap)
-                        anything-c-read-file-map)))
-    (flet ((action-fn (candidate)
-             (if marked-candidates
-                 (anything-marked-candidates)
-                 (identity candidate))))
+
+  (flet ((action-fn (candidate)
+           (if marked-candidates
+               (anything-marked-candidates)
+               (identity candidate))))
+  
+    (let* ((anything-mp-highlight-delay nil)
+           ;; Be sure we don't erase the underlying minibuffer if some.
+           (anything-ff-auto-update-initial-value
+            (not (minibuffer-window-active-p (minibuffer-window))))
+           anything-same-window
+           (hist (and history (anything-comp-read-get-candidates
+                               history nil nil alistp))))
+           ;; (minibuffer-completion-confirm (unless (eq must-match t)
+           ;;                                  must-match))
+           ;; (keymap (when must-match minibuffer-local-must-match-map))
+           ;; (anything-map (make-composed-keymap
+           ;;                ;; Merge some anything bindings
+           ;;                ;; that clash with minibuffer ones.
+           ;;                (list '(keymap
+           ;;                        (7 . anything-keyboard-quit)
+           ;;                        (up . anything-previous-line)
+           ;;                        (down . anything-next-line))
+           ;;                      keymap)
+           ;;                anything-c-read-file-map)))
+      
       (or (anything
            :sources
            `(((name . ,(format "%s History" name))
@@ -4702,6 +4706,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            :prompt prompt
            :resume 'noresume
            :buffer buffer
+           :keymap anything-c-read-file-map
            :preselect preselect)
           (when (and (not (string= anything-pattern ""))
                      (eq anything-exit-status 0)
