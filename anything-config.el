@@ -9635,7 +9635,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :preselect preselect
         :prompt prompt
         :resume 'noresume
-        :history input-history
+        :history (and (symbolp input-history) input-history)
         :buffer buffer)
        (when (and (not (string= anything-pattern ""))
                   (eq must-match 'confirm))
