@@ -4638,6 +4638,10 @@ This is deprecated for Emacs24+ users, use `ac-mode' instead."
 INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
+  ;; Assume completion have been already required,
+  ;; so always use 'confirm.
+  (when (eq must-match 'confirm-after-completion)
+    (setq must-match 'confirm))
   (let* ((anything-mp-highlight-delay nil)
          ;; Be sure we don't erase the underlying minibuffer if some.
          (anything-ff-auto-update-initial-value
