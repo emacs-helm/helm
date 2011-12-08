@@ -1609,6 +1609,7 @@ automatically.")
 
 (defvar anything-c-read-file-map
   (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-]")           'anything-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'anything-find-files-down-one-level)
     (define-key map (kbd "C-l")           'anything-find-files-down-one-level)
     (define-key map (kbd "C-<backspace>") 'anything-ff-run-toggle-auto-update)
@@ -3806,7 +3807,8 @@ purpose."
            (list (format "Opening directory: access denied, `%s'" path)))
           ((file-directory-p path) (anything-ff-directory-files path t))
           (t
-           (append (unless require-match (list path)) (anything-ff-directory-files path-name-dir t))))))
+           (append (unless require-match (list path))
+                   (anything-ff-directory-files path-name-dir t))))))
 
 (defun anything-ff-directory-files (directory &optional full)
   "List contents of DIRECTORY.
@@ -4657,7 +4659,6 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            (hist (and history (anything-comp-read-get-candidates
                                history nil nil alistp)))
            (minibuffer-completion-table nil)
-           (minibuffer-completing-file-name t)
            (minibuffer-completion-predicate (or test 'file-exists-p))
            (minibuffer-completion-confirm (unless (eq must-match t)
                                             must-match))
@@ -4694,8 +4695,12 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (mode-line . anything-read-file-name-mode-line-string)
               (candidates . (lambda ()
                               (let ((seq (anything-find-files-get-candidates must-match)))
-                                (setq minibuffer-completion-table
-                                      (all-completions "" seq test)))))
+                                (when must-match
+                                  ;; Add anything-pattern to list of candidates
+                                  ;; Fix issue with must-match == 'confirm.
+                                  (setq minibuffer-completion-table
+                                        (append (list anything-pattern seq))))
+                                seq)))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
