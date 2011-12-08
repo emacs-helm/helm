@@ -4655,19 +4655,22 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
             (not (minibuffer-window-active-p (minibuffer-window))))
            anything-same-window
            (hist (and history (anything-comp-read-get-candidates
-                               history nil nil alistp))))
-           ;; (minibuffer-completion-confirm (unless (eq must-match t)
-           ;;                                  must-match))
-           ;; (keymap (when must-match minibuffer-local-must-match-map))
-           ;; (anything-map (make-composed-keymap
-           ;;                ;; Merge some anything bindings
-           ;;                ;; that clash with minibuffer ones.
-           ;;                (list '(keymap
-           ;;                        (7 . anything-keyboard-quit)
-           ;;                        (up . anything-previous-line)
-           ;;                        (down . anything-next-line))
-           ;;                      keymap)
-           ;;                anything-c-read-file-map)))
+                               history nil nil alistp)))
+           (minibuffer-completion-table nil)
+           (minibuffer-completing-file-name t)
+           (minibuffer-completion-predicate (or test 'file-exists-p))
+           (minibuffer-completion-confirm (unless (eq must-match t)
+                                            must-match))
+           (keymap (when must-match minibuffer-local-must-match-map))
+           (anything-map (make-composed-keymap
+                          ;; Merge some anything bindings
+                          ;; that clash with minibuffer ones.
+                          (list '(keymap
+                                  (7 . anything-keyboard-quit)
+                                  (up . anything-previous-line)
+                                  (down . anything-next-line))
+                                keymap)
+                          anything-c-read-file-map)))
       
       (or (anything
            :sources
@@ -4691,10 +4694,8 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (mode-line . anything-read-file-name-mode-line-string)
               (candidates . (lambda ()
                               (let ((seq (anything-find-files-get-candidates must-match)))
-                                (if test
-                                    (loop for fname in seq
-                                          when (funcall test fname) collect fname)
-                                    seq))))
+                                (setq minibuffer-completion-table
+                                      (all-completions "" seq test)))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
@@ -4706,7 +4707,6 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            :prompt prompt
            :resume 'noresume
            :buffer buffer
-           :keymap anything-c-read-file-map
            :preselect preselect)
           (when (and (not (string= anything-pattern ""))
                      (eq anything-exit-status 0)
