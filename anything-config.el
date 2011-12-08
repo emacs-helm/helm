@@ -4699,7 +4699,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
                                   ;; Add anything-pattern to list of candidates
                                   ;; Fix issue with must-match == 'confirm.
                                   (setq minibuffer-completion-table
-                                        (append (list anything-pattern seq))))
+                                        (append (list anything-pattern) seq)))
                                 seq)))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
