@@ -3004,8 +3004,7 @@ don't exit and send message 'no match'."
             ((and empty-buffer-p
                   (eq minibuffer-completion-confirm t))
              (minibuffer-message " [No match]"))
-            (t (setq anything-exit-status 0)
-               (exit-minibuffer))))))
+            (t (anything-exit-minibuffer))))))
 
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
