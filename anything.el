@@ -1801,6 +1801,34 @@ are same args as in `anything'."
 Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
   (anything :sources any-sources :buffer any-buffer))
 
+(defun anything-nest (&rest same-as-anything)
+  "Nested `anything'. If you use `anything' within `anything', use it."
+  (with-anything-window
+    (let (anything-current-position
+          anything-current-buffer
+          (orig-anything-current-buffer anything-current-buffer)
+          (orig-anything-buffer anything-buffer)
+          (orig-anything-last-frame-or-window-configuration
+           anything-last-frame-or-window-configuration)
+          anything-pattern
+          (anything-buffer (or (getf same-as-anything :buffer)
+                               (nth 5 same-as-anything)
+                               "*Anything*"))
+          anything-sources
+          anything-compiled-sources
+          (anything-samewindow t)
+          (enable-recursive-minibuffers t))
+      (unwind-protect
+           (apply #'anything same-as-anything)
+        (with-current-buffer orig-anything-buffer
+          (anything-initialize-overlays orig-anything-buffer)
+          (setq anything-buffer (current-buffer))
+          (anything-mark-current-line)
+          (setq anything-last-frame-or-window-configuration
+                orig-anything-last-frame-or-window-configuration)
+          (setq cursor-type t)
+          (setq anything-current-buffer orig-anything-current-buffer))))))
+
 
 ;;; Initialize
 ;;

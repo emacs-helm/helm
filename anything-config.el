@@ -2162,24 +2162,6 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
           (apropos-internal "^anything-c-source" #'boundp))
     (pop-to-buffer standard-output)))
 
-(defun anything-nest (&rest same-as-anything)
-  "Nested `anything'. If you use `anything' within `anything', use it."
-  (with-selected-window (anything-window)
-    (let (anything-current-position
-          anything-current-buffer
-          (orig-anything-buffer anything-buffer)
-          anything-pattern
-          anything-buffer
-          anything-sources
-          anything-compiled-sources
-          anything-buffer-chars-modified-tick
-          (anything-samewindow t)
-          (enable-recursive-minibuffers t))
-      (unwind-protect
-           (apply #'anything same-as-anything)
-        (anything-initialize-overlays orig-anything-buffer)
-        (add-hook 'post-command-hook 'anything-check-minibuffer-input)))))
-
 (defun anything-displaying-source-names ()
   "Display sources name."
   (with-current-buffer anything-buffer
