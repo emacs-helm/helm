@@ -4644,18 +4644,13 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            (minibuffer-completion-predicate (or test 'file-exists-p))
            (minibuffer-completion-confirm (unless (eq must-match t)
                                             must-match))
-           (keymap (when must-match minibuffer-local-must-match-map))
-           (anything-map (if keymap
+           (must-match-map (when must-match
+                             (let ((map (make-sparse-keymap)))
+                               (define-key map (kbd "RET") 'minibuffer-complete-and-exit)
+                               map)))
+           (anything-map (if must-match-map
                              (make-composed-keymap
-                              ;; Merge some anything bindings
-                              ;; that clash with minibuffer ones.
-                              (list '(keymap
-                                      (7 . anything-keyboard-quit)
-                                      (up . anything-previous-line)
-                                      (down . anything-next-line)
-                                      (26 . anything-execute-persistent-action))
-                                    keymap)
-                              anything-c-read-file-map)
+                              must-match-map anything-c-read-file-map)
                              anything-c-read-file-map)))
       
       (or (anything
@@ -9572,18 +9567,14 @@ that use `anything-comp-read' See `anything-M-x' for example."
       (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm (unless (eq must-match t)
                                             must-match))
-           (keymap (when must-match minibuffer-local-must-match-map))
-           (anything-map (if keymap
+           (must-match-map (when must-match
+                             (let ((map (make-sparse-keymap)))
+                               (define-key map (kbd "RET")
+                                 'minibuffer-complete-and-exit)
+                               map)))
+           (anything-map (if must-match-map
                              (make-composed-keymap
-                              ;; Merge some anything bindings
-                              ;; that clash with minibuffer ones.
-                              (list '(keymap
-                                      (7 . anything-keyboard-quit)
-                                      (up . anything-previous-line)
-                                      (down . anything-next-line)
-                                      (26 . anything-execute-persistent-action))
-                                    keymap)
-                              anything-map)
+                              must-match-map anything-map)
                              anything-map))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
