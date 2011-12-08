@@ -12098,7 +12098,6 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
       (let* ((command (anything-comp-read
                        "M-x " obarray
                        :test 'commandp
-                       :must-match t
                        :requires-pattern 2
                        :name "Emacs Commands"
                        :persistent-action 'pers-help
