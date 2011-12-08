@@ -2986,6 +2986,27 @@ It is useful for example to restore a window config if anything abort
 in special cases.
 See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
 
+(defun anything-confirm-and-exit-minibuffer ()
+  "Maybe ask for confirmation when exiting anything.
+It is similar to `minibuffer-complete-and-exit' adapted to anything.
+If `minibuffer-completion-confirm' value is 'confirm,
+send in minibuffer confirm message and exit on next hit.
+If `minibuffer-completion-confirm' value is t,
+don't exit and send message 'no match'."
+  (interactive)
+  (let ((empty-buffer-p (with-current-buffer anything-buffer
+                          (eq (point-min) (point-max)))))
+    (catch 'anything-confirm
+      (cond ((and empty-buffer-p
+                  (or (eq minibuffer-completion-confirm 'confirm)))
+             (setq minibuffer-completion-confirm nil)
+             (throw 'anything-confirm (minibuffer-message " [confirm]")))
+            ((and empty-buffer-p
+                  (eq minibuffer-completion-confirm t))
+             (minibuffer-message " [No match]"))
+            (t (setq anything-exit-status 0)
+               (exit-minibuffer))))))
+
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
   (interactive)

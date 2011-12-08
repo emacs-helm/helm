@@ -4640,13 +4640,11 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
            anything-same-window
            (hist (and history (anything-comp-read-get-candidates
                                history nil nil alistp)))
-           (minibuffer-completion-table nil)
-           (minibuffer-completion-predicate (or test 'file-exists-p))
-           (minibuffer-completion-confirm (unless (eq must-match t)
-                                            must-match))
+           (minibuffer-completion-confirm must-match)
            (must-match-map (when must-match
                              (let ((map (make-sparse-keymap)))
-                               (define-key map (kbd "RET") 'minibuffer-complete-and-exit)
+                               (define-key map (kbd "RET")
+                                 'anything-confirm-and-exit-minibuffer)
                                map)))
            (anything-map (if must-match-map
                              (make-composed-keymap
@@ -4674,13 +4672,7 @@ INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
               (disable-shortcuts)
               (mode-line . anything-read-file-name-mode-line-string)
               (candidates . (lambda ()
-                              (let ((seq (anything-find-files-get-candidates must-match)))
-                                (when must-match
-                                  ;; Add anything-pattern to list of candidates
-                                  ;; Fix issue with must-match == 'confirm.
-                                  (setq minibuffer-completion-table
-                                        (append (list anything-pattern) seq)))
-                                seq)))
+                              (anything-find-files-get-candidates must-match)))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
@@ -9565,12 +9557,11 @@ that use `anything-comp-read' See `anything-M-x' for example."
     ;; so always use 'confirm.
     (when (eq must-match 'confirm-after-completion)
       (setq must-match 'confirm))
-    (let* ((minibuffer-completion-confirm (unless (eq must-match t)
-                                            must-match))
+    (let* ((minibuffer-completion-confirm must-match)
            (must-match-map (when must-match
                              (let ((map (make-sparse-keymap)))
                                (define-key map (kbd "RET")
-                                 'minibuffer-complete-and-exit)
+                                 'anything-confirm-and-exit-minibuffer)
                                map)))
            (anything-map (if must-match-map
                              (make-composed-keymap
