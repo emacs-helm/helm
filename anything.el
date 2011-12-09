@@ -2998,7 +2998,7 @@ don't exit and send message 'no match'."
                           (eq (point-min) (point-max)))))
     (catch 'anything-confirm
       (cond ((and empty-buffer-p
-                  (or (eq minibuffer-completion-confirm 'confirm)))
+                  (eq minibuffer-completion-confirm 'confirm))
              (setq minibuffer-completion-confirm nil)
              (throw 'anything-confirm (minibuffer-message " [confirm]")))
             ((and empty-buffer-p
