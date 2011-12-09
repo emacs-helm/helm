@@ -2986,6 +2986,7 @@ It is useful for example to restore a window config if anything abort
 in special cases.
 See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
 
+(defvar anything-minibuffer-confirm-state nil)
 (defun anything-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting anything.
 It is similar to `minibuffer-complete-and-exit' adapted to anything.
@@ -2998,12 +2999,24 @@ don't exit and send message 'no match'."
                           (eq (point-min) (point-max)))))
       (cond ((and empty-buffer-p
                   (eq minibuffer-completion-confirm 'confirm))
+             (setq anything-minibuffer-confirm-state
+                   'confirm)
              (setq minibuffer-completion-confirm nil)
              (minibuffer-message " [confirm]"))
             ((and empty-buffer-p
                   (eq minibuffer-completion-confirm t))
              (minibuffer-message " [No match]"))
-            (t (anything-exit-minibuffer)))))
+            (t
+             (setq anything-minibuffer-confirm-state nil)
+             (anything-exit-minibuffer)))))
+(add-hook 'anything-after-update-hook 'anything-confirm-and-exit-hook)
+
+(defun anything-confirm-and-exit-hook ()
+  "Restore `minibuffer-completion-confirm' when anything update."
+  (unless (or (eq minibuffer-completion-confirm t)
+              (not anything-minibuffer-confirm-state))
+    (setq minibuffer-completion-confirm
+          anything-minibuffer-confirm-state)))
 
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
