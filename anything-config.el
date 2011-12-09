@@ -9678,11 +9678,15 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :resume 'noresume
         :history (and (symbolp input-history) input-history)
         :buffer buffer)
-       (when (and (not (string= anything-pattern ""))
-                  (eq anything-exit-status 0)
+       (when (and (eq anything-exit-status 0)
                   (eq must-match 'confirm))
-         (identity anything-pattern))
-       (unless (or (eq anything-exit-status 1) must-match)
+         ;; Return empty string only if it is the DEFAULT
+         ;; value and anything-pattern is empty.
+         ;; otherwise return anything-pattern
+         (if (and (string= anything-pattern "") default)
+             default (identity anything-pattern)))
+       (unless (or (eq anything-exit-status 1)
+                   must-match) ; FIXME this should not be needed now.
          default)
        (keyboard-quit)))))
 
@@ -9763,6 +9767,11 @@ It should be used when candidate list don't need to rebuild dynamically."
      :must-match require-match
      :alistp nil ; Be sure `all-completions' is used.
      :name name
+     :requires-pattern (if (and (string= default "")
+                                (or (eq require-match 'confirm)
+                                    (eq require-match
+                                        'confirm-after-completion)))
+                           1 0)
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
      :buffer buffer
