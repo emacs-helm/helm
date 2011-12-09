@@ -2996,15 +2996,14 @@ don't exit and send message 'no match'."
   (interactive)
   (let ((empty-buffer-p (with-current-buffer anything-buffer
                           (eq (point-min) (point-max)))))
-    (catch 'anything-confirm
       (cond ((and empty-buffer-p
                   (eq minibuffer-completion-confirm 'confirm))
              (setq minibuffer-completion-confirm nil)
-             (throw 'anything-confirm (minibuffer-message " [confirm]")))
+             (minibuffer-message " [confirm]"))
             ((and empty-buffer-p
                   (eq minibuffer-completion-confirm t))
              (minibuffer-message " [No match]"))
-            (t (anything-exit-minibuffer))))))
+            (t (anything-exit-minibuffer)))))
 
 (defun anything-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
