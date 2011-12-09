@@ -78,6 +78,8 @@
 ;; Invoke default action with prefix shortcut.
 ;; `anything-select-with-digit-shortcut'
 ;; Invoke default action with digit/alphabet shortcut.
+;; `anything-confirm-and-exit-minibuffer'
+;; Maybe ask for confirmation when exiting anything.
 ;; `anything-exit-minibuffer'
 ;; Select the current candidate by exiting the minibuffer.
 ;; `anything-keyboard-quit'
@@ -191,6 +193,8 @@
 ;; Run after the anything buffer was updated according the new input pattern.
 ;; `anything-cleanup-hook'
 ;; Run after anything minibuffer is closed.
+;; `anything-select-action-hook'
+;; Run when opening the action buffer.
 ;; `anything-before-action-hook'
 ;; Run before executing action.
 ;; `anything-after-action-hook'
@@ -229,6 +233,8 @@
 ;; Buffer local value of `anything-sources'.
 ;; `anything-last-buffer'
 ;; `anything-buffer' of previously `anything' session.
+;; `anything-save-configuration-functions'
+;; The functions used to restore/save window or frame configurations.
 ;; `anything-persistent-action-use-special-display'
 ;; If non-nil, use `special-display-function' in persistent action.
 ;; `anything-execute-action-at-once-if-one'
@@ -279,6 +285,8 @@
 ;; Not documented.
 ;; `anything-split-window-state'
 ;; Not documented.
+;; `anything-selection-point'
+;; Not documented.
 ;; `anything-last-log-file'
 ;; Not documented.
 ;; `anything-compile-source-functions'
@@ -305,6 +313,8 @@
 ;; Not documented.
 ;; `anything-exit-status'
 ;; Flag to inform whether anything have aborted or quitted.
+;; `anything-minibuffer-confirm-state'
+;; Not documented.
 ;; `anything-types'
 ;; Not documented.
 ;; `anything-orig-enable-shortcuts'
@@ -626,7 +636,7 @@
 
 (require 'cl)
 
-(defvar anything-version "1.3.5")
+(defvar anything-version "1.3.6")
 
 ;; (@* "User Configuration")
 

@@ -108,6 +108,8 @@
 ;; List all anything sources for test.
 ;; `anything-select-source'
 ;; [OBSOLETE] Select source.
+;; `anything-insert-buffer-name'
+;; Insert buffer name.
 ;; `anything-quit-and-find-file'
 ;; Drop into `anything-find-files' from `anything'.
 ;; `anything-mark-all'
@@ -194,6 +196,8 @@
 ;; Go down one level like unix command `cd ..'.
 ;; `anything-ff-properties-persistent'
 ;; Show properties without quitting anything.
+;; `anything-ff-persistent-delete'
+;; Delete current candidate without quitting.
 ;; `anything-ff-run-kill-buffer-persistent'
 ;; Execute `anything-ff-kill-buffer-fname' whitout quitting.
 ;; `anything-ff-rotate-left-persistent'
@@ -242,6 +246,8 @@
 ;; First call indent and second call complete lisp symbol.
 ;; `anything-lisp-completion-or-file-name-at-point'
 ;; Complete lisp symbol or filename at point.
+;; `anything-w32-shell-execute-open-file'
+;; Not documented.
 ;; `anything-c-set-variable'
 ;; Set value to VAR interactively.
 ;; `anything-c-adaptive-save-history'
@@ -493,6 +499,8 @@
 ;; Default Value:	("gz" "bz2" "zip" "7z") 
 ;; `anything-locate-db-file-regexp'
 ;; Default Value: "m?locate.db$"
+;; `anything-c-locate-command'
+;; Default Value: nil
 ;; `anything-c-show-info-in-mode-line-delay'
 ;; Default Value: 12
 ;; `anything-c-copy-files-async-log-file'
@@ -501,6 +509,10 @@
 ;; Default Value: nil
 ;; `anything-ff-transformer-show-only-basename'
 ;; Default Value: nil
+;; `anything-ff-quick-delete-dont-prompt-for-deletion'
+;; Default Value: nil
+;; `anything-ff-signal-error-on-dot-files'
+;; Default Value: t
 ;; `anything-completing-read-handlers-alist'
 ;; Default Value:	((describe-function . anything-completing-read-symbols)  (describe-variabl [...]
 
@@ -4605,21 +4617,48 @@ This is deprecated for Emacs24+ users, use `ac-mode' instead."
 
 (defalias 'anything-dired-bindings 'anything-dired-mode)
 
-(defun* anything-c-read-file-name (prompt
-                                   &key
-                                   (name "Read File Name")
-                                   (initial-input (expand-file-name default-directory))
-                                   (buffer "*Anything Completions*")
-                                   test
-                                   (preselect nil)
-                                   (history nil)
-                                   must-match
-                                   (marked-candidates nil)
-                                   (alistp t)
-                                   (persistent-action 'anything-find-files-persistent-action)
-                                   (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
-  "Anything `read-file-name' emulation.
-INITIAL-INPUT is a valid path, TEST is a predicate that take one arg."
+(defun* anything-c-read-file-name
+    (prompt
+     &key
+     (name "Read File Name")
+     (initial-input (expand-file-name default-directory))
+     (buffer "*Anything Completions*")
+     test
+     (preselect nil)
+     (history nil)
+     must-match
+     (marked-candidates nil)
+     (alistp t)
+     (persistent-action 'anything-find-files-persistent-action)
+     (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
+  "Read a file name with anything completion.
+It is anything `read-file-name' emulation.
+
+Argument PROMPT is the default prompt to use.
+
+Keys description:
+
+- NAME: Source name, default to \"Read File Name\".
+
+- INITIAL-INPUT: Where to start read file name, default to `default-directory'.
+
+- BUFFER: `anything-buffer' name default to \"*Anything Completions*\".
+
+- TEST: A predicate called with one arg 'candidate'.
+
+- PRESELECT: anything preselection.
+
+- HISTORY: Display HISTORY in a special source.
+
+- MUST-MATCH: Can be 'confirm, nil, or t.
+
+- MARKED-CANDIDATES: When non--nil return a list of marked candidates.
+
+- ALISTP: Don't use `all-completions' in history (take effect only on history).
+
+- PERSISTENT-ACTION: a persistent action function.
+
+- PERSISTENT-HELP: persistent help message."
   (when (get-buffer anything-action-buffer)
     (kill-buffer anything-action-buffer))
   
