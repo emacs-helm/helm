@@ -12156,6 +12156,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                        :test 'commandp
                        :requires-pattern 2
                        :name "Emacs Commands"
+                       :buffer "*anything M-x*"
                        :persistent-action 'pers-help
                        :persistent-help "Describe this command"
                        :history history
