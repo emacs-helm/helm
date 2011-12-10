@@ -729,6 +729,7 @@
 (require 'thingatpt)
 (require 'ffap)
 (require 'cl)
+(eval-when-compile (require 'dired))
 (require 'dired-aux)
 (require 'dired-x)
 (require 'tramp)
@@ -2523,12 +2524,16 @@ visible or invisible in all sources of current anything session"
 ;;
 ;;
 (defun anything-c-buffer-list ()
-  "Return the list of names of buffers with boring buffers filtered out.
-Boring buffers is specified by `anything-c-boring-buffer-regexp'.
+  "Return a list of buffer names.
 The first buffer in the list will be the last recently used
-buffer that is not the current buffer."
+buffer that is not the current buffer unless
+`anything-allow-skipping-current-buffer' is nil."
   (let ((buffers (mapcar 'buffer-name (buffer-list))))
-    (append (cdr buffers) (list (car buffers)))))
+    (if anything-allow-skipping-current-buffer
+        (progn
+          (setq buffers (remove (buffer-name anything-current-buffer) buffers))
+          (append (cdr buffers) (list (car buffers))))
+        buffers)))
 
 (defvar anything-c-source-buffers
   '((name . "Buffers")
@@ -2548,10 +2553,13 @@ buffer that is not the current buffer."
 ;;; Buffers-list (was buffers+)
 ;;
 ;;
-(eval-when-compile (require 'dired))
-
 (defun anything-c-highlight-buffers (buffers)
-  (loop for i in buffers
+  "Transformer function to highlight BUFFERS list.
+Should be called after others transformers i.e (boring buffers)."
+  (loop with buflist = (if anything-allow-skipping-current-buffer
+                           buffers
+                           (cons (pop (cdr buffers)) buffers))
+        for i in buflist
         for buf = (get-buffer i)
         for bfname = (buffer-file-name buf)
         collect
@@ -2602,7 +2610,7 @@ buffer that is not the current buffer."
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
     (candidate-transformer
-     anything-c-skip-current-buffer
+     ;anything-c-skip-current-buffer
      anything-c-skip-boring-buffers
      anything-c-highlight-buffers)
     (persistent-action . anything-c-buffers-list-persistent-action)
