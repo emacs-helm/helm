@@ -3117,14 +3117,34 @@ Copying is done asynchronously with `anything-c-copy-files-async-1'."
 (defvar eshell-command-aliases-list nil)
 (defvar anything-eshell-command-on-file-input-history nil)
 (defun anything-find-files-eshell-command-on-file-1 (candidate &optional map)
-  "Run `eshell-command' on CANDIDATE or marked candidates possibly with an eshell alias.
+  "Run `eshell-command' on CANDIDATE or marked candidates.
+This is done possibly with an eshell alias, if no alias found, you can type in
+an eshell command.
 
 Basename of CANDIDATE can be a wild-card.
+e.g you can do \"eshell-command command *.el\"
+Where \"*.el\" is the CANDIDATE.
+
+It is possible to do eshell-command command <CANDIDATE> <some more args>
+like this: \"command %s some more args\".
+
 If MAP is given run `eshell-command' on all marked files at once,
 Otherwise, run `eshell-command' on each marked files.
+In other terms, with a prefix arg do on the three marked files
+\"foo\" \"bar\" \"baz\":
 
-If `eshell' or `eshell-command' have not been run once, or if you have no eshell aliases
-`eshell-command-aliases-list' will not be loaded first time you use this."
+\"eshell-command command foo bar baz\"
+
+otherwise do
+
+\"eshell-command command foo\"
+\"eshell-command command bar\"
+\"eshell-command command baz\"
+
+Note:
+If `eshell' or `eshell-command' have not been run once,
+or if you have no eshell aliases `eshell-command-aliases-list'
+will not be loaded first time you use this."
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
