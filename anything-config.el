@@ -931,7 +931,7 @@ It is prepended to predefined pairs."
   :type 'list
   :group 'anything-config)
 
-(defcustom anything-allow-skipping-current-buffer t
+(defcustom anything-allow-skipping-current-buffer nil
   "Show current buffer or not in anything buffer"
   :type 'boolean
   :group 'anything-config)
@@ -2539,7 +2539,6 @@ buffer that is not the current buffer unless
   '((name . "Buffers")
     (candidates . anything-c-buffer-list)
     (type . buffer)))
-;; (anything 'anything-c-source-buffers)
 
 (defvar anything-c-source-buffer-not-found
   '((name . "Create buffer")
@@ -2548,7 +2547,6 @@ buffer that is not the current buffer unless
                                       (list anything-pattern)))
     (action . (lambda (candidate)
                 (anything-c-switch-to-buffer (get-buffer-create candidate))))))
-;; (anything 'anything-c-source-buffer-not-found)
 
 ;;; Buffers-list (was buffers+)
 ;;
@@ -2609,15 +2607,12 @@ Should be called after others transformers i.e (boring buffers)."
     (candidates . anything-c-buffer-list)
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
-    (candidate-transformer
-     ;anything-c-skip-current-buffer
-     anything-c-skip-boring-buffers
-     anything-c-highlight-buffers)
+    (candidate-transformer anything-c-skip-boring-buffers
+                           anything-c-highlight-buffers)
     (persistent-action . anything-c-buffers-list-persistent-action)
     (volatile)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
-;; (anything 'anything-c-source-buffers-list)
 (defvaralias 'anything-c-source-buffers+ 'anything-c-source-buffers-list)
 
 (defun anything-c-buffer-match-major-mode (candidate)
@@ -2797,7 +2792,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (candidates . file-name-history)
     (match anything-c-match-on-basename)
     (type . file)))
-;; (anything 'anything-c-source-file-name-history)
 
 ;;; Files in current dir
 ;;
@@ -2809,7 +2803,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                       (directory-files (anything-c-current-directory)))))
     ;; volatile is not needed, I think.
     (type . file)))
-;; (anything 'anything-c-source-files-in-current-dir)
 
 (defun anything-c-highlight-files (files)
   (loop for i in files
@@ -2830,7 +2823,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (candidate-transformer anything-c-highlight-files)
     ;; volatile is not needed, I think.
     (type . file)))
-;; (anything 'anything-c-source-files-in-current-dir+)
 
 
 
@@ -2906,7 +2898,6 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
            ("Find file other frame `C-c C-o'" . find-file-other-frame)
            ("Print File `C-c p'" . anything-ff-print)
            ("Locate `C-x C-f, C-u to specify locate db'" . anything-ff-locate))))))
-;; (anything 'anything-c-source-find-files)
 
 (defun anything-find-files-set-prompt-for-action (action files)
   "Set prompt for action ACTION for FILES."
@@ -4781,7 +4772,6 @@ Keys description:
     (candidates . anything-c-file-cache-files)
     (match anything-c-match-on-basename)
     (type . file)))
-;; (anything 'anything-c-source-file-cache)
 
 
 ;;; Locate
@@ -4873,7 +4863,6 @@ See also `anything-locate'."
     (mode-line . anything-generic-file-mode-line-string)
     (delayed))
   "Find files matching the current input pattern with locate.")
-;; (anything 'anything-c-source-locate)
 
 (defun anything-c-locate-read-file-name (prompt &optional init)
   "Search a file with locate and return it's filename.
@@ -5503,7 +5492,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     (type . file))
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
-;; (anything 'anything-c-source-recentf)
 
 ;;; ffap
 (eval-when-compile (require 'ffap))
@@ -5516,7 +5504,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                           (ffap-guesser))
                         (list it))))
     (type . file)))
-;; (anything 'anything-c-source-ffap-guesser)
 
 ;;; ffap with line number
 (defun anything-c-ffap-file-line-at-point ()
@@ -5556,7 +5543,6 @@ It is cleared after jumping line.")
     (init . (lambda () (require 'ffap)))
     (candidates . anything-c-ffap-line-candidates)
     (type . file)))
-;; (anything 'anything-c-source-ffap-line)
 
 ;;; list of files gleaned from every dired buffer
 (defun anything-c-files-in-all-dired-candidates ()
@@ -5583,7 +5569,6 @@ It is cleared after jumping line.")
   '((name . "Files in all dired buffer.")
     (candidates . anything-c-files-in-all-dired-candidates)
     (type . file)))
-;; (anything 'anything-c-source-files-in-all-dired)
 
 (defvar anything-c-source-filelist
   '((name . "FileList")
@@ -5625,7 +5610,6 @@ source.")
                                     (info (replace-regexp-in-string
                                            "^[^:]+: " "" node-str))))))
     (requires-pattern . 2)))
-;; (anything 'anything-c-source-info-pages)
 
 
 ;; FIXME should be merged in anything.el with `anything-describe-anything-attribute'.
@@ -5654,19 +5638,16 @@ Same as `anything-describe-anything-attribute' but with anything completion."
 (defvar anything-c-source-info-elisp
   '((name . "Info index: elisp")
     (info-index . "elisp")))
-;; (anything 'anything-c-source-info-elisp)
 
 ;; Info-Common-Lisp
 (defvar anything-c-source-info-cl
   '((name . "Info index: cl")
     (info-index . "cl")))
-;; (anything 'anything-c-source-info-cl)
 
 ;; Info Index org
 (defvar anything-c-source-info-org
   '((name . "Info index: org")
     (info-index . "org")))
-;; (anything 'anything-c-source-info-org)
 
 ;; Info Index gnus
 (defvar anything-c-source-info-gnus
@@ -5677,272 +5658,227 @@ Same as `anything-describe-anything-attribute' but with anything completion."
 (defvar anything-c-source-info-ratpoison
   '((name . "Info index: ratpoison")
     (info-index . "ratpoison")))
-;; (anything 'anything-c-source-info-ratpoison)
 
 ;; Info Index zsh
 (defvar anything-c-source-info-zsh
   '((name . "Info index: zsh")
     (info-index . "zsh")))
-;; (anything 'anything-c-source-info-zsh)
 
 ;; Info Index bash
 (defvar anything-c-source-info-bash
   '((name . "Info index: bash")
     (info-index . "bash")))
-;; (anything 'anything-c-source-info-bash)
 
 ;; Info Index coreutils
 (defvar anything-c-source-info-coreutils
   '((name . "Info index: coreutils")
     (info-index . "coreutils")))
-;; (anything 'anything-c-source-info-coreutils)
 
 ;; Info Index fileutils
 (defvar anything-c-source-info-fileutils
   '((name . "Info index: fileutils")
     (info-index . "fileutils")))
-;; (anything 'anything-c-source-info-fileutils)
 
 ;; Info Index find
 (defvar anything-c-source-info-find
   '((name . "Info index: find")
     (info-index . "find")))
-;; (anything 'anything-c-source-info-find)
 
 ;; Info Index sh-utils
 (defvar anything-c-source-info-sh-utils
   '((name . "Info index: sh-utils")
     (info-index . "sh-utils")))
-;; (anything 'anything-c-source-info-sh-utils)
 
 ;; Info Index textutils
 (defvar anything-c-source-info-textutils
   '((name . "Info index: textutils")
     (info-index . "textutils")))
-;; (anything 'anything-c-source-info-textutils)
 
 ;; Info Index libc
 (defvar anything-c-source-info-libc
   '((name . "Info index: libc")
     (info-index . "libc")))
-;; (anything 'anything-c-source-info-libc)
 
 ;; Info Index make
 (defvar anything-c-source-info-make
   '((name . "Info index: make")
     (info-index . "make")))
-;; (anything 'anything-c-source-info-make)
 
 ;; Info Index automake
 (defvar anything-c-source-info-automake
   '((name . "Info index: automake")
     (info-index . "automake")))
-;; (anything 'anything-c-source-info-automake)
 
 ;; Info Index autoconf
 (defvar anything-c-source-info-autoconf
   '((name . "Info index: autoconf")
     (info-index . "autoconf")))
-;; (anything 'anything-c-source-info-autoconf)
 
 ;; Info Index emacs-lisp-intro
 (defvar anything-c-source-info-emacs-lisp-intro
   '((name . "Info index: emacs-lisp-intro")
     (info-index . "emacs-lisp-intro")))
-;; (anything 'anything-c-source-info-emacs-lisp-intro)
 
 ;; Info Index emacs
 (defvar anything-c-source-info-emacs
   '((name . "Info index: emacs")
     (info-index . "emacs")))
-;; (anything 'anything-c-source-info-emacs)
 
 ;; Info Index elib
 (defvar anything-c-source-info-elib
   '((name . "Info index: elib")
     (info-index . "elib")))
-;; (anything 'anything-c-source-info-elib)
 
 ;; Info Index eieio
 (defvar anything-c-source-info-eieio
   '((name . "Info index: eieio")
     (info-index . "eieio")))
-;; (anything 'anything-c-source-info-eieio)
 
 ;; Info Index gauche-refe
 (defvar anything-c-source-info-gauche-refe
   '((name . "Info index: gauche")
     (info-index . "gauche-refe")))
-;; (anything 'anything-c-source-info-gauche-refe)
 
 ;; Info Index guile
 (defvar anything-c-source-info-guile
   '((name . "Info index: guile")
     (info-index . "guile")))
-;; (anything 'anything-c-source-info-guile)
 
 ;; Info Index guile-tut
 (defvar anything-c-source-info-guile-tut
   '((name . "Info index: guile-tut")
     (info-index . "guile-tut")))
-;; (anything 'anything-c-source-info-guile-tut)
 
 ;; Info Index goops
 (defvar anything-c-source-info-goops
   '((name . "Info index: goops")
     (info-index . "goops")))
-;; (anything 'anything-c-source-info-goops)
 
 ;; Info Index screen
 (defvar anything-c-source-info-screen
   '((name . "Info index: screen")
     (info-index . "screen")
     (index-nodes "Concept Index" "Command Index" "Keystroke Index")))
-;; (anything 'anything-c-source-info-screen)
 
 ;; Info Index latex
 (defvar anything-c-source-info-latex
   '((name . "Info index: latex")
     (info-index . "latex")))
-;; (anything 'anything-c-source-info-latex)
 
 ;; Info Index gawk
 (defvar anything-c-source-info-gawk
   '((name . "Info index: gawk")
     (info-index . "gawk")))
-;; (anything 'anything-c-source-info-gawk)
 
 ;; Info Index sed
 (defvar anything-c-source-info-sed
   '((name . "Info index: sed")
     (info-index . "sed")))
-;; (anything 'anything-c-source-info-sed)
 
 ;; Info Index m4
 (defvar anything-c-source-info-m4
   '((name . "Info index: m4")
     (info-index . "m4")))
-;; (anything 'anything-c-source-info-m4)
 
 ;; Info Index wget
 (defvar anything-c-source-info-wget
   '((name . "Info index: wget")
     (info-index . "wget")))
-;; (anything 'anything-c-source-info-wget)
 
 ;; Info Index binutils
 (defvar anything-c-source-info-binutils
   '((name . "Info index: binutils")
     (info-index . "binutils")))
-;; (anything 'anything-c-source-info-binutils)
 
 ;; Info Index as
 (defvar anything-c-source-info-as
   '((name . "Info index: as")
     (info-index . "as")))
-;; (anything 'anything-c-source-info-as)
 
 ;; Info Index bfd
 (defvar anything-c-source-info-bfd
   '((name . "Info index: bfd")
     (info-index . "bfd")))
-;; (anything 'anything-c-source-info-bfd)
 
 ;; Info Index gprof
 (defvar anything-c-source-info-gprof
   '((name . "Info index: gprof")
     (info-index . "gprof")))
-;; (anything 'anything-c-source-info-gprof)
 
 ;; Info Index ld
 (defvar anything-c-source-info-ld
   '((name . "Info index: ld")
     (info-index . "ld")))
-;; (anything 'anything-c-source-info-ld)
 
 ;; Info Index diff
 (defvar anything-c-source-info-diff
   '((name . "Info index: diff")
     (info-index . "diff")))
-;; (anything 'anything-c-source-info-diff)
 
 ;; Info Index flex
 (defvar anything-c-source-info-flex
   '((name . "Info index: flex")
     (info-index . "flex")))
-;; (anything 'anything-c-source-info-flex)
 
 ;; Info Index grep
 (defvar anything-c-source-info-grep
   '((name . "Info index: grep")
     (info-index . "grep")))
-;; (anything 'anything-c-source-info-grep)
 
 ;; Info Index gzip
 (defvar anything-c-source-info-gzip
   '((name . "Info index: gzip")
     (info-index . "gzip")))
-;; (anything 'anything-c-source-info-gzip)
 
 ;; Info Index libtool
 (defvar anything-c-source-info-libtool
   '((name . "Info index: libtool")
     (info-index . "libtool")))
-;; (anything 'anything-c-source-info-libtool)
 
 ;; Info Index texinfo
 (defvar anything-c-source-info-texinfo
   '((name . "Info index: texinfo")
     (info-index . "texinfo")))
-;; (anything 'anything-c-source-info-texinfo)
 
 ;; Info Index info
 (defvar anything-c-source-info-info
   '((name . "Info index: info")
     (info-index . "info")))
-;; (anything 'anything-c-source-info-info)
 
 ;; Info Index gdb
 (defvar anything-c-source-info-gdb
   '((name . "Info index: gdb")
     (info-index . "gdb")))
-;; (anything 'anything-c-source-info-gdb)
 
 ;; Info Index stabs
 (defvar anything-c-source-info-stabs
   '((name . "Info index: stabs")
     (info-index . "stabs")))
-;; (anything 'anything-c-source-info-stabs)
 
 ;; Info Index cvsbook
 (defvar anything-c-source-info-cvsbook
   '((name . "Info index: cvsbook")
     (info-index . "cvsbook")))
-;; (anything 'anything-c-source-info-cvsbook)
 
 ;; Info Index cvs
 (defvar anything-c-source-info-cvs
   '((name . "Info index: cvs")
     (info-index . "cvs")))
-;; (anything 'anything-c-source-info-cvs)
 
 ;; Info Index bison
 (defvar anything-c-source-info-bison
   '((name . "Info index: bison")
     (info-index . "bison")))
-;; (anything 'anything-c-source-info-bison)
 
 ;; Info Index id-utils
 (defvar anything-c-source-info-id-utils
   '((name . "Info index: id-utils")
     (info-index . "id-utils")))
-;; (anything 'anything-c-source-info-id-utils)
 
 ;; Info Index global
 (defvar anything-c-source-info-global
   '((name . "Info index: global")
     (info-index . "global")))
-;; (anything 'anything-c-source-info-global)
 
 
 ;;; Man and woman UI
@@ -5988,7 +5924,6 @@ source.")
                                 '(("Show with Man" . man))
                                 actions)))
     (requires-pattern . 2)))
-;; (anything 'anything-c-source-man-pages)
 
 
 ;;;; <Command>
@@ -6068,7 +6003,6 @@ Show global bindings and local bindings according to current `major-mode'."
   '((name . "Complex Command History")
     (candidates . (lambda () (mapcar 'prin1-to-string command-history)))
     (type . sexp)))
-;; (anything 'anything-c-source-complex-command-history)
 
 ;;; M-x history (not related to `anything-M-x')
 ;;
@@ -6079,7 +6013,6 @@ Show global bindings and local bindings according to current `major-mode'."
      . (lambda ()
          (anything-fast-remove-dups extended-command-history :test 'equal)))
     (type . command)))
-;; (anything 'anything-c-source-extended-command-history)
 
 ;;; Emacs commands (Basic source for emacs commands)
 ;;
@@ -6101,7 +6034,6 @@ be invoked with `M-x'.
 
 To get non-interactive functions listed, use
 `anything-c-source-emacs-functions'.")
-;; (anything 'anything-c-source-emacs-commands)
 
 
 ;;;; <Function>
@@ -6119,7 +6051,6 @@ To get non-interactive functions listed, use
     (type . function)
     (requires-pattern . 2))
   "Source for completing Emacs functions.")
-;; (anything 'anything-c-source-emacs-functions)
 
 ;;; With abbrev expansion
 ;;; Similar to my exec-abbrev-cmd.el
@@ -6152,7 +6083,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
                        (setq str (concat str (list c) "[^-]*-")))
                      (setq str (concat (substring str 0 (1- (length str))) "$"))
                      (setq anything-c-function-abbrev-regexp str))))))))
-;; (anything 'anything-c-source-emacs-functions-with-abbrevs)
 
 (defvar anything-c-source-advice
   '((name . "Function Advice")
@@ -6161,7 +6091,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
     (persistent-action . anything-c-advice-persistent-action)
     (multiline)
     (persistent-help . "Describe function / C-u C-z: Toggle advice")))
-;; (anything 'anything-c-source-advice)
 ;; (let ((debug-on-signal t))(anything 'anything-c-source-advice))
 ;; (testadvice)
 
@@ -6219,7 +6148,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
     (type . variable)
     (requires-pattern . 2))
   "Source for completing Emacs variables.")
-;; (anything 'anything-c-source-emacs-variables)
 
 
 ;;; LaCarte
@@ -6232,7 +6160,6 @@ word in the function's name, e.g. \"bb\" is an abbrev for
   "Needs lacarte.el.
 
 http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
-;; (anything 'anything-c-source-lacarte)
 
 
 ;;; Bookmarks
@@ -6251,7 +6178,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
     (candidates . bookmark-all-names)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
-;; (anything 'anything-c-source-bookmarks)
 
 ;;; bookmark-set
 (defvar anything-c-source-bookmark-set
@@ -6259,7 +6185,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
     (dummy)
     (action . bookmark-set))
   "See (info \"(emacs)Bookmarks\").")
-;; (anything 'anything-c-source-bookmark-set)
 
 ;;; Visible Bookmarks
 ;; (install-elisp "http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el")
@@ -6301,7 +6226,6 @@ http://www.nongnu.org/bm/")
     (candidates . (lambda () (anything-c-collect-bookmarks :ssh t)))
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
-;; (anything 'anything-c-source-bookmarks-ssh)
 
 (defvar anything-c-source-bookmarks-su
   '((name . "Bookmarks-root")
@@ -6312,7 +6236,6 @@ http://www.nongnu.org/bm/")
 
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
-;; (anything 'anything-c-source-bookmarks-su)
 
 (defvar anything-c-source-bookmarks-local
   '((name . "Bookmarks-Local")
@@ -6324,7 +6247,6 @@ http://www.nongnu.org/bm/")
      anything-c-highlight-bookmark)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
-;; (anything 'anything-c-source-bookmarks-local)
 
 (defun* anything-c-collect-bookmarks (&key local su sudo ssh)
   (let* ((lis-all (bookmark-all-names))
@@ -6518,7 +6440,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-w3m)
 
 (defun anything-c-bookmark-w3m-setup-alist ()
   "Specialized filter function for bookmarks w3m."
@@ -6535,7 +6456,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-images)
 
 (defun anything-c-bookmark-images-setup-alist ()
   "Specialized filter function for images bookmarks."
@@ -6552,7 +6472,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-man)
 
 (defun anything-c-bookmark-man-setup-alist ()
   "Specialized filter function for bookmarks w3m."
@@ -6570,7 +6489,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-gnus)
 
 (defun anything-c-bookmark-gnus-setup-alist ()
   "Specialized filter function for bookmarks gnus."
@@ -6587,7 +6505,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-info)
 
 (defun anything-c-bookmark-info-setup-alist ()
   "Specialized filter function for bookmarks info."
@@ -6604,7 +6521,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-files&dirs)
 
 (defun anything-c-bookmark-local-files-setup-alist ()
   "Specialized filter function for bookmarks locals files."
@@ -6621,7 +6537,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
      anything-c-adaptive-sort
      anything-c-highlight-bookmark-su)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-su-files&dirs)
 
 (defun anything-c-bookmark-su-files-setup-alist ()
   "Specialized filter function for bookmarks su/sudo files."
@@ -6647,7 +6562,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
     (candidates . anything-c-bookmark-ssh-files-setup-alist)
     (filtered-candidate-transformer . anything-c-adaptive-sort)
     (type . bookmark)))
-;; (anything 'anything-c-source-bookmark-ssh-files&dirs)
 
 (defun anything-c-bookmark-ssh-files-setup-alist ()
   "Specialized filter function for bookmarks ssh files."
@@ -6737,7 +6651,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                 . (lambda (elm)
                     (kill-new (anything-c-w3m-bookmarks-get-value elm))))))))
 
-;; (anything 'anything-c-source-firefox-bookmarks)
 
 (defun anything-c-firefox-bookmarks-get-value (elm)
   (assoc-default elm anything-c-firefox-bookmarks-alist))
@@ -6804,7 +6717,6 @@ C-u \\[anything-execute-persistent-action]: Open URL with Firefox"))
 http://w3m.sourceforge.net/
 http://emacs-w3m.namazu.org/")
 
-;; (anything 'anything-c-source-w3m-bookmarks)
 
 (defun anything-c-w3m-bookmarks-get-value (elm)
   (replace-regexp-in-string
@@ -6865,7 +6777,6 @@ http://emacs-w3m.namazu.org/")
           (find-file-other-window (find-library-name candidate))))
      ("Load library"
       . (lambda (candidate) (load-library candidate))))))
-;; (anything 'anything-c-source-elisp-library-scan)
 
 (defun anything-c-elisp-library-scan-init ()
   "Init anything buffer status."
@@ -6954,7 +6865,6 @@ STRING is string to match."
     (action . anything-c-imenu-default-action))
   "See (info \"(emacs)Imenu\")")
 
-;; (anything 'anything-c-source-imenu)
 
 (defun anything-c-imenu-candidates ()
   (with-anything-current-buffer
@@ -7033,7 +6943,6 @@ STRING is string to match."
   "Needs Exuberant Ctags.
 
 http://ctags.sourceforge.net/")
-;; (anything 'anything-c-source-ctags)
 
 
 ;;; Etags
@@ -7235,7 +7144,6 @@ If FILE is nil return nil."
 http://cedet.sourceforge.net/semantic.shtml
 http://cedet.sourceforge.net/"))
 
-;; (anything 'anything-c-source-semantic)
 
 
 ;;; Anything interface of `simple-call-tree.el'.
@@ -7306,7 +7214,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
               (length anything-c-simple-call-tree-related-functions))
          anything-c-simple-call-tree-related-functions))))
 
-;; (anything 'anything-c-source-simple-call-tree-functions-callers)
 
 ;;; Function calls
 (defvar anything-c-source-simple-call-tree-callers-functions
@@ -7324,7 +7231,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 (defun anything-c-simple-call-tree-callers-functions-init ()
   (anything-c-simple-call-tree-init-base 'identity " calls \n"))
 
-;; (anything 'anything-c-source-simple-call-tree-callers-functions)
 
 
 
@@ -7381,7 +7287,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
                              var-alist)))))))
     anything-c-auto-document-data))
 
-;; (anything 'anything-c-source-commands-and-options-in-file)
 
 
 ;;;; <Color and Face>
@@ -7403,7 +7308,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
                 (customize-face (intern (car (split-string line))))))
     (requires-pattern . 3))
   "See (info \"(emacs)Faces\")")
-;; (anything 'anything-c-source-customize-face)
 
 ;;; Colors browser
 ;;
@@ -7427,7 +7331,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
      ("Insert RGB" . (lambda (candidate)
                        (with-anything-current-buffer
                          (insert (anything-c-colors-get-rgb candidate))))))))
-;; (anything 'anything-c-source-colors)
 
 (defun anything-c-colors-get-name (candidate)
   "Get color name."
@@ -7465,7 +7368,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
     (delayed))
   "Source for retrieving files matching the current input pattern
 with the tracker desktop search.")
-;; (anything 'anything-c-source-tracker-search)
 
 ;;; Spotlight (MacOS X desktop search)
 (defvar anything-c-source-mac-spotlight
@@ -7477,14 +7379,12 @@ with the tracker desktop search.")
     (delayed))
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
-;; (anything 'anything-c-source-mac-spotlight)
 
 ;;; Picklist
 (defvar anything-c-source-picklist
   '((name . "Picklist")
     (candidates . (lambda () (mapcar 'car picklist-list)))
     (type . file)))
-;; (anything 'anything-c-source-picklist)
 
 
 
@@ -7554,7 +7454,6 @@ replace with STR as yanked string."
                          (set-marker (mark-marker) (point) (current-buffer)))))))
   (kill-new str))
 
-;; (anything 'anything-c-source-kill-ring)
 
 
 ;;;; <Mark ring>
@@ -7598,7 +7497,6 @@ replace with STR as yanked string."
                            (anything-match-line-color-current-line)))
     (persistent-help . "Show this line")))
 
-;; (anything 'anything-c-source-mark-ring)
 
 ;;; Global-mark-ring
 (defvar anything-c-source-global-mark-ring
@@ -7640,7 +7538,6 @@ replace with STR as yanked string."
           collect gm into recip
           finally return recip)))
 
-;; (anything 'anything-c-source-global-mark-ring)
 
 
 ;;;; <Register>
@@ -7737,7 +7634,6 @@ replace with STR as yanked string."
         when cell
         collect (cdr cell)))
 
-;; (anything 'anything-c-source-register)
 
 
 ;;; Latex completion
@@ -7767,7 +7663,6 @@ replace with STR as yanked string."
     (adjust)
     (recenter))
   "Show TODO/FIXME/DRY comments in current file.")
-;; (anything 'anything-c-source-fixme)
 
 (defvar anything-c-source-rd-headline
   '((name . "RD HeadLine")
@@ -7779,7 +7674,6 @@ replace with STR as yanked string."
 
 RD is Ruby's POD.
 http://en.wikipedia.org/wiki/Ruby_Document_format")
-;; (anything 'anything-c-source-rd-headline)
 
 (defvar anything-c-source-oddmuse-headline
   '((name . "Oddmuse HeadLine")
@@ -7789,7 +7683,6 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
     (migemo)
     (subexp . 1))
   "Show Oddmuse headlines, such as EmacsWiki.")
-;; (anything 'anything-c-source-oddmuse-headline)
 
 (defvar anything-c-source-emacs-source-defun
   '((name . "Emacs Source DEFUN")
@@ -7797,7 +7690,6 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
     (condition . (string-match "/emacs2[0-9].+/src/.+c$"
                   (or buffer-file-name ""))))
   "Show DEFUN/DEFVAR in Emacs C source file.")
-;; (anything 'anything-c-source-emacs-source-defun)
 
 (defvar anything-c-source-emacs-lisp-expectations
   '((name . "Emacs Lisp Expectations")
@@ -7806,7 +7698,6 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
   "Show descriptions (desc) in Emacs Lisp Expectations.
 
 http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
-;; (anything 'anything-c-source-emacs-lisp-expectations)
 
 (defvar anything-c-source-emacs-lisp-toplevels
   '((name . "Emacs Lisp Toplevel / Level 4 Comment / Linkd Star")
@@ -7817,7 +7708,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
   "Show top-level forms, level 4 comments and linkd stars (optional) in Emacs Lisp.
 linkd.el is optional because linkd stars are extracted by regexp.
 http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
-;; (anything 'anything-c-source-emacs-lisp-toplevels)
 
 
 ;;; Anything yaoddmuse
@@ -7876,7 +7766,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 http://www.emacswiki.org/emacs/download/yaoddmuse.el")
 
-;; (anything 'anything-c-source-yaoddmuse-emacswiki-edit-or-view)
 
 (defvar anything-c-source-yaoddmuse-emacswiki-post-library
   '((name . "Yaoddmuse Post library (EmacsWiki)")
@@ -7900,7 +7789,6 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
 
 http://www.emacswiki.org/emacs/download/yaoddmuse.el")
 
-;; (anything 'anything-c-source-yaoddmuse-emacswiki-post-library)
 
 (defun anything-c-yaoddmuse-action-transformer (actions candidate)
   "Allow the use of `install-elisp' only on elisp files."
@@ -7963,7 +7851,6 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
                            (anything-match-line-color-current-line)))
     (persistent-help . "Show this entry")
     (action . (("Goto link" . ee-to)))))
-;; (anything 'anything-c-source-eev-anchor)
 
 
 ;;; Org headlines
@@ -7994,7 +7881,6 @@ org-mode is very very much extended text-mode/outline-mode.
 
 See (find-library \"org.el\")
 See http://orgmode.org for the latest version.")
-;; (anything 'anything-c-source-org-headline)
 
 (defun anything-c-org-headline-insert-link-to-headline (lineno-and-content)
   (insert
@@ -8025,7 +7911,6 @@ See http://orgmode.org for the latest version.")
     (persistent-help . "Show an example and info page to describe this keyword.")
     (keywords-examples)
     (keywords)))
-;; (anything 'anything-c-source-org-keywords)
 
 (defvar anything-c-org-keywords-info-location
   '(("#+TITLE:" . "(org)Export options")
@@ -8159,7 +8044,6 @@ removed."
   "Needs BBDB.
 
 http://bbdb.sourceforge.net/")
-;; (anything 'anything-c-source-bbdb)
 
 (defun anything-c-bbdb-view-person-action (candidate)
   "View BBDB data of single CANDIDATE or marked candidates."
@@ -8213,7 +8097,6 @@ http://bbdb.sourceforge.net/")
                                                    (kill-region (point) end)))))
                ("copy sexp to kill-ring" . (lambda (candidate)
                                              (kill-new anything-input)))))))
-;; (anything 'anything-c-source-evaluation-result)
 
 (defun anything-eval-new-line-and-indent ()
   (interactive)
@@ -8264,7 +8147,6 @@ http://bbdb.sourceforge.net/")
                                              (calc-eval anything-pattern)
                                            (error "error")))))
     (action ("Copy result to kill-ring" . kill-new))))
-;; (anything 'anything-c-source-calculation-result)
 
 
 ;;; Google Suggestions
@@ -8314,7 +8196,8 @@ Return an alist with elements like (data . number_results)."
   (let ((suggestions
          (loop with suggested-results = (anything-c-google-suggest-fetch
                                          (or (and request-prefix
-                                                  (concat request-prefix " " anything-pattern))
+                                                  (concat request-prefix
+                                                          " " anything-pattern))
                                              anything-pattern))
                for (real . numresult) in suggested-results
                ;; Prepare number of results with ","
@@ -8325,14 +8208,19 @@ Return an alist with elements like (data . number_results)."
                ;; e.g 1,234,567
                ;;       345,678
                ;; To be sure it is aligned properly.
-               for nspaces = (if (< (length fnumresult) anything-ggs-max-length-num-flag)
-                                 (- anything-ggs-max-length-num-flag (length fnumresult))
+               for nspaces = (if (< (length fnumresult)
+                                    anything-ggs-max-length-num-flag)
+                                 (- anything-ggs-max-length-num-flag
+                                    (length fnumresult))
                                  0)
                ;; Add now the spaces before fnumresult.
-               for align-fnumresult = (concat (make-string nspaces ? ) fnumresult)
-               for interval = (- anything-ggs-max-length-real-flag (length real))
+               for align-fnumresult = (concat (make-string nspaces ? )
+                                              fnumresult)
+               for interval = (- anything-ggs-max-length-real-flag
+                                 (length real))
                for spaces   = (make-string (+ 2 interval) ? )
-               for display = (format "%s%s(%s results)" real spaces align-fnumresult)
+               for display = (format "%s%s(%s results)"
+                                     real spaces align-fnumresult)
                collect (cons display real))))
     (if (loop for (disp . dat) in suggestions
               thereis (equal dat anything-pattern))
@@ -8389,7 +8277,6 @@ See `anything-browse-url-default-browser-alist'.")
   "Try to emacs lisp complete with google suggestions."
   (anything-c-google-suggest-set-candidates "emacs lisp"))
 
-;; (anything 'anything-c-source-google-suggest)
 
 ;;; Yahoo suggestions
 ;;
@@ -8402,7 +8289,8 @@ Return an alist with elements like (data . number_results)."
     (flet ((fetch ()
              (loop
                    with result-alist = (xml-get-children
-                                        (car (xml-parse-region (point-min) (point-max)))
+                                        (car (xml-parse-region
+                                              (point-min) (point-max)))
                                         'Result)
                    for i in result-alist
                    collect (caddr i))))
@@ -8432,7 +8320,6 @@ Return an alist with elements like (data . number_results)."
     (requires-pattern . 3)
     (delayed)))
 
-;; (anything 'anything-c-source-yahoo-suggest)
 
 
 ;;; Web browser functions.
@@ -8579,7 +8466,6 @@ When nil, fallback to `browse-url-browser-function'.")
                ("Delete" . anything-emms-stream-delete-bookmark)
                ("Edit" . anything-emms-stream-edit-bookmark)))
     (filtered-candidate-transformer . anything-c-adaptive-sort)))
-;; (anything 'anything-c-source-emms-streams)
 
 ;; Don't forget to set `emms-source-file-default-directory'
 (defvar anything-c-source-emms-dired
@@ -8598,7 +8484,6 @@ When nil, fallback to `browse-url-browser-function'.")
                                               item
                                               emms-source-file-default-directory))))))
     (filtered-candidate-transformer . anything-c-adaptive-sort)))
-;; (anything 'anything-c-source-emms-dired)
 
 
 (defun anything-c-emms-files-modifier (candidates source)
@@ -8644,7 +8529,6 @@ When nil, fallback to `browse-url-browser-function'.")
                     (unless emms-player-playing-p
                       (anything-c-emms-play-current-playlist))))))))
 
-;; (anything 'anything-c-source-emms-files)
 
 
 ;;; Jabber Contacts (jabber.el)
@@ -8667,7 +8551,6 @@ When nil, fallback to `browse-url-browser-function'.")
                  (jabber-read-account)
                  (symbol-name
                   (cdr (assoc x (anything-c-jabber-online-contacts)))))))))
-;; (anything 'anything-c-source-jabber-contacts)
 
 
 
@@ -8696,7 +8579,6 @@ When nil, fallback to `browse-url-browser-function'.")
         ("Find variable" . find-variable)))
     (persistent-action . describe-variable)
     (persistent-help . "Show description of this source")))
-;; (anything 'anything-c-source-call-source)
 
 (defun anything-call-source-from-anything ()
   "Call anything source within `anything' session."
@@ -8710,7 +8592,6 @@ When nil, fallback to `browse-url-browser-function'.")
     (candidates . anything-c-anything-commands-candidates)
     (type . command)
     (candidate-number-limit)))
-;; (anything 'anything-c-source-anything-commands)
 
 (defun anything-c-anything-commands-candidates ()
   (loop for (cmd . desc) in (anything-c-list-preconfigured-anything)
@@ -8764,7 +8645,6 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (requires-pattern . 1)
     (delayed)
     (volatile)))
-;; (anything 'anything-c-source-occur)
 
 
 ;;; Anything browse code.
@@ -8800,7 +8680,6 @@ Line is parsed for BEG position to END position."
     (action-transformer . anything-create--actions))
   "Do many create actions from `anything-pattern'.
 See also `anything-create--actions'.")
-;; (anything 'anything-c-source-create)
 
 (defun anything-create-from-anything ()
   "Run `anything-create' from `anything' as a fallback."
@@ -8844,7 +8723,6 @@ See also `anything-create--actions'.")
                history))))
     (migemo)
     (action . insert)))
-;; (anything 'anything-c-source-minibuffer-history)
 
 
 ;;; Elscreen
@@ -8872,7 +8750,6 @@ See also `anything-create--actions'.")
                        (lambda (candidate)
                          (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
                          (elscreen-kill-others)))))))
-;; (anything 'anything-c-source-elscreen)
 
 
 ;;;; <System>
@@ -8893,7 +8770,6 @@ See also `anything-create--actions'.")
      ("kill (KILL)" . (lambda (pid)
                         (anything-c-top-sh (format "kill -KILL %s" pid))))
      ("Copy PID" . (lambda (pid) (kill-new pid))))))
-;; (anything 'anything-c-source-top)
 
 (defun anything-c-top-sh (cmd)
   (message "Executed %s\n%s" cmd (shell-command-to-string cmd)))
@@ -8918,13 +8794,11 @@ See also `anything-create--actions'.")
   '((name . "Absolute Time Timers")
     (candidates . timer-list)
     (type . timer)))
-;; (anything 'anything-c-source-absolute-time-timers)
 
 (defvar anything-c-source-idle-time-timers
   '((name . "Idle Time Timers")
     (candidates . timer-idle-list)
     (type . timer)))
-;; (anything 'anything-c-source-idle-time-timers)
 
 (defun anything-c-timer-real-to-display (timer)
   (destructuring-bind (triggered t1 t2 t3 repeat-delay func args idle-delay)
@@ -8958,7 +8832,6 @@ See also `anything-create--actions'.")
                                             "--screen" anything-c-xrandr-screen
                                             "--output" anything-c-xrandr-output
                                             "--mode" mode))))))
-;; (anything 'anything-c-source-xrandr-change-resolution)
 
 ;;; Xfont selection
 ;;
@@ -8987,7 +8860,6 @@ See also `anything-create--actions'.")
                                (message "New font have been copied to kill ring")))))
     (persistent-action . anything-c-persistent-xfont-action)
     (persistent-help . "Switch to this font temporarily")))
-;; (anything 'anything-c-source-xfonts)
 
 ;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
 ;;
@@ -9087,7 +8959,6 @@ Only math* symbols are collected."
     (persistent-help . "Kill Process")
     (action ("Kill Process" . (lambda (elm)
                                 (delete-process (get-process elm)))))))
-;; (anything 'anything-c-source-emacs-process)
 
 ;;; World time
 ;;
@@ -9120,7 +8991,6 @@ Only math* symbols are collected."
      ("Purge package" . anything-c-apt-purge))
     (persistent-action . anything-c-apt-persistent-action)
     (persistent-help . "Show package description")))
-;; (anything 'anything-c-source-apt)
 
 (defvar anything-c-apt-query "emacs")
 (defvar anything-c-apt-search-command "apt-cache search '%s'")
@@ -9280,7 +9150,6 @@ Support install, remove and purge actions."
                               (anything-c-gentoo-setup-cache)
                               (setq anything-c-cache-world (anything-c-gentoo-get-world))))))))
 
-;; (anything 'anything-c-source-gentoo)
 
 (defun* anything-gentoo-install (candidate &key action)
   (setq anything-c-external-commands-list nil)
@@ -9345,7 +9214,6 @@ Support install, remove and purge actions."
                              ,elm))))))))
 
 
-;; (anything 'anything-c-source-use-flags)
 
 (defun anything-c-gentoo-init-list ()
   "Initialize buffer with all packages in Portage."
@@ -9451,7 +9319,6 @@ Support install, remove and purge actions."
     (action ("Execute the command" . anything-c-ratpoison-commands-execute))
     (display-to-real . anything-c-ratpoison-commands-display-to-real)
     (candidate-number-limit)))
-;; (anything 'anything-c-source-ratpoison-commands)
 
 (defun anything-c-ratpoison-commands-init ()
   (unless (anything-candidate-buffer)
@@ -10865,6 +10732,9 @@ evaluate it and put it onto the `command-history'."
   (anything-c-skip-entries buffers anything-c-boring-buffer-regexp))
 
 (defun anything-c-skip-current-buffer (buffers)
+  "[DEPRECATED] Skip current buffer in buffer lists.
+This transformer should not be used as this is now handled directly
+in `anything-c-buffer-list' and `anything-c-highlight-buffers'."
   (if anything-allow-skipping-current-buffer
       (remove (buffer-name anything-current-buffer) buffers)
       buffers))
@@ -11516,8 +11386,7 @@ The SPEC is like source. The symbol `REST' is replaced with original attribute v
        ("Ediff Merge marked buffers" . (lambda (candidate)
                                          (anything-ediff-marked-buffers candidate t))))
       (persistent-help . "Show this buffer")
-      (candidate-transformer anything-c-skip-current-buffer
-                             anything-c-skip-boring-buffers
+      (candidate-transformer anything-c-skip-boring-buffers
                              anything-c-transform-buffer-display-string))
   "Buffer or buffer name.")
 
