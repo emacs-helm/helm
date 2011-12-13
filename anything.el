@@ -1812,7 +1812,7 @@ Call `anything' with only ANY-SOURCES and ANY-BUFFER as args."
   (anything :sources any-sources :buffer any-buffer))
 
 (defun anything-nest (&rest same-as-anything)
-  "Nested `anything'. If you use `anything' within `anything', use it."
+  "Allow calling `anything' whithin a running anything session."
   (with-anything-window
     (let (anything-current-position
           anything-current-buffer
@@ -2086,10 +2086,13 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   (anything-log "start cleanup")
   (with-current-buffer anything-buffer
     ;; rubikitch: I think it is not needed.
-    ;; (setq cursor-type t)
-
+    ;; thierry: If you end up for any reasons (error etc...)
+    ;; with an anything-buffer staying around (visible),
+    ;; You will have no cursor in this buffer when switching to it,
+    ;; so I think this is needed.
+    (setq cursor-type t)
     ;; Call burry-buffer whithout arg
-    ;; to remove anything-buffer from window.
+    ;; to be sure anything-buffer is removed from window.
     (bury-buffer)
     ;; Be sure we call this from anything-buffer.
     (anything-funcall-foreach 'cleanup))
