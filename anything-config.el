@@ -8987,6 +8987,7 @@ Only math* symbols are collected."
     (action
      ("Show package description" . anything-c-apt-cache-show)
      ("Install package" . anything-c-apt-install)
+     ("Reinstall package" . anything-c-apt-reinstall)
      ("Remove package" . anything-c-apt-uninstall)
      ("Purge package" . anything-c-apt-purge))
     (persistent-action . anything-c-apt-persistent-action)
@@ -9063,6 +9064,10 @@ If a buffer named COMMAND already exists, just switch to it."
   "Run 'apt-get install' shell command on PACKAGE."
   (anything-c-apt-generic-action :action 'install))
 
+(defun anything-c-apt-reinstall (package)
+  "Run 'apt-get install --reinstall' shell command on PACKAGE."
+  (anything-c-apt-generic-action :action 'reinstall))
+
 (defun anything-c-apt-uninstall (package)
   "Run 'apt-get remove' shell command on PACKAGE."
   (anything-c-apt-generic-action :action 'uninstall))
@@ -9078,6 +9083,7 @@ Support install, remove and purge actions."
   (term-line-mode)
   (let ((command   (case action
                      ('install   "sudo apt-get install ")
+                     ('reinstall "sudo apt-get install --reinstall ")
                      ('uninstall "sudo apt-get remove ")
                      ('purge     "sudo apt-get purge ")
                      (t          (error "Unknow action"))))
