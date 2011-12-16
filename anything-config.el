@@ -2613,6 +2613,7 @@ Should be called after others transformers i.e (boring buffers)."
     (volatile)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
+
 (defvaralias 'anything-c-source-buffers+ 'anything-c-source-buffers-list)
 
 (defun anything-c-buffer-match-major-mode (candidate)
@@ -11651,7 +11652,11 @@ First call open the kill-ring browser, next calls move to next line."
   (anything :sources '(anything-c-source-buffers-list
                        anything-c-source-buffer-not-found)
             :buffer "*anything buffers*" :keymap anything-c-buffer-map))
-(defalias 'anything-buffers+ 'anything-buffer-list)
+
+(defalias 'anything-buffers+ 'anything-buffers-list
+  "Enhanced preconfigured `anything' to list buffers.
+It is an alias of `anything-buffers-list'.")
+
 ;;;###autoload
 (defun anything-bbdb ()
   "Preconfigured `anything' for BBDB.
