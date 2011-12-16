@@ -11641,20 +11641,21 @@ First call open the kill-ring browser, next calls move to next line."
 ;;; Converted from anything-show-*-only
 ;;;###autoload
 (defun anything-for-buffers ()
-  "Preconfigured `anything' for buffer."
+  "Preconfigured `anything' for buffers."
   (interactive)
   (anything-other-buffer 'anything-c-source-buffers "*anything for buffers*"))
 
 ;;;###autoload
 (defun anything-buffers-list ()
-  "Enhanced preconfigured `anything' for buffer."
+  "Preconfigured `anything' to list buffers.
+It is an enhanced version of `anything-for-buffers'."
   (interactive)
   (anything :sources '(anything-c-source-buffers-list
                        anything-c-source-buffer-not-found)
             :buffer "*anything buffers*" :keymap anything-c-buffer-map))
 
 (defalias 'anything-buffers+ 'anything-buffers-list
-  "Enhanced preconfigured `anything' to list buffers.
+  "Preconfigured `anything' to list buffers.
 It is an alias of `anything-buffers-list'.")
 
 ;;;###autoload
