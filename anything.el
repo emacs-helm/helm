@@ -1621,7 +1621,6 @@ If 'noresume, this instance of `anything' cannot be resumed.
 \:preselect
 
 Initially selected candidate.  Specified by exact candidate or a regexp.
-Note that it is not working with delayed sources.
 
 \:buffer
 
@@ -1863,12 +1862,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `anything'."
        (anything-execute-selection-action)
     (anything-aif (get-buffer anything-action-buffer)
         (kill-buffer it))
-    (anything-log-run-hook 'anything-after-action-hook)
-    ;; Depending the keymap used, i.e `minibuffer-local-must-match-map'
-    ;; we can exit minibuffer with `exit-minibuffer'
-    ;; instead of `anything-exit-minibuffer',
-    ;; so set exit status here instead of in `anything-exit-minibuffer'.
-    (setq anything-exit-status 0)))
+    (anything-log-run-hook 'anything-after-action-hook)))
 
 (defun anything-restore-position-on-quit ()
   "Restore position in `anything-current-buffer' when quitting."
@@ -3028,6 +3022,7 @@ don't exit and send message 'no match'."
   (interactive)
   (unless anything-current-prefix-arg
     (setq anything-current-prefix-arg current-prefix-arg))
+  (setq anything-exit-status 0)
   (exit-minibuffer))
 
 (defun anything-keyboard-quit ()

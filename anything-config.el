@@ -1584,6 +1584,7 @@ automatically.")
     (define-key map (kbd "M-B")           'anything-ff-run-byte-compile-file)
     (define-key map (kbd "M-L")           'anything-ff-run-load-file)
     (define-key map (kbd "M-S")           'anything-ff-run-symlink-file)
+    (define-key map (kbd "M-H")           'anything-ff-run-hardlink-file)
     (define-key map (kbd "M-D")           'anything-ff-run-delete-file)
     (define-key map (kbd "M-K")           'anything-ff-run-kill-buffer-persistent)
     (define-key map (kbd "C-d")           'anything-ff-persistent-delete)
@@ -1629,6 +1630,7 @@ automatically.")
     (when anything-ff-lynx-style-map
       (define-key map (kbd "<left>")      'anything-find-files-down-one-level)
       (define-key map (kbd "<right>")     'anything-execute-persistent-action)
+      (define-key map (kbd "C-o")         nil)
       (define-key map (kbd "<M-left>")    'anything-previous-source)
       (define-key map (kbd "<M-right>")   'anything-next-source))
     (delq nil map))
@@ -1861,9 +1863,10 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
 \\[anything-ff-run-load-file]\t\t->Load File.
 \\[anything-ff-run-symlink-file]\t\t->Symlink File.
+\\[anything-ff-run-hardlink-file]\t\t->Hardlink file.
 \\[anything-ff-run-delete-file]\t\t->Delete File.
 \\[anything-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
-\\[anything-ff-persistent-delete]\t->Delete file without quitting.
+\\[anything-ff-persistent-delete]\t\t->Delete file without quitting.
 \\[anything-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
 \\[anything-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
 \\[anything-ff-run-ediff-file]\t\t->Ediff file.
@@ -1903,7 +1906,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\<anything-c-read-file-map>
 \\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
 \\[anything-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
-\\[anything-next-source]\t\t->Goto next source.
+\\[anything-next-source]\t->Goto next source.
 \\[anything-previous-source]\t->Goto previous source.
 \\[anything-read-file-name-help]\t\t->Display this help info.
 \n== Anything Map ==
@@ -3374,6 +3377,12 @@ See `anything-ff-serial-rename-1'."
   "Run Symlink file action from `anything-c-source-find-files'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-find-files-symlink))
+
+;;;###autoload
+(defun anything-ff-run-hardlink-file ()
+  "Run Hardlink file action from `anything-c-source-find-files'."
+  (interactive)
+  (anything-c-quit-and-execute-action 'anything-find-files-hardlink))
 
 ;;;###autoload
 (defun anything-ff-run-delete-file ()
