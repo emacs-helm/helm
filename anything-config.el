@@ -16,15 +16,15 @@
 
 ;; Created: 2009-02-16 21:38:23
 
-;; X-URL: http://repo.or.cz/w/anything-config.git
+;; X-URL: <http://repo.or.cz/w/anything-config.git>
 
-;; MailingList: https://groups.google.com/group/emacs-anything?hl=en
+;; MailingList: <https://groups.google.com/group/emacs-anything?hl=en>
 
 ;; Keywords: anything, anything-config
 
 ;; Compatibility: GNU Emacs 22 ~ 24
 
-;; Dependencies: `anything.el'
+;; Dependencies: `anything.el', `anything-match-plugin.el'.
 
 ;;; This file is NOT part of GNU Emacs
 
@@ -44,11 +44,6 @@
 ;; along with this program; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 ;; Floor, Boston, MA 02110-1301, USA.
-
-;;; !NOTICE!
-;;
-;; If this file does not work, upgrade anything.el!
-;; http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 
 ;;; Commentary:
 ;;
@@ -77,6 +72,10 @@
 ;; directly, because you can define multiple anything commands with
 ;; different sources. Each anything command should have own anything
 ;; buffer, because M-x anything-resume revives anything command.
+
+;; NOTE: What you find on Emacswiki is mostly deprecated and not maintained,
+;;       don't complain if you use such code or configuration and something
+;;       doesn't work.
 
 
 ;;; Autodoc documentation:
@@ -12398,28 +12397,10 @@ You can set your own list of commands with
 
 ;;; Unit tests are now in ../developer-tools/unit-test-anything-config.el.
 
-
 (provide 'anything-config)
 
-;;; Local Variables:
-;;; time-stamp-format: "%:y-%02m-%02d %02H:%02M:%02S (%Z) %u"
-;;; End:
+;; Local Variables:
+;; coding: utf-8
+;; End:
 
-;; How to save (DO NOT REMOVE!!)
-;; (progn (magit-push) (emacswiki-post "anything-config.el"))
 ;;; anything-config.el ends here
-
-;;; LocalWords:  Tassilo Patrovics Vagn Johansen Dahl Clementson infos
-;;; LocalWords:  Kamphausen informations McBrayer Volpiatto bbdb bb
-;;; LocalWords:  iswitchb imenu Recentf sym samewindow pos bol eol
-;;; LocalWords:  aif str lst func attrib recentf lessp prin mapatoms commandp
-;;; LocalWords:  cmd stb Picklist picklist mapcan subentry destructuring dirs
-;;; LocalWords:  darwin locat MacOS mdfind Firstname Lastname calc prepend jids
-;;; LocalWords:  dotimes Thierry online vname
-;;; LocalWords:  csharp javascript lua makefile cperl zcat lineno buf
-;;; LocalWords:  multiline href fn cand NewTitle cwd filepath thru ret
-;;; LocalWords:  bfn fOpen UNC cygdrive nt xdg macos FILE's elc rx svn hg
-;;; LocalWords:  CANDIDATE's darcs facep pathname args pathnames subseq priorty
-;;; LocalWords:  Vokes rfind berkeley JST ffap lacarte bos
-;;; LocalWords:  Lacarte Minibuf epp LaCarte bm attrset migemo attr conf mklist
-;;; LocalWords:  startpos noselect dont desc

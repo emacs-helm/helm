@@ -11,11 +11,11 @@
 
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
 
-;; X-URL: http://repo.or.cz/w/anything-config.git
+;; X-URL: <http://repo.or.cz/w/anything-config.git>
 
-;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
+;; Site: <http://www.emacswiki.org/cgi-bin/emacs/Anything>
 
-;; MailingList: https://groups.google.com/group/emacs-anything?hl=en
+;; MailingList: <https://groups.google.com/group/emacs-anything?hl=en>
 
 
 ;;; This file is NOT part of GNU Emacs
@@ -350,16 +350,11 @@
 ;; Note that anything.el provides only the framework and some example
 ;; configurations for demonstration purposes.  See anything-config.el
 ;; for practical, polished, easy to use configurations which can be
-;; used to assemble a custom personalized configuration.  And many
-;; other configurations are in the EmacsWiki.
+;; used to assemble a custom personalized configuration.
 ;;
-;; http://www.emacswiki.org/cgi-bin/wiki/download/anything-config.el
-;; http://www.emacswiki.org/cgi-bin/emacs/AnythingSources
-;;
-;; Maintainer's configuration is in the EmacsWiki.  It would tell you
-;; many tips to write smart sources!
-;;
-;; http://www.emacswiki.org/cgi-bin/emacs/RubikitchAnythingConfiguration
+;; NOTE: What you find on Emacswiki is mostly deprecated and not maintained,
+;;       don't complain if you use such code or configuration and something
+;;       doesn't work.
 ;;
 ;; Here is Japanese translation of `anything-sources' attributes.  Thanks.
 ;; http://d.hatena.ne.jp/sirocco634/20091012/1255336649
@@ -388,6 +383,9 @@
 ;;     then M-x insert-buffer *Backtrace* (if you got error)
 ;;  7) Describe the bug using a precise recipe.
 ;;  8) Type C-c C-c to send.
+;;
+;;  You can also just report bug to:
+;;  https://groups.google.com/group/emacs-anything?hl=en
 
 
 ;; You can extend `anything' by writing plug-ins. As soon as
@@ -403,11 +401,7 @@
 ;; 1. Define a compiler: anything-compile-source--*
 ;; 2. Add compier function to `anything-compile-source-functions'.
 ;; 3. (optional) Write helper functions.
-;;
-;; Anything plug-ins are found in the EmacsWiki.
-;;
-;; http://www.emacswiki.org/cgi-bin/emacs/AnythingPlugins
-
+;
 ;; Tested on Emacs 22/23/24.
 ;;
 ;;
@@ -505,9 +499,6 @@
 ;; and `anything-quit-if-no-candidate' to non-nil to remedy it. Note
 ;; that setting these variables GLOBALLY is bad idea because of
 ;; delayed sources. These are meant to be let-binded.
-;; See anything-etags.el for example.
-;;
-;; [EVAL IT] (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/anything-etags.el")
 ;;
 ;; ex.
 ;; (let ((anything-execute-action-at-once-if-one t)
@@ -601,10 +592,11 @@
 ;;
 ;; [EVAL IT] (describe-function 'anything-test-candidates)
 ;;
+;; For anything developpers:
+;;
 ;; There are many unit-testing framework in Emacs Lisp. See the EmacsWiki.
 ;; http://www.emacswiki.org/cgi-bin/emacs/UnitTesting
-;;
-;; There is an unit-test by Emacs Lisp Expectations at the tail of this file.
+;; There is an unit-test by Emacs Lisp Expectations in developper-tools directory.
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/el-mock.el
 
@@ -4327,9 +4319,6 @@ Given pseudo `anything-sources' and `anything-pattern', returns list like
 ;; See developer-tools/unit-test-anything.el
 
 (provide 'anything)
-
-;; How to save (DO NOT REMOVE!!)
-;; (progn (magit-push) (emacswiki-post "anything.el"))
 
 ;; Local Variables:
 ;; coding: utf-8
