@@ -8523,7 +8523,7 @@ When nil, fallback to `browse-url-browser-function'.")
                                     'face 'anything-emms-playlist)
                         (cdr i)) into lis
           else collect i into lis
-          finally return lis)))
+          finally return (reverse lis))))
 
 (defun anything-c-emms-play-current-playlist ()
   "Play current playlist."
