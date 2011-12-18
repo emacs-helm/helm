@@ -8497,11 +8497,12 @@ When nil, fallback to `browse-url-browser-function'.")
 
 (defun anything-c-emms-files-modifier (candidates source)
   (let ((current-playlist (with-current-emms-playlist
-                              (loop
-                                    with cur-list = (emms-playlist-tracks-in-region
+                              (loop with cur-list = (emms-playlist-tracks-in-region
                                                      (point-min) (point-max))
                                     for i in cur-list
-                                    collect (assoc-default 'name i)))))
+                                    for name = (assoc-default 'name i)
+                                    when name
+                                    collect name))))
     (loop for i in candidates
           if (member (cdr i) current-playlist)
           collect (cons (propertize (car i)
@@ -8528,6 +8529,7 @@ When nil, fallback to `browse-url-browser-function'.")
                           for info      = (concat artist " - " genre " - " tracknum ": " song)
                           unless (string-match "^http:" name) collect (cons info name))))
     (filtered-candidate-transformer . anything-c-emms-files-modifier)
+    (candidate-number-limit . 9999)
     (action . (("Play file" . emms-play-file)
                ("Add to Playlist and play (C-u clear current)"
                 . (lambda (candidate)
