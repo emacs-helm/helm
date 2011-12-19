@@ -169,6 +169,8 @@
 ;; Run Ediff merge file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-symlink-file'
 ;; Run Symlink file action from `anything-c-source-find-files'.
+;; `anything-ff-run-hardlink-file'
+;; Run Hardlink file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-delete-file'
 ;; Run Delete file action from `anything-c-source-find-files'.
 ;; `anything-ff-run-complete-fn-at-point'
@@ -215,8 +217,6 @@
 ;; Run grep goto other window action from `anything-do-grep-1'.
 ;; `anything-c-grep-run-save-buffer'
 ;; Run grep save results action from `anything-do-grep-1'.
-;; `anything-do-pdfgrep'
-;; Not documented.
 ;; `anything-yank-text-at-point'
 ;; Yank text at point in minibuffer.
 ;; `anything-c-describe-attributes'
@@ -278,9 +278,9 @@
 ;; `anything-yahoo-suggest'
 ;; Preconfigured `anything' for Yahoo searching with Yahoo suggest.
 ;; `anything-for-buffers'
-;; Preconfigured `anything' for buffer.
+;; Preconfigured `anything' for buffers.
 ;; `anything-buffers-list'
-;; Enhanced preconfigured `anything' for buffer.
+;; Preconfigured `anything' to list buffers.
 ;; `anything-bbdb'
 ;; Preconfigured `anything' for BBDB.
 ;; `anything-locate'
@@ -341,6 +341,8 @@
 ;; Preconfigured `anything' to hardlink files from dired.
 ;; `anything-do-grep'
 ;; Preconfigured anything for grep.
+;; `anything-do-pdfgrep'
+;; Preconfigured anything for pdfgrep.
 ;; `anything-c-etags-select'
 ;; Preconfigured anything for etags.
 ;; `anything-filelist'
@@ -431,7 +433,7 @@
 ;; `anything-create--actions-private'
 ;; Default Value: nil
 ;; `anything-allow-skipping-current-buffer'
-;; Default Value: t
+;; Default Value: nil
 ;; `anything-c-enable-eval-defun-hack'
 ;; Default Value: t
 ;; `anything-tramp-verbose'
@@ -5452,20 +5454,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      "pdf-reader" nil
      (format-spec anything-c-pdfgrep-default-read-command
                   (list (cons ?f fname) (cons ?p pageno))))))
-
-(defun anything-do-pdfgrep ()
-  (interactive)
-  (let ((only (anything-c-read-file-name
-               "Search in file(s): "
-               :marked-candidates t
-               :test #'(lambda (file)
-                         (or (string= (file-name-extension file) "pdf")
-                             (string= (file-name-extension file) "PDF")
-                             (file-directory-p file)))
-               :preselect (or (dired-get-filename nil t)
-                              (buffer-file-name (current-buffer)))))
-        (anything-c-grep-default-function 'anything-c-pdfgrep-init))
-    (anything-do-pdfgrep-1 only)))
 
 
 ;; Yank text at point.
@@ -11992,6 +11980,23 @@ See also `anything-do-grep-1'."
                             (buffer-file-name (current-buffer))))))
     (anything-ff-zgrep-1 ls prefarg)))
 
+;;;###autoload
+(defun anything-do-pdfgrep ()
+  "Preconfigured anything for pdfgrep."
+  (interactive)
+  (let ((only (anything-c-read-file-name
+               "Search in file(s): "
+               :marked-candidates t
+               :test #'(lambda (file)
+                         (or (string= (file-name-extension file) "pdf")
+                             (string= (file-name-extension file) "PDF")
+                             (file-directory-p file)))
+               :preselect (or (dired-get-filename nil t)
+                              (buffer-file-name (current-buffer)))))
+        (anything-c-grep-default-function 'anything-c-pdfgrep-init))
+    (anything-do-pdfgrep-1 only)))
+
+;;;###autoload
 (defun anything-c-etags-select (arg)
   "Preconfigured anything for etags.
 Called with one prefix arg use symbol at point as initial input.
