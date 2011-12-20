@@ -3221,20 +3221,32 @@ See `anything-find-files-eshell-command-on-file-1' for more info."
   "Rename all marked files to `anything-ff-default-directory' with METHOD.
 See `anything-ff-serial-rename-1'."
   (let* ((cands     (anything-marked-candidates))
-         (name      (read-string "NewName: "))
+         (def-name  (car cands))
+         (name      (read-string "NewName: "
+                                 (replace-regexp-in-string
+                                  "[0-9]+$" ""
+                                  (anything-c-basename
+                                   def-name
+                                   (file-name-extension def-name)))))
          (start     (read-number "StartAtNumber: "))
-         (extension (read-string "Extension: " (file-name-extension (car cands))))
+         (extension (read-string "Extension: "
+                                 (file-name-extension (car cands))))
          (dir       (expand-file-name
                      (anything-c-read-file-name
-                      "Serial Rename to directory: " :initial-input
-                      (expand-file-name anything-ff-default-directory)))))
-    (when (y-or-n-p (format "Serial Rename %s *files to `%s' with prefix `%s'? "
+                      "Serial Rename to directory: "
+                      :initial-input
+                      (expand-file-name anything-ff-default-directory)
+                      :test 'file-directory-p
+                      :must-match t))))
+    (when (y-or-n-p (format "Really rename %s *files to `%s' with prefix `%s'? "
                             (length cands) dir name))
-      (anything-ff-serial-rename-1 dir cands name start extension :method method)
+      (anything-ff-serial-rename-1
+       dir cands name start extension :method method)
       (anything-find-files-1 dir))))
 
 (defun anything-ff-member-directory-p (file directory)
-  (let ((dir-file (expand-file-name (file-name-as-directory (file-name-directory file))))
+  (let ((dir-file (expand-file-name
+                   (file-name-as-directory (file-name-directory file))))
         (cur-dir  (expand-file-name (file-name-as-directory directory))))
     (string= dir-file cur-dir)))
 
@@ -4562,10 +4574,14 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                    (anything-find-files-1 (expand-file-name candidate))))
           (setq anything-ff-cand-to-mark nil))))))
 
-
-(defun anything-c-basename (fname)
-  "Resolve basename of file or directory named FNAME."
-  (file-name-nondirectory (directory-file-name fname)))
+(defun anything-c-basename (fname &optional ext)
+  "Print FNAME  with any  leading directory  components removed.
+If specified, also remove filename extension EXT."
+  (if (and ext (or (string= (file-name-extension fname) ext)
+                   (string= (file-name-extension fname t) ext))
+           (not (file-directory-p fname)))
+      (file-name-sans-extension (file-name-nondirectory fname))
+      (file-name-nondirectory (directory-file-name fname))))
 
 (defun anything-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
   "Transform filenames of FLIST to abs of DEST-CAND.
@@ -4754,8 +4770,13 @@ Keys description:
               ;; It is needed for filenames with capital letters
               (disable-shortcuts)
               (mode-line . anything-read-file-name-mode-line-string)
-              (candidates . (lambda ()
-                              (anything-find-files-get-candidates must-match)))
+              (candidates
+               . (lambda ()
+                   (if test
+                       (loop for i in (anything-find-files-get-candidates
+                                       must-match)
+                             when (funcall test i) collect i)
+                       (anything-find-files-get-candidates must-match))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
