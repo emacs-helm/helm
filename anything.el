@@ -1681,7 +1681,7 @@ in source."
   ;;                        :buffer "toto"
   ;;                        :candidate-number-limit 4))
   ;; ==> ((anything-candidate-number-limit . 4))
-  (loop for (key value &rest _) on keys by #'cddr
+  (loop for (key value) on keys by #'cddr
         for symname = (substring (symbol-name key) 1)
         for sym = (intern (if (string-match "^anything-" symname)
                               symname
