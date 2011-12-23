@@ -8451,7 +8451,7 @@ When nil, fallback to `browse-url-browser-function'.")
                                          (int-to-string (nth 2 bookmark))))
          (type     (read-from-minibuffer "Type (url, streamlist, or lastfm): "
                                          (format "%s" (car (last bookmark))))))
-    (save-excursion
+    (save-window-excursion
       (emms-streams)
       (when (re-search-forward (concat "^" name) nil t)
         (beginning-of-line)
@@ -8461,19 +8461,23 @@ When nil, fallback to `browse-url-browser-function'.")
         (emms-stream-quit)
         (anything-c-switch-to-buffer cur-buf)))))
 
-(defun anything-emms-stream-delete-bookmark (elm)
-  "Delete an emms-stream bookmark from anything."
-  (let* ((cur-buf anything-current-buffer)
-         (bookmark (assoc elm emms-stream-list))
-         (name (nth 0 bookmark)))
-    (save-excursion
-      (emms-streams)
-      (when (re-search-forward (concat "^" name) nil t)
-        (beginning-of-line)
-        (emms-stream-delete-bookmark)
-        (emms-stream-save-bookmarks-file)
-        (emms-stream-quit)
-        (anything-c-switch-to-buffer cur-buf)))))
+(defun anything-emms-stream-delete-bookmark (candidate)
+  "Delete emms-streams bookmarks from anything."
+  (let* ((cands   (anything-marked-candidates))
+         (bmks    (loop for bm in cands collect
+                        (car (assoc bm emms-stream-list))))
+         (bmk-reg (mapconcat 'regexp-quote bmks "\\|^")))
+    (when (y-or-n-p (format "Really delete radios\n -%s: ? "
+                            (mapconcat 'identity bmks "\n -")))
+      (save-window-excursion
+        (emms-streams)
+        (goto-char (point-min))
+        (loop while (re-search-forward bmk-reg nil t)
+              do (progn (beginning-of-line)
+                        (emms-stream-delete-bookmark))
+              finally do (progn
+                           (emms-stream-save-bookmarks-file)
+                           (emms-stream-quit)))))))
 
 (defvar anything-c-source-emms-streams
   '((name . "Emms Streams")
