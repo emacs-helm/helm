@@ -23,6 +23,85 @@
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
+;;; Auto documentation
+;;  ------------------
+;;
+;;  * User variables
+;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "anything-mp" :var-value t)
+;; `anything-mp-matching-method'
+;; Default Value: multi3
+;;
+;;  * Internal variables
+;; [EVAL] (autodoc-document-lisp-buffer :type 'internal-variable :prefix "anything-mp" :var-value t)
+;; `anything-mp-default-match-functions'
+;; Default Value: (anything-mp-exact-match anything-mp-3-match) 
+;; `anything-mp-default-search-functions'
+;; Default Value: (anything-mp-exact-search anything-mp-3-search) 
+;; `anything-mp-default-search-backward-functions'
+;; Default Value: (anything-mp-exact-search-backward anything-mp-3-search-backward) 
+;; `anything-mp-space-regexp'
+;; Default Value: "[\\ ] "
+;; `anything-mp-exact-pattern-str'
+;; Default Value: "autodoc"
+;; `anything-mp-exact-pattern-real'
+;; Default Value: "\nautodoc\n"
+;; `anything-mp-prefix-pattern-str'
+;; Default Value: "find"
+;; `anything-mp-prefix-pattern-real'
+;; Default Value: "\nfind"
+;; `anything-mp-1-pattern-str'
+;; Default Value: nil
+;; `anything-mp-1-pattern-real'
+;; Default Value: nil
+;; `anything-mp-2-pattern-str'
+;; Default Value: "lisp ini"
+;; `anything-mp-2-pattern-real'
+;; Default Value: "^.*lisp.*ini"
+;; `anything-mp-3-pattern-str'
+;; Default Value: "autodoc"
+;; `anything-mp-3-pattern-list'
+;; Default Value: ((identity . "autodoc")) 
+;; `anything-mp-highlight-delay'
+;; Default Value: 0.7
+;; `anything-mp-highlight-threshold'
+;; Default Value: 2
+;;
+;;  * Anything match plugin Functions
+;; [EVAL] (autodoc-document-lisp-buffer :type 'function :prefix "anything-mp")
+;; `anything-mp-set-matching-method'
+;; `anything-mp-make-regexps'
+;; `anything-mp-1-make-regexp'
+;; `anything-mp-exact-get-pattern'
+;; `anything-mp-exact-match'
+;; `anything-mp-exact-search'
+;; `anything-mp-exact-search-backward'
+;; `anything-mp-prefix-get-pattern'
+;; `anything-mp-prefix-match'
+;; `anything-mp-prefix-search'
+;; `anything-mp-prefix-search-backward'
+;; `anything-mp-1-get-pattern'
+;; `anything-mp-1-match'
+;; `anything-mp-1-search'
+;; `anything-mp-1-search-backward'
+;; `anything-mp-2-get-pattern'
+;; `anything-mp-2-match'
+;; `anything-mp-2-search'
+;; `anything-mp-2-search-backward'
+;; `anything-mp-3-get-patterns'
+;; `anything-mp-3-get-patterns-internal'
+;; `anything-mp-3-match'
+;; `anything-mp-3-search-base'
+;; `anything-mp-3-search'
+;; `anything-mp-3-search-backward'
+;; `anything-mp-3p-match'
+;; `anything-mp-3p-search'
+;; `anything-mp-3p-search-backward'
+;; `anything-mp-highlight-match'
+;; `anything-mp-highlight-region'
+;; `anything-mp-highlight-match-internal'
+
+;;  *** END auto-documentation
+
 ;;; Commentary:
 
 ;; Change anything.el matching algorithm humanely.

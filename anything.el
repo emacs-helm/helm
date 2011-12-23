@@ -628,7 +628,7 @@
 
 (require 'cl)
 
-(defvar anything-version "1.3.6")
+(defvar anything-version "1.3.7")
 
 ;; (@* "User Configuration")
 
