@@ -69,7 +69,7 @@
 (require 'anything)
 (require 'cl)
 
-
+
 ;;;; Match-plugin
 
 ;;; multiple patterns
@@ -89,7 +89,7 @@
 
 (defun anything-mp-1-make-regexp (pattern)
   (mapconcat 'identity (anything-mp-make-regexps pattern) ".*"))
-
+
 ;;; Exact match.
 ;;
 ;;
@@ -113,8 +113,7 @@
 (defun anything-mp-exact-search-backward (pattern &rest ignore)
   (and (search-backward (anything-mp-exact-get-pattern pattern) nil t)
        (forward-line 1)))
-
-
+
 ;;; Prefix match
 ;;
 ;;
@@ -139,7 +138,7 @@
 (defun anything-mp-prefix-search-backward (pattern &rest ignore)
   (and (search-backward (anything-mp-prefix-get-pattern pattern) nil t)
        (forward-line 1)))
-
+
 ;;; Multiple regexp patterns 1 (order is preserved / prefix).
 ;;
 ;;
@@ -161,7 +160,7 @@
 
 (defun anything-mp-1-search-backward (pattern &rest ignore)
   (re-search-backward (anything-mp-1-get-pattern pattern) nil t))
-
+
 ;;; Multiple regexp patterns 2 (order is preserved / partial).
 ;;
 ;;
@@ -183,7 +182,7 @@
 
 (defun anything-mp-2-search-backward (pattern &rest ignore)
   (re-search-backward (anything-mp-2-get-pattern pattern) nil t))
-
+
 ;;; Multiple regexp patterns 3 (permutation).
 ;;
 ;;
@@ -209,11 +208,20 @@ e.g ((identity . \"foo\") (identity . \"bar\"))."
                       (cons 'not (substring pat 1))
                       (cons 'identity pat)))))
 
-(defun* anything-mp-3-match (str &optional (pattern anything-pattern))
-  (when (stringp pattern)
-    (setq pattern (anything-mp-3-get-patterns pattern)))
-  (loop for (predicate . regexp) in pattern
-        always (funcall predicate (string-match regexp str))))
+(defun anything-mp-3-match (str &optional pattern)
+  "Check if PATTERN match STR.
+When PATTERN contain a space, it is splitted and matching is done
+with the several resulting regexps against STR.
+e.g \"bar foo\" will match \"foobar\" and \"barfoo\".
+Argument PATTERN, a string, is transformed in a list of
+cons cell with `anything-mp-3-get-patterns' if it contain a space.
+e.g \"foo bar\"=>((identity . \"foo\") (identity . \"bar\")).
+Then each predicate of cons cell(s) is called with regexp of same
+cons cell against STR (a candidate).
+i.e (identity (string-match \"foo\" \"foo bar\")) => t."
+  (let ((pat (anything-mp-3-get-patterns (or pattern anything-pattern))))
+    (loop for (predicate . regexp) in pat
+          always (funcall predicate (string-match regexp str)))))
 
 (defun anything-mp-3-search-base (pattern searchfn1 searchfn2)
   (loop with pat = (if (stringp pattern)
@@ -240,10 +248,21 @@ e.g ((identity . \"foo\") (identity . \"bar\"))."
     (setq pattern (anything-mp-3-get-patterns pattern)))
   (anything-mp-3-search-base
    pattern 're-search-backward 're-search-backward))
-  
+  
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)
 ;;
 ;;
+(defun anything-mp-3p-match (str &optional pattern)
+    "Check if PATTERN match STR.
+Same as `anything-mp-3-match' but more strict, matching against prefix also.
+e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
+`anything-mp-3-match'."
+  (let* ((pat (anything-mp-3-get-patterns (or pattern anything-pattern)))
+         (first (car pat)))
+    (and (funcall (car first) (anything-mp-prefix-match str (cdr first)))
+         (loop for (predicate . regexp) in (cdr pat)
+               always (funcall predicate (string-match regexp str))))))
+  
 (defun anything-mp-3p-search (pattern &rest ignore)
   (when (stringp pattern)
     (setq pattern (anything-mp-3-get-patterns pattern)))
@@ -255,7 +274,7 @@ e.g ((identity . \"foo\") (identity . \"bar\"))."
     (setq pattern (anything-mp-3-get-patterns pattern)))
   (anything-mp-3-search-base
    pattern 'anything-mp-prefix-search-backward 're-search-backward))
-
+
 ;;; source compiler
 ;;
 ;;
@@ -286,7 +305,7 @@ e.g ((identity . \"foo\") (identity . \"bar\"))."
                ,@(assoc-default 'search source))
        ,@source)))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--match-plugin t)
-
+
 ;;; Highlight matches.
 ;;
 ;;
@@ -335,6 +354,7 @@ The smaller  this value is, the slower highlight is.")
           do
           (anything-mp-highlight-region (point-min) end re 'anything-match))))
 
+
 ;;;; Grep-candidates plug-in
 
 (defcustom anything-grep-candidates-fast-directory-regexp nil
