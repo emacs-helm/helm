@@ -284,12 +284,10 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 
 (defvar anything-mp-default-search-functions
   '(anything-mp-exact-search
-    anything-mp-3p-search
     anything-mp-3-search))
 
 (defvar anything-mp-default-search-backward-functions
   '(anything-mp-exact-search-backward
-    anything-mp-3p-search-backward
     anything-mp-3-search-backward))
 
 (defun anything-compile-source--match-plugin (source)
