@@ -3946,7 +3946,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
   (interactive (list (intern
                       (completing-read
                        "Describe anything attribute: "
-                       (mapcar 'symbol-name anything-additional-attributes)))))
+                       (mapcar 'symbol-name anything-additional-attributes)
+                       nil t))))
   (with-output-to-temp-buffer "*Help*"
     (princ (get anything-attribute 'anything-attrdoc))))
 

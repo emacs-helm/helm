@@ -253,7 +253,7 @@ i.e (identity (string-match \"foo\" \"foo bar\")) => t."
 ;;
 ;;
 (defun anything-mp-3p-match (str &optional pattern)
-    "Check if PATTERN match STR.
+  "Check if PATTERN match STR.
 Same as `anything-mp-3-match' but more strict, matching against prefix also.
 e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 `anything-mp-3-match'."

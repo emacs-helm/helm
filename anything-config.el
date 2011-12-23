@@ -5653,23 +5653,6 @@ source.")
                                            "^[^:]+: " "" node-str))))))
     (requires-pattern . 2)))
 
-
-;; FIXME should be merged in anything.el with `anything-describe-anything-attribute'.
-(defun anything-c-describe-attributes (anything-attribute)
-  "Display the full documentation of ANYTHING-ATTRIBUTE (a symbol).
-Same as `anything-describe-anything-attribute' but with anything completion."
-  (interactive (list (intern
-                      (anything-comp-read
-                       "Describe anything attribute: "
-                       (mapcar 'symbol-name anything-additional-attributes)
-                       :must-match t
-                       :persistent-action
-                       #'(lambda (candidate)
-                           (with-output-to-temp-buffer "*Help*"
-                             (princ (get (intern candidate) 'anything-attrdoc))))))))
-  (with-output-to-temp-buffer "*Help*"
-    (princ (get anything-attribute 'anything-attrdoc))))
-
 
 ;;; Use info-index plug-in.
 ;;
