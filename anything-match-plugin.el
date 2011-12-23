@@ -72,6 +72,62 @@
 
 ;;;; Match-plugin
 
+;; Internals
+(defvar anything-mp-default-match-functions nil)
+(defvar anything-mp-default-search-functions nil)
+(defvar anything-mp-default-search-backward-functions nil)
+
+(defun anything-mp-set-matching-method (var key)
+  "Default function to set matching methods in anything match plugin."
+  (set-default var key)
+  (case (symbol-value var)
+    (multi1 (setq anything-mp-default-match-functions
+                  '(anything-mp-exact-match anything-mp-1-match)
+                  anything-mp-default-search-functions
+                  '(anything-mp-exact-search anything-mp-1-search)
+                  anything-mp-default-search-backward-functions
+                  '(anything-mp-exact-search-backward
+                    anything-mp-1-search-backward)))
+    (multi2 (setq anything-mp-default-match-functions
+                  '(anything-mp-exact-match anything-mp-2-match)
+                  anything-mp-default-search-functions
+                  '(anything-mp-exact-search anything-mp-2-search)
+                  anything-mp-default-search-backward-functions
+                  '(anything-mp-exact-search-backward
+                    anything-mp-2-search-backward)))
+    (multi3 (setq anything-mp-default-match-functions
+                  '(anything-mp-exact-match anything-mp-3-match)
+                  anything-mp-default-search-functions
+                  '(anything-mp-exact-search anything-mp-3-search)
+                  anything-mp-default-search-backward-functions
+                  '(anything-mp-exact-search-backward
+                    anything-mp-3-search-backward)))
+    (multi3p (setq anything-mp-default-match-functions
+                   '(anything-mp-exact-match anything-mp-3p-match)
+                   anything-mp-default-search-functions
+                   '(anything-mp-exact-search anything-mp-3p-search)
+                   anything-mp-default-search-backward-functions
+                   '(anything-mp-exact-search-backward
+                     anything-mp-3p-search-backward)))
+    (t (error "Unknow value: %s" anything-mp-matching-method))))
+
+(defcustom anything-mp-matching-method 'multi3
+  "Matching method for anything match plugin.
+You can set here different methods to match candidates in anything.
+Here are the possible value of this symbol and their meaning:
+- multi1: Respect order, prefix of pattern must match.
+- multi2: Same but with partial match.
+- multi3: The best, multiple regexp match, allow negation.
+- multi3p: Same but prefix must match.
+Default is multi3."
+  :type  '(radio :tag "Matching methods for anything"
+           (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
+           (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
+           (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
+           (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
+  :set   'anything-mp-set-matching-method
+  :group 'anything)
+
 ;;; multiple patterns
 ;;
 ;;
@@ -89,6 +145,7 @@
 
 (defun anything-mp-1-make-regexp (pattern)
   (mapconcat 'identity (anything-mp-make-regexps pattern) ".*"))
+
 
 ;;; Exact match.
 ;;
@@ -113,6 +170,7 @@
 (defun anything-mp-exact-search-backward (pattern &rest ignore)
   (and (search-backward (anything-mp-exact-get-pattern pattern) nil t)
        (forward-line 1)))
+
 
 ;;; Prefix match
 ;;
@@ -138,6 +196,7 @@
 (defun anything-mp-prefix-search-backward (pattern &rest ignore)
   (and (search-backward (anything-mp-prefix-get-pattern pattern) nil t)
        (forward-line 1)))
+
 
 ;;; Multiple regexp patterns 1 (order is preserved / prefix).
 ;;
@@ -160,6 +219,7 @@
 
 (defun anything-mp-1-search-backward (pattern &rest ignore)
   (re-search-backward (anything-mp-1-get-pattern pattern) nil t))
+
 
 ;;; Multiple regexp patterns 2 (order is preserved / partial).
 ;;
@@ -171,7 +231,7 @@
   (unless (equal pattern anything-mp-2-pattern-str)
     (setq anything-mp-2-pattern-str pattern
           anything-mp-2-pattern-real
-          (concat "^.+" (anything-mp-1-make-regexp pattern))))
+          (concat "^.*" (anything-mp-1-make-regexp pattern))))
   anything-mp-2-pattern-real)
 
 (defun* anything-mp-2-match (str &optional (pattern anything-pattern))
@@ -182,6 +242,7 @@
 
 (defun anything-mp-2-search-backward (pattern &rest ignore)
   (re-search-backward (anything-mp-2-get-pattern pattern) nil t))
+
 
 ;;; Multiple regexp patterns 3 (permutation).
 ;;
@@ -248,6 +309,7 @@ i.e (identity (string-match \"foo\" \"foo bar\")) => t."
     (setq pattern (anything-mp-3-get-patterns pattern)))
   (anything-mp-3-search-base
    pattern 're-search-backward 're-search-backward))
+
   
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)
 ;;
@@ -274,22 +336,11 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
     (setq pattern (anything-mp-3-get-patterns pattern)))
   (anything-mp-3-search-base
    pattern 'anything-mp-prefix-search-backward 're-search-backward))
+
 
 ;;; source compiler
 ;;
 ;;
-(defvar anything-mp-default-match-functions
-  '(anything-mp-exact-match
-    anything-mp-3-match))
-
-(defvar anything-mp-default-search-functions
-  '(anything-mp-exact-search
-    anything-mp-3-search))
-
-(defvar anything-mp-default-search-backward-functions
-  '(anything-mp-exact-search-backward
-    anything-mp-3-search-backward))
-
 (defun anything-compile-source--match-plugin (source)
   (let ((searchers (if (assoc 'search-from-end source)
                        anything-mp-default-search-backward-functions
@@ -303,6 +354,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                ,@(assoc-default 'search source))
        ,@source)))
 (add-to-list 'anything-compile-source-functions 'anything-compile-source--match-plugin t)
+
 
 ;;; Highlight matches.
 ;;
