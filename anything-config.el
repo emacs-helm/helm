@@ -3247,12 +3247,20 @@ See `anything-ff-serial-rename-1'."
                       :initial-input
                       (expand-file-name anything-ff-default-directory)
                       :test 'file-directory-p
-                      :must-match t))))
-    (when (y-or-n-p (format "Really rename %s *files to `%s' with prefix `%s'? "
-                            (length cands) dir name))
-      (anything-ff-serial-rename-1
-       dir cands name start extension :method method)
-      (anything-find-files-1 dir))))
+                      :must-match t)))
+         (res       (loop for f in cands
+                          for bn = (anything-c-basename f)
+                          for count from start
+                          concat (format "%s <-> %s%s.%s\n"
+                                         bn name count extension))))
+    (if (y-or-n-p
+         (format "Result:\n %sRename like this to <%s> ? " res dir))
+        (progn
+          (anything-ff-serial-rename-1
+           dir cands name start extension :method method)
+          (message nil)
+          (anything-find-files-1 dir))
+        (message "Operation aborted"))))
 
 (defun anything-ff-member-directory-p (file directory)
   (let ((dir-file (expand-file-name
@@ -3286,26 +3294,32 @@ Default METHOD is rename."
                        (rename  'rename-file)
                        (t (error "Error: Unknow method %s" method)))))
       (make-directory tmp-dir)
-      (loop for i in collection
-            for count from start-at-num
-            for fnum = (if (< count 10) "0%s" "%s")
-            for nname = (concat tmp-dir new-name (format fnum count)
-                                (if (not (string= extension ""))
-                                    (format ".%s" (replace-regexp-in-string
-                                                   "[.]" "" extension))
-                                    (file-name-extension i 'dot)))
-            do (if (anything-ff-member-directory-p i directory)
-                   (rename-file i nname)
-                   (funcall fn i nname)))
-      (loop with dirlist = (directory-files
-                            tmp-dir t directory-files-no-dot-files-regexp)
-            for f in dirlist do
-            (if (file-symlink-p f)
-                (symlink-file (file-truename f)
-                              (concat (file-name-as-directory directory)
-                                      (anything-c-basename f)))
-                (rename-file f directory)))
-      (delete-directory tmp-dir t))))
+      (unwind-protect
+           (progn
+             ;; Rename all files to tmp-dir with new-name.
+             ;; If files are not from start directory, use method
+             ;; to move files to tmp-dir.
+             (loop for i in collection
+                   for count from start-at-num
+                   for fnum = (if (< count 10) "0%s" "%s")
+                   for nname = (concat tmp-dir new-name (format fnum count)
+                                       (if (not (string= extension ""))
+                                           (format ".%s" (replace-regexp-in-string
+                                                          "[.]" "" extension))
+                                           (file-name-extension i 'dot)))
+                   do (if (anything-ff-member-directory-p i directory)
+                          (rename-file i nname)
+                          (funcall fn i nname)))
+             ;; Now move all from tmp-dir to destination.
+             (loop with dirlist = (directory-files
+                                   tmp-dir t directory-files-no-dot-files-regexp)
+                   for f in dirlist do
+                   (if (file-symlink-p f)
+                       (symlink-file (file-truename f)
+                                     (concat (file-name-as-directory directory)
+                                             (anything-c-basename f)))
+                       (rename-file f directory))))
+        (delete-directory tmp-dir t)))))
 
 (defun anything-ff-serial-rename (candidate)
   "Serial rename all marked files to `anything-ff-default-directory'.
