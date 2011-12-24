@@ -476,12 +476,14 @@ The smaller  this value is, the slower highlight is.")
     (set-buffer anything-buffer)
     (let ((requote (loop for (pred . re) in
                          (anything-mp-3-get-patterns anything-pattern)
-                          when (and (eq pred 'identity)
+                         when (and (eq pred 'identity)
                                     (>= (length re)
                                         anything-mp-highlight-threshold))
-                          collect re into re-list
-                          finally return
-                         (mapconcat 'regexp-quote re-list "\\|"))))
+                         collect re into re-list
+                         finally return
+                         (if (and re-list (>= (length re-list) 1))
+                             (mapconcat 'identity re-list "\\|")
+                             (regexp-quote anything-pattern)))))
       (when (>= (length requote) anything-mp-highlight-threshold)
         (anything-mp-highlight-region (point-min) end
                                       requote 
