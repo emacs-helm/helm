@@ -468,20 +468,24 @@ The smaller  this value is, the slower highlight is.")
       (while (and (setq me (re-search-forward regexp nil t))
                   (< (point) end)
                   (< 0 (- (match-end 0) (match-beginning 0))))
-        (put-text-property (match-beginning 0) me 'face face)))))
+        (unless (anything-pos-header-line-p)
+          (put-text-property (match-beginning 0) me 'face face))))))
 
-(defun* anything-mp-highlight-match-internal (end)
+(defun anything-mp-highlight-match-internal (end)
   (when (anything-window)
     (set-buffer anything-buffer)
-    (let ((requote (regexp-quote anything-pattern)))
+    (let ((requote (loop for (pred . re) in
+                         (anything-mp-3-get-patterns anything-pattern)
+                          when (and (eq pred 'identity)
+                                    (>= (length re)
+                                        anything-mp-highlight-threshold))
+                          collect re into re-list
+                          finally return
+                         (mapconcat 'regexp-quote re-list "\\|"))))
       (when (>= (length requote) anything-mp-highlight-threshold)
         (anything-mp-highlight-region (point-min) end
-                                      requote 'anything-match)))
-    (loop for (pred . re) in (anything-mp-3-get-patterns anything-pattern)
-          when (and (eq pred 'identity)
-                    (>= (length re) anything-mp-highlight-threshold))
-          do
-          (anything-mp-highlight-region (point-min) end re 'anything-match))))
+                                      requote 
+                                      'anything-match)))))
 
 
 ;;;; Grep-candidates plug-in
