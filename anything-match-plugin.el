@@ -151,7 +151,7 @@
 
 ;;;; Match-plugin
 
-;; Internals
+;; Internal
 (defvar anything-mp-default-match-functions nil)
 (defvar anything-mp-default-search-functions nil)
 (defvar anything-mp-default-search-backward-functions nil)
@@ -207,13 +207,36 @@ Default is multi3."
   :set   'anything-mp-set-matching-method
   :group 'anything)
 
-;;; multiple patterns
+(defface anything-match
+    '((t (:inherit match)))
+  "Face used to highlight matches."
+  :group 'anything)
+
+(defcustom anything-mp-highlight-delay 0.7
+  "Highlight matches with `anything-match' face after this many seconds.
+ If nil, no highlight. "
+  :type  'integer
+  :group 'anything)
+
+(defcustom anything-mp-highlight-threshold 2
+  "Minimum length of pattern to highlight.
+The smaller  this value is, the slower highlight is."
+  :type  'integer
+  :group 'anything)
+
+
+
+;;; Build regexps
 ;;
 ;;
 (defvar anything-mp-space-regexp "[\\ ] "
   "Regexp to represent space itself in multiple regexp match.")
 
 (defun anything-mp-make-regexps (pattern)
+  "Split PATTERN if it contain spaces and return resulting list.
+If spaces in PATTERN are escaped, don't split at this place.
+i.e \"foo bar\"=> (\"foo\" \"bar\")
+but \"foo\ bar\"=> (\"foobar\")."
   (if (string= pattern "")
       '("")
       (loop for s in (split-string
@@ -223,12 +246,14 @@ Default is multi3."
             collect (replace-regexp-in-string "\000\000" " " s))))
 
 (defun anything-mp-1-make-regexp (pattern)
+  "Replace spaces in PATTERN with \"\.*\"."
   (mapconcat 'identity (anything-mp-make-regexps pattern) ".*"))
 
 
 ;;; Exact match.
 ;;
 ;;
+;; Internal.
 (defvar anything-mp-exact-pattern-str nil)
 (defvar anything-mp-exact-pattern-real nil)
 
@@ -254,6 +279,7 @@ Default is multi3."
 ;;; Prefix match
 ;;
 ;;
+;; Internal
 (defvar anything-mp-prefix-pattern-str nil)
 (defvar anything-mp-prefix-pattern-real nil)
 
@@ -280,6 +306,7 @@ Default is multi3."
 ;;; Multiple regexp patterns 1 (order is preserved / prefix).
 ;;
 ;;
+;; Internal
 (defvar anything-mp-1-pattern-str nil)
 (defvar anything-mp-1-pattern-real nil)
 
@@ -303,6 +330,7 @@ Default is multi3."
 ;;; Multiple regexp patterns 2 (order is preserved / partial).
 ;;
 ;;
+;; Internal
 (defvar anything-mp-2-pattern-str nil)
 (defvar anything-mp-2-pattern-real nil)
 
@@ -326,6 +354,7 @@ Default is multi3."
 ;;; Multiple regexp patterns 3 (permutation).
 ;;
 ;;
+;; Internal
 (defvar anything-mp-3-pattern-str nil)
 (defvar anything-mp-3-pattern-list nil)
 
@@ -438,19 +467,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 ;;; Highlight matches.
 ;;
 ;;
-(defface anything-match
-    '((t (:inherit match)))
-  "Face used to highlight matches."
-  :group 'anything)
-
-(defvar anything-mp-highlight-delay 0.7
-  "Highlight matches with `anything-match' face after this many seconds.
- If nil, no highlight. ")
-
-(defvar anything-mp-highlight-threshold 2
-  "Minimum length of pattern to highlight.
-The smaller  this value is, the slower highlight is.")
-
 (defun anything-mp-highlight-match ()
   "Highlight matches after `anything-mp-highlight-delay' seconds."
   (when (and anything-mp-highlight-delay
