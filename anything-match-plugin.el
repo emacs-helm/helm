@@ -505,9 +505,47 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                              (mapconcat 'identity re-list "\\|")
                              (regexp-quote anything-pattern)))))
       (when (>= (length requote) anything-mp-highlight-threshold)
-        (anything-mp-highlight-region (point-min) end
-                                      requote 
-                                      'anything-match)))))
+        (anything-mp-highlight-region
+         (point-min) end requote 'anything-match)))))
+
+
+;;; Toggle anything-match-plugin
+;;
+;;
+(defvar anything-mp-initial-highlight-delay nil)
+
+;;;###autoload
+(defun anything-mp-toggle-match-plugin ()
+  "Turn on/off multiple regexp matching in anything.
+i.e anything-match-plugin."
+  (interactive)
+  (let ((anything-match-plugin-enabled
+         (member 'anything-compile-source--match-plugin
+                 anything-compile-source-functions)))
+    (flet ((disable-match-plugin ()
+             (setq anything-compile-source-functions
+                   (delq 'anything-compile-source--match-plugin
+                         anything-compile-source-functions))
+             (setq anything-mp-initial-highlight-delay
+                   anything-mp-highlight-delay)
+             (setq anything-mp-highlight-delay nil))
+           (enable-match-plugin ()
+             (unless anything-mp-initial-highlight-delay
+               (setq anything-mp-initial-highlight-delay
+                     anything-mp-highlight-delay))
+             (setq anything-compile-source-functions
+                   (cons 'anything-compile-source--match-plugin
+                         anything-compile-source-functions))
+             (unless anything-mp-highlight-delay
+               (setq anything-mp-highlight-delay
+                     anything-mp-initial-highlight-delay))))
+      (if anything-match-plugin-enabled
+          (when (y-or-n-p "Really disable match-plugin? ")
+            (disable-match-plugin)
+            (message "Anything-match-plugin disabled"))
+          (when (y-or-n-p "Really enable match-plugin? ")
+            (enable-match-plugin)
+            (message "Anything-match-plugin enabled"))))))
 
 
 ;;;; Grep-candidates plug-in
