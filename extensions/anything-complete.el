@@ -574,7 +574,7 @@ used by `anything-lisp-complete-symbol-set-timer' and `anything-apropos'"
       (anything-old-completing-read prompt collection predicate require-match initial hist default inherit-input-method)
     ;; support only collection list.
     (setq hist (or (car-safe hist) hist))
-    (let* (anything-input-idle-delay
+    (let* ((anything-input-idle-delay 0.1)
            (result (or (anything-noresume (acr-sources
                                            prompt
                                            collection
