@@ -190,6 +190,10 @@
                      anything-mp-3p-search-backward)))
     (t (error "Unknow value: %s" anything-mp-matching-method))))
 
+(defgroup anything-match-plugin nil
+  "Anything match plugin."
+  :group 'anything)
+
 (defcustom anything-mp-matching-method 'multi3
   "Matching method for anything match plugin.
 You can set here different methods to match candidates in anything.
@@ -205,24 +209,24 @@ Default is multi3."
            (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
            (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
   :set   'anything-mp-set-matching-method
-  :group 'anything)
+  :group 'anything-match-plugin)
 
 (defface anything-match
     '((t (:inherit match)))
   "Face used to highlight matches."
-  :group 'anything)
+  :group 'anything-match-plugin)
 
 (defcustom anything-mp-highlight-delay 0.7
   "Highlight matches with `anything-match' face after this many seconds.
  If nil, no highlight. "
   :type  'integer
-  :group 'anything)
+  :group 'anything-match-plugin)
 
 (defcustom anything-mp-highlight-threshold 2
   "Minimum length of pattern to highlight.
 The smaller  this value is, the slower highlight is."
   :type  'integer
-  :group 'anything)
+  :group 'anything-match-plugin)
 
 
 
