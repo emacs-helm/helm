@@ -1149,7 +1149,20 @@ Should take one arg: the string to display."
 (defcustom anything-c-turn-on-show-completion t
   "Display candidate in buffer while moving selection when non--nil."
   :group 'anything-config
-  :type 'boolean)
+  :type  'boolean)
+
+(defcustom anything-c-show-completion-use-special-display t
+  "A special display will be used in lisp completion if non--nil.
+All functions that are wrapped in macro `with-anything-show-completion'
+will be affected."
+  :group 'anything-config
+  :type  'boolean)
+
+(defcustom anything-c-show-completion-min-window-height 7
+  "Minimum completion window height used in show completion.
+This is used in macro `with-anything-show-completion'."
+  :group 'anything-config
+  :type  'integer)
 
 (defcustom anything-lisp-completion-or-indent-delay 0.6
   "After this delay `anything-lisp-completion-counter' is reset to 0.
@@ -10047,6 +10060,22 @@ This is the same as `ac-insert', just inlined here for compatibility."
        (overlay-put anything-c-show-completion-overlay
                     'face 'anything-lisp-show-completion)))
 
+(defun anything-c-show-completion-display-function (buffer)
+  "A special resized anything window is used depending on position in BUFFER."
+  (with-selected-window (selected-window)
+    (let* ((screen-size  (+ (count-screen-lines (window-start) (point) t)
+                            1                             ; mode-line
+                            (if header-line-format 1 0))) ; header-line
+           (def-size     (- (window-height)
+                            anything-c-show-completion-min-window-height))
+           (upper-height (max window-min-height (min screen-size def-size)))
+           split-window-keep-point)
+      (recenter -1)
+      (set-window-buffer (if (active-minibuffer-window)
+                             (minibuffer-selected-window)
+                             (split-window nil upper-height))
+                         buffer))))
+
 (defmacro with-anything-show-completion (beg end &rest body)
   "Show anything candidate in an overlay at point.
 BEG and END are the beginning and end position of the current completion
@@ -10059,8 +10088,13 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
                (append (list 'anything-c-show-completion)
                        anything-move-selection-after-hook))))
      (unwind-protect
-          (progn (anything-c-show-completion-init-overlay ,beg ,end)
-                 ,@body)
+          (progn
+            (anything-c-show-completion-init-overlay ,beg ,end)
+            (let ((anything-display-function
+                   (if anything-c-show-completion-use-special-display
+                       'anything-c-show-completion-display-function
+                       'anything-default-display-buffer)))
+              ,@body))
        (and anything-c-turn-on-show-completion
             (delete-overlay anything-c-show-completion-overlay)))))
 
@@ -10081,6 +10115,7 @@ If `anything-c-turn-on-show-completion' is nil just do nothing."
          (target     (and beg end (buffer-substring-no-properties beg end)))
          (candidates (all-completions target (nth 2 data) pred))
          (anything-quit-if-no-candidate t)
+         
          (anything-execute-action-at-once-if-one t)
          (anything-match-plugin-enabled
           (member 'anything-compile-source--match-plugin
