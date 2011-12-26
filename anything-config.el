@@ -5681,256 +5681,33 @@ source.")
     (requires-pattern . 2)))
 
 
-;;; Use info-index plug-in.
+;;; Build info-index sources with info-index plug-in.
 ;;
 ;;
 ;; Note that `name' attribute is not needed since
 ;; `anything-c-insert-summary' have been removed.
-;; Info Elisp
-(defvar anything-c-source-info-elisp
-  '((name . "Info index: elisp")
-    (info-index . "elisp")))
+(defvar anything-c-default-info-index-list
+  '("elisp" "cl" "org" "gnus" "ratpoison"
+    "zsh" "bash" "coreutils" "fileutils"
+    "find" "sh-utils" "textutils" "libc"
+    "make" "automake" "autoconf" "emacs-lisp-intro"
+    "emacs" "elib" "eieio" "gauche-refe" "guile"
+    "guile-tut" "goops" "screen" "latex" "gawk"
+    "sed" "m4" "wget" "binutils" "as" "bfd" "gprof"
+    "ld" "diff" "flex" "grep" "gzip" "libtool"
+    "texinfo" "info" "gdb" "stabs" "cvsbook" "cvs"
+    "bison" "id-utils" "global"))
 
-;; Info-Common-Lisp
-(defvar anything-c-source-info-cl
-  '((name . "Info index: cl")
-    (info-index . "cl")))
+(defun anything-c-define-info-index-sources ()
+  (loop with symbols = (loop for str in anything-c-default-info-index-list
+                             collect
+                             (intern (concat "anything-c-source-info-" str)))
+        for sym in symbols
+        for str in anything-c-default-info-index-list
+        do (set sym (list (cons 'name (format "Info index: %s" str))
+                          (cons 'info-index str)))))
 
-;; Info Index org
-(defvar anything-c-source-info-org
-  '((name . "Info index: org")
-    (info-index . "org")))
-
-;; Info Index gnus
-(defvar anything-c-source-info-gnus
-  '((name . "Info index: Gnus")
-    (info-index . "gnus")))
-
-;; Info Index ratpoison
-(defvar anything-c-source-info-ratpoison
-  '((name . "Info index: ratpoison")
-    (info-index . "ratpoison")))
-
-;; Info Index zsh
-(defvar anything-c-source-info-zsh
-  '((name . "Info index: zsh")
-    (info-index . "zsh")))
-
-;; Info Index bash
-(defvar anything-c-source-info-bash
-  '((name . "Info index: bash")
-    (info-index . "bash")))
-
-;; Info Index coreutils
-(defvar anything-c-source-info-coreutils
-  '((name . "Info index: coreutils")
-    (info-index . "coreutils")))
-
-;; Info Index fileutils
-(defvar anything-c-source-info-fileutils
-  '((name . "Info index: fileutils")
-    (info-index . "fileutils")))
-
-;; Info Index find
-(defvar anything-c-source-info-find
-  '((name . "Info index: find")
-    (info-index . "find")))
-
-;; Info Index sh-utils
-(defvar anything-c-source-info-sh-utils
-  '((name . "Info index: sh-utils")
-    (info-index . "sh-utils")))
-
-;; Info Index textutils
-(defvar anything-c-source-info-textutils
-  '((name . "Info index: textutils")
-    (info-index . "textutils")))
-
-;; Info Index libc
-(defvar anything-c-source-info-libc
-  '((name . "Info index: libc")
-    (info-index . "libc")))
-
-;; Info Index make
-(defvar anything-c-source-info-make
-  '((name . "Info index: make")
-    (info-index . "make")))
-
-;; Info Index automake
-(defvar anything-c-source-info-automake
-  '((name . "Info index: automake")
-    (info-index . "automake")))
-
-;; Info Index autoconf
-(defvar anything-c-source-info-autoconf
-  '((name . "Info index: autoconf")
-    (info-index . "autoconf")))
-
-;; Info Index emacs-lisp-intro
-(defvar anything-c-source-info-emacs-lisp-intro
-  '((name . "Info index: emacs-lisp-intro")
-    (info-index . "emacs-lisp-intro")))
-
-;; Info Index emacs
-(defvar anything-c-source-info-emacs
-  '((name . "Info index: emacs")
-    (info-index . "emacs")))
-
-;; Info Index elib
-(defvar anything-c-source-info-elib
-  '((name . "Info index: elib")
-    (info-index . "elib")))
-
-;; Info Index eieio
-(defvar anything-c-source-info-eieio
-  '((name . "Info index: eieio")
-    (info-index . "eieio")))
-
-;; Info Index gauche-refe
-(defvar anything-c-source-info-gauche-refe
-  '((name . "Info index: gauche")
-    (info-index . "gauche-refe")))
-
-;; Info Index guile
-(defvar anything-c-source-info-guile
-  '((name . "Info index: guile")
-    (info-index . "guile")))
-
-;; Info Index guile-tut
-(defvar anything-c-source-info-guile-tut
-  '((name . "Info index: guile-tut")
-    (info-index . "guile-tut")))
-
-;; Info Index goops
-(defvar anything-c-source-info-goops
-  '((name . "Info index: goops")
-    (info-index . "goops")))
-
-;; Info Index screen
-(defvar anything-c-source-info-screen
-  '((name . "Info index: screen")
-    (info-index . "screen")
-    (index-nodes "Concept Index" "Command Index" "Keystroke Index")))
-
-;; Info Index latex
-(defvar anything-c-source-info-latex
-  '((name . "Info index: latex")
-    (info-index . "latex")))
-
-;; Info Index gawk
-(defvar anything-c-source-info-gawk
-  '((name . "Info index: gawk")
-    (info-index . "gawk")))
-
-;; Info Index sed
-(defvar anything-c-source-info-sed
-  '((name . "Info index: sed")
-    (info-index . "sed")))
-
-;; Info Index m4
-(defvar anything-c-source-info-m4
-  '((name . "Info index: m4")
-    (info-index . "m4")))
-
-;; Info Index wget
-(defvar anything-c-source-info-wget
-  '((name . "Info index: wget")
-    (info-index . "wget")))
-
-;; Info Index binutils
-(defvar anything-c-source-info-binutils
-  '((name . "Info index: binutils")
-    (info-index . "binutils")))
-
-;; Info Index as
-(defvar anything-c-source-info-as
-  '((name . "Info index: as")
-    (info-index . "as")))
-
-;; Info Index bfd
-(defvar anything-c-source-info-bfd
-  '((name . "Info index: bfd")
-    (info-index . "bfd")))
-
-;; Info Index gprof
-(defvar anything-c-source-info-gprof
-  '((name . "Info index: gprof")
-    (info-index . "gprof")))
-
-;; Info Index ld
-(defvar anything-c-source-info-ld
-  '((name . "Info index: ld")
-    (info-index . "ld")))
-
-;; Info Index diff
-(defvar anything-c-source-info-diff
-  '((name . "Info index: diff")
-    (info-index . "diff")))
-
-;; Info Index flex
-(defvar anything-c-source-info-flex
-  '((name . "Info index: flex")
-    (info-index . "flex")))
-
-;; Info Index grep
-(defvar anything-c-source-info-grep
-  '((name . "Info index: grep")
-    (info-index . "grep")))
-
-;; Info Index gzip
-(defvar anything-c-source-info-gzip
-  '((name . "Info index: gzip")
-    (info-index . "gzip")))
-
-;; Info Index libtool
-(defvar anything-c-source-info-libtool
-  '((name . "Info index: libtool")
-    (info-index . "libtool")))
-
-;; Info Index texinfo
-(defvar anything-c-source-info-texinfo
-  '((name . "Info index: texinfo")
-    (info-index . "texinfo")))
-
-;; Info Index info
-(defvar anything-c-source-info-info
-  '((name . "Info index: info")
-    (info-index . "info")))
-
-;; Info Index gdb
-(defvar anything-c-source-info-gdb
-  '((name . "Info index: gdb")
-    (info-index . "gdb")))
-
-;; Info Index stabs
-(defvar anything-c-source-info-stabs
-  '((name . "Info index: stabs")
-    (info-index . "stabs")))
-
-;; Info Index cvsbook
-(defvar anything-c-source-info-cvsbook
-  '((name . "Info index: cvsbook")
-    (info-index . "cvsbook")))
-
-;; Info Index cvs
-(defvar anything-c-source-info-cvs
-  '((name . "Info index: cvs")
-    (info-index . "cvs")))
-
-;; Info Index bison
-(defvar anything-c-source-info-bison
-  '((name . "Info index: bison")
-    (info-index . "bison")))
-
-;; Info Index id-utils
-(defvar anything-c-source-info-id-utils
-  '((name . "Info index: id-utils")
-    (info-index . "id-utils")))
-
-;; Info Index global
-(defvar anything-c-source-info-global
-  '((name . "Info index: global")
-    (info-index . "global")))
+(anything-c-define-info-index-sources)
 
 
 ;;; Man and woman UI
