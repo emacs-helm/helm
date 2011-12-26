@@ -2518,18 +2518,23 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
              (maxpoint  (or end (point-max))))
         (while (< (point) maxpoint)
           (anything-mark-current-line)
-          (let ((prefix (get-text-property (point-at-bol) 'display))
-                (bn     (anything-c-basename (anything-get-selection)))
-                (src    (assoc-default 'name (anything-get-current-source))))
+          (let* ((prefix (get-text-property (point-at-bol) 'display))
+                 (cand   (anything-get-selection))
+                 (bn     (and (anything-file-completion-source-p)
+                              (anything-c-basename cand)))
+                 (src    (assoc-default 'name (anything-get-current-source))))
             (when (and (not (anything-this-visible-mark))
                        (not (or (string= prefix "[?]")
                                 (string= prefix "[@]"))))
               ;; Don't mark possibles directories ending with . or ..
-              ;; and also autosave files/links.
+              ;; autosave files/links and non--existent file.
               (unless
                   (and (or (anything-file-completion-source-p)
                            (equal src "Files from Current Directory"))
-                       (string-match "^\\.#.*\\|^#.*#$\\|\\.$" bn))
+                       (or (string-match "^\\.#.*\\|^#.*#$\\|\\.$" bn)
+                           ;; We need to test here when not using a transformer
+                           ;; that tag prefix (i.e on tramp)
+                           (not (file-exists-p cand))))
                 (anything-make-visible-mark))))
           (forward-line 1) (end-of-line))))
     (anything-mark-current-line)
@@ -5699,6 +5704,8 @@ source.")
     "bison" "id-utils" "global"))
 
 (defun anything-c-define-info-index-sources ()
+  "Define anything sources named anything-c-source-info-<NAME>.
+Sources are generated for all entries of `anything-c-default-info-index-list'."
   (loop with symbols = (loop for str in anything-c-default-info-index-list
                              collect
                              (intern (concat "anything-c-source-info-" str)))
