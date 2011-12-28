@@ -5709,7 +5709,10 @@ Arg SOURCE will be an existing anything source named
 `anything-c-source-info-<NAME>' and BUFFER a string buffer name."
   (eval (list 'defun name nil doc
               (list 'interactive)
-              (list 'anything ':sources source ':buffer buffer))))
+              (list 'anything
+                    :sources source
+                    :buffer buffer
+                    :candidate-number-limit 1000))))
 
 (defun anything-c-define-info-index-sources (&optional commands)
   "Define anything sources named anything-c-source-info-<NAME>.
