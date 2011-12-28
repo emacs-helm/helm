@@ -5703,18 +5703,34 @@ source.")
     "texinfo" "info" "gdb" "stabs" "cvsbook" "cvs"
     "bison" "id-utils" "global"))
 
-(defun anything-c-define-info-index-sources ()
+(defun anything-c-build-info-index-command (name doc source buffer)
+  "Define an anything command NAME with documentation DOC.
+Arg SOURCE will be an existing anything source named
+`anything-c-source-info-<NAME>' and BUFFER a string buffer name."
+  (eval (list 'defun name nil doc
+              (list 'interactive)
+              (list 'anything ':sources source ':buffer buffer))))
+
+(defun anything-c-define-info-index-sources (&optional commands)
   "Define anything sources named anything-c-source-info-<NAME>.
-Sources are generated for all entries of `anything-c-default-info-index-list'."
+Sources are generated for all entries of `anything-c-default-info-index-list'.
+If COMMANDS arg is non--nil build also commands named `anything-info<NAME>'.
+Where NAME is one of `anything-c-default-info-index-list'."
   (loop with symbols = (loop for str in anything-c-default-info-index-list
                              collect
                              (intern (concat "anything-c-source-info-" str)))
         for sym in symbols
         for str in anything-c-default-info-index-list
         do (set sym (list (cons 'name (format "Info index: %s" str))
-                          (cons 'info-index str)))))
+                          (cons 'info-index str)))
+        when commands
+        do (let ((com (intern (concat "anything-info-" str))))
+	     (anything-c-build-info-index-command com
+               (format "Predefined anything for %s info." str) sym
+               (format "*anything info %s*" str)))))
 
-(anything-c-define-info-index-sources)
+;; Define now info-index sources and commands.
+(anything-c-define-info-index-sources t)
 
 
 ;;; Man and woman UI
@@ -11411,12 +11427,6 @@ With a prefix-arg insert symbol at point."
               :buffer "*anything info*")))
 
 ;;;###autoload
-(defun anything-info-emacs ()
-  "Preconfigured anything for Emacs manual index."
-  (interactive)
-  (anything-other-buffer 'anything-c-source-info-emacs "*info emacs*"))
-
-;;;###autoload
 (defun anything-show-kill-ring ()
   "Preconfigured `anything' for `kill-ring'.
 It is drop-in replacement of `yank-pop'.
@@ -11656,12 +11666,6 @@ otherwise search in whole buffer."
   "Preconfigured anything to show org headlines."
   (interactive)
   (anything-other-buffer 'anything-c-source-org-headline "*org headlines*"))
-
-;;;###autoload
-(defun anything-info-gnus ()
-  "Preconfigured anything to browse Gnus Manual."
-  (interactive)
-  (anything-other-buffer 'anything-c-source-info-gnus "*info Gnus*"))
 
 ;;;###autoload
 (defun anything-regexp ()
