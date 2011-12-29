@@ -1436,6 +1436,11 @@ automatically.")
   "*Face used for apt installed candidates."
   :group 'anything)
 
+(defface anything-apt-deinstalled
+    '((t (:foreground "DimGray")))
+  "*Face used for apt deinstalled candidates."
+  :group 'anything)
+
 (defface anything-gentoo-match-face '((t (:foreground "red")))
   "Face for anything-gentoo installed packages."
   :group 'traverse-faces)
@@ -5692,7 +5697,7 @@ source.")
 ;; Note that `name' attribute is not needed since
 ;; `anything-c-insert-summary' have been removed.
 (defvar anything-c-default-info-index-list
-  '("elisp" "cl" "org" "gnus" "ratpoison"
+  '("elisp" "cl" "org" "gnus" "tramp" "ratpoison"
     "zsh" "bash" "coreutils" "fileutils"
     "find" "sh-utils" "textutils" "libc"
     "make" "automake" "autoconf" "emacs-lisp-intro"
@@ -8872,14 +8877,18 @@ Only math* symbols are collected."
   (anything-c-apt-cache-show candidate))
 
 (defun anything-c-apt-candidate-transformer (candidates)
-  "Show installed candidates in a different color."
-  (loop
-        with all
-        for cand in candidates
+  "Show installed CANDIDATES and the ones to deinstall in a different color."
+  (loop for cand in candidates
         for name = (anything-c-apt-display-to-real cand)
-        if (member name anything-c-apt-installed-packages)
-        collect (propertize cand 'face 'anything-apt-installed) into all
-        else collect cand into all finally return all))
+        collect (cond ((string= (assoc-default
+                                 name anything-c-apt-installed-packages)
+                                "deinstall")
+                       (propertize cand 'face 'anything-apt-deinstalled))
+                      ((string= (assoc-default
+                                 name anything-c-apt-installed-packages)
+                                "install")
+                       (propertize cand 'face 'anything-apt-installed))
+                      (t cand))))
 
 (defun anything-c-apt-init ()
   "Initialize list of debian packages."
@@ -8892,7 +8901,8 @@ Only math* symbols are collected."
               (call-process-shell-command "dpkg --get-selections"
                                           nil (current-buffer))
               (loop for i in (split-string (buffer-string) "\n" t)
-                    collect (car (split-string i)))))
+                    for p = (split-string i)
+                    collect (cons (car p) (cadr p)))))
       (setq anything-c-apt-all-packages
             (with-current-buffer
                 (anything-candidate-buffer
