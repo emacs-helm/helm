@@ -1928,7 +1928,7 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
 \\[anything-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[anything-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
-\\[anything-ff-run-print-file]\t\t->Print file with default printer.
+\\[anything-ff-run-print-file]\t\t->Print file, (C-u to refresh printers list).
 \\[anything-enlarge-window]\t\t->Enlarge anything window.
 \\[anything-narrow-window]\t\t->Narrow anything window.
 \\[anything-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
@@ -2944,11 +2944,11 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
            ("Serial rename by copying files" . anything-ff-serial-rename-by-copying)
            ("Symlink files(s) `M-S, C-u to follow'" . anything-find-files-symlink)
            ("Relsymlink file(s) `C-u to follow'" . anything-find-files-relsymlink)
-           ("Hardlink file(s) `C-u to follow'" . anything-find-files-hardlink)
+           ("Hardlink file(s) `M-H, C-u to follow'" . anything-find-files-hardlink)
            ("Find file other window `C-o'" . find-file-other-window)
            ("Switch to history `M-p'" . anything-find-files-switch-to-hist)
            ("Find file other frame `C-c C-o'" . find-file-other-frame)
-           ("Print File `C-c p'" . anything-ff-print)
+           ("Print File `C-c p, C-u to refresh'" . anything-ff-print)
            ("Locate `C-x C-f, C-u to specify locate db'" . anything-ff-locate))))))
 
 (defun anything-find-files-set-prompt-for-action (action files)
@@ -3528,7 +3528,6 @@ See `anything-ff-serial-rename-1'."
   (interactive)
   (anything-c-quit-and-execute-action 'anything-ff-etags-select))
 
-
 (defun anything-ff-print (candidate)
   "Print marked files.
 You have to set in order
@@ -3540,7 +3539,8 @@ e.g:
 \(setq printer-name \"Epson-Stylus-Photo-R265\"\)
 
 Same as `dired-do-print' but for anything."
-  (unless anything-ff-printer-list
+  (when (or anything-current-prefix-arg
+            (not anything-ff-printer-list))
     (setq anything-ff-printer-list
           (anything-ff-find-printers)))
   (let* ((file-list (anything-marked-candidates))
