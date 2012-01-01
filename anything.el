@@ -1,8 +1,8 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
 
 ;; Copyright (C) 2007              Tamas Patrovics
-;;               2008 ~ 2011       rubikitch <rubikitch@ruby-lang.org>
-;;               2011              Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;;               2008 ~ 2012       rubikitch <rubikitch@ruby-lang.org>
+;;               2011 ~ 2012       Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Tamas Patrovics
 

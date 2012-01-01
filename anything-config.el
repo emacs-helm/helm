@@ -11,8 +11,8 @@
 ;;             Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; Copyright (C) 2007 ~ 2011, Tassilo Horn, all rights reserved.
 ;; Copyright (C) 2009, Andy Stewart, all rights reserved.
-;; Copyright (C) 2009 ~ 2011, rubikitch, all rights reserved.
-;; Copyright (C) 2009 ~ 2011, Thierry Volpiatto, all rights reserved.
+;; Copyright (C) 2009 ~ 2012, rubikitch, all rights reserved.
+;; Copyright (C) 2009 ~ 2012, Thierry Volpiatto, all rights reserved.
 
 ;; Created: 2009-02-16 21:38:23
 

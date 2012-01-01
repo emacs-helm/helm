@@ -1,9 +1,12 @@
-;;; anything-match-plugin.el --- Humane match plug-in for anything
+;;; anything-match-plugin.el --- Multiple regexp matching methods for anything
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 
-;; Copyright (C) 2008~2011  rubikitch, all rights reserved.
-;; Copyright (C) 2011, Thierry Volpiatto, all rights reserved.
+;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
+;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
+
+;; Copyright (C) 2008~2012, rubikitch, all rights reserved.
+;; Copyright (C) 2011~2012, Thierry Volpiatto, all rights reserved.
 
 ;; Keywords: anything, matching
 ;; X-URL: <http://repo.or.cz/w/anything-config.git>
