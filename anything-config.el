@@ -2193,15 +2193,22 @@ Default is `anything-current-buffer'."
 (defun anything-region-active-p ()
   (and transient-mark-mode mark-active (/= (mark) (point))))
 
-(defun anything-goto-line (lineno)
-  "Goto LINENO opening only outline headline if needed."
-  (goto-char (point-min)) (forward-line (1- lineno))
+(defun anything-goto-char (loc)
+  "Go to char, revealing if necessary."
+  (goto-char loc)
   (when (or (eq major-mode 'org-mode)
             (and (boundp 'outline-minor-mode)
                  outline-minor-mode))
     (require 'org) ; On some old Emacs versions org may not be loaded.
-    (org-reveal))
-  (anything-match-line-color-current-line) (sit-for 0.3)
+    (org-reveal)))
+
+(defun anything-goto-line (lineno)
+  "Goto LINENO opening only outline headline if needed.
+Animation is used."
+  (goto-char (point-min))
+  (anything-goto-char (point-at-bol lineno))
+  (anything-match-line-color-current-line)
+  (sit-for 0.3)
   (anything-match-line-cleanup))
 
 (defun anything-show-this-source-only ()
@@ -2494,7 +2501,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
    (1- s)))
 
 (defun anything-c-regexp-persistent-action (pt)
-  (goto-char pt)
+  (anything-goto-char pt)
   (anything-persistent-highlight-point))
 
 (defun anything-c-regexp-kill-new (input)
@@ -6842,7 +6849,7 @@ If not found in CURRENT-DIR search in upper directory."
            (let ((tag-path (expand-file-name
                             anything-c-etags-tag-file-name dir)))
              (and (stringp tag-path)
-                  (file-exists-p tag-path)
+                  (file-regular-p tag-path)
                   (file-readable-p tag-path)))))
     (loop with count = 0
           until (file-exists? current-dir)
