@@ -2661,13 +2661,14 @@ Should be called after others transformers i.e (boring buffers)."
 
 
 (defvar anything-c-source-buffers-list
-  '((name . "Buffers")
+  `((name . "Buffers")
     (candidates . anything-c-buffer-list)
     (type . buffer)
     (match anything-c-buffer-match-major-mode)
     (candidate-transformer anything-c-skip-boring-buffers
                            anything-c-highlight-buffers)
     (persistent-action . anything-c-buffers-list-persistent-action)
+    (keymap . ,anything-c-buffer-map)
     (volatile)
     (mode-line . anything-buffer-mode-line-string)
     (persistent-help . "Show this buffer / C-u \\[anything-execute-persistent-action]: Kill this buffer")))
@@ -4955,10 +4956,11 @@ See also `anything-locate'."
                                   (anything-update-move-first-line)))))))
 
 (defvar anything-c-source-locate
-  '((name . "Locate")
+  `((name . "Locate")
     (candidates . anything-c-locate-init)
     (type . file)
     (requires-pattern . 3)
+    (keymap . ,anything-generic-files-map)
     (candidate-number-limit . 9999)
     (mode-line . anything-generic-file-mode-line-string)
     (delayed))
@@ -5568,12 +5570,13 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;
 ;;
 (defvar anything-c-source-recentf
-  '((name . "Recentf")
+  `((name . "Recentf")
     (init . (lambda ()
               (require 'recentf)
               (or recentf-mode (recentf-mode 1))))
     (disable-shortcuts) ;; Needed for filenames with capitals letters.
     (candidates . recentf-list)
+    (keymap . ,anything-generic-files-map)
     (match anything-c-match-on-basename)
     (type . file))
   "See (info \"(emacs)File Conveniences\").

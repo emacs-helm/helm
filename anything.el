@@ -991,9 +991,6 @@ If nil, use default `mode-line-format'.")
   "Detailed help message string for `anything'.
 It also accepts function or variable symbol.")
 
-;; FIXME: What is this
-                                        ;(put 'anything 'timid-completion 'disabled)
-
 (defvar anything-source-in-each-line-flag nil
   "Non-nil means add anything-source text-property in each candidate.
 experimental feature.")
@@ -1280,7 +1277,7 @@ Attributes:
 - type
   `anything-type-attributes' are merged in.
 - candidates-buffer
-  candidates, volatile and match attrubute are created."
+  candidates, volatile and match attribute are created."
   (cond
     ;; action
     ((anything-action-window)
@@ -1339,24 +1336,26 @@ filtered-candidate-transformer functions."
   (if (and (boundp 'anything-source-name) (stringp anything-source-name))
       source
       (with-current-buffer (anything-buffer-get)
-        (or (get-text-property (point) 'anything-source)
-            (block exit
-              ;; This goto-char shouldn't be necessary, but point is moved to
-              ;; point-min somewhere else which shouldn't happen.
-              (goto-char (overlay-start anything-selection-overlay))
-              (let* ((header-pos (or (anything-get-previous-header-pos)
-                                     (anything-get-next-header-pos)))
-                     (source-name
-                      (save-excursion
-                        (unless header-pos
-                                        ;(message "No candidates")
-                          (return-from exit nil))
-                        (goto-char header-pos)
-                        (anything-current-line-contents))))
-                (some (lambda (source)
-                        (if (equal (assoc-default 'name source) source-name)
-                            source))
-                      (anything-get-sources))))))))
+        (or
+         ;; This happen only when `anything-source-in-each-line-flag'
+         ;; is non--nil and there is candidates in buffer.
+         (get-text-property (point) 'anything-source)
+         ;; Return nil when no--candidates.
+         (block exit
+           ;; This goto-char shouldn't be necessary, but point is moved to
+           ;; point-min somewhere else which shouldn't happen.
+           (goto-char (overlay-start anything-selection-overlay))
+           (let* ((header-pos (or (anything-get-previous-header-pos)
+                                  (anything-get-next-header-pos)))
+                  (source-name
+                   (save-excursion
+                     (unless header-pos
+                       (return-from exit nil))
+                     (goto-char header-pos)
+                     (anything-current-line-contents))))
+             (loop for source in (anything-get-sources) thereis
+                   (and (equal (assoc-default 'name source) source-name)
+                        source))))))))
 
 (defun anything-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `anything' was invoked."
@@ -1720,7 +1719,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
                (unwind-protect
                     (anything-read-pattern-maybe
                      any-prompt any-input any-preselect
-                     any-resume any-keymap any-default
+                     any-resume any-keymap any-default any-sources
                      (when (and any-history (symbolp any-history)) any-history))
                  (anything-cleanup)))
              (prog1 (unless anything-quit
@@ -1973,16 +1972,29 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Whether in `read-string' in anything or not.")
 (defun anything-read-pattern-maybe (any-prompt any-input
                                     any-preselect any-resume any-keymap
-                                    any-default any-history)
+                                    any-default any-sources any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
       (anything-mark-current-line t)
       (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
-    (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
-    (let ((minibuffer-local-map
-           anything-map))
+    (let ((src-keymap (if (and
+                           ;; Maybe a list of symbols+source(s)
+                           (listp any-sources)
+                           ;; But not a list of cons-cell.
+                           (loop for s in any-sources never (consp s)))
+                          (make-composed-keymap
+                           (loop for src in any-sources
+                                 for kmap = (assoc-default 'keymap
+                                                           (if (symbolp src)
+                                                               (symbol-value src)
+                                                               src))
+                                 when kmap collect kmap)
+                           anything-map)
+                          (assoc-default 'keymap (anything-get-current-source)))))
+      (set (make-local-variable 'anything-map)
+           (or any-keymap src-keymap anything-map))
       (anything-log-eval (anything-approximate-candidate-number)
                          anything-execute-action-at-once-if-one
                          anything-quit-if-no-candidate)
@@ -1999,7 +2011,10 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
                    (tap (or any-default
                             (with-anything-current-buffer
                               (thing-at-point 'symbol)))))
-               (read-string (or any-prompt "pattern: ") any-input any-history tap)))))))
+               (read-from-minibuffer (or any-prompt "pattern: ")
+                                     any-input anything-map
+                                     nil any-history tap)))))))
+               
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
