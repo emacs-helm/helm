@@ -1847,11 +1847,8 @@ Enjoy!")))
 ;;; `anything-buffer-list' help
 ;;
 ;;
-;;;###autoload
-(defun anything-c-buffer-help ()
-  "Help command for anything buffers."
-  (interactive)
-  (let ((anything-help-message "== Anything Buffer ==
+(defvar anything-c-buffer-help-message
+  "== Anything Buffer ==
 \nTips:
 You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
 Enter then a space and a pattern to narrow down to buffers matching this pattern. 
@@ -1873,19 +1870,20 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-mark-all]\t\t->Mark all.
 \\[anything-c-buffer-help]\t\t->Display this help.
 \n== Anything Map ==
-\\{anything-map}
-"))
-    (anything-help)))
+\\{anything-map}")
 
+;;;###autoload
+(defun anything-c-buffer-help ()
+  "Help command for anything buffers."
+  (interactive)
+  (let ((anything-help-message anything-c-buffer-help-message))
+    (anything-help)))
 
 ;;; Find files help (`anything-find-files')
 ;;
 ;;
-;;;###autoload
-(defun anything-ff-help ()
-  "Help command for `anything-find-files'."
-  (interactive)
-  (let ((anything-help-message "== Anything Find Files ==
+(defvar anything-ff-help-message
+  "== Anything Find Files ==
 \nTips:
 \n- Enter `~/' at end of pattern to quickly reach home directory.
 - Enter `/' at end of pattern to quickly reach root of your file system.
@@ -1935,17 +1933,20 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-send-bug-report-from-anything]\t\t->Send Bug report.
 \\[anything-ff-help]\t\t->Display this help info.
 \n== Anything Map ==
-\\{anything-map}
-"))
+\\{anything-map}")
+
+;;;###autoload
+(defun anything-ff-help ()
+  "Help command for `anything-find-files'."
+  (interactive)
+  (let ((anything-help-message anything-ff-help-message))
     (anything-help)))
 
 ;;; Help for `anything-c-read-file-name'
 ;;
 ;;
-;;;###autoload
-(defun anything-read-file-name-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything read file name Map ==\
+(defvar anything-read-file-name-help-message
+  "== Anything read file name Map ==\
 \nSpecific commands for anything-c-read-file-name:
 \\<anything-c-read-file-map>
 \\[anything-find-files-down-one-level]\t\t->Go down precedent directory.
@@ -1954,17 +1955,19 @@ Enter then a space and a pattern to narrow down to buffers matching this pattern
 \\[anything-previous-source]\t->Goto previous source.
 \\[anything-read-file-name-help]\t\t->Display this help info.
 \n== Anything Map ==
-\\{anything-map}
-"))
+\\{anything-map}")
+  
+;;;###autoload
+(defun anything-read-file-name-help ()
+  (interactive)
+  (let ((anything-help-message anything-read-file-name-help-message))
     (anything-help)))
 
 ;;; Generic file help - Used by locate.
 ;;
 ;;
-;;;###autoload
-(defun anything-generic-file-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything Generic files Map ==\
+(defvar anything-generic-file-help-message
+  "== Anything Generic files Map ==\
 \nSpecific commands for anything locate and others files sources:
 \\<anything-generic-files-map>
 \\[anything-ff-run-grep]\t\t->Run grep (C-u recurse).
@@ -1981,17 +1984,19 @@ You can add after writing search pattern any of the locate command line options.
 e.g -b, -e, -n <number>...etc.
 See Man locate for more infos.
 \n== Anything Map ==
-\\{anything-map}"))
-    (anything-help)))
+\\{anything-map}")
 
+;;;###autoload
+(defun anything-generic-file-help ()
+  (interactive)
+  (let ((anything-help-message anything-generic-file-help-message))
+    (anything-help)))
 
 ;;; Grep help
 ;;
 ;;
-;;;###autoload
-(defun anything-grep-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything Grep Map ==\
+(defvar anything-grep-help-message
+  "== Anything Grep Map ==\
 \nSpecific commands for Grep and Etags:
 \\<anything-c-grep-map>
 \\[anything-c-goto-next-file]\t->Next File.
@@ -2002,16 +2007,19 @@ See Man locate for more infos.
 \\[anything-c-grep-run-default-action]\t\t->Run default action (Same as RET).
 \\[anything-grep-help]\t\t->Show this help.
 \n== Anything Map ==
-\\{anything-map}"))
+\\{anything-map}")
+  
+;;;###autoload
+(defun anything-grep-help ()
+  (interactive)
+  (let ((anything-help-message anything-grep-help-message))
     (anything-help)))
 
 ;;; Pdf grep help
 ;;
 ;;
-;;;###autoload
-(defun anything-pdfgrep-help ()
-  (interactive)
-  (let ((anything-help-message "== Anything PdfGrep Map ==\
+(defvar anything-pdfgrep-help-message
+  "== Anything PdfGrep Map ==\
 \nSpecific commands for Pdf Grep:
 \\<anything-c-pdfgrep-map>
 \\[anything-c-goto-next-file]\t->Next File.
@@ -2019,17 +2027,19 @@ See Man locate for more infos.
 \\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[anything-pdfgrep-help]\t\t->Show this help.
 \n== Anything Map ==
-\\{anything-map}"))
+\\{anything-map}")
+  
+;;;###autoload
+(defun anything-pdfgrep-help ()
+  (interactive)
+  (let ((anything-help-message anything-pdfgrep-help-message))
     (anything-help)))
 
 ;;; Etags help
 ;;
 ;;
-;;;###autoload
-(defun anything-etags-help ()
-  "The help function for etags."
-  (interactive)
-  (let ((anything-help-message "== Anything Etags Map ==\
+(defvar anything-etags-help-message
+  "== Anything Etags Map ==\
 \nSpecific commands for Etags:
 \\<anything-c-etags-map>
 \\[anything-c-goto-next-file]\t->Next File.
@@ -2037,16 +2047,20 @@ See Man locate for more infos.
 \\[anything-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[anything-etags-help]\t\t->Show this help.
 \n== Anything Map ==
-\\{anything-map}"))
+\\{anything-map}")
+
+;;;###autoload
+(defun anything-etags-help ()
+  "The help function for etags."
+  (interactive)
+  (let ((anything-help-message anything-etags-help-message))
     (anything-help)))
 
 ;;; Ucs help
 ;;
 ;;
-(defun anything-c-ucs-help ()
-  "Help command for `anything-ucs'."
-  (interactive)
-  (let ((anything-help-message "== Anything Ucs ==
+(defvar anything-c-ucs-help-message
+  "== Anything Ucs ==
 \nSpecific commands for `anything-ucs':
 \\<anything-c-ucs-map>
 \\[anything-c-ucs-persistent-insert]\t->Insert char.
@@ -2056,10 +2070,13 @@ See Man locate for more infos.
 \\[anything-c-ucs-help]\t\t->Show this help.
 
 \n== Anything Map ==
-\\{anything-map}
-"))
+\\{anything-map}")
+  
+(defun anything-c-ucs-help ()
+  "Help command for `anything-ucs'."
+  (interactive)
+  (let ((anything-help-message anything-c-ucs-help-message))
     (anything-help)))
-
 
 
 ;;; Mode line strings
@@ -4961,6 +4978,7 @@ See also `anything-locate'."
     (type . file)
     (requires-pattern . 3)
     (keymap . ,anything-generic-files-map)
+    (help-message . anything-generic-file-help-message)
     (candidate-number-limit . 9999)
     (mode-line . anything-generic-file-mode-line-string)
     (delayed))
@@ -5574,9 +5592,12 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     (init . (lambda ()
               (require 'recentf)
               (or recentf-mode (recentf-mode 1))))
-    (disable-shortcuts) ;; Needed for filenames with capitals letters.
+    ;; Needed for filenames with capitals letters.
+    (disable-shortcuts)
     (candidates . recentf-list)
     (keymap . ,anything-generic-files-map)
+    (help-message . anything-generic-file-help-message)
+    (mode-line . anything-generic-file-mode-line-string)
     (match anything-c-match-on-basename)
     (type . file))
   "See (info \"(emacs)File Conveniences\").
