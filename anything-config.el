@@ -2616,10 +2616,11 @@ buffer that is not the current buffer unless
     (type . buffer)))
 
 (defvar anything-c-source-buffer-not-found
-  '((name . "Create buffer")
+  `((name . "Create buffer")
     (dummy)
     (filtered-candidate-transformer (lambda (cands source)
                                       (list anything-pattern)))
+    (keymap . ,anything-map)
     (action . (lambda (candidate)
                 (anything-c-switch-to-buffer (get-buffer-create candidate))))))
 
@@ -2893,10 +2894,13 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                             'help-echo (expand-file-name i))))
 
 (defvar anything-c-source-files-in-current-dir+
-  '((name . "Files from Current Directory")
+  `((name . "Files from Current Directory")
     (candidates . (lambda ()
                     (with-anything-current-buffer
                       (directory-files (anything-c-current-directory) t))))
+    (keymap . ,anything-generic-files-map)
+    (help-message . anything-generic-file-help-message)
+    (mode-line . anything-generic-file-mode-line-string)
     (candidate-transformer anything-c-highlight-files)
     ;; volatile is not needed, I think.
     (type . file)))
@@ -4874,7 +4878,7 @@ Keys description:
 (defvar anything-c-file-cache-files nil)
 
 (defvar anything-c-source-file-cache
-  '((name . "File Cache")
+  `((name . "File Cache")
     (init
      . (lambda ()
          (require 'filecache nil t)
@@ -4887,6 +4891,9 @@ Keys description:
            (defadvice file-cache-add-file (after file-cache-list activate)
              (add-to-list 'anything-c-file-cache-files (expand-file-name file)))
            (setq anything-c-file-cache-initialized-p t))))
+    (keymap . ,anything-generic-files-map)
+    (help-message . anything-generic-file-help-message)
+    (mode-line . anything-generic-file-mode-line-string)
     (candidates . anything-c-file-cache-files)
     (match anything-c-match-on-basename)
     (type . file)))
@@ -5606,13 +5613,16 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 ;;; ffap
 (eval-when-compile (require 'ffap))
 (defvar anything-c-source-ffap-guesser
-  '((name . "File at point")
+  `((name . "File at point")
     (init . (lambda () (require 'ffap)))
     (candidates . (lambda ()
                     (anything-aif
                         (with-anything-current-buffer
                           (ffap-guesser))
                         (list it))))
+    (keymap . ,anything-generic-files-map)
+    (help-message . anything-generic-file-help-message)
+    (mode-line . anything-generic-file-mode-line-string)
     (type . file)))
 
 ;;; ffap with line number
@@ -5649,9 +5659,10 @@ It is cleared after jumping line.")
 (add-hook 'anything-after-persistent-action-hook 'anything-c-ffap-line-goto-line)
 
 (defvar anything-c-source-ffap-line
-  '((name . "File/Lineno at point")
+  `((name . "File/Lineno at point")
     (init . (lambda () (require 'ffap)))
     (candidates . anything-c-ffap-line-candidates)
+    (keymap . ,anything-map)
     (type . file)))
 
 ;;; list of files gleaned from every dired buffer
@@ -6063,10 +6074,11 @@ http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
 
 (eval-when-compile (require 'bookmark))
 (defvar anything-c-source-bookmarks
-  '((name . "Bookmarks")
+  `((name . "Bookmarks")
     (init . (lambda ()
               (require 'bookmark)))
     (candidates . bookmark-all-names)
+    (keymap . ,anything-map)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
