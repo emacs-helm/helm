@@ -1722,7 +1722,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
                  (unwind-protect
                       (anything-read-pattern-maybe
                        any-prompt any-input any-preselect
-                       any-resume any-keymap any-default any-sources
+                       any-resume any-keymap any-default
                        (when (and any-history (symbolp any-history)) any-history))
                    (anything-cleanup)))
                (prog1 (unless anything-quit
@@ -1976,7 +1976,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Whether in `read-string' in anything or not.")
 (defun anything-read-pattern-maybe (any-prompt any-input
                                     any-preselect any-resume any-keymap
-                                    any-default any-sources any-history)
+                                    any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
