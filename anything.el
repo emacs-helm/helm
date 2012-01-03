@@ -2992,9 +2992,9 @@ to mark candidates."
 ;; (define-key anything-map (kbd "<f18>") 'anything-select-with-prefix-shortcut)
 
 (defvar anything-exit-status 0
-  "Flag to inform whether anything have aborted or quitted.
-Exit with 0 mean anything exit executing an action.
-Exit with 1 mean anything abort with \\[keyboard-quit]
+  "Flag to inform whether anything have exited or quitted.
+Exit with 0 mean anything have exited executing an action.
+Exit with 1 mean anything have quitted with \\[keyboard-quit]
 It is useful for example to restore a window config if anything abort
 in special cases.
 See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
