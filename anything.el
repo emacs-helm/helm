@@ -1703,35 +1703,37 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
   (anything-log (concat "[Start session] " (make-string 41 ?+)))
   (anything-log-eval any-prompt any-preselect
                      any-buffer any-keymap any-default)
-  (unwind-protect
-       (condition-case v
-           (let (;; It is needed because `anything-source-name' is non-nil
-                 ;; when `anything' is invoked by action. Awful global scope.
-                 anything-source-name
-                 anything-in-persistent-action
-                 anything-quit
-                 (case-fold-search t)
-                 (anything-buffer (or any-buffer anything-buffer))
-                 ;; cua-mode ; avoid error when region is selected
-                 )
-             (with-anything-restore-variables
-               (anything-initialize any-resume any-input any-sources)
-               (anything-display-buffer anything-buffer)
-               (anything-log "show prompt")
-               (unwind-protect
-                    (anything-read-pattern-maybe
-                     any-prompt any-input any-preselect
-                     any-resume any-keymap any-default any-sources
-                     (when (and any-history (symbolp any-history)) any-history))
-                 (anything-cleanup)))
-             (prog1 (unless anything-quit
-                      (anything-execute-selection-action-1))
-               (anything-log (concat "[End session] " (make-string 41 ?-)))))
-         (quit
-          (anything-restore-position-on-quit)
-          (anything-log (concat "[End session (quit)] " (make-string 34 ?-)))
-          nil))
-    (anything-log-save-maybe)))
+  (let ((old-overridding-local-map overriding-local-map))
+    (unwind-protect
+         (condition-case v
+             (let ( ;; It is needed because `anything-source-name' is non-nil
+                   ;; when `anything' is invoked by action. Awful global scope.
+                   anything-source-name
+                   anything-in-persistent-action
+                   anything-quit
+                   (case-fold-search t)
+                   (anything-buffer (or any-buffer anything-buffer))
+                   ;; cua-mode ; avoid error when region is selected
+                   )
+               (with-anything-restore-variables
+                 (anything-initialize any-resume any-input any-sources)
+                 (anything-display-buffer anything-buffer)
+                 (anything-log "show prompt")
+                 (unwind-protect
+                      (anything-read-pattern-maybe
+                       any-prompt any-input any-preselect
+                       any-resume any-keymap any-default any-sources
+                       (when (and any-history (symbolp any-history)) any-history))
+                   (anything-cleanup)))
+               (prog1 (unless anything-quit
+                        (anything-execute-selection-action-1))
+                 (anything-log (concat "[End session] " (make-string 41 ?-)))))
+           (quit
+            (anything-restore-position-on-quit)
+            (anything-log (concat "[End session (quit)] " (make-string 34 ?-)))
+            nil))
+      (setq overriding-local-map old-overridding-local-map)
+      (anything-log-save-maybe))))
 
 
 ;;; Anything resume
@@ -1981,20 +1983,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
       (anything-mark-current-line t)
       (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
-    (let ((src-keymap (if (and
-                           ;; Maybe a list of symbols+source(s)
-                           (listp any-sources)
-                           ;; But not a list of cons-cell.
-                           (loop for s in any-sources never (consp s)))
-                          (make-composed-keymap
-                           (loop for src in any-sources
-                                 for kmap = (assoc-default 'keymap
-                                                           (if (symbolp src)
-                                                               (symbol-value src)
-                                                               src))
-                                 when kmap collect kmap)
-                           anything-map)
-                          (assoc-default 'keymap (anything-get-current-source)))))
+    (let ((src-keymap (assoc-default 'keymap (anything-get-current-source))))
       (set (make-local-variable 'anything-map)
            (or any-keymap src-keymap anything-map))
       (anything-log-eval (anything-approximate-candidate-number)
@@ -2017,6 +2006,13 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
                                      any-input anything-map
                                      nil any-history tap)))))))
                
+(defun anything-maybe-update-keymap ()
+  "Handle differents keymaps in multiples sources."
+  (with-anything-window
+    (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
+      (when (and kmap (> (length anything-sources) 1))
+        (setq overriding-local-map kmap)))))
+(add-hook 'anything-move-selection-after-hook 'anything-maybe-update-keymap)
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
