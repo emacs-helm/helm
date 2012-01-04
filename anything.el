@@ -1984,8 +1984,13 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
       (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
     (let ((src-keymap (assoc-default 'keymap (anything-get-current-source))))
+      ;; Startup with the first keymap found either in current source
+      ;; or anything arg, otherwise use global value of `anything-map'.
+      ;; This map with be used as a `minibuffer-local-map'.
+      ;; Maybe it will be overriden when changing source
+      ;; by `anything-maybe-update-keymap'.
       (set (make-local-variable 'anything-map)
-           (or any-keymap src-keymap anything-map))
+           (or src-keymap any-keymap anything-map))
       (anything-log-eval (anything-approximate-candidate-number)
                          anything-execute-action-at-once-if-one
                          anything-quit-if-no-candidate)
@@ -2007,7 +2012,10 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
                                      nil any-history tap)))))))
                
 (defun anything-maybe-update-keymap ()
-  "Handle differents keymaps in multiples sources."
+  "Handle differents keymaps in multiples sources.
+This function is meant to be run in `anything-move-selection-after-hook'.
+It will override `anything-map' with the keymap attribute of current source
+if some when multiples sources are present."
   (with-anything-window
     (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
       (when (and kmap (> (length anything-sources) 1))
@@ -4263,8 +4271,9 @@ ANYTHING-ATTRIBUTE should be a symbol."
   "  Enable to selection multiline candidates.")
 
 (anything-document-attribute 'update "optional"
-  ;; FIXME: this is not displayed correctly in help buffer.
-  "  Function called with no parameters when \\<anything-map>\\[anything-force-update] is pressed.")
+  (substitute-command-keys
+   "  Function called with no parameters when \
+\\<anything-map>\\[anything-force-update] is pressed."))
 
 (anything-document-attribute 'mode-line "optional"
   "  source local `anything-mode-line-string'. (included in `mode-line-format')
@@ -4281,7 +4290,9 @@ ANYTHING-ATTRIBUTE should be a symbol."
 (anything-document-attribute 'keymap "optional"
   "  Specific keymap for this source.
   It is useful to have a keymap per source when using more than one source.
-  Otherwise, a keymap can be set per command with `anything' argument KEYMAP.")
+  Otherwise, a keymap can be set per command with `anything' argument KEYMAP.
+  NOTE: when a source have `anything-map' as keymap attr,
+  the global value of `anything-map' will override the actual local one.")
 
 (anything-document-attribute 'help-message "optional"
   "  Help message for this source.
