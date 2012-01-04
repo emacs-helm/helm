@@ -8757,8 +8757,12 @@ See also `anything-create--actions'.")
            (call-process "xrandr" nil (current-buffer) nil
                          "--screen" (anything-c-xrandr-screen) "-q")
            (goto-char 1)
-           (loop while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
-                 collect (match-string 1)))))
+           (loop with modes = nil
+                 while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
+                 for mode = (match-string 1)
+                 unless (member mode modes)
+                 collect mode into modes
+                 finally return modes))))
     (action
      ("Change Resolution"
       . (lambda (mode)
