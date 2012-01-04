@@ -8723,25 +8723,49 @@ See also `anything-create--actions'.")
             (mapconcat 'prin1-to-string args " "))))
 
 ;;; X RandR resolution change
+;;
+;;
 ;;; FIXME I do not care multi-display.
-(defvar anything-c-xrandr-output "VGA")
-(defvar anything-c-xrandr-screen "0")
+
+(defun anything-c-xrandr-info ()
+  "Return a pair with current X screen number and current X display name."
+  (with-temp-buffer
+    (call-process "xrandr" nil (current-buffer) nil
+                  "--current")
+    (let (screen output)
+      (goto-char (point-min))
+      (save-excursion
+        (when (re-search-forward "\\(^Screen \\)\\([0-9]\\):" nil t)
+          (setq screen (match-string 2))))
+      (when (re-search-forward "^\\(.*\\) connected" nil t)
+        (setq output (match-string 1)))
+      (list screen output))))
+
+(defun anything-c-xrandr-screen ()
+  "Return current X screen number."
+  (car (anything-c-xrandr-info)))
+
+(defun anything-c-xrandr-output ()
+  "Return current X display name."
+  (cadr (anything-c-xrandr-info)))
+
 (defvar anything-c-source-xrandr-change-resolution
   '((name . "Change Resolution")
     (candidates
      . (lambda ()
          (with-temp-buffer
            (call-process "xrandr" nil (current-buffer) nil
-                         "--screen" anything-c-xrandr-screen "-q")
+                         "--screen" (anything-c-xrandr-screen) "-q")
            (goto-char 1)
            (loop while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
                  collect (match-string 1)))))
     (action
-     ("Change Resolution" . (lambda (mode)
-                              (call-process "xrandr" nil nil nil
-                                            "--screen" anything-c-xrandr-screen
-                                            "--output" anything-c-xrandr-output
-                                            "--mode" mode))))))
+     ("Change Resolution"
+      . (lambda (mode)
+          (call-process "xrandr" nil nil nil
+                        "--screen" (anything-c-xrandr-screen)
+                        "--output" (anything-c-xrandr-output)
+                        "--mode" mode))))))
 
 ;;; Xfont selection
 ;;
@@ -12299,6 +12323,12 @@ You can set your own list of commands with
                  (action . (lambda (candidate)
                              (with-output-to-temp-buffer "*Help*"
                                (princ (get (intern candidate) 'anything-attrdoc))))))))))
+
+;;;###autoload
+(defun anything-xrandr-set ()
+  (interactive)
+  (anything :sources 'anything-c-source-xrandr-change-resolution
+            :buffer "*anything xrandr*"))
 
 
 ;;; Unit tests are now in ../developer-tools/unit-test-anything-config.el.
