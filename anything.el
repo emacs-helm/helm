@@ -1402,7 +1402,6 @@ Use this function is better than setting `anything-type-attributes' directly."
   "Register ATTRIBUTE documentation introduced by plug-in.
 SHORT-DOC is displayed beside attribute name.
 LONG-DOC is displayed below attribute name and short documentation."
-  (declare (indent 2) (debug t))
   (if long-doc
       (setq short-doc (concat "(" short-doc ")"))
       (setq long-doc short-doc
