@@ -1751,6 +1751,16 @@ automatically.")
     map)
   "Keymap for `anything-ucs'.")
 
+(defvar anything-c-bookmark-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-o")   'anything-c-bookmark-run-jump-other-window)
+    (define-key map (kbd "C-d")   'anything-c-bookmark-run-delete)
+    (when (locate-library "bookmark-extensions")
+      (define-key map (kbd "M-e") 'anything-c-bmkext-run-edit))
+    (define-key map (kbd "C-c ?") 'anything-c-bookmark-help)
+    (delq nil map))
+  "Generic Keymap for emacs bookmark sources.")
+
 
 
 ;;; Embeded documentation.
@@ -2078,6 +2088,27 @@ See Man locate for more infos.
   (let ((anything-help-message anything-c-ucs-help-message))
     (anything-help)))
 
+;;; Bookmark help
+;;
+;;
+(defvar anything-bookmark-help-message
+  "== Anything bookmark name Map ==\
+\nSpecific commands for bookmarks:
+\\<anything-c-bookmark-map>
+\\[anything-c-bookmark-run-jump-other-window]\t\t->Jump other window.
+\\[anything-c-bookmark-run-delete]\t\t->Delete bookmark.
+\\[anything-c-bmkext-run-edit]\t\t->Edit bookmark (only for bmkext).
+\\[anything-c-bookmark-help]\t\t->Run this help.
+\n== Anything Map ==
+\\{anything-map}")
+
+(defun anything-c-bookmark-help ()
+  "Help command for bookmarks."
+  (interactive)
+  (let ((anything-help-message anything-bookmark-help-message))
+    (anything-help)))
+
+
 
 ;;; Mode line strings
 ;;
@@ -2161,6 +2192,17 @@ See Man locate for more infos.
 \\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
 \\[anything-select-3rd-action]:NthAct."
   "String displayed in mode-line in `anything-ucs'.")
+
+(defvar anything-bookmark-mode-line-string
+  '("Bookmark(s)"
+    "\\<anything-c-bookmark-map>\
+\\[anything-c-bookmark-help]:Help, \
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport."
+    "String displayed in mode-line in `anything-c-source-buffers-list'"))
 
 
 
@@ -6078,7 +6120,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
     (init . (lambda ()
               (require 'bookmark)))
     (candidates . bookmark-all-names)
-    (keymap . ,anything-map)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
@@ -6229,6 +6270,17 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                        (propertize i 'face 'anything-bmkext-file 'help-echo isfile)))))
 
 
+(defun anything-c-bookmark-run-jump-other-window ()
+  "Jump to bookmark from keyboard."
+  (interactive)
+  (anything-c-quit-and-execute-action 'bookmark-jump-other-window))
+
+(defun anything-c-bookmark-run-delete ()
+  "Delete bookmark from keyboard."
+  (interactive)
+  (when (y-or-n-p "Delete bookmark?")
+    (anything-c-quit-and-execute-action 'anything-delete-marked-bookmarks)))
+
 
 ;;; Sources to filter bookmark-extensions bookmarks.
 ;;
@@ -6248,6 +6300,11 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
         for b = (car i)
         collect b into sa
         finally return (sort sa 'string-lessp)))
+
+(defun anything-c-bmkext-run-edit ()
+  "Run `bmkext-edit-bookmark' from keyboard."
+  (interactive)
+  (anything-c-quit-and-execute-action 'bmkext-edit-bookmark))
 
 ;;; Addressbook.
 ;;
@@ -11365,8 +11422,6 @@ with original attribute value.
   (define-anything-type-attribute 'command
       `((action ("Call interactively" . anything-c-call-interactively)
                 ,@actions)
-        ;; Sort commands according to their usage count.
-                                        ;(filtered-candidate-transformer . anything-c-adaptive-sort)
         (coerce . anything-c-symbolify)
         (persistent-action . describe-function))
     "Command. (string or symbol)")
@@ -11395,20 +11450,17 @@ with original attribute value.
 (define-anything-type-attribute 'bookmark
     `((coerce . anything-bookmark-get-bookmark-from-name)
       (action
-       ("Jump to bookmark" . (lambda (bookmark)
-                               (let ((current-prefix-arg anything-current-prefix-arg))
-                                 (bookmark-jump bookmark))
-                               (anything-update)))
-       ("Jump to BM other window" . (lambda (bookmark)
-                                      (bookmark-jump-other-window bookmark)
-                                      (anything-update)))
+       ("Jump to bookmark" . bookmark-jump)
+       ("Jump to BM other window" . bookmark-jump-other-window)
        ("Bookmark edit annotation" . bookmark-edit-annotation)
        ("Bookmark show annotation" . bookmark-show-annotation)
        ("Delete bookmark(s)" . anything-delete-marked-bookmarks)
        ,@(and (locate-library "bookmark-extensions")
               `(("Edit Bookmark" . bmkext-edit-bookmark)))
        ("Rename bookmark" . bookmark-rename)
-       ("Relocate bookmark" . bookmark-relocate)))
+       ("Relocate bookmark" . bookmark-relocate))
+      (keymap . ,anything-c-bookmark-map)
+      (mode-line . anything-bookmark-mode-line-string))
   "Bookmark name.")
 
 (define-anything-type-attribute 'line
