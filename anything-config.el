@@ -6269,12 +6269,18 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                        t
                        (propertize i 'face 'anything-bmkext-file 'help-echo isfile)))))
 
+(defun anything-c-bookmark-jump (candidate)
+  "Jump to bookmark from keyboard."
+  (let ((current-prefix-arg anything-current-prefix-arg))
+    (bookmark-jump candidate)))
 
+;;;###autoload
 (defun anything-c-bookmark-run-jump-other-window ()
   "Jump to bookmark from keyboard."
   (interactive)
   (anything-c-quit-and-execute-action 'bookmark-jump-other-window))
 
+;;;###autoload
 (defun anything-c-bookmark-run-delete ()
   "Delete bookmark from keyboard."
   (interactive)
@@ -6301,6 +6307,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
         collect b into sa
         finally return (sort sa 'string-lessp)))
 
+;;;###autoload
 (defun anything-c-bmkext-run-edit ()
   "Run `bmkext-edit-bookmark' from keyboard."
   (interactive)
@@ -11450,7 +11457,7 @@ with original attribute value.
 (define-anything-type-attribute 'bookmark
     `((coerce . anything-bookmark-get-bookmark-from-name)
       (action
-       ("Jump to bookmark" . bookmark-jump)
+       ("Jump to bookmark" . anything-c-bookmark-jump)
        ("Jump to BM other window" . bookmark-jump-other-window)
        ("Bookmark edit annotation" . bookmark-edit-annotation)
        ("Bookmark show annotation" . bookmark-show-annotation)
