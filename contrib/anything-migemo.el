@@ -342,6 +342,10 @@ Bind `anything-use-migemo' = t in COMMAND.
 
 (provide 'anything-migemo)
 
+;; Local Variables:
+;; coding: utf-8
+;; End:
+
 ;; How to save (DO NOT REMOVE!!)
 ;; (progn (magit-push) (emacswiki-post "anything-migemo.el"))
 ;;; anything-migemo.el ends here
