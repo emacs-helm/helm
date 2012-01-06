@@ -2273,9 +2273,9 @@ Animation is used."
 (defun anything-show-this-source-only ()
   "Show all candidates of this source."
   (interactive)
-  (setq anything-candidate-number-limit nil)
-  (anything-set-source-filter
-   (list (assoc-default 'name (anything-get-current-source)))))
+  (let (anything-candidate-number-limit)
+    (anything-set-source-filter
+     (list (assoc-default 'name (anything-get-current-source))))))
 
 ;;;###autoload
 (defun anything-test-sources ()
@@ -2319,11 +2319,9 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
         (anything-set-source-filter (list it))
       (anything-set-source-filter nil))))
 
-;; Same as anything-set-pattern but bad written, please fix.
 (defun anything-insert-string (str)
   "Insert STR."
-  (delete-minibuffer-contents)
-  (insert str))
+  (anything-set-pattern str 'noupdate))
 
 ;;;###autoload
 (defun anything-insert-buffer-name ()
