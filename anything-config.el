@@ -6554,6 +6554,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;; user_pref("browser.bookmarks.autoExportHTML", false);
 ;; You should have now:
 ;; user_pref("browser.bookmarks.autoExportHTML", true);
+;; NOTE: This is also working in the same way for mozilla aka seamonkey.
 
 (defvar anything-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ \"]*")
 (defvar anything-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
@@ -6604,13 +6605,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
     (filtered-candidate-transformer
      anything-c-adaptive-sort
      anything-c-highlight-firefox-bookmarks)
-    (action . (("Browse Url Firefox"
+    (action . (("Browse Url"
                 . (lambda (candidate)
-                    (browse-url-firefox
-                     (anything-c-firefox-bookmarks-get-value candidate))))
-               ("Browse Url w3m"
-                . (lambda (candidate)
-                    (w3m-browse-url
+                    (anything-c-browse-url
                      (anything-c-firefox-bookmarks-get-value candidate))))
                ("Copy Url"
                 . (lambda (elm)
@@ -6662,7 +6659,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                ("Copy Url"
                 . (lambda (elm)
                     (kill-new (anything-c-w3m-bookmarks-get-value elm))))
-               ("Browse Url Firefox"
+               ("Browse Url Externaly"
                 . (lambda (candidate)
                     (anything-c-w3m-browse-bookmark candidate t)))
                ("Delete Bookmark"
@@ -6687,8 +6684,8 @@ http://emacs-w3m.namazu.org/")
   (replace-regexp-in-string
    "\"" "" (cdr (assoc elm anything-c-w3m-bookmarks-alist))))
 
-(defun anything-c-w3m-browse-bookmark (elm &optional use-firefox new-tab)
-  (let* ((fn (if use-firefox 'browse-url-firefox 'w3m-browse-url))
+(defun anything-c-w3m-browse-bookmark (elm &optional use-external new-tab)
+  (let* ((fn  (if use-external 'anything-c-browse-url 'w3m-browse-url))
          (arg (and (eq fn 'w3m-browse-url) new-tab)))
     (funcall fn (anything-c-w3m-bookmarks-get-value elm) arg)))
 
@@ -8346,11 +8343,11 @@ Return an alist with elements like (data . number_results)."
         (apply default-browser-fn url args)
         (error "No usable browser found"))))
 
-(defun* anything-c-browse-url (&optional (url anything-c-home-url))
+(defun anything-c-browse-url (url &rest args)
   "Default command to browse URL."
   (if browse-url-browser-function
-      (browse-url url)
-      (anything-browse-url-default-browser url)))
+      (browse-url url args)
+      (anything-browse-url-default-browser url args)))
 
 
 ;;; Surfraw
@@ -12198,7 +12195,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
          (browse-url-browser-function (or anything-surfraw-default-browser-function
                                           browse-url-browser-function)))
     (if (string= engine-nodesc "W")
-        (anything-c-browse-url)
+        (anything-c-browse-url anything-c-home-url)
         (anything-c-browse-url url)
         (setq anything-surfraw-engines-history
               (cons engine (delete engine anything-surfraw-engines-history))))))
