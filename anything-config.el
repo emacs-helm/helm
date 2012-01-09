@@ -6659,7 +6659,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                ("Copy Url"
                 . (lambda (elm)
                     (kill-new (anything-c-w3m-bookmarks-get-value elm))))
-               ("Browse Url Externaly"
+               ("Browse Url Externally"
                 . (lambda (candidate)
                     (anything-c-w3m-browse-bookmark candidate t)))
                ("Delete Bookmark"
@@ -9962,6 +9962,31 @@ This is the same as `ac-insert', just inlined here for compatibility."
               finally return
               (if (and entry (not (string= entry "")) (file-exists-p entry))
                   (append (list (expand-file-name entry default-directory)) ls) ls))))))
+
+
+(unless (fboundp 'pcomplete/find)
+  (defun pcomplete/find ()
+    "Provide Eshell completion on Unix find command options."
+    (let ((cur (pcomplete-arg 'last)))
+      (when (string-match "-" cur)
+        (while (pcomplete-here
+                '("-amin" "-anewer" "-atime" "-cmin" "-cnewer" "-context"
+                  "-ctime" "-daystart" "-delete" "-depth" "-empty" "-exec"
+                  "-execdir" "-executable" "-false" "-fls" "-follow" "-fprint"
+                  "-fprint0" "-fprintf" "-fstype" "-gid" "-group"
+                  "-help" "-ignore_readdir_race" "-ilname" "-iname"
+                  "-inum" "-ipath" "-iregex" "-iwholename"
+                  "-links" "-lname" "-ls" "-maxdepth"
+                  "-mindepth" "-mmin" "-mount" "-mtime"
+                  "-name" "-newer" "-nogroup" "-noignore_readdir_race"
+                  "-noleaf" "-nouser" "-nowarn" "-ok"
+                  "-okdir" "-path" "-perm" "-print"
+                  "-print0" "-printf" "-prune" "-quit"
+                  "-readable" "-regex" "-regextype" "-samefile"
+                  "-size" "-true" "-type" "-uid"
+                  "-used" "-user" "-version" "-warn"
+                  "-wholename" "-writable" "-xdev" "-xtype")
+                nil 'identity))))))
 
 ;;; Eshell history.
 ;;
