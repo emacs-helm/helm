@@ -328,6 +328,9 @@ You have to ways to serial rename:\\
 \item By symlinking: All the files that are not files of the directory where you want to rename will be symlinked,
 others will be renamed.\\
 \end{itemize}
+\begin{itemize}
+\item By copying: All the file of others directories are copied in directory where renaming happen.\\ 
+\end{itemize}
 
 Example of Use:\\
 I want to create a directory with many symlinked images coming from various directories.\\
@@ -358,7 +361,7 @@ It have full tramp integration.
 \begin{itemize}
 \item NOTE: 
 You will find a file named anything-grep.el in extensions.
-It is NOT needed to use with what is described here.
+It is DEPRECATED and NOT needed to use with what is described here.
 It is another implementation of grep but not incremental.
 \end{itemize}
 
@@ -486,7 +489,7 @@ Accessing the mark-ring in Emacs is really inconvenient, fortunately, you will f
 \subsection{Save grep session}
 \label{sec:save-grep-session}
 If you want to save the results of your grep session, doing ``C-x C-s'' will save your grep results
-in a *grep* buffer. 
+in a grep-mode buffer. 
 
 \subsection{Open Files Externally}
 \label{sec:open-files-extern}
@@ -556,7 +559,8 @@ M-x anything-dired-bindings
 \end{verbatim}
 This will replace in dired C, R, S, and H commands.
 That is copy, rename, symlink, hardlink.
-When creating a symlink, you will find relsymlink in actions menu.(TAB).
+When creating a symlink, you will find relsymlink in actions menu.(TAB).\\
+NOTE: This is deprecated for Emacs24 users, use instead 'ac-mode'.
 
 \subsection{Copy Files}
 \label{sec:copy-files}
@@ -823,7 +827,7 @@ documentation.
 \label{sec:anything-buffers}
 
 \begin{verbatim}
-M-x anything-buffer+
+M-x anything-buffers-list
 \end{verbatim}
 
 \subsection{Borring buffers}
@@ -909,7 +913,7 @@ Not complete.
 \section{Usefuls links}
 \label{sec:usefuls-links}
 
-You can have info about anything on Emacswiki (Sometime deprecated).\\
+You can have infos about anything on Emacswiki (Mostly deprecated).\\
 \url{http://www.emacswiki.org/emacs/Anything}\\
 
 You can ask on the anything mailing-list by subscribing at:\\

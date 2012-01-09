@@ -1,10 +1,10 @@
 ;;; autodoc.el --- Inline auto documentation of lisp sources files.
 
-;; Author: Thierry Volpiatto
+;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; Copyright (C) 2010 Thierry Volpiatto, all rights reserved.
+;; Copyright (C) 2010 ~ 2012, Thierry Volpiatto, all rights reserved.
 
-;; Compatibility: GNU Emacs 23.1.92.1
+;; Compatibility: GNU Emacs 23/24+
 
 ;; This file is not part of GNU Emacs. 
 

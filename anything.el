@@ -1,8 +1,8 @@
 ;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
 
 ;; Copyright (C) 2007              Tamas Patrovics
-;;               2008 ~ 2011       rubikitch <rubikitch@ruby-lang.org>
-;;               2011              Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;;               2008 ~ 2012       rubikitch <rubikitch@ruby-lang.org>
+;;               2011 ~ 2012       Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Tamas Patrovics
 
@@ -628,7 +628,7 @@
 
 (require 'cl)
 
-(defvar anything-version "1.3.6")
+(defvar anything-version "1.3.8")
 
 ;; (@* "User Configuration")
 
@@ -765,6 +765,7 @@ See also `anything-set-source-filter'.")
     (define-key map (kbd "<C-M-down>")      'anything-scroll-other-window)
     (define-key map (kbd "<C-M-up>")        'anything-scroll-other-window-down)
     (define-key map (kbd "C-SPC")           'anything-toggle-visible-mark)
+    (define-key map (kbd "M-SPC")           'anything-toggle-visible-mark)
     (define-key map (kbd "M-[")             'anything-prev-visible-mark)
     (define-key map (kbd "M-]")             'anything-next-visible-mark)
     (define-key map (kbd "C-k")             'anything-delete-minibuffer-contents)
@@ -989,9 +990,6 @@ If nil, use default `mode-line-format'.")
        \\{anything-map}"
   "Detailed help message string for `anything'.
 It also accepts function or variable symbol.")
-
-;; FIXME: What is this
-                                        ;(put 'anything 'timid-completion 'disabled)
 
 (defvar anything-source-in-each-line-flag nil
   "Non-nil means add anything-source text-property in each candidate.
@@ -1279,7 +1277,7 @@ Attributes:
 - type
   `anything-type-attributes' are merged in.
 - candidates-buffer
-  candidates, volatile and match attrubute are created."
+  candidates, volatile and match attribute are created."
   (cond
     ;; action
     ((anything-action-window)
@@ -1338,24 +1336,26 @@ filtered-candidate-transformer functions."
   (if (and (boundp 'anything-source-name) (stringp anything-source-name))
       source
       (with-current-buffer (anything-buffer-get)
-        (or (get-text-property (point) 'anything-source)
-            (block exit
-              ;; This goto-char shouldn't be necessary, but point is moved to
-              ;; point-min somewhere else which shouldn't happen.
-              (goto-char (overlay-start anything-selection-overlay))
-              (let* ((header-pos (or (anything-get-previous-header-pos)
-                                     (anything-get-next-header-pos)))
-                     (source-name
-                      (save-excursion
-                        (unless header-pos
-                                        ;(message "No candidates")
-                          (return-from exit nil))
-                        (goto-char header-pos)
-                        (anything-current-line-contents))))
-                (some (lambda (source)
-                        (if (equal (assoc-default 'name source) source-name)
-                            source))
-                      (anything-get-sources))))))))
+        (or
+         ;; This happen only when `anything-source-in-each-line-flag'
+         ;; is non--nil and there is candidates in buffer.
+         (get-text-property (point) 'anything-source)
+         ;; Return nil when no--candidates.
+         (block exit
+           ;; This goto-char shouldn't be necessary, but point is moved to
+           ;; point-min somewhere else which shouldn't happen.
+           (goto-char (overlay-start anything-selection-overlay))
+           (let* ((header-pos (or (anything-get-previous-header-pos)
+                                  (anything-get-next-header-pos)))
+                  (source-name
+                   (save-excursion
+                     (unless header-pos
+                       (return-from exit nil))
+                     (goto-char header-pos)
+                     (anything-current-line-contents))))
+             (loop for source in (anything-get-sources) thereis
+                   (and (equal (assoc-default 'name source) source-name)
+                        source))))))))
 
 (defun anything-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `anything' was invoked."
@@ -1397,11 +1397,11 @@ Use this function is better than setting `anything-type-attributes' directly."
 (defvaralias 'anything-attributes 'anything-additional-attributes)
 (defvar anything-additional-attributes nil
   "List of all `anything' attributes.")
+
 (defun anything-document-attribute (attribute short-doc &optional long-doc)
   "Register ATTRIBUTE documentation introduced by plug-in.
 SHORT-DOC is displayed beside attribute name.
 LONG-DOC is displayed below attribute name and short documentation."
-  (declare (indent 2) (debug t))
   (if long-doc
       (setq short-doc (concat "(" short-doc ")"))
       (setq long-doc short-doc
@@ -1411,6 +1411,7 @@ LONG-DOC is displayed below attribute name and short documentation."
        (concat "- " (symbol-name attribute)
                " " short-doc "\n\n" long-doc "\n")))
 
+(put 'anything-document-attribute 'lisp-indent-function 2)
 
 (defun anything-interpret-value (value &optional source)
   "Interpret VALUE as variable, function or literal.
@@ -1681,7 +1682,7 @@ in source."
   ;;                        :buffer "toto"
   ;;                        :candidate-number-limit 4))
   ;; ==> ((anything-candidate-number-limit . 4))
-  (loop for (key value &rest _) on keys by #'cddr
+  (loop for (key value) on keys by #'cddr
         for symname = (substring (symbol-name key) 1)
         for sym = (intern (if (string-match "^anything-" symname)
                               symname
@@ -1701,35 +1702,37 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `anything'."
   (anything-log (concat "[Start session] " (make-string 41 ?+)))
   (anything-log-eval any-prompt any-preselect
                      any-buffer any-keymap any-default)
-  (unwind-protect
-       (condition-case v
-           (let (;; It is needed because `anything-source-name' is non-nil
-                 ;; when `anything' is invoked by action. Awful global scope.
-                 anything-source-name
-                 anything-in-persistent-action
-                 anything-quit
-                 (case-fold-search t)
-                 (anything-buffer (or any-buffer anything-buffer))
-                 ;; cua-mode ; avoid error when region is selected
-                 )
-             (with-anything-restore-variables
-               (anything-initialize any-resume any-input any-sources)
-               (anything-display-buffer anything-buffer)
-               (anything-log "show prompt")
-               (unwind-protect
-                    (anything-read-pattern-maybe
-                     any-prompt any-input any-preselect
-                     any-resume any-keymap any-default
-                     (when (and any-history (symbolp any-history)) any-history))
-                 (anything-cleanup)))
-             (prog1 (unless anything-quit
-                      (anything-execute-selection-action-1))
-               (anything-log (concat "[End session] " (make-string 41 ?-)))))
-         (quit
-          (anything-restore-position-on-quit)
-          (anything-log (concat "[End session (quit)] " (make-string 34 ?-)))
-          nil))
-    (anything-log-save-maybe)))
+  (let ((old-overridding-local-map overriding-local-map))
+    (unwind-protect
+         (condition-case v
+             (let ( ;; It is needed because `anything-source-name' is non-nil
+                   ;; when `anything' is invoked by action. Awful global scope.
+                   anything-source-name
+                   anything-in-persistent-action
+                   anything-quit
+                   (case-fold-search t)
+                   (anything-buffer (or any-buffer anything-buffer))
+                   ;; cua-mode ; avoid error when region is selected
+                   )
+               (with-anything-restore-variables
+                 (anything-initialize any-resume any-input any-sources)
+                 (anything-display-buffer anything-buffer)
+                 (anything-log "show prompt")
+                 (unwind-protect
+                      (anything-read-pattern-maybe
+                       any-prompt any-input any-preselect
+                       any-resume any-keymap any-default
+                       (when (and any-history (symbolp any-history)) any-history))
+                   (anything-cleanup)))
+               (prog1 (unless anything-quit
+                        (anything-execute-selection-action-1))
+                 (anything-log (concat "[End session] " (make-string 41 ?-)))))
+           (quit
+            (anything-restore-position-on-quit)
+            (anything-log (concat "[End session (quit)] " (make-string 34 ?-)))
+            nil))
+      (setq overriding-local-map old-overridding-local-map)
+      (anything-log-save-maybe))))
 
 
 ;;; Anything resume
@@ -1979,9 +1982,14 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
       (anything-mark-current-line t)
       (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
-    (and any-keymap (set (make-local-variable 'anything-map) any-keymap))
-    (let ((minibuffer-local-map
-           anything-map))
+    (let ((src-keymap (assoc-default 'keymap (anything-get-current-source))))
+      ;; Startup with the first keymap found either in current source
+      ;; or anything arg, otherwise use global value of `anything-map'.
+      ;; This map with be used as a `minibuffer-local-map'.
+      ;; Maybe it will be overriden when changing source
+      ;; by `anything-maybe-update-keymap'.
+      (set (make-local-variable 'anything-map)
+           (or src-keymap any-keymap anything-map))
       (anything-log-eval (anything-approximate-candidate-number)
                          anything-execute-action-at-once-if-one
                          anything-quit-if-no-candidate)
@@ -1998,7 +2006,20 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
                    (tap (or any-default
                             (with-anything-current-buffer
                               (thing-at-point 'symbol)))))
-               (read-string (or any-prompt "pattern: ") any-input any-history tap)))))))
+               (read-from-minibuffer (or any-prompt "pattern: ")
+                                     any-input anything-map
+                                     nil any-history tap)))))))
+               
+(defun anything-maybe-update-keymap ()
+  "Handle differents keymaps in multiples sources.
+This function is meant to be run in `anything-move-selection-after-hook'.
+It will override `anything-map' with the keymap attribute of current source
+if some when multiples sources are present."
+  (with-anything-window
+    (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
+      (when (and kmap (> (length anything-sources) 1))
+        (setq overriding-local-map kmap)))))
+(add-hook 'anything-move-selection-after-hook 'anything-maybe-update-keymap)
 
 (defun anything-create-anything-buffer (&optional test-mode)
   "Create newly created `anything-buffer'.
@@ -2978,9 +2999,9 @@ to mark candidates."
 ;; (define-key anything-map (kbd "<f18>") 'anything-select-with-prefix-shortcut)
 
 (defvar anything-exit-status 0
-  "Flag to inform whether anything have aborted or quitted.
-Exit with 0 mean anything exit executing an action.
-Exit with 1 mean anything abort with \\[keyboard-quit]
+  "Flag to inform whether anything have exited or quitted.
+Exit with 0 mean anything have exited executing an action.
+Exit with 1 mean anything have quitted with \\[keyboard-quit]
 It is useful for example to restore a window config if anything abort
 in special cases.
 See `anything-exit-minibuffer' and `anything-keyboard-quit'.")
@@ -3094,7 +3115,10 @@ INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
    " *Anything Help*"
    (lambda ()
      (insert (substitute-command-keys
-              (anything-interpret-value anything-help-message)))
+              (anything-interpret-value (or (assoc-default
+                                             'help-message
+                                             (anything-get-current-source))
+                                            anything-help-message))))
      (org-mode))))
 
 (defun anything-debug-output ()
@@ -3946,18 +3970,20 @@ ANYTHING-ATTRIBUTE should be a symbol."
   (interactive (list (intern
                       (completing-read
                        "Describe anything attribute: "
-                       (mapcar 'symbol-name anything-additional-attributes)))))
+                       (mapcar 'symbol-name anything-additional-attributes)
+                       nil t))))
   (with-output-to-temp-buffer "*Help*"
     (princ (get anything-attribute 'anything-attrdoc))))
 
-(put 'anything-document-attribute 'lisp-indent-function 2)
 (anything-document-attribute 'name "mandatory"
   "  The name of the source. It is also the heading which appears
-  above the list of matches from the source. Must be unique. ")
+  above the list of matches from the source. Must be unique.")
+
 (anything-document-attribute 'header-name "optional"
   "  A function returning the display string of the header. Its
   argument is the name of the source. This attribute is useful to
-  add an additional information with the source name. ")
+  add an additional information with the source name.")
+
 (anything-document-attribute 'candidates "mandatory if candidates-in-buffer attribute is not provided"
   "  Specifies how to retrieve candidates from the source. It can
   either be a variable name, a function called with no parameters
@@ -3989,7 +4015,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
 
   Note that currently results from asynchronous sources appear
   last in the anything buffer regardless of their position in
-  `anything-sources'. ")
+  `anything-sources'.")
+
 (anything-document-attribute 'action "mandatory if type attribute is not provided"
   "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
   FUNCTION is called with one parameter: the selected candidate.
@@ -3998,7 +4025,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
   of actions for the currently selected candidate (by default
   with TAB). The DISPLAY string is shown in the completions
   buffer and the FUNCTION is invoked when an action is
-  selected. The first action of the list is the default. ")
+  selected. The first action of the list is the default.")
+
 (anything-document-attribute 'coerce "optional"
   "  It's a function called with one argument: the selected candidate.
 
@@ -4007,14 +4035,16 @@ ANYTHING-ATTRIBUTE should be a symbol."
   If coerce function is specified, it is called just before action function.
 
   Example: converting string to symbol
-    (coerce . intern) ")
+    (coerce . intern)")
+
 (anything-document-attribute 'type "optional if action attribute is provided"
   "  Indicates the type of the items the source returns.
 
   Merge attributes not specified in the source itself from
   `anything-type-attributes'.
 
-  This attribute is implemented by plug-in. ")
+  This attribute is implemented by plug-in.")
+
 (anything-document-attribute 'init "optional"
   "  Function called with no parameters when anything is started. It
   is useful for collecting current state information which can be
@@ -4024,11 +4054,13 @@ ANYTHING-ATTRIBUTE should be a symbol."
   directory then it can store its value here, because later
   anything does its job in the minibuffer and in the
   `anything-buffer' and the current directory can be different
-  there. ")
+  there.")
+
 (anything-document-attribute 'delayed-init "optional"
   "  Function called with no parameters before candidate function is
   called.  It is similar with `init' attribute, but its
   evaluation is deferred. It is useful to combine with ")
+
 (anything-document-attribute 'match "optional"
   "  List of functions called with one parameter: a candidate. The
   function should return non-nil if the candidate matches the
@@ -4051,7 +4083,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
 
   This attribute has no effect for asynchronous sources (see
   attribute `candidates'), since they perform pattern matching
-  themselves. ")
+  themselves.")
+
 (anything-document-attribute 'candidate-transformer "optional"
   "  It's a function or a list of functions called with one argument
   when the completion list from the source is built. The argument
@@ -4065,7 +4098,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
 
   Note that `candidates' is run already, so the given transformer
   function should also be able to handle candidates with (DISPLAY
-  . REAL) format. ")
+  . REAL) format.")
+
 (anything-document-attribute 'filtered-candidate-transformer "optional"
   "  It has the same format as `candidate-transformer', except the
   function is called with two parameters: the candidate list and
@@ -4092,7 +4126,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
   to handle candidates with (DISPLAY . REAL) format.
 
   This option has no effect for asynchronous sources. (Not yet,
-  at least. ")
+  at least.")
+
 (anything-document-attribute 'action-transformer "optional"
   "  It's a function or a list of functions called with two
   arguments when the action list from the source is
@@ -4103,31 +4138,37 @@ ANYTHING-ATTRIBUTE should be a symbol."
   The function should return a transformed action list.
 
   This can be used to customize the list of actions based on the
-  currently selected candidate. ")
+  currently selected candidate.")
+
 (anything-document-attribute 'pattern-transformer "optional"
   "  It's a function or a list of functions called with one argument
   before computing matches. Its argument is `anything-pattern'.
   Functions should return transformed `anything-pattern'.
 
-  It is useful to change interpretation of `anything-pattern'. ")
+  It is useful to change interpretation of `anything-pattern'.")
+
 (anything-document-attribute 'delayed "optional"
   "  Candidates from the source are shown only if the user stops
-  typing and is idle for `anything-idle-delay' seconds. ")
+  typing and is idle for `anything-idle-delay' seconds.")
+
 (anything-document-attribute 'volatile "optional"
   "  Indicates the source assembles the candidate list dynamically,
   so it shouldn't be cached within a single Anything
   invocation. It is only applicable to synchronous sources,
-  because asynchronous sources are not cached. ")
+  because asynchronous sources are not cached.")
+
 (anything-document-attribute 'requires-pattern "optional"
   "  If present matches from the source are shown only if the
   pattern is not empty. Optionally, it can have an integer
   parameter specifying the required length of input which is
-  useful in case of sources with lots of candidates. ")
+  useful in case of sources with lots of candidates.")
+
 (anything-document-attribute 'persistent-action "optional"
   "  Function called with one parameter; the selected candidate.
 
   An action performed by `anything-execute-persistent-action'.
-  If none, use the default action. ")
+  If none, use the default action.")
+
 (anything-document-attribute 'candidates-in-buffer "optional"
   "  Shortcut attribute for making and narrowing candidates using
   buffers.  This newly-introduced attribute prevents us from
@@ -4145,24 +4186,28 @@ ANYTHING-ATTRIBUTE should be a symbol."
     (volatile)
     (match identity)
 
-  This attribute is implemented by plug-in. ")
+  This attribute is implemented by plug-in.")
+
 (anything-document-attribute 'search "optional"
   "  List of functions like `re-search-forward' or `search-forward'.
   Buffer search function used by `anything-candidates-in-buffer'.
   By default, `anything-candidates-in-buffer' uses `re-search-forward'.
   This attribute is meant to be used with
   (candidates . anything-candidates-in-buffer) or
-  (candidates-in-buffer) in short. ")
+  (candidates-in-buffer) in short.")
+
 (anything-document-attribute 'search-from-end "optional"
   "  Make `anything-candidates-in-buffer' search from the end of buffer.
   If this attribute is specified, `anything-candidates-in-buffer' uses
-  `re-search-backward' instead. ")
+  `re-search-backward' instead.")
+
 (anything-document-attribute 'get-line "optional"
   "  A function like `buffer-substring-no-properties' or `buffer-substring'.
   This function converts point of line-beginning and point of line-end,
   which represents a candidate computed by `anything-candidates-in-buffer'.
   By default, `anything-candidates-in-buffer' uses
-  `buffer-substring-no-properties'. ")
+  `buffer-substring-no-properties'.")
+
 (anything-document-attribute 'display-to-real "optional"
   "  Function called with one parameter; the selected candidate.
 
@@ -4175,7 +4220,8 @@ ANYTHING-ATTRIBUTE should be a symbol."
   candidate-transformer or filtered-candidate-transformer
   function return a list with (DISPLAY . REAL) pairs. But if REAL
   can be generated from DISPLAY, display-to-real is more
-  convenient and faster. ")
+  convenient and faster.")
+
 (anything-document-attribute 'real-to-display "optional"
   "  Function called with one parameter; the selected candidate.
 
@@ -4194,40 +4240,62 @@ ANYTHING-ATTRIBUTE should be a symbol."
 
   Note that DISPLAY parts returned from candidates /
   candidate-transformer are IGNORED as the name `display-to-real'
-  says. ")
+  says.")
+
 (anything-document-attribute 'cleanup "optional"
   "  Function called with no parameters when *anything* buffer is closed. It
   is useful for killing unneeded candidates buffer.
 
-  Note that the function is executed BEFORE performing action. ")
+  Note that the function is executed BEFORE performing action.")
+
 (anything-document-attribute 'candidate-number-limit "optional"
-  "  Override `anything-candidate-number-limit' only for this source. ")
+  "  Override `anything-candidate-number-limit' only for this source.")
+
 (anything-document-attribute 'accept-empty "optional"
-  "  Pass empty string \"\" to action function. ")
+  "  Pass empty string \"\" to action function.")
+
 (anything-document-attribute 'disable-shortcuts "optional"
   "  Disable `anything-enable-shortcuts' in current `anything' session.
 
-  This attribute is implemented by plug-in. ")
+  This attribute is implemented by plug-in.")
+
 (anything-document-attribute 'dummy "optional"
   "  Set `anything-pattern' to candidate. If this attribute is
   specified, The candidates attribute is ignored.
 
   This attribute is implemented by plug-in.
-  This plug-in implies disable-shortcuts plug-in. ")
+  This plug-in implies disable-shortcuts plug-in.")
+
 (anything-document-attribute 'multiline "optional"
-  "  Enable to selection multiline candidates. ")
+  "  Enable to selection multiline candidates.")
+
 (anything-document-attribute 'update "optional"
-  ;; FIXME: this is not displayed correctly in help buffer.
-  "  Function called with no parameters when \\<anything-map>\\[anything-force-update] is pressed. ")
+  (substitute-command-keys
+   "  Function called with no parameters when \
+\\<anything-map>\\[anything-force-update] is pressed."))
+
 (anything-document-attribute 'mode-line "optional"
   "  source local `anything-mode-line-string'. (included in `mode-line-format')
-  It accepts also variable/function name. ")
+  It accepts also variable/function name.")
+
 (anything-document-attribute 'header-line "optional"
   "  source local `header-line-format'.
   It accepts also variable/function name. ")
+
 (anything-document-attribute
  'resume "optional"
  "  Function called with no parameters when `anything-resume' is started.")
+
+(anything-document-attribute 'keymap "optional"
+  "  Specific keymap for this source.
+  It is useful to have a keymap per source when using more than one source.
+  Otherwise, a keymap can be set per command with `anything' argument KEYMAP.
+  NOTE: when a source have `anything-map' as keymap attr,
+  the global value of `anything-map' will override the actual local one.")
+
+(anything-document-attribute 'help-message "optional"
+  "  Help message for this source.
+  If not present, `anything-help-message' value will be used.")
 
 
 ;; (@* "Bug Report")
