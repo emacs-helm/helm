@@ -1007,6 +1007,13 @@ It is useful for debug.")
 If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because *Anything Log* grows quickly.")
 
+(defcustom anything-local-map-override-anything-map t
+  "Override `anything-map' keys with the corresponding ones in source local map.
+When non--nil keys in source local map will override same keys in `anything-map'
+otherwise same keys in `anything-map' will take precedence."
+  :group 'anything
+  :type  'boolean)
+
 
 ;; (@* "Internal Variables")
 (defvar anything-test-candidate-list nil)
@@ -1973,6 +1980,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 
 (defvar anything-reading-pattern nil
   "Whether in `read-string' in anything or not.")
+
 (defun anything-read-pattern-maybe (any-prompt any-input
                                     any-preselect any-resume any-keymap
                                     any-default any-history)
@@ -1988,8 +1996,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
       ;; This map with be used as a `minibuffer-local-map'.
       ;; Maybe it will be overriden when changing source
       ;; by `anything-maybe-update-keymap'.
-      (anything-aif (or src-keymap any-keymap)
-          (set-keymap-parent it anything-map))
+      (unless anything-local-map-override-anything-map
+        (anything-aif (or src-keymap any-keymap)
+            (set-keymap-parent it anything-map)))
       (set (make-local-variable 'anything-map)
            (or src-keymap any-keymap anything-map))
       (anything-log-eval (anything-approximate-candidate-number)
@@ -2020,7 +2029,8 @@ if some when multiples sources are present."
   (with-anything-window
     (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
       (when (and kmap (> (length anything-sources) 1))
-        (set-keymap-parent kmap (default-value 'anything-map))
+        (and anything-local-map-override-anything-map
+             (set-keymap-parent kmap (default-value 'anything-map)))
         (setq overriding-local-map kmap)))))
 (add-hook 'anything-move-selection-after-hook 'anything-maybe-update-keymap)
 

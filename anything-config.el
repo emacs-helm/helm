@@ -4078,7 +4078,8 @@ in `anything-ff-history'."
             (anything-c-delete-file candidate)
             (save-selected-window
               (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
-                (anything-c-delete-file candidate))))
+                (anything-c-delete-file candidate)
+                (message nil))))
         (anything-force-update presel))))
 
 (defun anything-ff-kill-buffer-fname (candidate)
