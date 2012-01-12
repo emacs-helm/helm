@@ -9941,28 +9941,33 @@ This is the same as `ac-insert', just inlined here for compatibility."
            (pcomplete-autolist pcomplete-autolist)
            (pcomplete-suffix-list pcomplete-suffix-list))
       (with-anything-current-buffer
-        (loop
-              with table  = (pcomplete-completions)
+        (loop with table  = (pcomplete-completions)
               with entry  = (condition-case nil
                                 ;; For Emacs24
-                                (try-completion anything-pattern (pcomplete-entries))
-                              ;; Fall back to this in Emacs23 as pcomplete-entries seem broken.
+                                (or (try-completion anything-pattern
+                                                    (pcomplete-entries))
+                                    anything-pattern)
+                              ;; Fall back to this in Emacs23
+                              ;; as pcomplete-entries seem broken.
                               (error
                                nil
-                               (let ((fc (car (last (pcomplete-parse-arguments)))))
+                               (let ((fc (car (last
+                                               (pcomplete-parse-arguments)))))
                                  ;; Check if last arg require fname completion.
                                  (and (file-name-directory fc) fc))))
-              for i in (if (listp table) table                     ; Emacs23 or commands.
-                           (all-completions pcomplete-stub table)) ; Emacs24
+              for i in (all-completions pcomplete-stub table)
               for file-cand = (and entry
                                    (if (file-remote-p i) i
-                                       (expand-file-name i (file-name-directory entry))))
-              if (and file-cand (or (file-remote-p file-cand) (file-exists-p file-cand)))
+                                       (expand-file-name
+                                        i (file-name-directory entry))))
+              if (and file-cand (or (file-remote-p file-cand)
+                                    (file-exists-p file-cand)))
               collect file-cand into ls
               else collect i into ls
               finally return
               (if (and entry (not (string= entry "")) (file-exists-p entry))
-                  (append (list (expand-file-name entry default-directory)) ls) ls))))))
+                  (append (list (expand-file-name entry default-directory)) ls)
+                  ls))))))
 
 ;;; Eshell history.
 ;;
