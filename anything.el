@@ -312,7 +312,7 @@
 ;; `anything-mode-line-string-real'
 ;; Not documented.
 ;; `anything-exit-status'
-;; Flag to inform whether anything have aborted or quitted.
+;; Flag to inform whether anything have exited or quitted.
 ;; `anything-minibuffer-confirm-state'
 ;; Not documented.
 ;; `anything-types'

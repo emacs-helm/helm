@@ -33,41 +33,43 @@
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "anything-mp" :var-value t)
 ;; `anything-mp-matching-method'
 ;; Default Value: multi3
+;; `anything-mp-highlight-delay'
+;; Default Value: 0.7
+;; `anything-mp-highlight-threshold'
+;; Default Value: 2
 ;;
 ;;  * Internal variables
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'internal-variable :prefix "anything-mp" :var-value t)
 ;; `anything-mp-default-match-functions'
-;; Default Value: (anything-mp-exact-match anything-mp-3-match) 
+;; Default Value:	(anything-mp-exact-match anything-mp-3-match) 
 ;; `anything-mp-default-search-functions'
-;; Default Value: (anything-mp-exact-search anything-mp-3-search) 
+;; Default Value:	(anything-mp-exact-search anything-mp-3-search) 
 ;; `anything-mp-default-search-backward-functions'
-;; Default Value: (anything-mp-exact-search-backward anything-mp-3-search-backward) 
+;; Default Value:	(anything-mp-exact-search-backward anything-mp-3-search-backward) 
 ;; `anything-mp-space-regexp'
 ;; Default Value: "[\\ ] "
 ;; `anything-mp-exact-pattern-str'
-;; Default Value: "autodoc"
+;; Default Value: "autod"
 ;; `anything-mp-exact-pattern-real'
-;; Default Value: "\nautodoc\n"
+;; Default Value: "\nautod\n"
 ;; `anything-mp-prefix-pattern-str'
-;; Default Value: "find"
+;; Default Value: nil
 ;; `anything-mp-prefix-pattern-real'
-;; Default Value: "\nfind"
+;; Default Value: nil
 ;; `anything-mp-1-pattern-str'
 ;; Default Value: nil
 ;; `anything-mp-1-pattern-real'
 ;; Default Value: nil
 ;; `anything-mp-2-pattern-str'
-;; Default Value: "lisp ini"
+;; Default Value: nil
 ;; `anything-mp-2-pattern-real'
-;; Default Value: "^.*lisp.*ini"
+;; Default Value: nil
 ;; `anything-mp-3-pattern-str'
-;; Default Value: "autodoc"
+;; Default Value: "autod"
 ;; `anything-mp-3-pattern-list'
-;; Default Value: ((identity . "autodoc")) 
-;; `anything-mp-highlight-delay'
-;; Default Value: 0.7
-;; `anything-mp-highlight-threshold'
-;; Default Value: 2
+;; Default Value:	((identity . "autod")) 
+;; `anything-mp-initial-highlight-delay'
+;; Default Value: nil
 ;;
 ;;  * Anything match plugin Functions
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'function :prefix "anything-mp")
