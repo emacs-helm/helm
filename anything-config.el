@@ -9943,12 +9943,16 @@ This is the same as `ac-insert', just inlined here for compatibility."
       (with-anything-current-buffer
         (loop with table  = (pcomplete-completions)
               with entry  = (condition-case nil
-                                ;; For Emacs24
+                                ;; On Emacs24 `try-completion' return
+                                ;; pattern when more than one result.
+                                ;; Otherwise Emacs23 return nil, which
+                                ;; is wrong, in this case use pattern
+                                ;; to behave like Emacs24.
                                 (or (try-completion anything-pattern
                                                     (pcomplete-entries))
                                     anything-pattern)
-                              ;; Fall back to this in Emacs23
-                              ;; as pcomplete-entries seem broken.
+                              ;; In Emacs23 `pcomplete-entries' may fail
+                              ;; with error, so try this instead.
                               (error
                                nil
                                (let ((fc (car (last
