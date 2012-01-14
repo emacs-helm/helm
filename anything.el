@@ -2238,6 +2238,20 @@ Cache the candidates if there is not yet a cached value."
 
 
 ;;; (@* "Core: candidate transformers")
+(defun anything-transform-mapcar (function args)
+  "`mapcar' for candidate-transformer.
+
+ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
+
+\(anything-transform-mapcar 'upcase '(\"foo\" \"bar\")) ; => (\"FOO\" \"BAR\")
+\(anything-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\"))) ; => ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
+"
+  (loop for arg in args
+        if (consp arg)
+        collect (cons (car arg) (funcall function (cdr arg)))
+        else
+        collect (funcall function arg)))
+
 (defun anything-process-candidate-transformer (candidates source)
   "Execute candidate-transformer function on all CANDIDATES of SOURCE."
   (anything-aif (assoc-default 'candidate-transformer source)
