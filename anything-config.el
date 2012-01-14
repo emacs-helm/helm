@@ -10858,21 +10858,24 @@ displayed with the `file-name-shadow' face if available."
   "Change undesirable features of windows pathnames to ones more acceptable to
 other candidate transformers."
   (if (eq system-type 'windows-nt)
-      (mapcar (lambda (x)
-                (replace-regexp-in-string "/cygdrive/\\(.\\)" "\\1:" x))
-              (mapcar (lambda (y)
-                        (replace-regexp-in-string "\\\\" "/" y)) args))
-      args))
+      (anything-transform-mapcar
+       (lambda (x)
+         (replace-regexp-in-string
+          "/cygdrive/\\(.\\)" "\\1:"
+          (replace-regexp-in-string "\\\\" "/" x)))
+       args)
+    args))
 
 (defun anything-c-shorten-home-path (files)
   "Replaces /home/user with ~."
   (let ((home (replace-regexp-in-string "\\\\" "/" ; stupid Windows...
                                         (getenv "HOME"))))
-    (mapcar (lambda (file)
-              (if (and (stringp file) (string-match home file))
-                  (cons (replace-match "~" nil nil file) file)
-                  file))
-            files)))
+    (anything-transform-mapcar
+     (lambda (file)
+       (if (and (stringp file) (string-match home file))
+           (cons (replace-match "~" nil nil file) file)
+         file))
+     files)))
 
 ;;; Functions
 (defun anything-c-mark-interactive-functions (functions)
