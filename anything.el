@@ -1989,7 +1989,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
       ;; Maybe it will be overriden when changing source
       ;; by `anything-maybe-update-keymap'.
       (anything-aif (or src-keymap any-keymap)
-          (set-keymap-parent it anything-map))
+          (ignore-errors              ;It may be child of anything-map
+            (set-keymap-parent it anything-map)))
       (set (make-local-variable 'anything-map)
            (or src-keymap any-keymap anything-map))
       (anything-log-eval (anything-approximate-candidate-number)
@@ -2020,7 +2021,8 @@ if some when multiples sources are present."
   (with-anything-window
     (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
       (when (and kmap (> (length anything-sources) 1))
-        (set-keymap-parent kmap (default-value 'anything-map))
+        (ignore-errors                ;It may be child of anything-map
+          (set-keymap-parent kmap (default-value 'anything-map)))
         (setq overriding-local-map kmap)))))
 (add-hook 'anything-move-selection-after-hook 'anything-maybe-update-keymap)
 
