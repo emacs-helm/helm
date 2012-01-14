@@ -5675,26 +5675,23 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                    (looking-at ":\\([0-9]+\\)"))
           (cons it (string-to-number (match-string 1)))))))
 
-(defvar anything-c-ffap-line-location nil
-  "(FILENAME . LINENO) used by `anything-c-source-ffap-line'.
-It is cleared after jumping line.")
-
 (defun anything-c-ffap-line-candidates ()
   (with-anything-current-buffer
-    (setq anything-c-ffap-line-location (anything-c-ffap-file-line-at-point)))
-  (when anything-c-ffap-line-location
-    (destructuring-bind (file . line) anything-c-ffap-line-location
+    (anything-attrset 'ffap-line-location (anything-c-ffap-file-line-at-point)))
+  (anything-aif (anything-attr 'ffap-line-location)
+    (destructuring-bind (file . line) it
       (list (cons (format "%s (line %d)" file line) file)))))
 
 ;;; Goto line after opening file by `anything-c-source-ffap-line'.
 (defun anything-c-ffap-line-goto-line ()
-  (when (car anything-c-ffap-line-location)
+  (when (car (anything-attr 'ffap-line-location))
     (unwind-protect
-         (ignore-errors
-           (with-selected-window
-               (get-buffer-window
-                (get-file-buffer (car anything-c-ffap-line-location)))
-             (anything-goto-line (cdr anything-c-ffap-line-location)))))))
+        (ignore-errors
+          (with-selected-window
+              (get-buffer-window
+               (get-file-buffer (car (anything-attr 'ffap-line-location))))
+            (anything-goto-line (cdr (anything-attr 'ffap-line-location)))))
+      (anything-attrset 'ffap-line-location nil))))
 (add-hook 'anything-after-action-hook 'anything-c-ffap-line-goto-line)
 (add-hook 'anything-after-persistent-action-hook 'anything-c-ffap-line-goto-line)
 
