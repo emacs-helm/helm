@@ -101,6 +101,8 @@
 ;; The help function for etags.
 ;; `anything-c-ucs-help'
 ;; Help command for `anything-ucs'.
+;; `anything-c-bookmark-help'
+;; Help command for bookmarks.
 ;; `anything-show-this-source-only'
 ;; Show all candidates of this source.
 ;; `anything-test-sources'
@@ -219,8 +221,12 @@
 ;; Run grep save results action from `anything-do-grep-1'.
 ;; `anything-yank-text-at-point'
 ;; Yank text at point in minibuffer.
-;; `anything-c-describe-attributes'
-;; Display the full documentation of ANYTHING-ATTRIBUTE (a symbol).
+;; `anything-c-bookmark-run-jump-other-window'
+;; Jump to bookmark from keyboard.
+;; `anything-c-bookmark-run-delete'
+;; Delete bookmark from keyboard.
+;; `anything-c-bmkext-run-edit'
+;; Run `bmkext-edit-bookmark' from keyboard.
 ;; `anything-yaoddmuse-cache-pages'
 ;; Fetch the list of files on emacswiki and create cache file.
 ;; `anything-eval-new-line-and-indent'
@@ -253,18 +259,14 @@
 ;; Save history information to file given by `anything-c-adaptive-history-file'.
 ;; `anything-c-reset-adaptative-history'
 ;; Delete all `anything-c-adaptive-history' and his file.
-;; `anything-c-toggle-match-plugin'
-;; Toggle anything-match-plugin.
 ;; `anything-mini'
-;; Preconfigured `anything' lightweight version		(buffer -> recentf).
+;; Preconfigured `anything' lightweight version (buffer -> recentf).
 ;; `anything-for-files'
 ;; Preconfigured `anything' for opening files.
 ;; `anything-recentf'
 ;; Preconfigured `anything' for `recentf'.
 ;; `anything-info-at-point'
 ;; Preconfigured `anything' for searching info at point.
-;; `anything-info-emacs'
-;; Preconfigured anything for Emacs manual index.
 ;; `anything-show-kill-ring'
 ;; Preconfigured `anything' for `kill-ring'.
 ;; `anything-minibuffer-history'
@@ -294,7 +296,7 @@
 ;; `anything-bookmarks'
 ;; Preconfigured `anything' for bookmarks.
 ;; `anything-c-pp-bookmarks'
-;; Preconfigured `anything' for bookmarks		(pretty-printed).
+;; Preconfigured `anything' for bookmarks	(pretty-printed).
 ;; `anything-c-insert-latex-math'
 ;; Preconfigured anything for latex math symbols completion.
 ;; `anything-register'
@@ -319,8 +321,6 @@
 ;; Preconfigured anything to browse code.
 ;; `anything-org-headlines'
 ;; Preconfigured anything to show org headlines.
-;; `anything-info-gnus'
-;; Preconfigured anything to browse Gnus Manual.
 ;; `anything-regexp'
 ;; Preconfigured anything to build regexps.
 ;; `anything-c-copy-files-async'
@@ -401,6 +401,8 @@
 ;; Preconfigured anything for `ucs-names' math symbols.
 ;; `anything-c-apropos'
 ;; Preconfigured anything to describe commands, functions, variables and faces.
+;; `anything-xrandr-set'
+;; Not documented.
 
 ;;  * User variables defined here:
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "anything-" :var-value t)
@@ -486,6 +488,10 @@
 ;; Default Value: anything-c-show-info-in-mode-line
 ;; `anything-c-turn-on-show-completion'
 ;; Default Value: t
+;; `anything-c-show-completion-use-special-display'
+;; Default Value: t
+;; `anything-c-show-completion-min-window-height'
+;; Default Value: 7
 ;; `anything-lisp-completion-or-indent-delay'
 ;; Default Value: 0.6
 ;; `anything-c-default-external-file-browser'
@@ -540,55 +546,6 @@
 ;; `anything-c-source-files-in-all-dired'			(Files in all dired buffer.)
 ;; `anything-c-source-filelist'					(FileList)
 ;; `anything-c-source-info-pages'				(Info Pages)
-;; `anything-c-source-info-elisp'				(Info index: elisp)
-;; `anything-c-source-info-cl'					(Info index: cl)
-;; `anything-c-source-info-org'					(Info index: org)
-;; `anything-c-source-info-gnus'				(Info index: Gnus)
-;; `anything-c-source-info-ratpoison'				(Info index: ratpoison)
-;; `anything-c-source-info-zsh'					(Info index: zsh)
-;; `anything-c-source-info-bash'				(Info index: bash)
-;; `anything-c-source-info-coreutils'				(Info index: coreutils)
-;; `anything-c-source-info-fileutils'				(Info index: fileutils)
-;; `anything-c-source-info-find'				(Info index: find)
-;; `anything-c-source-info-sh-utils'				(Info index: sh-utils)
-;; `anything-c-source-info-textutils'				(Info index: textutils)
-;; `anything-c-source-info-libc'				(Info index: libc)
-;; `anything-c-source-info-make'				(Info index: make)
-;; `anything-c-source-info-automake'				(Info index: automake)
-;; `anything-c-source-info-autoconf'				(Info index: autoconf)
-;; `anything-c-source-info-emacs-lisp-intro'			(Info index: emacs-lisp-intro)
-;; `anything-c-source-info-emacs'				(Info index: emacs)
-;; `anything-c-source-info-elib'				(Info index: elib)
-;; `anything-c-source-info-eieio'				(Info index: eieio)
-;; `anything-c-source-info-gauche-refe'				(Info index: gauche)
-;; `anything-c-source-info-guile'				(Info index: guile)
-;; `anything-c-source-info-guile-tut'				(Info index: guile-tut)
-;; `anything-c-source-info-goops'				(Info index: goops)
-;; `anything-c-source-info-screen'				(Info index: screen)
-;; `anything-c-source-info-latex'				(Info index: latex)
-;; `anything-c-source-info-gawk'				(Info index: gawk)
-;; `anything-c-source-info-sed'					(Info index: sed)
-;; `anything-c-source-info-m4'					(Info index: m4)
-;; `anything-c-source-info-wget'				(Info index: wget)
-;; `anything-c-source-info-binutils'				(Info index: binutils)
-;; `anything-c-source-info-as'					(Info index: as)
-;; `anything-c-source-info-bfd'					(Info index: bfd)
-;; `anything-c-source-info-gprof'				(Info index: gprof)
-;; `anything-c-source-info-ld'					(Info index: ld)
-;; `anything-c-source-info-diff'				(Info index: diff)
-;; `anything-c-source-info-flex'				(Info index: flex)
-;; `anything-c-source-info-grep'				(Info index: grep)
-;; `anything-c-source-info-gzip'				(Info index: gzip)
-;; `anything-c-source-info-libtool'				(Info index: libtool)
-;; `anything-c-source-info-texinfo'				(Info index: texinfo)
-;; `anything-c-source-info-info'				(Info index: info)
-;; `anything-c-source-info-gdb'					(Info index: gdb)
-;; `anything-c-source-info-stabs'				(Info index: stabs)
-;; `anything-c-source-info-cvsbook'				(Info index: cvsbook)
-;; `anything-c-source-info-cvs'					(Info index: cvs)
-;; `anything-c-source-info-bison'				(Info index: bison)
-;; `anything-c-source-info-id-utils'				(Info index: id-utils)
-;; `anything-c-source-info-global'				(Info index: global)
 ;; `anything-c-source-man-pages'				(Manual Pages)
 ;; `anything-c-source-complex-command-history'			(Complex Command History)
 ;; `anything-c-source-extended-command-history'			(Emacs Commands History)
@@ -4078,7 +4035,8 @@ in `anything-ff-history'."
             (anything-c-delete-file candidate)
             (save-selected-window
               (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
-                (anything-c-delete-file candidate))))
+                (anything-c-delete-file candidate)
+                (message nil))))
         (anything-force-update presel))))
 
 (defun anything-ff-kill-buffer-fname (candidate)
@@ -4889,9 +4847,11 @@ Keys description:
               (candidates
                . (lambda ()
                    (if test
-                       (loop for i in (anything-find-files-get-candidates
+                       (loop with hn = (anything-ff-tramp-hostnames)
+                             for i in (anything-find-files-get-candidates
                                        must-match)
-                             when (funcall test i) collect i)
+                             when (or (member i hn) (funcall test i))
+                             collect i)
                        (anything-find-files-get-candidates must-match))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
               (persistent-action . ,persistent-action)
@@ -9937,53 +9897,37 @@ This is the same as `ac-insert', just inlined here for compatibility."
            (pcomplete-autolist pcomplete-autolist)
            (pcomplete-suffix-list pcomplete-suffix-list))
       (with-anything-current-buffer
-        (loop
-              with table  = (pcomplete-completions)
+        (loop with table  = (pcomplete-completions)
               with entry  = (condition-case nil
-                                ;; For Emacs24
-                                (try-completion anything-pattern (pcomplete-entries))
-                              ;; Fall back to this in Emacs23 as pcomplete-entries seem broken.
+                                ;; On Emacs24 `try-completion' return
+                                ;; pattern when more than one result.
+                                ;; Otherwise Emacs23 return nil, which
+                                ;; is wrong, in this case use pattern
+                                ;; to behave like Emacs24.
+                                (or (try-completion anything-pattern
+                                                    (pcomplete-entries))
+                                    anything-pattern)
+                              ;; In Emacs23 `pcomplete-entries' may fail
+                              ;; with error, so try this instead.
                               (error
                                nil
-                               (let ((fc (car (last (pcomplete-parse-arguments)))))
+                               (let ((fc (car (last
+                                               (pcomplete-parse-arguments)))))
                                  ;; Check if last arg require fname completion.
                                  (and (file-name-directory fc) fc))))
-              for i in (if (listp table) table                     ; Emacs23 or commands.
-                           (all-completions pcomplete-stub table)) ; Emacs24
+              for i in (all-completions pcomplete-stub table)
               for file-cand = (and entry
                                    (if (file-remote-p i) i
-                                       (expand-file-name i (file-name-directory entry))))
-              if (and file-cand (or (file-remote-p file-cand) (file-exists-p file-cand)))
+                                       (expand-file-name
+                                        i (file-name-directory entry))))
+              if (and file-cand (or (file-remote-p file-cand)
+                                    (file-exists-p file-cand)))
               collect file-cand into ls
               else collect i into ls
               finally return
               (if (and entry (not (string= entry "")) (file-exists-p entry))
-                  (append (list (expand-file-name entry default-directory)) ls) ls))))))
-
-
-(unless (fboundp 'pcomplete/find)
-  (defun pcomplete/find ()
-    "Provide Eshell completion on Unix find command options."
-    (let ((cur (pcomplete-arg 'last)))
-      (when (string-match "-" cur)
-        (while (pcomplete-here
-                '("-amin" "-anewer" "-atime" "-cmin" "-cnewer" "-context"
-                  "-ctime" "-daystart" "-delete" "-depth" "-empty" "-exec"
-                  "-execdir" "-executable" "-false" "-fls" "-follow" "-fprint"
-                  "-fprint0" "-fprintf" "-fstype" "-gid" "-group"
-                  "-help" "-ignore_readdir_race" "-ilname" "-iname"
-                  "-inum" "-ipath" "-iregex" "-iwholename"
-                  "-links" "-lname" "-ls" "-maxdepth"
-                  "-mindepth" "-mmin" "-mount" "-mtime"
-                  "-name" "-newer" "-nogroup" "-noignore_readdir_race"
-                  "-noleaf" "-nouser" "-nowarn" "-ok"
-                  "-okdir" "-path" "-perm" "-print"
-                  "-print0" "-printf" "-prune" "-quit"
-                  "-readable" "-regex" "-regextype" "-samefile"
-                  "-size" "-true" "-type" "-uid"
-                  "-used" "-user" "-version" "-warn"
-                  "-wholename" "-writable" "-xdev" "-xtype")
-                nil 'identity))))))
+                  (append (list (expand-file-name entry default-directory)) ls)
+                  ls))))))
 
 ;;; Eshell history.
 ;;
