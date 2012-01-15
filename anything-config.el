@@ -5280,7 +5280,9 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                                             default-directory))
     (anything
      :sources
-     `(((name . "Grep (C-c ? Help)")
+     `(((name . "Grep")
+        (header-name . (lambda (name)
+                         (concat name "(C-c ? Help)")))
         (candidates
          . (lambda ()
              (funcall anything-c-grep-default-function only include-files zgrep)))
@@ -11340,7 +11342,7 @@ with original attribute value.
        ("Query replace" . anything-c-buffer-query-replace)
        ("View buffer" . view-buffer)
        ("Display buffer"   . display-buffer)
-       ("Grep buffers (C-u grep all buffers)" . anything-c-grep-buffers)
+       ("Grep buffers (C-u grep all buffers)" . anything-c-zgrep-buffers)
        ("Revert buffer(s)" . anything-revert-marked-buffers)
        ("Insert buffer" . insert-buffer)
        ("Kill buffer(s)" . anything-kill-marked-buffers)
@@ -11897,8 +11899,9 @@ See also `anything-do-grep-1'."
     (anything-do-grep-1 only prefarg)))
 
 ;;;###autoload
-(defun anything-do-zgrep (candidate)
+(defun anything-do-zgrep ()
   "Preconfigured anything for zgrep."
+  (interactive)
   (let ((prefarg (or current-prefix-arg anything-current-prefix-arg))
         (ls (anything-c-read-file-name
              "Search in file(s): "

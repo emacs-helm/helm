@@ -1,4 +1,4 @@
-;;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
+;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008 ~ 2012       rubikitch <rubikitch@ruby-lang.org>
@@ -9,7 +9,8 @@
 ;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
 ;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
+;; Keywords: files, frames, help, matching, outlines,
+;;           processes, tools, convenience, anything
 
 ;; X-URL: <http://repo.or.cz/w/anything-config.git>
 
@@ -45,9 +46,11 @@
 ;;  ---------------------
 
 ;;  * Commands defined here are:
-;; [EVAL] (autodoc-document-lisp-buffer :type 'command :prefix "anything-" :docstring t)
+;; [EVAL] (autodoc-document-lisp-buffer :type 'command :prefix "anything" :docstring t)
 ;; `anything-open-last-log'
 ;; Open anything log file of last anything session.
+;; `anything'
+;; Main function to execute anything sources.
 ;; `anything-resume'
 ;; Resurrect previously invoked `anything'.
 ;; `anything-resume-window-only'
@@ -109,9 +112,9 @@
 ;; `anything-execute-persistent-action'
 ;; Perform the associated action ATTR without quitting anything.
 ;; `anything-scroll-other-window'
-;; Scroll other window	(not *Anything* window) upward.
+;; Scroll other window (not *Anything* window) upward.
 ;; `anything-scroll-other-window-down'
-;; Scroll other window	(not *Anything* window) downward.
+;; Scroll other window (not *Anything* window) downward.
 ;; `anything-toggle-visible-mark'
 ;; Toggle anything visible mark at point.
 ;; `anything-display-all-visible-marks'
@@ -142,7 +145,7 @@
 ;; `anything-sources'
 ;; A list of sources to use with `anything'.
 ;; `anything-type-attributes'
-;; It's a list of					(TYPE ATTRIBUTES ...).
+;; It's a list of                                      (TYPE ATTRIBUTES ...).
 ;; `anything-enable-shortcuts'
 ;; *Whether to use digit/alphabet shortcut to select the first nine matches.
 ;; `anything-shortcut-keys-alist'
@@ -290,7 +293,7 @@
 ;; `anything-last-log-file'
 ;; Not documented.
 ;; `anything-compile-source-functions'
-;; Functions to compile elements of `anything-sources'	(plug-in).
+;; Functions to compile elements of `anything-sources' (plug-in).
 ;; `anything-quit'
 ;; Not documented.
 ;; `anything-additional-attributes'
@@ -358,107 +361,6 @@
 ;;
 ;; Here is Japanese translation of `anything-sources' attributes.  Thanks.
 ;; http://d.hatena.ne.jp/sirocco634/20091012/1255336649
-
-;;; Commands:
-;;
-;; Below are complete command list:
-;;
-;;  `anything-open-last-log'
-;;    Open anything log file of last anything session.
-;;  `anything'
-;;    Main function to execute anything sources.
-;;  `anything-resume'
-;;    Resurrect previously invoked `anything'.
-;;  `anything-at-point'
-;;    Call anything with symbol at point as initial input.
-;;  `anything-force-update'
-;;    Force recalculation and update of candidates.
-;;  `anything-select-action'
-;;    Select an action for the currently selected candidate.
-;;  `anything-previous-line'
-;;    Move selection to the previous line.
-;;  `anything-next-line'
-;;    Move selection to the next line.
-;;  `anything-previous-page'
-;;    Move selection back with a pageful.
-;;  `anything-next-page'
-;;    Move selection forward with a pageful.
-;;  `anything-beginning-of-buffer'
-;;    Move selection at the top.
-;;  `anything-end-of-buffer'
-;;    Move selection at the bottom.
-;;  `anything-previous-source'
-;;    Move selection to the previous source.
-;;  `anything-next-source'
-;;    Move selection to the next source.
-;;  `anything-select-with-prefix-shortcut'
-;;    Invoke default action with prefix shortcut.
-;;  `anything-select-with-digit-shortcut'
-;;    Invoke default action with digit/alphabet shortcut.
-;;  `anything-confirm-and-exit-minibuffer'
-;;    Maybe ask for confirmation when exiting anything.
-;;  `anything-exit-minibuffer'
-;;    Select the current candidate by exiting the minibuffer.
-;;  `anything-keyboard-quit'
-;;    Quit minibuffer in anything.
-;;  `anything-help'
-;;    Help of `anything'.
-;;  `anything-debug-output'
-;;    Show all anything-related variables at this time.
-;;  `anything-delete-current-selection'
-;;    Delete the currently selected item.
-;;  `anything-delete-minibuffer-contents'
-;;    Same as `delete-minibuffer-contents' but this is a command.
-;;  `anything-toggle-resplit-window'
-;;    Toggle resplit anything window, vertically or horizontally.
-;;  `anything-narrow-window'
-;;    Narrow anything window.
-;;  `anything-enlarge-window'
-;;    Enlarge anything window.
-;;  `anything-select-2nd-action'
-;;    Select the 2nd action for the currently selected candidate.
-;;  `anything-select-3rd-action'
-;;    Select the 3rd action for the currently selected candidate.
-;;  `anything-select-4th-action'
-;;    Select the 4th action for the currently selected candidate.
-;;  `anything-select-2nd-action-or-end-of-line'
-;;    Select the 2nd action for the currently selected candidate.
-;;  `anything-execute-persistent-action'
-;;    Perform the associated action ATTR without quitting anything.
-;;  `anything-scroll-other-window'
-;;    Scroll other window (not *Anything* window) upward.
-;;  `anything-scroll-other-window-down'
-;;    Scroll other window (not *Anything* window) downward.
-;;  `anything-toggle-visible-mark'
-;;    Toggle anything visible mark at point.
-;;  `anything-display-all-visible-marks'
-;;    Show all `anything' visible marks strings.
-;;  `anything-next-visible-mark'
-;;    Move next anything visible mark.
-;;  `anything-prev-visible-mark'
-;;    Move previous anything visible mark.
-;;  `anything-yank-selection'
-;;    Set minibuffer contents to current selection.
-;;  `anything-kill-selection-and-quit'
-;;    Store current selection to kill ring.
-;;  `anything-follow-mode'
-;;    If this mode is on, persistent action is executed everytime the cursor is moved.
-;;  `anything-migrate-sources'
-;;    Help to migrate to new `anything' way.
-;;  `anything-describe-anything-attribute'
-;;    Display the full documentation of ANYTHING-ATTRIBUTE.
-;;  `anything-send-bug-report'
-;;    Send a bug report of anything.el.
-;;  `anything-send-bug-report-from-anything'
-;;    Send a bug report of anything.el in anything session.
-;;
-;;; Customizable Options:
-;;
-;; Below are customizable option list:
-;;
-;;  `anything-local-map-override-anything-map'
-;;    Override `anything-map' keys with the corresponding ones in source local map.
-;;    default = t
 
 
 ;;; Bug Report:
@@ -2083,13 +1985,13 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Whether in `read-string' in anything or not.")
 
 (defun anything-read-pattern-maybe (any-prompt any-input
-                                               any-preselect any-resume any-keymap
-                                               any-default any-history)
+                                    any-preselect any-resume any-keymap
+                                    any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
   (if (anything-resume-p any-resume)
       (anything-mark-current-line t)
-    (anything-update any-preselect))
+      (anything-update any-preselect))
   (with-current-buffer (anything-buffer-get)
     (let ((src-keymap (assoc-default 'keymap (anything-get-current-source))))
       ;; Startup with the first keymap found either in current source
@@ -2355,8 +2257,10 @@ Cache the candidates if there is not yet a cached value."
 
 ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 
-\(anything-transform-mapcar 'upcase '(\"foo\" \"bar\")) ; => (\"FOO\" \"BAR\")
-\(anything-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\"))) ; => ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
+\(anything-transform-mapcar 'upcase '(\"foo\" \"bar\"))
+=> (\"FOO\" \"BAR\")
+\(anything-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
+=> ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
 "
   (loop for arg in args
         if (consp arg)
