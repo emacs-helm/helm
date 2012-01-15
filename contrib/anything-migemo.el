@@ -168,8 +168,7 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
                            'anything-mp-3migemo-search
                          'migemo-forward))))
       (cond (anything-use-migemo
-             `((delayed)
-               (search ,@(assoc-default 'search source) ,searcher)
+             `((search ,@(assoc-default 'search source) ,searcher)
                ,(if match-identity-p
                     '(match identity)
                   `(match ,matcher
