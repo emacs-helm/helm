@@ -2218,14 +2218,15 @@ Default is `anything-current-buffer'."
     (require 'org) ; On some old Emacs versions org may not be loaded.
     (org-reveal)))
 
-(defun anything-goto-line (lineno)
+(defun anything-goto-line (lineno &optional noanim)
   "Goto LINENO opening only outline headline if needed.
-Animation is used."
+Animation is used unless NOANIM is non--nil."
   (goto-char (point-min))
   (anything-goto-char (point-at-bol lineno))
-  (anything-match-line-color-current-line)
-  (sit-for 0.3)
-  (anything-match-line-cleanup))
+  (unless noanim
+    (anything-match-line-color-current-line)
+    (sit-for 0.3)
+    (anything-match-line-cleanup)))
 
 (defun anything-show-this-source-only ()
   "Show all candidates of this source."
