@@ -2033,7 +2033,7 @@ if some when multiples sources are present."
   (with-anything-window
     (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
       (when kmap
-        (and anything-local-map-override-anything-map
+        (and (not anything-local-map-override-anything-map)
              (ignore-errors (set-keymap-parent kmap (default-value 'anything-map))))
         (setq overriding-local-map kmap)))))
 (add-hook 'anything-move-selection-after-hook 'anything-maybe-update-keymap)
