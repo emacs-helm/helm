@@ -5290,6 +5290,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (filtered-candidate-transformer anything-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . anything-grep-mode-line-string)
+        (keymap . ,anything-c-grep-map)
         (action . ,(delq
                     nil
                     `(("Find File" . anything-c-grep-action)
@@ -5303,7 +5304,6 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
-     :keymap anything-c-grep-map
      :buffer "*anything grep*")))
 
 (defun anything-ff-zgrep-1 (flist recursive)

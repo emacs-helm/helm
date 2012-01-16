@@ -2032,7 +2032,7 @@ It will override `anything-map' with the keymap attribute of current source
 if some when multiples sources are present."
   (with-anything-window
     (let ((kmap (assoc-default 'keymap (anything-get-current-source))))
-      (when (and kmap (> (length anything-sources) 1))
+      (when kmap
         (and anything-local-map-override-anything-map
              (ignore-errors (set-keymap-parent kmap (default-value 'anything-map))))
         (setq overriding-local-map kmap)))))
