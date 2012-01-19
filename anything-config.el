@@ -3233,15 +3233,16 @@ will not be loaded first time you use this."
                      :name "Eshell command"
                      :input-history
                      'anything-eshell-command-on-file-input-history))
-           (com-value (car (assoc-default command eshell-command-aliases-list))))
+           (com-value (car (assoc-default command eshell-command-aliases-list)))
+           ;; Be sure output don't go in current buffer.
+           current-prefix-arg)
       (if (and (or map (and com-value (string-match "\\$\\*$" com-value)))
                (> (length cand-list) 1))
           ;; Run eshell-command with ALL marked files as arguments.
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (eshell-command (format "%s %s" command mapfiles)))
           ;; Run eshell-command on EACH marked files.
-          (loop
-                for i in cand-list
+          (loop for i in cand-list
                 for bn = (anything-c-basename i)
                 for files = (if (and bn (string-match "^\*" bn))
                                 ;; Assume if fname is a wildcard
