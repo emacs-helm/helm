@@ -3279,7 +3279,6 @@ will not be loaded first time you use this."
                      :buffer "*esh command on file*"
                      :name "Eshell command"
                      :keymap anything-esh-on-file-map
-                     :must-match 'confirm
                      :mode-line
                      '("Eshell alias"
                        "C-c ?: Help, \\[universal-argument]: Insert output at point")
