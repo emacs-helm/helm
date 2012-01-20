@@ -1718,6 +1718,12 @@ automatically.")
     (delq nil map))
   "Generic Keymap for emacs bookmark sources.")
 
+(defvar anything-esh-on-file-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-c ?")    'anything-esh-help)
+    map)
+  "Keymap for `anything-find-files-eshell-command-on-file'.")
+
 
 
 ;;; Embeded documentation.
@@ -2065,6 +2071,47 @@ See Man locate for more infos.
   (let ((anything-help-message anything-bookmark-help-message))
     (anything-help)))
 
+;;; Eshell command on file help
+;;
+;;
+(defvar anything-c-esh-help-message
+  "== Anything eshell on file ==
+\nTips:
+
+- Passing extra args after filename:
+
+Normally your command or alias will be called with file as argument.
+
+e.g <command> 'candidate_file'
+
+But you can also pass an argument or more after 'candidate_file' like this:
+
+<command> %s [extra_args]\n
+
+'candidate_file' will be inserted at '%s' and your command will look at this:
+
+<command> 'candidate_file' [args]
+
+- Specify many files as args (marked files):
+
+e.g <command> file1 file2 ...
+
+Please restart and use a prefix arg to call `anything-find-files-eshell-command-on-file'.
+Otherwise your command will be called many times like this:
+
+<command> file1 <command> file2 etc...
+
+\nSpecific commands for `anything-find-files-eshell-command-on-file':
+\\<anything-esh-on-file-map>
+\\[anything-esh-help]\t\t->Display this help.
+\n== Anything Map ==
+\\{anything-map}")
+
+(defun anything-esh-help ()
+  "Help command for `anything-find-files-eshell-command-on-file'."
+  (interactive)
+  (let ((anything-help-message anything-c-esh-help-message))
+    (anything-help)))
 
 
 ;;; Mode line strings
@@ -3231,9 +3278,11 @@ will not be loaded first time you use this."
                            finally return (sort ls 'string<))
                      :buffer "*esh command on file*"
                      :name "Eshell command"
+                     :keymap anything-esh-on-file-map
+                     :must-match 'confirm
                      :mode-line
                      '("Eshell alias"
-                       "\\[universal-argument]: Insert output at point")
+                       "C-c ?: Help, \\[universal-argument]: Insert output at point")
                      :input-history
                      'anything-eshell-command-on-file-input-history))
            (com-value (car (assoc-default command eshell-command-aliases-list))))
@@ -9388,6 +9437,7 @@ Do nothing, just return candidate list unmodified."
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
                                    (mode-line anything-mode-line-string)
+                                   (keymap anything-map)
                                    (name "Anything Completions")
                                    candidates-in-buffer
                                    exec-when-only-one
@@ -9477,8 +9527,8 @@ that use `anything-comp-read' See `anything-M-x' for example."
                                map)))
            (anything-map (if must-match-map
                              (make-composed-keymap
-                              must-match-map anything-map)
-                             anything-map))
+                              must-match-map (or keymap anything-map))
+                             (or keymap anything-map)))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
@@ -9500,6 +9550,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                        (persistent-action . ,persistent-action)
                        (persistent-help . ,persistent-help)
                        (mode-line . ,mode-line)
+                       (keymap . ,anything-map)
                        (action . ,'action-fn)))
            (src `((name . ,name)
                   (candidates
@@ -9516,6 +9567,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (mode-line . ,mode-line)
+                  (keymap . ,anything-map)
                   (action . ,'action-fn)))
            (src-1 `((name . ,name)
                     (init
@@ -9536,6 +9588,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                     (persistent-action . ,persistent-action)
                     (persistent-help . ,persistent-help)
                     (mode-line . ,mode-line)
+                    (keymap . ,anything-map)
                     (action . ,'action-fn)))
            (src-list (list src-hist
                            (if candidates-in-buffer
