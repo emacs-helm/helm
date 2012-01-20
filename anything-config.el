@@ -3231,6 +3231,9 @@ will not be loaded first time you use this."
                            finally return (sort ls 'string<))
                      :buffer "*esh command on file*"
                      :name "Eshell command"
+                     :mode-line
+                     '("Eshell alias"
+                       "\\[universal-argument]: Insert output at point")
                      :input-history
                      'anything-eshell-command-on-file-input-history))
            (com-value (car (assoc-default command eshell-command-aliases-list))))
@@ -9384,6 +9387,7 @@ Do nothing, just return candidate list unmodified."
                                    input-history
                                    (persistent-action nil)
                                    (persistent-help "DoNothing")
+                                   (mode-line anything-mode-line-string)
                                    (name "Anything Completions")
                                    candidates-in-buffer
                                    exec-when-only-one
@@ -9495,6 +9499,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                                   collect i)))
                        (persistent-action . ,persistent-action)
                        (persistent-help . ,persistent-help)
+                       (mode-line . ,mode-line)
                        (action . ,'action-fn)))
            (src `((name . ,name)
                   (candidates
@@ -9510,6 +9515,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                   (requires-pattern . ,requires-pattern)
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
+                  (mode-line . ,mode-line)
                   (action . ,'action-fn)))
            (src-1 `((name . ,name)
                     (init
@@ -9529,6 +9535,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
                     (requires-pattern . ,requires-pattern)
                     (persistent-action . ,persistent-action)
                     (persistent-help . ,persistent-help)
+                    (mode-line . ,mode-line)
                     (action . ,'action-fn)))
            (src-list (list src-hist
                            (if candidates-in-buffer
