@@ -3233,9 +3233,14 @@ will not be loaded first time you use this."
                      :name "Eshell command"
                      :input-history
                      'anything-eshell-command-on-file-input-history))
-           (com-value (car (assoc-default command eshell-command-aliases-list)))
-           ;; Be sure output don't go in current buffer.
-           current-prefix-arg)
+           (com-value (car (assoc-default command eshell-command-aliases-list))))
+      ;; Be sure output don't go in current buffer
+      ;; but allow sending output to current buffer
+      ;; if a prefix arg have been passed during the
+      ;; `anything-comp-read' call.
+      (setq current-prefix-arg anything-current-prefix-arg)
+      ;; MAP have been set before calling `anything-comp-read' 
+      ;; by `anything-current-prefix-arg'.
       (if (and (or map (and com-value (string-match "\\$\\*$" com-value)))
                (> (length cand-list) 1))
           ;; Run eshell-command with ALL marked files as arguments.
