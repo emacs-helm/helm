@@ -120,7 +120,7 @@
 
 (eval-when-compile (require 'anything))
 (require 'migemo nil t)
-(require 'anything-match-plugin nil t)
+(require 'anything-match-plugin)
 (defvar anything-use-migemo nil
   "[Internal] If non-nil, `anything' is migemo-ized.")
 (defun anything-migemo (with-migemo &rest anything-args)
@@ -138,14 +138,13 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
     (setq anything-previous-migemo-info (cons pattern (migemo-get-pattern pattern))))
   (string-match (cdr anything-previous-migemo-info) str))
 
-(when (memq 'anything-compile-source--match-plugin anything-compile-source-functions)
-  (defun* anything-mp-3migemo-match (str &optional (pattern anything-pattern))
-    (loop for (pred . re) in (anything-mp-3-get-patterns pattern)
-          always (funcall pred (anything-string-match-with-migemo str re))))
-  (defun anything-mp-3migemo-search (pattern &rest ignore)
-    (anything-mp-3-search-base pattern 'migemo-forward 'migemo-forward))
-  (defun anything-mp-3migemo-search-backward (pattern &rest ignore)
-    (anything-mp-3-search-base pattern 'migemo-backward 'migemo-backward)))
+(defun* anything-mp-3migemo-match (str &optional (pattern anything-pattern))
+  (loop for (pred . re) in (anything-mp-3-get-patterns pattern)
+        always (funcall pred (anything-string-match-with-migemo str re))))
+(defun anything-mp-3migemo-search (pattern &rest ignore)
+  (anything-mp-3-search-base pattern 'migemo-forward 'migemo-forward))
+(defun anything-mp-3migemo-search-backward (pattern &rest ignore)
+  (anything-mp-3-search-base pattern 'migemo-backward 'migemo-backward))
 ;; (anything-string-match-with-migemo "日本語入力" "nihongo")
 ;; (anything-string-match-with-migemo "日本語入力" "nyuuryoku")
 ;; (anything-mp-3migemo-match "日本語入力" "nihongo nyuuryoku")
@@ -155,18 +154,10 @@ With prefix arugument, `anything-pattern' is migemo-ized, otherwise normal `anyt
     (let* ((match-identity-p 
             (or (assoc 'candidates-in-buffer source)
                 (equal '(identity) (assoc-default 'match source))))
-           (use-match-plugin
-            (memq 'anything-compile-source--match-plugin anything-compile-source-functions))
-           (matcher (if use-match-plugin
-                        'anything-mp-3migemo-match
-                      'anything-string-match-with-migemo))
+           (matcher 'anything-mp-3migemo-match)
            (searcher (if (assoc 'search-from-end source)
-                         (if use-match-plugin
-                             'anything-mp-3migemo-search-backward
-                           'migemo-backward)
-                       (if use-match-plugin
-                           'anything-mp-3migemo-search
-                         'migemo-forward))))
+                         'anything-mp-3migemo-search-backward
+                       'anything-mp-3migemo-search)))
       (cond (anything-use-migemo
              `((search ,@(assoc-default 'search source) ,searcher)
                ,(if match-identity-p
@@ -208,18 +199,6 @@ Bind `anything-use-migemo' = t in COMMAND.
               (candidates "日本語")))
            "nihongo"
            '(anything-compile-source--migemo))))
-      (desc "candidates buffer")
-      (expect '(("TEST" ("日本語")))
-        (let ((anything-use-migemo t))
-          (anything-test-candidates
-           '(((name . "TEST")
-              (init
-               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                              (insert "日本語\n"))))
-              (candidates-in-buffer)))
-           "nihongo"
-           '(anything-compile-source--candidates-in-buffer
-             anything-compile-source--migemo))))
       (desc "migemo attribute")
       (expect '(("TEST" ("日本語")))
         (let ((anything-use-migemo nil))
@@ -229,99 +208,64 @@ Bind `anything-use-migemo' = t in COMMAND.
               (migemo)))
            "nihongo"
            '(anything-compile-source--migemo))))
-      (expect '(("TEST" ("日本語")))
+
+      (desc "with anything-match-plugin")
+      (expect '(("FOO" ("日本語入力")))
         (let ((anything-use-migemo nil))
           (anything-test-candidates
-           '(((name . "TEST")
+           '(((name . "FOO")
               (init
-               . (lambda () (with-current-buffer (anything-candidate-buffer 'global)
-                              (insert "日本語\n"))))
+               . (lambda ()
+                   (with-current-buffer (anything-candidate-buffer 'global)
+                     (insert "日本語会話\n日本語入力\n"))))
               (candidates-in-buffer)
               (migemo)))
-           "nihongo"
+           "nihongo nyuuryoku"
            '(anything-compile-source--candidates-in-buffer
+             anything-compile-source--match-plugin
              anything-compile-source--migemo))))
-      (desc "search-from-end attribute")
-      
-      (expect '(("FOO" ("日本語入力" "日本語会話")))
-        (let ((anything-use-migemo nil))
-          (anything-test-candidates '(((name . "FOO")
-                                       (init
-                                        . (lambda ()
-                                            (with-current-buffer (anything-candidate-buffer 'global)
-                                              (insert "日本語会話\n日本語入力\n"))))
-                                       (candidates-in-buffer)
-                                       (migemo)
-                                       (search-from-end)))
-                                    "nihongo"
-                                    '(anything-compile-source--candidates-in-buffer
-                                      anything-compile-source--migemo))))
-      (expect '(("FOO" ("日本語入力" "日本語会話")))
-        (let ((anything-use-migemo t))
-          (anything-test-candidates '(((name . "FOO")
-                                       (init
-                                        . (lambda ()
-                                            (with-current-buffer (anything-candidate-buffer 'global)
-                                              (insert "日本語会話\n日本語入力\n"))))
-                                       (candidates-in-buffer)
-                                       (search-from-end)))
-                                    "nihongo"
-                                    '(anything-compile-source--candidates-in-buffer
-                                      anything-compile-source--migemo))))
-      (desc "with anything-match-plugin")
-      
-      (expect '(("FOO" ("日本語入力")))
-        (let ((anything-use-migemo nil))
-          (anything-test-candidates '(((name . "FOO")
-                                       (init
-                                        . (lambda ()
-                                            (with-current-buffer (anything-candidate-buffer 'global)
-                                              (insert "日本語会話\n日本語入力\n"))))
-                                       (candidates-in-buffer)
-                                       (migemo)))
-                                    "nihongo nyuuryoku"
-                                    '(anything-compile-source--candidates-in-buffer
-                                      anything-compile-source--match-plugin
-                                      anything-compile-source--migemo))))
       (expect '(("FOO" ("日本語入力")))
         (let ((anything-use-migemo t))
-          (anything-test-candidates '(((name . "FOO")
-                                       (init
-                                        . (lambda ()
-                                            (with-current-buffer (anything-candidate-buffer 'global)
-                                              (insert "日本語会話\n日本語入力\n"))))
-                                       (candidates-in-buffer)))
-                                    "nihongo nyuuryoku"
-                                    '(anything-compile-source--candidates-in-buffer
-                                      anything-compile-source--match-plugin
-                                      anything-compile-source--migemo))))
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init
+               . (lambda ()
+                   (with-current-buffer (anything-candidate-buffer 'global)
+                     (insert "日本語会話\n日本語入力\n"))))
+              (candidates-in-buffer)))
+           "nihongo nyuuryoku"
+           '(anything-compile-source--candidates-in-buffer
+             anything-compile-source--match-plugin
+             anything-compile-source--migemo))))
       (expect '(("FOO" ("日本語入力")))
         (let ((anything-use-migemo nil))
-          (anything-test-candidates '(((name . "FOO")
-                                       (init
-                                        . (lambda ()
-                                            (with-current-buffer (anything-candidate-buffer 'global)
-                                              (insert "日本語会話\n日本語入力\n"))))
-                                       (candidates-in-buffer)
-                                       (search-from-end)
-                                       (migemo)))
-                                    "nihongo nyuuryoku"
-                                    '(anything-compile-source--candidates-in-buffer
-                                      anything-compile-source--match-plugin
-                                      anything-compile-source--migemo))))
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init
+               . (lambda ()
+                   (with-current-buffer (anything-candidate-buffer 'global)
+                     (insert "日本語会話\n日本語入力\n"))))
+              (candidates-in-buffer)
+              (search-from-end)
+              (migemo)))
+           "nihongo nyuuryoku"
+           '(anything-compile-source--candidates-in-buffer
+             anything-compile-source--match-plugin
+             anything-compile-source--migemo))))
       (expect '(("FOO" ("日本語入力")))
         (let ((anything-use-migemo t))
-          (anything-test-candidates '(((name . "FOO")
-                                       (init
-                                        . (lambda ()
-                                            (with-current-buffer (anything-candidate-buffer 'global)
-                                              (insert "日本語会話\n日本語入力\n"))))
-                                       (candidates-in-buffer)
-                                       (search-from-end)))
-                                    "nihongo nyuuryoku"
-                                    '(anything-compile-source--candidates-in-buffer
-                                      anything-compile-source--match-plugin
-                                      anything-compile-source--migemo))))
+          (anything-test-candidates
+           '(((name . "FOO")
+              (init
+               . (lambda ()
+                   (with-current-buffer (anything-candidate-buffer 'global)
+                     (insert "日本語会話\n日本語入力\n"))))
+              (candidates-in-buffer)
+              (search-from-end)))
+           "nihongo nyuuryoku"
+           '(anything-compile-source--candidates-in-buffer
+             anything-compile-source--match-plugin
+             anything-compile-source--migemo))))
       (expect '(("TEST" ("日本語入力")))
         (let ((anything-use-migemo nil))
           (anything-test-candidates
