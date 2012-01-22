@@ -9708,7 +9708,9 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; If DEF is not provided, fallback to empty string
      ;; to avoid `thing-at-point' to be appended on top of list
      :default (or default "")
-     :initial-input init)))
+     ;; Use `regexp-quote' to fix initial input
+     ;; with special characters (e.g nnimap+gmail:)
+     :initial-input (regexp-quote init))))
 
 (defun anything-completing-read-with-cands-in-buffer
     (prompt collection test require-match
