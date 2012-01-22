@@ -9710,7 +9710,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :default (or default "")
      ;; Use `regexp-quote' to fix initial input
      ;; with special characters (e.g nnimap+gmail:)
-     :initial-input (regexp-quote init))))
+     :initial-input (and (stringp init) (regexp-quote init)))))
 
 (defun anything-completing-read-with-cands-in-buffer
     (prompt collection test require-match
