@@ -2570,6 +2570,11 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (kill-new input)
   (message "Killed: %s" input))
 
+(defun anything-quote-whitespace (candidate)
+  "Quote whitespace, if some, in string CANDIDATE."
+  (if (string-match " " candidate)
+      (replace-regexp-in-string " " "\\\\ " candidate)
+      candidate))
 
 
 ;;; Toggle all marks.
@@ -9951,14 +9956,15 @@ Note: This mode will work only partially on Emacs23."
 ;; Internal.
 (defvar anything-ec-target "")
 (defun anything-ec-insert (candidate)
-  "Insert CANDIDATE at point.
+  "Replace text at point with CANDIDATE
+The function that call this should set `anything-ec-target' to thing at point.
 This is the same as `ac-insert', just inlined here for compatibility."
   (let ((pt (point)))
     (when (and anything-ec-target
                (search-backward anything-ec-target nil t)
                (string= (buffer-substring (point) pt) anything-ec-target))
       (delete-region (point) pt)))
-  (insert candidate))
+  (insert (anything-quote-whitespace candidate)))
 
 (defun anything-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
