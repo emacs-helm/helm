@@ -2572,9 +2572,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 
 (defun anything-quote-whitespace (candidate)
   "Quote whitespace, if some, in string CANDIDATE."
-  (if (string-match " " candidate)
-      (replace-regexp-in-string " " "\\\\ " candidate)
-      candidate))
+  (replace-regexp-in-string " " "\\\\ " candidate))
 
 
 ;;; Toggle all marks.
