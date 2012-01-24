@@ -3766,14 +3766,13 @@ This happen after using `anything-find-files-down-one-level',
 or hitting C-z on \"..\"."
   (when (and anything-ff-last-expanded
              (anything-file-completion-source-p))
-    (let ((dirname (if anything-ff-transformer-show-only-basename
+    (let ((presel (if anything-ff-transformer-show-only-basename
                        (anything-c-basename
                         (directory-file-name anything-ff-last-expanded))
                        (directory-file-name anything-ff-last-expanded))))
       (with-anything-window
-        (when (or (re-search-forward (concat dirname "$") nil t)
-                  (re-search-forward
-                   (concat anything-ff-last-expanded "$") nil t))
+        (when (re-search-forward
+               (concat "^" (regexp-quote presel) "$") nil t)
           (forward-line 0)
           (anything-mark-current-line)))
       (setq anything-ff-last-expanded nil))))
