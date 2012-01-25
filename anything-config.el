@@ -1259,6 +1259,11 @@ Note that you don't need to enable `ido-mode' for this to work."
   :group 'anything-config
   :type '(alist :key-type symbol :value-type symbol))
 
+(defcustom anything-M-x-requires-pattern 2
+  "Value of requires-pattern for `anything-M-x'.
+Set it to 0 to disable requires-pattern in `anything-M-x'."
+  :group 'anything-config
+  :type 'boolean)
 
 
 ;;; General internal variables
@@ -12087,7 +12092,7 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
       (let* ((command (anything-comp-read
                        "M-x " obarray
                        :test 'commandp
-                       :requires-pattern 2
+                       :requires-pattern anything-M-x-requires-pattern
                        :name "Emacs Commands"
                        :buffer "*anything M-x*"
                        :persistent-action 'pers-help
