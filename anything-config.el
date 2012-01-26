@@ -2464,9 +2464,12 @@ from its directory."
                 (expand-file-name org-directory))
            default-directory)
      (let ((sel (anything-get-selection)))
-       (if (file-exists-p sel)
-           (expand-file-name sel)
-           default-directory)))))
+       (cond ((or (file-remote-p sel)
+                  (file-exists-p sel))
+              (expand-file-name sel))
+             ((string-match ffap-url-regexp sel)
+              sel)
+             (t default-directory))))))
 
 
 (defmacro* anything-c-walk-directory (directory &key path (directories t) match)
