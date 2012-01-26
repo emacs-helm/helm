@@ -3295,7 +3295,10 @@ will not be loaded first time you use this."
                        "C-c ?: Help, \\[universal-argument]: Insert output at point")
                      :input-history
                      'anything-eshell-command-on-file-input-history))
-           (com-value (car (assoc-default command eshell-command-aliases-list))))
+           (alias-value (car (assoc-default command eshell-command-aliases-list))))
+      (when (and (= (length cand-list) 1)
+                 (string-match "[*]" (anything-c-basename (car cand-list))))
+        (setq cand-list (file-expand-wildcards (car cand-list) t)))
       ;; Be sure output don't go in current buffer
       ;; but allow sending output to current buffer
       ;; if a prefix arg have been passed during the
@@ -3303,23 +3306,23 @@ will not be loaded first time you use this."
       (setq current-prefix-arg anything-current-prefix-arg)
       ;; MAP have been set before calling `anything-comp-read' 
       ;; by `anything-current-prefix-arg'.
-      (if (and (or map (and com-value (string-match "\\$\\*$" com-value)))
+      (if (and (or map ; prefix-arg
+                   (and alias-value
+                        ;; If command is an alias be sure it accept
+                        ;; more than one arg i.e $*.
+                        (string-match "\\$\\*$" alias-value)))
                (> (length cand-list) 1))
+          
           ;; Run eshell-command with ALL marked files as arguments.
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                 (eshell-command (format command mapfiles)) ; See [1]
                 (eshell-command (format "%s %s" command mapfiles))))
+          
           ;; Run eshell-command on EACH marked files.
           (loop for i in cand-list
                 for bn = (anything-c-basename i)
-                for files = (if (and bn (string-match "^\*" bn))
-                                ;; Assume that if fname is a wildcard
-                                ;; cand-list have a length of 1.
-                                (mapconcat
-                                 'shell-quote-argument
-                                 (file-expand-wildcards i t) " ")
-                                (format "'%s'" i))
+                for files = (format "'%s'" i)
                 for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                               ;; [1] This allow to enter other args AFTER filename
                               ;; i.e <command %s some_more_args>
