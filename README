@@ -22,16 +22,19 @@ B) By copying files from anything directory
  
 * NOTE to Distribution maintainers:(Ubuntu etc...)
 
-Use only the files mentioned above in [1] for your packages, other files
-contained in contrib directory contain deprecated or unmaintained code.
+Use only the files mentioned above in 1) for your packages, other files
+contained in contrib and extensions directory contain deprecated, unmaintained or
+incompatible code or files that need dependencies not provided here.
 Most of the features provided in these files are present in anything-config.el.
 
 Thanks.
 
-* NOTE to install optional ../extensions/anything-complete.el
+* NOTE to install optional deprecated library ../extensions/anything-complete.el
 
-Additionaly, if you want to install extensions/anything-complete.el,
+Additionaly, if you want to install extensions/anything-complete.el, 
 anything-obsolete.el is needed.
 So don't forget to add to your load-path the extensions directory. 
 You may want also to add anything-show-completion.el to your load-path.
 These libraries will be required by anything-complete.el.
+WARNING: You will find in anything-complete.el deprecated code that may clash with
+some features of anything-config.el, so use it with care.

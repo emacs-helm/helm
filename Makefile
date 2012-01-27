@@ -26,10 +26,10 @@
 EMACS		:= emacs -Q -batch
 
 # additional emacs loadpath
-LOADPATH	:= -L . -L extensions
+LOADPATH	:= -L .
 
 # files to compile
-EL			:= $(filter-out anything-startup.el, $(wildcard anything*.el) $(wildcard extensions/*.el))
+EL			:= $(wildcard anything*.el)
 
 # compiled files
 ELC			:= $(EL:.el=.elc)
