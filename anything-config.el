@@ -2235,10 +2235,13 @@ Otherwise your command will be called many times like this:
   (with-no-warnings
     (switch-to-buffer buffer-or-name)))
 
-(defsubst* anything-c-position (item seq &key (test 'eq))
+(defun* anything-c-position (item seq &key (test 'eq))
   "A simple and faster replacement of CL `position'."
-  (loop for i in seq for index from 0
-        when (funcall test i item) return index))
+  (if (stringp seq)
+      (loop for c across seq for index from 0
+            when (funcall test c item) return index)
+      (loop for i in seq for index from 0
+            when (funcall test i item) return index)))
 
 (defun anything-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
@@ -5123,7 +5126,7 @@ See `anything-c-grep-default-command' for format specs.")
   ;; of this candidate (e.g /home/user/directory/*).
   ;; If r option is enabled search also in subdidrectories.
   ;; We need here to expand wildcards to support crap windows filenames
-  ;; as grep don't accept quoted wildcards (e.g "dir/*.el").
+  ;; as grep doesn't accept quoted wildcards (e.g "dir/*.el").
   (if anything-c-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
       (loop for i in candidates append
@@ -5169,7 +5172,7 @@ See `anything-c-grep-default-command' for format specs.")
                              (concat "--exclude=" (shell-quote-argument x)))
                          grep-find-ignored-files " "))
          (ignored-dirs  (mapconcat
-                         ;; Need grep version 2.5.4 of Gnuwin32 on windoze.
+                         ;; Need grep version >=2.5.4 of Gnuwin32 on windoze.
                          #'(lambda (x)
                              (concat "--exclude-dir=" (shell-quote-argument x)))
                          grep-find-ignored-directories " "))
