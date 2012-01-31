@@ -1735,6 +1735,13 @@ automatically.")
     map)
   "Keymap for `anything-eshell-history'.")
 
+(defvar anything-kill-ring-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-y") 'anything-next-line)
+    (define-key map (kbd "M-u") 'anything-previous-line)
+    map)
+  "Keymap for `anything-show-kill-ring'.")
+
 
 ;;; Embeded documentation.
 ;;
@@ -7394,11 +7401,12 @@ utility mdfind.")
 ;;
 ;;
 (defvar anything-c-source-kill-ring
-  '((name . "Kill Ring")
+  `((name . "Kill Ring")
     (init . (lambda () (anything-attrset 'last-command last-command)))
     (candidates . anything-c-kill-ring-candidates)
     (filtered-candidate-transformer anything-c-kill-ring-transformer)
     (action . anything-c-kill-ring-action)
+    (keymap . ,anything-kill-ring-map)
     (last-command)
     (migemo)
     (multiline))
@@ -11635,13 +11643,8 @@ It is drop-in replacement of `yank-pop'.
 You may bind this command to M-y.
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (let ((buf "*anything kill-ring*"))
-    (if (get-buffer-window buf)
-        (with-anything-window
-          (if (eq (overlay-end anything-selection-overlay) (point-max))
-              (anything-beginning-of-buffer)
-              (anything-next-line)))
-        (anything-other-buffer 'anything-c-source-kill-ring buf))))
+  (anything :sources 'anything-c-source-kill-ring
+            :buffer "*anything kill-ring*"))
 
 ;;;###autoload
 (defun anything-minibuffer-history ()
