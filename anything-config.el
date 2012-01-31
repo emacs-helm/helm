@@ -4522,7 +4522,8 @@ Use it for non--interactive calls of `anything-find-files'."
 
 (defun anything-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
-  (or (and input (expand-file-name input))
+  (or (and input (or (and (file-remote-p input) input)
+                     (expand-file-name input)))
       (anything-find-files-input
        (ffap-guesser)
        (thing-at-point 'filename))))
@@ -4532,13 +4533,17 @@ Use it for non--interactive calls of `anything-find-files'."
   (let* ((def-dir (anything-c-current-directory))
          (lib     (anything-find-library-at-point))
          (url     (anything-ff-find-url-at-point))
-         (file-p  (and fap (not (string= fap ""))
+         (remp    (and fap (file-remote-p fap)))
+         (file-p  (and (not remp)
+                       fap
+                       (not (string= fap ""))
                        (file-exists-p fap)
                        tap (not (string= tap ""))
                        (file-exists-p
                         (file-name-directory (expand-file-name tap def-dir))))))
     (cond (lib) ; e.g we are inside a require sexp.
           (url) ; String at point is an hyperlink.
+          (remp fap)
           (file-p (expand-file-name tap def-dir))
           (t (and (not (string= fap "")) fap)))))
 
