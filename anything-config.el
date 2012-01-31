@@ -3918,7 +3918,7 @@ purpose."
     (let ((method      (match-string 1 pattern))
           (tn          (match-string 0 pattern))
           (all-methods (mapcar 'car tramp-methods)))
-      (remove-duplicates
+      (anything-fast-remove-dups
        (loop for (f . h) in (tramp-get-completion-function method)
              append (loop for e in (funcall f (car h))
                           for host = (and (consp e) (cadr e))
