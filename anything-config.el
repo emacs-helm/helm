@@ -8660,8 +8660,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                 . anything-c-occur-query-replace-regexp)))
     (recenter)
     (requires-pattern . 1)
-    (delayed)
-    (volatile)))
+    (delayed)))
 
 
 ;;; Anything browse code.
