@@ -1729,6 +1729,11 @@ automatically.")
     map)
   "Keymap for `anything-find-files-eshell-command-on-file'.")
 
+(defvar anything-eshell-history-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "M-p") 'anything-next-line)
+    map)
+  "Keymap for `anything-eshell-history'.")
 
 
 ;;; Embeded documentation.
@@ -10022,7 +10027,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
 ;;
 ;;
 (defvar anything-c-source-eshell-history
-  '((name . "Eshell history")
+  `((name . "Eshell history")
     (init . (lambda ()
               (let (eshell-hist-ignoredups)
                 ;; Write the content's of ring to file.
@@ -10032,6 +10037,7 @@ This is the same as `ac-insert', just inlined here for compatibility."
               ;; Same comment as in `anything-c-source-esh'
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates-in-buffer)
+    (keymap . ,anything-eshell-history-map)
     (filtered-candidate-transformer . (lambda (candidates sources)
                                         (reverse candidates)))
     (candidate-number-limit . 9999)
