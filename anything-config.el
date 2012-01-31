@@ -1742,6 +1742,12 @@ automatically.")
     map)
   "Keymap for `anything-show-kill-ring'.")
 
+(defvar anything-occur-map
+  (let ((map (copy-keymap anything-map)))
+    (define-key map (kbd "C-M-%") 'anything-occur-run-query-replace-regexp)
+    map)
+  "Keymap for `anything-occur'.")
+
 
 ;;; Embeded documentation.
 ;;
@@ -8648,8 +8654,14 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (apply 'query-replace-regexp
            (anything-c-query-replace-args regexp))))
 
+(defun anything-occur-run-query-replace-regexp ()
+  "Run `query-replace-regexp' in anything occur from keymap."
+  (interactive)
+  (anything-c-quit-and-execute-action
+   'anything-c-occur-query-replace-regexp))
+
 (defvar anything-c-source-occur
-  '((name . "Occur")
+  `((name . "Occur")
     (init . anything-c-occur-init)
     (candidates-in-buffer)
     (migemo)
@@ -8659,6 +8671,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                ("Query replace regexp (C-u Not inside word.)"
                 . anything-c-occur-query-replace-regexp)))
     (recenter)
+    (keymap . ,anything-occur-map)
     (requires-pattern . 1)
     (delayed)))
 
