@@ -940,12 +940,10 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :group 'anything-config)
 
 (defun anything-set-anything-command-map-prefix-key (var key)
-  (declare (special anything-command-map-prefix-key))
-  (when (boundp 'anything-command-map-prefix-key)
-    (global-unset-key (read-kbd-macro anything-command-map-prefix-key)))
-  (setq anything-command-map-prefix-key key)
-  (global-set-key (read-kbd-macro anything-command-map-prefix-key)
-                  'anything-command-map))
+  (when (boundp var)
+    (global-unset-key (read-kbd-macro (symbol-value var))))
+  (set var key)
+  (global-set-key (read-kbd-macro (symbol-value var)) 'anything-command-map))
 
 (defcustom anything-command-map-prefix-key "<f5> a"
   "*The prefix key for all `anything-command-map' commands.
@@ -953,8 +951,8 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
 !!WARNING!!
 This default value is very likely to be changed,
 because it is under discussion."
-  :type 'string
-  :set 'anything-set-anything-command-map-prefix-key
+  :type  'string
+  :set   'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
 
 (defcustom anything-c-browse-code-regexp-lisp
