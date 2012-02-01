@@ -823,7 +823,7 @@ was called."
   :group 'anything-config)
 
 (defcustom anything-google-suggest-use-curl-p nil
-  "*When non--nil use CURL to get info from `anything-c-google-suggest-url'.
+  "When non--nil use CURL to get info from `anything-c-google-suggest-url'.
 Otherwise `url-retrieve-synchronously' is used."
   :type 'boolean
   :group 'anything-config)
@@ -876,7 +876,7 @@ they will be displayed with face `file-name-shadow' if
   :group 'anything-config)
 
 (defcustom anything-kill-ring-threshold 10
-  "*Minimum length to be listed by `anything-c-source-kill-ring'."
+  "Minimum length to be listed by `anything-c-source-kill-ring'."
   :type 'integer
   :group 'anything-config)
 
@@ -919,21 +919,21 @@ It is prepended to predefined pairs."
   :group 'anything-config)
 
 (defcustom anything-c-enable-eval-defun-hack t
-  "*If non-nil, execute `anything' using the source at point when C-M-x is pressed.
+  "If non-nil, execute `anything' using the source at point when C-M-x is pressed.
 This hack is invoked when pressing C-M-x in the form \
  (defvar anything-c-source-XXX ...) or (setq anything-c-source-XXX ...)."
   :type 'boolean
   :group 'anything-config)
 
 (defcustom anything-tramp-verbose 0
-  "*Just like `tramp-verbose' but specific to anything.
+  "Just like `tramp-verbose' but specific to anything.
 When set to 0 don't show tramp messages in anything.
 If you want to have the default tramp messages set it to 3."
   :type 'integer
   :group 'anything-config)
 
 (defcustom anything-raise-command nil
-  "*A shell command to jump to a window running specific program.
+  "A shell command to jump to a window running specific program.
 Need external program wmctrl.
 This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :type 'string
@@ -946,7 +946,7 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   (global-set-key (read-kbd-macro (symbol-value var)) 'anything-command-map))
 
 (defcustom anything-command-map-prefix-key "<f5> a"
-  "*The prefix key for all `anything-command-map' commands.
+  "The prefix key for all `anything-command-map' commands.
 
 !!WARNING!!
 This default value is very likely to be changed,
@@ -958,13 +958,13 @@ because it is under discussion."
 (defcustom anything-c-browse-code-regexp-lisp
   "^ *\(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|\
 type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
-  "*Regexp used to parse lisp buffer when browsing code."
+  "Regexp used to parse lisp buffer when browsing code."
   :type 'string
   :group 'anything-config)
 
 (defcustom anything-c-browse-code-regexp-python
   "\\<def\\>\\|\\<class\\>"
-  "*Regexp used to parse python buffer when browsing code."
+  "Regexp used to parse python buffer when browsing code."
   :type 'string
   :group 'anything-config)
 
@@ -973,13 +973,13 @@ type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
     (emacs-lisp-mode . ,anything-c-browse-code-regexp-lisp)
     (lisp-mode . ,anything-c-browse-code-regexp-lisp)
     (python-mode . ,anything-c-browse-code-regexp-python))
-  "*Alist to store regexps for browsing code corresponding \
+  "Alist to store regexps for browsing code corresponding \
 to a specific `major-mode'."
   :type 'list
   :group 'anything-config)
 
 (defcustom anything-c-external-programs-associations nil
-  "*Alist to store externals programs associated with file extension.
+  "Alist to store externals programs associated with file extension.
 This variable overhide setting in .mailcap file.
 e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
   :type 'list
@@ -1006,7 +1006,7 @@ and `anything-c-read-file-map' for this take effect."
   :type 'boolean)
 
 (defcustom anything-ff-history-max-length 100
-  "*Number of elements shown in `anything-find-files' history."
+  "Number of elements shown in `anything-find-files' history."
   :group 'anything-config
   :type 'integer)
 
@@ -1029,7 +1029,7 @@ This make listing much faster, specially on slow machines."
   :type  'boolean)
 
 (defcustom anything-ff-exif-data-program "exiftran"
-  "*Program used to extract exif data of an image file."
+  "Program used to extract exif data of an image file."
   :group 'anything-config
   :type 'string)
 
@@ -1137,7 +1137,7 @@ Windows users should set that to \"explorer.exe\"."
   :type  'string)
 
 (defcustom anything-c-use-adaptative-sorting nil
-  "*Wheter to use or not adaptative sorting.
+  "Wheter to use or not adaptative sorting.
 Even if a source use it, it will have no effect when set to nil."
   :type 'boolean
   :group 'anything-config)
@@ -1150,7 +1150,7 @@ This set `ffap-newfile-prompt'."
 
 
 (defcustom anything-ff-avfs-directory nil
-  "*The default avfs directory, usually '.avfs'.
+  "The default avfs directory, usually '.avfs'.
 When this is set you will be able to expand archive filenames with `C-z'
 inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
@@ -1158,7 +1158,7 @@ See <http://sourceforge.net/projects/avf/>."
   :group 'anything-config)
 
 (defcustom anything-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
-  "*Minimal list of compressed files extension."
+  "Minimal list of compressed files extension."
   :type  'list
   :group 'anything-config)
 
