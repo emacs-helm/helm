@@ -720,6 +720,21 @@ When search is done, you can search in a specific file or directory with grep th
 \item NOTE:You can now launch grep with (C-u) M-g s without switching to the action pannel.
 \end{itemize}
 
+\subsection{Use a local locate DB}
+\label{sec:use-local-locate}
+
+You can specify a specific database with prefix argument ARG (C-u).
+Many databases can be used: navigate and mark them.
+See also `anything-locate-with-db'.
+
+To create a user specific db, use:
+\begin{verbatim}
+updatedb -l 0 -o dbpath -U directory
+\end{verbatim}
+
+Where ``dbpath'' is a filename matched by
+``anything-locate-db-file-regexp''
+
 \subsection{Windows specificity}
 \label{sec:windows-specificity}
 
