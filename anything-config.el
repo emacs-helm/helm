@@ -940,13 +940,15 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :group 'anything-config)
 
 (defun anything-set-anything-command-map-prefix-key (var key)
+  "The customize set function for `anything-command-map-prefix-key'."
   (when (boundp var)
-    (global-unset-key (read-kbd-macro (symbol-value var))))
+    (define-key ctl-x-map (symbol-value var) nil))
   (set var key)
-  (global-set-key (read-kbd-macro (symbol-value var)) 'anything-command-map))
+  (define-key ctl-x-map (symbol-value var) 'anything-command-map))
 
-(defcustom anything-command-map-prefix-key "<f5> a"
+(defcustom anything-command-map-prefix-key "c"
   "The prefix key for all `anything-command-map' commands.
+It use `ctl-x-map', so when set, the prefix key will be 'C-x <prefix>'.
 
 !!WARNING!!
 This default value is very likely to be changed,
