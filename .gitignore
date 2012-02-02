@@ -1,1 +1,4 @@
 *.elc
+patch*
+*.patch
+*.diff
