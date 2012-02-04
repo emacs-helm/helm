@@ -11880,7 +11880,9 @@ otherwise search in whole buffer."
          ;; rule out anything-match-plugin because the input is one regexp.
          (delq 'anything-compile-source--match-plugin
                (copy-sequence anything-compile-source-functions))))
-    (anything-other-buffer 'anything-c-source-occur "*Anything Occur*")))
+    (anything :sources 'anything-c-source-occur
+              :buffer "*Anything Occur*"
+              :history 'anything-c-grep-history)))
 
 ;;;###autoload
 (defun anything-browse-code ()
