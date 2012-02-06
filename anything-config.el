@@ -1265,6 +1265,57 @@ Set it to 0 to disable requires-pattern in `anything-M-x'."
   :group 'anything-config
   :type 'boolean)
 
+;;; Build info-index sources with info-index plug-in.
+;;
+;;
+(defun anything-c-build-info-index-command (name doc source buffer)
+  "Define an anything command NAME with documentation DOC.
+Arg SOURCE will be an existing anything source named
+`anything-c-source-info-<NAME>' and BUFFER a string buffer name."
+  (eval (list 'defun name nil doc
+              (list 'interactive)
+              (list 'anything
+                    :sources source
+                    :buffer buffer
+                    :candidate-number-limit 1000))))
+
+(defun anything-c-define-info-index-sources (var-value &optional commands)
+  "Define anything sources named anything-c-source-info-<NAME>.
+Sources are generated for all entries of `anything-c-default-info-index-list'.
+If COMMANDS arg is non--nil build also commands named `anything-info<NAME>'.
+Where NAME is one of `anything-c-default-info-index-list'."
+  (loop with symbols = (loop for str in var-value
+                             collect
+                             (intern (concat "anything-c-source-info-" str)))
+        for sym in symbols
+        for str in var-value
+        do (set sym (list (cons 'name (format "Info index: %s" str))
+                          (cons 'info-index str)))
+        when commands
+        do (let ((com (intern (concat "anything-info-" str))))
+	     (anything-c-build-info-index-command com
+               (format "Predefined anything for %s info." str) sym
+               (format "*anything info %s*" str)))))
+
+(defun anything-info-index-set (var value)
+  (anything-c-define-info-index-sources value t))
+
+(defcustom anything-c-default-info-index-list
+  '("elisp" "cl" "org" "gnus" "tramp" "ratpoison"
+    "zsh" "bash" "coreutils" "fileutils"
+    "find" "sh-utils" "textutils" "libc"
+    "make" "automake" "autoconf" "emacs-lisp-intro"
+    "emacs" "elib" "eieio" "gauche-refe" "guile"
+    "guile-tut" "goops" "screen" "latex" "gawk"
+    "sed" "m4" "wget" "binutils" "as" "bfd" "gprof"
+    "ld" "diff" "flex" "grep" "gzip" "libtool"
+    "texinfo" "info" "gdb" "stabs" "cvsbook" "cvs"
+    "bison" "id-utils" "global")
+  "Info Manual entries to use for building anything info index commands."
+  :group 'anything-config
+  :type 'list
+  :set 'anything-info-index-set)
+
 
 ;;; General internal variables
 ;;
@@ -5836,56 +5887,6 @@ source.")
                                     (info (replace-regexp-in-string
                                            "^[^:]+: " "" node-str))))))
     (requires-pattern . 2)))
-
-
-;;; Build info-index sources with info-index plug-in.
-;;
-;;
-;; Note that `name' attribute is not needed since
-;; `anything-c-insert-summary' have been removed.
-(defvar anything-c-default-info-index-list
-  '("elisp" "cl" "org" "gnus" "tramp" "ratpoison"
-    "zsh" "bash" "coreutils" "fileutils"
-    "find" "sh-utils" "textutils" "libc"
-    "make" "automake" "autoconf" "emacs-lisp-intro"
-    "emacs" "elib" "eieio" "gauche-refe" "guile"
-    "guile-tut" "goops" "screen" "latex" "gawk"
-    "sed" "m4" "wget" "binutils" "as" "bfd" "gprof"
-    "ld" "diff" "flex" "grep" "gzip" "libtool"
-    "texinfo" "info" "gdb" "stabs" "cvsbook" "cvs"
-    "bison" "id-utils" "global"))
-
-(defun anything-c-build-info-index-command (name doc source buffer)
-  "Define an anything command NAME with documentation DOC.
-Arg SOURCE will be an existing anything source named
-`anything-c-source-info-<NAME>' and BUFFER a string buffer name."
-  (eval (list 'defun name nil doc
-              (list 'interactive)
-              (list 'anything
-                    :sources source
-                    :buffer buffer
-                    :candidate-number-limit 1000))))
-
-(defun anything-c-define-info-index-sources (&optional commands)
-  "Define anything sources named anything-c-source-info-<NAME>.
-Sources are generated for all entries of `anything-c-default-info-index-list'.
-If COMMANDS arg is non--nil build also commands named `anything-info<NAME>'.
-Where NAME is one of `anything-c-default-info-index-list'."
-  (loop with symbols = (loop for str in anything-c-default-info-index-list
-                             collect
-                             (intern (concat "anything-c-source-info-" str)))
-        for sym in symbols
-        for str in anything-c-default-info-index-list
-        do (set sym (list (cons 'name (format "Info index: %s" str))
-                          (cons 'info-index str)))
-        when commands
-        do (let ((com (intern (concat "anything-info-" str))))
-	     (anything-c-build-info-index-command com
-               (format "Predefined anything for %s info." str) sym
-               (format "*anything info %s*" str)))))
-
-;; Define now info-index sources and commands.
-(anything-c-define-info-index-sources t)
 
 
 ;;; Man and woman UI
