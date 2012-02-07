@@ -1298,6 +1298,7 @@ Where NAME is one of `anything-c-default-info-index-list'."
                (format "*anything info %s*" str)))))
 
 (defun anything-info-index-set (var value)
+  (set var value)
   (anything-c-define-info-index-sources value t))
 
 (defcustom anything-c-default-info-index-list
