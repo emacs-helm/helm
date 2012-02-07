@@ -4093,16 +4093,19 @@ It is same as `directory-files' but always returns the
 dotted filename '.' and '..' on root directories on Windows
 systems."
   (setq directory (expand-file-name directory))
-  (if (string-match "^[a-zA-Z]\\{1\\}:/$" directory)
-      (let* ((dot (concat directory "."))
-             (dot2 (concat directory ".."))
-             (lsdir (remove
-                     dot2
-                     (remove
-                      dot
-                      (directory-files directory full)))))
-        (append (list dot dot2) lsdir))
-      (directory-files directory full)))
+  (let ((ls (directory-files directory full))
+        dot dot2 lsdir)
+    (if (or
+         ;; A windows volume.
+         (string-match "^[a-zA-Z]\\{1\\}:/$" directory)
+         ;; Empty directories on ftp hosts may have no dot dirs.
+         (and (file-remote-p directory)
+              (string-match "^/ftp:" directory)))
+        (progn (setq dot (concat directory "."))
+               (setq dot2 (concat directory ".."))
+               (setq lsdir (remove dot2 (remove dot ls)))
+               (append (list dot dot2) lsdir))
+        ls)))
 
 (defun anything-ff-transform-fname-for-completion (fname)
   "Return FNAME with it's basename modified as a regexp.
