@@ -2283,6 +2283,16 @@ Otherwise your command will be called many times like this:
 \\[anything-send-bug-report-from-anything]:BugReport."
     "String displayed in mode-line in `anything-c-source-buffers-list'"))
 
+(defvar anything-occur-mode-line
+  "\\<anything-map>\
+\\[anything-help]:Help,\
+\\<anything-occur-map>\
+\\[anything-occur-run-query-replace-regexp]:Query replace regexp,\
+\\<anything-map>\
+\\[anything-select-action]:Acts,\
+\\[anything-exit-minibuffer]/\\[anything-select-2nd-action-or-end-of-line]/\
+\\[anything-select-3rd-action]:NthAct,\
+\\[anything-send-bug-report-from-anything]:BugReport.")
 
 
 ;;; Utilities Functions
@@ -8688,6 +8698,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                ("Query replace regexp (C-u Not inside word.)"
                 . anything-c-occur-query-replace-regexp)))
     (recenter)
+    (mode-line . anything-occur-mode-line)
     (keymap . ,anything-occur-map)
     (requires-pattern . 1)
     (delayed)))
