@@ -12386,6 +12386,7 @@ With a prefix arg reload cache."
     (setq anything-ec-target (or target " "))
     (with-anything-show-completion beg end
       (anything :sources 'anything-c-source-esh
+                :buffer "*anything pcomplete*"
                 :input (anything-ff-set-pattern ; Handle tramp filenames.
                         (car (last (ignore-errors ; Needed in lisp symbols completion.
                                      (pcomplete-parse-arguments)))))))))
