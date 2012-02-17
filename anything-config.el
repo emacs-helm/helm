@@ -3067,7 +3067,9 @@ Don't set it directly, use instead `anything-ff-auto-update-initial-value'.")
 (defvar anything-ff-default-directory nil)
 (defvar anything-ff-history nil)
 (defvar anything-ff-cand-to-mark nil)
-
+(defvar anything-ff-url-regexp
+  "\\`\\(news\\(post\\)?:\\|nntp:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\):/?/?\\).*"
+  "Same as `ffap-url-regexp' but match earlier possible url.")
 
 (defvar anything-c-source-find-files
   `((name . "Find Files")
@@ -3946,7 +3948,8 @@ This happen only in function using sources that are
 `anything-file-completion-source-p' compliant."
   (when (and (anything-file-completion-source-p)
              (string-match ".*\\(/~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)$"
-                           anything-pattern))
+                           anything-pattern)
+             (not (string-match anything-ff-url-regexp anything-pattern)))
     (let ((match (match-string 1 anything-pattern)))
       (cond ((string= match "//")
              ;; Expand to "/" or "c:/"
@@ -4018,7 +4021,8 @@ purpose."
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)$" pattern)
            (with-anything-current-buffer
              (expand-file-name default-directory)))
-          ((string-match ".*\\(~//\\|//\\)$" pattern)
+          ((and (string-match ".*\\(~//\\|//\\)$" pattern)
+                (not (string-match anything-ff-url-regexp anything-pattern)))
            (expand-file-name "/") ; Expand to "/" or "c:/"
            )
           ((string-match "^~\\|.*/~/$" pattern)
@@ -4069,7 +4073,8 @@ purpose."
     (setq anything-ff-default-directory
           (if (string= anything-pattern "")
               (expand-file-name "/") ; Expand to "/" or "c:/"
-              (unless (string-match ffap-url-regexp path)
+              (unless (or (string-match anything-ff-url-regexp path)
+                          (string-match ffap-url-regexp path))
                 ;; If path is an url *default-directory have to be nil.
                 path-name-dir)))
     (cond ((string= path "Invalid tramp file name")
@@ -4085,6 +4090,8 @@ purpose."
                    ;; in `anything-buffer'.
                    (list path))))
           ((or (file-regular-p path)
+               ;; `ffap-url-regexp' don't match until url is complete.
+               (string-match anything-ff-url-regexp path)
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
@@ -4319,7 +4326,8 @@ return FNAME prefixed with [?]."
                       " " 'display
                       (propertize "[@]" 'face 'anything-ff-prefix))))
     (cond ((or file-or-symlinkp (file-exists-p fname)) fname)
-          ((string-match ffap-url-regexp fname)
+          ((or (string-match anything-ff-url-regexp fname)
+               (string-match ffap-url-regexp fname))
            (concat prefix-url " " fname))
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
@@ -4342,7 +4350,8 @@ is non--nil."
   (loop for i in files
         for disp = (if (and anything-ff-transformer-show-only-basename
                             (not (string-match "[.]\\{1,2\\}$" i))
-                            (not (string-match ffap-url-regexp i)))
+                            (not (string-match ffap-url-regexp i))
+                            (not (string-match anything-ff-url-regexp i)))
                        (anything-c-basename i) i)
         collect
         (cond ((and (stringp (car (file-attributes i)))
