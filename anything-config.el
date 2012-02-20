@@ -4139,7 +4139,8 @@ return FNAME unchanged."
     (if (or (not anything-ff-smart-completion)
             (string-match "\\s-" bn)
             (string-match "/$" fname) ; Allow mkdir.
-            (file-directory-p fname))
+            (file-directory-p fname)
+            (string-match anything-ff-url-regexp fname))
         fname ; Fall back to match-plugin.
         (setq bn (if (> (length bn) 2) ; Normal completion on first 2 char.
                      (mapconcat 'identity (split-string bn "" t) ".*") bn))
