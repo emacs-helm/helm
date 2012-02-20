@@ -12184,7 +12184,6 @@ It is `anything' replacement of regular `M-x' `execute-extended-command'."
                        :persistent-action 'pers-help
                        :persistent-help "Describe this command"
                        :history history
-                       :sort 'string-lessp
                        :must-match t
                        :candidates-in-buffer t
                        :fc-transformer 'anything-M-x-transformer))
