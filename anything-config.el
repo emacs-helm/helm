@@ -757,6 +757,7 @@
 (declare-function adoc-prin1-to-string "ext:auto-document.el" (object))
 (declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
+(declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
 
 
 ;;; compatibility
@@ -7655,6 +7656,10 @@ replace with STR as yanked string."
             'insert-register
             'append-to-register
             'prepend-to-register))
+          ((vectorp val)
+           (list
+            "Undo-tree entry."
+            'undo-tree-restore-state-from-register))
           (t
            "GARBAGE!"))
         collect (cons (format "register %3s: %s" key (car string-actions))
@@ -7680,7 +7685,11 @@ replace with STR as yanked string."
           (increment-register
            "Increment Prefix Arg to Register" .
            (lambda (c) (increment-register
-                        anything-current-prefix-arg (car c)))))
+                        anything-current-prefix-arg (car c))))
+          (undo-tree-restore-state-from-register
+           "Restore Undo-tree register"
+           (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
+                            (undo-tree-restore-state-from-register (car c))))))
         for func in (cdr register-and-functions)
         for cell = (assq func func-actions)
         when cell
