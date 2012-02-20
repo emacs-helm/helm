@@ -1318,6 +1318,11 @@ Where NAME is one of `anything-c-default-info-index-list'."
   :type 'list
   :set 'anything-info-index-set)
 
+(defcustom anything-c-register-max-offset 160
+  "Max size of string register entries before truncating."
+  :group 'anything-config
+  :type 'integer)
+
 
 ;;; General internal variables
 ;;
@@ -7647,12 +7652,15 @@ replace with STR as yanked string."
              (list (format "%s: %s\n" lines
                            (truncate-string-to-width
                             (mapconcat 'identity (list (car val))
-                                       ;; (mapconcat (lambda (y) y) val
                                        "^J") (- (window-width) 15)))
                    'insert-register)))
           ((stringp val)
-           (list ;; without properties
-            (substring-no-properties val)
+           (list
+            ;; without properties
+            (concat (substring-no-properties
+                     val 0 (min (length val) anything-c-register-max-offset))
+                    (if (> (length val) anything-c-register-max-offset)
+                        "[...]" ""))
             'insert-register
             'append-to-register
             'prepend-to-register))
