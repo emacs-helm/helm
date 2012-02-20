@@ -6012,8 +6012,7 @@ Return nil if no mode-map found."
   "filtered-candidate-transformer to show bindings in emacs commands.
 Show global bindings and local bindings according to current `major-mode'."
   (with-anything-current-buffer
-    (loop
-          with local-map = (anything-M-x-current-mode-map-alist)
+    (loop with local-map = (anything-M-x-current-mode-map-alist)
           for cand in candidates
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
@@ -9646,7 +9645,6 @@ that use `anything-comp-read' See `anything-M-x' for example."
                        (persistent-action . ,persistent-action)
                        (persistent-help . ,persistent-help)
                        (mode-line . ,mode-line)
-                       (keymap . ,anything-map)
                        (action . ,'action-fn)))
            (src `((name . ,name)
                   (candidates
@@ -9663,7 +9661,6 @@ that use `anything-comp-read' See `anything-M-x' for example."
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (mode-line . ,mode-line)
-                  (keymap . ,anything-map)
                   (action . ,'action-fn)))
            (src-1 `((name . ,name)
                     (init
@@ -9684,7 +9681,6 @@ that use `anything-comp-read' See `anything-M-x' for example."
                     (persistent-action . ,persistent-action)
                     (persistent-help . ,persistent-help)
                     (mode-line . ,mode-line)
-                    (keymap . ,anything-map)
                     (action . ,'action-fn)))
            (src-list (list src-hist
                            (if candidates-in-buffer
@@ -9701,6 +9697,7 @@ that use `anything-comp-read' See `anything-M-x' for example."
         :preselect preselect
         :prompt prompt
         :resume 'noresume
+        :keymap anything-map
         :history (and (symbolp input-history) input-history)
         :buffer buffer)
        (when (and (eq anything-exit-status 0)
