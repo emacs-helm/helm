@@ -1171,6 +1171,15 @@ If nil Search in all files."
   :type  'string
   :group 'anything-config)
 
+(defcustom anything-ff-locate-db-filename "locate.db"
+  "The basename of the locatedb file you use locally in your directories.
+When this is set and `anything' find such a file in the directory from
+where you launch locate, it will use this file and will not prompt you
+for a db file.
+Note that this happen only when locate is launched with a prefix arg."
+  :group 'anything-config
+  :type 'string)
+
 (defcustom anything-c-locate-command nil
   "A list of arguments for locate program.
 If nil it will be calculated when `anything-locate' startup
@@ -5093,6 +5102,26 @@ Keys description:
 ;; You have to install Everything with his command line interface here:
 ;; http://www.voidtools.com/download.php
 
+(defun anything-ff-find-locatedb ()
+  "Try to find if a local locatedb file is available.
+The search is done in `anything-ff-default-directory' or
+`default-directory' depending from where you started.
+i.e `anything-find-files' or `anything-locate'."
+  (when anything-ff-locate-db-filename
+    (or (and anything-ff-default-directory
+             (file-exists-p (expand-file-name
+                             anything-ff-locate-db-filename
+                             anything-ff-default-directory))
+             (expand-file-name
+              anything-ff-locate-db-filename
+              anything-ff-default-directory))
+        (and (file-exists-p (expand-file-name
+                             anything-ff-locate-db-filename
+                             default-directory))
+             (expand-file-name
+              anything-ff-locate-db-filename
+              default-directory)))))
+
 (defun anything-locate-1 (&optional localdb init)
   "Generic function to run Locate.
 if LOCALDB is non--nil search and use a local locate db file.
@@ -5100,18 +5129,21 @@ INIT is a string to use as initial input in prompt.
 See `anything-locate-with-db' and `anything-locate'."
   (anything-locate-with-db
    (and localdb
-        (anything-c-read-file-name
-         "LocateDBFiles: "
-         :marked-candidates t
-         :preselect anything-locate-db-file-regexp
-         :test #'(lambda (x)
-                   (if anything-locate-db-file-regexp
-                       ;; Select only locate db files and directories
-                       ;; to allow navigation.
-                       (or (string-match
-                            anything-locate-db-file-regexp x)
-                           (file-directory-p x))
-                       x))))
+        (or (anything-ff-find-locatedb)
+            (anything-c-read-file-name
+             "LocateDBFiles: "
+             :initial-input (or anything-ff-default-directory
+                                default-directory)
+             :marked-candidates t
+             :preselect anything-locate-db-file-regexp
+             :test #'(lambda (x)
+                       (if anything-locate-db-file-regexp
+                           ;; Select only locate db files and directories
+                           ;; to allow navigation.
+                           (or (string-match
+                                anything-locate-db-file-regexp x)
+                               (file-directory-p x))
+                           x)))))
    init))
 ;; (anything-locate-1 t)
 
@@ -11796,6 +11828,7 @@ To create a user specific db, use
 Where db_path is a filename matched by
 `anything-locate-db-file-regexp'."
   (interactive "P")
+  (setq anything-ff-default-directory default-directory)
   (anything-locate-1 arg))
 
 ;;;###autoload
