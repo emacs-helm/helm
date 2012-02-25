@@ -1387,6 +1387,7 @@ filtered-candidate-transformer functions."
   "Perform an action after quitting `anything'.
 The action is to call FUNCTION with arguments ARGS."
   (setq anything-quit t)
+  (anything-kill-async-processes)
   (anything-log-eval function args)
   (apply 'run-with-idle-timer 0 nil function args)
   (anything-exit-minibuffer))

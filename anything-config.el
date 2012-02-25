@@ -3715,7 +3715,7 @@ See `anything-ff-serial-rename-1'."
                                     (string-match "^es" anything-c-locate-command))
                          " -b")))
         (anything-mp-highlight-delay 0.7))
-    (anything-locate-1 anything-current-prefix-arg input)))
+    (anything-locate-1 anything-current-prefix-arg input 'from-ff)))
 
 ;;;###autoload
 (defun anything-ff-run-locate ()
@@ -5102,34 +5102,35 @@ Keys description:
 ;; You have to install Everything with his command line interface here:
 ;; http://www.voidtools.com/download.php
 
-(defun anything-ff-find-locatedb ()
+(defun anything-ff-find-locatedb (&optional from-ff)
   "Try to find if a local locatedb file is available.
 The search is done in `anything-ff-default-directory' or
-`default-directory' depending from where you started.
-i.e `anything-find-files' or `anything-locate'."
+fall back to `default-directory' if FROM-FF is nil."
   (when anything-ff-locate-db-filename
-    (or (and anything-ff-default-directory
-             (file-exists-p (expand-file-name
-                             anything-ff-locate-db-filename
-                             anything-ff-default-directory))
-             (expand-file-name
-              anything-ff-locate-db-filename
-              anything-ff-default-directory))
-        (and (file-exists-p (expand-file-name
-                             anything-ff-locate-db-filename
-                             default-directory))
-             (expand-file-name
-              anything-ff-locate-db-filename
-              default-directory)))))
+    (cond ((and anything-ff-default-directory
+                from-ff
+                (file-exists-p (expand-file-name
+                                anything-ff-locate-db-filename
+                                anything-ff-default-directory))
+                (expand-file-name
+                 anything-ff-locate-db-filename
+                 anything-ff-default-directory)))
+          ((and (not from-ff)
+                (file-exists-p (expand-file-name
+                                anything-ff-locate-db-filename
+                                default-directory))
+                (expand-file-name
+                 anything-ff-locate-db-filename
+                 default-directory))))))
 
-(defun anything-locate-1 (&optional localdb init)
+(defun anything-locate-1 (&optional localdb init from-ff)
   "Generic function to run Locate.
 if LOCALDB is non--nil search and use a local locate db file.
 INIT is a string to use as initial input in prompt.
 See `anything-locate-with-db' and `anything-locate'."
   (anything-locate-with-db
    (and localdb
-        (or (anything-ff-find-locatedb)
+        (or (anything-ff-find-locatedb from-ff)
             (anything-c-read-file-name
              "LocateDBFiles: "
              :initial-input (or anything-ff-default-directory
