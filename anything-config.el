@@ -3167,7 +3167,7 @@ ACTION must be an action supported by `anything-dired-action'."
                   prompt
                   :preselect (if anything-ff-transformer-show-only-basename
                                  (anything-c-basename cand) cand)
-                  :initial-input (anything-dwim-target-directory) 
+                  :initial-input (anything-dwim-target-directory)
                   :history (anything-find-files-history :comp-read nil))))
     (anything-dired-action
      dest :files ifiles :action action :follow parg)))
