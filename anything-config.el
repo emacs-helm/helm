@@ -9581,6 +9581,12 @@ Keys description:
 
 - PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
 
+- MODE-LINE: A string or list to display in mode line.
+  (See `anything-mode-line-string')
+
+- KEYMAP: A keymap to use in this `anything-comp-read'.
+  (The keymap will be shared with history source)
+
 - NAME: The name related to this local source.
 
 - EXEC-WHEN-ONLY-ONE: Bound `anything-execute-action-at-once-if-one'

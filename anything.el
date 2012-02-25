@@ -1996,7 +1996,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `anything'."
     (let ((src-keymap (assoc-default 'keymap (anything-get-current-source))))
       ;; Startup with the first keymap found either in current source
       ;; or anything arg, otherwise use global value of `anything-map'.
-      ;; This map with be used as a `minibuffer-local-map'.
+      ;; This map will be used as a `minibuffer-local-map'.
       ;; Maybe it will be overriden when changing source
       ;; by `anything-maybe-update-keymap'.
       (unless anything-local-map-override-anything-map
