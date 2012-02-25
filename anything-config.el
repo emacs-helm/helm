@@ -4164,7 +4164,7 @@ in `anything-ff-history'."
     (if (window-system)
         (tooltip-show
          (concat
-          (anything-c-basename candidate) ": \n"
+          (anything-c-basename candidate) "\n"
           "Type: " type "\n"
           (when (string= type "symlink")
             (format "True name: '%s'\n"
