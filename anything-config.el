@@ -1228,7 +1228,8 @@ This can be toggled at anytime from `anything-find-files' with \
 
 (defcustom anything-ff-signal-error-on-dot-files t
   "Signal error when file is `.' or `..' on file deletion when non--nil.
-Default is non--nil."
+Default is non--nil.
+WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :group 'anything-config
   :type 'boolean)
 
@@ -4205,28 +4206,27 @@ in `anything-ff-history'."
 
 (defun anything-ff-quick-delete (candidate)
   "Delete file CANDIDATE without quitting."
-  (if (and anything-ff-signal-error-on-dot-files
-           (anything-ff-dot-file-p candidate))
-      (message "Error: Cannot operate on `.' or `..'")
-      (let ((presel (prog1 (save-excursion
-                             (let (sel)
-                               (anything-next-line)
-                               (setq sel (anything-get-selection))
-                               (if (string= sel candidate)
-                                   (progn (anything-previous-line)
-                                          (anything-get-selection))
-                                   sel)))
-                      (anything-mark-current-line))))
-        (setq presel (if (and anything-ff-transformer-show-only-basename
-                              (not (anything-ff-dot-file-p presel)))
-                         (anything-c-basename presel) presel))
-        (if anything-ff-quick-delete-dont-prompt-for-deletion
-            (anything-c-delete-file candidate)
-            (save-selected-window
-              (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
-                (anything-c-delete-file candidate)
-                (message nil))))
-        (anything-force-update presel))))
+  (let ((presel (prog1 (save-excursion
+                         (let (sel)
+                           (anything-next-line)
+                           (setq sel (anything-get-selection))
+                           (if (string= sel candidate)
+                               (progn (anything-previous-line)
+                                      (anything-get-selection))
+                               sel)))
+                  (anything-mark-current-line))))
+    (setq presel (if (and anything-ff-transformer-show-only-basename
+                          (not (anything-ff-dot-file-p presel)))
+                     (anything-c-basename presel) presel))
+    (if anything-ff-quick-delete-dont-prompt-for-deletion
+        (anything-c-delete-file candidate
+                                anything-ff-signal-error-on-dot-files)
+        (save-selected-window
+          (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
+            (anything-c-delete-file candidate
+                                    anything-ff-signal-error-on-dot-files)
+            (message nil))))
+    (anything-force-update presel)))
 
 (defun anything-ff-kill-buffer-fname (candidate)
   (let* ((buf (get-file-buffer candidate))
