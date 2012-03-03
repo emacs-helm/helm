@@ -12460,6 +12460,7 @@ With a prefix arg reload cache."
   (interactive)
   (let* ((end (point))
          (beg (save-excursion (eshell-bol) (point)))
+         (input (buffer-substring beg end))
          flag-empty)
     (when (eq beg end)
       (insert " ")
@@ -12468,7 +12469,8 @@ With a prefix arg reload cache."
     (unwind-protect
          (with-anything-show-completion beg end
            (anything :sources 'anything-c-source-eshell-history
-                     :buffer "*Eshell history*"))
+                     :buffer "*Eshell history*"
+                     :input input))
       (when (and flag-empty
                  (looking-back " "))
         (delete-char -1)))))

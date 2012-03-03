@@ -36,6 +36,18 @@
 \usepackage{natbib}
 \usepackage{setspace}
 
+\newsavebox{\boiteencadre}
+\newenvironment{encadre}{%
+  % clause begin
+  \begin{lrbox}{\boiteencadre}% début mise en boîte
+  \begin{minipage}{.8\textwidth}}{%
+  % clause end
+  \end{minipage}
+  \end{lrbox}% fin mise en boîte
+  % production de la boîte encadrée
+  \begin{center}
+    \fbox{\usebox{\boiteencadre}}
+  \end{center}}
 
 \begin{document}
 \begin{titlepage}
@@ -920,6 +932,89 @@ Customize with:\\
 See C-h v `anything-completing-read-handlers-alist' for more infos.
 
 Not complete.
+
+\section{Anything Eshell completion}
+\label{sec:anyth-eshell-compl}
+
+\subsection{Enable anything pcomplete}
+\label{sec:enable-anyth-pcompl}
+
+
+Of course pcomplete is already enabled in Eshell, but what we want here 
+is to enable it with anything support. \\
+To enable it's easy, just add to ``.emacs.el'':
+
+\begin{encadre}
+\begin{verbatim}
+(add-hook 'eshell-mode-hook
+          #'(lambda ()
+              (define-key eshell-mode-map 
+                [remap pcomplete]
+                'anything-esh-pcomplete)))
+
+\end{verbatim}
+\end{encadre}
+
+Now when hitting ``TAB'', you should have anything pcompletion.\\
+\\
+
+\subsubsection{Write your own pcomplete functions}
+\label{sec:write-your-own}
+
+You can enhance Emacs pcomplete by writing your own pcomplete functions.\\
+\\
+Here an example with ``find'' command:
+
+\begin{verbatim}
+  
+(defun pcomplete/find ()
+  (let ((prec (pcomplete-arg 'last -1)))
+    (cond ((and (pcomplete-match "^-" 'last)
+                (string= "find" prec))
+           (pcomplete-opt "HLPDO"))
+          ((pcomplete-match "^-" 'last)
+           (while (pcomplete-here
+                   '("-amin" "-anewer" "-atime" "-cmin" "-cnewer" "-context"
+                     "-ctime" "-daystart" "-delete" "-depth" "-empty" "-exec"
+                     "-execdir" "-executable" "-false" "-fls" "-follow" "-fprint"
+                     "-fprint0" "-fprintf" "-fstype" "-gid" "-group"
+                     "-help" "-ignore_readdir_race" "-ilname" "-iname"
+                     "-inum" "-ipath" "-iregex" "-iwholename"
+                     "-links" "-lname" "-ls" "-maxdepth"
+                     "-mindepth" "-mmin" "-mount" "-mtime"
+                     "-name" "-newer" "-nogroup" "-noignore_readdir_race"
+                     "-noleaf" "-nouser" "-nowarn" "-ok"
+                     "-okdir" "-path" "-perm" "-print"
+                     "-print0" "-printf" "-prune" "-quit"
+                     "-readable" "-regex" "-regextype" "-samefile"
+                     "-size" "-true" "-type" "-uid"
+                     "-used" "-user" "-version" "-warn"
+                     "-wholename" "-writable" "-xdev" "-xtype"))))
+          ((string= "-type" prec)
+           (while (pcomplete-here (list "b" "c" "d" "p" "f" "l" "s" "D"))))
+          ((string= "-xtype" prec)
+           (while (pcomplete-here (list "b" "c" "d" "p" "f" "l" "s"))))
+          ((or (string= prec "-exec")
+               (string= prec "-execdir"))
+           (while (pcomplete-here* (funcall pcomplete-command-completion-function)
+                                   (pcomplete-arg 'last) t))))
+    (while (pcomplete-here (pcomplete-entries) nil 'identity))))
+
+\end{verbatim}
+\newpage
+\subsection{Enable anything Eshell history}
+\label{sec:enable-anyth-eshell}
+
+Add this to ``.emacs.el''
+\begin{encadre}
+\begin{verbatim}
+(add-hook 'eshell-mode-hook
+          #'(lambda ()
+              (define-key eshell-mode-map 
+                (kbd "M-p")
+                'anything-eshell-history)))
+\end{verbatim}
+\end{encadre}
 
 \section{Usefuls extensions}
 \label{sec:usefuls-extensions}
