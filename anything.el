@@ -2608,12 +2608,15 @@ call it before update."
   "Insert MATCH into `anything-buffer' with INSERT-FUNCTION for SOURCE.
 If MATCH is a list then insert the string intended to appear on the display
 and store the real value in a text property."
-  (let ((start (point-at-bol (point)))
-        (string (or (car-safe match) match))
+  (let ((start     (point-at-bol (point)))
+        (dispvalue (or (car-safe match) match))
         (realvalue (cdr-safe match)))
-    (when (symbolp string) (setq string (symbol-name string)))
-    (when (stringp string)
-      (funcall insert-function string)
+    (setq dispvalue
+          (cond ((symbolp dispvalue) (symbol-name dispvalue))
+                ((numberp dispvalue) (number-to-string dispvalue))
+                (t dispvalue)))
+    (when (stringp dispvalue)
+      (funcall insert-function dispvalue)
       ;; Some sources with candidates-in-buffer have already added
       ;; 'anything-realvalue property when creating candidate buffer.
       (unless (get-text-property start 'anything-realvalue)
