@@ -3586,123 +3586,145 @@ See `anything-ff-serial-rename-1'."
 ;;;###autoload
 (defun anything-ff-run-toggle-auto-update ()
   (interactive)
-  (anything-attrset 'toggle-auto-update 'anything-ff-toggle-auto-update)
-  (anything-execute-persistent-action 'toggle-auto-update))
+  (when (anything-file-completion-source-p)
+    (anything-attrset 'toggle-auto-update 'anything-ff-toggle-auto-update)
+    (anything-execute-persistent-action 'toggle-auto-update)))
 
 ;;;###autoload
 (defun anything-ff-run-switch-to-history ()
   "Run Switch to history action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-switch-to-hist))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-switch-to-hist)))
 
 ;;;###autoload
 (defun anything-ff-run-grep ()
   "Run Grep action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-grep))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-grep)))
 
 ;;;###autoload
 (defun anything-ff-run-pdfgrep ()
   "Run Pdfgrep action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-pdfgrep))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-pdfgrep)))
 
 ;;;###autoload
 (defun anything-ff-run-zgrep ()
   "Run Grep action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-zgrep))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-zgrep)))
 
 ;;;###autoload
 (defun anything-ff-run-copy-file ()
   "Run Copy file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-copy))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-copy)))
 
 ;;;###autoload
 (defun anything-ff-run-rename-file ()
   "Run Rename file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-rename))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-rename)))
 
 ;;;###autoload
 (defun anything-ff-run-byte-compile-file ()
   "Run Byte compile file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-byte-compile))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-byte-compile)))
 
 ;;;###autoload
 (defun anything-ff-run-load-file ()
   "Run Load file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-load-files))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-load-files)))
 
 ;;;###autoload
 (defun anything-ff-run-eshell-command-on-file ()
   "Run eshell command on file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-eshell-command-on-file))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action
+     'anything-find-files-eshell-command-on-file)))
 
 ;;;###autoload
 (defun anything-ff-run-ediff-file ()
   "Run Ediff file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-ediff-files))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-ediff-files)))
 
 ;;;###autoload
 (defun anything-ff-run-ediff-merge-file ()
   "Run Ediff merge file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-ediff-merge-files))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action
+     'anything-find-files-ediff-merge-files)))
 
 ;;;###autoload
 (defun anything-ff-run-symlink-file ()
   "Run Symlink file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-symlink))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-symlink)))
 
 ;;;###autoload
 (defun anything-ff-run-hardlink-file ()
   "Run Hardlink file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-find-files-hardlink))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-find-files-hardlink)))
 
 ;;;###autoload
 (defun anything-ff-run-delete-file ()
   "Run Delete file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-delete-marked-files))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-delete-marked-files)))
 
 ;;;###autoload
 (defun anything-ff-run-complete-fn-at-point ()
   "Run complete file name action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action
-   'anything-c-insert-file-name-completion-at-point))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action
+     'anything-c-insert-file-name-completion-at-point)))
 
 ;;;###autoload
 (defun anything-ff-run-switch-to-eshell ()
   "Run switch to eshell action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-switch-to-eshell))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-switch-to-eshell)))
 
 ;;;###autoload
 (defun anything-ff-run-switch-other-window ()
   "Run switch to other window action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'find-file-other-window))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'find-file-other-window)))
 
 ;;;###autoload
 (defun anything-ff-run-switch-other-frame ()
   "Run switch to other frame action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'find-file-other-frame))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'find-file-other-frame)))
 
 ;;;###autoload
 (defun anything-ff-run-open-file-externally ()
   "Run open file externally command action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-c-open-file-externally))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-c-open-file-externally)))
 
 (defun anything-ff-locate (candidate)
   "Locate action function for `anything-find-files'."
@@ -3722,19 +3744,22 @@ See `anything-ff-serial-rename-1'."
 (defun anything-ff-run-locate ()
   "Run locate action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-locate))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-locate)))
 
 ;;;###autoload
 (defun anything-ff-run-gnus-attach-files ()
   "Run gnus attach files command action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-gnus-attach-files))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-gnus-attach-files)))
 
 ;;;###autoload
 (defun anything-ff-run-etags ()
   "Run Etags command action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-etags-select))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-etags-select)))
 
 (defun anything-ff-print (candidate)
   "Print marked files.
@@ -3785,7 +3810,8 @@ Same as `dired-do-print' but for anything."
 (defun anything-ff-run-print-file ()
   "Run Print file action from `anything-c-source-find-files'."
   (interactive)
-  (anything-c-quit-and-execute-action 'anything-ff-print))
+  (when (anything-file-completion-source-p)
+    (anything-c-quit-and-execute-action 'anything-ff-print)))
 
 (defun anything-ff-checksum (file)
   "Calculate the checksum of FILE.
@@ -3814,8 +3840,9 @@ The checksum is copied to kill-ring."
 
 (defun anything-ff-run-toggle-basename ()
   (interactive)
-  (anything-attrset 'toggle-basename 'anything-ff-toggle-basename)
-  (anything-execute-persistent-action 'toggle-basename))
+  (when (anything-file-completion-source-p)
+    (anything-attrset 'toggle-basename 'anything-ff-toggle-basename)
+    (anything-execute-persistent-action 'toggle-basename)))
 
 (defun* anything-reduce-file-name (fname level &key unix-close expand)
   "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
@@ -3855,10 +3882,14 @@ be done automatically.
 You should not modify this yourself unless you know what you do.")
 
 (defun anything-file-completion-source-p ()
-  "Test if current source is a dired or find-files source."
-  (let ((cur-source (cdr (assoc 'name (anything-get-current-source)))))
-    (loop for i in anything-file-completion-sources
-          thereis (string= cur-source i))))
+  "Return non--nil if current source is a file completion source.
+A source is a file completion source if it is
+one of `anything-file-completion-sources'.
+Return nil if anything is not running"
+  (and anything-alive-p
+       (let ((cur-source (cdr (assoc 'name (anything-get-current-source)))))
+         (loop for i in anything-file-completion-sources
+               thereis (string= cur-source i)))))
 
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
@@ -4256,8 +4287,9 @@ in `anything-find-files-persistent-action'."
 (defun anything-ff-run-kill-buffer-persistent ()
   "Execute `anything-ff-kill-buffer-fname' whitout quitting."
   (interactive)
-  (anything-attrset 'kill-buffer-fname 'anything-ff-kill-buffer-fname)  
-  (anything-execute-persistent-action 'kill-buffer-fname))
+  (when (anything-file-completion-source-p)
+    (anything-attrset 'kill-buffer-fname 'anything-ff-kill-buffer-fname)  
+    (anything-execute-persistent-action 'kill-buffer-fname)))
 
 (defun anything-ff-human-size (size)
   "Return a string showing SIZE of a file in human readable form.

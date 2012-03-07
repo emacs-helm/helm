@@ -1034,6 +1034,7 @@ otherwise same keys in `anything-map' will take precedence."
 (defvar anything-let-variables nil)
 (defvar anything-split-window-state nil)
 (defvar anything-selection-point nil)
+(defvar anything-alive-p nil)
 
 
 ;; (@* "Utility: logging")
@@ -1958,6 +1959,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (setq anything-current-prefix-arg nil)
   (setq anything-once-called-functions nil)
   (setq anything-delayed-init-executed nil)
+  (setq anything-alive-p t)
   (setq anything-current-buffer
         (if (minibuffer-window-active-p (minibuffer-window))
             ;; If minibuffer is active be sure to use it's buffer
@@ -2121,6 +2123,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
     (bury-buffer)
     ;; Be sure we call this from anything-buffer.
     (anything-funcall-foreach 'cleanup))
+  (setq anything-alive-p nil)
   (anything-new-timer 'anything-check-minibuffer-input-timer nil)
   (anything-kill-async-processes)
   (anything-log-run-hook 'anything-cleanup-hook)
