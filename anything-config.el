@@ -3885,11 +3885,10 @@ You should not modify this yourself unless you know what you do.")
   "Return non--nil if current source is a file completion source.
 A source is a file completion source if it is
 one of `anything-file-completion-sources'.
-Return nil if anything is not running"
-  (and anything-alive-p
-       (let ((cur-source (cdr (assoc 'name (anything-get-current-source)))))
-         (loop for i in anything-file-completion-sources
-               thereis (string= cur-source i)))))
+Return nil if anything is not running."
+  (let ((cur-source (cdr (assoc 'name (anything-get-current-source)))))
+    (loop for i in anything-file-completion-sources
+          thereis (string= cur-source i))))
 
 (defun anything-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
