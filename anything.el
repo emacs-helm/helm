@@ -2123,12 +2123,12 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
     (bury-buffer)
     ;; Be sure we call this from anything-buffer.
     (anything-funcall-foreach 'cleanup))
-  (setq anything-alive-p nil)
   (anything-new-timer 'anything-check-minibuffer-input-timer nil)
   (anything-kill-async-processes)
   (anything-log-run-hook 'anything-cleanup-hook)
   (anything-hooks 'cleanup)
   (anything-frame-or-window-configuration 'restore)
+  (setq anything-alive-p nil)
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after anything session.
   (anything-clean-up-minibuffer))
