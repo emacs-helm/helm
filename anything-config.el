@@ -4122,7 +4122,7 @@ purpose."
               (unless (or (string-match anything-ff-url-regexp path)
                           (string-match ffap-url-regexp path))
                 ;; If path is an url *default-directory have to be nil.
-                path-name-dir)))
+                (expand-file-name path-name-dir))))
     (cond ((string= path "Invalid tramp file name")
            (or (anything-ff-tramp-hostnames) ; Hostnames completion.
                (prog2
