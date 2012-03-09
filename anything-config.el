@@ -4638,7 +4638,8 @@ Use it for non--interactive calls of `anything-find-files'."
   (let ((anything-mp-highlight-delay nil)
         ;; Be sure we don't erase the precedent minibuffer if some.
         (anything-ff-auto-update-initial-value
-         (not (minibuffer-window-active-p (minibuffer-window))))
+         (and anything-ff-auto-update-initial-value
+              (not (minibuffer-window-active-p (minibuffer-window)))))
         anything-samewindow)
     (anything :sources 'anything-c-source-find-files
               :input fname
@@ -5036,7 +5037,8 @@ Keys description:
     (let* ((anything-mp-highlight-delay nil)
            ;; Be sure we don't erase the underlying minibuffer if some.
            (anything-ff-auto-update-initial-value
-            (not (minibuffer-window-active-p (minibuffer-window))))
+            (and anything-ff-auto-update-initial-value
+                 (not (minibuffer-window-active-p (minibuffer-window)))))
            anything-same-window
            (hist (and history (anything-comp-read-get-candidates
                                history nil nil alistp)))
