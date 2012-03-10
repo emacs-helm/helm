@@ -4119,10 +4119,10 @@ purpose."
     (setq anything-ff-default-directory
           (if (string= anything-pattern "")
               (expand-file-name "/") ; Expand to "/" or "c:/"
+              ;; If path is an url *default-directory have to be nil.
               (unless (or (string-match anything-ff-url-regexp path)
                           (string-match ffap-url-regexp path))
-                ;; If path is an url *default-directory have to be nil.
-                (expand-file-name path-name-dir))))
+                path-name-dir)))
     (cond ((string= path "Invalid tramp file name")
            (or (anything-ff-tramp-hostnames) ; Hostnames completion.
                (prog2
@@ -4861,7 +4861,8 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
      marker)
     (push (file-name-as-directory
            (if (file-directory-p candidate)
-               candidate (file-name-directory candidate)))
+               (expand-file-name candidate)
+               (file-name-directory candidate)))
            anything-ff-history)
     (when (and follow (not (get-buffer dired-log-buffer)))
       (let ((target (directory-file-name candidate)))
