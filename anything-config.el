@@ -5407,8 +5407,10 @@ WHERE can be one of other-window, elscreen, other-frame."
       (other-window (find-file-other-window fname))
       (elscreen     (anything-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
+      (grep         (anything-c-grep-save-results-1))
       (t (find-file fname)))
-    (anything-goto-line lineno)
+    (unless (eq where 'grep)
+      (anything-goto-line lineno))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))
@@ -5436,7 +5438,10 @@ WHERE can be one of other-window, elscreen, other-frame."
   "Jump to result in elscreen from anything grep."
   (anything-c-grep-action candidate 'elscreen))
 
-(defun anything-c-grep-save-results (candidate)
+(defun anything-c-grep-save-results (_candidate)
+  (anything-c-grep-action _candidate 'grep))
+
+(defun anything-c-grep-save-results-1 ()
   "Save anything grep result in a `grep-mode' buffer."
   (let ((buf "*grep*")
         new-buf)
