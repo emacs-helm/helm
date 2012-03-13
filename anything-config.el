@@ -943,17 +943,13 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
 (defun anything-set-anything-command-map-prefix-key (var key)
   "The customize set function for `anything-command-map-prefix-key'."
   (when (boundp var)
-    (define-key ctl-x-map (symbol-value var) nil))
+    (define-key global-map (read-kbd-macro (symbol-value var)) nil))
   (set var key)
-  (define-key ctl-x-map (symbol-value var) 'anything-command-map))
+  (define-key global-map
+      (read-kbd-macro (symbol-value var)) 'anything-command-map))
 
-(defcustom anything-command-map-prefix-key "c"
-  "The prefix key for all `anything-command-map' commands.
-It use `ctl-x-map', so when set, the prefix key will be 'C-x <prefix>'.
-
-!!WARNING!!
-This default value is very likely to be changed,
-because it is under discussion."
+(defcustom anything-command-map-prefix-key "C-x c"
+  "The prefix key for all `anything-command-map' commands."
   :type  'string
   :set   'anything-set-anything-command-map-prefix-key
   :group 'anything-config)
