@@ -2057,7 +2057,13 @@ See Man locate for more infos.
 ;;
 (defvar anything-grep-help-message
   "== Anything Grep Map ==\
-\nSpecific commands for Grep and Etags:
+\nAnything Grep tips:
+You can start grep with a prefix arg to recurse in subdirectories.
+You can use wild card when selecting files (e.g *.el)
+You can grep in many differents directories by marking files or wild cards.
+You can save your results in a grep-mode buffer, see below.
+
+\nSpecific commands for Anything Grep:
 \\<anything-c-grep-map>
 \\[anything-c-goto-next-file]\t->Next File.
 \\[anything-c-goto-precedent-file]\t\t->Precedent File.
@@ -2065,6 +2071,7 @@ See Man locate for more infos.
 \\[anything-c-grep-run-other-window-action]\t\t->Jump other window.
 \\[anything-c-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
 \\[anything-c-grep-run-default-action]\t\t->Run default action (Same as RET).
+\\[anything-c-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
 \\[anything-grep-help]\t\t->Show this help.
 \n== Anything Map ==
 \\{anything-map}")
