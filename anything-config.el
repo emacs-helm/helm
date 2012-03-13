@@ -5460,7 +5460,7 @@ WHERE can be one of other-window, elscreen, other-frame."
                 (format "Grep Results for `%s':\n\n" anything-pattern))
         (save-excursion
           (insert (with-current-buffer anything-buffer
-                    (forward-line 1)
+                    (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max))))
           (grep-mode))))
     (message "Anything Grep Results saved in `%s' buffer" buf)))
