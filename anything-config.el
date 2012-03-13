@@ -8872,7 +8872,9 @@ See also `anything-create--actions'.")
                (mapcar 'prin1-to-string history)
                history))))
     (migemo)
-    (action . insert)))
+    (action . (lambda (candidate)
+                (delete-minibuffer-contents)
+                (insert candidate)))))
 
 
 ;;; Elscreen
