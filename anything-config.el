@@ -5083,7 +5083,9 @@ Keys description:
                        (loop with hn = (anything-ff-tramp-hostnames)
                              for i in (anything-find-files-get-candidates
                                        must-match)
-                             when (or (member i hn) (funcall test i))
+                             when (or (member i hn)            ; A tramp host
+                                      (funcall test i)         ; Test ok
+                                      (not (file-exists-p i))) ; A new file.
                              collect i)
                        (anything-find-files-get-candidates must-match))))
               (filtered-candidate-transformer anything-c-find-files-transformer)
