@@ -4,19 +4,21 @@
 
 ;; Description: Applications libary for `helm.el'
 
-;; Author: Tassilo Horn <tassilo@member.fsf.org>
+;; Original Author: Tassilo Horn <tassilo@member.fsf.org>
 
-;; Maintainer: Tassilo Horn <tassilo@member.fsf.org>
-;;             rubikitch    <rubikitch@ruby-lang.org>
+;; This is a fork of original `anything-config.el' created by
+;; Tassilo Horn <tassilo@member.fsf.org>.
+
+;; Maintainer: rubikitch    <rubikitch@ruby-lang.org>
 ;;             Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; Copyright (C) 2007 ~ 2011, Tassilo Horn, all rights reserved.
 ;; Copyright (C) 2009, Andy Stewart, all rights reserved.
 ;; Copyright (C) 2009 ~ 2012, rubikitch, all rights reserved.
 ;; Copyright (C) 2009 ~ 2012, Thierry Volpiatto, all rights reserved.
 
-;; Created: 2009-02-16 21:38:23
+;; Created: 2012-03-15 12:29:23
 
-;; X-URL: <http://repo.or.cz/w/helm-config.git>
+;; X-URL:
 
 ;; MailingList: <https://groups.google.com/group/emacs-helm?hl=en>
 

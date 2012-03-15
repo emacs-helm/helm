@@ -4,7 +4,9 @@
 ;;               2008 ~ 2012       rubikitch <rubikitch@ruby-lang.org>
 ;;               2011 ~ 2012       Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; Author: Tamas Patrovics
+;; Original Author: Tamas Patrovics
+
+;; This is a fork of `anything.el' created by Tamas Patrovics.
 
 ;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
 ;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>

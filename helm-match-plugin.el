@@ -1,6 +1,9 @@
 ;;; helm-match-plugin.el --- Multiple regexp matching methods for helm
 
-;; Author: rubikitch <rubikitch@ruby-lang.org>
+;; Original Author: rubikitch <rubikitch@ruby-lang.org>
+
+;; This is a fork of `anything-match-plugin.el' created by
+;; rubikitch <rubikitch@ruby-lang.org>
 
 ;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
 ;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
@@ -9,7 +12,10 @@
 ;; Copyright (C) 2011~2012, Thierry Volpiatto, all rights reserved.
 
 ;; Keywords: helm, matching
-;; X-URL: <http://repo.or.cz/w/helm-config.git>
+
+;; X-URL:
+
+;; Created: 2012-03-15 12:29:23
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
