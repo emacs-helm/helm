@@ -13,7 +13,7 @@
 
 ;; Keywords: helm, matching
 
-;; X-URL: https://github.com/thierryvolpiatto/emacs-helm
+;; X-URL: <https://github.com/emacs-helm/helm>
 
 ;; Created: 2012-03-15 12:29:23
 
