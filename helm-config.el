@@ -1603,7 +1603,8 @@ automatically.")
 ;;
 ;;
 (defvar helm-c-buffer-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")     'helm-c-buffer-help)
     ;; No need to have separate command for grep and zgrep
     ;; as we don't use recursivity for buffers.
@@ -1627,7 +1628,8 @@ automatically.")
   "Keymap for buffer sources in helm.")
 
 (defvar helm-find-files-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
@@ -1676,7 +1678,8 @@ automatically.")
   "Keymap for `helm-find-files'.")
 
 (defvar helm-c-read-file-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-down-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-down-one-level)
@@ -1692,7 +1695,8 @@ automatically.")
   "Keymap for `helm-c-read-file-name'.")
 
 (defvar helm-generic-files-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "M-g s")   'helm-ff-run-grep)
     (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
     (define-key map (kbd "M-g p")   'helm-ff-run-pdfgrep)
@@ -1708,7 +1712,8 @@ automatically.")
   "Generic Keymap for files.")
 
 (defvar helm-c-grep-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
     (define-key map (kbd "C-c o")    'helm-c-grep-run-other-window-action)
@@ -1722,7 +1727,8 @@ automatically.")
   "Keymap used in Grep sources.")
 
 (defvar helm-c-pdfgrep-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
@@ -1731,7 +1737,8 @@ automatically.")
   "Keymap used in pdfgrep.")
 
 (defvar helm-c-etags-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
@@ -1740,7 +1747,8 @@ automatically.")
   "Keymap used in Etags.")
 
 (defvar helm-eval-expression-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-eval-new-line-and-indent)
     (define-key map (kbd "<tab>")      'lisp-indent-line)
     (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
@@ -1753,7 +1761,8 @@ automatically.")
     map))
 
 (defvar helm-c-ucs-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-backspace>") 'helm-c-ucs-persistent-delete)
     (define-key map (kbd "<C-left>")      'helm-c-ucs-persistent-backward)
     (define-key map (kbd "<C-right>")     'helm-c-ucs-persistent-forward)
@@ -1763,7 +1772,8 @@ automatically.")
   "Keymap for `helm-ucs'.")
 
 (defvar helm-c-bookmark-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c o") 'helm-c-bookmark-run-jump-other-window)
     (define-key map (kbd "C-d")   'helm-c-bookmark-run-delete)
     (when (locate-library "bookmark-extensions")
@@ -1773,26 +1783,30 @@ automatically.")
   "Generic Keymap for emacs bookmark sources.")
 
 (defvar helm-esh-on-file-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")    'helm-esh-help)
     map)
   "Keymap for `helm-find-files-eshell-command-on-file'.")
 
 (defvar helm-eshell-history-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "M-p") 'helm-next-line)
     map)
   "Keymap for `helm-eshell-history'.")
 
 (defvar helm-kill-ring-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "M-y") 'helm-next-line)
     (define-key map (kbd "M-u") 'helm-previous-line)
     map)
   "Keymap for `helm-show-kill-ring'.")
 
 (defvar helm-occur-map
-  (let ((map (copy-keymap helm-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
     (define-key map (kbd "C-M-%") 'helm-occur-run-query-replace-regexp)
     map)
   "Keymap for `helm-occur'.")
