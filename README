@@ -1,40 +1,40 @@
-* To install anything:
+* To install helm:
 
 A) The easiest way:
 
-  1) Put the anything directory in load-path.
+  1) Put the helm directory in load-path.
   2) Run make from this directory.
   3) Add to .emacs.el:
-     (add-to-list 'load-path "/path/to/anything/directory")
-     (require 'anything-config)
+     (add-to-list 'load-path "/path/to/helm/directory")
+     (require 'helm-config)
 
-B) By copying files from anything directory
+B) By copying files from helm directory
 
   1) Put following files somewhere in your load-path:
-     - anything.el
-     - anything-config.el
-     - anything-match-plugin.el
+     - helm.el
+     - helm-config.el
+     - helm-match-plugin.el
 
   2) Byte-compile these files
 
   3) Add this code to .emacs.el:
-     (require 'anything-config)
+     (require 'helm-config)
  
 * NOTE to Distribution maintainers:(Ubuntu etc...)
 
 Use only the files mentioned above in 1) for your packages, other files
 contained in contrib and extensions directory contain deprecated, unmaintained or
 incompatible code or files that need dependencies not provided here.
-Most of the features provided in these files are present in anything-config.el.
+Most of the features provided in these files are present in helm-config.el.
 
 Thanks.
 
-* NOTE to install optional deprecated library ../extensions/anything-complete.el
+* NOTE to install optional deprecated library ../extensions/helm-complete.el
 
-Additionaly, if you want to install extensions/anything-complete.el, 
-anything-obsolete.el is needed.
+Additionaly, if you want to install extensions/helm-complete.el, 
+helm-obsolete.el is needed.
 So don't forget to add to your load-path the extensions directory. 
-You may want also to add anything-show-completion.el to your load-path.
-These libraries will be required by anything-complete.el.
-WARNING: You will find in anything-complete.el deprecated code that may clash with
-some features of anything-config.el, so use it with care.
+You may want also to add helm-show-completion.el to your load-path.
+These libraries will be required by helm-complete.el.
+WARNING: You will find in helm-complete.el deprecated code that may clash with
+some features of helm-config.el, so use it with care.

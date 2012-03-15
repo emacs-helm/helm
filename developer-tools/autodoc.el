@@ -88,7 +88,7 @@ TYPE can be one of:
     - nested-variable
     - user-variable
     - faces
-    - anything-source
+    - helm-source
 
 PREFIX let you define a special name by regexp,
 \(e.g match only function with PREFIX \"^autodoc-\")
@@ -117,7 +117,7 @@ See headers of traverselisp.el for example."
                              ('nested-variable   "^ +\(defvar")
                              ('user-variable     "\(defcustom")
                              ('faces             "\(defface")
-                             ('anything-source   "^\(defvar anything-c-source")
+                             ('helm-source   "^\(defvar helm-c-source")
                              (t (error           "Unknow type"))))
           (fn-list         (autodoc-find-readlines
                             (current-buffer)
@@ -128,7 +128,7 @@ See headers of traverselisp.el for example."
      (flet ((maybe-insert-with-prefix (name)
               (let ((doc (or (autodoc-get-first-line-documentation (intern name))
                              "Not documented."))
-                    (any-source-name (or (when (and ,any-sname (eq ,type 'anything-source))
+                    (any-source-name (or (when (and ,any-sname (eq ,type 'helm-source))
                                            (concat
                                             " ("
                                             (assoc-default
@@ -164,7 +164,7 @@ See headers of traverselisp.el for example."
        (save-excursion (when (re-search-forward boundary-regexp)
                          (forward-line -1) (setq end (point))))
        (delete-region beg end)
-       (when (eq ,type 'anything-source) (setq regexp "\(defvar"))
+       (when (eq ,type 'helm-source) (setq regexp "\(defvar"))
        (dolist (i fn-list)
          (let* ((elm     (cadr i))
                 (elm1    (replace-regexp-in-string "\*" "" elm))
@@ -184,7 +184,7 @@ See headers of traverselisp.el for example."
               (when (not (commandp (intern elm-fin)))
                 (maybe-insert-with-prefix elm-fin)))
              ('internal-variable
-              (unless (string-match "anything-c-source" elm-fin)
+              (unless (string-match "helm-c-source" elm-fin)
                 (maybe-insert-with-prefix elm-fin)))
              (t
               (maybe-insert-with-prefix elm-fin)))))
@@ -227,19 +227,19 @@ See headers of traverselisp.el for example."
 With prefix arg insert also the docstring argument.
 See headers of `autodoc.el' for example."
   (interactive "sTitle: \nP")
-  (let* ((ttype      (anything-comp-read "Type: " '("command" "nested-command"
+  (let* ((ttype      (helm-comp-read "Type: " '("command" "nested-command"
                                                     "function" "nested-function"
                                                     "macro" "internal-variable"
                                                     "user-variable" "nested-variable"
-                                                    "faces" "anything-source")))
+                                                    "faces" "helm-source")))
          (prefix     (read-string "Prefix: " (autodoc-document-default-prefix)))
          (prefix-arg (concat " :prefix " "\"" prefix "\"")))
     (insert (concat ";;  * " title "\n"
                     ";; [EVAL] (autodoc-document-lisp-buffer :type \'"
                     ttype
                     (unless (string= prefix "") prefix-arg)
-                    (when (and (string= ttype "anything-source")
-                               (y-or-n-p "Insert Anything Source Name?"))
+                    (when (and (string= ttype "helm-source")
+                               (y-or-n-p "Insert Helm Source Name?"))
                       " :any-sname t")
                     (when (and (or (string= ttype "user-variable")
                                    (string= ttype "nested-variable")

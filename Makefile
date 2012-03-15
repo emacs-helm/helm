@@ -1,4 +1,4 @@
-# makefile for anything.
+# makefile for helm.
 
 # Author: Michael Markert.
 # Copyright (C) 2011~2012, Michael Markert, all rights reserved.
@@ -29,7 +29,7 @@ EMACS		:= emacs -Q -batch
 LOADPATH	:= -L .
 
 # files to compile
-EL			:= $(wildcard anything*.el)
+EL			:= $(wildcard helm*.el)
 
 # compiled files
 ELC			:= $(EL:.el=.elc)
