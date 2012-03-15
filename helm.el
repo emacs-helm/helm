@@ -14,7 +14,7 @@
 ;; Keywords: files, frames, help, matching, outlines,
 ;;           processes, tools, convenience, helm
 
-;; X-URL:
+;; X-URL: https://github.com/thierryvolpiatto/Emacs-helm
 
 ;; MailingList: <https://groups.google.com/group/emacs-helm?hl=en>
 

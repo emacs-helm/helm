@@ -18,7 +18,7 @@
 
 ;; Created: 2012-03-15 12:29:23
 
-;; X-URL:
+;; X-URL: https://github.com/thierryvolpiatto/Emacs-helm
 
 ;; MailingList: <https://groups.google.com/group/emacs-helm?hl=en>
 
