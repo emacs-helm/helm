@@ -14,9 +14,7 @@
 ;; Keywords: files, frames, help, matching, outlines,
 ;;           processes, tools, convenience, helm
 
-;; X-URL: <http://repo.or.cz/w/helm-config.git>
-
-;; Site: <http://www.emacswiki.org/cgi-bin/emacs/Helm>
+;; X-URL:
 
 ;; MailingList: <https://groups.google.com/group/emacs-helm?hl=en>
 
