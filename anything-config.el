@@ -4149,7 +4149,7 @@ purpose."
            (list (format "Opening directory: access denied, `%s'" path)))
           ((file-directory-p path) (anything-ff-directory-files path t))
           (t
-           (append (unless require-match (list path))
+           (append (list path) ; No need to check for must-match.
                    (anything-ff-directory-files path-name-dir t))))))
 
 (defun anything-ff-directory-files (directory &optional full)
