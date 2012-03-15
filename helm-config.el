@@ -18,9 +18,9 @@
 
 ;; Created: 2012-03-15 12:29:23
 
-;; X-URL: https://github.com/thierryvolpiatto/Emacs-helm
+;; X-URL: https://github.com/thierryvolpiatto/emacs-helm
 
-;; MailingList: <https://groups.google.com/group/emacs-helm?hl=en>
+;; MailingList: <https://groups.google.com/forum/?hl=en&fromgroups#!forum/emacs-anything>
 
 ;; Keywords: helm, helm-config
 

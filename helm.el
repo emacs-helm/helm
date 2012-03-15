@@ -14,9 +14,9 @@
 ;; Keywords: files, frames, help, matching, outlines,
 ;;           processes, tools, convenience, helm
 
-;; X-URL: https://github.com/thierryvolpiatto/Emacs-helm
+;; X-URL: https://github.com/thierryvolpiatto/emacs-helm
 
-;; MailingList: <https://groups.google.com/group/emacs-helm?hl=en>
+;; MailingList: <https://groups.google.com/forum/?hl=en&fromgroups#!forum/emacs-anything>
 
 
 ;;; This file is NOT part of GNU Emacs
