@@ -9532,33 +9532,42 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
     (if sort-fn (sort cands sort-fn) cands)))
 
 (defun helm-cr-default-transformer (candidates source)
-  "Default filter candidate function for `helm-comp-read'.
-Do nothing, just return candidate list unmodified."
-  candidates)
+  "Default filter candidate function for `helm-comp-read'."
+  (loop for cand in candidates
+        if (and (string= cand helm-pattern)
+                (not (member helm-pattern
+                             (or (cdr candidates)
+                                 candidates))))
+        collect (cons (concat (propertize
+                               " " 'display
+                               (propertize "[?]" 'face 'helm-ff-prefix))
+                              cand)
+                      cand)
+        else collect cand))
 
 (defun* helm-comp-read (prompt collection
-                                   &key
-                                   test
-                                   initial-input
-                                   default
-                                   preselect
-                                   (buffer "*Helm Completions*")
-                                   must-match
-                                   (requires-pattern 0)
-                                   (history nil)
-                                   input-history
-                                   (persistent-action nil)
-                                   (persistent-help "DoNothing")
-                                   (mode-line helm-mode-line-string)
-                                   (keymap helm-map)
-                                   (name "Helm Completions")
-                                   candidates-in-buffer
-                                   exec-when-only-one
-                                   (volatile t)
-                                   sort
-                                   (fc-transformer 'helm-cr-default-transformer)
-                                   (marked-candidates nil)
-                                   (alistp t))
+                               &key
+                               test
+                               initial-input
+                               default
+                               preselect
+                               (buffer "*Helm Completions*")
+                               must-match
+                               (requires-pattern 0)
+                               (history nil)
+                               input-history
+                               (persistent-action nil)
+                               (persistent-help "DoNothing")
+                               (mode-line helm-mode-line-string)
+                               (keymap helm-map)
+                               (name "Helm Completions")
+                               candidates-in-buffer
+                               exec-when-only-one
+                               (volatile t)
+                               sort
+                               (fc-transformer 'helm-cr-default-transformer)
+                               (marked-candidates nil)
+                               (alistp t))
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -9645,9 +9654,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                  'helm-confirm-and-exit-minibuffer)
                                map)))
            (helm-map (if must-match-map
-                             (make-composed-keymap
-                              must-match-map (or keymap helm-map))
-                             (or keymap helm-map)))
+                         (make-composed-keymap
+                          must-match-map (or keymap helm-map))
+                         (or keymap helm-map)))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
@@ -9675,7 +9684,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                    . (lambda ()
                        (let ((cands (helm-comp-read-get-candidates
                                      collection test sort alistp)))
-                         (unless (or must-match (string= helm-pattern ""))
+                         (unless (or (eq must-match t) (string= helm-pattern ""))
                            (setq cands (append (list helm-pattern) cands)))
                          (if (and default (not (string= default "")))
                              (delq nil (cons default (delete default cands)))
@@ -9691,7 +9700,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                      . (lambda ()
                          (let ((cands (helm-comp-read-get-candidates
                                        collection test sort alistp)))
-                           (unless (or must-match (string= helm-pattern ""))
+                           (unless (or (eq must-match t) (string= helm-pattern ""))
                              (setq cands (append (list helm-pattern) cands)))
                            (with-current-buffer (helm-candidate-buffer 'global)
                              (loop for i in
@@ -9732,7 +9741,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
          (if (and (string= helm-pattern "") default)
              default (identity helm-pattern)))
        (unless (or (eq helm-exit-status 1)
-                   must-match) ; FIXME this should not be needed now.
+                   must-match)  ; FIXME this should not be needed now.
          default)
        (keyboard-quit)))))
 
