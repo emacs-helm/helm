@@ -2401,44 +2401,6 @@ The output is sexps which are evaluated by \\[eval-last-sexp]."
           collect (buffer-substring-no-properties (point-at-bol)(point-at-eol))
           do (forward-line 1))))
 
-;; [Obsolete]
-(defun helm-select-source ()
-  "[OBSOLETE] Select source."
-  (interactive)
-  (let ((default (assoc-default 'name (helm-get-current-source)))
-        (source-names (helm-displaying-source-names))
-        (all-source-names (mapcar (lambda (s) (assoc-default 'name s))
-                                  (helm-get-sources))))
-    (setq helm-candidate-number-limit 9999)
-    (helm-aif
-        (let (helm-source-filter)
-          (helm-nest '(((name . "Helm Source")
-                            (candidates . source-names)
-                            (action . identity))
-                           ((name . "Helm Source (ALL)")
-                            (candidates . all-source-names)
-                            (action . identity)))
-                         nil "Source: " nil
-                         default "*helm select source*"))
-        (helm-set-source-filter (list it))
-      (helm-set-source-filter nil))))
-
-(defun helm-insert-string (str)
-  "Insert STR."
-  (helm-set-pattern str 'noupdate))
-
-;;;###autoload
-(defun helm-insert-buffer-name ()
-  "Insert buffer name."
-  (interactive)
-  (helm-set-pattern
-   (with-helm-current-buffer
-     (if buffer-file-name (file-name-nondirectory buffer-file-name)
-       (buffer-name)))))
-
-(defalias 'helm-insert-symbol 'next-history-element)
-(defalias 'helm-insert-selection 'helm-yank-selection)
-
 (defun helm-c-match-on-file-name (candidate)
   "Return non-nil if `helm-pattern' match basename of filename CANDIDATE."
   (string-match helm-pattern (file-name-nondirectory candidate)))
