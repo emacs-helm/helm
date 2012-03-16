@@ -47,11 +47,11 @@
 ;;  * Internal variables
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'internal-variable :prefix "helm-mp" :var-value t)
 ;; `helm-mp-default-match-functions'
-;; Default Value:	(helm-mp-exact-match helm-mp-3-match) 
+;; Default Value:	(helm-mp-exact-match helm-mp-3-match)
 ;; `helm-mp-default-search-functions'
-;; Default Value:	(helm-mp-exact-search helm-mp-3-search) 
+;; Default Value:	(helm-mp-exact-search helm-mp-3-search)
 ;; `helm-mp-default-search-backward-functions'
-;; Default Value:	(helm-mp-exact-search-backward helm-mp-3-search-backward) 
+;; Default Value:	(helm-mp-exact-search-backward helm-mp-3-search-backward)
 ;; `helm-mp-space-regexp'
 ;; Default Value: "[\\ ] "
 ;; `helm-mp-exact-pattern-str'
@@ -73,7 +73,7 @@
 ;; `helm-mp-3-pattern-str'
 ;; Default Value: "autod"
 ;; `helm-mp-3-pattern-list'
-;; Default Value:	((identity . "autod")) 
+;; Default Value:	((identity . "autod"))
 ;; `helm-mp-initial-highlight-delay'
 ;; Default Value: nil
 ;;
@@ -408,14 +408,14 @@ i.e (identity (string-match \"foo\" \"foo bar\")) => t."
     (setq pattern (helm-mp-3-get-patterns pattern)))
   (helm-mp-3-search-base
    pattern 're-search-forward 're-search-forward))
-  
+
 (defun helm-mp-3-search-backward (pattern &rest ignore)
   (when (stringp pattern)
     (setq pattern (helm-mp-3-get-patterns pattern)))
   (helm-mp-3-search-base
    pattern 're-search-backward 're-search-backward))
 
-  
+
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)
 ;;
 ;;
@@ -429,7 +429,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
     (and (funcall (car first) (helm-mp-prefix-match str (cdr first)))
          (loop for (predicate . regexp) in (cdr pat)
                always (funcall predicate (string-match regexp str))))))
-  
+
 (defun helm-mp-3p-search (pattern &rest ignore)
   (when (stringp pattern)
     (setq pattern (helm-mp-3-get-patterns pattern)))
@@ -546,5 +546,11 @@ i.e helm-match-plugin."
 ;; unit test for match plugin are now in developper-tools/unit-test-match-plugin.el
 
 (provide 'helm-match-plugin)
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; End:
+;;
 
 ;;; helm-match-plugin.el ends here

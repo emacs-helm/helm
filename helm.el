@@ -55,7 +55,7 @@
 ;; `helm-resume'
 ;; Resurrect previously invoked `helm'.
 ;; `helm-resume-window-only'
-;; 
+;;
 ;; `helm-at-point'
 ;; Call helm with symbol at point as initial input.
 ;; `helm-force-update'
@@ -778,7 +778,7 @@ See also `helm-set-source-filter'.")
     (define-key map (kbd "C-t")             'helm-toggle-resplit-window)
     (define-key map (kbd "C-}")             'helm-narrow-window)
     (define-key map (kbd "C-{")             'helm-enlarge-window)
-    
+
     (define-key map (kbd "C-c C-d")         'helm-delete-current-selection)
     (define-key map (kbd "C-c C-y")         'helm-yank-selection)
     (define-key map (kbd "C-c C-k")         'helm-kill-selection-and-quit)
@@ -2026,7 +2026,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                (read-from-minibuffer (or any-prompt "pattern: ")
                                      any-input helm-map
                                      nil any-history tap)))))))
-               
+
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
 This function is meant to be run in `helm-move-selection-after-hook'.
@@ -4422,6 +4422,7 @@ Given pseudo `helm-sources' and `helm-pattern', returns list like
 
 ;; Local Variables:
 ;; coding: utf-8
+;; indent-tabs-mode: nil
 ;; End:
 
 ;;; helm.el ends here
