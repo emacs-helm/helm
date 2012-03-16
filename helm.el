@@ -3051,11 +3051,12 @@ send in minibuffer confirm message and exit on next hit.
 If `minibuffer-completion-confirm' value is t,
 don't exit and send message 'no match'."
   (interactive)
-  (let ((empty-buffer-p (with-current-buffer helm-buffer
+  (let* ((empty-buffer-p (with-current-buffer helm-buffer
                           (eq (point-min) (point-max))))
-        (unknow (string= (get-text-property
-                          0 'display (helm-get-selection nil 'withprop))
-                         "[?]")))
+         (unknow (and (not empty-buffer-p)
+                      (string= (get-text-property
+                                0 'display (helm-get-selection nil 'withprop))
+                               "[?]"))))
     (cond ((and (or empty-buffer-p unknow)
                 (eq minibuffer-completion-confirm 'confirm))
            (setq helm-minibuffer-confirm-state
