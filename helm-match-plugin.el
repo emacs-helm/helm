@@ -119,35 +119,17 @@
 ;; It gives helm.el search refinement functionality.
 ;; exact match -> prefix match -> multiple regexp match
 
-;;; Commands:
-;;
-;; Below are complete command list:
-;;
-;;
-;;; Customizable Options:
-;;
-;; Below are customizable option list:
-;;
-;;  `helm-grep-candidates-fast-directory-regexp'
-;;    *Directory regexp where a RAM disk (or tmpfs) is mounted.
-;;    default = nil
-
 ;; A query of multiple regexp match is space-delimited string.
 ;; Helm displays candidates which matches all the regexps.
 ;; A regexp with "!" prefix means not matching the regexp.
 ;; To include spaces to a regexp, prefix "\" before space,
 ;; it is controlled by `helm-mp-space-regexp' variable.
 
-;; If multiple regexps are specified, first one also tries to match the source name.
-;; If you want to disable this feature, evaluate
-;;   (setq helm-mp-match-source-name nil) .
-;; NOTE: This is obsolete and disabled in helm versions >= 1.3.7
-
 ;; This file highlights patterns like `occur'. Note that patterns
 ;; longer than `helm-mp-highlight-threshold' are highlighted. And
 ;; region out of screen is highlighted after
 ;; `helm-mp-highlight-delay' seconds.
-;;
+
 ;; Highlight in Emacs is time-consuming process for slow computers. To
 ;; disable it is to set nil to `helm-mp-highlight-delay'.
 
@@ -558,124 +540,9 @@ i.e helm-match-plugin."
             (enable-match-plugin)
             (message "Helm-match-plugin enabled"))))))
 
-
-;;;; Grep-candidates plug-in
 
-(defcustom helm-grep-candidates-fast-directory-regexp nil
-  "*Directory regexp where a RAM disk (or tmpfs) is mounted.
-
-If non-nil, grep-candidates plugin gets faster because it uses
-grep as synchronous process.
-
-ex. (setq helm-grep-candidates-fast-directory-regexp \"^/tmp/\")"
-  :type 'string
-  :group 'helm)
-
-(defun agp-candidates (&optional filter)
-  "Normal version of grep-candidates candidates function.
-Grep is run by asynchronous process."
-  (start-process-shell-command
-   "helm-grep-candidates" nil
-   (agp-command-line-2 filter (helm-attr-defined 'search-from-end))))
-
-(defun agp-candidates-synchronous-grep (&optional filter)
-  "Faster version of grep-candidates candidates function.
-Grep is run by synchronous process.
-It is faster when candidate files are in ramdisk."
-  (split-string
-   (shell-command-to-string
-    (agp-command-line-2 filter (helm-attr-defined 'search-from-end)))
-   "\n"))
-
-(defun agp-candidates-synchronous-grep--direct-insert-match (&optional filter)
-  "[EXPERIMENTAL]Fastest version of grep-candidates candidates function at the cost of absense of transformers.
-Grep is run by synchronous process.
-It is faster when candidate files are in ramdisk.
-
-If (direct-insert-match) is in the source, this function is used."
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (call-process-shell-command
-     (agp-command-line-2 filter (helm-attr-defined 'search-from-end))
-     nil t)))
-
-(defun agp-command-line (query files &optional limit filter search-from-end)
-  "Build command line used by grep-candidates from QUERY, FILES, LIMIT, and FILTER."
-  (let ((allfiles (mapconcat (lambda (f) (shell-quote-argument (expand-file-name f)))
-                             files " ")))
-    (with-temp-buffer
-      (when search-from-end
-        (insert "tac " allfiles))
-      (if (string= query "")
-          (unless search-from-end
-            (insert "cat " allfiles))
-        (when search-from-end (insert " | "))
-        (loop for (flag . re) in (helm-mp-3-get-patterns-internal query)
-              for i from 0
-              do
-              (setq re (replace-regexp-in-string "^-" "\\-" re))
-              (unless (zerop i) (insert " | ")) 
-              (insert "grep -ih "
-                      (if (eq flag 'identity) "" "-v ")
-                      (shell-quote-argument re))
-              (when (and (not search-from-end) (zerop i))
-                (insert " " allfiles))))
-      
-      (when limit (insert (format " | head -n %d" limit)))
-      (when filter (insert " | " filter))
-      (buffer-string))))
-
-(defun agp-command-line-2 (filter &optional search-from-end)
-  "Build command line used by grep-candidates from FILTER and current source."
-  (agp-command-line
-   helm-pattern
-   (helm-mklist (helm-interpret-value (helm-attr 'grep-candidates)))
-   (helm-candidate-number-limit (helm-get-current-source))
-   filter search-from-end))
-
-(defun helm-compile-source--grep-candidates (source)
-  (helm-aif (assoc-default 'grep-candidates source)
-      (append
-       source
-       (let ((use-fast-directory
-              (and helm-grep-candidates-fast-directory-regexp
-                   (string-match
-                    helm-grep-candidates-fast-directory-regexp
-                    (or (car (helm-mklist (helm-interpret-value it))) "")))))
-         (cond ((not (helm-interpret-value it)) nil)
-               ((and use-fast-directory (assq 'direct-insert-match source))
-                (helm-log "fastest version (use-fast-directory and direct-insert-match)")
-                `((candidates . agp-candidates-synchronous-grep--direct-insert-match)
-                  (match identity)
-                  (volatile)))
-               (use-fast-directory
-                (helm-log "faster version (use-fast-directory)")
-                `((candidates . agp-candidates-synchronous-grep)
-                  (match identity)
-                  (volatile)))
-               (t
-                (helm-log "normal version")
-                '((candidates . agp-candidates)
-                  (delayed))))))
-    source))
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--grep-candidates)
-
-(helm-document-attribute 'grep-candidates "grep-candidates plug-in"
-  "grep-candidates plug-in provides helm-match-plugin.el feature with grep and head program.
-It is MUCH FASTER than normal match-plugin to search from vary large (> 1MB) candidates.
-Make sure to install these programs.
-
-It expands `candidates' and `delayed' attributes.
-
-`grep-candidates' attribute accepts a filename or list of filename.
-It also accepts 0-argument function name or variable name.")
-
-;; (helm '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message))))
-;; (let ((a "~/.emacs.el")) (helm '(((name . "grep-test")  (grep-candidates . a) (action . message) (delayed)))))
-;; (let ((a "~/.emacs.el")) (helm '(((name . "grep-test")  (grep-candidates . (lambda () a)) (action . message) (delayed)))))
-;; (helm '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed) (candidate-number-limit . 2))))
-;; (let ((helm-candidate-number-limit 2)) (helm '(((name . "grep-test")  (grep-candidates . "~/.emacs.el") (action . message) (delayed)))))
-
-;;;; unit test
+;;;; Unit test
+;;
 ;; unit test for match plugin are now in developper-tools/unit-test-match-plugin.el
 
 (provide 'helm-match-plugin)
