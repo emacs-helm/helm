@@ -1078,24 +1078,6 @@ is nil."
   :group 'helm-config
   :type  'regexp)
 
-(defcustom helm-c-filelist-file-name nil
-  "Filename of file list.
-Accept a list of string for multiple files.
-
-This file tend to be very large \(> 100MB\) and recommend to be in ramdisk for speed.
-File list is created by make-filelist.rb script.
-
-Usage:
-  ruby make-filelist.rb > /tmp/all.filelist
-
-Then
- ;; Assume that /tmp is ramdisk or tmpfs
- \(setq helm-grep-candidates-fast-directory-regexp \"^/tmp/\"\)
- \(setq helm-c-filelist-file-name \"/tmp/all.filelist\"\)
-"
-  :type 'string
-  :group 'helm-config)
-
 (defcustom helm-c-eldoc-in-minibuffer-show-fn
   'helm-c-show-info-in-mode-line
   "A function to display eldoc info.
@@ -5956,15 +5938,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
   '((name . "Files in all dired buffer.")
     (candidates . helm-c-files-in-all-dired-candidates)
     (type . file)))
-
-(defvar helm-c-source-filelist
-  '((name . "FileList")
-    (grep-candidates . helm-c-filelist-file-name)
-    (candidate-number-limit . 200)
-    (requires-pattern . 4)
-    (type . file))
-  "Source to find files instantly.
-See `helm-c-filelist-file-name' docstring for usage.")
 
 
 ;;;; <info>
@@ -12202,30 +12175,6 @@ If tag file have been modified reinitialize cache."
                   :buffer "*helm etags*")
         (message "Error: No tag file found, please create one with etags shell command."))))
 
-;;;###autoload
-(defun helm-filelist ()
-  "Preconfigured `helm' to open files instantly.
-
-See `helm-c-filelist-file-name' docstring for usage."
-  (interactive)
-  (helm-other-buffer 'helm-c-source-filelist "*helm file list*"))
-
-;;;###autoload
-(defun helm-filelist+ ()
-  "Preconfigured `helm' to open files/buffers/bookmarks instantly.
-
-This is a replacement for `helm-for-files'.
-See `helm-c-filelist-file-name' docstring for usage."
-  (interactive)
-  (helm-other-buffer
-   '(helm-c-source-ffap-line
-     helm-c-source-ffap-guesser
-     helm-c-source-buffers-list
-     helm-c-source-recentf
-     helm-c-source-bookmarks
-     helm-c-source-file-cache
-     helm-c-source-filelist)
-   "*helm file list*"))
 
 ;;;###autoload
 (defun helm-M-x ()
