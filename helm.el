@@ -1,15 +1,16 @@
-;;; helm.el --- open helm / QuickSilver-like candidate-selection framework
+;;; helm.el --- Emacs incremental and narrowing framework
 
 ;; Copyright (C) 2007              Tamas Patrovics
 ;;               2008 ~ 2012       rubikitch <rubikitch@ruby-lang.org>
 ;;               2011 ~ 2012       Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; Original Author: Tamas Patrovics
+;; Original Authors: Tamas Patrovics
+;;                   rubikitch <rubikitch@ruby-lang.org>
 
 ;; This is a fork of `anything.el' created by Tamas Patrovics.
 
-;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
-;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Maintainers: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;;              Le Wang
 
 ;; Keywords: files, frames, help, matching, outlines,
 ;;           processes, tools, convenience, helm

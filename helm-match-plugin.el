@@ -5,8 +5,8 @@
 ;; This is a fork of `anything-match-plugin.el' created by
 ;; rubikitch <rubikitch@ruby-lang.org>
 
-;; Maintainers: rubikitch <rubikitch@ruby-lang.org>
-;;              Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Maintainers: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;;              Le Wang
 
 ;; Copyright (C) 2008~2012, rubikitch, all rights reserved.
 ;; Copyright (C) 2011~2012, Thierry Volpiatto, all rights reserved.

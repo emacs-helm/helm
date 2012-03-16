@@ -9,8 +9,9 @@
 ;; This is a fork of original `anything-config.el' created by
 ;; Tassilo Horn <tassilo@member.fsf.org>.
 
-;; Maintainer: rubikitch    <rubikitch@ruby-lang.org>
-;;             Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Maintainers: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;;              Le Wang
+
 ;; Copyright (C) 2007 ~ 2011, Tassilo Horn, all rights reserved.
 ;; Copyright (C) 2009, Andy Stewart, all rights reserved.
 ;; Copyright (C) 2009 ~ 2012, rubikitch, all rights reserved.
