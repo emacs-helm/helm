@@ -1011,13 +1011,6 @@ It is useful for debug.")
 If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because *Helm Log* grows quickly.")
 
-(defcustom helm-local-map-override-helm-map t
-  "Override `helm-map' keys with the corresponding ones in source local map.
-When non--nil keys in source local map will override same keys in `helm-map'
-otherwise same keys in `helm-map' will take precedence."
-  :group 'helm
-  :type  'boolean)
-
 
 ;; (@* "Internal Variables")
 (defvar helm-test-candidate-list nil)
@@ -2012,10 +2005,6 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
       ;; This map will be used as a `minibuffer-local-map'.
       ;; Maybe it will be overriden when changing source
       ;; by `helm-maybe-update-keymap'.
-      (unless helm-local-map-override-helm-map
-        (helm-aif (or src-keymap any-keymap)
-            (ignore-errors
-              (set-keymap-parent it helm-map))))
       (set (make-local-variable 'helm-map)
            (or src-keymap any-keymap helm-map))
       (helm-log-eval (helm-approximate-candidate-number)
@@ -2045,10 +2034,7 @@ It will override `helm-map' with the keymap attribute of current source
 if some when multiples sources are present."
   (with-helm-window
     (let ((kmap (assoc-default 'keymap (helm-get-current-source))))
-      (when kmap
-        (and (not helm-local-map-override-helm-map)
-             (ignore-errors (set-keymap-parent kmap (default-value 'helm-map))))
-        (setq overriding-local-map kmap)))))
+      (when kmap (setq overriding-local-map kmap)))))
 (add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
 
 (defun helm-create-helm-buffer (&optional test-mode)
