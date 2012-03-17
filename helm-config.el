@@ -3547,7 +3547,7 @@ See `helm-ff-serial-rename-1'."
 ;;;###autoload
 (defun helm-ff-run-toggle-auto-update ()
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-attrset 'toggle-auto-update 'helm-ff-toggle-auto-update)
     (helm-execute-persistent-action 'toggle-auto-update)))
 
@@ -3562,56 +3562,56 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-grep ()
   "Run Grep action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-grep)))
 
 ;;;###autoload
 (defun helm-ff-run-pdfgrep ()
   "Run Pdfgrep action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-pdfgrep)))
 
 ;;;###autoload
 (defun helm-ff-run-zgrep ()
   "Run Grep action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-zgrep)))
 
 ;;;###autoload
 (defun helm-ff-run-copy-file ()
   "Run Copy file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-copy)))
 
 ;;;###autoload
 (defun helm-ff-run-rename-file ()
   "Run Rename file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-rename)))
 
 ;;;###autoload
 (defun helm-ff-run-byte-compile-file ()
   "Run Byte compile file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-byte-compile)))
 
 ;;;###autoload
 (defun helm-ff-run-load-file ()
   "Run Load file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-load-files)))
 
 ;;;###autoload
 (defun helm-ff-run-eshell-command-on-file ()
   "Run eshell command on file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action
      'helm-find-files-eshell-command-on-file)))
 
@@ -3619,14 +3619,14 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-ediff-file ()
   "Run Ediff file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-ediff-files)))
 
 ;;;###autoload
 (defun helm-ff-run-ediff-merge-file ()
   "Run Ediff merge file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action
      'helm-find-files-ediff-merge-files)))
 
@@ -3634,28 +3634,28 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-symlink-file ()
   "Run Symlink file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-symlink)))
 
 ;;;###autoload
 (defun helm-ff-run-hardlink-file ()
   "Run Hardlink file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-find-files-hardlink)))
 
 ;;;###autoload
 (defun helm-ff-run-delete-file ()
   "Run Delete file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-delete-marked-files)))
 
 ;;;###autoload
 (defun helm-ff-run-complete-fn-at-point ()
   "Run complete file name action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action
      'helm-c-insert-file-name-completion-at-point)))
 
@@ -3663,28 +3663,28 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-switch-to-eshell ()
   "Run switch to eshell action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-switch-to-eshell)))
 
 ;;;###autoload
 (defun helm-ff-run-switch-other-window ()
   "Run switch to other window action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'find-file-other-window)))
 
 ;;;###autoload
 (defun helm-ff-run-switch-other-frame ()
   "Run switch to other frame action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'find-file-other-frame)))
 
 ;;;###autoload
 (defun helm-ff-run-open-file-externally ()
   "Run open file externally command action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-c-open-file-externally)))
 
 (defun helm-ff-locate (candidate)
@@ -3705,21 +3705,21 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-locate ()
   "Run locate action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-locate)))
 
 ;;;###autoload
 (defun helm-ff-run-gnus-attach-files ()
   "Run gnus attach files command action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-gnus-attach-files)))
 
 ;;;###autoload
 (defun helm-ff-run-etags ()
   "Run Etags command action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-etags-select)))
 
 (defun helm-ff-print (candidate)
@@ -3771,7 +3771,7 @@ Same as `dired-do-print' but for helm."
 (defun helm-ff-run-print-file ()
   "Run Print file action from `helm-c-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-print)))
 
 (defun helm-ff-checksum (file)
@@ -3801,7 +3801,7 @@ The checksum is copied to kill-ring."
 
 (defun helm-ff-run-toggle-basename ()
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-attrset 'toggle-basename 'helm-ff-toggle-basename)
     (helm-execute-persistent-action 'toggle-basename)))
 
@@ -4247,7 +4247,7 @@ in `helm-find-files-persistent-action'."
 (defun helm-ff-run-kill-buffer-persistent ()
   "Execute `helm-ff-kill-buffer-fname' whitout quitting."
   (interactive)
-  (when (helm-file-completion-source-p)
+  (when helm-alive-p
     (helm-attrset 'kill-buffer-fname 'helm-ff-kill-buffer-fname)
     (helm-execute-persistent-action 'kill-buffer-fname)))
 
@@ -5173,9 +5173,9 @@ See also `helm-locate'."
               helm-c-locate-command)
              helm-c-locate-command)))
     (helm :sources 'helm-c-source-locate
-              :buffer "*helm locate*"
-              :input initial-input
-              :keymap helm-generic-files-map)))
+          :buffer "*helm locate*"
+          :input initial-input
+          :keymap helm-generic-files-map)))
 ;; (helm-locate-with-db "~/locate.db")
 
 (defun helm-c-locate-init ()
