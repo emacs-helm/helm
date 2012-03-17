@@ -814,8 +814,13 @@ See also `helm-set-source-filter'.")
     '((t (:background "Yellow" :foreground "black")))
   "Face for candidate number in mode-line." :group 'helm)
 
-(defvar helm-selection-face 'highlight
-  "*Face for currently selected item.")
+(defface helm-selection
+    '((t (:inherit highlight)))
+  "Face for currently selected item in the helm buffer."
+  :group 'helm)
+
+(defvar helm-selection-face 'helm-selection
+  "*Face for currently selected item in the helm buffer.")
 
 (defvar helm-buffer "*helm*"
   "Buffer showing completions.")
