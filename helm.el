@@ -730,7 +730,8 @@ See also `helm-set-source-filter'.")
 
 
 (defvar helm-map
-  (let ((map (copy-keymap minibuffer-local-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map minibuffer-local-map)
     (define-key map (kbd "<down>")          'helm-next-line)
     (define-key map (kbd "<up>")            'helm-previous-line)
     (define-key map (kbd "C-n")             'helm-next-line)
@@ -791,7 +792,7 @@ See also `helm-set-source-filter'.")
     (define-key map "\C-c\C-x\C-m"          'helm-display-all-visible-marks)
     (define-key map "\C-c\C-x\C-b"          'helm-send-bug-report-from-helm)
     ;; Use `describe-mode' key in `global-map'.
-    (define-key map [f1] nil) ; Allow to eval keymap whithout errors.
+    (define-key map [f1] nil) ; Allow to eval keymap without errors.
     (dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
     map)
