@@ -11694,15 +11694,6 @@ the center of window, otherwise at the top of window.
   "Timer.")
 
 
-;;; Default `helm-sources'
-;; Setting `helm-sources' is DEPRECATED, but it seems that newbies
-;; tend to invoke M-x helm directly. So I offer default setting.
-(setq helm-sources
-      '(helm-c-source-buffers-list
-        helm-c-source-recentf
-        helm-c-source-files-in-current-dir+))
-
-
 ;;; Preconfigured Helm
 ;;
 ;;

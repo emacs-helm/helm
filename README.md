@@ -70,12 +70,14 @@ Helm built-in and properly set-up.
 
 ### Basic usage
 
-Just type `M-x helm` and enjoy. You might want to bind that command to
+Just type `M-x helm-mini` and enjoy. You might want to bind that command to
 a keyboard shortcut. Here's a suggestion:
 
 ```elisp
-(global-set-key (kbd "C-c h") 'helm)
+(global-set-key (kbd "C-c h") 'helm-mini)
 ```
+As a startup point you can also look at the helm section in Emacs menu to
+discover some of the commands provided by helm.
 
 ### Advanced usage
 

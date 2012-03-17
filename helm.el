@@ -636,18 +636,87 @@
 
 ;; (@* "User Configuration")
 
+;;; Keymap
+;;
+;;
+
+(defvar helm-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map minibuffer-local-map)
+    (define-key map (kbd "<down>")          'helm-next-line)
+    (define-key map (kbd "<up>")            'helm-previous-line)
+    (define-key map (kbd "C-n")             'helm-next-line)
+    (define-key map (kbd "C-p")             'helm-previous-line)
+    (define-key map (kbd "<prior>")         'helm-previous-page)
+    (define-key map (kbd "<next>")          'helm-next-page)
+    (define-key map (kbd "M-v")             'helm-previous-page)
+    (define-key map (kbd "C-v")             'helm-next-page)
+    (define-key map (kbd "M-<")             'helm-beginning-of-buffer)
+    (define-key map (kbd "M->")             'helm-end-of-buffer)
+    (define-key map (kbd "C-g")             'helm-keyboard-quit)
+    (define-key map (kbd "<right>")         'helm-next-source)
+    (define-key map (kbd "<left>")          'helm-previous-source)
+    (define-key map (kbd "<RET>")           'helm-exit-minibuffer)
+    (define-key map (kbd "C-1")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-2")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-3")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-4")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-5")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-6")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-7")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-8")             'helm-select-with-digit-shortcut)
+    (define-key map (kbd "C-9")             'helm-select-with-digit-shortcut)
+    (loop for c from ?A to ?Z do
+          (define-key map (make-string 1 c) 'helm-select-with-digit-shortcut))
+    (define-key map (kbd "C-i")             'helm-select-action)
+    (define-key map (kbd "C-z")             'helm-execute-persistent-action)
+    (define-key map (kbd "C-e")             'helm-select-2nd-action-or-end-of-line)
+    (define-key map (kbd "C-j")             'helm-select-3rd-action)
+    (define-key map (kbd "C-o")             'helm-next-source)
+    (define-key map (kbd "C-M-v")           'helm-scroll-other-window)
+    (define-key map (kbd "M-<next>")        'helm-scroll-other-window)
+    (define-key map (kbd "C-M-y")           'helm-scroll-other-window-down)
+    (define-key map (kbd "C-M-S-v")         'helm-scroll-other-window-down)
+    (define-key map (kbd "M-<prior>")       'helm-scroll-other-window-down)
+    (define-key map (kbd "<C-M-down>")      'helm-scroll-other-window)
+    (define-key map (kbd "<C-M-up>")        'helm-scroll-other-window-down)
+    (define-key map (kbd "C-SPC")           'helm-toggle-visible-mark)
+    (define-key map (kbd "M-SPC")           'helm-toggle-visible-mark)
+    (define-key map (kbd "M-[")             'helm-prev-visible-mark)
+    (define-key map (kbd "M-]")             'helm-next-visible-mark)
+    (define-key map (kbd "C-k")             'helm-delete-minibuffer-contents)
+
+    (define-key map (kbd "C-r")             'undefined)
+    (define-key map (kbd "C-t")             'helm-toggle-resplit-window)
+    (define-key map (kbd "C-}")             'helm-narrow-window)
+    (define-key map (kbd "C-{")             'helm-enlarge-window)
+
+    (define-key map (kbd "C-c C-d")         'helm-delete-current-selection)
+    (define-key map (kbd "C-c C-y")         'helm-yank-selection)
+    (define-key map (kbd "C-c C-k")         'helm-kill-selection-and-quit)
+    (define-key map (kbd "C-c C-f")         'helm-follow-mode)
+    (define-key map (kbd "C-c C-u")         'helm-force-update)
+    (define-key map (kbd "M-p")             'previous-history-element)
+    (define-key map (kbd "M-n")             'next-history-element)
+    ;; Debugging command
+    (define-key map "\C-c\C-x\C-d"          'helm-debug-output)
+    (define-key map "\C-c\C-x\C-m"          'helm-display-all-visible-marks)
+    (define-key map "\C-c\C-x\C-b"          'helm-send-bug-report-from-helm)
+    ;; Use `describe-mode' key in `global-map'.
+    (define-key map [f1] nil) ; Allow to eval keymap without errors.
+    (dolist (k (where-is-internal 'describe-mode global-map))
+      (define-key map k 'helm-help))
+    map)
+  "Keymap for helm.")
+
 
 ;;; Variables
 ;;
 ;;
-;; [DEPRECATED]
-;; A default value is provided in helm-config.el
-(defvar helm-sources nil
-  "A list of sources to use with `helm'.
-It is deprecated, you should not use this.
-Use instead individual sources or list of sources of your choice.")
+(defgroup helm nil
+  "Open helm."
+  :prefix "helm-" :group 'convenience)
 
-;; Default values are provided in helm-config.el.
 (defvar helm-type-attributes nil
   "It's a list of \(TYPE ATTRIBUTES ...\).
 ATTRIBUTES are the same as attributes for `helm-sources'.
@@ -728,81 +797,6 @@ Other sources won't appear in the search results.
 If nil then there is no filtering.
 See also `helm-set-source-filter'.")
 
-
-(defvar helm-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map minibuffer-local-map)
-    (define-key map (kbd "<down>")          'helm-next-line)
-    (define-key map (kbd "<up>")            'helm-previous-line)
-    (define-key map (kbd "C-n")             'helm-next-line)
-    (define-key map (kbd "C-p")             'helm-previous-line)
-    (define-key map (kbd "<prior>")         'helm-previous-page)
-    (define-key map (kbd "<next>")          'helm-next-page)
-    (define-key map (kbd "M-v")             'helm-previous-page)
-    (define-key map (kbd "C-v")             'helm-next-page)
-    (define-key map (kbd "M-<")             'helm-beginning-of-buffer)
-    (define-key map (kbd "M->")             'helm-end-of-buffer)
-    (define-key map (kbd "C-g")             'helm-keyboard-quit)
-    (define-key map (kbd "<right>")         'helm-next-source)
-    (define-key map (kbd "<left>")          'helm-previous-source)
-    (define-key map (kbd "<RET>")           'helm-exit-minibuffer)
-    (define-key map (kbd "C-1")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-2")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-3")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-4")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-5")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-6")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-7")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-8")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-9")             'helm-select-with-digit-shortcut)
-    (loop for c from ?A to ?Z do
-          (define-key map (make-string 1 c) 'helm-select-with-digit-shortcut))
-    (define-key map (kbd "C-i")             'helm-select-action)
-    (define-key map (kbd "C-z")             'helm-execute-persistent-action)
-    (define-key map (kbd "C-e")             'helm-select-2nd-action-or-end-of-line)
-    (define-key map (kbd "C-j")             'helm-select-3rd-action)
-    (define-key map (kbd "C-o")             'helm-next-source)
-    (define-key map (kbd "C-M-v")           'helm-scroll-other-window)
-    (define-key map (kbd "M-<next>")        'helm-scroll-other-window)
-    (define-key map (kbd "C-M-y")           'helm-scroll-other-window-down)
-    (define-key map (kbd "C-M-S-v")         'helm-scroll-other-window-down)
-    (define-key map (kbd "M-<prior>")       'helm-scroll-other-window-down)
-    (define-key map (kbd "<C-M-down>")      'helm-scroll-other-window)
-    (define-key map (kbd "<C-M-up>")        'helm-scroll-other-window-down)
-    (define-key map (kbd "C-SPC")           'helm-toggle-visible-mark)
-    (define-key map (kbd "M-SPC")           'helm-toggle-visible-mark)
-    (define-key map (kbd "M-[")             'helm-prev-visible-mark)
-    (define-key map (kbd "M-]")             'helm-next-visible-mark)
-    (define-key map (kbd "C-k")             'helm-delete-minibuffer-contents)
-
-    (define-key map (kbd "C-r")             'undefined)
-    (define-key map (kbd "C-t")             'helm-toggle-resplit-window)
-    (define-key map (kbd "C-}")             'helm-narrow-window)
-    (define-key map (kbd "C-{")             'helm-enlarge-window)
-
-    (define-key map (kbd "C-c C-d")         'helm-delete-current-selection)
-    (define-key map (kbd "C-c C-y")         'helm-yank-selection)
-    (define-key map (kbd "C-c C-k")         'helm-kill-selection-and-quit)
-    (define-key map (kbd "C-c C-f")         'helm-follow-mode)
-    (define-key map (kbd "C-c C-u")         'helm-force-update)
-    (define-key map (kbd "M-p")             'previous-history-element)
-    (define-key map (kbd "M-n")             'next-history-element)
-    ;; Debugging command
-    (define-key map "\C-c\C-x\C-d"          'helm-debug-output)
-    (define-key map "\C-c\C-x\C-m"          'helm-display-all-visible-marks)
-    (define-key map "\C-c\C-x\C-b"          'helm-send-bug-report-from-helm)
-    ;; Use `describe-mode' key in `global-map'.
-    (define-key map [f1] nil) ; Allow to eval keymap without errors.
-    (dolist (k (where-is-internal 'describe-mode global-map))
-      (define-key map k 'helm-help))
-    map)
-  "Keymap for helm.")
-
-
-(defgroup helm nil
-  "Open helm."
-  :prefix "helm-" :group 'convenience)
-
 (defface helm-header
     '((t (:inherit header-line)))
   "Face for header lines in the helm buffer."
@@ -823,9 +817,6 @@ See also `helm-set-source-filter'.")
 (defvar helm-selection-face 'helm-selection
   "*Face for currently selected item in the helm buffer.")
 
-(defvar helm-buffer "*helm*"
-  "Buffer showing completions.")
-
 (defvar helm-action-buffer "*helm action*"
   "Buffer showing actions.")
 
@@ -834,15 +825,6 @@ See also `helm-set-source-filter'.")
 
 (defvar helm-digit-overlays nil
   "Overlays for digit shortcuts.  See `helm-enable-shortcuts'.")
-
-(defvar helm-candidate-cache nil
-  "Holds the available candidate withing a single helm invocation.")
-
-(defvar helm-pattern ""
-  "The input pattern used to update the helm buffer.")
-
-(defvar helm-input ""
-  "The input typed in the candidates panel.")
 
 (defvar helm-async-processes nil
   "List of information about asynchronous processes managed by helm.")
@@ -913,12 +895,6 @@ and before performing action.")
   "--------------------"
   "Candidates separator of `multiline' source.")
 
-(defvar helm-current-buffer nil
-  "Current buffer when `helm' is invoked.")
-
-(defvar helm-buffer-file-name nil
-  "Variable `buffer-file-name' when `helm' is invoked.")
-
 (defvar helm-saved-action nil
   "Saved value of the currently selected action by key.")
 
@@ -982,8 +958,6 @@ If you prefer scrolling line by line, set this value to 1.")
 It is `helm-default-display-buffer' by default,
 which affects `helm-samewindow'.")
 
-(defvar helm-delayed-init-executed nil)
-
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:help \
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
@@ -1018,7 +992,23 @@ If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because *Helm Log* grows quickly.")
 
 
-;; (@* "Internal Variables")
+;;; Internal Variables
+;;
+;;
+(defvar helm-sources nil)
+(defvar helm-delayed-init-executed nil)
+(defvar helm-buffer "*helm*"
+  "Buffer showing completions.")
+(defvar helm-current-buffer nil
+  "Current buffer when `helm' is invoked.")
+(defvar helm-buffer-file-name nil
+  "Variable `buffer-file-name' when `helm' is invoked.")
+(defvar helm-candidate-cache nil
+  "Holds the available candidate withing a single helm invocation.")
+(defvar helm-pattern ""
+  "The input pattern used to update the helm buffer.")
+(defvar helm-input ""
+  "The input typed in the candidates panel.")
 (defvar helm-test-candidate-list nil)
 (defvar helm-test-mode nil)
 (defvar helm-source-name nil)
@@ -1604,7 +1594,6 @@ This is used in transformers to modify candidates list."
 (defconst helm-argument-keys
   '(:sources :input :prompt :resume :preselect :buffer :keymap :default :history))
 
-;;;###autoload
 (defun helm (&rest plist)
   "Main function to execute helm sources.
 
@@ -1680,7 +1669,6 @@ The `helm-' prefix can be omitted.  For example,
 means starting helm session with `helm-c-source-buffers'
 source in *buffers* buffer and set variable `helm-candidate-number-limit'
 to 10 as session local variable."
-  (interactive)
   (if (keywordp (car plist))
       (helm-let-internal
        (helm-parse-keys plist)
