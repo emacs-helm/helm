@@ -837,10 +837,10 @@ See also `helm-set-source-filter'.")
 (defvar helm-candidate-cache nil
   "Holds the available candidate withing a single helm invocation.")
 
-(defvar helm-pattern
+(defvar helm-pattern ""
   "The input pattern used to update the helm buffer.")
 
-(defvar helm-input
+(defvar helm-input ""
   "The input typed in the candidates panel.")
 
 (defvar helm-async-processes nil
