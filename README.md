@@ -8,8 +8,8 @@
 
 ## Abstract
 
-`Helm` is incremental search and narrowing selection framework for
-Emacs. It will help steer in the right direction when you're looking
+`Helm` is incremental completion and selection narrowing framework for
+Emacs. It will help steer you in the right direction when you're looking
 for stuff in Emacs (like buffers, files, etc).
 
 Helm is a fork of `anything.el` and can be considered to be its
