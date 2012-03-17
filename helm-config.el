@@ -8371,13 +8371,13 @@ Return an alist with elements like (data . number_results)."
 (defvar helm-c-home-url "http://www.google.fr"
   "*Default url to use as home url.")
 
-(defvar ac-browse-url-chromium-program "chromium-browser")
-(defvar ac-browse-url-uzbl-program "uzbl-browser")
+(defvar helm-browse-url-chromium-program "chromium-browser")
+(defvar helm-browse-url-uzbl-program "uzbl-browser")
 (defvar helm-browse-url-default-browser-alist
   `((,w3m-command . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
-    (,ac-browse-url-chromium-program . ac-browse-url-chromium)
-    (,ac-browse-url-uzbl-program . ac-browse-url-uzbl)
+    (,helm-browse-url-chromium-program . helm-browse-url-chromium)
+    (,helm-browse-url-uzbl-program . helm-browse-url-uzbl)
     (,browse-url-kde-program . browse-url-kde)
     (,browse-url-gnome-moz-program . browse-url-gnome-moz)
     (,browse-url-mozilla-program . browse-url-mozilla)
@@ -8399,16 +8399,16 @@ Return an alist with elements like (data . number_results)."
          (when (string= event "finished\n")
            (message "%s process %s" process event))))))
 
-(defun ac-browse-url-chromium (url)
+(defun helm-browse-url-chromium (url)
   "Browse URL with google chrome browser."
   (interactive "sURL: ")
   (helm-c-generic-browser
-   url ac-browse-url-chromium-program))
+   url helm-browse-url-chromium-program))
 
-(defun ac-browse-url-uzbl (url &optional ignore)
+(defun helm-browse-url-uzbl (url &optional ignore)
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
-  (helm-c-generic-browser url ac-browse-url-uzbl-program "-u"))
+  (helm-c-generic-browser url helm-browse-url-uzbl-program "-u"))
 
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
@@ -10026,8 +10026,7 @@ Note: This mode will work only partially on Emacs23."
 (defvar helm-ec-target "")
 (defun helm-ec-insert (candidate)
   "Replace text at point with CANDIDATE.
-The function that call this should set `helm-ec-target' to thing at point.
-This is the same as `ac-insert', just inlined here for compatibility."
+The function that call this should set `helm-ec-target' to thing at point."
   (let ((pt (point)))
     (when (and helm-ec-target
                (search-backward helm-ec-target nil t)
