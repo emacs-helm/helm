@@ -632,7 +632,7 @@
 
 (require 'cl)
 
-(defvar helm-version "1.3.9")
+(defvar helm-version "1.4.0")
 
 ;; (@* "User Configuration")
 
