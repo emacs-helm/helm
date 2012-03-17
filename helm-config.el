@@ -755,9 +755,6 @@
 (declare-function eldoc-get-var-docstring "eldoc" (sym))
 (declare-function eldoc-fnsym-in-current-sexp "eldoc")
 (declare-function find-library-name "find-func.el" (library))
-(declare-function adoc-construct "ext:auto-document.el" (buf))
-(declare-function adoc-first-line "ext:auto-document.el" (str))
-(declare-function adoc-prin1-to-string "ext:auto-document.el" (object))
 (declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
 (declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
@@ -7316,63 +7313,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
 (defun helm-c-simple-call-tree-callers-functions-init ()
   (helm-c-simple-call-tree-init-base 'identity " calls \n"))
-
-
-
-
-;;; Helm UI of auto-document.el
-;;
-;; <http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el>
-;;
-;; Commands/Options with doc
-(defvar helm-c-auto-document-data nil)
-(make-variable-buffer-local 'helm-c-auto-document-data)
-(defvar helm-c-source-commands-and-options-in-file
-  '((name . "Commands/Options in file")
-    (header-name
-     . (lambda (x) (format "Commands/Options in %s"
-                           (buffer-local-value 'buffer-file-name
-                                               helm-current-buffer))))
-    (candidates . helm-command-and-options-candidates)
-    (multiline)
-    (action . imenu))
-  "List Commands and Options with doc. It needs auto-document.el .
-
-http://www.emacswiki.org/cgi-bin/wiki/download/auto-document.el")
-
-(eval-when-compile (require 'auto-document nil t))
-(defun helm-command-and-options-candidates ()
-  (with-helm-current-buffer
-    (when (and (require 'auto-document nil t)
-               (eq major-mode 'emacs-lisp-mode)
-               (or (helm-current-buffer-is-modified)
-                   (not helm-c-auto-document-data)))
-      (or imenu--index-alist (imenu--make-index-alist t))
-      (setq helm-c-auto-document-data
-            (destructuring-bind (commands options)
-                (adoc-construct helm-current-buffer)
-              (append
-               (loop for (command . doc) in commands
-                     for cmdname = (symbol-name command)
-                     collect
-                     (cons
-                      (format "Command: %s\n %s"
-                              (propertize cmdname 'face font-lock-function-name-face)
-                              (adoc-first-line doc))
-                      (assoc cmdname imenu--index-alist)))
-               (loop with var-alist = (cdr (assoc "Variables" imenu--index-alist))
-                     for (option doc default) in options
-                     for optname = (symbol-name option)
-                     collect
-                     (cons
-                      (format "Option: %s\n %s\n default = %s"
-                              (propertize optname 'face font-lock-variable-name-face)
-                              (adoc-first-line doc)
-                              (adoc-prin1-to-string default))
-                      (assoc optname
-                             var-alist)))))))
-    helm-c-auto-document-data))
-
 
 
 ;;;; <Color and Face>
