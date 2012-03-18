@@ -1282,9 +1282,9 @@ Where NAME is one of `helm-c-default-info-index-list'."
                           (cons 'info-index str)))
         when commands
         do (let ((com (intern (concat "helm-info-" str))))
-	     (helm-c-build-info-index-command com
-               (format "Predefined helm for %s info." str) sym
-               (format "*helm info %s*" str)))))
+	     (helm-c-build-info-index-command
+              com (format "Predefined helm for %s info." str)
+              sym (format "*helm info %s*" str)))))
 
 (defun helm-info-index-set (var value)
   (set var value)
@@ -1303,13 +1303,13 @@ Where NAME is one of `helm-c-default-info-index-list'."
     "bison" "id-utils" "global")
   "Info Manual entries to use for building helm info index commands."
   :group 'helm-config
-  :type 'list
-  :set 'helm-info-index-set)
+  :type  'list
+  :set   'helm-info-index-set)
 
 (defcustom helm-c-register-max-offset 160
   "Max size of string register entries before truncating."
   :group 'helm-config
-  :type 'integer)
+  :type  'integer)
 
 
 ;;; General internal variables
@@ -2354,7 +2354,7 @@ all ITEM found in SEQ."
         return pid))
 
 (defun* helm-current-buffer-narrowed-p (&optional
-                                            (buffer helm-current-buffer))
+                                        (buffer helm-current-buffer))
   "Check if BUFFER is narrowed.
 Default is `helm-current-buffer'."
   (with-current-buffer buffer
@@ -2448,13 +2448,13 @@ The match is done with `string-match'."
             file)
           list))
 
-(defsubst helm-c-stringify (str-or-sym)
+(defun helm-c-stringify (str-or-sym)
   "Get string of STR-OR-SYM."
   (if (stringp str-or-sym)
       str-or-sym
       (symbol-name str-or-sym)))
 
-(defsubst helm-c-symbolify (str-or-sym)
+(defun helm-c-symbolify (str-or-sym)
   "Get symbol of STR-OR-SYM."
   (if (symbolp str-or-sym)
       str-or-sym
@@ -2519,8 +2519,8 @@ from its directory."
    (lambda (f)
      (if (file-exists-p f)
          (helm-find-files-1 (file-name-directory f)
-                                (if helm-ff-transformer-show-only-basename
-                                    (helm-c-basename f) f))
+                            (if helm-ff-transformer-show-only-basename
+                                (helm-c-basename f) f))
          (helm-find-files-1 f)))
    (helm-aif (get-buffer (helm-get-selection))
        (or (buffer-file-name it)
@@ -2552,7 +2552,8 @@ MATCH match only filenames matching regexp MATCH."
                (full     'identity)
                (t        'file-name-nondirectory))))
      (labels ((ls-R (dir)
-                (loop with ls = (directory-files dir t directory-files-no-dot-files-regexp)
+                (loop with ls = (directory-files
+                                 dir t directory-files-no-dot-files-regexp)
                       for f in ls
                       if (file-directory-p f)
                       do (progn (when ,directories
@@ -2561,7 +2562,9 @@ MATCH match only filenames matching regexp MATCH."
                                 (unless (file-symlink-p f)
                                   (ls-R f)))
                       else do
-                      (unless (and ,match (not (string-match ,match (file-name-nondirectory f))))
+                      (unless (and ,match (not (string-match
+                                                ,match
+                                                (file-name-nondirectory f))))
                         (push (funcall fn f) result)))))
        (ls-R ,directory)
        (nreverse result))))
@@ -2716,7 +2719,6 @@ visible or invisible in all sources of current helm session"
         (helm-unmark-all)
         (helm-mark-all))))
 
-
 
 ;;; Buffers
 ;;
@@ -2846,8 +2848,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
         (bufs   (helm-marked-candidates)))
-    (loop
-          with replace = (query-replace-read-from prompt regexp-flag)
+    (loop with replace = (query-replace-read-from prompt regexp-flag)
           with tostring = (unless (consp replace)
                             (query-replace-read-to
                              replace prompt regexp-flag))
@@ -3207,7 +3208,7 @@ ACTION must be an action supported by `helm-dired-action'."
 (defun helm-find-files-grep (candidate)
   "Default action to grep files from `helm-find-files'."
   (helm-do-grep-1 (helm-marked-candidates)
-                      helm-current-prefix-arg))
+                  helm-current-prefix-arg))
 
 (defun helm-ff-zgrep (candidate)
   "Default action to zgrep files from `helm-find-files'."
@@ -3867,7 +3868,7 @@ If prefix numeric arg is given go ARG level down."
         (setq helm-ff-last-expanded helm-pattern)
         (setq helm-ff-last-expanded helm-ff-default-directory))
     (let ((new-pattern (helm-reduce-file-name helm-pattern arg
-                                                  :unix-close t :expand t)))
+                                              :unix-close t :expand t)))
       (helm-set-pattern new-pattern))))
 
 (defun helm-ff-retrieve-last-expanded ()
@@ -3877,9 +3878,9 @@ or hitting C-z on \"..\"."
   (when (and helm-ff-last-expanded
              (helm-file-completion-source-p))
     (let ((presel (if helm-ff-transformer-show-only-basename
-                       (helm-c-basename
-                        (directory-file-name helm-ff-last-expanded))
-                       (directory-file-name helm-ff-last-expanded))))
+                      (helm-c-basename
+                       (directory-file-name helm-ff-last-expanded))
+                      (directory-file-name helm-ff-last-expanded))))
       (with-helm-window
         (when (re-search-forward
                (concat "^" (regexp-quote presel) "$") nil t)
@@ -4030,8 +4031,7 @@ purpose."
              (expand-file-name default-directory)))
           ((and (string-match ".*\\(~//\\|//\\)$" pattern)
                 (not (string-match helm-ff-url-regexp helm-pattern)))
-           (expand-file-name "/") ; Expand to "/" or "c:/"
-           )
+           (expand-file-name "/")) ; Expand to "/" or "c:/"
           ((string-match "^~\\|.*/~/$" pattern)
            (let* ((home (expand-file-name (getenv "HOME"))))
              (replace-match home nil t pattern)))
@@ -4148,8 +4148,7 @@ return FNAME unchanged."
         (concat (file-name-directory fname) bn))))
 
 (defun helm-ff-save-history ()
-  "Store the last value of `helm-ff-default-directory' \
-in `helm-ff-history'."
+  "Store the last value of `helm-ff-default-directory' in `helm-ff-history'."
   (when (and helm-ff-default-directory
              (helm-file-completion-source-p))
     (push helm-ff-default-directory helm-ff-history)))
@@ -4211,11 +4210,11 @@ in `helm-ff-history'."
                      (helm-c-basename presel) presel))
     (if helm-ff-quick-delete-dont-prompt-for-deletion
         (helm-c-delete-file candidate
-                                helm-ff-signal-error-on-dot-files)
+                            helm-ff-signal-error-on-dot-files)
         (save-selected-window
           (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
             (helm-c-delete-file candidate
-                                    helm-ff-signal-error-on-dot-files)
+                                helm-ff-signal-error-on-dot-files)
             (message nil))))
     (helm-force-update presel)))
 
@@ -4576,7 +4575,7 @@ Show the first `helm-ff-history-max-length' elements of
 `helm-ff-history' in an `helm-comp-read'."
   (let ((history (when helm-ff-history
                    (helm-fast-remove-dups helm-ff-history
-                                              :test 'equal))))
+                                          :test 'equal))))
     (when history
       (setq helm-ff-history
             (if (>= (length history) helm-ff-history-max-length)
@@ -4603,11 +4602,11 @@ Use it for non--interactive calls of `helm-find-files'."
               (not (minibuffer-window-active-p (minibuffer-window)))))
         helm-samewindow)
     (helm :sources 'helm-c-source-find-files
-              :input fname
-              :preselect preselect
-              :keymap helm-find-files-map
-              :prompt "Find Files or Url: "
-              :buffer "*Helm Find Files*")))
+          :input fname
+          :preselect preselect
+          :keymap helm-find-files-map
+          :prompt "Find Files or Url: "
+          :buffer "*Helm Find Files*")))
 
 
 (defun helm-find-files-initial-input (&optional input)
@@ -4824,7 +4823,7 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
            (if (file-directory-p candidate)
                (expand-file-name candidate)
                (file-name-directory candidate)))
-           helm-ff-history)
+          helm-ff-history)
     (when (and follow (not (get-buffer dired-log-buffer)))
       (let ((target (directory-file-name candidate)))
         (unwind-protect
@@ -4833,8 +4832,8 @@ ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
                      (helm-get-dest-fnames-from-list files candidate dirflag))
                (if (and dirflag (eq action 'rename))
                    (helm-find-files-1 (file-name-directory target)
-                                          (if helm-ff-transformer-show-only-basename
-                                              (helm-c-basename target) target))
+                                      (if helm-ff-transformer-show-only-basename
+                                          (helm-c-basename target) target))
                    (helm-find-files-1 (expand-file-name candidate))))
           (setq helm-ff-cand-to-mark nil))))))
 
@@ -4906,12 +4905,12 @@ members of FLIST."
                       ('hardlink "*Helm Hardlink Files*")))
          (helm-mp-highlight-delay     nil))
     (helm :sources source
-              :input (or (dired-dwim-target-directory)
-                         (expand-file-name (helm-c-current-directory)))
-              :preselect (dired-get-filename)
-              :prompt (format prompt-fm fname)
-              :keymap helm-c-read-file-map
-              :buffer buffer)))
+          :input (or (dired-dwim-target-directory)
+                     (expand-file-name (helm-c-current-directory)))
+          :preselect (dired-get-filename)
+          :prompt (format prompt-fm fname)
+          :keymap helm-c-read-file-map
+          :buffer buffer)))
 
 ;;;###autoload
 (define-minor-mode helm-dired-mode ()
@@ -5011,9 +5010,9 @@ Keys description:
                                  'helm-confirm-and-exit-minibuffer)
                                map)))
            (helm-map (if must-match-map
-                             (make-composed-keymap
-                              must-match-map helm-c-read-file-map)
-                             helm-c-read-file-map)))
+                         (make-composed-keymap
+                          must-match-map helm-c-read-file-map)
+                         helm-c-read-file-map)))
 
       (or (helm
            :sources
@@ -5213,16 +5212,16 @@ See also `helm-locate'."
 Use argument PROMPT and INIT for `helm' arguments
 prompt and input."
   (helm :sources
-            '((name . "Locate")
-              (candidates . helm-c-locate-init)
-              (action . identity)
-              (requires-pattern . 3)
-              (candidate-number-limit . 9999)
-              (mode-line . helm-generic-file-mode-line-string)
-              (delayed))
-            :prompt prompt
-            :input init
-            :buffer "*helm locate rfn*"))
+        '((name . "Locate")
+          (candidates . helm-c-locate-init)
+          (action . identity)
+          (requires-pattern . 3)
+          (candidate-number-limit . 9999)
+          (mode-line . helm-generic-file-mode-line-string)
+          (delayed))
+        :prompt prompt
+        :input init
+        :buffer "*helm locate rfn*"))
 
 
 
@@ -5480,10 +5479,11 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
          ;; Set `minibuffer-history' AFTER includes-files
          ;; to avoid storing wild-cards here.
          (minibuffer-history helm-c-grep-history)
-         (helm-c-grep-default-command (cond ((and recurse zgrep) helm-c-default-zgrep-command)
-                                                (recurse helm-c-grep-default-recurse-command)
-                                                (zgrep helm-c-default-zgrep-command)
-                                                (t helm-c-grep-default-command)))
+         (helm-c-grep-default-command
+          (cond ((and recurse zgrep) helm-c-default-zgrep-command)
+                (recurse helm-c-grep-default-recurse-command)
+                (zgrep helm-c-default-zgrep-command)
+                (t helm-c-grep-default-command)))
          ;; Disable match-plugin and use here own highlighting.
          (helm-mp-highlight-delay     nil))
     (when include-files
@@ -5499,7 +5499,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
     ;; `helm-find-files' haven't already started,
     ;; give a default value to `helm-ff-default-directory'.
     (setq helm-ff-default-directory (or helm-ff-default-directory
-                                            default-directory))
+                                        default-directory))
     (helm
      :sources
      `(((name . "Grep")
@@ -5754,7 +5754,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     ;; If `helm-find-files' haven't already started,
     ;; give a default value to `helm-ff-default-directory'.
     (setq helm-ff-default-directory (or helm-ff-default-directory
-                                            default-directory))
+                                        default-directory))
     (helm
      :sources
      `(((name . "PdfGrep")
@@ -5863,18 +5863,18 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
   (with-helm-current-buffer
     (helm-attrset 'ffap-line-location (helm-c-ffap-file-line-at-point)))
   (helm-aif (helm-attr 'ffap-line-location)
-    (destructuring-bind (file . line) it
-      (list (cons (format "%s (line %d)" file line) file)))))
+      (destructuring-bind (file . line) it
+        (list (cons (format "%s (line %d)" file line) file)))))
 
 ;;; Goto line after opening file by `helm-c-source-ffap-line'.
 (defun helm-c-ffap-line-goto-line ()
   (when (car (helm-attr 'ffap-line-location))
     (unwind-protect
-        (ignore-errors
-          (with-selected-window
-              (get-buffer-window
-               (get-file-buffer (car (helm-attr 'ffap-line-location))))
-            (helm-goto-line (cdr (helm-attr 'ffap-line-location)))))
+         (ignore-errors
+           (with-selected-window
+               (get-buffer-window
+                (get-file-buffer (car (helm-attr 'ffap-line-location))))
+             (helm-goto-line (cdr (helm-attr 'ffap-line-location)))))
       (helm-attrset 'ffap-line-location nil))))
 (add-hook 'helm-after-action-hook 'helm-c-ffap-line-goto-line)
 (add-hook 'helm-after-persistent-action-hook 'helm-c-ffap-line-goto-line)
@@ -6217,7 +6217,8 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 (defvar helm-c-source-lacarte
   '((name . "Lacarte")
     (init . (lambda () (require 'lacarte )))
-    (candidates . (lambda () (delete '(nil) (lacarte-get-overall-menu-item-alist))))
+    (candidates . (lambda ()
+                    (delete '(nil) (lacarte-get-overall-menu-item-alist))))
     (candidate-number-limit . 9999)
     (action . helm-c-call-interactively))
   "Needs lacarte.el.
@@ -7270,7 +7271,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
 (defun helm-c-simple-call-tree-functions-callers-init ()
   (helm-c-simple-call-tree-init-base 'simple-call-tree-invert
-                                         " is called by\n"))
+                                     " is called by\n"))
 
 (defun helm-c-simple-call-tree-candidates ()
   (with-current-buffer (helm-candidate-buffer)
@@ -7987,13 +7988,13 @@ See http://orgmode.org for the latest version.")
   (unless (helm-attr 'keywords-examples)
     (require 'org)
     (helm-attrset 'keywords-examples
-                      (append
-                       (mapcar
-                        (lambda (x)
-                          (string-match "^#\\+\\(\\([A-Z_]+:?\\).*\\)" x)
-                          (cons (match-string 2 x) (match-string 1 x)))
-                        (org-split-string (org-get-current-options) "\n"))
-                       (mapcar 'list org-additional-option-like-keywords)))
+                  (append
+                   (mapcar
+                    (lambda (x)
+                      (string-match "^#\\+\\(\\([A-Z_]+:?\\).*\\)" x)
+                      (cons (match-string 2 x) (match-string 1 x)))
+                    (org-split-string (org-get-current-options) "\n"))
+                   (mapcar 'list org-additional-option-like-keywords)))
     (helm-attrset 'keywords (mapcar 'car (helm-attr 'keywords-examples)))))
 
 (defun helm-c-org-keywords-candidates ()
@@ -8348,7 +8349,7 @@ Return an alist with elements like (data . number_results)."
 (defun helm-c-yahoo-suggest-action (candidate)
   "Default action to jump to a Yahoo suggested candidate."
   (helm-c-browse-url (concat helm-c-yahoo-suggest-search-url
-                                 (url-hexify-string candidate))))
+                             (url-hexify-string candidate))))
 
 (defvar helm-c-source-yahoo-suggest
   '((name . "Yahoo Suggest")
@@ -8530,12 +8531,12 @@ When nil, fallback to `browse-url-browser-function'.")
 
 (defun helm-c-emms-files-modifier (candidates source)
   (let ((current-playlist (with-current-emms-playlist
-                              (loop with cur-list = (emms-playlist-tracks-in-region
-                                                     (point-min) (point-max))
-                                    for i in cur-list
-                                    for name = (assoc-default 'name i)
-                                    when name
-                                    collect name))))
+                            (loop with cur-list = (emms-playlist-tracks-in-region
+                                                   (point-min) (point-max))
+                                  for i in cur-list
+                                  for name = (assoc-default 'name i)
+                                  when name
+                                  collect name))))
     (loop for i in candidates
           if (member (cdr i) current-playlist)
           collect (cons (propertize (car i)
@@ -8547,7 +8548,7 @@ When nil, fallback to `browse-url-browser-function'.")
 (defun helm-c-emms-play-current-playlist ()
   "Play current playlist."
   (with-current-emms-playlist
-      (emms-playlist-first)
+    (emms-playlist-first)
     (emms-playlist-mode-play-smart)))
 
 (defvar helm-c-source-emms-files
@@ -8619,7 +8620,7 @@ When nil, fallback to `browse-url-browser-function'.")
          (lambda (candidate)
            (setq helm-candidate-number-limit 9999)
            (helm candidate nil nil nil nil
-                     helm-source-select-buffer)))
+                 helm-source-select-buffer)))
         ("Describe variable" . describe-variable)
         ("Find variable" . find-variable)))
     (persistent-action . describe-variable)
@@ -9802,8 +9803,8 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; So (re)calculate collection outside of main helm-session.
   (let ((cands (all-completions "" collection)))
     (helm-completing-read-default-1 prompt cands test require-match
-                                        init hist default inherit-input-method
-                                        name buffer t)))
+                                    init hist default inherit-input-method
+                                    name buffer t)))
 
 (defun* helm-completing-read-default
     (prompt collection &optional
@@ -10261,7 +10262,7 @@ Borrowed from helm-complete.el, inlined here for compatibility."
          completion)
     (with-helm-show-completion beg end
       (setq completion (helm-c-read-file-name "FileName: "
-                                                  :initial-input init)))
+                                              :initial-input init)))
     (helm-c-insert-file-name-completion-at-point completion)))
 
 ;; Internal
@@ -10491,7 +10492,7 @@ If not found or a prefix arg is given query the user which tool to use."
             "Do you want to make `%s' the default program for this kind of files? "
             real-prog-name))
         (helm-aif (assoc (file-name-extension fname)
-                             helm-c-external-programs-associations)
+                         helm-c-external-programs-associations)
             (setq helm-c-external-programs-associations
                   (delete it helm-c-external-programs-associations)))
         (push (cons (file-name-extension fname)
@@ -10742,17 +10743,17 @@ directory, open this directory."
   (beginning-of-line))
 
 (helm-document-attribute 'default-directory "type . file-line"
-                             "`default-directory' to interpret file.")
+  "`default-directory' to interpret file.")
 (helm-document-attribute 'before-jump-hook "type . file-line / line"
-                             "Function to call before jumping to the target location.")
+  "Function to call before jumping to the target location.")
 (helm-document-attribute 'after-jump-hook "type . file-line / line"
-                             "Function to call after jumping to the target location.")
+  "Function to call after jumping to the target location.")
 (helm-document-attribute 'adjust "type . file-line"
-                             "Search around line matching line contents.")
+  "Search around line matching line contents.")
 (helm-document-attribute 'recenter "type . file-line / line"
-                             "`recenter' after jumping.")
+  "`recenter' after jumping.")
 (helm-document-attribute 'target-file "type . line"
-                             "Goto line of target-file.")
+  "Goto line of target-file.")
 
 ;;;###autoload
 (defun helm-c-call-interactively (cmd-or-name)
@@ -10952,7 +10953,7 @@ other candidate transformers."
           "/cygdrive/\\(.\\)" "\\1:"
           (replace-regexp-in-string "\\\\" "/" x)))
        args)
-    args))
+      args))
 
 (defun helm-c-shorten-home-path (files)
   "Replaces /home/user with ~."
@@ -10962,7 +10963,7 @@ other candidate transformers."
      (lambda (file)
        (if (and (stringp file) (string-match home file))
            (cons (replace-match "~" nil nil file) file)
-         file))
+           file))
      files)))
 
 ;;; Functions
@@ -10991,18 +10992,18 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
 
 ;; Should run at beginning of `helm-initial-setup'.
 (add-hook 'helm-before-initialize-hook #'(lambda ()
-                                               (when helm-c-use-adaptative-sorting
-                                                 (setq helm-c-adaptive-done nil))))
+                                           (when helm-c-use-adaptative-sorting
+                                             (setq helm-c-adaptive-done nil))))
 
 ;; Should run at beginning of `helm-exit-minibuffer'.
 (add-hook 'helm-before-action-hook #'(lambda ()
-                                          (when helm-c-use-adaptative-sorting
-                                            (helm-c-adaptive-store-selection))))
+                                       (when helm-c-use-adaptative-sorting
+                                         (helm-c-adaptive-store-selection))))
 
 ;; Should run at beginning of `helm-select-action'.
 (add-hook 'helm-select-action-hook #'(lambda ()
-                                           (when helm-c-use-adaptative-sorting
-                                             (helm-c-adaptive-store-selection))))
+                                       (when helm-c-use-adaptative-sorting
+                                         (helm-c-adaptive-store-selection))))
 
 (defun helm-c-source-use-adaptative-p (&optional source-name)
   "Return current source only if it use adaptative history, nil otherwise."
@@ -11259,12 +11260,12 @@ candidate can be in (DISPLAY . REAL) format."
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--info-index)
 
 (helm-document-attribute 'info-index "info-index plugin"
-                             "Create a source of info index very easily.
+  "Create a source of info index very easily.
 
 ex. (defvar helm-c-source-info-wget '((info-index . \"wget\"))")
 
 (helm-document-attribute 'index-nodes "info-index plugin (optional)"
-                             "Index nodes of info file.
+  "Index nodes of info file.
 
 If it is omitted, `Info-index-nodes' is used to collect index nodes.
 Some info files are missing index specification.
@@ -11295,7 +11296,7 @@ ex. See `helm-c-source-info-screen'.")
         (auto-revert-mode 1)))))
 
 (helm-document-attribute 'candidates-file "candidates-file plugin"
-                             "Use a file as the candidates buffer.
+  "Use a file as the candidates buffer.
 
 1st argument is a filename, string or function name or variable name.
 If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
@@ -11321,11 +11322,11 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
      (helm-interpret-value (helm-attr 'subexp)))))
 
 (helm-document-attribute 'headline "Headline plug-in"
-                             "Regexp string for helm-headline to scan.")
+  "Regexp string for helm-headline to scan.")
 (helm-document-attribute 'condition "Headline plug-in"
-                             "A sexp representing the condition to use helm-headline.")
+  "A sexp representing the condition to use helm-headline.")
 (helm-document-attribute 'subexp "Headline plug-in"
-                             "Display (match-string-no-properties subexp).")
+  "Display (match-string-no-properties subexp).")
 
 ;; Le Wang: Note on how `helm-head-line-get-candidates' works with a list
 ;; of regexps.
@@ -11405,16 +11406,16 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
            (or (helm-interpret-value (helm-attr 'persistent-help))
                (helm-aif (or (assoc-default 'persistent-action
-                                                (helm-get-current-source))
-                                 (assoc-default 'action
-                                                (helm-get-current-source)))
+                                            (helm-get-current-source))
+                             (assoc-default 'action
+                                            (helm-get-current-source)))
                    (cond ((symbolp it) (symbol-name it))
                          ((listp it) (or (ignore-errors (caar it))  ""))))
                "")
            " (keeping session)")))
 
 (helm-document-attribute 'persistent-help "persistent-help plug-in"
-                             "A string to explain persistent-action of this source.
+  "A string to explain persistent-action of this source.
 It also accepts a function or a variable name.")
 
 ;;; (helm '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
@@ -11455,7 +11456,7 @@ with original attribute value.
 
 (defun helm-compile-source--type-customize (source)
   (helm-aif (assoc-default (assoc-default 'type source)
-                               helm-additional-type-attributes)
+                           helm-additional-type-attributes)
       (append it source)
     source))
 (add-to-list 'helm-compile-source-functions
@@ -11470,7 +11471,7 @@ with original attribute value.
 (add-to-list 'helm-compile-source-functions
              'helm-compile-source--default-action t)
 (helm-document-attribute 'default-action "default-action plug-in"
-                             "Default action.")
+  "Default action.")
 
 
 ;;; Type Attributes
@@ -11598,8 +11599,7 @@ If `adjust' attribute is specified, searches the line whose
 content is CONTENT near the LINENO.
 
 If `recenter' attribute is specified, the line is displayed at
-the center of window, otherwise at the top of window.
-")
+the center of window, otherwise at the top of window.")
 
 (define-helm-type-attribute 'file-line
     `((filtered-candidate-transformer helm-c-filtered-candidate-transformer-file-line)
@@ -11620,8 +11620,7 @@ If `adjust' attribute is specified, searches the line whose
 content is CONTENT near the LINENO.
 
 If `recenter' attribute is specified, the line is displayed at
-the center of window, otherwise at the top of window.
-")
+the center of window, otherwise at the top of window.")
 
 (define-helm-type-attribute 'timer
     '((real-to-display . helm-c-timer-real-to-display)
@@ -11641,13 +11640,13 @@ the center of window, otherwise at the top of window.
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
   (helm-other-buffer '(helm-c-source-buffers-list
-                           helm-c-source-recentf
-                           helm-c-source-buffer-not-found)
-                         "*helm mini*"))
+                       helm-c-source-recentf
+                       helm-c-source-buffer-not-found)
+                     "*helm mini*"))
 ;;;###autoload
 (defun helm-for-files ()
   "Preconfigured `helm' for opening files.
-ffap -> recentf -> buffer -> bookmark -> file-cache -> files-in-current-dir -> locate."
+Run all sources defined in `helm-for-files-prefered-list'."
   (interactive)
   (helm-other-buffer helm-for-files-prefered-list "*helm for files*"))
 
@@ -11665,11 +11664,11 @@ With a prefix-arg insert symbol at point."
   (let ((helm-c-google-suggest-default-function
          'helm-c-google-suggest-emacs-lisp))
     (helm :sources '(helm-c-source-info-elisp
-                         helm-c-source-info-cl
-                         helm-c-source-info-pages
-                         helm-c-source-google-suggest)
-              :input (and arg (thing-at-point 'symbol))
-              :buffer "*helm info*")))
+                     helm-c-source-info-cl
+                     helm-c-source-info-pages
+                     helm-c-source-google-suggest)
+          :input (and arg (thing-at-point 'symbol))
+          :buffer "*helm info*")))
 
 ;;;###autoload
 (defun helm-show-kill-ring ()
@@ -11679,7 +11678,7 @@ You may bind this command to M-y.
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
   (helm :sources 'helm-c-source-kill-ring
-            :buffer "*helm kill-ring*"))
+        :buffer "*helm kill-ring*"))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
@@ -11687,22 +11686,22 @@ First call open the kill-ring browser, next calls move to next line."
   (interactive)
   (let ((enable-recursive-minibuffers t))
     (helm-other-buffer 'helm-c-source-minibuffer-history
-                           "*helm minibuffer-history*")))
+                       "*helm minibuffer-history*")))
 
 ;;;###autoload
 (defun helm-gentoo ()
   "Preconfigured `helm' for gentoo linux."
   (interactive)
   (helm-other-buffer '(helm-c-source-gentoo
-                           helm-c-source-use-flags)
-                         "*helm gentoo*"))
+                       helm-c-source-use-flags)
+                     "*helm gentoo*"))
 
 ;;;###autoload
 (defun helm-imenu ()
   "Preconfigured `helm' for `imenu'."
   (interactive)
   (helm :sources 'helm-c-source-imenu
-            :buffer "*helm imenu*"))
+        :buffer "*helm imenu*"))
 
 ;;;###autoload
 (defun helm-google-suggest ()
@@ -11729,8 +11728,8 @@ First call open the kill-ring browser, next calls move to next line."
 It is an enhanced version of `helm-for-buffers'."
   (interactive)
   (helm :sources '(helm-c-source-buffers-list
-                       helm-c-source-buffer-not-found)
-            :buffer "*helm buffers*" :keymap helm-c-buffer-map))
+                   helm-c-source-buffer-not-found)
+        :buffer "*helm buffers*" :keymap helm-c-buffer-map))
 
 (defalias 'helm-buffers+ 'helm-buffers-list
   "Preconfigured `helm' to list buffers.
@@ -11774,7 +11773,7 @@ http://w3m.sourceforge.net/
 http://emacs-w3m.namazu.org/"
   (interactive)
   (helm-other-buffer 'helm-c-source-w3m-bookmarks
-                         "*helm w3m bookmarks*"))
+                     "*helm w3m bookmarks*"))
 
 ;;;###autoload
 (defun helm-firefox-bookmarks ()
@@ -11793,7 +11792,7 @@ After closing firefox, you will be able to browse you bookmarks.
 "
   (interactive)
   (helm-other-buffer 'helm-c-source-firefox-bookmarks
-                         "*Helm Firefox*"))
+                     "*Helm Firefox*"))
 
 ;;;###autoload
 (defun helm-colors ()
@@ -11814,9 +11813,9 @@ After closing firefox, you will be able to browse you bookmarks.
   "Preconfigured `helm' for bookmarks (pretty-printed)."
   (interactive)
   (helm-other-buffer '(helm-c-source-bookmarks-local
-                           helm-c-source-bookmarks-su
-                           helm-c-source-bookmarks-ssh)
-                         "*helm pp bookmarks*"))
+                       helm-c-source-bookmarks-su
+                       helm-c-source-bookmarks-ssh)
+                     "*helm pp bookmarks*"))
 
 ;;;###autoload
 (defun helm-c-insert-latex-math ()
@@ -11847,9 +11846,9 @@ After closing firefox, you will be able to browse you bookmarks.
   "Preconfigured `helm' for emms sources."
   (interactive)
   (helm :sources '(helm-c-source-emms-streams
-                       helm-c-source-emms-files
-                       helm-c-source-emms-dired)
-            :buffer "*Helm Emms*"))
+                   helm-c-source-emms-files
+                   helm-c-source-emms-dired)
+        :buffer "*Helm Emms*"))
 
 ;;;###autoload
 (defun helm-eev-anchors ()
@@ -11873,8 +11872,8 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   "Preconfigured `helm' for timers."
   (interactive)
   (helm-other-buffer '(helm-c-source-absolute-time-timers
-                           helm-c-source-idle-time-timers)
-                         "*helm timers*"))
+                       helm-c-source-idle-time-timers)
+                     "*helm timers*"))
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
@@ -11893,16 +11892,16 @@ otherwise search in whole buffer."
          (delq 'helm-compile-source--match-plugin
                (copy-sequence helm-compile-source-functions))))
     (helm :sources 'helm-c-source-occur
-              :buffer "*Helm Occur*"
-              :history 'helm-c-grep-history)))
+          :buffer "*Helm Occur*"
+          :history 'helm-c-grep-history)))
 
 ;;;###autoload
 (defun helm-browse-code ()
   "Preconfigured helm to browse code."
   (interactive)
   (helm :sources 'helm-c-source-browse-code
-            :buffer "*helm browse code*"
-            :default (thing-at-point 'symbol)))
+        :buffer "*helm browse code*"
+        :default (thing-at-point 'symbol)))
 
 ;;;###autoload
 (defun helm-org-headlines ()
@@ -11925,9 +11924,9 @@ otherwise search in whole buffer."
                  (not (helm-current-buffer-narrowed-p)))
         (narrow-to-region (region-beginning) (region-end)))
       (helm :sources helm-c-source-regexp
-                :buffer "*helm regexp*"
-                :prompt "Regexp: "
-                :history 'helm-build-regexp-history))))
+            :buffer "*helm regexp*"
+            :prompt "Regexp: "
+            :history 'helm-build-regexp-history))))
 
 ;;;###autoload
 (defun helm-c-copy-files-async ()
@@ -11973,9 +11972,9 @@ This is the starting point for nearly all actions you can do on files."
   (interactive)
   (let ((helm-mp-highlight-delay nil))
     (helm :sources 'helm-c-source-write-file
-              :input (expand-file-name default-directory)
-              :prompt "Write buffer to file: "
-              :buffer "*Helm write file*")))
+          :input (expand-file-name default-directory)
+          :prompt "Write buffer to file: "
+          :buffer "*Helm write file*")))
 
 ;;;###autoload
 (defun helm-insert-file ()
@@ -11983,9 +11982,9 @@ This is the starting point for nearly all actions you can do on files."
   (interactive)
   (let ((helm-mp-highlight-delay nil))
     (helm :sources 'helm-c-source-insert-file
-              :input (expand-file-name default-directory)
-              :prompt "Insert file: "
-              :buffer "*Helm insert file*")))
+          :input (expand-file-name default-directory)
+          :prompt "Insert file: "
+          :buffer "*Helm insert file*")))
 
 ;;;###autoload
 (defun helm-dired-rename-file ()
@@ -12083,9 +12082,9 @@ If tag file have been modified reinitialize cache."
       (remhash tag helm-c-etags-cache))
     (if (and tag (file-exists-p tag))
         (helm :sources 'helm-c-source-etags-select
-                  :keymap helm-c-etags-map
-                  :input init
-                  :buffer "*helm etags*")
+              :keymap helm-c-etags-map
+              :input init
+              :buffer "*helm etags*")
         (message "Error: No tag file found, please create one with etags shell command."))))
 
 
@@ -12200,7 +12199,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el"
 `helm-c-source-mark-ring'."
   (interactive)
   (helm :sources '(helm-c-source-mark-ring
-                       helm-c-source-global-mark-ring)))
+                   helm-c-source-global-mark-ring)))
 
 ;;;###autoload
 (defun helm-yaoddmuse-emacswiki-edit-or-view ()
@@ -12227,10 +12226,10 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   "Preconfigured helm for `helm-c-source-evaluation-result'."
   (interactive "P")
   (helm :sources 'helm-c-source-evaluation-result
-            :input (when arg (thing-at-point 'sexp))
-            :buffer "*helm eval*"
-            :history 'helm-eval-expression-input-history
-            :keymap helm-eval-expression-map))
+        :input (when arg (thing-at-point 'sexp))
+        :buffer "*helm eval*"
+        :history 'helm-eval-expression-input-history
+        :keymap helm-eval-expression-map))
 
 ;;;###autoload
 (defun helm-eval-expression-with-eldoc ()
@@ -12240,7 +12239,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (let ((timer (run-with-idle-timer eldoc-idle-delay
                                     'repeat 'helm-eldoc-show-in-eval))
         (minibuffer-completing-symbol t) ; Enable lisp completion.
-        (completion-cycle-threshold t))  ; Always cycle, no pesty completion buffer (emacs24 only).
+        (completion-cycle-threshold t))  ; Always cycle, (emacs24* only).
     (unwind-protect
          (minibuffer-with-setup-hook
              'helm-eldoc-store-minibuffer
@@ -12286,14 +12285,14 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   "Preconfigured `helm' to call helm source."
   (interactive)
   (helm :sources 'helm-c-source-call-source
-            :buffer helm-source-select-buffer))
+        :buffer helm-source-select-buffer))
 
 ;;;###autoload
 (defun helm-execute-helm-command ()
   "Preconfigured `helm' to execute preconfigured `helm'."
   (interactive)
   (helm-other-buffer 'helm-c-source-helm-commands
-                         "*helm commands*"))
+                     "*helm commands*"))
 
 ;;;###autoload
 (defun helm-create (&optional string initial-input)
@@ -12302,10 +12301,10 @@ See also `helm-create--actions'."
   (interactive)
   (setq string (or string (read-string "Create Helm: " initial-input)))
   (helm :sources '(((name . "Helm Create")
-                        (header-name . (lambda (_) (format "Action for \"%s\"" string)))
-                        (candidates . helm-create--actions)
-                        (candidate-number-limit)
-                        (action . (lambda (func) (funcall func string)))))))
+                    (header-name . (lambda (_) (format "Action for \"%s\"" string)))
+                    (candidates . helm-create--actions)
+                    (candidate-number-limit)
+                    (action . (lambda (func) (funcall func string)))))))
 
 ;;;###autoload
 (defun helm-top ()
@@ -12339,9 +12338,9 @@ With a prefix arg reload cache."
   (let ((query (read-string "Search Package: " nil 'helm-c-apt-input-history)))
     (when arg (helm-c-apt-refresh))
     (helm :sources 'helm-c-source-apt
-              :prompt "Search Package: "
-              :input query
-              :history 'helm-c-apt-input-history)))
+          :prompt "Search Package: "
+          :input query
+          :history 'helm-c-apt-input-history)))
 
 ;;;###autoload
 (defun helm-esh-pcomplete ()
@@ -12357,10 +12356,10 @@ With a prefix arg reload cache."
     (setq helm-ec-target (or target " "))
     (with-helm-show-completion beg end
       (helm :sources 'helm-c-source-esh
-                :buffer "*helm pcomplete*"
-                :input (helm-ff-set-pattern ; Handle tramp filenames.
-                        (car (last (ignore-errors ; Needed in lisp symbols completion.
-                                     (pcomplete-parse-arguments)))))))))
+            :buffer "*helm pcomplete*"
+            :input (helm-ff-set-pattern ; Handle tramp filenames.
+                    (car (last (ignore-errors ; Needed in lisp symbols completion.
+                                 (pcomplete-parse-arguments)))))))))
 
 ;;;###autoload
 (defun helm-eshell-history ()
@@ -12377,8 +12376,8 @@ With a prefix arg reload cache."
     (unwind-protect
          (with-helm-show-completion beg end
            (helm :sources 'helm-c-source-eshell-history
-                     :buffer "*Eshell history*"
-                     :input input))
+                 :buffer "*Eshell history*"
+                 :input input))
       (when (and flag-empty
                  (looking-back " "))
         (delete-char -1)))))
@@ -12407,14 +12406,14 @@ You can set your own list of commands with
   "Preconfigured `helm' to execute ratpoison commands."
   (interactive)
   (helm-other-buffer 'helm-c-source-ratpoison-commands
-                         "*helm ratpoison commands*"))
+                     "*helm ratpoison commands*"))
 
 ;;;###autoload
 (defun helm-ucs ()
   "Preconfigured helm for `ucs-names' math symbols."
   (interactive)
   (helm :sources 'helm-c-source-ucs
-            :keymap  helm-c-ucs-map))
+        :keymap  helm-c-ucs-map))
 
 ;;;###autoload
 (defun helm-c-apropos ()
@@ -12422,55 +12421,55 @@ You can set your own list of commands with
   (interactive)
   (let ((default (thing-at-point 'symbol)))
     (helm :sources
-              `(((name . "Commands")
-                 (init . (lambda ()
-                           (helm-c-apropos-init 'commandp ,default)))
-                 (persistent-action . helm-lisp-completion-persistent-action)
-                 (persistent-help . "Show brief doc in mode-line")
-                 (candidates-in-buffer)
-                 (action . (lambda (candidate)
-                             (describe-function (intern candidate)))))
-                ((name . "Functions")
-                 (init . (lambda ()
-                           (helm-c-apropos-init #'(lambda (x) (and (fboundp x)
-                                                                       (not (commandp x))))
-                                                    ,default)))
-                 (persistent-action . helm-lisp-completion-persistent-action)
-                 (persistent-help . "Show brief doc in mode-line")
-                 (candidates-in-buffer)
-                 (action . (lambda (candidate)
-                             (describe-function (intern candidate)))))
-                ((name . "Variables")
-                 (init . (lambda ()
-                           (helm-c-apropos-init 'boundp ,default)))
-                 (persistent-action . helm-lisp-completion-persistent-action)
-                 (persistent-help . "Show brief doc in mode-line")
-                 (candidates-in-buffer)
-                 (action . (lambda (candidate)
-                             (describe-variable (intern candidate)))))
-                ((name . "Faces")
-                 (init . (lambda ()
-                           (helm-c-apropos-init 'facep ,default)))
-                 (persistent-action . helm-lisp-completion-persistent-action)
-                 (persistent-help . "Show brief doc in mode-line")
-                 (candidates-in-buffer)
-                 (filtered-candidate-transformer . (lambda (candidates source)
-                                                     (loop for c in candidates
-                                                           collect (propertize c 'face (intern c)))))
-                 (action . (lambda (candidate)
-                             (describe-face (intern candidate)))))
-                ((name . "Helm attributes")
-                 (candidates . (lambda ()
-                                 (mapcar 'symbol-name helm-additional-attributes)))
-                 (action . (lambda (candidate)
-                             (with-output-to-temp-buffer "*Help*"
-                               (princ (get (intern candidate) 'helm-attrdoc))))))))))
+          `(((name . "Commands")
+             (init . (lambda ()
+                       (helm-c-apropos-init 'commandp ,default)))
+             (persistent-action . helm-lisp-completion-persistent-action)
+             (persistent-help . "Show brief doc in mode-line")
+             (candidates-in-buffer)
+             (action . (lambda (candidate)
+                         (describe-function (intern candidate)))))
+            ((name . "Functions")
+             (init . (lambda ()
+                       (helm-c-apropos-init #'(lambda (x) (and (fboundp x)
+                                                               (not (commandp x))))
+                                            ,default)))
+             (persistent-action . helm-lisp-completion-persistent-action)
+             (persistent-help . "Show brief doc in mode-line")
+             (candidates-in-buffer)
+             (action . (lambda (candidate)
+                         (describe-function (intern candidate)))))
+            ((name . "Variables")
+             (init . (lambda ()
+                       (helm-c-apropos-init 'boundp ,default)))
+             (persistent-action . helm-lisp-completion-persistent-action)
+             (persistent-help . "Show brief doc in mode-line")
+             (candidates-in-buffer)
+             (action . (lambda (candidate)
+                         (describe-variable (intern candidate)))))
+            ((name . "Faces")
+             (init . (lambda ()
+                       (helm-c-apropos-init 'facep ,default)))
+             (persistent-action . helm-lisp-completion-persistent-action)
+             (persistent-help . "Show brief doc in mode-line")
+             (candidates-in-buffer)
+             (filtered-candidate-transformer . (lambda (candidates source)
+                                                 (loop for c in candidates
+                                                       collect (propertize c 'face (intern c)))))
+             (action . (lambda (candidate)
+                         (describe-face (intern candidate)))))
+            ((name . "Helm attributes")
+             (candidates . (lambda ()
+                             (mapcar 'symbol-name helm-additional-attributes)))
+             (action . (lambda (candidate)
+                         (with-output-to-temp-buffer "*Help*"
+                           (princ (get (intern candidate) 'helm-attrdoc))))))))))
 
 ;;;###autoload
 (defun helm-xrandr-set ()
   (interactive)
   (helm :sources 'helm-c-source-xrandr-change-resolution
-            :buffer "*helm xrandr*"))
+        :buffer "*helm xrandr*"))
 
 
 ;;; Unit tests are now in ../developer-tools/unit-test-helm-config.el.

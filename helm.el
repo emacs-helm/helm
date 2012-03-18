@@ -405,7 +405,7 @@
 ;; 1. Define a compiler: helm-compile-source--*
 ;; 2. Add compier function to `helm-compile-source-functions'.
 ;; 3. (optional) Write helper functions.
-;
+                                        ;
 ;; Tested on Emacs 22/23/24.
 ;;
 ;;
@@ -1181,7 +1181,7 @@ Otherwise make a list with one element."
        (helm-log "restore variables"))))
 
 (defun* helm-attr (attribute-name &optional
-                                      (src (helm-get-current-source)))
+                                  (src (helm-get-current-source)))
   "Get the value of ATTRIBUTE-NAME of SRC.
 if SRC is omitted, use current source.
 It is useful to write your sources."
@@ -1189,22 +1189,22 @@ It is useful to write your sources."
       (cdr it)))
 
 (defun* helm-attr* (attribute-name
-                        &optional (src (helm-get-current-source)))
+                    &optional (src (helm-get-current-source)))
   "Pass the value of ATTRIBUTE-NAME of SRC to `helm-interpret-value'.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (helm-interpret-value (helm-attr attribute-name src)))
 
 (defun* helm-attr-defined (attribute-name
-                               &optional (src (helm-get-current-source)))
+                           &optional (src (helm-get-current-source)))
   "Return non-nil if ATTRIBUTE-NAME of SRC is defined.
 if SRC is omitted, use current source.
 It is useful to write your sources."
   (and (assq attribute-name src) t))
 
 (defun* helm-attrset (attribute-name value
-                                         &optional
-                                         (src (helm-get-current-source)))
+                                     &optional
+                                     (src (helm-get-current-source)))
   "Set the value of ATTRIBUTE-NAME of SRC to VALUE.
 if SRC is omitted, use current source.
 It is useful to write your sources."
@@ -1294,7 +1294,7 @@ Attributes:
        (helm-log-eval helm-compiled-sources)))))
 
 (defun* helm-get-selection (&optional (buffer nil buffer-s)
-                                          force-display-part)
+                                      force-display-part)
   "Return the currently selected item or nil.
 if BUFFER is nil or unspecified, use helm-buffer as default value.
 If FORCE-DISPLAY-PART is non-nil, return the display string.
@@ -1307,21 +1307,21 @@ with its properties."
                           'buffer-substring
                           'buffer-substring-no-properties))
              (selection
-             (or (and (not force-display-part)
-                      (get-text-property (overlay-start
-                                          helm-selection-overlay)
-                                         'helm-realvalue))
-                 ;; It is needed to return properties of DISP in some case,
-                 ;; e.g for `helm-confirm-and-exit-minibuffer',
-                 ;; so use `buffer-substring' here when 'withprop is specified.
-                 (let ((disp (funcall disp-fn
-                              (overlay-start helm-selection-overlay)
-                              (1- (overlay-end helm-selection-overlay))))
-                       (source (helm-get-current-source)))
-                   (helm-aif (and (not force-display-part)
-                                      (assoc-default 'display-to-real source))
-                       (helm-funcall-with-source source it disp)
-                     disp)))))
+              (or (and (not force-display-part)
+                       (get-text-property (overlay-start
+                                           helm-selection-overlay)
+                                          'helm-realvalue))
+                  ;; It is needed to return properties of DISP in some case,
+                  ;; e.g for `helm-confirm-and-exit-minibuffer',
+                  ;; so use `buffer-substring' here when 'withprop is specified.
+                  (let ((disp (funcall disp-fn
+                                       (overlay-start helm-selection-overlay)
+                                       (1- (overlay-end helm-selection-overlay))))
+                        (source (helm-get-current-source)))
+                    (helm-aif (and (not force-display-part)
+                                   (assoc-default 'display-to-real source))
+                        (helm-funcall-with-source source it disp)
+                      disp)))))
         (unless (equal selection "")
           (helm-log-eval selection)
           selection)))))
@@ -1701,16 +1701,16 @@ in source."
 
 ;;; (@* "Core: entry point helper")
 (defun helm-internal (&optional
-                            any-sources any-input
-                            any-prompt any-resume
-                            any-preselect any-buffer
-                            any-keymap any-default any-history)
+                        any-sources any-input
+                        any-prompt any-resume
+                        any-preselect any-buffer
+                        any-keymap any-default any-history)
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log-eval any-prompt any-preselect
-                     any-buffer any-keymap any-default)
+                 any-buffer any-keymap any-default)
   (let ((old-overridding-local-map overriding-local-map))
     (unwind-protect
          (condition-case v
@@ -1748,8 +1748,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 ;;
 ;;
 (defun* helm-resume (&optional
-                         (any-buffer helm-last-buffer)
-                         buffer-pattern (any-resume t))
+                     (any-buffer helm-last-buffer)
+                     buffer-pattern (any-resume t))
   "Resurrect previously invoked `helm'.
 Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions."
@@ -1768,8 +1768,8 @@ helm buffers.  i.e choose among various helm sessions."
 ;;; I use this and check it whether I am convenient.
 ;;; I may introduce an option to control the behavior.
 (defun* helm-resume-window-only (&optional
-                                     (any-buffer helm-last-buffer)
-                                     buffer-pattern)
+                                 (any-buffer helm-last-buffer)
+                                 buffer-pattern)
   (interactive)
   (helm-resume any-buffer buffer-pattern 'window-only))
 
@@ -1781,32 +1781,32 @@ Just check if ANY-RESUME value is t or window-only."
 (defun helm-resume-select-buffer (input)
   "Resume precedent helm session with initial input INPUT."
   (or (helm :sources '(((name . "Resume helm buffer")
-                            (candidates . helm-buffers)
-                            (action . identity)))
-                :input  input
-                :resume 'noresume
-                :buffer "*helm resume*")
+                        (candidates . helm-buffers)
+                        (action . identity)))
+            :input  input
+            :resume 'noresume
+            :buffer "*helm resume*")
       (keyboard-quit)))
 
 
 ;;;###autoload
 (defun helm-at-point (&optional
-                            any-sources any-input
-                            any-prompt any-resume
-                            any-preselect any-buffer)
+                        any-sources any-input
+                        any-prompt any-resume
+                        any-preselect any-buffer)
   "Call helm with symbol at point as initial input.
 ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
 are same args as in `helm'."
   (interactive)
   (helm :sources any-sources
-            :input (if current-prefix-arg
-                       (concat "\\b" (thing-at-point 'symbol) "\\b"
-                               (if (featurep 'helm-match-plugin) " " ""))
-                       any-input)
-            :prompt any-prompt
-            :resume any-resume
-            :preselect any-preselect
-            :buffer any-buffer))
+        :input (if current-prefix-arg
+                   (concat "\\b" (thing-at-point 'symbol) "\\b"
+                           (if (featurep 'helm-match-plugin) " " ""))
+                   any-input)
+        :prompt any-prompt
+        :resume any-resume
+        :preselect any-preselect
+        :buffer any-buffer))
 
 ;;;###autoload
 (defun helm-other-buffer (any-sources any-buffer)
@@ -1825,8 +1825,8 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
            helm-last-frame-or-window-configuration)
           helm-pattern
           (helm-buffer (or (getf same-as-helm :buffer)
-                               (nth 5 same-as-helm)
-                               "*Helm*"))
+                           (nth 5 same-as-helm)
+                           "*Helm*"))
           helm-sources
           helm-compiled-sources
           (helm-samewindow t)
@@ -1902,8 +1902,8 @@ Argument SAVE-OR-RESTORE is one of save or restore."
      (setq helm-current-position (cons (point) (window-start))))
     (restore
      (helm-log "Restore position at  %S in buffer %s"
-                   helm-current-position
-                   (buffer-name (current-buffer)))
+               helm-current-position
+               (buffer-name (current-buffer)))
      (goto-char (car helm-current-position))
      ;; Fix this position with the NOFORCE arg of `set-window-start'
      ;; otherwise, if there is some other buffer than `helm-current-buffer'
@@ -1985,8 +1985,8 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Whether in `read-string' in helm or not.")
 
 (defun helm-read-pattern-maybe (any-prompt any-input
-                                    any-preselect any-resume any-keymap
-                                    any-default any-history)
+                                any-preselect any-resume any-keymap
+                                any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
   (if (helm-resume-p any-resume)
@@ -2002,8 +2002,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
       (set (make-local-variable 'helm-map)
            (or src-keymap any-keymap helm-map))
       (helm-log-eval (helm-approximate-candidate-number)
-                         helm-execute-action-at-once-if-one
-                         helm-quit-if-no-candidate)
+                     helm-execute-action-at-once-if-one
+                     helm-quit-if-no-candidate)
       (cond ((and helm-execute-action-at-once-if-one
                   (= (helm-approximate-candidate-number) 1))
              (ignore))
@@ -2348,7 +2348,7 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
       helm-default-match-functions))
 
 (defmacro helm-accumulate-candidates-internal (cand newmatches
-                                                   hash item-count limit)
+                                               hash item-count limit)
   "Internal, add CAND into NEWMATCHES.
 Use HASH to uniq NEWMATCHES.
 Argument ITEM-COUNT count the matches.
@@ -2388,7 +2388,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
           (helm-source-name (assoc-default 'name source))
           (limit (helm-candidate-number-limit source))
           (helm-pattern (helm-process-pattern-transformer
-                             helm-pattern source)))
+                         helm-pattern source)))
       (helm-process-filtered-candidate-transformer
        (if (or (equal helm-pattern "") (equal matchfns '(identity)))
            (helm-take-first-elements
@@ -2571,7 +2571,7 @@ call it before update."
 (defun helm-force-update--reinit (source)
   "Reinit SOURCE by calling his update and/or init functions."
   (helm-aif (helm-funcall-with-source
-                 source 'helm-candidate-buffer)
+             source 'helm-candidate-buffer)
       (kill-buffer it))
   (dolist (attr '(update init))
     (helm-aif (assoc-default attr source)
@@ -2726,8 +2726,8 @@ after the source name by overlay."
 
 ;; (@* "Core: action")
 (defun helm-execute-selection-action (&optional
-                                            selection action
-                                            preserve-saved-action)
+                                        selection action
+                                        preserve-saved-action)
   "If a candidate SELECTION is present then perform the associated ACTION on it.
 If PRESERVE-SAVED-ACTION is non-nil don't save action."
   (helm-log "executing action")
@@ -2839,8 +2839,8 @@ It is determined by UNIT and DIRECTION."
 (defun helm-display-mode-line (source)
   (set (make-local-variable 'helm-mode-line-string)
        (helm-interpret-value (or (assoc-default 'mode-line source)
-                                     (default-value 'helm-mode-line-string))
-                                 source))
+                                 (default-value 'helm-mode-line-string))
+                             source))
   (if helm-mode-line-string
       (setq mode-line-format
             '(" " mode-line-buffer-identification " "
@@ -2987,7 +2987,7 @@ to mark candidates."
                     separator-pos)
                header-pos
                (point-max)))
-       (1+ (point-at-eol))))
+         (1+ (point-at-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay)))
   (helm-follow-execute-persistent-action-maybe))
 
@@ -3046,7 +3046,7 @@ If `minibuffer-completion-confirm' value is t,
 don't exit and send message 'no match'."
   (interactive)
   (let* ((empty-buffer-p (with-current-buffer helm-buffer
-                          (eq (point-min) (point-max))))
+                           (eq (point-min) (point-max))))
          (unknow (and (not empty-buffer-p)
                       (string= (get-text-property
                                 0 'display (helm-get-selection nil 'withprop))
@@ -3150,9 +3150,9 @@ INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
    (lambda ()
      (insert (substitute-command-keys
               (helm-interpret-value (or (assoc-default
-                                             'help-message
-                                             (helm-get-current-source))
-                                            helm-help-message))))
+                                         'help-message
+                                         (helm-get-current-source))
+                                        helm-help-message))))
      (org-mode))))
 
 (defun helm-debug-output ()
@@ -3410,7 +3410,7 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
   (re-search-backward pattern nil t))
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
-                                        search-fns limit search-from-end)
+                                    search-fns limit search-from-end)
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
@@ -3429,8 +3429,8 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
   (/= (point) (progn (funcall proc) (point))))
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
-                                              limit search-from-end
-                                              start-point endp)
+                                          limit search-from-end
+                                          start-point endp)
   (let (buffer-read-only
         matches exit newmatches)
     (helm-search-from-candidate-buffer-internal
@@ -3523,7 +3523,7 @@ Acceptable values of CREATE-OR-BUFFER:
              (or (get-buffer local-bname)
                  (get-buffer global-bname)
                  (helm-aif (assoc-default helm-source-name
-                                              helm-candidate-buffer-alist)
+                                          helm-candidate-buffer-alist)
                      (and (buffer-live-p it) it)))))
       (when create-or-buffer
         (register-func)
@@ -4314,8 +4314,8 @@ HELM-ATTRIBUTE should be a symbol."
   It accepts also variable/function name. ")
 
 (helm-document-attribute
- 'resume "optional"
- "  Function called with no parameters when `helm-resume' is started.")
+    'resume "optional"
+  "  Function called with no parameters when `helm-resume' is started.")
 
 (helm-document-attribute 'keymap "optional"
   "  Specific keymap for this source.

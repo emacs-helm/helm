@@ -490,8 +490,8 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
     (let ((requote (loop for (pred . re) in
                          (helm-mp-3-get-patterns helm-pattern)
                          when (and (eq pred 'identity)
-                                    (>= (length re)
-                                        helm-mp-highlight-threshold))
+                                   (>= (length re)
+                                       helm-mp-highlight-threshold))
                          collect re into re-list
                          finally return
                          (if (and re-list (>= (length re-list) 1))
