@@ -6216,9 +6216,10 @@ word in the function's name, e.g. \"bb\" is an abbrev for
 ;;; LaCarte
 (defvar helm-c-source-lacarte
   '((name . "Lacarte")
-    (init . (lambda () (require 'lacarte )))
+    (init . (lambda () (require 'lacarte)))
     (candidates . (lambda ()
-                    (delete '(nil) (lacarte-get-overall-menu-item-alist))))
+                    (with-helm-current-buffer
+                      (delete '(nil) (lacarte-get-overall-menu-item-alist)))))
     (candidate-number-limit . 9999)
     (action . helm-c-call-interactively))
   "Needs lacarte.el.
