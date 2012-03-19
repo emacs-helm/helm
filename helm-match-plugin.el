@@ -32,87 +32,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Auto documentation
-;;  ------------------
-;;
-;;  * User variables
-;; [EVAL] (autodoc-document-lisp-buffer :type 'user-variable :prefix "helm-mp" :var-value t)
-;; `helm-mp-matching-method'
-;; Default Value: multi3
-;; `helm-mp-highlight-delay'
-;; Default Value: 0.7
-;; `helm-mp-highlight-threshold'
-;; Default Value: 2
-;;
-;;  * Internal variables
-;; [EVAL] (autodoc-document-lisp-buffer :type 'internal-variable :prefix "helm-mp" :var-value t)
-;; `helm-mp-default-match-functions'
-;; Default Value:	(helm-mp-exact-match helm-mp-3-match)
-;; `helm-mp-default-search-functions'
-;; Default Value:	(helm-mp-exact-search helm-mp-3-search)
-;; `helm-mp-default-search-backward-functions'
-;; Default Value:	(helm-mp-exact-search-backward helm-mp-3-search-backward)
-;; `helm-mp-space-regexp'
-;; Default Value: "[\\ ] "
-;; `helm-mp-exact-pattern-str'
-;; Default Value: "autod"
-;; `helm-mp-exact-pattern-real'
-;; Default Value: "\nautod\n"
-;; `helm-mp-prefix-pattern-str'
-;; Default Value: nil
-;; `helm-mp-prefix-pattern-real'
-;; Default Value: nil
-;; `helm-mp-1-pattern-str'
-;; Default Value: nil
-;; `helm-mp-1-pattern-real'
-;; Default Value: nil
-;; `helm-mp-2-pattern-str'
-;; Default Value: nil
-;; `helm-mp-2-pattern-real'
-;; Default Value: nil
-;; `helm-mp-3-pattern-str'
-;; Default Value: "autod"
-;; `helm-mp-3-pattern-list'
-;; Default Value:	((identity . "autod"))
-;; `helm-mp-initial-highlight-delay'
-;; Default Value: nil
-;;
-;;  * Helm match plugin Functions
-;; [EVAL] (autodoc-document-lisp-buffer :type 'function :prefix "helm-mp")
-;; `helm-mp-set-matching-method'
-;; `helm-mp-make-regexps'
-;; `helm-mp-1-make-regexp'
-;; `helm-mp-exact-get-pattern'
-;; `helm-mp-exact-match'
-;; `helm-mp-exact-search'
-;; `helm-mp-exact-search-backward'
-;; `helm-mp-prefix-get-pattern'
-;; `helm-mp-prefix-match'
-;; `helm-mp-prefix-search'
-;; `helm-mp-prefix-search-backward'
-;; `helm-mp-1-get-pattern'
-;; `helm-mp-1-match'
-;; `helm-mp-1-search'
-;; `helm-mp-1-search-backward'
-;; `helm-mp-2-get-pattern'
-;; `helm-mp-2-match'
-;; `helm-mp-2-search'
-;; `helm-mp-2-search-backward'
-;; `helm-mp-3-get-patterns'
-;; `helm-mp-3-get-patterns-internal'
-;; `helm-mp-3-match'
-;; `helm-mp-3-search-base'
-;; `helm-mp-3-search'
-;; `helm-mp-3-search-backward'
-;; `helm-mp-3p-match'
-;; `helm-mp-3p-search'
-;; `helm-mp-3p-search-backward'
-;; `helm-mp-highlight-match'
-;; `helm-mp-highlight-region'
-;; `helm-mp-highlight-match-internal'
-
-;;  *** END auto-documentation
-
 ;;; Commentary:
 
 ;; Change helm.el matching algorithm humanely.
@@ -136,12 +55,12 @@
 ;; helm-match-plugin is enable by default in helm.
 ;; To disable/enable it use M-x helm-c-toggle-match-plugin.
 
+
 ;;; Code:
 
 (require 'helm)
 (require 'cl)
 
-
 ;;;; Match-plugin
 
 ;; Internal

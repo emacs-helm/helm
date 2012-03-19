@@ -37,309 +37,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;; Autodoc documentation:
-;;  ---------------------
-
-;;  * Commands defined here are:
-;; [EVAL] (autodoc-document-lisp-buffer :type 'command :prefix "helm" :docstring t)
-;; `helm-open-last-log'
-;; Open helm log file of last helm session.
-;; `helm'
-;; Main function to execute helm sources.
-;; `helm-resume'
-;; Resurrect previously invoked `helm'.
-;; `helm-resume-window-only'
-;;
-;; `helm-at-point'
-;; Call helm with symbol at point as initial input.
-;; `helm-force-update'
-;; Force recalculation and update of candidates.
-;; `helm-select-action'
-;; Select an action for the currently selected candidate.
-;; `helm-previous-line'
-;; Move selection to the previous line.
-;; `helm-next-line'
-;; Move selection to the next line.
-;; `helm-previous-page'
-;; Move selection back with a pageful.
-;; `helm-next-page'
-;; Move selection forward with a pageful.
-;; `helm-beginning-of-buffer'
-;; Move selection at the top.
-;; `helm-end-of-buffer'
-;; Move selection at the bottom.
-;; `helm-previous-source'
-;; Move selection to the previous source.
-;; `helm-next-source'
-;; Move selection to the next source.
-;; `helm-select-with-prefix-shortcut'
-;; Invoke default action with prefix shortcut.
-;; `helm-select-with-digit-shortcut'
-;; Invoke default action with digit/alphabet shortcut.
-;; `helm-confirm-and-exit-minibuffer'
-;; Maybe ask for confirmation when exiting helm.
-;; `helm-exit-minibuffer'
-;; Select the current candidate by exiting the minibuffer.
-;; `helm-keyboard-quit'
-;; Quit minibuffer in helm.
-;; `helm-help'
-;; Help of `helm'.
-;; `helm-debug-output'
-;; Show all helm-related variables at this time.
-;; `helm-delete-current-selection'
-;; Delete the currently selected item.
-;; `helm-delete-minibuffer-contents'
-;; Same as `delete-minibuffer-contents' but this is a command.
-;; `helm-toggle-resplit-window'
-;; Toggle resplit helm window, vertically or horizontally.
-;; `helm-narrow-window'
-;; Narrow helm window.
-;; `helm-enlarge-window'
-;; Enlarge helm window.
-;; `helm-select-2nd-action'
-;; Select the 2nd action for the currently selected candidate.
-;; `helm-select-3rd-action'
-;; Select the 3rd action for the currently selected candidate.
-;; `helm-select-4th-action'
-;; Select the 4th action for the currently selected candidate.
-;; `helm-select-2nd-action-or-end-of-line'
-;; Select the 2nd action for the currently selected candidate.
-;; `helm-execute-persistent-action'
-;; Perform the associated action ATTR without quitting helm.
-;; `helm-scroll-other-window'
-;; Scroll other window (not *Helm* window) upward.
-;; `helm-scroll-other-window-down'
-;; Scroll other window (not *Helm* window) downward.
-;; `helm-toggle-visible-mark'
-;; Toggle helm visible mark at point.
-;; `helm-display-all-visible-marks'
-;; Show all `helm' visible marks strings.
-;; `helm-next-visible-mark'
-;; Move next helm visible mark.
-;; `helm-prev-visible-mark'
-;; Move previous helm visible mark.
-;; `helm-yank-selection'
-;; Set minibuffer contents to current selection.
-;; `helm-kill-selection-and-quit'
-;; Store current selection to kill ring.
-;; `helm-follow-mode'
-;; If this mode is on, persistent action is executed everytime the cursor is moved.
-;; `helm-migrate-sources'
-;; Help to migrate to new `helm' way.
-;; `helm-describe-helm-attribute'
-;; Display the full documentation of HELM-ATTRIBUTE.
-;; `helm-send-bug-report'
-;; Send a bug report of helm.el.
-;; `helm-send-bug-report-from-helm'
-;; Send a bug report of helm.el in helm session.
-
-;;  * Variables defined here are:
-;; [EVAL] (autodoc-document-lisp-buffer :type 'internal-variable :prefix "helm-" :docstring t)
-;; `helm-version'
-;; Not documented.
-;; `helm-sources'
-;; A list of sources to use with `helm'.
-;; `helm-type-attributes'
-;; It's a list of                                      (TYPE ATTRIBUTES ...).
-;; `helm-enable-shortcuts'
-;; *Whether to use digit/alphabet shortcut to select the first nine matches.
-;; `helm-shortcut-keys-alist'
-;; Not documented.
-;; `helm-display-source-at-screen-top'
-;; *Display candidates at the top of screen.
-;; `helm-candidate-number-limit'
-;; Apply candidate-number-limit attribute value.
-;; `helm-idle-delay'
-;; *Be idle for this many seconds, before updating in delayed sources.
-;; `helm-input-idle-delay'
-;; Be idle for this many seconds, before updating.
-;; `helm-samewindow'
-;; Use current window to show the candidates.
-;; `helm-source-filter'
-;; A list of source names to be displayed.
-;; `helm-map'
-;; Keymap for helm.
-;; `helm-header-face'
-;; *Face for header lines in the helm buffer.
-;; `helm-selection-face'
-;; *Face for currently selected item.
-;; `helm-buffer'
-;; Buffer showing completions.
-;; `helm-action-buffer'
-;; Buffer showing actions.
-;; `helm-selection-overlay'
-;; Overlay used to highlight the currently selected item.
-;; `helm-digit-overlays'
-;; Overlays for digit shortcuts.  See `helm-enable-shortcuts'.
-;; `helm-candidate-cache'
-;; Holds the available candidate withing a single helm invocation.
-;; `helm-pattern'
-;; Not documented.
-;; `helm-input'
-;; Not documented.
-;; `helm-async-processes'
-;; List of information about asynchronous processes managed by helm.
-;; `helm-digit-shortcut-count'
-;; Number of digit shortcuts shown in the helm buffer.
-;; `helm-before-initialize-hook'
-;; Run before helm initialization.
-;; `helm-after-initialize-hook'
-;; Run after helm initialization.
-;; `helm-update-hook'
-;; Run after the helm buffer was updated according the new input pattern.
-;; `helm-after-update-hook'
-;; Run after the helm buffer was updated according the new input pattern.
-;; `helm-cleanup-hook'
-;; Run after helm minibuffer is closed.
-;; `helm-select-action-hook'
-;; Run when opening the action buffer.
-;; `helm-before-action-hook'
-;; Run before executing action.
-;; `helm-after-action-hook'
-;; Run after executing action.
-;; `helm-after-persistent-action-hook'
-;; Run after executing persistent action.
-;; `helm-move-selection-before-hook'
-;; Run before moving selection in `helm-buffer'.
-;; `helm-move-selection-after-hook'
-;; Run after moving selection in `helm-buffer'.
-;; `helm-restored-variables'
-;; Variables which are restored after `helm' invocation.
-;; `helm-saved-selection'
-;; Value of the currently selected object when the action list is shown.
-;; `helm-current-prefix-arg'
-;; Record `current-prefix-arg' when exiting minibuffer.
-;; `helm-candidate-separator'
-;; Candidates separator of `multiline' source.
-;; `helm-current-buffer'
-;; Current buffer when `helm' is invoked.
-;; `helm-buffer-file-name'
-;; Variable `buffer-file-name' when `helm' is invoked.
-;; `helm-saved-action'
-;; Saved value of the currently selected action by key.
-;; `helm-last-sources'
-;; OBSOLETE!! Sources of previously invoked `helm'.
-;; `helm-saved-current-source'
-;; Value of the current source when the action list is shown.
-;; `helm-compiled-sources'
-;; Compiled version of `helm-sources'.
-;; `helm-in-persistent-action'
-;; Flag whether in persistent-action or not.
-;; `helm-quick-update'
-;; If non-nil, suppress displaying sources which are out of screen at first.
-;; `helm-last-sources-local'
-;; Buffer local value of `helm-sources'.
-;; `helm-last-buffer'
-;; `helm-buffer' of previously `helm' session.
-;; `helm-save-configuration-functions'
-;; The functions used to restore/save window or frame configurations.
-;; `helm-persistent-action-use-special-display'
-;; If non-nil, use `special-display-function' in persistent action.
-;; `helm-execute-action-at-once-if-one'
-;; Execute default action and exit when only one candidate is remaining.
-;; `helm-quit-if-no-candidate'
-;; Quit when there is no candidates when non--nil.
-;; `helm-scroll-amount'
-;; Scroll amount when scrolling other window in an helm session.
-;; `helm-display-function'
-;; Function to display *helm* buffer.
-;; `helm-delayed-init-executed'
-;; Not documented.
-;; `helm-mode-line-string'
-;; Help string displayed in mode-line in `helm'.
-;; `helm-help-message'
-;; Detailed help message string for `helm'.
-;; `helm-source-in-each-line-flag'
-;; Non-nil means add helm-source text-property in each candidate.
-;; `helm-debug-forms'
-;; Forms to show in `helm-debug-output'.
-;; `helm-debug'
-;; If non-nil, write log message into *Helm Log* buffer.
-;; `helm-test-candidate-list'
-;; Not documented.
-;; `helm-test-mode'
-;; Not documented.
-;; `helm-source-name'
-;; Not documented.
-;; `helm-candidate-buffer-alist'
-;; Not documented.
-;; `helm-check-minibuffer-input-timer'
-;; Not documented.
-;; `helm-match-hash'
-;; Not documented.
-;; `helm-cib-hash'
-;; Not documented.
-;; `helm-tick-hash'
-;; Not documented.
-;; `helm-issued-errors'
-;; Not documented.
-;; `helm-shortcut-keys'
-;; Not documented.
-;; `helm-once-called-functions'
-;; Not documented.
-;; `helm-follow-mode'
-;; If this mode is on, persistent action is executed everytime the cursor is moved.
-;; `helm-let-variables'
-;; Not documented.
-;; `helm-split-window-state'
-;; Not documented.
-;; `helm-selection-point'
-;; Not documented.
-;; `helm-last-log-file'
-;; Not documented.
-;; `helm-compile-source-functions'
-;; Functions to compile elements of `helm-sources' (plug-in).
-;; `helm-quit'
-;; Not documented.
-;; `helm-additional-attributes'
-;; List of all `helm' attributes.
-;; `helm-buffers'
-;; All of `helm-buffer' in most recently used order.
-;; `helm-current-position'
-;; Restore or save current position in `helm-current-buffer'.
-;; `helm-last-frame-or-window-configuration'
-;; Used to store window or frame configuration when helm start.
-;; `helm-reading-pattern'
-;; Whether in `read-string' in helm or not.
-;; `helm-compile-source-functions-default'
-;; Plug-ins this file provides.
-;; `helm-input-local'
-;; Not documented.
-;; `helm-process-delayed-sources-timer'
-;; Not documented.
-;; `helm-mode-line-string-real'
-;; Not documented.
-;; `helm-exit-status'
-;; Flag to inform whether helm have exited or quitted.
-;; `helm-minibuffer-confirm-state'
-;; Not documented.
-;; `helm-types'
-;; Not documented.
-;; `helm-orig-enable-shortcuts'
-;; Not documented.
-;; `helm-persistent-action-display-window'
-;; Return the window that will be used for presistent action.
-;; `helm-visible-mark-face'
-;; Not documented.
-;; `helm-visible-mark-overlays'
-;; Not documented.
-;; `helm-marked-candidates'
-;; Return marked candidates of current source if any.
-;; `helm-maintainer-mail-address'
-;; Not documented.
-;; `helm-bug-report-salutation'
-;; Not documented.
-;; `helm-no-dump-variables'
-;; Variables not to dump in bug report.
-
-;;  *** END auto-documentation
-
-;; [EVAL] (autodoc-update-all)
-
-
 ;;; Commentary:
 
 ;;
@@ -360,7 +57,6 @@
 ;; Here is Japanese translation of `helm-sources' attributes.  Thanks.
 ;; http://d.hatena.ne.jp/sirocco634/20091012/1255336649
 
-
 ;;; Bug Report:
 ;;
 ;; If you have problems, send a bug report via C-c C-x C-b in helm session (best)
@@ -456,7 +152,6 @@
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/helm-source.yasnippet
 ;;
 ;; Put it in ~/.emacs.d/plugins/yasnippet/snippets/text-mode/emacs-lisp-mode/
-
 
 ;;
 ;; `helm-interpret-value' is useful function to interpret value
@@ -614,14 +309,6 @@
 ;;
 ;;   - helm-candidate-number-limit can't be nil everywhere
 
-;; (@* "HISTORY")
-;;
-;;  Change log of this file is found at
-;;  http://repo.or.cz/w/helm-config.git/history/master:/helm.el
-;;
-;;  Change log of this project is found at
-;;  http://repo.or.cz/w/helm-config.git?a=shortlog
-;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -631,12 +318,9 @@
 
 (defvar helm-version "1.4.0")
 
-;; (@* "User Configuration")
-
 ;;; Keymap
 ;;
 ;;
-
 (defvar helm-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map minibuffer-local-map)
