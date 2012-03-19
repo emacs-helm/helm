@@ -9306,16 +9306,18 @@ other candidate transformers."
        args)
       args))
 
+(defvar helm-canonical-home
+  (regexp-quote (expand-file-name "~")))
+
+(defsubst helm-c-shorten-home-path_ (file)
+  (if (and (stringp file)
+           (string-match (concat "\\`" helm-canonical-home) file))
+      (cons (replace-match "~" nil nil file) file)
+    file))
+
 (defun helm-c-shorten-home-path (files)
   "Replaces /home/user with ~."
-  (let ((home (replace-regexp-in-string "\\\\" "/" ; stupid Windows...
-                                        (getenv "HOME"))))
-    (helm-transform-mapcar
-     (lambda (file)
-       (if (and (stringp file) (string-match home file))
-           (cons (replace-match "~" nil nil file) file)
-           file))
-     files)))
+  (helm-transform-mapcar #'helm-c-shorten-home-path_ files))
 
 ;;; Functions
 (defun helm-c-mark-interactive-functions (functions)
