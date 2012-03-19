@@ -1,14 +1,8 @@
 ;;; helm-vars.el --- Users variables and faces for helm.
 
-;; Copyright (C) Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; X-URL: <https://github.com/emacs-helm/helm>
-
-;;; This file is NOT part of GNU Emacs
-
-;;; License
-;;
-;; This program is free software: you can redistribute it and/or modify
+;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
@@ -512,7 +506,7 @@ Where NAME is one of `helm-c-default-info-index-list'."
                           (cons 'info-index str)))
         when commands
         do (let ((com (intern (concat "helm-info-" str))))
-	     (helm-c-build-info-index-command
+             (helm-c-build-info-index-command
               com (format "Predefined helm for %s info." str)
               sym (format "*helm info %s*" str)))))
 

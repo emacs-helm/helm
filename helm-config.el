@@ -1,39 +1,8 @@
-;;; helm-config.el --- Applications libary for `helm.el'
+;;; helm-config.el --- Applications library for `helm.el'
 
-;; Filename: helm-config.el
+;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; Description: Applications libary for `helm.el'
-
-;; Original Author: Tassilo Horn <tassilo@member.fsf.org>
-
-;; This is a fork of original `anything-config.el' created by
-;; Tassilo Horn <tassilo@member.fsf.org>.
-
-;; Maintainers: Thierry Volpiatto <thierry.volpiatto@gmail.com>
-;;              Le Wang
-
-;; Copyright (C) 2007 ~ 2011, Tassilo Horn, all rights reserved.
-;; Copyright (C) 2009, Andy Stewart, all rights reserved.
-;; Copyright (C) 2009 ~ 2012, rubikitch, all rights reserved.
-;; Copyright (C) 2009 ~ 2012, Thierry Volpiatto, all rights reserved.
-
-;; Created: 2012-03-15 12:29:23
-
-;; X-URL: <https://github.com/emacs-helm/helm>
-
-;; MailingList: <https://groups.google.com/forum/?hl=en&fromgroups#!forum/emacs-anything>
-
-;; Keywords: helm, helm-config
-
-;; Compatibility: GNU Emacs 22 ~ 24
-
-;; Dependencies: `helm.el', `helm-match-plugin.el'.
-
-;;; This file is NOT part of GNU Emacs
-
-;;; License
-;;
-;; This program is free software: you can redistribute it and/or modify
+;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
@@ -46,30 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Commentary:
-;;
-;; Predefined configurations for `helm.el'
-;;
-;; For quick start, try `helm-for-files' to open files.
-;;
-;; To configure helm you should define helm command
-;; with your favorite sources, like below:
-;;
-;; (defun my-helm ()
-;;   (interactive)
-;;   (helm-other-buffer
-;;    '(helm-c-source-buffers
-;;      helm-c-source-file-name-history
-;;      helm-c-source-info-pages
-;;      helm-c-source-info-elisp
-;;      helm-c-source-man-pages
-;;      helm-c-source-locate
-;;      helm-c-source-emacs-commands)
-;;    " *my-helm*"))
-;;
-;; Then type M-x my-helm to use sources.
-
-
 ;;; Code:
 
 ;;; Require
@@ -2181,7 +2126,7 @@ Same as `dired-do-print' but for helm."
                            (helm-comp-read
                             "Printer: " helm-ff-printer-list)
                            printer-name))
-	 (command (read-string
+         (command (read-string
                    (format "Print *%s File(s):\n%s with: "
                            len
                            (mapconcat
@@ -10619,7 +10564,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (let* ((engine-nodesc (car (split-string engine)))
          (url (with-temp-buffer
                 (apply 'call-process "surfraw" nil t nil
-		       ;;JAVE
+                       ;;JAVE
                        (append  (list engine-nodesc "-p") (split-string pattern)))
                 (replace-regexp-in-string
                  "\n" "" (buffer-string))))
