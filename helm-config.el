@@ -24,7 +24,6 @@
 (require 'helm-vars)
 (require 'helm-utils)
 (require 'helm-buffers)
-(require 'helm-regexp)
 (require 'thingatpt)
 (require 'ffap)
 (require 'cl)
@@ -108,6 +107,13 @@ variable is not set by the user, it will be calculated
 automatically.")
 
 (defvar helm-c-show-completion-overlay nil)
+
+
+;;;###autoload
+(defun helm-configuration ()
+  "Customize `helm'."
+  (interactive)
+  (customize-group "helm-config"))
 
 
 ;;; Helm-command-map
@@ -411,6 +417,13 @@ automatically.")
     (define-key map (kbd "M-u") 'helm-previous-line)
     map)
   "Keymap for `helm-show-kill-ring'.")
+
+(defvar helm-occur-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-M-%") 'helm-occur-run-query-replace-regexp)
+    map)
+  "Keymap for `helm-occur'.")
 
 
 ;;; Embeded documentation.
@@ -916,6 +929,88 @@ Otherwise your command will be called many times like this:
 
 ;;; Helm Applications.
 
+;;; Helm regexp.
+;;
+;;
+(defvar helm-build-regexp-history nil)
+(defun helm-c-query-replace-regexp (candidate)
+  "Query replace regexp from `helm-regexp'.
+With a prefix arg replace only matches surrounded by word boundaries,
+i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
+  (let ((regexp (funcall (helm-attr 'regexp))))
+    (apply 'query-replace-regexp
+           (helm-c-query-replace-args regexp))))
+
+(defun helm-c-kill-regexp-as-sexp (candidate)
+  "Kill regexp in a format usable in lisp code."
+  (helm-c-regexp-kill-new
+   (prin1-to-string (funcall (helm-attr 'regexp)))))
+
+(defun helm-c-kill-regexp (candidate)
+  "Kill regexp as it is in `helm-pattern'."
+  (helm-c-regexp-kill-new (funcall (helm-attr 'regexp))))
+
+(defun helm-c-query-replace-args (regexp)
+  "create arguments of `query-replace-regexp' action in `helm-regexp'."
+  (let ((region-only (helm-region-active-p)))
+    (list
+     regexp
+     (query-replace-read-to regexp
+                            (format "Query replace %sregexp %s"
+                                    (if helm-current-prefix-arg "word " "")
+                                    (if region-only "in region " ""))
+                            t)
+     helm-current-prefix-arg
+     (when region-only (region-beginning))
+     (when region-only (region-end)))))
+
+(defvar helm-c-source-regexp
+  '((name . "Regexp Builder")
+    (init . (lambda ()
+              (helm-candidate-buffer helm-current-buffer)))
+    (candidates-in-buffer)
+    (get-line . helm-c-regexp-get-line)
+    (persistent-action . helm-c-regexp-persistent-action)
+    (persistent-help . "Show this line")
+    (multiline)
+    (delayed)
+    (requires-pattern . 2)
+    (mode-line . "Press TAB to select action.")
+    (regexp . (lambda () helm-input))
+    (action . (("Kill Regexp as sexp" . helm-c-kill-regexp-as-sexp)
+               ("Query Replace Regexp (C-u Not inside word.)"
+                . helm-c-query-replace-regexp)
+               ("Kill Regexp" . helm-c-kill-regexp)))))
+
+(defun helm-c-regexp-get-line (s e)
+  (propertize
+   (apply 'concat
+          ;; Line contents
+          (format "%5d: %s" (line-number-at-pos (1- s)) (buffer-substring s e))
+          ;; subexps
+          (loop for i from 0 to (1- (/ (length (match-data)) 2))
+                collect (format "\n         %s'%s'"
+                                (if (zerop i) "Group 0: " (format "Group %d: " i))
+                                (match-string i))))
+   ;; match beginning
+   ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.
+   ;; It is implementation problem of candidates-in-buffer.
+   'helm-realvalue
+   (1- s)))
+
+(defun helm-c-regexp-persistent-action (pt)
+  (helm-goto-char pt)
+  (helm-persistent-highlight-point))
+
+(defun helm-c-regexp-kill-new (input)
+  (kill-new input)
+  (message "Killed: %s" input))
+
+(defun helm-quote-whitespace (candidate)
+  "Quote whitespace, if some, in string CANDIDATE."
+  (replace-regexp-in-string " " "\\\\ " candidate))
+
+
 ;;; Toggle all marks.
 ;;
 ;;
@@ -1532,11 +1627,6 @@ Rename only file of current directory, and copy files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
-
-(defun helm-c-quit-and-execute-action (action)
-  "Quit current helm session and execute ACTION."
-  (setq helm-saved-action action)
-  (helm-exit-minibuffer))
 
 (defun helm-ff-toggle-auto-update (candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
@@ -6560,6 +6650,59 @@ When nil, fallback to `browse-url-browser-function'.")
                       cmd)))
 
 
+;;; Occur
+;;
+;;
+(defun helm-c-occur-init ()
+  "Create the initial helm occur buffer.
+If region is active use region as buffer contents
+instead of whole buffer."
+  (with-current-buffer (helm-candidate-buffer 'global)
+    (erase-buffer)
+    (let ((buf-contents
+           (with-helm-current-buffer
+             (if (helm-region-active-p)
+                 (buffer-substring (region-beginning) (region-end))
+                 (buffer-substring (point-min) (point-max))))))
+      (insert buf-contents))))
+
+(defun helm-c-occur-get-line (s e)
+  (format "%7d:%s" (line-number-at-pos (1- s)) (buffer-substring s e)))
+
+(defun helm-c-occur-query-replace-regexp (candidate)
+  "Query replace regexp starting from CANDIDATE.
+If region is active ignore CANDIDATE and replace only in region.
+With a prefix arg replace only matches surrounded by word boundaries,
+i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
+  (let ((regexp helm-input))
+    (unless (helm-region-active-p)
+      (helm-c-action-line-goto candidate))
+    (apply 'query-replace-regexp
+           (helm-c-query-replace-args regexp))))
+
+(defun helm-occur-run-query-replace-regexp ()
+  "Run `query-replace-regexp' in helm occur from keymap."
+  (interactive)
+  (helm-c-quit-and-execute-action
+   'helm-c-occur-query-replace-regexp))
+
+(defvar helm-c-source-occur
+  `((name . "Occur")
+    (init . helm-c-occur-init)
+    (candidates-in-buffer)
+    (migemo)
+    (get-line . helm-c-occur-get-line)
+    (display-to-real . helm-c-display-to-real-line)
+    (action . (("Go to Line" . helm-c-action-line-goto)
+               ("Query replace regexp (C-u Not inside word.)"
+                . helm-c-occur-query-replace-regexp)))
+    (recenter)
+    (mode-line . helm-occur-mode-line)
+    (keymap . ,helm-occur-map)
+    (requires-pattern . 1)
+    (delayed)))
+
+
 ;;; Helm browse code.
 (defun helm-c-browse-code-get-line (beg end)
   "Select line if it match the regexp corresponding to current `major-mode'.
@@ -6643,6 +6786,22 @@ See also `helm-create--actions'.")
 ;;; Elscreen
 ;;
 ;;
+(defun helm-find-buffer-on-elscreen (candidate)
+  "Open buffer in new screen, if marked buffers open all in elscreens."
+  (helm-require-or-error 'elscreen 'helm-find-buffer-on-elscreen)
+  (helm-aif (helm-marked-candidates)
+      (dolist (i it)
+        (let ((target-screen (elscreen-find-screen-by-buffer
+                              (get-buffer i) 'create)))
+          (elscreen-goto target-screen)))
+    (let ((target-screen (elscreen-find-screen-by-buffer
+                          (get-buffer candidate) 'create)))
+      (elscreen-goto target-screen))))
+
+(defun helm-elscreen-find-file (file)
+  (helm-require-or-error 'elscreen 'helm-elscreen-find-file)
+  (elscreen-find-file file))
+
 (defvar helm-c-source-elscreen
   '((name . "Elscreen")
     (candidates
@@ -8249,28 +8408,6 @@ In this case EXE must be provided as \"EXE %s\"."
 ;;; Generic action functions
 ;;
 ;;
-(defun helm-c-file-buffers (filename)
-  "Returns a list of buffer names corresponding to FILENAME."
-  (let ((name     (expand-file-name filename))
-        (buf-list ()))
-    (dolist (buf (buffer-list) buf-list)
-      (let ((bfn (buffer-file-name buf)))
-        (when (and bfn (string= name bfn))
-          (push (buffer-name buf) buf-list))))))
-
-(defun helm-revert-buffer (candidate)
-  (with-current-buffer candidate
-    (when (or (buffer-modified-p)
-              (not (verify-visited-file-modtime
-                    (get-buffer candidate))))
-      (revert-buffer t t))))
-
-(defun helm-revert-marked-buffers (ignore)
-  (mapc 'helm-revert-buffer (helm-marked-candidates)))
-
-(defun helm-kill-marked-buffers (ignore)
-  (mapc 'kill-buffer (helm-marked-candidates)))
-
 (defun helm-c-delete-file (file &optional error-if-dot-file-p)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
@@ -8408,31 +8545,6 @@ If not found or a prefix arg is given query the user which tool to use."
           (helm-c-delete-file i helm-ff-signal-error-on-dot-files))
         (message "%s File(s) deleted" len))))
 
-(defun helm-ediff-marked-buffers (candidate &optional merge)
-  "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
-With optional arg MERGE call `ediff-merge-buffers'."
-  (let ((lg-lst (length (helm-marked-candidates)))
-        buf1 buf2)
-    (case lg-lst
-      (0
-       (error "Error:You have to mark at least 1 buffer"))
-      (1
-       (setq buf1 helm-current-buffer
-             buf2 (first (helm-marked-candidates))))
-      (2
-       (setq buf1 (first (helm-marked-candidates))
-             buf2 (second (helm-marked-candidates))))
-      (t
-       (error "Error:To much buffers marked!")))
-    (if merge
-        (ediff-merge-buffers buf1 buf2)
-        (ediff-buffers buf1 buf2))))
-
-(defun helm-ediff-marked-buffers-merge (candidate)
-  "Ediff merge `helm-current-buffer' with CANDIDATE.
-See `helm-ediff-marked-buffers'."
-  (helm-ediff-marked-buffers candidate t))
-
 (defun helm-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.
 e.g prepended with *.
@@ -8448,159 +8560,6 @@ Return nil if bmk is not a valid bookmark."
   (dolist (i (helm-marked-candidates))
     (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
                      'batch)))
-
-(defun helm-require-or-error (feature function)
-  (or (require feature nil t)
-      (error "Need %s to use `%s'." feature function)))
-
-(defun helm-find-buffer-on-elscreen (candidate)
-  "Open buffer in new screen, if marked buffers open all in elscreens."
-  (helm-require-or-error 'elscreen 'helm-find-buffer-on-elscreen)
-  (helm-aif (helm-marked-candidates)
-      (dolist (i it)
-        (let ((target-screen (elscreen-find-screen-by-buffer
-                              (get-buffer i) 'create)))
-          (elscreen-goto target-screen)))
-    (let ((target-screen (elscreen-find-screen-by-buffer
-                          (get-buffer candidate) 'create)))
-      (elscreen-goto target-screen))))
-
-(defun helm-elscreen-find-file (file)
-  (helm-require-or-error 'elscreen 'helm-elscreen-find-file)
-  (elscreen-find-file file))
-
-(defun helm-w32-prepare-filename (file)
-  "Convert filename FILE to something usable by external w32 executables."
-  (replace-regexp-in-string ; For UNC paths
-   "/" "\\"
-   (replace-regexp-in-string ; Strip cygdrive paths
-    "/cygdrive/\\(.\\)" "\\1:"
-    file nil nil) nil t))
-
-;;;###autoload
-(defun helm-w32-shell-execute-open-file (file)
-  (interactive "fOpen file:")
-  (with-no-warnings
-    (w32-shell-execute "open" (helm-w32-prepare-filename file))))
-
-(defun helm-c-open-file-with-default-tool (file)
-  "Open FILE with the default tool on this platform."
-  (if (eq system-type 'windows-nt)
-      (helm-w32-shell-execute-open-file file)
-      (start-process "helm-c-open-file-with-default-tool"
-                     nil
-                     (cond ((eq system-type 'gnu/linux)
-                            "xdg-open")
-                           ((or (eq system-type 'darwin) ;; Mac OS X
-                                (eq system-type 'macos)) ;; Mac OS 9
-                            "open"))
-                     file)))
-
-(defun helm-c-open-dired (file)
-  "Opens a dired buffer in FILE's directory.  If FILE is a
-directory, open this directory."
-  (if (file-directory-p file)
-      (dired file)
-      (dired (file-name-directory file))
-      (dired-goto-file file)))
-
-(defun helm-c-display-to-real-line (candidate)
-  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
-      (list (string-to-number (match-string 1 candidate)) (match-string 2 candidate))
-      (error "Line number not found")))
-
-(defun helm-c-action-line-goto (lineno-and-content)
-  (apply #'helm-goto-file-line (helm-interpret-value (helm-attr 'target-file))
-         (append lineno-and-content
-                 (list (if (and (helm-attr-defined 'target-file)
-                                (not helm-in-persistent-action))
-                           'find-file-other-window
-                           'find-file)))))
-
-(defun* helm-c-action-file-line-goto (file-line-content &optional (find-file-function #'find-file))
-  (apply #'helm-goto-file-line
-         (if (stringp file-line-content)
-             ;; Case: filtered-candidate-transformer is skipped
-             (cdr (helm-c-filtered-candidate-transformer-file-line-1 file-line-content))
-             file-line-content)))
-
-(require 'compile)
-(defun helm-c-filtered-candidate-transformer-file-line (candidates source)
-  (delq nil (mapcar 'helm-c-filtered-candidate-transformer-file-line-1 candidates)))
-
-(defun helm-c-filtered-candidate-transformer-file-line-1 (candidate)
-  (when (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate)
-    (let ((filename (match-string 1 candidate))
-          (lineno (match-string 2 candidate))
-          (content (match-string 3 candidate)))
-      (cons (format "%s:%s\n %s"
-                    (propertize filename 'face compilation-info-face)
-                    (propertize lineno 'face compilation-line-face)
-                    content)
-            (list (expand-file-name
-                   filename
-                   (or (helm-interpret-value (helm-attr 'default-directory))
-                       (and (helm-candidate-buffer)
-                            (buffer-local-value
-                             'default-directory (helm-candidate-buffer)))))
-                  (string-to-number lineno) content)))))
-
-(defun* helm-goto-file-line (file lineno content &optional (find-file-function #'find-file))
-  (helm-aif (helm-attr 'before-jump-hook)
-      (funcall it))
-  (when file (funcall find-file-function file))
-  (if (helm-attr-defined 'adjust)
-      (helm-c-goto-line-with-adjustment lineno content)
-      (helm-goto-line lineno))
-  (unless (helm-attr-defined 'recenter)
-    (set-window-start (get-buffer-window helm-current-buffer) (point)))
-  (helm-aif (helm-attr 'after-jump-hook)
-      (funcall it))
-  (when helm-in-persistent-action
-    (helm-match-line-color-current-line)))
-
-(defun helm-find-file-as-root (candidate)
-  (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))
-
-(defun helm-find-many-files (ignore)
-  (mapc 'find-file (helm-marked-candidates)))
-
-;; borrowed from etags.el
-;; (helm-c-goto-line-with-adjustment (line-number-at-pos) ";; borrowed from etags.el")
-(defun helm-c-goto-line-with-adjustment (line line-content)
-  (let ((startpos)
-        offset found pat)
-    ;; This constant is 1/2 the initial search window.
-    ;; There is no sense in making it too small,
-    ;; since just going around the loop once probably
-    ;; costs about as much as searching 2000 chars.
-    (setq offset 1000
-          found nil
-          pat (concat (if (eq selective-display t)
-                          "\\(^\\|\^m\\) *" "^ *") ;allow indent
-                      (regexp-quote line-content)))
-    ;; If no char pos was given, try the given line number.
-    (setq startpos (progn (helm-goto-line line) (point)))
-    (or startpos (setq startpos (point-min)))
-    ;; First see if the tag is right at the specified location.
-    (goto-char startpos)
-    (setq found (looking-at pat))
-    (while (and (not found)
-                (progn
-                  (goto-char (- startpos offset))
-                  (not (bobp))))
-      (setq found
-            (re-search-forward pat (+ startpos offset) t)
-            offset (* 3 offset)))       ; expand search window
-    (or found
-        (re-search-forward pat nil t)
-        (error "not found")))
-  ;; Position point at the right place
-  ;; if the search string matched an extra Ctrl-m at the beginning.
-  (and (eq selective-display t)
-       (looking-at "\^m")
-       (forward-char 1))
-  (beginning-of-line))
 
 (helm-document-attribute 'default-directory "type . file-line"
   "`default-directory' to interpret file.")
@@ -8638,46 +8597,6 @@ It is added to `extended-command-history'.
                               (prin1-to-string (symbol-value sym))))))
 ;; (setq hh 12)
 ;; (helm-c-set-variable 'hh)
-
-
-
-;;; Persistent Action Helpers
-;;
-;;
-(defvar helm-match-line-overlay-face nil)
-(defvar helm-match-line-overlay nil)
-
-(defun helm-match-line-color-current-line (&optional start end buf face rec)
-  "Highlight and underline current position"
-  (let ((args (list (or start (line-beginning-position))
-                    (or end (1+ (line-end-position)))
-                    buf)))
-    (if (not helm-match-line-overlay)
-        (setq helm-match-line-overlay (apply 'make-overlay args))
-        (apply 'move-overlay helm-match-line-overlay args)))
-  (overlay-put helm-match-line-overlay
-               'face (or face helm-match-line-overlay-face))
-  (when rec
-    (goto-char start)
-    (recenter)))
-
-(defalias 'helm-persistent-highlight-point 'helm-match-line-color-current-line)
-
-
-(setq helm-match-line-overlay-face 'helm-overlay-line-face)
-
-(defun helm-match-line-cleanup ()
-  (when helm-match-line-overlay
-    (delete-overlay helm-match-line-overlay)
-    (setq helm-match-line-overlay nil)))
-
-(defun helm-match-line-update ()
-  (when helm-match-line-overlay
-    (delete-overlay helm-match-line-overlay)
-    (helm-match-line-color-current-line)))
-
-(add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
-(add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
 
 
 ;;; Actions Transformers
@@ -8727,65 +8646,6 @@ evaluate it and put it onto the `command-history'."
       actions))
 
 
-;;; Candidate Transformers
-;;
-;;
-;;; Buffers
-(defun helm-c-skip-boring-buffers (buffers)
-  (helm-c-skip-entries buffers helm-c-boring-buffer-regexp))
-
-(defun helm-c-skip-current-buffer (buffers)
-  "[DEPRECATED] Skip current buffer in buffer lists.
-This transformer should not be used as this is now handled directly
-in `helm-c-buffer-list' and `helm-c-highlight-buffers'."
-  (if helm-allow-skipping-current-buffer
-      (remove (buffer-name helm-current-buffer) buffers)
-      buffers))
-
-(defun helm-c-shadow-boring-buffers (buffers)
-  "Buffers matching `helm-c-boring-buffer-regexp' will be
-displayed with the `file-name-shadow' face if available."
-  (helm-c-shadow-entries buffers helm-c-boring-buffer-regexp))
-
-(defvar helm-c-buffer-display-string-functions
-  '(helm-c-buffer-display-string--compilation
-    helm-c-buffer-display-string--shell
-    helm-c-buffer-display-string--eshell)
-  "Functions to setup display string for buffer.
-
-Function has one argument, buffer name.
-If it returns string, use it.
-If it returns nil, display buffer name.
-See `helm-c-buffer-display-string--compilation' for example.")
-
-(defun helm-c-transform-buffer-display-string (buffers)
-  "Setup display string for buffer candidates
-using `helm-c-buffer-display-string-functions'."
-  (loop for buf in buffers
-        if (consp buf)
-        collect buf
-        else
-        for disp = (progn (set-buffer buf)
-                          (run-hook-with-args-until-success
-                           'helm-c-buffer-display-string-functions buf))
-        collect (if disp (cons disp buf) buf)))
-
-(defun helm-c-buffer-display-string--compilation (buf)
-  (helm-aif (car compilation-arguments)
-      (format "%s: %s [%s]" buf it default-directory)))
-
-(defun helm-c-buffer-display-string--eshell (buf)
-  (declare (special eshell-history-ring))
-  (when (eq major-mode 'eshell-mode)
-    (format "%s: %s [%s]" buf
-            (ignore-errors (ring-ref eshell-history-ring 0))
-            default-directory)))
-
-(defun helm-c-buffer-display-string--shell (buf)
-  (when (eq major-mode 'shell-mode)
-    (format "%s: %s [%s]" buf
-            (ignore-errors (ring-ref comint-input-ring 0))
-            default-directory)))
 
 ;;; Files
 (defun helm-c-shadow-boring-files (files)

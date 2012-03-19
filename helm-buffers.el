@@ -19,6 +19,8 @@
 
 (require 'cl)
 (require 'helm)
+(require 'helm-vars)
+(require 'helm-utils)
 
 (defvar helm-c-buffer-map
   (let ((map (make-sparse-keymap)))
@@ -303,6 +305,113 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (if current-prefix-arg
       (helm-c-buffers-persistent-kill candidate)
       (helm-c-switch-to-buffer candidate)))
+
+(defun helm-ediff-marked-buffers (candidate &optional merge)
+  "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
+With optional arg MERGE call `ediff-merge-buffers'."
+  (let ((lg-lst (length (helm-marked-candidates)))
+        buf1 buf2)
+    (case lg-lst
+      (0
+       (error "Error:You have to mark at least 1 buffer"))
+      (1
+       (setq buf1 helm-current-buffer
+             buf2 (first (helm-marked-candidates))))
+      (2
+       (setq buf1 (first (helm-marked-candidates))
+             buf2 (second (helm-marked-candidates))))
+      (t
+       (error "Error:To much buffers marked!")))
+    (if merge
+        (ediff-merge-buffers buf1 buf2)
+        (ediff-buffers buf1 buf2))))
+
+(defun helm-ediff-marked-buffers-merge (candidate)
+  "Ediff merge `helm-current-buffer' with CANDIDATE.
+See `helm-ediff-marked-buffers'."
+  (helm-ediff-marked-buffers candidate t))
+
+;;; Candidate Transformers
+;;
+;;
+;;; Buffers
+(defun helm-c-skip-boring-buffers (buffers)
+  (helm-c-skip-entries buffers helm-c-boring-buffer-regexp))
+
+(defun helm-c-skip-current-buffer (buffers)
+  "[DEPRECATED] Skip current buffer in buffer lists.
+This transformer should not be used as this is now handled directly
+in `helm-c-buffer-list' and `helm-c-highlight-buffers'."
+  (if helm-allow-skipping-current-buffer
+      (remove (buffer-name helm-current-buffer) buffers)
+      buffers))
+
+(defun helm-c-shadow-boring-buffers (buffers)
+  "Buffers matching `helm-c-boring-buffer-regexp' will be
+displayed with the `file-name-shadow' face if available."
+  (helm-c-shadow-entries buffers helm-c-boring-buffer-regexp))
+
+(defvar helm-c-buffer-display-string-functions
+  '(helm-c-buffer-display-string--compilation
+    helm-c-buffer-display-string--shell
+    helm-c-buffer-display-string--eshell)
+  "Functions to setup display string for buffer.
+
+Function has one argument, buffer name.
+If it returns string, use it.
+If it returns nil, display buffer name.
+See `helm-c-buffer-display-string--compilation' for example.")
+
+(defun helm-c-transform-buffer-display-string (buffers)
+  "Setup display string for buffer candidates
+using `helm-c-buffer-display-string-functions'."
+  (loop for buf in buffers
+        if (consp buf)
+        collect buf
+        else
+        for disp = (progn (set-buffer buf)
+                          (run-hook-with-args-until-success
+                           'helm-c-buffer-display-string-functions buf))
+        collect (if disp (cons disp buf) buf)))
+
+(defun helm-c-buffer-display-string--compilation (buf)
+  (helm-aif (car compilation-arguments)
+      (format "%s: %s [%s]" buf it default-directory)))
+
+(defun helm-c-buffer-display-string--eshell (buf)
+  (declare (special eshell-history-ring))
+  (when (eq major-mode 'eshell-mode)
+    (format "%s: %s [%s]" buf
+            (ignore-errors (ring-ref eshell-history-ring 0))
+            default-directory)))
+
+(defun helm-c-buffer-display-string--shell (buf)
+  (when (eq major-mode 'shell-mode)
+    (format "%s: %s [%s]" buf
+            (ignore-errors (ring-ref comint-input-ring 0))
+            default-directory)))
+
+(defun helm-c-file-buffers (filename)
+  "Returns a list of buffer names corresponding to FILENAME."
+  (let ((name     (expand-file-name filename))
+        (buf-list ()))
+    (dolist (buf (buffer-list) buf-list)
+      (let ((bfn (buffer-file-name buf)))
+        (when (and bfn (string= name bfn))
+          (push (buffer-name buf) buf-list))))))
+
+(defun helm-revert-buffer (candidate)
+  (with-current-buffer candidate
+    (when (or (buffer-modified-p)
+              (not (verify-visited-file-modtime
+                    (get-buffer candidate))))
+      (revert-buffer t t))))
+
+(defun helm-revert-marked-buffers (ignore)
+  (mapc 'helm-revert-buffer (helm-marked-candidates)))
+
+(defun helm-kill-marked-buffers (ignore)
+  (mapc 'kill-buffer (helm-marked-candidates)))
 
 ;;;###autoload
 (defun helm-buffers-list ()

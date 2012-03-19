@@ -18,6 +18,10 @@
 ;;; Code:
 
 (require 'cl)
+(require 'helm)
+(require 'compile) ; Fixme: Is this needed?
+(require 'dired)
+
 
 
 ;;; compatibility
@@ -249,6 +253,7 @@ See `helm-c-enable-eval-defun-hack'."
         (helm varsym)))))
 ;; (progn (ad-disable-advice 'eval-defun 'after 'helm-source-hack) (ad-update 'eval-defun))
 
+(declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
 (defun helm-quit-and-find-file ()
   "Drop into `helm-find-files' from `helm'.
 If current selection is a buffer or a file, `helm-find-files'
@@ -392,6 +397,190 @@ Useful in dired buffers when there is inserted subdirs."
   (if (eq major-mode 'dired-mode)
       (dired-current-directory)
       default-directory))
+
+;;; Persistent Action Helpers
+;;
+;;
+(defvar helm-match-line-overlay-face nil)
+(defvar helm-match-line-overlay nil)
+
+(defun helm-match-line-color-current-line (&optional start end buf face rec)
+  "Highlight and underline current position"
+  (let ((args (list (or start (line-beginning-position))
+                    (or end (1+ (line-end-position)))
+                    buf)))
+    (if (not helm-match-line-overlay)
+        (setq helm-match-line-overlay (apply 'make-overlay args))
+        (apply 'move-overlay helm-match-line-overlay args)))
+  (overlay-put helm-match-line-overlay
+               'face (or face helm-match-line-overlay-face))
+  (when rec
+    (goto-char start)
+    (recenter)))
+
+(defalias 'helm-persistent-highlight-point 'helm-match-line-color-current-line)
+
+(setq helm-match-line-overlay-face 'helm-overlay-line-face)
+
+(defun helm-match-line-cleanup ()
+  (when helm-match-line-overlay
+    (delete-overlay helm-match-line-overlay)
+    (setq helm-match-line-overlay nil)))
+
+(defun helm-match-line-update ()
+  (when helm-match-line-overlay
+    (delete-overlay helm-match-line-overlay)
+    (helm-match-line-color-current-line)))
+
+(add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
+(add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
+
+(defun helm-w32-prepare-filename (file)
+  "Convert filename FILE to something usable by external w32 executables."
+  (replace-regexp-in-string ; For UNC paths
+   "/" "\\"
+   (replace-regexp-in-string ; Strip cygdrive paths
+    "/cygdrive/\\(.\\)" "\\1:"
+    file nil nil) nil t))
+
+;;;###autoload
+(defun helm-w32-shell-execute-open-file (file)
+  (interactive "fOpen file:")
+  (with-no-warnings
+    (w32-shell-execute "open" (helm-w32-prepare-filename file))))
+
+(defun helm-c-open-file-with-default-tool (file)
+  "Open FILE with the default tool on this platform."
+  (if (eq system-type 'windows-nt)
+      (helm-w32-shell-execute-open-file file)
+      (start-process "helm-c-open-file-with-default-tool"
+                     nil
+                     (cond ((eq system-type 'gnu/linux)
+                            "xdg-open")
+                           ((or (eq system-type 'darwin) ;; Mac OS X
+                                (eq system-type 'macos)) ;; Mac OS 9
+                            "open"))
+                     file)))
+
+(defun helm-c-open-dired (file)
+  "Opens a dired buffer in FILE's directory.  If FILE is a
+directory, open this directory."
+  (if (file-directory-p file)
+      (dired file)
+      (dired (file-name-directory file))
+      (dired-goto-file file)))
+
+(defun helm-c-display-to-real-line (candidate)
+  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
+      (list (string-to-number (match-string 1 candidate))
+            (match-string 2 candidate))
+      (error "Line number not found")))
+
+(defun helm-c-action-line-goto (lineno-and-content)
+  (apply #'helm-goto-file-line
+         (helm-interpret-value (helm-attr 'target-file))
+         (append lineno-and-content
+                 (list (if (and (helm-attr-defined 'target-file)
+                                (not helm-in-persistent-action))
+                           'find-file-other-window
+                           'find-file)))))
+
+(defun* helm-c-action-file-line-goto (file-line-content
+                                      &optional
+                                      (find-file-function #'find-file))
+  (apply #'helm-goto-file-line
+         (if (stringp file-line-content)
+             ;; Case: filtered-candidate-transformer is skipped
+             (cdr (helm-c-filtered-candidate-transformer-file-line-1
+                   file-line-content))
+             file-line-content)))
+
+(defun helm-require-or-error (feature function)
+  (or (require feature nil t)
+      (error "Need %s to use `%s'." feature function)))
+
+(defun helm-c-filtered-candidate-transformer-file-line (candidates source)
+  (delq nil (mapcar 'helm-c-filtered-candidate-transformer-file-line-1
+                    candidates)))
+
+(defun helm-c-filtered-candidate-transformer-file-line-1 (candidate)
+  (when (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate)
+    (let ((filename (match-string 1 candidate))
+          (lineno (match-string 2 candidate))
+          (content (match-string 3 candidate)))
+      (cons (format "%s:%s\n %s"
+                    (propertize filename 'face compilation-info-face)
+                    (propertize lineno 'face compilation-line-face)
+                    content)
+            (list (expand-file-name
+                   filename
+                   (or (helm-interpret-value (helm-attr 'default-directory))
+                       (and (helm-candidate-buffer)
+                            (buffer-local-value
+                             'default-directory (helm-candidate-buffer)))))
+                  (string-to-number lineno) content)))))
+
+(defun* helm-goto-file-line (file lineno content
+                                  &optional (find-file-function #'find-file))
+  (helm-aif (helm-attr 'before-jump-hook)
+      (funcall it))
+  (when file (funcall find-file-function file))
+  (if (helm-attr-defined 'adjust)
+      (helm-c-goto-line-with-adjustment lineno content)
+      (helm-goto-line lineno))
+  (unless (helm-attr-defined 'recenter)
+    (set-window-start (get-buffer-window helm-current-buffer) (point)))
+  (helm-aif (helm-attr 'after-jump-hook)
+      (funcall it))
+  (when helm-in-persistent-action
+    (helm-match-line-color-current-line)))
+
+(defun helm-find-file-as-root (candidate)
+  (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))
+
+(defun helm-find-many-files (ignore)
+  (mapc 'find-file (helm-marked-candidates)))
+
+(defun helm-c-goto-line-with-adjustment (line line-content)
+  (let ((startpos)
+        offset found pat)
+    ;; This constant is 1/2 the initial search window.
+    ;; There is no sense in making it too small,
+    ;; since just going around the loop once probably
+    ;; costs about as much as searching 2000 chars.
+    (setq offset 1000
+          found nil
+          pat (concat (if (eq selective-display t)
+                          "\\(^\\|\^m\\) *" "^ *") ;allow indent
+                      (regexp-quote line-content)))
+    ;; If no char pos was given, try the given line number.
+    (setq startpos (progn (helm-goto-line line) (point)))
+    (or startpos (setq startpos (point-min)))
+    ;; First see if the tag is right at the specified location.
+    (goto-char startpos)
+    (setq found (looking-at pat))
+    (while (and (not found)
+                (progn
+                  (goto-char (- startpos offset))
+                  (not (bobp))))
+      (setq found
+            (re-search-forward pat (+ startpos offset) t)
+            offset (* 3 offset)))       ; expand search window
+    (or found
+        (re-search-forward pat nil t)
+        (error "not found")))
+  ;; Position point at the right place
+  ;; if the search string matched an extra Ctrl-m at the beginning.
+  (and (eq selective-display t)
+       (looking-at "\^m")
+       (forward-char 1))
+  (beginning-of-line))
+
+(defun helm-c-quit-and-execute-action (action)
+  "Quit current helm session and execute ACTION."
+  (setq helm-saved-action action)
+  (helm-exit-minibuffer))
+
 
 (provide 'helm-utils)
 
