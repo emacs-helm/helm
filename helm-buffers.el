@@ -17,6 +17,9 @@
 
 ;;; Code:
 
+(require 'cl)
+(require 'helm)
+
 (defvar helm-c-buffer-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
