@@ -98,6 +98,7 @@
 (declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
 
 
+
 ;;; General internal variables
 ;;
 ;; Some internals variable that need to be loaded
@@ -155,21 +156,6 @@ automatically.")
 (define-key helm-command-map (kbd "C-c C-b")   'helm-browse-code)
 (define-key helm-command-map (kbd "C-x r i")   'helm-register)
 (define-key helm-command-map (kbd "C-c C-x")   'helm-c-run-external-command)
-
-;; In Emacs 23.1.50, minibuffer-local-must-match-filename-map was renamed to
-;; minibuffer-local-filename-must-match-map.
-(defvar minibuffer-local-filename-must-match-map (make-sparse-keymap)) ;; Emacs 23.1.+
-(defvar minibuffer-local-must-match-filename-map (make-sparse-keymap)) ;; Older Emacsen
-(dolist (map (list minibuffer-local-filename-completion-map
-                   minibuffer-local-completion-map
-                   minibuffer-local-must-match-filename-map
-                   minibuffer-local-filename-must-match-map
-                   minibuffer-local-map
-                   minibuffer-local-isearch-map
-                   minibuffer-local-must-match-map
-                   minibuffer-local-ns-map))
-  (define-key map "\C-r" 'helm-minibuffer-history))
-
 
 
 ;;; Menu

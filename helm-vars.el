@@ -164,19 +164,42 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :type 'string
   :group 'helm-config)
 
-(defun helm-set-helm-command-map-prefix-key (var key)
-  "The customize set function for `helm-command-map-prefix-key'."
-  (when (boundp var)
-    (define-key global-map (read-kbd-macro (symbol-value var)) nil))
-  (set var key)
-  (define-key global-map
-      (read-kbd-macro (symbol-value var)) 'helm-command-map))
+(defcustom helm-command-prefix-key "C-x c"
+  "The key `helm-command-prefix' is bound to in the global map."
+  :type '(choice (string :tag "Key") (const :tag "no binding"))
+  :group 'helm-config
+  :set
+  (lambda (var key)
+    (when (and (boundp var) (symbol-value var))
+      (define-key (current-global-map)
+        (read-kbd-macro (symbol-value var)) nil))
+    (when key
+      (define-key (current-global-map)
+        (read-kbd-macro key) 'helm-command-prefix))
+    (set var key)))
 
-(defcustom helm-command-map-prefix-key "C-x c"
-  "The prefix key for all `helm-command-map' commands."
-  :type  'string
-  :set   'helm-set-helm-command-map-prefix-key
-  :group 'helm-config)
+(defcustom helm-minibuffer-history-key "C-r"
+  "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
+  :type '(choice (string :tag "Key") (const :tag "no binding"))
+  :group 'helm-config
+  :set
+  (lambda (var key)
+    (dolist (map '(minibuffer-local-completion-map
+                   minibuffer-local-filename-completion-map
+                   minibuffer-local-filename-must-match-map ; Emacs 23.1.+
+                   minibuffer-local-isearch-map
+                   minibuffer-local-map
+                   minibuffer-local-must-match-filename-map ; Older Emacsen
+                   minibuffer-local-must-match-map
+                   minibuffer-local-ns-map))
+      (when (and (boundp map) (keymapp (symbol-value map)))
+        (when (and (boundp var) (symbol-value var))
+          (define-key (symbol-value map)
+            (read-kbd-macro (symbol-value var)) nil))
+        (when key
+          (define-key (symbol-value map)
+            (read-kbd-macro key) 'helm-minibuffer-history))))
+    (set var key)))
 
 (defcustom helm-c-browse-code-regexp-lisp
   "^ *\(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|\
