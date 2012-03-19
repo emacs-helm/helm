@@ -103,6 +103,35 @@ development of Helm.
 Bug reports and suggestions for improvements are always
 welcome. GitHub pull requests are even better! :-)
 
+### Send Bug Report from Emacs
+
+If you have problems, send a bug report via `C-c C-x C-b` in helm session (best)
+or `M-x helm-send-bug-report` outside helm session.
+We implemented this bug report feature because we want to know your current state.
+It helps usa solve problems easily.
+The steps are:
+
+  1. Setup mail in Emacs, the easiest way is:
+  
+    ```elisp
+    (setq user-mail-address "your@mail.address")
+    (setq user-full-name "Your Full Name")
+    (setq smtpmail-smtp-server "your.smtp.server.jp")
+    (setq mail-user-agent 'message-user-agent)
+    (setq message-send-mail-function 'message-smtpmail-send-it)
+    ```
+  
+  2. Be sure to use the **LATEST** version of `helm.el`.
+  3. Enable debugger. `M-x toggle-debug-on-error` or `(setq debug-on-error t)`
+  4. Use Lisp version instead of compiled one: `(load "helm.el")`
+  5. Do it!
+  6. If you got an error, please do not close _*Backtrace*_ buffer.
+  7. Type `C-c C-x C-b` (helm session, best!)
+     or `M-x helm-send-bug-report` (outside) and
+     then `M-x insert-buffer` *Backtrace* (if you got error)
+  8. Describe the bug using a precise recipe.
+  9. Type `C-c C-c` to send.
+
 Cheers,<br>
 The Helm Team
 

@@ -1,25 +1,12 @@
 ;;; helm-match-plugin.el --- Multiple regexp matching methods for helm
 
-;; Original Author: rubikitch <rubikitch@ruby-lang.org>
+;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
-;; This is a fork of `anything-match-plugin.el' created by
-;; rubikitch <rubikitch@ruby-lang.org>
+;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; URL: http://github.com/emacs-helm/helm
+;; Version: 0.2.1
 
-;; Maintainers: Thierry Volpiatto <thierry.volpiatto@gmail.com>
-;;              Le Wang
-
-;; Copyright (C) 2008~2012, rubikitch, all rights reserved.
-;; Copyright (C) 2011~2012, Thierry Volpiatto, all rights reserved.
-
-;; Keywords: helm, matching
-
-;; X-URL: <https://github.com/emacs-helm/helm>
-
-;; Created: 2012-03-15 12:29:23
-
-;;; License
-;;
-;; This program is free software: you can redistribute it and/or modify
+;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
@@ -32,30 +19,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Commentary:
-
-;; Change helm.el matching algorithm humanely.
-;; It gives helm.el search refinement functionality.
-;; exact match -> prefix match -> multiple regexp match
-
-;; A query of multiple regexp match is space-delimited string.
-;; Helm displays candidates which matches all the regexps.
-;; A regexp with "!" prefix means not matching the regexp.
-;; To include spaces to a regexp, prefix "\" before space,
-;; it is controlled by `helm-mp-space-regexp' variable.
-
-;; This file highlights patterns like `occur'. Note that patterns
-;; longer than `helm-mp-highlight-threshold' are highlighted. And
-;; region out of screen is highlighted after
-;; `helm-mp-highlight-delay' seconds.
-
-;; Highlight in Emacs is time-consuming process for slow computers. To
-;; disable it is to set nil to `helm-mp-highlight-delay'.
-
-;; helm-match-plugin is enable by default in helm.
-;; To disable/enable it use M-x helm-c-toggle-match-plugin.
-
-
 ;;; Code:
 
 (require 'helm)
