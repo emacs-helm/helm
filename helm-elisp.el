@@ -25,7 +25,7 @@
 ;;
 ;; Provide show completion with macro `with-helm-show-completion'.
 
-
+(defvar helm-c-show-completion-overlay nil)
 ;; Called each time cursor move in helm-buffer.
 (defun helm-c-show-completion ()
   (with-helm-current-buffer

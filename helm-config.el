@@ -106,8 +106,6 @@
 variable is not set by the user, it will be calculated
 automatically.")
 
-(defvar helm-c-show-completion-overlay nil)
-
 
 ;;;###autoload
 (defun helm-configuration ()
