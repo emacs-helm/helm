@@ -3722,59 +3722,6 @@ http://bbdb.sourceforge.net/")
                       cmd)))
 
 
-;;; Occur
-;;
-;;
-(defun helm-c-occur-init ()
-  "Create the initial helm occur buffer.
-If region is active use region as buffer contents
-instead of whole buffer."
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (erase-buffer)
-    (let ((buf-contents
-           (with-helm-current-buffer
-             (if (helm-region-active-p)
-                 (buffer-substring (region-beginning) (region-end))
-                 (buffer-substring (point-min) (point-max))))))
-      (insert buf-contents))))
-
-(defun helm-c-occur-get-line (s e)
-  (format "%7d:%s" (line-number-at-pos (1- s)) (buffer-substring s e)))
-
-(defun helm-c-occur-query-replace-regexp (candidate)
-  "Query replace regexp starting from CANDIDATE.
-If region is active ignore CANDIDATE and replace only in region.
-With a prefix arg replace only matches surrounded by word boundaries,
-i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
-  (let ((regexp helm-input))
-    (unless (helm-region-active-p)
-      (helm-c-action-line-goto candidate))
-    (apply 'query-replace-regexp
-           (helm-c-query-replace-args regexp))))
-
-(defun helm-occur-run-query-replace-regexp ()
-  "Run `query-replace-regexp' in helm occur from keymap."
-  (interactive)
-  (helm-c-quit-and-execute-action
-   'helm-c-occur-query-replace-regexp))
-
-(defvar helm-c-source-occur
-  `((name . "Occur")
-    (init . helm-c-occur-init)
-    (candidates-in-buffer)
-    (migemo)
-    (get-line . helm-c-occur-get-line)
-    (display-to-real . helm-c-display-to-real-line)
-    (action . (("Go to Line" . helm-c-action-line-goto)
-               ("Query replace regexp (C-u Not inside word.)"
-                . helm-c-occur-query-replace-regexp)))
-    (recenter)
-    (mode-line . helm-occur-mode-line)
-    (keymap . ,helm-occur-map)
-    (requires-pattern . 1)
-    (delayed)))
-
-
 ;;; Helm browse code.
 (defun helm-c-browse-code-get-line (beg end)
   "Select line if it match the regexp corresponding to current `major-mode'.
