@@ -176,6 +176,20 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
             :prompt "Regexp: "
             :history 'helm-build-regexp-history))))
 
+;;;###autoload
+(defun helm-occur ()
+  "Preconfigured Helm for Occur source.
+If region is active, search only in region,
+otherwise search in whole buffer."
+  (interactive)
+  (let ((helm-compile-source-functions
+         ;; rule out helm-match-plugin because the input is one regexp.
+         (delq 'helm-compile-source--match-plugin
+               (copy-sequence helm-compile-source-functions))))
+    (helm :sources 'helm-c-source-occur
+          :buffer "*Helm Occur*"
+          :history 'helm-c-grep-history)))
+
 (provide 'helm-regexp)
 
 ;;; helm-regexp.el ends here
