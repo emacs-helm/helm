@@ -114,7 +114,6 @@ automatically.")
 ;;
 (defvar helm-command-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "<SPC>")     'helm-execute-helm-command)
     (define-key map (kbd "a")         'helm-c-apropos)
     (define-key map (kbd "e")         'helm-c-etags-select)
     (define-key map (kbd "l")         'helm-locate)
@@ -168,7 +167,6 @@ automatically.")
 (easy-menu-define nil global-map
   "`helm' menu"
   '("Helm"
-    ["All helm commands" helm-execute-helm-command t]
     ["Find any Files/Buffers" helm-for-files t]
     ["Helm Everywhere (Toggle)" helm-mode t]
     "----"
