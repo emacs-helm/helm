@@ -275,24 +275,6 @@ automatically.")
 ;;; Embeded documentation.
 ;;
 ;;
-(defun helm-c-list-preconfigured-helm ()
-  "Collect preconfigured helm functions in this file."
-  (loop with doc
-        with sym
-        for entry in (cdr (assoc
-                           (file-truename (locate-library "helm-config"))
-                           load-history))
-        if (and (consp entry)
-                (eq (car entry) 'defun)
-                (string-match "^Preconfigured.+$"
-                              (setq doc (or (documentation (setq sym (cdr entry)))
-                                            ""))))
-        collect (cons sym (match-string 0 doc))))
-
-(defun helm-c-format-preconfigured-helm ()
-  (mapcar (lambda (x) (format "\\[%s] : %s\n" (car x) (cdr x)))
-          (helm-c-list-preconfigured-helm)))
-
 ;;; Global help message - Used by `helm-help'
 ;;
 ;;
@@ -352,16 +334,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\<global-map>\\[helm-resume] revives last `helm' session.
 It is very useful, so you should bind any key.
 
-Single source is executed by \\[helm-call-source].
-
-== Preconfigured `helm' ==
-Preconfigured `helm' is commands that uses `helm' interface.
-You can use them without configuration.
-
-"
-         (apply 'concat (helm-c-format-preconfigured-helm))
-         "
-Enjoy!")))
+Single source is executed by \\[helm-call-source].")))
 
 ;;; `helm-buffer-list' help
 ;;
@@ -2795,19 +2768,6 @@ http://bbdb.sourceforge.net/")
   (setq helm-input-idle-delay 0)
   (helm-set-sources '(helm-c-source-call-source)))
 
-;;; Execute Preconfigured helm.
-(defvar helm-c-source-helm-commands
-  '((name . "Preconfigured Helm")
-    (candidates . helm-c-helm-commands-candidates)
-    (type . command)
-    (candidate-number-limit)))
-
-(defun helm-c-helm-commands-candidates ()
-  (loop for (cmd . desc) in (helm-c-list-preconfigured-helm)
-        collect (cons (if (where-is-internal cmd nil t)
-                          (substitute-command-keys (format "M-x %s (\\[%s]) : %s" cmd cmd desc))
-                          (substitute-command-keys (format "\\[%s] : %s" cmd desc)))
-                      cmd)))
 
 
 ;;; Helm browse code.
@@ -4747,13 +4707,6 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
   (interactive)
   (helm :sources 'helm-c-source-call-source
         :buffer helm-source-select-buffer))
-
-;;;###autoload
-(defun helm-execute-helm-command ()
-  "Preconfigured `helm' to execute preconfigured `helm'."
-  (interactive)
-  (helm-other-buffer 'helm-c-source-helm-commands
-                     "*helm commands*"))
 
 ;;;###autoload
 (defun helm-create (&optional string initial-input)
