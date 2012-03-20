@@ -700,6 +700,11 @@ Where NAME is one of `helm-c-default-info-index-list'."
 (defface helm-overlay-line-face '((t (:background "IndianRed4" :underline t)))
   "Face for source header in the helm buffer." :group 'helm)
 
+;;;###autoload
+(defun helm-configuration ()
+  "Customize `helm'."
+  (interactive)
+  (customize-group "helm-config"))
 
 (provide 'helm-vars)
 

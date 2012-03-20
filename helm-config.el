@@ -107,13 +107,6 @@ variable is not set by the user, it will be calculated
 automatically.")
 
 
-;;;###autoload
-(defun helm-configuration ()
-  "Customize `helm'."
-  (interactive)
-  (customize-group "helm-config"))
-
-
 ;;; Helm-command-map
 ;;
 ;;
