@@ -934,39 +934,6 @@ prompt and input."
         :buffer "*helm locate rfn*"))
 
 
-;; Yank text at point.
-;;
-;;
-;; Internal
-(defvar helm-yank-point nil)
-
-;;;###autoload
-(defun helm-yank-text-at-point ()
-  "Yank text at point in minibuffer."
-  (interactive)
-  (let (input)
-    (flet ((insert-in-minibuffer (word)
-             (with-selected-window (minibuffer-window)
-               (let ((str helm-pattern))
-                 (delete-minibuffer-contents)
-                 (set-text-properties 0 (length word) nil word)
-                 (insert (concat str word))))))
-      (with-helm-current-buffer
-        ;; Start to initial point if C-w have never been hit.
-        (unless helm-yank-point (setq helm-yank-point (point)))
-        (and helm-yank-point (goto-char helm-yank-point))
-        (forward-word 1)
-        (setq input (buffer-substring-no-properties helm-yank-point (point)))
-        (setq helm-yank-point (point))) ; End of last forward-word
-      (insert-in-minibuffer input))))
-
-(defun helm-reset-yank-point ()
-  (setq helm-yank-point nil))
-
-(add-hook 'helm-after-persistent-action-hook 'helm-reset-yank-point)
-(add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
-
-
 ;;; Recentf files
 ;;
 ;;
