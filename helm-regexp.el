@@ -157,6 +157,25 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (requires-pattern . 1)
     (delayed)))
 
+;;;###autoload
+(defun helm-regexp ()
+  "Preconfigured helm to build regexps.
+`query-replace-regexp' can be run from there against found regexp."
+  (interactive)
+  (save-restriction
+    (let ((helm-compile-source-functions
+           ;; rule out helm-match-plugin because the input is one regexp.
+           (delq 'helm-compile-source--match-plugin
+                 (copy-sequence helm-compile-source-functions))))
+      (when (and (helm-region-active-p)
+                 ;; Don't narrow to region if buffer is already narrowed.
+                 (not (helm-current-buffer-narrowed-p)))
+        (narrow-to-region (region-beginning) (region-end)))
+      (helm :sources helm-c-source-regexp
+            :buffer "*helm regexp*"
+            :prompt "Regexp: "
+            :history 'helm-build-regexp-history))))
+
 (provide 'helm-regexp)
 
 ;;; helm-regexp.el ends here
