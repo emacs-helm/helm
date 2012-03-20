@@ -349,6 +349,40 @@ or between double quotes."
   (interactive)
   (helm-other-buffer 'helm-c-source-advice "*helm advice*"))
 
+;;; Elisp Timers.
+;;
+;;
+(defvar helm-c-source-absolute-time-timers
+  '((name . "Absolute Time Timers")
+    (candidates . timer-list)
+    (type . timer)))
+
+(defvar helm-c-source-idle-time-timers
+  '((name . "Idle Time Timers")
+    (candidates . timer-idle-list)
+    (type . timer)))
+
+(defun helm-c-timer-real-to-display (timer)
+  (destructuring-bind (triggered t1 t2 t3 repeat-delay func args idle-delay)
+      (append timer nil)                ;use `append' to convert vector->list
+    (format "%s repeat=%5S %s(%s)"
+            (let ((time (list t1 t2 t3)))
+              (if idle-delay
+                  (format-time-string "idle-for=%5s" time)
+                  (format-time-string "%m/%d %T" time)))
+            repeat-delay
+            func
+            (mapconcat 'prin1-to-string args " "))))
+
+;;;###autoload
+(defun helm-timers ()
+  "Preconfigured `helm' for timers."
+  (interactive)
+  (helm-other-buffer '(helm-c-source-absolute-time-timers
+                       helm-c-source-idle-time-timers)
+                     "*helm timers*"))
+
+
 ;;; Complex command history
 ;;
 ;;

@@ -3498,29 +3498,6 @@ See also `helm-create--actions'.")
 (defun helm-c-top-display-to-real (line)
   (car (split-string line)))
 
-;;; Timers
-(defvar helm-c-source-absolute-time-timers
-  '((name . "Absolute Time Timers")
-    (candidates . timer-list)
-    (type . timer)))
-
-(defvar helm-c-source-idle-time-timers
-  '((name . "Idle Time Timers")
-    (candidates . timer-idle-list)
-    (type . timer)))
-
-(defun helm-c-timer-real-to-display (timer)
-  (destructuring-bind (triggered t1 t2 t3 repeat-delay func args idle-delay)
-      (append timer nil)                ;use `append' to convert vector->list
-    (format "%s repeat=%5S %s(%s)"
-            (let ((time (list t1 t2 t3)))
-              (if idle-delay
-                  (format-time-string "idle-for=%5s" time)
-                  (format-time-string "%m/%d %T" time)))
-            repeat-delay
-            func
-            (mapconcat 'prin1-to-string args " "))))
-
 ;;; X RandR resolution change
 ;;
 ;;
@@ -5207,14 +5184,6 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (interactive)
   (let ((helm-outline-using t))
     (helm-other-buffer 'helm-c-source-bm "*helm bm list*")))
-
-;;;###autoload
-(defun helm-timers ()
-  "Preconfigured `helm' for timers."
-  (interactive)
-  (helm-other-buffer '(helm-c-source-absolute-time-timers
-                       helm-c-source-idle-time-timers)
-                     "*helm timers*"))
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
