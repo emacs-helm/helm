@@ -22,6 +22,31 @@
 (require 'helm-files)
 (require 'helm-regexp)
 
+(defvar helm-c-grep-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
+    (define-key map (kbd "C-c o")    'helm-c-grep-run-other-window-action)
+    (define-key map (kbd "C-w")      'helm-yank-text-at-point)
+    (define-key map (kbd "C-x C-s")  'helm-c-grep-run-save-buffer)
+    (when helm-c-grep-use-ioccur-style-keys
+      (define-key map (kbd "<right>")  'helm-c-grep-run-persistent-action)
+      (define-key map (kbd "<left>")  'helm-c-grep-run-default-action))
+    (define-key map (kbd "C-c ?")    'helm-grep-help)
+    (delq nil map))
+  "Keymap used in Grep sources.")
+
+(defvar helm-c-pdfgrep-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'helm-yank-text-at-point)
+    (define-key map (kbd "C-c ?")    'helm-pdfgrep-help)
+    map)
+  "Keymap used in pdfgrep.")
+
 ;; Allow to grep incrementally with helm interface.
 ;; It allow also to Grep files recursively without using 'find' shell command.
 ;; On Windows you will need at least Grep version 2.5.4 of Gnuwin32.

@@ -23,6 +23,14 @@
 ;;; Kill ring
 ;;
 ;;
+(defvar helm-kill-ring-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-y") 'helm-next-line)
+    (define-key map (kbd "M-u") 'helm-previous-line)
+    map)
+  "Keymap for `helm-show-kill-ring'.")
+
 (defvar helm-c-source-kill-ring
   `((name . "Kill Ring")
     (init . (lambda () (helm-attrset 'last-command last-command)))
