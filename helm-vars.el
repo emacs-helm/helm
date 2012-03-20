@@ -123,7 +123,7 @@ If nil or zero, don't truncate candidate, show all."
     helm-c-source-recentf
     helm-c-source-bookmarks
     helm-c-source-file-cache
-    helm-c-source-files-in-current-dir+
+    helm-c-source-files-in-current-dir
     helm-c-source-locate)
   "Your prefered sources to find files."
   :type 'list

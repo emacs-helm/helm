@@ -2230,6 +2230,40 @@ other candidate transformers."
   "Replaces /home/user with ~."
   (helm-transform-mapcar #'helm-c-shorten-home-path_ files))
 
+;;; File name history
+;;
+;;
+(defvar helm-c-source-file-name-history
+  '((name . "File Name History")
+    (candidates . file-name-history)
+    (match helm-c-match-on-basename)
+    (type . file)))
+
+;;; Files in current dir
+;;
+;;
+(defun helm-c-highlight-files (files)
+  (loop for i in files
+        if (file-directory-p i)
+        collect (propertize (file-name-nondirectory i)
+                            'face 'helm-ff-directory
+                            'help-echo (expand-file-name i))
+        else
+        collect (propertize (file-name-nondirectory i)
+                            'face 'helm-ff-file
+                            'help-echo (expand-file-name i))))
+
+(defvar helm-c-source-files-in-current-dir
+  `((name . "Files from Current Directory")
+    (candidates . (lambda ()
+                    (with-helm-current-buffer
+                      (directory-files (helm-c-current-directory) t))))
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (candidate-transformer helm-c-highlight-files)
+    (type . file)))
+
 ;;;###autoload
 (defun helm-c-copy-files-async ()
   "Preconfigured helm to copy file list FLIST to DEST asynchronously."
