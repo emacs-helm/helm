@@ -27,7 +27,9 @@
 (require 'helm-buffers)
 (require 'helm-net)
 (require 'helm-files)
+(require 'helm-locate)
 (require 'helm-elisp)
+(require 'helm-regexp)
 (require 'helm-grep)
 (require 'helm-mode)
 (require 'helm-ring)
@@ -799,139 +801,6 @@ Otherwise your command will be called many times like this:
     (candidates . helm-c-file-cache-files)
     (match helm-c-match-on-basename)
     (type . file)))
-
-
-;;; Locate
-;;
-;;
-;; NOTE for WINDOZE users:
-;; You have to install Everything with his command line interface here:
-;; http://www.voidtools.com/download.php
-
-(defun helm-ff-find-locatedb (&optional from-ff)
-  "Try to find if a local locatedb file is available.
-The search is done in `helm-ff-default-directory' or
-fall back to `default-directory' if FROM-FF is nil."
-  (when helm-ff-locate-db-filename
-    (cond ((and helm-ff-default-directory
-                from-ff
-                (file-exists-p (expand-file-name
-                                helm-ff-locate-db-filename
-                                helm-ff-default-directory))
-                (expand-file-name
-                 helm-ff-locate-db-filename
-                 helm-ff-default-directory)))
-          ((and (not from-ff)
-                (file-exists-p (expand-file-name
-                                helm-ff-locate-db-filename
-                                default-directory))
-                (expand-file-name
-                 helm-ff-locate-db-filename
-                 default-directory))))))
-
-(defun helm-locate-1 (&optional localdb init from-ff)
-  "Generic function to run Locate.
-if LOCALDB is non--nil search and use a local locate db file.
-INIT is a string to use as initial input in prompt.
-See `helm-locate-with-db' and `helm-locate'."
-  (helm-locate-with-db
-   (and localdb
-        (or (helm-ff-find-locatedb from-ff)
-            (helm-c-read-file-name
-             "LocateDBFiles: "
-             :initial-input (or helm-ff-default-directory
-                                default-directory)
-             :marked-candidates t
-             :preselect helm-locate-db-file-regexp
-             :test #'(lambda (x)
-                       (if helm-locate-db-file-regexp
-                           ;; Select only locate db files and directories
-                           ;; to allow navigation.
-                           (or (string-match
-                                helm-locate-db-file-regexp x)
-                               (file-directory-p x))
-                           x)))))
-   init))
-;; (helm-locate-1 t)
-
-(defun helm-locate-with-db (&optional db initial-input)
-  "Run locate -d DB.
-If DB is not given or nil use locate without -d option.
-Argument DB can be given as a string or list of db files.
-Argument INITIAL-INPUT is a string to use as initial-input.
-See also `helm-locate'."
-  (when (and db (stringp db)) (setq db (list db)))
-  (unless helm-c-locate-command
-    (setq helm-c-locate-command
-          (case system-type
-            ('gnu/linux "locate -i -r %s")
-            ('berkeley-unix "locate -i %s")
-            ('windows-nt "es -i -r %s")
-            (t "locate %s"))))
-  (let ((helm-c-locate-command
-         (if db
-             (replace-regexp-in-string
-              "locate"
-              (format "locate -d %s"
-                      (mapconcat 'identity
-                                 ;; Remove eventually
-                                 ;; marked directories by error.
-                                 (loop for i in db
-                                       unless (file-directory-p i)
-                                       collect i) ":"))
-              helm-c-locate-command)
-             helm-c-locate-command)))
-    (helm :sources 'helm-c-source-locate
-          :buffer "*helm locate*"
-          :input initial-input
-          :keymap helm-generic-files-map)))
-;; (helm-locate-with-db "~/locate.db")
-
-(defun helm-c-locate-init ()
-  "Initialize async locate process for `helm-c-source-locate'."
-  (setq mode-line-format
-        '(" " mode-line-buffer-identification " "
-          (line-number-mode "%l") " "
-          (:eval (propertize "(Locate Process Running) "
-                  'face '((:foreground "red"))))))
-  (prog1
-      (start-process-shell-command "locate-process" nil
-                                   (format helm-c-locate-command
-                                           helm-pattern))
-    (set-process-sentinel (get-process "locate-process")
-                          #'(lambda (process event)
-                              (when (string= event "finished\n")
-                                (with-helm-window
-                                  (force-mode-line-update nil)
-                                  (helm-update-move-first-line)))))))
-
-(defvar helm-c-source-locate
-  `((name . "Locate")
-    (candidates . helm-c-locate-init)
-    (type . file)
-    (requires-pattern . 3)
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (candidate-number-limit . 9999)
-    (mode-line . helm-generic-file-mode-line-string)
-    (delayed))
-  "Find files matching the current input pattern with locate.")
-
-(defun helm-c-locate-read-file-name (prompt &optional init)
-  "Search a file with locate and return it's filename.
-Use argument PROMPT and INIT for `helm' arguments
-prompt and input."
-  (helm :sources
-        '((name . "Locate")
-          (candidates . helm-c-locate-init)
-          (action . identity)
-          (requires-pattern . 3)
-          (candidate-number-limit . 9999)
-          (mode-line . helm-generic-file-mode-line-string)
-          (delayed))
-        :prompt prompt
-        :input init
-        :buffer "*helm locate rfn*"))
 
 
 ;;; Recentf files
@@ -4671,24 +4540,6 @@ Needs BBDB.
 http://bbdb.sourceforge.net/"
   (interactive)
   (helm-other-buffer 'helm-c-source-bbdb "*helm bbdb*"))
-
-;;;###autoload
-(defun helm-locate (arg)
-  "Preconfigured `helm' for Locate.
-Note: you can add locate options after entering pattern.
-See 'man locate' for valid options.
-
-You can specify a specific database with prefix argument ARG \(C-u\).
-Many databases can be used: navigate and mark them.
-See also `helm-locate-with-db'.
-
-To create a user specific db, use
-\"updatedb -l 0 -o db_path -U directory\".
-Where db_path is a filename matched by
-`helm-locate-db-file-regexp'."
-  (interactive "P")
-  (setq helm-ff-default-directory default-directory)
-  (helm-locate-1 arg))
 
 ;;;###autoload
 (defun helm-w3m-bookmarks ()
