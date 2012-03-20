@@ -3143,6 +3143,7 @@ second argument of `display-buffer'."
   (push (cons (helm-get-current-source) (helm-get-selection))
         helm-marked-candidates))
 
+;;;###autoload
 (defun helm-toggle-visible-mark ()
   "Toggle helm visible mark at point."
   (interactive)
@@ -3151,6 +3152,69 @@ second argument of `display-buffer'."
         (helm-delete-visible-mark it)
       (helm-make-visible-mark))
     (helm-next-line)))
+
+;;;###autoload
+(defun helm-mark-all ()
+  "Mark all visible unmarked candidates in current source."
+  (interactive)
+  (with-helm-window
+    (save-excursion
+      (goto-char (helm-get-previous-header-pos))
+      (helm-next-line)
+      (let* ((next-head (helm-get-next-header-pos))
+             (end       (and next-head
+                             (save-excursion
+                               (goto-char next-head)
+                               (forward-line -1)
+                               (point))))
+             (maxpoint  (or end (point-max))))
+        (while (< (point) maxpoint)
+          (helm-mark-current-line)
+          (let* ((prefix (get-text-property (point-at-bol) 'display))
+                 (cand   (helm-get-selection))
+                 (bn     (and (helm-file-completion-source-p)
+                              (helm-c-basename cand)))
+                 (src    (assoc-default 'name (helm-get-current-source))))
+            (when (and (not (helm-this-visible-mark))
+                       (not (or (string= prefix "[?]")
+                                (string= prefix "[@]"))))
+              ;; Don't mark possibles directories ending with . or ..
+              ;; autosave files/links and non--existent file.
+              (unless
+                  (and (or (helm-file-completion-source-p)
+                           (equal src "Files from Current Directory"))
+                       (or (string-match "^\\.#.*\\|^#.*#$\\|\\.$" bn)
+                           ;; We need to test here when not using a transformer
+                           ;; that tag prefix (i.e on tramp)
+                           (not (file-exists-p cand))))
+                (helm-make-visible-mark))))
+          (forward-line 1) (end-of-line))))
+    (helm-mark-current-line)
+    (message "%s candidates marked" (length helm-marked-candidates))))
+
+;;;###autoload
+(defun helm-unmark-all ()
+  "Unmark all candidates in all sources of current helm session."
+  (interactive)
+  (with-helm-window
+    (let ((len (length helm-marked-candidates)))
+      (save-excursion
+        (helm-clear-visible-mark))
+      (setq helm-marked-candidates nil)
+      (helm-mark-current-line)
+      (message "%s candidates unmarked" len))))
+
+;;;###autoload
+(defun helm-toggle-all-marks ()
+  "Toggle all marks.
+Mark all visible candidates of current source or unmark all candidates
+visible or invisible in all sources of current helm session"
+  (interactive)
+  (let ((marked (helm-marked-candidates)))
+    (if (and (>= (length marked) 1)
+             (with-helm-window helm-visible-mark-overlays))
+        (helm-unmark-all)
+        (helm-mark-all))))
 
 (defun helm-display-all-visible-marks ()
   "Show all `helm' visible marks strings."
