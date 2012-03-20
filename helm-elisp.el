@@ -19,6 +19,7 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-utils)
+(require 'advice)
 
 ;;; Show completion.
 ;;
@@ -290,6 +291,77 @@ or between double quotes."
              (action . (lambda (candidate)
                          (with-output-to-temp-buffer "*Help*"
                            (princ (get (intern candidate) 'helm-attrdoc))))))))))
+
+(defvar helm-c-source-advice
+  '((name . "Function Advice")
+    (candidates . helm-c-advice-candidates)
+    (action ("Toggle Enable/Disable" . helm-c-advice-toggle))
+    (persistent-action . helm-c-advice-persistent-action)
+    (multiline)
+    (persistent-help . "Describe function / C-u C-z: Toggle advice")))
+;; (let ((debug-on-signal t))(helm 'helm-c-source-advice))
+;; (testadvice)
+
+(defun helm-c-advice-candidates ()
+  (loop for (fname) in ad-advised-functions
+        for function = (intern fname)
+        append
+        (loop for class in ad-advice-classes append
+              (loop for advice in (ad-get-advice-info-field function class)
+                    for enabled = (ad-advice-enabled advice)
+                    collect
+                    (cons (format
+                           "%s %s %s"
+                           (if enabled "Enabled " "Disabled")
+                           (propertize fname 'face 'font-lock-function-name-face)
+                           (ad-make-single-advice-docstring advice class nil))
+                          (list function class advice))))))
+
+(defun helm-c-advice-persistent-action (func-class-advice)
+  (if current-prefix-arg
+      (helm-c-advice-toggle func-class-advice)
+      (describe-function (car func-class-advice))))
+
+(defun helm-c-advice-toggle (func-class-advice)
+  (destructuring-bind (function class advice) func-class-advice
+    (cond ((ad-advice-enabled advice)
+           (ad-advice-set-enabled advice nil)
+           (message "Disabled"))
+          (t                            ;disabled
+           (ad-advice-set-enabled advice t)
+           (message "Enabled")))
+    (ad-activate function)
+    (and helm-in-persistent-action
+         (helm-c-advice-update-current-display-string))))
+
+(defun helm-c-advice-update-current-display-string ()
+  (helm-edit-current-selection
+    (let ((newword (cond ((looking-at "Disabled") "Enabled")
+                         ((looking-at "Enabled")  "Disabled")))
+          realvalue)
+      (when newword
+        (delete-region (point) (progn (forward-word 1) (point)))
+        (insert newword)))))
+
+;;;###autoload
+(defun helm-manage-advice ()
+  "Preconfigured `helm' to disable/enable function advices."
+  (interactive)
+  (helm-other-buffer 'helm-c-source-advice "*helm advice*"))
+
+;;; Complex command history
+;;
+;;
+(defvar helm-c-source-complex-command-history
+  '((name . "Complex Command History")
+    (candidates . (lambda () (mapcar 'prin1-to-string command-history)))
+    (type . sexp)))
+
+;;;###autoload
+(defun helm-complex-command-history ()
+  (interactive)
+  (helm :sources 'helm-c-source-complex-command-history
+        :buffer "*helm complex commands*"))
 
 (provide 'helm-elisp)
 

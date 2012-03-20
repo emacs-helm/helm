@@ -1547,160 +1547,6 @@ Show global bindings and local bindings according to current `major-mode'."
           (sort ls #'(lambda (x y) (string-lessp (car x) (car y)))))))
 
 
-;;; Complex command history
-;;
-;;
-(defvar helm-c-source-complex-command-history
-  '((name . "Complex Command History")
-    (candidates . (lambda () (mapcar 'prin1-to-string command-history)))
-    (type . sexp)))
-
-;;; M-x history (not related to `helm-M-x')
-;;
-;;
-(defvar helm-c-source-extended-command-history
-  '((name . "Emacs Commands History")
-    (candidates
-     . (lambda ()
-         (helm-fast-remove-dups extended-command-history :test 'equal)))
-    (type . command)))
-
-;;; Emacs commands (Basic source for emacs commands)
-;;
-;;
-(defvar helm-c-source-emacs-commands
-  '((name . "Emacs Commands")
-    (candidates . (lambda ()
-                    (let (commands)
-                      (mapatoms (lambda (a)
-                                  (if (commandp a)
-                                      (push (symbol-name a)
-                                            commands))))
-                      (sort commands 'string-lessp))))
-    (type . command)
-    (requires-pattern . 2))
-  "Source for completing and invoking Emacs commands.
-A command is a function with interactive spec that can
-be invoked with `M-x'.
-
-To get non-interactive functions listed, use
-`helm-c-source-emacs-functions'.")
-
-
-;;;; <Function>
-;;; Emacs functions
-;;
-;;
-(defvar helm-c-source-emacs-functions
-  '((name . "Emacs Functions")
-    (candidates . (lambda ()
-                    (let (commands)
-                      (mapatoms (lambda (a)
-                                  (if (functionp a)
-                                      (push (symbol-name a) commands))))
-                      (sort commands 'string-lessp))))
-    (type . function)
-    (requires-pattern . 2))
-  "Source for completing Emacs functions.")
-
-;;; With abbrev expansion
-;;; Similar to my exec-abbrev-cmd.el
-;;; See http://www.tsdh.de/cgi-bin/wiki.pl/exec-abbrev-cmd.el
-(defvar helm-c-function-abbrev-regexp nil
-  "The regexp for `helm-c-source-emacs-functions-with-abbrevs'.
-Regexp built from the current `helm-pattern' interpreting it
-as abbreviation.
-Only for internal use.")
-
-(defun helm-c-match-function-by-abbrev (candidate)
-  "Return non-nil if `helm-pattern' is an abbreviation of the function CANDIDATE.
-
-Abbreviations are made by taking the first character from each
-word in the function's name, e.g. \"bb\" is an abbrev for
-`bury-buffer', \"stb\" is an abbrev for `helm-c-switch-to-buffer'."
-  (string-match helm-c-function-abbrev-regexp candidate))
-
-(defvar helm-c-source-emacs-functions-with-abbrevs
-  (append helm-c-source-emacs-functions
-          '((match helm-c-match-function-by-abbrev
-             helm-c-string-match))
-          '((init
-             . (lambda ()
-                 (defadvice helm-update
-                     (before helm-c-update-function-abbrev-regexp activate)
-                   (let ((char-list (append helm-pattern nil))
-                         (str "^"))
-                     (dolist (c char-list)
-                       (setq str (concat str (list c) "[^-]*-")))
-                     (setq str (concat (substring str 0 (1- (length str))) "$"))
-                     (setq helm-c-function-abbrev-regexp str))))))))
-
-(defvar helm-c-source-advice
-  '((name . "Function Advice")
-    (candidates . helm-c-advice-candidates)
-    (action ("Toggle Enable/Disable" . helm-c-advice-toggle))
-    (persistent-action . helm-c-advice-persistent-action)
-    (multiline)
-    (persistent-help . "Describe function / C-u C-z: Toggle advice")))
-;; (let ((debug-on-signal t))(helm 'helm-c-source-advice))
-;; (testadvice)
-
-(defun helm-c-advice-candidates ()
-  (require 'advice)
-  (loop for (fname) in ad-advised-functions
-        for function = (intern fname)
-        append
-        (loop for class in ad-advice-classes append
-              (loop for advice in (ad-get-advice-info-field function class)
-                    for enabled = (ad-advice-enabled advice)
-                    collect
-                    (cons (format
-                           "%s %s %s"
-                           (if enabled "Enabled " "Disabled")
-                           (propertize fname 'face 'font-lock-function-name-face)
-                           (ad-make-single-advice-docstring advice class nil))
-                          (list function class advice))))))
-
-(defun helm-c-advice-persistent-action (func-class-advice)
-  (if current-prefix-arg
-      (helm-c-advice-toggle func-class-advice)
-      (describe-function (car func-class-advice))))
-
-(defun helm-c-advice-toggle (func-class-advice)
-  (destructuring-bind (function class advice) func-class-advice
-    (cond ((ad-advice-enabled advice)
-           (ad-advice-set-enabled advice nil)
-           (message "Disabled"))
-          (t                            ;disabled
-           (ad-advice-set-enabled advice t)
-           (message "Enabled")))
-    (ad-activate function)
-    (and helm-in-persistent-action
-         (helm-c-advice-update-current-display-string))))
-
-(defun helm-c-advice-update-current-display-string ()
-  (helm-edit-current-selection
-    (let ((newword (cond ((looking-at "Disabled") "Enabled")
-                         ((looking-at "Enabled")  "Disabled")))
-          realvalue)
-      (when newword
-        (delete-region (point) (progn (forward-word 1) (point)))
-        (insert newword)))))
-
-
-;;;; <Variable>
-;;; Emacs variables
-;;
-;;
-(defvar helm-c-source-emacs-variables
-  '((name . "Emacs Variables")
-    (candidates . (lambda ()
-                    (sort (all-completions "" obarray 'boundp) 'string-lessp)))
-    (type . variable)
-    (requires-pattern . 2))
-  "Source for completing Emacs variables.")
-
-
 ;;; LaCarte
 (defvar helm-c-source-lacarte
   '((name . "Lacarte")
@@ -6489,12 +6335,6 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
         (call-interactively sym-com)
         (setq extended-command-history
               (cons command (delete command history)))))))
-
-;;;###autoload
-(defun helm-manage-advice ()
-  "Preconfigured `helm' to disable/enable function advices."
-  (interactive)
-  (helm-other-buffer 'helm-c-source-advice "*helm advice*"))
 
 ;;;###autoload
 (defun helm-bookmark-ext ()
