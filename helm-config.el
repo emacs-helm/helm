@@ -39,9 +39,10 @@
 (require 'helm-eval)
 (require 'helm-tags)
 (require 'helm-adaptative)
-(require 'helm-apt)
-(require 'helm-gentoo)
-(require 'helm-emms)
+(require 'helm-apt nil t)
+(require 'helm-gentoo nil t)
+(require 'helm-bbdb nil t)
+(require 'helm-emms nil t)
 (eval-when-compile (require 'org)) ; Shut up byte compiler about org-directory.
 (eval-when-compile (require 'semantic nil t))
 (require 'helm-match-plugin)
@@ -2286,85 +2287,6 @@ See http://orgmode.org for the latest version.")
   (helm-persistent-highlight-point)
   (message "%s" (or (cdr (assoc keyword (helm-attr 'keywords-examples))) "")))
 
-
-
-;;; bbdb
-;;
-;;
-(defvar bbdb-records)
-(defvar bbdb-buffer-name)
-
-(defun helm-c-bbdb-candidates ()
-  "Return a list of all names in the bbdb database.  The format
-is \"Firstname Lastname\"."
-  (mapcar (lambda (bbdb-record)
-            (replace-regexp-in-string
-             "\\s-+$" ""
-             (concat (aref bbdb-record 0) " " (aref bbdb-record 1))))
-          (bbdb-records)))
-
-(defun helm-c-bbdb-create-contact (actions candidate)
-  "Action transformer that returns only an entry to add the
-current `helm-pattern' as new contact.  All other actions are
-removed."
-  (if (string= candidate "*Add to contacts*")
-      '(("Add to contacts" . (lambda (actions)
-                               (bbdb-create-internal
-                                (read-from-minibuffer "Name: " helm-c-bbdb-name)
-                                (read-from-minibuffer "Company: ")
-                                (read-from-minibuffer "Email: ")
-                                nil
-                                nil
-                                (read-from-minibuffer "Note: ")))))
-      actions))
-
-(defun helm-c-bbdb-get-record (candidate)
-  "Return record that match CANDIDATE."
-  (bbdb candidate nil)
-  (set-buffer "*BBDB*")
-  (bbdb-current-record))
-
-(defvar helm-c-bbdb-name nil
-  "Only for internal use.")
-
-(defvar helm-c-source-bbdb
-  '((name . "BBDB")
-    (candidates . helm-c-bbdb-candidates)
-    (action ("Send a mail" . helm-c-bbdb-compose-mail)
-     ("View person's data" . helm-c-bbdb-view-person-action))
-    (filtered-candidate-transformer . (lambda (candidates source)
-                                        (setq helm-c-bbdb-name helm-pattern)
-                                        (if (not candidates)
-                                            (list "*Add to contacts*")
-                                            candidates)))
-    (action-transformer . (lambda (actions candidate)
-                            (helm-c-bbdb-create-contact actions candidate))))
-  "Needs BBDB.
-
-http://bbdb.sourceforge.net/")
-
-(defun helm-c-bbdb-view-person-action (candidate)
-  "View BBDB data of single CANDIDATE or marked candidates."
-  (helm-aif (helm-marked-candidates)
-      (let ((bbdb-append-records (length it)))
-        (dolist (i it)
-          (bbdb-redisplay-one-record (helm-c-bbdb-get-record i))))
-    (bbdb-redisplay-one-record (helm-c-bbdb-get-record candidate))))
-
-(defun helm-c-bbdb-collect-mail-addresses ()
-  "Return a list of all mail addresses of records in bbdb buffer."
-  (with-current-buffer bbdb-buffer-name
-    (loop for i in bbdb-records
-          if (bbdb-record-net (car i))
-          collect (bbdb-dwim-net-address (car i)))))
-
-(defun helm-c-bbdb-compose-mail (candidate)
-  "Compose a mail with all records of bbdb buffer."
-  (helm-c-bbdb-view-person-action candidate)
-  (let* ((address-list (helm-c-bbdb-collect-mail-addresses))
-         (address-str  (mapconcat 'identity address-list ",\n    ")))
-    (compose-mail address-str)))
-
 
 ;;; Jabber Contacts (jabber.el)
 (defun helm-c-jabber-online-contacts ()
@@ -3317,16 +3239,6 @@ With a prefix-arg insert symbol at point."
   (interactive)
   (helm :sources 'helm-c-source-imenu
         :buffer "*helm imenu*"))
-
-;;;###autoload
-(defun helm-bbdb ()
-  "Preconfigured `helm' for BBDB.
-
-Needs BBDB.
-
-http://bbdb.sourceforge.net/"
-  (interactive)
-  (helm-other-buffer 'helm-c-source-bbdb "*helm bbdb*"))
 
 ;;;###autoload
 (defun helm-w3m-bookmarks ()
