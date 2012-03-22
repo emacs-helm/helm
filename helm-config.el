@@ -4224,46 +4224,6 @@ With a prefix arg reload cache."
           :history 'helm-c-apt-input-history)))
 
 ;;;###autoload
-(defun helm-esh-pcomplete ()
-  "Preconfigured helm to provide helm completion in eshell."
-  (interactive)
-  (let* ((helm-quit-if-no-candidate t)
-         (helm-execute-action-at-once-if-one t)
-         (target (thing-at-point 'symbol))
-         (end (point))
-         (beg (or (and target (- end (length target)))
-                  ;; Nothing at point.
-                  (progn (insert " ") (point)))))
-    (setq helm-ec-target (or target " "))
-    (with-helm-show-completion beg end
-      (helm :sources 'helm-c-source-esh
-            :buffer "*helm pcomplete*"
-            :input (helm-ff-set-pattern ; Handle tramp filenames.
-                    (car (last (ignore-errors ; Needed in lisp symbols completion.
-                                 (pcomplete-parse-arguments)))))))))
-
-;;;###autoload
-(defun helm-eshell-history ()
-  "Preconfigured helm for eshell history."
-  (interactive)
-  (let* ((end (point))
-         (beg (save-excursion (eshell-bol) (point)))
-         (input (buffer-substring beg end))
-         flag-empty)
-    (when (eq beg end)
-      (insert " ")
-      (setq flag-empty t)
-      (setq end (point)))
-    (unwind-protect
-         (with-helm-show-completion beg end
-           (helm :sources 'helm-c-source-eshell-history
-                 :buffer "*Eshell history*"
-                 :input input))
-      (when (and flag-empty
-                 (looking-back " "))
-        (delete-char -1)))))
-
-;;;###autoload
 (defun helm-c-run-external-command (program)
   "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
 If program is already running exit with error.
