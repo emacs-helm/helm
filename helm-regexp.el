@@ -157,6 +157,30 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (requires-pattern . 1)
     (delayed)))
 
+
+;;; Helm browse code.
+(defun helm-c-browse-code-get-line (beg end)
+  "Select line if it match the regexp corresponding to current `major-mode'.
+Line is parsed for BEG position to END position."
+  (let ((str-line (buffer-substring beg end))
+        (regexp   (assoc-default major-mode
+                                 helm-c-browse-code-regexp-alist))
+        (num-line (if (string= helm-pattern "") beg (1- beg))))
+    (when (and regexp (string-match regexp str-line))
+      (format "%4d:%s" (line-number-at-pos num-line) str-line))))
+
+(defvar helm-c-source-browse-code
+  '((name . "Browse code")
+    (init . (lambda ()
+              (helm-candidate-buffer helm-current-buffer)
+              (with-helm-current-buffer
+                (jit-lock-fontify-now))))
+    (candidate-number-limit . 9999)
+    (candidates-in-buffer)
+    (get-line . helm-c-browse-code-get-line)
+    (type . line)
+    (recenter)))
+
 ;;;###autoload
 (defun helm-regexp ()
   "Preconfigured helm to build regexps.
@@ -189,6 +213,15 @@ otherwise search in whole buffer."
     (helm :sources 'helm-c-source-occur
           :buffer "*Helm Occur*"
           :history 'helm-c-grep-history)))
+
+;;;###autoload
+(defun helm-browse-code ()
+  "Preconfigured helm to browse code."
+  (interactive)
+  (helm :sources 'helm-c-source-browse-code
+        :buffer "*helm browse code*"
+        :default (thing-at-point 'symbol)))
+
 
 (provide 'helm-regexp)
 

@@ -1014,32 +1014,6 @@ http://cedet.sourceforge.net/"))
   (setq helm-input-idle-delay 0)
   (helm-set-sources '(helm-c-source-call-source)))
 
-
-
-;;; Helm browse code.
-(defun helm-c-browse-code-get-line (beg end)
-  "Select line if it match the regexp corresponding to current `major-mode'.
-Line is parsed for BEG position to END position."
-  (let ((str-line (buffer-substring beg end))
-        (regexp   (assoc-default major-mode
-                                 helm-c-browse-code-regexp-alist))
-        (num-line (if (string= helm-pattern "") beg (1- beg))))
-    (when (and regexp (string-match regexp str-line))
-      (format "%4d:%s" (line-number-at-pos num-line) str-line))))
-
-
-(defvar helm-c-source-browse-code
-  '((name . "Browse code")
-    (init . (lambda ()
-              (helm-candidate-buffer helm-current-buffer)
-              (with-helm-current-buffer
-                (jit-lock-fontify-now))))
-    (candidate-number-limit . 9999)
-    (candidates-in-buffer)
-    (get-line . helm-c-browse-code-get-line)
-    (type . line)
-    (recenter)))
-
 
 ;; Do many actions for input
 (defvar helm-c-source-create
@@ -1471,14 +1445,6 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (interactive)
   (let ((helm-outline-using t))
     (helm-other-buffer 'helm-c-source-bm "*helm bm list*")))
-
-;;;###autoload
-(defun helm-browse-code ()
-  "Preconfigured helm to browse code."
-  (interactive)
-  (helm :sources 'helm-c-source-browse-code
-        :buffer "*helm browse code*"
-        :default (thing-at-point 'symbol)))
 
 ;;;###autoload
 (defun helm-call-source ()
