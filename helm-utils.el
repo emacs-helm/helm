@@ -613,6 +613,22 @@ directory, open this directory."
 (add-hook 'helm-after-persistent-action-hook 'helm-reset-yank-point)
 (add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
 
+(defun helm-html-bookmarks-to-alist (file url-regexp bmk-regexp)
+  "Parse html bookmark FILE and return an alist with (title . url) as elements."
+  (let (bookmarks-alist url title)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (goto-char (point-min))
+      (while (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
+        (forward-line 0)
+        (when (re-search-forward url-regexp nil t)
+          (setq url (match-string 0)))
+        (when (re-search-forward bmk-regexp nil t)
+          (setq title (match-string 1)))
+        (push (cons title url) bookmarks-alist)
+        (forward-line)))
+    (nreverse bookmarks-alist)))
+
 (provide 'helm-utils)
 
 ;;; helm-utils.el ends here

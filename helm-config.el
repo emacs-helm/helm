@@ -40,6 +40,8 @@
 (require 'helm-tags)
 (require 'helm-adaptative)
 (require 'helm-imenu)
+(require 'helm-w3m)
+(require 'helm-firefox)
 (require 'helm-apt nil t)
 (require 'helm-gentoo nil t)
 (require 'helm-bbdb nil t)
@@ -1381,187 +1383,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                          (string-match "/ssh:" isfile))
         if isssh
         collect i))
-
-
-
-;;; Firefox bookmarks
-;;
-;;
-;; You will have to set firefox to import bookmarks in his html file bookmarks.html.
-;; (only for firefox versions >=3)
-;; To achieve that, open about:config in firefox and double click on this line to enable value
-;; to true:
-;; user_pref("browser.bookmarks.autoExportHTML", false);
-;; You should have now:
-;; user_pref("browser.bookmarks.autoExportHTML", true);
-;; NOTE: This is also working in the same way for mozilla aka seamonkey.
-
-(defvar helm-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ \"]*")
-(defvar helm-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
-
-(defun helm-get-firefox-user-init-dir ()
-  "Guess the default Firefox user directory name."
-  (let* ((moz-dir (concat (getenv "HOME") "/.mozilla/firefox/"))
-         (moz-user-dir
-          (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
-            (goto-char (point-min))
-            (prog1
-                (when (search-forward "Path=" nil t)
-                  (buffer-substring-no-properties (point) (point-at-eol)))
-              (kill-buffer)))))
-    (file-name-as-directory (concat moz-dir moz-user-dir))))
-
-(defun helm-guess-firefox-bookmark-file ()
-  "Return the path of the Firefox bookmarks file."
-  (concat (helm-get-firefox-user-init-dir) "bookmarks.html"))
-
-(defun helm-html-bookmarks-to-alist (file url-regexp bmk-regexp)
-  "Parse html bookmark FILE and return an alist with (title . url) as elements."
-  (let (bookmarks-alist url title)
-    (with-temp-buffer
-      (insert-file-contents file)
-      (goto-char (point-min))
-      (while (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
-        (forward-line 0)
-        (when (re-search-forward url-regexp nil t)
-          (setq url (match-string 0)))
-        (when (re-search-forward bmk-regexp nil t)
-          (setq title (match-string 1)))
-        (push (cons title url) bookmarks-alist)
-        (forward-line)))
-    (nreverse bookmarks-alist)))
-
-(defvar helm-c-firefox-bookmarks-alist nil)
-(defvar helm-c-source-firefox-bookmarks
-  '((name . "Firefox Bookmarks")
-    (init . (lambda ()
-              (setq helm-c-firefox-bookmarks-alist
-                    (helm-html-bookmarks-to-alist
-                     (helm-guess-firefox-bookmark-file)
-                     helm-firefox-bookmark-url-regexp
-                     helm-firefox-bookmarks-regexp))))
-    (candidates . (lambda ()
-                    (mapcar #'car helm-c-firefox-bookmarks-alist)))
-    (filtered-candidate-transformer
-     helm-c-adaptive-sort
-     helm-c-highlight-firefox-bookmarks)
-    (action . (("Browse Url"
-                . (lambda (candidate)
-                    (helm-c-browse-url
-                     (helm-c-firefox-bookmarks-get-value candidate))))
-               ("Copy Url"
-                . (lambda (elm)
-                    (kill-new (helm-c-w3m-bookmarks-get-value elm))))))))
-
-
-(defun helm-c-firefox-bookmarks-get-value (elm)
-  (assoc-default elm helm-c-firefox-bookmarks-alist))
-
-(defun helm-c-highlight-firefox-bookmarks (bookmarks source)
-  (loop for i in bookmarks
-        collect (propertize
-                 i 'face '((:foreground "YellowGreen"))
-                 'help-echo (helm-c-firefox-bookmarks-get-value i))))
-
-
-
-;;; W3m bookmark - helm interface.
-;;
-;;
-;; Some users have the emacs-w3m library in load-path
-;; without having the w3m executable :-;
-;; So check if w3m program is present before trying to load
-;; emacs-w3m.
-(eval-when-compile
-  (when (executable-find "w3m")
-    (require 'w3m-bookmark nil t)))
-
-(defvar w3m-bookmark-file "~/.w3m/bookmark.html")
-(defvar helm-w3m-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
-(defvar helm-w3m-bookmark-url-regexp "\\(https\\|http\\|ftp\\|file\\)://[^>]*")
-(defvar helm-c-w3m-bookmarks-alist nil)
-(defvar helm-c-source-w3m-bookmarks
-  '((name . "W3m Bookmarks")
-    (init . (lambda ()
-              (setq helm-c-w3m-bookmarks-alist
-                    (helm-html-bookmarks-to-alist
-                     w3m-bookmark-file
-                     helm-w3m-bookmark-url-regexp
-                     helm-w3m-bookmarks-regexp))))
-    (candidates . (lambda ()
-                    (mapcar #'car helm-c-w3m-bookmarks-alist)))
-    (filtered-candidate-transformer
-     helm-c-adaptive-sort
-     helm-c-highlight-w3m-bookmarks)
-    (action . (("Browse Url"
-                . (lambda (candidate)
-                    (helm-c-w3m-browse-bookmark candidate)))
-               ("Copy Url"
-                . (lambda (elm)
-                    (kill-new (helm-c-w3m-bookmarks-get-value elm))))
-               ("Browse Url Externally"
-                . (lambda (candidate)
-                    (helm-c-w3m-browse-bookmark candidate t)))
-               ("Delete Bookmark"
-                . (lambda (candidate)
-                    (helm-c-w3m-delete-bookmark candidate)))
-               ("Rename Bookmark"
-                . (lambda (candidate)
-                    (helm-c-w3m-rename-bookmark candidate)))))
-    (persistent-action . (lambda (candidate)
-                           (if current-prefix-arg
-                               (helm-c-w3m-browse-bookmark candidate t)
-                               (helm-c-w3m-browse-bookmark candidate nil t))))
-    (persistent-help . "Open URL with emacs-w3m in new tab / \
-C-u \\[helm-execute-persistent-action]: Open URL with Firefox"))
-  "Needs w3m and emacs-w3m.
-
-http://w3m.sourceforge.net/
-http://emacs-w3m.namazu.org/")
-
-
-(defun helm-c-w3m-bookmarks-get-value (elm)
-  (replace-regexp-in-string
-   "\"" "" (cdr (assoc elm helm-c-w3m-bookmarks-alist))))
-
-(defun helm-c-w3m-browse-bookmark (elm &optional use-external new-tab)
-  (let* ((fn  (if use-external 'helm-c-browse-url 'w3m-browse-url))
-         (arg (and (eq fn 'w3m-browse-url) new-tab)))
-    (funcall fn (helm-c-w3m-bookmarks-get-value elm) arg)))
-
-(defun helm-c-highlight-w3m-bookmarks (bookmarks source)
-  (loop for i in bookmarks
-        collect (propertize
-                 i 'face 'helm-w3m-bookmarks-face
-                 'help-echo (helm-c-w3m-bookmarks-get-value i))))
-
-
-(defun helm-c-w3m-delete-bookmark (elm)
-  "Delete w3m bookmark from `w3m-bookmark-file'."
-  (with-current-buffer
-      (find-file-literally w3m-bookmark-file)
-    (goto-char (point-min))
-    (when (re-search-forward elm nil t)
-      (beginning-of-line)
-      (delete-region (point)
-                     (line-end-position))
-      (delete-blank-lines))
-    (save-buffer)
-    (kill-buffer)))
-
-(defun helm-c-w3m-rename-bookmark (elm)
-  "Rename w3m bookmark in `w3m-bookmark-file'."
-  (let* ((old-title (replace-regexp-in-string ">" "" elm))
-         (new-title (read-string "NewTitle: " old-title)))
-    (with-current-buffer
-        (find-file-literally w3m-bookmark-file)
-      (goto-char (point-min))
-      (when (re-search-forward (concat elm "<") nil t)
-        (goto-char (1- (point)))
-        (delete-char (- (length old-title)))
-        (insert new-title))
-      (save-buffer)
-      (kill-buffer))))
 
 
 ;;;; <Library>
@@ -3149,37 +2970,6 @@ With a prefix-arg insert symbol at point."
   (let ((enable-recursive-minibuffers t))
     (helm-other-buffer 'helm-c-source-minibuffer-history
                        "*helm minibuffer-history*")))
-
-;;;###autoload
-(defun helm-w3m-bookmarks ()
-  "Preconfigured `helm' for w3m bookmark.
-
-Needs w3m and emacs-w3m.
-
-http://w3m.sourceforge.net/
-http://emacs-w3m.namazu.org/"
-  (interactive)
-  (helm-other-buffer 'helm-c-source-w3m-bookmarks
-                     "*helm w3m bookmarks*"))
-
-;;;###autoload
-(defun helm-firefox-bookmarks ()
-  "Preconfigured `helm' for firefox bookmark.
-You will have to enable html bookmarks in firefox:
-open about:config in firefox and double click on this line to enable value \
-to true:
-
-user_pref(\"browser.bookmarks.autoExportHTML\", false);
-
-You should have now:
-
-user_pref(\"browser.bookmarks.autoExportHTML\", true);
-
-After closing firefox, you will be able to browse you bookmarks.
-"
-  (interactive)
-  (helm-other-buffer 'helm-c-source-firefox-bookmarks
-                     "*Helm Firefox*"))
 
 ;;;###autoload
 (defun helm-colors ()
