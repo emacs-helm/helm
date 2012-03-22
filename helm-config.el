@@ -53,9 +53,9 @@
 (require 'helm-bbdb nil t)
 (require 'helm-emms nil t)
 (require 'yaoddmuse nil t)
+(require 'helm-call-tree nil t)
 (require 'helm-descbinds nil t)
 (require 'helm-slime nil t)
-(eval-when-compile (require 'org)) ; Shut up byte compiler about org-directory.
 (eval-when-compile (require 'semantic nil t))
 (require 'helm-match-plugin)
 
@@ -991,93 +991,6 @@ STRING is string to match."
 http://cedet.sourceforge.net/semantic.shtml
 http://cedet.sourceforge.net/"))
 
-
-
-;;; Helm interface of `simple-call-tree.el'.
-;;
-;; <http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el>
-;;
-;; Function is called by
-(defvar helm-c-source-simple-call-tree-functions-callers
-  '((name . "Function is called by")
-    (init . helm-c-simple-call-tree-functions-callers-init)
-    (multiline)
-    (candidates . helm-c-simple-call-tree-candidates)
-    (persistent-action . helm-c-simple-call-tree-persistent-action)
-    (persistent-help . "Show function definitions by rotation")
-    (action ("Find definition selected by persistent-action" .
-             helm-c-simple-call-tree-find-definition)))
-  "Needs simple-call-tree.el.
-http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
-
-(defvar helm-c-simple-call-tree-tick nil)
-(make-variable-buffer-local 'helm-c-simple-call-tree-tick)
-(defun helm-c-simple-call-tree-analyze-maybe ()
-  (unless (eq (buffer-chars-modified-tick) helm-c-simple-call-tree-tick)
-    (simple-call-tree-analyze)
-    (setq helm-c-simple-call-tree-tick (buffer-chars-modified-tick))))
-
-(defun helm-c-simple-call-tree-init-base (function message)
-  (require 'simple-call-tree)
-  (with-no-warnings
-    (when (helm-current-buffer-is-modified)
-      (helm-c-simple-call-tree-analyze-maybe)
-      (let ((list (funcall function simple-call-tree-alist)))
-        (with-current-buffer (helm-candidate-buffer 'local)
-          (dolist (entry list)
-            (let ((funcs (concat "  " (mapconcat #'identity (cdr entry) "\n  "))))
-              (insert (car entry) message
-                      (if (string= funcs "  ")
-                          "  no functions."
-                          funcs)
-                      "\n\n"))))))))
-
-(defun helm-c-simple-call-tree-functions-callers-init ()
-  (helm-c-simple-call-tree-init-base 'simple-call-tree-invert
-                                     " is called by\n"))
-
-(defun helm-c-simple-call-tree-candidates ()
-  (with-current-buffer (helm-candidate-buffer)
-    (split-string (buffer-string) "\n\n")))
-
-(defvar helm-c-simple-call-tree-related-functions nil)
-(defvar helm-c-simple-call-tree-function-index 0)
-(defun helm-c-simple-call-tree-persistent-action (candidate)
-  (unless (eq last-command 'helm-execute-persistent-action)
-    (setq helm-c-simple-call-tree-related-functions
-          (delete "no functions."
-                  (split-string
-                   (replace-regexp-in-string "  \\| is called by\\| calls "
-                                             "" candidate)
-                   "\n")))
-    (setq helm-c-simple-call-tree-function-index -1))
-  (incf helm-c-simple-call-tree-function-index)
-  (helm-c-simple-call-tree-find-definition candidate))
-
-(defun helm-c-simple-call-tree-find-definition (candidate)
-  (find-function
-   (intern
-    (nth (mod helm-c-simple-call-tree-function-index
-              (length helm-c-simple-call-tree-related-functions))
-         helm-c-simple-call-tree-related-functions))))
-
-
-;;; Function calls
-(defvar helm-c-source-simple-call-tree-callers-functions
-  '((name . "Function calls")
-    (init . helm-c-simple-call-tree-callers-functions-init)
-    (multiline)
-    (candidates . helm-c-simple-call-tree-candidates)
-    (persistent-action . helm-c-simple-call-tree-persistent-action)
-    (persistent-help . "Show function definitions by rotation")
-    (action ("Find definition selected by persistent-action" .
-             helm-c-simple-call-tree-find-definition)))
-  "Needs simple-call-tree.el.
-http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
-
-(defun helm-c-simple-call-tree-callers-functions-init ()
-  (helm-c-simple-call-tree-init-base 'identity " calls \n"))
-
 
 ;;;; <Color and Face>
 ;;
@@ -1980,18 +1893,6 @@ http://cvs.savannah.gnu.org/viewvc/*checkout*/bm/bm/bm.el"
   (helm :sources 'helm-c-source-browse-code
         :buffer "*helm browse code*"
         :default (thing-at-point 'symbol)))
-
-;;;###autoload
-(defun helm-simple-call-tree ()
-  "Preconfigured `helm' for simple-call-tree. List function relationships.
-
-Needs simple-call-tree.el.
-http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el"
-  (interactive)
-  (helm-other-buffer
-   '(helm-c-source-simple-call-tree-functions-callers
-     helm-c-source-simple-call-tree-callers-functions)
-   "*helm simple-call-tree*"))
 
 ;;;###autoload
 (defun helm-call-source ()
