@@ -23,6 +23,15 @@
 (defvar bbdb-records)
 (defvar bbdb-buffer-name)
 
+(declare-function bbdb "ext:bbdb-com")
+(declare-function bbdb-current-record "ext:bbdb-com")
+(declare-function bbdb-redisplay-one-record "ext:bbdb-com")
+(declare-function bbdb-record-net "ext:bbdb-com" (string) t)
+(declare-function bbdb-current-record "ext:bbdb-com")
+(declare-function bbdb-dwim-net-address "ext:bbdb-com")
+(declare-function bbdb-records "ext:bbdb-com"
+                  (&optional dont-check-disk already-in-db-buffer))
+
 (defun helm-c-bbdb-candidates ()
   "Return a list of all names in the bbdb database.  The format
 is \"Firstname Lastname\"."

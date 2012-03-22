@@ -19,6 +19,10 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(declare-function term-line-mode "term")
+(declare-function term-char-mode "term")
+(declare-function term-send-input "term")
+(declare-function term-send-eof "term")
 
 (defvar helm-c-gentoo-use-flags nil)
 (defvar helm-c-gentoo-buffer "*helm-gentoo-output*")

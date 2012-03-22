@@ -19,6 +19,7 @@
 
 (require 'cl)
 (require 'helm)
+(require 'helm-mode)
 
 (defvar helm-M-x-input-history nil)
 

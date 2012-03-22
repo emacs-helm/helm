@@ -68,31 +68,6 @@
 ;;; Declare external functions
 ;;
 ;;
-(declare-function gnus-dired-attach "ext:gnus-dired.el" (files-to-attach))
-(declare-function image-dired-display-image "image-dired.el" (file &optional original-size))
-(declare-function image-dired-update-property "image-dired.el" (prop value))
-(declare-function woman-file-name-all-completions "woman.el" (topic))
-(declare-function Man-getpage-in-background "man.el" (topic))
-(declare-function simple-call-tree-analyze "ext:simple-call-tree.el" (&optional test))
-(declare-function yaoddmuse-update-pagename "ext:yaoddmuse.el" (&optional unforced))
-(declare-function yaoddmuse-get-library-list "ext:yaoddmuse.el" (&optional dirs string))
-(declare-function org-get-current-options "ext:org-exp.el")
-(declare-function emms-streams "ext:emms-streams")
-(declare-function emms-stream-delete-bookmark "ext:emms-streams")
-(declare-function emms-stream-add-bookmark "ext:emms-streams" (name url fd type))
-(declare-function emms-stream-save-bookmarks-file "ext:emms-streams")
-(declare-function emms-stream-quit "ext:emms-streams")
-(declare-function with-current-emms-playlist "ext:emms" (&rest body))
-(declare-function emms-playlist-tracks-in-region "ext:emms" (beg end))
-(declare-function emms-playlist-first "ext:emms")
-(declare-function emms-playlist-mode-play-smart "ext:emms-playlist-mode")
-(declare-function term-line-mode "term")
-(declare-function term-char-mode "term")
-(declare-function term-send-input "term")
-(declare-function term-send-eof "term")
-(declare-function Info-index-nodes "info" (&optional file))
-(declare-function Info-goto-node "info" (&optional fork))
-(declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
 (declare-function elscreen-find-screen-by-buffer "ext:elscreen.el" (buffer &optional create))
 (declare-function elscreen-find-file "ext:elscreen.el" (filename))
 (declare-function elscreen-goto "ext:elscreen.el" (screen))
@@ -101,25 +76,6 @@
 (declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
 (declare-function semantic-tag-type "ext:tag-file.el" (tag) t)
 (declare-function semantic-tag-class "ext:tag-file.el" (tag) t)
-(declare-function bbdb "ext:bbdb-com")
-(declare-function bbdb-current-record "ext:bbdb-com")
-(declare-function bbdb-redisplay-one-record "ext:bbdb-com")
-(declare-function bbdb-record-net "ext:bbdb-com" (string) t)
-(declare-function bbdb-current-record "ext:bbdb-com")
-(declare-function bbdb-dwim-net-address "ext:bbdb-com")
-(declare-function bbdb-records "ext:bbdb-com"
-                  (&optional dont-check-disk already-in-db-buffer))
-(declare-function eshell-read-aliases-list "em-alias")
-(declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
-(declare-function eshell-bol "esh-mode")
-(declare-function eldoc-current-symbol "eldoc")
-(declare-function eldoc-get-fnsym-args-string "eldoc" (sym &optional index))
-(declare-function eldoc-get-var-docstring "eldoc" (sym))
-(declare-function eldoc-fnsym-in-current-sexp "eldoc")
-(declare-function find-library-name "find-func.el" (library))
-(declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
-(declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
-(declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
 
 
 ;;; Helm-command-map
@@ -232,16 +188,6 @@
 (define-key helm-map (kbd "M-m")     'helm-toggle-all-marks)
 (define-key helm-map (kbd "C-w")     'helm-yank-text-at-point)
 
-
-;;; Specialized keymaps
-;;
-;;
-(defvar helm-esh-on-file-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?")    'helm-esh-help)
-    map)
-  "Keymap for `helm-find-files-eshell-command-on-file'.")
 
 
 ;;; Embeded documentation.

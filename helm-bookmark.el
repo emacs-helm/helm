@@ -17,8 +17,10 @@
 
 ;;; Code:
 (eval-when-compile (require 'cl))
-(require 'helm)
 (eval-when-compile (require 'bookmark))
+(require 'helm)
+(require 'helm-utils)
+
 
 (defvar helm-c-bookmarks-face1 'helm-ff-directory)
 (defvar helm-c-bookmarks-face2 'helm-ff-file)

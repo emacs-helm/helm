@@ -19,6 +19,11 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(declare-function eldoc-current-symbol "eldoc")
+(declare-function eldoc-get-fnsym-args-string "eldoc" (sym &optional index))
+(declare-function eldoc-get-var-docstring "eldoc" (sym))
+(declare-function eldoc-fnsym-in-current-sexp "eldoc")
+
 ;;; Evaluation Result
 ;;
 ;;

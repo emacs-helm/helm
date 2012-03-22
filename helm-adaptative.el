@@ -19,6 +19,7 @@
 
 (require 'cl)
 (require 'helm)
+(require 'helm-vars)
 
 ;; Internal
 (defvar helm-c-adaptive-done nil

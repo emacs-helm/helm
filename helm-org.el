@@ -19,6 +19,9 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-plugin)
+(require 'org)
+
+(declare-function org-get-current-options "ext:org-exp.el")
 
 ;;; Org headlines
 ;;

@@ -20,6 +20,9 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(declare-function woman-file-name-all-completions "woman.el" (topic))
+(declare-function Man-getpage-in-background "man.el" (topic))
+
 (defvar helm-c-man-pages nil
   "All man pages on system.
 Will be calculated the first time you invoke helm with this

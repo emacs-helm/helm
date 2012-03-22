@@ -15,18 +15,22 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Code:
-(eval-when-compile (require 'cl))
-(require 'helm)
-(require 'helm-elisp)
-(require 'helm-regexp)
-
 ;; Enable like this in .emacs:
 ;;
 ;; (add-hook 'eshell-mode-hook
 ;;           #'(lambda ()
 ;;               (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)))
 ;;
+
+;;; Code:
+(eval-when-compile (require 'cl))
+(require 'helm)
+(require 'helm-elisp)
+(require 'helm-regexp)
+
+(declare-function eshell-read-aliases-list "em-alias")
+(declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
+(declare-function eshell-bol "esh-mode")
 
 (defvar helm-eshell-history-map
   (let ((map (make-sparse-keymap)))

@@ -20,6 +20,12 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-external)
+
+(declare-function term-line-mode "term")
+(declare-function term-char-mode "term")
+(declare-function term-send-input "term")
+(declare-function term-send-eof "term")
 
 (defvar helm-c-source-apt
   '((name . "APT")

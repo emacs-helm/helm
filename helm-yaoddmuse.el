@@ -20,6 +20,9 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(declare-function yaoddmuse-update-pagename "ext:yaoddmuse.el" (&optional unforced))
+(declare-function yaoddmuse-get-library-list "ext:yaoddmuse.el" (&optional dirs string))
+
 ;; Be sure to have yaoddmuse.el installed
 ;; install-elisp may be required if you want to install elisp file from here.
 (defvar helm-yaoddmuse-use-cache-file nil)

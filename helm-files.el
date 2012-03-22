@@ -29,6 +29,16 @@
 (require 'tramp)
 (require 'image-dired)
 
+(declare-function find-library-name "find-func.el" (library))
+(declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
+(declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
+(declare-function gnus-dired-attach "ext:gnus-dired.el" (files-to-attach))
+(declare-function image-dired-display-image "image-dired.el" (file &optional original-size))
+(declare-function image-dired-update-property "image-dired.el" (prop value))
+(declare-function eshell-read-aliases-list "em-alias")
+(declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
+(declare-function eshell-bol "esh-mode")
+
 
 ;;; Helm-find-files - The helm file browser.
 ;;
@@ -116,6 +126,13 @@
     (define-key map (kbd "C-c ?")   'helm-generic-file-help)
     map)
   "Generic Keymap for files.")
+
+(defvar helm-esh-on-file-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c ?")    'helm-esh-help)
+    map)
+  "Keymap for `helm-find-files-eshell-command-on-file'.")
 
 ;; Internal.
 (defvar helm-c-find-files-doc-header " (`C-l': Go to precedent level)"

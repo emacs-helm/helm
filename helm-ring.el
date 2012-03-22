@@ -20,6 +20,8 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
+
 ;;; Kill ring
 ;;
 ;;

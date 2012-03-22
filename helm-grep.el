@@ -22,6 +22,8 @@
 (require 'helm-files)
 (require 'helm-regexp)
 
+(declare-function helm-elscreen-find-file "helm-elscreen" (file))
+
 (defvar helm-c-grep-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)

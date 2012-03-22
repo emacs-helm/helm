@@ -20,6 +20,10 @@
 (require 'cl)
 (require 'helm)
 
+(declare-function Info-index-nodes "info" (&optional file))
+(declare-function Info-goto-node "info" (&optional fork))
+(declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
+
 ;;
 ;;
 ;; Plug-in: info-index

@@ -22,6 +22,8 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(declare-function simple-call-tree-analyze "ext:simple-call-tree.el" (&optional test))
+
 ;; Function is called by
 (defvar helm-c-source-simple-call-tree-functions-callers
   '((name . "Function is called by")
