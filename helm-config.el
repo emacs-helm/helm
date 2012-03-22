@@ -45,6 +45,8 @@
 (require 'helm-org)
 (require 'helm-info)
 (require 'helm-man)
+(require 'helm-color)
+(require 'helm-font)
 (require 'helm-w3m nil t)
 (require 'helm-firefox nil t)
 (require 'helm-bmkext nil t)
@@ -992,72 +994,6 @@ http://cedet.sourceforge.net/semantic.shtml
 http://cedet.sourceforge.net/"))
 
 
-;;;; <Color and Face>
-;;
-
-;;; Customize Face
-;;
-;;
-(defvar helm-c-source-customize-face
-  '((name . "Customize Face")
-    (init . (lambda ()
-              (unless (helm-candidate-buffer)
-                (save-selected-window
-                  (list-faces-display))
-                (helm-candidate-buffer (get-buffer "*Faces*")))))
-    (candidates-in-buffer)
-    (get-line . buffer-substring)
-    (action . (lambda (line)
-                (customize-face (intern (car (split-string line))))))
-    (requires-pattern . 3))
-  "See (info \"(emacs)Faces\")")
-
-;;; Colors browser
-;;
-;;
-(defvar helm-c-source-colors
-  '((name . "Colors")
-    (init . (lambda () (unless (helm-candidate-buffer)
-                         (save-selected-window
-                           (list-colors-display))
-                         (helm-candidate-buffer (get-buffer "*Colors*")))))
-    (candidates-in-buffer)
-    (get-line . buffer-substring)
-    (action
-     ("Copy Name" . (lambda (candidate)
-                      (kill-new (helm-c-colors-get-name candidate))))
-     ("Copy RGB" . (lambda (candidate)
-                     (kill-new (helm-c-colors-get-rgb candidate))))
-     ("Insert Name" . (lambda (candidate)
-                        (with-helm-current-buffer
-                          (insert (helm-c-colors-get-name candidate)))))
-     ("Insert RGB" . (lambda (candidate)
-                       (with-helm-current-buffer
-                         (insert (helm-c-colors-get-rgb candidate))))))))
-
-(defun helm-c-colors-get-name (candidate)
-  "Get color name."
-  (replace-regexp-in-string
-   " " ""
-   (with-temp-buffer
-     (insert (capitalize candidate))
-     (goto-char (point-min))
-     (search-forward-regexp "\\s-\\{2,\\}")
-     (delete-region (point) (point-max))
-     (buffer-string))))
-
-(defun helm-c-colors-get-rgb (candidate)
-  "Get color RGB."
-  (replace-regexp-in-string
-   " " ""
-   (with-temp-buffer
-     (insert (capitalize candidate))
-     (goto-char (point-max))
-     (search-backward-regexp "\\s-\\{2,\\}")
-     (delete-region (point) (point-min))
-     (buffer-string))))
-
-
 ;;;; <Search Engine>
 ;;; Tracker desktop search
 (defvar helm-c-source-tracker-search
@@ -1514,22 +1450,6 @@ See also `helm-create--actions'.")
 ;;; Generic action functions
 ;;
 ;;
-(defun helm-bookmark-get-bookmark-from-name (bmk)
-  "Return bookmark name even if it is a bookmark with annotation.
-e.g prepended with *.
-Return nil if bmk is not a valid bookmark."
-  (let ((bookmark (replace-regexp-in-string "\*" "" bmk)))
-    (if (assoc bookmark bookmark-alist)
-        bookmark
-        (when (assoc bmk bookmark-alist)
-          bmk))))
-
-(defun helm-delete-marked-bookmarks (ignore)
-  "Delete this bookmark or all marked bookmarks."
-  (dolist (i (helm-marked-candidates))
-    (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
-                     'batch)))
-
 (helm-document-attribute 'default-directory "type . file-line"
   "`default-directory' to interpret file.")
 (helm-document-attribute 'before-jump-hook "type . file-line / line"
@@ -1848,14 +1768,6 @@ Run all sources defined in `helm-for-files-prefered-list'."
   (let ((enable-recursive-minibuffers t))
     (helm-other-buffer 'helm-c-source-minibuffer-history
                        "*helm minibuffer-history*")))
-
-;;;###autoload
-(defun helm-colors ()
-  "Preconfigured `helm' for color."
-  (interactive)
-  (helm-other-buffer
-   '(helm-c-source-colors helm-c-source-customize-face)
-   "*helm colors*"))
 
 ;;;###autoload
 (defun helm-c-insert-latex-math ()

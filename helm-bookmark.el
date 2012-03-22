@@ -175,6 +175,23 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (when (y-or-n-p "Delete bookmark?")
     (helm-c-quit-and-execute-action 'helm-delete-marked-bookmarks)))
 
+(defun helm-bookmark-get-bookmark-from-name (bmk)
+  "Return bookmark name even if it is a bookmark with annotation.
+e.g prepended with *.
+Return nil if bmk is not a valid bookmark."
+  (let ((bookmark (replace-regexp-in-string "\*" "" bmk)))
+    (if (assoc bookmark bookmark-alist)
+        bookmark
+        (when (assoc bmk bookmark-alist)
+          bmk))))
+
+(defun helm-delete-marked-bookmarks (ignore)
+  "Delete this bookmark or all marked bookmarks."
+  (dolist (i (helm-marked-candidates))
+    (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
+                     'batch)))
+
+
 ;;;###autoload
 (defun helm-bookmarks ()
   "Preconfigured `helm' for bookmarks."
