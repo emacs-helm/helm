@@ -26,6 +26,7 @@
 (require 'helm-utils)
 (require 'helm-buffers)
 (require 'helm-net)
+(require 'helm-external)
 (require 'helm-files)
 (require 'helm-locate)
 (require 'helm-elisp)
@@ -40,6 +41,7 @@
 (require 'helm-adaptative)
 (require 'helm-apt)
 (require 'helm-gentoo)
+(require 'helm-emms)
 (eval-when-compile (require 'org)) ; Shut up byte compiler about org-directory.
 (eval-when-compile (require 'semantic nil t))
 (require 'helm-match-plugin)
@@ -2364,134 +2366,6 @@ http://bbdb.sourceforge.net/")
     (compose-mail address-str)))
 
 
-;;; Emms
-;;
-;;
-(defun helm-emms-stream-edit-bookmark (elm)
-  "Change the information of current emms-stream bookmark from helm."
-  (declare (special emms-stream-list))
-  (let* ((cur-buf helm-current-buffer)
-         (bookmark (assoc elm emms-stream-list))
-         (name     (read-from-minibuffer "Description: "
-                                         (nth 0 bookmark)))
-         (url      (read-from-minibuffer "URL: "
-                                         (nth 1 bookmark)))
-         (fd       (read-from-minibuffer "Feed Descriptor: "
-                                         (int-to-string (nth 2 bookmark))))
-         (type     (read-from-minibuffer "Type (url, streamlist, or lastfm): "
-                                         (format "%s" (car (last bookmark))))))
-    (save-window-excursion
-      (emms-streams)
-      (when (re-search-forward (concat "^" name) nil t)
-        (beginning-of-line)
-        (emms-stream-delete-bookmark)
-        (emms-stream-add-bookmark name url (string-to-number fd) type)
-        (emms-stream-save-bookmarks-file)
-        (emms-stream-quit)
-        (helm-c-switch-to-buffer cur-buf)))))
-
-(defun helm-emms-stream-delete-bookmark (candidate)
-  "Delete emms-streams bookmarks from helm."
-  (let* ((cands   (helm-marked-candidates))
-         (bmks    (loop for bm in cands collect
-                        (car (assoc bm emms-stream-list))))
-         (bmk-reg (mapconcat 'regexp-quote bmks "\\|^")))
-    (when (y-or-n-p (format "Really delete radios\n -%s: ? "
-                            (mapconcat 'identity bmks "\n -")))
-      (save-window-excursion
-        (emms-streams)
-        (goto-char (point-min))
-        (loop while (re-search-forward bmk-reg nil t)
-              do (progn (beginning-of-line)
-                        (emms-stream-delete-bookmark))
-              finally do (progn
-                           (emms-stream-save-bookmarks-file)
-                           (emms-stream-quit)))))))
-
-(defvar helm-c-source-emms-streams
-  '((name . "Emms Streams")
-    (init . (lambda ()
-              (emms-stream-init)))
-    (candidates . (lambda ()
-                    (declare (special emms-stream-list))
-                    (mapcar 'car emms-stream-list)))
-    (action . (("Play" . (lambda (elm)
-                           (declare (special emms-stream-list))
-                           (let* ((stream (assoc elm emms-stream-list))
-                                  (fn (intern (concat "emms-play-" (symbol-name (car (last stream))))))
-                                  (url (second stream)))
-                             (funcall fn url))))
-               ("Delete" . helm-emms-stream-delete-bookmark)
-               ("Edit" . helm-emms-stream-edit-bookmark)))
-    (filtered-candidate-transformer . helm-c-adaptive-sort)))
-
-;; Don't forget to set `emms-source-file-default-directory'
-(defvar helm-c-source-emms-dired
-  '((name . "Music Directory")
-    (candidates . (lambda ()
-                    (cddr (directory-files emms-source-file-default-directory))))
-    (action .
-     (("Play Directory" . (lambda (item)
-                            (emms-play-directory
-                             (expand-file-name
-                              item
-                              emms-source-file-default-directory))))
-      ("Open dired in file's directory" . (lambda (item)
-                                            (helm-c-open-dired
-                                             (expand-file-name
-                                              item
-                                              emms-source-file-default-directory))))))
-    (filtered-candidate-transformer . helm-c-adaptive-sort)))
-
-
-(defun helm-c-emms-files-modifier (candidates source)
-  (let ((current-playlist (with-current-emms-playlist
-                            (loop with cur-list = (emms-playlist-tracks-in-region
-                                                   (point-min) (point-max))
-                                  for i in cur-list
-                                  for name = (assoc-default 'name i)
-                                  when name
-                                  collect name))))
-    (loop for i in candidates
-          if (member (cdr i) current-playlist)
-          collect (cons (propertize (car i)
-                                    'face 'helm-emms-playlist)
-                        (cdr i)) into lis
-          else collect i into lis
-          finally return (reverse lis))))
-
-(defun helm-c-emms-play-current-playlist ()
-  "Play current playlist."
-  (with-current-emms-playlist
-    (emms-playlist-first)
-    (emms-playlist-mode-play-smart)))
-
-(defvar helm-c-source-emms-files
-  '((name . "Emms files")
-    (candidates . (lambda ()
-                    (loop for v being the hash-values in emms-cache-db
-                          for name      = (assoc-default 'name v)
-                          for artist    = (or (assoc-default 'info-artist v) "unknown")
-                          for genre     = (or (assoc-default 'info-genre v) "unknown")
-                          for tracknum  = (or (assoc-default 'info-tracknumber v) "unknown")
-                          for song      = (or (assoc-default 'info-title v) "unknown")
-                          for info      = (concat artist " - " genre " - " tracknum ": " song)
-                          unless (string-match "^\\(http\\|mms\\):" name)
-                          collect (cons info name))))
-    (filtered-candidate-transformer . helm-c-emms-files-modifier)
-    (candidate-number-limit . 9999)
-    (action . (("Play file" . emms-play-file)
-               ("Add to Playlist and play (C-u clear current)"
-                . (lambda (candidate)
-                    (when helm-current-prefix-arg
-                      (emms-playlist-current-clear))
-                    (emms-playlist-new)
-                    (mapc 'emms-add-playlist-file (helm-marked-candidates))
-                    (unless emms-player-playing-p
-                      (helm-c-emms-play-current-playlist))))))))
-
-
-
 ;;; Jabber Contacts (jabber.el)
 (defun helm-c-jabber-online-contacts ()
   "List online Jabber contacts."
@@ -3525,15 +3399,6 @@ After closing firefox, you will be able to browse you bookmarks.
   "Preconfigured `helm' for org keywords."
   (interactive)
   (helm-other-buffer 'helm-c-source-org-keywords "*org keywords*"))
-
-;;;###autoload
-(defun helm-emms ()
-  "Preconfigured `helm' for emms sources."
-  (interactive)
-  (helm :sources '(helm-c-source-emms-streams
-                   helm-c-source-emms-files
-                   helm-c-source-emms-dired)
-        :buffer "*Helm Emms*"))
 
 ;;;###autoload
 (defun helm-eev-anchors ()
