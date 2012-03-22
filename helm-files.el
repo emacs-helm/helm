@@ -27,7 +27,7 @@
 (require 'dired-aux)
 (require 'dired-x)
 (require 'tramp)
-
+(require 'image-dired)
 
 
 ;;; Helm-find-files - The helm file browser.
