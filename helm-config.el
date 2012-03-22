@@ -29,6 +29,7 @@
 (require 'helm-files)
 (require 'helm-locate)
 (require 'helm-elisp)
+(require 'helm-eshell)
 (require 'helm-regexp)
 (require 'helm-grep)
 (require 'helm-mode)
@@ -253,13 +254,6 @@ automatically.")
     (define-key map (kbd "C-c ?")    'helm-esh-help)
     map)
   "Keymap for `helm-find-files-eshell-command-on-file'.")
-
-(defvar helm-eshell-history-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-p") 'helm-next-line)
-    map)
-  "Keymap for `helm-eshell-history'.")
 
 
 ;;; Embeded documentation.
@@ -3292,103 +3286,6 @@ Support install, remove and purge actions."
 
 (defun helm-c-ratpoison-commands-execute (candidate)
   (call-process "ratpoison" nil nil nil "-ic" candidate))
-
-
-;;; Eshell completion.
-;;
-;; Enable like this in .emacs:
-;;
-;; (add-hook 'eshell-mode-hook
-;;           #'(lambda ()
-;;               (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)))
-;;
-(defvar helm-c-source-esh
-  '((name . "Eshell completions")
-    (init . (lambda ()
-              (setq pcomplete-current-completions nil
-                    pcomplete-last-completion-raw nil)
-              ;; Eshell-command add this hook in all minibuffers
-              ;; Remove it for the helm one. (Fixed in Emacs24)
-              (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
-    (candidates . helm-esh-get-candidates)
-    (action . helm-ec-insert))
-  "Helm source for Eshell completion.")
-
-;; Internal.
-(defvar helm-ec-target "")
-(defun helm-ec-insert (candidate)
-  "Replace text at point with CANDIDATE.
-The function that call this should set `helm-ec-target' to thing at point."
-  (let ((pt (point)))
-    (when (and helm-ec-target
-               (search-backward helm-ec-target nil t)
-               (string= (buffer-substring (point) pt) helm-ec-target))
-      (delete-region (point) pt)))
-  (insert (helm-quote-whitespace candidate)))
-
-(defun helm-esh-get-candidates ()
-  "Get candidates for eshell completion using `pcomplete'."
-  (catch 'pcompleted
-    (let* ((pcomplete-stub)
-           pcomplete-seen pcomplete-norm-func
-           pcomplete-args pcomplete-last pcomplete-index
-           (pcomplete-autolist pcomplete-autolist)
-           (pcomplete-suffix-list pcomplete-suffix-list))
-      (with-helm-current-buffer
-        (loop with table  = (pcomplete-completions)
-              with entry  = (condition-case nil
-                                ;; On Emacs24 `try-completion' return
-                                ;; pattern when more than one result.
-                                ;; Otherwise Emacs23 return nil, which
-                                ;; is wrong, in this case use pattern
-                                ;; to behave like Emacs24.
-                                (or (try-completion helm-pattern
-                                                    (pcomplete-entries))
-                                    helm-pattern)
-                              ;; In Emacs23 `pcomplete-entries' may fail
-                              ;; with error, so try this instead.
-                              (error
-                               nil
-                               (let ((fc (car (last
-                                               (pcomplete-parse-arguments)))))
-                                 ;; Check if last arg require fname completion.
-                                 (and (file-name-directory fc) fc))))
-              for i in (all-completions pcomplete-stub table)
-              for file-cand = (and entry
-                                   (if (file-remote-p i) i
-                                       (expand-file-name
-                                        i (file-name-directory entry))))
-              if (and file-cand (or (file-remote-p file-cand)
-                                    (file-exists-p file-cand)))
-              collect file-cand into ls
-              else collect i into ls
-              finally return
-              (if (and entry (not (string= entry "")) (file-exists-p entry))
-                  (append (list (expand-file-name entry default-directory)) ls)
-                  ls))))))
-
-;;; Eshell history.
-;;
-;;
-(defvar helm-c-source-eshell-history
-  `((name . "Eshell history")
-    (init . (lambda ()
-              (let (eshell-hist-ignoredups)
-                ;; Write the content's of ring to file.
-                (eshell-write-history eshell-history-file-name t)
-                (with-current-buffer (helm-candidate-buffer 'global)
-                  (insert-file-contents eshell-history-file-name)))
-              ;; Same comment as in `helm-c-source-esh'
-              (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
-    (candidates-in-buffer)
-    (keymap . ,helm-eshell-history-map)
-    (filtered-candidate-transformer . (lambda (candidates sources)
-                                        (reverse candidates)))
-    (candidate-number-limit . 9999)
-    (action . (lambda (candidate)
-                (eshell-kill-input)
-                (insert candidate))))
-  "Helm source for Eshell history.")
 
 
 ;;; Run Externals commands within Emacs with helm completion
