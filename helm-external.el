@@ -21,6 +21,10 @@
 (require 'helm)
 
 (defvar helm-external-command-history nil)
+(defvar helm-c-external-commands-list nil
+  "A list of all external commands the user can execute.  If this
+variable is not set by the user, it will be calculated
+automatically.")
 
 (defun helm-c-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.

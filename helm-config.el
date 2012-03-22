@@ -103,17 +103,6 @@
 (declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
 
 
-
-;;; General internal variables
-;;
-;; Some internals variable that need to be loaded
-;; here to avoid compiler warnings.
-(defvar helm-c-external-commands-list nil
-  "A list of all external commands the user can execute.  If this
-variable is not set by the user, it will be calculated
-automatically.")
-
-
 ;;; Helm-command-map
 ;;
 ;;
@@ -2769,120 +2758,6 @@ See also `helm-create--actions'.")
                         "--output" (helm-c-xrandr-output)
                         "--mode" mode))))))
 
-;;; Xfont selection
-;;
-;;
-(defun helm-c-persistent-xfont-action (elm)
-  "Show current font temporarily"
-  (let ((current-font (cdr (assoc 'font (frame-parameters))))
-        (default-font elm))
-    (unwind-protect
-         (progn (set-frame-font default-font 'keep-size) (sit-for 2))
-      (set-frame-font current-font))))
-
-(defvar helm-c-xfonts-cache nil)
-(defvar helm-c-source-xfonts
-  '((name . "X Fonts")
-    (init . (lambda ()
-              (unless helm-c-xfonts-cache
-                (setq helm-c-xfonts-cache
-                      (x-list-fonts "*")))))
-    (candidates . helm-c-xfonts-cache)
-    (action . (("Copy to kill ring" . (lambda (elm)
-                                        (kill-new elm)))
-               ("Set Font" . (lambda (elm)
-                               (kill-new elm)
-                               (set-frame-font elm 'keep-size)
-                               (message "New font have been copied to kill ring")))))
-    (persistent-action . helm-c-persistent-xfont-action)
-    (persistent-help . "Switch to this font temporarily")))
-
-;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
-;;
-;;
-(defvar helm-c-ucs-max-len 0)
-(defun helm-c-calculate-ucs-max-len ()
-  "Calculate the length of longest `ucs-names' candidate."
-  (loop with count = 0
-        for (n . v) in (ucs-names)
-        for len = (length n)
-        if (> len count)
-        do (setq count len)
-        finally return count))
-
-(defun helm-c-ucs-init ()
-  "Initialize an helm buffer with ucs symbols.
-Only math* symbols are collected."
-  (unless (> helm-c-ucs-max-len 0)
-    (setq helm-c-ucs-max-len
-          (helm-c-calculate-ucs-max-len)))
-  (with-current-buffer (helm-candidate-buffer
-                        (get-buffer-create "*helm ucs*"))
-    ;; `ucs-names' fn will not run again, data is cached in
-    ;; var `ucs-names'.
-    (loop for (n . v) in (ucs-names)
-          for len = (length n)
-          for diff = (+ (- helm-c-ucs-max-len len) 2)
-          unless (string= "" n)
-          do (progn (insert (concat
-                             n ":"
-                             (make-string
-                              diff ? )))
-                    (ucs-insert v)
-                    (insert "\n")))))
-
-(defun helm-c-ucs-forward-char (candidate)
-  (with-helm-current-buffer
-    (forward-char 1)))
-
-(defun helm-c-ucs-backward-char (candidate)
-  (with-helm-current-buffer
-    (forward-char -1)))
-
-(defun helm-c-ucs-delete-backward (candidate)
-  (with-helm-current-buffer
-    (delete-char -1)))
-
-(defun helm-c-ucs-insert-char (candidate)
-  (with-helm-current-buffer
-    (insert
-     (replace-regexp-in-string
-      " " ""
-      (cadr (split-string candidate ":"))))))
-
-(defun helm-c-ucs-persistent-insert ()
-  (interactive)
-  (helm-attrset 'action-insert 'helm-c-ucs-insert-char)
-  (helm-execute-persistent-action 'action-insert))
-
-(defun helm-c-ucs-persistent-forward ()
-  (interactive)
-  (helm-attrset 'action-forward 'helm-c-ucs-forward-char)
-  (helm-execute-persistent-action 'action-forward))
-
-(defun helm-c-ucs-persistent-backward ()
-  (interactive)
-  (helm-attrset 'action-back 'helm-c-ucs-backward-char)
-  (helm-execute-persistent-action 'action-back))
-
-(defun helm-c-ucs-persistent-delete ()
-  (interactive)
-  (helm-attrset 'action-delete 'helm-c-ucs-delete-backward)
-  (helm-execute-persistent-action 'action-delete))
-
-(defvar helm-c-source-ucs
-  '((name . "Ucs names")
-    (init . helm-c-ucs-init)
-    (candidate-number-limit . 9999)
-    (candidates-in-buffer)
-    (mode-line . helm-c-ucs-mode-line-string)
-    (action . (("Insert" . helm-c-ucs-insert-char)
-               ("Forward char" . helm-c-ucs-forward-char)
-               ("Backward char" . helm-c-ucs-backward-char)
-               ("Delete char backward" . helm-c-ucs-delete-backward))))
-  "Source for collecting `ucs-names' math symbols.")
-
-
 ;;; Emacs process
 ;;
 ;;
@@ -3783,12 +3658,6 @@ See also `helm-create--actions'."
       (helm-other-buffer 'helm-c-source-top "*helm top*"))))
 
 ;;;###autoload
-(defun helm-select-xfont ()
-  "Preconfigured `helm' to select Xfont."
-  (interactive)
-  (helm-other-buffer 'helm-c-source-xfonts "*helm select* xfont"))
-
-;;;###autoload
 (defun helm-world-time ()
   "Preconfigured `helm' to show world time."
   (interactive)
@@ -3800,13 +3669,6 @@ See also `helm-create--actions'."
   (interactive)
   (helm-other-buffer 'helm-c-source-ratpoison-commands
                      "*helm ratpoison commands*"))
-
-;;;###autoload
-(defun helm-ucs ()
-  "Preconfigured helm for `ucs-names' math symbols."
-  (interactive)
-  (helm :sources 'helm-c-source-ucs
-        :keymap  helm-c-ucs-map))
 
 ;;;###autoload
 (defun helm-xrandr-set ()
