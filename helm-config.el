@@ -3626,14 +3626,6 @@ With a prefix-arg insert symbol at point."
                        "*helm minibuffer-history*")))
 
 ;;;###autoload
-(defun helm-gentoo ()
-  "Preconfigured `helm' for gentoo linux."
-  (interactive)
-  (helm-other-buffer '(helm-c-source-gentoo
-                       helm-c-source-use-flags)
-                     "*helm gentoo*"))
-
-;;;###autoload
 (defun helm-imenu ()
   "Preconfigured `helm' for `imenu'."
   (interactive)

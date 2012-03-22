@@ -225,6 +225,14 @@
           else
           collect i)))
 
+;;;###autoload
+(defun helm-gentoo ()
+  "Preconfigured `helm' for gentoo linux."
+  (interactive)
+  (helm-other-buffer '(helm-c-source-gentoo
+                       helm-c-source-use-flags)
+                     "*helm gentoo*"))
+
 
 (provide 'helm-gentoo)
 
