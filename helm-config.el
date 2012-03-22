@@ -49,6 +49,7 @@
 (require 'helm-font)
 (require 'helm-sys)
 (require 'helm-misc)
+(require 'helm-elscreen nil t)
 (require 'helm-w3m nil t)
 (require 'helm-firefox nil t)
 (require 'helm-bmkext nil t)
@@ -1014,49 +1015,6 @@ See also `helm-create--actions'.")
     (action . (lambda (candidate)
                 (delete-minibuffer-contents)
                 (insert candidate)))))
-
-
-;;; Elscreen
-;;
-;;
-(defun helm-find-buffer-on-elscreen (candidate)
-  "Open buffer in new screen, if marked buffers open all in elscreens."
-  (helm-require-or-error 'elscreen 'helm-find-buffer-on-elscreen)
-  (helm-aif (helm-marked-candidates)
-      (dolist (i it)
-        (let ((target-screen (elscreen-find-screen-by-buffer
-                              (get-buffer i) 'create)))
-          (elscreen-goto target-screen)))
-    (let ((target-screen (elscreen-find-screen-by-buffer
-                          (get-buffer candidate) 'create)))
-      (elscreen-goto target-screen))))
-
-(defun helm-elscreen-find-file (file)
-  (helm-require-or-error 'elscreen 'helm-elscreen-find-file)
-  (elscreen-find-file file))
-
-(defvar helm-c-source-elscreen
-  '((name . "Elscreen")
-    (candidates
-     . (lambda ()
-         (if (cdr (elscreen-get-screen-to-name-alist))
-             (sort
-              (loop for sname in (elscreen-get-screen-to-name-alist)
-                    append (list (format "[%d] %s" (car sname) (cdr sname))))
-              #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
-    (action
-     . (("Change Screen" .
-                         (lambda (candidate)
-                           (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
-        ("Kill Screen(s)" .
-                          (lambda (candidate)
-                            (dolist (i (helm-marked-candidates))
-                              (elscreen-goto (- (aref i 1) (aref "0" 0)))
-                              (elscreen-kill))))
-        ("Only Screen" .
-                       (lambda (candidate)
-                         (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
-                         (elscreen-kill-others)))))))
 
 
 ;;; Generic action functions
