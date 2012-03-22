@@ -69,9 +69,6 @@
 ;;; Declare external functions
 ;;
 ;;
-(declare-function elscreen-find-screen-by-buffer "ext:elscreen.el" (buffer &optional create))
-(declare-function elscreen-find-file "ext:elscreen.el" (filename))
-(declare-function elscreen-goto "ext:elscreen.el" (screen))
 (declare-function semantic-format-tag-summarize "ext:format.el" (tag &optional parent color) t)
 (declare-function semantic-tag-components "ext:tag.el" (tag) t)
 (declare-function semantic-go-to-tag "ext:tag-file.el" (tag) t)
@@ -668,52 +665,6 @@ Otherwise your command will be called many times like this:
 ;;;; <File>
 ;;
 ;;
-;;; File Cache
-(defvar helm-c-file-cache-initialized-p nil)
-
-(defvar helm-c-file-cache-files nil)
-
-(defvar helm-c-source-file-cache
-  `((name . "File Cache")
-    (init
-     . (lambda ()
-         (require 'filecache nil t)
-         (unless helm-c-file-cache-initialized-p
-           (setq helm-c-file-cache-files
-                 (loop for item in file-cache-alist append
-                       (destructuring-bind (base &rest dirs) item
-                         (loop for dir in dirs collect
-                               (concat dir base)))))
-           (defadvice file-cache-add-file (after file-cache-list activate)
-             (add-to-list 'helm-c-file-cache-files (expand-file-name file)))
-           (setq helm-c-file-cache-initialized-p t))))
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (mode-line . helm-generic-file-mode-line-string)
-    (candidates . helm-c-file-cache-files)
-    (match helm-c-match-on-basename)
-    (type . file)))
-
-
-;;; Recentf files
-;;
-;;
-(defvar helm-c-source-recentf
-  `((name . "Recentf")
-    (init . (lambda ()
-              (require 'recentf)
-              (or recentf-mode (recentf-mode 1))))
-    ;; Needed for filenames with capitals letters.
-    (disable-shortcuts)
-    (candidates . recentf-list)
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (mode-line . helm-generic-file-mode-line-string)
-    (match helm-c-match-on-basename)
-    (type . file))
-  "See (info \"(emacs)File Conveniences\").
-Set `recentf-max-saved-items' to a bigger value if default is too small.")
-
 ;;; ffap
 (eval-when-compile (require 'ffap))
 (defvar helm-c-source-ffap-guesser
@@ -766,31 +717,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
     (keymap . ,helm-map)
     (type . file)))
 
-;;; list of files gleaned from every dired buffer
-(defun helm-c-files-in-all-dired-candidates ()
-  (save-excursion
-    (mapcan
-     (lambda (dir)
-       (cond ((listp dir)               ;filelist
-              dir)
-             ((equal "" (file-name-nondirectory dir)) ;dir
-              (directory-files dir t))
-             (t                         ;wildcard
-              (file-expand-wildcards dir t))))
-     (delq nil
-           (mapcar (lambda (buf)
-                     (set-buffer buf)
-                     (when (eq major-mode 'dired-mode)
-                       (if (consp dired-directory)
-                           (cdr dired-directory) ;filelist
-                           dired-directory))) ;dir or wildcard
-                   (buffer-list))))))
-;; (dired '("~/" "~/.emacs-custom.el" "~/.emacs.bmk"))
-
-(defvar helm-c-source-files-in-all-dired
-  '((name . "Files in all dired buffer.")
-    (candidates . helm-c-files-in-all-dired-candidates)
-    (type . file)))
 
 
 ;;; Visible Bookmarks
@@ -824,59 +750,6 @@ http://www.nongnu.org/bm/")
                                  annotation
                                  (buffer-substring start (1- end)))))
                 (with-current-buffer buf (insert str))))))))))
-
-
-;;;; <Library>
-;;; Elisp library scan
-;;
-;;
-(defvar helm-c-source-elisp-library-scan
-  '((name . "Elisp libraries (Scan)")
-    (init . (helm-c-elisp-library-scan-init))
-    (candidates-in-buffer)
-    (action ("Find library"
-             . (lambda (candidate) (find-file (find-library-name candidate))))
-     ("Find library other window"
-      . (lambda (candidate)
-          (find-file-other-window (find-library-name candidate))))
-     ("Load library"
-      . (lambda (candidate) (load-library candidate))))))
-
-(defun helm-c-elisp-library-scan-init ()
-  "Init helm buffer status."
-  (let ((helm-buffer (helm-candidate-buffer 'global))
-        (library-list (helm-c-elisp-library-scan-list)))
-    (with-current-buffer helm-buffer
-      (dolist (library library-list)
-        (insert (format "%s\n" library))))))
-
-(defun helm-c-elisp-library-scan-list (&optional dirs string)
-  "Do completion for file names passed to `locate-file'.
-DIRS is directory to search path.
-STRING is string to match."
-  ;; Use `load-path' as path when ignore `dirs'.
-  (or dirs (setq dirs load-path))
-  ;; Init with blank when ignore `string'.
-  (or string (setq string ""))
-  ;; Get library list.
-  (let ((string-dir (file-name-directory string))
-        ;; File regexp that suffix match `load-file-rep-suffixes'.
-        (match-regexp (format "^.*\\.el%s$" (regexp-opt load-file-rep-suffixes)))
-        name
-        names)
-    (dolist (dir dirs)
-      (unless dir
-        (setq dir default-directory))
-      (if string-dir
-          (setq dir (expand-file-name string-dir dir)))
-      (when (file-directory-p dir)
-        (dolist (file (file-name-all-completions
-                       (file-name-nondirectory string) dir))
-          ;; Suffixes match `load-file-rep-suffixes'.
-          (setq name (if string-dir (concat string-dir file) file))
-          (if (string-match match-regexp name)
-              (add-to-list 'names name)))))
-    names))
 
 
 ;;; Semantic
@@ -1059,26 +932,6 @@ It is added to `extended-command-history'.
 
 
 ;;; Actions Transformers
-;;
-;;
-;;; Files
-(defun helm-c-transform-file-load-el (actions candidate)
-  "Add action to load the file CANDIDATE if it is an emacs lisp
-file.  Else return ACTIONS unmodified."
-  (if (member (file-name-extension candidate) '("el" "elc"))
-      (append actions '(("Load Emacs Lisp File" . load-file)))
-      actions))
-
-(defun helm-c-transform-file-browse-url (actions candidate)
-  "Add an action to browse the file CANDIDATE if it in a html
-file or URL.  Else return ACTIONS unmodified."
-  (let ((browse-action '("Browse with Browser" . browse-url)))
-    (cond ((string-match "^http\\|^ftp" candidate)
-           (cons browse-action actions))
-          ((string-match "\\.html?$" candidate)
-           (append actions (list browse-action)))
-          (t actions))))
-
 ;;; Function
 (defun helm-c-transform-function-call-interactively (actions candidate)
   "Add an action to call the function CANDIDATE interactively if
@@ -1318,18 +1171,6 @@ the center of window, otherwise at the top of window.")
                        helm-c-source-recentf
                        helm-c-source-buffer-not-found)
                      "*helm mini*"))
-;;;###autoload
-(defun helm-for-files ()
-  "Preconfigured `helm' for opening files.
-Run all sources defined in `helm-for-files-prefered-list'."
-  (interactive)
-  (helm-other-buffer helm-for-files-prefered-list "*helm for files*"))
-
-;;;###autoload
-(defun helm-recentf ()
-  "Preconfigured `helm' for `recentf'."
-  (interactive)
-  (helm-other-buffer 'helm-c-source-recentf "*helm recentf*"))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()

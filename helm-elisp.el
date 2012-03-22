@@ -349,6 +349,57 @@ or between double quotes."
   (interactive)
   (helm-other-buffer 'helm-c-source-advice "*helm advice*"))
 
+;;; Elisp library scan
+;;
+;;
+(defvar helm-c-source-elisp-library-scan
+  '((name . "Elisp libraries (Scan)")
+    (init . (helm-c-elisp-library-scan-init))
+    (candidates-in-buffer)
+    (action ("Find library"
+             . (lambda (candidate) (find-file (find-library-name candidate))))
+     ("Find library other window"
+      . (lambda (candidate)
+          (find-file-other-window (find-library-name candidate))))
+     ("Load library"
+      . (lambda (candidate) (load-library candidate))))))
+
+(defun helm-c-elisp-library-scan-init ()
+  "Init helm buffer status."
+  (let ((helm-buffer (helm-candidate-buffer 'global))
+        (library-list (helm-c-elisp-library-scan-list)))
+    (with-current-buffer helm-buffer
+      (dolist (library library-list)
+        (insert (format "%s\n" library))))))
+
+(defun helm-c-elisp-library-scan-list (&optional dirs string)
+  "Do completion for file names passed to `locate-file'.
+DIRS is directory to search path.
+STRING is string to match."
+  ;; Use `load-path' as path when ignore `dirs'.
+  (or dirs (setq dirs load-path))
+  ;; Init with blank when ignore `string'.
+  (or string (setq string ""))
+  ;; Get library list.
+  (let ((string-dir (file-name-directory string))
+        ;; File regexp that suffix match `load-file-rep-suffixes'.
+        (match-regexp (format "^.*\\.el%s$" (regexp-opt load-file-rep-suffixes)))
+        name
+        names)
+    (dolist (dir dirs)
+      (unless dir
+        (setq dir default-directory))
+      (if string-dir
+          (setq dir (expand-file-name string-dir dir)))
+      (when (file-directory-p dir)
+        (dolist (file (file-name-all-completions
+                       (file-name-nondirectory string) dir))
+          ;; Suffixes match `load-file-rep-suffixes'.
+          (setq name (if string-dir (concat string-dir file) file))
+          (if (string-match match-regexp name)
+              (add-to-list 'names name)))))
+    names))
+
 ;;; Elisp Timers.
 ;;
 ;;

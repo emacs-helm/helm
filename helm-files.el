@@ -2248,6 +2248,75 @@ other candidate transformers."
   "Replaces /home/user with ~."
   (helm-transform-mapcar #'helm-c-shorten-home-path_ files))
 
+;;; list of files gleaned from every dired buffer
+(defun helm-c-files-in-all-dired-candidates ()
+  (save-excursion
+    (mapcan
+     (lambda (dir)
+       (cond ((listp dir)               ;filelist
+              dir)
+             ((equal "" (file-name-nondirectory dir)) ;dir
+              (directory-files dir t))
+             (t                         ;wildcard
+              (file-expand-wildcards dir t))))
+     (delq nil
+           (mapcar (lambda (buf)
+                     (set-buffer buf)
+                     (when (eq major-mode 'dired-mode)
+                       (if (consp dired-directory)
+                           (cdr dired-directory) ;filelist
+                           dired-directory))) ;dir or wildcard
+                   (buffer-list))))))
+;; (dired '("~/" "~/.emacs-custom.el" "~/.emacs.bmk"))
+
+(defun helm-c-transform-file-load-el (actions candidate)
+  "Add action to load the file CANDIDATE if it is an emacs lisp
+file.  Else return ACTIONS unmodified."
+  (if (member (file-name-extension candidate) '("el" "elc"))
+      (append actions '(("Load Emacs Lisp File" . load-file)))
+      actions))
+
+(defun helm-c-transform-file-browse-url (actions candidate)
+  "Add an action to browse the file CANDIDATE if it is a html file or URL.
+Else return ACTIONS unmodified."
+  (let ((browse-action '("Browse with Browser" . browse-url)))
+    (cond ((string-match "^http\\|^ftp" candidate)
+           (cons browse-action actions))
+          ((string-match "\\.html?$" candidate)
+           (append actions (list browse-action)))
+          (t actions))))
+
+(defvar helm-c-source-files-in-all-dired
+  '((name . "Files in all dired buffer.")
+    (candidates . helm-c-files-in-all-dired-candidates)
+    (type . file)))
+
+;;; File Cache
+(defvar helm-c-file-cache-initialized-p nil)
+
+(defvar helm-c-file-cache-files nil)
+
+(defvar helm-c-source-file-cache
+  `((name . "File Cache")
+    (init
+     . (lambda ()
+         (require 'filecache nil t)
+         (unless helm-c-file-cache-initialized-p
+           (setq helm-c-file-cache-files
+                 (loop for item in file-cache-alist append
+                       (destructuring-bind (base &rest dirs) item
+                         (loop for dir in dirs collect
+                               (concat dir base)))))
+           (defadvice file-cache-add-file (after file-cache-list activate)
+             (add-to-list 'helm-c-file-cache-files (expand-file-name file)))
+           (setq helm-c-file-cache-initialized-p t))))
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (candidates . helm-c-file-cache-files)
+    (match helm-c-match-on-basename)
+    (type . file)))
+
 ;;; File name history
 ;;
 ;;
@@ -2256,6 +2325,25 @@ other candidate transformers."
     (candidates . file-name-history)
     (match helm-c-match-on-basename)
     (type . file)))
+
+;;; Recentf files
+;;
+;;
+(defvar helm-c-source-recentf
+  `((name . "Recentf")
+    (init . (lambda ()
+              (require 'recentf)
+              (or recentf-mode (recentf-mode 1))))
+    ;; Needed for filenames with capitals letters.
+    (disable-shortcuts)
+    (candidates . recentf-list)
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (match helm-c-match-on-basename)
+    (type . file))
+  "See (info \"(emacs)File Conveniences\").
+Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 ;;; Files in current dir
 ;;
@@ -2364,6 +2452,18 @@ This is the starting point for nearly all actions you can do on files."
   (interactive)
   (helm-dired-do-action-on-file :action 'hardlink))
 
+;;;###autoload
+(defun helm-for-files ()
+  "Preconfigured `helm' for opening files.
+Run all sources defined in `helm-for-files-prefered-list'."
+  (interactive)
+  (helm-other-buffer helm-for-files-prefered-list "*helm for files*"))
+
+;;;###autoload
+(defun helm-recentf ()
+  "Preconfigured `helm' for `recentf'."
+  (interactive)
+  (helm-other-buffer 'helm-c-source-recentf "*helm recentf*"))
 
 (provide 'helm-files)
 

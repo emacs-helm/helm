@@ -19,8 +19,10 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
-;;
-;;
+(declare-function elscreen-find-screen-by-buffer "ext:elscreen.el" (buffer &optional create))
+(declare-function elscreen-find-file "ext:elscreen.el" (filename))
+(declare-function elscreen-goto "ext:elscreen.el" (screen))
+
 (defun helm-find-buffer-on-elscreen (candidate)
   "Open buffer in new screen, if marked buffers open all in elscreens."
   (helm-require-or-error 'elscreen 'helm-find-buffer-on-elscreen)
