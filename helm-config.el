@@ -39,6 +39,7 @@
 (require 'helm-eval)
 (require 'helm-tags)
 (require 'helm-adaptative)
+(require 'helm-imenu)
 (require 'helm-apt nil t)
 (require 'helm-gentoo nil t)
 (require 'helm-bbdb nil t)
@@ -1616,90 +1617,6 @@ STRING is string to match."
     names))
 
 
-;;;; <Programming>
-;;
-;;
-
-;;; Imenu
-;;
-;;
-(defvar helm-c-imenu-delimiter " / ")
-
-(defvar helm-c-imenu-index-filter nil)
-(make-variable-buffer-local 'helm-c-imenu-index-filter)
-
-(defvar helm-c-cached-imenu-alist nil)
-(make-variable-buffer-local 'helm-c-cached-imenu-alist)
-
-(defvar helm-c-cached-imenu-candidates nil)
-(make-variable-buffer-local 'helm-c-cached-imenu-candidates)
-
-(defvar helm-c-cached-imenu-tick nil)
-(make-variable-buffer-local 'helm-c-cached-imenu-tick)
-
-(eval-when-compile (require 'imenu))
-(setq imenu-auto-rescan t)
-
-(defun helm-imenu-create-candidates (entry)
-  "Create candidates with ENTRY."
-  (if (listp (cdr entry))
-      (mapcan
-       (lambda (sub)
-         (if (consp (cdr sub))
-             (mapcar
-              (lambda (subentry)
-                (concat (car entry) helm-c-imenu-delimiter subentry))
-              (helm-imenu-create-candidates sub))
-             (list (concat (car entry) helm-c-imenu-delimiter (car sub)))))
-       (cdr entry))
-      (list entry)))
-
-(defvar helm-c-source-imenu
-  '((name . "Imenu")
-    (init . (lambda () (require 'imenu)))
-    (candidates . helm-c-imenu-candidates)
-    (persistent-action . (lambda (elm)
-                           (helm-c-imenu-default-action elm)
-                           (unless (fboundp 'semantic-imenu-tag-overlay)
-                             (helm-match-line-color-current-line))))
-    (persistent-help . "Show this entry")
-    (action . helm-c-imenu-default-action))
-  "See (info \"(emacs)Imenu\")")
-
-
-(defun helm-c-imenu-candidates ()
-  (with-helm-current-buffer
-    (let ((tick (buffer-modified-tick)))
-      (if (eq helm-c-cached-imenu-tick tick)
-          helm-c-cached-imenu-candidates
-          (setq imenu--index-alist nil)
-          (setq helm-c-cached-imenu-tick tick
-                helm-c-cached-imenu-candidates
-                (ignore-errors
-                  (mapcan
-                   'helm-imenu-create-candidates
-                   (setq helm-c-cached-imenu-alist
-                         (let ((index (imenu--make-index-alist)))
-                           (if helm-c-imenu-index-filter
-                               (funcall helm-c-imenu-index-filter index)
-                               index))))))
-          (setq helm-c-cached-imenu-candidates
-                (mapcar #'(lambda (x)
-                            (if (stringp x)
-                                x
-                                (car x)))
-                        helm-c-cached-imenu-candidates))))))
-
-(setq imenu-default-goto-function 'imenu-default-goto-function)
-(defun helm-c-imenu-default-action (elm)
-  "The default action for `helm-c-source-imenu'."
-  (let ((path (split-string elm helm-c-imenu-delimiter))
-        (alist helm-c-cached-imenu-alist))
-    (dolist (elm path)
-      (setq alist (assoc elm alist)))
-    (imenu alist)))
-
-
 ;;; Semantic
 ;;
 ;;
@@ -3232,13 +3149,6 @@ With a prefix-arg insert symbol at point."
   (let ((enable-recursive-minibuffers t))
     (helm-other-buffer 'helm-c-source-minibuffer-history
                        "*helm minibuffer-history*")))
-
-;;;###autoload
-(defun helm-imenu ()
-  "Preconfigured `helm' for `imenu'."
-  (interactive)
-  (helm :sources 'helm-c-source-imenu
-        :buffer "*helm imenu*"))
 
 ;;;###autoload
 (defun helm-w3m-bookmarks ()
