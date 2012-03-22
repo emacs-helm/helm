@@ -44,6 +44,7 @@
 (require 'helm-bookmark)
 (require 'helm-org)
 (require 'helm-info)
+(require 'helm-man)
 (require 'helm-w3m nil t)
 (require 'helm-firefox nil t)
 (require 'helm-bmkext nil t)
@@ -839,51 +840,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
   '((name . "Files in all dired buffer.")
     (candidates . helm-c-files-in-all-dired-candidates)
     (type . file)))
-
-
-;;; Man and woman UI
-;;
-;;
-(defvar helm-c-man-pages nil
-  "All man pages on system.
-Will be calculated the first time you invoke helm with this
-source.")
-
-(defun helm-c-man-default-action (candidate)
-  "Default action for jumping to a woman or man page from helm."
-  (let ((wfiles (woman-file-name-all-completions candidate)))
-    (condition-case err
-        (if (> (length wfiles) 1)
-            (woman-find-file
-             (helm-comp-read
-              "ManFile: " wfiles :must-match t))
-            (woman candidate))
-      ;; If woman is unable to format correctly
-      ;; use man instead.
-      (error (kill-buffer) ; Kill woman buffer.
-             (let ((Man-notify-method 'meek))
-               (Man-getpage-in-background candidate))))))
-
-(defvar helm-c-source-man-pages
-  `((name . "Manual Pages")
-    (candidates . (lambda ()
-                    (if helm-c-man-pages
-                        helm-c-man-pages
-                        ;; XEmacs doesn't have a woman :)
-                        (setq helm-c-man-pages
-                              (ignore-errors
-                                (require 'woman)
-                                (woman-file-name "")
-                                (sort (mapcar 'car woman-topic-all-completions)
-                                      'string-lessp))))))
-    (action  ("Show with Woman" . helm-c-man-default-action))
-    ;; Woman does not work OS X
-    ;; http://xahlee.org/emacs/modernization_man_page.html
-    (action-transformer . (lambda (actions candidate)
-                            (if (eq system-type 'darwin)
-                                '(("Show with Man" . man))
-                                actions)))
-    (requires-pattern . 2)))
 
 
 ;;; LaCarte
@@ -1993,12 +1949,6 @@ Run all sources defined in `helm-for-files-prefered-list'."
   "Preconfigured helm for latex math symbols completion."
   (interactive)
   (helm-other-buffer 'helm-c-source-latex-math "*helm latex*"))
-
-;;;###autoload
-(defun helm-man-woman ()
-  "Preconfigured `helm' for Man and Woman pages."
-  (interactive)
-  (helm-other-buffer 'helm-c-source-man-pages "*Helm man woman*"))
 
 ;;;###autoload
 (defun helm-eev-anchors ()
