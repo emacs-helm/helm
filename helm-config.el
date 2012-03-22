@@ -43,6 +43,7 @@
 (require 'helm-imenu)
 (require 'helm-bookmark)
 (require 'helm-org)
+(require 'helm-info)
 (require 'helm-w3m nil t)
 (require 'helm-firefox nil t)
 (require 'helm-bmkext nil t)
@@ -838,38 +839,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
   '((name . "Files in all dired buffer.")
     (candidates . helm-c-files-in-all-dired-candidates)
     (type . file)))
-
-
-;;;; <info>
-;;; Info pages
-(defvar helm-c-info-pages nil
-  "All info pages on system.
-Will be calculated the first time you invoke helm with this
-source.")
-
-(defun helm-c-info-pages-init ()
-  "Collect candidates for initial Info node Top."
-  (if helm-c-info-pages
-      helm-c-info-pages
-      (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-            topics)
-        (require 'info)
-        (with-temp-buffer
-          (Info-find-node "dir" "top")
-          (goto-char (point-min))
-          (while (re-search-forward info-topic-regexp nil t)
-            (push (match-string-no-properties 1) topics))
-          (kill-buffer))
-        (setq helm-c-info-pages topics))))
-
-(defvar helm-c-source-info-pages
-  `((name . "Info Pages")
-    (init . helm-c-info-pages-init)
-    (candidates . helm-c-info-pages)
-    (action . (("Show with Info" .(lambda (node-str)
-                                    (info (replace-regexp-in-string
-                                           "^[^:]+: " "" node-str))))))
-    (requires-pattern . 2)))
 
 
 ;;; Man and woman UI
@@ -2002,20 +1971,6 @@ Run all sources defined in `helm-for-files-prefered-list'."
   "Preconfigured `helm' for `recentf'."
   (interactive)
   (helm-other-buffer 'helm-c-source-recentf "*helm recentf*"))
-
-;;;###autoload
-(defun helm-info-at-point (arg)
-  "Preconfigured `helm' for searching info at point.
-With a prefix-arg insert symbol at point."
-  (interactive "P")
-  (let ((helm-c-google-suggest-default-function
-         'helm-c-google-suggest-emacs-lisp))
-    (helm :sources '(helm-c-source-info-elisp
-                     helm-c-source-info-cl
-                     helm-c-source-info-pages
-                     helm-c-source-google-suggest)
-          :input (and arg (thing-at-point 'symbol))
-          :buffer "*helm info*")))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
