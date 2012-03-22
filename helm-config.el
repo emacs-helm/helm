@@ -2942,69 +2942,6 @@ Only math* symbols are collected."
   (call-process "ratpoison" nil nil nil "-ic" candidate))
 
 
-;;; Run Externals commands within Emacs with helm completion
-;;
-;;
-(defvar helm-external-command-history nil)
-
-(defun helm-c-external-commands-list-1 (&optional sort)
-  "Returns a list of all external commands the user can execute.
-If `helm-c-external-commands-list' is non-nil it will
-return its contents.  Else it calculates all external commands
-and sets `helm-c-external-commands-list'."
-  (if helm-c-external-commands-list
-      helm-c-external-commands-list
-      (setq helm-c-external-commands-list
-            (loop
-                  with paths = (split-string (getenv "PATH") path-separator)
-                  with completions = ()
-                  for dir in paths
-                  when (and (file-exists-p dir) (file-accessible-directory-p dir))
-                  for lsdir = (loop for i in (directory-files dir t)
-                                    for bn = (file-name-nondirectory i)
-                                    when (and (not (member bn completions))
-                                              (not (file-directory-p i))
-                                              (file-executable-p i))
-                                    collect bn)
-                  append lsdir into completions
-                  finally return (if sort (sort completions 'string-lessp) completions)))))
-
-(defun helm-run-or-raise (exe &optional file)
-  "Generic command that run asynchronously EXE.
-If EXE is already running just jump to his window if `helm-raise-command'
-is non--nil.
-When FILE argument is provided run EXE with FILE.
-In this case EXE must be provided as \"EXE %s\"."
-  (lexical-let* ((real-com (car (split-string (replace-regexp-in-string
-                                               "%s" "" exe))))
-                 (proc     (if file (concat real-com " " file) real-com)))
-    (if (get-process proc)
-        (if helm-raise-command
-            (shell-command  (format helm-raise-command real-com))
-            (error "Error: %s is already running" real-com))
-        (when (loop for i in helm-c-external-commands-list thereis real-com)
-          (message "Starting %s..." real-com)
-          (if file
-              (start-process-shell-command
-               proc nil (format exe (shell-quote-argument
-                                     (if (eq system-type 'windows-nt)
-                                         (helm-w32-prepare-filename file)
-                                         file))))
-              (start-process-shell-command proc nil real-com))
-          (set-process-sentinel
-           (get-process proc)
-           #'(lambda (process event)
-               (when (and (string= event "finished\n")
-                          helm-raise-command
-                          (not (helm-c-get-pid-from-process-name real-com)))
-                 (shell-command  (format helm-raise-command "emacs")))
-               (message "%s process...Finished." process))))
-        (setq helm-c-external-commands-list
-              (cons real-com
-                    (delete real-com helm-c-external-commands-list))))))
-
-
-
 ;;; Generic action functions
 ;;
 ;;
@@ -3856,25 +3793,6 @@ See also `helm-create--actions'."
   "Preconfigured `helm' to show world time."
   (interactive)
   (helm-other-buffer 'helm-c-source-time-world "*helm world time*"))
-
-;;;###autoload
-(defun helm-c-run-external-command (program)
-  "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
-If program is already running exit with error.
-You can set your own list of commands with
-`helm-c-external-commands-list'."
-  (interactive (list
-                (helm-comp-read
-                 "RunProgram: "
-                 (helm-c-external-commands-list-1 'sort)
-                 :must-match t
-                 :name "External Commands"
-                 :history helm-external-command-history)))
-  (helm-run-or-raise program)
-  (setq helm-external-command-history
-        (cons program (delete program
-                              (loop for i in helm-external-command-history
-                                    when (executable-find i) collect i)))))
 
 ;;;###autoload
 (defun helm-ratpoison-commands ()

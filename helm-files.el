@@ -20,6 +20,7 @@
 (require 'cl)
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-external)
 (require 'thingatpt)
 (require 'ffap)
 (eval-when-compile (require 'dired))
