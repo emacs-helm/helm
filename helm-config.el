@@ -49,6 +49,7 @@
 (require 'helm-gentoo nil t)
 (require 'helm-bbdb nil t)
 (require 'helm-emms nil t)
+(require 'yaoddmuse nil t)
 (require 'helm-descbinds nil t)
 (require 'helm-slime nil t)
 (eval-when-compile (require 'org)) ; Shut up byte compiler about org-directory.
@@ -228,28 +229,6 @@
 ;;; Specialized keymaps
 ;;
 ;;
-(defvar helm-c-ucs-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "<C-backspace>") 'helm-c-ucs-persistent-delete)
-    (define-key map (kbd "<C-left>")      'helm-c-ucs-persistent-backward)
-    (define-key map (kbd "<C-right>")     'helm-c-ucs-persistent-forward)
-    (define-key map (kbd "<C-return>")    'helm-c-ucs-persistent-insert)
-    (define-key map (kbd "C-c ?")         'helm-c-ucs-help)
-    map)
-  "Keymap for `helm-ucs'.")
-
-(defvar helm-c-bookmark-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o") 'helm-c-bookmark-run-jump-other-window)
-    (define-key map (kbd "C-d")   'helm-c-bookmark-run-delete)
-    (when (locate-library "bookmark-extensions")
-      (define-key map (kbd "M-e") 'helm-c-bmkext-run-edit))
-    (define-key map (kbd "C-c ?") 'helm-c-bookmark-help)
-    (delq nil map))
-  "Generic Keymap for emacs bookmark sources.")
-
 (defvar helm-esh-on-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -1346,127 +1325,6 @@ linkd.el is optional because linkd stars are extracted by regexp.
 http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 
-;;; Helm yaoddmuse
-;;
-;; Be sure to have yaoddmuse.el installed
-;; install-elisp may be required if you want to install elisp file from here.
-(defvar helm-yaoddmuse-use-cache-file nil)
-(defvar helm-c-yaoddmuse-cache-file "~/.emacs.d/yaoddmuse-cache.el")
-(defvar helm-c-yaoddmuse-ew-cache nil)
-
-(defun helm-yaoddmuse-get-candidates ()
-  (declare (special yaoddmuse-pages-hash))
-  (if helm-yaoddmuse-use-cache-file
-      (ignore-errors
-        (unless helm-c-yaoddmuse-ew-cache
-          (load helm-c-yaoddmuse-cache-file)
-          (setq helm-c-yaoddmuse-ew-cache
-                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-        helm-c-yaoddmuse-ew-cache)
-      (yaoddmuse-update-pagename t)
-      (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-
-(defvar helm-c-source-yaoddmuse-emacswiki-edit-or-view
-  '((name . "Yaoddmuse Edit or View (EmacsWiki)")
-    (candidates . helm-yaoddmuse-get-candidates)
-    (action . (("Edit page" . (lambda (candidate)
-                                (yaoddmuse-edit "EmacsWiki" candidate)))
-               ("Browse page"
-                . (lambda (candidate)
-                    (yaoddmuse-browse-page "EmacsWiki" candidate)))
-               ("Browse page other window"
-                . (lambda (candidate)
-                    (if (one-window-p)
-                        (split-window-vertically))
-                    (yaoddmuse-browse-page "EmacsWiki" candidate)))
-               ("Browse diff"
-                . (lambda (candidate)
-                    (yaoddmuse-browse-page-diff "EmacsWiki" candidate)))
-               ("Copy URL"
-                . (lambda (candidate)
-                    (kill-new (yaoddmuse-url "EmacsWiki" candidate))
-                    (message "Have copy page %s's URL to yank." candidate)))
-               ("Create page"
-                . (lambda (candidate)
-                    (yaoddmuse-edit "EmacsWiki" helm-input)))
-               ("Update cache"
-                . (lambda (candidate)
-                    (if helm-yaoddmuse-use-cache-file
-                        (progn
-                          (helm-yaoddmuse-cache-pages t)
-                          (setq helm-c-yaoddmuse-ew-cache
-                                (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                        (yaoddmuse-update-pagename))))))
-    (action-transformer helm-c-yaoddmuse-action-transformer))
-  "Needs yaoddmuse.el.
-
-http://www.emacswiki.org/emacs/download/yaoddmuse.el")
-
-
-(defvar helm-c-source-yaoddmuse-emacswiki-post-library
-  '((name . "Yaoddmuse Post library (EmacsWiki)")
-    (init . (helm-yaoddmuse-init))
-    (candidates-in-buffer)
-    (action . (("Post library and Browse"
-                . (lambda (candidate)
-                    (yaoddmuse-post-file
-                     (find-library-name candidate)
-                     "EmacsWiki"
-                     (file-name-nondirectory (find-library-name candidate))
-                     nil t)))
-               ("Post library"
-                . (lambda (candidate)
-                    (yaoddmuse-post-file
-                     (find-library-name candidate)
-                     "EmacsWiki"
-                     (file-name-nondirectory
-                      (find-library-name candidate))))))))
-  "Needs yaoddmuse.el.
-
-http://www.emacswiki.org/emacs/download/yaoddmuse.el")
-
-
-(defun helm-c-yaoddmuse-action-transformer (actions candidate)
-  "Allow the use of `install-elisp' only on elisp files."
-  (if (string-match "\.el$" candidate)
-      (append actions '(("Install Elisp"
-                         . (lambda (elm)
-                             (install-elisp-from-emacswiki elm)))))
-      actions))
-
-;;;###autoload
-(defun helm-yaoddmuse-cache-pages (&optional load)
-  "Fetch the list of files on emacswiki and create cache file.
-If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
-  (interactive)
-  (declare (special yaoddmuse-pages-hash))
-  (yaoddmuse-update-pagename)
-  (save-excursion
-    (find-file helm-c-yaoddmuse-cache-file)
-    (erase-buffer)
-    (insert "(puthash \"EmacsWiki\" '(")
-    (loop for i in (gethash "EmacsWiki" yaoddmuse-pages-hash)
-          do
-          (insert (concat "(\"" (car i) "\") ")))
-    (insert ") yaoddmuse-pages-hash)\n")
-    (save-buffer)
-    (kill-buffer (current-buffer))
-    (when (or current-prefix-arg
-              load)
-      (load helm-c-yaoddmuse-cache-file))))
-
-(defun helm-yaoddmuse-init ()
-  "Init helm buffer status."
-  (let ((helm-buffer (helm-candidate-buffer 'global))
-        (library-list (yaoddmuse-get-library-list)))
-    (with-current-buffer helm-buffer
-      ;; Insert library name.
-      (dolist (library library-list)
-        (insert (format "%s\n" library)))
-      ;; Sort lines.
-      (sort-lines nil (point-min) (point-max)))))
-
-
 ;;; Eev anchors
 (defvar helm-c-source-eev-anchor
   '((name . "Anchors")
@@ -2376,26 +2234,6 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el"
    '(helm-c-source-simple-call-tree-functions-callers
      helm-c-source-simple-call-tree-callers-functions)
    "*helm simple-call-tree*"))
-
-;;;###autoload
-(defun helm-yaoddmuse-emacswiki-edit-or-view ()
-  "Preconfigured `helm' to edit or view EmacsWiki page.
-
-Needs yaoddmuse.el.
-
-http://www.emacswiki.org/emacs/download/yaoddmuse.el"
-  (interactive)
-  (helm :sources 'helm-c-source-yaoddmuse-emacswiki-edit-or-view))
-
-;;;###autoload
-(defun helm-yaoddmuse-emacswiki-post-library ()
-  "Preconfigured `helm' to post library to EmacsWiki.
-
-Needs yaoddmuse.el.
-
-http://www.emacswiki.org/emacs/download/yaoddmuse.el"
-  (interactive)
-  (helm :sources 'helm-c-source-yaoddmuse-emacswiki-post-library))
 
 ;;;###autoload
 (defun helm-call-source ()

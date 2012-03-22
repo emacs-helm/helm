@@ -24,6 +24,17 @@
 (defvar helm-c-bookmarks-face2 'helm-ff-file)
 (defvar helm-c-bookmarks-face3 'helm-bookmarks-su-face)
 
+(defvar helm-c-bookmark-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c o") 'helm-c-bookmark-run-jump-other-window)
+    (define-key map (kbd "C-d")   'helm-c-bookmark-run-delete)
+    (when (locate-library "bookmark-extensions")
+      (define-key map (kbd "M-e") 'helm-c-bmkext-run-edit))
+    (define-key map (kbd "C-c ?") 'helm-c-bookmark-help)
+    (delq nil map))
+  "Generic Keymap for emacs bookmark sources.")
+
 (defvar helm-c-source-bookmarks
   `((name . "Bookmarks")
     (init . (lambda ()

@@ -20,6 +20,18 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+(defvar helm-c-ucs-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "<C-backspace>") 'helm-c-ucs-persistent-delete)
+    (define-key map (kbd "<C-left>")      'helm-c-ucs-persistent-backward)
+    (define-key map (kbd "<C-right>")     'helm-c-ucs-persistent-forward)
+    (define-key map (kbd "<C-return>")    'helm-c-ucs-persistent-insert)
+    (define-key map (kbd "C-c ?")         'helm-c-ucs-help)
+    map)
+  "Keymap for `helm-ucs'.")
+
+
 ;;; Xfont selection
 ;;
 ;;
