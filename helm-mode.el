@@ -421,7 +421,7 @@ See documentation of `completing-read' and `all-completions' for details."
          (minibuffer-setup-hook (remove 'minibuffer-completion-help
                                         minibuffer-setup-hook)))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
-    (unless (or (not entry) def-com (eq collection 'read-file-name-internal))
+    (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
       ;; a nil value, so we exit from here, disable `helm-mode'
       ;; and run the command again with it original behavior.
