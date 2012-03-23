@@ -40,6 +40,11 @@ Where '%f' format spec is filename and '%p' is page number"
   :group 'helm-grep
   :type  'string)
 
+(defcustom helm-c-grep-max-length-history 100
+  "Max number of elements to save in `helm-c-grep-history'."
+  :group 'helm-grep
+  :type 'integer)
+
 
 ;;; Faces
 ;;
@@ -95,9 +100,6 @@ Where '%f' format spec is filename and '%p' is page number"
     map)
   "Keymap used in pdfgrep.")
 
-;; Allow to grep incrementally with helm interface.
-;; It allow also to Grep files recursively without using 'find' shell command.
-;; On Windows you will need at least Grep version 2.5.4 of Gnuwin32.
 (defvar helm-c-grep-default-command
   "grep -d skip %e -niH -e %p %f"
   "Default grep format command for `helm-do-grep-1'.
@@ -123,9 +125,6 @@ See `helm-c-grep-default-command' for format specs.")
 (defvar helm-c-zgrep-recurse-flag nil)
 
 (defvar helm-c-grep-history nil)
-
-(defvar helm-c-grep-max-length-history 100
-  "*Max number of elements to save in `helm-c-grep-history'.")
 
 (defun helm-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories CANDIDATES for grep command line."
@@ -523,7 +522,10 @@ If N is positive go forward otherwise go backward."
   (interactive)
   (helm-c-quit-and-execute-action 'helm-c-grep-save-results))
 
-;; Grep buffers
+
+;;; Grep buffers
+;;
+;;
 (defun helm-c-grep-buffers-1 (candidate &optional zgrep)
   "Run grep on all file--buffers or CANDIDATE if it is a file--buffer.
 If one of selected buffers is not a file--buffer,

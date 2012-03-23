@@ -116,6 +116,7 @@
     (define-key map (kbd "M-g s")     'helm-do-grep)
     (define-key map (kbd "c")         'helm-colors)
     (define-key map (kbd "F")         'helm-select-xfont)
+    (define-key map (kbd "8")         'helm-ucs)
     (define-key map (kbd "C-c f")     'helm-recentf)
     (define-key map (kbd "C-c g")     'helm-google-suggest)
     (define-key map (kbd "h i")       'helm-info-at-point)
