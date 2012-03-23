@@ -501,9 +501,10 @@ See documentation of `completing-read' and `all-completions' for details."
     ;; for `completing-read', so set it to 'incompatible to be sure
     ;; we switch to `helm-c-read-file-name' and don't try to call it
     ;; with wrong number of args.
+    (when (eq def-com 'ido)
+      (setq def-com 'ido-read-file-name) (ido-mode 1))
     (when (and def-com (> (length (help-function-arglist def-com)) 8))
       (setq def-com 'incompatible))
-    (when (eq def-com 'ido) (setq def-com 'ido-read-file-name))
     (unless (or (not entry) def-com)
       (return-from helm-generic-read-file-name
         (unwind-protect
