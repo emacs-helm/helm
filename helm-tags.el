@@ -20,6 +20,40 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+
+(defgroup helm-tags nil
+  "Tags related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-etags-tag-file-name "TAGS"
+  "Etags tag file name."
+  :type  'string
+  :group 'helm-tags)
+
+(defcustom helm-c-etags-tag-file-search-limit 10
+  "The limit level of directory to search tag file.
+Don't search tag file deeply if outside this value."
+  :type  'number
+  :group 'helm-tags)
+
+(defcustom helm-c-etags-use-regexp-search nil
+  "When non--nil search etags candidates by regexp.
+This disable helm-match-plugin when enabled.
+When nil search is performed directly on patter and *match-plugin is used
+if available.  You can customize `helm-c-etags-search-regexp'."
+  :group 'helm-tags
+  :type  'boolean)
+
+(defcustom helm-c-etags-search-regexp "^.+: .+ \\<%s"
+  "Regexp that match tags in an helm etags buffer.
+The format spec is replaced by pattern.
+This regexp have no effect when `helm-c-etags-use-regexp-search'
+is nil."
+  :group 'helm-tags
+  :type  'regexp)
+
+
+
 (defvar helm-c-etags-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)

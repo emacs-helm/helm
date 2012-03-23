@@ -27,6 +27,22 @@
 (declare-function term-send-input "term")
 (declare-function term-send-eof "term")
 
+
+(defgroup helm-apt nil
+  "Apt related Applications and libraries for Helm."
+  :group 'helm)
+
+(defface helm-apt-installed
+    '((t (:foreground "green")))
+  "*Face used for apt installed candidates."
+  :group 'helm-apt)
+
+(defface helm-apt-deinstalled
+    '((t (:foreground "DimGray")))
+  "*Face used for apt deinstalled candidates."
+  :group 'helm-apt)
+
+
 (defvar helm-c-source-apt
   '((name . "APT")
     (init . helm-c-apt-init)

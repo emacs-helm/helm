@@ -21,6 +21,16 @@
 (require 'helm)
 (require 'helm-utils)
 
+
+(defgroup helm-bookmark nil
+  "Predefined configurations for `helm.el'."
+  :group 'helm)
+
+(defface helm-bookmarks-su-face '((t (:foreground "red")))
+  "Face for su/sudo bookmarks."
+  :group 'helm-bookmark)
+
+
 
 (defvar helm-c-bookmarks-face1 'helm-ff-directory)
 (defvar helm-c-bookmarks-face2 'helm-ff-file)

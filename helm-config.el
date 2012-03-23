@@ -23,7 +23,6 @@
 ;;
 (require 'cl)
 (require 'helm)
-(require 'helm-vars)
 (require 'helm-utils)
 (require 'helm-plugin)
 (require 'helm-buffers)
@@ -64,6 +63,25 @@
 (require 'helm-call-tree nil t)
 (require 'helm-descbinds nil t)
 (require 'helm-slime nil t)
+
+
+(defgroup helm-config nil
+  "Various configurations for Helm."
+  :group 'helm)
+
+(defcustom helm-command-prefix-key "C-x c"
+  "The key `helm-command-prefix' is bound to in the global map."
+  :type '(choice (string :tag "Key") (const :tag "no binding"))
+  :group 'helm-config
+  :set
+  (lambda (var key)
+    (when (and (boundp var) (symbol-value var))
+      (define-key (current-global-map)
+        (read-kbd-macro (symbol-value var)) nil))
+    (when key
+      (define-key (current-global-map)
+        (read-kbd-macro key) 'helm-command-prefix))
+    (set var key)))
 
 
 ;;; Helm-command-map
@@ -168,6 +186,12 @@
      ["Emacs internals process" helm-list-emacs-process t])
     "----"
     ["Prefered Options" helm-configuration t]))
+
+;;;###autoload
+(defun helm-configuration ()
+  "Customize `helm'."
+  (interactive)
+  (customize-group "helm"))
 
 
 ;;; Helm map add ons

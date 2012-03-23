@@ -21,6 +21,51 @@
 (require 'helm-utils)
 (require 'advice)
 
+
+(defgroup helm-elisp nil
+  "Elisp related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-turn-on-show-completion t
+  "Display candidate in buffer while moving selection when non--nil."
+  :group 'helm-elisp
+  :type  'boolean)
+
+(defcustom helm-c-show-completion-use-special-display t
+  "A special display will be used in lisp completion if non--nil.
+All functions that are wrapped in macro `with-helm-show-completion'
+will be affected."
+  :group 'helm-elisp
+  :type  'boolean)
+
+(defcustom helm-c-show-completion-min-window-height 7
+  "Minimum completion window height used in show completion.
+This is used in macro `with-helm-show-completion'."
+  :group 'helm-elisp
+  :type  'integer)
+
+(defcustom helm-lisp-completion-or-indent-delay 0.6
+  "After this delay `helm-lisp-completion-counter' is reset to 0.
+This allow to indent again without completing lisp symbol after this delay.
+Default is 0.6 seconds."
+  :group 'helm-elisp
+  :type  'number)
+
+
+;;; Faces
+;;
+;;
+(defface helm-lisp-show-completion
+    '((t (:background "DarkSlateGray")))
+  "*Face used for showing candidates in `helm-lisp-completion'."
+  :group 'helm-elisp)
+
+(defface helm-lisp-completion-info
+    '((t (:foreground "red")))
+  "*Face used for showing info in `helm-lisp-completion'."
+  :group 'helm-elisp)
+
+
 ;;; Show completion.
 ;;
 ;; Provide show completion with macro `with-helm-show-completion'.

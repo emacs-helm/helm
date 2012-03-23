@@ -24,6 +24,52 @@
 
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))
 
+
+(defgroup helm-grep nil
+  "Grep related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-grep-use-ioccur-style-keys t
+  "Use Arrow keys to jump to occurences."
+  :group 'helm-grep
+  :type  'boolean)
+
+(defcustom helm-c-pdfgrep-default-read-command "xpdf '%f' %p"
+  "Default command to read pdf files from pdfgrep.
+Where '%f' format spec is filename and '%p' is page number"
+  :group 'helm-grep
+  :type  'string)
+
+
+;;; Faces
+;;
+;;
+(defface helm-grep-match
+    '((t (:inherit match)))
+  "Face used to highlight grep matches."
+  :group 'helm-grep)
+
+(defface helm-grep-file
+    '((t (:foreground "BlueViolet" :underline t)))
+  "Face used to highlight grep results filenames."
+  :group 'helm-grep)
+
+(defface helm-grep-lineno
+    '((t (:foreground "Darkorange1")))
+  "Face used to highlight grep number lines."
+  :group 'helm-grep)
+
+(defface helm-grep-running
+    '((t (:foreground "Red")))
+  "Face used in mode line when grep is running."
+  :group 'helm-grep)
+
+(defface helm-grep-finish
+    '((t (:foreground "Green")))
+  "Face used in mode line when grep is finish."
+  :group 'helm-grep)
+
+
 (defvar helm-c-grep-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)

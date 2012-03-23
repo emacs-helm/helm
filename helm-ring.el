@@ -19,9 +19,32 @@
 
 (eval-when-compile (require 'cl))
 (require 'helm)
+(require 'helm-utils)
 
 (declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))
 
+
+(defgroup helm-ring nil
+  "Ring related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-kill-ring-threshold 10
+  "Minimum length to be listed by `helm-c-source-kill-ring'."
+  :type 'integer
+  :group 'helm-ring)
+
+(defcustom helm-c-kill-ring-max-lines-number nil
+  "Max number of lines displayed per candidate in kill-ring browser.
+If nil or zero, don't truncate candidate, show all."
+  :type 'integer
+  :group 'helm-ring)
+
+(defcustom helm-c-register-max-offset 160
+  "Max size of string register entries before truncating."
+  :group 'helm-ring
+  :type  'integer)
+
+
 ;;; Kill ring
 ;;
 ;;

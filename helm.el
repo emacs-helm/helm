@@ -103,6 +103,9 @@
   "Open helm."
   :prefix "helm-" :group 'convenience)
 
+(defface helm-overlay-line-face '((t (:background "IndianRed4" :underline t)))
+  "Face for source header in the helm buffer." :group 'helm)
+
 (defvar helm-type-attributes nil
   "It's a list of \(TYPE ATTRIBUTES ...\).
 ATTRIBUTES are the same as attributes for `helm-sources'.

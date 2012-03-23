@@ -19,7 +19,37 @@
 
 (require 'cl)
 (require 'helm)
+(require 'helm-utils)
 
+
+(defgroup helm-regexp nil
+  "Regexp related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-browse-code-regexp-lisp
+  "^ *\(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|\
+type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
+  "Regexp used to parse lisp buffer when browsing code."
+  :type 'string
+  :group 'helm-regexp)
+
+(defcustom helm-c-browse-code-regexp-python
+  "\\<def\\>\\|\\<class\\>"
+  "Regexp used to parse python buffer when browsing code."
+  :type 'string
+  :group 'helm-regexp)
+
+(defcustom helm-c-browse-code-regexp-alist
+  `((lisp-interaction-mode . ,helm-c-browse-code-regexp-lisp)
+    (emacs-lisp-mode . ,helm-c-browse-code-regexp-lisp)
+    (lisp-mode . ,helm-c-browse-code-regexp-lisp)
+    (python-mode . ,helm-c-browse-code-regexp-python))
+  "Alist to store regexps for browsing code corresponding \
+to a specific `major-mode'."
+  :type 'list
+  :group 'helm-regexp)
+
+
 (defvar helm-occur-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)

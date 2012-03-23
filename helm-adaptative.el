@@ -19,8 +19,30 @@
 
 (require 'cl)
 (require 'helm)
-(require 'helm-vars)
 
+
+(defgroup helm-adapt nil
+  "Adaptative sorting of candidates for Helm."
+  :group 'helm)
+
+(defcustom helm-c-adaptive-history-file
+  "~/.emacs.d/helm-c-adaptive-history"
+  "Path of file where history information is stored."
+  :type 'string
+  :group 'helm-config)
+
+(defcustom helm-c-adaptive-history-length 50
+  "Maximum number of candidates stored for a source."
+  :type 'number
+  :group 'helm-config)
+
+(defcustom helm-c-use-adaptative-sorting nil
+  "Wheter to use or not adaptative sorting.
+Even if a source use it, it will have no effect when set to nil."
+  :type 'boolean
+  :group 'helm-config)
+
+
 ;; Internal
 (defvar helm-c-adaptive-done nil
   "nil if history information is not yet stored for the current

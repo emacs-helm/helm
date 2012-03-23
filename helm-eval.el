@@ -19,6 +19,24 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+
+(defgroup helm-eval nil
+  "Eval related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-eldoc-in-minibuffer-show-fn
+  'helm-c-show-info-in-mode-line
+  "A function to display eldoc info.
+Should take one arg: the string to display."
+  :group 'helm-eval
+  :type  'symbol)
+
+(defcustom helm-c-show-info-in-mode-line-delay 12
+  "Eldoc will show info in mode-line during this delay if user is idle."
+  :type  'integer
+  :group 'helm-eval)
+
+
 (declare-function eldoc-current-symbol "eldoc")
 (declare-function eldoc-get-fnsym-args-string "eldoc" (sym &optional index))
 (declare-function eldoc-get-var-docstring "eldoc" (sym))

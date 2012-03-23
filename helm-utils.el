@@ -24,6 +24,29 @@
 
 
 
+(defgroup helm-utils nil
+  "Utilities routines for Helm."
+  :group 'helm)
+
+(defcustom helm-su-or-sudo "sudo"
+  "What command to use for root access."
+  :type 'string
+  :group 'helm-utils)
+
+(defcustom helm-c-enable-eval-defun-hack t
+  "If non-nil, execute `helm' using the source at point when C-M-x is pressed.
+This hack is invoked when pressing C-M-x in the form \
+ (defvar helm-c-source-XXX ...) or (setq helm-c-source-XXX ...)."
+  :type 'boolean
+  :group 'helm-utils)
+
+(defcustom helm-default-kbsize 1024.0
+  "Default Kbsize to use for showing files size.
+It is a float, usually 1024.0 but could be 1000.0 on some systems."
+  :group 'helm-utils
+  :type 'float)
+
+
 ;;; compatibility
 ;;
 ;;
@@ -326,9 +349,9 @@ If specified, also remove filename extension EXT."
 SIZE can be an integer or a float depending it's value.
 `file-attributes' will take care of that to avoid overflow error.
 KBSIZE if a floating point number, default value is 1024.0."
-  (let ((M (cons "M" (/ size (expt helm-ff-default-kbsize 2))))
-        (G (cons "G" (/ size (expt helm-ff-default-kbsize 3))))
-        (K (cons "K" (/ size helm-ff-default-kbsize)))
+  (let ((M (cons "M" (/ size (expt helm-default-kbsize 2))))
+        (G (cons "G" (/ size (expt helm-default-kbsize 3))))
+        (K (cons "K" (/ size helm-default-kbsize)))
         (B (cons "B" size)))
     (loop with result = B
           for (a . b) in

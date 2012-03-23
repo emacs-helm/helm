@@ -24,6 +24,17 @@
 (declare-function term-send-input "term")
 (declare-function term-send-eof "term")
 
+
+(defgroup helm-gentoo nil
+  "Predefined configurations for `helm.el'."
+  :group 'helm)
+
+(defface helm-gentoo-match-face '((t (:foreground "red")))
+  "Face for helm-gentoo installed packages."
+  :group 'traverse-faces)
+
+
+;;; Internals
 (defvar helm-c-gentoo-use-flags nil)
 (defvar helm-c-gentoo-buffer "*helm-gentoo-output*")
 (defvar helm-c-cache-gentoo nil)

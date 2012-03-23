@@ -21,6 +21,59 @@
 (require 'helm)
 (require 'url)
 (require 'xml)
+(require 'browse-url)
+
+(defgroup helm-net nil
+  "Net related applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-google-suggest-default-browser-function nil
+  "The browse url function you prefer to use with google suggest.
+When nil, use the first browser function available
+See `helm-browse-url-default-browser-alist'."
+  :group 'helm-net
+  :type 'symbol)
+
+(defcustom helm-c-home-url "http://www.google.fr"
+  "Default url to use as home url."
+  :group 'helm-net
+  :type 'string)
+
+(defcustom helm-surfraw-default-browser-function nil
+  "The browse url function you prefer to use with surfraw.
+When nil, fallback to `browse-url-browser-function'."
+  :group 'helm-net
+  :type 'symbol)
+
+(defcustom helm-c-google-suggest-url
+  "http://google.com/complete/search?output=toolbar&q="
+  "URL used for looking up Google suggestions."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-c-google-suggest-search-url
+  "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
+  "URL used for Google searching."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-google-suggest-use-curl-p nil
+  "When non--nil use CURL to get info from `helm-c-google-suggest-url'.
+Otherwise `url-retrieve-synchronously' is used."
+  :type 'boolean
+  :group 'helm-net)
+
+(defcustom helm-c-yahoo-suggest-url
+  "http://search.yahooapis.com/WebSearchService/V1/relatedSuggestion?appid=Generic&query="
+  "Url used for looking up Yahoo suggestions."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-c-yahoo-suggest-search-url
+  "http://search.yahoo.com/search?&ei=UTF-8&fr&h=c&p="
+  "Url used for Yahoo searching."
+  :type 'string
+  :group 'helm-net)
 
 
 ;;; Google Suggestions
@@ -121,11 +174,6 @@ Return an alist with elements like (data . number_results)."
                "^," "" (mapconcat 'identity (reverse C) ""))))
       "?"))
 
-(defvar helm-c-google-suggest-default-browser-function nil
-  "*The browse url function you prefer to use with google suggest.
-When nil, use the first browser function available
-See `helm-browse-url-default-browser-alist'.")
-
 (defun helm-c-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
   (let ((arg (concat helm-c-google-suggest-search-url
@@ -198,13 +246,10 @@ Return an alist with elements like (data . number_results)."
 ;;; Web browser functions.
 ;;
 ;;
-(require 'browse-url)
 ;; If default setting of `w3m-command' is not
 ;; what you want you and you modify it, you will have to reeval
 ;; also `helm-browse-url-default-browser-alist'.
 (defvar w3m-command "/usr/bin/w3m")
-(defvar helm-c-home-url "http://www.google.fr"
-  "*Default url to use as home url.")
 
 (defvar helm-browse-url-chromium-program "chromium-browser")
 (defvar helm-browse-url-uzbl-program "uzbl-browser")
@@ -265,10 +310,6 @@ Return an alist with elements like (data . number_results)."
 ;;
 ;; Need external program surfraw.
 ;; <http://surfraw.alioth.debian.org/>
-
-(defvar helm-surfraw-default-browser-function nil
-  "*The browse url function you prefer to use with surfraw.
-When nil, fallback to `browse-url-browser-function'.")
 
 ;; Internal
 (defvar helm-surfraw-engines-history nil)

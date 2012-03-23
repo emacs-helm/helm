@@ -30,6 +30,17 @@
 (declare-function emms-playlist-first "ext:emms")
 (declare-function emms-playlist-mode-play-smart "ext:emms-playlist-mode")
 
+
+(defgroup helm-emms nil
+  "Predefined configurations for `helm.el'."
+  :group 'helm)
+
+(defface helm-emms-playlist
+    '((t (:foreground "Springgreen4" :underline t)))
+  "*Face used for tracks in current emms playlist."
+  :group 'helm-emms)
+
+
 (defun helm-emms-stream-edit-bookmark (elm)
   "Change the information of current emms-stream bookmark from helm."
   (declare (special emms-stream-list))

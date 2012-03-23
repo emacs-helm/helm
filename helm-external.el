@@ -20,6 +20,37 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 
+
+(defgroup helm-external nil
+  "External related Applications and libraries for Helm." 
+  :group 'helm)
+
+(defcustom helm-raise-command nil
+  "A shell command to jump to a window running specific program.
+Need external program wmctrl.
+This will be use with `format', so use something like \"wmctrl -xa %s\"."
+  :type 'string
+  :group 'helm-external)
+
+(defcustom helm-c-external-programs-associations nil
+  "Alist to store externals programs associated with file extension.
+This variable overhide setting in .mailcap file.
+e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
+  :type 'list
+  :group 'helm-external)
+
+(defcustom helm-c-default-external-file-browser "nautilus"
+  "Default external file browser for your system.
+Directories will be opened externally with it when
+opening file externally in `helm-find-files'.
+Set to nil if you do not have external file browser
+or do not want to use it.
+Windows users should set that to \"explorer.exe\"."
+  :group 'helm-external
+  :type  'string)
+
+
+;;; Internals
 (defvar helm-external-command-history nil)
 (defvar helm-c-external-commands-list nil
   "A list of all external commands the user can execute.  If this

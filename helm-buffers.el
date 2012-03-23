@@ -19,9 +19,50 @@
 
 (require 'cl)
 (require 'helm)
-(require 'helm-vars)
 (require 'helm-utils)
 
+(defgroup helm-buffers nil
+  "Buffers related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-boring-buffer-regexp
+  (rx (or
+       (group bos  " ")
+       ;; helm-buffers
+       "*helm" "*helm-mode"
+       ;; echo area
+       " *Echo Area" " *Minibuf"))
+  "The regexp that match boring buffers.
+Buffer candidates matching this regular expression will be
+filtered from the list of candidates if the
+`helm-c-skip-boring-buffers' candidate transformer is used, or
+they will be displayed with face `file-name-shadow' if
+`helm-c-shadow-boring-buffers' is used."
+  :type 'string
+  :group 'helm-buffers)
+
+(defcustom helm-allow-skipping-current-buffer nil
+  "Show current buffer or not in helm buffer"
+  :type 'boolean
+  :group 'helm-buffers)
+
+
+;;; Faces
+;;
+;;
+(defface helm-buffer-saved-out
+    '((t (:foreground "red")))
+  "*Face used for buffer files modified outside of emacs."
+  :group 'helm-buffers)
+
+(defface helm-buffer-not-saved
+    '((t (:foreground "Indianred2")))
+  "*Face used for buffer files not already saved on disk."
+  :group 'helm-buffers)
+
+
+;;; Buffers keymap
+;;
 (defvar helm-c-buffer-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)

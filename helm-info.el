@@ -20,13 +20,70 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-plugin)
-(require 'helm-vars)
 (require 'helm-net)
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
 (declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
 
+
+(defgroup helm-info nil
+  "Info related Applications and libraries for Helm."
+  :group 'helm)
+
+;;; Build info-index sources with info-index plug-in.
+;;
+;;
+(defun helm-c-build-info-index-command (name doc source buffer)
+  "Define an helm command NAME with documentation DOC.
+Arg SOURCE will be an existing helm source named
+`helm-c-source-info-<NAME>' and BUFFER a string buffer name."
+  (eval (list 'defun name nil doc
+              (list 'interactive)
+              (list 'helm
+                    :sources source
+                    :buffer buffer
+                    :candidate-number-limit 1000))))
+
+(defun helm-c-define-info-index-sources (var-value &optional commands)
+  "Define helm sources named helm-c-source-info-<NAME>.
+Sources are generated for all entries of `helm-c-default-info-index-list'.
+If COMMANDS arg is non--nil build also commands named `helm-info<NAME>'.
+Where NAME is one of `helm-c-default-info-index-list'."
+  (loop with symbols = (loop for str in var-value
+                             collect
+                             (intern (concat "helm-c-source-info-" str)))
+        for sym in symbols
+        for str in var-value
+        do (set sym (list (cons 'name (format "Info index: %s" str))
+                          (cons 'info-index str)))
+        when commands
+        do (let ((com (intern (concat "helm-info-" str))))
+             (helm-c-build-info-index-command
+              com (format "Predefined helm for %s info." str)
+              sym (format "*helm info %s*" str)))))
+
+(defun helm-info-index-set (var value)
+  (set var value)
+  (helm-c-define-info-index-sources value t))
+
+(defcustom helm-c-default-info-index-list
+  '("elisp" "cl" "org" "gnus" "tramp" "ratpoison"
+    "zsh" "bash" "coreutils" "fileutils"
+    "find" "sh-utils" "textutils" "libc"
+    "make" "automake" "autoconf" "emacs-lisp-intro"
+    "emacs" "elib" "eieio" "gauche-refe" "guile"
+    "guile-tut" "goops" "screen" "latex" "gawk"
+    "sed" "m4" "wget" "binutils" "as" "bfd" "gprof"
+    "ld" "diff" "flex" "grep" "gzip" "libtool"
+    "texinfo" "info" "gdb" "stabs" "cvsbook" "cvs"
+    "bison" "id-utils" "global")
+  "Info Manual entries to use for building helm info index commands."
+  :group 'helm-info
+  :type  'list
+  :set   'helm-info-index-set)
+
+
 ;;; Info pages
 (defvar helm-c-info-pages nil
   "All info pages on system.

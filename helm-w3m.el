@@ -28,6 +28,15 @@
   (when (executable-find "w3m")
     (require 'w3m-bookmark nil t)))
 
+
+(defgroup helm-w3m nil
+  "W3m related Applications and libraries for Helm."
+  :group 'helm)
+
+(defface helm-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
+  "Face for w3m bookmarks" :group 'helm-w3m)
+
+
 (defvar w3m-bookmark-file "~/.w3m/bookmark.html")
 (defvar helm-w3m-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 (defvar helm-w3m-bookmark-url-regexp "\\(https\\|http\\|ftp\\|file\\)://[^>]*")

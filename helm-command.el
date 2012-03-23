@@ -21,6 +21,26 @@
 (require 'helm)
 (require 'helm-mode)
 
+
+(defgroup helm-command nil
+  "Emacs command related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-M-x-requires-pattern 2
+  "Value of requires-pattern for `helm-M-x'.
+Set it to 0 to disable requires-pattern in `helm-M-x'."
+  :group 'helm-command
+  :type 'boolean)
+
+
+;;; Faces
+;;
+;;
+(defface helm-M-x-key-face '((t (:foreground "orange" :underline t)))
+  "*Face used in helm-M-x to show keybinding."
+  :group 'helm-command)
+
+
 (defvar helm-M-x-input-history nil)
 
 (defun* helm-M-x-get-major-mode-command-alist (mode-map)

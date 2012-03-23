@@ -20,6 +20,44 @@
 (require 'helm)
 (require 'helm-bookmark)
 
+
+;;; Faces
+;;
+;;
+(defgroup helm-bmkext nil
+  "Bmkext related Applications and libraries for Helm."
+  :group 'helm)
+
+(defface helm-bmkext-info
+    '((t (:foreground "green")))
+  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'helm-bmkext)
+
+(defface helm-bmkext-w3m
+    '((t (:foreground "yellow")))
+  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'helm-bmkext)
+
+(defface helm-bmkext-gnus
+    '((t (:foreground "magenta")))
+  "*Face used for Gnus bookmarks."
+  :group 'helm-bmkext)
+
+(defface helm-bmkext-man
+    '((t (:foreground "Orange4")))
+  "*Face used for Woman/man bookmarks."
+  :group 'helm-bmkext)
+
+(defface helm-bmkext-no--file
+    '((t (:foreground "grey")))
+  "*Face used for non--file bookmarks."
+  :group 'helm-bmkext)
+
+(defface helm-bmkext-file
+    '((t (:foreground "Deepskyblue2")))
+  "*Face used for non--file bookmarks."
+  :group 'helm-bmkext)
+
 ;; Dependency: http://mercurial.intuxication.org/hg/emacs-bookmark-extension
 ;; If you want to enable google-maps in addressbook you will need
 ;; Julien Danjou google-maps-el package available here:

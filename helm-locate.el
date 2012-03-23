@@ -25,6 +25,42 @@
 (require 'helm)
 (require 'helm-files)
 
+
+(defgroup helm-locate nil
+  "Locate related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-locate-db-file-regexp "m?locate\.db$"
+  "Default regexp to match locate database.
+If nil Search in all files."
+  :type  'string
+  :group 'helm-locate)
+
+(defcustom helm-ff-locate-db-filename "locate.db"
+  "The basename of the locatedb file you use locally in your directories.
+When this is set and `helm' find such a file in the directory from
+where you launch locate, it will use this file and will not prompt you
+for a db file.
+Note that this happen only when locate is launched with a prefix arg."
+  :group 'helm-locate
+  :type 'string)
+
+(defcustom helm-c-locate-command nil
+  "A list of arguments for locate program.
+If nil it will be calculated when `helm-locate' startup
+with these default values for different systems:
+
+Gnu/linux: \"locate -i -r %s\"
+berkeley-unix: \"locate -i %s\"
+windows-nt: \"es -i -r %s\"
+Others: \"locate %s\"
+
+This string will be passed to format so it should end with `%s'.
+The \"-r\" option must be the last option."
+  :type 'string
+  :group 'helm-locate)
+
+
 (defun helm-ff-find-locatedb (&optional from-ff)
   "Try to find if a local locatedb file is available.
 The search is done in `helm-ff-default-directory' or

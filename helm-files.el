@@ -40,6 +40,217 @@
 (declare-function eshell-bol "esh-mode")
 
 
+(defgroup helm-files nil
+  "Files applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-c-boring-file-regexp
+  (rx (or
+       ;; Boring directories
+       (and "/" (or ".svn" "CVS" "_darcs" ".git" ".hg") (or "/" eol))
+       ;; Boring files
+       (and line-start  ".#")
+       (and (or ".class" ".la" ".o" "~") eol)))
+  "The regexp that match boring files.
+File candidates matching this regular expression will be
+filtered from the list of candidates if the
+`helm-c-skip-boring-files' candidate transformer is used, or
+they will be displayed with face `file-name-shadow' if
+`helm-c-shadow-boring-files' is used."
+  :type 'string
+  :group 'helm-files)
+
+(defcustom helm-for-files-prefered-list
+  '(helm-c-source-ffap-line
+    helm-c-source-ffap-guesser
+    helm-c-source-buffers-list
+    helm-c-source-recentf
+    helm-c-source-bookmarks
+    helm-c-source-file-cache
+    helm-c-source-files-in-current-dir
+    helm-c-source-locate)
+  "Your prefered sources to find files."
+  :type 'list
+  :group 'helm-files)
+
+(defcustom helm-tramp-verbose 0
+  "Just like `tramp-verbose' but specific to helm.
+When set to 0 don't show tramp messages in helm.
+If you want to have the default tramp messages set it to 3."
+  :type 'integer
+  :group 'helm-files)
+
+(defcustom helm-ff-auto-update-initial-value t
+  "Auto update when only one candidate directory is matched.
+This is the default value when starting `helm-find-files'."
+  :group 'helm-files
+  :type  'boolean)
+
+(defcustom helm-c-copy-async-prefered-emacs "emacs"
+  "Path to the emacs you want to use for copying async.
+Emacs versions < 24 fail to copy directory due to a bug not fixed
+in `copy-directory'."
+  :group 'helm-files
+  :type 'string)
+
+(defcustom helm-ff-lynx-style-map t
+  "Use arrow keys to navigate with `helm-find-files'.
+You will have to restart Emacs or reeval `helm-find-files-map'
+and `helm-c-read-file-map' for this take effect."
+  :group 'helm-files
+  :type 'boolean)
+
+(defcustom helm-ff-history-max-length 100
+  "Number of elements shown in `helm-find-files' history."
+  :group 'helm-files
+  :type 'integer)
+
+(defcustom helm-ff-smart-completion t
+  "Try to complete filenames smarter when non--nil.
+See `helm-ff-transform-fname-for-completion' for more info."
+  :group 'helm-files
+  :type 'boolean)
+
+(defcustom helm-ff-tramp-not-fancy t
+  "No colors when listing remote files when set to non--nil.
+This make listing much faster, specially on slow machines."
+  :group 'helm-files
+  :type  'boolean)
+
+(defcustom helm-ff-exif-data-program "exiftran"
+  "Program used to extract exif data of an image file."
+  :group 'helm-files
+  :type 'string)
+
+(defcustom helm-ff-exif-data-program-args "-d"
+  "*Arguments used for `helm-ff-exif-data-program'."
+  :group 'helm-files
+  :type 'string)
+
+(defcustom helm-ff-newfile-prompt-p t
+  "Whether Prompt or not when creating new file.
+This set `ffap-newfile-prompt'."
+  :type  'boolean
+  :group 'helm-files)
+
+(defcustom helm-ff-avfs-directory nil
+  "The default avfs directory, usually '.avfs'.
+When this is set you will be able to expand archive filenames with `C-z'
+inside an avfs directory mounted with mountavfs.
+See <http://sourceforge.net/projects/avf/>."
+  :type  'boolean
+  :group 'helm-files)
+
+(defcustom helm-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
+  "Minimal list of compressed files extension."
+  :type  'list
+  :group 'helm-files)
+
+(defcustom helm-c-copy-files-async-log-file "/tmp/dired.log"
+  "The file used to communicate with two emacs when copying files async."
+  :type  'string
+  :group 'helm-files)
+
+(defcustom helm-ff-printer-list nil
+  "A list of available printers on your system.
+When non--nil let you choose a printer to print file.
+Otherwise when nil the variable `printer-name' will be used.
+On Unix based systems (lpstat command needed) you don't need to set this,
+`helm-ff-find-printers' will find a list of available printers for you."
+  :type 'list
+  :group 'helm-files)
+
+(defcustom helm-ff-transformer-show-only-basename nil
+  "Show only basename of candidates in `helm-find-files'.
+This can be toggled at anytime from `helm-find-files' with \
+\\<helm-find-files-map>0\\[helm-ff-run-toggle-basename]."
+  :type 'boolean
+  :group 'helm-files)
+
+(defcustom helm-ff-quick-delete-dont-prompt-for-deletion nil
+  "Don't ask in persistent deletion of files when non--nil."
+  :group 'helm-files
+  :type 'boolean)
+
+(defcustom helm-ff-signal-error-on-dot-files t
+  "Signal error when file is `.' or `..' on file deletion when non--nil.
+Default is non--nil.
+WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
+  :group 'helm-files
+  :type 'boolean)
+
+(defcustom helm-completing-read-handlers-alist
+  '((describe-function . helm-completing-read-symbols)
+    (describe-variable . helm-completing-read-symbols)
+    (debug-on-entry . helm-completing-read-symbols)
+    (find-function . helm-completing-read-symbols)
+    (trace-function . helm-completing-read-symbols)
+    (trace-function-background . helm-completing-read-symbols)
+    (find-tag . helm-completing-read-with-cands-in-buffer)
+    (ffap-alternate-file . nil))
+  "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
+Each entry is a cons cell like \(emacs_command . completing-read_handler\)
+where key and value are symbols.
+
+Each key is an Emacs command that use originaly `completing-read'.
+
+Each value maybe an helm function that take same arguments as
+`completing-read' plus NAME and BUFFER, where NAME is the name of the new
+helm source and BUFFER the name of the buffer we will use.
+This function prefix name must start by \"helm\".
+
+See `helm-completing-read-symbols' for example.
+
+If the value of an entry is nil completion will fall back to
+emacs vanilla behavior.
+e.g If you want to disable helm completion for `describe-function':
+\(describe-function . nil\).
+
+Ido is also supported, you can use `ido-completing-read' and
+`ido-read-file-name' as value of an entry or just 'ido.
+e.g ido completion for `find-file':
+\(find-file . ido\)
+same as
+\(find-file . ido-read-file-name\)
+Note that you don't need to enable `ido-mode' for this to work."
+  :group 'helm-files
+  :type '(alist :key-type symbol :value-type symbol))
+
+
+;;; Faces
+;;
+;;
+(defface helm-ff-prefix
+    '((t (:background "yellow" :foreground "black")))
+  "*Face used to prefix new file or url paths in `helm-find-files'."
+  :group 'helm-files)
+
+(defface helm-ff-executable
+    '((t (:foreground "green")))
+  "*Face used for executable files in `helm-find-files'."
+  :group 'helm-files)
+
+(defface helm-ff-directory
+    '((t (:foreground "DarkRed" :background "LightGray")))
+  "*Face used for directories in `helm-find-files'."
+  :group 'helm-files)
+
+(defface helm-ff-symlink
+    '((t (:foreground "DarkOrange")))
+  "*Face used for symlinks in `helm-find-files'."
+  :group 'helm-files)
+
+(defface helm-ff-invalid-symlink
+    '((t (:foreground "black" :background "red")))
+  "*Face used for invalid symlinks in `helm-find-files'."
+  :group 'helm-files)
+
+(defface helm-ff-file
+    '((t (:foreground "CadetBlue" :underline t)))
+  "*Face used for file names in `helm-find-files'."
+  :group 'helm-files)
+
+
 ;;; Helm-find-files - The helm file browser.
 ;;
 ;;
@@ -1926,7 +2137,7 @@ members of FLIST."
   "Enable helm completion in Dired functions.
 Bindings affected are C, R, S, H.
 This is deprecated for Emacs24+ users, use `helm-mode' instead."
-  :group 'helm-config
+  :group 'helm-files
   :global t
   (if helm-dired-mode
       (progn
