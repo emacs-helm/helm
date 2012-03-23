@@ -400,6 +400,13 @@ STRING is string to match."
               (add-to-list 'names name)))))
     names))
 
+(defun helm-c-set-variable (var)
+  "Set value to VAR interactively."
+  (interactive)
+  (let ((sym (helm-c-symbolify var)))
+    (set sym (eval-minibuffer (format "Set %s: " var)
+                              (prin1-to-string (symbol-value sym))))))
+
 ;;; Elisp Timers.
 ;;
 ;;

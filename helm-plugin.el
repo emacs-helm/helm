@@ -285,8 +285,21 @@ with original attribute value.
     source))
 (add-to-list 'helm-compile-source-functions
              'helm-compile-source--default-action t)
+
 (helm-document-attribute 'default-action "default-action plug-in"
   "Default action.")
+(helm-document-attribute 'default-directory "type . file-line"
+  "`default-directory' to interpret file.")
+(helm-document-attribute 'before-jump-hook "type . file-line / line"
+  "Function to call before jumping to the target location.")
+(helm-document-attribute 'after-jump-hook "type . file-line / line"
+  "Function to call after jumping to the target location.")
+(helm-document-attribute 'adjust "type . file-line"
+  "Search around line matching line contents.")
+(helm-document-attribute 'recenter "type . file-line / line"
+  "`recenter' after jumping.")
+(helm-document-attribute 'target-file "type . line"
+  "Goto line of target-file.")
 
 (provide 'helm-plugin)
 

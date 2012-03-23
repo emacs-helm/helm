@@ -192,6 +192,41 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
 
+(defun helm-c-call-interactively (cmd-or-name)
+  "Execute CMD-OR-NAME as Emacs command.
+It is added to `extended-command-history'.
+`helm-current-prefix-arg' is used as the command's prefix argument."
+  (setq extended-command-history
+        (cons (helm-c-stringify cmd-or-name)
+              (delete (helm-c-stringify cmd-or-name) extended-command-history)))
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        (cmd (helm-c-symbolify cmd-or-name)))
+    (if (stringp (symbol-function cmd))
+        (execute-kbd-macro (symbol-function cmd))
+        (setq this-command cmd)
+        (call-interactively cmd))))
+
+;; Minibuffer History
+;;
+;;
+(defvar helm-c-source-minibuffer-history
+  '((name . "Minibuffer History")
+    (header-name . (lambda (name)
+                     (format "%s (%s)" name minibuffer-history-variable)))
+    (candidates
+     . (lambda ()
+         (let ((history (loop for i in
+                              (symbol-value minibuffer-history-variable)
+                              unless (string= "" i) collect i)))
+           (if (consp (car history))
+               (mapcar 'prin1-to-string history)
+               history))))
+    (migemo)
+    (action . (lambda (candidate)
+                (delete-minibuffer-contents)
+                (insert candidate)))))
+
+
 
 ;;; Helm ratpoison UI
 ;;
@@ -251,6 +286,22 @@ http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
   (helm-other-buffer 'helm-c-source-ratpoison-commands
                      "*helm ratpoison commands*"))
 
+;;;###autoload
+(defun helm-mini ()
+  "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
+  (interactive)
+  (helm-other-buffer '(helm-c-source-buffers-list
+                       helm-c-source-recentf
+                       helm-c-source-buffer-not-found)
+                     "*helm mini*"))
+
+;;;###autoload
+(defun helm-minibuffer-history ()
+  "Preconfigured `helm' for `minibuffer-history'."
+  (interactive)
+  (let ((enable-recursive-minibuffers t))
+    (helm-other-buffer 'helm-c-source-minibuffer-history
+                       "*helm minibuffer-history*")))
 
 (provide 'helm-misc)
 

@@ -2316,6 +2316,93 @@ Else return ACTIONS unmodified."
     (candidates . helm-c-file-cache-files)
     (match helm-c-match-on-basename)
     (type . file)))
+
+;;; ffap
+;;
+;;
+(eval-when-compile (require 'ffap))
+(defvar helm-c-source-ffap-guesser
+  `((name . "File at point")
+    (init . (lambda () (require 'ffap)))
+    (candidates . (lambda ()
+                    (helm-aif
+                        (with-helm-current-buffer
+                          (ffap-guesser))
+                        (list it))))
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (type . file)))
+
+;;; ffap with line number
+(defun helm-c-ffap-file-line-at-point ()
+  "Get (FILENAME . LINENO) at point."
+  (helm-aif (let (ffap-alist) (ffap-file-at-point))
+      (save-excursion
+        (beginning-of-line)
+        (when (and (search-forward it nil t)
+                   (looking-at ":\\([0-9]+\\)"))
+          (cons it (string-to-number (match-string 1)))))))
+
+(defun helm-c-ffap-line-candidates ()
+  (with-helm-current-buffer
+    (helm-attrset 'ffap-line-location (helm-c-ffap-file-line-at-point)))
+  (helm-aif (helm-attr 'ffap-line-location)
+      (destructuring-bind (file . line) it
+        (list (cons (format "%s (line %d)" file line) file)))))
+
+;;; Goto line after opening file by `helm-c-source-ffap-line'.
+(defun helm-c-ffap-line-goto-line ()
+  (when (car (helm-attr 'ffap-line-location))
+    (unwind-protect
+         (ignore-errors
+           (with-selected-window
+               (get-buffer-window
+                (get-file-buffer (car (helm-attr 'ffap-line-location))))
+             (helm-goto-line (cdr (helm-attr 'ffap-line-location)))))
+      (helm-attrset 'ffap-line-location nil))))
+(add-hook 'helm-after-action-hook 'helm-c-ffap-line-goto-line)
+(add-hook 'helm-after-persistent-action-hook 'helm-c-ffap-line-goto-line)
+
+(defvar helm-c-source-ffap-line
+  `((name . "File/Lineno at point")
+    (init . (lambda () (require 'ffap)))
+    (candidates . helm-c-ffap-line-candidates)
+    (keymap . ,helm-map)
+    (type . file)))
+
+
+
+;;; Outliner
+;;
+;;
+(defvar helm-outline-goto-near-line-flag t)
+(defvar helm-outline-using nil)
+(defun helm-after-update-hook--outline ()
+  (if (and (eq helm-outline-using t)
+           (eq helm-outline-goto-near-line-flag t))
+      (helm-outline-goto-near-line)))
+(add-hook 'helm-after-update-hook 'helm-after-update-hook--outline)
+
+(defun helm-outline-goto-near-line ()
+  (with-helm-window
+    ;; TODO need consideration whether to update position by every input.
+    (when t ; (equal helm-pattern "")
+      (helm-goto-line 2)
+      (let ((lineno (with-helm-current-buffer
+                      (line-number-at-pos (car helm-current-position)))))
+        (block exit
+          (while (<= (progn (skip-chars-forward " ")
+                            (or (number-at-point) lineno))
+                     lineno)
+            (forward-line 1)
+            (when (eobp)
+              (forward-line -1)
+              (return-from exit))))
+        (forward-line -1)
+        (and (bobp) (forward-line 1))
+        (and (helm-pos-header-line-p) (forward-line -2))
+        (helm-mark-current-line)))))
 
 ;;; File name history
 ;;
