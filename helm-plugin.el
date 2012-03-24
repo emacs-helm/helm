@@ -24,9 +24,9 @@
 (declare-function Info-goto-node "info" (&optional fork))
 (declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
 
+;;; Plug-in: `info-index'
 ;;
 ;;
-;; Plug-in: info-index
 (defun* helm-c-info-init (&optional (file (helm-attr 'info-file)))
   (let (result)
     (unless (helm-candidate-buffer)
@@ -73,6 +73,7 @@
   (helm-aif (helm-interpret-value (assoc-default 'info-index source))
       (helm-c-make-info-source source it)
     source))
+
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--info-index)
 
 (helm-document-attribute 'info-index "info-index plugin"
@@ -88,10 +89,12 @@ Some info files are missing index specification.
 
 ex. See `helm-c-source-info-screen'.")
 
-;; Plug-in: candidates-file
+;;; Plug-in: `candidates-file'
+;;
+;; List all lines in a file.
 (defun helm-compile-source--candidates-file (source)
   (if (assoc-default 'candidates-file source)
-      `((init helm-p-candidats-file-init
+      `((init helm-p-candidates-file-init
               ,@(let ((orig-init (assoc-default 'init source)))
                      (cond ((null orig-init) nil)
                            ((functionp orig-init) (list orig-init))
@@ -101,7 +104,7 @@ ex. See `helm-c-source-info-screen'.")
       source))
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--candidates-file)
 
-(defun helm-p-candidats-file-init ()
+(defun helm-p-candidates-file-init ()
   (destructuring-bind (file &optional updating)
       (helm-mklist (helm-attr 'candidates-file))
     (setq file (helm-interpret-value file))
@@ -115,9 +118,29 @@ ex. See `helm-c-source-info-screen'.")
   "Use a file as the candidates buffer.
 
 1st argument is a filename, string or function name or variable name.
-If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
+If optional 2nd argument is non-nil, the file is opened with
+`auto-revert-mode' enabled.
 
-;; Plug-in: headline
+e.g
+
+\(defvar helm-c-source-test-file
+  '((name . \"test1\")
+    (candidates-file \"~/.emacs.el\" t)))
+
+Will list all lines in .emacs.el.")
+
+;;; Plug-in: `headline'
+;;
+;;
+;; Le Wang: Note on how `helm-head-line-get-candidates' works with a list
+;; of regexps.
+;;
+;;   1. Create list of ((title . start-of-match) . hiearchy)
+;;   2. Sort this list by start-of-match.
+;;   3. Go through sorted list and return titles that reflect full hiearchy.
+;;
+;; It's quite brilliantly written.
+;;
 (defun helm-compile-source--helm-headline (source)
   (if (assoc-default 'headline source)
       (append '((init . helm-headline-init)
@@ -143,16 +166,6 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
   "A sexp representing the condition to use helm-headline.")
 (helm-document-attribute 'subexp "Headline plug-in"
   "Display (match-string-no-properties subexp).")
-
-;; Le Wang: Note on how `helm-head-line-get-candidates' works with a list
-;; of regexps.
-;;
-;;   1. Create list of ((title . start-of-match) . hiearchy)
-;;   2. Sort this list by start-of-match.
-;;   3. Go through sorted list and return titles that reflect full hiearchy.
-;;
-;; It's quite brilliantly written.
-;;
 
 (defun helm-headline-get-candidates (regexp subexp)
   (with-helm-current-buffer
@@ -211,7 +224,9 @@ If optional 2nd argument is non-nil, the file opened with `auto-revert-mode'.")
     (set-window-start (get-buffer-window helm-current-buffer) (point))))
 
 
-;; Plug-in: persistent-help
+;;; Plug-in: `persistent-help'
+;;
+;; Add help about persistent action in `helm-buffer' header.
 (defun helm-compile-source--persistent-help (source)
   (append source '((header-line . helm-persistent-help-string))))
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--persistent-help)
@@ -235,12 +250,16 @@ It also accepts a function or a variable name.")
 
 ;;; (helm '(((name . "persistent-help test")(candidates "a")(persistent-help . "TEST"))))
 
-;; Plug-in: Type customize
+;;; Plug-in: Type `customize'
+;;
+;;
+(defvar helm-additional-type-attributes nil)
+
 (defun helm-c-uniq-list (lst)
   "Like `remove-duplicates' in CL.
 But cut deeper duplicates and test by `equal'. "
   (reverse (remove-duplicates (reverse lst) :test 'equal)))
-(defvar helm-additional-type-attributes nil)
+
 (defun helm-c-arrange-type-attribute (type spec)
   "Override type attributes by `define-helm-type-attribute'.
 
@@ -274,10 +293,13 @@ with original attribute value.
                            helm-additional-type-attributes)
       (append it source)
     source))
+
 (add-to-list 'helm-compile-source-functions
              'helm-compile-source--type-customize t)
 
-;; Plug-in: default-action
+;;; Plug-in: `default-action'
+;;
+;;
 (defun helm-compile-source--default-action (source)
   (helm-aif (assoc-default 'default-action source)
       (append `((action ,it ,@(remove it (assoc-default 'action source))))
