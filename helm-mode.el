@@ -352,6 +352,14 @@ Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
 method which is faster.
 It should be used when candidate list don't need to rebuild dynamically."
   (let ((history (or (car-safe hist) hist)))
+    (when (and default (listp default))
+      ;; When DEFAULT is a list move the list on head of COLLECTION
+      ;; and set it to its car. #bugfix `grep-read-files'.
+      (setq collection (if (listp collection)
+                           (append default collection)
+                           ;; Else COLLECTION is maybe a function or a table.
+                           (append default (all-completions "" collection))))
+      (setq default (car default)))
     (helm-comp-read
      prompt collection
      :test test
@@ -432,7 +440,6 @@ See documentation of `completing-read' and `all-completions' for details."
                (helm-mode -1)
                (apply completing-read-function def-args))
           (helm-mode 1))))
-    (setq def (if (and def (listp def)) (helm-comp-read "Use: " def) def))
     ;; If we use now `completing-read' we MUST turn off `helm-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (eq def-com 'completing-read)
