@@ -179,7 +179,8 @@ Should be called after others transformers i.e (boring buffers)."
     (keymap . ,helm-c-buffer-map)
     (volatile)
     (mode-line . helm-buffer-mode-line-string)
-    (persistent-help . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
+    (persistent-help
+     . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
 
 (defun helm-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -201,7 +202,7 @@ with name matching pattern."
                  (string-match (car split) mjm))
                 ((string-match "\\s-" helm-pattern)
                  (and (string-match (car split) mjm)
-                      (string-match (cadr split) cand)))
+                      (loop for i in (cdr split) always (string-match i cand))))
                 (t (or (string-match helm-pattern mjm)
                        (string-match helm-pattern cand)))))))))
 
