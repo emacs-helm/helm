@@ -35,31 +35,9 @@ the trap of backward compatibility.
     (require 'helm-config)
     ```
 
-### Manual install
+**Note to Linux Distributions Maintainers**
 
-  1. Clone the `helm` repository to some directory:
-  
-    ```elisp
-    $ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory
-    ```
-
-  2. Put following files somewhere in your `load-path`:
-     - `helm.el`
-     - `helm-config.el`
-     - `helm-match-plugin.el`
-
-  3. Byte-compile these files.
-  4. Add this code to `.emacs.el`:
-
-  ```elisp
-  (require 'helm-config)
-  ```
-
-**Note to Linux Distribution (e.g. Debian) Maintainers**
-
-`Use only the files mentioned above in the **Manual install** section
-for your packages, other files found on emacswiki or elsewhere are not
-supported.`
+`Only the extensions present in the github emacs-helm organisation are supported.`
 
 ### Emacs Prelude
 
@@ -76,6 +54,14 @@ a keyboard shortcut. Here's a suggestion:
 ```elisp
 (global-set-key (kbd "C-c h") 'helm-mini)
 ```
+You can also start with M-x helm-mode and enjoy helm completion in your favourites
+Emacs commands (e.g `M-x', `C-x C-f', etc...).
+You can enable this by adding in your init file:
+
+```elisp
+(helm-mode 1)
+```
+
 As a startup point you can also look at the helm section in Emacs menu to
 discover some of the commands provided by helm.
 
