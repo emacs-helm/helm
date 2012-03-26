@@ -48,6 +48,10 @@
               ;; Remove it for the helm one. (Fixed in Emacs24)
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates . helm-esh-get-candidates)
+    (filtered-candidate-transformer
+     (lambda (candidates _sources)
+       (loop for i in candidates collect
+             (cons (abbreviate-file-name i) i))))
     (action . helm-ec-insert))
   "Helm source for Eshell completion.")
 
@@ -61,7 +65,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                (search-backward helm-ec-target nil t)
                (string= (buffer-substring (point) pt) helm-ec-target))
       (delete-region (point) pt)))
-  (insert (helm-quote-whitespace candidate)))
+  (if (string-match "\\`~/" helm-ec-target)
+      (insert (helm-quote-whitespace (abbreviate-file-name candidate)))
+      (insert (helm-quote-whitespace candidate))))
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
