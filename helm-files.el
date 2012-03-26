@@ -1437,6 +1437,8 @@ systems."
                (append (list dot dot2) lsdir))
         ls)))
 
+;; Internal
+(defvar helm-ff-smart-completion-incompatible-methods '(multi1 multi3p))
 (defun helm-ff-transform-fname-for-completion (fname)
   "Return FNAME with it's basename modified as a regexp.
 e.g foo => f.*o.*o .
@@ -1444,6 +1446,8 @@ If basename contain one or more space or FNAME is a valid directory name
 return FNAME unchanged."
   (let ((bn (helm-c-basename fname)))
     (if (or (not helm-ff-smart-completion)
+            (memq helm-mp-matching-method
+                  helm-ff-smart-completion-incompatible-methods)
             (string-match "\\s-" bn)
             (string-match "/$" fname) ; Allow mkdir.
             (file-directory-p fname)
