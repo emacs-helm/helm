@@ -62,7 +62,6 @@
 (require 'yaoddmuse nil t)
 (require 'helm-call-tree nil t)
 (require 'helm-descbinds nil t)
-(require 'helm-slime nil t)
 
 
 (defgroup helm-config nil
