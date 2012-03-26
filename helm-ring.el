@@ -278,7 +278,7 @@ replace with STR as yanked string."
             'undo-tree-restore-state-from-register))
           (t
            "GARBAGE!"))
-        collect (cons (format "register %3s: %s" key (car string-actions))
+        collect (cons (format "Register %3s:\n %s" key (car string-actions))
                       (cons char (cdr string-actions)))))
 
 (defun helm-c-register-action-transformer (actions register-and-functions)
