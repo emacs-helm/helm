@@ -195,13 +195,6 @@
   (interactive)
   (customize-group "helm"))
 
-
-;;; Helm map add ons
-;;
-;;
-(define-key helm-map (kbd "C-x C-f") 'helm-quit-and-find-file)
-(define-key helm-map (kbd "M-m")     'helm-toggle-all-marks)
-(define-key helm-map (kbd "C-w")     'helm-yank-text-at-point)
 
 
 ;;; Type Attributes

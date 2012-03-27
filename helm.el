@@ -71,6 +71,9 @@
     (define-key map (kbd "M-[")             'helm-prev-visible-mark)
     (define-key map (kbd "M-]")             'helm-next-visible-mark)
     (define-key map (kbd "C-k")             'helm-delete-minibuffer-contents)
+    (define-key map (kbd "C-x C-f")         'helm-quit-and-find-file)
+    (define-key map (kbd "M-m")             'helm-toggle-all-marks)
+    (define-key map (kbd "C-w")             'helm-yank-text-at-point)
 
     (define-key map (kbd "C-r")             'undefined)
     (define-key map (kbd "C-t")             'helm-toggle-resplit-window)
