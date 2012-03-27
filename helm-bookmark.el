@@ -26,12 +26,37 @@
   "Predefined configurations for `helm.el'."
   :group 'helm)
 
-(defface helm-bookmarks-su-face '((t (:foreground "red")))
+(defface helm-bookmarks-su-face
+    '((t (:foreground "red")))
   "Face for su/sudo bookmarks."
   :group 'helm-bookmark)
 
-
+(defface helm-bookmark-info
+    '((t (:foreground "green")))
+  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'helm-bookmark)
 
+(defface helm-bookmark-w3m
+    '((t (:foreground "yellow")))
+  "*Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'helm-bookmark)
+
+(defface helm-bookmark-gnus
+    '((t (:foreground "magenta")))
+  "*Face used for Gnus bookmarks."
+  :group 'helm-bookmark)
+
+(defface helm-bookmark-man
+    '((t (:foreground "Orange4")))
+  "*Face used for Woman/man bookmarks."
+  :group 'helm-bookmark)
+
+(defface helm-bookmark-file
+    '((t (:foreground "Deepskyblue2")))
+  "*Face used for file bookmarks."
+  :group 'helm-bookmark)
+
+
 (defvar helm-c-bookmarks-face1 'helm-ff-directory)
 (defvar helm-c-bookmarks-face2 'helm-ff-file)
 (defvar helm-c-bookmarks-face3 'helm-bookmarks-su-face)
@@ -149,16 +174,16 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
         do (setq i (concat "*" i))
         collect (cond (;; info buffers
                        isinfo
-                       (propertize i 'face 'helm-bmkext-info 'help-echo isfile))
+                       (propertize i 'face 'helm-bookmark-info 'help-echo isfile))
                       (;; w3m buffers
                        isw3m
-                       (propertize i 'face 'helm-bmkext-w3m 'help-echo isfile))
+                       (propertize i 'face 'helm-bookmark-w3m 'help-echo isfile))
                       (;; gnus buffers
                        isgnus
-                       (propertize i 'face 'helm-bmkext-gnus 'help-echo isfile))
+                       (propertize i 'face 'helm-bookmark-gnus 'help-echo isfile))
                       (;; Man Woman
                        (or iswoman isman)
-                       (propertize i 'face 'helm-bmkext-man 'help-echo isfile))
+                       (propertize i 'face 'helm-bookmark-man 'help-echo isfile))
                       (;; Addressbook
                        isabook
                        (propertize i 'face '((:foreground "Tomato"))))
@@ -167,7 +192,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                        (propertize i 'face helm-c-bookmarks-face1 'help-echo isfile))
                       (;; regular files
                        t
-                       (propertize i 'face 'helm-bmkext-file 'help-echo isfile)))))
+                       (propertize i 'face 'helm-bookmark-file 'help-echo isfile)))))
 
 (defun helm-c-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
