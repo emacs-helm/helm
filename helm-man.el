@@ -30,7 +30,7 @@ source.")
 
 (defun helm-c-man-default-action (candidate)
   "Default action for jumping to a woman or man page from helm."
-  (let ((wfiles (woman-file-name-all-completions candidate)))
+  (let ((wfiles (mapcar 'car (woman-file-name-all-completions candidate))))
     (condition-case err
         (if (> (length wfiles) 1)
             (woman-find-file
