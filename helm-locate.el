@@ -105,7 +105,6 @@ See `helm-locate-with-db' and `helm-locate'."
                                (file-directory-p x))
                            x)))))
    init))
-;; (helm-locate-1 t)
 
 (defun helm-locate-with-db (&optional db initial-input)
   "Run locate -d DB.
@@ -138,7 +137,6 @@ See also `helm-locate'."
           :buffer "*helm locate*"
           :input initial-input
           :keymap helm-generic-files-map)))
-;; (helm-locate-with-db "~/locate.db")
 
 (defun helm-c-locate-init ()
   "Initialize async locate process for `helm-c-source-locate'."

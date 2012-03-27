@@ -19,7 +19,6 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'grep)
-;(require 'helm-files)
 (require 'helm-regexp)
 
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))

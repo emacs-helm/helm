@@ -474,6 +474,132 @@ See documentation of `completing-read' and `all-completions' for details."
       ;; initial value when exiting.
       (setq this-command current-command))))
 
+;;; Generic read-file-name
+;;
+;;
+(defun* helm-c-read-file-name
+    (prompt
+     &key
+     (name "Read File Name")
+     (initial-input (expand-file-name default-directory))
+     (buffer "*Helm Completions*")
+     test
+     (preselect nil)
+     (history nil)
+     must-match
+     (marked-candidates nil)
+     (alistp t)
+     (persistent-action 'helm-find-files-persistent-action)
+     (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
+  "Read a file name with helm completion.
+It is helm `read-file-name' emulation.
+
+Argument PROMPT is the default prompt to use.
+
+Keys description:
+
+- NAME: Source name, default to \"Read File Name\".
+
+- INITIAL-INPUT: Where to start read file name, default to `default-directory'.
+
+- BUFFER: `helm-buffer' name default to \"*Helm Completions*\".
+
+- TEST: A predicate called with one arg 'candidate'.
+
+- PRESELECT: helm preselection.
+
+- HISTORY: Display HISTORY in a special source.
+
+- MUST-MATCH: Can be 'confirm, nil, or t.
+
+- MARKED-CANDIDATES: When non--nil return a list of marked candidates.
+
+- ALISTP: Don't use `all-completions' in history (take effect only on history).
+
+- PERSISTENT-ACTION: a persistent action function.
+
+- PERSISTENT-HELP: persistent help message."
+  (when (get-buffer helm-action-buffer)
+    (kill-buffer helm-action-buffer))
+
+  ;; Assume completion have been already required,
+  ;; so always use 'confirm.
+  (when (eq must-match 'confirm-after-completion)
+    (setq must-match 'confirm))
+
+  (flet ((action-fn (candidate)
+           (if marked-candidates
+               (helm-marked-candidates)
+               (identity candidate))))
+
+    (let* ((helm-mp-highlight-delay nil)
+           ;; Be sure we don't erase the underlying minibuffer if some.
+           (helm-ff-auto-update-initial-value
+            (and helm-ff-auto-update-initial-value
+                 (not (minibuffer-window-active-p (minibuffer-window)))))
+           helm-same-window
+           (hist (and history (helm-comp-read-get-candidates
+                               history nil nil alistp)))
+           (minibuffer-completion-confirm must-match)
+           (must-match-map (when must-match
+                             (let ((map (make-sparse-keymap)))
+                               (define-key map (kbd "RET")
+                                 'helm-confirm-and-exit-minibuffer)
+                               map)))
+           (helm-map (if must-match-map
+                         (make-composed-keymap
+                          must-match-map helm-c-read-file-map)
+                         helm-c-read-file-map)))
+
+      (or (helm
+           :sources
+           `(((name . ,(format "%s History" name))
+              (header-name . (lambda (name)
+                               (concat name helm-c-find-files-doc-header)))
+              (disable-shortcuts)
+              (mode-line . helm-read-file-name-mode-line-string)
+              (candidates . hist)
+              (persistent-action . ,persistent-action)
+              (persistent-help . ,persistent-help)
+              (action . ,'action-fn))
+             ((name . ,name)
+              (header-name . (lambda (name)
+                               (concat name helm-c-find-files-doc-header)))
+              (init . (lambda ()
+                        (setq helm-ff-auto-update-flag
+                              helm-ff-auto-update-initial-value)))
+              ;; It is needed for filenames with capital letters
+              (disable-shortcuts)
+              (mode-line . helm-read-file-name-mode-line-string)
+              (candidates
+               . (lambda ()
+                   (if test
+                       (loop with hn = (helm-ff-tramp-hostnames)
+                             for i in (helm-find-files-get-candidates
+                                       must-match)
+                             when (or (member i hn)            ; A tramp host
+                                      (funcall test i)         ; Test ok
+                                      (not (file-exists-p i))) ; A new file.
+                             collect i)
+                       (helm-find-files-get-candidates must-match))))
+              (filtered-candidate-transformer helm-c-find-files-transformer)
+              (persistent-action . ,persistent-action)
+              (candidate-number-limit . 9999)
+              (toggle-auto-update . helm-ff-toggle-auto-update)
+              (persistent-help . ,persistent-help)
+              (volatile)
+              (action . ,'action-fn)))
+           :input initial-input
+           :prompt prompt
+           :resume 'noresume
+           :buffer buffer
+           :preselect preselect)
+          (when (and (not (string= helm-pattern ""))
+                     (eq helm-exit-status 0)
+                     (eq must-match 'confirm))
+            (identity helm-pattern))
+          (keyboard-quit)))))
+
 (defun* helm-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An helm replacement of `read-file-name'."
