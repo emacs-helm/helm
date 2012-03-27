@@ -256,7 +256,7 @@ Note that you don't need to enable `ido-mode' for this to work."
 
 ;;; Helm-find-files - The helm file browser.
 ;;
-;;
+;; Keymaps
 (defvar helm-find-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -348,6 +348,7 @@ Note that you don't need to enable `ido-mode' for this to work."
     map)
   "Keymap for `helm-find-files-eshell-command-on-file'.")
 
+
 ;; Internal.
 (defvar helm-c-find-files-doc-header " (`C-l': Go to precedent level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
@@ -363,6 +364,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "\\`\\(news\\(post\\)?:\\|nntp:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\):/?/?\\).*"
   "Same as `ffap-url-regexp' but match earlier possible url.")
 
+
 (defvar helm-c-source-find-files
   `((name . "Find Files")
     (header-name . (lambda (name)
@@ -1921,7 +1923,10 @@ Find inside `require' and `declare-function' sexp."
                (third (split-string sexp)))))
             (t nil)))))
 
+
 ;;; Helm completion for `write-file'.==> C-x C-w
+;;
+;;
 (defvar helm-c-source-write-file
   `((name . "Write File")
     (header-name . (lambda (name)
@@ -1938,6 +1943,8 @@ Find inside `require' and `declare-function' sexp."
                                (write-file candidate 'confirm)))))))
 
 ;;; Helm completion for `insert-file'.==> C-x i
+;;
+;;
 (defvar helm-c-source-insert-file
   `((name . "Insert File")
     (header-name . (lambda (name)
@@ -1955,7 +1962,10 @@ Find inside `require' and `declare-function' sexp."
                                                         candidate helm-current-buffer))
                                   (insert-file-contents candidate))))))))
 
+
 ;;; Helm completion for copy, rename and (rel)sym/hard/link files from dired.
+;;
+;;
 (defvar helm-c-source-copy-files
   `((name . "Copy Files")
     (header-name . (lambda (name)
@@ -2171,6 +2181,10 @@ This is deprecated for Emacs24+ users, use `helm-mode' instead."
 
 (defalias 'helm-dired-bindings 'helm-dired-mode)
 
+
+;;; Routines for files
+;;
+;;
 (defun helm-c-delete-file (file &optional error-if-dot-file-p)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
@@ -2277,6 +2291,7 @@ other candidate transformers."
   "Replaces /home/user with ~."
   (helm-transform-mapcar #'helm-c-shorten-home-path_ files))
 
+
 ;;; List of files gleaned from every dired buffer
 ;;
 ;;
@@ -2322,6 +2337,7 @@ Else return ACTIONS unmodified."
     (candidates . helm-c-files-in-all-dired-candidates)
     (type . file)))
 
+
 ;;; File Cache
 ;;
 ;;
@@ -2436,7 +2452,7 @@ Else return ACTIONS unmodified."
         (and (bobp) (forward-line 1))
         (and (helm-pos-header-line-p) (forward-line -2))
         (helm-mark-current-line)))))
-
+
 ;;; File name history
 ;;
 ;;
@@ -2465,6 +2481,7 @@ Else return ACTIONS unmodified."
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
+
 ;;; Files in current dir
 ;;
 ;;
@@ -2490,6 +2507,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
     (candidate-transformer helm-c-highlight-files)
     (type . file)))
 
+
 ;;;###autoload
 (defun helm-c-copy-files-async ()
   "Preconfigured helm to copy file list FLIST to DEST asynchronously."
