@@ -12,8 +12,9 @@
 Emacs. It will help steer you in the right direction when you're looking
 for stuff in Emacs (like buffers, files, etc).
 
-Helm is a fork of `anything.el` and can be considered to be its
-successor. `Helm` sets out to clean up the legacy code in `anything.el`
+Helm is a fork of `anything.el` originaly written by Tamas Patrovic
+and can be considered to be its successor. 
+`Helm` sets out to clean up the legacy code in `anything.el`
 and provide a cleaner, leaner and more modular tool, that's not tied in
 the trap of backward compatibility. 
 
