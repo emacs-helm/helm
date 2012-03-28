@@ -19,6 +19,7 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-info)
 (require 'advice)
 
 
@@ -271,6 +272,10 @@ or between double quotes."
         (helm-c-complete-file-name-at-point)
         (helm-lisp-completion-at-point))))
 
+
+;;; Apropos
+;;
+;;
 (defun helm-c-apropos-init (test default)
   "Init candidates buffer for `helm-c-apropos' sources."
   (with-current-buffer (helm-candidate-buffer 'global)
@@ -337,6 +342,10 @@ or between double quotes."
                          (with-output-to-temp-buffer "*Help*"
                            (princ (get (intern candidate) 'helm-attrdoc))))))))))
 
+
+;;; Advices
+;;
+;;
 (defvar helm-c-source-advice
   '((name . "Function Advice")
     (candidates . helm-c-advice-candidates)
@@ -344,8 +353,6 @@ or between double quotes."
     (persistent-action . helm-c-advice-persistent-action)
     (multiline)
     (persistent-help . "Describe function / C-u C-z: Toggle advice")))
-;; (let ((debug-on-signal t))(helm 'helm-c-source-advice))
-;; (testadvice)
 
 (defun helm-c-advice-candidates ()
   (loop for (fname) in ad-advised-functions
@@ -394,6 +401,7 @@ or between double quotes."
   (interactive)
   (helm-other-buffer 'helm-c-source-advice "*helm advice*"))
 
+
 ;;; Elisp library scan
 ;;
 ;;
@@ -452,6 +460,52 @@ STRING is string to match."
     (set sym (eval-minibuffer (format "Set %s: " var)
                               (prin1-to-string (symbol-value sym))))))
 
+
+;;; Type attributes
+;;
+;;
+(let ((actions '(("Describe command" . describe-function)
+                 ("Add command to kill ring" . helm-c-kill-new)
+                 ("Go to command's definition" . find-function)
+                 ("Debug on entry" . debug-on-entry)
+                 ("Cancel debug on entry" . cancel-debug-on-entry)
+                 ("Trace function" . trace-function)
+                 ("Trace function (background)" . trace-function-background)
+                 ("Untrace function" . untrace-function))))
+  (define-helm-type-attribute 'command
+      `((action ("Call interactively" . helm-c-call-interactively)
+                ,@actions)
+        (coerce . helm-c-symbolify)
+        (persistent-action . describe-function))
+    "Command. (string or symbol)")
+
+  (define-helm-type-attribute 'function
+      `((action . ,actions)
+        (action-transformer helm-c-transform-function-call-interactively)
+        (candidate-transformer helm-c-mark-interactive-functions)
+        (coerce . helm-c-symbolify))
+    "Function. (string or symbol)"))
+
+(define-helm-type-attribute 'variable
+    '((action ("Describe variable" . describe-variable)
+       ("Add variable to kill ring" . helm-c-kill-new)
+       ("Go to variable's definition" . find-variable)
+       ("Set variable" . helm-c-set-variable))
+      (coerce . helm-c-symbolify))
+  "Variable.")
+
+
+
+(define-helm-type-attribute 'timer
+    '((real-to-display . helm-c-timer-real-to-display)
+      (action ("Cancel Timer" . cancel-timer)
+       ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
+       ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
+      (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
+      (persistent-help . "Describe Function"))
+  "Timer.")
+
+
 ;;; Elisp Timers.
 ;;
 ;;
@@ -485,7 +539,7 @@ STRING is string to match."
                        helm-c-source-idle-time-timers)
                      "*helm timers*"))
 
-
+
 ;;; Complex command history
 ;;
 ;;

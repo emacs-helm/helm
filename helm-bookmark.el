@@ -20,6 +20,8 @@
 (eval-when-compile (require 'bookmark))
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-info)
+(require 'helm-adaptative)
 
 
 (defgroup helm-bookmark nil
@@ -198,6 +200,22 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   "Jump to bookmark from keyboard."
   (let ((current-prefix-arg helm-current-prefix-arg))
     (bookmark-jump candidate)))
+
+(define-helm-type-attribute 'bookmark
+    `((coerce . helm-bookmark-get-bookmark-from-name)
+      (action
+       ("Jump to bookmark" . helm-c-bookmark-jump)
+       ("Jump to BM other window" . bookmark-jump-other-window)
+       ("Bookmark edit annotation" . bookmark-edit-annotation)
+       ("Bookmark show annotation" . bookmark-show-annotation)
+       ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
+       ,@(and (locate-library "bookmark-extensions")
+              `(("Edit Bookmark" . bmkext-edit-bookmark)))
+       ("Rename bookmark" . bookmark-rename)
+       ("Relocate bookmark" . bookmark-relocate))
+      (keymap . ,helm-c-bookmark-map)
+      (mode-line . helm-bookmark-mode-line-string))
+  "Bookmark name.")
 
 ;;;###autoload
 (defun helm-c-bookmark-run-jump-other-window ()

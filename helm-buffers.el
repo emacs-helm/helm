@@ -20,6 +20,7 @@
 (require 'cl)
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-elscreen)
 
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
@@ -454,6 +455,30 @@ using `helm-c-buffer-display-string-functions'."
 
 (defun helm-kill-marked-buffers (ignore)
   (mapc 'kill-buffer (helm-marked-candidates)))
+
+(define-helm-type-attribute 'buffer
+    `((action
+       ("Switch to buffer" . helm-c-switch-to-buffer)
+       ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
+       ("Switch to buffer other window" . switch-to-buffer-other-window)
+       ("Switch to buffer other frame" . switch-to-buffer-other-frame)
+       ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . helm-find-buffer-on-elscreen))
+       ("Query replace regexp" . helm-c-buffer-query-replace-regexp)
+       ("Query replace" . helm-c-buffer-query-replace)
+       ("View buffer" . view-buffer)
+       ("Display buffer"   . display-buffer)
+       ("Grep buffers (C-u grep all buffers)" . helm-c-zgrep-buffers)
+       ("Revert buffer(s)" . helm-revert-marked-buffers)
+       ("Insert buffer" . insert-buffer)
+       ("Kill buffer(s)" . helm-kill-marked-buffers)
+       ("Diff with file" . diff-buffer-with-file)
+       ("Ediff Marked buffers" . helm-ediff-marked-buffers)
+       ("Ediff Merge marked buffers" . (lambda (candidate)
+                                         (helm-ediff-marked-buffers candidate t))))
+      (persistent-help . "Show this buffer")
+      (candidate-transformer helm-c-skip-boring-buffers
+                             helm-c-transform-buffer-display-string))
+  "Buffer or buffer name.")
 
 ;;;###autoload
 (defun helm-buffers-list ()

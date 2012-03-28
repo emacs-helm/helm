@@ -211,6 +211,49 @@ Line is parsed for BEG position to END position."
     (type . line)
     (recenter)))
 
+;;; Type attributes
+;;
+;;
+(define-helm-type-attribute 'line
+    '((display-to-real . helm-c-display-to-real-line)
+      (action ("Go to Line" . helm-c-action-line-goto)))
+  "LINENO:CONTENT string, eg. \"  16:foo\".
+
+Optional `target-file' attribute is a name of target file.
+
+Optional `before-jump-hook' attribute is a function with no
+arguments which is called before jumping to position.
+
+Optional `after-jump-hook' attribute is a function with no
+arguments which is called after jumping to position.
+
+If `adjust' attribute is specified, searches the line whose
+content is CONTENT near the LINENO.
+
+If `recenter' attribute is specified, the line is displayed at
+the center of window, otherwise at the top of window.")
+
+(define-helm-type-attribute 'file-line
+    `((filtered-candidate-transformer helm-c-filtered-candidate-transformer-file-line)
+      (multiline)
+      (action ("Go to" . helm-c-action-file-line-goto)))
+  "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
+
+Optional `default-directory' attribute is a default-directory
+FILENAME is interpreted.
+
+Optional `before-jump-hook' attribute is a function with no
+arguments which is called before jumping to position.
+
+Optional `after-jump-hook' attribute is a function with no
+arguments which is called after jumping to position.
+
+If `adjust' attribute is specified, searches the line whose
+content is CONTENT near the LINENO.
+
+If `recenter' attribute is specified, the line is displayed at
+the center of window, otherwise at the top of window.")
+
 ;;;###autoload
 (defun helm-regexp ()
   "Preconfigured helm to build regexps.

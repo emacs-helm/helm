@@ -1,4 +1,4 @@
-;;; helm-mode.el --- Enable helm completion evrywhere.
+;;; helm-mode.el --- Enable helm completion everywhere.
 
 ;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
