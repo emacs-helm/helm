@@ -21,6 +21,45 @@
 (require 'helm)
 (require 'helm-files)
 
+
+(defcustom helm-completing-read-handlers-alist
+  '((describe-function . helm-completing-read-symbols)
+    (describe-variable . helm-completing-read-symbols)
+    (debug-on-entry . helm-completing-read-symbols)
+    (find-function . helm-completing-read-symbols)
+    (trace-function . helm-completing-read-symbols)
+    (trace-function-background . helm-completing-read-symbols)
+    (find-tag . helm-completing-read-with-cands-in-buffer)
+    (ffap-alternate-file . nil))
+  "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
+Each entry is a cons cell like \(emacs_command . completing-read_handler\)
+where key and value are symbols.
+
+Each key is an Emacs command that use originaly `completing-read'.
+
+Each value maybe an helm function that take same arguments as
+`completing-read' plus NAME and BUFFER, where NAME is the name of the new
+helm source and BUFFER the name of the buffer we will use.
+This function prefix name must start by \"helm\".
+
+See `helm-completing-read-symbols' for example.
+
+If the value of an entry is nil completion will fall back to
+emacs vanilla behavior.
+e.g If you want to disable helm completion for `describe-function':
+\(describe-function . nil\).
+
+Ido is also supported, you can use `ido-completing-read' and
+`ido-read-file-name' as value of an entry or just 'ido.
+e.g ido completion for `find-file':
+\(find-file . ido\)
+same as
+\(find-file . ido-read-file-name\)
+Note that you don't need to enable `ido-mode' for this to work."
+  :group 'helm-files
+  :type '(alist :key-type symbol :value-type symbol))
+
+
 ;;; Helm `completing-read' replacement
 ;;
 ;;
@@ -473,7 +512,7 @@ See documentation of `completing-read' and `all-completions' for details."
       ;; on another `completing-read', so restore `this-command' to
       ;; initial value when exiting.
       (setq this-command current-command))))
-
+
 ;;; Generic read-file-name
 ;;
 ;;
@@ -720,5 +759,12 @@ Note: This mode will work only partially on Emacs23."
       (message helm-completion-mode-quit-message)))
 
 (provide 'helm-mode)
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
 
 ;;; helm-mode.el ends here

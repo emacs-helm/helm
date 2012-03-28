@@ -265,4 +265,11 @@ Return nil if bmk is not a valid bookmark."
 
 (provide 'helm-bookmark)
 
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
+
 ;;; helm-bookmark.el ends here

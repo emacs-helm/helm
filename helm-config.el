@@ -238,7 +238,7 @@ http://bbdb.sourceforge.net/
 ;;;***
 
 ;;;### (autoloads (helm-bookmark-ext helm-c-bmkext-run-edit) "helm-bmkext"
-;;;;;;  "helm-bmkext.el" (20338 53828))
+;;;;;;  "helm-bmkext.el" (20338 53998))
 ;;; Generated autoloads from helm-bmkext.el
 
 (autoload 'helm-c-bmkext-run-edit "helm-bmkext" "\
@@ -258,7 +258,7 @@ Contain also `helm-c-source-google-suggest'.
 
 ;;;### (autoloads (helm-c-pp-bookmarks helm-bookmarks helm-c-bookmark-run-delete
 ;;;;;;  helm-c-bookmark-run-jump-other-window) "helm-bookmark" "helm-bookmark.el"
-;;;;;;  (20338 53404))
+;;;;;;  (20338 54015))
 ;;; Generated autoloads from helm-bookmark.el
 
 (autoload 'helm-c-bookmark-run-jump-other-window "helm-bookmark" "\
@@ -289,7 +289,7 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 ;;;;;;  helm-buffer-run-zgrep helm-buffer-run-grep helm-buffer-run-kill-buffers
 ;;;;;;  helm-buffer-save-persistent helm-buffer-revert-persistent
 ;;;;;;  helm-buffer-diff-persistent) "helm-buffers" "helm-buffers.el"
-;;;;;;  (20338 52312))
+;;;;;;  (20339 28136))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffer-diff-persistent "helm-buffers" "\
@@ -401,7 +401,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 ;;;;;;  helm-c-apropos helm-lisp-completion-or-file-name-at-point
 ;;;;;;  helm-lisp-completion-at-point-or-indent helm-c-complete-file-name-at-point
 ;;;;;;  helm-lisp-completion-at-point) "helm-elisp" "helm-elisp.el"
-;;;;;;  (20338 53368))
+;;;;;;  (20339 27987))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -540,7 +540,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20338 52312))
+;;;;;;  "helm-files" "helm-files.el" (20339 28418))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -824,7 +824,7 @@ Preconfigured `helm' for gentoo linux.
 ;;;### (autoloads (helm-do-pdfgrep helm-do-zgrep helm-do-grep helm-c-grep-run-save-buffer
 ;;;;;;  helm-c-grep-run-other-window-action helm-c-grep-run-default-action
 ;;;;;;  helm-c-grep-run-persistent-action helm-c-goto-next-file helm-c-goto-precedent-file)
-;;;;;;  "helm-grep" "helm-grep.el" (20338 52312))
+;;;;;;  "helm-grep" "helm-grep.el" (20339 28632))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-c-goto-precedent-file "helm-grep" "\
@@ -948,8 +948,8 @@ With a prefix-arg insert symbol at point.
 
 ;;;***
 
-;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20338
-;;;;;;  52312))
+;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20339
+;;;;;;  27472))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate "helm-locate" "\
@@ -1030,7 +1030,7 @@ Preconfigured `helm' for `minibuffer-history'.
 
 ;;;***
 
-;;;### (autoloads (helm-mode) "helm-mode" "helm-mode.el" (20338 52784))
+;;;### (autoloads (helm-mode) "helm-mode" "helm-mode.el" (20339 27006))
 ;;; Generated autoloads from helm-mode.el
 
 (defvar helm-mode nil "\
@@ -1266,8 +1266,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20338
-;;;;;;  53857 233210))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20339
+;;;;;;  28690 269891))
 
 ;;;***
 
@@ -1278,6 +1278,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;; Local Variables:
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-config.el ends here

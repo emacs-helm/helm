@@ -115,4 +115,11 @@ http://bbdb.sourceforge.net/"
 
 (provide 'helm-bbdb)
 
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
+
 ;;; helm-bbdb ends here

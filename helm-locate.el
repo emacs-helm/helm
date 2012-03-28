@@ -23,7 +23,7 @@
 
 (eval-when-compile (require 'cl))
 (require 'helm)
-(require 'helm-files)
+;(require 'helm-mode)
 
 
 (defgroup helm-locate nil
@@ -59,6 +59,24 @@ This string will be passed to format so it should end with `%s'.
 The \"-r\" option must be the last option."
   :type 'string
   :group 'helm-locate)
+
+(defvar helm-generic-files-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-g s")   'helm-ff-run-grep)
+    (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
+    (define-key map (kbd "M-g p")   'helm-ff-run-pdfgrep)
+    (define-key map (kbd "M-D")     'helm-ff-run-delete-file)
+    (define-key map (kbd "C-=")     'helm-ff-run-ediff-file)
+    (define-key map (kbd "C-c =")   'helm-ff-run-ediff-merge-file)
+    (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
+    (define-key map (kbd "M-i")     'helm-ff-properties-persistent)
+    (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
+    (define-key map (kbd "C-w")     'helm-yank-text-at-point)
+    (define-key map (kbd "C-c ?")   'helm-generic-file-help)
+    map)
+  "Generic Keymap for files.")
+
 
 
 (defun helm-ff-find-locatedb (&optional from-ff)
@@ -203,5 +221,12 @@ Where db_path is a filename matched by
   (helm-locate-1 arg))
 
 (provide 'helm-locate)
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
 
 ;;; helm-locate.el ends here

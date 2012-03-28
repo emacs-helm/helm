@@ -434,15 +434,6 @@ using `helm-c-buffer-display-string-functions'."
             (ignore-errors (ring-ref comint-input-ring 0))
             default-directory)))
 
-(defun helm-c-file-buffers (filename)
-  "Returns a list of buffer names corresponding to FILENAME."
-  (let ((name     (expand-file-name filename))
-        (buf-list ()))
-    (dolist (buf (buffer-list) buf-list)
-      (let ((bfn (buffer-file-name buf)))
-        (when (and bfn (string= name bfn))
-          (push (buffer-name buf) buf-list))))))
-
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
     (when (or (buffer-modified-p)
@@ -490,5 +481,12 @@ It is an enhanced version of `helm-for-buffers'."
         :buffer "*helm buffers*" :keymap helm-c-buffer-map))
 
 (provide 'helm-buffers)
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
 
 ;;; helm-buffers.el ends here

@@ -24,7 +24,9 @@
 (require 'helm-grep)
 (require 'helm-match-plugin)
 (require 'helm-help)
+(require 'helm-locate)
 (require 'helm-bookmark)
+(require 'helm-tags)
 (require 'thingatpt)
 (require 'ffap)
 (eval-when-compile (require 'dired))
@@ -32,6 +34,7 @@
 (require 'dired-x)
 (require 'tramp)
 (require 'image-dired)
+(require 'org)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
@@ -183,43 +186,6 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-completing-read-handlers-alist
-  '((describe-function . helm-completing-read-symbols)
-    (describe-variable . helm-completing-read-symbols)
-    (debug-on-entry . helm-completing-read-symbols)
-    (find-function . helm-completing-read-symbols)
-    (trace-function . helm-completing-read-symbols)
-    (trace-function-background . helm-completing-read-symbols)
-    (find-tag . helm-completing-read-with-cands-in-buffer)
-    (ffap-alternate-file . nil))
-  "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
-Each entry is a cons cell like \(emacs_command . completing-read_handler\)
-where key and value are symbols.
-
-Each key is an Emacs command that use originaly `completing-read'.
-
-Each value maybe an helm function that take same arguments as
-`completing-read' plus NAME and BUFFER, where NAME is the name of the new
-helm source and BUFFER the name of the buffer we will use.
-This function prefix name must start by \"helm\".
-
-See `helm-completing-read-symbols' for example.
-
-If the value of an entry is nil completion will fall back to
-emacs vanilla behavior.
-e.g If you want to disable helm completion for `describe-function':
-\(describe-function . nil\).
-
-Ido is also supported, you can use `ido-completing-read' and
-`ido-read-file-name' as value of an entry or just 'ido.
-e.g ido completion for `find-file':
-\(find-file . ido\)
-same as
-\(find-file . ido-read-file-name\)
-Note that you don't need to enable `ido-mode' for this to work."
-  :group 'helm-files
-  :type '(alist :key-type symbol :value-type symbol))
-
 
 ;;; Faces
 ;;
@@ -324,23 +290,6 @@ Note that you don't need to enable `ido-mode' for this to work."
       (define-key map (kbd "<M-right>")   'helm-next-source))
     (delq nil map))
   "Keymap for `helm-c-read-file-name'.")
-
-(defvar helm-generic-files-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-g s")   'helm-ff-run-grep)
-    (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
-    (define-key map (kbd "M-g p")   'helm-ff-run-pdfgrep)
-    (define-key map (kbd "M-D")     'helm-ff-run-delete-file)
-    (define-key map (kbd "C-=")     'helm-ff-run-ediff-file)
-    (define-key map (kbd "C-c =")   'helm-ff-run-ediff-merge-file)
-    (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
-    (define-key map (kbd "M-i")     'helm-ff-properties-persistent)
-    (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
-    (define-key map (kbd "C-w")     'helm-yank-text-at-point)
-    (define-key map (kbd "C-c ?")   'helm-generic-file-help)
-    map)
-  "Generic Keymap for files.")
 
 (defvar helm-esh-on-file-map
   (let ((map (make-sparse-keymap)))
@@ -2186,6 +2135,15 @@ This is deprecated for Emacs24+ users, use `helm-mode' instead."
 ;;; Routines for files
 ;;
 ;;
+(defun helm-c-file-buffers (filename)
+  "Returns a list of buffer names corresponding to FILENAME."
+  (let ((name     (expand-file-name filename))
+        (buf-list ()))
+    (dolist (buf (buffer-list) buf-list)
+      (let ((bfn (buffer-file-name buf)))
+        (when (and bfn (string= name bfn))
+          (push (buffer-name buf) buf-list))))))
+
 (defun helm-c-delete-file (file &optional error-if-dot-file-p)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
@@ -2637,5 +2595,12 @@ Run all sources defined in `helm-for-files-prefered-list'."
   (helm-other-buffer 'helm-c-source-recentf "*helm recentf*"))
 
 (provide 'helm-files)
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
 
 ;;; helm-files.el ends here

@@ -20,6 +20,7 @@
 (require 'helm)
 (require 'grep)
 (require 'helm-regexp)
+(require 'helm-buffers)
 
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))
 
@@ -700,5 +701,12 @@ See also `helm-do-grep-1'."
 
 
 (provide 'helm-grep)
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
 
 ;;; helm-grep.el ends here

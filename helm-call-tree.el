@@ -119,4 +119,11 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el"
 
 (provide 'helm-call-tree)
 
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; byte-compile-dynamic: t
+;; generated-autoload-file: "helm-config.el"
+;; End:
+
 ;;; helm-call-tree.el ends here
