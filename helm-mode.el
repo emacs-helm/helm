@@ -60,6 +60,13 @@ Note that you don't need to enable `ido-mode' for this to work."
   :type '(alist :key-type symbol :value-type symbol))
 
 
+;;; Internal
+;;
+;;
+;; Flag to know if `helm-pattern' have been added
+;; to candidate list in `helm-comp-read'.
+(defvar helm-cr-unknow-pattern-flag nil)
+
 ;;; Helm `completing-read' replacement
 ;;
 ;;
@@ -111,10 +118,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
   (loop for cand in candidates
-        if (and (string= cand helm-pattern)
+        if (and (equal cand helm-pattern)
                 (not (member helm-pattern
                              (or (cdr candidates)
-                                 candidates))))
+                                 candidates)))
+                helm-cr-unknow-pattern-flag)
         collect (cons (concat (propertize
                                " " 'display
                                (propertize "[?]" 'face 'helm-ff-prefix))
@@ -261,8 +269,11 @@ that use `helm-comp-read' See `helm-M-x' for example."
                    . (lambda ()
                        (let ((cands (helm-comp-read-get-candidates
                                      collection test sort alistp)))
-                         (unless (or (eq must-match t) (string= helm-pattern ""))
-                           (setq cands (append (list helm-pattern) cands)))
+                         (setq helm-cr-unknow-pattern-flag nil)
+                         (unless (or (eq must-match t) (string= helm-pattern "")
+                                     (member helm-pattern cands))
+                           (setq cands (append (list helm-pattern) cands))
+                           (setq helm-cr-unknow-pattern-flag t))
                          (if (and default (not (string= default "")))
                              (delq nil (cons default (delete default cands)))
                              cands))))
@@ -278,7 +289,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          (let ((cands (helm-comp-read-get-candidates
                                        collection test sort alistp)))
                            (unless (or (eq must-match t) (string= helm-pattern ""))
-                             (setq cands (append (list helm-pattern) cands)))
+                             (setq cands (append (list helm-pattern) cands))
+                             (setq helm-cr-unknow-pattern-flag t))
                            (with-current-buffer (helm-candidate-buffer 'global)
                              (loop for i in
                                    (if (and default (not (string= default "")))
