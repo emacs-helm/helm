@@ -287,7 +287,11 @@ WHERE can be one of other-window, elscreen, other-frame."
             do (setq new-buf (read-string "GrepBufferName: " "*grep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (let ((inhibit-read-only t))
+      (kill-all-local-variables)
+      (let ((inhibit-read-only t)
+            (grep-mode-font-lock-keywords
+             `((,helm-pattern (0 grep-match-face))
+               ,grep-mode-font-lock-keywords)))
         (erase-buffer)
         (insert "-*- mode: grep -*-\n\n"
                 (format "Grep Results for `%s':\n\n" helm-pattern))
