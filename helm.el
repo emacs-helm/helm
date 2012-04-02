@@ -356,8 +356,7 @@ which affects `helm-samewindow'.")
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "Help string displayed in mode-line in `helm'.
 It can be a string or a list of two args, in this case,
 first arg is a string that will be used as name for candidates number,

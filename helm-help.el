@@ -397,8 +397,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-c-source-buffers-list'"))
 
 (defvar helm-ff-mode-line-string "\
@@ -408,9 +407,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\<helm-find-files-map>\
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-source-find-files'")
 
 (defvar helm-read-file-name-mode-line-string "\
@@ -420,8 +417,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-source-find-files'")
 
 (defvar helm-generic-file-mode-line-string "\
@@ -431,8 +427,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in Locate.")
 
 (defvar helm-grep-mode-line-string"\
@@ -442,8 +437,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-do-grep'.")
 
 (defvar helm-pdfgrep-mode-line-string "\
@@ -453,8 +447,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-do-pdfgrep'.")
 
 (defvar helm-etags-mode-line-string "\
@@ -464,8 +457,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-etags-select'.")
 
 (defvar helm-c-ucs-mode-line-string "\
@@ -486,8 +478,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport"
+\\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-c-source-buffers-list'"))
 
 (defvar helm-occur-mode-line "\
@@ -499,8 +490,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
-\\[helm-send-bug-report-from-helm]:BugReport")
+\\[helm-select-3rd-action]:NthAct")
 
 (provide 'helm-help)
 
