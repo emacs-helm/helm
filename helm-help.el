@@ -78,9 +78,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 
 == Global Commands ==
 \\<global-map>\\[helm-resume] revives last `helm' session.
-It is very useful, so you should bind any key.
-
-Single source is executed by \\[helm-call-source].")))
+It is very useful, so you should bind any key.")))
 
 ;;; `helm-buffer-list' help
 ;;
