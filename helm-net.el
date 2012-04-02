@@ -368,7 +368,6 @@ Return an alist with elements like (data . number_results)."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-net.el ends here

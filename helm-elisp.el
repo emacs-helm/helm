@@ -561,7 +561,6 @@ STRING is string to match."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-elisp.el ends here

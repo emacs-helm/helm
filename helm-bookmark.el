@@ -58,11 +58,12 @@
   "*Face used for file bookmarks."
   :group 'helm-bookmark)
 
-
-(defvar helm-c-bookmarks-face1 'helm-ff-directory)
-(defvar helm-c-bookmarks-face2 'helm-ff-file)
-(defvar helm-c-bookmarks-face3 'helm-bookmarks-su-face)
+(defface helm-bookmark-directory
+    '((t (:inherit helm-ff-directory)))
+  "*Face used for file bookmarks."
+  :group 'helm-bookmark)
 
+
 (defvar helm-c-bookmark-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -148,7 +149,7 @@
 
 (defun helm-c-highlight-not-logged (files source)
   (loop for i in files
-        collect (propertize i 'face helm-c-bookmarks-face3)))
+        collect (propertize i 'face 'helm-bookmarks-su-face)))
 
 (defun helm-c-highlight-bookmark (bookmarks source)
   "Used as `candidate-transformer' to colorize bookmarks.
@@ -191,7 +192,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                        (propertize i 'face '((:foreground "Tomato"))))
                       (;; directories
                        (and isfile (file-directory-p isfile))
-                       (propertize i 'face helm-c-bookmarks-face1 'help-echo isfile))
+                       (propertize i 'face 'helm-bookmark-directory 'help-echo isfile))
                       (;; regular files
                        t
                        (propertize i 'face 'helm-bookmark-file 'help-echo isfile)))))
@@ -269,7 +270,6 @@ Return nil if bmk is not a valid bookmark."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-bookmark.el ends here

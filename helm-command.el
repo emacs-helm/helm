@@ -156,7 +156,6 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-command.el ends here

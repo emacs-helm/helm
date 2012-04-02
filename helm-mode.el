@@ -776,7 +776,6 @@ Note: This mode will work only partially on Emacs23."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-mode.el ends here

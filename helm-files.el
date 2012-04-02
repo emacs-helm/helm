@@ -2600,7 +2600,6 @@ Run all sources defined in `helm-for-files-prefered-list'."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-files.el ends here

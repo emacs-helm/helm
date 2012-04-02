@@ -226,7 +226,6 @@ Where db_path is a filename matched by
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-locate.el ends here

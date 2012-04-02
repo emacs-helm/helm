@@ -710,7 +710,6 @@ See also `helm-do-grep-1'."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-grep.el ends here

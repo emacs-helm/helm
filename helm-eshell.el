@@ -179,7 +179,6 @@ The function that call this should set `helm-ec-target' to thing at point."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-eshell ends here

@@ -18,6 +18,8 @@
 ;;; Code:
 (eval-when-compile (require 'cl))
 (require 'helm)
+(require 'helm-buffers)
+(require 'helm-files)
 
 
 (defgroup helm-misc nil
@@ -336,7 +338,6 @@ It is added to `extended-command-history'.
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm-misc.el ends here

@@ -99,16 +99,44 @@
   "Keymap for helm.")
 
 
-;;; Variables
-;;
-;;
 (defgroup helm nil
   "Open helm."
   :prefix "helm-" :group 'convenience)
 
-(defface helm-overlay-line-face '((t (:background "IndianRed4" :underline t)))
-  "Face for source header in the helm buffer." :group 'helm)
+;;; Faces
+;;
+;;
+(defface helm-source-header
+    '((t (:background "#22083397778B" :foreground "white" :underline t)))
+  "Face for source header in the helm buffer."
+  :group 'helm)
 
+(defface helm-visible-mark
+    '((((min-colors 88) (background dark))
+       (:background "green1" :foreground "black"))
+      (((background dark)) (:background "green" :foreground "black"))
+      (((min-colors 88)) (:background "green1"))
+      (t (:background "green")))
+  "Face for visible mark."
+  :group 'helm)
+
+(defface helm-header
+    '((t (:inherit header-line)))
+  "Face for header lines in the helm buffer."
+  :group 'helm)
+
+(defface helm-candidate-number
+    '((t (:background "Yellow" :foreground "black")))
+  "Face for candidate number in mode-line." :group 'helm)
+
+(defface helm-selection
+    '((t (:inherit highlight)))
+  "Face for currently selected item in the helm buffer."
+  :group 'helm)
+
+;;; Variables
+;;
+;;
 (defvar helm-type-attributes nil
   "It's a list of \(TYPE ATTRIBUTES ...\).
 ATTRIBUTES are the same as attributes for `helm-sources'.
@@ -188,26 +216,6 @@ If t then Helm doesn't pop up a new window.")
 Other sources won't appear in the search results.
 If nil then there is no filtering.
 See also `helm-set-source-filter'.")
-
-(defface helm-header
-    '((t (:inherit header-line)))
-  "Face for header lines in the helm buffer."
-  :group 'helm)
-
-(defvar helm-header-face 'helm-header
-  "*Face for header lines in the helm buffer.")
-
-(defface helm-candidate-number
-    '((t (:background "Yellow" :foreground "black")))
-  "Face for candidate number in mode-line." :group 'helm)
-
-(defface helm-selection
-    '((t (:inherit highlight)))
-  "Face for currently selected item in the helm buffer."
-  :group 'helm)
-
-(defvar helm-selection-face 'helm-selection
-  "*Face for currently selected item in the helm buffer.")
 
 (defvar helm-action-buffer "*helm action*"
   "Buffer showing actions.")
@@ -417,9 +425,10 @@ It is disabled by default because *Helm Log* grows quickly.")
 (defvar helm-split-window-state nil)
 (defvar helm-selection-point nil)
 (defvar helm-alive-p nil)
+(defvar helm-visible-mark-overlays nil)
 
 
-;; (@* "Utility: logging")
+;; Utility: logging
 (defun helm-log (format-string &rest args)
   "Log message if `debug-on-error' or `helm-debug' is non-nil.
 Messages are written to the *Helm Log* buffer.
@@ -507,7 +516,7 @@ ARGS are args given to `format'."
 ;; (switch-to-buffer-other-window "*Helm Log*")
 
 
-;; (@* "Programming Tools")
+;; Programming Tools
 (defmacro helm-aif (test-form then-form &rest else-forms)
   "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
 THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
@@ -523,7 +532,7 @@ Otherwise make a list with one element."
       (list obj)))
 
 
-;; (@* "Helm API")
+;; Helm API
 
 (defun helm-buffer-get ()
   "Return `helm-action-buffer' if shown otherwise `helm-buffer'."
@@ -845,7 +854,7 @@ Otherwise, return VALUE itself."
       (push spec helm-once-called-functions))))
 
 
-;; (@* "Core: API helper")
+;; Core: API helper
 (defun* helm-empty-buffer-p (&optional (buffer helm-buffer))
   "Check if BUFFER have candidates.
 Default value for BUFFER is `helm-buffer'."
@@ -885,7 +894,7 @@ BINDING is a list of \(VARNAME . VALUE\) pair."
     (setq helm-let-variables nil)))
 
 
-;; (@* "Core: tools")
+;; Core: tools
 (defun helm-current-line-contents ()
   "Current line string without properties."
   (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
@@ -982,7 +991,7 @@ This is used in transformers to modify candidates list."
   (set variable timer))
 
 
-;; (@* "Core: entry point")
+;; Core: entry point
 (defconst helm-argument-keys
   '(:sources :input :prompt :resume :preselect :buffer :keymap :default :history))
 
@@ -1091,7 +1100,7 @@ in source."
         unless (memq key helm-argument-keys)
         collect (cons sym value)))
 
-;;; (@* "Core: entry point helper")
+;;; Core: entry point helper
 (defun helm-internal (&optional
                         any-sources any-input
                         any-prompt any-resume
@@ -1279,7 +1288,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
     (push elt (symbol-value list-var))))
 
 
-;;; (@* "Core: Accessors")
+;;; Core: Accessors
 ;;; rubikitch: I love to create functions to control variables.
 (defvar helm-current-position nil
   "Cons of \(point . window-start\)  when `helm' is invoked.
@@ -1327,7 +1336,7 @@ window or frame configuration is saved/restored according to values of
                (select-frame-set-input-focus frame)))))
 
 
-;; (@* "Core: Display *helm* buffer")
+;; Core: Display *helm* buffer
 (defun helm-display-buffer (buf)
   "Display *helm* buffer BUF."
   (let (pop-up-frames)
@@ -1341,7 +1350,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (funcall (if helm-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
 
 
-;; (@* "Core: initialize")
+;; Core: initialize
 (defun helm-initial-setup ()
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
@@ -1459,7 +1468,7 @@ If TEST-MODE is non-nil, clear `helm-candidate-cache'."
 
       (setq helm-selection-overlay
             (make-overlay (point-min) (point-min) (get-buffer buffer)))
-      (overlay-put helm-selection-overlay 'face helm-selection-face))
+      (overlay-put helm-selection-overlay 'face 'helm-selection))
 
   (cond (helm-enable-shortcuts
          (setq helm-shortcut-keys
@@ -1488,7 +1497,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
         (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
 
 
-;; (@* "Core: clean up")
+;; Core: clean up
 ;;; TODO move
 (defun helm-cleanup ()
   "Clean up the mess when helm exit or quit."
@@ -1525,7 +1534,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
         (delete-minibuffer-contents)))))
 
 
-;; (@* "Core: input handling")
+;; Core: input handling
 (defun helm-check-minibuffer-input ()
   "Extract input string from the minibuffer and check if it needs to be handled."
   (let ((delay (with-current-buffer helm-buffer
@@ -1553,7 +1562,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
     (helm-update)))
 
 
-;; (@* "Core: source compiler")
+;; Core: source compiler
 (defvar helm-compile-source-functions-default helm-compile-source-functions
   "Plug-ins this file provides.")
 (defun helm-compile-sources (sources funcs)
@@ -1569,7 +1578,7 @@ Helm plug-ins are realized by this function."
    sources))
 
 
-;; (@* "Core: plug-in attribute documentation hack")
+;; Core: plug-in attribute documentation hack
 
 ;; `helm-document-attribute' is public API.
 (defadvice documentation-property (after helm-document-attribute activate)
@@ -1585,7 +1594,7 @@ Helm plug-ins are realized by this function."
 ;; (progn (ad-disable-advice 'documentation-property 'after 'helm-document-attribute) (ad-update 'documentation-property))
 
 
-;; (@* "Core: all candidates")
+;; Core: all candidates
 (defun helm-process-delayed-init (source)
   "Initialize delayed SOURCE."
   (let ((name (assoc-default 'name source)))
@@ -1637,7 +1646,7 @@ Cache the candidates if there is not yet a cached value."
              candidates)))))
 
 
-;;; (@* "Core: candidate transformers")
+;;; Core: candidate transformers
 (defun helm-transform-mapcar (function args)
   "`mapcar' for candidate-transformer.
 
@@ -1695,7 +1704,7 @@ This happen if PROCESS-P is non-nil."
    source))
 
 
-;; (@* "Core: narrowing candidates")
+;; Core: narrowing candidates
 (defun helm-candidate-number-limit (source)
   "Apply candidate-number-limit attribute value.
 This overhide variable `helm-candidate-number-limit'.
@@ -1865,7 +1874,7 @@ when emacs is idle for `helm-idle-delay'."
       (helm-log-run-hook 'helm-after-update-hook))))
 
 
-;; (@* "Core: *helm* buffer contents")
+;; Core: *helm* buffer contents
 (defvar helm-input-local nil)
 (defvar helm-process-delayed-sources-timer nil)
 (defun helm-update (&optional preselect)
@@ -2038,17 +2047,17 @@ after the source name by overlay."
       (overlay-put (make-overlay (point-at-bol) (point-at-eol))
                    'display display-string))
     (insert "\n")
-    (put-text-property start (point) 'face helm-header-face)))
+    (put-text-property start (point) 'face 'helm-source-header)))
 
 (defun helm-insert-candidate-separator ()
   "Insert separator of candidates into the helm buffer."
-  (insert helm-candidate-separator)
+  (insert (propertize helm-candidate-separator 'face 'helm-separator))
   (put-text-property (point-at-bol)
                      (point-at-eol) 'helm-candidate-separator t)
   (insert "\n"))
 
 
-;; (@* "Core: async process")
+;; Core: async process
 (defun helm-output-filter (process string)
   "From PROCESS process output STRING."
   (helm-output-filter-1 (assoc process helm-async-processes) string))
@@ -2116,7 +2125,7 @@ after the source name by overlay."
   (delete-process process))
 
 
-;; (@* "Core: action")
+;; Core: action
 (defun helm-execute-selection-action (&optional
                                         selection action
                                         preserve-saved-action)
@@ -2192,7 +2201,7 @@ If action buffer is selected, back to the helm buffer."
     (helm-initialize-overlays helm-action-buffer)))
 
 
-;; (@* "Core: selection")
+;; Core: selection
 (defun helm-move-selection-common (move-func unit direction)
   "Move the selection marker to a new position wit function MOVE-FUNC.
 It is determined by UNIT and DIRECTION."
@@ -2511,7 +2520,7 @@ If action buffer is displayed, kill it."
   (get-text-property (point-at-bol) 'helm-candidate-separator))
 
 
-;; (@* "Core: help")
+;; Core: help
 (defun helm-help-internal (bufname insert-content-fn)
   "Show long message during `helm' session in BUFNAME.
 INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
@@ -2565,7 +2574,7 @@ to a list of forms.\n\n")
   (message "Calculating all helm-related values...Done"))
 
 
-;; (@* "Core: misc")
+;; Core: misc
 (defun helm-kill-buffer-hook ()
   "Remove tick entry from `helm-tick-hash' when killing a buffer."
   (loop for key being the hash-keys in helm-tick-hash
@@ -2654,7 +2663,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
 
 ;;; Plugins
 ;;
-;; (@* "Built-in plug-in: type")
+;; Built-in plug-in: type
 (defun helm-compile-source--type (source)
   (helm-aif (assoc-default 'type source)
       (append source (assoc-default it helm-type-attributes) nil)
@@ -2681,7 +2690,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
                   (mapconcat (lambda (sym) (get sym 'helm-typeattrdoc))
                              helm-types "\n")))))
 
-;; (@* "Built-in plug-in: dummy")
+;; Built-in plug-in: dummy
 (defun helm-dummy-candidate (candidate source)
   "Use `helm-pattern' as CANDIDATE in SOURCE."
   ;; `source' is defined in filtered-candidate-transformer
@@ -2698,7 +2707,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
                 (volatile)))
       source))
 
-;; (@* "Built-in plug-in: disable-shortcuts")
+;; Built-in plug-in: disable-shortcuts
 (defvar helm-orig-enable-shortcuts nil)
 (defun helm-save-enable-shortcuts ()
   (helm-once
@@ -2718,7 +2727,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
               source)
       source))
 
-;; (@* "Built-in plug-in: candidates-in-buffer")
+;; Built-in plug-in: candidates-in-buffer
 (defun helm-candidates-in-buffer ()
   "Get candidates from the candidates buffer according to `helm-pattern'.
 
@@ -2932,7 +2941,7 @@ Acceptable values of CREATE-OR-BUFFER:
     source))
 
 
-;; (@* "Utility: resplit helm window")
+;; Utility: resplit helm window
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
@@ -2948,7 +2957,7 @@ Acceptable values of CREATE-OR-BUFFER:
                           (split-window-horizontally)))
        helm-buffer))))
 
-;; (@* "Utility: Resize helm window.")
+;; Utility: Resize helm window.
 (defun helm-enlarge-window-1 (n)
   "Enlarge or narrow helm window.
 If N is positive enlarge, if negative narrow."
@@ -2967,7 +2976,7 @@ If N is positive enlarge, if negative narrow."
   (interactive)
   (helm-enlarge-window-1 1))
 
-;; (@* "Utility: select another action by key")
+;; Utility: select another action by key
 (defun helm-select-nth-action (n)
   "Select the N nth action for the currently selected candidate."
   (setq helm-saved-selection (helm-get-selection))
@@ -3011,7 +3020,7 @@ Otherwise goto the end of minibuffer."
       (helm-select-nth-action 1)
       (end-of-line)))
 
-;; (@* "Utility: Persistent Action")
+;; Utility: Persistent Action
 (defmacro with-helm-display-same-window (&rest body)
   "Execute BODY in the window used for persistent action.
 Make `pop-to-buffer' and `display-buffer' display in the same window."
@@ -3103,18 +3112,7 @@ second argument of `display-buffer'."
   (helm-scroll-other-window-base 'scroll-down))
 
 
-;; (@* "Utility: Visible Mark")
-(defface helm-visible-mark
-    '((((min-colors 88) (background dark))
-       (:background "green1" :foreground "black"))
-      (((background dark)) (:background "green" :foreground "black"))
-      (((min-colors 88)) (:background "green1"))
-      (t (:background "green")))
-  "Face for visible mark."
-  :group 'helm)
-
-(defvar helm-visible-mark-face 'helm-visible-mark)
-(defvar helm-visible-mark-overlays nil)
+;; Utility: Visible Mark
 
 (defun helm-clear-visible-mark ()
   (with-current-buffer (helm-buffer-get)
@@ -3141,7 +3139,7 @@ second argument of `display-buffer'."
 
 (defun helm-make-visible-mark ()
   (let ((o (make-overlay (point-at-bol) (1+ (point-at-eol)))))
-    (overlay-put o 'face   helm-visible-mark-face)
+    (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
     (overlay-put o 'real   (helm-get-selection))
@@ -3314,7 +3312,7 @@ If PREV is non-nil move to precedent."
   (interactive)
   (helm-next-visible-mark t))
 
-;; (@* "Utility: Selection Paste")
+;; Utility: Selection Paste
 (defun helm-yank-selection ()
   "Set minibuffer contents to current selection."
   (interactive)
@@ -3331,7 +3329,7 @@ You can paste it by typing \\[yank]."
    (helm-get-selection nil t)))
 
 
-;; (@* "Utility: Automatical execution of persistent-action")
+;; Utility: Automatical execution of persistent-action
 (add-to-list 'minor-mode-alist '(helm-follow-mode " AFollow"))
 (defun helm-follow-mode ()
   "If this mode is on, persistent action is executed everytime the cursor is moved."
@@ -3355,42 +3353,7 @@ This happen after `helm-input-idle-delay' secs."
          (helm-execute-persistent-action))))
 
 
-;; (@* "Utility: Migrate `helm-sources' to my-helm command")
-(defun helm-migrate-sources ()
-  "Help to migrate to new `helm' way."
-  (interactive)
-  (with-current-buffer (get-buffer-create "*helm migrate*")
-    (erase-buffer)
-    (insert (format "\
-Setting `helm-sources' directly is not good because
-`helm' is not for one command.  For now, interactive use of
-`helm' (M-x helm) is only for demonstration purpose.
-So you should define commands calling `helm'.
-I help you to migrate to the new way.
-
-The code below is automatically generated from current
-`helm-sources' value. You can use the `my-helm' command
-now!
-
-Copy and paste it to your .emacs. Then substitute `my-helm'
-for `helm' bindings in all `define-key', `local-set-key' and
-`global-set-key' calls.
-
-\(defun my-helm ()
-  \"Helm command for you.
-
-It is automatically generated by `helm-migrate-sources'.\"
-  (interactive)
-  (helm-other-buffer
-    '%S
-    \"*my-helm*\"))
-" helm-sources))
-    (eval-last-sexp nil)
-    (substitute-key-definition 'helm 'my-helm global-map)
-    (pop-to-buffer (current-buffer))))
-
-
-;; (@* "Compatibility")
+;; Compatibility
 
 ;; Copied assoc-default from XEmacs version 21.5.12
 (unless (fboundp 'assoc-default)
@@ -3441,7 +3404,7 @@ buffer as BUFFER."
           (buffer-modified-tick)))))
 
 
-;; (@* "CUA workaround")
+;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
   (ignore-errors ad-do-it))
 
@@ -3450,7 +3413,7 @@ buffer as BUFFER."
       (ignore-errors ad-do-it)
       ad-do-it))
 
-;;(@* "Attribute Documentation")
+;; Attribute Documentation
 (defun helm-describe-helm-attribute (helm-attribute)
   "Display the full documentation of HELM-ATTRIBUTE.
 HELM-ATTRIBUTE should be a symbol."
@@ -3785,7 +3748,7 @@ HELM-ATTRIBUTE should be a symbol."
   If not present, `helm-help-message' value will be used.")
 
 
-;; (@* "Bug Report")
+;; Bug Report
 (defvar helm-maintainer-mail-address "emacs-helm@googlegroups.com")
 
 (defvar helm-bug-report-salutation
@@ -3865,7 +3828,7 @@ Given pseudo `helm-sources' and `helm-pattern', returns list like
       (helm-cleanup))))
 
 
-;; (@* "Unit Tests")
+;; Unit Tests
 ;; See developer-tools/unit-test-helm.el
 
 (provide 'helm)
@@ -3874,7 +3837,6 @@ Given pseudo `helm-sources' and `helm-pattern', returns list like
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
-;; generated-autoload-file: "helm-config.el"
 ;; End:
 
 ;;; helm.el ends here
