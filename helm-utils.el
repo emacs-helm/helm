@@ -46,6 +46,11 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'float)
 
+(defface helm-overlay-line-face
+    '((t (:background "IndianRed4" :underline t)))
+  "Face for source header in the helm buffer."
+  :group 'helm-utils)
+
 
 ;;; compatibility
 ;;
@@ -424,7 +429,7 @@ Useful in dired buffers when there is inserted subdirs."
 ;;; Persistent Action Helpers
 ;;
 ;;
-(defvar helm-match-line-overlay-face nil)
+;; Internal
 (defvar helm-match-line-overlay nil)
 
 (defun helm-match-line-color-current-line (&optional start end buf face rec)
@@ -436,14 +441,12 @@ Useful in dired buffers when there is inserted subdirs."
         (setq helm-match-line-overlay (apply 'make-overlay args))
         (apply 'move-overlay helm-match-line-overlay args)))
   (overlay-put helm-match-line-overlay
-               'face (or face helm-match-line-overlay-face))
+               'face (or face 'helm-overlay-line-face))
   (when rec
     (goto-char start)
     (recenter)))
 
 (defalias 'helm-persistent-highlight-point 'helm-match-line-color-current-line)
-
-(setq helm-match-line-overlay-face 'helm-overlay-line-face)
 
 (defun helm-match-line-cleanup ()
   (when helm-match-line-overlay

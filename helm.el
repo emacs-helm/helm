@@ -130,7 +130,7 @@
   "Face for candidate number in mode-line." :group 'helm)
 
 (defface helm-selection
-    '((t (:inherit highlight)))
+    '((t (:inherit mode-line-highlight)))
   "Face for currently selected item in the helm buffer."
   :group 'helm)
 
