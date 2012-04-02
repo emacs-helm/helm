@@ -478,8 +478,8 @@ Otherwise your command will be called many times like this:
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
-    "String displayed in mode-line in `helm-c-source-buffers-list'"))
+\\[helm-select-3rd-action]:NthAct")
+  "String displayed in mode-line in `helm-c-source-buffers-list'")
 
 (defvar helm-occur-mode-line "\
 \\<helm-map>\
