@@ -388,106 +388,107 @@ Otherwise your command will be called many times like this:
 ;;
 ;;
 (defvar helm-buffer-mode-line-string
-  '("Buffer(s)"
-    "\\<helm-c-buffer-map>\
-\\[helm-c-buffer-help]:Help, \
+  '("Buffer(s)" "\
+\\<helm-c-buffer-map>\
+\\[helm-c-buffer-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport."
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-c-source-buffers-list'"))
 
-(defvar helm-ff-mode-line-string
-  "\\<helm-find-files-map>\
-\\[helm-ff-help]:Help, \
-\\[helm-send-bug-report-from-helm]:BugReport, \
+(defvar helm-ff-mode-line-string "\
+\\<helm-find-files-map>\
+\\[helm-ff-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts, \
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-source-find-files'")
 
-(defvar helm-read-file-name-mode-line-string
-  "\\<helm-c-read-file-map>\
-\\[helm-read-file-name-help]:Help, \
+(defvar helm-read-file-name-mode-line-string "\
+\\<helm-c-read-file-map>\
+\\[helm-read-file-name-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-source-find-files'")
 
-(defvar helm-generic-file-mode-line-string
-  "\\<helm-generic-files-map>\
-\\[helm-generic-file-help]:Help, \
+(defvar helm-generic-file-mode-line-string "\
+\\<helm-generic-files-map>\
+\\[helm-generic-file-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport."
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in Locate.")
 
-(defvar helm-grep-mode-line-string
-  "\\<helm-c-grep-map>\
-\\[helm-grep-help]:Help,\
+(defvar helm-grep-mode-line-string"\
+\\<helm-c-grep-map>\
+\\[helm-grep-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport."
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-do-grep'.")
 
-(defvar helm-pdfgrep-mode-line-string
-  "\\<helm-c-pdfgrep-map>\
-\\[helm-pdfgrep-help]:Help,\
+(defvar helm-pdfgrep-mode-line-string "\
+\\<helm-c-pdfgrep-map>\
+\\[helm-pdfgrep-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport."
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-do-pdfgrep'.")
 
-(defvar helm-etags-mode-line-string
-  "\\<helm-c-etags-map>\
-\\[helm-etags-help]:Help,\
+(defvar helm-etags-mode-line-string "\
+\\<helm-c-etags-map>\
+\\[helm-etags-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport."
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-etags-select'.")
 
-
-(defvar helm-c-ucs-mode-line-string
-  "\\<helm-c-ucs-map>\
-\\[helm-c-ucs-help]:Help, \
+(defvar helm-c-ucs-mode-line-string "\
+\\<helm-c-ucs-map>\
+\\[helm-c-ucs-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct."
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-ucs'.")
 
 (defvar helm-bookmark-mode-line-string
-  '("Bookmark(s)"
-    "\\<helm-c-bookmark-map>\
-\\[helm-c-bookmark-help]:Help, \
+  '("Bookmark(s)" "\
+\\<helm-c-bookmark-map>\
+\\[helm-c-bookmark-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport."
-    "String displayed in mode-line in `helm-c-source-buffers-list'"))
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct")
+  "String displayed in mode-line in `helm-c-source-buffers-list'")
 
-(defvar helm-occur-mode-line
-  "\\<helm-map>\
-\\[helm-help]:Help,\
-\\<helm-occur-map>\
-\\[helm-occur-run-query-replace-regexp]:Query replace regexp,\
+(defvar helm-occur-mode-line "\
 \\<helm-map>\
-\\[helm-select-action]:Acts,\
-\\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct,\
-\\[helm-send-bug-report-from-helm]:BugReport.")
+\\[helm-help]:Help \
+\\<helm-occur-map>\
+\\[helm-occur-run-query-replace-regexp]:Query replace regexp \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct")
 
 (provide 'helm-help)
 
