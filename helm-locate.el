@@ -124,6 +124,16 @@ See `helm-locate-with-db' and `helm-locate'."
                            x)))))
    init))
 
+(defun helm-locate-set-command ()
+  "Setup `helm-c-locate-command' if not already defined."
+  (unless helm-c-locate-command
+    (setq helm-c-locate-command
+          (case system-type
+            ('gnu/linux "locate -i -r %s")
+            ('berkeley-unix "locate -i %s")
+            ('windows-nt "es -i -r %s")
+            (t "locate %s")))))
+
 (defun helm-locate-with-db (&optional db initial-input)
   "Run locate -d DB.
 If DB is not given or nil use locate without -d option.
@@ -131,13 +141,7 @@ Argument DB can be given as a string or list of db files.
 Argument INITIAL-INPUT is a string to use as initial-input.
 See also `helm-locate'."
   (when (and db (stringp db)) (setq db (list db)))
-  (unless helm-c-locate-command
-    (setq helm-c-locate-command
-          (case system-type
-            ('gnu/linux "locate -i -r %s")
-            ('berkeley-unix "locate -i %s")
-            ('windows-nt "es -i -r %s")
-            (t "locate %s"))))
+  (helm-locate-set-command)
   (let ((helm-c-locate-command
          (if db
              (replace-regexp-in-string
@@ -176,6 +180,7 @@ See also `helm-locate'."
 
 (defvar helm-c-source-locate
   `((name . "Locate")
+    (init . helm-locate-set-command)
     (candidates . helm-c-locate-init)
     (type . file)
     (requires-pattern . 3)
