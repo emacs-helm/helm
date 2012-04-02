@@ -350,7 +350,8 @@ If you prefer scrolling line by line, set this value to 1.")
 It is `helm-default-display-buffer' by default,
 which affects `helm-samewindow'.")
 
-(defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:help \
+(defvar helm-mode-line-string
+  "\\<helm-map>\\[helm-help]:Help \
 \\[helm-select-action]:Acts \
 \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
@@ -2240,7 +2241,7 @@ It is determined by UNIT and DIRECTION."
               (:eval (helm-show-candidate-number
                       (when (listp helm-mode-line-string)
                         (car helm-mode-line-string))))
-              " " helm-mode-line-string-real "-%-")
+              " " helm-mode-line-string-real " -%-")
             helm-mode-line-string-real
             (substitute-command-keys (if (listp helm-mode-line-string)
                                          (cadr helm-mode-line-string)
