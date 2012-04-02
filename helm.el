@@ -353,7 +353,7 @@ which affects `helm-samewindow'.")
 (defvar helm-mode-line-string "\
 \\<helm-map>\
 \\[helm-help]:Help \
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"

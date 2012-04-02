@@ -394,7 +394,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-buffer-map>\
 \\[helm-c-buffer-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -404,7 +404,7 @@ Otherwise your command will be called many times like this:
 \\<helm-find-files-map>\
 \\[helm-ff-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -414,7 +414,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-read-file-map>\
 \\[helm-read-file-name-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -424,7 +424,7 @@ Otherwise your command will be called many times like this:
 \\<helm-generic-files-map>\
 \\[helm-generic-file-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -434,7 +434,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-grep-map>\
 \\[helm-grep-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -444,7 +444,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-pdfgrep-map>\
 \\[helm-pdfgrep-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -454,7 +454,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-etags-map>\
 \\[helm-etags-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -464,7 +464,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-ucs-map>\
 \\[helm-c-ucs-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -475,7 +475,7 @@ Otherwise your command will be called many times like this:
 \\<helm-c-bookmark-map>\
 \\[helm-c-bookmark-help]:Help \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
@@ -487,7 +487,7 @@ Otherwise your command will be called many times like this:
 \\<helm-occur-map>\
 \\[helm-occur-run-query-replace-regexp]:Query replace regexp \
 \\<helm-map>\
-\\[helm-select-action]:Acts \
+\\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
