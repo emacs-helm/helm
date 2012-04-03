@@ -34,7 +34,7 @@
   "W3m related Applications and libraries for Helm."
   :group 'helm)
 
-(defface helm-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
+(defface helm-w3m-bookmarks '((t (:foreground "cyan1" :underline t)))
   "Face for w3m bookmarks" :group 'helm-w3m)
 
 
@@ -94,7 +94,7 @@ http://emacs-w3m.namazu.org/")
 (defun helm-c-highlight-w3m-bookmarks (bookmarks source)
   (loop for i in bookmarks
         collect (propertize
-                 i 'face 'helm-w3m-bookmarks-face
+                 i 'face 'helm-w3m-bookmarks
                  'help-echo (helm-c-w3m-bookmarks-get-value i))))
 
 
