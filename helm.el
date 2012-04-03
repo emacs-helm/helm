@@ -107,15 +107,19 @@
 ;;
 ;;
 (defface helm-source-header
-    '((t (:background "#22083397778B" :foreground "white" :underline t)))
+    '((t (:background "#22083397778B"
+          :foreground "white"
+          :underline t)))
   "Face for source header in the helm buffer."
   :group 'helm)
 
 (defface helm-visible-mark
     '((((min-colors 88) (background dark))
        (:background "green1" :foreground "black"))
-      (((background dark)) (:background "green" :foreground "black"))
-      (((min-colors 88)) (:background "green1"))
+      (((background dark))
+       (:background "green" :foreground "black"))
+      (((min-colors 88))
+       (:background "green1"))
       (t (:background "green")))
   "Face for visible mark."
   :group 'helm)
@@ -130,7 +134,7 @@
   "Face for candidate number in mode-line." :group 'helm)
 
 (defface helm-selection
-    '((t (:inherit mode-line-highlight)))
+    '((t (:background "ForestGreen" :underline t)))
   "Face for currently selected item in the helm buffer."
   :group 'helm)
 

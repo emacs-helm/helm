@@ -216,7 +216,7 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :group 'helm-files)
 
 (defface helm-ff-file
-    '((t (:foreground "CadetBlue" :underline t)))
+    '((t (:inherit font-lock-builtin-face)))
   "*Face used for file names in `helm-find-files'."
   :group 'helm-files)
 
