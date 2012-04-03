@@ -17,9 +17,10 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-utils)
-(eval-when-compile (require 'cl))
+(require 'helm-adaptative)
 ;; Some users have the emacs-w3m library in load-path
 ;; without having the w3m executable :-;
 ;; So check if w3m program is present before trying to load

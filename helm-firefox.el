@@ -19,7 +19,7 @@
 (eval-when-compile (require 'cl))
 (require 'helm)
 (require 'helm-utils)
-
+(require 'helm-adaptative)
 ;;
 ;; You will have to set firefox to import bookmarks in his html file bookmarks.html.
 ;; (only for firefox versions >=3)
