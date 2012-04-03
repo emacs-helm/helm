@@ -36,7 +36,7 @@ Set it to 0 to disable requires-pattern in `helm-M-x'."
 ;;; Faces
 ;;
 ;;
-(defface helm-M-x-key-face '((t (:foreground "orange" :underline t)))
+(defface helm-M-x-key '((t (:foreground "orange" :underline t)))
   "*Face used in helm-M-x to show keybinding."
   :group 'helm-command)
 
@@ -87,12 +87,12 @@ Show global bindings and local bindings according to current `major-mode'."
                        (format "%s (%s)"
                                cand (propertize
                                      local-key
-                                     'face 'helm-M-x-key-face)))
+                                     'face 'helm-M-x-key)))
                       ((string-match "^M-x" key) cand)
                       (t (format "%s (%s)"
                                  cand (propertize
                                        key
-                                       'face 'helm-M-x-key-face))))
+                                       'face 'helm-M-x-key))))
                 cand) into ls
           finally return
           (sort ls #'(lambda (x y) (string-lessp (car x) (car y)))))))
