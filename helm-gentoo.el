@@ -29,7 +29,7 @@
   "Predefined configurations for `helm.el'."
   :group 'helm)
 
-(defface helm-gentoo-match-face '((t (:foreground "red")))
+(defface helm-gentoo-match '((t (:foreground "red")))
   "Face for helm-gentoo installed packages."
   :group 'traverse-faces)
 
@@ -228,7 +228,7 @@
   "Highlight all installed package."
   (loop for i in eix
         if (member i helm-c-cache-world)
-        collect (propertize i 'face 'helm-gentoo-match-face)
+        collect (propertize i 'face 'helm-gentoo-match)
         else
         collect i))
 
@@ -236,7 +236,7 @@
   (let ((local-uses (helm-c-gentoo-get-local-use)))
     (loop for i in use-flags
           if (member i local-uses)
-          collect (propertize i 'face 'helm-gentoo-match-face)
+          collect (propertize i 'face 'helm-gentoo-match)
           else
           collect i)))
 

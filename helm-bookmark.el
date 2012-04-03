@@ -28,7 +28,7 @@
   "Predefined configurations for `helm.el'."
   :group 'helm)
 
-(defface helm-bookmarks-su-face
+(defface helm-bookmarks-su
     '((t (:foreground "red")))
   "Face for su/sudo bookmarks."
   :group 'helm-bookmark)
@@ -149,7 +149,7 @@
 
 (defun helm-c-highlight-not-logged (files source)
   (loop for i in files
-        collect (propertize i 'face 'helm-bookmarks-su-face)))
+        collect (propertize i 'face 'helm-bookmarks-su)))
 
 (defun helm-c-highlight-bookmark (bookmarks source)
   "Used as `candidate-transformer' to colorize bookmarks.
