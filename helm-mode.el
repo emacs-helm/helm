@@ -607,7 +607,6 @@ Keys description:
            `(((name . ,(format "%s History" name))
               (header-name . (lambda (name)
                                (concat name helm-c-find-files-doc-header)))
-              (disable-shortcuts)
               (mode-line . helm-read-file-name-mode-line-string)
               (candidates . hist)
               (persistent-action . ,persistent-action)
@@ -619,8 +618,6 @@ Keys description:
               (init . (lambda ()
                         (setq helm-ff-auto-update-flag
                               helm-ff-auto-update-initial-value)))
-              ;; It is needed for filenames with capital letters
-              (disable-shortcuts)
               (mode-line . helm-read-file-name-mode-line-string)
               (candidates
                . (lambda ()

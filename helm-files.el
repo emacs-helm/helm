@@ -319,8 +319,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   `((name . "Find Files")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)))
@@ -1881,8 +1879,6 @@ Find inside `require' and `declare-function' sexp."
   `((name . "Write File")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
@@ -1899,8 +1895,6 @@ Find inside `require' and `declare-function' sexp."
   `((name . "Insert File")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
@@ -1920,8 +1914,6 @@ Find inside `require' and `declare-function' sexp."
   `((name . "Copy Files")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
@@ -1935,13 +1927,10 @@ Find inside `require' and `declare-function' sexp."
               . (lambda (candidate)
                   (helm-dired-action candidate :action 'copy :follow t)))))))
 
-
 (defvar  helm-c-source-rename-files
   `((name . "Rename Files")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
@@ -1959,8 +1948,6 @@ Find inside `require' and `declare-function' sexp."
   `((name . "Symlink Files")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
@@ -1974,13 +1961,10 @@ Find inside `require' and `declare-function' sexp."
          . (lambda (candidate)
              (helm-dired-action candidate :action 'relsymlink)))))))
 
-
 (defvar helm-c-source-hardlink-files
   `((name . "Hardlink Files")
     (header-name . (lambda (name)
                      (concat name helm-c-find-files-doc-header)))
-    ;; It is needed for filenames with capital letters
-    (disable-shortcuts)
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
@@ -2429,8 +2413,6 @@ Else return ACTIONS unmodified."
     (init . (lambda ()
               (require 'recentf)
               (or recentf-mode (recentf-mode 1))))
-    ;; Needed for filenames with capitals letters.
-    (disable-shortcuts)
     (candidates . recentf-list)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)

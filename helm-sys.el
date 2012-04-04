@@ -49,8 +49,7 @@
 (defun helm-c-top-init ()
   (with-current-buffer (helm-candidate-buffer 'global)
     (call-process-shell-command
-     (format helm-c-top-command
-             (- (frame-width) (if helm-enable-digit-shortcuts 4 0)))
+     (format helm-c-top-command (frame-width))
      nil (current-buffer))))
 
 (defun helm-c-top-display-to-real (line)
@@ -123,7 +122,6 @@
   "Preconfigured `helm' for top command."
   (interactive)
   (let ((helm-samewindow t)
-        (helm-enable-shortcuts)
         (helm-display-function 'helm-default-display-buffer)
         (helm-candidate-number-limit 9999))
     (save-window-excursion

@@ -43,17 +43,6 @@
     (define-key map (kbd "<right>")         'helm-next-source)
     (define-key map (kbd "<left>")          'helm-previous-source)
     (define-key map (kbd "<RET>")           'helm-exit-minibuffer)
-    (define-key map (kbd "C-1")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-2")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-3")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-4")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-5")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-6")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-7")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-8")             'helm-select-with-digit-shortcut)
-    (define-key map (kbd "C-9")             'helm-select-with-digit-shortcut)
-    (loop for c from ?A to ?Z do
-          (define-key map (make-string 1 c) 'helm-select-with-digit-shortcut))
     (define-key map (kbd "C-i")             'helm-select-action)
     (define-key map (kbd "C-z")             'helm-execute-persistent-action)
     (define-key map (kbd "C-e")             'helm-select-2nd-action-or-end-of-line)
@@ -151,32 +140,6 @@ This allows specifying common attributes for several sources.
 For example, sources which provide files can specify
 common attributes with a `file' type.")
 
-(defvaralias 'helm-enable-digit-shortcuts 'helm-enable-shortcuts
-  "Same as `helm-enable-shortcuts'.
-Alphabet shortcuts are available now in `helm-enable-shortcuts'.
-`helm-enable-digit-shortcuts' is retained for compatibility.")
-
-(defvar helm-enable-shortcuts nil
-  "*Whether to use digit/alphabet shortcut to select the first nine matches.
-If t then they can be selected using Ctrl+<number>.
-
-If 'prefix then they can be selected using <prefix-key> <alnum>.
-The prefix key is `helm-select-with-prefix-shortcut'.
-If the <prefix-key> is a letter, pressing twice inputs the letter itself.
-e.g.
- (setq helm-enable-shortcuts 'prefix)
- (define-key helm-map \"@\" 'helm-select-with-prefix-shortcut)
-
-If 'alphabet then they can be selected using Shift+<alphabet> (deprecated).
-It is not recommended because you cannot input capital letters in pattern.
-
-Keys (digit/alphabet) are listed in `helm-shortcut-keys-alist'.")
-
-(defvar helm-shortcut-keys-alist
-  '((alphabet . "asdfghjklzxcvbnmqwertyuiop")
-    (prefix   . "asdfghjklzxcvbnmqwertyuiop1234567890")
-    (t        . "123456789")))
-
 (defvar helm-display-source-at-screen-top t
   "*Display candidates at the top of screen.
 This happen when using `helm-next-source' and `helm-previous-source'.")
@@ -227,14 +190,8 @@ See also `helm-set-source-filter'.")
 (defvar helm-selection-overlay nil
   "Overlay used to highlight the currently selected item.")
 
-(defvar helm-digit-overlays nil
-  "Overlays for digit shortcuts.  See `helm-enable-shortcuts'.")
-
 (defvar helm-async-processes nil
   "List of information about asynchronous processes managed by helm.")
-
-(defvar helm-digit-shortcut-count 0
-  "Number of digit shortcuts shown in the helm buffer.")
 
 (defvar helm-before-initialize-hook nil
   "Run before helm initialization.
@@ -424,7 +381,6 @@ It is disabled by default because *Helm Log* grows quickly.")
 (defvar helm-cib-hash (make-hash-table :test 'equal))
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
-(defvar helm-shortcut-keys nil)
 (defvar helm-once-called-functions nil)
 (defvar helm-follow-mode nil)
 (defvar helm-let-variables nil)
@@ -673,7 +629,6 @@ If NO-UPDATE is non-nil, skip executing `helm-update'."
 (defvar helm-compile-source-functions
   '(helm-compile-source--type
     helm-compile-source--dummy
-    helm-compile-source--disable-shortcuts
     helm-compile-source--candidates-in-buffer)
   "Functions to compile elements of `helm-sources' (plug-in).")
 
@@ -1474,22 +1429,7 @@ If TEST-MODE is non-nil, clear `helm-candidate-cache'."
 
       (setq helm-selection-overlay
             (make-overlay (point-min) (point-min) (get-buffer buffer)))
-      (overlay-put helm-selection-overlay 'face 'helm-selection))
-
-  (cond (helm-enable-shortcuts
-         (setq helm-shortcut-keys
-               (assoc-default helm-enable-shortcuts helm-shortcut-keys-alist))
-         (unless helm-digit-overlays
-           (setq helm-digit-overlays
-                 (loop for key across helm-shortcut-keys
-                       for overlay = (make-overlay (point-min) (point-min)
-                                                   (get-buffer buffer))
-                       do (overlay-put overlay 'before-string
-                                       (format "%s - " (upcase (make-string 1 key))))
-                       collect overlay))))
-        (helm-digit-overlays
-         (mapc 'delete-overlay helm-digit-overlays)
-         (setq helm-digit-overlays nil))))
+      (overlay-put helm-selection-overlay 'face 'helm-selection)))
 
 (defun helm-hooks (setup-or-cleanup)
   "Add or remove hooks according to SETUP-OR-CLEANUP value.
@@ -1804,8 +1744,6 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
             (helm-get-cached-candidates source) matchfns limit))
        source))))
 
-;; (helm '(((name . "error")(candidates . (lambda () (hage))) (action . identity))))
-
 (defun helm-process-source (source)
   "Display matched results from SOURCE according to its settings."
   (helm-log-eval (assoc-default 'name source))
@@ -1820,29 +1758,15 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                       ,matches))))
           (helm-insert-header-from-source source)
           (if (not (assq 'multiline source))
-              (mapc 'helm-insert-match-with-digit-overlay matches)
+              (mapc #'(lambda (m)
+                        (helm-insert-match m 'insert source))
+                    matches)
               (let ((start (point)) separate)
                 (dolist (match matches)
                   (if separate
                       (helm-insert-candidate-separator)
-                      (setq separate t))
-                  (helm-insert-match-with-digit-overlay match))
+                      (setq separate t)))
                 (put-text-property start (point) 'helm-multiline t)))))))
-
-(defun helm-insert-match-with-digit-overlay (match)
-  (declare (special source))
-  (helm-put-digit-overlay-maybe)
-  (helm-insert-match match 'insert source))
-
-(defun helm-put-digit-overlay-maybe ()
-  (when (and helm-enable-shortcuts
-             (not (eq helm-digit-shortcut-count
-                      (length helm-digit-overlays))))
-    (move-overlay (nth helm-digit-shortcut-count
-                       helm-digit-overlays)
-                  (point-at-bol)
-                  (point-at-bol))
-    (incf helm-digit-shortcut-count)))
 
 (defun helm-process-source--direct-insert-match (source)
   "[EXPERIMENTAL] Insert candidates from `helm-candidate-buffer' in SOURCE."
@@ -1853,9 +1777,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
     (setq content-buf (helm-candidate-buffer))
     (unless (helm-empty-buffer-p content-buf)
       (helm-insert-header-from-source source)
-      (insert-buffer-substring content-buf)
-      ;; TODO call helm-put-digit-overlay-maybe with loop
-      )))
+      (insert-buffer-substring content-buf))))
 
 (defun helm-process-delayed-sources (delayed-sources &optional preselect)
   "Process helm DELAYED-SOURCES.
@@ -1889,13 +1811,10 @@ Argument PRESELECT is a string or regexp used to move selection to a particular
 place once updating is done.  It should be used on single source because search
 is done on whole `helm-buffer' and not on current source."
   (helm-log "start update")
-  (setq helm-digit-shortcut-count 0)
   (helm-kill-async-processes)
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
     (erase-buffer)
-    (when helm-enable-shortcuts
-      (mapc 'delete-overlay helm-digit-overlays))
     (let (delayed-sources
           normal-sources)
       (unwind-protect ; Process normal sources and store delayed one's.
@@ -2203,7 +2122,6 @@ If action buffer is selected, back to the helm buffer."
             (candidate-number-limit))))
     (set (make-local-variable 'helm-source-filter) nil)
     (set (make-local-variable 'helm-selection-overlay) nil)
-    (set (make-local-variable 'helm-digit-overlays) nil)
     (helm-initialize-overlays helm-action-buffer)))
 
 
@@ -2400,40 +2318,6 @@ to mark candidates."
 
 (defun helm-this-command-key ()
   (event-basic-type (elt (this-command-keys-vector) 0)))
-;; (progn (read-key-sequence "Key: ") (p (helm-this-command-key)))
-
-(defun helm-select-with-shortcut-internal (types get-key-func)
-  (if (memq helm-enable-shortcuts types)
-      (save-selected-window
-        (select-window (helm-window))
-        (let* ((key (funcall get-key-func))
-               (overlay (ignore-errors (nth (position key helm-shortcut-keys)
-                                            helm-digit-overlays))))
-          (if (not (and overlay (overlay-buffer overlay)))
-              (when (numberp key)
-                (select-window (minibuffer-window))
-                (self-insert-command 1))
-              (goto-char (overlay-start overlay))
-              (helm-mark-current-line)
-              (helm-exit-minibuffer))))
-      (self-insert-command 1)))
-
-(defun helm-select-with-prefix-shortcut ()
-  "Invoke default action with prefix shortcut."
-  (interactive)
-  (helm-select-with-shortcut-internal
-   '(prefix)
-   (lambda () (read-event "Select shortcut key: "))))
-
-(defun helm-select-with-digit-shortcut ()
-  "Invoke default action with digit/alphabet shortcut."
-  (interactive)
-  (helm-select-with-shortcut-internal
-   '(alphabet t) 'helm-this-command-key))
-
-;; (setq helm-enable-shortcuts 'prefix)
-;; (define-key helm-map "@" 'helm-select-with-prefix-shortcut)
-;; (define-key helm-map (kbd "<f18>") 'helm-select-with-prefix-shortcut)
 
 (defvar helm-exit-status 0
   "Flag to inform whether helm have exited or quitted.
@@ -2709,28 +2593,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
                 (accept-empty)
                 (match identity)
                 (filtered-candidate-transformer . helm-dummy-candidate)
-                (disable-shortcuts)
                 (volatile)))
-      source))
-
-;; Built-in plug-in: disable-shortcuts
-(defvar helm-orig-enable-shortcuts nil)
-(defun helm-save-enable-shortcuts ()
-  (helm-once
-   (lambda ()
-     (setq helm-orig-enable-shortcuts helm-enable-shortcuts
-           helm-enable-shortcuts nil))))
-
-(defun helm-compile-source--disable-shortcuts (source)
-  (if (assoc 'disable-shortcuts source)
-      (append `((init ,@(helm-mklist (assoc-default 'init source))
-                      helm-save-enable-shortcuts)
-                (resume ,@(helm-mklist (assoc-default 'resume source))
-                        helm-save-enable-shortcuts)
-                (cleanup ,@(helm-mklist (assoc-default 'cleanup source))
-                         (lambda () (setq helm-enable-shortcuts
-                                          helm-orig-enable-shortcuts))))
-              source)
       source))
 
 ;; Built-in plug-in: candidates-in-buffer
@@ -3710,11 +3573,6 @@ HELM-ATTRIBUTE should be a symbol."
 (helm-document-attribute 'accept-empty "optional"
   "  Pass empty string \"\" to action function.")
 
-(helm-document-attribute 'disable-shortcuts "optional"
-  "  Disable `helm-enable-shortcuts' in current `helm' session.
-
-  This attribute is implemented by plug-in.")
-
 (helm-document-attribute 'dummy "optional"
   "  Set `helm-pattern' to candidate. If this attribute is
   specified, The candidates attribute is ignored.
@@ -3771,7 +3629,6 @@ How to send a bug report:
 
 (defvar helm-no-dump-variables
   '(helm-candidate-buffer-alist
-    helm-digit-overlays
     helm-help-message
     helm-candidate-cache
     )
@@ -3815,7 +3672,6 @@ Given pseudo `helm-sources' and `helm-pattern', returns list like
   ((\"source name1\" (\"candidate1\" \"candidate2\"))
    (\"source name2\" (\"candidate3\" \"candidate4\")))"
   (let ((helm-test-mode t)
-        helm-enable-shortcuts
         helm-candidate-cache
         (helm-compile-source-functions compile-source-functions)
         helm-before-initialize-hook

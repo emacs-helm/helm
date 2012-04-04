@@ -160,7 +160,7 @@
 
 ;;;### (autoloads (helm-toggle-all-marks helm-unmark-all helm-mark-all
 ;;;;;;  helm-toggle-visible-mark helm-other-buffer helm-at-point)
-;;;;;;  "helm" "helm.el" (20345 62346))
+;;;;;;  "helm" "helm.el" (20347 59603))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-at-point "helm" "\
@@ -258,7 +258,7 @@ Contain also `helm-c-source-google-suggest'.
 
 ;;;### (autoloads (helm-c-pp-bookmarks helm-bookmarks helm-c-bookmark-run-delete
 ;;;;;;  helm-c-bookmark-run-jump-other-window) "helm-bookmark" "helm-bookmark.el"
-;;;;;;  (20345 62057))
+;;;;;;  (20347 17170))
 ;;; Generated autoloads from helm-bookmark.el
 
 (autoload 'helm-c-bookmark-run-jump-other-window "helm-bookmark" "\
@@ -385,8 +385,8 @@ Preconfigured `helm' for color.
 
 ;;;***
 
-;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20345
-;;;;;;  62057))
+;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20347
+;;;;;;  17170))
 ;;; Generated autoloads from helm-command.el
 
 (autoload 'helm-M-x "helm-command" "\
@@ -491,7 +491,7 @@ Preconfigured helm for eshell history.
 ;;;***
 
 ;;;### (autoloads (helm-calcul-expression helm-eval-expression-with-eldoc
-;;;;;;  helm-eval-expression) "helm-eval" "helm-eval.el" (20345 62057))
+;;;;;;  helm-eval-expression) "helm-eval" "helm-eval.el" (20347 59940))
 ;;; Generated autoloads from helm-eval.el
 
 (autoload 'helm-eval-expression "helm-eval" "\
@@ -540,7 +540,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20345 62057))
+;;;;;;  "helm-files" "helm-files.el" (20347 60168))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -774,7 +774,7 @@ Preconfigured `helm' for `recentf'.
 ;;;***
 
 ;;;### (autoloads (helm-firefox-bookmarks) "helm-firefox" "helm-firefox.el"
-;;;;;;  (20346 36689))
+;;;;;;  (20347 17170))
 ;;; Generated autoloads from helm-firefox.el
 
 (autoload 'helm-firefox-bookmarks "helm-firefox" "\
@@ -810,8 +810,8 @@ Preconfigured helm for `ucs-names' math symbols.
 
 ;;;***
 
-;;;### (autoloads (helm-gentoo) "helm-gentoo" "helm-gentoo.el" (20345
-;;;;;;  62057))
+;;;### (autoloads (helm-gentoo) "helm-gentoo" "helm-gentoo.el" (20347
+;;;;;;  17170))
 ;;; Generated autoloads from helm-gentoo.el
 
 (autoload 'helm-gentoo "helm-gentoo" "\
@@ -1030,7 +1030,7 @@ Preconfigured `helm' for `minibuffer-history'.
 
 ;;;***
 
-;;;### (autoloads (helm-mode) "helm-mode" "helm-mode.el" (20345 62143))
+;;;### (autoloads (helm-mode) "helm-mode" "helm-mode.el" (20347 60209))
 ;;; Generated autoloads from helm-mode.el
 
 (defvar helm-mode nil "\
@@ -1163,7 +1163,7 @@ First call open the kill-ring browser, next calls move to next line.
 ;;;***
 
 ;;;### (autoloads (helm-xrandr-set helm-list-emacs-process helm-top)
-;;;;;;  "helm-sys" "helm-sys.el" (20345 62057))
+;;;;;;  "helm-sys" "helm-sys.el" (20347 60250))
 ;;; Generated autoloads from helm-sys.el
 
 (autoload 'helm-top "helm-sys" "\
@@ -1198,7 +1198,7 @@ If tag file have been modified reinitialize cache.
 ;;;***
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
-;;;;;;  helm-test-sources) "helm-utils" "helm-utils.el" (20345 62685))
+;;;;;;  helm-test-sources) "helm-utils" "helm-utils.el" (20347 17170))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-test-sources "helm-utils" "\
@@ -1219,8 +1219,8 @@ Yank text at point in minibuffer.
 
 ;;;***
 
-;;;### (autoloads (helm-w3m-bookmarks) "helm-w3m" "helm-w3m.el" (20346
-;;;;;;  36681))
+;;;### (autoloads (helm-w3m-bookmarks) "helm-w3m" "helm-w3m.el" (20347
+;;;;;;  17170))
 ;;; Generated autoloads from helm-w3m.el
 
 (autoload 'helm-w3m-bookmarks "helm-w3m" "\
@@ -1266,8 +1266,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20346
-;;;;;;  36706 689088))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20347
+;;;;;;  60338 917013))
 
 ;;;***
 

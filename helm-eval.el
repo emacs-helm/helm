@@ -65,7 +65,6 @@ Should take one arg: the string to display."
 
 (defvar helm-c-source-evaluation-result
   '((name . "Evaluation Result")
-    (disable-shortcuts)
     (dummy)
     (multiline)
     (mode-line . "C-RET: nl-and-indent, tab: reindent, C-tab:complete, C-p/n: next/prec-line.")
