@@ -2137,7 +2137,7 @@ It is determined by UNIT and DIRECTION."
   (if helm-mode-line-string
       (setq mode-line-format
             '(" " mode-line-buffer-identification " "
-              (line-number-mode "L%l") " " (helm-follow-mode "(F) ")
+              (line-number-mode "L%l") " " (helm-follow-mode "(HF) ")
               (:eval (helm-show-candidate-number
                       (when (listp helm-mode-line-string)
                         (car helm-mode-line-string))))
@@ -3165,12 +3165,14 @@ You can paste it by typing \\[yank]."
    (helm-get-selection nil t)))
 
 
-;; Utility: Automatical execution of persistent-action
-(add-to-list 'minor-mode-alist '(helm-follow-mode " AFollow"))
+;;; Follow-mode: Automatical execution of persistent-action
+;;
+;;
 ;;;###autoload
-(defun helm-follow-mode ()
-  "If this mode is on, persistent action is executed everytime the cursor is moved."
-  (interactive)
+(define-minor-mode helm-follow-mode
+  "Execute persistent action everytime the cursor is moved when enabled."
+  :group 'helm
+  :init-value t
   (with-current-buffer helm-buffer
     (setq helm-follow-mode (not helm-follow-mode))
     (message "helm-follow-mode is %s"
