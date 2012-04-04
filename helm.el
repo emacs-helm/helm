@@ -319,25 +319,6 @@ If you prefer scrolling line by line, set this value to 1.")
 It is `helm-default-display-buffer' by default,
 which affects `helm-samewindow'.")
 
-(defvar helm-mode-line-string "\
-\\<helm-map>\
-\\[helm-help]:Help \
-\\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
-  "Help string displayed in mode-line in `helm'.
-It can be a string or a list of two args, in this case,
-first arg is a string that will be used as name for candidates number,
-second arg any string to display in mode line.
-If nil, use default `mode-line-format'.")
-
-(defvar helm-help-message
-  "\\<helm-map>The keys that are defined for `helm' are:
-       \\{helm-map}"
-  "Detailed help message string for `helm'.
-It also accepts function or variable symbol.")
-
 (defvar helm-source-in-each-line-flag nil
   "Non-nil means add helm-source text-property in each candidate.
 experimental feature.")
@@ -1104,6 +1085,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 ;;; Helm resume
 ;;
 ;;
+;;;###autoload
 (defun* helm-resume (&optional
                      (any-buffer helm-last-buffer)
                      buffer-pattern (any-resume t))
@@ -1121,9 +1103,7 @@ helm buffers.  i.e choose among various helm sessions."
    :resume any-resume
    :buffer any-buffer))
 
-;;; rubikitch: experimental
-;;; I use this and check it whether I am convenient.
-;;; I may introduce an option to control the behavior.
+;;;###autoload
 (defun* helm-resume-window-only (&optional
                                  (any-buffer helm-last-buffer)
                                  buffer-pattern)
@@ -1752,7 +1732,8 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                 (dolist (match matches)
                   (if separate
                       (helm-insert-candidate-separator)
-                      (setq separate t)))
+                      (setq separate t))
+                  (helm-insert-match match 'insert source))
                 (put-text-property start (point) 'helm-multiline t)))))))
 
 (defun helm-process-source--direct-insert-match (source)
@@ -1862,6 +1843,7 @@ is done on whole `helm-buffer' and not on current source."
     (save-excursion (helm-log-run-hook 'helm-update-hook)))
   (helm-next-line))
 
+;;;###autoload
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
 If current source has `update' attribute, a function without argument,
@@ -2072,6 +2054,7 @@ Coerce source with coerce function."
       (cdar action)
       action))
 
+;;;###autoload
 (defun helm-select-action ()
   "Select an action for the currently selected candidate.
 If action buffer is selected, back to the helm buffer."
@@ -2178,6 +2161,7 @@ it is \"Candidate\(s\)\" by default."
            (or name "Candidate(s)"))
    'face 'helm-candidate-number))
 
+;;;###autoload
 (defun helm-previous-line ()
   "Move selection to the previous line."
   (interactive)
@@ -2196,6 +2180,7 @@ it is \"Candidate\(s\)\" by default."
              (forward-line 1)))))
    'line 'previous))
 
+;;;###autoload
 (defun helm-next-line ()
   "Move selection to the next line."
   (interactive)
@@ -2212,6 +2197,7 @@ it is \"Candidate\(s\)\" by default."
                   (goto-char header-pos))))))
    'line 'next))
 
+;;;###autoload
 (defun helm-previous-page ()
   "Move selection back with a pageful."
   (interactive)
@@ -2222,6 +2208,7 @@ it is \"Candidate\(s\)\" by default."
        (beginning-of-buffer (goto-char (point-min)))))
    'page 'previous))
 
+;;;###autoload
 (defun helm-next-page ()
   "Move selection forward with a pageful."
   (interactive)
@@ -2232,6 +2219,7 @@ it is \"Candidate\(s\)\" by default."
        (end-of-buffer (goto-char (point-max)))))
    'page 'next))
 
+;;;###autoload
 (defun helm-beginning-of-buffer ()
   "Move selection at the top."
   (interactive)
@@ -2239,6 +2227,7 @@ it is \"Candidate\(s\)\" by default."
    (lambda () (goto-char (point-min)))
    'edge 'previous))
 
+;;;###autoload
 (defun helm-end-of-buffer ()
   "Move selection at the bottom."
   (interactive)
@@ -2246,6 +2235,7 @@ it is \"Candidate\(s\)\" by default."
    (lambda () (goto-char (point-max)))
    'edge 'next))
 
+;;;###autoload
 (defun helm-previous-source ()
   "Move selection to the previous source."
   (interactive)
@@ -2259,6 +2249,7 @@ it is \"Candidate\(s\)\" by default."
      (forward-line 1))
    'source 'previous))
 
+;;;###autoload
 (defun helm-next-source ()
   "Move selection to the next source."
   (interactive)
@@ -2313,6 +2304,8 @@ in special cases.
 See `helm-exit-minibuffer' and `helm-keyboard-quit'.")
 
 (defvar helm-minibuffer-confirm-state nil)
+
+;;;###autoload
 (defun helm-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting helm.
 It is similar to `minibuffer-complete-and-exit' adapted to helm.
@@ -2348,6 +2341,7 @@ don't exit and send message 'no match'."
     (setq minibuffer-completion-confirm
           helm-minibuffer-confirm-state)))
 
+;;;###autoload
 (defun helm-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
   (interactive)
@@ -2356,6 +2350,7 @@ don't exit and send message 'no match'."
   (setq helm-exit-status 0)
   (exit-minibuffer))
 
+;;;###autoload
 (defun helm-keyboard-quit ()
   "Quit minibuffer in helm.
 If action buffer is displayed, kill it."
@@ -2395,42 +2390,10 @@ If action buffer is displayed, kill it."
   (get-text-property (point-at-bol) 'helm-candidate-separator))
 
 
-;; Core: help
-(defun helm-help-internal (bufname insert-content-fn)
-  "Show long message during `helm' session in BUFNAME.
-INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
-  (save-window-excursion
-    (select-window (helm-window))
-    (delete-other-windows)
-    (switch-to-buffer (get-buffer-create bufname))
-    (erase-buffer)
-    (funcall insert-content-fn)
-    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
-    (setq cursor-type nil)
-    (goto-char 1)
-    (helm-help-event-loop)))
-
-(defun helm-help-event-loop ()
-  (ignore-errors
-    (loop for event = (read-event) do
-          (case event
-            ((?\C-v ? )  (scroll-up))
-            ((?\M-v ?b) (scroll-down))
-            (t (return))))))
-
-(defun helm-help ()
-  "Help of `helm'."
-  (interactive)
-  (helm-help-internal
-   " *Helm Help*"
-   (lambda ()
-     (insert (substitute-command-keys
-              (helm-interpret-value (or (assoc-default
-                                         'help-message
-                                         (helm-get-current-source))
-                                        helm-help-message))))
-     (org-mode))))
-
+;;; Debugging
+;;
+;;
+;;;###autoload
 (defun helm-debug-output ()
   "Show all helm-related variables at this time."
   (interactive)
@@ -2472,6 +2435,7 @@ to a list of forms.\n\n")
             (goto-char start))))
     (helm-mark-current-line)))
 
+;;;###autoload
 (defun helm-delete-current-selection ()
   "Delete the currently selected item."
   (interactive)
@@ -2529,6 +2493,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
     (helm-hooks 'cleanup)
     (run-with-idle-timer 0 nil 'helm-hooks 'setup)))
 
+;;;###autoload
 (defun helm-delete-minibuffer-contents ()
   "Same as `delete-minibuffer-contents' but this is a command."
   (interactive)
@@ -2709,7 +2674,9 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
          (if exit (return)))
        (delq nil matches)))))
 
-(defun helm-initial-candidates-from-candidate-buffer (endp get-line-fn limit search-from-end)
+(defun helm-initial-candidates-from-candidate-buffer (endp
+                                                      get-line-fn
+                                                      limit search-from-end)
   (delq nil (loop with next-line-fn =
                   (if search-from-end
                       (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
@@ -2796,6 +2763,7 @@ Acceptable values of CREATE-OR-BUFFER:
 
 
 ;; Utility: resplit helm window
+;;;###autoload
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
@@ -2820,11 +2788,13 @@ If N is positive enlarge, if negative narrow."
       (with-helm-window
         (enlarge-window n horizontal-p)))))
 
+;;;###autoload
 (defun helm-narrow-window ()
   "Narrow helm window."
   (interactive)
   (helm-enlarge-window-1 -1))
 
+;;;###autoload
 (defun helm-enlarge-window ()
   "Enlarge helm window."
   (interactive)
@@ -2850,21 +2820,25 @@ If N is positive enlarge, if negative narrow."
         (t
          (error "Error in `helm-select-nth-action'"))))
 
+;;;###autoload
 (defun helm-select-2nd-action ()
   "Select the 2nd action for the currently selected candidate."
   (interactive)
   (helm-select-nth-action 1))
 
+;;;###autoload
 (defun helm-select-3rd-action ()
   "Select the 3rd action for the currently selected candidate."
   (interactive)
   (helm-select-nth-action 2))
 
+;;;###autoload
 (defun helm-select-4th-action ()
   "Select the 4th action for the currently selected candidate."
   (interactive)
   (helm-select-nth-action 3))
 
+;;;###autoload
 (defun helm-select-2nd-action-or-end-of-line ()
   "Select the 2nd action for the currently selected candidate.
 This happen when point is at the end of minibuffer.
@@ -2886,6 +2860,7 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
 (defun helm-initialize-persistent-action ()
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
+;;;###autoload
 (defun* helm-execute-persistent-action (&optional (attr 'persistent-action) onewindow)
   "Perform the associated action ATTR without quitting helm.
 ATTR default is 'persistent-action', but it can be helm else.
@@ -2955,11 +2930,13 @@ second argument of `display-buffer'."
   (with-selected-window (helm-persistent-action-display-window)
     (funcall command helm-scroll-amount)))
 
+;;;###autoload
 (defun helm-scroll-other-window ()
   "Scroll other window (not *Helm* window) upward."
   (interactive)
   (helm-scroll-other-window-base 'scroll-up))
 
+;;;###autoload
 (defun helm-scroll-other-window-down ()
   "Scroll other window (not *Helm* window) downward."
   (interactive)
@@ -3074,8 +3051,10 @@ visible or invisible in all sources of current helm session"
         (helm-unmark-all)
         (helm-mark-all))))
 
+;;;###autoload
 (defun helm-display-all-visible-marks ()
-  "Show all `helm' visible marks strings."
+  "Show all `helm' visible marks strings.
+Only useful for debugging."
   (interactive)
   (with-helm-window
     (lexical-let ((overlays (reverse helm-visible-mark-overlays)))
@@ -3105,7 +3084,6 @@ It is analogous to `dired-get-marked-files'."
     (set (make-local-variable 'helm-marked-candidates) nil)))
 
 (add-hook 'helm-after-initialize-hook 'helm-reset-marked-candidates)
-;; (add-hook 'helm-after-action-hook 'helm-reset-marked-candidates)
 
 (defun helm-current-source-name= (name)
   (save-excursion
@@ -3149,6 +3127,7 @@ It is analogous to `dired-get-marked-files'."
                     return i))
           points))))
 
+;;;###autoload
 (defun helm-next-visible-mark (&optional prev)
   "Move next helm visible mark.
 If PREV is non-nil move to precedent."
@@ -3161,17 +3140,20 @@ If PREV is non-nil move to precedent."
                   prev)))
     (helm-mark-current-line)))
 
+;;;###autoload
 (defun helm-prev-visible-mark ()
   "Move previous helm visible mark."
   (interactive)
   (helm-next-visible-mark t))
 
 ;; Utility: Selection Paste
+;;;###autoload
 (defun helm-yank-selection ()
   "Set minibuffer contents to current selection."
   (interactive)
   (helm-set-pattern (helm-get-selection nil t)))
 
+;;;###autoload
 (defun helm-kill-selection-and-quit ()
   "Store current selection to kill ring.
 You can paste it by typing \\[yank]."
@@ -3185,6 +3167,7 @@ You can paste it by typing \\[yank]."
 
 ;; Utility: Automatical execution of persistent-action
 (add-to-list 'minor-mode-alist '(helm-follow-mode " AFollow"))
+;;;###autoload
 (defun helm-follow-mode ()
   "If this mode is on, persistent action is executed everytime the cursor is moved."
   (interactive)
@@ -3205,396 +3188,6 @@ This happen after `helm-input-idle-delay' secs."
        (helm-get-selection)
        (save-excursion
          (helm-execute-persistent-action))))
-
-
-;; Compatibility
-
-;; Copied assoc-default from XEmacs version 21.5.12
-(unless (fboundp 'assoc-default)
-  (defun assoc-default (key alist &optional test default)
-    "Find object KEY in a pseudo-alist ALIST.
-ALIST is a list of conses or objects.  Each element (or the element's car,
-if it is a cons) is compared with KEY by evaluating (TEST (car elt) KEY).
-If that is non-nil, the element matches;
-then `assoc-default' returns the element's cdr, if it is a cons,
-or DEFAULT if the element is not a cons.
-
-If no element matches, the value is nil.
-If TEST is omitted or nil, `equal' is used."
-    (let (found (tail alist) value)
-      (while (and tail (not found))
-        (let ((elt (car tail)))
-          (when (funcall (or test 'equal) (if (consp elt) (car elt) elt) key)
-            (setq found t value (if (consp elt) (cdr elt) default))))
-        (setq tail (cdr tail)))
-      value)))
-
-;; Function not available in XEmacs,
-(unless (fboundp 'minibuffer-contents)
-  (defun minibuffer-contents ()
-    "Return the user input in a minbuffer as a string.
-The current buffer must be a minibuffer."
-    (field-string (point-max)))
-
-  (defun delete-minibuffer-contents  ()
-    "Delete all user input in a minibuffer.
-The current buffer must be a minibuffer."
-    (delete-field (point-max))))
-
-;; Function not available in older Emacs (<= 22.1).
-(unless (fboundp 'buffer-chars-modified-tick)
-  (defun buffer-chars-modified-tick (&optional buffer)
-    "Return BUFFER's character-change tick counter.
-Each buffer has a character-change tick counter, which is set to the
-value of the buffer's tick counter (see `buffer-modified-tick'), each
-time text in that buffer is inserted or deleted.  By comparing the
-values returned by two individual calls of `buffer-chars-modified-tick',
-you can tell whether a character change occurred in that buffer in
-between these calls.  No argument or nil as argument means use current
-buffer as BUFFER."
-    (with-current-buffer (or buffer (current-buffer))
-      (if (listp buffer-undo-list)
-          (length buffer-undo-list)
-          (buffer-modified-tick)))))
-
-
-;; CUA workaround
-(defadvice cua-delete-region (around helm-avoid-cua activate)
-  (ignore-errors ad-do-it))
-
-(defadvice copy-region-as-kill (around helm-avoid-cua activate)
-  (if cua-mode
-      (ignore-errors ad-do-it)
-      ad-do-it))
-
-;; Attribute Documentation
-(defun helm-describe-helm-attribute (helm-attribute)
-  "Display the full documentation of HELM-ATTRIBUTE.
-HELM-ATTRIBUTE should be a symbol."
-  (interactive (list (intern
-                      (completing-read
-                       "Describe helm attribute: "
-                       (mapcar 'symbol-name helm-additional-attributes)
-                       nil t))))
-  (with-output-to-temp-buffer "*Help*"
-    (princ (get helm-attribute 'helm-attrdoc))))
-
-(helm-document-attribute 'name "mandatory"
-  "  The name of the source. It is also the heading which appears
-  above the list of matches from the source. Must be unique.")
-
-(helm-document-attribute 'header-name "optional"
-  "  A function returning the display string of the header. Its
-  argument is the name of the source. This attribute is useful to
-  add an additional information with the source name.")
-
-(helm-document-attribute 'candidates "mandatory if candidates-in-buffer attribute is not provided"
-  "  Specifies how to retrieve candidates from the source. It can
-  either be a variable name, a function called with no parameters
-  or the actual list of candidates.
-
-  The list must be a list whose members are strings, symbols
-  or (DISPLAY . REAL) pairs.
-
-  In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
-  in the Helm buffer, but the REAL one is used as action
-  argument when the candidate is selected. This allows a more
-  readable presentation for candidates which would otherwise be,
-  for example, too long or have a common part shared with other
-  candidates which can be safely replaced with an abbreviated
-  string for display purposes.
-
-  Note that if the (DISPLAY . REAL) form is used then pattern
-  matching is done on the displayed string, not on the real
-  value.
-
-  If the candidates have to be retrieved asynchronously (for
-  example, by an external command which takes a while to run)
-  then the function should start the external command
-  asynchronously and return the associated process object.
-  Helm will take care of managing the process (receiving the
-  output from it, killing it if necessary, etc.). The process
-  should return candidates matching the current pattern (see
-  variable `helm-pattern'.)
-
-  Note that currently results from asynchronous sources appear
-  last in the helm buffer regardless of their position in
-  `helm-sources'.")
-
-(helm-document-attribute 'action "mandatory if type attribute is not provided"
-  "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
-  FUNCTION is called with one parameter: the selected candidate.
-
-  An action other than the default can be chosen from this list
-  of actions for the currently selected candidate (by default
-  with TAB). The DISPLAY string is shown in the completions
-  buffer and the FUNCTION is invoked when an action is
-  selected. The first action of the list is the default.")
-
-(helm-document-attribute 'coerce "optional"
-  "  It's a function called with one argument: the selected candidate.
-
-  This function is intended for type convertion.
-  In normal case, the selected candidate (string) is passed to action function.
-  If coerce function is specified, it is called just before action function.
-
-  Example: converting string to symbol
-    (coerce . intern)")
-
-(helm-document-attribute 'type "optional if action attribute is provided"
-  "  Indicates the type of the items the source returns.
-
-  Merge attributes not specified in the source itself from
-  `helm-type-attributes'.
-
-  This attribute is implemented by plug-in.")
-
-(helm-document-attribute 'init "optional"
-  "  Function called with no parameters when helm is started. It
-  is useful for collecting current state information which can be
-  used to create the list of candidates later.
-
-  For example, if a source needs to work with the current
-  directory then it can store its value here, because later
-  helm does its job in the minibuffer and in the
-  `helm-buffer' and the current directory can be different
-  there.")
-
-(helm-document-attribute 'delayed-init "optional"
-  "  Function called with no parameters before candidate function is
-  called.  It is similar with `init' attribute, but its
-  evaluation is deferred. It is useful to combine with ")
-
-(helm-document-attribute 'match "optional"
-  "  List of functions called with one parameter: a candidate. The
-  function should return non-nil if the candidate matches the
-  current pattern (see variable `helm-pattern').
-
-  This attribute allows the source to override the default
-  pattern matching based on `string-match'. It can be used, for
-  example, to implement a source for file names and do the
-  pattern matching on the basename of files, since it's more
-  likely one is typing part of the basename when searching for a
-  file, instead of some string anywhere else in its path.
-
-  If the list contains more than one function then the list of
-  matching candidates from the source is constructed by appending
-  the results after invoking the first function on all the
-  potential candidates, then the next function, and so on. The
-  matching candidates supplied by the first function appear first
-  in the list of results and then results from the other
-  functions, respectively.
-
-  This attribute has no effect for asynchronous sources (see
-  attribute `candidates'), since they perform pattern matching
-  themselves.")
-
-(helm-document-attribute 'candidate-transformer "optional"
-  "  It's a function or a list of functions called with one argument
-  when the completion list from the source is built. The argument
-  is the list of candidates retrieved from the source. The
-  function should return a transformed list of candidates which
-  will be used for the actual completion.  If it is a list of
-  functions, it calls each function sequentially.
-
-  This can be used to transform or remove items from the list of
-  candidates.
-
-  Note that `candidates' is run already, so the given transformer
-  function should also be able to handle candidates with (DISPLAY
-  . REAL) format.")
-
-(helm-document-attribute 'filtered-candidate-transformer "optional"
-  "  It has the same format as `candidate-transformer', except the
-  function is called with two parameters: the candidate list and
-  the source.
-
-  This transformer is run on the candidate list which is already
-  filtered by the current pattern. While `candidate-transformer'
-  is run only once, it is run every time the input pattern is
-  changed.
-
-  It can be used to transform the candidate list dynamically, for
-  example, based on the current pattern.
-
-  In some cases it may also be more efficent to perform candidate
-  transformation here, instead of with `candidate-transformer'
-  even if this transformation is done every time the pattern is
-  changed.  For example, if a candidate set is very large then
-  `candidate-transformer' transforms every candidate while only
-  some of them will actually be dislpayed due to the limit
-  imposed by `helm-candidate-number-limit'.
-
-  Note that `candidates' and `candidate-transformer' is run
-  already, so the given transformer function should also be able
-  to handle candidates with (DISPLAY . REAL) format.
-
-  This option has no effect for asynchronous sources. (Not yet,
-  at least.")
-
-(helm-document-attribute 'action-transformer "optional"
-  "  It's a function or a list of functions called with two
-  arguments when the action list from the source is
-  assembled. The first argument is the list of actions, the
-  second is the current selection.  If it is a list of functions,
-  it calls each function sequentially.
-
-  The function should return a transformed action list.
-
-  This can be used to customize the list of actions based on the
-  currently selected candidate.")
-
-(helm-document-attribute 'pattern-transformer "optional"
-  "  It's a function or a list of functions called with one argument
-  before computing matches. Its argument is `helm-pattern'.
-  Functions should return transformed `helm-pattern'.
-
-  It is useful to change interpretation of `helm-pattern'.")
-
-(helm-document-attribute 'delayed "optional"
-  "  Candidates from the source are shown only if the user stops
-  typing and is idle for `helm-idle-delay' seconds.")
-
-(helm-document-attribute 'volatile "optional"
-  "  Indicates the source assembles the candidate list dynamically,
-  so it shouldn't be cached within a single Helm
-  invocation. It is only applicable to synchronous sources,
-  because asynchronous sources are not cached.")
-
-(helm-document-attribute 'requires-pattern "optional"
-  "  If present matches from the source are shown only if the
-  pattern is not empty. Optionally, it can have an integer
-  parameter specifying the required length of input which is
-  useful in case of sources with lots of candidates.")
-
-(helm-document-attribute 'persistent-action "optional"
-  "  Function called with one parameter; the selected candidate.
-
-  An action performed by `helm-execute-persistent-action'.
-  If none, use the default action.")
-
-(helm-document-attribute 'candidates-in-buffer "optional"
-  "  Shortcut attribute for making and narrowing candidates using
-  buffers.  This newly-introduced attribute prevents us from
-  forgetting to add volatile and match attributes.
-
-  See docstring of `helm-candidates-in-buffer'.
-
-  (candidates-in-buffer) is equivalent of three attributes:
-    (candidates . helm-candidates-in-buffer)
-    (volatile)
-    (match identity)
-
-  (candidates-in-buffer . candidates-function) is equivalent of:
-    (candidates . candidates-function)
-    (volatile)
-    (match identity)
-
-  This attribute is implemented by plug-in.")
-
-(helm-document-attribute 'search "optional"
-  "  List of functions like `re-search-forward' or `search-forward'.
-  Buffer search function used by `helm-candidates-in-buffer'.
-  By default, `helm-candidates-in-buffer' uses `re-search-forward'.
-  This attribute is meant to be used with
-  (candidates . helm-candidates-in-buffer) or
-  (candidates-in-buffer) in short.")
-
-(helm-document-attribute 'search-from-end "optional"
-  "  Make `helm-candidates-in-buffer' search from the end of buffer.
-  If this attribute is specified, `helm-candidates-in-buffer' uses
-  `re-search-backward' instead.")
-
-(helm-document-attribute 'get-line "optional"
-  "  A function like `buffer-substring-no-properties' or `buffer-substring'.
-  This function converts point of line-beginning and point of line-end,
-  which represents a candidate computed by `helm-candidates-in-buffer'.
-  By default, `helm-candidates-in-buffer' uses
-  `buffer-substring-no-properties'.")
-
-(helm-document-attribute 'display-to-real "optional"
-  "  Function called with one parameter; the selected candidate.
-
-  The function transforms the selected candidate, and the result
-  is passed to the action function.  The display-to-real
-  attribute provides another way to pass other string than one
-  shown in Helm buffer.
-
-  Traditionally, it is possible to make candidates,
-  candidate-transformer or filtered-candidate-transformer
-  function return a list with (DISPLAY . REAL) pairs. But if REAL
-  can be generated from DISPLAY, display-to-real is more
-  convenient and faster.")
-
-(helm-document-attribute 'real-to-display "optional"
-  "  Function called with one parameter; the selected candidate.
-
-  The inverse of display-to-real attribute.
-
-  The function transforms the selected candidate, which is passed
-  to the action function, for display.  The real-to-display
-  attribute provides the other way to pass other string than one
-  shown in Helm buffer.
-
-  Traditionally, it is possible to make candidates,
-  candidate-transformer or filtered-candidate-transformer
-  function return a list with (DISPLAY . REAL) pairs. But if
-  DISPLAY can be generated from REAL, real-to-display is more
-  convenient.
-
-  Note that DISPLAY parts returned from candidates /
-  candidate-transformer are IGNORED as the name `display-to-real'
-  says.")
-
-(helm-document-attribute 'cleanup "optional"
-  "  Function called with no parameters when *helm* buffer is closed. It
-  is useful for killing unneeded candidates buffer.
-
-  Note that the function is executed BEFORE performing action.")
-
-(helm-document-attribute 'candidate-number-limit "optional"
-  "  Override `helm-candidate-number-limit' only for this source.")
-
-(helm-document-attribute 'accept-empty "optional"
-  "  Pass empty string \"\" to action function.")
-
-(helm-document-attribute 'dummy "optional"
-  "  Set `helm-pattern' to candidate. If this attribute is
-  specified, The candidates attribute is ignored.
-
-  This attribute is implemented by plug-in.
-  This plug-in implies disable-shortcuts plug-in.")
-
-(helm-document-attribute 'multiline "optional"
-  "  Enable to selection multiline candidates.")
-
-(helm-document-attribute 'update "optional"
-  (substitute-command-keys
-   "  Function called with no parameters when \
-\\<helm-map>\\[helm-force-update] is pressed."))
-
-(helm-document-attribute 'mode-line "optional"
-  "  source local `helm-mode-line-string'. (included in `mode-line-format')
-  It accepts also variable/function name.")
-
-(helm-document-attribute 'header-line "optional"
-  "  source local `header-line-format'.
-  It accepts also variable/function name. ")
-
-(helm-document-attribute
-    'resume "optional"
-  "  Function called with no parameters when `helm-resume' is started.")
-
-(helm-document-attribute 'keymap "optional"
-  "  Specific keymap for this source.
-  It is useful to have a keymap per source when using more than one source.
-  Otherwise, a keymap can be set per command with `helm' argument KEYMAP.
-  NOTE: when a source have `helm-map' as keymap attr,
-  the global value of `helm-map' will override the actual local one.")
-
-(helm-document-attribute 'help-message "optional"
-  "  Help message for this source.
-  If not present, `helm-help-message' value will be used.")
 
 
 ;; Bug Report
@@ -3630,6 +3223,7 @@ How to send a bug report:
                      (memq var helm-no-dump-variables))
           collect var)))
 
+;;;###autoload
 (defun helm-send-bug-report ()
   "Send a bug report of helm.el."
   (interactive)
@@ -3642,6 +3236,7 @@ How to send a bug report:
      nil nil
      helm-bug-report-salutation)))
 
+;;;###autoload
 (defun helm-send-bug-report-from-helm ()
   "Send a bug report of helm.el in helm session."
   (interactive)

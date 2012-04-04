@@ -18,17 +18,32 @@
 ;;; Code:
 (require 'helm)
 
+
 ;;; Embeded documentation.
 ;;
 ;;
+(defvar helm-mode-line-string "\
+\\<helm-map>\
+\\[helm-help]:Help \
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
+  "Help string displayed in mode-line in `helm'.
+It can be a string or a list of two args, in this case,
+first arg is a string that will be used as name for candidates number,
+second arg any string to display in mode line.
+If nil, use default `mode-line-format'.")
+
+
 ;;; Global help message - Used by `helm-help'
 ;;
 ;;
-(setq helm-help-message
-      (lambda ()
-        (concat
-         "\\<helm-map>"
-         "`helm' is QuickSilver-like candidate-selection framework.
+(defvar helm-help-message
+  (lambda ()
+    (concat
+     "\\<helm-map>"
+     "`helm' is an Emacs incremental completion and selection narrowing framework.
 
 Narrow the list by typing some pattern,
 Multiple patterns are allowed by splitting by space.
@@ -78,7 +93,45 @@ Visible marks store candidate. Some actions uses marked candidates.
 
 == Global Commands ==
 \\<global-map>\\[helm-resume] revives last `helm' session.
-It is very useful, so you should bind any key.")))
+It is very useful, so you should bind any key."))
+  "Detailed help message string for `helm'.
+It also accepts function or variable symbol.")
+
+(defun helm-help-internal (bufname insert-content-fn)
+  "Show long message during `helm' session in BUFNAME.
+INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
+  (save-window-excursion
+    (select-window (helm-window))
+    (delete-other-windows)
+    (switch-to-buffer (get-buffer-create bufname))
+    (erase-buffer)
+    (funcall insert-content-fn)
+    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
+    (setq cursor-type nil)
+    (goto-char 1)
+    (helm-help-event-loop)))
+
+(defun helm-help-event-loop ()
+  (ignore-errors
+    (loop for event = (read-event) do
+          (case event
+            ((?\C-v ? )  (scroll-up))
+            ((?\M-v ?b) (scroll-down))
+            (t (return))))))
+
+;;;###autoload
+(defun helm-help ()
+  "Help of `helm'."
+  (interactive)
+  (helm-help-internal
+   " *Helm Help*"
+   (lambda ()
+     (insert (substitute-command-keys
+              (helm-interpret-value (or (assoc-default
+                                         'help-message
+                                         (helm-get-current-source))
+                                        helm-help-message))))
+     (org-mode))))
 
 ;;; `helm-buffer-list' help
 ;;
@@ -315,6 +368,7 @@ You can save your results in a grep-mode buffer, see below.
 \n== Helm Map ==
 \\{helm-map}")
 
+;;;###autoload
 (defun helm-c-ucs-help ()
   "Help command for `helm-ucs'."
   (interactive)
@@ -335,6 +389,7 @@ You can save your results in a grep-mode buffer, see below.
 \n== Helm Map ==
 \\{helm-map}")
 
+;;;###autoload
 (defun helm-c-bookmark-help ()
   "Help command for bookmarks."
   (interactive)
@@ -377,6 +432,7 @@ Otherwise your command will be called many times like this:
 \n== Helm Map ==
 \\{helm-map}")
 
+;;;###autoload
 (defun helm-esh-help ()
   "Help command for `helm-find-files-eshell-command-on-file'."
   (interactive)
@@ -489,6 +545,341 @@ Otherwise your command will be called many times like this:
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
+
+
+
+;;; Attribute Documentation
+;;
+;;
+;;;###autoload
+(defun helm-describe-helm-attribute (helm-attribute)
+  "Display the full documentation of HELM-ATTRIBUTE.
+HELM-ATTRIBUTE should be a symbol."
+  (interactive (list (intern
+                      (completing-read
+                       "Describe helm attribute: "
+                       (mapcar 'symbol-name helm-additional-attributes)
+                       nil t))))
+  (with-output-to-temp-buffer "*Help*"
+    (princ (get helm-attribute 'helm-attrdoc))))
+
+(helm-document-attribute 'name "mandatory"
+  "  The name of the source. It is also the heading which appears
+  above the list of matches from the source. Must be unique.")
+
+(helm-document-attribute 'header-name "optional"
+  "  A function returning the display string of the header. Its
+  argument is the name of the source. This attribute is useful to
+  add an additional information with the source name.")
+
+(helm-document-attribute 'candidates "mandatory if candidates-in-buffer attribute is not provided"
+  "  Specifies how to retrieve candidates from the source. It can
+  either be a variable name, a function called with no parameters
+  or the actual list of candidates.
+
+  The list must be a list whose members are strings, symbols
+  or (DISPLAY . REAL) pairs.
+
+  In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
+  in the Helm buffer, but the REAL one is used as action
+  argument when the candidate is selected. This allows a more
+  readable presentation for candidates which would otherwise be,
+  for example, too long or have a common part shared with other
+  candidates which can be safely replaced with an abbreviated
+  string for display purposes.
+
+  Note that if the (DISPLAY . REAL) form is used then pattern
+  matching is done on the displayed string, not on the real
+  value.
+
+  If the candidates have to be retrieved asynchronously (for
+  example, by an external command which takes a while to run)
+  then the function should start the external command
+  asynchronously and return the associated process object.
+  Helm will take care of managing the process (receiving the
+  output from it, killing it if necessary, etc.). The process
+  should return candidates matching the current pattern (see
+  variable `helm-pattern'.)
+
+  Note that currently results from asynchronous sources appear
+  last in the helm buffer regardless of their position in
+  `helm-sources'.")
+
+(helm-document-attribute 'action "mandatory if type attribute is not provided"
+  "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
+  FUNCTION is called with one parameter: the selected candidate.
+
+  An action other than the default can be chosen from this list
+  of actions for the currently selected candidate (by default
+  with TAB). The DISPLAY string is shown in the completions
+  buffer and the FUNCTION is invoked when an action is
+  selected. The first action of the list is the default.")
+
+(helm-document-attribute 'coerce "optional"
+  "  It's a function called with one argument: the selected candidate.
+
+  This function is intended for type convertion.
+  In normal case, the selected candidate (string) is passed to action function.
+  If coerce function is specified, it is called just before action function.
+
+  Example: converting string to symbol
+    (coerce . intern)")
+
+(helm-document-attribute 'type "optional if action attribute is provided"
+  "  Indicates the type of the items the source returns.
+
+  Merge attributes not specified in the source itself from
+  `helm-type-attributes'.
+
+  This attribute is implemented by plug-in.")
+
+(helm-document-attribute 'init "optional"
+  "  Function called with no parameters when helm is started. It
+  is useful for collecting current state information which can be
+  used to create the list of candidates later.
+
+  For example, if a source needs to work with the current
+  directory then it can store its value here, because later
+  helm does its job in the minibuffer and in the
+  `helm-buffer' and the current directory can be different
+  there.")
+
+(helm-document-attribute 'delayed-init "optional"
+  "  Function called with no parameters before candidate function is
+  called.  It is similar with `init' attribute, but its
+  evaluation is deferred. It is useful to combine with ")
+
+(helm-document-attribute 'match "optional"
+  "  List of functions called with one parameter: a candidate. The
+  function should return non-nil if the candidate matches the
+  current pattern (see variable `helm-pattern').
+
+  This attribute allows the source to override the default
+  pattern matching based on `string-match'. It can be used, for
+  example, to implement a source for file names and do the
+  pattern matching on the basename of files, since it's more
+  likely one is typing part of the basename when searching for a
+  file, instead of some string anywhere else in its path.
+
+  If the list contains more than one function then the list of
+  matching candidates from the source is constructed by appending
+  the results after invoking the first function on all the
+  potential candidates, then the next function, and so on. The
+  matching candidates supplied by the first function appear first
+  in the list of results and then results from the other
+  functions, respectively.
+
+  This attribute has no effect for asynchronous sources (see
+  attribute `candidates'), since they perform pattern matching
+  themselves.")
+
+(helm-document-attribute 'candidate-transformer "optional"
+  "  It's a function or a list of functions called with one argument
+  when the completion list from the source is built. The argument
+  is the list of candidates retrieved from the source. The
+  function should return a transformed list of candidates which
+  will be used for the actual completion.  If it is a list of
+  functions, it calls each function sequentially.
+
+  This can be used to transform or remove items from the list of
+  candidates.
+
+  Note that `candidates' is run already, so the given transformer
+  function should also be able to handle candidates with (DISPLAY
+  . REAL) format.")
+
+(helm-document-attribute 'filtered-candidate-transformer "optional"
+  "  It has the same format as `candidate-transformer', except the
+  function is called with two parameters: the candidate list and
+  the source.
+
+  This transformer is run on the candidate list which is already
+  filtered by the current pattern. While `candidate-transformer'
+  is run only once, it is run every time the input pattern is
+  changed.
+
+  It can be used to transform the candidate list dynamically, for
+  example, based on the current pattern.
+
+  In some cases it may also be more efficent to perform candidate
+  transformation here, instead of with `candidate-transformer'
+  even if this transformation is done every time the pattern is
+  changed.  For example, if a candidate set is very large then
+  `candidate-transformer' transforms every candidate while only
+  some of them will actually be dislpayed due to the limit
+  imposed by `helm-candidate-number-limit'.
+
+  Note that `candidates' and `candidate-transformer' is run
+  already, so the given transformer function should also be able
+  to handle candidates with (DISPLAY . REAL) format.
+
+  This option has no effect for asynchronous sources. (Not yet,
+  at least.")
+
+(helm-document-attribute 'action-transformer "optional"
+  "  It's a function or a list of functions called with two
+  arguments when the action list from the source is
+  assembled. The first argument is the list of actions, the
+  second is the current selection.  If it is a list of functions,
+  it calls each function sequentially.
+
+  The function should return a transformed action list.
+
+  This can be used to customize the list of actions based on the
+  currently selected candidate.")
+
+(helm-document-attribute 'pattern-transformer "optional"
+  "  It's a function or a list of functions called with one argument
+  before computing matches. Its argument is `helm-pattern'.
+  Functions should return transformed `helm-pattern'.
+
+  It is useful to change interpretation of `helm-pattern'.")
+
+(helm-document-attribute 'delayed "optional"
+  "  Candidates from the source are shown only if the user stops
+  typing and is idle for `helm-idle-delay' seconds.")
+
+(helm-document-attribute 'volatile "optional"
+  "  Indicates the source assembles the candidate list dynamically,
+  so it shouldn't be cached within a single Helm
+  invocation. It is only applicable to synchronous sources,
+  because asynchronous sources are not cached.")
+
+(helm-document-attribute 'requires-pattern "optional"
+  "  If present matches from the source are shown only if the
+  pattern is not empty. Optionally, it can have an integer
+  parameter specifying the required length of input which is
+  useful in case of sources with lots of candidates.")
+
+(helm-document-attribute 'persistent-action "optional"
+  "  Function called with one parameter; the selected candidate.
+
+  An action performed by `helm-execute-persistent-action'.
+  If none, use the default action.")
+
+(helm-document-attribute 'candidates-in-buffer "optional"
+  "  Shortcut attribute for making and narrowing candidates using
+  buffers.  This newly-introduced attribute prevents us from
+  forgetting to add volatile and match attributes.
+
+  See docstring of `helm-candidates-in-buffer'.
+
+  (candidates-in-buffer) is equivalent of three attributes:
+    (candidates . helm-candidates-in-buffer)
+    (volatile)
+    (match identity)
+
+  (candidates-in-buffer . candidates-function) is equivalent of:
+    (candidates . candidates-function)
+    (volatile)
+    (match identity)
+
+  This attribute is implemented by plug-in.")
+
+(helm-document-attribute 'search "optional"
+  "  List of functions like `re-search-forward' or `search-forward'.
+  Buffer search function used by `helm-candidates-in-buffer'.
+  By default, `helm-candidates-in-buffer' uses `re-search-forward'.
+  This attribute is meant to be used with
+  (candidates . helm-candidates-in-buffer) or
+  (candidates-in-buffer) in short.")
+
+(helm-document-attribute 'search-from-end "optional"
+  "  Make `helm-candidates-in-buffer' search from the end of buffer.
+  If this attribute is specified, `helm-candidates-in-buffer' uses
+  `re-search-backward' instead.")
+
+(helm-document-attribute 'get-line "optional"
+  "  A function like `buffer-substring-no-properties' or `buffer-substring'.
+  This function converts point of line-beginning and point of line-end,
+  which represents a candidate computed by `helm-candidates-in-buffer'.
+  By default, `helm-candidates-in-buffer' uses
+  `buffer-substring-no-properties'.")
+
+(helm-document-attribute 'display-to-real "optional"
+  "  Function called with one parameter; the selected candidate.
+
+  The function transforms the selected candidate, and the result
+  is passed to the action function.  The display-to-real
+  attribute provides another way to pass other string than one
+  shown in Helm buffer.
+
+  Traditionally, it is possible to make candidates,
+  candidate-transformer or filtered-candidate-transformer
+  function return a list with (DISPLAY . REAL) pairs. But if REAL
+  can be generated from DISPLAY, display-to-real is more
+  convenient and faster.")
+
+(helm-document-attribute 'real-to-display "optional"
+  "  Function called with one parameter; the selected candidate.
+
+  The inverse of display-to-real attribute.
+
+  The function transforms the selected candidate, which is passed
+  to the action function, for display.  The real-to-display
+  attribute provides the other way to pass other string than one
+  shown in Helm buffer.
+
+  Traditionally, it is possible to make candidates,
+  candidate-transformer or filtered-candidate-transformer
+  function return a list with (DISPLAY . REAL) pairs. But if
+  DISPLAY can be generated from REAL, real-to-display is more
+  convenient.
+
+  Note that DISPLAY parts returned from candidates /
+  candidate-transformer are IGNORED as the name `display-to-real'
+  says.")
+
+(helm-document-attribute 'cleanup "optional"
+  "  Function called with no parameters when *helm* buffer is closed. It
+  is useful for killing unneeded candidates buffer.
+
+  Note that the function is executed BEFORE performing action.")
+
+(helm-document-attribute 'candidate-number-limit "optional"
+  "  Override `helm-candidate-number-limit' only for this source.")
+
+(helm-document-attribute 'accept-empty "optional"
+  "  Pass empty string \"\" to action function.")
+
+(helm-document-attribute 'dummy "optional"
+  "  Set `helm-pattern' to candidate. If this attribute is
+  specified, The candidates attribute is ignored.
+
+  This attribute is implemented by plug-in.
+  This plug-in implies disable-shortcuts plug-in.")
+
+(helm-document-attribute 'multiline "optional"
+  "  Enable to selection multiline candidates.")
+
+(helm-document-attribute 'update "optional"
+  (substitute-command-keys
+   "  Function called with no parameters when \
+\\<helm-map>\\[helm-force-update] is pressed."))
+
+(helm-document-attribute 'mode-line "optional"
+  "  source local `helm-mode-line-string'. (included in `mode-line-format')
+  It accepts also variable/function name.")
+
+(helm-document-attribute 'header-line "optional"
+  "  source local `header-line-format'.
+  It accepts also variable/function name. ")
+
+(helm-document-attribute
+    'resume "optional"
+  "  Function called with no parameters when `helm-resume' is started.")
+
+(helm-document-attribute 'keymap "optional"
+  "  Specific keymap for this source.
+  It is useful to have a keymap per source when using more than one source.
+  Otherwise, a keymap can be set per command with `helm' argument KEYMAP.
+  NOTE: when a source have `helm-map' as keymap attr,
+  the global value of `helm-map' will override the actual local one.")
+
+(helm-document-attribute 'help-message "optional"
+  "  Help message for this source.
+  If not present, `helm-help-message' value will be used.")
+
 
 (provide 'helm-help)
 

@@ -83,6 +83,64 @@ the first N arguments are fixed at the values with which this function
 was called."
     (lexical-let ((fun fun) (args1 args))
       (lambda (&rest args2) (apply fun (append args1 args2))))))
+
+(unless (fboundp 'assoc-default)
+  (defun assoc-default (key alist &optional test default)
+    "Find object KEY in a pseudo-alist ALIST.
+ALIST is a list of conses or objects.  Each element (or the element's car,
+if it is a cons) is compared with KEY by evaluating (TEST (car elt) KEY).
+If that is non-nil, the element matches;
+then `assoc-default' returns the element's cdr, if it is a cons,
+or DEFAULT if the element is not a cons.
+
+If no element matches, the value is nil.
+If TEST is omitted or nil, `equal' is used."
+    (let (found (tail alist) value)
+      (while (and tail (not found))
+        (let ((elt (car tail)))
+          (when (funcall (or test 'equal) (if (consp elt) (car elt) elt) key)
+            (setq found t value (if (consp elt) (cdr elt) default))))
+        (setq tail (cdr tail)))
+      value)))
+
+;; Function not available in XEmacs,
+(unless (fboundp 'minibuffer-contents)
+  (defun minibuffer-contents ()
+    "Return the user input in a minbuffer as a string.
+The current buffer must be a minibuffer."
+    (field-string (point-max)))
+
+  (defun delete-minibuffer-contents  ()
+    "Delete all user input in a minibuffer.
+The current buffer must be a minibuffer."
+    (delete-field (point-max))))
+
+;; Function not available in older Emacs (<= 22.1).
+(unless (fboundp 'buffer-chars-modified-tick)
+  (defun buffer-chars-modified-tick (&optional buffer)
+    "Return BUFFER's character-change tick counter.
+Each buffer has a character-change tick counter, which is set to the
+value of the buffer's tick counter (see `buffer-modified-tick'), each
+time text in that buffer is inserted or deleted.  By comparing the
+values returned by two individual calls of `buffer-chars-modified-tick',
+you can tell whether a character change occurred in that buffer in
+between these calls.  No argument or nil as argument means use current
+buffer as BUFFER."
+    (with-current-buffer (or buffer (current-buffer))
+      (if (listp buffer-undo-list)
+          (length buffer-undo-list)
+          (buffer-modified-tick)))))
+
+
+;; CUA workaround
+(defadvice cua-delete-region (around helm-avoid-cua activate)
+  (ignore-errors ad-do-it))
+
+(defadvice copy-region-as-kill (around helm-avoid-cua activate)
+  (if cua-mode
+      (ignore-errors ad-do-it)
+      ad-do-it))
+
 
 ;;; Utils functions
 ;;

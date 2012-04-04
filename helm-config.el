@@ -158,10 +158,34 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads (helm-toggle-all-marks helm-unmark-all helm-mark-all
-;;;;;;  helm-toggle-visible-mark helm-other-buffer helm-at-point)
-;;;;;;  "helm" "helm.el" (20347 59603))
+;;;### (autoloads (helm-send-bug-report-from-helm helm-send-bug-report
+;;;;;;  helm-follow-mode helm-kill-selection-and-quit helm-yank-selection
+;;;;;;  helm-prev-visible-mark helm-next-visible-mark helm-display-all-visible-marks
+;;;;;;  helm-toggle-all-marks helm-unmark-all helm-mark-all helm-toggle-visible-mark
+;;;;;;  helm-scroll-other-window-down helm-scroll-other-window helm-execute-persistent-action
+;;;;;;  helm-select-2nd-action-or-end-of-line helm-select-4th-action
+;;;;;;  helm-select-3rd-action helm-select-2nd-action helm-enlarge-window
+;;;;;;  helm-narrow-window helm-toggle-resplit-window helm-delete-minibuffer-contents
+;;;;;;  helm-delete-current-selection helm-debug-output helm-keyboard-quit
+;;;;;;  helm-exit-minibuffer helm-confirm-and-exit-minibuffer helm-next-source
+;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
+;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
+;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-at-point
+;;;;;;  helm-resume-window-only helm-resume) "helm" "helm.el" (20348
+;;;;;;  191))
 ;;; Generated autoloads from helm.el
+
+(autoload 'helm-resume "helm" "\
+Resurrect previously invoked `helm'.
+Called with a prefix arg, allow choosing among all existing
+helm buffers.  i.e choose among various helm sessions.
+
+\(fn &optional (any-buffer helm-last-buffer) BUFFER-PATTERN (any-resume t))" t nil)
+
+(autoload 'helm-resume-window-only "helm" "\
+
+
+\(fn &optional (any-buffer helm-last-buffer) BUFFER-PATTERN)" t nil)
 
 (autoload 'helm-at-point "helm" "\
 Call helm with symbol at point as initial input.
@@ -175,6 +199,151 @@ Simplified interface of `helm' with other `helm-buffer'.
 Call `helm' with only ANY-SOURCES and ANY-BUFFER as args.
 
 \(fn ANY-SOURCES ANY-BUFFER)" nil nil)
+
+(autoload 'helm-force-update "helm" "\
+Force recalculation and update of candidates.
+If current source has `update' attribute, a function without argument,
+call it before update.
+
+\(fn &optional PRESELECT)" t nil)
+
+(autoload 'helm-select-action "helm" "\
+Select an action for the currently selected candidate.
+If action buffer is selected, back to the helm buffer.
+
+\(fn)" t nil)
+
+(autoload 'helm-previous-line "helm" "\
+Move selection to the previous line.
+
+\(fn)" t nil)
+
+(autoload 'helm-next-line "helm" "\
+Move selection to the next line.
+
+\(fn)" t nil)
+
+(autoload 'helm-previous-page "helm" "\
+Move selection back with a pageful.
+
+\(fn)" t nil)
+
+(autoload 'helm-next-page "helm" "\
+Move selection forward with a pageful.
+
+\(fn)" t nil)
+
+(autoload 'helm-beginning-of-buffer "helm" "\
+Move selection at the top.
+
+\(fn)" t nil)
+
+(autoload 'helm-end-of-buffer "helm" "\
+Move selection at the bottom.
+
+\(fn)" t nil)
+
+(autoload 'helm-previous-source "helm" "\
+Move selection to the previous source.
+
+\(fn)" t nil)
+
+(autoload 'helm-next-source "helm" "\
+Move selection to the next source.
+
+\(fn)" t nil)
+
+(autoload 'helm-confirm-and-exit-minibuffer "helm" "\
+Maybe ask for confirmation when exiting helm.
+It is similar to `minibuffer-complete-and-exit' adapted to helm.
+If `minibuffer-completion-confirm' value is 'confirm,
+send in minibuffer confirm message and exit on next hit.
+If `minibuffer-completion-confirm' value is t,
+don't exit and send message 'no match'.
+
+\(fn)" t nil)
+
+(autoload 'helm-exit-minibuffer "helm" "\
+Select the current candidate by exiting the minibuffer.
+
+\(fn)" t nil)
+
+(autoload 'helm-keyboard-quit "helm" "\
+Quit minibuffer in helm.
+If action buffer is displayed, kill it.
+
+\(fn)" t nil)
+
+(autoload 'helm-debug-output "helm" "\
+Show all helm-related variables at this time.
+
+\(fn)" t nil)
+
+(autoload 'helm-delete-current-selection "helm" "\
+Delete the currently selected item.
+
+\(fn)" t nil)
+
+(autoload 'helm-delete-minibuffer-contents "helm" "\
+Same as `delete-minibuffer-contents' but this is a command.
+
+\(fn)" t nil)
+
+(autoload 'helm-toggle-resplit-window "helm" "\
+Toggle resplit helm window, vertically or horizontally.
+
+\(fn)" t nil)
+
+(autoload 'helm-narrow-window "helm" "\
+Narrow helm window.
+
+\(fn)" t nil)
+
+(autoload 'helm-enlarge-window "helm" "\
+Enlarge helm window.
+
+\(fn)" t nil)
+
+(autoload 'helm-select-2nd-action "helm" "\
+Select the 2nd action for the currently selected candidate.
+
+\(fn)" t nil)
+
+(autoload 'helm-select-3rd-action "helm" "\
+Select the 3rd action for the currently selected candidate.
+
+\(fn)" t nil)
+
+(autoload 'helm-select-4th-action "helm" "\
+Select the 4th action for the currently selected candidate.
+
+\(fn)" t nil)
+
+(autoload 'helm-select-2nd-action-or-end-of-line "helm" "\
+Select the 2nd action for the currently selected candidate.
+This happen when point is at the end of minibuffer.
+Otherwise goto the end of minibuffer.
+
+\(fn)" t nil)
+
+(autoload 'helm-execute-persistent-action "helm" "\
+Perform the associated action ATTR without quitting helm.
+ATTR default is 'persistent-action', but it can be helm else.
+In this case you have to add this new attribute to your source.
+When `helm-samewindow' and ONEWINDOW are non--nil,
+the helm window is never split in persistent action.
+
+\(fn &optional (attr (quote persistent-action)) ONEWINDOW)" t nil)
+
+(autoload 'helm-scroll-other-window "helm" "\
+Scroll other window (not *Helm* window) upward.
+
+\(fn)" t nil)
+
+(autoload 'helm-scroll-other-window-down "helm" "\
+Scroll other window (not *Helm* window) downward.
+
+\(fn)" t nil)
 
 (autoload 'helm-toggle-visible-mark "helm" "\
 Toggle helm visible mark at point.
@@ -195,6 +364,49 @@ Unmark all candidates in all sources of current helm session.
 Toggle all marks.
 Mark all visible candidates of current source or unmark all candidates
 visible or invisible in all sources of current helm session
+
+\(fn)" t nil)
+
+(autoload 'helm-display-all-visible-marks "helm" "\
+Show all `helm' visible marks strings.
+Only useful for debugging.
+
+\(fn)" t nil)
+
+(autoload 'helm-next-visible-mark "helm" "\
+Move next helm visible mark.
+If PREV is non-nil move to precedent.
+
+\(fn &optional PREV)" t nil)
+
+(autoload 'helm-prev-visible-mark "helm" "\
+Move previous helm visible mark.
+
+\(fn)" t nil)
+
+(autoload 'helm-yank-selection "helm" "\
+Set minibuffer contents to current selection.
+
+\(fn)" t nil)
+
+(autoload 'helm-kill-selection-and-quit "helm" "\
+Store current selection to kill ring.
+You can paste it by typing \\[yank].
+
+\(fn)" t nil)
+
+(autoload 'helm-follow-mode "helm" "\
+If this mode is on, persistent action is executed everytime the cursor is moved.
+
+\(fn)" t nil)
+
+(autoload 'helm-send-bug-report "helm" "\
+Send a bug report of helm.el.
+
+\(fn)" t nil)
+
+(autoload 'helm-send-bug-report-from-helm "helm" "\
+Send a bug report of helm.el in helm session.
 
 \(fn)" t nil)
 
@@ -883,10 +1095,17 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads (helm-etags-help helm-pdfgrep-help helm-grep-help
+;;;### (autoloads (helm-describe-helm-attribute helm-esh-help helm-c-bookmark-help
+;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
-;;;;;;  helm-c-buffer-help) "helm-help" "helm-help.el" (20345 62057))
+;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
+;;;;;;  (20347 63906))
 ;;; Generated autoloads from helm-help.el
+
+(autoload 'helm-help "helm-help" "\
+Help of `helm'.
+
+\(fn)" t nil)
 
 (autoload 'helm-c-buffer-help "helm-help" "\
 Help command for helm buffers.
@@ -922,6 +1141,27 @@ Help command for `helm-find-files'.
 The help function for etags.
 
 \(fn)" t nil)
+
+(autoload 'helm-c-ucs-help "helm-help" "\
+Help command for `helm-ucs'.
+
+\(fn)" t nil)
+
+(autoload 'helm-c-bookmark-help "helm-help" "\
+Help command for bookmarks.
+
+\(fn)" t nil)
+
+(autoload 'helm-esh-help "helm-help" "\
+Help command for `helm-find-files-eshell-command-on-file'.
+
+\(fn)" t nil)
+
+(autoload 'helm-describe-helm-attribute "helm-help" "\
+Display the full documentation of HELM-ATTRIBUTE.
+HELM-ATTRIBUTE should be a symbol.
+
+\(fn HELM-ATTRIBUTE)" t nil)
 
 ;;;***
 
@@ -1129,7 +1369,7 @@ Preconfigured helm to browse code.
 
 ;;;### (autoloads (helm-show-kill-ring helm-register helm-all-mark-rings
 ;;;;;;  helm-global-mark-ring helm-mark-ring) "helm-ring" "helm-ring.el"
-;;;;;;  (20345 62057))
+;;;;;;  (20347 64034))
 ;;; Generated autoloads from helm-ring.el
 
 (autoload 'helm-mark-ring "helm-ring" "\
@@ -1198,7 +1438,7 @@ If tag file have been modified reinitialize cache.
 ;;;***
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
-;;;;;;  helm-test-sources) "helm-utils" "helm-utils.el" (20347 17170))
+;;;;;;  helm-test-sources) "helm-utils" "helm-utils.el" (20347 62296))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-test-sources "helm-utils" "\
@@ -1266,8 +1506,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20347
-;;;;;;  60338 917013))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20348
+;;;;;;  198 414234))
 
 ;;;***
 
