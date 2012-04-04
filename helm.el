@@ -372,8 +372,6 @@ It is disabled by default because *Helm Log* grows quickly.")
   "The input pattern used to update the helm buffer.")
 (defvar helm-input ""
   "The input typed in the candidates panel.")
-(defvar helm-test-candidate-list nil)
-(defvar helm-test-mode nil)
 (defvar helm-source-name nil)
 (defvar helm-candidate-buffer-alist nil)
 (defvar helm-check-minibuffer-input-timer nil)
@@ -513,11 +511,8 @@ Otherwise make a list with one element."
 (defmacro with-helm-window (&rest body)
   "Be sure BODY is excuted in the helm window."
   (declare (indent 0) (debug t))
-  `(if helm-test-mode
-       (with-current-buffer (helm-buffer-get)
-         ,@body)
-       (with-selected-window (helm-window)
-         ,@body)))
+  `(with-selected-window (helm-window)
+    ,@body))
 
 (defmacro with-helm-current-buffer (&rest body)
   "Eval BODY inside `helm-current-buffer'."
@@ -1393,11 +1388,8 @@ if some when multiples sources are present."
       (when kmap (setq overriding-local-map kmap)))))
 (add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
 
-(defun helm-create-helm-buffer (&optional test-mode)
-  "Create newly created `helm-buffer'.
-If TEST-MODE is non-nil, clear `helm-candidate-cache'."
-  (when test-mode
-    (setq helm-candidate-cache nil))
+(defun helm-create-helm-buffer ()
+  "Create and setup `helm-buffer'."
   (with-current-buffer (get-buffer-create helm-buffer)
     (helm-log "kill local variables: %S" (buffer-local-variables))
     (kill-all-local-variables)
@@ -1751,11 +1743,6 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
       (helm-process-source--direct-insert-match source)
       (let ((matches (helm-compute-matches source)))
         (when matches
-          (when helm-test-mode
-            (setq helm-test-candidate-list
-                  `(,@helm-test-candidate-list
-                    (,(assoc-default 'name source)
-                      ,matches))))
           (helm-insert-header-from-source source)
           (if (not (assq 'multiline source))
               (mapc #'(lambda (m)
@@ -1827,31 +1814,29 @@ is done on whole `helm-buffer' and not on current source."
                                       (helm-process-source source))))
         (helm-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
-        (if helm-test-mode ; Need only to process sources.
-            (mapc 'helm-process-source delayed-sources)
-            (cond ((and preselect delayed-sources normal-sources)
-                   ;; Preselection run here when there is
-                   ;; normal AND delayed sources.
-                   (helm-log "Update preselect candidate %s" preselect)
-                   (helm-preselect preselect))
-                  (delayed-sources ; Preselection and hooks will run later.
-                   (helm-update-move-first-line 'without-hook))
-                  (t ; No delayed sources, run the hooks now.
-                   (helm-update-move-first-line)
-                   (helm-log-run-hook 'helm-after-update-hook)
-                   (when preselect
-                     (helm-log "Update preselect candidate %s" preselect)
-                     (helm-preselect preselect))))
-            (when delayed-sources
-              (helm-new-timer
-               'helm-process-delayed-sources-timer
-               (run-with-idle-timer
-                ;; Be sure helm-idle-delay is >
-                ;; to helm-input-idle-delay
-                ;; otherwise use value of helm-input-idle-delay
-                ;; or 0.1 if == to 0.
-                (max helm-idle-delay helm-input-idle-delay 0.1) nil
-                'helm-process-delayed-sources delayed-sources preselect))))
+        (cond ((and preselect delayed-sources normal-sources)
+               ;; Preselection run here when there is
+               ;; normal AND delayed sources.
+               (helm-log "Update preselect candidate %s" preselect)
+               (helm-preselect preselect))
+              (delayed-sources ; Preselection and hooks will run later.
+               (helm-update-move-first-line 'without-hook))
+              (t              ; No delayed sources, run the hooks now.
+               (helm-update-move-first-line)
+               (helm-log-run-hook 'helm-after-update-hook)
+               (when preselect
+                 (helm-log "Update preselect candidate %s" preselect)
+                 (helm-preselect preselect))))
+        (when delayed-sources
+          (helm-new-timer
+           'helm-process-delayed-sources-timer
+           (run-with-idle-timer
+            ;; Be sure helm-idle-delay is >
+            ;; to helm-input-idle-delay
+            ;; otherwise use value of helm-input-idle-delay
+            ;; or 0.1 if == to 0.
+            (max helm-idle-delay helm-input-idle-delay 0.1) nil
+            'helm-process-delayed-sources delayed-sources preselect)))
         (helm-log "end update")))))
 
 (defun helm-update-source-p (source)
@@ -3662,36 +3647,6 @@ How to send a bug report:
   (interactive)
   (helm-run-after-quit 'helm-send-bug-report))
 
-;; Debugging function.
-(defun* helm-test-candidates
-    (sources &optional (input "")
-             (compile-source-functions
-              helm-compile-source-functions-default))
-  "Test helper function for helm.
-Given pseudo `helm-sources' and `helm-pattern', returns list like
-  ((\"source name1\" (\"candidate1\" \"candidate2\"))
-   (\"source name2\" (\"candidate3\" \"candidate4\")))"
-  (let ((helm-test-mode t)
-        helm-candidate-cache
-        (helm-compile-source-functions compile-source-functions)
-        helm-before-initialize-hook
-        helm-after-initialize-hook
-        helm-update-hook
-        helm-test-candidate-list)
-    (get-buffer-create helm-buffer)
-    (helm-initialize nil input sources)
-    (helm-update)
-    ;; test-mode spec: select 1st candidate!
-    (with-current-buffer helm-buffer
-      (forward-line 1)
-      (helm-mark-current-line))
-    (prog1
-        helm-test-candidate-list
-      (helm-cleanup))))
-
-
-;; Unit Tests
-;; See developer-tools/unit-test-helm.el
 
 (provide 'helm)
 
