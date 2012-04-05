@@ -2146,7 +2146,9 @@ It is determined by UNIT and DIRECTION."
       (setq mode-line-format
             (default-value 'mode-line-format)))
   (setq header-line-format
-        (helm-interpret-value (assoc-default 'header-line source) source)))
+        `(" " ,(helm-interpret-value
+                (assoc-default 'header-line source) source))))
+  
 
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.

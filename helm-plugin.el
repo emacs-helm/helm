@@ -232,19 +232,22 @@ Will list all lines in .emacs.el.")
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--persistent-help)
 
 (defun helm-persistent-help-string ()
-  (propertize
-   (substitute-command-keys
-    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
-            (or (helm-interpret-value (helm-attr 'persistent-help))
-                (helm-aif (or (assoc-default 'persistent-action
-                                             (helm-get-current-source))
-                              (assoc-default 'action
-                                             (helm-get-current-source)))
-                    (cond ((symbolp it) (symbol-name it))
-                          ((listp it) (or (ignore-errors (caar it))  ""))))
-                "")
-            " (keeping session)"))
-   'face 'helm-header))
+  (let ((hs (substitute-command-keys
+             (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
+                     (or (helm-interpret-value (helm-attr 'persistent-help))
+                         (helm-aif (or (assoc-default
+                                        'persistent-action
+                                        (helm-get-current-source))
+                                       (assoc-default
+                                        'action (helm-get-current-source)))
+                             (cond ((symbolp it)
+                                    (symbol-name it))
+                                   ((listp it)
+                                    (or (ignore-errors (caar it))  ""))))
+                         "")
+                     " (keeping session)"))))
+    (propertize (concat hs (make-string (- (window-width) (length hs)) ? ))
+                'face 'helm-header)))
 
 (helm-document-attribute 'persistent-help "persistent-help plug-in"
   "A string to explain persistent-action of this source.
