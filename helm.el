@@ -1,10 +1,17 @@
 ;;; helm.el --- Emacs incremental and narrowing framework
 
-;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2007         Tamas Patrovics
+;;               2008 ~ 2011  rubikitch <rubikitch@ruby-lang.org>
+;;               2011 ~ 2012  Thierry Volpiatto <thierry.volpiatto@gmail.com>
+
+;; This is a fork of anything.el wrote by Tamas Patrovics.
+
+;; Authors of anything.el: Tamas Patrovics
+;;                         rubikitch <rubikitch@ruby-lang.org>
+;;                         Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; URL: http://github.com/emacs-helm/helm
-;; Version: 1.4.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

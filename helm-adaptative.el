@@ -1,5 +1,8 @@
 ;;; helm-adaptative.el --- Adaptive Sorting of Candidates.
 
+;; Original Author: Tamas Patrovic
+
+;; Copyright (C) 2007 Tamas Patrovics
 ;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or modify
