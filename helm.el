@@ -367,6 +367,10 @@ It is disabled by default because *Helm Log* grows quickly.")
 (defvar helm-selection-point nil)
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
+(defconst helm-default-match-functions
+  (list (lambda (candidate)
+          (string-match helm-pattern candidate)))
+  "Default functions to match candidates according to `helm-pattern'.")
 
 
 ;; Utility: logging
@@ -806,21 +810,6 @@ as a list of one element."
                 (cons (car pair) (eval (cadr pair)))
                 (cons pair nil)))
           varlist))
-
-;; [NOT USED]
-;; (defun helm-let*-eval-varlist (varlist)
-;;   (let ((vars (mapcar (lambda (pair)
-;;                         (or (car-safe pair) pair))
-;;                       varlist)))
-;;     (eval `(let ,vars
-;;              ,@(mapcar (lambda (pair)
-;;                          (if (listp pair)
-;;                              `(setq ,(car pair) ,(cadr pair))
-;;                            `(setq ,pair nil)))
-;;                        varlist)
-;;              (mapcar (lambda (v)
-;;                        (cons v (symbol-value v)))
-;;                      ',vars)))))
 
 (defun helm-let-internal (binding bodyfunc)
   "Set BINDING to helm buffer-local variables and Evaluate BODYFUNC.
@@ -1421,11 +1410,9 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   "Clean up the mess when helm exit or quit."
   (helm-log "start cleanup")
   (with-current-buffer helm-buffer
-    ;; rubikitch: I think it is not needed.
-    ;; thierry: If you end up for any reasons (error etc...)
+    ;; If we end up for any reasons (error etc...)
     ;; with an helm-buffer staying around (visible),
-    ;; You will have no cursor in this buffer when switching to it,
-    ;; so I think this is needed.
+    ;; we will have no cursor in this buffer when switching to it.
     (setq cursor-type t)
     ;; Call burry-buffer whithout arg
     ;; to be sure helm-buffer is removed from window.
@@ -1507,9 +1494,6 @@ Helm plug-ins are realized by this function."
                   (mapconcat (lambda (sym) (get sym 'helm-attrdoc))
                              helm-additional-attributes
                              "\n")))))
-;; (describe-variable 'helm-sources)
-;; (documentation-property 'helm-sources 'variable-documentation)
-;; (progn (ad-disable-advice 'documentation-property 'after 'helm-document-attribute) (ad-update 'documentation-property))
 
 
 ;; Core: all candidates
@@ -1634,12 +1618,6 @@ If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
       (or (cdr it) 99999999)
     (or helm-candidate-number-limit 99999999)))
 
-;; FIXME: Why a defconst here
-(defconst helm-default-match-functions
-  (list (lambda (candidate)
-          (string-match helm-pattern candidate)))
-  "Default functions to match candidates according to `helm-pattern'.")
-
 (defun helm-compute-matches (source)
   "Compute matched results from SOURCE according to its settings."
   (if debug-on-error
@@ -1676,9 +1654,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
      (puthash ,cand t ,hash)
      (push ,cand ,newmatches)
      (incf ,item-count)
-     (when (= ,item-count ,limit)
-       (setq exit t)
-       (return))))
+     (when (= ,item-count ,limit) (return))))
 
 (defun helm-take-first-elements (seq n)
   (if (> (length seq) n)
@@ -1696,8 +1672,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
                 (when (funcall match (helm-candidate-get-display candidate))
                   (helm-accumulate-candidates-internal
                    candidate newmatches helm-match-hash item-count limit)))
-              (setq matches (append matches (reverse newmatches)))
-              (if exit (return)))))
+              (setq matches (append matches (reverse newmatches))))))
       (invalid-regexp (setq matches nil)))
     matches))
 
@@ -2670,8 +2645,7 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
                              (goto-char (1- (point-at-bol)))
                              (forward-line 1))))
                return nil)
-         (setq matches (append matches (nreverse newmatches)))
-         (if exit (return)))
+         (setq matches (append matches (nreverse newmatches))))
        (delq nil matches)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
