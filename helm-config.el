@@ -171,9 +171,15 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-at-point
-;;;;;;  helm-resume-window-only helm-resume) "helm" "helm.el" (20348
-;;;;;;  191))
+;;;;;;  helm-resume-window-only helm-resume helm-open-last-log) "helm"
+;;;;;;  "helm.el" (20349 43252))
 ;;; Generated autoloads from helm.el
+
+(autoload 'helm-open-last-log "helm" "\
+Open helm log file of last helm session.
+If `helm-last-log-file' is nil, switch to \"*Helm Log*\" buffer.
+
+\(fn)" t nil)
 
 (autoload 'helm-resume "helm" "\
 Resurrect previously invoked `helm'.
@@ -396,9 +402,9 @@ You can paste it by typing \\[yank].
 \(fn)" t nil)
 
 (autoload 'helm-follow-mode "helm" "\
-If this mode is on, persistent action is executed everytime the cursor is moved.
+Execute persistent action everytime the cursor is moved when enabled.
 
-\(fn)" t nil)
+\(fn &optional ARG)" t nil)
 
 (autoload 'helm-send-bug-report "helm" "\
 Send a bug report of helm.el.
@@ -413,7 +419,7 @@ Send a bug report of helm.el in helm session.
 ;;;***
 
 ;;;### (autoloads (helm-c-reset-adaptative-history) "helm-adaptative"
-;;;;;;  "helm-adaptative.el" (20345 62057))
+;;;;;;  "helm-adaptative.el" (20349 20936))
 ;;; Generated autoloads from helm-adaptative.el
 
 (autoload 'helm-c-reset-adaptative-history "helm-adaptative" "\
@@ -586,8 +592,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
 
 ;;;***
 
-;;;### (autoloads (helm-colors) "helm-color" "helm-color.el" (20345
-;;;;;;  62057))
+;;;### (autoloads (helm-colors) "helm-color" "helm-color.el" (20348
+;;;;;;  4963))
 ;;; Generated autoloads from helm-color.el
 
 (autoload 'helm-colors "helm-color" "\
@@ -1506,8 +1512,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20348
-;;;;;;  198 414234))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20349
+;;;;;;  43340 936086))
 
 ;;;***
 

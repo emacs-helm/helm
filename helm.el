@@ -438,12 +438,27 @@ ARGS are args given to `format'."
     (unless (member msg helm-issued-errors)
       (add-to-list 'helm-issued-errors msg))))
 
-(defvar helm-last-log-file nil)
+(defvar helm-debug-root-directory nil
+  "When non--nil, save helm log to `helm-last-log-file'.
+Be aware that if you set that, you will end up with a huge directory
+of log files, so use that only for debugging purpose.
+See `helm-log-save-maybe' for more info.")
+;; Internal
+(defvar helm-last-log-file nil
+  "The name of the last helm session log file.")
+
 (defun helm-log-save-maybe ()
-  "May be save log buffer to `helm-last-log-file'."
-  (when (stringp helm-debug)
-    (let ((logdir (expand-file-name (format-time-string "%Y%m%d")
-                                    helm-debug)))
+  "May be save log buffer to `helm-last-log-file'.
+If `helm-debug-root-directory' is non--nil and a valid directory,
+a directory named 'helm-debug-<date of today>'
+will be created there and the log recorded in a file named
+at the date and time of today in this directory."
+  (when (and (stringp helm-debug-root-directory)
+             (file-directory-p helm-debug-root-directory)
+             (or debug-on-error helm-debug))
+    (let ((logdir (expand-file-name (concat "helm-debug-"
+                                            (format-time-string "%Y%m%d"))
+                                    helm-debug-root-directory)))
       (make-directory logdir t)
       (with-current-buffer (get-buffer-create "*Helm Log*")
         (write-region (point-min) (point-max)
@@ -451,10 +466,12 @@ ARGS are args given to `format'."
                             (expand-file-name (format-time-string "%Y%m%d-%H%M%S")
                                               logdir))
                       nil 'silent)
-        (erase-buffer)))))
+        (kill-buffer)))))
 
+;;;###autoload
 (defun helm-open-last-log ()
-  "Open helm log file of last helm session."
+  "Open helm log file of last helm session.
+If `helm-last-log-file' is nil, switch to \"*Helm Log*\" buffer."
   (interactive)
   (if helm-last-log-file
       (view-file helm-last-log-file)
@@ -464,8 +481,6 @@ ARGS are args given to `format'."
   "Print error messages in `helm-issued-errors'."
   (message "%s" (mapconcat 'identity (reverse helm-issued-errors) "\n")))
 
-;; (helm-log "test")
-;; (switch-to-buffer-other-window "*Helm Log*")
 
 
 ;; Programming Tools
