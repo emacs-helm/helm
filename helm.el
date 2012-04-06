@@ -2118,6 +2118,8 @@ It is determined by UNIT and DIRECTION."
 
 
 (defun helm-skip-header-and-separator-line (direction)
+  "Skip source header or candidate separator when going to next/previous line.
+Possible value of DIRECTION are 'next or 'previous."
   (while (and (not (bobp))
               (or (helm-pos-header-line-p)
                   (helm-pos-candidate-separator-p)))
@@ -2125,8 +2127,11 @@ It is determined by UNIT and DIRECTION."
                            (not (eq (point-at-bol) (point-min))))
                       -1 1))))
 
+;; Internal
+;; The string to display in mode-line.
 (defvar helm-mode-line-string-real nil)
 (defun helm-display-mode-line (source)
+  "Setup mode-line and header-line for `helm-buffer'."
   (set (make-local-variable 'helm-mode-line-string)
        (helm-interpret-value (or (assoc-default 'mode-line source)
                                  (default-value 'helm-mode-line-string))

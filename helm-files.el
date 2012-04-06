@@ -184,8 +184,13 @@ This can be toggled at anytime from `helm-find-files' with \
 Default is non--nil.
 WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :group 'helm-files
-  :type 'boolean)
+  :type  'boolean)
 
+(defcustom helm-ff-search-library-in-sexp nil
+  "Search for library in `require' and `declare-function' sexp."
+  :group 'helm-files
+  :type  'boolean)
+  
 
 ;;; Faces
 ;;
@@ -1814,24 +1819,29 @@ Use it for non--interactive calls of `helm-find-files'."
        (ffap-guesser)
        (thing-at-point 'filename))))
 
-(defun helm-find-files-input (fap tap)
-  "Default input of `helm-find-files'."
+(defun helm-find-files-input (file-at-pt thing-at-pt)
+  "Try to guess a default input for `helm-find-files'."
   (let* ((def-dir (helm-c-current-directory))
-         (lib     (helm-find-library-at-point))
-         (url     (helm-ff-find-url-at-point))
-         (remp    (and fap (file-remote-p fap)))
+         (lib     (when helm-ff-search-library-in-sexp
+                    (helm-find-library-at-point)))
+         (hlink   (helm-ff-find-url-at-point))
+         (remp    (and file-at-pt (file-remote-p file-at-pt)))
          (file-p  (and (not remp)
-                       fap
-                       (not (string= fap ""))
-                       (file-exists-p fap)
-                       tap (not (string= tap ""))
+                       file-at-pt
+                       (not (string= file-at-pt ""))
+                       (file-exists-p file-at-pt)
+                       thing-at-pt (not (string= thing-at-pt ""))
                        (file-exists-p
-                        (file-name-directory (expand-file-name tap def-dir))))))
-    (cond (lib) ; e.g we are inside a require sexp.
-          (url) ; String at point is an hyperlink.
-          (remp fap)
-          (file-p (expand-file-name tap def-dir))
-          (t (and (not (string= fap "")) fap)))))
+                        (file-name-directory
+                         (expand-file-name thing-at-pt def-dir))))))
+    (cond (lib)   ; e.g we are inside a require sexp.
+          (hlink) ; String at point is an hyperlink.
+          (remp file-at-pt) ; A remote file
+          (file-p           ; a regular file
+           ;; Avoid ffap annoyances, don't use `ffap-alist'.
+           (let (ffap-alist) (ffap-file-at-point))) 
+          (t (and (not (string= file-at-pt "")) ; possibly an url or email.
+                  file-at-pt)))))
 
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
