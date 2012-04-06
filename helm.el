@@ -2143,13 +2143,14 @@ It is determined by UNIT and DIRECTION."
             (substitute-command-keys (if (listp helm-mode-line-string)
                                          (cadr helm-mode-line-string)
                                          helm-mode-line-string)))
-      (setq mode-line-format
-            (default-value 'mode-line-format)))
-  (setq header-line-format
-        `(" " ,(helm-interpret-value
-                (assoc-default 'header-line source) source))))
+      (setq mode-line-format (default-value 'mode-line-format)))
   
-
+  (let* ((hlstr (helm-interpret-value
+                 (assoc-default 'header-line source) source))
+         (hlend (make-string (- (window-width) (length hlstr)) ? )))
+    (setq header-line-format
+          (propertize (concat " " hlstr hlend) 'face 'helm-header))))
+  
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g \"Buffers\" otherwise
