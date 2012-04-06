@@ -36,57 +36,57 @@
 (defvar helm-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map minibuffer-local-map)
-    (define-key map (kbd "<down>")          'helm-next-line)
-    (define-key map (kbd "<up>")            'helm-previous-line)
-    (define-key map (kbd "C-n")             'helm-next-line)
-    (define-key map (kbd "C-p")             'helm-previous-line)
-    (define-key map (kbd "<prior>")         'helm-previous-page)
-    (define-key map (kbd "<next>")          'helm-next-page)
-    (define-key map (kbd "M-v")             'helm-previous-page)
-    (define-key map (kbd "C-v")             'helm-next-page)
-    (define-key map (kbd "M-<")             'helm-beginning-of-buffer)
-    (define-key map (kbd "M->")             'helm-end-of-buffer)
-    (define-key map (kbd "C-g")             'helm-keyboard-quit)
-    (define-key map (kbd "<right>")         'helm-next-source)
-    (define-key map (kbd "<left>")          'helm-previous-source)
-    (define-key map (kbd "<RET>")           'helm-exit-minibuffer)
-    (define-key map (kbd "C-i")             'helm-select-action)
-    (define-key map (kbd "C-z")             'helm-execute-persistent-action)
-    (define-key map (kbd "C-e")             'helm-select-2nd-action-or-end-of-line)
-    (define-key map (kbd "C-j")             'helm-select-3rd-action)
-    (define-key map (kbd "C-o")             'helm-next-source)
-    (define-key map (kbd "C-M-v")           'helm-scroll-other-window)
-    (define-key map (kbd "M-<next>")        'helm-scroll-other-window)
-    (define-key map (kbd "C-M-y")           'helm-scroll-other-window-down)
-    (define-key map (kbd "C-M-S-v")         'helm-scroll-other-window-down)
-    (define-key map (kbd "M-<prior>")       'helm-scroll-other-window-down)
-    (define-key map (kbd "<C-M-down>")      'helm-scroll-other-window)
-    (define-key map (kbd "<C-M-up>")        'helm-scroll-other-window-down)
-    (define-key map (kbd "C-SPC")           'helm-toggle-visible-mark)
-    (define-key map (kbd "M-SPC")           'helm-toggle-visible-mark)
-    (define-key map (kbd "M-[")             'helm-prev-visible-mark)
-    (define-key map (kbd "M-]")             'helm-next-visible-mark)
-    (define-key map (kbd "C-k")             'helm-delete-minibuffer-contents)
-    (define-key map (kbd "C-x C-f")         'helm-quit-and-find-file)
-    (define-key map (kbd "M-m")             'helm-toggle-all-marks)
-    (define-key map (kbd "C-w")             'helm-yank-text-at-point)
+    (define-key map (kbd "<down>")     'helm-next-line)
+    (define-key map (kbd "<up>")       'helm-previous-line)
+    (define-key map (kbd "C-n")        'helm-next-line)
+    (define-key map (kbd "C-p")        'helm-previous-line)
+    (define-key map (kbd "<prior>")    'helm-previous-page)
+    (define-key map (kbd "<next>")     'helm-next-page)
+    (define-key map (kbd "M-v")        'helm-previous-page)
+    (define-key map (kbd "C-v")        'helm-next-page)
+    (define-key map (kbd "M-<")        'helm-beginning-of-buffer)
+    (define-key map (kbd "M->")        'helm-end-of-buffer)
+    (define-key map (kbd "C-g")        'helm-keyboard-quit)
+    (define-key map (kbd "<right>")    'helm-next-source)
+    (define-key map (kbd "<left>")     'helm-previous-source)
+    (define-key map (kbd "<RET>")      'helm-exit-minibuffer)
+    (define-key map (kbd "C-i")        'helm-select-action)
+    (define-key map (kbd "C-z")        'helm-execute-persistent-action)
+    (define-key map (kbd "C-e")        'helm-select-2nd-action-or-end-of-line)
+    (define-key map (kbd "C-j")        'helm-select-3rd-action)
+    (define-key map (kbd "C-o")        'helm-next-source)
+    (define-key map (kbd "C-M-v")      'helm-scroll-other-window)
+    (define-key map (kbd "M-<next>")   'helm-scroll-other-window)
+    (define-key map (kbd "C-M-y")      'helm-scroll-other-window-down)
+    (define-key map (kbd "C-M-S-v")    'helm-scroll-other-window-down)
+    (define-key map (kbd "M-<prior>")  'helm-scroll-other-window-down)
+    (define-key map (kbd "<C-M-down>") 'helm-scroll-other-window)
+    (define-key map (kbd "<C-M-up>")   'helm-scroll-other-window-down)
+    (define-key map (kbd "C-SPC")      'helm-toggle-visible-mark)
+    (define-key map (kbd "M-SPC")      'helm-toggle-visible-mark)
+    (define-key map (kbd "M-[")        'helm-prev-visible-mark)
+    (define-key map (kbd "M-]")        'helm-next-visible-mark)
+    (define-key map (kbd "C-k")        'helm-delete-minibuffer-contents)
+    (define-key map (kbd "C-x C-f")    'helm-quit-and-find-file)
+    (define-key map (kbd "M-m")        'helm-toggle-all-marks)
+    (define-key map (kbd "C-w")        'helm-yank-text-at-point)
 
-    (define-key map (kbd "C-r")             'undefined)
-    (define-key map (kbd "C-t")             'helm-toggle-resplit-window)
-    (define-key map (kbd "C-}")             'helm-narrow-window)
-    (define-key map (kbd "C-{")             'helm-enlarge-window)
+    (define-key map (kbd "C-r")        'undefined)
+    (define-key map (kbd "C-t")        'helm-toggle-resplit-window)
+    (define-key map (kbd "C-}")        'helm-narrow-window)
+    (define-key map (kbd "C-{")        'helm-enlarge-window)
 
-    (define-key map (kbd "C-c C-d")         'helm-delete-current-selection)
-    (define-key map (kbd "C-c C-y")         'helm-yank-selection)
-    (define-key map (kbd "C-c C-k")         'helm-kill-selection-and-quit)
-    (define-key map (kbd "C-c C-f")         'helm-follow-mode)
-    (define-key map (kbd "C-c C-u")         'helm-force-update)
-    (define-key map (kbd "M-p")             'previous-history-element)
-    (define-key map (kbd "M-n")             'next-history-element)
+    (define-key map (kbd "C-c C-d")    'helm-delete-current-selection)
+    (define-key map (kbd "C-c C-y")    'helm-yank-selection)
+    (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
+    (define-key map (kbd "C-c C-f")    'helm-follow-mode)
+    (define-key map (kbd "C-c C-u")    'helm-force-update)
+    (define-key map (kbd "M-p")        'previous-history-element)
+    (define-key map (kbd "M-n")        'next-history-element)
     ;; Debugging command
-    (define-key map "\C-c\C-x\C-d"          'helm-debug-output)
-    (define-key map "\C-c\C-x\C-m"          'helm-display-all-visible-marks)
-    (define-key map "\C-c\C-x\C-b"          'helm-send-bug-report-from-helm)
+    (define-key map "\C-c\C-x\C-d"     'helm-debug-output)
+    (define-key map "\C-c\C-x\C-m"     'helm-display-all-visible-marks)
+    (define-key map "\C-c\C-x\C-b"     'helm-send-bug-report-from-helm)
     ;; Use `describe-mode' key in `global-map'.
     (define-key map [f1] nil) ; Allow to eval keymap without errors.
     (dolist (k (where-is-internal 'describe-mode global-map))
@@ -463,8 +463,9 @@ at the date and time of today in this directory."
       (with-current-buffer (get-buffer-create "*Helm Log*")
         (write-region (point-min) (point-max)
                       (setq helm-last-log-file
-                            (expand-file-name (format-time-string "%Y%m%d-%H%M%S")
-                                              logdir))
+                            (expand-file-name
+                             (format-time-string "%Y%m%d-%H%M%S")
+                             logdir))
                       nil 'silent)
         (kill-buffer)))))
 
@@ -678,9 +679,10 @@ with its properties."
                   ;; It is needed to return properties of DISP in some case,
                   ;; e.g for `helm-confirm-and-exit-minibuffer',
                   ;; so use `buffer-substring' here when 'withprop is specified.
-                  (let ((disp (funcall disp-fn
-                                       (overlay-start helm-selection-overlay)
-                                       (1- (overlay-end helm-selection-overlay))))
+                  (let ((disp (funcall
+                               disp-fn
+                               (overlay-start helm-selection-overlay)
+                               (1- (overlay-end helm-selection-overlay))))
                         (source (helm-get-current-source)))
                     (helm-aif (and (not force-display-part)
                                    (assoc-default 'display-to-real source))
@@ -805,7 +807,8 @@ Otherwise, return VALUE itself."
         ((and (symbolp value) (boundp value))
          (symbol-value value))
         ((symbolp value)
-         (error "helm-interpret-value: Symbol must be a function or a variable"))
+         (error
+          "helm-interpret-value: Symbol must be a function or a variable"))
         (t
          value)))
 
@@ -941,7 +944,8 @@ This is used in transformers to modify candidates list."
 
 ;; Core: entry point
 (defconst helm-argument-keys
-  '(:sources :input :prompt :resume :preselect :buffer :keymap :default :history))
+  '(:sources :input :prompt :resume
+    :preselect :buffer :keymap :default :history))
 
 (defun helm (&rest plist)
   "Main function to execute helm sources.
@@ -954,7 +958,8 @@ When call interactively with no arguments deprecated `helm-sources'
 will be used if non--nil.
 
 PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
-\(&optional sources input prompt resume preselect buffer keymap default history\).
+\(&optional sources input prompt resume
+            preselect buffer keymap default history\).
 
 Basic keywords are the following:
 
@@ -1080,7 +1085,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                       (helm-read-pattern-maybe
                        any-prompt any-input any-preselect
                        any-resume any-keymap any-default
-                       (when (and any-history (symbolp any-history)) any-history))
+                       (when (and any-history (symbolp any-history))
+                         any-history))
                    (helm-cleanup)))
                (prog1 (unless helm-quit
                         (helm-execute-selection-action-1))
@@ -1108,7 +1114,8 @@ helm buffers.  i.e choose among various helm sessions."
     (setq any-buffer (helm-resume-select-buffer buffer-pattern)))
   (setq helm-compiled-sources nil)
   (helm
-   :sources (or (buffer-local-value 'helm-last-sources-local (get-buffer any-buffer))
+   :sources (or (buffer-local-value
+                 'helm-last-sources-local (get-buffer any-buffer))
                 helm-last-sources helm-sources)
    :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
    :resume any-resume
@@ -1199,7 +1206,8 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
 (defun helm-initialize (any-resume any-input any-sources)
   "Start initialization of `helm' session.
 For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
-  (helm-log "start initialization: any-resume=%S any-input=%S" any-resume any-input)
+  (helm-log "start initialization: any-resume=%S any-input=%S"
+            any-resume any-input)
   (helm-frame-or-window-configuration 'save)
   (setq helm-sources (helm-normalize-sources any-sources))
   (helm-log "sources = %S" helm-sources)
@@ -1274,8 +1282,9 @@ window or frame configuration is saved/restored according to values of
     (restore (funcall (car helm-save-configuration-functions)
                       helm-last-frame-or-window-configuration)
              ;; Restore frame focus.
-             (let ((frame (and (listp helm-last-frame-or-window-configuration)
-                               (caadr helm-last-frame-or-window-configuration))))
+             (let ((frame
+                    (and (listp helm-last-frame-or-window-configuration)
+                         (caadr helm-last-frame-or-window-configuration))))
                ;; If `helm-save-configuration-functions' are window functions
                ;; frame should be nil, use current frame.
                (unless (framep frame)
@@ -1427,7 +1436,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
 
 
 ;; Core: clean up
-;;; TODO move
+
 (defun helm-cleanup ()
   "Clean up the mess when helm exit or quit."
   (helm-log "start cleanup")
@@ -1463,7 +1472,7 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
 
 ;; Core: input handling
 (defun helm-check-minibuffer-input ()
-  "Extract input string from the minibuffer and check if it needs to be handled."
+  "Extract input string from the minibuffer and use it maybe."
   (let ((delay (with-current-buffer helm-buffer
                  (and helm-input-idle-delay
                       (max helm-input-idle-delay 0.1)))))
@@ -1476,7 +1485,8 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
 (defun helm-check-minibuffer-input-1 ()
   "Check minibuffer content."
   (with-helm-quittable
-    (with-selected-window (or (active-minibuffer-window) (minibuffer-window))
+    (with-selected-window (or (active-minibuffer-window)
+                              (minibuffer-window))
       (helm-check-new-input (minibuffer-contents)))))
 
 (defun helm-check-new-input (input)
@@ -1599,7 +1609,8 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
       (helm-composed-funcall-with-source source it candidates source)
     candidates))
 
-(defun helm-process-filtered-candidate-transformer-maybe (candidates source process-p)
+(defun helm-process-filtered-candidate-transformer-maybe
+    (candidates source process-p)
   "Execute filtered-candidate-transformer function on all CANDIDATES of SOURCE.
 This happen if PROCESS-P is non-nil."
   (if process-p
@@ -1750,7 +1761,9 @@ Move selection to string or regexp PRESELECT if non--nil.
 This function is called in `helm-process-delayed-sources-timer'
 when emacs is idle for `helm-idle-delay'."
   (with-helm-quittable
-    (helm-log-eval (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
+    (helm-log-eval (mapcar (lambda (s)
+                             (assoc-default 'name s))
+                           delayed-sources))
     (with-current-buffer helm-buffer
       (save-excursion
         (goto-char (point-max))
@@ -2072,7 +2085,8 @@ If action buffer is selected, back to the helm buffer."
                (message "Sole action: %s" actions)
                (helm-show-action-buffer actions)
                (helm-delete-minibuffer-contents)
-               (setq helm-pattern 'dummy) ; so that it differs from the previous one
+               ;; Make `helm-pattern' differs from the previous value.
+               (setq helm-pattern 'dummy)
                (helm-check-minibuffer-input))))))
 
 (defun helm-show-action-buffer (actions)
@@ -2179,7 +2193,8 @@ it is \"Candidate\(s\)\" by default."
          (let ((header-pos (helm-get-previous-header-pos))
                (separator-pos (helm-get-previous-candidate-separator-pos)))
            (when header-pos
-             (goto-char (if (or (null separator-pos) (< separator-pos header-pos))
+             (goto-char (if (or (null separator-pos)
+                                (< separator-pos header-pos))
                             header-pos ; first candidate
                             separator-pos))
              (forward-line 1)))))
@@ -2865,7 +2880,8 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
 ;;;###autoload
-(defun* helm-execute-persistent-action (&optional (attr 'persistent-action) onewindow)
+(defun* helm-execute-persistent-action
+    (&optional (attr 'persistent-action) onewindow)
   "Perform the associated action ATTR without quitting helm.
 ATTR default is 'persistent-action', but it can be helm else.
 In this case you have to add this new attribute to your source.
