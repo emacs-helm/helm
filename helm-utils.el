@@ -217,25 +217,19 @@ Animation is used unless NOANIM is non--nil."
     (sit-for 0.3)
     (helm-match-line-cleanup)))
 
-(defun helm-show-this-source-only ()
-  "Show all candidates of this source."
-  (interactive)
-  (let (helm-candidate-number-limit)
-    (helm-set-source-filter
-     (list (assoc-default 'name (helm-get-current-source))))))
-
 ;;;###autoload
-(defun helm-test-sources ()
-  "List all helm sources for test.
-The output is sexps which are evaluated by \\[eval-last-sexp]."
-  (interactive)
-  (with-output-to-temp-buffer "*Helm Test Sources*"
-    (mapc (lambda (s) (princ (format ";; (helm '%s)\n" s)))
-          (apropos-internal "^helm-c-source" #'boundp))
-    (pop-to-buffer standard-output)))
+(defun helm-show-all-in-this-source-only (arg)
+  "Show only current source of this helm session with all its candidates.
+With a numeric prefix arg show only the ARG number of candidates."
+  (interactive "p")
+  (with-helm-window
+    (let ((helm-candidate-number-limit (and (> arg 1) arg)))
+      (save-window-excursion
+        (helm-set-source-filter
+         (list (assoc-default 'name (helm-get-current-source))))))))
 
 (defun helm-displaying-source-names ()
-  "Display sources name."
+  "Return the list of sources name for this helm session."
   (with-current-buffer helm-buffer
     (goto-char (point-min))
     (loop with pos
@@ -340,6 +334,7 @@ See `helm-c-enable-eval-defun-hack'."
 ;; (progn (ad-disable-advice 'eval-defun 'after 'helm-source-hack) (ad-update 'eval-defun))
 
 (declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
+;;;###autoload
 (defun helm-quit-and-find-file ()
   "Drop into `helm-find-files' from `helm'.
 If current selection is a buffer or a file, `helm-find-files'

@@ -70,12 +70,11 @@
     (define-key map (kbd "C-x C-f")    'helm-quit-and-find-file)
     (define-key map (kbd "M-m")        'helm-toggle-all-marks)
     (define-key map (kbd "C-w")        'helm-yank-text-at-point)
-
+    (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
     (define-key map (kbd "C-r")        'undefined)
     (define-key map (kbd "C-t")        'helm-toggle-resplit-window)
     (define-key map (kbd "C-}")        'helm-narrow-window)
     (define-key map (kbd "C-{")        'helm-enlarge-window)
-
     (define-key map (kbd "C-c C-d")    'helm-delete-current-selection)
     (define-key map (kbd "C-c C-y")    'helm-yank-selection)
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
@@ -606,16 +605,15 @@ Shift+A shows all results:
   (interactive)
   (helm-set-source-filter nil))
 
-Note that you have to prefix the functions with helm- prefix,
-otherwise they won't be bound when Helm is used under
-Iswitchb. The -my- part is added to avoid collisions with
+The -my- part is added to avoid collisions with
 existing Helm function names."
   (unless (and (listp sources)
                (loop for name in sources always (stringp name)))
     (error "Invalid data in `helm-set-source-filter': %S" sources))
-  (setq helm-source-filter sources)
-  (helm-log-eval helm-source-filter)
-  (helm-update))
+  (let ((cur-sel (with-current-buffer helm-buffer (helm-get-selection))))
+    (setq helm-source-filter sources)
+    (helm-log-eval helm-source-filter)
+    (helm-update cur-sel)))
 
 (defun helm-set-sources (sources &optional no-init no-update)
   "Set SOURCES during `helm' invocation.
@@ -2772,6 +2770,12 @@ Acceptable values of CREATE-OR-BUFFER:
           (and (eq create-or-buffer 'global) (kill-buffers-func))
           (create-func)))
       (return-func))))
+
+(defun helm-init-candidates-in-buffer (buffer data)
+  "Register BUFFER with DATA for an helm candidates-in-buffer session."
+  (let ((buf (helm-candidate-buffer (get-buffer-create buffer))))
+    (with-current-buffer buf (insert data)))
+  buffer)
 
 (defun helm-compile-source--candidates-in-buffer (source)
   (helm-aif (assoc 'candidates-in-buffer source)

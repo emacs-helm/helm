@@ -172,7 +172,7 @@
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-at-point
 ;;;;;;  helm-resume-window-only helm-resume helm-open-last-log) "helm"
-;;;;;;  "helm.el" (20349 43252))
+;;;;;;  "helm.el" (20351 61929))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -592,8 +592,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
 
 ;;;***
 
-;;;### (autoloads (helm-colors) "helm-color" "helm-color.el" (20348
-;;;;;;  4963))
+;;;### (autoloads (helm-colors) "helm-color" "helm-color.el" (20351
+;;;;;;  62676))
 ;;; Generated autoloads from helm-color.el
 
 (autoload 'helm-colors "helm-color" "\
@@ -758,7 +758,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20347 60168))
+;;;;;;  "helm-files" "helm-files.el" (20350 41523))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1444,12 +1444,20 @@ If tag file have been modified reinitialize cache.
 ;;;***
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
-;;;;;;  helm-test-sources) "helm-utils" "helm-utils.el" (20347 62296))
+;;;;;;  helm-quit-and-find-file helm-show-all-in-this-source-only)
+;;;;;;  "helm-utils" "helm-utils.el" (20351 62637))
 ;;; Generated autoloads from helm-utils.el
 
-(autoload 'helm-test-sources "helm-utils" "\
-List all helm sources for test.
-The output is sexps which are evaluated by \\[eval-last-sexp].
+(autoload 'helm-show-all-in-this-source-only "helm-utils" "\
+Show only current source of this helm session with all its candidates.
+With a numeric prefix arg show only the ARG number of candidates.
+
+\(fn ARG)" t nil)
+
+(autoload 'helm-quit-and-find-file "helm-utils" "\
+Drop into `helm-find-files' from `helm'.
+If current selection is a buffer or a file, `helm-find-files'
+from its directory.
 
 \(fn)" t nil)
 
@@ -1512,8 +1520,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20349
-;;;;;;  43340 936086))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20351
+;;;;;;  63022 643587))
 
 ;;;***
 
