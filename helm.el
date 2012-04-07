@@ -610,10 +610,11 @@ existing Helm function names."
   (unless (and (listp sources)
                (loop for name in sources always (stringp name)))
     (error "Invalid data in `helm-set-source-filter': %S" sources))
-  (let ((cur-sel (with-current-buffer helm-buffer (helm-get-selection))))
+  (let ((cur-disp-sel (with-current-buffer helm-buffer
+                        (helm-get-selection nil t))))
     (setq helm-source-filter sources)
     (helm-log-eval helm-source-filter)
-    (helm-update cur-sel)))
+    (helm-update cur-disp-sel)))
 
 (defun helm-set-sources (sources &optional no-init no-update)
   "Set SOURCES during `helm' invocation.
