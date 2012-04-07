@@ -545,34 +545,27 @@ Otherwise make a list with one element."
        (setq-default post-command-hook (cdr --post-command-hook-pair))
        (helm-log "restore variables"))))
 
-(defun* helm-attr (attribute-name &optional
-                                  (src (helm-get-current-source)))
+(defun* helm-attr (attribute-name
+                   &optional (src (helm-get-current-source)) compute)
   "Get the value of ATTRIBUTE-NAME of SRC.
-if SRC is omitted, use current source.
-It is useful to write your sources."
+If SRC is omitted, use current source.
+If COMPUTE is non--nil compute value of ATTRIBUTE-NAME
+with `helm-interpret-value'."
   (helm-aif (assq attribute-name src)
-      (cdr it)))
-
-(defun* helm-attr* (attribute-name
-                    &optional (src (helm-get-current-source)))
-  "Pass the value of ATTRIBUTE-NAME of SRC to `helm-interpret-value'.
-if SRC is omitted, use current source.
-It is useful to write your sources."
-  (helm-interpret-value (helm-attr attribute-name src)))
+      (if compute (helm-interpret-value (cdr it)) (cdr it))))
 
 (defun* helm-attr-defined (attribute-name
                            &optional (src (helm-get-current-source)))
   "Return non-nil if ATTRIBUTE-NAME of SRC is defined.
-if SRC is omitted, use current source.
-It is useful to write your sources."
+if SRC is omitted, use current source."
   (and (assq attribute-name src) t))
 
 (defun* helm-attrset (attribute-name value
                                      &optional
                                      (src (helm-get-current-source)))
-  "Set the value of ATTRIBUTE-NAME of SRC to VALUE.
-if SRC is omitted, use current source.
-It is useful to write your sources."
+  "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
+If ATTRIBUTE-NAME doesn't exists in source it is created with value VALUE.
+If SRC is omitted, use current source."
   (helm-aif (assq attribute-name src)
       (setcdr it value)
     (setcdr src (cons (cons attribute-name value) (cdr src))))
@@ -790,14 +783,11 @@ LONG-DOC is displayed below attribute name and short documentation."
 (put 'helm-document-attribute 'lisp-indent-function 2)
 
 (defun helm-interpret-value (value &optional source)
-  "Interpret VALUE as variable, function or literal.
+  "Interpret VALUE as variable, function or literal and return it.
 If VALUE is a function, call it with no arguments and return the value.
-If SOURCE is `helm' source, `helm-source-name' is source name.
-
+If SOURCE compute VALUE for this source.
 If VALUE is a variable, return the value.
-
 If VALUE is a symbol, but it is not a function or a variable, cause an error.
-
 Otherwise, return VALUE itself."
   (cond ((and source (functionp value))
          (helm-funcall-with-source source value))
