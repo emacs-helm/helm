@@ -1846,7 +1846,7 @@ is done on whole `helm-buffer' and not on current source."
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
 If arg PRESELECT, a candidate to preselect, is provided,
-It will be preselected by `anything-update', otherwise the current candidate
+It will be preselected by `helm-update', otherwise the current candidate
 will be preselected is available.
 If current source has `update' attribute, a function without argument,
 call it before update."
