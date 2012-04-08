@@ -1429,13 +1429,24 @@ return FNAME unchanged."
 
 (defun helm-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
-  (let ((type       (helm-file-attributes candidate :type t))
-        (dired-line (helm-file-attributes candidate :dired t :human-size t)))
+  (let* ((all (helm-file-attributes candidate :human-size t))
+         (type       (helm-file-attributes candidate :type t))
+         (dired-line (helm-file-attributes candidate :dired t :human-size t))
+         (mode-type (getf all :mode-type))
+         (owner (getf all :uid))
+         (owner-right (getf all :user t))
+         (group (getf all :gid))
+         (group-right (getf all :group))
+         (other-right (getf all :other))
+         (size (helm-file-attributes candidate :size t :human-size t))
+         (creation (helm-file-attributes candidate :status t))
+         (access (helm-file-attributes candidate :access-time t)))
     (if (window-system)
         (tooltip-show
          (concat
           (helm-c-basename candidate) "\n"
-          "Type: " type "\n"
+          dired-line "\n"
+          (format "Type: %s: %s\n" type mode-type)
           (when (string= type "symlink")
             (format "True name: '%s'\n"
                     (cond ((string-match "^\.#" (helm-c-basename candidate))
@@ -1443,7 +1454,12 @@ return FNAME unchanged."
                           ((helm-ff-valid-symlink-p candidate)
                            (file-truename candidate))
                           (t "Invalid Symlink"))))
-          dired-line))
+          (format "Owner: %s: %s\n" owner owner-right)
+          (format "Group: %s: %s\n" group group-right)
+          (format "Other: All: %s\n" other-right)
+          (format "Size: %s\n" size)
+          (format "Created: %s\n" creation)
+          (format "Accessed: %s\n" access)))
         (message dired-line) (sit-for 5))))
 
 ;;;###autoload

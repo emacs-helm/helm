@@ -422,24 +422,26 @@ KBSIZE if a floating point number, default value is 1024.0."
 
 (defun* helm-file-attributes
     (file &key type links uid gid access-time modif-time
-          status size mode gid-change inode device-num dired human-size)
+          status size mode gid-change inode device-num dired human-size
+          mode-type mode-owner mode-group mode-other)
   "Easy interface for `file-attributes'."
-  (let ((all (destructuring-bind
-                   (type links uid gid access-time modif-time
-                         status size mode gid-change inode device-num)
-                 (file-attributes file 'string)
-               (list :type        type
-                     :links       links
-                     :uid         uid
-                     :gid         gid
-                     :access-time access-time
-                     :modif-time  modif-time
-                     :status      status
-                     :size        size
-                     :mode        mode
-                     :gid-change  gid-change
-                     :inode       inode
-                     :device-num  device-num))))
+  (let* ((all (destructuring-bind
+                    (type links uid gid access-time modif-time
+                          status size mode gid-change inode device-num)
+                  (file-attributes file 'string)
+                (list :type        type
+                      :links       links
+                      :uid         uid
+                      :gid         gid
+                      :access-time access-time
+                      :modif-time  modif-time
+                      :status      status
+                      :size        size
+                      :mode        mode
+                      :gid-change  gid-change
+                      :inode       inode
+                      :device-num  device-num)))
+         (modes (helm-split-mode-file-attributes (getf all :mode))))
     (cond (type
            (let ((result (getf all :type)))
              (cond ((stringp result)
@@ -463,14 +465,38 @@ KBSIZE if a floating point number, default value is 1024.0."
           (device-num (getf all :device-num))
           (dired
            (concat
-            (getf all :mode) " "
+            (helm-split-mode-file-attributes
+             (getf all :mode) t) " "
             (number-to-string (getf all :links)) " "
             (getf all :uid) ":"
             (getf all :gid) " "
-            (if human-size (helm-file-human-size (getf all :size))
+            (if human-size
+                (helm-file-human-size (getf all :size))
                 (int-to-string (getf all :size))) " "
-                (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
-          (t all))))
+            (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
+          (mode-type (getf modes :mode-type))
+          (mode-owner (getf modes :user))
+          (mode-group (getf modes :group))
+          (mode-other (getf modes :other))
+          (t (append all modes)))))
+
+(defun helm-split-mode-file-attributes (str &optional string)
+  "Split mode file attributes STR into a proplist.
+If STRING is non--nil return instead a space separated string."
+  (loop with type = (substring str 0 1)
+        with cdr = (substring str 1)
+        for i across cdr
+        for count from 1
+        if (<= count 3)
+        concat (string i) into user
+        if (and (> count 3) (<= count 6))
+        concat (string i) into group
+        if (and (> count 6) (<= count 9))
+        concat (string i) into other
+        finally return
+        (if string
+            (mapconcat 'identity (list type user group other) " ")
+            (list :mode-type type :user user :group group :other other))))
 
 (defun helm-c-current-directory ()
   "Return current-directory name at point.
