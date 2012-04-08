@@ -457,8 +457,7 @@ KBSIZE if a floating point number, default value is 1024.0."
            (format-time-string "%Y-%m-%d %R" (getf all :modif-time)))
           (status
            (format-time-string "%Y-%m-%d %R" (getf all :status)))
-          (size (if human-size (helm-file-human-size (getf all :size))
-                    (getf all :size)))
+          (size (getf all :size))
           (mode (getf all :mode))
           (gid-change (getf all :gid-change))
           (inode (getf all :inode))
@@ -474,6 +473,7 @@ KBSIZE if a floating point number, default value is 1024.0."
                 (helm-file-human-size (getf all :size))
                 (int-to-string (getf all :size))) " "
             (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
+          (human-size (helm-file-human-size (getf all :size)))
           (mode-type (getf modes :mode-type))
           (mode-owner (getf modes :user))
           (mode-group (getf modes :group))
