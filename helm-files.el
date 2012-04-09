@@ -190,7 +190,12 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   "Search for library in `require' and `declare-function' sexp."
   :group 'helm-files
   :type  'boolean)
-  
+
+(defcustom helm-tooltip-hide-delay 25
+  "Hide tooltips automatically after this many seconds."
+  :group 'helm-files
+  :type 'integer)
+
 
 ;;; Faces
 ;;
@@ -1427,25 +1432,38 @@ return FNAME unchanged."
 (defun helm-ff-valid-symlink-p (file)
   (file-exists-p (file-truename file)))
 
+(defun helm-get-default-mode-for-file (filename)
+  "Return the default mode to open FILENAME."
+  (let ((mode (loop for (r . m) in auto-mode-alist
+                    thereis (and (string-match r filename) m))))
+   (or (and (symbolp mode) mode) "Fundamental")))
+
 (defun helm-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
-  (let* ((all (helm-file-attributes candidate))
-         (type       (helm-file-attributes candidate :type t))
-         (dired-line (helm-file-attributes candidate :dired t :human-size t))
-         (mode-type (getf all :mode-type))
-         (owner (getf all :uid))
-         (owner-right (getf all :user t))
-         (group (getf all :gid))
-         (group-right (getf all :group))
-         (other-right (getf all :other))
-         (size (helm-file-human-size (getf all :size)))
-         (creation (helm-file-attributes candidate :status t))
-         (access (helm-file-attributes candidate :access-time t)))
-    (if (window-system)
+  (let* ((all                (helm-file-attributes candidate))
+         (type               (helm-file-attributes candidate :type t))
+         (dired-line         (helm-file-attributes
+                              candidate :dired t :human-size t))
+         (mode-type          (getf all :mode-type))
+         (owner              (getf all :uid))
+         (owner-right        (getf all :user t))
+         (group              (getf all :gid))
+         (group-right        (getf all :group))
+         (other-right        (getf all :other))
+         (size               (helm-file-human-size (getf all :size)))
+         (creation           (helm-file-attributes candidate :status t))
+         (access             (helm-file-attributes candidate :access-time t))
+         (ext                (helm-get-default-program-for-file candidate))
+         (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
+    (if (and (window-system) tooltip-mode)
         (tooltip-show
          (concat
           (helm-c-basename candidate) "\n"
           dired-line "\n"
+          (format "Mode: %s\n" (helm-get-default-mode-for-file candidate))
+          (format "Ext prog: %s\n" (or (and ext (replace-regexp-in-string
+                                                 " %s" "" ext))
+                                       "Not defined"))
           (format "Type: %s: %s\n" type mode-type)
           (when (string= type "symlink")
             (format "True name: '%s'\n"
@@ -1456,9 +1474,9 @@ return FNAME unchanged."
                           (t "Invalid Symlink"))))
           (format "Owner: %s: %s\n" owner owner-right)
           (format "Group: %s: %s\n" group group-right)
-          (format "Other: All: %s\n" other-right)
+          (format "Others: %s\n" other-right)
           (format "Size: %s\n" size)
-          (format "Created: %s\n" creation)
+          (format "Modified: %s\n" creation)
           (format "Accessed: %s\n" access)))
         (message dired-line) (sit-for 5))))
 
