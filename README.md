@@ -36,6 +36,11 @@ the trap of backward compatibility.
     (require 'helm-config)
     ```
 
+### Install from Emacs packaging system
+
+Helm is now available on Melpa at `http://melpa.milkbox.net/`
+You will find there instructions to install.
+
 **Note to Linux Distributions Maintainers**
 
 `Only the extensions present in the github emacs-helm organisation are supported.`
