@@ -1451,7 +1451,7 @@ return FNAME unchanged."
          (group-right        (getf all :group))
          (other-right        (getf all :other))
          (size               (helm-file-human-size (getf all :size)))
-         (creation           (helm-file-attributes candidate :status t))
+         (modif              (helm-file-attributes candidate :modif-time t))
          (access             (helm-file-attributes candidate :access-time t))
          (ext                (helm-get-default-program-for-file candidate))
          (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
@@ -1476,7 +1476,7 @@ return FNAME unchanged."
           (format "Group: %s: %s\n" group group-right)
           (format "Others: %s\n" other-right)
           (format "Size: %s\n" size)
-          (format "Modified: %s\n" creation)
+          (format "Modified: %s\n" modif)
           (format "Accessed: %s\n" access)))
         (message dired-line) (sit-for 5))))
 
