@@ -1441,9 +1441,9 @@ return FNAME unchanged."
 (defun helm-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
   (let* ((all                (helm-file-attributes candidate))
-         (type               (helm-file-attributes candidate :type t))
          (dired-line         (helm-file-attributes
                               candidate :dired t :human-size t))
+         (type               (getf all :type))
          (mode-type          (getf all :mode-type))
          (owner              (getf all :uid))
          (owner-right        (getf all :user t))
@@ -1451,8 +1451,8 @@ return FNAME unchanged."
          (group-right        (getf all :group))
          (other-right        (getf all :other))
          (size               (helm-file-human-size (getf all :size)))
-         (modif              (helm-file-attributes candidate :modif-time t))
-         (access             (helm-file-attributes candidate :access-time t))
+         (modif              (getf all :modif-time))
+         (access             (getf all :access-time))
          (ext                (helm-get-default-program-for-file candidate))
          (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
     (if (and (window-system) tooltip-mode)

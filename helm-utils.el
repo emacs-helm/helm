@@ -429,34 +429,28 @@ KBSIZE if a floating point number, default value is 1024.0."
                     (type links uid gid access-time modif-time
                           status size mode gid-change inode device-num)
                   (file-attributes file 'string)
-                (list :type        type
+                (list :type        (cond ((stringp type) "symlink")
+                                         (type "directory")
+                                         (t "file"))
                       :links       links
                       :uid         uid
                       :gid         gid
-                      :access-time access-time
-                      :modif-time  modif-time
-                      :status      status
+                      :access-time (format-time-string "%Y-%m-%d %R" access-time)
+                      :modif-time  (format-time-string "%Y-%m-%d %R" modif-time)
+                      :status      (format-time-string "%Y-%m-%d %R" status)
                       :size        size
                       :mode        mode
                       :gid-change  gid-change
                       :inode       inode
                       :device-num  device-num)))
          (modes (helm-split-mode-file-attributes (getf all :mode))))
-    (cond (type
-           (let ((result (getf all :type)))
-             (cond ((stringp result)
-                    "symlink")
-                   (result "directory")
-                   (t "file"))))
+    (cond (type (getf all :type))
           (links (getf all :links))
           (uid   (getf all :uid))
           (gid   (getf all :gid))
-          (access-time
-           (format-time-string "%Y-%m-%d %R" (getf all :access-time)))
-          (modif-time
-           (format-time-string "%Y-%m-%d %R" (getf all :modif-time)))
-          (status
-           (format-time-string "%Y-%m-%d %R" (getf all :status)))
+          (access-time (getf all :access-time))
+          (modif-time (getf all :modif-time))
+          (status (getf all :status))
           (size (getf all :size))
           (mode (getf all :mode))
           (gid-change (getf all :gid-change))
@@ -464,15 +458,14 @@ KBSIZE if a floating point number, default value is 1024.0."
           (device-num (getf all :device-num))
           (dired
            (concat
-            (helm-split-mode-file-attributes
-             (getf all :mode) t) " "
+            (helm-split-mode-file-attributes (getf all :mode) t) " "
             (number-to-string (getf all :links)) " "
             (getf all :uid) ":"
             (getf all :gid) " "
             (if human-size
                 (helm-file-human-size (getf all :size))
                 (int-to-string (getf all :size))) " "
-            (format-time-string "%Y-%m-%d %R" (getf all :modif-time))))
+            (getf all :modif-time)))
           (human-size (helm-file-human-size (getf all :size)))
           (mode-type (getf modes :mode-type))
           (mode-owner (getf modes :user))
