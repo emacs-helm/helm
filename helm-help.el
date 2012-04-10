@@ -880,6 +880,28 @@ HELM-ATTRIBUTE should be a symbol."
   "  Help message for this source.
   If not present, `helm-help-message' value will be used.")
 
+(helm-document-attribute 'match-part "optional"
+  "  Allow matching candidate in the line with `candidates-in-buffer'.
+In candidates-in-buffer sources, match is done with `re-search-forward'
+which allow matching only a regexp on the `helm-buffer'; when this search is
+done, match-part allow matching only a specific part of the current line e.g
+with a line like this:
+
+filename:candidate-containing-the-word-filename
+
+What you want is to ignore \"filename\" part and match only
+\"candidate-containing-the-word-filename\" 
+
+So give a function matching only the part of candidate after \":\"
+
+If source contain match-part attribute, match is computed only
+on part of candidate returned by the call of function provided
+by this attribute.
+The function should have one arg, candidate, and return only
+a specific part of candidate.
+
+NOTE: This have effect only on sources using `candidates-in-buffer'.")
+
 
 (provide 'helm-help)
 

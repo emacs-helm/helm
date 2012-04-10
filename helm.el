@@ -2617,8 +2617,14 @@ creates candidates dynamically and need to be called everytime
 Because `helm-candidates-in-buffer' plays the role of `match' attribute
 function, specifying `(match identity)' makes the source slightly faster.
 
+However if source contain match-part attribute, match is computed only
+on part of candidate returned by the call of function provided by this attribute.
+The function should have one arg, candidate, and return only
+a specific part of candidate.
+
 To customize `helm-candidates-in-buffer' behavior, use search,
-get-line and search-from-end attributes. See also `helm-sources' docstring."
+get-line, match-part and search-from-end attributes.
+See also `helm-sources' docstring."
   (declare (special source))
   (helm-candidates-in-buffer-1
    (helm-candidate-buffer)
@@ -2631,7 +2637,8 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
            '(helm-candidates-in-buffer-search-from-end)
            '(helm-candidates-in-buffer-search-from-start)))
    (helm-candidate-number-limit source)
-   (assoc 'search-from-end source)))
+   (assoc 'search-from-end source)
+   (helm-attr 'match-part)))
 
 (defun helm-candidates-in-buffer-search-from-start (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
@@ -2642,7 +2649,8 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
   (re-search-backward pattern nil t))
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
-                                    search-fns limit search-from-end)
+                                    search-fns limit search-from-end
+                                    match-part-fn)
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
@@ -2654,7 +2662,7 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
              endp get-line-fn limit search-from-end)
             (helm-search-from-candidate-buffer
              pattern get-line-fn search-fns limit search-from-end
-             start-point endp))))))
+             start-point endp match-part-fn))))))
 
 (defun helm-point-is-moved (proc)
   "If point is moved after executing PROC, return t, otherwise nil."
@@ -2662,7 +2670,7 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit search-from-end
-                                          start-point endp)
+                                          start-point endp match-part-fn)
   (let (buffer-read-only
         matches exit newmatches)
     (helm-search-from-candidate-buffer-internal
@@ -2674,6 +2682,8 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
          (loop with item-count = 0
                while (funcall searcher pattern)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
+               when (and match-part-fn
+                         (helm-search-match-part cand pattern match-part-fn))
                do (helm-accumulate-candidates-internal
                    cand newmatches helm-cib-hash item-count limit)
                unless (helm-point-is-moved
@@ -2684,6 +2694,13 @@ get-line and search-from-end attributes. See also `helm-sources' docstring."
                return nil)
          (setq matches (append matches (nreverse newmatches))))
        (delq nil matches)))))
+
+(defun helm-search-match-part (candidate pattern match-part-fn)
+  "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN."
+  (if (string-match " " pattern)
+      (loop for i in (split-string pattern " " t)
+            always (funcall match-part-fn candidate))
+      (string-match pattern (funcall match-part-fn candidate))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
                                                       get-line-fn

@@ -157,9 +157,9 @@ If not found in CURRENT-DIR search in upper directory."
           (with-helm-current-buffer
             (helm-c-etags-get-tag-file))))
 
-(defmacro helm-c-etags-create-buffer (file)
+(defun helm-c-etags-create-buffer (file)
   "Create the `helm-buffer' based on contents of etags tag FILE."
-  `(let* ((tag-fname ,file)
+  (let* ((tag-fname file)
           max
           (split (with-current-buffer (find-file-noselect tag-fname)
                    (prog1
@@ -209,6 +209,8 @@ If no entry in cache, create one."
     (header-name . helm-c-source-etags-header-name)
     (init . helm-c-etags-init)
     (candidates-in-buffer)
+    (match-part . (lambda (candidate)
+                    (cadr (split-string candidate ":"))))
     (search . (helm-c-etags-search-fn))
     (mode-line . helm-etags-mode-line-string)
     (action . helm-c-etags-default-action)
