@@ -193,6 +193,8 @@ If no entry in cache, create one."
     (init . helm-c-etags-init)
     (candidates-in-buffer)
     (match-part . (lambda (candidate)
+                    ;; Match only the tag part of CANDIDATE
+                    ;; and not the filename.
                     (cadr (split-string candidate ":"))))
     (mode-line . helm-etags-mode-line-string)
     (action . helm-c-etags-default-action)
