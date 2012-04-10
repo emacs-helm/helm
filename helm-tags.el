@@ -36,23 +36,6 @@ Don't search tag file deeply if outside this value."
   :type  'number
   :group 'helm-tags)
 
-(defcustom helm-c-etags-use-regexp-search nil
-  "When non--nil search etags candidates by regexp.
-This disable helm-match-plugin when enabled.
-When nil search is performed directly on patter and *match-plugin is used
-if available.  You can customize `helm-c-etags-search-regexp'."
-  :group 'helm-tags
-  :type  'boolean)
-
-(defcustom helm-c-etags-search-regexp "^.+: .+ \\<%s"
-  "Regexp that match tags in an helm etags buffer.
-The format spec is replaced by pattern.
-This regexp have no effect when `helm-c-etags-use-regexp-search'
-is nil."
-  :group 'helm-tags
-  :type  'regexp)
-
-
 
 (defvar helm-c-etags-map
   (let ((map (make-sparse-keymap)))
@@ -211,21 +194,12 @@ If no entry in cache, create one."
     (candidates-in-buffer)
     (match-part . (lambda (candidate)
                     (cadr (split-string candidate ":"))))
-    (search . (helm-c-etags-search-fn))
     (mode-line . helm-etags-mode-line-string)
     (action . helm-c-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (helm-c-etags-default-action candidate)
                            (helm-match-line-color-current-line))))
   "Helm source for Etags.")
-
-(defun helm-c-etags-search-fn (pattern)
-  "Search function for `helm-c-source-etags-select'."
-  (re-search-forward
-   (if helm-c-etags-use-regexp-search
-       (format helm-c-etags-search-regexp pattern)
-       pattern)
-   nil t))
 
 (defun helm-c-etags-default-action (candidate)
   "Helm default action to jump to an etags entry."
@@ -261,13 +235,7 @@ If tag file have been modified reinitialize cache."
   (let ((tag  (helm-c-etags-get-tag-file))
         (init (and (equal arg '(4)) (thing-at-point 'symbol)))
         (helm-quit-if-no-candidate t)
-        (helm-execute-action-at-once-if-one t)
-        (helm-compile-source-functions
-         (if helm-c-etags-use-regexp-search
-             ;; rule out helm-match-plugin because the input is one regexp.
-             (delq 'helm-compile-source--match-plugin
-                   (copy-sequence helm-compile-source-functions))
-             helm-compile-source-functions)))
+        (helm-execute-action-at-once-if-one t))
     (when (or (equal arg '(16))
               (and helm-c-etags-mtime-alist
                    (helm-c-etags-file-modified-p tag)))
