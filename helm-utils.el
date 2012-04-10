@@ -423,21 +423,57 @@ KBSIZE if a floating point number, default value is 1024.0."
 (defun* helm-file-attributes
     (file &key type links uid gid access-time modif-time
           status size mode gid-change inode device-num dired human-size
-          mode-type mode-owner mode-group mode-other)
-  "Easy interface for `file-attributes'."
+          mode-type mode-owner mode-group mode-other (string t))
+  "Return `file-attributes' elements of FILE separately according to key value.
+Availables keys are:
+- TYPE: Same as nth 0 `files-attributes' if STRING is nil
+        otherwise return either symlink, directory or file (default).
+- LINKS: See nth 1 `files-attributes'.
+- UID: See nth 2 `files-attributes'.
+- GID: See nth 3 `files-attributes'.
+- ACCESS-TIME: See nth 4 `files-attributes', however format time
+               when STRING is non--nil (the default).
+- MODIF-TIME: See nth 5 `files-attributes', same as above.
+- STATUS: See nth 6 `files-attributes', same as above.
+- SIZE: See nth 7 `files-attributes'.
+- MODE: See nth 8 `files-attributes'.
+- GID-CHANGE: See nth 9 `files-attributes'.
+- INODE: See nth 10 `files-attributes'.
+- DEVICE-NUM: See nth 11 `files-attributes'.
+- DIRED: A line similar to what 'ls -l' return.
+- HUMAN-SIZE: The size in human form, see `helm-file-human-size'.
+- MODE-TYPE, mode-owner,mode-group, mode-other: Split what
+  nth 7 `files-attributes' return in four categories.
+- STRING: When non--nil (default) `helm-file-attributes' return
+          more friendly values.
+If you want the same behavior as `files-attributes' ,
+\(but with return values in proplist\) use a nil value for STRING.
+However when STRING is non--nil, time and type value are different from what
+you have in `file-attributes'."
   (let* ((all (destructuring-bind
                     (type links uid gid access-time modif-time
                           status size mode gid-change inode device-num)
-                  (file-attributes file 'string)
-                (list :type        (cond ((stringp type) "symlink")
-                                         (type "directory")
-                                         (t "file"))
+                  (file-attributes file string)
+                (list :type        (if string
+                                       (cond ((stringp type) "symlink") ; fname
+                                             (type "directory")         ; t
+                                             (t "file"))                ; nil
+                                       type)
                       :links       links
                       :uid         uid
                       :gid         gid
-                      :access-time (format-time-string "%Y-%m-%d %R" access-time)
-                      :modif-time  (format-time-string "%Y-%m-%d %R" modif-time)
-                      :status      (format-time-string "%Y-%m-%d %R" status)
+                      :access-time (if string
+                                       (format-time-string
+                                        "%Y-%m-%d %R" access-time)
+                                       access-time)
+                      :modif-time  (if string
+                                       (format-time-string
+                                        "%Y-%m-%d %R" modif-time)
+                                       modif-time)
+                      :status      (if string
+                                       (format-time-string
+                                        "%Y-%m-%d %R" status)
+                                       status)
                       :size        size
                       :mode        mode
                       :gid-change  gid-change
