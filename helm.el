@@ -2682,8 +2682,13 @@ See also `helm-sources' docstring."
          (loop with item-count = 0
                while (funcall searcher pattern)
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
-               when (or (not match-part-fn)
-                        (helm-search-match-part cand pattern match-part-fn))
+               when (or
+                     ;; Always collect when cand is matched by searcher funcs
+                     ;; and match-part attr is not present.
+                     (not match-part-fn)
+                     ;; If match-part attr is present, collect only if PATTERN
+                     ;; match the part of CAND specified by the match-part func.
+                     (helm-search-match-part cand pattern match-part-fn))
                do (helm-accumulate-candidates-internal
                    cand newmatches helm-cib-hash item-count limit)
                unless (helm-point-is-moved
@@ -2726,7 +2731,6 @@ See also `helm-sources' docstring."
     (delete-char 1)
     (goto-char (1- (point-max)))
     (delete-char 1)
-
     (set-buffer-modified-p nil)))
 
 (defun helm-candidate-buffer (&optional create-or-buffer)

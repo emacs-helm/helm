@@ -272,6 +272,11 @@ i.e (identity (string-match \"foo\" \"foo bar\")) => t."
           always (funcall predicate (string-match regexp str)))))
 
 (defun helm-mp-3-search-base (pattern searchfn1 searchfn2)
+  "Try to find PATTERN in `helm-buffer' with SEARCHFN1 and SEARCHFN2.
+This is the search function for `candidates-in-buffer' enabled sources.
+Use the same method as `helm-mp-3-match' except it search in buffer
+instead of matching on a string.
+i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (loop with pat = (if (stringp pattern)
                        (helm-mp-3-get-patterns pattern)
                        pattern)
