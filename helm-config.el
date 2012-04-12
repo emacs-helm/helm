@@ -171,8 +171,7 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-at-point
-;;;;;;  helm-resume-window-only helm-resume helm-open-last-log) "helm"
-;;;;;;  "helm.el" (20351 61929))
+;;;;;;  helm-resume helm-open-last-log) "helm" "helm.el" (20358 38639))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -186,12 +185,7 @@ Resurrect previously invoked `helm'.
 Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions.
 
-\(fn &optional (any-buffer helm-last-buffer) BUFFER-PATTERN (any-resume t))" t nil)
-
-(autoload 'helm-resume-window-only "helm" "\
-
-
-\(fn &optional (any-buffer helm-last-buffer) BUFFER-PATTERN)" t nil)
+\(fn ARG)" t nil)
 
 (autoload 'helm-at-point "helm" "\
 Call helm with symbol at point as initial input.
@@ -208,6 +202,9 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args.
 
 (autoload 'helm-force-update "helm" "\
 Force recalculation and update of candidates.
+If arg PRESELECT, a candidate to preselect, is provided,
+It will be preselected by `helm-update', otherwise the current candidate
+will be preselected is available.
 If current source has `update' attribute, a function without argument,
 call it before update.
 
@@ -758,7 +755,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20350 41523))
+;;;;;;  "helm-files" "helm-files.el" (20357 47167))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1105,7 +1102,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20347 63906))
+;;;;;;  (20356 989))
 ;;; Generated autoloads from helm-help.el
 
 (autoload 'helm-help "helm-help" "\
@@ -1228,7 +1225,7 @@ Preconfigured `helm' for Man and Woman pages.
 ;;;***
 
 ;;;### (autoloads (helm-mp-toggle-match-plugin) "helm-match-plugin"
-;;;;;;  "helm-match-plugin.el" (20345 62057))
+;;;;;;  "helm-match-plugin.el" (20357 12944))
 ;;; Generated autoloads from helm-match-plugin.el
 
 (autoload 'helm-mp-toggle-match-plugin "helm-match-plugin" "\
@@ -1430,7 +1427,7 @@ Preconfigured `helm' for emacs process.
 ;;;***
 
 ;;;### (autoloads (helm-c-etags-select) "helm-tags" "helm-tags.el"
-;;;;;;  (20345 62057))
+;;;;;;  (20356 35196))
 ;;; Generated autoloads from helm-tags.el
 
 (autoload 'helm-c-etags-select "helm-tags" "\
@@ -1445,7 +1442,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20351 62637))
+;;;;;;  "helm-utils" "helm-utils.el" (20356 19220))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1520,8 +1517,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20351
-;;;;;;  63022 643587))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20358
+;;;;;;  38834 443579))
 
 ;;;***
 

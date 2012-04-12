@@ -1092,45 +1092,41 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 ;;
 ;;
 ;;;###autoload
-(defun* helm-resume (&optional
-                     (any-buffer helm-last-buffer)
-                     buffer-pattern (any-resume t))
+(defun helm-resume (arg)
   "Resurrect previously invoked `helm'.
 Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions."
-  (interactive)
-  (when (or current-prefix-arg buffer-pattern)
-    (setq any-buffer (helm-resume-select-buffer buffer-pattern)))
-  (setq helm-compiled-sources nil)
-  (helm
-   :sources (or (buffer-local-value
-                 'helm-last-sources-local (get-buffer any-buffer))
-                helm-last-sources helm-sources)
-   :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
-   :resume any-resume
-   :buffer any-buffer))
-
-;;;###autoload
-(defun* helm-resume-window-only (&optional
-                                 (any-buffer helm-last-buffer)
-                                 buffer-pattern)
-  (interactive)
-  (helm-resume any-buffer buffer-pattern 'window-only))
+  (interactive "P")
+  (let (any-buffer)
+    (if arg
+        (setq any-buffer (helm-resume-select-buffer))
+        (setq any-buffer helm-last-buffer))
+    (assert any-buffer nil
+            "helm-resume: No helm buffers found to resume")
+    (setq helm-compiled-sources nil)
+    (helm
+     :sources (or (buffer-local-value
+                   'helm-last-sources-local (get-buffer any-buffer))
+                  helm-last-sources
+                  helm-sources)
+     :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
+     :resume t
+     :buffer any-buffer)))
 
 (defun helm-resume-p (any-resume)
-  "Whether current helm session is resumed or not.
-Just check if ANY-RESUME value is t or window-only."
-  (memq any-resume '(t window-only)))
+  "Whether current helm session is resumed or not."
+  (eq any-resume t))
 
-(defun helm-resume-select-buffer (input)
-  "Resume precedent helm session with initial input INPUT."
-  (or (helm :sources '(((name . "Resume helm buffer")
-                        (candidates . helm-buffers)
-                        (action . identity)))
-            :input  input
-            :resume 'noresume
-            :buffer "*helm resume*")
-      (keyboard-quit)))
+(defun helm-resume-select-buffer ()
+  "Select an `helm-buffer' in `helm-buffers' list to resume an helm session.
+Return nil if no `helm-buffer' found."
+  (when helm-buffers
+    (or (helm :sources '(((name . "Resume helm buffer")
+                          (candidates . helm-buffers)
+                          (action . identity)))
+              :resume 'noresume
+              :buffer "*helm resume*")
+        (keyboard-quit))))
 
 
 ;;;###autoload
