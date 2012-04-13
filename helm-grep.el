@@ -287,20 +287,74 @@ WHERE can be one of other-window, elscreen, other-frame."
             do (setq new-buf (read-string "GrepBufferName: " "*grep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (kill-all-local-variables)
-      (let ((inhibit-read-only t)
-            (grep-mode-font-lock-keywords
-             `((,helm-pattern (0 grep-match-face))
-               ,grep-mode-font-lock-keywords)))
+      (set (make-local-variable 'buffer-read-only) t)
+      (let ((inhibit-read-only t))
         (erase-buffer)
-        (insert "-*- mode: grep -*-\n\n"
+        (insert "-*- mode: helm-grep -*-\n\n"
                 (format "Grep Results for `%s':\n\n" helm-pattern))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
-                    (buffer-substring (point) (point-max))))
-          (grep-mode))))
+                    (buffer-substring (point) (point-max))))))
+      (helm-grep-mode) (pop-to-buffer buf))
     (message "Helm Grep Results saved in `%s' buffer" buf)))
+
+(defvar helm-grep-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") 'helm-grep-mode-jump)
+    (define-key map (kbd "C-o") 'helm-grep-mode-jump-other-window)
+    (define-key map (kbd "q")   'helm-grep-mode-quit)
+    (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
+    (define-key map (kbd "<C-up>") 'helm-grep-mode-jump-other-window-backward)
+    map))
+
+;;;###autoload
+(define-derived-mode helm-grep-mode
+    text-mode "helm-grep-"
+    "Major mode to provide actions in helm grep saved buffer.
+
+Special commands:
+\\{helm-grep-mode-map}")
+
+;;;###autoload
+(defun helm-grep-mode-quit ()
+  (interactive)
+  (view-mode 1) (View-quit))
+
+;;;###autoload
+(defun helm-grep-mode-jump ()
+  (interactive)
+  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+    (condition-case nil
+        (progn (helm-c-grep-action candidate) (delete-other-windows))
+      (error nil))))
+
+(defun helm-grep-mode-jump-other-window-1 (arg)
+  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+    (condition-case nil
+        (progn
+          (save-selected-window
+            (helm-c-grep-action candidate 'other-window))
+          (forward-line arg))
+      (error nil))))
+
+;;;###autoload
+(defun helm-grep-mode-jump-other-window-forward ()
+  (interactive)
+  (helm-grep-mode-jump-other-window-1 1))
+
+;;;###autoload
+(defun helm-grep-mode-jump-other-window-backward ()
+  (interactive)
+  (helm-grep-mode-jump-other-window-1 -1))
+
+;;;###autoload
+(defun helm-grep-mode-jump-other-window ()
+  (interactive)
+  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+    (condition-case nil
+        (helm-c-grep-action candidate 'other-window))
+      (error nil)))
 
 (defun helm-c-grep-persistent-action (candidate)
   "Persistent action for `helm-do-grep'.

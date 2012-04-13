@@ -171,7 +171,7 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-at-point
-;;;;;;  helm-resume helm-open-last-log) "helm" "helm.el" (20358 38639))
+;;;;;;  helm-resume helm-open-last-log) "helm" "helm.el" (20358 42209))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -755,7 +755,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20357 47167))
+;;;;;;  "helm-files" "helm-files.el" (20359 8264))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1038,9 +1038,33 @@ Preconfigured `helm' for gentoo linux.
 
 ;;;### (autoloads (helm-do-pdfgrep helm-do-zgrep helm-do-grep helm-c-grep-run-save-buffer
 ;;;;;;  helm-c-grep-run-other-window-action helm-c-grep-run-default-action
-;;;;;;  helm-c-grep-run-persistent-action helm-c-goto-next-file helm-c-goto-precedent-file)
-;;;;;;  "helm-grep" "helm-grep.el" (20345 62057))
+;;;;;;  helm-c-grep-run-persistent-action helm-c-goto-next-file helm-c-goto-precedent-file
+;;;;;;  helm-grep-mode-jump-other-window helm-grep-mode-jump helm-grep-mode-quit
+;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20359 62667))
 ;;; Generated autoloads from helm-grep.el
+
+(autoload 'helm-grep-mode "helm-grep" "\
+Major mode to provide actions in helm grep saved buffer.
+
+Special commands:
+\\{helm-grep-mode-map}
+
+\(fn)" t nil)
+
+(autoload 'helm-grep-mode-quit "helm-grep" "\
+
+
+\(fn)" t nil)
+
+(autoload 'helm-grep-mode-jump "helm-grep" "\
+
+
+\(fn)" t nil)
+
+(autoload 'helm-grep-mode-jump-other-window "helm-grep" "\
+
+
+\(fn)" t nil)
 
 (autoload 'helm-c-goto-precedent-file "helm-grep" "\
 Go to precedent file in helm grep/etags buffers.
@@ -1517,8 +1541,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20358
-;;;;;;  38834 443579))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20359
+;;;;;;  62882 876860))
 
 ;;;***
 
