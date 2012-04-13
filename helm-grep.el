@@ -23,6 +23,7 @@
 (require 'helm-buffers)
 
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))
+(declare-function View-quit "view")
 
 
 (defgroup helm-grep nil

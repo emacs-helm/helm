@@ -18,6 +18,7 @@
 ;;; Code:
 (eval-when-compile (require 'cl))
 (require 'helm)
+(require 'eldoc)
 
 
 (defgroup helm-eval nil
