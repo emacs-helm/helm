@@ -337,6 +337,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . helm-ff-mode-line-string)
+    (keymap . ,helm-find-files-map)
     (volatile)
     (candidate-number-limit . 9999)
     (action-transformer . helm-find-files-action-transformer)
@@ -1840,7 +1841,6 @@ Use it for non--interactive calls of `helm-find-files'."
     (helm :sources 'helm-c-source-find-files
           :input fname
           :preselect preselect
-          :keymap helm-find-files-map
           :prompt "Find Files or Url: "
           :buffer "*Helm Find Files*")))
 
