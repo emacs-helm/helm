@@ -229,7 +229,8 @@ See `helm-c-grep-default-command' for format specs.")
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split        (helm-c-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
-         (loc-fname    (car split))
+         (loc-fname    (or (get-text-property (point-at-bol) 'help-echo)
+                           (car split)))
          (tramp-method (file-remote-p helm-ff-default-directory 'method))
          (tramp-host   (file-remote-p helm-ff-default-directory 'host))
          (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
@@ -248,6 +249,7 @@ WHERE can be one of other-window, elscreen, other-frame."
       (push-mark (point) 'nomsg))
     ;; Save history
     (unless (or helm-in-persistent-action
+                (eq major-mode 'helm-grep-mode)
                 (string= helm-pattern ""))
       (setq helm-c-grep-history
             (cons helm-pattern
@@ -301,11 +303,13 @@ WHERE can be one of other-window, elscreen, other-frame."
 
 (defvar helm-grep-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") 'helm-grep-mode-jump)
-    (define-key map (kbd "C-o") 'helm-grep-mode-jump-other-window)
-    (define-key map (kbd "q")   'helm-grep-mode-quit)
+    (define-key map (kbd "RET")      'helm-grep-mode-jump)
+    (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
+    (define-key map (kbd "q")        'helm-grep-mode-quit)
     (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
-    (define-key map (kbd "<C-up>") 'helm-grep-mode-jump-other-window-backward)
+    (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
+    (define-key map (kbd "<M-down>") 'helm-gm-next-file)
+    (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
     map))
 
 ;;;###autoload
@@ -315,6 +319,16 @@ WHERE can be one of other-window, elscreen, other-frame."
 
 Special commands:
 \\{helm-grep-mode-map}")
+
+;;;###autoload
+(defun helm-gm-next-file ()
+  (interactive)
+  (helm-c-goto-next-or-prec-file 1))
+
+;;;###autoload
+(defun helm-gm-precedent-file ()
+  (interactive)
+  (helm-c-goto-next-or-prec-file -1))
 
 ;;;###autoload
 (defun helm-grep-mode-quit ()
@@ -334,7 +348,8 @@ Special commands:
     (condition-case nil
         (progn
           (save-selected-window
-            (helm-c-grep-action candidate 'other-window))
+            (helm-c-grep-action candidate 'other-window)
+            (recenter))
           (forward-line arg))
       (error nil))))
 
@@ -518,42 +533,52 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (buffer-string))
     (error nil)))
 
-;; Go to next or precedent file (common to etags and grep).
 (defun helm-c-goto-next-or-prec-file (n)
   "Go to next or precedent candidate file in helm grep/etags buffers.
 If N is positive go forward otherwise go backward."
-  (with-helm-window
-    (let* ((current-line-list  (split-string
-                                (buffer-substring
-                                 (point-at-bol)
-                                 (point-at-eol)) ":"))
-           (current-fname      (nth 0 current-line-list))
-           (fn-b-o-f           (if (eq n 1) 'eobp 'bobp)))
+  (let* ((current-line-list  (split-string
+                              (buffer-substring
+                               (point-at-bol)
+                               (point-at-eol)) ":"))
+         (current-fname      (nth 0 current-line-list))
+         (bob-or-eof         (if (eq n 1) 'eobp 'bobp)))
+    (flet ((mark-maybe ()
+             (if (eq major-mode 'helm-grep-mode)
+                 (ignore)
+                 (helm-mark-current-line))))
       (catch 'break
-        (while (not (funcall fn-b-o-f))
+        (while (not (funcall bob-or-eof))
           (forward-line n) ; Go forward or backward depending of n value.
-          (unless (search-forward current-fname (point-at-eol) t)
-            (helm-mark-current-line)
+          ;; Exit when current-fname is not matched or in `helm-grep-mode'
+          ;; the line is not a grep line i.e 'fname:num:tag'.
+          (unless (or (search-forward current-fname (point-at-eol) t)
+                      (and (eq major-mode 'helm-grep-mode)
+                           (not (get-text-property (point-at-bol) 'help-echo))))
+            (mark-maybe)
             (throw 'break nil))))
-      (cond ((and (eq n 1) (eobp))
+      (cond ((and (> n 0) (eobp))
              (re-search-backward ".")
              (forward-line 0)
-             (helm-mark-current-line))
-            ((and (< n 1) (bobp))
-             (forward-line 1)
-             (helm-mark-current-line))))))
+             (mark-maybe))
+            ((and (< n 0) (bobp))
+             (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
+                 (goto-char it)
+             (forward-line 1))
+             (mark-maybe))))))
 
 ;;;###autoload
 (defun helm-c-goto-precedent-file ()
   "Go to precedent file in helm grep/etags buffers."
   (interactive)
-  (helm-c-goto-next-or-prec-file -1))
+  (with-helm-window
+    (helm-c-goto-next-or-prec-file -1)))
 
 ;;;###autoload
 (defun helm-c-goto-next-file ()
   "Go to precedent file in helm grep/etags buffers."
   (interactive)
-  (helm-c-goto-next-or-prec-file 1))
+  (with-helm-window
+    (helm-c-goto-next-or-prec-file 1)))
 
 ;;;###autoload
 (defun helm-c-grep-run-persistent-action ()
