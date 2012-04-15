@@ -170,8 +170,8 @@
 ;;;;;;  helm-exit-minibuffer helm-confirm-and-exit-minibuffer helm-next-source
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
-;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-at-point
-;;;;;;  helm-resume helm-open-last-log) "helm" "helm.el" (20360 594))
+;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-resume
+;;;;;;  helm-open-last-log) "helm" "helm.el" (20362 24724))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -186,13 +186,6 @@ Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions.
 
 \(fn ARG)" t nil)
-
-(autoload 'helm-at-point "helm" "\
-Call helm with symbol at point as initial input.
-ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
-are same args as in `helm'.
-
-\(fn &optional ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER)" t nil)
 
 (autoload 'helm-other-buffer "helm" "\
 Simplified interface of `helm' with other `helm-buffer'.
@@ -706,7 +699,7 @@ Preconfigured helm for eshell history.
 ;;;***
 
 ;;;### (autoloads (helm-calcul-expression helm-eval-expression-with-eldoc
-;;;;;;  helm-eval-expression) "helm-eval" "helm-eval.el" (20360 594))
+;;;;;;  helm-eval-expression) "helm-eval" "helm-eval.el" (20360 25973))
 ;;; Generated autoloads from helm-eval.el
 
 (autoload 'helm-eval-expression "helm-eval" "\
@@ -755,7 +748,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20360 594))
+;;;;;;  "helm-files" "helm-files.el" (20360 29980))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1042,7 +1035,7 @@ Preconfigured `helm' for gentoo linux.
 ;;;;;;  helm-grep-mode-jump-other-window helm-grep-mode-jump-other-window-backward
 ;;;;;;  helm-grep-mode-jump-other-window-forward helm-grep-mode-jump
 ;;;;;;  helm-grep-mode-quit helm-gm-precedent-file helm-gm-next-file
-;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20360 15793))
+;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20360 26140))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-grep-mode "helm-grep" "\
@@ -1563,8 +1556,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20360
-;;;;;;  15835 703599))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20362
+;;;;;;  25079 740793))
 
 ;;;***
 
