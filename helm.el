@@ -1130,25 +1130,6 @@ Return nil if no `helm-buffer' found."
 
 
 ;;;###autoload
-(defun helm-at-point (&optional
-                        any-sources any-input
-                        any-prompt any-resume
-                        any-preselect any-buffer)
-  "Call helm with symbol at point as initial input.
-ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT and ANY-BUFFER
-are same args as in `helm'."
-  (interactive)
-  (helm :sources any-sources
-        :input (if current-prefix-arg
-                   (concat "\\b" (thing-at-point 'symbol) "\\b"
-                           (if (featurep 'helm-match-plugin) " " ""))
-                   any-input)
-        :prompt any-prompt
-        :resume any-resume
-        :preselect any-preselect
-        :buffer any-buffer))
-
-;;;###autoload
 (defun helm-other-buffer (any-sources any-buffer)
   "Simplified interface of `helm' with other `helm-buffer'.
 Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
