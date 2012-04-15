@@ -1193,6 +1193,7 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
 For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
   (helm-log "start initialization: any-resume=%S any-input=%S"
             any-resume any-input)
+  (setq helm-alive-p t)
   (helm-frame-or-window-configuration 'save)
   (setq helm-sources (helm-normalize-sources any-sources))
   (helm-log "sources = %S" helm-sources)
@@ -1298,7 +1299,6 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (setq helm-current-prefix-arg nil)
   (setq helm-once-called-functions nil)
   (setq helm-delayed-init-executed nil)
-  (setq helm-alive-p t)
   (setq helm-current-buffer
         (if (minibuffer-window-active-p (minibuffer-window))
             ;; If minibuffer is active be sure to use it's buffer
