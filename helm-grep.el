@@ -400,13 +400,7 @@ These extensions will be added to command line with --include arg of grep."
         collect glob into glob-list
         finally return glob-list))
 
-(defun helm-do-grep-1 (targets &optional recurse zgrep)
-  "Launch grep on a list of TARGETS files.
-When RECURSE is given use -r option of grep and prompt user
-to set the --include args of grep.
-You can give more than one arg separated by space.
-e.g *.el *.py *.tex.
-If it's empty --exclude `grep-find-ignored-files' is used instead."
+(defun helm-grep-collect-candidates (targets recurse zgrep)
   (let* ((helm-compile-source-functions
           ;; rule out helm-match-plugin because the input is one regexp.
           (delq 'helm-compile-source--match-plugin
@@ -420,9 +414,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
          ;; to avoid storing wild-cards here.
          (minibuffer-history helm-c-grep-history)
          (helm-c-grep-default-command
-          (cond ((and recurse zgrep) helm-c-default-zgrep-command)
+          (cond (zgrep helm-c-default-zgrep-command)
                 (recurse helm-c-grep-default-recurse-command)
-                (zgrep helm-c-default-zgrep-command)
                 (t helm-c-grep-default-command)))
          ;; Disable match-plugin and use here own highlighting.
          (helm-mp-highlight-delay     nil))
@@ -432,23 +425,41 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                  (mapconcat #'(lambda (x)
                                 (concat "--include=" (shell-quote-argument x)))
                             (split-string include-files) " "))))
+    (funcall helm-c-grep-default-function targets include-files zgrep)))
+
+;; Internal
+(defvar helm-grep-last-targets nil)
+(defvar helm-grep-in-recurse nil)
+(defvar helm-grep-use-zgrep nil)
+(defun helm-do-grep-1 (targets &optional recurse zgrep)
+  "Launch grep on a list of TARGETS files.
+When RECURSE is given use -r option of grep and prompt user
+to set the --include args of grep.
+You can give more than one arg separated by space.
+e.g *.el *.py *.tex.
+If it's empty --exclude `grep-find-ignored-files' is used instead."
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
-    ;; `helm-find-files' haven't already started,
-    ;; give a default value to `helm-ff-default-directory'.
-    (setq helm-ff-default-directory (or helm-ff-default-directory
-                                        default-directory))
     (helm
      :sources
      `(((name . "Grep")
+        (init . (lambda ()
+                  ;; `helm-find-files' haven't already started,
+                  ;; give a default value to `helm-ff-default-directory'.
+                  (setq helm-ff-default-directory (or helm-ff-default-directory
+                                                      default-directory))
+                  (setq helm-grep-last-targets targets)
+                  (setq helm-grep-in-recurse recurse)
+                  (setq helm-grep-use-zgrep zgrep)))
         (header-name . (lambda (name)
                          (concat name "(C-c ? Help)")))
-        (candidates
-         . (lambda ()
-             (funcall helm-c-grep-default-function
-                      targets include-files zgrep)))
+        (candidates . (lambda ()
+                        (helm-grep-collect-candidates
+                         helm-grep-last-targets
+                         helm-grep-in-recurse
+                         helm-grep-use-zgrep)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . helm-grep-mode-line-string)
@@ -466,8 +477,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
-     :buffer "*helm grep*"
-     :resume 'noresume)))
+     :buffer "*helm grep*"))
 
 (defun helm-ff-zgrep-1 (flist recursive)
   (unwind-protect
