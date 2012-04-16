@@ -902,6 +902,8 @@ a specific part of candidate.
 
 NOTE: This have effect only on sources using `candidates-in-buffer'.")
 
+(helm-document-attribute 'nohighlight "optional"
+  " Disable highlight match in this source.")
 
 (provide 'helm-help)
 

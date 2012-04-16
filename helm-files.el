@@ -339,6 +339,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (mode-line . helm-ff-mode-line-string)
     (keymap . ,helm-find-files-map)
     (volatile)
+    (nohighlight)
     (candidate-number-limit . 9999)
     (action-transformer . helm-find-files-action-transformer)
     (action
@@ -968,8 +969,7 @@ See `helm-ff-serial-rename-1'."
                        ;; in everything.
                        (unless (and (eq system-type 'windows-nt)
                                     (string-match "^es" helm-c-locate-command))
-                         " -b")))
-        (helm-mp-highlight-delay 0.7))
+                         " -b"))))
     (helm-locate-1 helm-current-prefix-arg input 'from-ff)))
 
 ;;;###autoload
@@ -1832,8 +1832,7 @@ Like `find-file' but with `helm' support.
 Use it for non--interactive calls of `helm-find-files'."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let ((helm-mp-highlight-delay nil)
-        ;; Be sure we don't erase the precedent minibuffer if some.
+  (let (;; Be sure we don't erase the precedent minibuffer if some.
         (helm-ff-auto-update-initial-value
          (and helm-ff-auto-update-initial-value
               (not (minibuffer-window-active-p (minibuffer-window)))))
