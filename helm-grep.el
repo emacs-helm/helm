@@ -400,29 +400,16 @@ These extensions will be added to command line with --include arg of grep."
         collect glob into glob-list
         finally return glob-list))
 
-(defun helm-grep-collect-candidates (targets recurse zgrep)
-  (let* ((exts (helm-c-grep-guess-extensions targets))
-         (globs (and (not zgrep) (mapconcat 'identity exts " ")))
-         (include-files (and recurse (not zgrep)
-                             (read-string "OnlyExt(*.[ext]): "
-                                          globs)))
-         ;; Set `minibuffer-history' AFTER includes-files
-         ;; to avoid storing wild-cards here.
-         (minibuffer-history helm-c-grep-history)
-         (helm-c-grep-default-command
+(defun helm-grep-collect-candidates (targets recurse zgrep include-files)
+  (let* ((helm-c-grep-default-command
           (cond (zgrep helm-c-default-zgrep-command)
                 (recurse helm-c-grep-default-recurse-command)
                 (t helm-c-grep-default-command))))
-    (when include-files
-      (setq include-files
-            (and (not (string= include-files ""))
-                 (mapconcat #'(lambda (x)
-                                (concat "--include=" (shell-quote-argument x)))
-                            (split-string include-files) " "))))
     (funcall helm-c-grep-default-function targets include-files zgrep)))
 
 ;; Internal
 (defvar helm-grep-last-targets nil)
+(defvar helm-grep-include-files nil)
 (defvar helm-grep-in-recurse nil)
 (defvar helm-grep-use-zgrep nil)
 (defun helm-do-grep-1 (targets &optional recurse zgrep)
@@ -434,12 +421,26 @@ e.g *.el *.py *.tex.
 If it's empty --exclude `grep-find-ignored-files' is used instead."
   ;; When called as action from an other source e.g *-find-files
   ;; we have to kill action buffer.
-  (let ((helm-compile-source-functions
-         ;; rule out helm-match-plugin because the input is one regexp.
-         (delq 'helm-compile-source--match-plugin
-               (copy-sequence helm-compile-source-functions))))
+  (let* ((helm-compile-source-functions
+          ;; rule out helm-match-plugin because the input is one regexp.
+          (delq 'helm-compile-source--match-plugin
+                (copy-sequence helm-compile-source-functions)))
+         (exts (helm-c-grep-guess-extensions targets))
+         (globs (and (not zgrep) (mapconcat 'identity exts " ")))
+         (include-files (and recurse (not zgrep)
+                             (read-string "OnlyExt(*.[ext]): "
+                                          globs)))
+         ;; Set `minibuffer-history' AFTER includes-files
+         ;; to avoid storing wild-cards here.
+         (minibuffer-history helm-c-grep-history))
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
+    (when include-files
+      (setq include-files
+            (and (not (string= include-files ""))
+                 (mapconcat #'(lambda (x)
+                                (concat "--include=" (shell-quote-argument x)))
+                            (split-string include-files) " "))))
     (helm
      :sources
      `(((name . "Grep")
@@ -448,7 +449,9 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                   ;; give a default value to `helm-ff-default-directory'.
                   (setq helm-ff-default-directory (or helm-ff-default-directory
                                                       default-directory))
+                  ;; We need this to pass infos to `helm-resume'.
                   (setq helm-grep-last-targets targets)
+                  (setq helm-grep-include-files include-files)
                   (setq helm-grep-in-recurse recurse)
                   (setq helm-grep-use-zgrep zgrep)))
         (header-name . (lambda (name)
@@ -457,7 +460,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                         (helm-grep-collect-candidates
                          helm-grep-last-targets
                          helm-grep-in-recurse
-                         helm-grep-use-zgrep)))
+                         helm-grep-use-zgrep
+                         helm-grep-include-files)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (nohighlight)
