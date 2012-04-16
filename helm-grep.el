@@ -400,8 +400,8 @@ These extensions will be added to command line with --include arg of grep."
         collect glob into glob-list
         finally return glob-list))
 
-(defun helm-do-grep-1 (only &optional recurse zgrep)
-  "Launch grep with a list of ONLY files.
+(defun helm-do-grep-1 (targets &optional recurse zgrep)
+  "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
 to set the --include args of grep.
 You can give more than one arg separated by space.
@@ -411,7 +411,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
           ;; rule out helm-match-plugin because the input is one regexp.
           (delq 'helm-compile-source--match-plugin
                 (copy-sequence helm-compile-source-functions)))
-         (exts (helm-c-grep-guess-extensions only))
+         (exts (helm-c-grep-guess-extensions targets))
          (globs (and (not zgrep) (mapconcat 'identity exts " ")))
          (include-files (and recurse (not zgrep)
                              (read-string "OnlyExt(*.[ext]): "
@@ -447,7 +447,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                          (concat name "(C-c ? Help)")))
         (candidates
          . (lambda ()
-             (funcall helm-c-grep-default-function only include-files zgrep)))
+             (funcall helm-c-grep-default-function
+                      targets include-files zgrep)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . helm-grep-mode-line-string)
@@ -465,7 +466,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
-     :buffer "*helm grep*")))
+     :buffer "*helm grep*"
+     :resume 'noresume)))
 
 (defun helm-ff-zgrep-1 (flist recursive)
   (unwind-protect
