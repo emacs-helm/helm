@@ -29,7 +29,7 @@
   :group 'helm)
 
 (defcustom helm-kill-ring-threshold 10
-  "Minimum length to be listed by `helm-c-source-kill-ring'."
+  "Minimum length of a candidate to be listed by `helm-c-source-kill-ring'."
   :type 'integer
   :group 'helm-ring)
 

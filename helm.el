@@ -150,7 +150,7 @@ common attributes with a `file' type.")
   "*Display candidates at the top of screen.
 This happen when using `helm-next-source' and `helm-previous-source'.")
 
-(defvar helm-candidate-number-limit 50
+(defvar helm-candidate-number-limit 100
   "*Limit candidate number globally.
 Do not show more candidates than this limit from individual sources.
 It is usually pointless to show hundreds of matches

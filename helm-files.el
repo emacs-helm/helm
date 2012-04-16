@@ -140,8 +140,8 @@ This set `ffap-newfile-prompt'."
   :type  'boolean
   :group 'helm-files)
 
-(defcustom helm-ff-avfs-directory nil
-  "The default avfs directory, usually '.avfs'.
+(defcustom helm-ff-avfs-directory "~/.avfs"
+  "The default avfs directory, usually '~/.avfs'.
 When this is set you will be able to expand archive filenames with `C-z'
 inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
@@ -167,7 +167,7 @@ On Unix based systems (lpstat command needed) you don't need to set this,
   :type 'list
   :group 'helm-files)
 
-(defcustom helm-ff-transformer-show-only-basename nil
+(defcustom helm-ff-transformer-show-only-basename t
   "Show only basename of candidates in `helm-find-files'.
 This can be toggled at anytime from `helm-find-files' with \
 \\<helm-find-files-map>0\\[helm-ff-run-toggle-basename]."
