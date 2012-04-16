@@ -401,11 +401,7 @@ These extensions will be added to command line with --include arg of grep."
         finally return glob-list))
 
 (defun helm-grep-collect-candidates (targets recurse zgrep)
-  (let* ((helm-compile-source-functions
-          ;; rule out helm-match-plugin because the input is one regexp.
-          (delq 'helm-compile-source--match-plugin
-                (copy-sequence helm-compile-source-functions)))
-         (exts (helm-c-grep-guess-extensions targets))
+  (let* ((exts (helm-c-grep-guess-extensions targets))
          (globs (and (not zgrep) (mapconcat 'identity exts " ")))
          (include-files (and recurse (not zgrep)
                              (read-string "OnlyExt(*.[ext]): "
@@ -416,9 +412,7 @@ These extensions will be added to command line with --include arg of grep."
          (helm-c-grep-default-command
           (cond (zgrep helm-c-default-zgrep-command)
                 (recurse helm-c-grep-default-recurse-command)
-                (t helm-c-grep-default-command)))
-         ;; Disable match-plugin and use here own highlighting.
-         (helm-mp-highlight-delay     nil))
+                (t helm-c-grep-default-command))))
     (when include-files
       (setq include-files
             (and (not (string= include-files ""))
@@ -438,8 +432,12 @@ to set the --include args of grep.
 You can give more than one arg separated by space.
 e.g *.el *.py *.tex.
 If it's empty --exclude `grep-find-ignored-files' is used instead."
-    ;; When called as action from an other source e.g *-find-files
-    ;; we have to kill action buffer.
+  ;; When called as action from an other source e.g *-find-files
+  ;; we have to kill action buffer.
+  (let ((helm-compile-source-functions
+         ;; rule out helm-match-plugin because the input is one regexp.
+         (delq 'helm-compile-source--match-plugin
+               (copy-sequence helm-compile-source-functions))))
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
     (helm
@@ -462,6 +460,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                          helm-grep-use-zgrep)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
+        (nohighlight)
         (mode-line . helm-grep-mode-line-string)
         (keymap . ,helm-c-grep-map)
         (action . ,(delq
@@ -477,7 +476,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
-     :buffer "*helm grep*"))
+     :buffer "*helm grep*")))
 
 (defun helm-ff-zgrep-1 (flist recursive)
   (unwind-protect
