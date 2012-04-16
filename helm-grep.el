@@ -315,7 +315,7 @@ WHERE can be one of other-window, elscreen, other-frame."
 
 ;;;###autoload
 (define-derived-mode helm-grep-mode
-    text-mode "helm-grep-"
+    text-mode "helm-grep"
     "Major mode to provide actions in helm grep saved buffer.
 
 Special commands:
