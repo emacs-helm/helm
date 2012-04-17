@@ -1312,7 +1312,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
                                 any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
-  (if (helm-resume-p any-resume)
+  (if (and (helm-resume-p any-resume) (not (helm-empty-buffer-p)))
       (helm-mark-current-line t)
       (helm-update any-preselect))
   (with-current-buffer (helm-buffer-get)
