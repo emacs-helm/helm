@@ -248,8 +248,9 @@ WHERE can be one of other-window, elscreen, other-frame."
       (elscreen     (helm-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
       (grep         (helm-c-grep-save-results-1))
+      (pdf          (helm-c-pdfgrep-action-1 split lineno (car split)))
       (t (find-file fname)))
-    (unless (eq where 'grep)
+    (unless (or (eq where 'grep) (eq where 'pdf))
       (helm-goto-line lineno))
     (when mark
       (set-marker (mark-marker) (point))
@@ -438,10 +439,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                              ;; `helm-zgrep-file-extension-regexp'
                              (not zgrep)
                              (read-string "OnlyExt(*.[ext]): "
-                                          globs)))
-         ;; Set `minibuffer-history' AFTER includes-files
-         ;; to avoid storing wild-cards here.
-         (minibuffer-history helm-c-grep-history))
+                                          globs))))
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
     (when include-files
@@ -489,7 +487,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
-     :buffer "*helm grep*")))
+     :buffer "*helm grep*"
+     :history 'helm-c-grep-history)))
 
 (defun helm-ff-zgrep-1 (flist recursive)
   (unwind-protect
@@ -722,9 +721,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
   (let* ((helm-compile-source-functions
           ;; rule out helm-match-plugin because the input is one regexp.
           (delq 'helm-compile-source--match-plugin
-                (copy-sequence helm-compile-source-functions)))
-         ;; Disable match-plugin and use here own highlighting.
-         (helm-mp-highlight-delay nil))
+                (copy-sequence helm-compile-source-functions))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -743,18 +740,21 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
              (funcall helm-c-pdfgrep-default-function helm-pdfgrep-targets)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
+        (nohighlight)
         (mode-line . helm-pdfgrep-mode-line-string)
         (action . helm-c-pdfgrep-action)
         (persistent-help . "Jump to PDF Page")
         (requires-pattern . 3)
         (delayed)))
      :keymap helm-c-pdfgrep-map
-     :buffer "*helm pdfgrep*")))
+     :buffer "*helm pdfgrep*"
+     :history 'helm-c-grep-history)))
 
 (defun helm-c-pdfgrep-action (candidate)
-  (let* ((split  (helm-c-grep-split-line candidate))
-         (pageno (nth 1 split))
-         (fname  (car split)))
+  (helm-c-grep-action candidate 'pdf))
+
+(defun helm-c-pdfgrep-action-1 (split pageno fname)
+  (save-selected-window
     (start-file-process-shell-command
      "pdf-reader" nil
      (format-spec helm-c-pdfgrep-default-read-command
