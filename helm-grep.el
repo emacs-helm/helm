@@ -713,7 +713,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                (helm-update-move-first-line))
              (force-mode-line-update nil)))))))
 
-
+;; Internal
+(defvar helm-pdfgrep-targets nil)
 (defun helm-do-pdfgrep-1 (only)
   "Launch pdfgrep with a list of ONLY files."
   (unless (executable-find "pdfgrep")
@@ -728,16 +729,18 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
-    ;; If `helm-find-files' haven't already started,
-    ;; give a default value to `helm-ff-default-directory'.
-    (setq helm-ff-default-directory (or helm-ff-default-directory
-                                        default-directory))
     (helm
      :sources
      `(((name . "PdfGrep")
+        (init . (lambda ()
+                  ;; If `helm-find-files' haven't already started,
+                  ;; give a default value to `helm-ff-default-directory'.
+                  (setq helm-ff-default-directory (or helm-ff-default-directory
+                                                      default-directory))
+                  (setq helm-pdfgrep-targets only)))
         (candidates
          . (lambda ()
-             (funcall helm-c-pdfgrep-default-function only)))
+             (funcall helm-c-pdfgrep-default-function helm-pdfgrep-targets)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (mode-line . helm-pdfgrep-mode-line-string)
@@ -746,8 +749,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (requires-pattern . 3)
         (delayed)))
      :keymap helm-c-pdfgrep-map
-     :buffer "*helm grep*")))
-
+     :buffer "*helm pdfgrep*")))
 
 (defun helm-c-pdfgrep-action (candidate)
   (let* ((split  (helm-c-grep-split-line candidate))
