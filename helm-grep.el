@@ -741,12 +741,12 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (nohighlight)
+        (keymap . ,helm-c-pdfgrep-map)
         (mode-line . helm-pdfgrep-mode-line-string)
         (action . helm-c-pdfgrep-action)
         (persistent-help . "Jump to PDF Page")
         (requires-pattern . 3)
         (delayed)))
-     :keymap helm-c-pdfgrep-map
      :buffer "*helm pdfgrep*"
      :history 'helm-c-grep-history)))
 
