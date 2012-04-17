@@ -46,6 +46,12 @@ Where '%f' format spec is filename and '%p' is page number"
   :group 'helm-grep
   :type 'integer)
 
+(defcustom helm-zgrep-file-extension-regexp
+  ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$"
+  "Default file extensions zgrep will search in."
+  :group 'helm-grep
+  :type 'string)
+
 
 ;;; Faces
 ;;
@@ -427,7 +433,10 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                 (copy-sequence helm-compile-source-functions)))
          (exts (helm-c-grep-guess-extensions targets))
          (globs (and (not zgrep) (mapconcat 'identity exts " ")))
-         (include-files (and recurse (not zgrep)
+         (include-files (and recurse
+                             ;; zgrep will search in all files with ext matching
+                             ;; `helm-zgrep-file-extension-regexp'
+                             (not zgrep)
                              (read-string "OnlyExt(*.[ext]): "
                                           globs)))
          ;; Set `minibuffer-history' AFTER includes-files
@@ -494,7 +503,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                                  def-dir
                                  :directories nil
                                  :path 'full
-                                 :match ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$")
+                                 :match helm-zgrep-file-extension-regexp)
                                 helm-c-rzgrep-cache))
                            flist)))
          (when recursive (setq helm-c-zgrep-recurse-flag t))
