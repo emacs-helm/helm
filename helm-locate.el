@@ -134,6 +134,7 @@ See `helm-locate-with-db' and `helm-locate'."
             ('windows-nt "es -i -r %s")
             (t "locate %s")))))
 
+(defvar helm-file-name-history nil)
 (defun helm-locate-with-db (&optional db initial-input)
   "Run locate -d DB.
 If DB is not given or nil use locate without -d option.
@@ -155,10 +156,11 @@ See also `helm-locate'."
                                        collect i) ":"))
               helm-c-locate-command)
              helm-c-locate-command)))
+    (setq helm-file-name-history (mapcar 'helm-c-basename file-name-history))
     (helm :sources 'helm-c-source-locate
           :buffer "*helm locate*"
           :input initial-input
-          :keymap helm-generic-files-map)))
+          :history 'helm-file-name-history)))
 
 (defun helm-c-locate-init ()
   "Initialize async locate process for `helm-c-source-locate'."
