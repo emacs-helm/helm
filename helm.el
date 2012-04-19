@@ -1304,9 +1304,6 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (helm-create-helm-buffer)
   (helm-log-run-hook 'helm-after-initialize-hook))
 
-(defvar helm-reading-pattern nil
-  "Whether in `read-string' in helm or not.")
-
 (defun helm-read-pattern-maybe (any-prompt any-input
                                 any-preselect any-resume any-keymap
                                 any-default any-history)
@@ -1340,8 +1337,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
              (and (functionp helm-quit-if-no-candidate)
                   (funcall helm-quit-if-no-candidate)))
             (t
-             (let ((helm-reading-pattern t)
-                   (tap (or any-default
+             (let ((tap (or any-default
                             (with-helm-current-buffer
                               (thing-at-point 'symbol)))))
                (read-from-minibuffer (or any-prompt "pattern: ")
