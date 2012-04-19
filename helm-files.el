@@ -483,14 +483,11 @@ ACTION must be an action supported by `helm-dired-action'."
 
 (defun helm-find-files-grep (candidate)
   "Default action to grep files from `helm-find-files'."
-  (helm-do-grep-1 (helm-marked-candidates)
-                  helm-current-prefix-arg))
+  (helm-do-grep-1 (helm-marked-candidates) helm-current-prefix-arg))
 
 (defun helm-ff-zgrep (candidate)
   "Default action to zgrep files from `helm-find-files'."
-  (let ((prefarg helm-current-prefix-arg)
-        (ls      (helm-marked-candidates)))
-    (helm-ff-zgrep-1 ls prefarg)))
+  (helm-ff-zgrep-1 (helm-marked-candidates) helm-current-prefix-arg))
 
 (defun helm-ff-pdfgrep (candidate)
   "Default action to pdfgrep files from `helm-find-files'."

@@ -461,7 +461,7 @@ Don't use it directly, use instead `helm-comp-read' in your programs.
 See documentation of `completing-read' and `all-completions' for details."
   (declare (special helm-mode))
   (let* ((current-command this-command)
-         (str-command     (if (consp current-command)
+         (str-command     (if (consp current-command) ; Maybe a lambda.
                               "Anonymous"
                               (symbol-name current-command)))
          (buf-name        (format "*helm-mode-%s*" str-command))

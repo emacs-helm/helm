@@ -905,6 +905,11 @@ NOTE: This have effect only on sources using `candidates-in-buffer'.")
 (helm-document-attribute 'nohighlight "optional"
   " Disable highlight match in this source.")
 
+(helm-document-attribute 'history "optional"
+  " Allow passing history variable to helm from source.
+It should be a quoted symbol evaluated from source.
+i.e (history . ,'history-var).")
+
 (provide 'helm-help)
 
 ;; Local Variables:

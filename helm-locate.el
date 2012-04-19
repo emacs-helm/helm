@@ -186,6 +186,7 @@ See also `helm-locate'."
     (candidates . helm-c-locate-init)
     (type . file)
     (requires-pattern . 3)
+    (history . ,'helm-file-name-history)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (candidate-number-limit . 9999)

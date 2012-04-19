@@ -474,6 +474,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (nohighlight)
         (mode-line . helm-grep-mode-line-string)
         (keymap . ,helm-c-grep-map)
+        (history . ,'helm-c-grep-history)
         (action . ,(delq
                     nil
                     `(("Find File" . helm-c-grep-action)
@@ -488,6 +489,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (requires-pattern . 3)
         (delayed)))
      :buffer "*helm grep*"
+     :keymap helm-c-grep-map
      :history 'helm-c-grep-history)))
 
 (defun helm-ff-zgrep-1 (flist recursive)
@@ -741,6 +743,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (nohighlight)
+        (history . ,'helm-c-grep-history)
         (keymap . ,helm-c-pdfgrep-map)
         (mode-line . helm-pdfgrep-mode-line-string)
         (action . helm-c-pdfgrep-action)

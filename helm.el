@@ -696,12 +696,12 @@ of \(action-display . function\)."
       (helm-attr 'action))))
 
 (defun helm-get-current-source ()
-  "Return the source for the current selection.
-Use it in init, candidates, action, candidate-transformer,
-filtered-candidate-transformer functions."
+  "Return the source for the current selection."
   (declare (special source))
-  ;; The name `helm-get-current-source' should be used in init function etc.
-  (if (and (boundp 'helm-source-name) (stringp helm-source-name))
+  ;; `helm-source-name' let-bounded in some function with value of source.
+  ;; Return source from this function. (e.g `helm-funcall-with-source').
+  (if (and (boundp 'helm-source-name)
+           (stringp helm-source-name))
       source
       (with-current-buffer (helm-buffer-get)
         (or
@@ -1316,7 +1316,11 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
       (helm-mark-current-line t)
       (helm-update any-preselect))
   (with-current-buffer (helm-buffer-get)
-    (let ((src-keymap (assoc-default 'keymap (helm-get-current-source))))
+    (let* ((src        (helm-get-current-source))
+           (src-keymap (assoc-default 'keymap src))
+           (hist       (or any-history
+                           ;; Needed for resuming. 
+                           (assoc-default 'history src))))
       ;; Startup with the first keymap found either in current source
       ;; or helm arg, otherwise use global value of `helm-map'.
       ;; This map will be used as a `minibuffer-local-map'.
@@ -1342,7 +1346,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                               (thing-at-point 'symbol)))))
                (read-from-minibuffer (or any-prompt "pattern: ")
                                      any-input helm-map
-                                     nil any-history tap)))))))
+                                     nil hist tap)))))))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
