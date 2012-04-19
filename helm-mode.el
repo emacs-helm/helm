@@ -635,7 +635,6 @@ Keys description:
               (filtered-candidate-transformer helm-c-find-files-transformer)
               (persistent-action . ,persistent-action)
               (candidate-number-limit . 9999)
-              (toggle-auto-update . helm-ff-toggle-auto-update)
               (persistent-help . ,persistent-help)
               (volatile)
               (action . ,'action-fn)))
