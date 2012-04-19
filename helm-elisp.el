@@ -164,7 +164,8 @@ If `helm-c-turn-on-show-completion' is nil just do nothing."
              (action . (lambda (candidate)
                          (delete-region beg end)
                          (insert candidate))))
-           :input (if helm-match-plugin-enabled (concat target " ") target)))
+           :input (if helm-match-plugin-enabled (concat target " ") target)
+           :resume 'noresume))
         (message "[No Match]"))))
 
 (defun helm-lisp-completion-persistent-action (candidate)

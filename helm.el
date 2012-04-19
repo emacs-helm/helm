@@ -2119,6 +2119,7 @@ Possible value of DIRECTION are 'next or 'previous."
        (helm-interpret-value (or (assoc-default 'mode-line source)
                                  (default-value 'helm-mode-line-string))
                              source))
+  ;; Setup mode-line.
   (if helm-mode-line-string
       (setq mode-line-format
             '(" " mode-line-buffer-identification " "
@@ -2132,7 +2133,7 @@ Possible value of DIRECTION are 'next or 'previous."
                                          (cadr helm-mode-line-string)
                                          helm-mode-line-string)))
       (setq mode-line-format (default-value 'mode-line-format)))
-  
+  ;; Setup header-line.
   (let* ((hlstr (helm-interpret-value
                  (assoc-default 'header-line source) source))
          (hlend (make-string (- (window-width) (length hlstr)) ? )))
