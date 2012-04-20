@@ -26,6 +26,7 @@
   (require 'cl))
 
 (require 'semantic)
+(require 'helm-imenu)
 
 (defun helm-semantic-init-candidates (tags depth)
   "Write the contents of TAGS to the current buffer."
@@ -49,9 +50,10 @@
         (t)))))
 
 (defun helm-semantic-default-action (candidate)
-  ;; By default, helm doesn't pass on the text properties of the selection. Fix
-  ;; this.
-  (setq candidate (helm-get-selection nil 'withprop))
+  ;; By default, helm doesn't pass on the text properties of the selection.
+  ;; Fix this.
+  (setq candidate (replace-regexp-in-string
+                   "^ *" "" (helm-get-selection nil 'withprop)))
   (let ((tag (get-text-property 0 'semantic-tag candidate)))
     (push-mark)
     (semantic-go-to-tag tag)))
