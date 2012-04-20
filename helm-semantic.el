@@ -49,14 +49,14 @@
         ;; Catch-all
         (t)))))
 
-(defun helm-semantic-default-action (candidate)
+(defun helm-semantic-default-action (_candidate)
   ;; By default, helm doesn't pass on the text properties of the selection.
   ;; Fix this.
-  (setq candidate (replace-regexp-in-string
-                   "^ *" "" (helm-get-selection nil 'withprop)))
-  (let ((tag (get-text-property 0 'semantic-tag candidate)))
-    (push-mark)
-    (semantic-go-to-tag tag)))
+  (with-current-buffer helm-buffer
+    (skip-chars-forward " " (point-at-eol))
+    (let ((tag (get-text-property (point) 'semantic-tag)))
+      (push-mark)
+      (semantic-go-to-tag tag))))
 
 (defvar helm-c-source-semantic
   '((name . "Semantic Tags")
