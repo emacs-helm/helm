@@ -113,7 +113,9 @@ buffer that is not the current buffer unless
                                       (list helm-pattern)))
     (keymap . ,helm-map)
     (action . (lambda (candidate)
-                (helm-c-switch-to-buffer (get-buffer-create candidate))))))
+                (let ((buffer (get-buffer-create candidate)))
+                  (set-buffer-major-mode buffer)
+                  (helm-c-switch-to-buffer buffer))))))
 
 ;;; Buffers-list (was buffers+)
 ;;
