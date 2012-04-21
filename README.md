@@ -49,7 +49,7 @@ You will find there instructions to install.
 
 If you're afraid to play with Emacs's configuration, but want to try
 out Helm - have to fear. Have a look at
-[Emacs Prelude](https://github.com/bbatsov/emacs-prelude) - it has
+[Emacs Prelude](https://github.com/bbatsov/prelude) - it has
 Helm built-in and properly set-up.
 
 ### Basic usage
