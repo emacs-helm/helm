@@ -34,7 +34,6 @@
 (require 'dired-x)
 (require 'tramp)
 (require 'image-dired)
-(require 'org)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
