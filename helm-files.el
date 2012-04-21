@@ -34,7 +34,6 @@
 (require 'dired-x)
 (require 'tramp)
 (require 'image-dired)
-(require 'org)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
@@ -2542,6 +2541,7 @@ Called with a prefix arg show history if some.
 Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
+  (declare (special org-directory))
   (let ((any-input (if (and arg helm-ff-history)
                        (helm-find-files-history)
                        (helm-find-files-initial-input)))
