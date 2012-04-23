@@ -141,6 +141,10 @@ INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
 \nTips:
 You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
 Enter then a space and a pattern to narrow down to buffers matching this pattern.
+
+When creating a new buffer use \\[universal-argument] to choose a mode for your buffer in a list.
+This list is customizable, see `helm-buffers-favorite-modes'.
+
 \nSpecific commands for `helm-buffers-list':
 \\<helm-c-buffer-map>
 \\[helm-buffer-run-zgrep]\t\t->Grep Buffer(s) works as zgrep too. (C-u grep all buffers but non--file buffers).

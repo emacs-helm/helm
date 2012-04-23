@@ -47,6 +47,14 @@ they will be displayed with face `file-name-shadow' if
   :type 'boolean
   :group 'helm-buffers)
 
+(defcustom helm-buffers-favorite-modes '(lisp-interaction-mode
+                                         emacs-lisp-mode
+                                         text-mode
+                                         org-mode)
+  "List of prefered mode to open new buffers with."
+  :type 'list
+  :group 'helm-buffers)
+
 
 ;;; Faces
 ;;
@@ -114,7 +122,12 @@ buffer that is not the current buffer unless
     (keymap . ,helm-map)
     (action . (lambda (candidate)
                 (let ((buffer (get-buffer-create candidate)))
-                  (set-buffer-major-mode buffer)
+                  (if helm-current-prefix-arg
+                      (with-current-buffer buffer
+                        (funcall (intern (helm-comp-read
+                                          "Major-mode: "
+                                          helm-buffers-favorite-modes))))
+                      (set-buffer-major-mode buffer))
                   (helm-c-switch-to-buffer buffer))))))
 
 ;;; Buffers-list (was buffers+)
