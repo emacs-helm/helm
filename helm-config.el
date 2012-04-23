@@ -84,6 +84,7 @@
     (define-key map (kbd "C-c C-b")   'helm-browse-code)
     (define-key map (kbd "C-x r i")   'helm-register)
     (define-key map (kbd "C-c C-x")   'helm-c-run-external-command)
+    (define-key map (kbd "b")         'helm-resume)
     map))
 
 ;; Don't override the keymap we just defined with an empty
@@ -98,52 +99,55 @@
 ;;; Menu
 ;;
 ;;
-(easy-menu-add-item nil '("Tools") 
+(easy-menu-add-item
+ nil '("Tools") 
  '("Helm"
-  ["Find any Files/Buffers" helm-for-files t]
-  ["Helm Everywhere (Toggle)" helm-mode t]
-  "----"
-  ("Files"
-   ["Find files" helm-find-files t]
-   ["Recent Files" helm-recentf t]
-   ["Locate" helm-locate t]
-   ["Bookmarks" helm-c-pp-bookmarks t])
-  ("Buffers"
-   ["Find buffers" helm-buffers-list t])
-  ("Commands"
-   ["Emacs Commands" helm-M-x t]
-   ["Externals Commands" helm-c-run-external-command t])
-  ("Help"
-   ["Helm Apropos" helm-c-apropos t])
-  ("Info"
-   ["Info at point" helm-info-at-point t]
-   ["Emacs Manual index" helm-info-emacs t]
-   ["Gnus Manual index" helm-info-gnus t])
-  ("Org"
-   ["Org keywords" helm-org-keywords t]
-   ["Org headlines" helm-org-headlines t])
-  ("Tools"
-   ["Occur" helm-occur t]
-   ["Grep" helm-do-grep t]
-   ["Etags" helm-c-etags-select t]
-   ["Lisp complete at point" helm-lisp-completion-at-point t]
-   ["Browse Kill ring" helm-show-kill-ring t]
-   ["Browse register" helm-register t]
-   ["Browse code" helm-browse-code t]
-   ["Mark Ring" helm-all-mark-rings t]
-   ["Regexp handler" helm-regexp t]
-   ["Colors & Faces" helm-colors t]
-   ["Show xfonts" helm-select-xfont t]
-   ["Ucs Symbols" helm-ucs t]
-   ["Imenu" helm-imenu t]
-   ["Google Suggest" helm-google-suggest t]
-   ["Eval expression" helm-eval-expression-with-eldoc t]
-   ["Calcul expression" helm-calcul-expression t]
-   ["Man pages" helm-man-woman t]
-   ["Top externals process" helm-top t]
-   ["Emacs internals process" helm-list-emacs-process t])
-  "----"
-  ["Prefered Options" helm-configuration t])
+   ["Find any Files/Buffers" helm-for-files t]
+   ["Helm Everywhere (Toggle)" helm-mode t]
+   ["Helm resume" helm-resume t]
+   "----"
+   ("Files"
+    ["Find files" helm-find-files t]
+    ["Recent Files" helm-recentf t]
+    ["Locate" helm-locate t]
+    ["Bookmarks" helm-c-pp-bookmarks t])
+   ("Buffers"
+    ["Find buffers" helm-buffers-list t])
+   ("Commands"
+    ["Emacs Commands" helm-M-x t]
+    ["Externals Commands" helm-c-run-external-command t])
+   ("Help"
+    ["Helm Apropos" helm-c-apropos t])
+   ("Info"
+    ["Info at point" helm-info-at-point t]
+    ["Emacs Manual index" helm-info-emacs t]
+    ["Gnus Manual index" helm-info-gnus t])
+   ("Org"
+    ["Org keywords" helm-org-keywords t]
+    ["Org headlines" helm-org-headlines t])
+   ("Tools"
+    ["Occur" helm-occur t]
+    ["Grep" helm-do-grep t]
+    ["Etags" helm-c-etags-select t]
+    ["Lisp complete at point" helm-lisp-completion-at-point t]
+    ["Browse Kill ring" helm-show-kill-ring t]
+    ["Browse register" helm-register t]
+    ["Browse code" helm-browse-code t]
+    ["Mark Ring" helm-all-mark-rings t]
+    ["Regexp handler" helm-regexp t]
+    ["Colors & Faces" helm-colors t]
+    ["Show xfonts" helm-select-xfont t]
+    ["Ucs Symbols" helm-ucs t]
+    ["Imenu" helm-imenu t]
+    ["Semantic or Imenu" helm-semantic-or-imenu t]
+    ["Google Suggest" helm-google-suggest t]
+    ["Eval expression" helm-eval-expression-with-eldoc t]
+    ["Calcul expression" helm-calcul-expression t]
+    ["Man pages" helm-man-woman t]
+    ["Top externals process" helm-top t]
+    ["Emacs internals process" helm-list-emacs-process t])
+   "----"
+   ["Prefered Options" helm-configuration t])
  "Spell Checking")
 
 (easy-menu-add-item nil '("Tools") '("----") "Spell Checking")
