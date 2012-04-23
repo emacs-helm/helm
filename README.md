@@ -61,7 +61,7 @@ a keyboard shortcut. Here's a suggestion:
 (global-set-key (kbd "C-c h") 'helm-mini)
 ```
 You can also start with `M-x helm-mode` and enjoy helm completion in your favourites
-Emacs commands (e.g `M-x', `C-x C-f', etc...).
+Emacs commands (e.g `M-x`, `C-x C-f`, etc...).
 You can enable this by adding in your init file:
 
 ```elisp
