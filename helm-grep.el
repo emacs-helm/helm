@@ -249,7 +249,7 @@ WHERE can be one of other-window, elscreen, other-frame."
       (other-frame  (find-file-other-frame fname))
       (grep         (helm-c-grep-save-results-1))
       (pdf          (helm-c-pdfgrep-action-1 split lineno (car split)))
-      (t (find-file fname)))
+      (t            (find-file fname)))
     (unless (or (eq where 'grep) (eq where 'pdf))
       (helm-goto-line lineno))
     (when mark
@@ -285,7 +285,7 @@ WHERE can be one of other-window, elscreen, other-frame."
 
 (defun helm-c-grep-save-results-1 ()
   "Save helm grep result in a `grep-mode' buffer."
-  (let ((buf "*grep*")
+  (let ((buf "*hgrep*")
         new-buf)
     (when (get-buffer buf)
       (setq new-buf (read-string "GrepBufferName: " buf))
@@ -294,7 +294,7 @@ WHERE can be one of other-window, elscreen, other-frame."
                       (not (y-or-n-p
                             (format "Buffer `%s' already exists overwrite? "
                                     new-buf))))
-            do (setq new-buf (read-string "GrepBufferName: " "*grep ")))
+            do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (set (make-local-variable 'buffer-read-only) t)
@@ -376,8 +376,8 @@ Special commands:
   (interactive)
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
     (condition-case nil
-        (helm-c-grep-action candidate 'other-window))
-      (error nil)))
+        (helm-c-grep-action candidate 'other-window)
+      (error nil))))
 
 (defun helm-c-grep-persistent-action (candidate)
   "Persistent action for `helm-do-grep'.
@@ -450,7 +450,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                             (split-string include-files) " "))))
     (helm
      :sources
-     `(((name . "Grep")
+     `(((name . ,(if zgrep "Zgrep" "Grep"))
         (init . (lambda ()
                   ;; `helm-find-files' haven't already started,
                   ;; give a default value to `helm-ff-default-directory'.
@@ -488,7 +488,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (persistent-help . "Jump to line (`C-u' Record in mark ring)")
         (requires-pattern . 3)
         (delayed)))
-     :buffer "*helm grep*"
+     :buffer (format "*helm %s*" (if zgrep "zgrep" "grep"))
      :keymap helm-c-grep-map
      :history 'helm-c-grep-history)))
 
