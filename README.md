@@ -73,10 +73,11 @@ discover some of the commands provided by helm.
 
 ### Advanced usage
 
-Helm is capable of a lot. For now you can find all the gory details
-only in the
-[pdf manual](https://github.com/emacs-helm/helm/raw/master/doc/helm.pdf). Soon
-we'll provide supplementary documentation.
+Helm is capable of a lot.
+
+You can find all the gory details on the
+[Helm Wiki](https://github.com/emacs-helm/helm/wiki) or in the
+[pdf manual](https://github.com/emacs-helm/helm/raw/master/doc/helm.pdf).
 
 ## Known issues
 
