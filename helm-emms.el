@@ -129,9 +129,8 @@
 
 (defun helm-c-emms-play-current-playlist ()
   "Play current playlist."
-  (with-current-emms-playlist
-    (emms-playlist-first)
-    (emms-playlist-mode-play-smart)))
+  (emms-playlist-first)
+  (emms-playlist-mode-play-smart))
 
 (defvar helm-c-source-emms-files
   '((name . "Emms files")
@@ -159,12 +158,13 @@
     (action . (("Play file" . emms-play-file)
                ("Add to Playlist and play (C-u clear current)"
                 . (lambda (candidate)
-                    (when helm-current-prefix-arg
-                      (emms-playlist-current-clear))
-                    (emms-playlist-new)
-                    (mapc 'emms-add-playlist-file (helm-marked-candidates))
-                    (unless emms-player-playing-p
-                      (helm-c-emms-play-current-playlist))))))))
+                    (with-current-emms-playlist
+                      (when helm-current-prefix-arg
+                        (emms-playlist-current-clear))
+                      (emms-playlist-new)
+                      (mapc 'emms-add-playlist-file (helm-marked-candidates))
+                      (unless emms-player-playing-p
+                        (helm-c-emms-play-current-playlist)))))))))
 
 ;;;###autoload
 (defun helm-emms ()
