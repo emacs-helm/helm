@@ -319,7 +319,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
         :preselect preselect
         :prompt prompt
         :resume 'noresume
-        :keymap keymap
+        :keymap helm-map
         :history (and (symbolp input-history) input-history)
         :buffer buffer)
        (when (and (eq helm-exit-status 0)
@@ -641,6 +641,7 @@ Keys description:
            :input initial-input
            :prompt prompt
            :resume 'noresume
+           :keymap helm-map
            :buffer buffer
            :preselect preselect)
           (when (and (not (string= helm-pattern ""))
