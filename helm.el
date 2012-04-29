@@ -133,6 +133,11 @@
   "Face for currently selected item in the helm buffer."
   :group 'helm)
 
+(defface helm-separator
+    '((t (:foreground "red")))
+  "Face for multiline source separator."
+  :group 'helm)
+
 ;;; Variables
 ;;
 ;;
