@@ -332,6 +332,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)))
     (candidates . helm-find-files-get-candidates)
+    (match (lambda (candidate)
+             (string-match (regexp-quote helm-pattern) candidate)))
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
@@ -1149,8 +1151,7 @@ or hitting C-z on \"..\"."
                        (directory-file-name helm-ff-last-expanded))
                       (directory-file-name helm-ff-last-expanded))))
       (with-helm-window
-        (when (re-search-forward
-               (concat "^" (regexp-quote presel) "$") nil t)
+        (when (re-search-forward (concat "^" (regexp-quote presel) "$") nil t)
           (forward-line 0)
           (helm-mark-current-line)))
       (setq helm-ff-last-expanded nil))))
