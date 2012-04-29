@@ -117,22 +117,15 @@
                                               emms-source-file-default-directory))))))
     (filtered-candidate-transformer . helm-c-adaptive-sort)))
 
-
+(defvar helm-emms-current-playlist nil)
 (defun helm-c-emms-files-modifier (candidates source)
-  (let ((current-playlist (with-current-emms-playlist
-                            (loop with cur-list = (emms-playlist-tracks-in-region
-                                                   (point-min) (point-max))
-                                  for i in cur-list
-                                  for name = (assoc-default 'name i)
-                                  when name
-                                  collect name))))
-    (loop for i in candidates
-          if (member (cdr i) current-playlist)
-          collect (cons (propertize (car i)
-                                    'face 'helm-emms-playlist)
-                        (cdr i)) into lis
-          else collect i into lis
-          finally return (reverse lis))))
+  (loop for i in candidates
+        if (member (cdr i) helm-emms-current-playlist)
+        collect (cons (propertize (car i)
+                                  'face 'helm-emms-playlist)
+                      (cdr i)) into lis
+        else collect i into lis
+        finally return (reverse lis)))
 
 (defun helm-c-emms-play-current-playlist ()
   "Play current playlist."
@@ -142,6 +135,15 @@
 
 (defvar helm-c-source-emms-files
   '((name . "Emms files")
+    (init . (lambda ()
+              (setq helm-emms-current-playlist
+                    (with-current-emms-playlist
+                      (loop with cur-list = (emms-playlist-tracks-in-region
+                                             (point-min) (point-max))
+                            for i in cur-list
+                            for name = (assoc-default 'name i)
+                            when name
+                            collect name)))))
     (candidates . (lambda ()
                     (loop for v being the hash-values in emms-cache-db
                           for name      = (assoc-default 'name v)
