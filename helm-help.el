@@ -448,6 +448,7 @@ Otherwise your command will be called many times like this:
 ;;; Mode line strings
 ;;
 ;;
+;;;###autoload
 (defvar helm-buffer-mode-line-string
   '("Buffer(s)" "\
 \\<helm-c-buffer-map>\
@@ -459,6 +460,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-c-source-buffers-list'"))
 
+;;;###autoload
 (defvar helm-ff-mode-line-string "\
 \\<helm-find-files-map>\
 \\[helm-ff-help]:Help \
@@ -469,6 +471,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-source-find-files'")
 
+;;;###autoload
 (defvar helm-read-file-name-mode-line-string "\
 \\<helm-c-read-file-map>\
 \\[helm-read-file-name-help]:Help \
@@ -479,6 +482,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-source-find-files'")
 
+;;;###autoload
 (defvar helm-generic-file-mode-line-string "\
 \\<helm-generic-files-map>\
 \\[helm-generic-file-help]:Help \
@@ -489,6 +493,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in Locate.")
 
+;;;###autoload
 (defvar helm-grep-mode-line-string"\
 \\<helm-c-grep-map>\
 \\[helm-grep-help]:Help \
@@ -499,6 +504,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-do-grep'.")
 
+;;;###autoload
 (defvar helm-pdfgrep-mode-line-string "\
 \\<helm-c-pdfgrep-map>\
 \\[helm-pdfgrep-help]:Help \
@@ -509,6 +515,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-do-pdfgrep'.")
 
+;;;###autoload
 (defvar helm-etags-mode-line-string "\
 \\<helm-c-etags-map>\
 \\[helm-etags-help]:Help \
@@ -519,6 +526,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-c-etags-select'.")
 
+;;;###autoload
 (defvar helm-c-ucs-mode-line-string "\
 \\<helm-c-ucs-map>\
 \\[helm-c-ucs-help]:Help \
@@ -529,6 +537,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-ucs'.")
 
+;;;###autoload
 (defvar helm-bookmark-mode-line-string
   '("Bookmark(s)" "\
 \\<helm-c-bookmark-map>\
@@ -540,6 +549,7 @@ Otherwise your command will be called many times like this:
 \\[helm-select-3rd-action]:NthAct")
   "String displayed in mode-line in `helm-c-source-buffers-list'")
 
+;;;###autoload
 (defvar helm-occur-mode-line "\
 \\<helm-map>\
 \\[helm-help]:Help \
