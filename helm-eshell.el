@@ -148,6 +148,7 @@ The function that call this should set `helm-ec-target' to thing at point."
     (with-helm-show-completion beg end
       (helm :sources 'helm-c-source-esh
             :buffer "*helm pcomplete*"
+            :resume 'noresume
             :input (helm-ff-set-pattern ; Handle tramp filenames.
                     (car (last (ignore-errors ; Needed in lisp symbols completion.
                                  (pcomplete-parse-arguments)))))))))
@@ -168,6 +169,7 @@ The function that call this should set `helm-ec-target' to thing at point."
          (with-helm-show-completion beg end
            (helm :sources 'helm-c-source-eshell-history
                  :buffer "*Eshell history*"
+                 :resume 'noresume
                  :input input))
       (when (and flag-empty
                  (looking-back " "))
