@@ -75,9 +75,7 @@ discover some of the commands provided by helm.
 
 Helm is capable of a lot.
 
-You can find all the gory details on the
-[Helm Wiki](https://github.com/emacs-helm/helm/wiki) or in the
-[pdf manual](https://github.com/emacs-helm/helm/raw/master/doc/helm.pdf).
+You can find all the gory details on the [Helm Wiki](https://github.com/emacs-helm/helm/wiki).
 
 ## Known issues
 
