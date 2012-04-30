@@ -22,6 +22,7 @@
 ;;; Embeded documentation.
 ;;
 ;;
+;;;###autoload
 (defvar helm-mode-line-string "\
 \\<helm-map>\
 \\[helm-help]:Help \
