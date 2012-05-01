@@ -946,20 +946,13 @@ You can resume an helm session at any moment.
 When called with a prefix arg allow choosing among different sessions.
 
 
-
-
- Other tools
-
-
+# Other tools
 
 In addition of what is described above, you will find a bunch of
 powerfull tools that come with helm-config.el. Just browse the helm
 commands availables with helm-M-x.
 
 Not complete.
-
-
-
 
 
 # Helm mode
