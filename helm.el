@@ -576,6 +576,17 @@ If SRC is omitted, use current source."
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
 
+(defun helm-add-action-to-source (name fn source)
+  "Add new action NAME linked to function FN to SOURCE.
+Function FN should be a valid function that take one arg i.e candidate,
+argument NAME is a string tha will appear in action menu
+and SOURCE should be an existing helm source already loaded.
+This allow user to add a specific action to an existing source
+without modifying source code."
+  (let ((actions    (helm-attr 'action source))
+        (new-action (list (cons name fn))))
+    (helm-attrset 'action (append actions new-action) source)))
+
 (defun helm-set-source-filter (sources)
   "Set the value of `helm-source-filter' to SOURCES and update.
 
