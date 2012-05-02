@@ -585,6 +585,8 @@ This allow user to add a specific action to an existing source
 without modifying source code."
   (let ((actions    (helm-attr 'action source))
         (new-action (list (cons name fn))))
+    (when (symbolp actions)
+      (setq actions (list (cons "Default action" actions))))
     (helm-attrset 'action (append actions new-action) source)))
 
 (defun helm-set-source-filter (sources)
