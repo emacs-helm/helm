@@ -480,7 +480,10 @@ See documentation of `completing-read' and `all-completions' for details."
          (minibuffer-completion-predicate predicate)
          ;; Be sure this pesty *completion* buffer doesn't popup.
          (minibuffer-setup-hook (remove 'minibuffer-completion-help
-                                        minibuffer-setup-hook)))
+                                        minibuffer-setup-hook))
+         ;; Disable hack that could be used before `completing-read'.
+         ;; i.e (push ?\t unread-command-events).
+         unread-command-events)
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
