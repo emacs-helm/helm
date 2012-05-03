@@ -32,18 +32,18 @@
   "~/.emacs.d/helm-c-adaptive-history"
   "Path of file where history information is stored."
   :type 'string
-  :group 'helm-config)
+  :group 'helm-adapt)
 
 (defcustom helm-c-adaptive-history-length 50
   "Maximum number of candidates stored for a source."
   :type 'number
-  :group 'helm-config)
+  :group 'helm-adapt)
 
 (defcustom helm-c-use-adaptative-sorting nil
   "Wheter to use or not adaptative sorting.
 Even if a source use it, it will have no effect when set to nil."
   :type 'boolean
-  :group 'helm-config)
+  :group 'helm-adapt)
 
 
 ;; Internal

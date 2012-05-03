@@ -22,6 +22,10 @@
 (require 'helm-files)
 
 
+(defgroup helm-mode nil
+  "Enable helm completion."
+  :group 'helm)
+
 (defcustom helm-completing-read-handlers-alist
   '((describe-function . helm-completing-read-symbols)
     (describe-variable . helm-completing-read-symbols)
@@ -56,7 +60,7 @@ e.g ido completion for `find-file':
 same as
 \(find-file . ido-read-file-name\)
 Note that you don't need to enable `ido-mode' for this to work."
-  :group 'helm-files
+  :group 'helm-mode
   :type '(alist :key-type symbol :value-type symbol))
 
 
@@ -757,7 +761,7 @@ You can add such functions to `helm-completing-read-handlers-alist'
 with a nil value.
 
 Note: This mode will work only partially on Emacs23."
-  :group 'helm
+  :group 'helm-mode
   :global t
   :lighter helm-completion-mode-string
   (declare (special completing-read-function))
