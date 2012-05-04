@@ -115,12 +115,14 @@ See `ido-make-buffer-list' for more infos."
                                       (list helm-pattern)))
     (keymap . ,helm-map)
     (action . (lambda (candidate)
-                (let ((buffer (get-buffer-create candidate)))
-                  (if helm-current-prefix-arg
-                      (with-current-buffer buffer
-                        (funcall (intern (helm-comp-read
-                                          "Major-mode: "
-                                          helm-buffers-favorite-modes))))
+                (let ((mjm (and helm-current-prefix-arg
+                                (intern (helm-comp-read
+                                         "Major-mode: "
+                                         helm-buffers-favorite-modes))))
+                      buffer)
+                  (setq buffer (get-buffer-create candidate)) 
+                  (if mjm
+                      (with-current-buffer buffer (funcall mjm))
                       (set-buffer-major-mode buffer))
                   (helm-c-switch-to-buffer buffer))))))
 
