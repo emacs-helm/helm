@@ -22,6 +22,8 @@
 (require 'helm-utils)
 (require 'helm-elscreen)
 
+(declare-function ido-make-buffer-list "ido" (default))
+
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
   :group 'helm)
@@ -40,11 +42,6 @@ filtered from the list of candidates if the
 they will be displayed with face `file-name-shadow' if
 `helm-c-shadow-boring-buffers' is used."
   :type 'string
-  :group 'helm-buffers)
-
-(defcustom helm-allow-skipping-current-buffer nil
-  "Show current buffer or not in helm buffer"
-  :type 'boolean
   :group 'helm-buffers)
 
 (defcustom helm-buffers-favorite-modes '(lisp-interaction-mode
@@ -98,16 +95,13 @@ they will be displayed with face `file-name-shadow' if
   "Keymap for buffer sources in helm.")
 
 (defun helm-c-buffer-list ()
-  "Return a list of buffer names.
-The first buffer in the list will be the last recently used
-buffer that is not the current buffer unless
-`helm-allow-skipping-current-buffer' is nil."
-  (let ((buffers (mapcar 'buffer-name (buffer-list))))
-    (if helm-allow-skipping-current-buffer
-        (progn
-          (setq buffers (remove (buffer-name helm-current-buffer) buffers))
-          (append (cdr buffers) (list (car buffers))))
-        buffers)))
+  "Return the current list of buffers.
+Currently visible buffers are put at the end of the list.
+See `ido-make-buffer-list' for more infos."
+  (require 'ido)
+  (let ((ido-process-ignore-lists t)
+        ido-ignored-list)
+    (ido-make-buffer-list nil)))
 
 (defvar helm-c-source-buffers
   '((name . "Buffers")
@@ -130,16 +124,13 @@ buffer that is not the current buffer unless
                       (set-buffer-major-mode buffer))
                   (helm-c-switch-to-buffer buffer))))))
 
-;;; Buffers-list (was buffers+)
+;;; Buffers list
 ;;
 ;;
 (defun helm-c-highlight-buffers (buffers)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop with buflist = (if helm-allow-skipping-current-buffer
-                           buffers
-                           (cons (pop (cdr buffers)) buffers))
-        for i in buflist
+  (loop for i in buffers
         for buf = (get-buffer i)
         for bfname = (buffer-file-name buf)
         collect
@@ -189,8 +180,6 @@ Should be called after others transformers i.e (boring buffers)."
     (candidates . helm-c-buffer-list)
     (type . buffer)
     (match helm-c-buffer-match-major-mode)
-    (candidate-transformer helm-c-skip-boring-buffers
-                           helm-c-highlight-buffers)
     (persistent-action . helm-c-buffers-list-persistent-action)
     (keymap . ,helm-c-buffer-map)
     (volatile)
@@ -396,58 +385,10 @@ See `helm-ediff-marked-buffers'."
 (defun helm-c-skip-boring-buffers (buffers)
   (helm-c-skip-entries buffers helm-c-boring-buffer-regexp))
 
-(defun helm-c-skip-current-buffer (buffers)
-  "[DEPRECATED] Skip current buffer in buffer lists.
-This transformer should not be used as this is now handled directly
-in `helm-c-buffer-list' and `helm-c-highlight-buffers'."
-  (if helm-allow-skipping-current-buffer
-      (remove (buffer-name helm-current-buffer) buffers)
-      buffers))
-
 (defun helm-c-shadow-boring-buffers (buffers)
   "Buffers matching `helm-c-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
   (helm-c-shadow-entries buffers helm-c-boring-buffer-regexp))
-
-(defvar helm-c-buffer-display-string-functions
-  '(helm-c-buffer-display-string--compilation
-    helm-c-buffer-display-string--shell
-    helm-c-buffer-display-string--eshell)
-  "Functions to setup display string for buffer.
-
-Function has one argument, buffer name.
-If it returns string, use it.
-If it returns nil, display buffer name.
-See `helm-c-buffer-display-string--compilation' for example.")
-
-(defun helm-c-transform-buffer-display-string (buffers)
-  "Setup display string for buffer candidates
-using `helm-c-buffer-display-string-functions'."
-  (loop for buf in buffers
-        if (consp buf)
-        collect buf
-        else
-        for disp = (progn (set-buffer buf)
-                          (run-hook-with-args-until-success
-                           'helm-c-buffer-display-string-functions buf))
-        collect (if disp (cons disp buf) buf)))
-
-(defun helm-c-buffer-display-string--compilation (buf)
-  (helm-aif (car compilation-arguments)
-      (format "%s: %s [%s]" buf it default-directory)))
-
-(defun helm-c-buffer-display-string--eshell (buf)
-  (declare (special eshell-history-ring))
-  (when (eq major-mode 'eshell-mode)
-    (format "%s: %s [%s]" buf
-            (ignore-errors (ring-ref eshell-history-ring 0))
-            default-directory)))
-
-(defun helm-c-buffer-display-string--shell (buf)
-  (when (eq major-mode 'shell-mode)
-    (format "%s: %s [%s]" buf
-            (ignore-errors (ring-ref comint-input-ring 0))
-            default-directory)))
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
@@ -483,7 +424,7 @@ using `helm-c-buffer-display-string-functions'."
                                          (helm-ediff-marked-buffers candidate t))))
       (persistent-help . "Show this buffer")
       (candidate-transformer helm-c-skip-boring-buffers
-                             helm-c-transform-buffer-display-string))
+                             helm-c-highlight-buffers))
   "Buffer or buffer name.")
 
 ;;;###autoload
