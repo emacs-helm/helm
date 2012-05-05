@@ -23,6 +23,7 @@
 (require 'helm-elscreen)
 
 (declare-function ido-make-buffer-list "ido" (default))
+(defvar ido-ignore-buffers) ; Shut up byte-compiler 
 
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
