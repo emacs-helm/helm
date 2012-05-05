@@ -49,7 +49,7 @@ with face `file-name-shadow' if
 Buffer candidates matching these regular expression will be
 filtered from the list of candidates if the
 `helm-c-skip-boring-buffers' candidate transformer is used."
-  :type  'list
+  :type  '(repeat (choice regexp))
   :group 'helm-buffers)
 
 (defcustom helm-buffers-favorite-modes '(lisp-interaction-mode
@@ -57,7 +57,7 @@ filtered from the list of candidates if the
                                          text-mode
                                          org-mode)
   "List of prefered mode to open new buffers with."
-  :type 'list
+  :type '(repeat (choice function))
   :group 'helm-buffers)
 
 

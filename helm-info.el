@@ -80,7 +80,7 @@ Where NAME is one of `helm-c-default-info-index-list'."
     "bison" "id-utils" "global")
   "Info Manual entries to use for building helm info index commands."
   :group 'helm-info
-  :type  'list
+  :type  '(repeat (choice string))
   :set   'helm-info-index-set)
 
 
