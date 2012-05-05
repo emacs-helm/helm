@@ -22,6 +22,7 @@
 (require 'compile) ; Fixme: Is this needed?
 (require 'dired)
 
+(declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
 
 
 (defgroup helm-utils nil
@@ -31,13 +32,6 @@
 (defcustom helm-su-or-sudo "sudo"
   "What command to use for root access."
   :type 'string
-  :group 'helm-utils)
-
-(defcustom helm-c-enable-eval-defun-hack t
-  "If non-nil, execute `helm' using the source at point when C-M-x is pressed.
-This hack is invoked when pressing C-M-x in the form \
- (defvar helm-c-source-XXX ...) or (setq helm-c-source-XXX ...)."
-  :type 'boolean
   :group 'helm-utils)
 
 (defcustom helm-default-kbsize 1024.0
@@ -320,20 +314,6 @@ Default is `eq'."
         finally return
         (loop for i being the hash-values in cont collect i)))
 
-(defadvice eval-defun (after helm-source-hack activate)
-  "Allow immediate execution of helm source when evaling it.
-See `helm-c-enable-eval-defun-hack'."
-  (when helm-c-enable-eval-defun-hack
-    (let ((varsym (save-excursion
-                    (beginning-of-defun)
-                    (forward-char 1)
-                    (when (memq (read (current-buffer)) '(defvar setq))
-                      (read (current-buffer))))))
-      (when (string-match "^helm-c-source-" (symbol-name varsym))
-        (helm varsym)))))
-;; (progn (ad-disable-advice 'eval-defun 'after 'helm-source-hack) (ad-update 'eval-defun))
-
-(declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
 ;;;###autoload
 (defun helm-quit-and-find-file ()
   "Drop into `helm-find-files' from `helm'.
