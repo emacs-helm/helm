@@ -100,7 +100,8 @@ Currently visible buffers are put at the end of the list.
 See `ido-make-buffer-list' for more infos."
   (require 'ido)
   (let ((ido-process-ignore-lists t)
-        ido-ignored-list)
+        ido-ignored-list
+        ido-use-virtual-buffers)
     (ido-make-buffer-list nil)))
 
 (defvar helm-c-source-buffers
