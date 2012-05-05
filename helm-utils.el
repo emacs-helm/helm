@@ -263,8 +263,8 @@ The match is done with `string-match'."
                             'file-name-shadow
                             ;; fall back to default on XEmacs
                             'default)))
-              (if (string-match regexp file)
-                  (setq file (propertize file 'face face))))
+              (when (string-match regexp file)
+                (setq file (propertize file 'face face))))
             file)
           list))
 
