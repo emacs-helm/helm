@@ -295,7 +295,8 @@ Contain also `helm-c-source-google-suggest'."
      helm-c-source-bookmark-ssh-files&dirs
      helm-c-source-bookmark-set)
    :prompt "SearchBookmark: "
-   :buffer "*helm bmkext*"))
+   :buffer "*helm bmkext*"
+   :default (buffer-name helm-current-buffer)))
 
 (provide 'helm-bmkext)
 
