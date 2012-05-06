@@ -252,7 +252,9 @@ Return nil if bmk is not a valid bookmark."
 (defun helm-bookmarks ()
   "Preconfigured `helm' for bookmarks."
   (interactive)
-  (helm-other-buffer 'helm-c-source-bookmarks "*helm bookmarks*"))
+  (helm-other-buffer '(helm-c-source-bookmarks
+                       helm-c-source-bookmark-set)
+                     "*helm bookmarks*"))
 
 ;;;###autoload
 (defun helm-c-pp-bookmarks ()
@@ -260,7 +262,8 @@ Return nil if bmk is not a valid bookmark."
   (interactive)
   (helm-other-buffer '(helm-c-source-bookmarks-local
                        helm-c-source-bookmarks-su
-                       helm-c-source-bookmarks-ssh)
+                       helm-c-source-bookmarks-ssh
+                       helm-c-source-bookmark-set)
                      "*helm pp bookmarks*"))
 
 

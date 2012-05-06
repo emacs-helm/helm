@@ -292,7 +292,8 @@ Contain also `helm-c-source-google-suggest'."
      helm-c-source-bookmark-man
      helm-c-source-bookmark-images
      helm-c-source-bookmark-su-files&dirs
-     helm-c-source-bookmark-ssh-files&dirs)
+     helm-c-source-bookmark-ssh-files&dirs
+     helm-c-source-bookmark-set)
    :prompt "SearchBookmark: "
    :buffer "*helm bmkext*"))
 
