@@ -103,8 +103,6 @@ The smaller  this value is, the slower highlight is."
   :type  'integer
   :group 'helm-match-plugin)
 
-(defvar helm-mp-initial-highlight-delay nil)
-
 ;;;###autoload
 (define-minor-mode helm-match-plugin-mode
   "Add more flexible regexp matching for helm.
@@ -114,19 +112,12 @@ See `helm-mp-matching-method' for the behavior of each method."
   :global t
   (if helm-match-plugin-mode
       (progn
-        (unless helm-mp-initial-highlight-delay
-          (setq helm-mp-initial-highlight-delay
-                helm-mp-highlight-delay))
         (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
-        (unless helm-mp-highlight-delay
-          (setq helm-mp-highlight-delay
-                helm-mp-initial-highlight-delay)))
+        (add-hook 'helm-update-hook 'helm-mp-highlight-match))
     (setq helm-compile-source-functions
           (delq 'helm-compile-source--match-plugin
                 helm-compile-source-functions))
-    (setq helm-mp-initial-highlight-delay
-          helm-mp-highlight-delay)
-    (setq helm-mp-highlight-delay nil)))
+    (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
 
 
 ;;; Build regexps
@@ -384,7 +375,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
       (run-with-idle-timer helm-mp-highlight-delay nil
                            'helm-mp-highlight-match-internal
                            (with-current-buffer helm-buffer (point-max))))))
-(add-hook 'helm-update-hook 'helm-mp-highlight-match)
 
 (defun helm-mp-highlight-region (start end regexp face)
   (save-excursion
