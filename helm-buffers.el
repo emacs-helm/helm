@@ -23,7 +23,6 @@
 (require 'helm-elscreen)
 
 (declare-function ido-make-buffer-list "ido" (default))
-(defvar ido-ignore-buffers) ; Shut up byte-compiler 
 
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
@@ -108,8 +107,6 @@ Currently visible buffers are put at the end of the list.
 See `ido-make-buffer-list' for more infos."
   (require 'ido)
   (let ((ido-process-ignore-lists t)
-        (ido-ignore-buffers (cons (regexp-quote helm-buffer)
-                                  ido-ignore-buffers))
         ido-ignored-list
         ido-use-virtual-buffers)
     (ido-make-buffer-list nil)))
@@ -187,10 +184,13 @@ Should be called after others transformers i.e (boring buffers)."
               ;; Any non--file buffer.
               (t (propertize i 'face 'italic)))))
 
-
+(defvar helm-buffers-list-cache nil)
 (defvar helm-c-source-buffers-list
   `((name . "Buffers")
-    (candidates . helm-c-buffer-list)
+    (init . (lambda ()
+              ;; Create the list before `helm-buffer' creation.
+              (setq helm-buffers-list-cache (helm-c-buffer-list))))
+    (candidates . helm-buffers-list-cache)
     (type . buffer)
     (match helm-c-buffer-match-major-mode)
     (persistent-action . helm-c-buffers-list-persistent-action)
