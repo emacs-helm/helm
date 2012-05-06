@@ -2154,7 +2154,7 @@ Possible value of DIRECTION are 'next or 'previous."
   ;; Setup header-line.
   (let* ((hlstr (helm-interpret-value
                  (assoc-default 'header-line source) source))
-         (hlend (make-string (- (window-width) (length hlstr)) ? )))
+         (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
     (setq header-line-format
           (propertize (concat " " hlstr hlend) 'face 'helm-header))))
   
