@@ -103,6 +103,21 @@ The smaller  this value is, the slower highlight is."
   :type  'integer
   :group 'helm-match-plugin)
 
+;;;###autoload
+(define-minor-mode helm-match-plugin-mode
+  "Add more flexible regexp matching for helm.
+See `helm-mp-matching-method' for the behavior of each method."
+  :group 'helm-match-plugin
+  :require 'helm-match-plugin
+  :global t
+  (if helm-match-plugin-mode
+      (progn
+        (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
+        (add-hook 'helm-update-hook 'helm-mp-highlight-match))
+    (setq helm-compile-source-functions
+          (delq 'helm-compile-source--match-plugin
+                helm-compile-source-functions))
+    (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
 
 
 ;;; Build regexps
@@ -360,7 +375,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
       (run-with-idle-timer helm-mp-highlight-delay nil
                            'helm-mp-highlight-match-internal
                            (with-current-buffer helm-buffer (point-max))))))
-(add-hook 'helm-update-hook 'helm-mp-highlight-match)
 
 (defun helm-mp-highlight-region (start end regexp face)
   (save-excursion
@@ -388,46 +402,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
       (when (>= (length requote) helm-mp-highlight-threshold)
         (helm-mp-highlight-region
          (point-min) end requote 'helm-match)))))
-
-
-;;; Toggle helm-match-plugin
-;;
-;;
-(defvar helm-mp-initial-highlight-delay nil)
-
-;;;###autoload
-(defun helm-mp-toggle-match-plugin ()
-  "Turn on/off multiple regexp matching in helm.
-i.e helm-match-plugin."
-  (interactive)
-  (let ((helm-match-plugin-enabled
-         (member 'helm-compile-source--match-plugin
-                 helm-compile-source-functions)))
-    (flet ((disable-match-plugin ()
-             (setq helm-compile-source-functions
-                   (delq 'helm-compile-source--match-plugin
-                         helm-compile-source-functions))
-             (setq helm-mp-initial-highlight-delay
-                   helm-mp-highlight-delay)
-             (setq helm-mp-highlight-delay nil))
-           (enable-match-plugin ()
-             (unless helm-mp-initial-highlight-delay
-               (setq helm-mp-initial-highlight-delay
-                     helm-mp-highlight-delay))
-             (setq helm-compile-source-functions
-                   (cons 'helm-compile-source--match-plugin
-                         helm-compile-source-functions))
-             (unless helm-mp-highlight-delay
-               (setq helm-mp-highlight-delay
-                     helm-mp-initial-highlight-delay))))
-      (if helm-match-plugin-enabled
-          (when (y-or-n-p "Really disable match-plugin? ")
-            (disable-match-plugin)
-            (message "Helm-match-plugin disabled"))
-          (when (y-or-n-p "Really enable match-plugin? ")
-            (enable-match-plugin)
-            (message "Helm-match-plugin enabled"))))))
-
 
 ;;;; Unit test
 ;;
