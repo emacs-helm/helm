@@ -394,13 +394,12 @@ See `helm-ediff-marked-buffers'."
 ;;; Candidate Transformers
 ;;
 ;;
-
 (defun helm-buffers-skip-entries (seq regexp-list)
   "Remove entries which matches REGEXP from SEQ."
   (loop for i in seq
         unless (loop for regexp in regexp-list
                      thereis (and (stringp i)
-                                 (string-match regexp i)))
+                                  (string-match regexp i)))
         collect i))
 
 (defun helm-c-skip-boring-buffers (buffers)
