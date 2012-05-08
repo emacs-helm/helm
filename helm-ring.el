@@ -341,14 +341,13 @@ replace with STR as yanked string."
 (defun helm-show-kill-ring ()
   "Preconfigured `helm' for `kill-ring'.
 It is drop-in replacement of `yank-pop'.
-You may bind this command to M-y.
+
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (if (get-buffer-window helm-buffer)
-      (helm-nest :sources 'helm-c-source-kill-ring
-                 :buffer "*helm kill-ring*")
-      (helm :sources 'helm-c-source-kill-ring
-            :buffer "*helm kill-ring*")))
+  (let ((plist '(:sources helm-c-source-kill-ring
+                 :buffer "*helm kill-ring*"))
+        (fn    (if (get-buffer-window helm-buffer) #'helm-nest #'helm)))
+    (apply fn plist)))
 
 (provide 'helm-ring)
 
