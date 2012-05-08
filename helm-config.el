@@ -175,7 +175,7 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-resume
-;;;;;;  helm-open-last-log) "helm" "helm.el" (20381 39109))
+;;;;;;  helm-open-last-log) "helm" "helm.el" (20390 12378))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -413,7 +413,7 @@ Send a bug report of helm.el in helm session.
 ;;;***
 
 ;;;### (autoloads (helm-c-reset-adaptative-history) "helm-adaptative"
-;;;;;;  "helm-adaptative.el" (20360 594))
+;;;;;;  "helm-adaptative.el" (20390 12378))
 ;;; Generated autoloads from helm-adaptative.el
 
 (autoload 'helm-c-reset-adaptative-history "helm-adaptative" "\
@@ -450,7 +450,7 @@ http://bbdb.sourceforge.net/
 ;;;***
 
 ;;;### (autoloads (helm-bookmark-ext helm-c-bmkext-run-edit) "helm-bmkext"
-;;;;;;  "helm-bmkext.el" (20345 62057))
+;;;;;;  "helm-bmkext.el" (20390 18979))
 ;;; Generated autoloads from helm-bmkext.el
 
 (autoload 'helm-c-bmkext-run-edit "helm-bmkext" "\
@@ -470,7 +470,7 @@ Contain also `helm-c-source-google-suggest'.
 
 ;;;### (autoloads (helm-c-pp-bookmarks helm-bookmarks helm-c-bookmark-run-delete
 ;;;;;;  helm-c-bookmark-run-jump-other-window) "helm-bookmark" "helm-bookmark.el"
-;;;;;;  (20368 31879))
+;;;;;;  (20390 19078))
 ;;; Generated autoloads from helm-bookmark.el
 
 (autoload 'helm-c-bookmark-run-jump-other-window "helm-bookmark" "\
@@ -501,7 +501,7 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 ;;;;;;  helm-buffer-run-zgrep helm-buffer-run-grep helm-buffer-run-kill-buffers
 ;;;;;;  helm-buffer-save-persistent helm-buffer-revert-persistent
 ;;;;;;  helm-buffer-diff-persistent) "helm-buffers" "helm-buffers.el"
-;;;;;;  (20381 39109))
+;;;;;;  (20390 12378))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffer-diff-persistent "helm-buffers" "\
@@ -687,7 +687,7 @@ Preconfigured `helm' for emms sources.
 ;;;***
 
 ;;;### (autoloads (helm-eshell-history helm-esh-pcomplete) "helm-eshell"
-;;;;;;  "helm-eshell.el" (20368 31879))
+;;;;;;  "helm-eshell.el" (20390 12378))
 ;;; Generated autoloads from helm-eshell.el
 
 (autoload 'helm-esh-pcomplete "helm-eshell" "\
@@ -1145,7 +1145,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20382 7547))
+;;;;;;  (20390 12378))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1258,7 +1258,7 @@ Preconfigured `helm' for `imenu'.
 ;;;***
 
 ;;;### (autoloads (helm-info-at-point) "helm-info" "helm-info.el"
-;;;;;;  (20345 62057))
+;;;;;;  (20390 12378))
 ;;; Generated autoloads from helm-info.el
 
 (autoload 'helm-info-at-point "helm-info" "\
@@ -1302,15 +1302,24 @@ Preconfigured `helm' for Man and Woman pages.
 
 ;;;***
 
-;;;### (autoloads (helm-mp-toggle-match-plugin) "helm-match-plugin"
-;;;;;;  "helm-match-plugin.el" (20381 39109))
+;;;### (autoloads (helm-match-plugin-mode) "helm-match-plugin" "helm-match-plugin.el"
+;;;;;;  (20391 53676))
 ;;; Generated autoloads from helm-match-plugin.el
 
-(autoload 'helm-mp-toggle-match-plugin "helm-match-plugin" "\
-Turn on/off multiple regexp matching in helm.
-i.e helm-match-plugin.
+(defvar helm-match-plugin-mode nil "\
+Non-nil if Helm-Match-Plugin mode is enabled.
+See the command `helm-match-plugin-mode' for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `helm-match-plugin-mode'.")
 
-\(fn)" t nil)
+(custom-autoload 'helm-match-plugin-mode "helm-match-plugin" nil)
+
+(autoload 'helm-match-plugin-mode "helm-match-plugin" "\
+Add more flexible regexp matching for helm.
+See `helm-mp-matching-method' for the behavior of each method.
+
+\(fn &optional ARG)" t nil)
 
 ;;;***
 
@@ -1351,7 +1360,7 @@ Preconfigured `helm' for `minibuffer-history'.
 
 ;;;***
 
-;;;### (autoloads (helm-mode) "helm-mode" "helm-mode.el" (20382 6549))
+;;;### (autoloads (helm-mode) "helm-mode" "helm-mode.el" (20390 12378))
 ;;; Generated autoloads from helm-mode.el
 
 (defvar helm-mode nil "\
@@ -1450,7 +1459,7 @@ Preconfigured helm to browse code.
 
 ;;;### (autoloads (helm-show-kill-ring helm-register helm-all-mark-rings
 ;;;;;;  helm-global-mark-ring helm-mark-ring) "helm-ring" "helm-ring.el"
-;;;;;;  (20381 39109))
+;;;;;;  (20390 57260))
 ;;; Generated autoloads from helm-ring.el
 
 (autoload 'helm-mark-ring "helm-ring" "\
@@ -1540,7 +1549,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20368 23009))
+;;;;;;  "helm-utils" "helm-utils.el" (20390 12378))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1615,8 +1624,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20382
-;;;;;;  7574 44426))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20391
+;;;;;;  53683 695715))
 
 ;;;***
 

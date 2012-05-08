@@ -360,7 +360,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
        (search ,@searchers
                ,@(assoc-default 'search source))
        ,@source)))
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin t)
 
 
 ;;; Highlight matches.
@@ -403,9 +402,8 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
         (helm-mp-highlight-region
          (point-min) end requote 'helm-match)))))
 
-;;;; Unit test
-;;
-;; unit test for match plugin are now in developper-tools/unit-test-match-plugin.el
+;; Enable match-plugin by default.
+(helm-match-plugin-mode 1)
 
 (provide 'helm-match-plugin)
 
