@@ -250,23 +250,23 @@ With a numeric prefix arg show only the ARG number of candidates."
 The match is done with `string-match'."
   (string-match helm-pattern candidate))
 
-(defun helm-c-skip-entries (list regexp)
-  "Remove entries which matches REGEXP from LIST."
-  (remove-if (lambda (x) (and (stringp x) (string-match regexp x)))
-             list))
+(defun helm-skip-entries (seq regexp-list)
+  "Remove entries which matches one of REGEXP-LIST from SEQ."
+  (loop for i in seq
+        unless (loop for regexp in regexp-list
+                     thereis (and (stringp i)
+                                  (string-match regexp i)))
+        collect i))
 
-(defun helm-c-shadow-entries (list regexp)
-  "Display elements of LIST matching REGEXP with the `file-name-shadow' face."
-  (mapcar (lambda (file)
-            ;; Add shadow face property to boring files.
-            (let ((face (if (facep 'file-name-shadow)
-                            'file-name-shadow
-                            ;; fall back to default on XEmacs
-                            'default)))
-              (when (string-match regexp file)
-                (setq file (propertize file 'face face))))
-            file)
-          list))
+(defun helm-shadow-entries (seq regexp-list)
+  "Put shadow property on entries in SEQ matching a regexp in REGEXP-LIST."
+  (let ((face 'italic))
+    (loop for i in seq
+          if (loop for regexp in regexp-list
+                   thereis (and (stringp i)
+                                (string-match regexp i)))
+          collect (propertize i 'face face)
+          else collect i)))
 
 (defun helm-c-stringify (str-or-sym)
   "Get string of STR-OR-SYM."

@@ -50,21 +50,11 @@
   "Files applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-c-boring-file-regexp
-  (rx (or
-       ;; Boring directories
-       (and "/" (or ".svn" "CVS" "_darcs" ".git" ".hg") (or "/" eol))
-       ;; Boring files
-       (and line-start  ".#")
-       (and (or ".class" ".la" ".o" "~") eol)))
-  "The regexp that match boring files.
-File candidates matching this regular expression will be
-filtered from the list of candidates if the
-`helm-c-skip-boring-files' candidate transformer is used, or
-they will be displayed with face `file-name-shadow' if
-`helm-c-shadow-boring-files' is used."
-  :type 'string
-  :group 'helm-files)
+(defcustom helm-c-boring-file-regexp-list
+  '("\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "~$")
+  "The regexp list matching boring files."
+  :group 'helm-files
+  :type  '(repeat (choice regexp)))
 
 (defcustom helm-for-files-prefered-list
   '(helm-c-source-ffap-line
@@ -2239,11 +2229,11 @@ Ask to kill buffers associated with that file, too."
 (defun helm-c-shadow-boring-files (files)
   "Files matching `helm-c-boring-file-regexp' will be
 displayed with the `file-name-shadow' face if available."
-  (helm-c-shadow-entries files helm-c-boring-file-regexp))
+  (helm-shadow-entries files helm-c-boring-file-regexp-list))
 
 (defun helm-c-skip-boring-files (files)
   "Files matching `helm-c-boring-file-regexp' will be skipped."
-  (helm-c-skip-entries files helm-c-boring-file-regexp))
+  (helm-skip-entries files helm-c-boring-file-regexp-list))
 
 (defun helm-c-skip-current-file (files)
   "Current file will be skipped."
@@ -2485,7 +2475,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
-    (candidate-transformer helm-c-highlight-files)
     (type . file)))
 
 ;;; Type attributes
@@ -2514,10 +2503,11 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
       (persistent-help . "Show this file")
       (action-transformer helm-c-transform-file-load-el
                           helm-c-transform-file-browse-url)
-      (candidate-transformer helm-c-w32-pathname-transformer
+      (candidate-transformer helm-c-highlight-files
+                             helm-c-w32-pathname-transformer
                              helm-c-skip-current-file
-                             helm-c-skip-boring-files
-                             helm-c-shorten-home-path))
+                             helm-c-shorten-home-path
+                             helm-c-skip-boring-files))
   "File name.")
 
 

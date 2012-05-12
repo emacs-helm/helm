@@ -28,20 +28,6 @@
   "Buffers related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-c-boring-buffer-regexp
-  (rx (or
-       (group bos  " ")
-       ;; helm-buffers
-       "*helm" "*helm-mode"
-       ;; echo area
-       " *Echo Area" " *Minibuf"))
-  "The regexp that match boring buffers.
-Buffer candidates matching this regular expression will be displayed
-with face `file-name-shadow' if
-`helm-c-shadow-boring-buffers' is used."
-  :type 'string
-  :group 'helm-buffers)
-
 (defcustom helm-c-boring-buffer-regexp-list
   '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*Minibuf")
   "The regexp list that match boring buffers.
@@ -394,21 +380,13 @@ See `helm-ediff-marked-buffers'."
 ;;; Candidate Transformers
 ;;
 ;;
-(defun helm-buffers-skip-entries (seq regexp-list)
-  "Remove entries which matches REGEXP from SEQ."
-  (loop for i in seq
-        unless (loop for regexp in regexp-list
-                     thereis (and (stringp i)
-                                  (string-match regexp i)))
-        collect i))
-
 (defun helm-c-skip-boring-buffers (buffers)
-  (helm-buffers-skip-entries buffers helm-c-boring-buffer-regexp-list))
+  (helm-skip-entries buffers helm-c-boring-buffer-regexp-list))
 
 (defun helm-c-shadow-boring-buffers (buffers)
   "Buffers matching `helm-c-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
-  (helm-c-shadow-entries buffers helm-c-boring-buffer-regexp))
+  (helm-shadow-entries buffers helm-c-boring-buffer-regexp-list))
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
