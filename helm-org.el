@@ -27,7 +27,7 @@
 ;;
 ;;
 (defvar helm-c-source-org-headline
-  `((name . "Org HeadLine")
+  `((name . "Org Headline")
     (headline
      ,@(mapcar
         (lambda (num)
@@ -42,9 +42,9 @@
                            (org-cycle)))
     (action-transformer
      . (lambda (actions candidate)
-         '(("Go to Line" . helm-c-action-line-goto)
-           ("Refile to this Headline" . helm-c-org-headline-refile)
-           ("Insert Link to This Headline"
+         '(("Go to line" . helm-c-action-line-goto)
+           ("Refile to this headline" . helm-c-org-headline-refile)
+           ("Insert link to this headline"
             . helm-c-org-headline-insert-link-to-headline)))))
   "Show Org headlines.
 org-mode is very very much extended text-mode/outline-mode.
