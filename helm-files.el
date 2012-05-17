@@ -2254,7 +2254,7 @@ other candidate transformers."
 (defvar helm-canonical-home
   (regexp-quote (expand-file-name "~")))
 
-(defsubst helm-c-shorten-home-path_ (file)
+(defun helm-shorten-home-path-1 (file)
   (if (and (stringp file)
            (string-match (concat "\\`" helm-canonical-home) file))
       (cons (replace-match "~" nil nil file) file)
@@ -2262,7 +2262,7 @@ other candidate transformers."
 
 (defun helm-c-shorten-home-path (files)
   "Replaces /home/user with ~."
-  (helm-transform-mapcar #'helm-c-shorten-home-path_ files))
+  (helm-transform-mapcar #'helm-shorten-home-path-1 files))
 
 
 ;;; List of files gleaned from every dired buffer

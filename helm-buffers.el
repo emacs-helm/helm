@@ -97,11 +97,6 @@ See `ido-make-buffer-list' for more infos."
         ido-use-virtual-buffers)
     (ido-make-buffer-list nil)))
 
-(defvar helm-c-source-buffers
-  '((name . "Buffers")
-    (candidates . helm-c-buffer-list)
-    (type . buffer)))
-
 (defvar helm-c-source-buffer-not-found
   `((name . "Create buffer")
     (dummy)
