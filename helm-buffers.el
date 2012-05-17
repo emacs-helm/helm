@@ -87,15 +87,22 @@ filtered from the list of candidates if the
     (delq nil map))
   "Keymap for buffer sources in helm.")
 
-(defun helm-c-buffer-list ()
-  "Return the current list of buffers.
-Currently visible buffers are put at the end of the list.
-See `ido-make-buffer-list' for more infos."
-  (require 'ido)
-  (let ((ido-process-ignore-lists t)
-        ido-ignored-list
-        ido-use-virtual-buffers)
-    (ido-make-buffer-list nil)))
+
+(defvar helm-buffers-list-cache nil)
+(defvar helm-c-source-buffers-list
+  `((name . "Buffers")
+    (init . (lambda ()
+              ;; Create the list before `helm-buffer' creation.
+              (setq helm-buffers-list-cache (helm-c-buffer-list))))
+    (candidates . helm-buffers-list-cache)
+    (type . buffer)
+    (match helm-c-buffer-match-major-mode)
+    (persistent-action . helm-c-buffers-list-persistent-action)
+    (keymap . ,helm-c-buffer-map)
+    (volatile)
+    (mode-line . helm-buffer-mode-line-string)
+    (persistent-help
+     . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
 
 (defvar helm-c-source-buffer-not-found
   `((name . "Create buffer")
@@ -115,9 +122,27 @@ See `ido-make-buffer-list' for more infos."
                       (set-buffer-major-mode buffer))
                   (helm-c-switch-to-buffer buffer))))))
 
-;;; Buffers list
-;;
-;;
+(defvar helm-c-source-ido-virtual-buffers
+  '((name . "Ido virtual buffers")
+    (candidates . (lambda ()
+                    (let (ido-temp-list
+                          ido-ignored-list
+                          (ido-process-ignore-lists t))
+                    (when ido-use-virtual-buffers
+                      (ido-add-virtual-buffers-to-list)
+                      ido-virtual-buffers))))
+    (action . find-file)))
+
+(defun helm-c-buffer-list ()
+  "Return the current list of buffers.
+Currently visible buffers are put at the end of the list.
+See `ido-make-buffer-list' for more infos."
+  (require 'ido)
+  (let ((ido-process-ignore-lists t)
+        ido-ignored-list
+        ido-use-virtual-buffers)
+    (ido-make-buffer-list nil)))
+
 (defun helm-c-highlight-buffers (buffers)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
@@ -164,22 +189,6 @@ Should be called after others transformers i.e (boring buffers)."
                            'help-echo bfname))
               ;; Any non--file buffer.
               (t (propertize i 'face 'italic)))))
-
-(defvar helm-buffers-list-cache nil)
-(defvar helm-c-source-buffers-list
-  `((name . "Buffers")
-    (init . (lambda ()
-              ;; Create the list before `helm-buffer' creation.
-              (setq helm-buffers-list-cache (helm-c-buffer-list))))
-    (candidates . helm-buffers-list-cache)
-    (type . buffer)
-    (match helm-c-buffer-match-major-mode)
-    (persistent-action . helm-c-buffers-list-persistent-action)
-    (keymap . ,helm-c-buffer-map)
-    (volatile)
-    (mode-line . helm-buffer-mode-line-string)
-    (persistent-help
-     . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
 
 (defun helm-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -426,6 +435,7 @@ displayed with the `file-name-shadow' face if available."
 It is an enhanced version of `helm-for-buffers'."
   (interactive)
   (helm :sources '(helm-c-source-buffers-list
+                   helm-c-source-ido-virtual-buffers
                    helm-c-source-buffer-not-found)
         :buffer "*helm buffers*" :keymap helm-c-buffer-map))
 
