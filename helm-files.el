@@ -2457,15 +2457,24 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 ;;
 ;;
 (defun helm-c-highlight-files (files)
+  "A basic transformer for helm files sources.
+Colorize only symlinks, directories and files."
   (loop for i in files
-        if (file-directory-p i)
-        collect (propertize (file-name-nondirectory i)
-                            'face 'helm-ff-directory
-                            'help-echo (expand-file-name i))
-        else
-        collect (propertize (file-name-nondirectory i)
-                            'face 'helm-ff-file
-                            'help-echo (expand-file-name i))))
+        collect
+        (cond ((file-symlink-p i)
+               (cons (propertize (file-name-nondirectory i)
+                                 'face 'helm-ff-symlink
+                                 'help-echo (expand-file-name i))
+                     i))
+              ((file-directory-p i)
+               (cons (propertize (file-name-nondirectory i)
+                                 'face 'helm-ff-directory
+                                 'help-echo (expand-file-name i))
+                     i))
+              (t (cons (propertize (file-name-nondirectory i)
+                                   'face 'helm-ff-file
+                                   'help-echo (expand-file-name i))
+                       i)))))
 
 (defvar helm-c-source-files-in-current-dir
   `((name . "Files from Current Directory")
@@ -2483,7 +2492,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 (define-helm-type-attribute 'file
     `((action
        ("Find file" . helm-find-many-files)
-       ,(and (locate-library "popwin") '("Find file in popup window" . popwin:find-file))
        ("Find file as root" . helm-find-file-as-root)
        ("Find file other window" . find-file-other-window)
        ("Find file other frame" . find-file-other-frame)
@@ -2505,8 +2513,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                           helm-c-transform-file-browse-url)
       (candidate-transformer helm-c-highlight-files
                              helm-c-w32-pathname-transformer
-                             helm-c-skip-current-file
-                             helm-c-shorten-home-path
                              helm-c-skip-boring-files))
   "File name.")
 
