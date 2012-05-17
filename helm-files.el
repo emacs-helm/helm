@@ -2462,16 +2462,16 @@ Colorize only symlinks, directories and files."
   (loop for i in files
         collect
         (cond ((file-symlink-p i)
-               (cons (propertize (file-name-nondirectory i)
+               (cons (propertize (helm-c-basename i)
                                  'face 'helm-ff-symlink
                                  'help-echo (expand-file-name i))
                      i))
               ((file-directory-p i)
-               (cons (propertize (file-name-nondirectory i)
+               (cons (propertize (helm-c-basename i)
                                  'face 'helm-ff-directory
                                  'help-echo (expand-file-name i))
                      i))
-              (t (cons (propertize (file-name-nondirectory i)
+              (t (cons (propertize (helm-c-basename i)
                                    'face 'helm-ff-file
                                    'help-echo (expand-file-name i))
                        i)))))
