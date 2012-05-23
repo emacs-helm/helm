@@ -87,6 +87,17 @@ filtered from the list of candidates if the
     (delq nil map))
   "Keymap for buffer sources in helm.")
 
+(defvar helm-buffers-ido-virtual-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    ;(define-key map (kbd "C-c ?") 'helm-buffers-ido-virtual-help)
+    (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-o") 'helm-ff-run-switch-other-frame)
+    (define-key map (kbd "M-g s")   'helm-ff-run-grep)
+    (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
+    (define-key map (kbd "M-D")     'helm-ff-run-delete-file)
+    (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
+    map))
 
 (defvar helm-buffers-list-cache nil)
 (defvar helm-c-source-buffers-list
@@ -123,7 +134,7 @@ filtered from the list of candidates if the
                   (helm-c-switch-to-buffer buffer))))))
 
 (defvar helm-c-source-ido-virtual-buffers
-  '((name . "Ido virtual buffers")
+  `((name . "Ido virtual buffers")
     (candidates . (lambda ()
                     (let (ido-temp-list
                           ido-ignored-list
@@ -131,7 +142,17 @@ filtered from the list of candidates if the
                     (when ido-use-virtual-buffers
                       (ido-add-virtual-buffers-to-list)
                       ido-virtual-buffers))))
-    (action . find-file)))
+    (keymap . ,helm-buffers-ido-virtual-map)
+    (action . (("Find file" . helm-find-many-files)
+               ("Find file other window" . find-file-other-window)
+               ("Find file other frame" . find-file-other-frame)
+               ("Find file as root" . helm-find-file-as-root)
+               ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
+               ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
+               ("View file" . view-file)
+               ("Delete file(s)" . helm-delete-marked-files)
+               ("Open file externally (C-u to choose)"
+                . helm-c-open-file-externally)))))
 
 (defun helm-c-buffer-list ()
   "Return the current list of buffers.
