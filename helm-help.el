@@ -264,6 +264,7 @@ This list is customizable, see `helm-buffers-favorite-modes'.
   "== Helm Generic files Map ==\
 \nSpecific commands for helm locate and others files sources:
 \\<helm-generic-files-map>
+\\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
 \\[helm-ff-run-grep]\t\t->Run grep (C-u recurse).
 \\[helm-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[helm-ff-run-delete-file]\t\t->Delete file.
