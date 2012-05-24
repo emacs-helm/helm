@@ -444,6 +444,30 @@ Otherwise your command will be called many times like this:
   (let ((helm-help-message helm-c-esh-help-message))
     (helm-help)))
 
+;;; Ido virtual buffer help
+;;
+;;
+(defvar helm-buffers-ido-virtual-help-message
+  "== Helm ido virtual buffers Map ==\
+\nSpecific commands for ido virtuals buffers:
+\\<helm-buffers-ido-virtual-map>
+\\[helm-ff-run-switch-other-window]\t\t->Switch other window. 
+\\[helm-ff-run-switch-other-frame]\t\t->Switch other frame.
+\\[helm-ff-run-grep]\t\t->Grep file.
+\\[helm-ff-run-zgrep]\t\t->Zgrep file.
+\\[helm-ff-run-delete-file]\t\t->Delete file.
+\\[helm-ff-run-open-file-externally]\t\t->Open file externally.
+\\[helm-buffers-ido-virtual-help]\t\t->Display this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-buffers-ido-virtual-help ()
+  "Help command for ido virtual buffers."
+  (interactive)
+  (let ((helm-help-message helm-buffers-ido-virtual-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -453,6 +477,18 @@ Otherwise your command will be called many times like this:
   '("Buffer(s)" "\
 \\<helm-c-buffer-map>\
 \\[helm-c-buffer-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
+    "String displayed in mode-line in `helm-c-source-buffers-list'"))
+
+;;;###autoload
+(defvar helm-buffers-ido-virtual-mode-line-string
+  '("Killed Buffer(s)" "\
+\\<helm-buffers-ido-virtual-map>\
+\\[helm-buffers-ido-virtual-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\

@@ -90,7 +90,7 @@ filtered from the list of candidates if the
 (defvar helm-buffers-ido-virtual-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    ;(define-key map (kbd "C-c ?") 'helm-buffers-ido-virtual-help)
+    (define-key map (kbd "C-c ?")   'helm-buffers-ido-virtual-help)
     (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-o") 'helm-ff-run-switch-other-frame)
     (define-key map (kbd "M-g s")   'helm-ff-run-grep)
@@ -143,6 +143,7 @@ filtered from the list of candidates if the
                       (ido-add-virtual-buffers-to-list)
                       ido-virtual-buffers))))
     (keymap . ,helm-buffers-ido-virtual-map)
+    (mode-line . helm-buffers-ido-virtual-mode-line-string)
     (action . (("Find file" . helm-find-many-files)
                ("Find file other window" . find-file-other-window)
                ("Find file other frame" . find-file-other-frame)
