@@ -185,6 +185,12 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :group 'helm-files
   :type 'integer)
 
+(defcustom helm-ff-maximum-candidate-to-decorate 2000
+  "If length of candidates is superior to this value do not highlight them.
+This happen only in `helm-find-files'."
+  :group 'helm-files
+  :type 'integer)
+
 
 ;;; Faces
 ;;
@@ -1563,8 +1569,9 @@ return FNAME prefixed with [?]."
   "Transformer for `helm-c-source-find-files'.
 Tramp files are not highlighted unless `helm-ff-tramp-not-fancy'
 is non--nil."
-  (if (and (string-match tramp-file-name-regexp helm-pattern)
-           helm-ff-tramp-not-fancy)
+  (if (or (and (string-match tramp-file-name-regexp helm-pattern)
+               helm-ff-tramp-not-fancy)
+          (> (length files) helm-ff-maximum-candidate-to-decorate))
       (if helm-ff-transformer-show-only-basename
           (loop for i in files collect
                 (if (string-match "[.]\\{1,2\\}$" i)
