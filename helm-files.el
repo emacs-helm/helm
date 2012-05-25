@@ -2465,7 +2465,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 (defun helm-c-highlight-files (files)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
-  (loop for i in files
+  (loop for i in (helm-c-skip-boring-files files)
         collect
         (cond ((file-symlink-p i)
                (cons (propertize (if helm-ff-transformer-show-only-basename
@@ -2521,8 +2521,7 @@ Colorize only symlinks, directories and files."
       (action-transformer helm-c-transform-file-load-el
                           helm-c-transform-file-browse-url)
       (candidate-transformer helm-c-highlight-files
-                             helm-c-w32-pathname-transformer
-                             helm-c-skip-boring-files))
+                             helm-c-w32-pathname-transformer))
   "File name.")
 
 
