@@ -2784,9 +2784,14 @@ Acceptable values of CREATE-OR-BUFFER:
       (return-func))))
 
 (defun helm-init-candidates-in-buffer (buffer data)
-  "Register BUFFER with DATA for an helm candidates-in-buffer session."
+  "Register BUFFER with DATA for an helm candidates-in-buffer session.
+DATA can be a list or a plain string."
   (let ((buf (helm-candidate-buffer (get-buffer-create buffer))))
-    (with-current-buffer buf (insert data)))
+    (with-current-buffer buf
+      (erase-buffer)
+      (if (listp data)
+          (loop for i in data do (insert (concat i "\n")))
+          (and (stringp data) (insert data)))))
   buffer)
 
 (defun helm-compile-source--candidates-in-buffer (source)
