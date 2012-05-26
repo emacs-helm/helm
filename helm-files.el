@@ -953,12 +953,13 @@ See `helm-ff-serial-rename-1'."
 
 (defun helm-ff-locate (candidate)
   "Locate action function for `helm-find-files'."
+  (helm-locate-set-command)
   (let ((input (concat (helm-c-basename
                         (expand-file-name
                          candidate
                          helm-ff-default-directory))
                        ;; The locate '-b' option doesn't exists
-                       ;; in everything.
+                       ;; in everything (es).
                        (unless (and (eq system-type 'windows-nt)
                                     (string-match "^es" helm-c-locate-command))
                          " -b"))))
