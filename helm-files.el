@@ -1865,7 +1865,7 @@ Use it for non--interactive calls of `helm-find-files'."
           (remp file-at-pt) ; A remote file
           (file-p           ; a regular file
            ;; Avoid ffap annoyances, don't use `ffap-alist'.
-           (let (ffap-alist) (ffap-file-at-point))) 
+           (let (ffap-alist) (ffap-file-at-point)))
           (t (and (not (string= file-at-pt "")) ; possibly an url or email.
                   file-at-pt)))))
 
@@ -2124,7 +2124,7 @@ members of FLIST."
           :buffer buffer)))
 
 ;;;###autoload
-(define-minor-mode helm-dired-mode ()
+(define-minor-mode helm-dired-mode
   "Enable helm completion in Dired functions.
 Bindings affected are C, R, S, H.
 This is deprecated for Emacs24+ users, use `helm-mode' instead."
@@ -2461,13 +2461,17 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 ;;; Files in current dir
 ;;
-;;
+;;ot
 (defun helm-c-highlight-files (files)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
   (loop for i in (helm-c-skip-boring-files files)
         collect
-        (cond ((file-symlink-p i)
+        (cond ((and
+                helm-ff-tramp-not-fancy
+                (string-match tramp-file-name-regexp i))
+               i)
+              ((file-symlink-p i)
                (cons (propertize (if helm-ff-transformer-show-only-basename
                                      (helm-c-basename i) i)
                                  'face 'helm-ff-symlink
