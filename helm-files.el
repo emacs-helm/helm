@@ -2467,21 +2467,26 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
   (loop for i in (helm-c-skip-boring-files files)
+        for disp = (if (and helm-ff-transformer-show-only-basename
+                            (not (string-match "[.]\\{1,2\\}$" i))
+                            (not (string-match ffap-url-regexp i))
+                            (not (string-match helm-ff-url-regexp i)))
+                       (helm-c-basename i) i)
         collect
-        (cond ((file-symlink-p i)
-               (cons (propertize (if helm-ff-transformer-show-only-basename
-                                     (helm-c-basename i) i)
+        (cond ((and helm-ff-tramp-not-fancy
+                    (string-match tramp-file-name-regexp i))
+               (cons disp i))
+              ((file-symlink-p i)
+               (cons (propertize disp
                                  'face 'helm-ff-symlink
                                  'help-echo (expand-file-name i))
                      i))
               ((file-directory-p i)
-               (cons (propertize (if helm-ff-transformer-show-only-basename
-                                     (helm-c-basename i) i)
+               (cons (propertize disp
                                  'face 'helm-ff-directory
                                  'help-echo (expand-file-name i))
                      i))
-              (t (cons (propertize (if helm-ff-transformer-show-only-basename
-                                     (helm-c-basename i) i)
+              (t (cons (propertize disp
                                    'face 'helm-ff-file
                                    'help-echo (expand-file-name i))
                        i)))))
