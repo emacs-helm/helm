@@ -1588,29 +1588,36 @@ is non--nil."
                             (not (string-match ffap-url-regexp i))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
+        for type = (car (file-attributes i))
         collect
-        (cond ((and (stringp (car (file-attributes i)))
+        (cond (;; A not already saved file.
+               (and (stringp type)
                     (not (helm-ff-valid-symlink-p i))
                     (not (string-match "^\.#" (helm-c-basename i))))
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-invalid-symlink) t)
                      i))
-              ((stringp (car (file-attributes i)))
+              ;; A symlink.
+              ((stringp type)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-symlink) t)
                      i))
-              ((eq t (car (file-attributes i)))
+              ;; A directory.
+              ((eq t type)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-directory) t)
                      i))
+              ;; An executable file.
               ((file-executable-p i)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-executable) t)
                      i))
-              ((file-exists-p i)
+              ;; A file.
+              ((not type)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-file) t)
                      i))
+              ;; A non--existing file.
               (t
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-file) nil 'new-file)
