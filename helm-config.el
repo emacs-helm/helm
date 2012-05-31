@@ -1355,6 +1355,11 @@ Preconfigured `helm' to execute ratpoison commands.
 
 \(fn)" t nil)
 
+(autoload 'helm-stumpwm-commands "helm-misc" "\
+Preconfigured `helm' to execute stumpem commands.
+
+\(fn)" t nil)
+
 (autoload 'helm-mini "helm-misc" "\
 Preconfigured `helm' lightweight version (buffer -> recentf).
 

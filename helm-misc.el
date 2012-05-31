@@ -290,6 +290,28 @@ It is added to `extended-command-history'.
 (defun helm-c-ratpoison-commands-execute (candidate)
   (call-process "ratpoison" nil nil nil "-ic" candidate))
 
+;;; Helm stumpwm UI
+;;
+;;
+
+(setq helm-c-source-stumpwm-commands
+  '((name . "Stumpwm Commands")
+    (init . helm-c-stumpwm-commands-init)
+    (candidates-in-buffer)
+    (action ("Execute the command" . helm-c-stumpwm-commands-execute))
+    (candidate-number-limit)))
+
+(defun helm-c-stumpwm-commands-init ()
+    (with-current-buffer (helm-candidate-buffer 'global)
+      (save-excursion
+        (call-process "stumpish" nil (current-buffer) nil "commands"))
+      (while (re-search-forward "\\([^ ]+\\) \n?" nil t)
+        (replace-match "\\1\n"))
+      (goto-char (point-max))))
+
+(defun helm-c-stumpwm-commands-execute (candidate)
+  (call-process "stumpish" nil nil nil  candidate))
+
 ;;;###autoload
 (defun helm-world-time ()
   "Preconfigured `helm' to show world time."
@@ -314,6 +336,13 @@ It is added to `extended-command-history'.
   (interactive)
   (helm-other-buffer 'helm-c-source-ratpoison-commands
                      "*helm ratpoison commands*"))
+
+;;;###autoload
+(defun helm-stumpwm-commands()
+  (interactive)
+  (helm-other-buffer 'helm-c-source-stumpwm-commands
+                     "*helm stumpwm commands*"))
+
 
 ;;;###autoload
 (defun helm-mini ()
