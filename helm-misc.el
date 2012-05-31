@@ -293,8 +293,7 @@ It is added to `extended-command-history'.
 ;;; Helm stumpwm UI
 ;;
 ;;
-
-(setq helm-c-source-stumpwm-commands
+(defvar helm-c-source-stumpwm-commands
   '((name . "Stumpwm Commands")
     (init . helm-c-stumpwm-commands-init)
     (candidates-in-buffer)
