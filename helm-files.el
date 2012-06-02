@@ -1613,7 +1613,7 @@ is non--nil."
                       (propertize disp 'face 'helm-ff-executable) t)
                      i))
               ;; A file.
-              ((not type)
+              ((file-exists-p i)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-file) t)
                      i))

@@ -29,7 +29,7 @@
 (defcustom helm-minibuffer-history-key "C-r"
   "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
-  :group 'helm-config
+  :group 'helm-misc
   :set
   (lambda (var key)
     (dolist (map '(minibuffer-local-completion-map
@@ -48,6 +48,21 @@
           (define-key (symbol-value map)
             (read-kbd-macro key) 'helm-minibuffer-history))))
     (set var key)))
+
+(defcustom helm-time-zone-home-location "Paris"
+  "The time zone of your home"
+  :group 'helm-misc
+  :type 'string)
+
+(defface helm-time-zone-current
+    '((t (:foreground "green")))
+  "Face used to colorize current time in `helm-world-time'."
+  :group 'helm-misc)
+
+(defface helm-time-zone-home
+    '((t (:foreground "red")))
+  "Face used to colorize home time in `helm-world-time'."
+  :group 'helm-misc)
 
 
 ;;; Tracker desktop search
@@ -199,13 +214,23 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 ;;; World time
 ;;
+(defun helm-time-zone-transformer (candidates sources)
+  (loop for i in candidates
+        collect
+        (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
+               (propertize i 'face 'helm-time-zone-current))
+              ((string-match helm-time-zone-home-location i)
+               (propertize i 'face 'helm-time-zone-home))
+              (t i))))
+
 (defvar helm-c-source-time-world
   '((name . "Time World List")
     (init . (lambda ()
               (let ((helm-buffer (helm-candidate-buffer 'global)))
                 (with-current-buffer helm-buffer
                   (display-time-world-display display-time-world-list)))))
-    (candidates-in-buffer)))
+    (candidates-in-buffer)
+    (filtered-candidate-transformer . helm-time-zone-transformer)))
 
 ;;; LaCarte
 ;;
