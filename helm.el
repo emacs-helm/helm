@@ -1069,41 +1069,42 @@ in source."
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
-  (helm-log (concat "[Start session] " (make-string 41 ?+)))
-  (helm-log-eval any-prompt any-preselect
-                 any-buffer any-keymap any-default)
-  (let ((old-overridding-local-map overriding-local-map))
-    (unwind-protect
-         (condition-case v
-             (let ( ;; It is needed because `helm-source-name' is non-nil
-                   ;; when `helm' is invoked by action. Awful global scope.
-                   helm-source-name
-                   helm-in-persistent-action
-                   helm-quit
-                   (case-fold-search t)
-                   (helm-buffer (or any-buffer helm-buffer))
-                   ;; cua-mode ; avoid error when region is selected
-                   )
-               (with-helm-restore-variables
-                 (helm-initialize any-resume any-input any-sources)
-                 (helm-display-buffer helm-buffer)
-                 (helm-log "show prompt")
-                 (unwind-protect
-                      (helm-read-pattern-maybe
-                       any-prompt any-input any-preselect
-                       any-resume any-keymap any-default
-                       (when (and any-history (symbolp any-history))
-                         any-history))
-                   (helm-cleanup)))
-               (prog1 (unless helm-quit
-                        (helm-execute-selection-action-1))
-                 (helm-log (concat "[End session] " (make-string 41 ?-)))))
-           (quit
-            (helm-restore-position-on-quit)
-            (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
-            nil))
-      (setq overriding-local-map old-overridding-local-map)
-      (helm-log-save-maybe))))
+  (catch 'exit ; `exit-minibuffer' use this tag on exit.
+    (helm-log (concat "[Start session] " (make-string 41 ?+)))
+    (helm-log-eval any-prompt any-preselect
+                   any-buffer any-keymap any-default)
+    (let ((old-overridding-local-map overriding-local-map))
+      (unwind-protect
+           (condition-case v
+               (let ( ;; It is needed because `helm-source-name' is non-nil
+                     ;; when `helm' is invoked by action. Awful global scope.
+                     helm-source-name
+                     helm-in-persistent-action
+                     helm-quit
+                     (case-fold-search t)
+                     (helm-buffer (or any-buffer helm-buffer))
+                     ;; cua-mode ; avoid error when region is selected
+                     )
+                 (with-helm-restore-variables
+                   (helm-initialize any-resume any-input any-sources)
+                   (helm-display-buffer helm-buffer)
+                   (helm-log "show prompt")
+                   (unwind-protect
+                        (helm-read-pattern-maybe
+                         any-prompt any-input any-preselect
+                         any-resume any-keymap any-default
+                         (when (and any-history (symbolp any-history))
+                           any-history))
+                     (helm-cleanup)))
+                 (prog1 (unless helm-quit
+                          (helm-execute-selection-action-1))
+                   (helm-log (concat "[End session] " (make-string 41 ?-)))))
+             (quit
+              (helm-restore-position-on-quit)
+              (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
+              nil))
+        (setq overriding-local-map old-overridding-local-map)
+        (helm-log-save-maybe)))))
 
 
 ;;; Helm resume
