@@ -134,6 +134,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                       cand)
         else collect cand))
 
+;;;###autoload
 (defun* helm-comp-read (prompt collection
                                &key
                                test
