@@ -2461,7 +2461,6 @@ Else return ACTIONS unmodified."
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
-    (match helm-c-match-on-basename)
     (type . file))
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
