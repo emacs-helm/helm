@@ -156,7 +156,7 @@ On Unix based systems (lpstat command needed) you don't need to set this,
   :type 'list
   :group 'helm-files)
 
-(defcustom helm-ff-transformer-show-only-basename t
+(defcustom helm-ff-transformer-show-only-basename nil
   "Show only basename of candidates in `helm-find-files'.
 This can be toggled at anytime from `helm-find-files' with \
 \\<helm-find-files-map>0\\[helm-ff-run-toggle-basename]."
