@@ -23,7 +23,6 @@
 
 (eval-when-compile (require 'cl))
 (require 'helm)
-;(require 'helm-mode)
 
 
 (defgroup helm-locate nil
@@ -106,6 +105,7 @@ fall back to `default-directory' if FROM-FF is nil."
 if LOCALDB is non--nil search and use a local locate db file.
 INIT is a string to use as initial input in prompt.
 See `helm-locate-with-db' and `helm-locate'."
+  (require 'helm-mode)
   (helm-locate-with-db
    (and localdb
         (or (helm-ff-find-locatedb from-ff)

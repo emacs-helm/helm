@@ -776,6 +776,7 @@ If a prefix arg is given use the -r option of grep.
 The prefix arg can be passed before or after start.
 See also `helm-do-grep-1'."
   (interactive)
+  (require 'helm-mode)
   (let ((only    (helm-c-read-file-name
                   "Search in file(s): "
                   :marked-candidates t
@@ -788,6 +789,7 @@ See also `helm-do-grep-1'."
 (defun helm-do-zgrep ()
   "Preconfigured helm for zgrep."
   (interactive)
+  (require 'helm-mode)
   (let ((prefarg (or current-prefix-arg helm-current-prefix-arg))
         (ls (helm-c-read-file-name
              "Search in file(s): "
@@ -800,6 +802,7 @@ See also `helm-do-grep-1'."
 (defun helm-do-pdfgrep ()
   "Preconfigured helm for pdfgrep."
   (interactive)
+  (require 'helm-mode)
   (let ((only (helm-c-read-file-name
                "Search in file(s): "
                :marked-candidates t
