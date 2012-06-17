@@ -1726,60 +1726,56 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
         (new-pattern   (helm-get-selection))
         (num-lines-buf (with-current-buffer helm-buffer
                          (count-lines (point-min) (point-max)))))
-    (flet ((insert-in-minibuffer (fname)
-             (with-selected-window (minibuffer-window)
-               (unless follow
-                 (delete-minibuffer-contents)
-                 (set-text-properties 0 (length fname) nil fname)
-                 (insert fname)))))
-      (cond ((and (string= (helm-ff-set-pattern helm-pattern)
-                           "Invalid tramp file name")
-                  (string-match tramp-file-name-regexp candidate))
-             ;; First hit insert hostname and
-             ;; second hit insert ":" and expand.
-             (if (string= candidate helm-pattern)
-                 (insert-in-minibuffer (concat candidate ":"))
-                 (insert-in-minibuffer candidate)))
-            (;; A symlink directory, expand it's truename.
-             (and (file-directory-p candidate) (file-symlink-p candidate))
-             (insert-in-minibuffer (file-name-as-directory
-                                    (file-truename
-                                     (expand-file-name candidate)))))
-            ;; A directory, open it.
-            ((file-directory-p candidate)
-             (when (string= (helm-c-basename candidate) "..")
-               (setq helm-ff-last-expanded helm-ff-default-directory))
-             (insert-in-minibuffer (file-name-as-directory
-                                    (expand-file-name candidate))))
-            ;; A symlink file, expand to it's true name. (first hit)
-            ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
-             (insert-in-minibuffer (file-truename candidate)))
-            ;; A regular file, expand it, (first hit)
-            ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
-             (insert-in-minibuffer new-pattern))
-            ;; An image file and it is the second hit on C-z,
-            ;; show the file in `image-dired'.
-            ((string-match (image-file-name-regexp) candidate)
-             (when (buffer-live-p image-dired-display-image-buffer)
-               (kill-buffer image-dired-display-image-buffer))
-             (image-dired-display-image candidate)
-             (message nil)
-             (helm-c-switch-to-buffer image-dired-display-image-buffer)
-             (with-current-buffer image-dired-display-image-buffer
-               (let ((exif-data (helm-ff-exif-data candidate)))
-                 (image-dired-update-property 'help-echo exif-data))))
-            ;; Allow browsing archive on avfs fs.
-            ;; Assume volume is already mounted with mountavfs.
-            ((and helm-ff-avfs-directory
-                  (string-match
-                   (regexp-quote (expand-file-name helm-ff-avfs-directory))
-                   (file-name-directory candidate))
-                  (helm-ff-file-compressed-p candidate))
-             (insert-in-minibuffer (concat candidate "#")))
-            ;; On second hit we open file.
-            ;; On Third hit we kill it's buffer maybe.
-            (t
-             (helm-ff-kill-or-find-buffer-fname candidate))))))
+    (cond ((and (string= (helm-ff-set-pattern helm-pattern)
+                         "Invalid tramp file name")
+                (string-match tramp-file-name-regexp candidate))
+           ;; First hit insert hostname and
+           ;; second hit insert ":" and expand.
+           (if (string= candidate helm-pattern)
+               (helm-insert-in-minibuffer (concat candidate ":") 'replace follow)
+             (helm-insert-in-minibuffer candidate 'replace follow)))
+          ( ;; A symlink directory, expand it's truename.
+           (and (file-directory-p candidate) (file-symlink-p candidate))
+           (helm-insert-in-minibuffer (file-name-as-directory
+                                  (file-truename
+                                   (expand-file-name candidate)))
+                                      'replace follow))
+          ;; A directory, open it.
+          ((file-directory-p candidate)
+           (when (string= (helm-c-basename candidate) "..")
+             (setq helm-ff-last-expanded helm-ff-default-directory))
+           (helm-insert-in-minibuffer (file-name-as-directory
+                                  (expand-file-name candidate))
+                                      'replace follow))
+          ;; A symlink file, expand to it's true name. (first hit)
+          ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
+           (helm-insert-in-minibuffer (file-truename candidate) 'replace follow))
+          ;; A regular file, expand it, (first hit)
+          ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
+           (helm-insert-in-minibuffer new-pattern 'replace follow))
+          ;; An image file and it is the second hit on C-z,
+          ;; show the file in `image-dired'.
+          ((string-match (image-file-name-regexp) candidate)
+           (when (buffer-live-p image-dired-display-image-buffer)
+             (kill-buffer image-dired-display-image-buffer))
+           (image-dired-display-image candidate)
+           (message nil)
+           (helm-c-switch-to-buffer image-dired-display-image-buffer)
+           (with-current-buffer image-dired-display-image-buffer
+             (let ((exif-data (helm-ff-exif-data candidate)))
+               (image-dired-update-property 'help-echo exif-data))))
+          ;; Allow browsing archive on avfs fs.
+          ;; Assume volume is already mounted with mountavfs.
+          ((and helm-ff-avfs-directory
+                (string-match
+                 (regexp-quote (expand-file-name helm-ff-avfs-directory))
+                 (file-name-directory candidate))
+                (helm-ff-file-compressed-p candidate))
+           (helm-insert-in-minibuffer (concat candidate "#") 'replace follow))
+          ;; On second hit we open file.
+          ;; On Third hit we kill it's buffer maybe.
+          (t
+           (helm-ff-kill-or-find-buffer-fname candidate)))))
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."
