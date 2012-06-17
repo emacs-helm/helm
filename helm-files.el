@@ -2501,7 +2501,9 @@ Colorize only symlinks, directories and files."
   `((name . "Files from Current Directory")
     (candidates . (lambda ()
                     (with-helm-current-buffer
-                      (directory-files (helm-c-current-directory) t))))
+                      (let ((dir (helm-c-current-directory)))
+                        (when (file-accessible-directory-p dir)
+                          (directory-files dir t))))))
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
