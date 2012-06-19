@@ -34,6 +34,12 @@
   :type 'string
   :group 'helm-utils)
 
+(defcustom helm-yank-symbol-first nil
+  "`helm-yank-text-at-point' yanks symbol at point on first
+invocation if this is non-nil."
+  :type  'boolean
+  :group 'helm-utils)
+
 (defcustom helm-default-kbsize 1024.0
   "Default Kbsize to use for showing files size.
 It is a float, usually 1024.0 but could be 1000.0 on some systems."
@@ -703,23 +709,39 @@ directory, open this directory."
 
 (defun helm-insert-in-minibuffer (word &optional replace follow)
   (unless follow
-    (with-selected-window (minibuffer-window)
+    (with-current-buffer (window-buffer (minibuffer-window))
       (delete-minibuffer-contents)
       (set-text-properties 0 (length word) nil word)
       (insert (concat (if replace "" helm-pattern) word)))))
 
 ;;;###autoload
 (defun helm-yank-text-at-point ()
-  "Yank text at point in minibuffer."
+  "Yank text at point in invocation buffer into minibuffer.
+
+`helm-yank-symbol-first' controls whether the first yank grabs
+the entire symbol.
+"
   (interactive)
   (with-helm-current-buffer
     ;; Start to initial point if C-w have never been hit.
-    (unless helm-yank-point (setq helm-yank-point (point)))
-    (and helm-yank-point (goto-char helm-yank-point))
-    (forward-word 1)
-    (helm-insert-in-minibuffer (buffer-substring-no-properties helm-yank-point (point)))
-    (setq helm-yank-point (point)))   ; End of last forward-word
-  )
+    (if (or helm-yank-point
+            (not helm-yank-symbol-first))
+        (progn
+          (unless helm-yank-point (setq helm-yank-point (point)))
+          (goto-char helm-yank-point)
+          (forward-word 1)
+          (helm-insert-in-minibuffer (buffer-substring-no-properties helm-yank-point (point)))
+          (setq helm-yank-point (point)))
+      (let* ((sym (symbol-at-point))
+             (str (and sym
+                       (symbol-name sym))))
+        (if str
+            (progn
+              (helm-insert-in-minibuffer str)
+              (setq helm-yank-point (cdr (bounds-of-thing-at-point 'symbol)))
+              (goto-char helm-yank-point))
+          (setq helm-yank-point (point))
+          (helm-yank-text-at-point))))))
 
 (defun helm-reset-yank-point ()
   (setq helm-yank-point nil))
