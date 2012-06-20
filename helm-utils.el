@@ -650,7 +650,14 @@ directory, open this directory."
     (helm-match-line-color-current-line)))
 
 (defun helm-find-file-as-root (candidate)
-  (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))
+  (let ((buf (helm-c-basename candidate)))
+    (if (buffer-live-p (get-buffer buf))
+        (progn
+          (set-buffer buf)
+          (find-alternate-file (concat "/" helm-su-or-sudo
+                                       "::" (expand-file-name candidate))))
+        (find-file (concat "/" helm-su-or-sudo
+                           "::" (expand-file-name candidate))))))
 
 (defun helm-find-many-files (ignore)
   (mapc 'find-file (helm-marked-candidates)))
