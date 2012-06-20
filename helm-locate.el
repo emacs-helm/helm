@@ -144,7 +144,8 @@ Argument INITIAL-INPUT is a string to use as initial-input.
 See also `helm-locate'."
   (when (and db (stringp db)) (setq db (list db)))
   (helm-locate-set-command)
-  (let ((helm-c-locate-command
+  (let ((helm-ff-transformer-show-only-basename nil)
+        (helm-c-locate-command
          (if db
              (replace-regexp-in-string
               "locate"
