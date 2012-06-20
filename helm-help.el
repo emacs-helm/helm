@@ -107,7 +107,7 @@ INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
     (switch-to-buffer (get-buffer-create bufname))
     (erase-buffer)
     (funcall insert-content-fn)
-    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  other:Exit)")
+    (setq mode-line-format "%b (SPC,C-v:NextPage  b,M-v:PrevPage  C-s/r:Isearch other:Exit)")
     (setq cursor-type nil)
     (goto-char 1)
     (helm-help-event-loop)))
@@ -117,7 +117,9 @@ INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
     (loop for event = (read-event) do
           (case event
             ((?\C-v ? )  (scroll-up))
-            ((?\M-v ?b) (scroll-down))
+            ((?\M-v ?b)  (scroll-down))
+            ((?\C-s)     (isearch-forward))
+            ((?\C-r)     (isearch-backward))
             (t (return))))))
 
 ;;;###autoload
@@ -224,6 +226,7 @@ This list is customizable, see `helm-buffers-favorite-modes'.
 \\[helm-enlarge-window]\t\t->Enlarge helm window.
 \\[helm-narrow-window]\t\t->Narrow helm window.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
+\\[helm-ff-run-find-file-as-root]\t\t->Find file as root.
 \\[helm-send-bug-report-from-helm]\t\t->Send Bug report.
 \\[helm-ff-help]\t\t->Display this help info.
 \n== Helm Map ==
