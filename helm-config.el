@@ -175,7 +175,7 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-resume
-;;;;;;  helm-open-last-log) "helm" "helm.el" (20428 33276))
+;;;;;;  helm-open-last-log) "helm" "helm.el" (20433 33820))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -613,7 +613,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 ;;;;;;  helm-c-apropos helm-lisp-completion-or-file-name-at-point
 ;;;;;;  helm-lisp-completion-at-point-or-indent helm-c-complete-file-name-at-point
 ;;;;;;  helm-lisp-completion-at-point) "helm-elisp" "helm-elisp.el"
-;;;;;;  (20428 33100))
+;;;;;;  (20433 33820))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -744,15 +744,16 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-kill-buffer-persistent helm-ff-persistent-delete
 ;;;;;;  helm-ff-properties-persistent helm-find-files-down-one-level
 ;;;;;;  helm-ff-run-toggle-basename helm-ff-run-print-file helm-ff-run-etags
-;;;;;;  helm-ff-run-gnus-attach-files helm-ff-run-locate helm-ff-run-open-file-externally
-;;;;;;  helm-ff-run-switch-other-frame helm-ff-run-switch-other-window
-;;;;;;  helm-ff-run-switch-to-eshell helm-ff-run-complete-fn-at-point
-;;;;;;  helm-ff-run-delete-file helm-ff-run-hardlink-file helm-ff-run-symlink-file
-;;;;;;  helm-ff-run-ediff-merge-file helm-ff-run-ediff-file helm-ff-run-eshell-command-on-file
+;;;;;;  helm-ff-run-gnus-attach-files helm-ff-run-find-file-as-root
+;;;;;;  helm-ff-run-locate helm-ff-run-open-file-externally helm-ff-run-switch-other-frame
+;;;;;;  helm-ff-run-switch-other-window helm-ff-run-switch-to-eshell
+;;;;;;  helm-ff-run-complete-fn-at-point helm-ff-run-delete-file
+;;;;;;  helm-ff-run-hardlink-file helm-ff-run-symlink-file helm-ff-run-ediff-merge-file
+;;;;;;  helm-ff-run-ediff-file helm-ff-run-eshell-command-on-file
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20428 33276))
+;;;;;;  "helm-files" "helm-files.el" (20449 34508))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -860,6 +861,11 @@ Run locate action from `helm-c-source-find-files'.
 
 \(fn)" t nil)
 
+(autoload 'helm-ff-run-find-file-as-root "helm-files" "\
+
+
+\(fn)" t nil)
+
 (autoload 'helm-ff-run-gnus-attach-files "helm-files" "\
 Run gnus attach files command action from `helm-c-source-find-files'.
 
@@ -911,7 +917,7 @@ Rotate image right without quitting helm.
 
 \(fn)" t nil)
 
-(defvar helm-dired-mode nil "\
+(defvar helm-dired-mode "Enable helm completion in Dired functions.\nBindings affected are C, R, S, H.\nThis is deprecated for Emacs24+ users, use `helm-mode' instead." "\
 Non-nil if Helm-Dired mode is enabled.
 See the command `helm-dired-mode' for a description of this minor mode.
 Setting this variable directly does not take effect;
@@ -921,9 +927,11 @@ or call the function `helm-dired-mode'.")
 (custom-autoload 'helm-dired-mode "helm-files" nil)
 
 (autoload 'helm-dired-mode "helm-files" "\
-Enable helm completion in Dired functions.
-Bindings affected are C, R, S, H.
-This is deprecated for Emacs24+ users, use `helm-mode' instead.
+Toggle Helm-Dired mode on or off.
+With a prefix argument ARG, enable Helm-Dired mode if ARG is
+positive, and disable it otherwise.  If called from Lisp, enable
+the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'.
+\\{helm-dired-mode-map}
 
 \(fn &optional ARG)" t nil)
 
@@ -1037,7 +1045,7 @@ Preconfigured `helm' for gentoo linux.
 ;;;;;;  helm-grep-mode-jump-other-window helm-grep-mode-jump-other-window-backward
 ;;;;;;  helm-grep-mode-jump-other-window-forward helm-grep-mode-jump
 ;;;;;;  helm-grep-mode-quit helm-gm-precedent-file helm-gm-next-file
-;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20428 32734))
+;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20433 33820))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-grep-mode "helm-grep" "\
@@ -1274,8 +1282,8 @@ With a prefix-arg insert symbol at point.
 
 ;;;***
 
-;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20428
-;;;;;;  32734))
+;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20449
+;;;;;;  28317))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate "helm-locate" "\
@@ -1328,9 +1336,9 @@ See `helm-mp-matching-method' for the behavior of each method.
 
 ;;;***
 
-;;;### (autoloads (helm-minibuffer-history helm-mini helm-ratpoison-commands
-;;;;;;  helm-eev-anchors helm-c-insert-latex-math helm-world-time)
-;;;;;;  "helm-misc" "helm-misc.el" (20428 33276))
+;;;### (autoloads (helm-minibuffer-history helm-mini helm-stumpwm-commands
+;;;;;;  helm-ratpoison-commands helm-eev-anchors helm-c-insert-latex-math
+;;;;;;  helm-world-time) "helm-misc" "helm-misc.el" (20433 33820))
 ;;; Generated autoloads from helm-misc.el
 
 (autoload 'helm-world-time "helm-misc" "\
@@ -1354,7 +1362,7 @@ Preconfigured `helm' to execute ratpoison commands.
 \(fn)" t nil)
 
 (autoload 'helm-stumpwm-commands "helm-misc" "\
-Preconfigured `helm' to execute stumpem commands.
+
 
 \(fn)" t nil)
 
@@ -1371,7 +1379,7 @@ Preconfigured `helm' for `minibuffer-history'.
 ;;;***
 
 ;;;### (autoloads (helm-mode helm-comp-read) "helm-mode" "helm-mode.el"
-;;;;;;  (20428 33221))
+;;;;;;  (20433 33820))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-comp-read "helm-mode" "\
@@ -1633,7 +1641,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20428 32734))
+;;;;;;  "helm-utils" "helm-utils.el" (20449 32324))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1708,8 +1716,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20428
-;;;;;;  33336 454053))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20449
+;;;;;;  34532 268574))
 
 ;;;***
 

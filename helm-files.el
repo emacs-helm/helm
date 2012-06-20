@@ -273,6 +273,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "C-l")           'helm-find-files-down-one-level)
     (define-key map (kbd "C-h C-b")       'helm-send-bug-report-from-helm)
     (define-key map (kbd "C-h C-d")       'helm-debug-output)
+    (define-key map (kbd "C-x @")         'helm-ff-run-find-file-as-root)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
@@ -971,6 +972,11 @@ See `helm-ff-serial-rename-1'."
   (interactive)
   (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-ff-locate)))
+
+;;;###autoload
+(defun helm-ff-run-find-file-as-root ()
+  (interactive)
+  (helm-c-quit-and-execute-action 'helm-find-file-as-root))
 
 ;;;###autoload
 (defun helm-ff-run-gnus-attach-files ()
