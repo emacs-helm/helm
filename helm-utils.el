@@ -715,6 +715,13 @@ directory, open this directory."
 (defvar helm-yank-point nil)
 
 (defun helm-insert-in-minibuffer (word &optional replace follow)
+  "Insert WORD in minibuffer.
+If REPLACE is non--nil, remove the actual content of minibuffer
+and replace it with WORD, otherwise WORD is appended.
+Argument FOLLOW is used to notify if we are in `helm-follow-mode'.
+If it is the case (i.e FOLLOW non--nil) function have no effect
+and return nil.
+See `helm-find-files-persistent-action' for usage."
   (unless follow
     (with-current-buffer (window-buffer (minibuffer-window))
       (delete-minibuffer-contents)
