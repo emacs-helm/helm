@@ -55,7 +55,18 @@ while in helm session will show you all other bindings.
 these keymap with `C-c ?`, it should be documented in mode-line.
 
 
+## Yanking text
 
+To yank the symbol at point from `helm-current-buffer` (i.e. buffer where a
+helm command originated):
+
+        M-n
+
+Alternatively, customize `helm-yank-symbol-first` to enable
+
+        C-w
+
+to always yank the whole symbol on first invocation.
 
 
 # Overview of preconfigured helm commands
