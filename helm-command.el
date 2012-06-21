@@ -32,6 +32,11 @@ Set it to 0 to disable requires-pattern in `helm-M-x'."
   :group 'helm-command
   :type 'boolean)
 
+(defcustom helm-M-x-always-save-history nil
+  "`helm-M-x' Save command in `extended-command-history' even when it fail."
+  :group 'helm-command
+  :type  'boolean)
+
 
 ;;; Faces
 ;;
@@ -146,9 +151,12 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
           (setq current-prefix-arg helm-current-prefix-arg))
         ;; Avoid having `this-command' set to *exit-minibuffer.
         (setq this-command sym-com)
-        (call-interactively sym-com)
+        (unless helm-M-x-always-save-history
+          (call-interactively sym-com))
         (setq extended-command-history
-              (cons command (delete command history)))))))
+              (cons command (delete command history)))
+        (when helm-M-x-always-save-history
+          (call-interactively sym-com))))))
 
 (provide 'helm-command)
 
