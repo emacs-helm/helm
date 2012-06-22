@@ -2021,9 +2021,12 @@ Find inside `require' and `declare-function' sexp."
          . (lambda (candidate)
              (helm-dired-action candidate :action 'hardlink)))))))
 
-(defun* helm-dired-action (candidate &key action follow (files (dired-get-marked-files)))
-  "Copy, rename or symlink file at point or marked files in dired to CANDIDATE.
-ACTION is a key that can be one of 'copy, 'rename, 'symlink, 'relsymlink."
+(defun* helm-dired-action (candidate
+                           &key action follow (files (dired-get-marked-files)))
+  "Execute ACTION on FILES to CANDIDATE.
+Where ACTION is a symbol that can be one of:
+'copy, 'rename, 'symlink,'relsymlink, 'hardlink.
+Argument FOLLOW when non--nil specify to follow FILES to destination."
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
   (let ((fn     (case action
                   ('copy       'dired-copy-file)
