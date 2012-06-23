@@ -1513,11 +1513,13 @@ return FNAME unchanged."
                      (helm-c-basename presel) presel))
     (if helm-ff-quick-delete-dont-prompt-for-deletion
         (helm-c-delete-file candidate
-                            helm-ff-signal-error-on-dot-files)
+                            helm-ff-signal-error-on-dot-files
+                            'synchro)
         (save-selected-window
           (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
             (helm-c-delete-file candidate
-                                helm-ff-signal-error-on-dot-files)
+                                helm-ff-signal-error-on-dot-files
+                                'synchro)
             (message nil))))
     (helm-force-update presel)))
 
@@ -2177,14 +2179,15 @@ This is deprecated for Emacs24+ users, use `helm-mode' instead."
         (when (and bfn (string= name bfn))
           (push (buffer-name buf) buf-list))))))
 
-(defun helm-c-delete-file (file &optional error-if-dot-file-p)
+(defun helm-c-delete-file (file &optional error-if-dot-file-p synchro)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
   (when (and error-if-dot-file-p
              (helm-ff-dot-file-p file))
     (error "Error: Cannot operate on `.' or `..'"))
   (let ((buffers (helm-c-file-buffers file)))
-    (if (< emacs-major-version 24)
+    (if (or (< emacs-major-version 24)
+            synchro)
         ;; `dired-delete-file' in Emacs versions < 24
         ;; doesn't support delete-by-moving-to-trash
         ;; so use `delete-directory' and `delete-file'
