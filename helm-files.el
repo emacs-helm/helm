@@ -2123,7 +2123,7 @@ Ask to kill buffers associated with that file, too."
                (delete-directory file))
               (t (delete-file file)))
         (dired-delete-file
-         file 'dired-recursive-deletes delete-by-moving-to-trash))
+         file dired-recursive-deletes delete-by-moving-to-trash))
     (when buffers
       (dolist (buf buffers)
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
