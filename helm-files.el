@@ -82,13 +82,6 @@ This is the default value when starting `helm-find-files'."
   :group 'helm-files
   :type  'boolean)
 
-(defcustom helm-c-copy-async-prefered-emacs "emacs"
-  "Path to the emacs you want to use for copying async.
-Emacs versions < 24 fail to copy directory due to a bug not fixed
-in `copy-directory'."
-  :group 'helm-files
-  :type 'string)
-
 (defcustom helm-ff-lynx-style-map t
   "Use arrow keys to navigate with `helm-find-files'.
 You will have to restart Emacs or reeval `helm-find-files-map'
@@ -140,11 +133,6 @@ See <http://sourceforge.net/projects/avf/>."
 (defcustom helm-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
   "Minimal list of compressed files extension."
   :type  'list
-  :group 'helm-files)
-
-(defcustom helm-c-copy-files-async-log-file "/tmp/dired.log"
-  "The file used to communicate with two emacs when copying files async."
-  :type  'string
   :group 'helm-files)
 
 (defcustom helm-ff-printer-list nil
@@ -363,7 +351,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ("Ediff Merge File `C-c ='" . helm-find-files-ediff-merge-files)
            ("Delete File(s) `M-D'" . helm-delete-marked-files)
            ("Copy file(s) `M-C, C-u to follow'" . helm-find-files-copy)
-           ("Copy file(s) Async" . helm-ff-copy-async)
            ("Rename file(s) `M-R, C-u to follow'" . helm-find-files-rename)
            ("Serial rename files" . helm-ff-serial-rename)
            ("Serial rename by symlinking files" . helm-ff-serial-rename-by-symlink)
@@ -505,81 +492,6 @@ ACTION must be an action supported by `helm-dired-action'."
 (defun helm-find-files-switch-to-hist (candidate)
   "Switch to helm-find-files history."
   (helm-find-files t))
-
-;;; Asynchronous copy of files.
-;;
-;;
-(defun helm-c-copy-files-async-1 (flist dest)
-  "Copy a list of Files FLIST to DEST asynchronously.
-It use another emacs process to do the job.
-Communication with background emacs is done with temp file
-`helm-c-copy-files-async-log-file'."
-  (start-file-process "emacs-batch" nil helm-c-copy-async-prefered-emacs
-                      "-Q" "--batch" "--eval"
-                      (format "(progn
-  (require 'dired) (require 'cl)
-  (let ((dired-recursive-copies 'always)
-        failures success
-        (ovw-count 0)
-        (cpf-count 0))
-    (dolist (f '%S)
-       (condition-case err
-             (let ((file-exists (file-exists-p
-                                 (expand-file-name
-                                  (file-name-nondirectory (directory-file-name f))
-                                   (file-name-directory
-                                     (file-name-as-directory \"%s\"))))))
-                (dired-copy-file f \"%s\" t)
-                (if file-exists
-                    (progn (push (cons \"Overwriting\" f) success)
-                           (incf ovw-count))
-                    (push (cons \"Copying\" f) success)
-                    (incf cpf-count)))
-          (file-error
-           (push (dired-make-relative
-                   (expand-file-name
-                     (file-name-nondirectory (directory-file-name f))
-                     (file-name-directory \"%s\")))
-                 failures))))
-    (with-current-buffer (find-file-noselect \"%s\")
-       (erase-buffer)
-       (when failures
-         (dolist (fail (reverse failures))
-           (insert (concat \"Failed to copy \" fail \"\n\"))))
-       (when success
-         (loop for (a . s) in (reverse success) do
-           (insert (concat a \" \" s  \" to %s done\n\"))))
-       (and (/= cpf-count 0) (insert (concat (int-to-string cpf-count) \" File(s) Copied\n\")))
-       (and (/= ovw-count 0) (insert (concat (int-to-string ovw-count) \" File(s) Overwrited\n\")))
-       (and failures (insert (concat (int-to-string (length failures)) \" File(s) Failed to copy\n\")))
-       (save-buffer))))"
-                              flist dest dest dest helm-c-copy-files-async-log-file dest)))
-
-(defun helm-c-copy-async-with-log (flist dest)
-  "Copy file list FLIST to DEST showing log.
-Log is send to `helm-c-copy-files-async-log-file'.
-Copying is done asynchronously with `helm-c-copy-files-async-1'."
-  (declare (special auto-revert-interval))
-  (pop-to-buffer (find-file-noselect helm-c-copy-files-async-log-file))
-  (set (make-local-variable 'auto-revert-interval) 1)
-  (erase-buffer)
-  (insert "Wait copying files...\n")
-  (sit-for 0.5) (save-buffer)
-  (goto-char (point-max))
-  (auto-revert-mode 1)
-  (helm-c-copy-files-async-1 flist dest))
-
-(defun helm-ff-copy-async (candidate)
-  "Helm find files action to copy files async.
-Copying is done asynchronously with `helm-c-copy-files-async-1'."
-  (let* ((flist (helm-marked-candidates))
-         (dest  (helm-c-read-file-name
-                 (helm-find-files-set-prompt-for-action
-                  "Copy Async" flist)
-                 :preselect candidate
-                 :initial-input (car helm-ff-history)
-                 :history (helm-find-files-history :comp-read nil))))
-    (helm-c-copy-async-with-log flist dest)))
 
 (defvar eshell-command-aliases-list nil)
 (defvar helm-eshell-command-on-file-input-history nil)
@@ -2556,20 +2468,6 @@ Colorize only symlinks, directories and files."
   "File name.")
 
 
-;;;###autoload
-(defun helm-c-copy-files-async ()
-  "Preconfigured helm to copy file list FLIST to DEST asynchronously."
-  (interactive)
-  (let* ((flist (helm-c-read-file-name
-                 "Copy File async: "
-                 :marked-candidates t))
-         (dest  (helm-c-read-file-name
-                 "Copy File async To: "
-                 :preselect (car flist)
-                 :initial-input (car helm-ff-history)
-                 :history (helm-find-files-history :comp-read nil))))
-    (helm-c-copy-async-with-log flist dest)))
-
 ;;;###autoload
 (defun helm-find-files (arg)
   "Preconfigured `helm' for helm implementation of `find-file'.

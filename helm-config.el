@@ -175,7 +175,7 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-resume
-;;;;;;  helm-open-last-log) "helm" "helm.el" (20433 33820))
+;;;;;;  helm-open-last-log) "helm" "helm.el" (20451 10527))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -597,8 +597,8 @@ Preconfigured `helm' for color.
 
 ;;;***
 
-;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20428
-;;;;;;  32734))
+;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20450
+;;;;;;  2443))
 ;;; Generated autoloads from helm-command.el
 
 (autoload 'helm-M-x "helm-command" "\
@@ -739,8 +739,8 @@ You can set your own list of commands with
 
 ;;;### (autoloads (helm-recentf helm-for-files helm-dired-hardlink-file
 ;;;;;;  helm-dired-symlink-file helm-dired-copy-file helm-dired-rename-file
-;;;;;;  helm-insert-file helm-write-file helm-find-files helm-c-copy-files-async
-;;;;;;  helm-dired-mode helm-ff-rotate-right-persistent helm-ff-rotate-left-persistent
+;;;;;;  helm-insert-file helm-write-file helm-find-files helm-dired-mode
+;;;;;;  helm-ff-rotate-right-persistent helm-ff-rotate-left-persistent
 ;;;;;;  helm-ff-run-kill-buffer-persistent helm-ff-persistent-delete
 ;;;;;;  helm-ff-properties-persistent helm-find-files-down-one-level
 ;;;;;;  helm-ff-run-toggle-basename helm-ff-run-print-file helm-ff-run-etags
@@ -753,7 +753,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20449 34508))
+;;;;;;  "helm-files" "helm-files.el" (20454 40390))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -934,11 +934,6 @@ the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'.
 \\{helm-dired-mode-map}
 
 \(fn &optional ARG)" t nil)
-
-(autoload 'helm-c-copy-files-async "helm-files" "\
-Preconfigured helm to copy file list FLIST to DEST asynchronously.
-
-\(fn)" t nil)
 
 (autoload 'helm-find-files "helm-files" "\
 Preconfigured `helm' for helm implementation of `find-file'.
@@ -1151,7 +1146,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-esh-help helm-c-bookmark-help helm-c-ucs-help helm-etags-help
 ;;;;;;  helm-pdfgrep-help helm-grep-help helm-generic-file-help helm-read-file-name-help
 ;;;;;;  helm-ff-help helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20428 32734))
+;;;;;;  (20449 63969))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1641,7 +1636,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20449 32324))
+;;;;;;  "helm-utils" "helm-utils.el" (20454 10828))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1663,7 +1658,10 @@ from its directory.
 \(fn FILE)" t nil)
 
 (autoload 'helm-yank-text-at-point "helm-utils" "\
-Yank text at point in minibuffer.
+Yank text at point in invocation buffer into minibuffer.
+
+`helm-yank-symbol-first' controls whether the first yank grabs
+the entire symbol.
 
 \(fn)" t nil)
 
@@ -1716,8 +1714,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20449
-;;;;;;  34532 268574))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20454
+;;;;;;  40448 439071))
 
 ;;;***
 
