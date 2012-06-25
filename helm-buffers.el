@@ -51,12 +51,17 @@ filtered from the list of candidates if the
 ;;
 (defface helm-buffer-saved-out
     '((t (:foreground "red")))
-  "*Face used for buffer files modified outside of emacs."
+  "Face used for buffer files modified outside of emacs."
   :group 'helm-buffers)
 
 (defface helm-buffer-not-saved
     '((t (:foreground "Indianred2")))
-  "*Face used for buffer files not already saved on disk."
+  "Face used for buffer files not already saved on disk."
+  :group 'helm-buffers)
+
+(defface helm-buffer-size
+    '((t (:foreground "SlateGray")))
+  "Face used for buffer size."
   :group 'helm-buffers)
 
 
@@ -103,7 +108,7 @@ filtered from the list of candidates if the
 (defvar helm-c-source-buffers-list
   `((name . "Buffers")
     (init . (lambda ()
-              ;; Create the list before `helm-buffer' creation.
+              ;; Issue #51 Create the list before `helm-buffer' creation.
               (setq helm-buffers-list-cache (helm-c-buffer-list))))
     (candidates . helm-buffers-list-cache)
     (type . buffer)
@@ -165,52 +170,78 @@ See `ido-make-buffer-list' for more infos."
         ido-use-virtual-buffers)
     (ido-make-buffer-list nil)))
 
-(defun helm-c-highlight-buffers (buffers)
+(defun helm-buffer-size (buffer)
+  "Return size of BUFFER."
+  (with-current-buffer buffer
+    (save-restriction
+      (widen)
+      (helm-file-human-size
+       (- (position-bytes (point-max))
+          (position-bytes (point-min)))))))
+
+(defun helm-c-highlight-buffers (buffers sources)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
   (loop for i in buffers
         for buf = (get-buffer i)
+        for size = (propertize (helm-buffer-size buf)
+                               'face 'helm-buffer-size)
         for bfname = (buffer-file-name buf)
         collect
         (cond (;; A dired buffer.
                (rassoc buf dired-buffers)
-               (propertize i 'face 'helm-ff-directory
-                           'help-echo (car (rassoc buf dired-buffers))))
+               (cons (concat (propertize
+                              i 'face 'helm-ff-directory
+                              'help-echo (car (rassoc buf dired-buffers)))
+                             " " size)
+                     i))
               ;; A buffer file modified somewhere outside of emacs.
               ((and bfname (not (file-remote-p bfname))
                     (file-exists-p bfname)
                     (not (verify-visited-file-modtime buf)))
-               (propertize i 'face 'helm-buffer-saved-out
-                           'help-echo bfname))
+               (cons (concat (propertize i 'face 'helm-buffer-saved-out
+                                         'help-echo bfname)
+                             " " size)
+                     i))
               ;; A new buffer file not already saved on disk.
               ((and bfname (not (file-remote-p bfname))
                     (not (verify-visited-file-modtime buf)))
-               (propertize i 'face 'helm-buffer-not-saved
-                           'help-echo bfname))
+               (cons (concat (propertize i 'face 'helm-buffer-not-saved
+                                         'help-echo bfname)
+                             " " size)
+                     i))
               ;; A Remote buffer file modified and not saved on disk.
               ((and bfname (file-remote-p bfname) (buffer-modified-p buf))
                (let ((prefix (propertize
                               " " 'display
                               (propertize "@ " 'face 'helm-ff-prefix))))
                  (cons (concat prefix (propertize i 'face 'helm-ff-symlink
-                                                  'help-echo bfname)) i)))
+                                                  'help-echo bfname)
+                               " " size)
+                       i)))
               ;; A buffer file modified and not saved on disk.
               ((and bfname (buffer-modified-p buf))
-               (propertize i 'face 'helm-ff-symlink
-                           'help-echo bfname))
+               (cons (concat (propertize i 'face 'helm-ff-symlink
+                                         'help-echo bfname)
+                             " " size)
+                     i))
               ;; A remote buffer file not modified and saved on disk.
               ((and bfname (file-remote-p bfname))
                (let ((prefix (propertize
                               " " 'display
                               (propertize "@ " 'face 'helm-ff-prefix))))
                  (cons (concat prefix (propertize i 'face 'font-lock-type-face
-                                                  'help-echo bfname)) i)))
+                                                  'help-echo bfname)
+                               " " size)
+                       i)))
               ;; A buffer file not modified and saved on disk.
               (bfname
-               (propertize i 'face 'font-lock-type-face
-                           'help-echo bfname))
+               (cons (concat (propertize i 'face 'font-lock-type-face
+                                         'help-echo bfname)
+                             " " size)
+                     i))
               ;; Any non--file buffer.
-              (t (propertize i 'face 'italic)))))
+              (t (cons (concat (propertize i 'face 'italic) " " size) i)))))
 
 (defun helm-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -406,7 +437,7 @@ See `helm-ediff-marked-buffers'."
 ;;; Candidate Transformers
 ;;
 ;;
-(defun helm-c-skip-boring-buffers (buffers)
+(defun helm-c-skip-boring-buffers (buffers sources)
   (helm-skip-entries buffers helm-c-boring-buffer-regexp-list))
 
 (defun helm-c-shadow-boring-buffers (buffers)
@@ -447,8 +478,8 @@ displayed with the `file-name-shadow' face if available."
        ("Ediff Merge marked buffers" . (lambda (candidate)
                                          (helm-ediff-marked-buffers candidate t))))
       (persistent-help . "Show this buffer")
-      (candidate-transformer helm-c-skip-boring-buffers
-                             helm-c-highlight-buffers))
+      (filtered-candidate-transformer helm-c-skip-boring-buffers
+                                      helm-c-highlight-buffers))
   "Buffer or buffer name.")
 
 ;;;###autoload
