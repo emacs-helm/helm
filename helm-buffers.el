@@ -182,66 +182,78 @@ See `ido-make-buffer-list' for more infos."
 (defun helm-c-highlight-buffers (buffers sources)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop for i in buffers
+  (loop with old-len-size = 10
+        for i in buffers
         for buf = (get-buffer i)
         for size = (propertize (helm-buffer-size buf)
                                'face 'helm-buffer-size)
+        for len-size = (length size)
+        for str-before-size = (helm-aif (and (> old-len-size len-size)
+                                             (- old-len-size len-size))
+                                  (make-string it ? ) "")
+        do (setq old-len-size (+ len-size (length str-before-size)))
+        for truncbuf = (if (> (length i) 20)
+                           (concat (substring i 0 20) "...")
+                           (concat i (make-string (- 23 (length i)) ? )))
         for bfname = (buffer-file-name buf)
+        for mode = (with-current-buffer i (symbol-name major-mode))
         collect
         (cond (;; A dired buffer.
                (rassoc buf dired-buffers)
                (cons (concat (propertize
-                              i 'face 'helm-ff-directory
+                              truncbuf 'face 'helm-ff-directory
                               'help-echo (car (rassoc buf dired-buffers)))
-                             " " size)
+                             " " str-before-size size "  " mode)
                      i))
               ;; A buffer file modified somewhere outside of emacs.
               ((and bfname (not (file-remote-p bfname))
                     (file-exists-p bfname)
                     (not (verify-visited-file-modtime buf)))
-               (cons (concat (propertize i 'face 'helm-buffer-saved-out
+               (cons (concat (propertize truncbuf 'face 'helm-buffer-saved-out
                                          'help-echo bfname)
-                             " " size)
+                             " " str-before-size size "  " mode)
                      i))
               ;; A new buffer file not already saved on disk.
               ((and bfname (not (file-remote-p bfname))
                     (not (verify-visited-file-modtime buf)))
-               (cons (concat (propertize i 'face 'helm-buffer-not-saved
+               (cons (concat (propertize truncbuf 'face 'helm-buffer-not-saved
                                          'help-echo bfname)
-                             " " size)
+                             " " str-before-size size "  " mode)
                      i))
               ;; A Remote buffer file modified and not saved on disk.
               ((and bfname (file-remote-p bfname) (buffer-modified-p buf))
                (let ((prefix (propertize
                               " " 'display
                               (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize i 'face 'helm-ff-symlink
+                 (cons (concat prefix (propertize truncbuf 'face 'helm-ff-symlink
                                                   'help-echo bfname)
-                               " " size)
+                               " " str-before-size size "  " mode)
                        i)))
               ;; A buffer file modified and not saved on disk.
               ((and bfname (buffer-modified-p buf))
-               (cons (concat (propertize i 'face 'helm-ff-symlink
+               (cons (concat (propertize truncbuf 'face 'helm-ff-symlink
                                          'help-echo bfname)
-                             " " size)
+                             " " str-before-size size "  " mode)
                      i))
               ;; A remote buffer file not modified and saved on disk.
               ((and bfname (file-remote-p bfname))
                (let ((prefix (propertize
                               " " 'display
                               (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize i 'face 'font-lock-type-face
+                 (cons (concat prefix (propertize truncbuf 'face 'font-lock-type-face
                                                   'help-echo bfname)
-                               " " size)
+                               " " str-before-size size "  " mode)
                        i)))
               ;; A buffer file not modified and saved on disk.
               (bfname
-               (cons (concat (propertize i 'face 'font-lock-type-face
+               (cons (concat (propertize truncbuf 'face 'font-lock-type-face
                                          'help-echo bfname)
-                             " " size)
+                             " " str-before-size size "  " mode)
                      i))
               ;; Any non--file buffer.
-              (t (cons (concat (propertize i 'face 'italic) " " size) i)))))
+              (t (cons (concat (propertize truncbuf 'face 'italic
+                                           'help-echo i)
+                               " " str-before-size size "  " mode) i)))))
 
 (defun helm-c-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
