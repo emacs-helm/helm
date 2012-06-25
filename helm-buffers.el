@@ -45,6 +45,10 @@ filtered from the list of candidates if the
   :type '(repeat (choice function))
   :group 'helm-buffers)
 
+(defcustom helm-buffer-max-length 20
+  "Max length of buffer names before truncate."
+  :group 'helm-buffers
+  :type  'integer)
 
 ;;; Faces
 ;;
@@ -182,7 +186,10 @@ See `ido-make-buffer-list' for more infos."
 (defun helm-c-highlight-buffers (buffers sources)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop with old-len-size = 10
+  (loop ;; length of last buffer size string.
+        ;; Start at ten, such a length should never be reach.
+        ;; e.g 9999K, so the max should be 5 + a space = 6.
+        with old-len-size = 10
         for i in buffers
         for buf = (get-buffer i)
         for size = (propertize (helm-buffer-size buf)
@@ -193,8 +200,11 @@ Should be called after others transformers i.e (boring buffers)."
                                   (make-string it ? ) "")
         do (setq old-len-size (+ len-size (length str-before-size)))
         for truncbuf = (if (> (length i) 20)
-                           (concat (substring i 0 20) "...")
-                           (concat i (make-string (- 23 (length i)) ? )))
+                           (concat (substring i 0 helm-buffer-max-length)
+                                   "...")
+                           (concat i (make-string
+                                      (- (+ helm-buffer-max-length 3)
+                                         (length i)) ? )))
         for bfname = (buffer-file-name buf)
         for mode = (with-current-buffer i (symbol-name major-mode))
         collect
