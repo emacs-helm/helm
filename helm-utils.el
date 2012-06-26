@@ -526,19 +526,17 @@ Useful in dired buffers when there is inserted subdirs."
 ;; Internal
 (defvar helm-match-line-overlay nil)
 
-(defun helm-match-line-color-current-line (&optional start end buf face rec)
+(defun helm-match-line-color-current-line (&optional start end buf face)
   "Highlight and underline current position"
-  (let ((args (list (or start (line-beginning-position))
-                    (or end (1+ (line-end-position)))
-                    buf)))
+  (let* ((start (or start (line-beginning-position)))
+         (end (or end (1+ (line-end-position))))
+         (args (list start end buf)))
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
-        (apply 'move-overlay helm-match-line-overlay args)))
-  (overlay-put helm-match-line-overlay
-               'face (or face 'helm-selection-line))
-  (when rec
-    (goto-char start)
-    (recenter)))
+      (apply 'move-overlay helm-match-line-overlay args))
+    (overlay-put helm-match-line-overlay
+                 'face (or face 'helm-selection-line))
+    (recenter-top-bottom)))
 
 (defalias 'helm-persistent-highlight-point 'helm-match-line-color-current-line)
 
