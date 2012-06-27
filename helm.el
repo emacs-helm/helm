@@ -147,6 +147,12 @@
   "Face for multiline source separator."
   :group 'helm)
 
+(defface helm-action
+    '((t (:underline t)))
+  "Face for action lines in the helm action buffer."
+  :group 'helm)
+
+
 ;;; Variables
 ;;
 ;;
@@ -2102,6 +2108,11 @@ If action buffer is selected, back to the helm buffer."
          `(((name . "Actions")
             (volatile)
             (candidates . ,actions)
+            (candidate-transformer
+             . (lambda (candidates)
+                 (loop for (i . j) in candidates
+                       collect
+                       (cons (propertize i 'face 'helm-action) j))))
             (candidate-number-limit))))
     (set (make-local-variable 'helm-source-filter) nil)
     (set (make-local-variable 'helm-selection-overlay) nil)
