@@ -102,9 +102,14 @@
 ;;
 ;;
 (defface helm-source-header
-    '((t (:background "#22083397778B"
-          :foreground "white"
-          :underline t)))
+    '((((background dark))
+       :background "#22083397778B"
+       :foreground "white"
+       :underline t)
+      (((background light))
+       :background "#abd7f0"
+       :foreground "black"
+       :underline t))
   "Face for source header in the helm buffer."
   :group 'helm)
 
@@ -113,6 +118,7 @@
        (:background "green1" :foreground "black"))
       (((background dark))
        (:background "green" :foreground "black"))
+      (((background light)) :background "#d1f5ea")
       (((min-colors 88))
        (:background "green1"))
       (t (:background "green")))
@@ -125,16 +131,19 @@
   :group 'helm)
 
 (defface helm-candidate-number
-    '((t (:background "Yellow" :foreground "black")))
+    '((((background dark)) :background "Yellow" :foreground "black")
+      (((background light)) :background "#faffb5" :foreground "black"))
   "Face for candidate number in mode-line." :group 'helm)
 
 (defface helm-selection
-    '((t (:background "ForestGreen" :underline t)))
+    '((((background dark)) :background "ForestGreen" :underline t)
+      (((background light)) :background "#b5ffd1" :underline t))
   "Face for currently selected item in the helm buffer."
   :group 'helm)
 
 (defface helm-separator
-    '((t (:foreground "red")))
+    '((((background dark)) :foreground "red")
+      (((background light)) :foreground "#ffbfb5"))
   "Face for multiline source separator."
   :group 'helm)
 
