@@ -591,6 +591,14 @@ If SRC is omitted, use current source."
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
 
+(defun helm-append-at-nth (seq elm index)
+  "Append ELM at INDEX in SEQ."
+  (loop for i in seq
+        for count from 1 collect i
+        when (= count index)
+        if (listp elm) append elm
+        else collect elm))
+
 (defun helm-add-action-to-source (name fn source &optional index)
   "Add new action NAME linked to function FN to SOURCE.
 Function FN should be a valid function that take one arg i.e candidate,
@@ -606,8 +614,7 @@ without modifying source code."
       (setq actions (list (cons "Default action" actions))))
     (helm-attrset 'action
                   (if index
-                      (append (butlast actions (- (length actions) index))
-                              (append new-action (nthcdr index actions)))
+                      (helm-append-at-nth actions new-action index)
                       (append actions new-action))
                   source)))
 
