@@ -618,9 +618,9 @@ without modifying source code."
                       (append actions new-action))
                   source)))
 
-(defun helm-add-action-to-source-if (name fn source predicate
-                                     &optional test-only)
-    "Add new action NAME linked to function FN to SOURCE.
+(defun* helm-add-action-to-source-if (name fn source predicate
+                                           &key (index 4) test-only)
+  "Add new action NAME linked to function FN to SOURCE.
 Action is added only if current candidate match PREDICATE.
 This function add an entry in the `action-transformer' attribute
 of SOURCE (or create one if not found).
@@ -628,6 +628,8 @@ Function PREDICATE should take one arg candidate.
 Function FN should be a valid function that take one arg i.e candidate,
 argument NAME is a string that will appear in action menu
 and SOURCE should be an existing helm source already loaded.
+If INDEX is specified, action is added in action list at INDEX.
+Value of INDEX should be always >=1, default to 4.
 This allow user to add a specific `action-tranformer'
 to an existing source without modifying source code.
 E.g
@@ -644,11 +646,12 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
          (new-action  (list (cons name fn)))
          (transformer `(lambda (actions candidate)
                          (cond ((funcall (quote ,predicate) candidate)
-                                (append (quote ,new-action) actions))
+                                (helm-append-at-nth
+                                 actions (quote ,new-action) ,index))
                                (t actions)))))
     (when (symbolp action-transformers)
       (setq action-transformers (list action-transformers)))
-    (if test-only ; debug
+    (if test-only                       ; debug
         (append (list transformer) action-transformers)
         (helm-attrset 'action-transformer
                       (append (list transformer) action-transformers)
