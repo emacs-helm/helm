@@ -618,6 +618,42 @@ without modifying source code."
                       (append actions new-action))
                   source)))
 
+(defun helm-add-action-to-source-if (name fn source predicate
+                                     &optional test-only)
+    "Add new action NAME linked to function FN to SOURCE.
+Action is added only if current candidate match PREDICATE.
+This function add an entry in the `action-transformer' attribute
+of SOURCE (or create one if not found).
+Function PREDICATE should take one arg candidate.
+Function FN should be a valid function that take one arg i.e candidate,
+argument NAME is a string that will appear in action menu
+and SOURCE should be an existing helm source already loaded.
+This allow user to add a specific `action-tranformer'
+to an existing source without modifying source code.
+E.g
+Add the action \"Byte compile file async\" linked to
+function 'async-byte-compile-file to source `helm-c-source-find-files'
+only when predicate helm-ff-candidates-lisp-p return non--nil:
+
+\(helm-add-action-to-source-if \"Byte compile file async\"
+                              'async-byte-compile-file
+                              helm-c-source-find-files
+                              'helm-ff-candidates-lisp-p\)."
+  (let* ((actions     (helm-attr 'action source))
+         (action-transformers (helm-attr 'action-transformer source))
+         (new-action  (list (cons name fn)))
+         (transformer `(lambda (actions candidate)
+                         (cond ((funcall (quote ,predicate) candidate)
+                                (append (quote ,new-action) actions))
+                               (t actions)))))
+    (when (symbolp action-transformers)
+      (setq action-transformers (list action-transformers)))
+    (if test-only ; debug
+        (append (list transformer) action-transformers)
+        (helm-attrset 'action-transformer
+                      (append (list transformer) action-transformers)
+                      source))))
+
 (defun helm-set-source-filter (sources)
   "Set the value of `helm-source-filter' to SOURCES and update.
 
