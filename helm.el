@@ -619,7 +619,7 @@ without modifying source code."
                   source)))
 
 (defun* helm-add-action-to-source-if (name fn source predicate
-                                           &key (index 4) test-only)
+                                           &optional (index 4) test-only)
   "Add new action NAME linked to function FN to SOURCE.
 Action is added only if current candidate match PREDICATE.
 This function add an entry in the `action-transformer' attribute
