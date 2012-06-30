@@ -591,6 +591,13 @@ If SRC is omitted, use current source."
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
 
+(defun helm-get-actions-from-type (source)
+  "Get actions list from type attribute of SOURCE."
+  (when (assq 'type source)
+    (assq 'action
+          (assq (helm-attr 'type source)
+                helm-type-attributes))))
+
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
   (loop for i in seq
