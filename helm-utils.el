@@ -351,10 +351,10 @@ from its directory."
 
 (defmacro* helm-c-walk-directory (directory &key path (directories t) match)
   "Walk through DIRECTORY tree.
-PATH can be one of basename, relative, or full.
-DIRECTORIES when non--nil (default) return also directories names, otherwise
-skip directories names.
-MATCH match only filenames matching regexp MATCH."
+Argument PATH can be one of basename, relative, or full, default to basename.
+Argument DIRECTORIES when non--nil (default) return also directories names,
+otherwise skip directories names.
+Argument MATCH can be a predicate or a regexp."
   `(let (result
          (fn (case ,path
                (basename 'file-name-nondirectory)
@@ -371,11 +371,14 @@ MATCH match only filenames matching regexp MATCH."
                                 ;; Don't recurse in directory symlink.
                                 (unless (file-symlink-p f)
                                   (ls-R f)))
-                      else do
-                      (unless (and ,match (not (string-match
-                                                ,match
-                                                (file-name-nondirectory f))))
-                        (push (funcall fn f) result)))))
+                      else when
+                      (and ,match
+                           (if (functionp ,match)
+                               (funcall ,match f)
+                               (and (stringp ,match)
+                                    (string-match
+                                     ,match (file-name-nondirectory f)))))
+                      do (push (funcall fn f) result))))
        (ls-R ,directory)
        (nreverse result))))
 
