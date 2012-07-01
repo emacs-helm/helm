@@ -197,7 +197,8 @@ See `helm-c-grep-default-command' for format specs.")
                          (delq nil
                                (list (unless zgrep (cons ?e exclude))
                                      (cons ?p (shell-quote-argument helm-pattern))
-                                     (cons ?f fnargs))))))
+                                     (cons ?f fnargs)))))
+         process-connection-type) ; Use pipe.
     (when helm-c-grep-debug-command-line
       (with-current-buffer (get-buffer-create "*any grep debug*")
         (goto-char (point-max))
