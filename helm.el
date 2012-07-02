@@ -82,6 +82,8 @@
     (define-key map (kbd "C-c C-u")    'helm-force-update)
     (define-key map (kbd "M-p")        'previous-history-element)
     (define-key map (kbd "M-n")        'next-history-element)
+    ;; Disable `file-cache-minibuffer-complete'.
+    (define-key map (kbd "<C-tab>")    'undefined)
     ;; Debugging command
     (define-key map "\C-c\C-x\C-d"     'helm-debug-output)
     (define-key map "\C-c\C-x\C-m"     'helm-display-all-visible-marks)
