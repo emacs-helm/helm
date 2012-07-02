@@ -203,34 +203,39 @@ See `helm-c-grep-default-command' for format specs.")
       (with-current-buffer (get-buffer-create "*any grep debug*")
         (goto-char (point-max))
         (insert (concat ">>> " cmd-line "\n\n"))))
-    (setq mode-line-format
+    (prog1 ; Start grep process.
+        (let ((default-directory helm-ff-default-directory))
+          (start-file-process-shell-command "grep-process" nil cmd-line))
+      (setq mode-line-format
           '(" " mode-line-buffer-identification " "
             (line-number-mode "%l") " "
             (:eval (when (get-process "grep-process")
-                     (propertize "[Grep Process Running] "
+                     (propertize (format "[Grep process status: %s]"
+                                         (process-status
+                                          (process-name
+                                           (get-process "grep-process"))))
                                  'face 'helm-grep-running)))))
-    (force-mode-line-update nil)
-    (prog1
-        (let ((default-directory helm-ff-default-directory))
-          (start-file-process-shell-command "grep-process" nil cmd-line))
+      (force-mode-line-update nil)
       (message nil)
       (set-process-sentinel
        (get-process "grep-process")
        #'(lambda (process event)
-           (when (string= event "finished\n")
-             (with-helm-window
-               (helm-update-move-first-line)
-               (setq mode-line-format
-                     '(" " mode-line-buffer-identification " "
-                       (line-number-mode "%l") " "
-                       (:eval (propertize
-                               (format "[Grep Process Finished - (%s results)] "
-                                       (let ((nlines (1- (count-lines
-                                                          (point-min)
-                                                          (point-max)))))
-                                         (if (> nlines 0) nlines 0)))
-                               'face 'helm-grep-finish))))
-               (force-mode-line-update nil))))))))
+           (if (string= event "finished\n")
+               (with-helm-window
+                 (helm-update-move-first-line)
+                 (setq mode-line-format
+                       '(" " mode-line-buffer-identification " "
+                         (line-number-mode "%l") " "
+                         (:eval (propertize
+                                 (format "[Grep Process Finished - (%s results)] "
+                                         (let ((nlines (1- (count-lines
+                                                            (point-min)
+                                                            (point-max)))))
+                                           (if (> nlines 0) nlines 0)))
+                                 'face 'helm-grep-finish))))
+                 (force-mode-line-update nil))
+               (message "Grep %s"
+                        (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-c-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep' on CANDIDATE.
