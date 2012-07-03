@@ -520,9 +520,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
   "Split a grep output line."
   ;; Don't print until grep line is valid.
   (when (string-match "^\\(.*\\):\\([0-9]+\\):\\(.*\\)" line)
-    (list (match-string 1 line)
-          (match-string 2 line)
-          (match-string 3 line))))
+    (loop for n from 1 to 3 collect (match-string n line))))
 
 (defun helm-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `helm-do-grep'."
