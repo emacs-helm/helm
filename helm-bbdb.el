@@ -68,8 +68,8 @@ removed."
 (defvar helm-c-source-bbdb
   '((name . "BBDB")
     (candidates . helm-c-bbdb-candidates)
-    (action ("Send a mail" . helm-c-bbdb-compose-mail)
-     ("View person's data" . helm-c-bbdb-view-person-action))
+    (action . (("Send a mail" . helm-c-bbdb-compose-mail)
+               ("View person's data" . helm-c-bbdb-view-person-action)))
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (setq helm-c-bbdb-name helm-pattern)
                                         (if (not candidates)
