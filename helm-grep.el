@@ -199,7 +199,7 @@ See `helm-c-grep-default-command' for format specs.")
                                      (cons ?p (shell-quote-argument helm-pattern))
                                      (cons ?f fnargs)))))
          process-connection-type) ; Use pipe.
-    (when helm-c-grep-debug-command-line
+    (when (or helm-c-grep-debug-command-line debug-on-error)
       (with-current-buffer (get-buffer-create "*helm grep debug*")
         (goto-char (point-max))
         (insert (concat ">>> " cmd-line "\n\n"))))
