@@ -206,6 +206,7 @@ See `helm-c-grep-default-command' for format specs.")
     (prog1 ; Start grep process.
         (let ((default-directory helm-ff-default-directory))
           (start-file-process-shell-command "grep-process" nil cmd-line))
+      (helm-log "Start Grep process")
       (setq mode-line-format
           '(" " mode-line-buffer-identification " "
             (line-number-mode "%l") " "
@@ -227,15 +228,13 @@ See `helm-c-grep-default-command' for format specs.")
                        '(" " mode-line-buffer-identification " "
                          (line-number-mode "%l") " "
                          (:eval (propertize
-                                 (format "[Grep Process Finished - (%s results)] "
-                                         (let ((nlines (1- (count-lines
-                                                            (point-min)
-                                                            (point-max)))))
-                                           (if (> nlines 0) nlines 0)))
+                                 (format "[Grep process finished - (%s results)] "
+                                         (max (1- (count-lines
+                                                   (point-min) (point-max))) 0))
                                  'face 'helm-grep-finish))))
                  (force-mode-line-update nil))
-               (message "Grep %s"
-                        (replace-regexp-in-string "\n" "" event))))))))
+               (helm-log "Grep %s"
+                         (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-c-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep' on CANDIDATE.
