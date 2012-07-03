@@ -844,7 +844,7 @@ The action is to call FUNCTION with arguments ARGS."
   (setq helm-quit t)
   (helm-kill-async-processes)
   (helm-log-eval function args)
-  (apply 'run-with-idle-timer 0 nil function args)
+  (apply 'run-with-timer 0.1 nil function args)
   (helm-exit-minibuffer))
 
 
