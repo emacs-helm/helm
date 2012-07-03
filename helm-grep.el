@@ -200,7 +200,7 @@ See `helm-c-grep-default-command' for format specs.")
                                      (cons ?f fnargs)))))
          process-connection-type) ; Use pipe.
     (when helm-c-grep-debug-command-line
-      (with-current-buffer (get-buffer-create "*any grep debug*")
+      (with-current-buffer (get-buffer-create "*helm grep debug*")
         (goto-char (point-max))
         (insert (concat ">>> " cmd-line "\n\n"))))
     (prog1 ; Start grep process.
