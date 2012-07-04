@@ -1103,7 +1103,7 @@ Of course, conventional arguments are supported, the two are same.
 Other keywords are interpreted as local variables of this helm session.
 The `helm-' prefix can be omitted.  For example,
 
-\(helm :sources 'helm-c-source-buffers
+\(helm :sources 'helm-c-source-buffers-list
            :buffer \"*buffers*\" :candidate-number-limit 10\)
 
 means starting helm session with `helm-c-source-buffers'
