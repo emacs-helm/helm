@@ -478,6 +478,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (candidate-number-limit . 9999)
         (nohighlight)
         (mode-line . helm-grep-mode-line-string)
+        ;; We need to specify keymap here and as :keymap arg [1]
+        ;; to make it available in further resuming.
         (keymap . ,helm-c-grep-map)
         (history . ,'helm-c-grep-history)
         (action . ,(delq
@@ -494,7 +496,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (requires-pattern . 3)
         (delayed)))
      :buffer (format "*helm %s*" (if zgrep "zgrep" "grep"))
-     :keymap helm-c-grep-map
+     :keymap helm-c-grep-map ; [1]
      :history 'helm-c-grep-history)))
 
 (defun helm-ff-zgrep-1 (flist recursive)
