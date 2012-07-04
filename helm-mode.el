@@ -123,15 +123,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   "Default filter candidate function for `helm-comp-read'."
   (loop for cand in candidates
         if (and (equal cand helm-pattern)
-                (not (member helm-pattern
-                             (or (cdr candidates)
-                                 candidates)))
                 helm-cr-unknow-pattern-flag)
-        collect (cons (concat (propertize
-                               " " 'display
-                               (propertize "[?]" 'face 'helm-ff-prefix))
-                              cand)
-                      cand)
+        collect
+        (cons (concat (propertize " " 'display (propertize
+                                                "[?]" 'face 'helm-ff-prefix))
+                      cand) cand)
         else collect cand))
 
 ;;;###autoload
