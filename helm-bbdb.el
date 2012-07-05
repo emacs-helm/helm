@@ -42,15 +42,22 @@ The format is \"Firstname Lastname\"."
              (concat (aref bbdb-record 0) " " (aref bbdb-record 1))))
           (bbdb-records)))
 
-(defun helm-bbdb-phone-read-string (prompt &rest args)
-  "Return a list of vectors composed of two string for each elm of SEQ.
-See docstring of `bbdb-create-internal' for more info on phone entries."
-  (loop with elm for i in args
-        when (string= elm "") return (remove "" lis)
-        for str = (symbol-name i) collect
-        (vector str (setq elm (read-string (concat prompt " (" str "): "))))
-        into lis
-        finally return (remove "" lis)))
+(defun helm-bbdb-read-phone ()
+  "Return a list of vector address objects.
+See docstring of `bbdb-create-internal' for more info on address entries."
+  (loop with phone-list
+        with loc-list = '("[Exit when no more]" "Home" "Office" "Work" "Mobile" "Other")
+        with loc ; Defer count
+        do (setq loc (helm-comp-read "Phone location: "
+                                     loc-list
+                                     :must-match 'confirm
+                                     :default ""))
+        while (not (string= loc "[Exit when no more]"))
+        for count from 1
+        for phone-number = (read-string (format "Phone number (%s): " loc))
+        collect (vector loc phone-number) into phone-list
+        do (setq loc-list (remove loc loc-list))
+        finally return phone-list))
 
 ;; TODO move this to helm-utils when finish
 (defun helm-read-repeat-string (prompt &optional count)
@@ -67,11 +74,13 @@ If COUNT is non--nil add a number after each prompt."
 (defun helm-bbdb-read-address ()
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
-  (loop with address-list with loc ; Defer count
+  (loop with address-list
+        with loc-list = '("[Exit when no more]" "Home" "Office" "Work" "Other")
+        with loc ; Defer count
         do (setq loc (helm-comp-read
                       (format "Address description[%s]: "
                               (int-to-string count))
-                      '("[Exit when no more]" "Home" "Office" "Work" "Other")
+                      loc-list
                       :must-match 'confirm
                       :default ""))
         while (not (string= loc "[Exit when no more]"))
@@ -83,6 +92,7 @@ See docstring of `bbdb-create-internal' for more info on address entries."
         for zip = (read-string "ZipCode: ")
         for country = (read-string "Country: ")
         collect (vector loc lines city state zip country) into address-list
+        do (setq loc-list (remove loc loc-list))
         finally return address-list))
 
 (defun helm-c-bbdb-create-contact (actions candidate)
@@ -97,8 +107,7 @@ All other actions are removed."
               (read-from-minibuffer "Company: ")
               (helm-read-repeat-string "Email " t)
               (helm-bbdb-read-address)
-              (helm-bbdb-phone-read-string
-               "Phone" 'home 'office 'mobile 'other)
+              (helm-bbdb-read-phone)
               (read-from-minibuffer "Note: ")))))
       actions))
 
