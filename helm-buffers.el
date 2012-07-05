@@ -199,7 +199,7 @@ Should be called after others transformers i.e (boring buffers)."
                                              (- old-len-size len-size))
                                   (make-string it ? ) "")
         do (setq old-len-size (+ len-size (length str-before-size)))
-        for truncbuf = (if (> (length i) 20)
+        for truncbuf = (if (> (length i) helm-buffer-max-length)
                            (concat (substring i 0 helm-buffer-max-length)
                                    "...")
                            (concat i (make-string
