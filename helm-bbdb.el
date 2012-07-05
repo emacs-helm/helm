@@ -47,7 +47,7 @@ See docstring of `bbdb-create-internal' for more info on phone entries."
   (loop with elm for i in args
         when (string= elm "") return (remove "" lis)
         for str = (symbol-name i) collect
-        (vector str (setq elm (read-string (concat prompt "(" str "): "))))
+        (vector str (setq elm (read-string (concat prompt " (" str "): "))))
         into lis
         finally return (remove "" lis)))
 
@@ -65,9 +65,12 @@ See docstring of `bbdb-create-internal' for more info on phone entries."
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
   (loop with address-list with loc ; Defer count
-        do (setq loc (read-string (format "Address description[%s]: "
-                                          (int-to-string count))))
-        while (not (string= loc ""))
+        do (setq loc (helm-comp-read (format "Address description[%s]: "
+                                          (int-to-string count))
+                                     '("[Exit when no more]" "Home" "Office" "Work" "Other")
+                                     :must-match 'confirm
+                                     :default ""))
+        while (not (string= loc "[Exit when no more]"))
         for count from 1
         ;; Create vector
         for lines =  (helm-read-repeat-string "Line" t)
@@ -79,9 +82,9 @@ See docstring of `bbdb-create-internal' for more info on address entries."
         finally return address-list))
 
 (defun helm-c-bbdb-create-contact (actions candidate)
-  "Action transformer that returns only an entry to add the
-current `helm-pattern' as new contact.  All other actions are
-removed."
+  "Action transformer for `helm-c-source-bbdb'.
+Returns only an entry to add the current `helm-pattern' as new contact.
+All other actions are removed."
   (if (string= candidate "*Add to contacts*")
       '(("Add to contacts"
          . (lambda (actions)
