@@ -58,6 +58,23 @@ See docstring of `bbdb-create-internal' for more info on phone entries."
         collect (setq elm (read-string prompt)) into lis
         finally return (remove "" lis)))
 
+(defun helm-bbdb-read-address ()
+  "Return a list of vector address objects.
+See docstring of `bbdb-create-internal' for more info on address entries."
+  (loop with address-list with loc ; Defer count
+        do (setq loc (read-string (format "Address description[%s]: "
+                                          (int-to-string count))))
+        while (not (string= loc ""))
+        for count from 1
+        ;; Create vector
+        for lines =  (helm-read-repeat-string "Line" t)
+        for city = (read-string "City: ")
+        for state = (read-string "State: ")
+        for zip = (read-string "ZipCode: ")
+        for country = (read-string "Country: ")
+        collect (vector loc lines city state zip country) into address-list
+        finally return address-list))
+
 (defun helm-c-bbdb-create-contact (actions candidate)
   "Action transformer that returns only an entry to add the
 current `helm-pattern' as new contact.  All other actions are
@@ -69,8 +86,7 @@ removed."
               (read-from-minibuffer "Name: " helm-c-bbdb-name)
               (read-from-minibuffer "Company: ")
               (helm-read-repeat-string "Email: ")
-              ;[\"location\" (\"line1\" \"line2\" ... ) \"City\" \"State\" \"Zip\" \"Country\"].
-              nil
+              (helm-bbdb-read-address)
               (helm-bbdb-phone-read-string
                "Phone" 'home 'office 'mobile 'other)
               (read-from-minibuffer "Note: ")))))
