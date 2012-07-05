@@ -33,6 +33,22 @@
 (declare-function bbdb-records "ext:bbdb-com"
                   (&optional dont-check-disk already-in-db-buffer))
 
+(defgroup helm-bbdb nil
+  "Commands and function for bbdb."
+  :group 'helm)
+
+(defcustom helm-bbdb-read-phone-locations
+  '("Home" "Office" "Work" "Mobile" "Other")
+  "Choice list for Phone entries locations."
+  :group 'helm-bbdb
+  :type '(repeat (choice string)))
+
+(defcustom helm-bbdb-read-address-locations
+  '("Home" "Office" "Work" "Other")
+  "Choice list for address entries locations."
+  :group 'helm-bbdb
+  :type '(repeat (choice string)))
+
 (defun helm-c-bbdb-candidates ()
   "Return a list of all names in the bbdb database.
 The format is \"Firstname Lastname\"."
@@ -46,7 +62,8 @@ The format is \"Firstname Lastname\"."
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
   (loop with phone-list
-        with loc-list = '("[Exit when no more]" "Home" "Office" "Work" "Mobile" "Other")
+        with loc-list = (cons "[Exit when no more]"
+                              helm-bbdb-read-phone-locations)
         with loc ; Defer count
         do (setq loc (helm-comp-read "Phone location: "
                                      loc-list
@@ -75,7 +92,8 @@ If COUNT is non--nil add a number after each prompt."
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
   (loop with address-list
-        with loc-list = '("[Exit when no more]" "Home" "Office" "Work" "Other")
+        with loc-list = (cons "[Exit when no more]"
+                              helm-bbdb-read-address-locations)
         with loc ; Defer count
         do (setq loc (helm-comp-read
                       (format "Address description[%s]: "
