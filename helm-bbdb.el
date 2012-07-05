@@ -52,10 +52,13 @@ See docstring of `bbdb-create-internal' for more info on phone entries."
         finally return (remove "" lis)))
 
 ;; TODO move this to helm-utils when finish
-(defun helm-read-repeat-string (prompt)
+(defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty."
-  (loop with elm while (not (string= elm ""))
-        collect (setq elm (read-string prompt)) into lis
+  (loop with elm with new-prompt = prompt
+        while (not (string= elm ""))
+        for n from 1
+        do (when count (setq new-prompt (concat prompt (int-to-string n) ": ")))
+        collect (setq elm (read-string new-prompt)) into lis
         finally return (remove "" lis)))
 
 (defun helm-bbdb-read-address ()
