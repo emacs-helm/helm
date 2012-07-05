@@ -32,6 +32,7 @@
 (declare-function bbdb-dwim-net-address "ext:bbdb-com")
 (declare-function bbdb-records "ext:bbdb-com"
                   (&optional dont-check-disk already-in-db-buffer))
+(declare-function bbdb-label-completion-list "ext:bbdb" (field))
 
 (defgroup helm-bbdb nil
   "Commands and function for bbdb."
