@@ -41,19 +41,39 @@ is \"Firstname Lastname\"."
              (concat (aref bbdb-record 0) " " (aref bbdb-record 1))))
           (bbdb-records)))
 
+(defun helm-bbdb-phone-read-string (prompt &rest args)
+  "Return a list of vectors composed of two string for each elm of SEQ.
+See docstring of `bbdb-create-internal' for more info on phone entries."
+  (loop with elm for i in args
+        when (string= elm "") return (remove "" lis)
+        for str = (symbol-name i) collect
+        (vector str (setq elm (read-string (concat prompt "(" str "): "))))
+        into lis
+        finally return (remove "" lis)))
+
+;; TODO move this to helm-utils when finish
+(defun helm-read-repeat-string (prompt)
+  "Prompt as many time PROMPT is not empty."
+  (loop with elm while (not (string= elm ""))
+        collect (setq elm (read-string prompt)) into lis
+        finally return (remove "" lis)))
+
 (defun helm-c-bbdb-create-contact (actions candidate)
   "Action transformer that returns only an entry to add the
 current `helm-pattern' as new contact.  All other actions are
 removed."
   (if (string= candidate "*Add to contacts*")
-      '(("Add to contacts" . (lambda (actions)
-                               (bbdb-create-internal
-                                (read-from-minibuffer "Name: " helm-c-bbdb-name)
-                                (read-from-minibuffer "Company: ")
-                                (read-from-minibuffer "Email: ")
-                                nil
-                                nil
-                                (read-from-minibuffer "Note: ")))))
+      '(("Add to contacts"
+         . (lambda (actions)
+             (bbdb-create-internal
+              (read-from-minibuffer "Name: " helm-c-bbdb-name)
+              (read-from-minibuffer "Company: ")
+              (helm-read-repeat-string "Email: ")
+              ;[\"location\" (\"line1\" \"line2\" ... ) \"City\" \"State\" \"Zip\" \"Country\"].
+              nil
+              (helm-bbdb-phone-read-string
+               "Phone" 'home 'office 'mobile 'other)
+              (read-from-minibuffer "Note: ")))))
       actions))
 
 (defun helm-c-bbdb-get-record (candidate)
