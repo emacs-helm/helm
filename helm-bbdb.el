@@ -19,6 +19,7 @@
 
 (eval-when-compile (require 'cl))
 (require 'helm)
+(require 'helm-mode)
 
 (defvar bbdb-records)
 (defvar bbdb-buffer-name)
@@ -33,8 +34,8 @@
                   (&optional dont-check-disk already-in-db-buffer))
 
 (defun helm-c-bbdb-candidates ()
-  "Return a list of all names in the bbdb database.  The format
-is \"Firstname Lastname\"."
+  "Return a list of all names in the bbdb database.
+The format is \"Firstname Lastname\"."
   (mapcar (lambda (bbdb-record)
             (replace-regexp-in-string
              "\\s-+$" ""
@@ -53,11 +54,13 @@ See docstring of `bbdb-create-internal' for more info on phone entries."
 
 ;; TODO move this to helm-utils when finish
 (defun helm-read-repeat-string (prompt &optional count)
-  "Prompt as many time PROMPT is not empty."
+  "Prompt as many time PROMPT is not empty.
+If COUNT is non--nil add a number after each prompt."
   (loop with elm with new-prompt = prompt
         while (not (string= elm ""))
         for n from 1
-        do (when count (setq new-prompt (concat prompt (int-to-string n) ": ")))
+        do (when count
+             (setq new-prompt (concat prompt (int-to-string n) ": ")))
         collect (setq elm (read-string new-prompt)) into lis
         finally return (remove "" lis)))
 
@@ -65,11 +68,12 @@ See docstring of `bbdb-create-internal' for more info on phone entries."
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
   (loop with address-list with loc ; Defer count
-        do (setq loc (helm-comp-read (format "Address description[%s]: "
-                                          (int-to-string count))
-                                     '("[Exit when no more]" "Home" "Office" "Work" "Other")
-                                     :must-match 'confirm
-                                     :default ""))
+        do (setq loc (helm-comp-read
+                      (format "Address description[%s]: "
+                              (int-to-string count))
+                      '("[Exit when no more]" "Home" "Office" "Work" "Other")
+                      :must-match 'confirm
+                      :default ""))
         while (not (string= loc "[Exit when no more]"))
         for count from 1
         ;; Create vector
@@ -91,7 +95,7 @@ All other actions are removed."
              (bbdb-create-internal
               (read-from-minibuffer "Name: " helm-c-bbdb-name)
               (read-from-minibuffer "Company: ")
-              (helm-read-repeat-string "Email: ")
+              (helm-read-repeat-string "Email " t)
               (helm-bbdb-read-address)
               (helm-bbdb-phone-read-string
                "Phone" 'home 'office 'mobile 'other)
