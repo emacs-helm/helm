@@ -1950,6 +1950,7 @@ Find inside `require' and `declare-function' sexp."
 Where ACTION is a symbol that can be one of:
 'copy, 'rename, 'symlink,'relsymlink, 'hardlink.
 Argument FOLLOW when non--nil specify to follow FILES to destination."
+  (declare (special helm-async-be-async))
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
   (let ((fn     (case action
                   ('copy       'dired-copy-file)
@@ -1964,7 +1965,10 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
                   ('hardlink       dired-keep-marker-hardlink)))
         (dirflag (and (= (length files) 1)
                       (file-directory-p (car files))
-                      (not (file-directory-p candidate)))))
+                      (not (file-directory-p candidate))))
+        ;; When FOLLOW is enabled, disable helm-async.
+        ;; If it is globally disabled use this nil value.
+        (helm-async-be-async (and helm-async-be-async (not follow))))
     (dired-create-files
      fn (symbol-name action) files
      ;; CANDIDATE is the destination.
@@ -1980,6 +1984,7 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
                (expand-file-name candidate)
                (file-name-directory candidate)))
           helm-ff-history)
+    ;; If follow is non--nil we should not be in async mode.
     (when (and follow (not (get-buffer dired-log-buffer)))
       (let ((target (directory-file-name candidate)))
         (unwind-protect
@@ -2129,6 +2134,19 @@ Ask to kill buffers associated with that file, too."
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
           (kill-buffer buf))))))
 
+(defun helm-delete-marked-files (ignore)
+  (let* ((files (helm-marked-candidates))
+         (len (length files)))
+    (if (not (y-or-n-p
+              (format "Delete *%s File(s):\n%s"
+                      len
+                      (mapconcat (lambda (f) (format "- %s\n" f)) files ""))))
+        (message "(No deletions performed)")
+        (dolist (i files)
+          (set-text-properties 0 (length i) nil i)
+          (helm-c-delete-file i helm-ff-signal-error-on-dot-files))
+        (message "%s File(s) deleted" len))))
+
 (defun helm-c-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."
   (let ((marked (helm-marked-candidates))
@@ -2155,19 +2173,6 @@ Ask to kill buffers associated with that file, too."
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
             (find-file-at-point (car marked))))))
-
-(defun helm-delete-marked-files (ignore)
-  (let* ((files (helm-marked-candidates))
-         (len (length files)))
-    (if (not (y-or-n-p
-              (format "Delete *%s File(s):\n%s"
-                      len
-                      (mapconcat (lambda (f) (format "- %s\n" f)) files ""))))
-        (message "(No deletions performed)")
-        (dolist (i files)
-          (set-text-properties 0 (length i) nil i)
-          (helm-c-delete-file i helm-ff-signal-error-on-dot-files))
-        (message "%s File(s) deleted" len))))
 
 (defun helm-c-shadow-boring-files (files)
   "Files matching `helm-c-boring-file-regexp' will be
