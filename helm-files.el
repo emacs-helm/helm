@@ -550,18 +550,26 @@ will not be loaded first time you use this."
       (when (and (= (length cand-list) 1)
                  (string-match "[*]" (helm-c-basename (car cand-list))))
         (setq cand-list (file-expand-wildcards (car cand-list) t)))
-      ;; Be sure output don't go in current buffer
-      ;; but allow sending output to current buffer
-      ;; if a prefix arg have been passed during the
-      ;; `helm-comp-read' call.
-      (setq current-prefix-arg helm-current-prefix-arg)
-      ;; MAP have been set before calling `helm-comp-read'
-      ;; by `helm-current-prefix-arg'.
-      (if (and (or map ; prefix-arg
-                   (and alias-value
-                        ;; If command is an alias be sure it accept
-                        ;; more than one arg i.e $*.
-                        (string-match "\\$\\*$" alias-value)))
+      (if (or (equal helm-current-prefix-arg '(16))
+              (equal map '(16)))
+          ;; Two time C-u from `helm-comp-read' mean print to current-buffer.
+          ;; i.e `eshell-command' will use this value.
+          (setq current-prefix-arg '(16))
+          ;; Else reset the value of `current-prefix-arg'
+          ;; to avoid printing in current-buffer.
+          (setq current-prefix-arg nil))
+      (if (and (or
+                ;; One prefix-arg have been passed before `helm-comp-read'.
+                ;; If map have been set with C-u C-u (value == '(16))
+                ;; ignore it. 
+                (and map (equal map '(4)))
+                ;; One C-u from `helm-comp-read'.
+                (equal helm-current-prefix-arg '(4))
+                ;; An alias that finish with $*
+                (and alias-value
+                     ;; If command is an alias be sure it accept
+                     ;; more than one arg i.e $*.
+                     (string-match "\\$\\*$" alias-value)))
                (> (length cand-list) 1))
 
           ;; Run eshell-command with ALL marked files as arguments.
