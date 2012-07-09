@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-elscreen)
+(require 'helm-grep)
 
 (declare-function ido-make-buffer-list "ido" (default))
 

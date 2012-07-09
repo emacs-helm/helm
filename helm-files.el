@@ -33,6 +33,7 @@
 (require 'dired-aux)
 (require 'dired-x)
 (require 'tramp)
+(require 'ange-ftp)
 (require 'image-dired)
 
 (declare-function find-library-name "find-func.el" (library))
@@ -1307,6 +1308,11 @@ It is same as `directory-files' but always returns the
 dotted filename '.' and '..' on root directories on Windows
 systems."
   (setq directory (expand-file-name directory))
+  ;; Always reread ftp directory, otherwise we will never be aware
+  ;; of new or deleted files.
+  (when (eq 'ftp (file-remote-p directory 'method))
+    (setq ange-ftp-ls-cache-file nil)
+    (remhash directory ange-ftp-files-hashtable))
   (let ((ls (directory-files directory full))
         dot dot2 lsdir)
     (if (or
