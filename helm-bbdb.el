@@ -54,7 +54,7 @@ See docstring of `bbdb-create-internal' for more info on address entries."
         with loc-list = (cons "[Exit when no more]"
                               (bbdb-label-completion-list "phones"))
         with loc ; Defer count
-        do (setq loc (helm-comp-read "Phone location: "
+        do (setq loc (helm-comp-read (format "Phone location[%s]: " count)
                                      loc-list
                                      :must-match 'confirm
                                      :default ""))
