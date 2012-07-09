@@ -538,7 +538,7 @@ will not be loaded first time you use this."
                            when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
                            collect (propertize a 'help-echo (car c)) into ls
                            finally return (sort ls 'string<))
-                     :buffer "*esh command on file*"
+                     :buffer "*helm eshell on file*"
                      :name "Eshell command"
                      :keymap helm-esh-on-file-map
                      :mode-line
