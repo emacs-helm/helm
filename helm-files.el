@@ -1310,7 +1310,9 @@ systems."
   (setq directory (expand-file-name directory))
   ;; Always reread ftp directory, otherwise we will never be aware
   ;; of new or deleted files.
-  (when (eq 'ftp (file-remote-p directory 'method))
+  (when (and (eq 'ftp (file-remote-p directory 'method))
+             ;; Don't try to remhash at first connection.
+             (gethash directory ange-ftp-files-hashtable))
     (setq ange-ftp-ls-cache-file nil)
     (remhash directory ange-ftp-files-hashtable))
   (let ((ls (directory-files directory full))
