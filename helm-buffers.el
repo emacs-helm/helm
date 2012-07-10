@@ -42,7 +42,7 @@ filtered from the list of candidates if the
                                          emacs-lisp-mode
                                          text-mode
                                          org-mode)
-  "List of prefered mode to open new buffers with."
+  "List of preferred mode to open new buffers with."
   :type '(repeat (choice function))
   :group 'helm-buffers)
 

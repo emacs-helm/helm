@@ -147,7 +147,7 @@
     ["Top externals process" helm-top t]
     ["Emacs internals process" helm-list-emacs-process t])
    "----"
-   ["Prefered Options" helm-configuration t])
+   ["Preferred Options" helm-configuration t])
  "Spell Checking")
 
 (easy-menu-add-item nil '("Tools") '("----") "Spell Checking")
@@ -977,7 +977,7 @@ Preconfigured `helm' to hardlink files from dired.
 
 (autoload 'helm-for-files "helm-files" "\
 Preconfigured `helm' for opening files.
-Run all sources defined in `helm-for-files-prefered-list'.
+Run all sources defined in `helm-for-files-preferred-list'.
 
 \(fn)" t nil)
 

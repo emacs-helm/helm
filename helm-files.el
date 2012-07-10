@@ -57,7 +57,7 @@
   :group 'helm-files
   :type  '(repeat (choice regexp)))
 
-(defcustom helm-for-files-prefered-list
+(defcustom helm-for-files-preferred-list
   '(helm-c-source-ffap-line
     helm-c-source-ffap-guesser
     helm-c-source-buffers-list
@@ -66,7 +66,7 @@
     helm-c-source-file-cache
     helm-c-source-files-in-current-dir
     helm-c-source-locate)
-  "Your prefered sources to find files."
+  "Your preferred sources to find files."
   :type 'list
   :group 'helm-files)
 
@@ -1812,7 +1812,7 @@ Use it for non--interactive calls of `helm-find-files'."
           (remp file-at-pt) ; A remote file
           (file-p           ; a regular file
            ;; Avoid ffap annoyances, don't use `ffap-alist'.
-           (let (ffap-alist) (ffap-file-at-point))) 
+           (let (ffap-alist) (ffap-file-at-point)))
           (t (and (not (string= file-at-pt "")) ; possibly an url or email.
                   file-at-pt)))))
 
@@ -2559,9 +2559,9 @@ This is the starting point for nearly all actions you can do on files."
 ;;;###autoload
 (defun helm-for-files ()
   "Preconfigured `helm' for opening files.
-Run all sources defined in `helm-for-files-prefered-list'."
+Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
-  (helm-other-buffer helm-for-files-prefered-list "*helm for files*"))
+  (helm-other-buffer helm-for-files-preferred-list "*helm for files*"))
 
 ;;;###autoload
 (defun helm-recentf ()
