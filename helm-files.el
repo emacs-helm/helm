@@ -1308,13 +1308,6 @@ It is same as `directory-files' but always returns the
 dotted filename '.' and '..' on root directories on Windows
 systems."
   (setq directory (expand-file-name directory))
-  ;; Always reread ftp directory, otherwise we will never be aware
-  ;; of new or deleted files.
-  (when (and (eq 'ftp (file-remote-p directory 'method))
-             ;; Don't try to remhash at first connection.
-             (gethash directory ange-ftp-files-hashtable))
-    (setq ange-ftp-ls-cache-file nil)
-    (remhash directory ange-ftp-files-hashtable))
   (let ((ls (directory-files directory full))
         dot dot2 lsdir)
     (if (or
