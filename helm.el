@@ -55,6 +55,8 @@
     (define-key map (kbd "C-e")        'helm-select-2nd-action-or-end-of-line)
     (define-key map (kbd "C-j")        'helm-select-3rd-action)
     (define-key map (kbd "C-o")        'helm-next-source)
+    (define-key map (kbd "C-l")        'helm-recenter-top-bottom-other-window)
+    (define-key map (kbd "M-C-l")      'helm-reposition-window-other-window)
     (define-key map (kbd "C-M-v")      'helm-scroll-other-window)
     (define-key map (kbd "M-<next>")   'helm-scroll-other-window)
     (define-key map (kbd "C-M-y")      'helm-scroll-other-window-down)
@@ -3052,21 +3054,36 @@ second argument of `display-buffer'."
     (display-buffer buf not-this-window)))
 
 ;; scroll-other-window(-down)? for persistent-action
-(defun helm-scroll-other-window-base (command)
+(defun helm-other-window-base (command &optional scroll-amount)
+  (setq scroll-amount (unless (eq scroll-amount 'noscroll)
+                        helm-scroll-amount))
   (with-selected-window (helm-persistent-action-display-window)
-    (funcall command helm-scroll-amount)))
+    (funcall command scroll-amount)))
 
 ;;;###autoload
 (defun helm-scroll-other-window ()
   "Scroll other window (not *Helm* window) upward."
   (interactive)
-  (helm-scroll-other-window-base 'scroll-up))
+  (helm-other-window-base 'scroll-up))
 
 ;;;###autoload
 (defun helm-scroll-other-window-down ()
   "Scroll other window (not *Helm* window) downward."
   (interactive)
-  (helm-scroll-other-window-base 'scroll-down))
+  (helm-other-window-base 'scroll-down))
+
+;;;###autoload
+(defun helm-recenter-top-bottom-other-window ()
+  "`recenter-top-bottom' in other window (not *Helm* window)."
+  (interactive)
+  (helm-other-window-base 'recenter-top-bottom 'noscroll))
+
+;;;###autoload
+(defun helm-reposition-window-other-window ()
+  "`helm-reposition-window' in other window (not *Helm* window)."
+  (interactive)
+  (helm-other-window-base 'reposition-window 'noscroll))
+
 
 
 ;; Utility: Visible Mark
