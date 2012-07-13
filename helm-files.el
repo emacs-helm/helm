@@ -1977,7 +1977,8 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
                       (not (file-directory-p candidate))))
         ;; When FOLLOW is enabled, disable helm-async.
         ;; If it is globally disabled use this nil value.
-        (helm-async-be-async (and helm-async-be-async (not follow))))
+        (helm-async-be-async (and (boundp 'helm-async-be-async)
+                                  helm-async-be-async) (not follow)))
     (dired-create-files
      fn (symbol-name action) files
      ;; CANDIDATE is the destination.
