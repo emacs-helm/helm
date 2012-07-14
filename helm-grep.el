@@ -143,7 +143,9 @@ See `helm-c-grep-default-command' for format specs.")
   (if helm-c-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
       (loop for i in candidates append
-            (cond ( ;; Candidate is a directory and we use recursion.
+            (cond ((string-match "^git" helm-c-grep-default-command)
+                   (list i))
+                  ( ;; Candidate is a directory and we use recursion.
                    (and (file-directory-p i)
                         (helm-c-grep-recurse-p))
                    (list (expand-file-name i)))
@@ -164,7 +166,9 @@ See `helm-c-grep-default-command' for format specs.")
                   ;; Else should be one or more file.
                   (t (list i))) into all-files
             finally return
-            (mapconcat 'shell-quote-argument all-files " "))))
+            (if (string-match "^git" helm-c-grep-default-command)
+                (mapconcat 'identity all-files " ")
+                (mapconcat 'shell-quote-argument all-files " ")))))
 
 (defun helm-c-grep-recurse-p ()
   "Check if `helm-do-grep-1' have switched to recursive."
@@ -524,11 +528,19 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
   (when (string-match "^\\(.*\\):\\([0-9]+\\):\\(.*\\)" line)
     (loop for n from 1 to 3 collect (match-string n line))))
 
+;; Internal
+(defvar helm-c-grep-default-directory-fn nil
+  "A function that should return a directory to expand candidate to.
+It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defun helm-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `helm-do-grep'."
-  (loop for i in candidates
+  (loop with root = (and helm-c-grep-default-directory-fn
+                         (funcall helm-c-grep-default-directory-fn))
+        for i in candidates
         for split  = (and i (helm-c-grep-split-line i))
-        for fname  = (car split)
+        for fname  = (if root
+                         (expand-file-name (car split) root)
+                         (car split))
         for lineno = (nth 1 split)
         for str    = (nth 2 split)
         when (and fname lineno str)
