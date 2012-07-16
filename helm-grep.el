@@ -538,9 +538,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          (funcall helm-c-grep-default-directory-fn))
         for i in candidates
         for split  = (and i (helm-c-grep-split-line i))
-        for fname  = (if root
+        for fname  = (if (and root split)
                          (expand-file-name (car split) root)
-                         (car split))
+                         (car-safe split))
         for lineno = (nth 1 split)
         for str    = (nth 2 split)
         when (and fname lineno str)
