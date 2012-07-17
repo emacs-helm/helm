@@ -36,6 +36,12 @@ the trap of backward compatibility.
     (require 'helm-config)
     ```
 
+Alternatively, you can have a quick try to helm by launching from the helm directory:
+
+`./emacs-helm.sh`
+
+Note that this will not work on Windows systems.
+
 ### Install from Emacs packaging system
 
 Helm is now available on Melpa at `http://melpa.milkbox.net/`
@@ -93,6 +99,9 @@ development of Helm.
 
 Bug reports and suggestions for improvements are always
 welcome. GitHub pull requests are even better! :-)
+
+NOTE: When trying if something is working or not, be sure to start helm from `Emacs -Q` or even better
+Start it from your helm directory with `./emacs-helm.sh`.
 
 ### Send Bug Report from Emacs
 
