@@ -510,6 +510,11 @@ in su/sudo methods).
 -   NOTE: Windows users need grep version `2.5.4` of Gnuwin32 on windoze. 
 This version should accept the `--exclude-dir` option.
 
+-   NOTE: Apple OS X users also need a version of grep that accepts `--exclude-dir`
+
+    This is installable from homebrew with:
+
+         brew install https://raw.github.com/Homebrew/homebrew-dupes/master/grep.rb
 
 
 
@@ -1096,6 +1101,6 @@ You can have infos about helm on Github.
 You can ask on the helm mailing-list by subscribing at:
  <https://groups.google.com/group/emacs-helm?hl=en>
 
-Or at gmane: gmane.emacs.helm
+Or at gmane: [gmane.emacs.helm.user](http://dir.gmane.org/gmane.emacs.helm.user)
 
 !REF
