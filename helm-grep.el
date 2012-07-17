@@ -209,7 +209,8 @@ See `helm-c-grep-default-command' for format specs.")
         (insert (concat ">>> " cmd-line "\n\n"))))
     (prog1 ; Start grep process.
         (let ((default-directory helm-ff-default-directory))
-          (start-file-process-shell-command "grep-process" (current-buffer) cmd-line))
+          (start-file-process-shell-command
+           "grep-process" helm-buffer cmd-line))
       (helm-log "Start Grep process")
       (setq mode-line-format
           '(" " mode-line-buffer-identification " "
@@ -701,7 +702,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                            helm-pattern
                            fnargs)))
     (when helm-c-pdfgrep-debug-command-line
-      (with-current-buffer (get-buffer-create "*any pdfgrep debug*")
+      (with-current-buffer (get-buffer-create "*helm pdfgrep debug*")
         (goto-char (point-max))
         (insert (concat ">>> " cmd-line "\n\n"))))
     (setq mode-line-format
@@ -711,8 +712,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                     'face '((:foreground "red"))))))
     (prog1
         (let ((default-directory helm-ff-default-directory))
-          (start-file-process-shell-command "pdfgrep-process"
-                                            (current-buffer) cmd-line))
+          (start-file-process-shell-command
+           "pdfgrep-process" helm-buffer cmd-line))
       (message nil)
       (set-process-sentinel
        (get-process "pdfgrep-process")
