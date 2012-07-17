@@ -115,7 +115,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
          (history (loop with hist
                         for i in extended-command-history
                         for com = (intern i)
-                        when (fboundp com)
+                        when (commandp com)
                         collect i into hist finally return hist)))
     (flet ((pers-help (candidate)
              (let ((hbuf (get-buffer (help-buffer))))
