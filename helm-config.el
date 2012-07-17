@@ -158,6 +158,11 @@
   (interactive)
   (customize-group "helm"))
 
+
+;;; We don't want helm source variables to be saved across Emacs sessions.
+(eval-after-load "session"
+  '(push "\\`helm-c-source" session-globals-exclude))
+
 
 ;;; Start of automatically extracted autoloads.
 
