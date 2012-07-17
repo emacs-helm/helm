@@ -166,21 +166,22 @@ See also `helm-locate'."
 
 (defun helm-c-locate-init ()
   "Initialize async locate process for `helm-c-source-locate'."
-  (setq mode-line-format
-        '(" " mode-line-buffer-identification " "
-          (line-number-mode "%l") " "
-          (:eval (propertize "(Locate Process Running) "
-                  'face '((:foreground "red"))))))
-  (prog1
-      (start-process-shell-command "locate-process" nil
-                                   (format helm-c-locate-command
-                                           helm-pattern))
-    (set-process-sentinel (get-process "locate-process")
-                          #'(lambda (process event)
-                              (when (string= event "finished\n")
-                                (with-helm-window
-                                  (force-mode-line-update nil)
-                                  (helm-update-move-first-line)))))))
+  (let (process-connection-type)
+    (setq mode-line-format
+          '(" " mode-line-buffer-identification " "
+            (line-number-mode "%l") " "
+            (:eval (propertize "(Locate Process Running) "
+                    'face '((:foreground "red"))))))
+    (prog1
+        (start-process-shell-command
+         "locate-process" helm-buffer
+         (format helm-c-locate-command helm-pattern))
+      (set-process-sentinel (get-process "locate-process")
+                            #'(lambda (process event)
+                                (when (string= event "finished\n")
+                                  (with-helm-window
+                                    (force-mode-line-update nil)
+                                    (helm-update-move-first-line))))))))
 
 (defvar helm-c-source-locate
   `((name . "Locate")

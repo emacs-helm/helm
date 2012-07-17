@@ -700,7 +700,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                         only-files)))
          (cmd-line (format helm-c-pdfgrep-default-command
                            helm-pattern
-                           fnargs)))
+                           fnargs))
+         process-connection-type)
     (when helm-c-pdfgrep-debug-command-line
       (with-current-buffer (get-buffer-create "*helm pdfgrep debug*")
         (goto-char (point-max))
