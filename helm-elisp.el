@@ -538,16 +538,14 @@ STRING is string to match."
     (type . timer)))
 
 (defun helm-c-timer-real-to-display (timer)
-  (destructuring-bind (triggered t1 t2 t3 repeat-delay func args idle-delay)
-      (append timer nil)                ;use `append' to convert vector->list
-    (format "%s repeat=%5S %s(%s)"
-            (let ((time (list t1 t2 t3)))
-              (if idle-delay
-                  (format-time-string "idle-for=%5s" time)
-                  (format-time-string "%m/%d %T" time)))
-            repeat-delay
-            func
-            (mapconcat 'prin1-to-string args " "))))
+  (format "%s repeat=%5S %s(%s)"
+          (let ((time (timer--time timer)))
+            (if (timer--idle-delay timer)
+                (format-time-string "idle-for=%5s" time)
+              (format-time-string "%m/%d %T" time)))
+          (timer--repeat-delay timer)
+          (timer--function timer)
+          (mapconcat 'prin1-to-string (timer--args timer) " ")))
 
 ;;;###autoload
 (defun helm-timers ()
