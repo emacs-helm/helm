@@ -2410,6 +2410,25 @@ Else return ACTIONS unmodified."
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
+;;; session.el files
+;;
+;;  sesion (http://emacs-session.sourceforge.net/) is an alternative to
+;;  recentf that saves recent file history and much more.
+(defvar helm-c-source-session
+  `((name . "Session")
+    (candidates . (lambda ()
+                    (delete-if #'(lambda (f)
+                                   (and (not (string-match tramp-file-name-regexp f))
+                                        (not (file-exists-p f))))
+                               (mapcar 'car session-file-alist))))
+    (match helm-c-match-on-file-name
+           helm-c-match-on-directory-name)
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (type . file))
+  "File list from emacs-session.")
+
 
 ;;; Files in current dir
 ;;
