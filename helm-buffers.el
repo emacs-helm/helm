@@ -55,7 +55,7 @@ filtered from the list of candidates if the
 ;;
 ;;
 (defface helm-buffer-saved-out
-    '((t (:foreground "red")))
+    '((t (:foreground "red" :background "black")))
   "Face used for buffer files modified outside of emacs."
   :group 'helm-buffers)
 
@@ -65,7 +65,8 @@ filtered from the list of candidates if the
   :group 'helm-buffers)
 
 (defface helm-buffer-size
-    '((t (:foreground "SlateGray")))
+  '((((background dark)) :foreground "RosyBrown")
+    (((background light)) :foreground "SlateGray"))
   "Face used for buffer size."
   :group 'helm-buffers)
 
