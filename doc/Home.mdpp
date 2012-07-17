@@ -510,6 +510,11 @@ in su/sudo methods).
 -   NOTE: Windows users need grep version `2.5.4` of Gnuwin32 on windoze. 
 This version should accept the `--exclude-dir` option.
 
+-   NOTE: Apple OS X users also need a version of grep that accepts `--exclude-dir`
+
+    This is installable from homebrew with:
+
+         brew install https://raw.github.com/Homebrew/homebrew-dupes/master/grep.rb
 
 
 
