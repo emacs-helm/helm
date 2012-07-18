@@ -91,7 +91,9 @@ Only math* symbols are collected."
                              n ":"
                              (make-string
                               diff ? )))
-                    (ucs-insert v)
+                    (if (fboundp 'ucs-insert)
+                        (ucs-insert v)
+                        (insert-char v))
                     (insert "\n")))))
 
 (defun helm-c-ucs-forward-char (candidate)
