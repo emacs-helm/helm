@@ -282,6 +282,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                      collection test sort alistp)))
                          (setq helm-cr-unknow-pattern-flag nil)
                          (unless (or (eq must-match t) (string= helm-pattern "")
+                                     (assoc helm-pattern cands)
+                                     (assoc (intern helm-pattern) cands)
                                      (member helm-pattern cands))
                            (setq cands (append (list helm-pattern) cands))
                            (setq helm-cr-unknow-pattern-flag t))
