@@ -82,41 +82,51 @@ SORT-FN is a predicate to sort COLLECTION.
 
 ALISTP when non--nil will not use `all-completions' to collect
 candidates because it doesn't handle alists correctly for helm.
-i.e In `all-completions' the keys \(cars of elements\)
-are the possible completions. In helm we want to use the cdr instead
-like \(display . real\).
+i.e In `all-completions' the car of each pair is used as value.
+In helm we want to use the cdr instead like \(display . real\),
+so we return the alist as it is with no transformation by all-completions.
 
 e.g
 
 \(setq A '((a . 1) (b . 2) (c . 3)))
 ==>((a . 1) (b . 2) (c . 3))
 \(helm-comp-read \"test: \" A :alistp nil
-                                  :exec-when-only-one t
-                                  :initial-input \"a\")
-==>\"a\"
+                              :exec-when-only-one t
+                              :initial-input \"a\")
+==>\"a\" Which is not what we expect.
+
 \(helm-comp-read \"test: \" A :alistp t
-                                  :exec-when-only-one t
-                                  :initial-input \"1\")
+                              :exec-when-only-one t
+                              :initial-input \"1\")
 ==>\"1\"
 
 See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (let ((cands
-         (cond ((and (eq collection obarray) test)
+         (cond ((eq collection obarray)
                 (all-completions "" collection test))
                ((and (vectorp collection) test)
                 (loop for i across collection when (funcall test i) collect i))
                ((vectorp collection)
                 (loop for i across collection collect i))
+               ;; When collection is a symbol, most of the time
+               ;; it should be a symbol used as a minibuffer-history.
+               ;; The value of this symbol in this case return a list
+               ;; of string which maybe are converted later as symbol
+               ;; in special cases.
+               ;; we treat here commandp as a special case as it return t
+               ;; also with a string unless its last arg is provided.
+               ((and (symbolp collection) (boundp collection))
+                (let ((predicate `(lambda (elm)
+                                    (if (eq (quote ,test) 'commandp)
+                                        (commandp (intern elm)) 
+                                        (funcall (quote ,test) elm)))))
+                  (all-completions "" (symbol-value collection) predicate)))
                ((and alistp test)
                 (loop for i in collection when (funcall test i) collect i))
-               ((and (symbolp collection) (boundp collection))
-                (symbol-value collection))
                (alistp collection)
-               ((and collection test)
-                (all-completions "" collection test))
-               (t (all-completions "" collection)))))
+               (t (all-completions "" collection test)))))
     (if sort-fn (sort cands sort-fn) cands)))
 
 (defun helm-cr-default-transformer (candidates source)
@@ -247,7 +257,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        (candidates
                         . (lambda ()
                             (let ((all (helm-comp-read-get-candidates
-                                        history nil nil ,alistp)))
+                                        history test nil ,alistp)))
                               (delete
                                ""
                                (helm-fast-remove-dups
