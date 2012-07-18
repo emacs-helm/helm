@@ -117,12 +117,14 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ;; in special cases.
                ;; we treat here commandp as a special case as it return t
                ;; also with a string unless its last arg is provided.
-               ((and (symbolp collection) (boundp collection))
+               ((and (symbolp collection) (boundp collection) test)
                 (let ((predicate `(lambda (elm)
                                     (if (eq (quote ,test) 'commandp)
                                         (commandp (intern elm)) 
                                         (funcall (quote ,test) elm)))))
                   (all-completions "" (symbol-value collection) predicate)))
+               ((and (symbolp collection) (boundp collection))
+                (all-completions "" (symbol-value collection)))
                ((and alistp test)
                 (loop for i in collection when (funcall test i) collect i))
                (alistp collection)
@@ -326,18 +328,24 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                (if volatile
                                    (append src '((volatile)))
                                    src))))
-           (helm-execute-action-at-once-if-one exec-when-only-one))
+           (helm-execute-action-at-once-if-one exec-when-only-one)
+           result)
+      (setq result (helm
+                    :sources src-list
+                    :input initial-input
+                    :default default
+                    :preselect preselect
+                    :prompt prompt
+                    :resume 'noresume
+                    :keymap helm-map
+                    :history (and (symbolp input-history) input-history)
+                    :buffer buffer))
+      ;; Avoid adding an incomplete input to history.
+      (when (and result history)
+        (setcar (if (symbolp history) (eval history) history)
+                result))
       (or
-       (helm
-        :sources src-list
-        :input initial-input
-        :default default
-        :preselect preselect
-        :prompt prompt
-        :resume 'noresume
-        :keymap helm-map
-        :history (and (symbolp input-history) input-history)
-        :buffer buffer)
+       result
        (when (and (eq helm-exit-status 0)
                   (eq must-match 'confirm))
          ;; Return empty string only if it is the DEFAULT
