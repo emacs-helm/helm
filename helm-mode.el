@@ -117,10 +117,14 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ;; in special cases.
                ;; we treat here commandp as a special case as it return t
                ;; also with a string unless its last arg is provided.
+               ;; Also, the history collections generally collect their
+               ;; elements as string, so intern them to call predicate.
                ((and (symbolp collection) (boundp collection) test)
                 (let ((predicate `(lambda (elm)
-                                    (if (eq (quote ,test) 'commandp)
-                                        (commandp (intern elm)) 
+                                    (if (or (eq (quote ,test) 'commandp)
+                                            (eq (quote ,test) 'functionp)
+                                            (eq (quote ,test) 'symbolp))
+                                        (funcall (quote ,test) (intern elm))
                                         (funcall (quote ,test) elm)))))
                   (all-completions "" (symbol-value collection) predicate)))
                ((and (symbolp collection) (boundp collection))
