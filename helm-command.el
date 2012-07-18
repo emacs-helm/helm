@@ -109,8 +109,6 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
   (let* (in-help
          help-cand
-         special-display-buffer-names
-         special-display-regexps
          helm-persistent-action-use-special-display
          (history (loop with hist
                         for i in extended-command-history
@@ -118,7 +116,9 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         when (commandp com)
                         collect i into hist finally return hist)))
     (flet ((pers-help (candidate)
-             (let ((hbuf (get-buffer (help-buffer))))
+             (let ((hbuf (get-buffer (help-buffer)))
+                   special-display-buffer-names
+                   special-display-regexps)
                (if (and in-help (string= candidate help-cand))
                    (progn
                      ;; When M-x is started from a help buffer,
