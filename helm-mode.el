@@ -158,6 +158,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                (requires-pattern 0)
                                (history nil)
                                input-history
+                               (del-input t)
                                (persistent-action nil)
                                (persistent-help "DoNothing")
                                (mode-line helm-mode-line-string)
@@ -204,6 +205,9 @@ Keys description:
 - INPUT-HISTORY: A symbol. the minibuffer input history will be
   stored there, if nil or not provided, `minibuffer-history'
   will be used instead.
+
+- DEL-INPUT: Boolean, when non--nil (default) remove the partial
+  minibuffer input from HISTORY is present.
 
 - PERSISTENT-ACTION: A function called with one arg i.e candidate.
 
@@ -345,7 +349,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :history (and (symbolp input-history) input-history)
                     :buffer buffer))
       ;; Avoid adding an incomplete input to history.
-      (when (and result history)
+      (when (and result history del-input)
         (setcar (if (symbolp history) (eval history) history)
                 result))
       (or

@@ -143,6 +143,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                        :persistent-action 'pers-help
                        :persistent-help "Describe this command"
                        :history history
+                       :del-input nil
                        :must-match t
                        :candidates-in-buffer t
                        :fc-transformer 'helm-M-x-transformer))
