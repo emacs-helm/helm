@@ -93,7 +93,9 @@ Only math* symbols are collected."
                               diff ? )))
                     (if (fboundp 'ucs-insert)
                         (ucs-insert v)
-                        (insert-char v))
+                        ;; call `insert-char' with nil nil
+                        ;; to shutup byte compiler in 24.1.
+                        (insert-char v nil nil))
                     (insert "\n")))))
 
 (defun helm-c-ucs-forward-char (candidate)
