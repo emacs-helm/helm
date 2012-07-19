@@ -131,6 +131,42 @@ buffer as BUFFER."
           (length buffer-undo-list)
           (buffer-modified-tick)))))
 
+;; Functions not available in versions < emacs-24.
+;; Allow using helm-async.el in Emacs-23 among other things.
+(unless (and (fboundp 'file-equal-p)
+             (fboundp 'file-in-directory-p))
+  (defun file-equal-p (file1 file2)
+    "Return non-nil if files FILE1 and FILE2 name the same file.
+If FILE1 or FILE2 does not exist, the return value is unspecified."
+    (let ((handler (or (find-file-name-handler file1 'file-equal-p)
+                       (find-file-name-handler file2 'file-equal-p))))
+      (if handler
+          (funcall handler 'file-equal-p file1 file2)
+          (let (f1-attr f2-attr)
+            (and (setq f1-attr (file-attributes (file-truename file1)))
+                 (setq f2-attr (file-attributes (file-truename file2)))
+                 (equal f1-attr f2-attr))))))
+  
+  ;; This is the original loop version, more readable, not the one of 24.1+.
+  (defun file-in-directory-p (file dir)
+    "Return non-nil if FILE is in DIR or a subdirectory of DIR.
+A directory is considered to be \"in\" itself.
+Return nil if DIR is not an existing directory."
+    (let ((handler (or (find-file-name-handler file 'file-in-directory-p)
+                       (find-file-name-handler dir 'file-in-directory-p))))
+      (if handler
+          (funcall handler 'file-in-directory-p file dir)
+          (when (file-directory-p dir)
+            (loop with f1 = (file-truename file)
+                  with f2 = (file-truename dir)
+                  with ls1 = (or (split-string f1 "/" t) (list "/"))
+                  with ls2 = (or (split-string f2 "/" t) (list "/"))
+                  for p = (string-match "^/" f1)
+                  for i in ls1 for j in ls2
+                  when (string= i j)
+                  concat (if p (concat "/" i) (concat i "/")) into root
+                  finally return (file-equal-p (file-truename root) f2)))))))
+
 
 ;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
