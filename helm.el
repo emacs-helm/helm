@@ -1423,8 +1423,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
       ;; This map will be used as a `minibuffer-local-map'.
       ;; Maybe it will be overriden when changing source
       ;; by `helm-maybe-update-keymap'.
-      (set (make-local-variable 'helm-map)
-           (or src-keymap any-keymap helm-map))
+      ;; Note that helm-map have been made buffer-local
+      ;; in `helm-create-helm-buffer'.
+      (setq helm-map (or src-keymap any-keymap helm-map))
       (helm-log-eval (helm-approximate-candidate-number)
                      helm-execute-action-at-once-if-one
                      helm-quit-if-no-candidate)
@@ -1462,7 +1463,7 @@ if some when multiples sources are present."
     (set (make-local-variable 'inhibit-read-only) t)
     (buffer-disable-undo)
     (erase-buffer)
-    (set (make-local-variable 'inhibit-read-only) t)
+    (set (make-local-variable 'helm-map) helm-map)
     (set (make-local-variable 'helm-last-sources-local) helm-sources)
     (set (make-local-variable 'helm-follow-mode) nil)
     (set (make-local-variable 'helm-display-function) helm-display-function)

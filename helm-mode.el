@@ -259,10 +259,10 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                (define-key map (kbd "RET")
                                  'helm-confirm-and-exit-minibuffer)
                                map)))
-           (helm-map (if must-match-map
-                         (make-composed-keymap
-                          must-match-map (or keymap helm-map))
-                         (or keymap helm-map)))
+           (loc-map (if must-match-map
+                        (make-composed-keymap
+                         must-match-map (or keymap helm-map))
+                        (or keymap helm-map)))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
@@ -345,7 +345,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :preselect preselect
                     :prompt prompt
                     :resume 'noresume
-                    :keymap helm-map
+                    :keymap loc-map
                     :history (and (symbolp input-history) input-history)
                     :buffer buffer))
       ;; Avoid adding an incomplete input to history.
