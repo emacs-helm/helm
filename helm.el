@@ -102,6 +102,13 @@
   "Open helm."
   :prefix "helm-" :group 'convenience)
 
+(defcustom helm-completion-window-scroll-margin 5
+  " `scroll-margin' to use for helm completion window.
+
+Which see.  Set to 0 to disable."
+  :group 'helm
+  :type  'integer)
+
 ;;; Faces
 ;;
 ;;
@@ -1468,6 +1475,7 @@ if some when multiples sources are present."
     (set (make-local-variable 'helm-follow-mode) nil)
     (set (make-local-variable 'helm-display-function) helm-display-function)
     (set (make-local-variable 'helm-selection-point) nil)
+    (set (make-local-variable 'scroll-margin) helm-completion-window-scroll-margin)
     (helm-initialize-persistent-action)
     (helm-log-eval helm-display-function helm-let-variables)
     (loop for (var . val) in helm-let-variables
