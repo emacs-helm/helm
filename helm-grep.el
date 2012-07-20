@@ -205,12 +205,12 @@ See `helm-c-grep-default-command' for format specs.")
                                          (cons ?f fnargs)))))
          process-connection-type)       ; Use pipe.
     ;; Start grep process.
-    (prog1
+    (helm-log "Starting Grep process in directory `%s'" default-directory)
+    (helm-log "Command line used was:\n\n%s"
+                (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
+    (prog1 ; This function should return the process first.
         (start-file-process-shell-command
          "grep" helm-buffer cmd-line)
-      (helm-log "Started Grep process in directory `%s'" default-directory)
-      (helm-log "Command line used was:\n\n%s"
-                (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
       ;; Notify process status in mode-line.
       (setq mode-line-format
           '(" " mode-line-buffer-identification " "
