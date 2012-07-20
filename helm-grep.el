@@ -121,16 +121,9 @@ Where:
 See `helm-c-grep-default-command' for format specs.")
 
 (defvar helm-c-default-zgrep-command "zgrep -niH -e %p %f")
-
 (defvar helm-c-rzgrep-cache (make-hash-table :test 'equal))
-
 (defvar helm-c-grep-default-function 'helm-c-grep-init)
-
-(defvar helm-c-grep-debug-command-line nil
-  "Turn on helm grep command-line debugging when non--nil.")
-
 (defvar helm-c-zgrep-recurse-flag nil)
-
 (defvar helm-c-grep-history nil)
 
 (defun helm-c-grep-prepare-candidates (candidates)
@@ -178,57 +171,66 @@ See `helm-c-grep-default-command' for format specs.")
 
 (defun helm-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (let* ((fnargs        (helm-c-grep-prepare-candidates
-                         (if (file-remote-p helm-ff-default-directory)
-                             (mapcar #'(lambda (x)
-                                         (file-remote-p x 'localname))
-                                     only-files)
-                             only-files)))
-         (ignored-files (mapconcat
-                         #'(lambda (x)
-                             (concat "--exclude=" (shell-quote-argument x)))
-                         grep-find-ignored-files " "))
-         (ignored-dirs  (mapconcat
-                         ;; Need grep version >=2.5.4 of Gnuwin32 on windoze.
-                         #'(lambda (x)
-                             (concat "--exclude-dir=" (shell-quote-argument x)))
-                         grep-find-ignored-directories " "))
-         (exclude       (if (helm-c-grep-recurse-p)
-                            (concat (or include ignored-files) " " ignored-dirs)
-                            ignored-files))
-         (cmd-line      (format-spec
-                         helm-c-grep-default-command
-                         (delq nil
-                               (list (unless zgrep (cons ?e exclude))
-                                     (cons ?p (shell-quote-argument helm-pattern))
-                                     (cons ?f fnargs)))))
-         process-connection-type) ; Use pipe.
-    (when (or helm-c-grep-debug-command-line debug-on-error)
-      (with-current-buffer (get-buffer-create "*helm grep debug*")
-        (goto-char (point-max))
-        (insert (concat ">>> " cmd-line "\n\n"))))
-    (prog1 ; Start grep process.
-        (let ((default-directory helm-ff-default-directory))
-          (start-file-process-shell-command
-           "grep-process" helm-buffer cmd-line))
-      (helm-log "Start Grep process")
+  (let* ((default-directory (expand-file-name helm-ff-default-directory))
+         (fnargs            (helm-c-grep-prepare-candidates
+                             (if (file-remote-p default-directory)
+                                 ;; Grep don't understand tramp filenames
+                                 ;; use the local name.
+                                 (mapcar #'(lambda (x)
+                                             (file-remote-p x 'localname))
+                                         only-files)
+                                 only-files)))
+         (ignored-files     (mapconcat
+                             #'(lambda (x)
+                                 (concat "--exclude="
+                                         (shell-quote-argument x)))
+                             grep-find-ignored-files " "))
+         (ignored-dirs      (mapconcat
+                             ;; Need grep version >=2.5.4
+                             ;; of Gnuwin32 on windoze.
+                             #'(lambda (x)
+                                 (concat "--exclude-dir="
+                                         (shell-quote-argument x)))
+                             grep-find-ignored-directories " "))
+         (exclude           (if (helm-c-grep-recurse-p)
+                                (concat (or include ignored-files)
+                                        " " ignored-dirs)
+                                ignored-files))
+         (cmd-line          (format-spec
+                             helm-c-grep-default-command
+                             (delq nil
+                                   (list (unless zgrep (cons ?e exclude))
+                                         (cons ?p (shell-quote-argument
+                                                   helm-pattern))
+                                         (cons ?f fnargs)))))
+         process-connection-type)       ; Use pipe.
+    ;; Start grep process.
+    (prog1
+        (start-file-process-shell-command
+         "grep" helm-buffer cmd-line)
+      (helm-log "Started Grep process in directory `%s'" default-directory)
+      (helm-log "Command line used was:\n\n%s"
+                (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
+      ;; Notify process status in mode-line.
       (setq mode-line-format
           '(" " mode-line-buffer-identification " "
             (line-number-mode "%l") " "
-            (:eval (when (get-process "grep-process")
+            (:eval (when (get-process "grep")
                      (propertize (format "[Grep process status: %s]"
                                          (process-status
                                           (process-name
-                                           (get-process "grep-process"))))
+                                           (get-process "grep"))))
                                  'face 'helm-grep-running)))))
       (force-mode-line-update nil)
       (message nil)
+      ;; Init sentinel.
       (set-process-sentinel
-       (get-process "grep-process")
+       (get-process "grep")
        #'(lambda (process event)
            (if (string= event "finished\n")
                (with-helm-window
                  (helm-update-move-first-line)
+                 ;; Notify result of process in mode-line.
                  (setq mode-line-format
                        '(" " mode-line-buffer-identification " "
                          (line-number-mode "%l") " "
@@ -238,7 +240,8 @@ See `helm-c-grep-default-command' for format specs.")
                                                    (point-min) (point-max))) 0))
                                  'face 'helm-grep-finish))))
                  (force-mode-line-update nil))
-               (helm-log "Grep %s"
+               ;; Catch error output in log.
+               (helm-log "Exit output: Grep %s"
                          (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-c-grep-action (candidate &optional where mark)
@@ -714,10 +717,10 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     (prog1
         (let ((default-directory helm-ff-default-directory))
           (start-file-process-shell-command
-           "pdfgrep-process" helm-buffer cmd-line))
+           "pdfgrep" helm-buffer cmd-line))
       (message nil)
       (set-process-sentinel
-       (get-process "pdfgrep-process")
+       (get-process "pdfgrep")
        #'(lambda (process event)
            (when (string= event "finished\n")
              (with-helm-window
