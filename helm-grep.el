@@ -465,10 +465,10 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
      :sources
      `(((name . ,(if zgrep "Zgrep" "Grep"))
         (init . (lambda ()
-                  ;; `helm-find-files' haven't already started,
+                  ;; If `helm-find-files' haven't already started,
                   ;; give a default value to `helm-ff-default-directory'.
-                  (setq helm-ff-default-directory (or helm-ff-default-directory
-                                                      default-directory))
+                  (unless helm-ff-default-directory
+                    (setq helm-ff-default-directory default-directory))
                   ;; We need this to pass infos to `helm-resume'.
                   (setq helm-grep-last-targets targets)
                   (setq helm-grep-include-files include-files)
