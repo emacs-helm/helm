@@ -207,30 +207,16 @@ See `helm-c-grep-default-command' for format specs.")
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
-                (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
+              (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
     (prog1 ; This function should return the process first.
         (start-file-process-shell-command
          "grep" helm-buffer cmd-line)
-      ;; Notify process status in mode-line.
-      (setq mode-line-format
-          '(" " mode-line-buffer-identification " "
-            (line-number-mode "%l") " "
-            (:eval (when (get-process "grep")
-                     (propertize (format "[Grep process status: %s]"
-                                         (process-status
-                                          (process-name
-                                           (get-process "grep"))))
-                                 'face 'helm-grep-running)))))
-      (force-mode-line-update nil)
-      (message nil)
       ;; Init sentinel.
       (set-process-sentinel
        (get-process "grep")
        #'(lambda (process event)
            (if (string= event "finished\n")
                (with-helm-window
-                 (helm-update-move-first-line)
-                 ;; Notify result of process in mode-line.
                  (setq mode-line-format
                        '(" " mode-line-buffer-identification " "
                          (line-number-mode "%l") " "
@@ -239,7 +225,7 @@ See `helm-c-grep-default-command' for format specs.")
                                          (max (1- (count-lines
                                                    (point-min) (point-max))) 0))
                                  'face 'helm-grep-finish))))
-                 (force-mode-line-update nil))
+                 (force-mode-line-update))
                ;; Catch error output in log.
                (helm-log "Exit output: Grep %s"
                          (replace-regexp-in-string "\n" "" event))))))))

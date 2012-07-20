@@ -2084,15 +2084,12 @@ after the source name by overlay."
                  (concat (cdr incomplete-line-info) line)
                (setcdr incomplete-line-info nil))
              line)
-         finally (setcdr incomplete-line-info line))))
+         finally do (setcdr incomplete-line-info line))))
 
 (defun helm-output-filter--post-process ()
-  (helm-log-run-hook 'helm-update-hook)
   (helm-aif (get-buffer-window helm-buffer 'visible)
-      (save-selected-window
-        (select-window it)
-        (helm-skip-noncandidate-line 'next)
-        (helm-mark-current-line))))
+      (with-selected-window it
+        (helm-update-move-first-line))))
 
 (defun helm-kill-async-processes ()
   "Kill all known asynchronous processes of `helm-async-processes'."
