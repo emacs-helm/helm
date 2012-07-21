@@ -227,7 +227,8 @@ See `helm-c-grep-default-command' for format specs.")
                                  'face 'helm-grep-finish))))
                  (force-mode-line-update))
                ;; Catch error output in log.
-               (helm-log "Exit output: Grep %s"
+               (helm-log "Error: %s %s"
+                         (if zgrep "Zgrep" "Grep")
                          (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-c-grep-action (candidate &optional where mark)
