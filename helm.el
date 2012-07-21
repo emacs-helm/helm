@@ -2078,8 +2078,15 @@ STRING is the output of PROCESS."
       (return))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info)
+  "Collect lines in LINES maybe completing the truncated first and last lines."
+  ;; The output of process may come in chunks of any size,
+  ;; so the last line of LINES come truncated, this truncated line is
+  ;; stored in INCOMPLETE-LINE-INFO and will be concated with the first
+  ;; incomplete line of next chunk arriving.
+  ;; INCOMPLETE-LINE-INFO is an attribute of source which is created
+  ;; with an empty string when the source is computed => (incomplete-line . "")
   (helm-log-eval (cdr incomplete-line-info))
-  (butlast ; The last line is the exit status of process, remove it.
+  (butlast ; The last line is the incomplete line, remove it.
    (loop for line in lines collect
          (if (cdr incomplete-line-info) ; On start it is an empty string.
              (prog1
