@@ -109,10 +109,12 @@
 ;;
 (defvar helm-c-source-emacs-process
   '((name . "Emacs Process")
+    (init . (lambda () (list-processes--refresh)))
     (candidates . (lambda () (mapcar #'process-name (process-list))))
     (persistent-action . (lambda (elm)
                            (delete-process (get-process elm))
                            (helm-delete-current-selection)))
+    (update . list-processes--refresh)
     (persistent-help . "Kill Process")
     (action ("Kill Process" . (lambda (elm)
                                 (delete-process (get-process elm)))))))
