@@ -2039,7 +2039,9 @@ after the source name by overlay."
 
 ;; Core: async process
 (defun helm-output-filter (process string)
-  "From PROCESS process output STRING."
+  "The `process-filter' of PROCESS.
+It will be used by `set-process-filter' in asynchronous sources.
+STRING is the output of PROCESS."
   (helm-output-filter-1 (assoc process helm-async-processes) string))
 
 (defun helm-output-filter-1 (process-assoc string)
@@ -2064,12 +2066,12 @@ after the source name by overlay."
                        (split-string string "\n")
                        (assoc 'incomplete-line source))
                       source t))
-    (if (not (assq 'multiline source))
-        (helm-insert-match candidate 'insert-before-markers source)
+    (if (assq 'multiline source)
         (let ((start (point)))
           (helm-insert-candidate-separator)
           (helm-insert-match candidate 'insert-before-markers source)
-          (put-text-property start (point) 'helm-multiline t)))
+          (put-text-property start (point) 'helm-multiline t))
+        (helm-insert-match candidate 'insert-before-markers source))
     (incf (cdr (assoc 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
@@ -2077,13 +2079,15 @@ after the source name by overlay."
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info)
   (helm-log-eval (cdr incomplete-line-info))
-  (butlast
+  (butlast ; The last line is the exit status of process, remove it.
    (loop for line in lines collect
-         (if (cdr incomplete-line-info)
+         (if (cdr incomplete-line-info) ; On start it is an empty string.
              (prog1
                  (concat (cdr incomplete-line-info) line)
                (setcdr incomplete-line-info nil))
              line)
+         ;; store last incomplete line (last chunk truncated)
+         ;; until new output arrives.
          finally do (setcdr incomplete-line-info line))))
 
 (defun helm-output-filter--post-process ()
