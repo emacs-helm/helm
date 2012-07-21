@@ -457,18 +457,16 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                   (unless helm-ff-default-directory
                     (setq helm-ff-default-directory default-directory))
                   ;; We need this to pass infos to `helm-resume'.
-                  (setq helm-grep-last-targets targets)
-                  (setq helm-grep-include-files include-files)
-                  (setq helm-grep-in-recurse recurse)
-                  (setq helm-grep-use-zgrep zgrep)))
+                  (setq helm-grep-last-targets targets
+                        helm-grep-include-files include-files
+                        helm-grep-in-recurse recurse
+                        helm-grep-use-zgrep zgrep)))
         (header-name . (lambda (name)
                          (concat name "(C-c ? Help)")))
         (candidates . (lambda ()
                         (helm-grep-collect-candidates
-                         helm-grep-last-targets
-                         helm-grep-in-recurse
-                         helm-grep-use-zgrep
-                         helm-grep-include-files)))
+                         helm-grep-last-targets helm-grep-in-recurse
+                         helm-grep-use-zgrep helm-grep-include-files)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (nohighlight)
@@ -682,7 +680,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 (defun helm-c-pdfgrep-init (only-files)
   "Start an asynchronous pdfgrep process in ONLY-FILES list."
-  (let* ((fnargs   (helm-c-grep-prepare-candidates
+  (let* ((default-directory helm-ff-default-directory)
+         (fnargs   (helm-c-grep-prepare-candidates
                     (if (file-remote-p helm-ff-default-directory)
                         (mapcar #'(lambda (x)
                                     (file-remote-p x 'localname))
@@ -692,27 +691,30 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                            helm-pattern
                            fnargs))
          process-connection-type)
-    (when helm-c-pdfgrep-debug-command-line
-      (with-current-buffer (get-buffer-create "*helm pdfgrep debug*")
-        (goto-char (point-max))
-        (insert (concat ">>> " cmd-line "\n\n"))))
-    (setq mode-line-format
-          '(" " mode-line-buffer-identification " "
-            (line-number-mode "%l") " "
-            (:eval (propertize "(Pdfgrep Process Running) "
-                    'face '((:foreground "red"))))))
+    ;; Start pdf grep process.
+    (helm-log "Starting Pdf Grep process in directory `%s'" default-directory)
+    (helm-log "Command line used was:\n\n%s"
+              (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
     (prog1
-        (let ((default-directory helm-ff-default-directory))
-          (start-file-process-shell-command
-           "pdfgrep" helm-buffer cmd-line))
+        (start-file-process-shell-command
+         "pdfgrep" helm-buffer cmd-line)
       (message nil)
       (set-process-sentinel
        (get-process "pdfgrep")
        #'(lambda (process event)
-           (when (string= event "finished\n")
-             (with-helm-window
-               (helm-update-move-first-line))
-             (force-mode-line-update nil)))))))
+           (if (string= event "finished\n")
+               (with-helm-window
+                 (setq mode-line-format
+                       '(" " mode-line-buffer-identification " "
+                         (line-number-mode "%l") " "
+                         (:eval (propertize
+                                 (format "[Pdfgrep Process Finish - %s result(s)] "
+                                         (max (1- (count-lines
+                                                   (point-min) (point-max))) 0))
+                                 'face 'helm-grep-finish))))
+                 (force-mode-line-update))
+               (helm-log "Error: Pdf grep %s"
+                         (replace-regexp-in-string "\n" "" event))))))))
 
 ;; Internal
 (defvar helm-pdfgrep-targets nil)
