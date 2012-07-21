@@ -2098,9 +2098,12 @@ STRING is the output of PROCESS."
          finally do (setcdr incomplete-line-info line))))
 
 (defun helm-output-filter--post-process ()
+  (helm-log-run-hook 'helm-update-hook)
   (helm-aif (get-buffer-window helm-buffer 'visible)
       (with-selected-window it
-        (helm-update-move-first-line))))
+        (helm-skip-noncandidate-line 'next)
+        (helm-mark-current-line)
+        (helm-display-mode-line (helm-get-current-source)))))
 
 (defun helm-kill-async-processes ()
   "Kill all known asynchronous processes of `helm-async-processes'."
