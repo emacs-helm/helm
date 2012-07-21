@@ -133,6 +133,13 @@ See `helm-c-grep-default-command' for format specs.")
   ;; If r option is enabled search also in subdidrectories.
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep doesn't accept quoted wildcards (e.g "dir/*.el").
+  (setq candidates (if (file-remote-p default-directory)
+                                 ;; Grep don't understand tramp filenames
+                                 ;; use the local name.
+                                 (mapcar #'(lambda (x)
+                                             (file-remote-p x 'localname))
+                                         candidates)
+                                 candidates))
   (if helm-c-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
       (loop for i in candidates append
@@ -172,14 +179,7 @@ See `helm-c-grep-default-command' for format specs.")
 (defun helm-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((default-directory (expand-file-name helm-ff-default-directory))
-         (fnargs            (helm-c-grep-prepare-candidates
-                             (if (file-remote-p default-directory)
-                                 ;; Grep don't understand tramp filenames
-                                 ;; use the local name.
-                                 (mapcar #'(lambda (x)
-                                             (file-remote-p x 'localname))
-                                         only-files)
-                                 only-files)))
+         (fnargs            (helm-c-grep-prepare-candidates only-files))
          (ignored-files     (mapconcat
                              #'(lambda (x)
                                  (concat "--exclude="
