@@ -119,12 +119,14 @@ Where:
 If your grep version doesn't support the --exclude/include args
 don't specify the '%e' format spec.
 
-Helm now support ack-grep, here a default command example:
+Helm also support ack-grep and git-grep ,
+here a default command example for ack-grep:
 
 \(setq helm-c-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
        helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
 
-You can ommit the %e spec if you don't want to be prompted for types.")
+You can ommit the %e spec if you don't want to be prompted for types.
+NOTE: remote grepping is not available with ack-grep.")
 
 (defvar helm-c-grep-default-recurse-command
   "grep -d recurse %e -niH -e %p %f"
@@ -222,7 +224,8 @@ See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
                                                    helm-pattern))
                                          (cons ?f fnargs)))))
          ;; Use pipe only with grep.
-         (process-connection-type (helm-grep-use-ack-p)))
+         (process-connection-type (helm-grep-use-ack-p))
+         (tramp-verbose helm-tramp-verbose))
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
