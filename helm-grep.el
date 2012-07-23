@@ -483,6 +483,7 @@ You can give more than one arg separated by space.
 e.g *.el *.py *.tex.
 If it's empty --exclude `grep-find-ignored-files' is used instead."
   (when (and (helm-grep-use-ack-p)
+             helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
   ;; When called as action from an other source e.g *-find-files
@@ -556,7 +557,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (delayed)))
      :buffer (format "*helm %s*" (if zgrep "zgrep" "grep"))
      :keymap helm-c-grep-map ; [1]
-     :input-idle-delay (if (file-remote-p helm-ff-default-directory)
+     :input-idle-delay (if (and helm-ff-default-directory
+                                (file-remote-p helm-ff-default-directory))
                            3 helm-input-idle-delay)
      :history 'helm-c-grep-history)))
 
@@ -707,14 +709,19 @@ If only one candidate is selected and it is not a file--buffer,
 switch to this buffer and run `helm-occur'.
 If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
   (let* ((prefarg (or current-prefix-arg helm-current-prefix-arg))
+         (helm-ff-default-directory
+          (if (and helm-ff-default-directory
+                   (file-remote-p helm-ff-default-directory))
+              default-directory
+              helm-ff-default-directory))
          (cands (if prefarg
                     (buffer-list)
                     (helm-marked-candidates)))
          (win-conf (current-window-configuration))
-         ;; Non--fname buffers are ignored.
+         ;; Non--fname and remote buffers are ignored.
          (bufs (loop for buf in cands
                      for fname = (buffer-file-name (get-buffer buf))
-                     when fname
+                     when (and fname (not (file-remote-p fname)))
                      collect (expand-file-name fname))))
     (if bufs
         (if zgrep
@@ -748,9 +755,10 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 (defun helm-c-pdfgrep-init (only-files)
   "Start an asynchronous pdfgrep process in ONLY-FILES list."
-  (let* ((default-directory helm-ff-default-directory)
+  (let* ((default-directory (or helm-ff-default-directory
+                                default-directory))
          (fnargs   (helm-c-grep-prepare-candidates
-                    (if (file-remote-p helm-ff-default-directory)
+                    (if (file-remote-p default-directory)
                         (mapcar #'(lambda (x)
                                     (file-remote-p x 'localname))
                                 only-files)
