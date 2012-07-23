@@ -111,18 +111,20 @@ Where '%f' format spec is filename and '%p' is page number"
   "grep -d skip %e -niH -e %p %f"
   "Default grep format command for `helm-do-grep-1'.
 Where:
-'%e' format spec is for --exclude or --include grep options.
-'%p' format spec is for pattern.
-'%f' format spec is for filenames.
+'%e' format spec is for --exclude or --include grep options or
+     ack-grep --type option.       (not mandatory)
+'%p' format spec is for pattern.   mandatory
+'%f' format spec is for filenames. mandatory
+
 If your grep version doesn't support the --exclude/include args
 don't specify the '%e' format spec.
+
 Helm now support ack-grep, here a default command example:
 
-\(setq helm-c-grep-default-command \"ack-grep -Hn --no-group --no-color %p %f\"
-       helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %p %f\")
+\(setq helm-c-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
+       helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
 
-Note that the '%e' format spec is removed, it will NOT work with it.
-Ack-grep is clever enough to guess where to search and what to skip.")
+You can ommit the %e spec if you don't want to be prompted for types.")
 
 (defvar helm-c-grep-default-recurse-command
   "grep -d recurse %e -niH -e %p %f"
@@ -189,26 +191,33 @@ See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((default-directory (expand-file-name helm-ff-default-directory))
          (fnargs            (helm-c-grep-prepare-candidates only-files))
-         (ignored-files     (mapconcat
-                             #'(lambda (x)
-                                 (concat "--exclude="
-                                         (shell-quote-argument x)))
-                             grep-find-ignored-files " "))
-         (ignored-dirs      (mapconcat
-                             ;; Need grep version >=2.5.4
-                             ;; of Gnuwin32 on windoze.
-                             #'(lambda (x)
-                                 (concat "--exclude-dir="
-                                         (shell-quote-argument x)))
-                             grep-find-ignored-directories " "))
-         (exclude           (if helm-grep-in-recurse
-                                (concat (or include ignored-files)
-                                        " " ignored-dirs)
-                                ignored-files))
+         (ignored-files     (unless (helm-grep-use-ack-p)
+                              (mapconcat
+                               #'(lambda (x)
+                                   (concat "--exclude="
+                                           (shell-quote-argument x)))
+                               grep-find-ignored-files " ")))
+         (ignored-dirs      (unless (helm-grep-use-ack-p)
+                              (mapconcat
+                               ;; Need grep version >=2.5.4
+                               ;; of Gnuwin32 on windoze.
+                               #'(lambda (x)
+                                   (concat "--exclude-dir="
+                                           (shell-quote-argument x)))
+                               grep-find-ignored-directories " ")))
+         (exclude           (unless (helm-grep-use-ack-p)
+                              (if helm-grep-in-recurse
+                                  (concat (or include ignored-files)
+                                          " " ignored-dirs)
+                                  ignored-files)))
+         (types             (and (helm-grep-use-ack-p) (or include "")))
          (cmd-line          (format-spec
                              helm-c-grep-default-command
                              (delq nil
-                                   (list (unless zgrep (cons ?e exclude))
+                                   (list (unless zgrep
+                                           (if types
+                                               (cons ?e types)
+                                               (cons ?e exclude)))
                                          (cons ?p (shell-quote-argument
                                                    helm-pattern))
                                          (cons ?f fnargs)))))
@@ -431,6 +440,32 @@ These extensions will be added to command line with --include arg of grep."
              helm-grep-include-files
              helm-grep-use-zgrep)))
 
+(defun helm-grep-hack-types ()
+  "Return a list of known ack-grep types."
+  (with-temp-buffer
+    (call-process "ack-grep" nil t nil
+                  "--help" "types")
+    (goto-char (point-min))
+    (loop while (re-search-forward
+                 "^ *--\\(\\[no\\]\\)\\([^. ]+\\) *\\(.*\\)" nil t)
+          collect (cons (concat (match-string 2)
+                                " [" (match-string 3) "]")
+                        (match-string 2))
+          collect (cons (concat "no" (match-string 2)
+                                " [" (match-string 3) "]")
+                        (concat "no" (match-string 2))))))
+
+(defun helm-grep-read-ack-type ()
+  "Select types for the '--type' argument of ack-grep."
+  (require 'helm-mode)
+  (let ((types (helm-comp-read "Types: "
+                               (helm-grep-hack-types)
+                               :marked-candidates t
+                               :must-match t)))
+    (mapconcat #'(lambda (type)
+                       (concat "--type=" type))
+               types " ")))
+
 ;; Internal
 (defvar helm-grep-last-targets nil)
 (defvar helm-grep-include-files nil)
@@ -458,7 +493,13 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                              (not zgrep)
                              (not (helm-grep-use-ack-p))
                              (read-string "OnlyExt(*.[ext]): "
-                                          globs))))
+                                          globs)))
+         (types (and recurse
+                     (helm-grep-use-ack-p)
+                     ;; When %e format spec is not specified
+                     ;; ignore types and do not prompt for choice.
+                     (string-match "%e" helm-c-grep-default-command)
+                     (helm-grep-read-ack-type))))
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
     (when include-files
@@ -478,7 +519,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                   ;; We need these global vars
                   ;; to further pass infos to `helm-resume'.
                   (setq helm-grep-last-targets targets
-                        helm-grep-include-files include-files
+                        helm-grep-include-files (or include-files types)
                         helm-grep-in-recurse recurse
                         helm-grep-use-zgrep zgrep
                         helm-grep-last-default-directory
