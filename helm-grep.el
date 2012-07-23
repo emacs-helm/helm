@@ -134,12 +134,12 @@ See `helm-c-grep-default-command' for format specs.")
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep doesn't accept quoted wildcards (e.g "dir/*.el").
   (setq candidates (if (file-remote-p default-directory)
-                                 ;; Grep don't understand tramp filenames
-                                 ;; use the local name.
-                                 (mapcar #'(lambda (x)
-                                             (file-remote-p x 'localname))
-                                         candidates)
-                                 candidates))
+                       ;; Grep don't understand tramp filenames
+                       ;; use the local name.
+                       (mapcar #'(lambda (x)
+                                   (file-remote-p x 'localname))
+                               candidates)
+                       candidates))
   (if helm-c-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
       (loop for i in candidates append
@@ -147,7 +147,7 @@ See `helm-c-grep-default-command' for format specs.")
                    (list i))
                   ( ;; Candidate is a directory and we use recursion.
                    (and (file-directory-p i)
-                        (helm-c-grep-recurse-p))
+                        helm-grep-in-recurse)
                    (list (expand-file-name i)))
                   ;; Candidate is a directory, search in all files.
                   ((file-directory-p i)
@@ -156,7 +156,7 @@ See `helm-c-grep-default-command' for format specs.")
                   ;; Candidate is a file or wildcard and we use recursion, use the
                   ;; current directory instead of candidate.
                   ((and (or (file-exists-p i) (string-match "\*" i))
-                        (helm-c-grep-recurse-p))
+                        helm-grep-in-recurse)
                    (list (expand-file-name
                           (directory-file-name ; Needed for windoze.
                            (file-name-directory (directory-file-name i))))))
@@ -169,12 +169,6 @@ See `helm-c-grep-default-command' for format specs.")
             (if (string-match "^git" helm-c-grep-default-command)
                 (mapconcat 'identity all-files " ")
                 (mapconcat 'shell-quote-argument all-files " ")))))
-
-(defun helm-c-grep-recurse-p ()
-  "Check if `helm-do-grep-1' have switched to recursive."
-  (let ((args (replace-regexp-in-string
-               "grep" "" helm-c-grep-default-command)))
-    (string-match-p "r\\|recurse" args)))
 
 (defun helm-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
@@ -192,7 +186,7 @@ See `helm-c-grep-default-command' for format specs.")
                                  (concat "--exclude-dir="
                                          (shell-quote-argument x)))
                              grep-find-ignored-directories " "))
-         (exclude           (if (helm-c-grep-recurse-p)
+         (exclude           (if helm-grep-in-recurse
                                 (concat (or include ignored-files)
                                         " " ignored-dirs)
                                 ignored-files))
@@ -407,18 +401,23 @@ These extensions will be added to command line with --include arg of grep."
         collect glob into glob-list
         finally return glob-list))
 
-(defun helm-grep-collect-candidates (targets recurse zgrep include-files)
+(defun helm-grep-collect-candidates ()
   (let* ((helm-c-grep-default-command
-          (cond (zgrep helm-c-default-zgrep-command)
-                (recurse helm-c-grep-default-recurse-command)
-                (t helm-c-grep-default-command))))
-    (funcall helm-c-grep-default-function targets include-files zgrep)))
+          (cond (helm-grep-use-zgrep helm-c-default-zgrep-command)
+                (helm-grep-in-recurse helm-c-grep-default-recurse-command)
+                (t helm-c-grep-default-command)))
+         (helm-ff-default-directory helm-grep-last-default-directory))
+    (funcall helm-c-grep-default-function
+             helm-grep-last-targets
+             helm-grep-include-files
+             helm-grep-use-zgrep)))
 
 ;; Internal
 (defvar helm-grep-last-targets nil)
 (defvar helm-grep-include-files nil)
 (defvar helm-grep-in-recurse nil)
 (defvar helm-grep-use-zgrep nil)
+(defvar helm-grep-last-default-directory nil)
 (defun helm-do-grep-1 (targets &optional recurse zgrep)
   "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
@@ -456,17 +455,17 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                   ;; give a default value to `helm-ff-default-directory'.
                   (unless helm-ff-default-directory
                     (setq helm-ff-default-directory default-directory))
-                  ;; We need this to pass infos to `helm-resume'.
+                  ;; We need these global vars
+                  ;; to further pass infos to `helm-resume'.
                   (setq helm-grep-last-targets targets
                         helm-grep-include-files include-files
                         helm-grep-in-recurse recurse
-                        helm-grep-use-zgrep zgrep)))
+                        helm-grep-use-zgrep zgrep
+                        helm-grep-last-default-directory
+                        helm-ff-default-directory)))
         (header-name . (lambda (name)
                          (concat name "(C-c ? Help)")))
-        (candidates . (lambda ()
-                        (helm-grep-collect-candidates
-                         helm-grep-last-targets helm-grep-in-recurse
-                         helm-grep-use-zgrep helm-grep-include-files)))
+        (candidates . helm-grep-collect-candidates)
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (nohighlight)
