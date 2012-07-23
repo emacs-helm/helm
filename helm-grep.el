@@ -482,9 +482,9 @@ to set the --include args of grep.
 You can give more than one arg separated by space.
 e.g *.el *.py *.tex.
 If it's empty --exclude `grep-find-ignored-files' is used instead."
-  (assert (and (not (helm-grep-use-ack-p))
-               (file-remote-p helm-ff-default-directory))
-          nil "Error: Remote operation not supported with ack-grep.")
+  (when (and (helm-grep-use-ack-p)
+             (file-remote-p helm-ff-default-directory))
+    (error "Error: Remote operation not supported with ack-grep."))
   ;; When called as action from an other source e.g *-find-files
   ;; we have to kill action buffer.
   (let* ((helm-compile-source-functions
