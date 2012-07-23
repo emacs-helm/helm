@@ -113,12 +113,21 @@ Where '%f' format spec is filename and '%p' is page number"
 Where:
 '%e' format spec is for --exclude or --include grep options.
 '%p' format spec is for pattern.
-'%f' format spec is for filenames.")
+'%f' format spec is for filenames.
+If your grep version doesn't support the --exclude/include args
+don't specify the '%e' format spec.
+Helm now support ack-grep, here a default command example:
+
+\(setq helm-c-grep-default-command \"ack-grep -Hn --no-group --no-color %p %f\"
+       helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %p %f\")
+
+Note that the '%e' format spec is removed, it will NOT work with it.
+Ack-grep is clever enough to guess where to search and what to skip.")
 
 (defvar helm-c-grep-default-recurse-command
   "grep -d recurse %e -niH -e %p %f"
   "Default recursive grep format command for `helm-do-grep-1'.
-See `helm-c-grep-default-command' for format specs.")
+See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
 
 (defvar helm-c-default-zgrep-command "zgrep -niH -e %p %f")
 (defvar helm-c-rzgrep-cache (make-hash-table :test 'equal))
@@ -166,9 +175,15 @@ See `helm-c-grep-default-command' for format specs.")
                   ;; Else should be one or more file.
                   (t (list i))) into all-files
             finally return
-            (if (string-match "^git" helm-c-grep-default-command)
+            (if (string-match "^git\\|^ack" helm-c-grep-default-command)
                 (mapconcat 'identity all-files " ")
                 (mapconcat 'shell-quote-argument all-files " ")))))
+
+(defun helm-grep-command ()
+  (car (split-string helm-c-grep-default-command " ")))
+
+(defun helm-grep-use-ack-p ()
+  (string= (helm-grep-command) "ack-grep"))
 
 (defun helm-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
@@ -197,7 +212,8 @@ See `helm-c-grep-default-command' for format specs.")
                                          (cons ?p (shell-quote-argument
                                                    helm-pattern))
                                          (cons ?f fnargs)))))
-         process-connection-type)       ; Use pipe.
+         ;; Use pipe only with grep.
+         (process-connection-type (helm-grep-use-ack-p)))
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
@@ -215,7 +231,10 @@ See `helm-c-grep-default-command' for format specs.")
                        '(" " mode-line-buffer-identification " "
                          (line-number-mode "%l") " "
                          (:eval (propertize
-                                 (format "[Grep process finished - (%s results)] "
+                                 (format "[%s process finished - (%s results)] "
+                                         (if zgrep
+                                             "Zgrep"
+                                             (capitalize (helm-grep-command)))
                                          (max (1- (count-lines
                                                    (point-min) (point-max))) 0))
                                  'face 'helm-grep-finish))))
@@ -437,6 +456,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                              ;; zgrep will search in all files with ext matching
                              ;; `helm-zgrep-file-extension-regexp'
                              (not zgrep)
+                             (not (helm-grep-use-ack-p))
                              (read-string "OnlyExt(*.[ext]): "
                                           globs))))
     (when (get-buffer helm-action-buffer)
@@ -449,7 +469,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                             (split-string include-files) " "))))
     (helm
      :sources
-     `(((name . ,(if zgrep "Zgrep" "Grep"))
+     `(((name . ,(if zgrep "Zgrep" (capitalize (helm-grep-command))))
         (init . (lambda ()
                   ;; If `helm-find-files' haven't already started,
                   ;; give a default value to `helm-ff-default-directory'.
