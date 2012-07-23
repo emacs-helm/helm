@@ -482,6 +482,9 @@ to set the --include args of grep.
 You can give more than one arg separated by space.
 e.g *.el *.py *.tex.
 If it's empty --exclude `grep-find-ignored-files' is used instead."
+  (assert (and (not (helm-grep-use-ack-p))
+               (file-remote-p helm-ff-default-directory))
+          nil "Error: Remote operation not supported with ack-grep.")
   ;; When called as action from an other source e.g *-find-files
   ;; we have to kill action buffer.
   (let* ((helm-compile-source-functions
@@ -553,6 +556,8 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
         (delayed)))
      :buffer (format "*helm %s*" (if zgrep "zgrep" "grep"))
      :keymap helm-c-grep-map ; [1]
+     :input-idle-delay (if (file-remote-p helm-ff-default-directory)
+                           3 helm-input-idle-delay)
      :history 'helm-c-grep-history)))
 
 (defun helm-ff-zgrep-1 (flist recursive)
