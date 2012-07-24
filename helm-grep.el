@@ -285,7 +285,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          (line-number-mode "%l") " "
                          (:eval (propertize
                                  (format "[%s process finished - (%s results)] "
-                                         (if zgrep
+                                         (if helm-grep-use-zgrep
                                              "Zgrep"
                                              (capitalize (if helm-grep-in-recurse
                                                              (helm-grep-command t)
@@ -296,7 +296,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                  (force-mode-line-update))
                ;; Catch error output in log.
                (helm-log "Error: %s %s"
-                         (if zgrep "Zgrep" "Grep")
+                         (if helm-grep-use-zgrep "Zgrep" "Grep")
                          (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-c-grep-action (candidate &optional where mark)
