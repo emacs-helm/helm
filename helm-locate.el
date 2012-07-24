@@ -59,6 +59,12 @@ The \"-r\" option must be the last option."
   :type 'string
   :group 'helm-locate)
 
+(defcustom helm-locate-create-db-command
+  "updatedb -l 0 -o %s -U %s"
+  "Command used to create a locale locate db file."
+  :type 'string
+  :group 'helm-locate)
+
 (defvar helm-generic-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -110,11 +116,22 @@ See `helm-locate-with-db' and `helm-locate'."
    (and localdb
         (or (helm-ff-find-locatedb from-ff)
             (helm-c-read-file-name
-             "LocateDBFiles: "
+             "Choose or create Locate Db file: "
              :initial-input (or helm-ff-default-directory
                                 default-directory)
              :marked-candidates t
              :preselect helm-locate-db-file-regexp
+             :persistent-action #'(lambda (candidate)
+                                    (shell-command
+                                     (format helm-locate-create-db-command
+                                             candidate
+                                             helm-ff-default-directory))
+                                    (helm-force-update
+                                     (if helm-ff-transformer-show-only-basename
+                                         (helm-c-basename candidate)
+                                         candidate)))
+             :must-match t
+             :persistent-help "Create locale locate Db"
              :test #'(lambda (x)
                        (if helm-locate-db-file-regexp
                            ;; Select only locate db files and directories
