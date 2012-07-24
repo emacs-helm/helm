@@ -30,6 +30,52 @@
   "Grep related Applications and libraries for Helm."
   :group 'helm)
 
+(defcustom helm-c-grep-default-command
+  "grep -d skip %e -niH -e %p %f"
+  "Default grep format command for `helm-do-grep-1'.
+Where:
+'%e' format spec is for --exclude or --include grep options or
+     ack-grep --type option.       (not mandatory)
+'%p' format spec is for pattern.   mandatory
+'%f' format spec is for filenames. mandatory
+
+If your grep version doesn't support the --exclude/include args
+don't specify the '%e' format spec.
+
+Helm also support ack-grep and git-grep ,
+here a default command example for ack-grep:
+
+\(setq helm-c-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
+       helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
+
+You can ommit the %e spec if you don't want to be prompted for types.
+`helm-c-grep-default-command' and `helm-c-grep-default-recurse-command'are
+independents, so you can enable `helm-c-grep-default-command' with ack-grep
+and `helm-c-grep-default-recurse-command' with grep if you want to be faster
+on recursive grep.
+NOTE: remote grepping is not available with ack-grep."
+  :group 'helm-grep
+  :type  'string)
+
+(defcustom helm-c-grep-default-recurse-command
+  "grep -d recurse %e -niH -e %p %f"
+  "Default recursive grep format command for `helm-do-grep-1'.
+See `helm-c-grep-default-command' for format specs and infos about ack-grep."
+  :group 'helm-grep
+  :type  'string)
+
+(defcustom helm-c-default-zgrep-command
+  "zgrep -niH -e %p %f"
+  "Default command for Zgrep."
+  :group 'helm-grep
+  :type  'string)
+
+(defcustom helm-c-pdfgrep-default-command
+  "pdfgrep --color never -niH %s %s"
+  "Default command for pdfgrep."
+  :group 'helm-grep
+  :type  'string)
+
 (defcustom helm-c-grep-use-ioccur-style-keys t
   "Use Arrow keys to jump to occurences."
   :group 'helm-grep
@@ -107,41 +153,20 @@ Where '%f' format spec is filename and '%p' is page number"
     map)
   "Keymap used in pdfgrep.")
 
-(defvar helm-c-grep-default-command
-  "grep -d skip %e -niH -e %p %f"
-  "Default grep format command for `helm-do-grep-1'.
-Where:
-'%e' format spec is for --exclude or --include grep options or
-     ack-grep --type option.       (not mandatory)
-'%p' format spec is for pattern.   mandatory
-'%f' format spec is for filenames. mandatory
-
-If your grep version doesn't support the --exclude/include args
-don't specify the '%e' format spec.
-
-Helm also support ack-grep and git-grep ,
-here a default command example for ack-grep:
-
-\(setq helm-c-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
-       helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
-
-You can ommit the %e spec if you don't want to be prompted for types.
-`helm-c-grep-default-command' and `helm-c-grep-default-recurse-command'are
-independents, so you can enable `helm-c-grep-default-command' with ack-grep
-and `helm-c-grep-default-recurse-command' with grep if you want to be faster
-on recursive grep.
-NOTE: remote grepping is not available with ack-grep.")
-
-(defvar helm-c-grep-default-recurse-command
-  "grep -d recurse %e -niH -e %p %f"
-  "Default recursive grep format command for `helm-do-grep-1'.
-See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
-
-(defvar helm-c-default-zgrep-command "zgrep -niH -e %p %f")
+;;; Internals vars
 (defvar helm-c-rzgrep-cache (make-hash-table :test 'equal))
 (defvar helm-c-grep-default-function 'helm-c-grep-init)
 (defvar helm-c-zgrep-recurse-flag nil)
 (defvar helm-c-grep-history nil)
+(defvar helm-grep-last-targets nil)
+(defvar helm-grep-include-files nil)
+(defvar helm-grep-in-recurse nil)
+(defvar helm-grep-use-zgrep nil)
+(defvar helm-grep-last-default-directory nil)
+(defvar helm-c-grep-default-directory-fn nil
+  "A function that should return a directory to expand candidate to.
+It is intended to use as a let-bound variable, DON'T set this globaly.")
+(defvar helm-pdfgrep-targets nil)
 
 (defun helm-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories CANDIDATES for grep command line."
@@ -487,12 +512,6 @@ These extensions will be added to command line with --include arg of grep."
                        (concat "--type=" type))
                types " ")))
 
-;; Internal
-(defvar helm-grep-last-targets nil)
-(defvar helm-grep-include-files nil)
-(defvar helm-grep-in-recurse nil)
-(defvar helm-grep-use-zgrep nil)
-(defvar helm-grep-last-default-directory nil)
 (defun helm-do-grep-1 (targets &optional recurse zgrep)
   "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
@@ -607,10 +626,6 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
   (when (string-match "^\\(.*\\):\\([0-9]+\\):\\(.*\\)" line)
     (loop for n from 1 to 3 collect (match-string n line))))
 
-;; Internal
-(defvar helm-c-grep-default-directory-fn nil
-  "A function that should return a directory to expand candidate to.
-It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defun helm-c-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `helm-do-grep'."
   (loop with root = (and helm-c-grep-default-directory-fn
@@ -769,10 +784,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;  pdfgrep program <http://pdfgrep.sourceforge.net/>
 ;;  and a pdf-reader (e.g xpdf) are needed.
 ;;
-(defvar helm-c-pdfgrep-default-command "pdfgrep --color never -niH %s %s")
 (defvar helm-c-pdfgrep-default-function 'helm-c-pdfgrep-init)
-(defvar helm-c-pdfgrep-debug-command-line nil)
-
 (defun helm-c-pdfgrep-init (only-files)
   "Start an asynchronous pdfgrep process in ONLY-FILES list."
   (let* ((default-directory (or helm-ff-default-directory
@@ -812,8 +824,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                (helm-log "Error: Pdf grep %s"
                          (replace-regexp-in-string "\n" "" event))))))))
 
-;; Internal
-(defvar helm-pdfgrep-targets nil)
 (defun helm-do-pdfgrep-1 (only)
   "Launch pdfgrep with a list of ONLY files."
   (unless (executable-find "pdfgrep")
