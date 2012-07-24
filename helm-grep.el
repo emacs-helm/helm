@@ -126,6 +126,10 @@ here a default command example for ack-grep:
        helm-c-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
 
 You can ommit the %e spec if you don't want to be prompted for types.
+`helm-c-grep-default-command' and `helm-c-grep-default-recurse-command'are
+independents, so you can enable `helm-c-grep-default-command' with ack-grep
+and `helm-c-grep-default-recurse-command' with grep if you want to be faster
+on recursive grep.
 NOTE: remote grepping is not available with ack-grep.")
 
 (defvar helm-c-grep-default-recurse-command
@@ -183,12 +187,20 @@ See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
                 (mapconcat 'identity all-files " ")
                 (mapconcat 'shell-quote-argument all-files " ")))))
 
-(defun helm-grep-command ()
-  (car (split-string helm-c-grep-default-command " ")))
+(defun helm-grep-command (&optional recursive)
+  (car (split-string (if recursive
+                         helm-c-grep-default-recurse-command
+                         helm-c-grep-default-command) " ")))
 
-(defun helm-grep-use-ack-p ()
-  (string= (helm-grep-command) "ack-grep"))
-
+(defun* helm-grep-use-ack-p (&key where)
+  (case where
+    (default (string= (helm-grep-command) "ack-grep"))
+    (recursive (string= (helm-grep-command t) "ack-grep"))
+    (strict (and (string= (helm-grep-command t) "ack-grep")
+                 (string= (helm-grep-command) "ack-grep")))
+    (t (or (string= (helm-grep-command t) "ack-grep")
+           (string= (helm-grep-command) "ack-grep")))))
+          
 (defun helm-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((default-directory (expand-file-name helm-ff-default-directory))
@@ -212,7 +224,11 @@ See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
                                   (concat (or include ignored-files)
                                           " " ignored-dirs)
                                   ignored-files)))
-         (types             (and (helm-grep-use-ack-p) (or include "")))
+         (types             (and (helm-grep-use-ack-p)
+                                 ;; When %e format spec is not specified
+                                 ;; in command we need to pass an empty string
+                                 ;; to types to avoid error.
+                                 (or include "")))
          (cmd-line          (format-spec
                              helm-c-grep-default-command
                              (delq nil
@@ -246,7 +262,9 @@ See `helm-c-grep-default-command' for format specs and infos about ack-grep.")
                                  (format "[%s process finished - (%s results)] "
                                          (if zgrep
                                              "Zgrep"
-                                             (capitalize (helm-grep-command)))
+                                             (capitalize (if helm-grep-in-recurse
+                                                             (helm-grep-command t)
+                                                             (helm-grep-command))))
                                          (max (1- (count-lines
                                                    (point-min) (point-max))) 0))
                                  'face 'helm-grep-finish))))
@@ -498,11 +516,11 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                              ;; zgrep will search in all files with ext matching
                              ;; `helm-zgrep-file-extension-regexp'
                              (not zgrep)
-                             (not (helm-grep-use-ack-p))
+                             (not (helm-grep-use-ack-p :where 'recursive))
                              (read-string "OnlyExt(*.[ext]): "
                                           globs)))
          (types (and recurse
-                     (helm-grep-use-ack-p)
+                     (helm-grep-use-ack-p :where 'recursive)
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-c-grep-default-command)
@@ -517,7 +535,9 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                             (split-string include-files) " "))))
     (helm
      :sources
-     `(((name . ,(if zgrep "Zgrep" (capitalize (helm-grep-command))))
+     `(((name . ,(if zgrep "Zgrep" (capitalize (if recurse
+                                                   (helm-grep-command t)
+                                                   (helm-grep-command)))))
         (init . (lambda ()
                   ;; If `helm-find-files' haven't already started,
                   ;; give a default value to `helm-ff-default-directory'.
