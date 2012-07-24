@@ -1861,6 +1861,7 @@ Find inside `require' and `declare-function' sexp."
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
+    (keymap . ,helm-c-read-file-map)
     (volatile)
     (action .
             (("Write File" . (lambda (candidate)
@@ -1877,6 +1878,7 @@ Find inside `require' and `declare-function' sexp."
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
+    (keymap . ,helm-c-read-file-map)
     (volatile)
     (action .
             (("Insert File" . (lambda (candidate)
@@ -1896,6 +1898,7 @@ Find inside `require' and `declare-function' sexp."
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
+    (keymap . ,helm-c-read-file-map)
     (volatile)
     (action .
             (("Copy File"
@@ -1913,6 +1916,7 @@ Find inside `require' and `declare-function' sexp."
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
+    (keymap . ,helm-c-read-file-map)
     (volatile)
     (action .
             (("Rename File"
@@ -1930,6 +1934,7 @@ Find inside `require' and `declare-function' sexp."
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
+    (keymap . ,helm-c-read-file-map)
     (volatile)
     (action
      . (("Symlink File"
@@ -1947,6 +1952,7 @@ Find inside `require' and `declare-function' sexp."
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Expand Candidate")
+    (keymap . ,helm-c-read-file-map)
     (volatile)
     (action
      . (("Hardlink File"
