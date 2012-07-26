@@ -174,15 +174,15 @@
 ;;;;;;  helm-reposition-window-other-window helm-recenter-top-bottom-other-window
 ;;;;;;  helm-scroll-other-window-down helm-scroll-other-window helm-execute-persistent-action
 ;;;;;;  helm-select-2nd-action-or-end-of-line helm-select-4th-action
-;;;;;;  helm-select-3rd-action helm-select-2nd-action helm-enlarge-window
-;;;;;;  helm-narrow-window helm-toggle-resplit-window helm-delete-minibuffer-contents
-;;;;;;  helm-delete-current-selection helm-debug-output helm-keyboard-quit
-;;;;;;  helm-exit-minibuffer helm-confirm-and-exit-minibuffer helm-next-source
-;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
-;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
-;;;;;;  helm-select-action helm-force-update helm-other-buffer helm-resume
-;;;;;;  helm-open-last-log) "helm" "helm.el" (20479 48601 915642
-;;;;;;  220000))
+;;;;;;  helm-select-3rd-action helm-select-2nd-action helm-swap-windows
+;;;;;;  helm-enlarge-window helm-narrow-window helm-toggle-resplit-window
+;;;;;;  helm-delete-minibuffer-contents helm-delete-current-selection
+;;;;;;  helm-debug-output helm-keyboard-quit helm-exit-minibuffer
+;;;;;;  helm-confirm-and-exit-minibuffer helm-next-source helm-previous-source
+;;;;;;  helm-end-of-buffer helm-beginning-of-buffer helm-next-page
+;;;;;;  helm-previous-page helm-next-line helm-previous-line helm-select-action
+;;;;;;  helm-force-update helm-other-buffer helm-resume helm-open-last-log)
+;;;;;;  "helm" "helm.el" (20496 59416 6821 812000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -308,6 +308,11 @@ Narrow helm window.
 
 (autoload 'helm-enlarge-window "helm" "\
 Enlarge helm window.
+
+\(fn)" t nil)
+
+(autoload 'helm-swap-windows "helm" "\
+Swap window holding `helm-buffer' with other window.
 
 \(fn)" t nil)
 
@@ -614,8 +619,8 @@ Preconfigured `helm' for color.
 
 ;;;***
 
-;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20487
-;;;;;;  6415 581255 223000))
+;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20488
+;;;;;;  26282 46639 263000))
 ;;; Generated autoloads from helm-command.el
 
 (autoload 'helm-M-x "helm-command" "\
@@ -770,7 +775,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20485 50448 902925 693000))
+;;;;;;  "helm-files" "helm-files.el" (20496 7738 88799 833000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1025,7 +1030,7 @@ After closing firefox, you will be able to browse you bookmarks.
 ;;;***
 
 ;;;### (autoloads (helm-ucs helm-select-xfont) "helm-font" "helm-font.el"
-;;;;;;  (20487 2901 843831 571000))
+;;;;;;  (20488 26282 50639 285000))
 ;;; Generated autoloads from helm-font.el
 
 (autoload 'helm-select-xfont "helm-font" "\
@@ -1057,8 +1062,8 @@ Preconfigured `helm' for gentoo linux.
 ;;;;;;  helm-grep-mode-jump-other-window helm-grep-mode-jump-other-window-backward
 ;;;;;;  helm-grep-mode-jump-other-window-forward helm-grep-mode-jump
 ;;;;;;  helm-grep-mode-quit helm-gm-precedent-file helm-gm-next-file
-;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20485 34226 717168
-;;;;;;  809000))
+;;;;;;  helm-grep-mode) "helm-grep" "helm-grep.el" (20494 58544 864573
+;;;;;;  807000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-grep-mode "helm-grep" "\
@@ -1295,8 +1300,8 @@ With a prefix-arg insert symbol at point.
 
 ;;;***
 
-;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20485
-;;;;;;  34226 721168 832000))
+;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20494
+;;;;;;  27762 814876 404000))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate "helm-locate" "\
@@ -1393,7 +1398,7 @@ Preconfigured `helm' for `minibuffer-history'.
 ;;;***
 
 ;;;### (autoloads (helm-mode helm-comp-read) "helm-mode" "helm-mode.el"
-;;;;;;  (20487 6824 607283 484000))
+;;;;;;  (20488 26282 54639 309000))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-comp-read "helm-mode" "\
@@ -1543,7 +1548,7 @@ Preconfigured helm to show org headlines.
 ;;;***
 
 ;;;### (autoloads (helm-browse-code helm-occur helm-regexp) "helm-regexp"
-;;;;;;  "helm-regexp.el" (20467 56949 935623 747000))
+;;;;;;  "helm-regexp.el" (20494 62705 966340 765000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1622,7 +1627,7 @@ Fill in the symbol at point by default.
 ;;;***
 
 ;;;### (autoloads (helm-xrandr-set helm-list-emacs-process helm-top)
-;;;;;;  "helm-sys" "helm-sys.el" (20428 32734))
+;;;;;;  "helm-sys" "helm-sys.el" (20490 55027 834487 520000))
 ;;; Generated autoloads from helm-sys.el
 
 (autoload 'helm-top "helm-sys" "\
@@ -1658,7 +1663,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20485 16400 974954 272000))
+;;;;;;  "helm-utils" "helm-utils.el" (20488 26282 54639 309000))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1736,8 +1741,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20487
-;;;;;;  9214 269924 798000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20496
+;;;;;;  59502 284372 980000))
 
 ;;;***
 

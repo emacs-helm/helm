@@ -77,6 +77,7 @@
     (define-key map (kbd "C-t")        'helm-toggle-resplit-window)
     (define-key map (kbd "C-}")        'helm-narrow-window)
     (define-key map (kbd "C-{")        'helm-enlarge-window)
+    (define-key map (kbd "C-c -")      'helm-swap-windows)
     (define-key map (kbd "C-c C-d")    'helm-delete-current-selection)
     (define-key map (kbd "C-c C-y")    'helm-yank-selection)
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
@@ -2947,6 +2948,27 @@ If N is positive enlarge, if negative narrow."
   (interactive)
   (helm-enlarge-window-1 1))
 
+;;;###autoload
+(defun helm-swap-windows ()
+  "Swap window holding `helm-buffer' with other window."
+  (interactive)
+  (let* ((w1 (helm-window))
+         (b1 (window-buffer w1))
+         (s1 (window-start w1))
+         (w2 (next-window w1 1))
+         (b2 (window-buffer w2))
+         (s2 (window-start w2)))
+    (helm-replace-buffer-in-window w1 b1 b2)
+    (helm-replace-buffer-in-window w2 b2 b1)
+    (set-window-start w1 s2 t)
+    (set-window-start w2 s1 t)))
+
+(defun helm-replace-buffer-in-window (window buffer1 buffer2)
+  "Replace BUFFER1 by BUFFER2 in WINDOW registering BUFFER1."
+  (when (get-buffer-window buffer1)
+    (unrecord-window-buffer window buffer1)
+    (set-window-buffer window buffer2)))
+
 ;; Utility: select another action by key
 (defun helm-select-nth-action (n)
   "Select the N nth action for the currently selected candidate."
@@ -3032,12 +3054,14 @@ the helm window is never split in persistent action."
 
 
 (defun helm-persistent-action-display-window (&optional onewindow)
-  "Return the window that will be used for presistent action.
+  "Return the window that will be used for persistent action.
 If ONEWINDOW is non--nil window will not be splitted in persistent action
 if `helm-samewindow' is non--nil also."
   (with-helm-window
     (setq helm-persistent-action-display-window
-          (cond ((window-live-p helm-persistent-action-display-window)
+          (cond ((and (window-live-p helm-persistent-action-display-window)
+                      (not (loop for w in (get-buffer-window-list helm-buffer)
+                                 thereis helm-persistent-action-display-window)))
                  helm-persistent-action-display-window)
                 ((and helm-samewindow (one-window-p t) (not onewindow))
                  (split-window))
@@ -3067,9 +3091,9 @@ second argument of `display-buffer'."
                        (or (member name
                                    (mapcar (lambda (x) (or (car-safe x) x))
                                            special-display-buffer-names))
-                           (remove-if-not
-                            (lambda (x) (string-match (or (car-safe x) x) name))
-                            special-display-regexps)))
+                           (loop for x in special-display-regexps
+                                 thereis (string-match (or (car-safe x) x)
+                                                       name))))
             '("."))))
     (display-buffer buf not-this-window)))
 
