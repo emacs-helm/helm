@@ -1335,11 +1335,12 @@ return FNAME unchanged."
     (if (or (not helm-ff-smart-completion)
             (memq helm-mp-matching-method
                   helm-ff-smart-completion-incompatible-methods)
-            (string-match "\\s-" bn)
-            (string-match "/$" fname) ; Allow mkdir.
+            (string-match "\\s-" bn)     ; Fall back to match-plugin.
+            (string-match "[*][.].*" bn) ; Allow entering wilcard.
+            (string-match "/$" fname)    ; Allow mkdir.
             (file-directory-p fname)
             (string-match helm-ff-url-regexp fname))
-        fname ; Fall back to match-plugin.
+        fname
         (setq bn (if (> (length bn) 2) ; Normal completion on first 2 char.
                      (helm-ff-mapconcat-candidate bn)
                      bn))
