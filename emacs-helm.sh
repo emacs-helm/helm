@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 ## Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ## 
 ## This program is free software; you can redistribute it and/or modify
@@ -22,14 +23,14 @@
 # Run it from this directory.
 
 TMP="/tmp/helm-cfg.el"
-LOADPATH="."
+LOADPATH=`dirname $0`
 cat > $TMP <<EOF
 (setq default-frame-alist '((vertical-scroll-bars . nil)
                             (tool-bar-lines . 0)
                             (menu-bar-lines . 0)
                             (fullscreen . nil)))
 (blink-cursor-mode -1)
-(add-to-list 'load-path "$LOADPATH")
+(add-to-list 'load-path (expand-file-name "$LOADPATH"))
 (require 'helm-config)
 (helm-mode 1)
 (define-key global-map [remap find-file] 'helm-find-files)
