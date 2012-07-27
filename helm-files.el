@@ -1114,7 +1114,7 @@ expand to this directory."
                                 (helm-next-line))
                               (helm-get-selection))))
             (when (and (stringp cur-cand) (file-directory-p cur-cand))
-              (if (and (not (string-match "^.*[.]\\{1,2\\}$" cur-cand)) ; [1]
+              (if (and (not (helm-dir-is-dot cur-cand))         ; [1]
                        ;; Maybe we are here because completed-p is true
                        ;; but check this again to be sure. (Windows fix)
                        (<= (helm-approximate-candidate-number) 2)) ; [2]
@@ -1362,6 +1362,9 @@ See `helm-ff-transform-fname-for-completion'."
         do (setq last-elm i)
         finally return (mapconcat 'identity ls "")))
 
+(defun helm-dir-is-dot (dir)
+  (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
+
 (defun helm-ff-save-history ()
   "Store the last value of `helm-ff-default-directory' in `helm-ff-history'."
   (when (and helm-ff-default-directory
@@ -1524,7 +1527,7 @@ is non--nil."
           (> (length files) helm-ff-maximum-candidate-to-decorate))
       (if helm-ff-transformer-show-only-basename
           (loop for i in files collect
-                (if (string-match "[.]\\{1,2\\}$" i)
+                (if (helm-dir-is-dot i)
                     i (cons (helm-c-basename i) i)))
           files)
       (helm-ff-highlight-files files sources)))
@@ -1533,7 +1536,7 @@ is non--nil."
   "Candidate transformer for `helm-c-source-find-files' without icons."
   (loop for i in files
         for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (string-match "[.]\\{1,2\\}$" i))
+                            (not (helm-dir-is-dot i))
                             (not (string-match ffap-url-regexp i))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
@@ -2464,7 +2467,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 Colorize only symlinks, directories and files."
   (loop for i in (helm-c-skip-boring-files files)
         for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (string-match "[.]\\{1,2\\}$" i))
+                            (not (helm-dir-is-dot i))
                             (not (string-match ffap-url-regexp i))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
