@@ -1326,8 +1326,10 @@ systems."
 (defvar helm-ff-smart-completion-incompatible-methods '(multi1 multi3p))
 (defun helm-ff-transform-fname-for-completion (fname)
   "Return FNAME with it's basename modified as a regexp.
-e.g foo => f.*o.*o .
-If basename contain one or more space or FNAME is a valid directory name
+e.g foo => f.*o.*o.*
+Treat special characters (\"^\" \".\" \"$\") differently:
+e.g ^helm.el$ => \"^h.*e.*l.*m[.]e.*l$\"
+If basename contain one or more space or if FNAME is a valid directory name,
 return FNAME unchanged."
   (let ((bn (helm-c-basename fname)))
     (if (or (not helm-ff-smart-completion)
@@ -1339,8 +1341,26 @@ return FNAME unchanged."
             (string-match helm-ff-url-regexp fname))
         fname ; Fall back to match-plugin.
         (setq bn (if (> (length bn) 2) ; Normal completion on first 2 char.
-                     (mapconcat 'identity (split-string bn "" t) ".*") bn))
+                     (helm-ff-mapconcat-candidate bn)
+                     bn))
         (concat (file-name-directory fname) bn))))
+
+(defun helm-ff-mapconcat-candidate (candidate)
+  "Transform string CANDIDATE in regexp.
+See `helm-ff-transform-fname-for-completion'."
+  (loop with ls with last-elm
+        for i in (split-string candidate "" t)
+        for rev = (reverse ls)
+        if (member i (list "." "$" "^"))
+        do (and ls
+                (setq ls (append (butlast ls)
+                                 (list (replace-regexp-in-string
+                                        "[.*]" "" (car (reverse ls)))))))
+        and collect (if (string= i ".") "[.]" i) into ls
+        else
+        collect (concat i ".*") into ls
+        do (setq last-elm i)
+        finally return (mapconcat 'identity ls "")))
 
 (defun helm-ff-save-history ()
   "Store the last value of `helm-ff-default-directory' in `helm-ff-history'."
