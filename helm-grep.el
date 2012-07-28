@@ -213,9 +213,10 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                 (mapconcat 'shell-quote-argument all-files " ")))))
 
 (defun helm-grep-command (&optional recursive)
-  (car (split-string (if recursive
-                         helm-c-grep-default-recurse-command
-                         helm-c-grep-default-command) " ")))
+  (let ((com (car (split-string (if recursive
+                                    helm-c-grep-default-recurse-command
+                                    helm-c-grep-default-command) " "))))
+    (if (string= com "git") "git-grep" com)))
 
 (defun* helm-grep-use-ack-p (&key where)
   (case where
@@ -223,8 +224,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
     (recursive (string= (helm-grep-command t) "ack-grep"))
     (strict (and (string= (helm-grep-command t) "ack-grep")
                  (string= (helm-grep-command) "ack-grep")))
-    (t (or (string= (helm-grep-command t) "ack-grep")
-           (string= (helm-grep-command) "ack-grep")))))
+    (t (and (not (string= (helm-grep-command) "git-grep"))
+            (or (string= (helm-grep-command) "ack-grep")
+                (string= (helm-grep-command t) "ack-grep"))))))
           
 (defun helm-c-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
@@ -251,7 +253,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                   ignored-files)))
          (types             (and (helm-grep-use-ack-p)
                                  ;; When %e format spec is not specified
-                                 ;; in command we need to pass an empty string
+                                 ;; in `helm-c-grep-default-command'
+                                 ;; we need to pass an empty string
                                  ;; to types to avoid error.
                                  (or include "")))
          (cmd-line          (format-spec
@@ -264,7 +267,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                          (cons ?p (shell-quote-argument
                                                    helm-pattern))
                                          (cons ?f fnargs)))))
-         ;; Use pipe only with grep.
+         ;; Use pipe only with grep or git-grep.
          (process-connection-type (helm-grep-use-ack-p))
          (tramp-verbose helm-tramp-verbose))
     ;; Start grep process.
