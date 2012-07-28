@@ -69,6 +69,7 @@ The \"-r\" option must be the last option."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")     'helm-ff-run-toggle-basename)
+    (define-key map (kbd "C-s")     'helm-ff-run-grep)
     (define-key map (kbd "M-g s")   'helm-ff-run-grep)
     (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
     (define-key map (kbd "M-g p")   'helm-ff-run-pdfgrep)
