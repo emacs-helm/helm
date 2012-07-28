@@ -187,11 +187,17 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
       (loop for i in candidates append
             (cond ((string-match "^git" helm-c-grep-default-command)
                    (list i))
-                  ( ;; Candidate is a directory and we use recursion.
-                   (and (file-directory-p i)
+                  ;; Candidate is a directory and we use recursion.
+                  ((and (file-directory-p i)
                         helm-grep-in-recurse)
                    (list (expand-file-name i)))
                   ;; Candidate is a directory, search in all files.
+                  ;; NOTE that `file-expand-wildcards' will return also
+                  ;; directories, they will be ignored by grep but not
+                  ;; by ack-grep that will grep all files of this directory
+                  ;; without recursing in subdirs though, see that as a one
+                  ;; level recursion with ack-grep.
+                  ;; So I leave it as it is, considering it is a feature. [1]
                   ((file-directory-p i)
                    (file-expand-wildcards
                     (concat (file-name-as-directory (expand-file-name i)) "*") t))
@@ -202,13 +208,14 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                    (list (expand-file-name
                           (directory-file-name ; Needed for windoze.
                            (file-name-directory (directory-file-name i))))))
-                  ;; Candidate use wildcard.
+                  ;; Candidate use wildcard. Same comments as in [1].
                   ((string-match "^\*" (helm-c-basename i))
                    (file-expand-wildcards i t))
-                  ;; Else should be one or more file.
+                  ;; Else should be one or more file/directory
+                  ;; possibly marked.
                   (t (list i))) into all-files
             finally return
-            (if (string-match "^git\\|^ack" helm-c-grep-default-command)
+            (if (string-match "^git" helm-c-grep-default-command)
                 (mapconcat 'identity all-files " ")
                 (mapconcat 'shell-quote-argument all-files " ")))))
 
