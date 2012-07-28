@@ -518,7 +518,11 @@ When RECURSE is given use -r option of grep and prompt user
 to set the --include args of grep.
 You can give more than one arg separated by space.
 e.g *.el *.py *.tex.
-If it's empty --exclude `grep-find-ignored-files' is used instead."
+If you are using ack-grep, you will be prompted for --type
+instead.
+If prompt is empty '--exclude `grep-find-ignored-files'' is used instead.
+ZGREP when non--nil use zgrep instead, without prompting for a choice
+in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
   (when (and (helm-grep-use-ack-p)
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
