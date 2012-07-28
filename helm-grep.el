@@ -539,6 +539,7 @@ If it's empty --exclude `grep-find-ignored-files' is used instead."
                              (read-string "OnlyExt(*.[ext]): "
                                           globs)))
          (types (and recurse
+                     (not zgrep)
                      (helm-grep-use-ack-p :where 'recursive)
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
