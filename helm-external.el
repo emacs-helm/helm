@@ -151,6 +151,7 @@ If not found or a prefix arg is given query the user which tool to use."
                                   "Program: " collection
                                   :must-match t
                                   :name "Open file Externally"
+                                  :del-input nil
                                   :history helm-external-command-history)
                                ;; Always prompt to set this program as default.
                                (setq def-prog nil))
@@ -193,6 +194,7 @@ You can set your own list of commands with
                  "RunProgram: "
                  (helm-c-external-commands-list-1 'sort)
                  :must-match t
+                 :del-input nil
                  :name "External Commands"
                  :history helm-external-command-history)))
   (helm-run-or-raise program)

@@ -333,6 +333,7 @@ Return an alist with elements like (data . number_results)."
                       (helm-c-build-elvi-list)
                       :must-match t
                       :name "Surfraw Search Engines"
+                      :del-input nil
                       :history helm-surfraw-engines-history)))
   (let* ((engine-nodesc (car (split-string engine)))
          (url (with-temp-buffer
