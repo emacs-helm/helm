@@ -74,6 +74,7 @@
     (define-key map (kbd "C-w")        'helm-yank-text-at-point)
     (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
     (define-key map (kbd "C-r")        'undefined)
+    (define-key map (kbd "C-s")        'undefined)
     (define-key map (kbd "C-t")        'helm-toggle-resplit-window)
     (define-key map (kbd "C-}")        'helm-narrow-window)
     (define-key map (kbd "C-{")        'helm-enlarge-window)
