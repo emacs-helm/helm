@@ -511,13 +511,27 @@ These extensions will be added to command line with --include arg of grep."
                                 " [" (match-string 3) "]")
                         (concat "no" (match-string 2))))))
 
+(defun helm-grep-ack-types-transformer (candidates source)
+  (loop for i in candidates
+        if (stringp i)
+        collect (rassoc i helm-grep-ack-types-cache)
+        else
+        collect i))
+
+(defvar helm-grep-ack-types-cache nil)
 (defun helm-grep-read-ack-type ()
   "Select types for the '--type' argument of ack-grep."
   (require 'helm-mode)
-  (let ((types (helm-comp-read "Types: "
-                               (helm-grep-hack-types)
-                               :marked-candidates t
-                               :must-match t)))
+  (require 'helm-adaptative)
+  (setq helm-grep-ack-types-cache (helm-grep-hack-types))
+  (let ((types (helm-comp-read
+                "Types: " helm-grep-ack-types-cache
+                :name "*Ack-grep types*"
+                :marked-candidates t
+                :must-match t
+                :fc-transformer '(helm-c-adaptive-sort
+                                  helm-grep-ack-types-transformer)
+                :buffer "*helm ack-types*")))
     (mapconcat #'(lambda (type)
                        (concat "--type=" type))
                types " ")))
