@@ -178,6 +178,7 @@ The function that call this should set `helm-ec-target' to thing at point."
 (provide 'helm-eshell)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

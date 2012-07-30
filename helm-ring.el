@@ -344,14 +344,14 @@ It is drop-in replacement of `yank-pop'.
 
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (let ((plist '(:sources helm-c-source-kill-ring
-                 :buffer "*helm kill-ring*"))
-        (fn    (if (get-buffer-window helm-buffer) #'helm-nest #'helm)))
-    (apply fn plist)))
+  (helm :sources helm-c-source-kill-ring
+        :buffer "*helm kill-ring*"
+        :allow-nest t))
 
 (provide 'helm-ring)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

@@ -1048,11 +1048,10 @@ This is used in transformers to modify candidates list."
   "Main function to execute helm sources.
 
 Keywords supported:
-:sources :input :prompt :resume :preselect :buffer :keymap :default :history
-Extra keywords are supported and can be added, see below.
+:sources :input :prompt :resume :preselect
+:buffer :keymap :default :history :allow-nest
 
-When call interactively with no arguments deprecated `helm-sources'
-will be used if non--nil.
+Extra keywords are supported and can be added, see below.
 
 PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
 \(&optional sources input prompt resume
@@ -1104,30 +1103,49 @@ By default all minibuffer input is pushed to `minibuffer-history',
 if an argument HISTORY is provided, input will be pushed to HISTORY.
 History element should be a symbol.
 
+\:allow-nest
+
+Allow running this helm command within a running helm session.
+
 Of course, conventional arguments are supported, the two are same.
 
 \(helm :sources sources :input input :prompt prompt :resume resume
-           :preselect preselect :buffer buffer :keymap keymap :default default
-           :history history\)
+       :preselect preselect :buffer buffer :keymap keymap :default default
+       :history history\)
+
+and
+
 \(helm sources input prompt resume preselect buffer keymap default history\)
+
+are the same.
+
+However the use of non keyword args is deprecated and should not be used.
 
 Other keywords are interpreted as local variables of this helm session.
 The `helm-' prefix can be omitted.  For example,
 
 \(helm :sources 'helm-c-source-buffers-list
-           :buffer \"*buffers*\" :candidate-number-limit 10\)
+       :buffer \"*buffers*\" :candidate-number-limit 10\)
 
 means starting helm session with `helm-c-source-buffers'
 source in *buffers* buffer and set variable `helm-candidate-number-limit'
 to 10 as session local variable."
-  (if (keywordp (car plist))
-      (helm-let-internal
-       (helm-parse-keys plist)
-       (lambda ()
-         (apply 'helm
-                (mapcar (lambda (key) (plist-get plist key))
-                        helm-argument-keys))))
-      (apply 'helm-internal plist)))
+  (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
+                       (and helm-alive-p (memq 'allow-nest plist)))
+                   #'helm-nest)
+                  ((keywordp (car plist))
+                   #'helm)
+                  (t #'helm-internal))))
+    (if (and helm-alive-p (eq fn #'helm))
+        (error "Error: Trying to run helm within a running helm session")
+        (if (keywordp (car plist))
+            (helm-let-internal
+             (helm-parse-keys plist)
+             (lambda ()
+               (apply fn
+                      (mapcar (lambda (key) (plist-get plist key))
+                              helm-argument-keys))))
+            (apply fn plist)))))
 
 (defun helm-parse-keys (keys)
   "Parse the KEYS arguments of `helm'.
@@ -3436,6 +3454,7 @@ How to send a bug report:
 (provide 'helm)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

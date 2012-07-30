@@ -807,6 +807,7 @@ Note: This mode will work only partially on Emacs23."
 (provide 'helm-mode)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

@@ -141,6 +141,7 @@ http://emacs-w3m.namazu.org/"
 (provide 'helm-w3m)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

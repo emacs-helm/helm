@@ -409,6 +409,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

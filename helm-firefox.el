@@ -103,6 +103,7 @@ After closing firefox, you will be able to browse you bookmarks.
 (provide 'helm-firefox)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

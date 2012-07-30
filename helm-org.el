@@ -174,6 +174,7 @@ See http://orgmode.org for the latest version.")
 (provide 'helm-org)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t

@@ -573,6 +573,7 @@ STRING is string to match."
 (provide 'helm-elisp)
 
 ;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; byte-compile-dynamic: t
