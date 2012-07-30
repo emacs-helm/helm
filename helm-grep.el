@@ -557,18 +557,14 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
           ;; rule out helm-match-plugin because the input is one regexp.
           (delq 'helm-compile-source--match-plugin
                 (copy-sequence helm-compile-source-functions)))
-         (exts (helm-c-grep-guess-extensions targets))
-         (globs (and (not zgrep) (mapconcat 'identity exts " ")))
-         (include-files (and recurse
-                             ;; zgrep will search in all files with ext matching
-                             ;; `helm-zgrep-file-extension-regexp'
-                             (not zgrep)
-                             (not (helm-grep-use-ack-p :where 'recursive))
-                             (read-string "OnlyExt(*.[ext]): "
-                                          globs)))
-         (types (and recurse
-                     (not zgrep)
-                     (helm-grep-use-ack-p :where 'recursive)
+         (exts (and recurse (not zgrep)
+                    (not (helm-grep-use-ack-p :where 'recursive))
+                    (helm-c-grep-guess-extensions targets)))
+         (globs (and exts (mapconcat 'identity exts " ")))
+         (include-files (and globs (read-string "OnlyExt(*.[ext]): "
+                                                globs)))
+         (types (and (not include-files)
+                     recurse
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-c-grep-default-command)
