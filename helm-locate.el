@@ -117,20 +117,22 @@ See `helm-locate-with-db' and `helm-locate'."
    (and localdb
         (or (helm-ff-find-locatedb from-ff)
             (helm-c-read-file-name
-             "Choose or create Locate Db file: "
+             "Choose or create Locate Db file (locate.db) : "
              :initial-input (or helm-ff-default-directory
                                 default-directory)
              :marked-candidates t
              :preselect helm-locate-db-file-regexp
              :persistent-action #'(lambda (candidate)
-                                    (shell-command
-                                     (format helm-locate-create-db-command
-                                             candidate
-                                             helm-ff-default-directory))
-                                    (helm-force-update
-                                     (if helm-ff-transformer-show-only-basename
-                                         (helm-c-basename candidate)
-                                         candidate)))
+                                    (if (file-directory-p candidate)
+                                        (message "Error: The locate Db should be a file")
+                                        (shell-command
+                                         (format helm-locate-create-db-command
+                                                 candidate
+                                                 helm-ff-default-directory))
+                                        (helm-force-update
+                                         (if helm-ff-transformer-show-only-basename
+                                             (helm-c-basename candidate)
+                                             candidate))))
              :must-match t
              :persistent-help "Create locale locate Db"
              :test #'(lambda (x)
