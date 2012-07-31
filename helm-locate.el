@@ -117,7 +117,7 @@ See `helm-locate-with-db' and `helm-locate'."
    (and localdb
         (or (helm-ff-find-locatedb from-ff)
             (helm-c-read-file-name
-             "Choose or create Locate Db file (locate.db) : "
+             "Choose or create Locate Db file (locate.db): "
              :initial-input (or helm-ff-default-directory
                                 default-directory)
              :marked-candidates t

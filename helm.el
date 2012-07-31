@@ -1184,15 +1184,13 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (let ((old-overridding-local-map overriding-local-map))
       (unwind-protect
            (condition-case v
-               (let ( ;; It is needed because `helm-source-name' is non-nil
-                     ;; when `helm' is invoked by action. Awful global scope.
+               (let (;; `helm-source-name' is non-nil
+                     ;; when `helm' is invoked by action, reset it.
                      helm-source-name
                      helm-in-persistent-action
                      helm-quit
                      (case-fold-search t)
-                     (helm-buffer (or any-buffer helm-buffer))
-                     ;; cua-mode ; avoid error when region is selected
-                     )
+                     (helm-buffer (or any-buffer helm-buffer)))
                  (with-helm-restore-variables
                    (helm-initialize any-resume any-input any-sources)
                    (helm-display-buffer helm-buffer)
@@ -2971,16 +2969,17 @@ If N is positive enlarge, if negative narrow."
 (defun helm-swap-windows ()
   "Swap window holding `helm-buffer' with other window."
   (interactive)
-  (let* ((w1 (helm-window))
-         (b1 (window-buffer w1))
-         (s1 (window-start w1))
-         (w2 (next-window w1 1))
-         (b2 (window-buffer w2))
-         (s2 (window-start w2)))
-    (helm-replace-buffer-in-window w1 b1 b2)
-    (helm-replace-buffer-in-window w2 b2 b1)
-    (set-window-start w1 s2 t)
-    (set-window-start w2 s1 t)))
+  (unless (and helm-samewindow (one-window-p t))
+    (let* ((w1 (helm-window))
+           (b1 (window-buffer w1))
+           (s1 (window-start w1))
+           (w2 (next-window w1 1))
+           (b2 (window-buffer w2))
+           (s2 (window-start w2)))
+      (helm-replace-buffer-in-window w1 b1 b2)
+      (helm-replace-buffer-in-window w2 b2 b1)
+      (set-window-start w1 s2 t)
+      (set-window-start w2 s1 t))))
 
 (defun helm-replace-buffer-in-window (window buffer1 buffer2)
   "Replace BUFFER1 by BUFFER2 in WINDOW registering BUFFER1."
@@ -3079,8 +3078,8 @@ if `helm-samewindow' is non--nil also."
   (with-helm-window
     (setq helm-persistent-action-display-window
           (cond ((and (window-live-p helm-persistent-action-display-window)
-                      (not (loop for w in (get-buffer-window-list helm-buffer)
-                                 thereis helm-persistent-action-display-window)))
+                      (not (member helm-persistent-action-display-window
+                                   (get-buffer-window-list helm-buffer))))
                  helm-persistent-action-display-window)
                 ((and helm-samewindow (one-window-p t) (not onewindow))
                  (split-window))
