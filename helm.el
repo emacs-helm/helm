@@ -3049,17 +3049,21 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
 
 ;;;###autoload
 (defun* helm-execute-persistent-action
-    (&optional (attr 'persistent-action) onewindow)
+    (&optional (attr 'persistent-action) split-onewindow)
   "Perform the associated action ATTR without quitting helm.
 ATTR default is 'persistent-action', but it can be helm else.
 In this case you have to add this new attribute to your source.
-When `helm-samewindow' and ONEWINDOW are non--nil,
-the helm window is never split in persistent action."
+When `helm-samewindow' or SPLIT-ONEWINDOW are non--nil,
+and `helm-buffer' is displayed in only one window,
+the helm window is splitted to display
+`helm-select-persistent-action-window' in other window 
+and keep its visibility."
   (interactive)
   (helm-log "executing persistent-action")
   (with-helm-window
     (save-selected-window
-      (helm-select-persistent-action-window onewindow)
+      (helm-select-persistent-action-window
+       (or split-onewindow (and helm-samewindow (one-window-p t))))
       (helm-log-eval (current-buffer))
       (let ((helm-in-persistent-action t))
         (with-helm-display-same-window
@@ -3071,29 +3075,26 @@ the helm window is never split in persistent action."
           (helm-log-run-hook 'helm-after-persistent-action-hook))))))
 
 
-(defun helm-persistent-action-display-window (&optional onewindow)
+(defun helm-persistent-action-display-window (&optional split-onewindow)
   "Return the window that will be used for persistent action.
-If ONEWINDOW is non--nil window will not be splitted in persistent action
-if `helm-samewindow' is non--nil also."
+If SPLIT-ONEWINDOW is non--nil window will be splitted in persistent action."
   (with-helm-window
     (setq helm-persistent-action-display-window
           (cond ((and (window-live-p helm-persistent-action-display-window)
                       (not (member helm-persistent-action-display-window
                                    (get-buffer-window-list helm-buffer))))
                  helm-persistent-action-display-window)
-                ((and helm-samewindow (one-window-p t) (not onewindow))
-                 (split-window))
+                (split-onewindow (split-window))
                 ((get-buffer-window helm-current-buffer))
-                (t
-                 (next-window (selected-window) 1))))))
+                (t (next-window (selected-window) 1))))))
 
-(defun helm-select-persistent-action-window (&optional onewindow)
+(defun helm-select-persistent-action-window (&optional split-onewindow)
   "Select the window that will be used for persistent action.
-See `helm-persistent-action-display-window' for how to use ONEWINDOW."
+See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
   (select-window (get-buffer-window (helm-buffer-get)))
   (select-window
    (setq minibuffer-scroll-window
-         (helm-persistent-action-display-window onewindow))))
+         (helm-persistent-action-display-window split-onewindow))))
 
 (defun helm-persistent-action-display-buffer (buf &optional not-this-window)
   "Make `pop-to-buffer' and `display-buffer' display in the same window.
