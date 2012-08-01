@@ -40,8 +40,7 @@ source.")
       ;; If woman is unable to format correctly
       ;; use man instead.
       (error (kill-buffer) ; Kill woman buffer.
-             (let ((Man-notify-method 'meek))
-               (Man-getpage-in-background candidate))))))
+             (Man-getpage-in-background candidate)))))
 
 (defvar helm-c-source-man-pages
   `((name . "Manual Pages")
