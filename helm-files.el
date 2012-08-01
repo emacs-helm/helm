@@ -1299,7 +1299,7 @@ purpose."
            (list (format "Opening directory: access denied, `%s'" path)))
           ((file-directory-p path) (helm-ff-directory-files path t))
           (t
-           (append (list path) ; No need to check for must-match.
+           (append (unless require-match (list path))
                    (helm-ff-directory-files path-name-dir t))))))
 
 (defun helm-ff-directory-files (directory &optional full)
