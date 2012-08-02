@@ -3078,7 +3078,19 @@ and keep its visibility."
            (or (assoc-default attr (helm-get-current-source))
                (helm-get-action))
            t)
-          (helm-log-run-hook 'helm-after-persistent-action-hook))))))
+          (helm-log-run-hook 'helm-after-persistent-action-hook))
+        ;; A typical case is when a persistent action delete
+        ;; the buffer already displayed in
+        ;; `helm-persistent-action-display-window' and `helm-samewindow'
+        ;; is enabled, we end up with the `helm-buffer'
+        ;; displayed in two windows.
+        (when (and helm-samewindow
+                   (> (length (window-list)) 1)
+                   (equal (buffer-name
+                           (window-buffer
+                            helm-persistent-action-display-window))
+                          helm-buffer))
+          (delete-other-windows))))))
 
 
 (defun helm-persistent-action-display-window (&optional split-onewindow)
