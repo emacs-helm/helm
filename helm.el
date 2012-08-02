@@ -1881,8 +1881,14 @@ when emacs is idle for `helm-idle-delay'."
 Argument PRESELECT is a string or regexp used to move selection to a particular
 place once updating is done.  It should be used on single source because search
 is done on whole `helm-buffer' and not on current source."
-  (helm-log "start update")
+  (helm-log "Start updating")
   (helm-kill-async-processes)
+  ;; When persistent action have been called
+  ;; we have two windows even with `helm-samewindow'.
+  ;; So go back to one window when updating if `helm-samewindow'
+  ;; is non--nil.
+  (with-helm-window
+    (when helm-samewindow (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
     (erase-buffer)
