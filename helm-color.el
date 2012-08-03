@@ -38,8 +38,12 @@
     (init . helm-custom-faces-init)
     (candidates-in-buffer)
     (get-line . buffer-substring)
-    (action . (lambda (line)
-                (customize-face (intern (car (split-string line)))))))
+    (action . (("Customize"
+                . (lambda (line)
+                    (customize-face (intern (car (split-string line))))))
+               ("Copy name"
+                . (lambda (line)
+                    (kill-new (car (split-string line " " t))))))))
   "See (info \"(emacs)Faces\")")
 
 ;;; Colors browser
