@@ -399,7 +399,6 @@ It is disabled by default because *Helm Log* grows quickly.")
 (defvar helm-cib-hash (make-hash-table :test 'equal))
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
-(defvar helm-once-called-functions nil)
 (defvar helm-follow-mode nil)
 (defvar helm-let-variables nil)
 (defvar helm-split-window-state nil)
@@ -909,13 +908,6 @@ Otherwise, return VALUE itself."
         (t
          value)))
 
-(defun helm-once (function &rest args)
-  "Ensure FUNCTION with ARGS to be called once in `helm' session."
-  (let ((spec (cons function args)))
-    (unless (member spec helm-once-called-functions)
-      (apply function args)
-      (push spec helm-once-called-functions))))
-
 
 ;; Core: API helper
 (defun* helm-empty-buffer-p (&optional (buffer helm-buffer))
@@ -923,19 +915,13 @@ Otherwise, return VALUE itself."
 Default value for BUFFER is `helm-buffer'."
   (zerop (buffer-size (and buffer (get-buffer buffer)))))
 
-(defun helm-let-eval-varlist (varlist)
-  "Return the list of pairs VARLIST with each cdr of pair evaluated.
-If VARLIST contain single elements, those are returned
-as a list of one element."
-  (mapcar (lambda (pair)
-            (if (listp pair)
-                (cons (car pair) (eval (cadr pair)))
-                (cons pair nil)))
-          varlist))
-
 (defun helm-let-internal (binding bodyfunc)
   "Set BINDING to helm buffer-local variables and Evaluate BODYFUNC.
-BINDING is a list of \(VARNAME . VALUE\) pair."
+BINDING is a list of (VARNAME . VALUE) pair.
+The BINDING list should be created with `helm-parse-keys' when `helm'
+is called.
+Each KEYS VARNAME of elements of BINDING will be bound locally
+to VALUE by `helm-create-helm-buffer'."
   (setq helm-let-variables binding)
   (unwind-protect
        (funcall bodyfunc)
@@ -1142,9 +1128,8 @@ to 10 as session local variable."
             (helm-let-internal
              (helm-parse-keys plist)
              (lambda ()
-               (apply fn
-                      (mapcar (lambda (key) (plist-get plist key))
-                              helm-argument-keys))))
+               (apply fn (mapcar #'(lambda (key) (plist-get plist key))
+                                 helm-argument-keys))))
             (apply fn plist)))))
 
 (defun helm-parse-keys (keys)
@@ -1403,7 +1388,6 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
   (setq helm-current-prefix-arg nil)
-  (setq helm-once-called-functions nil)
   (setq helm-delayed-init-executed nil)
   (setq helm-current-buffer
         (if (minibuffer-window-active-p (minibuffer-window))
