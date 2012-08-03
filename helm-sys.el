@@ -22,10 +22,14 @@
 
 
 ;;; Top (process)
+;;
+;;
 (defvar helm-c-top-command "COLUMNS=%s top -b -n 1"
   "Top command (batch mode). %s is replaced with `frame-width'.")
+
 (defvar helm-c-source-top
-  '((name . "Top (Press C-c C-u to refresh)")
+  '((name . "Top")
+    (header-name . (lambda (name) (concat name " (Press C-c C-u to refresh)"))) 
     (init . helm-c-top-init)
     (candidates-in-buffer)
     (display-to-real . helm-c-top-display-to-real)
