@@ -115,7 +115,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         for com = (intern i)
                         when (commandp com)
                         collect i into hist finally return hist))
-         command)
+         command sym-com)
     (flet ((pers-help (candidate)
              (let ((hbuf (get-buffer (help-buffer)))
                    special-display-buffer-names
