@@ -95,6 +95,12 @@
 (fset 'helm-command-prefix helm-command-map)
 (setq  helm-command-prefix helm-command-map)
 
+;;; Minibuffer history
+;; We need this because minibuffer will not be necessary be used
+;; first by an helm command.  This will define `helm-minibuffer-history-key'
+;; as soon minibuffer is in use.
+(add-hook 'minibuffer-setup-hook #'(lambda () (require 'helm-misc)))
+
 
 ;;; Menu
 ;;
