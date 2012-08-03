@@ -114,7 +114,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         for i in extended-command-history
                         for com = (intern i)
                         when (commandp com)
-                        collect i into hist finally return hist)))
+                        collect i into hist finally return hist))
+         command)
     (flet ((pers-help (candidate)
              (let ((hbuf (get-buffer (help-buffer)))
                    special-display-buffer-names
@@ -134,30 +135,30 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                    (message nil) ; Erase the new stupid message Type "q"[...]
                    (setq in-help t))
                (setq help-cand candidate))))
-      (let* ((command (helm-comp-read
-                       "M-x " obarray
-                       :test 'commandp
-                       :requires-pattern helm-M-x-requires-pattern
-                       :name "Emacs Commands"
-                       :buffer "*helm M-x*"
-                       :persistent-action 'pers-help
-                       :persistent-help "Describe this command"
-                       :history history
-                       :del-input nil
-                       :must-match t
-                       :candidates-in-buffer t
-                       :fc-transformer 'helm-M-x-transformer))
-             (sym-com (intern command)))
+      (setq command (intern
+                     (helm-comp-read
+                      "M-x " obarray
+                      :test 'commandp
+                      :requires-pattern helm-M-x-requires-pattern
+                      :name "Emacs Commands"
+                      :buffer "*helm M-x*"
+                      :persistent-action 'pers-help
+                      :persistent-help "Describe this command"
+                      :history history
+                      :del-input nil
+                      :must-match t
+                      :candidates-in-buffer t
+                      :fc-transformer 'helm-M-x-transformer)))
         (unless current-prefix-arg
           (setq current-prefix-arg helm-current-prefix-arg))
         ;; Avoid having `this-command' set to *exit-minibuffer.
-        (setq this-command sym-com)
+        (setq this-command command)
         (unless helm-M-x-always-save-history
-          (call-interactively sym-com))
+          (call-interactively command))
         (setq extended-command-history
               (cons command (delete command history)))
         (when helm-M-x-always-save-history
-          (call-interactively sym-com))))))
+          (call-interactively command))))))
 
 (provide 'helm-command)
 
