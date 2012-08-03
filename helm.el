@@ -1299,7 +1299,6 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
 For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
   (helm-log "start initialization: any-resume=%S any-input=%S"
             any-resume any-input)
-  (setq helm-alive-p t)
   (helm-frame-or-window-configuration 'save)
   (setq helm-sources (helm-normalize-sources any-sources))
   (helm-log "sources = %S" helm-sources)
@@ -1308,6 +1307,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
   (if (helm-resume-p any-resume)
       (helm-initialize-overlays (helm-buffer-get))
       (helm-initial-setup))
+  (setq helm-alive-p t)
   (unless (eq any-resume 'noresume)
     (helm-recent-push helm-buffer 'helm-buffers)
     (setq helm-last-buffer helm-buffer))
