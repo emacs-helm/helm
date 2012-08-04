@@ -343,7 +343,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Revert buffer without quitting helm."
   (interactive)
   (helm-attrset 'revert-action 'helm-buffer-revert-and-update)
-  (helm-execute-persistent-action 'revert-action 'onewindow))
+  (helm-execute-persistent-action 'revert-action))
 
 (defun helm-buffer-save-and-update (candidate)
   (let ((marked (helm-marked-candidates))
@@ -358,7 +358,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Save buffer without quitting helm."
   (interactive)
   (helm-attrset 'save-action 'helm-buffer-save-and-update)
-  (helm-execute-persistent-action 'save-action 'onewindow))
+  (helm-execute-persistent-action 'save-action))
 
 ;;;###autoload
 (defun helm-buffer-run-kill-buffers ()
