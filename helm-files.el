@@ -1485,12 +1485,15 @@ This is called normally on third hit of \
 \\<helm-map>\\[helm-execute-persistent-action]
 in `helm-find-files-persistent-action'."
   (let* ((buf      (get-file-buffer candidate))
-         (buf-name (buffer-name buf)))
-    (if (and buf (get-buffer-window buf)
+         (buf-name (buffer-name buf))
+         (win (get-buffer-window buf)))
+    (if (and buf win
              (not (eq buf (get-buffer helm-current-buffer)))
              (not (buffer-modified-p buf)))
         (progn
-          (kill-buffer buf) (message "Buffer `%s' killed" buf-name))
+          (kill-buffer buf)
+          (set-window-buffer win helm-current-buffer)
+          (message "Buffer `%s' killed" buf-name))
         (find-file candidate))))
 
 ;;;###autoload

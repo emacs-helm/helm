@@ -3086,16 +3086,13 @@ and keep its visibility."
         ;; `helm-persistent-action-display-window' and `helm-samewindow'
         ;; is enabled, we end up with the `helm-buffer'
         ;; displayed in two windows.
-        (when (and (> (length (window-list)) 1)
+        (when (and helm-samewindow
+                   (> (length (window-list)) 1)
                    (equal (buffer-name
                            (window-buffer
                             helm-persistent-action-display-window))
                           helm-buffer))
-          (if helm-samewindow
-              (delete-other-windows)
-              (set-window-buffer helm-persistent-action-display-window
-                                 helm-current-buffer)))))))
-
+          (delete-other-windows))))))
 
 (defun helm-persistent-action-display-window (&optional split-onewindow)
   "Return the window that will be used for persistent action.
