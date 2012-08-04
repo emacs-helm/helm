@@ -2959,17 +2959,35 @@ If N is positive enlarge, if negative narrow."
 (defun helm-swap-windows ()
   "Swap window holding `helm-buffer' with other window."
   (interactive)
-  (unless (and helm-samewindow (one-window-p t))
-    (let* ((w1 (helm-window))
-           (b1 (window-buffer w1))
-           (s1 (window-start w1))
-           (w2 (next-window w1 1))
-           (b2 (window-buffer w2))
-           (s2 (window-start w2)))
-      (helm-replace-buffer-in-window w1 b1 b2)
-      (helm-replace-buffer-in-window w2 b2 b1)
-      (set-window-start w1 s2 t)
-      (set-window-start w2 s1 t))))
+  (if (and helm-samewindow (one-window-p t))
+      (error "Error: Can't swap windows in a single window")
+      (let* ((w1 (helm-window))
+             (split-state (eq helm-split-window-state 'horizontal))
+             (w1size (window-total-size w1 split-state))
+             (b1 (window-buffer w1))    ; helm-buffer
+             (s1 (window-start w1))
+             (w2 (next-window w1 1))
+             (w2size (window-total-size w2 split-state))
+             (b2 (window-buffer w2))    ; probably helm-current-buffer
+             (s2 (window-start w2))
+             resize)
+        (helm-replace-buffer-in-window w1 b1 b2)
+        (helm-replace-buffer-in-window w2 b2 b1)
+        (setq resize
+              (cond ( ;; helm-window is smaller than other window.
+                     (< w1size w2size)
+                     (lognot (- (max w2size w1size)
+                                (min w2size w1size))))
+                    ( ;; helm-window is larger than other window.
+                     (> w1size w2size)
+                     (- (max w2size w1size)
+                        (min w2size w1size)))
+                    ( ;; windows have probably same size.
+                     t nil)))
+        ;; Maybe resize the window holding helm-buffer.
+        (and resize (window-resize w2 resize split-state))
+        (set-window-start w1 s2 t)
+        (set-window-start w2 s1 t))))
 
 (defun helm-replace-buffer-in-window (window buffer1 buffer2)
   "Replace BUFFER1 by BUFFER2 in WINDOW registering BUFFER1."
@@ -3068,13 +3086,15 @@ and keep its visibility."
         ;; `helm-persistent-action-display-window' and `helm-samewindow'
         ;; is enabled, we end up with the `helm-buffer'
         ;; displayed in two windows.
-        (when (and helm-samewindow
-                   (> (length (window-list)) 1)
+        (when (and (> (length (window-list)) 1)
                    (equal (buffer-name
                            (window-buffer
                             helm-persistent-action-display-window))
                           helm-buffer))
-          (delete-other-windows))))))
+          (if helm-samewindow
+              (delete-other-windows)
+              (set-window-buffer helm-persistent-action-display-window
+                                 helm-current-buffer)))))))
 
 
 (defun helm-persistent-action-display-window (&optional split-onewindow)
