@@ -125,7 +125,9 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                      ;; When M-x is started from a help buffer,
                      ;; Don't kill it as it is helm-current-buffer.
                      (unless (equal hbuf helm-current-buffer)
-                       (kill-buffer hbuf))
+                       (kill-buffer hbuf)
+                       (set-window-buffer (get-buffer-window hbuf)
+                                          helm-current-buffer))
                      (setq in-help nil))
                    ;; Be sure helm-current-buffer
                    ;; have not a dedicated window.
