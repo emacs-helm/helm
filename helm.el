@@ -2961,15 +2961,15 @@ If N is positive enlarge, if negative narrow."
   (interactive)
   (if (and helm-samewindow (one-window-p t))
       (error "Error: Can't swap windows in a single window")
-      (let* ((w1 (helm-window))
+      (let* ((w1          (helm-window))
              (split-state (eq helm-split-window-state 'horizontal))
-             (w1size (window-total-size w1 split-state))
-             (b1 (window-buffer w1))    ; helm-buffer
-             (s1 (window-start w1))
-             (w2 (next-window w1 1))
-             (w2size (window-total-size w2 split-state))
-             (b2 (window-buffer w2))    ; probably helm-current-buffer
-             (s2 (window-start w2))
+             (w1size      (window-total-size w1 split-state))
+             (b1          (window-buffer w1)) ; helm-buffer
+             (s1          (window-start w1))
+             (w2          (next-window w1 1))
+             (w2size      (window-total-size w2 split-state))
+             (b2          (window-buffer w2)) ; probably helm-current-buffer
+             (s2          (window-start w2))
              resize)
         (helm-replace-buffer-in-window w1 b1 b2)
         (helm-replace-buffer-in-window w2 b2 b1)

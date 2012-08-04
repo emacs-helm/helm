@@ -2107,7 +2107,7 @@ members of FLIST."
           :buffer buffer)))
 
 ;;;###autoload
-(define-minor-mode helm-dired-mode ()
+(define-minor-mode helm-dired-mode
   "Enable helm completion in Dired functions.
 Bindings affected are C, R, S, H.
 This is deprecated for Emacs24+ users, use `helm-mode' instead."
