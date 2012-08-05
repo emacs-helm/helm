@@ -1818,10 +1818,13 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
   (let* ((def-dir (helm-c-current-directory))
+         (abs (and file-at-pt
+                   (not (string-match ffap-url-regexp file-at-pt))
+                   (expand-file-name file-at-pt def-dir)))
          (lib     (when helm-ff-search-library-in-sexp
                     (helm-find-library-at-point)))
          (hlink   (helm-ff-find-url-at-point))
-         (remp    (and file-at-pt (file-remote-p file-at-pt)))
+         (remp    (and abs (file-remote-p abs)))
          (file-p  (and (not remp)
                        file-at-pt
                        (not (string= file-at-pt ""))
@@ -1830,10 +1833,10 @@ Use it for non--interactive calls of `helm-find-files'."
                        (file-exists-p
                         (file-name-directory
                          (expand-file-name thing-at-pt def-dir))))))
-    (cond (lib)   ; e.g we are inside a require sexp.
-          (hlink) ; String at point is an hyperlink.
-          (remp file-at-pt) ; A remote file
-          (file-p           ; a regular file
+    (cond (lib)      ; e.g we are inside a require sexp.
+          (hlink)    ; String at point is an hyperlink.
+          (remp abs) ; A remote file
+          (file-p    ; a regular file
            ;; Avoid ffap annoyances, don't use `ffap-alist'.
            (let (ffap-alist) (ffap-file-at-point)))
           (t (and (not (string= file-at-pt "")) ; possibly an url or email.
