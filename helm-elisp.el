@@ -301,8 +301,8 @@ or between double quotes."
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (candidates-in-buffer)
-    (action . (lambda (candidate)
-                (describe-variable (intern candidate))))))
+    (action . (("Describe Variable" . helm-c-describe-variable)
+               ("Find Variable" . helm-c-find-variable)))))
 
 (defun helm-c-source-emacs-faces (&optional default)
   `((name . "Faces")
@@ -332,8 +332,8 @@ or between double quotes."
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (candidates-in-buffer)
-    (action . (lambda (candidate)
-                (describe-function (intern candidate))))))
+    (action . (("Describe Function" . helm-c-describe-function)
+               ("Find Function" . helm-c-find-function)))))
 
 (defun helm-c-source-emacs-functions (&optional default)
   `((name . "Functions")
@@ -344,8 +344,8 @@ or between double quotes."
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (candidates-in-buffer)
-    (action . (lambda (candidate)
-                (describe-function (intern candidate))))))
+    (action . (("Describe Function" . helm-c-describe-function)
+               ("Find Function" . helm-c-find-function)))))
 ;;;###autoload
 (defun helm-c-apropos ()
   "Preconfigured helm to describe commands, functions, variables and faces."
