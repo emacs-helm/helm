@@ -2967,28 +2967,30 @@ If N is positive enlarge, if negative narrow."
              (w1size      (window-total-size w1 split-state))
              (b1          (window-buffer w1)) ; helm-buffer
              (s1          (window-start w1))
-             (w2          (next-window w1 1))
+             (cur-frame   (window-frame w1))
+             (w2          (next-window w1 1 cur-frame))
              (w2size      (window-total-size w2 split-state))
              (b2          (window-buffer w2)) ; probably helm-current-buffer
              (s2          (window-start w2))
              resize)
-        (helm-replace-buffer-in-window w1 b1 b2)
-        (helm-replace-buffer-in-window w2 b2 b1)
-        (setq resize
-              (cond ( ;; helm-window is smaller than other window.
-                     (< w1size w2size)
-                     (lognot (- (max w2size w1size)
-                                (min w2size w1size))))
-                    ( ;; helm-window is larger than other window.
-                     (> w1size w2size)
-                     (- (max w2size w1size)
-                        (min w2size w1size)))
-                    ( ;; windows have probably same size.
-                     t nil)))
-        ;; Maybe resize the window holding helm-buffer.
-        (and resize (window-resize w2 resize split-state))
-        (set-window-start w1 s2 t)
-        (set-window-start w2 s1 t))))
+        (with-selected-frame (window-frame w1)
+          (helm-replace-buffer-in-window w1 b1 b2)
+          (helm-replace-buffer-in-window w2 b2 b1)
+          (setq resize
+                (cond ( ;; helm-window is smaller than other window.
+                       (< w1size w2size)
+                       (lognot (- (max w2size w1size)
+                                  (min w2size w1size))))
+                      ( ;; helm-window is larger than other window.
+                       (> w1size w2size)
+                       (- (max w2size w1size)
+                          (min w2size w1size)))
+                      ( ;; windows have probably same size.
+                       t nil)))
+          ;; Maybe resize the window holding helm-buffer.
+          (and resize (window-resize w2 resize split-state))
+          (set-window-start w1 s2 t)
+          (set-window-start w2 s1 t)))))
 
 (defun helm-replace-buffer-in-window (window buffer1 buffer2)
   "Replace BUFFER1 by BUFFER2 in WINDOW registering BUFFER1."
