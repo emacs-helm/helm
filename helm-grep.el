@@ -483,7 +483,7 @@ These extensions will be added to command line with --include arg of grep."
                    (member glob glob-list)
                    (member glob grep-find-ignored-files))
         collect glob into glob-list
-        finally return glob-list))
+        finally return (append glob-list (list "*"))))
 
 (defun helm-grep-collect-candidates ()
   (let* ((helm-c-grep-default-command
@@ -559,10 +559,20 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
                 (copy-sequence helm-compile-source-functions)))
          (exts (and recurse (not zgrep)
                     (not (helm-grep-use-ack-p :where 'recursive))
-                    (helm-c-grep-guess-extensions targets)))
-         (globs (and exts (mapconcat 'identity exts " ")))
-         (include-files (and globs (read-string "OnlyExt(*.[ext]): "
-                                                globs)))
+                    (helm-comp-read
+                     "Search Only in: "
+                     (helm-c-grep-guess-extensions targets)
+                     :marked-candidates t
+                     :must-match t
+                     :fc-transformer 'helm-c-adaptive-sort
+                     :buffer "*helm grep exts*")))
+         (include-files (and exts
+                             (mapconcat #'(lambda (x)
+                                            (concat "--include="
+                                                    (shell-quote-argument x)))
+                                        (if (> (length exts) 1)
+                                            (remove "*" exts)
+                                            exts) " ")))
          (types (and (not include-files)
                      recurse
                      ;; When %e format spec is not specified
@@ -571,12 +581,6 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
                      (helm-grep-read-ack-type))))
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
-    (when include-files
-      (setq include-files
-            (and (not (string= include-files ""))
-                 (mapconcat #'(lambda (x)
-                                (concat "--include=" (shell-quote-argument x)))
-                            (split-string include-files) " "))))
     (helm
      :sources
      `(((name . ,(if zgrep "Zgrep" (capitalize (if recurse
