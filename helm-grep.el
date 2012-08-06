@@ -689,9 +689,7 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
   "Go to next or precedent candidate file in helm grep/etags buffers.
 If N is positive go forward otherwise go backward."
   (let* ((current-line-list  (split-string
-                              (buffer-substring
-                               (point-at-bol)
-                               (point-at-eol)) ":"))
+                              (helm-get-selection nil t) ":"))
          (current-fname      (nth 0 current-line-list))
          (bob-or-eof         (if (eq n 1) 'eobp 'bobp)))
     (flet ((mark-maybe ()

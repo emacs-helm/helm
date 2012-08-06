@@ -2111,7 +2111,8 @@ STRING is the output of PROCESS."
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line)
-        (helm-display-mode-line (helm-get-current-source)))))
+        (helm-display-mode-line (helm-get-current-source))
+        (helm-maybe-update-keymap))))
 
 (defun helm-kill-async-processes ()
   "Kill all known asynchronous processes of `helm-async-processes'."
