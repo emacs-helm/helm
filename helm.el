@@ -1368,8 +1368,7 @@ window or frame configuration is saved/restored according to values of
                  ;; This is needed for minibuffer own-frame config
                  ;; when recursive minibuffers are in use.
                  ;; e.g M-: + helm-minibuffer-history.
-                 (setq frame (if (minibuffer-window-active-p
-                                  (minibuffer-window))
+                 (setq frame (if (minibufferp helm-current-buffer)
                                  (selected-frame)
                                  (last-nonminibuffer-frame))))
                (select-frame-set-input-focus frame)))))
