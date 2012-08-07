@@ -1365,7 +1365,13 @@ window or frame configuration is saved/restored according to values of
                ;; If `helm-save-configuration-functions' are window functions
                ;; frame should be nil, use current frame.
                (unless (framep frame)
-                 (setq frame (selected-frame)))
+                 ;; This is needed for minibuffer own-frame config
+                 ;; when recursive minibuffers are in use.
+                 ;; e.g M-: + helm-minibuffer-history.
+                 (setq frame (if (minibuffer-window-active-p
+                                  (minibuffer-window))
+                                 (selected-frame)
+                                 (last-nonminibuffer-frame))))
                (select-frame-set-input-focus frame)))))
 
 
