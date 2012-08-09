@@ -695,11 +695,11 @@ If N is positive go forward otherwise go backward."
   (let* ((current-line-list  (split-string
                               (helm-get-selection nil t) ":"))
          (current-fname      (nth 0 current-line-list))
-         (bob-or-eof         (if (eq n 1) 'eobp 'bobp)))
-    (flet ((mark-maybe ()
-             (if (eq major-mode 'helm-grep-mode)
-                 (ignore)
-                 (helm-mark-current-line))))
+         (bob-or-eof         (if (eq n 1) 'eobp 'bobp))
+         (mark-maybe #'(lambda ()
+                         (if (eq major-mode 'helm-grep-mode)
+                             (ignore)
+                             (helm-mark-current-line)))))
       (catch 'break
         (while (not (funcall bob-or-eof))
           (forward-line n) ; Go forward or backward depending of n value.
@@ -708,17 +708,17 @@ If N is positive go forward otherwise go backward."
           (unless (or (search-forward current-fname (point-at-eol) t)
                       (and (eq major-mode 'helm-grep-mode)
                            (not (get-text-property (point-at-bol) 'help-echo))))
-            (mark-maybe)
+            (funcall mark-maybe)
             (throw 'break nil))))
       (cond ((and (> n 0) (eobp))
              (re-search-backward ".")
              (forward-line 0)
-             (mark-maybe))
+             (funcall mark-maybe))
             ((and (< n 0) (bobp))
              (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
                  (goto-char it)
              (forward-line 1))
-             (mark-maybe))))))
+             (funcall mark-maybe)))))
 
 ;;;###autoload
 (defun helm-c-goto-precedent-file ()

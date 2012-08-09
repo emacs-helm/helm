@@ -116,14 +116,14 @@ http://ctags.sourceforge.net/")
 (defun helm-c-etags-find-tag-file-directory (current-dir)
   "Try to find the directory containing tag file.
 If not found in CURRENT-DIR search in upper directory."
-  (flet ((file-exists? (dir)
-           (let ((tag-path (expand-file-name
-                            helm-c-etags-tag-file-name dir)))
-             (and (stringp tag-path)
-                  (file-regular-p tag-path)
-                  (file-readable-p tag-path)))))
+  (let ((file-exists? #'(lambda (dir)
+                          (let ((tag-path (expand-file-name
+                                           helm-c-etags-tag-file-name dir)))
+                            (and (stringp tag-path)
+                                 (file-regular-p tag-path)
+                                 (file-readable-p tag-path))))))
     (loop with count = 0
-          until (file-exists? current-dir)
+          until (funcall file-exists? current-dir)
           ;; Return nil if outside the value of
           ;; `helm-c-etags-tag-file-search-limit'.
           if (= count helm-c-etags-tag-file-search-limit)

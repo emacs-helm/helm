@@ -245,10 +245,10 @@ That's mean you can pass prefix args before or after calling a command
 that use `helm-comp-read' See `helm-M-x' for example."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (flet ((action-fn (candidate)
-           (if marked-candidates
-               (helm-marked-candidates)
-               (identity candidate))))
+  (let ((action-fn #'(lambda (candidate)
+                       (if marked-candidates
+                           (helm-marked-candidates)
+                           (identity candidate)))))
     ;; Assume completion have been already required,
     ;; so always use 'confirm.
     (when (eq must-match 'confirm-after-completion)
@@ -284,7 +284,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        (persistent-action . ,persistent-action)
                        (persistent-help . ,persistent-help)
                        (mode-line . ,mode-line)
-                       (action . ,'action-fn)))
+                       (action . ,action-fn)))
            (src `((name . ,name)
                   (candidates
                    . (lambda ()
@@ -305,7 +305,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
                   (mode-line . ,mode-line)
-                  (action . ,'action-fn)))
+                  (action . ,action-fn)))
            (src-1 `((name . ,name)
                     (init
                      . (lambda ()
@@ -329,7 +329,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     (persistent-action . ,persistent-action)
                     (persistent-help . ,persistent-help)
                     (mode-line . ,mode-line)
-                    (action . ,'action-fn)))
+                    (action . ,action-fn)))
            (src-list (list src-hist
                            (if candidates-in-buffer
                                src-1
@@ -615,11 +615,10 @@ Keys description:
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
 
-  (flet ((action-fn (candidate)
-           (if marked-candidates
-               (helm-marked-candidates)
-               (identity candidate))))
-
+  (let ((action-fn #'(lambda (candidate)
+                       (if marked-candidates
+                           (helm-marked-candidates)
+                           (identity candidate)))))
     (let* ((helm-mp-highlight-delay nil)
            ;; Be sure we don't erase the underlying minibuffer if some.
            (helm-ff-auto-update-initial-value
@@ -648,7 +647,7 @@ Keys description:
               (candidates . hist)
               (persistent-action . ,persistent-action)
               (persistent-help . ,persistent-help)
-              (action . ,'action-fn))
+              (action . ,action-fn))
              ((name . ,name)
               (header-name . (lambda (name)
                                (concat name helm-c-find-files-doc-header)))
@@ -662,8 +661,8 @@ Keys description:
                        (loop with hn = (helm-ff-tramp-hostnames)
                              for i in (helm-find-files-get-candidates
                                        must-match)
-                             when (or (member i hn)            ; A tramp host
-                                      (funcall test i)         ; Test ok
+                             when (or (member i hn)    ; A tramp host
+                                      (funcall test i) ; Test ok
                                       (not (file-exists-p i))) ; A new file.
                              collect i)
                        (helm-find-files-get-candidates must-match))))
@@ -672,7 +671,7 @@ Keys description:
               (candidate-number-limit . 9999)
               (persistent-help . ,persistent-help)
               (volatile)
-              (action . ,'action-fn)))
+              (action . ,action-fn)))
            :input initial-input
            :prompt prompt
            :resume 'noresume

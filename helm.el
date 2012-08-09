@@ -2871,38 +2871,38 @@ Acceptable values of CREATE-OR-BUFFER:
                                helm-source-name))
          (local-bname (format " *helm candidates:%s*%s"
                               helm-source-name
-                              (buffer-name helm-current-buffer))))
-    (flet ((register-func ()
-             (setq helm-candidate-buffer-alist
-                   (cons (cons helm-source-name create-or-buffer)
-                         (delete (assoc helm-source-name
-                                        helm-candidate-buffer-alist)
-                                 helm-candidate-buffer-alist))))
-           (kill-buffers-func ()
-             (loop for b in (buffer-list)
-                   if (string-match (format "^%s" (regexp-quote global-bname))
-                                    (buffer-name b))
-                   do (kill-buffer b)))
-           (create-func ()
-             (with-current-buffer
-                 (get-buffer-create (if (eq create-or-buffer 'global)
-                                        global-bname
-                                        local-bname))
-               (buffer-disable-undo)
-               (erase-buffer)
-               (font-lock-mode -1)))
-           (return-func ()
-             (or (get-buffer local-bname)
-                 (get-buffer global-bname)
-                 (helm-aif (assoc-default helm-source-name
-                                          helm-candidate-buffer-alist)
-                     (and (buffer-live-p it) it)))))
-      (when create-or-buffer
-        (register-func)
-        (unless (bufferp create-or-buffer)
-          (and (eq create-or-buffer 'global) (kill-buffers-func))
-          (create-func)))
-      (return-func))))
+                              (buffer-name helm-current-buffer)))
+         (register-func #'(lambda ()
+                            (setq helm-candidate-buffer-alist
+                                  (cons (cons helm-source-name create-or-buffer)
+                                        (delete (assoc helm-source-name
+                                                       helm-candidate-buffer-alist)
+                                                helm-candidate-buffer-alist)))))
+         (kill-buffers-func #'(lambda ()
+                                (loop for b in (buffer-list)
+                                      if (string-match (format "^%s" (regexp-quote global-bname))
+                                                       (buffer-name b))
+                                      do (kill-buffer b))))
+         (create-func #'(lambda ()
+                          (with-current-buffer
+                              (get-buffer-create (if (eq create-or-buffer 'global)
+                                                     global-bname
+                                                     local-bname))
+                            (buffer-disable-undo)
+                            (erase-buffer)
+                            (font-lock-mode -1))))
+         (return-func #'(lambda ()
+                          (or (get-buffer local-bname)
+                              (get-buffer global-bname)
+                              (helm-aif (assoc-default helm-source-name
+                                                       helm-candidate-buffer-alist)
+                                  (and (buffer-live-p it) it))))))
+    (when create-or-buffer
+      (funcall register-func)
+      (unless (bufferp create-or-buffer)
+        (and (eq create-or-buffer 'global) (funcall kill-buffers-func))
+        (funcall create-func)))
+    (funcall return-func)))
 
 (defun helm-init-candidates-in-buffer (buffer data)
   "Register BUFFER with DATA for an helm candidates-in-buffer session.

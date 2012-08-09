@@ -89,34 +89,34 @@ Return an alist with elements like (data . number_results)."
   (setq helm-ggs-max-length-real-flag 0
         helm-ggs-max-length-num-flag 0)
   (let ((request (concat helm-c-google-suggest-url
-                         (url-hexify-string input))))
-    (flet ((fetch ()
-             (loop
-                   with result-alist = (xml-get-children
-                                        (car (xml-parse-region
-                                              (point-min) (point-max)))
-                                        'CompleteSuggestion)
-                   for i in result-alist
-                   for data = (cdr (caadr (assoc 'suggestion i)))
-                   for nqueries = (cdr (caadr (assoc 'num_queries i)))
-                   for lqueries = (length (helm-c-ggs-set-number-result
-                                           nqueries))
-                   for ldata = (length data)
-                   do
-                   (progn
-                     (when (> ldata helm-ggs-max-length-real-flag)
-                       (setq helm-ggs-max-length-real-flag ldata))
-                     (when (> lqueries helm-ggs-max-length-num-flag)
-                       (setq helm-ggs-max-length-num-flag lqueries)))
-                   collect (cons data nqueries) into cont
-                   finally return cont)))
-      (if helm-google-suggest-use-curl-p
-          (with-temp-buffer
-            (call-process "curl" nil t nil request)
-            (fetch))
-          (with-current-buffer
-              (url-retrieve-synchronously request)
-            (fetch))))))
+                         (url-hexify-string input)))
+        (fetch #'(lambda ()
+                   (loop
+                         with result-alist = (xml-get-children
+                                              (car (xml-parse-region
+                                                    (point-min) (point-max)))
+                                              'CompleteSuggestion)
+                         for i in result-alist
+                         for data = (cdr (caadr (assoc 'suggestion i)))
+                         for nqueries = (cdr (caadr (assoc 'num_queries i)))
+                         for lqueries = (length (helm-c-ggs-set-number-result
+                                                 nqueries))
+                         for ldata = (length data)
+                         do
+                         (progn
+                           (when (> ldata helm-ggs-max-length-real-flag)
+                             (setq helm-ggs-max-length-real-flag ldata))
+                           (when (> lqueries helm-ggs-max-length-num-flag)
+                             (setq helm-ggs-max-length-num-flag lqueries)))
+                         collect (cons data nqueries) into cont
+                         finally return cont))))
+    (if helm-google-suggest-use-curl-p
+        (with-temp-buffer
+          (call-process "curl" nil t nil request)
+          (funcall fetch))
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (funcall fetch)))))
 
 (defun helm-c-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
@@ -208,18 +208,16 @@ Return an alist with elements like (data . number_results)."
 Return an alist with elements like (data . number_results)."
   (let ((request (concat helm-c-yahoo-suggest-url
                          (url-hexify-string input))))
-    (flet ((fetch ()
-             (loop
-                   with result-alist = (xml-get-children
-                                        (car (xml-parse-region
-                                              (point-min) (point-max)))
-                                        'Result)
-                   for i in result-alist
-                   collect (caddr i))))
-      (with-current-buffer
-          (url-retrieve-synchronously request)
-        (fetch)))))
-
+    (with-current-buffer
+        (url-retrieve-synchronously request)
+      (loop with result-alist =
+            (xml-get-children
+             (car (xml-parse-region
+                   (point-min) (point-max)))
+             'Result)
+            for i in result-alist
+            collect (caddr i)))))
+        
 (defun helm-c-yahoo-suggest-set-candidates ()
   "Set candidates with Yahoo results found."
   (let ((suggestions (helm-c-yahoo-suggest-fetch helm-input)))

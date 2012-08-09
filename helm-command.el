@@ -107,60 +107,59 @@ Show global bindings and local bindings according to current `major-mode'."
   "Preconfigured `helm' for Emacs commands.
 It is `helm' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
-  (let* (in-help
-         help-cand
-         helm-persistent-action-use-special-display
-         (history (loop with hist
+  (let* ((history (loop with hist
                         for i in extended-command-history
                         for com = (intern i)
                         when (commandp com)
                         collect i into hist finally return hist))
-         command sym-com)
-    (flet ((pers-help (candidate)
-             (let ((hbuf (get-buffer (help-buffer)))
-                   special-display-buffer-names
-                   special-display-regexps)
-               (if (and in-help (string= candidate help-cand))
-                   (progn
-                     ;; When M-x is started from a help buffer,
-                     ;; Don't kill it as it is helm-current-buffer.
-                     (unless (equal hbuf helm-current-buffer)
-                       (kill-buffer hbuf)
-                       (set-window-buffer (get-buffer-window hbuf)
-                                          helm-current-buffer))
-                     (setq in-help nil))
-                   ;; Be sure helm-current-buffer
-                   ;; have not a dedicated window.
-                   (set-window-dedicated-p
-                    (get-buffer-window helm-current-buffer) nil)
-                   (describe-function (intern candidate))
-                   (message nil) ; Erase the new stupid message Type "q"[...]
-                   (setq in-help t))
-               (setq help-cand candidate))))
-      (setq command (helm-comp-read
-                     "M-x " obarray
-                     :test 'commandp
-                     :requires-pattern helm-M-x-requires-pattern
-                     :name "Emacs Commands"
-                     :buffer "*helm M-x*"
-                     :persistent-action 'pers-help
-                     :persistent-help "Describe this command"
-                     :history history
-                     :del-input nil
-                     :must-match t
-                     :candidates-in-buffer t
-                     :fc-transformer 'helm-M-x-transformer))
-      (setq sym-com (intern command))
-      (unless current-prefix-arg
-        (setq current-prefix-arg helm-current-prefix-arg))
-      ;; Avoid having `this-command' set to *exit-minibuffer.
-      (setq this-command sym-com)
-      (unless helm-M-x-always-save-history
-        (call-interactively sym-com))
-      (setq extended-command-history
-            (cons command (delete command history)))
-      (when helm-M-x-always-save-history
-        (call-interactively sym-com)))))
+         command sym-com in-help help-cand
+         helm-persistent-action-use-special-display
+         (pers-help #'(lambda (candidate)
+                        (let ((hbuf (get-buffer (help-buffer)))
+                              special-display-buffer-names
+                              special-display-regexps)
+                          (if (and in-help (string= candidate help-cand))
+                              (progn
+                                ;; When M-x is started from a help buffer,
+                                ;; Don't kill it as it is helm-current-buffer.
+                                (unless (equal hbuf helm-current-buffer)
+                                  (kill-buffer hbuf)
+                                  (set-window-buffer (get-buffer-window hbuf)
+                                                     helm-current-buffer))
+                                (setq in-help nil))
+                              ;; Be sure helm-current-buffer
+                              ;; have not a dedicated window.
+                              (set-window-dedicated-p
+                               (get-buffer-window helm-current-buffer) nil)
+                              (describe-function (intern candidate))
+                              (message nil)
+                              (setq in-help t))
+                          (setq help-cand candidate)))))
+    (setq command (helm-comp-read
+                   "M-x " obarray
+                   :test 'commandp
+                   :requires-pattern helm-M-x-requires-pattern
+                   :name "Emacs Commands"
+                   :buffer "*helm M-x*"
+                   :persistent-action pers-help
+                   :persistent-help "Describe this command"
+                   :history history
+                   :del-input nil
+                   :must-match t
+                   :candidates-in-buffer t
+                   :fc-transformer 'helm-M-x-transformer))
+    (setq sym-com (intern command))
+    (unless current-prefix-arg
+      (setq current-prefix-arg helm-current-prefix-arg))
+    ;; Avoid having `this-command' set to *exit-minibuffer.
+    (setq this-command sym-com)
+    ;; This ugly construct is to save history even on error.
+    (unless helm-M-x-always-save-history
+      (call-interactively sym-com))
+    (setq extended-command-history
+          (cons command (delete command history)))
+    (when helm-M-x-always-save-history
+      (call-interactively sym-com))))
 
 (provide 'helm-command)
 

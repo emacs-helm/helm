@@ -599,17 +599,17 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 
 (defun helm-ff-switch-to-eshell (candidate)
   "Switch to eshell and cd to `helm-ff-default-directory'."
-  (flet ((cd-eshell ()
-           (goto-char (point-max))
-           (insert
-            (format "cd '%s'" helm-ff-default-directory))
-           (eshell-send-input)))
+  (let ((cd-eshell #'(lambda ()
+                       (goto-char (point-max))
+                       (insert
+                        (format "cd '%s'" helm-ff-default-directory))
+                       (eshell-send-input))))
     (if (get-buffer "*eshell*")
         (progn
           (helm-c-switch-to-buffer "*eshell*")
-          (cd-eshell))
+          (funcall cd-eshell))
         (call-interactively 'eshell)
-        (cd-eshell))))
+        (funcall cd-eshell))))
 
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files to `helm-ff-default-directory' with METHOD.
@@ -664,46 +664,41 @@ will be treated with METHOD.
 Default METHOD is rename."
   ;; Maybe remove directories selected by error in collection.
   (setq collection (remove-if 'file-directory-p collection))
-  (flet ((symlink-file (file dest)
-           (let ((flist (list file)))
-             (helm-dired-action
-              dest :action 'symlink :files flist))))
-
-    (let* ((tmp-dir  (file-name-as-directory
-                      (concat (file-name-as-directory directory)
-                              (symbol-name (gensym "tmp")))))
-           (fn       (case method
-                       (copy    'copy-file)
-                       (symlink 'symlink-file)
-                       (rename  'rename-file)
-                       (t (error "Error: Unknow method %s" method)))))
-      (make-directory tmp-dir)
-      (unwind-protect
-           (progn
-             ;; Rename all files to tmp-dir with new-name.
-             ;; If files are not from start directory, use method
-             ;; to move files to tmp-dir.
-             (loop for i in collection
-                   for count from start-at-num
-                   for fnum = (if (< count 10) "0%s" "%s")
-                   for nname = (concat tmp-dir new-name (format fnum count)
-                                       (if (not (string= extension ""))
-                                           (format ".%s" (replace-regexp-in-string
-                                                          "[.]" "" extension))
-                                           (file-name-extension i 'dot)))
-                   do (if (helm-ff-member-directory-p i directory)
-                          (rename-file i nname)
-                          (funcall fn i nname)))
-             ;; Now move all from tmp-dir to destination.
-             (loop with dirlist = (directory-files
-                                   tmp-dir t directory-files-no-dot-files-regexp)
-                   for f in dirlist do
-                   (if (file-symlink-p f)
-                       (symlink-file (file-truename f)
-                                     (concat (file-name-as-directory directory)
-                                             (helm-c-basename f)))
-                       (rename-file f directory))))
-        (delete-directory tmp-dir t)))))
+  (let* ((tmp-dir  (file-name-as-directory
+                    (concat (file-name-as-directory directory)
+                            (symbol-name (gensym "tmp")))))
+         (fn       (case method
+                     (copy    'copy-file)
+                     (symlink 'make-symbolic-link)
+                     (rename  'rename-file)
+                     (t (error "Error: Unknow method %s" method)))))
+    (make-directory tmp-dir)
+    (unwind-protect
+         (progn
+           ;; Rename all files to tmp-dir with new-name.
+           ;; If files are not from start directory, use method
+           ;; to move files to tmp-dir.
+           (loop for i in collection
+                 for count from start-at-num
+                 for fnum = (if (< count 10) "0%s" "%s")
+                 for nname = (concat tmp-dir new-name (format fnum count)
+                                     (if (not (string= extension ""))
+                                         (format ".%s" (replace-regexp-in-string
+                                                        "[.]" "" extension))
+                                         (file-name-extension i 'dot)))
+                 do (if (helm-ff-member-directory-p i directory)
+                        (rename-file i nname)
+                        (funcall fn i nname)))
+           ;; Now move all from tmp-dir to destination.
+           (loop with dirlist = (directory-files
+                                 tmp-dir t directory-files-no-dot-files-regexp)
+                 for f in dirlist do
+                 (if (file-symlink-p f)
+                     (make-symbolic-link (file-truename f)
+                                         (concat (file-name-as-directory directory)
+                                                 (helm-c-basename f)))
+                     (rename-file f directory))))
+      (delete-directory tmp-dir t))))
 
 (defun helm-ff-serial-rename (candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
@@ -1677,71 +1672,70 @@ If CANDIDATE is alone, open file CANDIDATE filename.
 That's mean:
 First hit on C-z expand CANDIDATE second hit open file.
 If a prefix arg is given or `helm-follow-mode' is on open file."
-  (let ((follow        (buffer-local-value
-                        'helm-follow-mode
-                        (get-buffer-create helm-buffer)))
-        (new-pattern   (helm-get-selection))
-        (num-lines-buf (with-current-buffer helm-buffer
-                         (count-lines (point-min) (point-max)))))
-    ;; `helm-insert-in-minibuffer' don't expand correctly fnames
-    ;; (#Bugfix cursor coming back at bol).
-    ;; So use a flet or a function using `minibuffer-window'
-    ;; as before.
-    (flet ((insert-in-minibuffer (fname)
-             (with-selected-window (minibuffer-window)
-               (unless follow
-                 (delete-minibuffer-contents)
-                 (set-text-properties 0 (length fname) nil fname)
-                 (insert fname)))))
-
-      (cond ((and (string= (helm-ff-set-pattern helm-pattern)
-                           "Invalid tramp file name")
-                  (string-match tramp-file-name-regexp candidate))
-             ;; First hit insert hostname and
-             ;; second hit insert ":" and expand.
-             (if (string= candidate helm-pattern)
-                 (insert-in-minibuffer (concat candidate ":"))
-                 (insert-in-minibuffer candidate)))
-            ( ;; A symlink directory, expand it's truename.
-             (and (file-directory-p candidate) (file-symlink-p candidate))
-             (insert-in-minibuffer (file-name-as-directory
-                                    (file-truename
-                                     (expand-file-name candidate)))))
-            ;; A directory, open it.
-            ((file-directory-p candidate)
-             (when (string= (helm-c-basename candidate) "..")
-               (setq helm-ff-last-expanded helm-ff-default-directory))
-             (insert-in-minibuffer (file-name-as-directory
-                                         (expand-file-name candidate))))
-            ;; A symlink file, expand to it's true name. (first hit)
-            ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
-             (insert-in-minibuffer (file-truename candidate)))
-            ;; A regular file, expand it, (first hit)
-            ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
-             (insert-in-minibuffer new-pattern))
-            ;; An image file and it is the second hit on C-z,
-            ;; show the file in `image-dired'.
-            ((string-match (image-file-name-regexp) candidate)
-             (when (buffer-live-p image-dired-display-image-buffer)
-               (kill-buffer image-dired-display-image-buffer))
-             (image-dired-display-image candidate)
-             (message nil)
-             (helm-c-switch-to-buffer image-dired-display-image-buffer)
-             (with-current-buffer image-dired-display-image-buffer
-               (let ((exif-data (helm-ff-exif-data candidate)))
-                 (image-dired-update-property 'help-echo exif-data))))
-            ;; Allow browsing archive on avfs fs.
-            ;; Assume volume is already mounted with mountavfs.
-            ((and helm-ff-avfs-directory
-                  (string-match
-                   (regexp-quote (expand-file-name helm-ff-avfs-directory))
-                   (file-name-directory candidate))
-                  (helm-ff-file-compressed-p candidate))
-             (insert-in-minibuffer (concat candidate "#")))
-            ;; On second hit we open file.
-            ;; On Third hit we kill it's buffer maybe.
-            (t
-             (helm-ff-kill-or-find-buffer-fname candidate))))))
+  (let* ((follow        (buffer-local-value
+                         'helm-follow-mode
+                         (get-buffer-create helm-buffer)))
+         (new-pattern   (helm-get-selection))
+         (num-lines-buf (with-current-buffer helm-buffer
+                          (count-lines (point-min) (point-max))))
+         ;; `helm-insert-in-minibuffer' don't expand correctly fnames
+         ;; (#Bugfix cursor coming back at bol).
+         ;; So use a function using `minibuffer-window' instead.
+         (insert-in-minibuffer #'(lambda (fname)
+                                   (with-selected-window (minibuffer-window)
+                                     (unless follow
+                                       (delete-minibuffer-contents)
+                                       (set-text-properties 0 (length fname)
+                                                            nil fname)
+                                       (insert fname))))))
+    (cond ((and (string= (helm-ff-set-pattern helm-pattern)
+                         "Invalid tramp file name")
+                (string-match tramp-file-name-regexp candidate))
+           ;; First hit insert hostname and
+           ;; second hit insert ":" and expand.
+           (if (string= candidate helm-pattern)
+               (funcall insert-in-minibuffer (concat candidate ":"))
+               (funcall insert-in-minibuffer candidate)))
+          ( ;; A symlink directory, expand it's truename.
+           (and (file-directory-p candidate) (file-symlink-p candidate))
+           (funcall insert-in-minibuffer (file-name-as-directory
+                                          (file-truename
+                                           (expand-file-name candidate)))))
+          ;; A directory, open it.
+          ((file-directory-p candidate)
+           (when (string= (helm-c-basename candidate) "..")
+             (setq helm-ff-last-expanded helm-ff-default-directory))
+           (funcall insert-in-minibuffer (file-name-as-directory
+                                          (expand-file-name candidate))))
+          ;; A symlink file, expand to it's true name. (first hit)
+          ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
+           (funcall insert-in-minibuffer (file-truename candidate)))
+          ;; A regular file, expand it, (first hit)
+          ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
+           (funcall insert-in-minibuffer new-pattern))
+          ;; An image file and it is the second hit on C-z,
+          ;; show the file in `image-dired'.
+          ((string-match (image-file-name-regexp) candidate)
+           (when (buffer-live-p image-dired-display-image-buffer)
+             (kill-buffer image-dired-display-image-buffer))
+           (image-dired-display-image candidate)
+           (message nil)
+           (helm-c-switch-to-buffer image-dired-display-image-buffer)
+           (with-current-buffer image-dired-display-image-buffer
+             (let ((exif-data (helm-ff-exif-data candidate)))
+               (image-dired-update-property 'help-echo exif-data))))
+          ;; Allow browsing archive on avfs fs.
+          ;; Assume volume is already mounted with mountavfs.
+          ((and helm-ff-avfs-directory
+                (string-match
+                 (regexp-quote (expand-file-name helm-ff-avfs-directory))
+                 (file-name-directory candidate))
+                (helm-ff-file-compressed-p candidate))
+           (funcall insert-in-minibuffer (concat candidate "#")))
+          ;; On second hit we open file.
+          ;; On Third hit we kill it's buffer maybe.
+          (t
+           (helm-ff-kill-or-find-buffer-fname candidate)))))
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."

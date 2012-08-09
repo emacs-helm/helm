@@ -127,31 +127,31 @@ replace with STR as yanked string."
 ;; the commands `helm-mark-ring', `helm-global-mark-ring' or
 ;; `helm-all-mark-rings' instead.
 
-(defun helm-c-source-mark-ring-candidates ()
-  (flet ((get-marks (pos)
-           (save-excursion
-             (goto-char pos)
-             (beginning-of-line)
-             (let ((line  (car (split-string (thing-at-point 'line) "[\n\r]"))))
-               (when (string= "" line)
-                 (setq line  "<EMPTY LINE>"))
-               (format "%7d: %s" (line-number-at-pos) line)))))
-    (with-helm-current-buffer
-      (loop
-            with marks = (if (mark) (cons (mark-marker) mark-ring) mark-ring)
-            with recip = nil
-            for i in marks
-            for m = (get-marks i)
-            unless (member m recip)
-            collect m into recip
-            finally return recip))))
+(defun helm-mark-ring-get-marks (pos)
+  (save-excursion
+    (goto-char pos)
+    (beginning-of-line)
+    (let ((line  (car (split-string (thing-at-point 'line) "[\n\r]"))))
+      (when (string= "" line)
+        (setq line  "<EMPTY LINE>"))
+      (format "%7d: %s" (line-number-at-pos) line))))
+
+(defun helm-mark-ring-get-candidates ()
+  (with-helm-current-buffer
+    (loop with marks = (if (mark) (cons (mark-marker) mark-ring) mark-ring)
+          with recip = nil
+          for i in marks
+          for m = (helm-mark-ring-get-marks i)
+          unless (member m recip)
+          collect m into recip
+          finally return recip)))
 
 (defvar helm-mark-ring-cache nil)
 (defvar helm-c-source-mark-ring
   '((name . "mark-ring")
     (init . (lambda ()
               (setq helm-mark-ring-cache
-                    (ignore-errors (helm-c-source-mark-ring-candidates)))))
+                    (ignore-errors (helm-mark-ring-get-candidates)))))
     (candidates . (lambda ()
                     (helm-aif helm-mark-ring-cache
                         it)))
@@ -167,7 +167,7 @@ replace with STR as yanked string."
 ;;; Global-mark-ring
 (defvar helm-c-source-global-mark-ring
   '((name . "global-mark-ring")
-    (candidates . helm-c-source-global-mark-ring-candidates)
+    (candidates . helm-global-mark-ring-get-candidates)
     (action . (("Goto line"
                 . (lambda (candidate)
                     (let ((items (split-string candidate ":")))
@@ -180,30 +180,29 @@ replace with STR as yanked string."
                              (helm-match-line-color-current-line))))
     (persistent-help . "Show this line")))
 
-(defun helm-c-source-global-mark-ring-candidates ()
-  (flet ((buf-fn (m)
-           (with-current-buffer (marker-buffer m)
-             (goto-char m)
-             (beginning-of-line)
-             (let (line)
-               (if (string= "" line)
-                   (setq line  "<EMPTY LINE>")
-                   (setq line (car (split-string (thing-at-point 'line)
-                                                 "[\n\r]"))))
-               (format "%7d:%s:    %s"
-                       (line-number-at-pos) (marker-buffer m) line)))))
-    (loop
-          with marks = global-mark-ring
-          with recip = nil
-          for i in marks
-          for gm = (unless (or (string-match
-                                "^ " (format "%s" (marker-buffer i)))
-                               (null (marker-buffer i)))
-                     (buf-fn i))
-          when (and gm (not (member gm recip)))
-          collect gm into recip
-          finally return recip)))
+(defun helm-global-mark-ring-format-buffer (marker)
+  (with-current-buffer (marker-buffer marker)
+    (goto-char marker)
+    (beginning-of-line)
+    (let (line)
+      (if (string= "" line)
+          (setq line  "<EMPTY LINE>")
+          (setq line (car (split-string (thing-at-point 'line)
+                                        "[\n\r]"))))
+      (format "%7d:%s:    %s"
+              (line-number-at-pos) (marker-buffer marker) line))))
 
+(defun helm-global-mark-ring-get-candidates ()
+  (loop with marks = global-mark-ring
+        with recip = nil
+        for i in marks
+        for gm = (unless (or (string-match
+                              "^ " (format "%s" (marker-buffer i)))
+                             (null (marker-buffer i)))
+                   (helm-global-mark-ring-format-buffer i))
+        when (and gm (not (member gm recip)))
+        collect gm into recip
+        finally return recip))
 
 
 ;;;; <Register>
