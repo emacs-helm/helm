@@ -78,8 +78,10 @@
 (defvar helm-c-source-bookmarks
   `((name . "Bookmarks")
     (init . (lambda ()
-              (require 'bookmark)))
-    (candidates . bookmark-all-names)
+              (require 'bookmark)
+              (helm-init-candidates-in-buffer
+               "*hbookmark list*" (bookmark-all-names))))
+    (candidates-in-buffer)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
@@ -94,26 +96,31 @@
 (defvar helm-c-source-bookmarks-ssh
   '((name . "Bookmarks-ssh")
     (init . (lambda ()
-              (require 'bookmark)))
-    (candidates . (lambda () (helm-c-collect-bookmarks :ssh t)))
+              (require 'bookmark)
+              (helm-init-candidates-in-buffer
+               "*hbookmark list*" (helm-c-collect-bookmarks :ssh t))))
+    (candidates-in-buffer)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
 (defvar helm-c-source-bookmarks-su
   '((name . "Bookmarks-root")
     (init . (lambda ()
-              (require 'bookmark)))
-    (candidates . (lambda () (helm-c-collect-bookmarks :su t)))
-    (filtered-candidate-transformer helm-c-highlight-bookmark-su)
-
+              (require 'bookmark)
+              (helm-init-candidates-in-buffer
+               "*hbookmark list*" (helm-c-collect-bookmarks :su t))))
+    (candidates-in-buffer)
+    (filtered-candidate-transformer . helm-c-highlight-bookmark-su)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
 (defvar helm-c-source-bookmarks-local
   '((name . "Bookmarks-Local")
     (init . (lambda ()
-              (require 'bookmark)))
-    (candidates . (lambda () (helm-c-collect-bookmarks :local t)))
+              (require 'bookmark)
+              (helm-init-candidates-in-buffer
+               "*hlbookmark list*" (helm-c-collect-bookmarks :local t))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)

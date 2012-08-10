@@ -50,8 +50,11 @@
   '((name . "Bookmark Addressbook")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bmkext-addressbook-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext addressbook*"
+               (helm-c-bmkext-addressbook-setup-alist))))
+    (candidates-in-buffer)
     (persistent-action
      . (lambda (candidate)
          (let ((bmk (helm-bookmark-get-bookmark-from-name
@@ -131,8 +134,10 @@
   '((name . "Bookmark W3m")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-w3m-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext w3m*" (helm-c-bookmark-w3m-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
@@ -147,8 +152,10 @@
   '((name . "Bookmark Images")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-images-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext images*" (helm-c-bookmark-images-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
@@ -163,8 +170,10 @@
   '((name . "Bookmark Woman&Man")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-man-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext man*" (helm-c-bookmark-man-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
@@ -180,8 +189,10 @@
   '((name . "Bookmark Gnus")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-gnus-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext gnus*" (helm-c-bookmark-gnus-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
@@ -196,8 +207,10 @@
   '((name . "Bookmark Info")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-info-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext info*" (helm-c-bookmark-info-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
@@ -212,8 +225,10 @@
   '((name . "Bookmark Files&Directories")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-local-files-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext files*" (helm-c-bookmark-local-files-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
@@ -228,8 +243,10 @@
   '((name . "Bookmark Root-Files&Directories")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-su-files-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext su*" (helm-c-bookmark-su-files-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark-su)
@@ -255,8 +272,10 @@
   '((name . "Bookmark Ssh-Files&Directories")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)))
-    (candidates . helm-c-bookmark-ssh-files-setup-alist)
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               "*hbmkext ssh*" (helm-c-bookmark-ssh-files-setup-alist))))
+    (candidates-in-buffer)
     (filtered-candidate-transformer . helm-c-adaptive-sort)
     (type . bookmark)))
 
