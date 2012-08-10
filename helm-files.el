@@ -113,7 +113,7 @@ This make listing much faster, specially on slow machines."
   :type 'string)
 
 (defcustom helm-ff-exif-data-program-args "-d"
-  "*Arguments used for `helm-ff-exif-data-program'."
+  "Arguments used for `helm-ff-exif-data-program'."
   :group 'helm-files
   :type 'string)
 
@@ -186,32 +186,32 @@ This happen only in `helm-find-files'."
 ;;
 (defface helm-ff-prefix
     '((t (:background "yellow" :foreground "black")))
-  "*Face used to prefix new file or url paths in `helm-find-files'."
+  "Face used to prefix new file or url paths in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-executable
     '((t (:foreground "green")))
-  "*Face used for executable files in `helm-find-files'."
+  "Face used for executable files in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-directory
     '((t (:foreground "DarkRed" :background "LightGray")))
-  "*Face used for directories in `helm-find-files'."
+  "Face used for directories in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-symlink
     '((t (:foreground "DarkOrange")))
-  "*Face used for symlinks in `helm-find-files'."
+  "Face used for symlinks in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-invalid-symlink
     '((t (:foreground "black" :background "red")))
-  "*Face used for invalid symlinks in `helm-find-files'."
+  "Face used for invalid symlinks in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-file
     '((t (:inherit font-lock-builtin-face)))
-  "*Face used for file names in `helm-find-files'."
+  "Face used for file names in `helm-find-files'."
   :group 'helm-files)
 
 

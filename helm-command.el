@@ -42,7 +42,7 @@ Set it to 0 to disable requires-pattern in `helm-M-x'."
 ;;
 ;;
 (defface helm-M-x-key '((t (:foreground "orange" :underline t)))
-  "*Face used in helm-M-x to show keybinding."
+  "Face used in helm-M-x to show keybinding."
   :group 'helm-command)
 
 

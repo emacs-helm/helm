@@ -34,12 +34,12 @@
 
 (defface helm-apt-installed
     '((t (:foreground "green")))
-  "*Face used for apt installed candidates."
+  "Face used for apt installed candidates."
   :group 'helm-apt)
 
 (defface helm-apt-deinstalled
     '((t (:foreground "DimGray")))
-  "*Face used for apt deinstalled candidates."
+  "Face used for apt deinstalled candidates."
   :group 'helm-apt)
 
 

@@ -37,7 +37,7 @@
 
 (defface helm-emms-playlist
     '((t (:foreground "Springgreen4" :underline t)))
-  "*Face used for tracks in current emms playlist."
+  "Face used for tracks in current emms playlist."
   :group 'helm-emms)
 
 

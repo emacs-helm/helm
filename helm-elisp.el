@@ -59,12 +59,12 @@ Default is 0.6 seconds."
 ;;
 (defface helm-lisp-show-completion
     '((t (:background "DarkSlateGray")))
-  "*Face used for showing candidates in `helm-lisp-completion'."
+  "Face used for showing candidates in `helm-lisp-completion'."
   :group 'helm-elisp)
 
 (defface helm-lisp-completion-info
     '((t (:foreground "red")))
-  "*Face used for showing info in `helm-lisp-completion'."
+  "Face used for showing info in `helm-lisp-completion'."
   :group 'helm-elisp)
 
 

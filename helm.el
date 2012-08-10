@@ -111,6 +111,104 @@ Which see.  Set to 0 to disable."
   :group 'helm
   :type  'integer)
 
+(defcustom helm-display-source-at-screen-top t
+  "Display candidates at the top of screen.
+This happen when using `helm-next-source' and `helm-previous-source'."
+  :group 'helm
+  :type 'boolean)
+
+(defcustom helm-candidate-number-limit 100
+  "Limit candidate number globally.
+Do not show more candidates than this limit from individual sources.
+It is usually pointless to show hundreds of matches
+when the pattern is empty, because it is much simpler to type a
+few characters to narrow down the list of potential candidates.
+
+Set it to nil if you don't want this limit."
+  :group 'helm
+  :type 'integer)
+
+(defcustom helm-idle-delay 0.3
+  "Be idle for this many seconds, before updating in delayed sources.
+This is useful for sources involving heavy operations
+\(like launching external programs\), so that candidates
+from the source are not retrieved unnecessarily if the user keeps typing.
+
+It also can be used to declutter the results helm displays,
+so that results from certain sources are not shown with every
+character typed, only if the user hesitates a bit.
+Be sure to know what you are doing when modifying this."
+  :group 'helm
+  :type 'float)
+
+(defcustom helm-input-idle-delay 0.3
+  "Be idle for this many seconds, before updating.
+
+Unlike `helm-idle-delay', it is also effective for non-delayed sources.
+If nil, candidates are collected immediately.
+
+Note:  If this value is too low compared to `helm-idle-delay',
+you may have duplicated sources when using multiples sources.
+Safe value is always >= `helm-idle-delay'.
+Default settings are equal value for both.
+Be sure to know what you are doing when modifying this."
+  :group 'helm
+  :type 'float)
+
+(defcustom helm-samewindow nil
+  "Use current window to show the candidates.
+If t then Helm doesn't pop up a new window."
+  :group 'helm
+  :type 'boolean)
+
+(defcustom helm-quick-update nil
+  "If non-nil, suppress displaying sources which are out of screen at first.
+They are treated as delayed sources at this input.
+This flag makes `helm' a bit faster with many sources."
+  :group 'helm
+  :type 'boolean)
+
+(defcustom helm-candidate-separator
+  "--------------------"
+  "Candidates separator of `multiline' source."
+  :group 'helm
+  :type 'string)
+
+(defcustom helm-save-configuration-functions
+  '(set-window-configuration . current-window-configuration)
+  "The functions used to restore/save window or frame configurations.
+It is a pair where the car is the function to restore window or frame config,
+and the cdr is the function to save the window or frame config.
+
+If you want to save and restore frame configuration, set this variable to
+ '\(set-frame-configuration . current-frame-configuration\)
+NOTE: This may not work properly with own-frame minibuffer settings.
+Older version saves/restores frame configuration, but the default is changed now
+because flickering can occur in some environment."
+  :group 'helm
+  :type 'sexp)
+
+(defcustom helm-persistent-action-use-special-display nil
+  "If non-nil, use `special-display-function' in persistent action."
+  :group 'helm
+  :type 'boolean)
+
+(defcustom helm-scroll-amount nil
+  "Scroll amount when scrolling other window in an helm session.
+It is used by `helm-scroll-other-window'
+and `helm-scroll-other-window-down'.
+
+If you prefer scrolling line by line, set this value to 1."
+  :group 'helm
+  :type 'integer)
+
+(defcustom helm-display-function 'helm-default-display-buffer
+  "Function to display *helm* buffer.
+It is `helm-default-display-buffer' by default,
+which affects `helm-samewindow'."
+  :group 'helm
+  :type 'symbol)
+
 ;;; Faces
 ;;
 ;;
@@ -165,8 +263,8 @@ Which see.  Set to 0 to disable."
   "Face for action lines in the helm action buffer."
   :group 'helm)
 
-
-;;; Variables
+
+;;; Variables.
 ;;
 ;;
 (defvar helm-type-attributes nil
@@ -178,44 +276,6 @@ Don't set this directly, use instead `define-helm-type-attribute'.
 This allows specifying common attributes for several sources.
 For example, sources which provide files can specify
 common attributes with a `file' type.")
-
-(defvar helm-display-source-at-screen-top t
-  "*Display candidates at the top of screen.
-This happen when using `helm-next-source' and `helm-previous-source'.")
-
-(defvar helm-candidate-number-limit 100
-  "*Limit candidate number globally.
-Do not show more candidates than this limit from individual sources.
-It is usually pointless to show hundreds of matches
-when the pattern is empty, because it is much simpler to type a
-few characters to narrow down the list of potential candidates.
-
-Set it to nil if you don't want this limit.")
-
-(defvar helm-idle-delay 0.3
-  "*Be idle for this many seconds, before updating in delayed sources.
-This is useful for sources involving heavy operations
-\(like launching external programs\), so that candidates
-from the source are not retrieved unnecessarily if the user keeps typing.
-
-It also can be used to declutter the results helm displays,
-so that results from certain sources are not shown with every
-character typed, only if the user hesitates a bit.")
-
-(defvar helm-input-idle-delay 0.3
-  "Be idle for this many seconds, before updating.
-
-Unlike `helm-idle-delay', it is also effective for non-delayed sources.
-If nil, candidates are collected immediately.
-
-Note:  If this value is too low compared to `helm-idle-delay',
-you may have duplicated sources when using multiples sources.
-Safe value is always >= `helm-idle-delay'.
-Default settings are equal value for both.")
-
-(defvar helm-samewindow nil
-  "Use current window to show the candidates.
-If t then Helm doesn't pop up a new window.")
 
 (defvar helm-source-filter nil
   "A list of source names to be displayed.
@@ -291,13 +351,10 @@ and before performing action.")
 (defvar helm-current-prefix-arg nil
   "Record `current-prefix-arg' when exiting minibuffer.")
 
-(defvar helm-candidate-separator
-  "--------------------"
-  "Candidates separator of `multiline' source.")
-
 (defvar helm-saved-action nil
   "Saved value of the currently selected action by key.")
 
+;; [TODO] Remove.
 (defvar helm-last-sources nil
   "OBSOLETE!! Sources of previously invoked `helm'.")
 
@@ -310,31 +367,11 @@ and before performing action.")
 (defvar helm-in-persistent-action nil
   "Flag whether in persistent-action or not.")
 
-(defvar helm-quick-update nil
-  "If non-nil, suppress displaying sources which are out of screen at first.
-They are treated as delayed sources at this input.
-This flag makes `helm' a bit faster with many sources.")
-
 (defvar helm-last-sources-local nil
   "Buffer local value of `helm-sources'.")
 
 (defvar helm-last-buffer nil
   "`helm-buffer' of previously `helm' session.")
-
-(defvar helm-save-configuration-functions
-  '(set-window-configuration . current-window-configuration)
-  "The functions used to restore/save window or frame configurations.
-It is a pair where the car is the function to restore window or frame config,
-and the cdr is the function to save the window or frame config.
-
-If you want to save and restore frame configuration, set this variable to
- '\(set-frame-configuration . current-frame-configuration\)
-
-Older version saves/restores frame configuration, but the default is changed now
-because flickering can occur in some environment. ")
-
-(defvar helm-persistent-action-use-special-display nil
-  "If non-nil, use `special-display-function' in persistent action.")
 
 (defvar helm-execute-action-at-once-if-one nil
   "Execute default action and exit when only one candidate is remaining.
@@ -345,18 +382,6 @@ It is useful for `helm' applications.")
 This variable accepts a function, which is executed if no candidate.
 
 It is useful for `helm' applications.")
-
-(defvar helm-scroll-amount nil
-  "Scroll amount when scrolling other window in an helm session.
-It is used by `helm-scroll-other-window'
-and `helm-scroll-other-window-down'.
-
-If you prefer scrolling line by line, set this value to 1.")
-
-(defvar helm-display-function 'helm-default-display-buffer
-  "Function to display *helm* buffer.
-It is `helm-default-display-buffer' by default,
-which affects `helm-samewindow'.")
 
 (defvar helm-source-in-each-line-flag nil
   "Non-nil means add helm-source text-property in each candidate.
@@ -2984,8 +3009,8 @@ If N is positive enlarge, if negative narrow."
           (setq resize
                 (cond ( ;; helm-window is smaller than other window.
                        (< w1size w2size)
-                       (lognot (- (max w2size w1size)
-                                  (min w2size w1size))))
+                       (- (- (max w2size w1size)
+                                      (min w2size w1size))))
                       ( ;; helm-window is larger than other window.
                        (> w1size w2size)
                        (- (max w2size w1size)
