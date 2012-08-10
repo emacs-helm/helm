@@ -581,24 +581,23 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
                      (helm-grep-read-ack-type))))
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
+    ;; If `helm-find-files' haven't already started,
+    ;; give a default value to `helm-ff-default-directory'.
+    (unless helm-ff-default-directory
+      (setq helm-ff-default-directory default-directory))
+    ;; We need these global vars
+    ;; to further pass infos to `helm-resume'.
+    (setq helm-grep-last-targets targets
+          helm-grep-include-files (or include-files types)
+          helm-grep-in-recurse recurse
+          helm-grep-use-zgrep zgrep
+          helm-grep-last-default-directory
+          helm-ff-default-directory)
     (helm
      :sources
      `(((name . ,(if zgrep "Zgrep" (capitalize (if recurse
                                                    (helm-grep-command t)
                                                    (helm-grep-command)))))
-        (init . (lambda ()
-                  ;; If `helm-find-files' haven't already started,
-                  ;; give a default value to `helm-ff-default-directory'.
-                  (unless helm-ff-default-directory
-                    (setq helm-ff-default-directory default-directory))
-                  ;; We need these global vars
-                  ;; to further pass infos to `helm-resume'.
-                  (setq helm-grep-last-targets targets
-                        helm-grep-include-files (or include-files types)
-                        helm-grep-in-recurse recurse
-                        helm-grep-use-zgrep zgrep
-                        helm-grep-last-default-directory
-                        helm-ff-default-directory)))
         (header-name . (lambda (name)
                          (concat name "(C-c ? Help)")))
         (candidates . helm-grep-collect-candidates)
