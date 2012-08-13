@@ -31,6 +31,7 @@
 (declare-function eshell-read-aliases-list "em-alias")
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (declare-function eshell-bol "esh-mode")
+(declare-function eshell-parse-arguments "esh-arg" (beg end))
 
 (defvar helm-eshell-history-map
   (let ((map (make-sparse-keymap)))
@@ -72,31 +73,31 @@ The function that call this should set `helm-ec-target' to thing at point."
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
   (catch 'pcompleted
-    (let* ((pcomplete-stub)
-           pcomplete-seen pcomplete-norm-func
-           pcomplete-args pcomplete-last pcomplete-index
-           (pcomplete-autolist pcomplete-autolist)
-           (pcomplete-suffix-list pcomplete-suffix-list))
-      (with-helm-current-buffer
-        (loop with table  = (pcomplete-completions)
-              with entry  = (condition-case nil
-                                ;; On Emacs24 `try-completion' return
-                                ;; pattern when more than one result.
-                                ;; Otherwise Emacs23 return nil, which
-                                ;; is wrong, in this case use pattern
-                                ;; to behave like Emacs24.
-                                (or (try-completion helm-pattern
-                                                    (pcomplete-entries))
-                                    helm-pattern)
-                              ;; In Emacs23 `pcomplete-entries' may fail
-                              ;; with error, so try this instead.
-                              (error
-                               nil
-                               (let ((fc (car (last
-                                               (pcomplete-parse-arguments)))))
-                                 ;; Check if last arg require fname completion.
-                                 (and (file-name-directory fc) fc))))
-              for i in (all-completions pcomplete-stub table)
+    (with-helm-current-buffer
+      (let* ((pcomplete-stub)
+             pcomplete-seen pcomplete-norm-func
+             pcomplete-args pcomplete-last pcomplete-index
+             (pcomplete-autolist pcomplete-autolist)
+             (pcomplete-suffix-list pcomplete-suffix-list)
+             (table (pcomplete-completions))
+             (entry (condition-case nil
+                        ;; On Emacs24 `try-completion' return
+                        ;; pattern when more than one result.
+                        ;; Otherwise Emacs23 return nil, which
+                        ;; is wrong, in this case use pattern
+                        ;; to behave like Emacs24.
+                        (or (try-completion helm-pattern
+                                            (pcomplete-entries))
+                            helm-pattern)
+                      ;; In Emacs23 `pcomplete-entries' may fail
+                      ;; with error, so try this instead.
+                      (error
+                       nil
+                       (let ((fc (car (last
+                                       (pcomplete-parse-arguments)))))
+                         ;; Check if last arg require fname completion.
+                         (and (file-name-directory fc) fc))))))
+        (loop for i in (all-completions pcomplete-stub table)
               for file-cand = (and entry
                                    (if (file-remote-p i) i
                                        (expand-file-name
@@ -139,19 +140,37 @@ The function that call this should set `helm-ec-target' to thing at point."
   (interactive)
   (let* ((helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
+         (end (point-marker))
+         (beg (save-excursion (eshell-bol) (point)))
+         (args (catch 'eshell-incomplete
+                 (eshell-parse-arguments beg end)))
+         ;; Use thing-at-point instead of last args value
+         ;; to exclude possible delimiters e.g "(".
          (target (thing-at-point 'symbol))
-         (end (point))
-         (beg (or (and target (- end (length target)))
+         (first (car args)) ; Maybe lisp delimiter "(".
+         last) ; Will be the last but parsed by pcomplete.
+    (setq helm-ec-target (or target " ")
+          end (point)
+          ;; Reset beg for `with-helm-show-completion'.
+          beg (or (and target (- end (length target)))
                   ;; Nothing at point.
-                  (progn (insert " ") (point)))))
-    (setq helm-ec-target (or target " "))
-    (with-helm-show-completion beg end
-      (helm :sources 'helm-c-source-esh
-            :buffer "*helm pcomplete*"
-            :resume 'noresume
-            :input (helm-ff-set-pattern ; Handle tramp filenames.
-                    (car (last (ignore-errors ; Needed in lisp symbols completion.
-                                 (pcomplete-parse-arguments)))))))))
+                  (progn (insert " ") (point))))
+    (cond ((eq first ?\()
+           (helm-lisp-completion-at-point))
+          ;; In eshell `pcomplete-parse-arguments' is called
+          ;; with `pcomplete-parse-arguments-function'
+          ;; locally bound to `eshell-complete-parse-arguments'
+          ;; which is calling `lisp-complete-symbol',
+          ;; calling it before would popup the
+          ;; *completions* buffer.
+          (t (setq last (car (last (ignore-errors
+                                     (pcomplete-parse-arguments)))))
+             (with-helm-show-completion beg end
+               (helm :sources 'helm-c-source-esh
+                     :buffer "*helm pcomplete*"
+                     :resume 'noresume
+                     :input (and (stringp last)
+                                 (helm-ff-set-pattern last))))))))
 
 ;;;###autoload
 (defun helm-eshell-history ()
