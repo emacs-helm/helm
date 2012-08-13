@@ -156,7 +156,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                   ;; Nothing at point.
                   (progn (insert " ") (point))))
     (cond ((eq first ?\()
-           (helm-lisp-completion-at-point))
+           (helm-lisp-completion-or-file-name-at-point))
           ;; In eshell `pcomplete-parse-arguments' is called
           ;; with `pcomplete-parse-arguments-function'
           ;; locally bound to `eshell-complete-parse-arguments'

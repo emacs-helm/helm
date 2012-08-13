@@ -138,7 +138,7 @@ If `helm-c-turn-on-show-completion' is nil just do nothing."
          (pred       (plist-get plist :predicate))
          (lgst-len   0)
          (target     (and beg end (buffer-substring-no-properties beg end)))
-         (candidates (all-completions target (nth 2 data) pred))
+         (candidates (and data (all-completions target (nth 2 data) pred)))
          (helm-quit-if-no-candidate t)
 
          (helm-execute-action-at-once-if-one t)
@@ -222,7 +222,8 @@ If SYM is not documented, return \"Not documented\"."
 (defun helm-c-complete-file-name-at-point ()
   "Complete file name at point."
   (interactive)
-  (let* ((init (substring-no-properties (thing-at-point 'filename)))
+  (let* ((tap (thing-at-point 'filename))
+         (init (and tap (substring-no-properties tap)))
          (end  (point))
          (beg  (- (point) (length init)))
          (helm-quit-if-no-candidate t)
@@ -268,8 +269,9 @@ One hit indent, two quick hits maybe indent and complete."
 Filename completion happen if filename is started in
 or between double quotes."
   (interactive)
-  (let ((tap (substring-no-properties (thing-at-point 'filename))))
-    (if (and tap (string-match "^\\(~/\\|/\\|[a-zA-Z]\:/\\).*" tap)
+  (let* ((tap (thing-at-point 'filename))
+         (tap-noprop (and tap (substring-no-properties tap))))
+    (if (and tap-noprop (string-match "^\\(~/\\|/\\|[a-zA-Z]\:/\\).*" tap-noprop)
              (save-excursion (search-backward "\"" (point-at-bol) t)))
         (helm-c-complete-file-name-at-point)
         (helm-lisp-completion-at-point))))
