@@ -275,7 +275,7 @@ or between double quotes."
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
                    (when (search-backward "\"" (point-at-bol) t)
-                     (not (search-forward "(" (point-at-eol) t)))))
+                     (forward-char 1) (not (looking-at " ")))))
         (helm-c-complete-file-name-at-point)
         (helm-lisp-completion-at-point))))
 
