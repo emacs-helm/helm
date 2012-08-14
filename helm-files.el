@@ -1754,7 +1754,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                 (string-match-p "^[^\~]" guess))))
           (set-text-properties 0 (length candidate) nil candidate)
           (if (and guess (not (string= guess ""))
-                   (string-match-p "^~\\|/.*" guess))
+                   (string-match-p "^\\(~/\\|/\\|[a-zA-Z]:/\\)" guess))
               (progn
                 (delete-region beg end)
                 (insert (if full-path-p

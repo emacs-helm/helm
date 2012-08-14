@@ -356,6 +356,12 @@ Default is `eq'."
         finally return
         (loop for i being the hash-values in cont collect i)))
 
+(defun helm-create-completion-filename (input)
+  (let ((exp (expand-file-name input)))
+    (cond ((file-exists-p input) input)
+          ((not (string-match "^\\(~/\\|/\\|[a-zA-Z]:/\\)" input)) exp)
+          (t input))))
+
 ;;;###autoload
 (defun helm-quit-and-find-file ()
   "Drop into `helm-find-files' from `helm'.
