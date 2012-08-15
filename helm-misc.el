@@ -128,7 +128,6 @@ utility mdfind.")
   '((name . "RD HeadLine")
     (headline  "^= \\(.+\\)$" "^== \\(.+\\)$" "^=== \\(.+\\)$" "^==== \\(.+\\)$")
     (condition . (memq major-mode '(rdgrep-mode rd-mode)))
-    (migemo)
     (subexp . 1))
   "Show RD headlines.
 
@@ -140,7 +139,6 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
     (headline  "^= \\(.+\\) =$" "^== \\(.+\\) ==$"
      "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
     (condition . (memq major-mode '(oddmuse-mode yaoddmuse-mode)))
-    (migemo)
     (subexp . 1))
   "Show Oddmuse headlines, such as EmacsWiki.")
 
@@ -275,7 +273,6 @@ It is added to `extended-command-history'.
            (if (consp (car history))
                (mapcar 'prin1-to-string history)
                history))))
-    (migemo)
     (action . (lambda (candidate)
                 (delete-minibuffer-contents)
                 (insert candidate)))))

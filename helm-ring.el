@@ -64,7 +64,6 @@ If nil or zero, don't truncate candidate, show all."
     (action . helm-c-kill-ring-action)
     (keymap . ,helm-kill-ring-map)
     (last-command)
-    (migemo)
     (multiline))
   "Source for browse and insert contents of kill-ring.")
 

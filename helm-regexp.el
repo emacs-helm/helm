@@ -175,7 +175,6 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   `((name . "Occur")
     (init . helm-c-occur-init)
     (candidates-in-buffer)
-    (migemo)
     (get-line . helm-c-occur-get-line)
     (display-to-real . helm-c-display-to-real-line)
     (action . (("Go to Line" . helm-c-action-line-goto)
