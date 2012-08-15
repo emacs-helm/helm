@@ -133,7 +133,6 @@ See `helm-locate-with-db' and `helm-locate'."
                                          (if helm-ff-transformer-show-only-basename
                                              (helm-c-basename candidate)
                                              candidate))))
-             :must-match t
              :persistent-help "Create locale locate Db"
              :test #'(lambda (x)
                        (if helm-locate-db-file-regexp
