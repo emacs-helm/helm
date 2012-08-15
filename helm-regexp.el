@@ -46,7 +46,7 @@ type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
     (python-mode . ,helm-c-browse-code-regexp-python))
   "Alist to store regexps for browsing code corresponding \
 to a specific `major-mode'."
-  :type 'list
+  :type '(alist :key-type symbol :value-type regexp)
   :group 'helm-regexp)
 
 

@@ -67,7 +67,7 @@
     helm-c-source-files-in-current-dir
     helm-c-source-locate)
   "Your preferred sources to find files."
-  :type 'list
+  :type '(repeat (choice symbol))
   :group 'helm-files)
 
 (defcustom helm-tramp-verbose 0
@@ -128,12 +128,12 @@ This set `ffap-newfile-prompt'."
 When this is set you will be able to expand archive filenames with `C-z'
 inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
-  :type  'boolean
+  :type  'string
   :group 'helm-files)
 
 (defcustom helm-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
   "Minimal list of compressed files extension."
-  :type  'list
+  :type  '(repeat (choice string))
   :group 'helm-files)
 
 (defcustom helm-ff-printer-list nil
@@ -142,7 +142,7 @@ When non--nil let you choose a printer to print file.
 Otherwise when nil the variable `printer-name' will be used.
 On Unix based systems (lpstat command needed) you don't need to set this,
 `helm-ff-find-printers' will find a list of available printers for you."
-  :type 'list
+  :type '(repeat (choice string))
   :group 'helm-files)
 
 (defcustom helm-ff-transformer-show-only-basename nil

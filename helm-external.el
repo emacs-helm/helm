@@ -36,7 +36,7 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   "Alist to store externals programs associated with file extension.
 This variable overhide setting in .mailcap file.
 e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
-  :type 'list
+  :type '(alist :key-type string :value-type string)
   :group 'helm-external)
 
 (defcustom helm-c-default-external-file-browser "nautilus"
