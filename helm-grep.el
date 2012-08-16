@@ -31,13 +31,26 @@
   :group 'helm)
 
 (defcustom helm-c-grep-default-command
-  "grep -d skip %e -niH -e %p %f"
+  "grep -d skip %e -n%cH -e %p %f"
   "Default grep format command for `helm-do-grep-1'.
 Where:
 '%e' format spec is for --exclude or --include grep options or
-     ack-grep --type option.       (not mandatory)
-'%p' format spec is for pattern.   mandatory
-'%f' format spec is for filenames. mandatory
+     ack-grep --type option.               (Not mandatory)
+
+'%c' format spec is for case-fold-search,
+     whether to use the -i option of grep. (Not mandatory)
+     When you specify this spec, helm grep will use smartcase
+     that is when a upcase character is found in pattern case will
+     be respected and no '-i' option will be used, otherwise, when
+     no upcase character is found in pattern always use '-i'.
+     If you don't want this behavior, don't use this spec and
+     specify or not the '-i' option.
+     Note that with ack-grep this is not needed, just specify
+     the '--smart-case' option.
+
+'%p' format spec is for pattern.           (Mandatory)
+
+'%f' format spec is for filenames.         (Mandatory)
 
 If your grep version doesn't support the --exclude/include args
 don't specify the '%e' format spec.
@@ -58,15 +71,16 @@ NOTE: remote grepping is not available with ack-grep."
   :type  'string)
 
 (defcustom helm-c-grep-default-recurse-command
-  "grep -d recurse %e -niH -e %p %f"
+  "grep -d recurse %e -n%cH -e %p %f"
   "Default recursive grep format command for `helm-do-grep-1'.
 See `helm-c-grep-default-command' for format specs and infos about ack-grep."
   :group 'helm-grep
   :type  'string)
 
 (defcustom helm-c-default-zgrep-command
-  "zgrep -niH -e %p %f"
-  "Default command for Zgrep."
+  "zgrep -n%cH -e %p %f"
+  "Default command for Zgrep.
+See `helm-c-grep-default-command' for infos on format specs."
   :group 'helm-grep
   :type  'string)
 
@@ -97,6 +111,11 @@ Where '%f' format spec is filename and '%p' is page number"
   "Default file extensions zgrep will search in."
   :group 'helm-grep
   :type 'string)
+
+(defcustom helm-do-grep-preselect-candidate nil
+  "When non--nil the file name of current buffer will be selected."
+  :group 'helm-grep
+  :type 'boolean)
 
 
 ;;; Faces
@@ -264,6 +283,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                  ;; we need to pass an empty string
                                  ;; to types to avoid error.
                                  (or include "")))
+         (smartcase         (if (helm-grep-use-ack-p) ""
+                                (unless (let ((case-fold-search nil))
+                                          (string-match-p "[A-Z]" helm-pattern)) "i")))
          (cmd-line          (format-spec
                              helm-c-grep-default-command
                              (delq nil
@@ -271,6 +293,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                            (if types
                                                (cons ?e types)
                                                (cons ?e exclude)))
+                                         (cons ?c (or smartcase ""))
                                          (cons ?p (shell-quote-argument
                                                    helm-pattern))
                                          (cons ?f fnargs)))))
@@ -900,22 +923,26 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;;###autoload
 (defun helm-do-grep ()
   "Preconfigured helm for grep.
-Contrarily to Emacs `grep' no default directory is given, but
+Contrarily to Emacs `grep', no default directory is given, but
 the full path of candidates in ONLY.
 That allow to grep different files not only in `default-directory' but anywhere
 by marking them (C-<SPACE>). If one or more directory is selected
 grep will search in all files of these directories.
-You can use also wildcard in the base name of candidate.
-If a prefix arg is given use the -r option of grep.
-The prefix arg can be passed before or after start.
+You can also use wildcard in the base name of candidate.
+If a prefix arg is given use the -r option of grep (recurse).
+The prefix arg can be passed before or after start file selection.
 See also `helm-do-grep-1'."
   (interactive)
   (require 'helm-mode)
-  (let ((only    (helm-c-read-file-name
-                  "Search in file(s): "
-                  :marked-candidates t
-                  :preselect (or (dired-get-filename nil t)
-                                 (buffer-file-name (current-buffer)))))
+  (let* ((preselection (or (dired-get-filename nil t)
+                           (buffer-file-name (current-buffer))))
+         (only    (helm-c-read-file-name
+                   "Search in file(s): "
+                   :marked-candidates t
+                   :preselect (and helm-do-grep-preselect-candidate
+                                   (if helm-ff-transformer-show-only-basename
+                                       (helm-c-basename preselection)
+                                       preselection))))
         (prefarg (or current-prefix-arg helm-current-prefix-arg)))
     (helm-do-grep-1 only prefarg)))
 
@@ -924,12 +951,16 @@ See also `helm-do-grep-1'."
   "Preconfigured helm for zgrep."
   (interactive)
   (require 'helm-mode)
-  (let ((prefarg (or current-prefix-arg helm-current-prefix-arg))
-        (ls (helm-c-read-file-name
-             "Search in file(s): "
-             :marked-candidates t
-             :preselect (or (dired-get-filename nil t)
-                            (buffer-file-name (current-buffer))))))
+  (let* ((prefarg (or current-prefix-arg helm-current-prefix-arg))
+         (preselection (or (dired-get-filename nil t)
+                           (buffer-file-name (current-buffer))))
+         (ls (helm-c-read-file-name
+              "Search in file(s): "
+              :marked-candidates t
+              :preselect (and helm-do-grep-preselect-candidate
+                              (if helm-ff-transformer-show-only-basename
+                                  (helm-c-basename preselection)
+                                  preselection)))))
     (helm-ff-zgrep-1 ls prefarg)))
 
 ;;;###autoload
@@ -937,17 +968,21 @@ See also `helm-do-grep-1'."
   "Preconfigured helm for pdfgrep."
   (interactive)
   (require 'helm-mode)
-  (let ((only (helm-c-read-file-name
-               "Search in file(s): "
-               :marked-candidates t
-               :test #'(lambda (file)
-                         (or (string= (file-name-extension file) "pdf")
-                             (string= (file-name-extension file) "PDF")
-                             (file-directory-p file)))
-               :preselect (or (dired-get-filename nil t)
-                              (buffer-file-name (current-buffer)))))
-        (helm-c-grep-default-function 'helm-c-pdfgrep-init))
-    (helm-do-pdfgrep-1 only)))
+  (let* ((preselection (or (dired-get-filename nil t)
+                           (buffer-file-name (current-buffer))))
+         (only (helm-c-read-file-name
+                "Search in file(s): "
+                :marked-candidates t
+                :test #'(lambda (file)
+                          (or (string= (file-name-extension file) "pdf")
+                              (string= (file-name-extension file) "PDF")
+                              (file-directory-p file)))
+                :preselect (and helm-do-grep-preselect-candidate
+                                (if helm-ff-transformer-show-only-basename
+                                    (helm-c-basename preselection)
+                                    preselection))))
+         (helm-c-grep-default-function 'helm-c-pdfgrep-init))
+  (helm-do-pdfgrep-1 only)))
 
 
 (provide 'helm-grep)
