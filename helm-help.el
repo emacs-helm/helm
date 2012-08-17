@@ -478,6 +478,28 @@ is called once for each file like this:
   (let ((helm-help-message helm-buffers-ido-virtual-help-message))
     (helm-help)))
 
+;;; Moccur help
+;;
+;;
+(defvar helm-moccur-help-message
+  "== Helm Moccur Map ==\
+\nHelm Moccur tips:
+
+\nSpecific commands for Helm Moccur:
+\\<helm-c-moccur-map>
+\\[helm-c-goto-next-file]\t->Next Buffer.
+\\[helm-c-goto-precedent-file]\t\t->Precedent Buffer.
+\\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[helm-moccur-help]\t\t->Show this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-moccur-help ()
+  (interactive)
+  (let ((helm-help-message helm-moccur-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -601,6 +623,16 @@ is called once for each file like this:
 \\[helm-help]:Help \
 \\<helm-occur-map>\
 \\[helm-occur-run-query-replace-regexp]:Query replace regexp \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct")
+
+;;;###autoload
+(defvar helm-moccur-mode-line "\
+\\<helm-c-moccur-map>\
+\\[helm-moccur-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\

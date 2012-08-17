@@ -68,6 +68,7 @@ to a specific `major-mode'."
     (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
+    (define-key map (kbd "C-c ?")    'helm-moccur-help)
     (delq nil map))
   "Keymap used in Moccur source.")
 
@@ -256,7 +257,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (action . (("Go to Line" . helm-m-occur-goto-line)))
     (recenter)
     (candidate-number-limit . 9999)
-    (mode-line . helm-occur-mode-line)
+    (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-c-moccur-map)
     (requires-pattern . 3))
   "Helm source for multi occur.")

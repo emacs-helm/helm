@@ -1176,11 +1176,12 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads (helm-describe-helm-attribute helm-buffers-ido-virtual-help
-;;;;;;  helm-esh-help helm-c-bookmark-help helm-c-ucs-help helm-etags-help
-;;;;;;  helm-pdfgrep-help helm-grep-help helm-generic-file-help helm-read-file-name-help
-;;;;;;  helm-ff-help helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20509 62549 796231 595000))
+;;;### (autoloads (helm-describe-helm-attribute helm-moccur-help
+;;;;;;  helm-buffers-ido-virtual-help helm-esh-help helm-c-bookmark-help
+;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
+;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
+;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
+;;;;;;  (20525 60395 95335 217000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1250,6 +1251,11 @@ Help command for ido virtual buffers.
 
 \(fn)" t nil)
 
+(autoload 'helm-moccur-help "helm-help" "\
+
+
+\(fn)" t nil)
+
 (defvar helm-buffer-mode-line-string '("Buffer(s)" "\\<helm-c-buffer-map>\\[helm-c-buffer-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "String displayed in mode-line in `helm-c-source-buffers-list'"))
 
 (defvar helm-buffers-ido-virtual-mode-line-string '("Killed Buffer(s)" "\\<helm-buffers-ido-virtual-map>\\[helm-buffers-ido-virtual-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "String displayed in mode-line in `helm-c-source-buffers-list'"))
@@ -1279,6 +1285,8 @@ String displayed in mode-line in `helm-ucs'.")
 String displayed in mode-line in `helm-c-source-buffers-list'")
 
 (defvar helm-occur-mode-line "\\<helm-map>\\[helm-help]:Help \\<helm-occur-map>\\[helm-occur-run-query-replace-regexp]:Query replace regexp \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct")
+
+(defvar helm-moccur-mode-line "\\<helm-c-moccur-map>\\[helm-moccur-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct")
 
 (autoload 'helm-describe-helm-attribute "helm-help" "\
 Display the full documentation of HELM-ATTRIBUTE.
@@ -1559,7 +1567,7 @@ Preconfigured helm to show org headlines.
 ;;;***
 
 ;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20525 53336 356333 25000))
+;;;;;;  "helm-regexp" "helm-regexp.el" (20525 59564 699217 616000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1758,7 +1766,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20525
-;;;;;;  54703 174093 936000))
+;;;;;;  60696 955597 892000))
 
 ;;;***
 
