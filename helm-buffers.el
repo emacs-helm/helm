@@ -82,8 +82,7 @@ filtered from the list of candidates if the
     ;; as we don't use recursivity for buffers.
     ;; So use zgrep for both as it is capable to handle non--compressed files.
     (define-key map (kbd "M-g s")     'helm-buffer-run-zgrep)
-    (define-key map (kbd "C-s")       'helm-buffer-run-zgrep)
-    (define-key map (kbd "C-c s")     'helm-buffers-run-multi-occur)
+    (define-key map (kbd "C-s")       'helm-buffers-run-multi-occur)
     (define-key map (kbd "C-c o")     'helm-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'helm-buffer-switch-other-frame)
     (define-key map (kbd "C-c =")     'helm-buffer-run-ediff)
