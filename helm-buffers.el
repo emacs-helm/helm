@@ -465,6 +465,7 @@ See `helm-ediff-marked-buffers'."
   (let ((buffers (helm-marked-candidates)))
     (helm-multi-occur-1 buffers)))
 
+;;;###autoload
 (defun helm-buffers-run-multi-occur ()
   (interactive)
   (helm-c-quit-and-execute-action 'helm-multi-occur-as-action))

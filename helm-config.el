@@ -188,7 +188,7 @@
 ;;;;;;  helm-end-of-buffer helm-beginning-of-buffer helm-next-page
 ;;;;;;  helm-previous-page helm-next-line helm-previous-line helm-select-action
 ;;;;;;  helm-force-update helm-other-buffer helm-resume helm-open-last-log)
-;;;;;;  "helm" "helm.el" (20518 24247 654990 453000))
+;;;;;;  "helm" "helm.el" (20526 27033 184308 828000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-open-last-log "helm" "\
@@ -528,13 +528,13 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 
 ;;;***
 
-;;;### (autoloads (helm-buffers-list helm-buffer-run-ediff helm-buffer-switch-to-elscreen
-;;;;;;  helm-buffer-switch-other-frame helm-buffer-switch-other-window
-;;;;;;  helm-buffer-run-query-replace helm-buffer-run-query-replace-regexp
-;;;;;;  helm-buffer-run-zgrep helm-buffer-run-grep helm-buffer-run-kill-buffers
-;;;;;;  helm-buffer-save-persistent helm-buffer-revert-persistent
-;;;;;;  helm-buffer-diff-persistent) "helm-buffers" "helm-buffers.el"
-;;;;;;  (20525 52500 588188 569000))
+;;;### (autoloads (helm-buffers-list helm-buffers-run-multi-occur
+;;;;;;  helm-buffer-run-ediff helm-buffer-switch-to-elscreen helm-buffer-switch-other-frame
+;;;;;;  helm-buffer-switch-other-window helm-buffer-run-query-replace
+;;;;;;  helm-buffer-run-query-replace-regexp helm-buffer-run-zgrep
+;;;;;;  helm-buffer-run-grep helm-buffer-run-kill-buffers helm-buffer-save-persistent
+;;;;;;  helm-buffer-revert-persistent helm-buffer-diff-persistent)
+;;;;;;  "helm-buffers" "helm-buffers.el" (20526 28108 921642 931000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffer-diff-persistent "helm-buffers" "\
@@ -594,6 +594,11 @@ Run switch to elscreen  action from `helm-c-source-buffers-list'.
 
 (autoload 'helm-buffer-run-ediff "helm-buffers" "\
 Run ediff action from `helm-c-source-buffers-list'.
+
+\(fn)" t nil)
+
+(autoload 'helm-buffers-run-multi-occur "helm-buffers" "\
+
 
 \(fn)" t nil)
 
@@ -1181,7 +1186,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20525 60395 95335 217000))
+;;;;;;  (20526 3640 755935 16000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1567,7 +1572,7 @@ Preconfigured helm to show org headlines.
 ;;;***
 
 ;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20525 59564 699217 616000))
+;;;;;;  "helm-regexp" "helm-regexp.el" (20526 27468 182465 688000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1765,8 +1770,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20525
-;;;;;;  60696 955597 892000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20526
+;;;;;;  28272 340188 951000))
 
 ;;;***
 
