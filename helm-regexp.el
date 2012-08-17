@@ -208,7 +208,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defun helm-m-occur-init (buffers)
   "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
-   "*hmoccur*"
+   'global
    (loop for buf in buffers
          for bufstr = (with-current-buffer buf (buffer-string))
          do (add-text-properties
