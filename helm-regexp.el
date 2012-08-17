@@ -48,6 +48,11 @@ type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
 to a specific `major-mode'."
   :type '(alist :key-type symbol :value-type regexp)
   :group 'helm-regexp)
+
+(defface helm-moccur-buffer
+    '((t (:foreground "DarkTurquoise" :underline t)))
+  "Face used to highlight moccur buffer names."
+  :group 'helm-regexp)
 
 
 (defvar helm-occur-map
@@ -65,7 +70,7 @@ to a specific `major-mode'."
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (delq nil map))
   "Keymap used in Moccur source.")
-
+
 (defvar helm-build-regexp-history nil)
 (defun helm-c-query-replace-regexp (candidate)
   "Query replace regexp from `helm-regexp'.
@@ -200,9 +205,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 ;;
 ;;
 (defun helm-m-occur-init (buffers)
-  "Create the initial helm multi occur buffer.
-If region is active use region as buffer contents
-instead of whole buffer."
+  "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
    "*hmoccur*"
    (loop for buf in buffers
@@ -214,16 +217,21 @@ instead of whole buffer."
          concat bufstr)))
 
 (defun helm-m-occur-get-line (s e)
+  "Format line for `helm-c-source-moccur'."
   (format "%s:%d:%s"
           (get-text-property (point-at-bol) 'buffer-name)
           (save-restriction
-            (narrow-to-region (previous-property-change (point))
-                              (next-property-change (point)))
+            (narrow-to-region (previous-single-property-change
+                               (point) 'buffer-name)
+                              (next-single-property-change
+                               (point) 'buffer-name))
             (line-number-at-pos s))
           (buffer-substring s e)))
 
 (defun* helm-m-occur-action (candidate
                              &optional (method (quote buffer)))
+  "Jump to CANDIDATE with METHOD.
+arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (let* ((split (split-string candidate ":" t))
          (buf (car split))
          (lineno (string-to-number (nth 1 split))))
@@ -234,6 +242,7 @@ instead of whole buffer."
     (helm-goto-line lineno)))
 
 (defun helm-m-occur-goto-line (candidate)
+  "From multi occur, switch to buffer and go to nth 1 CANDIDATE line."
   (helm-m-occur-action candidate))
 
 (defvar helm-c-source-moccur
@@ -241,15 +250,35 @@ instead of whole buffer."
     (init . (lambda ()
               (helm-m-occur-init buffers)))
     (candidates-in-buffer)
+    (filtered-candidate-transformer . helm-m-occur-transformer)
+    (nohighlight)
     (get-line . helm-m-occur-get-line)
     (action . (("Go to Line" . helm-m-occur-goto-line)))
     (recenter)
     (candidate-number-limit . 9999)
     (mode-line . helm-occur-mode-line)
     (keymap . ,helm-c-moccur-map)
-    (requires-pattern . 3)))
+    (requires-pattern . 3))
+  "Helm source for multi occur.")
+
+(defun helm-m-occur-transformer (candidates source)
+  "Transformer function for `helm-c-source-moccur'."
+  (require 'helm-grep)
+  (loop for i in candidates
+        for split = (split-string i ":" t)
+        for buf = (car split)
+        for lineno = (nth 1 split)
+        for str = (nth 2 split)
+        collect (cons (concat (propertize buf 'face 'helm-moccur-buffer
+                                          'buffer-name buf)
+                              ":"
+                              (propertize lineno 'face 'helm-grep-lineno)
+                              ":"
+                              (helm-c-grep-highlight-match str))
+                      i)))
 
 (defun helm-multi-occur-1 (buffers)
+  "Main function to call `helm-c-source-moccur' with BUFFERS list."
   (declare (special buffers))
   (helm :sources 'helm-c-source-moccur
         :buffer "*helm moccur*"))
@@ -356,9 +385,13 @@ otherwise search in whole buffer."
 
 ;;;###autoload
 (defun helm-multi-occur ()
-  "Preconfigured for helm multi occur."
+  "Preconfigured helm for multi occur."
   (interactive)
-  (let ((buffers (helm-comp-read
+  (let ((helm-compile-source-functions
+         ;; rule out helm-match-plugin because the input is one regexp.
+         (delq 'helm-compile-source--match-plugin
+               (copy-sequence helm-compile-source-functions)))
+        (buffers (helm-comp-read
                   "Buffers: " (helm-c-buffer-list)
                   :marked-candidates t)))
     (helm-multi-occur-1 buffers)))
