@@ -57,6 +57,15 @@ to a specific `major-mode'."
     map)
   "Keymap for `helm-occur'.")
 
+(defvar helm-c-moccur-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-<down>") 'helm-c-goto-next-file)
+    (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
+    (define-key map (kbd "C-w")      'helm-yank-text-at-point)
+    (delq nil map))
+  "Keymap used in Moccur source.")
+
 (defvar helm-build-regexp-history nil)
 (defun helm-c-query-replace-regexp (candidate)
   "Query replace regexp from `helm-regexp'.
@@ -187,6 +196,65 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (delayed)))
 
 
+;;; Multi occur
+;;
+;;
+(defun helm-m-occur-init (buffers)
+  "Create the initial helm multi occur buffer.
+If region is active use region as buffer contents
+instead of whole buffer."
+  (helm-init-candidates-in-buffer
+   "*hmoccur*"
+   (loop for buf in buffers
+         for bufstr = (with-current-buffer buf (buffer-string))
+         do (add-text-properties
+             0 (length bufstr)
+             `(buffer-name ,(buffer-name (get-buffer buf)))
+             bufstr)
+         concat bufstr)))
+
+(defun helm-m-occur-get-line (s e)
+  (format "%s:%d:%s"
+          (get-text-property (point-at-bol) 'buffer-name)
+          (save-restriction
+            (narrow-to-region (previous-property-change (point))
+                              (next-property-change (point)))
+            (line-number-at-pos s))
+          (buffer-substring s e)))
+
+(defun* helm-m-occur-action (candidate
+                             &optional (method (quote buffer)))
+  (let* ((split (split-string candidate ":" t))
+         (buf (car split))
+         (lineno (string-to-number (nth 1 split))))
+    (case method
+      (buffer              (switch-to-buffer buf))
+      (buffer-other-window (switch-to-buffer-other-window buf))
+      (buffer-other-frame  (switch-to-buffer-other-frame buf)))
+    (helm-goto-line lineno)))
+
+(defun helm-m-occur-goto-line (candidate)
+  (helm-m-occur-action candidate))
+
+(defvar helm-c-source-moccur
+  `((name . "Moccur")
+    (init . (lambda ()
+              (helm-m-occur-init buffers)))
+    (candidates-in-buffer)
+    (get-line . helm-m-occur-get-line)
+    (action . (("Go to Line" . helm-m-occur-goto-line)))
+    (recenter)
+    (candidate-number-limit . 9999)
+    (mode-line . helm-occur-mode-line)
+    (keymap . ,helm-c-moccur-map)
+    (requires-pattern . 3)))
+
+(defun helm-multi-occur-1 (buffers)
+  (declare (special buffers))
+  (helm :sources 'helm-c-source-moccur
+        :buffer "*helm moccur*"))
+
+
 ;;; Helm browse code.
 (defun helm-c-browse-code-get-line (beg end)
   "Select line if it match the regexp corresponding to current `major-mode'.
@@ -285,6 +353,15 @@ otherwise search in whole buffer."
     (helm :sources 'helm-c-source-occur
           :buffer "*Helm Occur*"
           :history 'helm-c-grep-history)))
+
+;;;###autoload
+(defun helm-multi-occur ()
+  "Preconfigured for helm multi occur."
+  (interactive)
+  (let ((buffers (helm-comp-read
+                  "Buffers: " (helm-c-buffer-list)
+                  :marked-candidates t)))
+    (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
 (defun helm-browse-code ()

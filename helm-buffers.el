@@ -22,6 +22,7 @@
 (require 'helm-utils)
 (require 'helm-elscreen)
 (require 'helm-grep)
+(require 'helm-regexp)
 
 (declare-function ido-make-buffer-list "ido" (default))
 
@@ -82,6 +83,7 @@ filtered from the list of candidates if the
     ;; So use zgrep for both as it is capable to handle non--compressed files.
     (define-key map (kbd "M-g s")     'helm-buffer-run-zgrep)
     (define-key map (kbd "C-s")       'helm-buffer-run-zgrep)
+    (define-key map (kbd "C-c s")     'helm-buffers-run-multi-occur)
     (define-key map (kbd "C-c o")     'helm-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'helm-buffer-switch-other-frame)
     (define-key map (kbd "C-c =")     'helm-buffer-run-ediff)
@@ -460,6 +462,14 @@ With optional arg MERGE call `ediff-merge-buffers'."
 See `helm-ediff-marked-buffers'."
   (helm-ediff-marked-buffers candidate t))
 
+(defun helm-multi-occur-as-action (_candidate)
+  (let ((buffers (helm-marked-candidates)))
+    (helm-multi-occur-1 buffers)))
+
+(defun helm-buffers-run-multi-occur ()
+  (interactive)
+  (helm-c-quit-and-execute-action 'helm-multi-occur-as-action))
+
 ;;; Candidate Transformers
 ;;
 ;;
@@ -496,6 +506,7 @@ displayed with the `file-name-shadow' face if available."
        ("View buffer" . view-buffer)
        ("Display buffer"   . display-buffer)
        ("Grep buffers (C-u grep all buffers)" . helm-c-zgrep-buffers)
+       ("Multi occur buffer(s)" . helm-multi-occur-as-action)
        ("Revert buffer(s)" . helm-revert-marked-buffers)
        ("Insert buffer" . insert-buffer)
        ("Kill buffer(s)" . helm-kill-marked-buffers)
