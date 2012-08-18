@@ -192,7 +192,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (candidates-in-buffer)
     (migemo)
     (get-line . helm-c-occur-get-line)
-    (display-to-real . helm-c-display-to-real-line)
+    (display-to-real . helm-c-display-to-real-numbered-line)
     (action . (("Go to Line" . helm-c-action-line-goto)
                ("Query replace regexp (C-u Not inside word.)"
                 . helm-c-occur-query-replace-regexp)))
@@ -310,11 +310,20 @@ Line is parsed for BEG position to END position."
     (type . line)
     (recenter)))
 
+(defun helm-c-display-to-real-numbered-line (candidate)
+  "This is used to display a line in occur style in helm sources.
+e.g \"    12:some_text\".
+It is used with type attribute 'line'."
+  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
+      (list (string-to-number (match-string 1 candidate))
+            (match-string 2 candidate))
+      (error "Line number not found")))
+
 ;;; Type attributes
 ;;
 ;;
 (define-helm-type-attribute 'line
-    '((display-to-real . helm-c-display-to-real-line)
+    '((display-to-real . helm-c-display-to-real-numbered-line)
       (action ("Go to Line" . helm-c-action-line-goto)))
   "LINENO:CONTENT string, eg. \"  16:foo\".
 

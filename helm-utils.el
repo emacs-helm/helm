@@ -633,12 +633,6 @@ directory, open this directory."
       (dired (file-name-directory file))
       (dired-goto-file file)))
 
-(defun helm-c-display-to-real-line (candidate)
-  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
-      (list (string-to-number (match-string 1 candidate))
-            (match-string 2 candidate))
-      (error "Line number not found")))
-
 (defun helm-c-action-line-goto (lineno-and-content)
   (apply #'helm-goto-file-line
          (helm-interpret-value (helm-attr 'target-file))
