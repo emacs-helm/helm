@@ -35,6 +35,7 @@
                   num))
         (number-sequence 1 8)))
     (condition . (eq major-mode 'org-mode))
+    (migemo)
     (subexp . 1)
     (persistent-action . (lambda (elm)
                            (helm-c-action-line-goto elm)
