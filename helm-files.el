@@ -273,6 +273,7 @@ This happen only in `helm-find-files'."
 (defvar helm-c-read-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
+    (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-down-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-down-one-level)

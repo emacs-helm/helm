@@ -67,11 +67,7 @@ Note that you don't need to enable `ido-mode' for this to work."
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "<C-return>") #'(lambda ()
-                                           (interactive)
-                                           (helm-c-quit-and-execute-action
-                                            #'(lambda (_candidate)
-                                                (identity "")))))
+    (define-key map (kbd "<C-return>") 'helm-cr-empty-string)
     map)
   "Keymap for `helm-comp-read'.")
 
@@ -87,6 +83,14 @@ Note that you don't need to enable `ido-mode' for this to work."
 ;;; Helm `completing-read' replacement
 ;;
 ;;
+;;;###autoload
+(defun helm-cr-empty-string ()
+  "Return empty string."
+  (interactive)
+  (helm-c-quit-and-execute-action
+   #'(lambda (_candidate)
+       (identity ""))))
+
 (defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp)
   "Convert COLLECTION to list removing elements that don't match TEST.
 See `helm-comp-read' about supported COLLECTION arguments.
@@ -174,7 +178,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                (del-input t)
                                (persistent-action nil)
                                (persistent-help "DoNothing")
-                               (mode-line helm-mode-line-string)
+                               (mode-line helm-comp-read-mode-line)
                                (keymap helm-comp-read-map)
                                (name "Helm Completions")
                                candidates-in-buffer

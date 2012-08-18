@@ -544,6 +544,7 @@ is called once for each file like this:
 (defvar helm-read-file-name-mode-line-string "\
 \\<helm-c-read-file-map>\
 \\[helm-read-file-name-help]:Help \
+\\[helm-cr-empty-string]:Empty \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
@@ -640,6 +641,16 @@ is called once for each file like this:
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
 
+;;;###autoload
+(defvar helm-comp-read-mode-line "\
+\\<helm-comp-read-map>\
+\\[helm-cr-empty-string]:Empty \
+\\<helm-map>\
+\\[helm-help]:Help \
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct")
 
 
 ;;; Attribute Documentation
