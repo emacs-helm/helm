@@ -199,8 +199,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (recenter)
     (mode-line . helm-occur-mode-line)
     (keymap . ,helm-occur-map)
-    (requires-pattern . 1)
-    (delayed)))
+    (requires-pattern . 3)))
 
 
 ;;; Multi occur
