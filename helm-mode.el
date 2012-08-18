@@ -64,12 +64,25 @@ Note that you don't need to enable `ido-mode' for this to work."
   :type '(alist :key-type symbol :value-type symbol))
 
 
+(defvar helm-comp-read-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "<C-return>") #'(lambda ()
+                                           (interactive)
+                                           (helm-c-quit-and-execute-action
+                                            #'(lambda (_candidate)
+                                                (identity "")))))
+    map)
+  "Keymap for `helm-comp-read'.")
+
+
 ;;; Internal
 ;;
 ;;
 ;; Flag to know if `helm-pattern' have been added
 ;; to candidate list in `helm-comp-read'.
 (defvar helm-cr-unknow-pattern-flag nil)
+
 
 ;;; Helm `completing-read' replacement
 ;;
@@ -162,7 +175,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                (persistent-action nil)
                                (persistent-help "DoNothing")
                                (mode-line helm-mode-line-string)
-                               (keymap helm-map)
+                               (keymap helm-comp-read-map)
                                (name "Helm Completions")
                                candidates-in-buffer
                                exec-when-only-one
