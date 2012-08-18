@@ -280,6 +280,10 @@ that use `helm-comp-read' See `helm-M-x' for example."
                         (make-composed-keymap
                          must-match-map (or keymap helm-map))
                         (or keymap helm-map)))
+           (helm-read-file-name-mode-line-string
+            (replace-regexp-in-string "helm-exit-minibuffer"
+                          "helm-confirm-and-exit-minibuffer"
+                          helm-read-file-name-mode-line-string))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
@@ -653,7 +657,11 @@ Keys description:
            (helm-map (if must-match-map
                          (make-composed-keymap
                           must-match-map helm-c-read-file-map)
-                         helm-c-read-file-map)))
+                         helm-c-read-file-map))
+           (helm-read-file-name-mode-line-string
+            (replace-regexp-in-string "helm-exit-minibuffer"
+                          "helm-confirm-and-exit-minibuffer"
+                          helm-read-file-name-mode-line-string)))
 
       (or (helm
            :sources
