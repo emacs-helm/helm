@@ -271,8 +271,12 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
         for buf = (car split)
         for lineno = (nth 1 split)
         for str = (nth 2 split)
-        collect (cons (concat (propertize buf 'face 'helm-moccur-buffer
-                                          'buffer-name buf)
+        collect (cons (concat (propertize
+                               buf
+                               'face 'helm-moccur-buffer
+                               'help-echo (buffer-file-name
+                                           (get-buffer buf))
+                               'buffer-name buf)
                               ":"
                               (propertize lineno 'face 'helm-grep-lineno)
                               ":"
