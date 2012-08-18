@@ -727,7 +727,10 @@ If N is positive go forward otherwise go backward."
           (forward-line n) ; Go forward or backward depending of n value.
           ;; Exit when current-fname is not matched or in `helm-grep-mode'
           ;; the line is not a grep line i.e 'fname:num:tag'.
-          (unless (or (search-forward current-fname (point-at-eol) t)
+          (unless (or (string= current-fname
+                               (car (split-string
+                                     (buffer-substring (point-at-bol)
+                                                       (point-at-eol)) ":")))
                       (and (eq major-mode 'helm-grep-mode)
                            (not (get-text-property (point-at-bol) 'help-echo))))
             (funcall mark-maybe)
