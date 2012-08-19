@@ -675,6 +675,8 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
   "Split a grep output line."
   ;; Don't print until grep line is valid.
   (when (string-match "^\\(.*\\):\\([0-9]+\\):\\(.*\\)" line)
+    ;; Don't use split-string because buffer/file name or string
+    ;; may contain a ":".
     (loop for n from 1 to 3 collect (match-string n line))))
 
 (defun helm-c-grep-cand-transformer (candidates sources)
@@ -714,8 +716,8 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
 (defun helm-c-goto-next-or-prec-file (n)
   "Go to next or precedent candidate file in helm grep/etags buffers.
 If N is positive go forward otherwise go backward."
-  (let* ((current-line-list  (split-string
-                              (helm-get-selection nil t) ":"))
+  (let* ((current-line-list  (helm-c-grep-split-line 
+                              (helm-get-selection nil t)))
          (current-fname      (nth 0 current-line-list))
          (bob-or-eof         (if (eq n 1) 'eobp 'bobp))
          (mark-maybe #'(lambda ()
@@ -728,9 +730,9 @@ If N is positive go forward otherwise go backward."
           ;; Exit when current-fname is not matched or in `helm-grep-mode'
           ;; the line is not a grep line i.e 'fname:num:tag'.
           (unless (or (string= current-fname
-                               (car (split-string
+                               (car (helm-c-grep-split-line
                                      (buffer-substring (point-at-bol)
-                                                       (point-at-eol)) ":")))
+                                                       (point-at-eol)))))
                       (and (eq major-mode 'helm-grep-mode)
                            (not (get-text-property (point-at-bol) 'help-echo))))
             (funcall mark-maybe)

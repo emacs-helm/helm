@@ -48,6 +48,12 @@ type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
 to a specific `major-mode'."
   :type '(alist :key-type symbol :value-type regexp)
   :group 'helm-regexp)
+
+(defcustom helm-moccur-always-search-in-current t
+  "Helm multi occur always search in current buffer when non--nil."
+  :group 'helm-regexp
+  :type 'boolean)
+
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
@@ -206,7 +212,10 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 ;;
 ;;
 (defun helm-m-occur-init (buffers)
-  "Create the initial helm multi occur buffer."
+  "Create the initial helm multi occur buffer with BUFFERS list."
+  (when helm-moccur-always-search-in-current
+    (setq buffers (cons helm-current-buffer
+                        (remove helm-current-buffer buffers))))
   (helm-init-candidates-in-buffer
    'global
    (loop for buf in buffers
@@ -233,7 +242,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                              &optional (method (quote buffer)))
   "Jump to CANDIDATE with METHOD.
 arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
-  (let* ((split (split-string candidate ":" t))
+  (require 'helm-grep)
+  (let* ((split (helm-c-grep-split-line candidate))
          (buf (car split))
          (lineno (string-to-number (nth 1 split))))
     (case method
@@ -267,7 +277,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   "Transformer function for `helm-c-source-moccur'."
   (require 'helm-grep)
   (loop for i in candidates
-        for split = (split-string i ":" t)
+        for split = (helm-c-grep-split-line i)
         for buf = (car split)
         for lineno = (nth 1 split)
         for str = (nth 2 split)
