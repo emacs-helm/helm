@@ -189,7 +189,7 @@ If no entry in cache, create one."
                          (cons tagfile (helm-c-etags-mtime tagfile)))))))))
 
 (defvar helm-c-source-etags-select
-  '((name . "Etags")
+  `((name . "Etags")
     (header-name . helm-c-source-etags-header-name)
     (init . helm-c-etags-init)
     (candidates-in-buffer)
@@ -198,6 +198,7 @@ If no entry in cache, create one."
                     ;; and not the filename.
                     (cadr (split-string candidate ":"))))
     (mode-line . helm-etags-mode-line-string)
+    (keymap . ,helm-c-etags-map)
     (action . helm-c-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (helm-c-etags-default-action candidate)
