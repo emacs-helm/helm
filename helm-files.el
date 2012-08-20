@@ -2521,6 +2521,7 @@ Colorize only symlinks, directories and files."
        ("Checksum File" . helm-ff-checksum)
        ("Ediff File" . helm-find-files-ediff-files)
        ("Ediff Merge File" . helm-find-files-ediff-merge-files)
+       ("Etags `C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
        ("View file" . view-file)
        ("Insert file" . insert-file)
        ("Delete file(s)" . helm-delete-marked-files)
