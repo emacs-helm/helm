@@ -49,7 +49,7 @@ to a specific `major-mode'."
   :type '(alist :key-type symbol :value-type regexp)
   :group 'helm-regexp)
 
-(defcustom helm-moccur-always-search-in-current t
+(defcustom helm-moccur-always-search-in-current nil
   "Helm multi occur always search in current buffer when non--nil."
   :group 'helm-regexp
   :type 'boolean)
