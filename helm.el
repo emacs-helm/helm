@@ -1932,15 +1932,22 @@ is done on whole `helm-buffer' and not on current source."
                  (helm-log "Update preselect candidate %s" preselect)
                  (helm-preselect preselect))))
         (when delayed-sources
-          (helm-new-timer
-           'helm-process-delayed-sources-timer
-           (run-with-idle-timer
-            ;; Be sure helm-idle-delay is >
-            ;; to helm-input-idle-delay
-            ;; otherwise use value of helm-input-idle-delay
-            ;; or 0.1 if == to 0.
-            (max helm-idle-delay helm-input-idle-delay 0.1) nil
-            'helm-process-delayed-sources delayed-sources preselect)))
+          ;; Allow giving a value to `delayed' attr from inside source.
+          ;; Retain the biggest value (the slower) found in DELAYED-SOURCES.
+          (let ((helm-idle-delay (loop with delay = helm-idle-delay
+                                       for s in delayed-sources
+                                       for d = (assoc-default 'delayed s)
+                                       when d do (setq delay (max delay d))
+                                       finally return delay)))
+            (helm-new-timer
+             'helm-process-delayed-sources-timer
+             (run-with-idle-timer
+              ;; Be sure helm-idle-delay is >
+              ;; to helm-input-idle-delay
+              ;; otherwise use value of helm-input-idle-delay
+              ;; or 0.1 if == to 0.
+              (max helm-idle-delay helm-input-idle-delay 0.1) nil
+              'helm-process-delayed-sources delayed-sources preselect))))
         (helm-log "end update")))))
 
 (defun helm-update-source-p (source)
@@ -2844,11 +2851,11 @@ See also `helm-sources' docstring."
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN."
-  (if (string-match " " pattern)
-      (loop with part = (funcall match-part-fn candidate)
-            for i in (split-string pattern " " t)
-            always (string-match i part))
-      (string-match pattern (funcall match-part-fn candidate))))
+  (let ((part (funcall match-part-fn candidate)))
+    (if (string-match " " pattern)
+        (loop for i in (split-string pattern " " t)
+              always (string-match i part))
+        (string-match pattern part))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
                                                       get-line-fn

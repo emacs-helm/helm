@@ -54,6 +54,12 @@ to a specific `major-mode'."
   :group 'helm-regexp
   :type 'boolean)
 
+(defcustom helm-m-occur-idle-delay 0.6
+  "Delay before updating display in `helm-c-source-moccur'.
+It is similar to `helm-idle-delay' but local to `helm-c-source-moccur'."
+  :group 'helm-regexp
+  :type 'float)
+
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
@@ -205,7 +211,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (recenter)
     (mode-line . helm-occur-mode-line)
     (keymap . ,helm-occur-map)
-    (requires-pattern . 3)))
+    (requires-pattern . 3)
+    (delayed)))
 
 
 ;;; Multi occur
@@ -270,7 +277,8 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-c-moccur-map)
-    (requires-pattern . 3))
+    (requires-pattern . 3)
+    (delayed . ,helm-m-occur-idle-delay))
   "Helm source for multi occur.")
 
 (defun helm-m-occur-transformer (candidates source)

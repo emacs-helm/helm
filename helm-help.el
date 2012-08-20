@@ -842,7 +842,9 @@ HELM-ATTRIBUTE should be a symbol."
 
 (helm-document-attribute 'delayed "optional"
   "  Candidates from the source are shown only if the user stops
-  typing and is idle for `helm-idle-delay' seconds.")
+  typing and is idle for `helm-idle-delay' seconds.
+  If a value is given to delayed attr, this value is used instead only
+  if it is > to `helm-idle-delay'.")
 
 (helm-document-attribute 'volatile "optional"
   "  Indicates the source assembles the candidate list dynamically,
