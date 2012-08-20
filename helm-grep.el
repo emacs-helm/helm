@@ -673,7 +673,10 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
 
 (defun helm-c-grep-split-line (line)
   "Split a grep output line."
-  ;; Don't print until grep line is valid.
+  ;; The output of grep may send a truncated line in this chunk,
+  ;; so don't split until grep line is valid, that is
+  ;; once the second part of the line comes with next chunk
+  ;; send by process.
   (when (string-match "^\\(.*\\):\\([0-9]+\\):\\(.*\\)" line)
     ;; Don't use split-string because buffer/file name or string
     ;; may contain a ":".
