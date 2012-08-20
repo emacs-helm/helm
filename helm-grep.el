@@ -713,11 +713,13 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
         (buffer-string))
     (error nil)))
 
-(defun helm-c-goto-next-or-prec-file (n)
+(defun helm-c-goto-next-or-prec-file (n &optional type)
   "Go to next or precedent candidate file in helm grep/etags buffers.
 If N is positive go forward otherwise go backward."
-  (let* ((current-line-list  (helm-c-grep-split-line 
-                              (helm-get-selection nil t)))
+  (let* ((sel (helm-get-selection nil t))
+         (current-line-list  (if (eq type 'etags)
+                                 (split-string sel ": +" t)
+                                 (helm-c-grep-split-line sel)))
          (current-fname      (nth 0 current-line-list))
          (bob-or-eof         (if (eq n 1) 'eobp 'bobp))
          (mark-maybe #'(lambda ()
@@ -729,10 +731,11 @@ If N is positive go forward otherwise go backward."
           (forward-line n) ; Go forward or backward depending of n value.
           ;; Exit when current-fname is not matched or in `helm-grep-mode'
           ;; the line is not a grep line i.e 'fname:num:tag'.
+          (setq sel (buffer-substring (point-at-bol) (point-at-eol)))
           (unless (or (string= current-fname
-                               (car (helm-c-grep-split-line
-                                     (buffer-substring (point-at-bol)
-                                                       (point-at-eol)))))
+                               (car (if (eq type 'etags)
+                                        (split-string sel ": +" t)
+                                        (helm-c-grep-split-line sel))))
                       (and (eq major-mode 'helm-grep-mode)
                            (not (get-text-property (point-at-bol) 'help-echo))))
             (funcall mark-maybe)
@@ -751,15 +754,21 @@ If N is positive go forward otherwise go backward."
 (defun helm-c-goto-precedent-file ()
   "Go to precedent file in helm grep/etags buffers."
   (interactive)
-  (with-helm-window
-    (helm-c-goto-next-or-prec-file -1)))
+  (let ((etagp (when (string= (assoc-default
+                               'name (helm-get-current-source)) "Etags")
+                 'etags)))
+    (with-helm-window
+      (helm-c-goto-next-or-prec-file -1 etagp))))
 
 ;;;###autoload
 (defun helm-c-goto-next-file ()
   "Go to precedent file in helm grep/etags buffers."
   (interactive)
-  (with-helm-window
-    (helm-c-goto-next-or-prec-file 1)))
+  (let ((etagp (when (string= (assoc-default
+                               'name (helm-get-current-source)) "Etags")
+                 'etags)))
+    (with-helm-window
+      (helm-c-goto-next-or-prec-file 1 etagp))))
 
 ;;;###autoload
 (defun helm-c-grep-run-persistent-action ()
