@@ -297,7 +297,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   "Main function to call `helm-c-source-moccur' with BUFFERS list."
   (declare (special buffers))
   (helm :sources 'helm-c-source-moccur
-        :buffer "*helm moccur*"))
+        :buffer "*helm multi occur*"))
 
 
 ;;; Helm browse code.
