@@ -127,7 +127,8 @@ Where '%f' format spec is filename and '%p' is page number"
   :group 'helm-grep)
 
 (defface helm-grep-file
-    '((t (:foreground "BlueViolet" :underline t)))
+    '((t (:foreground "BlueViolet"
+          :underline t)))
   "Face used to highlight grep results filenames."
   :group 'helm-grep)
 
@@ -147,7 +148,7 @@ Where '%f' format spec is filename and '%p' is page number"
   :group 'helm-grep)
 
 (defface helm-grep-cmd-line
-    '((t (:inherit 'diff-added)))
+    '((t (:inherit diff-added)))
   "Face used to highlight grep command line when no results."
   :group 'helm-grep)
 
