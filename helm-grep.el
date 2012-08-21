@@ -146,6 +146,11 @@ Where '%f' format spec is filename and '%p' is page number"
   "Face used in mode line when grep is finish."
   :group 'helm-grep)
 
+(defface helm-grep-cmd-line
+    '((t (:inherit 'diff-added)))
+  "Face used to highlight grep command line when no results."
+  :group 'helm-grep)
+
 
 (defvar helm-c-grep-map
   (let ((map (make-sparse-keymap)))
@@ -306,7 +311,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
-              (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
+              (concat ">>> " (propertize cmd-line 'face 'helm-grep-cmd-line) "\n\n"))
     (prog1            ; This function should return the process first.
         (start-file-process-shell-command
          "grep" helm-buffer cmd-line)
@@ -322,9 +327,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          (not helm-grep-use-zgrep))
                     (with-current-buffer helm-buffer
                       (insert (concat "* Exit with code 1, no result found,"
-                                      " Command line was:\n\n"
+                                      " Command line was:\n\n "
                                       (propertize helm-grep-last-cmd-line
-                                                  'face 'diff-added)))
+                                                  'face 'helm-grep-cmd-line)))
                       (setq mode-line-format
                             '(" " mode-line-buffer-identification " "
                               (line-number-mode "%l") " "
@@ -906,7 +911,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     ;; Start pdf grep process.
     (helm-log "Starting Pdf Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
-              (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
+              (concat ">>> " (propertize cmd-line 'face 'helm-grep-cmd-line) "\n\n"))
     (prog1
         (start-file-process-shell-command
          "pdfgrep" helm-buffer cmd-line)
