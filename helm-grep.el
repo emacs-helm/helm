@@ -186,6 +186,7 @@ Where '%f' format spec is filename and '%p' is page number"
   "A function that should return a directory to expand candidate to.
 It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defvar helm-pdfgrep-targets nil)
+(defvar helm-grep-last-cmd-line nil)
 
 (defun helm-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories CANDIDATES for grep command line."
@@ -285,7 +286,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                  (or include "")))
          (smartcase         (if (helm-grep-use-ack-p) ""
                                 (unless (let ((case-fold-search nil))
-                                          (string-match-p "[A-Z]" helm-pattern)) "i")))
+                                          (string-match-p
+                                           "[A-Z]" helm-pattern)) "i")))
          (cmd-line          (format-spec
                              helm-c-grep-default-command
                              (delq nil
@@ -300,37 +302,70 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          ;; Use pipe only with grep or git-grep.
          (process-connection-type (helm-grep-use-ack-p))
          (tramp-verbose helm-tramp-verbose))
+    (setq helm-grep-last-cmd-line cmd-line)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
               (concat ">>> " (propertize cmd-line 'face 'diff-added) "\n\n"))
-    (prog1 ; This function should return the process first.
+    (prog1            ; This function should return the process first.
         (start-file-process-shell-command
          "grep" helm-buffer cmd-line)
       ;; Init sentinel.
       (set-process-sentinel
        (get-process "grep")
        #'(lambda (process event)
-           (if (string= event "finished\n")
-               (with-helm-window
-                 (setq mode-line-format
-                       '(" " mode-line-buffer-identification " "
-                         (line-number-mode "%l") " "
-                         (:eval (propertize
-                                 (format "[%s process finished - (%s results)] "
-                                         (if helm-grep-use-zgrep
-                                             "Zgrep"
-                                             (capitalize (if helm-grep-in-recurse
-                                                             (helm-grep-command t)
-                                                             (helm-grep-command))))
-                                         (max (1- (count-lines
-                                                   (point-min) (point-max))) 0))
-                                 'face 'helm-grep-finish))))
-                 (force-mode-line-update))
-               ;; Catch error output in log.
-               (helm-log "Error: %s %s"
-                         (if helm-grep-use-zgrep "Zgrep" "Grep")
-                         (replace-regexp-in-string "\n" "" event))))))))
+           (let ((noresult (= (process-exit-status process) 1)))
+             (cond ((and noresult
+                         ;; [FIXME] This is a workaround for zgrep
+                         ;; that exit with code 1
+                         ;; after a certain amount of results.
+                         (not helm-grep-use-zgrep))
+                    (with-current-buffer helm-buffer
+                      (insert (concat "* Exit with code 1, no result found,"
+                                      " Command line was:\n\n"
+                                      (propertize helm-grep-last-cmd-line
+                                                  'face 'diff-added)))
+                      (setq mode-line-format
+                            '(" " mode-line-buffer-identification " "
+                              (line-number-mode "%l") " "
+                              (:eval (propertize
+                                      (format
+                                       "[%s process finished - (no results)] "
+                                       (if helm-grep-use-zgrep
+                                           "Zgrep"
+                                           (capitalize
+                                            (if helm-grep-in-recurse
+                                                (helm-grep-command t)
+                                                (helm-grep-command)))))
+                                      'face 'helm-grep-finish))))))
+                   ((string= event "finished\n")
+                    (with-helm-window
+                      ;; Make now `helm-c-grep-default-command' local
+                      ;; to have it in further resuming session.
+                      (set (make-local-variable 'helm-c-grep-default-command)
+                           helm-c-grep-default-command)
+                      (setq mode-line-format
+                            '(" " mode-line-buffer-identification " "
+                              (line-number-mode "%l") " "
+                              (:eval (propertize
+                                      (format
+                                       "[%s process finished - (%s results)] "
+                                       (if helm-grep-use-zgrep
+                                           "Zgrep"
+                                           (capitalize
+                                            (if helm-grep-in-recurse
+                                                (helm-grep-command t)
+                                                (helm-grep-command))))
+                                       (max (1- (count-lines
+                                                 (point-min)
+                                                 (point-max))) 0))
+                                      'face 'helm-grep-finish))))
+                      (force-mode-line-update)))
+                   ;; Catch error output in log.
+                   (t (helm-log
+                       "Error: %s %s"
+                       (if helm-grep-use-zgrep "Zgrep" "Grep")
+                       (replace-regexp-in-string "\n" "" event))))))))))
 
 (defun helm-c-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep' on CANDIDATE.
@@ -512,6 +547,9 @@ These extensions will be added to command line with --include arg of grep."
   (let* ((helm-c-grep-default-command
           (cond (helm-grep-use-zgrep helm-c-default-zgrep-command)
                 (helm-grep-in-recurse helm-c-grep-default-recurse-command)
+                ;; When resuming the local value of
+                ;; `helm-c-grep-default-command' is used, only git-grep
+                ;; should need this.
                 (t helm-c-grep-default-command)))
          (helm-ff-default-directory helm-grep-last-default-directory))
     (funcall helm-c-grep-default-function
