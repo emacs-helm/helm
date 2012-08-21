@@ -211,6 +211,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (recenter)
     (mode-line . helm-occur-mode-line)
     (keymap . ,helm-occur-map)
+    (history . ,'helm-c-grep-history)
     (requires-pattern . 3)
     (delayed)))
 
@@ -278,6 +279,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-c-moccur-map)
+    (history . ,'helm-c-grep-history)
     (requires-pattern . 3)
     (delayed . ,helm-m-occur-idle-delay))
   "Helm source for multi occur.")
@@ -306,7 +308,8 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   "Main function to call `helm-c-source-moccur' with BUFFERS list."
   (declare (special buffers))
   (helm :sources 'helm-c-source-moccur
-        :buffer "*helm multi occur*"))
+        :buffer "*helm multi occur*"
+        :history 'helm-c-grep-history))
 
 
 ;;; Helm browse code.
