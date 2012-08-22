@@ -267,6 +267,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 (defvar helm-c-source-moccur
   `((name . "Moccur")
     (init . (lambda ()
+              (require 'helm-grep)
               (helm-m-occur-init buffers)
               (helm-attrset 'delayed helm-m-occur-idle-delay)))
     (candidates-in-buffer)
