@@ -269,12 +269,14 @@ One hit indent, two quick hits maybe indent and complete."
 ;;;###autoload
 (defun helm-lisp-completion-or-file-name-at-point ()
   "Complete lisp symbol or filename at point.
-Filename completion happen if filename is started in
-or between double quotes."
+Filename completion happen if string start after
+a double quote or between."
   (interactive)
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
-                   (when (search-backward "\"" (point-at-bol) t)
+                   (when (and ;; Allow completing symbols in docstrings
+                          (not (search-backward "`" (point-at-bol) t))
+                          (search-backward "\"" (point-at-bol) t))
                      (forward-char 1) (not (looking-at " ")))))
         (helm-c-complete-file-name-at-point)
         (helm-lisp-completion-at-point))))
