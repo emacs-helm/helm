@@ -628,12 +628,23 @@ If SRC is omitted, use current source."
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
 
+(defun helm-get-attribute-from-source-type (attribute source)
+  "Get ATTRIBUTE from type attribute of SOURCE."
+  (when (assq 'type source)
+    (assq attribute
+          (assq (helm-attr 'type source)
+                helm-type-attributes))))
+
 (defun helm-get-actions-from-type (source)
   "Get actions list from type attribute of SOURCE."
   (when (assq 'type source)
-    (assq 'action
-          (assq (helm-attr 'type source)
-                helm-type-attributes))))
+    (helm-get-attribute-from-source-type 'action source)))
+
+(defun helm-inherit-attribute-from-source (attribute source)
+  "Get the ATTRIBUTE of SOURCE."
+  (helm-aif (assq attribute source)
+      it
+    (helm-get-attribute-from-source-type attribute source)))
 
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
