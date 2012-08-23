@@ -2474,16 +2474,17 @@ Colorize only symlinks, directories and files."
                             (not (string-match ffap-url-regexp i))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
+        for type = (car (file-attributes i))
         collect
         (cond ((and helm-ff-tramp-not-fancy
                     (string-match tramp-file-name-regexp i))
                (cons disp i))
-              ((file-symlink-p i)
+              ((stringp type)
                (cons (propertize disp
                                  'face 'helm-ff-symlink
                                  'help-echo (expand-file-name i))
                      i))
-              ((file-directory-p i)
+              ((eq type t)
                (cons (propertize disp
                                  'face 'helm-ff-directory
                                  'help-echo (expand-file-name i))
