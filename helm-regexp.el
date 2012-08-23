@@ -312,9 +312,13 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 (defun helm-multi-occur-1 (buffers)
   "Main function to call `helm-c-source-moccur' with BUFFERS list."
   (declare (special buffers))
-  (helm :sources 'helm-c-source-moccur
-        :buffer "*helm multi occur*"
-        :history 'helm-c-grep-history))
+  (let ((helm-compile-source-functions
+         ;; rule out helm-match-plugin because the input is one regexp.
+         (delq 'helm-compile-source--match-plugin
+               (copy-sequence helm-compile-source-functions))))
+    (helm :sources 'helm-c-source-moccur
+          :buffer "*helm multi occur*"
+          :history 'helm-c-grep-history)))
 
 
 ;;; Helm browse code.
@@ -433,11 +437,7 @@ otherwise search in whole buffer."
   (interactive (list (helm-comp-read
                       "Buffers: " (helm-c-buffer-list)
                       :marked-candidates t)))
-  (let ((helm-compile-source-functions
-         ;; rule out helm-match-plugin because the input is one regexp.
-         (delq 'helm-compile-source--match-plugin
-               (copy-sequence helm-compile-source-functions))))
-    (helm-multi-occur-1 buffers)))
+  (helm-multi-occur-1 buffers))
 
 ;;;###autoload
 (defun helm-browse-code ()
