@@ -426,16 +426,17 @@ otherwise search in whole buffer."
           :history 'helm-c-grep-history)))
 
 ;;;###autoload
-(defun helm-multi-occur ()
-  "Preconfigured helm for multi occur."
-  (interactive)
+(defun helm-multi-occur (buffers)
+  "Preconfigured helm for multi occur.
+
+  BUFFERS is a list of buffers to search through."
+  (interactive (list (helm-comp-read
+                      "Buffers: " (helm-c-buffer-list)
+                      :marked-candidates t)))
   (let ((helm-compile-source-functions
          ;; rule out helm-match-plugin because the input is one regexp.
          (delq 'helm-compile-source--match-plugin
-               (copy-sequence helm-compile-source-functions)))
-        (buffers (helm-comp-read
-                  "Buffers: " (helm-c-buffer-list)
-                  :marked-candidates t)))
+               (copy-sequence helm-compile-source-functions))))
     (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
