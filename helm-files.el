@@ -2439,7 +2439,7 @@ Else return ACTIONS unmodified."
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
     (action . ,(cdr (helm-get-actions-from-type
-                     helm-c-source-locate)))
+                     helm-c-source-locate))))
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
@@ -2460,7 +2460,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
     (action . ,(cdr (helm-get-actions-from-type
-                     helm-c-source-locate)))
+                     helm-c-source-locate))))
   "File list from emacs-session.")
 
 
