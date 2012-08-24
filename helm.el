@@ -635,6 +635,11 @@ If SRC is omitted, use current source."
           (assq (helm-attr 'type source)
                 helm-type-attributes))))
 
+(defun helm-get-attribute-from-type (attribute type)
+  "Get ATTRIBUTE from TYPE.
+arg TYPE is an existing type defined in `helm-type-attributes'."
+  (assq attribute (assq type helm-type-attributes)))
+
 (defun helm-get-actions-from-type (source)
   "Get actions list from type attribute of SOURCE."
   (when (assq 'type source)

@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-
+
 (require 'cl)
 (require 'helm)
 (require 'helm-utils)
@@ -45,6 +45,38 @@
 (declare-function eshell-read-aliases-list "em-alias")
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (declare-function eshell-bol "esh-mode")
+
+
+;;; Type attributes
+;;
+;;
+(define-helm-type-attribute 'file
+    `((action
+       ("Find file" . helm-find-many-files)
+       ("Find file as root" . helm-find-file-as-root)
+       ("Find file other window" . find-file-other-window)
+       ("Find file other frame" . find-file-other-frame)
+       ("Open dired in file's directory" . helm-c-open-dired)
+       ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
+       ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
+       ("Pdfgrep File(s)" . helm-ff-pdfgrep)
+       ("Checksum File" . helm-ff-checksum)
+       ("Ediff File" . helm-find-files-ediff-files)
+       ("Ediff Merge File" . helm-find-files-ediff-merge-files)
+       ("Etags `C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
+       ("View file" . view-file)
+       ("Insert file" . insert-file)
+       ("Delete file(s)" . helm-delete-marked-files)
+       ("Open file externally (C-u to choose)" . helm-c-open-file-externally)
+       ("Open file with default tool" . helm-c-open-file-with-default-tool)
+       ("Find file in hex dump" . hexl-find-file))
+      (persistent-help . "Show this file")
+      (action-transformer helm-c-transform-file-load-el
+                          helm-c-transform-file-browse-url)
+      (candidate-transformer helm-c-highlight-files
+                             helm-c-w32-pathname-transformer))
+  "File name.")
+
 
 
 (defgroup helm-files nil
@@ -2507,36 +2539,6 @@ Colorize only symlinks, directories and files."
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
     (type . file)))
-
-;;; Type attributes
-;;
-;;
-(define-helm-type-attribute 'file
-    `((action
-       ("Find file" . helm-find-many-files)
-       ("Find file as root" . helm-find-file-as-root)
-       ("Find file other window" . find-file-other-window)
-       ("Find file other frame" . find-file-other-frame)
-       ("Open dired in file's directory" . helm-c-open-dired)
-       ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
-       ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
-       ("Pdfgrep File(s)" . helm-ff-pdfgrep)
-       ("Checksum File" . helm-ff-checksum)
-       ("Ediff File" . helm-find-files-ediff-files)
-       ("Ediff Merge File" . helm-find-files-ediff-merge-files)
-       ("Etags `C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
-       ("View file" . view-file)
-       ("Insert file" . insert-file)
-       ("Delete file(s)" . helm-delete-marked-files)
-       ("Open file externally (C-u to choose)" . helm-c-open-file-externally)
-       ("Open file with default tool" . helm-c-open-file-with-default-tool)
-       ("Find file in hex dump" . hexl-find-file))
-      (persistent-help . "Show this file")
-      (action-transformer helm-c-transform-file-load-el
-                          helm-c-transform-file-browse-url)
-      (candidate-transformer helm-c-highlight-files
-                             helm-c-w32-pathname-transformer))
-  "File name.")
 
 
 ;;;###autoload
