@@ -521,7 +521,10 @@ ACTION must be an action supported by `helm-dired-action'."
   "Default action to jump to etags from `helm-find-files'."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let ((default-directory helm-ff-default-directory))
+  (let* ((source-name (assoc-default 'name (helm-get-current-source)))
+         (default-directory (if (string= source-name "Find Files")
+                                helm-ff-default-directory
+                                (file-name-directory candidate))))
     (helm-c-etags-select helm-current-prefix-arg)))
 
 (defun helm-find-files-switch-to-hist (candidate)
