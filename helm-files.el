@@ -2438,7 +2438,8 @@ Else return ACTIONS unmodified."
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
-    (type . file))
+    (action . ,(cdr (helm-get-actions-from-type
+                     helm-c-source-locate)))
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
@@ -2449,16 +2450,17 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 (defvar helm-c-source-session
   `((name . "Session")
     (candidates . (lambda ()
-                    (delete-if #'(lambda (f)
-                                   (and (not (string-match tramp-file-name-regexp f))
-                                        (not (file-exists-p f))))
-                               (mapcar 'car session-file-alist))))
+                    (delete-if-not #'(lambda (f)
+                                       (or (string-match tramp-file-name-regexp f)
+                                           (file-exists-p f)))
+                                   (mapcar 'car session-file-alist))))
     (match helm-c-match-on-file-name
            helm-c-match-on-directory-name)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
-    (type . file))
+    (action . ,(cdr (helm-get-actions-from-type
+                     helm-c-source-locate)))
   "File list from emacs-session.")
 
 
