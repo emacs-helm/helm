@@ -234,17 +234,17 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
              bufstr)
          concat bufstr)))
 
-(defun helm-m-occur-get-line (s e)
+(defun helm-m-occur-get-line (beg end)
   "Format line for `helm-c-source-moccur'."
   (format "%s:%d:%s"
-          (get-text-property (point-at-bol) 'buffer-name)
+          (get-text-property beg 'buffer-name)
           (save-restriction
             (narrow-to-region (previous-single-property-change
                                (point) 'buffer-name)
                               (next-single-property-change
                                (point) 'buffer-name))
-            (line-number-at-pos s))
-          (buffer-substring s e)))
+            (line-number-at-pos beg))
+          (buffer-substring beg end)))
 
 (defun* helm-m-occur-action (candidate
                              &optional (method (quote buffer)))
