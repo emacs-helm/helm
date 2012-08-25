@@ -157,7 +157,8 @@ replace with STR as yanked string."
                         it)))
     (action . (("Goto line"
                 . (lambda (candidate)
-                    (helm-goto-line (string-to-number candidate))))))
+                    (helm-goto-line (string-to-number candidate))
+                    (push-mark nil 'nomsg))))) 
     (persistent-action . (lambda (candidate)
                            (helm-goto-line (string-to-number candidate))
                            (helm-match-line-color-current-line)))
