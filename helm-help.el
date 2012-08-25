@@ -276,6 +276,7 @@ This list is customizable, see `helm-buffers-favorite-modes'.
 \\[helm-ff-run-ediff-merge-file]\t\t->Ediff merge file.
 \\[helm-ff-run-switch-other-window]\t\t->Switch other window.
 \\[helm-ff-properties-persistent]\t\t->Show file properties.
+\\[helm-ff-run-etags]\t\t->Run etags (C-u use tap, C-u C-u reload DB).
 \\[helm-yank-text-at-point]\t\t->Yank text at point.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \nLocate tips:
