@@ -309,7 +309,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
                               (helm-c-grep-highlight-match str))
                       i)))
 
-(defun helm-multi-occur-1 (buffers)
+(defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-c-source-moccur' with BUFFERS list."
   (declare (special buffers))
   (let ((helm-compile-source-functions
@@ -318,7 +318,8 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
                (copy-sequence helm-compile-source-functions))))
     (helm :sources 'helm-c-source-moccur
           :buffer "*helm multi occur*"
-          :history 'helm-c-grep-history)))
+          :history 'helm-c-grep-history
+          :input input)))
 
 
 ;;; Helm browse code.

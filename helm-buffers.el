@@ -480,11 +480,17 @@ See `helm-ediff-marked-buffers'."
   (helm-ediff-marked-buffers candidate t))
 
 (defun helm-multi-occur-as-action (_candidate)
-  (let ((buffers (helm-marked-candidates)))
-    (helm-multi-occur-1 buffers)))
+  "Multi occur action for `helm-c-source-buffers-list'.
+Can be used by any source that list buffers."
+  (let ((buffers (helm-marked-candidates))
+        (input (loop for i in (split-string helm-pattern " " t)
+                     thereis (and (string-match "\\`@\\(.*\\)" i)
+                                  (match-string 1 i)))))
+    (helm-multi-occur-1 buffers input)))
 
 ;;;###autoload
 (defun helm-buffers-run-multi-occur ()
+  "Run `helm-multi-occur-as-action' by key."
   (interactive)
   (helm-c-quit-and-execute-action 'helm-multi-occur-as-action))
 
