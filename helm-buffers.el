@@ -285,13 +285,31 @@ with name matching pattern."
       (with-current-buffer buf
         (let ((mjm   (symbol-name major-mode))
               (split (split-string helm-pattern)))
-          (cond ((string-match "\\s-$" helm-pattern)
+          (cond ((string-match "^@" helm-pattern)
+                 (or (helm-buffers-match-inside cand split)
+                     (string-match helm-pattern cand)))
+                ((string-match "\\s-$" helm-pattern)
                  (string-match (car split) mjm))
+                ((string-match "\\s-[@]" helm-pattern)
+                 (and (string-match (car split) mjm)
+                      (helm-buffers-match-inside cand (cdr split))))
                 ((string-match "\\s-" helm-pattern)
                  (and (string-match (car split) mjm)
                       (loop for i in (cdr split) always (string-match i cand))))
                 (t (or (string-match helm-pattern mjm)
                        (string-match helm-pattern cand)))))))))
+
+(defun helm-buffers-match-inside (candidate lst)
+  (loop for i in lst
+        always
+        (cond ((string-match "\\`[\\]@" i)
+               (string-match i candidate))
+              ((string-match "\\`@\\(.*\\)" i)
+               (save-excursion
+                 (let ((str (match-string 1 i)))
+                   (goto-char (point-min))
+                   (re-search-forward str nil t))))
+              (t (string-match i candidate)))))
 
 (defun helm-c-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace in marked buffers.
