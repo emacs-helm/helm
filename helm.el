@@ -209,6 +209,19 @@ which affects `helm-samewindow'."
   :group 'helm
   :type 'symbol)
 
+(defcustom helm-case-fold-search 'smart
+  "Add 'smart' option to `case-fold-search'.
+When smart is enabled, ignore case in the search strings
+if pattern contains no uppercase characters.
+Otherwise, with a nil or t value, the behavior is same as
+`case-fold-search'.
+Default value is smart, other possible values are nil and t.
+NOTE: This have no effect in asynchronous sources, you will
+have to implement a similar feature directly in the process.
+See in helm-grep.el how it is implemented."
+  :group 'helm
+  :type 'symbol)
+
 ;;; Faces
 ;;
 ;;
@@ -1215,7 +1228,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                      helm-source-name
                      helm-in-persistent-action
                      helm-quit
-                     (case-fold-search t)
                      (helm-buffer (or any-buffer helm-buffer)))
                  (with-helm-restore-variables
                    (helm-initialize any-resume any-input any-sources)
@@ -1817,10 +1829,21 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
       (setq seq (subseq seq 0 n))
       seq))
 
+(defun helm-set-case-fold-search ()
+  "Used to set the value of `case-fold-search' in helm.
+Return t or nil depending of value of `helm-case-fold-search'
+and `helm-pattern'."
+  (case helm-case-fold-search
+    (smart (let ((case-fold-search nil))
+             (if (string-match "[A-Z]" helm-pattern) nil t)))
+    (t helm-case-fold-search)))
+
 (defun helm-match-from-candidates (cands matchfns limit)
   (let (matches)
     (condition-case nil
-        (let ((item-count 0) exit)
+        (let ((item-count 0)
+              (case-fold-search (helm-set-case-fold-search))
+              exit)
           (clrhash helm-match-hash)
           (dolist (match matchfns)
             (let (newmatches)
@@ -2807,11 +2830,13 @@ See also `helm-sources' docstring."
 
 (defun helm-candidates-in-buffer-search-from-start (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
-  (re-search-forward pattern nil t))
+  (let ((case-fold-search (helm-set-case-fold-search)))
+    (re-search-forward pattern nil t)))
 
 (defun helm-candidates-in-buffer-search-from-end (pattern)
   "Search PATTERN with `re-search-backward' with bound and noerror args."
-  (re-search-backward pattern nil t))
+  (let ((case-fold-search (helm-set-case-fold-search)))
+    (re-search-backward pattern nil t)))
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
                                     search-fns limit search-from-end
