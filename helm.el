@@ -2830,13 +2830,11 @@ See also `helm-sources' docstring."
 
 (defun helm-candidates-in-buffer-search-from-start (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
-  (let ((case-fold-search (helm-set-case-fold-search)))
-    (re-search-forward pattern nil t)))
+  (re-search-forward pattern nil t))
 
 (defun helm-candidates-in-buffer-search-from-end (pattern)
   "Search PATTERN with `re-search-backward' with bound and noerror args."
-  (let ((case-fold-search (helm-set-case-fold-search)))
-    (re-search-backward pattern nil t)))
+  (re-search-backward pattern nil t))
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
                                     search-fns limit search-from-end
@@ -2862,7 +2860,10 @@ See also `helm-sources' docstring."
                                           limit search-from-end
                                           start-point endp match-part-fn)
   (let (buffer-read-only
-        matches exit newmatches)
+        matches
+        exit
+        newmatches
+        (case-fold-search (helm-set-case-fold-search)))
     (helm-search-from-candidate-buffer-internal
      (lambda ()
        (clrhash helm-cib-hash)
