@@ -119,7 +119,7 @@ The function that call this should set `helm-ec-target' to thing at point."
     (init . (lambda ()
               (let (eshell-hist-ignoredups)
                 ;; Write the content's of ring to file.
-                (eshell-write-history eshell-history-file-name t)
+                (eshell-write-history eshell-history-file-name)
                 (with-current-buffer (helm-candidate-buffer 'global)
                   (insert-file-contents eshell-history-file-name)))
               ;; Same comment as in `helm-c-source-esh'
