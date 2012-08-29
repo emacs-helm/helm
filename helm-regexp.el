@@ -67,13 +67,6 @@ It is similar to `helm-idle-delay' but local to `helm-c-source-moccur'."
   :group 'helm-regexp)
 
 
-(defvar helm-occur-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-M-%") 'helm-occur-run-query-replace-regexp)
-    map)
-  "Keymap for `helm-occur'.")
-
 (defvar helm-c-moccur-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -83,6 +76,7 @@ It is similar to `helm-idle-delay' but local to `helm-c-source-moccur'."
     (define-key map (kbd "C-c ?")    'helm-moccur-help)
     (delq nil map))
   "Keymap used in Moccur source.")
+
 
 (defvar helm-build-regexp-history nil)
 (defun helm-c-query-replace-regexp (candidate)
@@ -162,58 +156,11 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   "Quote whitespace, if some, in string CANDIDATE."
   (replace-regexp-in-string " " "\\\\ " candidate))
 
+
 ;;; Occur
 ;;
 ;;
-(defun helm-c-occur-init ()
-  "Create the initial helm occur buffer.
-If region is active use region as buffer contents
-instead of whole buffer."
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (erase-buffer)
-    (let ((buf-contents
-           (with-helm-current-buffer
-             (if (helm-region-active-p)
-                 (buffer-substring (region-beginning) (region-end))
-                 (buffer-substring (point-min) (point-max))))))
-      (insert buf-contents))))
-
-(defun helm-c-occur-get-line (s e)
-  (format "%7d:%s" (line-number-at-pos (1- s)) (buffer-substring s e)))
-
-(defun helm-c-occur-query-replace-regexp (candidate)
-  "Query replace regexp starting from CANDIDATE.
-If region is active ignore CANDIDATE and replace only in region.
-With a prefix arg replace only matches surrounded by word boundaries,
-i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
-  (let ((regexp helm-input))
-    (unless (helm-region-active-p)
-      (helm-c-action-line-goto candidate))
-    (apply 'query-replace-regexp
-           (helm-c-query-replace-args regexp))))
-
-(defun helm-occur-run-query-replace-regexp ()
-  "Run `query-replace-regexp' in helm occur from keymap."
-  (interactive)
-  (helm-c-quit-and-execute-action
-   'helm-c-occur-query-replace-regexp))
-
-(defvar helm-c-source-occur
-  `((name . "Occur")
-    (init . helm-c-occur-init)
-    (candidates-in-buffer)
-    (migemo)
-    (get-line . helm-c-occur-get-line)
-    (display-to-real . helm-c-display-to-real-numbered-line)
-    (action . (("Go to Line" . helm-c-action-line-goto)
-               ("Query replace regexp (C-u Not inside word.)"
-                . helm-c-occur-query-replace-regexp)))
-    (recenter)
-    (mode-line . helm-occur-mode-line)
-    (keymap . ,helm-occur-map)
-    (history . ,'helm-c-grep-history)
-    (requires-pattern . 3)
-    (delayed)))
+(defvar helm-c-source-occur nil)
 
 
 ;;; Multi occur
@@ -418,16 +365,19 @@ the center of window, otherwise at the top of window.")
 
 ;;;###autoload
 (defun helm-occur ()
-  "Preconfigured Helm for Occur source.
-If region is active, search only in region,
-otherwise search in whole buffer."
+  "Preconfigured helm for Occur."
   (interactive)
-  (let ((helm-compile-source-functions
+  (declare (special buffers))
+  (let ((buffers (list (buffer-name (current-buffer))))
+        (helm-compile-source-functions
          ;; rule out helm-match-plugin because the input is one regexp.
          (delq 'helm-compile-source--match-plugin
                (copy-sequence helm-compile-source-functions))))
+    (unless helm-c-source-occur
+      (setq helm-c-source-occur (copy-alist helm-c-source-moccur)))
+    (helm-attrset 'name "Occur" helm-c-source-occur)
     (helm :sources 'helm-c-source-occur
-          :buffer "*Helm Occur*"
+          :buffer "*helm occur*"
           :history 'helm-c-grep-history)))
 
 ;;;###autoload
