@@ -54,9 +54,10 @@ to a specific `major-mode'."
   :group 'helm-regexp
   :type 'boolean)
 
-(defcustom helm-m-occur-idle-delay 0.6
+(defcustom helm-m-occur-idle-delay 0.3
   "Delay before updating display in `helm-c-source-moccur'.
-It is similar to `helm-idle-delay' but local to `helm-c-source-moccur'."
+It is similar to `helm-idle-delay' but local to `helm-c-source-moccur'.
+This setting apply also to `helm-c-source-occur'."
   :group 'helm-regexp
   :type 'float)
 
@@ -161,6 +162,9 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 ;;
 ;;
 (defvar helm-c-source-occur nil)
+(defun helm-occur-init-source ()
+  (unless helm-c-source-occur
+    (setq helm-c-source-occur (copy-alist helm-c-source-moccur))))
 
 
 ;;; Multi occur
@@ -373,8 +377,7 @@ the center of window, otherwise at the top of window.")
          ;; rule out helm-match-plugin because the input is one regexp.
          (delq 'helm-compile-source--match-plugin
                (copy-sequence helm-compile-source-functions))))
-    (unless helm-c-source-occur
-      (setq helm-c-source-occur (copy-alist helm-c-source-moccur)))
+    (helm-occur-init-source)
     (helm-attrset 'name "Occur" helm-c-source-occur)
     (helm :sources 'helm-c-source-occur
           :buffer "*helm occur*"
