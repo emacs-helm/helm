@@ -222,6 +222,14 @@ See in helm-grep.el how it is implemented."
   :group 'helm
   :type 'symbol)
 
+(defcustom helm-reuse-last-window-split-state nil
+  "Reuse the last state of window split, vertical or horizontal.
+That is when you use `helm-toggle-resplit-window' the next helm session
+will reuse the same window scheme than the one of last session."
+  :group 'helm
+  :type 'boolean)
+
+
 ;;; Faces
 ;;
 ;;
@@ -1431,7 +1439,16 @@ window or frame configuration is saved/restored according to values of
 (defun helm-display-buffer (buf)
   "Display *helm* buffer BUF."
   (let (pop-up-frames)
-    (funcall (with-current-buffer buf helm-display-function) buf)))
+    (funcall (with-current-buffer buf helm-display-function) buf)
+    (when helm-reuse-last-window-split-state
+      (with-helm-window
+        (delete-window)
+        (set-window-buffer
+         (select-window
+          (if (eq helm-split-window-state 'horizontal)
+              (split-window-horizontally)
+              (split-window-vertically)))
+         helm-buffer)))))
 
 (defun helm-default-display-buffer (buf)
   "Default function to display BUF.
@@ -1457,11 +1474,13 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (setq helm-issued-errors nil)
   (setq helm-compiled-sources nil)
   (setq helm-saved-current-source nil)
-  (if (or (not split-width-threshold)
-          (and (integerp split-width-threshold)
-               (>= split-width-threshold (+ (frame-width) 4))))
-      (setq helm-split-window-state 'vertical)
-      (setq helm-split-window-state 'horizontal))
+  (unless (and helm-reuse-last-window-split-state
+               helm-split-window-state)
+    (if (or (not split-width-threshold)
+            (and (integerp split-width-threshold)
+                 (>= split-width-threshold (+ (frame-width) 4))))
+        (setq helm-split-window-state 'vertical)
+        (setq helm-split-window-state 'horizontal)))
   ;; Call the init function for sources where appropriate
   (helm-funcall-foreach 'init)
   (setq helm-pattern "")
