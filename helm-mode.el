@@ -371,8 +371,14 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :buffer buffer))
       ;; Avoid adding an incomplete input to history.
       (when (and result history del-input)
-        (setcar (if (symbolp history) (eval history) history)
-                result))
+        (cond (;; Be sure history is not a symbol with a nil value.
+               (and (symbolp history)
+                    (symbol-value history))
+               (setcar (eval history) result))
+              (;; A list with a non--nil value.
+               (consp history) (setcar history result))
+              (t ; Possibly a symbol with a nil value.
+               (set history (list result)))))
       (or
        result
        (when (and (eq helm-exit-status 0)
