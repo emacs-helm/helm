@@ -1440,7 +1440,8 @@ window or frame configuration is saved/restored according to values of
   "Display *helm* buffer BUF."
   (let (pop-up-frames)
     (funcall (with-current-buffer buf helm-display-function) buf)
-    (when helm-reuse-last-window-split-state
+    (when (and (not helm-samewindow)
+               helm-reuse-last-window-split-state)
       (with-helm-window
         (delete-window)
         (set-window-buffer
