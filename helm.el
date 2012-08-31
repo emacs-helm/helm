@@ -494,7 +494,7 @@ Use optional arguments ARGS like in `format'."
   (dolist (expr exprs)
     (condition-case err
         (helm-log "%S = %S" expr (eval expr))
-      (error (helm-log "%S = ERROR!" expr)))))
+      (error (helm-log "%S = ERROR: %S" expr err)))))
 
 (defun helm-log-get-current-function ()
   "Get function name calling `helm-log'.
@@ -1253,6 +1253,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
              (quit
               (helm-restore-position-on-quit)
+              (helm-log-eval (setq helm-alive-p nil))
               (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
               nil))
         (setq overriding-local-map old-overridding-local-map)
