@@ -1530,7 +1530,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                               (thing-at-point 'symbol)))))
                (read-from-minibuffer (or any-prompt "pattern: ")
                                      any-input helm-map
-                                     nil hist tap)))))))
+                                     nil hist tap t)))))))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
