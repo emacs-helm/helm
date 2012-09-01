@@ -54,7 +54,7 @@ to a specific `major-mode'."
   :group 'helm-regexp
   :type 'boolean)
 
-(defcustom helm-m-occur-idle-delay 0.3
+(defcustom helm-m-occur-idle-delay helm-idle-delay
   "Delay before updating display in `helm-c-source-moccur'.
 It is similar to `helm-idle-delay' but local to `helm-c-source-moccur'.
 This setting apply also to `helm-c-source-occur'."
