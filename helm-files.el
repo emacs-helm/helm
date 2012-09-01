@@ -1339,7 +1339,8 @@ Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
 dotted filename '.' and '..' even on root directories in Windows
 systems."
-  (setq directory (expand-file-name directory))
+  (setq directory (file-name-as-directory
+                   (expand-file-name directory)))
   (let ((ls   (directory-files
                directory full directory-files-no-dot-files-regexp))
         (dot  (concat directory "."))
