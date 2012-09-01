@@ -1337,22 +1337,14 @@ purpose."
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
-dotted filename '.' and '..' on root directories on Windows
+dotted filename '.' and '..' even on root directories in Windows
 systems."
   (setq directory (expand-file-name directory))
-  (let ((ls (directory-files directory full))
-        dot dot2 lsdir)
-    (if (or
-         ;; A windows volume.
-         (string-match "^[a-zA-Z]\\{1\\}:/$" directory)
-         ;; Empty directories on ftp hosts may have no dot dirs.
-         (and (file-remote-p directory)
-              (string-match "^/ftp:" directory)))
-        (progn (setq dot (concat directory "."))
-               (setq dot2 (concat directory ".."))
-               (setq lsdir (remove dot2 (remove dot ls)))
-               (append (list dot dot2) lsdir))
-        ls)))
+  (let ((ls   (directory-files
+               directory full directory-files-no-dot-files-regexp))
+        (dot  (concat directory "."))
+        (dot2 (concat directory "..")))
+    (append (list dot dot2) ls)))
 
 ;; Internal
 (defvar helm-ff-smart-completion-incompatible-methods '(multi1 multi3p))
