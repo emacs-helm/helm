@@ -1861,7 +1861,8 @@ Use it for non--interactive calls of `helm-find-files'."
           (remp abs) ; A remote file
           (file-p    ; a regular file
            ;; Avoid ffap annoyances, don't use `ffap-alist'.
-           (let (ffap-alist) (ffap-file-at-point)))
+           (let (ffap-alist)
+             (expand-file-name (ffap-file-at-point))))
           (t (and (not (string= file-at-pt "")) ; possibly an url or email.
                   file-at-pt)))))
 
@@ -2549,18 +2550,20 @@ This is the starting point for nearly all actions you can do on files."
                        (helm-find-files-history)
                        (helm-find-files-initial-input)))
         (presel    (buffer-file-name (current-buffer))))
-    (when (and (eq major-mode 'org-agenda-mode)
+    (cond ((and (eq major-mode 'org-agenda-mode)
                org-directory
                (not any-input))
-      (setq any-input (expand-file-name org-directory)))
+           (setq any-input (expand-file-name org-directory)))
+          ((and (eq major-mode 'dired-mode) any-input)
+           (setq presel any-input)
+           (setq any-input (file-name-directory any-input))))
     (set-text-properties 0 (length any-input) nil any-input)
-    (if any-input
-        (helm-find-files-1 any-input)
-        (setq any-input (expand-file-name (helm-c-current-directory)))
-        (helm-find-files-1
-         any-input (if helm-ff-transformer-show-only-basename
-                       (and presel (helm-c-basename presel))
-                       presel)))))
+    (unless any-input
+      (setq any-input (expand-file-name (helm-c-current-directory))))
+    (helm-find-files-1
+     any-input (if helm-ff-transformer-show-only-basename
+                   (and presel (helm-c-basename presel))
+                   presel))))
 
 ;;;###autoload
 (defun helm-write-file ()
