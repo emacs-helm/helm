@@ -667,53 +667,61 @@ Keys description:
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-exit-minibuffer"
                           "helm-confirm-and-exit-minibuffer"
-                          helm-read-file-name-mode-line-string)))
-
-      (or (helm
-           :sources
-           `(((name . ,(format "%s History" name))
-              (header-name . (lambda (name)
-                               (concat name helm-c-find-files-doc-header)))
-              (mode-line . helm-read-file-name-mode-line-string)
-              (candidates . hist)
-              (persistent-action . ,persistent-action)
-              (persistent-help . ,persistent-help)
-              (action . ,action-fn))
-             ((name . ,name)
-              (header-name . (lambda (name)
-                               (concat name helm-c-find-files-doc-header)))
-              (init . (lambda ()
-                        (setq helm-ff-auto-update-flag
-                              helm-ff-auto-update-initial-value)))
-              (mode-line . helm-read-file-name-mode-line-string)
-              (candidates
-               . (lambda ()
-                   (if test
-                       (loop with hn = (helm-ff-tramp-hostnames)
-                             for i in (helm-find-files-get-candidates
-                                       must-match)
-                             when (or (member i hn)    ; A tramp host
-                                      (funcall test i) ; Test ok
-                                      (not (file-exists-p i))) ; A new file.
-                             collect i)
-                       (helm-find-files-get-candidates must-match))))
-              (filtered-candidate-transformer helm-c-find-files-transformer)
-              (persistent-action . ,persistent-action)
-              (candidate-number-limit . 9999)
-              (persistent-help . ,persistent-help)
-              (volatile)
-              (action . ,action-fn)))
-           :input initial-input
-           :prompt prompt
-           :resume 'noresume
-           :keymap helm-map
-           :buffer buffer
-           :preselect preselect)
-          (when (and (not (string= helm-pattern ""))
-                     (eq helm-exit-status 0)
-                     (eq must-match 'confirm))
-            (identity helm-pattern))
-          (keyboard-quit)))))
+                          helm-read-file-name-mode-line-string))
+           (result (helm
+                    :sources
+                    `(((name . ,(format "%s History" name))
+                       (header-name . (lambda (name)
+                                        (concat name
+                                                helm-c-find-files-doc-header)))
+                       (mode-line . helm-read-file-name-mode-line-string)
+                       (candidates . hist)
+                       (persistent-action . ,persistent-action)
+                       (persistent-help . ,persistent-help)
+                       (action . ,action-fn))
+                      ((name . ,name)
+                       (header-name . (lambda (name)
+                                        (concat name
+                                                helm-c-find-files-doc-header)))
+                       (init . (lambda ()
+                                 (setq helm-ff-auto-update-flag
+                                       helm-ff-auto-update-initial-value)))
+                       (mode-line . helm-read-file-name-mode-line-string)
+                       (candidates
+                        . (lambda ()
+                            (if test
+                                (loop with hn = (helm-ff-tramp-hostnames)
+                                      for i in (helm-find-files-get-candidates
+                                                must-match)
+                                      when (or (member i hn)    ; A tramp host
+                                               (funcall test i) ; Test ok
+                                               (not (file-exists-p i))) ; A new file.
+                                      collect i)
+                                (helm-find-files-get-candidates must-match))))
+                       (filtered-candidate-transformer
+                        helm-c-find-files-transformer)
+                       (persistent-action . ,persistent-action)
+                       (candidate-number-limit . 9999)
+                       (persistent-help . ,persistent-help)
+                       (volatile)
+                       (action . ,action-fn)))
+                    :input initial-input
+                    :prompt prompt
+                    :resume 'noresume
+                    :keymap helm-map
+                    :buffer buffer
+                    :preselect preselect)))
+      (or
+       (cond ((and result (stringp result))
+              (expand-file-name result))
+             ((and result (listp result))
+              (mapcar #'expand-file-name result))
+             (t result))
+       (when (and (not (string= helm-pattern ""))
+                  (eq helm-exit-status 0)
+                  (eq must-match 'confirm))
+         (identity helm-pattern))
+       (keyboard-quit)))))
 
 (defun* helm-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
