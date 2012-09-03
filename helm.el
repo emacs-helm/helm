@@ -3485,7 +3485,9 @@ If PREV is non-nil move to precedent."
 (defun helm-yank-selection ()
   "Set minibuffer contents to current selection."
   (interactive)
-  (helm-set-pattern (helm-get-selection nil t)))
+  (let ((str (helm-get-selection nil t)))
+    (kill-new str)
+    (helm-set-pattern str)))
 
 ;;;###autoload
 (defun helm-kill-selection-and-quit ()
