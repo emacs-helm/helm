@@ -48,7 +48,6 @@ Should take one arg: the string to display."
 ;;
 ;; Internal
 (defvar helm-eldoc-active-minibuffers-list nil)
-(defvar helm-eval-expression-input-history nil)
 
 (defvar helm-eval-expression-map
   (let ((map (make-sparse-keymap)))
@@ -143,7 +142,7 @@ Should take one arg: the string to display."
   (helm :sources 'helm-c-source-evaluation-result
         :input (when arg (thing-at-point 'sexp))
         :buffer "*helm eval*"
-        :history 'helm-eval-expression-input-history
+        :history 'read-expression-history
         :keymap helm-eval-expression-map))
 
 ;;;###autoload
