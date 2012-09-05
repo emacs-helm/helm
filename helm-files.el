@@ -1862,7 +1862,8 @@ Use it for non--interactive calls of `helm-find-files'."
           (file-p    ; a regular file
            ;; Avoid ffap annoyances, don't use `ffap-alist'.
            (let (ffap-alist)
-             (expand-file-name (ffap-file-at-point))))
+             (helm-aif (ffap-file-at-point)
+                 (expand-file-name it))))
           (t (and (not (string= file-at-pt "")) ; possibly an url or email.
                   file-at-pt)))))
 
