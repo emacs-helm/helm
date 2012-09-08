@@ -208,7 +208,7 @@ This list is customizable, see `helm-buffers-favorite-modes'.
 
 \nSpecific commands for `helm-find-files':
 \\<helm-find-files-map>
-\\[helm-ff-run-locate]\t\t->Run Locate on basename of candidate (C-u to specify locate db).
+\\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
 \\[helm-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[helm-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[helm-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).

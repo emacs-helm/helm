@@ -108,7 +108,7 @@ fall back to `default-directory' if FROM-FF is nil."
                  helm-ff-locate-db-filename
                  default-directory))))))
 
-(defun helm-locate-1 (&optional localdb init from-ff)
+(defun helm-locate-1 (&optional localdb init from-ff default)
   "Generic function to run Locate.
 if LOCALDB is non--nil search and use a local locate db file.
 INIT is a string to use as initial input in prompt.
@@ -143,7 +143,7 @@ See `helm-locate-with-db' and `helm-locate'."
                                 helm-locate-db-file-regexp x)
                                (file-directory-p x))
                            x)))))
-   init))
+   init default))
 
 (defun helm-locate-set-command ()
   "Setup `helm-c-locate-command' if not already defined."
@@ -156,7 +156,7 @@ See `helm-locate-with-db' and `helm-locate'."
             (t "locate %s")))))
 
 (defvar helm-file-name-history nil)
-(defun helm-locate-with-db (&optional db initial-input)
+(defun helm-locate-with-db (&optional db initial-input default)
   "Run locate -d DB.
 If DB is not given or nil use locate without -d option.
 Argument DB can be given as a string or list of db files.
@@ -182,6 +182,7 @@ See also `helm-locate'."
     (helm :sources 'helm-c-source-locate
           :buffer "*helm locate*"
           :input initial-input
+          :default default
           :history 'helm-file-name-history)))
 
 (defun helm-c-locate-init ()

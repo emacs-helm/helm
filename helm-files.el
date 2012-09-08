@@ -917,7 +917,7 @@ See `helm-ff-serial-rename-1'."
                        (unless (and (eq system-type 'windows-nt)
                                     (string-match "^es" helm-c-locate-command))
                          " -b"))))
-    (helm-locate-1 helm-current-prefix-arg input 'from-ff)))
+    (helm-locate-1 helm-current-prefix-arg nil 'from-ff input)))
 
 ;;;###autoload
 (defun helm-ff-run-locate ()
