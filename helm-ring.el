@@ -71,7 +71,7 @@ If nil or zero, don't truncate candidate, show all."
 (defun helm-c-kill-ring-candidates ()
   (loop for kill in (helm-fast-remove-dups kill-ring :test 'equal)
         unless (or (< (length kill) helm-kill-ring-threshold)
-                   (string-match "^[\\s\\t]+$" kill))
+                   (string-match "^\\(\\s-\\|\t\\)+$" kill))
         collect kill))
 
 (defun helm-c-kill-ring-transformer (candidates source)
