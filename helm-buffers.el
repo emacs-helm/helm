@@ -482,7 +482,10 @@ See `helm-ediff-marked-buffers'."
 (defun helm-multi-occur-as-action (_candidate)
   "Multi occur action for `helm-c-source-buffers-list'.
 Can be used by any source that list buffers."
-  (let ((buffers (helm-marked-candidates))
+  (let ((helm-moccur-always-search-in-current
+         (or helm-moccur-always-search-in-current
+             helm-current-prefix-arg))
+        (buffers (helm-marked-candidates))
         (input (loop for i in (split-string helm-pattern " " t)
                      thereis (and (string-match "\\`@\\(.*\\)" i)
                                   (match-string 1 i)))))

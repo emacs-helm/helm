@@ -387,11 +387,19 @@ the center of window, otherwise at the top of window.")
 (defun helm-multi-occur (buffers)
   "Preconfigured helm for multi occur.
 
-  BUFFERS is a list of buffers to search through."
+  BUFFERS is a list of buffers to search through.
+With a prefix arg, force searching in current buffer
+even if `helm-moccur-always-search-in-current' is nil.
+The prefix arg can be set before calling `helm-multi-occur'
+or during the buffer selection."
   (interactive (list (helm-comp-read
                       "Buffers: " (helm-c-buffer-list)
                       :marked-candidates t)))
-  (helm-multi-occur-1 buffers))
+  (let ((helm-moccur-always-search-in-current
+         (or helm-moccur-always-search-in-current
+             (or current-prefix-arg
+                 helm-current-prefix-arg))))
+    (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
 (defun helm-browse-code ()
