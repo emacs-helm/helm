@@ -61,6 +61,11 @@ This setting apply also to `helm-c-source-occur'."
   :group 'helm-regexp
   :type 'float)
 
+(defcustom helm-m-occur-use-ioccur-style-keys t
+  "Similar to `helm-c-grep-use-ioccur-style-keys' but for multi occur."
+  :group 'helm-regexp
+  :type 'boolean)
+
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
@@ -75,6 +80,9 @@ This setting apply also to `helm-c-source-occur'."
     (define-key map (kbd "M-<up>")   'helm-c-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-c ?")    'helm-moccur-help)
+    (when helm-m-occur-use-ioccur-style-keys
+      (define-key map (kbd "<right>")  'helm-m-occur-run-persistent-action)
+      (define-key map (kbd "<left>")   'helm-m-occur-run-default-action))
     (delq nil map))
   "Keymap used in Moccur source.")
 
@@ -211,9 +219,22 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
     (helm-goto-line lineno)))
 
+(defun helm-m-occur-persistent-action (candidate)
+  (helm-m-occur-goto-line candidate)
+  (helm-match-line-color-current-line))
+
+(defun helm-m-occur-run-persistent-action ()
+  (interactive)
+  (when helm-alive-p
+    (helm-execute-persistent-action)))
+
 (defun helm-m-occur-goto-line (candidate)
   "From multi occur, switch to buffer and go to nth 1 CANDIDATE line."
   (helm-m-occur-action candidate))
+
+(defun helm-m-occur-run-default-action ()
+  (interactive)
+  (helm-c-quit-and-execute-action 'helm-m-occur-goto-line))
 
 (defvar helm-c-source-moccur
   `((name . "Moccur")
@@ -227,9 +248,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (get-line . helm-m-occur-get-line)
     (migemo)
     (action . (("Go to Line" . helm-m-occur-goto-line)))
-    (persistent-action . (lambda (candidate)
-                           (helm-m-occur-goto-line candidate)
-                           (helm-match-line-color-current-line)))
+    (persistent-action . helm-m-occur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)
     (candidate-number-limit . 9999)
