@@ -1253,9 +1253,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
              (quit
               (helm-restore-position-on-quit)
-              (helm-log-eval (setq helm-alive-p nil))
               (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
               nil))
+        (helm-log-eval (setq helm-alive-p nil))
         (setq overriding-local-map old-overridding-local-map)
         (helm-log-save-maybe)))))
 
@@ -1442,6 +1442,9 @@ window or frame configuration is saved/restored according to values of
   (let (pop-up-frames)
     (funcall (with-current-buffer buf helm-display-function) buf)
     (when (and (not helm-samewindow)
+               ;; This can happen when calling helm
+               ;; from a dedicated frame with no minibuffer.
+               (not (with-helm-window (one-window-p)))
                helm-reuse-last-window-split-state)
       (with-helm-window
         (delete-window)
