@@ -217,7 +217,9 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
-    (helm-goto-line lineno)))
+    (helm-goto-line lineno)
+    (when (re-search-forward helm-pattern (point-at-eol) t)
+      (goto-char (match-beginning 0)))))
 
 (defun helm-m-occur-persistent-action (candidate)
   (helm-m-occur-goto-line candidate)
