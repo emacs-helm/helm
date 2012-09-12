@@ -229,6 +229,16 @@ will reuse the same window scheme than the one of last session."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-display-buffer-default-action nil
+  "An action that `helm-display-buffer' can pass to `pop-to-buffer'.
+The default, nil mean reuse other window to display `helm-buffer'
+if there is more than one window.
+The value should be nil, t or an alist.
+See `display-buffer' for how to use action arg.
+This is not available for emacs versions < 24.1."
+  :group 'helm
+  :type 'list)
+
 
 ;;; Faces
 ;;
@@ -1239,7 +1249,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                      (helm-buffer (or any-buffer helm-buffer)))
                  (with-helm-restore-variables
                    (helm-initialize any-resume any-input any-sources)
-                   (helm-display-buffer helm-buffer)
+                   (helm-display-buffer helm-buffer
+                                        helm-display-buffer-default-action)
                    (helm-log "show prompt")
                    (unwind-protect
                         (helm-read-pattern-maybe
@@ -1437,10 +1448,12 @@ window or frame configuration is saved/restored according to values of
 
 
 ;; Core: Display *helm* buffer
-(defun helm-display-buffer (buf)
-  "Display *helm* buffer BUF."
+(defun helm-display-buffer (buf &optional action)
+  "Display *helm* buffer BUF.
+The ACTION arg value used is generally `helm-display-buffer-default-action'.
+For how to use ACTION arg see `display-buffer' for more info."
   (let (pop-up-frames)
-    (funcall (with-current-buffer buf helm-display-function) buf)
+    (funcall (with-current-buffer buf helm-display-function) buf action)
     (when (and (not helm-samewindow)
                ;; This can happen when calling helm
                ;; from a dedicated frame with no minibuffer.
@@ -1455,12 +1468,15 @@ window or frame configuration is saved/restored according to values of
               (split-window-vertically)))
          helm-buffer)))))
 
-(defun helm-default-display-buffer (buf)
-  "Default function to display BUF.
-Where BUF is generally `helm-buffer'.
+(defun helm-default-display-buffer (buf &rest args)
+  "Default function to display `helm-buffer' BUF.
 It use `switch-to-buffer' or `pop-to-buffer' depending of value of
-`helm-samewindow'."
-  (funcall (if helm-samewindow 'switch-to-buffer 'pop-to-buffer) buf))
+`helm-samewindow'.
+ARGS should be valid arguments for `pop-to-buffer', they have no effect
+when `helm-samewindow' is enabled."
+  (if helm-samewindow
+      (switch-to-buffer buf)
+      (apply #'pop-to-buffer (cons buf args))))
 
 
 ;; Core: initialize

@@ -85,7 +85,7 @@ Default is 0.6 seconds."
        (overlay-put helm-c-show-completion-overlay
                     'face 'helm-lisp-show-completion)))
 
-(defun helm-c-show-completion-display-function (buffer)
+(defun helm-c-show-completion-display-function (buffer &rest _args)
   "A special resized helm window is used depending on position in BUFFER."
   (with-selected-window (selected-window)
     (let* ((screen-size  (+ (count-screen-lines (window-start) (point) t)
