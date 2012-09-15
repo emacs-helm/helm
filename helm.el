@@ -448,6 +448,8 @@ It is disabled by default because *Helm Log* grows quickly.")
   "The input pattern used to update the helm buffer.")
 (defvar helm-input ""
   "The input typed in the candidates panel.")
+(defvar helm-input-local nil
+  "Internal, store locally `helm-pattern' value for later use in `helm-resume'.")
 (defvar helm-source-name nil)
 (defvar helm-candidate-buffer-alist nil)
 (defvar helm-check-minibuffer-input-timer nil)
@@ -465,6 +467,7 @@ It is disabled by default because *Helm Log* grows quickly.")
   (list (lambda (candidate)
           (string-match helm-pattern candidate)))
   "Default functions to match candidates according to `helm-pattern'.")
+(defvar helm-process-delayed-sources-timer nil)
 
 
 ;; Utility: logging
@@ -1967,8 +1970,6 @@ when emacs is idle for `helm-idle-delay'."
 
 
 ;; Core: *helm* buffer contents
-(defvar helm-input-local nil)
-(defvar helm-process-delayed-sources-timer nil)
 (defun helm-update (&optional preselect)
   "Update candidates list in `helm-buffer' according to `helm-pattern'.
 Argument PRESELECT is a string or regexp used to move selection to a particular

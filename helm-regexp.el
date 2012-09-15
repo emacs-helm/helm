@@ -257,7 +257,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-c-moccur-map)
     (history . ,'helm-c-grep-history)
-    (requires-pattern . 3)
+    (requires-pattern . 2)
     (delayed . ,helm-m-occur-idle-delay))
   "Helm source for multi occur.")
 
