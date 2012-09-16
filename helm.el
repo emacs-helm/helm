@@ -3021,14 +3021,14 @@ Acceptable values of CREATE-OR-BUFFER:
 
 (defun helm-init-candidates-in-buffer (buffer data)
   "Register BUFFER with DATA for an helm candidates-in-buffer session.
-arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
-in this case 'global arg is passed to `helm-candidate-buffer'.
-arg DATA can be either a list or a plain string."
+Arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
+either 'local or 'global which is passed to `helm-candidate-buffer'.
+Arg DATA can be either a list or a plain string."
   (let ((buf (helm-candidate-buffer
               (if (or (stringp buffer)
                       (bufferp buffer))
                   (get-buffer-create buffer)
-                  'global))))
+                  buffer)))) ; a symbol.
     (with-current-buffer buf
       (erase-buffer)
       (if (listp data)
