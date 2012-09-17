@@ -51,7 +51,7 @@ with these default values for different systems:
 
 Gnu/linux: \"locate -i -r %s\"
 berkeley-unix: \"locate -i %s\"
-windows-nt: \"es -i -r %s\"
+windows-nt: \"es -r %s\"
 Others: \"locate %s\"
 
 This string will be passed to format so it should end with `%s'.
@@ -65,6 +65,18 @@ The \"-r\" option must be the last option."
   :type 'string
   :group 'helm-locate)
 
+(defcustom helm-locate-case-fold-search helm-case-fold-search
+  "It have the same meaning as `helm-case-fold-search'.
+The -i option of locate will be used depending of value of
+`helm-pattern' when this is set to 'smart.
+When nil \"-i\" will not be used at all.
+and when non--nil it will always be used.
+NOTE: the -i option of the \"es\" command used on windows does
+the opposite of \"locate\" command."
+  :group 'helm-locate
+  :type 'symbol)
+
+
 (defvar helm-generic-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -84,7 +96,6 @@ The \"-r\" option must be the last option."
     (define-key map (kbd "C-c ?")   'helm-generic-file-help)
     map)
   "Generic Keymap for files.")
-
 
 
 (defun helm-ff-find-locatedb (&optional from-ff)
@@ -150,9 +161,9 @@ See `helm-locate-with-db' and `helm-locate'."
   (unless helm-c-locate-command
     (setq helm-c-locate-command
           (case system-type
-            ('gnu/linux "locate -i -r %s")
-            ('berkeley-unix "locate -i %s")
-            ('windows-nt "es -i -r %s")
+            ('gnu/linux "locate %s -r %s")
+            ('berkeley-unix "locate %s %s")
+            ('windows-nt "es %s -r %s")
             (t "locate %s")))))
 
 (defvar helm-file-name-history nil)
@@ -187,26 +198,37 @@ See also `helm-locate'."
 
 (defun helm-c-locate-init ()
   "Initialize async locate process for `helm-c-source-locate'."
-  (let (process-connection-type)
+  (let ((locate-is-es (string-match "^es" helm-c-locate-command))
+        process-connection-type)
     (prog1
         (start-process-shell-command
          "locate-process" helm-buffer
-         (format helm-c-locate-command helm-pattern))
-      (set-process-sentinel (get-process "locate-process")
-                            #'(lambda (process event)
-                                (if (string= event "finished\n")
-                                    (with-helm-window
-                                      (setq mode-line-format
-                                            '(" " mode-line-buffer-identification " "
-                                              (line-number-mode "%l") " "
-                                              (:eval (propertize
-                                                      (format "[Locate Process Finish- (%s results)]"
-                                                              (max (1- (count-lines
-                                                                        (point-min) (point-max))) 0))
-                                                      'face 'helm-grep-finish))))
-                                      (force-mode-line-update))
-                                    (helm-log "Error: Locate %s"
-                                              (replace-regexp-in-string "\n" "" event))))))))
+         (format helm-c-locate-command
+                 (case helm-locate-case-fold-search
+                   (smart (let ((case-fold-search nil))
+                            (if (string-match "[A-Z]" helm-pattern)
+                                (if locate-is-es "-i" "")
+                                (if locate-is-es "" "-i"))))
+                   (t (if helm-locate-case-fold-search
+                          (if locate-is-es "-i" "")
+                          (if locate-is-es "" "-i"))))
+                 helm-pattern))
+      (set-process-sentinel
+       (get-process "locate-process")
+       #'(lambda (process event)
+           (if (string= event "finished\n")
+               (with-helm-window
+                 (setq mode-line-format
+                       '(" " mode-line-buffer-identification " "
+                         (line-number-mode "%l") " "
+                         (:eval (propertize
+                                 (format "[Locate Process Finish- (%s results)]"
+                                         (max (1- (count-lines
+                                                   (point-min) (point-max))) 0))
+                                 'face 'helm-grep-finish))))
+                 (force-mode-line-update))
+               (helm-log "Error: Locate %s"
+                         (replace-regexp-in-string "\n" "" event))))))))
 
 (defvar helm-c-source-locate
   `((name . "Locate")
