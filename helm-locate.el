@@ -46,15 +46,20 @@ Note that this happen only when locate is launched with a prefix arg."
 
 (defcustom helm-c-locate-command nil
   "A list of arguments for locate program.
+Normally you should not have to modify this yourself.
+
 If nil it will be calculated when `helm-locate' startup
 with these default values for different systems:
 
-Gnu/linux: \"locate -i -r %s\"
-berkeley-unix: \"locate -i %s\"
-windows-nt: \"es -r %s\"
-Others: \"locate %s\"
+Gnu/linux: \"locate %s -r %s\"
+berkeley-unix: \"locate %s %s\"
+windows-nt: \"es %s -r %s\"
+Others: \"locate %s %s\"
 
 This string will be passed to format so it should end with `%s'.
+The first format spec is used for the \"-i\" value of locate/es,
+So don't set it directly but use `helm-locate-case-fold-search'
+for this.
 The \"-r\" option must be the last option."
   :type 'string
   :group 'helm-locate)
@@ -164,7 +169,7 @@ See `helm-locate-with-db' and `helm-locate'."
             ('gnu/linux "locate %s -r %s")
             ('berkeley-unix "locate %s %s")
             ('windows-nt "es %s -r %s")
-            (t "locate %s")))))
+            (t "locate %s %s")))))
 
 (defvar helm-file-name-history nil)
 (defun helm-locate-with-db (&optional db initial-input default)
