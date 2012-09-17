@@ -766,10 +766,10 @@ Where `dbpath` is a filename matched by `helm-locate-db-file-regexp`
 
 
 On Windows you should use Everything program that mimic locate, is very
-fast and don`t need to update database manually. To use with
+fast and don't need to update database manually. To use with
 helm-locate, you will need his command line named `es`. Be sure to
 modify the PATH environment variable, to include path to the directory
-that contain `es`. The arguments are the same than the ones in `locate`.
+that contain `es`.
 
 
 
