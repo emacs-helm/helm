@@ -378,7 +378,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 (defun helm-mp-highlight-region (start end regexp face)
   (save-excursion
     (goto-char start)
-    (let (me)
+    (let ((case-fold-search (helm-set-case-fold-search)) me)
       (while (and (setq me (re-search-forward regexp nil t))
                   (< (point) end)
                   (< 0 (- (match-end 0) (match-beginning 0))))

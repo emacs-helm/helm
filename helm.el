@@ -1872,13 +1872,13 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
       (setq seq (subseq seq 0 n))
       seq))
 
-(defun helm-set-case-fold-search ()
+(defun* helm-set-case-fold-search (&optional (pattern helm-pattern))
   "Used to set the value of `case-fold-search' in helm.
 Return t or nil depending of value of `helm-case-fold-search'
 and `helm-pattern'."
   (case helm-case-fold-search
     (smart (let ((case-fold-search nil))
-             (if (string-match "[A-Z]" helm-pattern) nil t)))
+             (if (string-match "[A-Z]" pattern) nil t)))
     (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns limit)
