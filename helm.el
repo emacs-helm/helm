@@ -1263,7 +1263,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                            any-history))
                      (helm-cleanup)))
                  (prog1 (unless helm-quit
-                          (helm-execute-selection-action-1))
+                          (helm-execute-selection-action))
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
              (quit
               (helm-restore-position-on-quit)
@@ -1376,15 +1376,6 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
   (and (helm-resume-p any-resume) (helm-funcall-foreach 'resume))
   (helm-log "end initialization"))
 
-(defun helm-execute-selection-action-1 ()
-  "Execute current action."
-  (helm-log-run-hook 'helm-before-action-hook)
-  (unwind-protect
-       (helm-execute-selection-action)
-    (helm-aif (get-buffer helm-action-buffer)
-        (kill-buffer it))
-    (helm-log-run-hook 'helm-after-action-hook)))
-
 (defun helm-restore-position-on-quit ()
   "Restore position in `helm-current-buffer' when quitting."
   (helm-current-position 'restore))
@@ -1397,7 +1388,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
 
 
 ;;; Core: Accessors
-;;; rubikitch: I love to create functions to control variables.
+;;
 (defvar helm-current-position nil
   "Cons of \(point . window-start\)  when `helm' is invoked.
 It is needed to restore position in `helm-current-buffer'
@@ -2242,12 +2233,22 @@ STRING is the output of PROCESS."
   (delete-process process))
 
 
-;; Core: action
-(defun helm-execute-selection-action (&optional
+;;; Core: action
+;;
+(defun helm-execute-selection-action ()
+  "Execute current action and kill the action buffer if present."
+  (helm-log-run-hook 'helm-before-action-hook)
+  (unwind-protect
+       (helm-execute-selection-action-1)
+    (helm-aif (get-buffer helm-action-buffer)
+        (kill-buffer it))
+    (helm-log-run-hook 'helm-after-action-hook)))
+
+(defun helm-execute-selection-action-1 (&optional
                                         selection action
                                         preserve-saved-action)
-  "If a candidate SELECTION is present then perform the associated ACTION on it.
-If PRESERVE-SAVED-ACTION is non-nil don't save action."
+  "Execute ACTION on current SELECTION.
+If PRESERVE-SAVED-ACTION is non--nil save action."
   (helm-log "executing action")
   (setq action (helm-get-default-action
                 (or action
@@ -2739,7 +2740,6 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
   "Same as `delete-minibuffer-contents' but this is a command."
   (interactive)
   (helm-set-pattern ""))
-(defalias 'helm-delete-minibuffer-content 'helm-delete-minibuffer-contents)
 
 
 ;;; Plugins
@@ -3204,7 +3204,7 @@ and keep its visibility."
       (helm-log-eval (current-buffer))
       (let ((helm-in-persistent-action t))
         (with-helm-display-same-window
-          (helm-execute-selection-action
+          (helm-execute-selection-action-1
            nil
            (or (assoc-default attr (helm-get-current-source))
                (helm-get-action))
