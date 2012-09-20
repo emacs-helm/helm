@@ -230,6 +230,7 @@ This list is customizable, see `helm-buffers-favorite-modes'.
 \\[helm-ff-run-switch-other-window]\t\t->Switch other window.
 \\[helm-ff-run-switch-other-frame]\t\t->Switch other frame.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
+\\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \\[helm-ff-rotate-left-persistent]\t\t->Rotate Image Left.
 \\[helm-ff-rotate-right-persistent]\t\t->Rotate Image Right.
 \\[helm-find-files-down-one-level]\t\t->Go down precedent directory.
@@ -295,6 +296,7 @@ This list is customizable, see `helm-buffers-favorite-modes'.
 \\[helm-ff-run-etags]\t\t->Run etags (C-u use tap, C-u C-u reload DB).
 \\[helm-yank-text-at-point]\t\t->Yank text at point.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
+\\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \nLocate tips:
 You can add after writing search pattern any of the locate command line options.
 e.g -b, -e, -n <number>...etc.

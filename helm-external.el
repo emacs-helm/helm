@@ -87,7 +87,8 @@ When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
   (lexical-let* ((real-com (car (split-string (replace-regexp-in-string
                                                "%s" "" exe))))
-                 (proc     (if file (concat real-com " " file) real-com)))
+                 (proc     (if file (concat real-com " " file) real-com))
+                 process-connection-type)
     (if (get-process proc)
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))

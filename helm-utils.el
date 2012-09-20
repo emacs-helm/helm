@@ -614,16 +614,17 @@ Useful in dired buffers when there is inserted subdirs."
 
 (defun helm-c-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
-  (if (eq system-type 'windows-nt)
-      (helm-w32-shell-execute-open-file file)
-      (start-process "helm-c-open-file-with-default-tool"
-                     nil
-                     (cond ((eq system-type 'gnu/linux)
-                            "xdg-open")
-                           ((or (eq system-type 'darwin) ;; Mac OS X
-                                (eq system-type 'macos)) ;; Mac OS 9
-                            "open"))
-                     file)))
+  (let (process-connection-type)
+    (if (eq system-type 'windows-nt)
+        (helm-w32-shell-execute-open-file file)
+        (start-process "helm-c-open-file-with-default-tool"
+                       nil
+                       (cond ((eq system-type 'gnu/linux)
+                              "xdg-open")
+                             ((or (eq system-type 'darwin) ;; Mac OS X
+                                  (eq system-type 'macos)) ;; Mac OS 9
+                              "open"))
+                       file))))
 
 (defun helm-c-open-dired (file)
   "Opens a dired buffer in FILE's directory.  If FILE is a

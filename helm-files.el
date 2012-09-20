@@ -274,6 +274,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "C-c o")         'helm-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-o")       'helm-ff-run-switch-other-frame)
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
+    (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
     (define-key map (kbd "C-=")           'helm-ff-run-ediff-file)
     (define-key map (kbd "C-c =")         'helm-ff-run-ediff-merge-file)
@@ -374,6 +375,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
             . helm-c-insert-file-name-completion-at-point)
            ("Open file externally `C-c C-x, C-u to choose'"
             . helm-c-open-file-externally)
+           ("Open file with default tool" . helm-c-open-file-with-default-tool)
            ("Grep File(s) `M-g s, C-u Recurse'" . helm-find-files-grep)
            ("Zgrep File(s) `M-g z, C-u Recurse'" . helm-ff-zgrep)
            ("Switch to Eshell `M-e'" . helm-ff-switch-to-eshell)
@@ -904,6 +906,13 @@ See `helm-ff-serial-rename-1'."
   (interactive)
   (when helm-alive-p
     (helm-c-quit-and-execute-action 'helm-c-open-file-externally)))
+
+;;;###autoload
+(defun helm-ff-run-open-file-with-default-tool ()
+  "Run open file externally command action from `helm-c-source-find-files'."
+  (interactive)
+  (when helm-alive-p
+    (helm-c-quit-and-execute-action 'helm-c-open-file-with-default-tool)))
 
 (defun helm-ff-locate (candidate)
   "Locate action function for `helm-find-files'."
@@ -1608,31 +1617,26 @@ is non--nil."
   "Action transformer for `helm-c-source-find-files'."
   (cond ((with-helm-current-buffer
            (eq major-mode 'message-mode))
-         (append (subseq actions 0 4)
-                 '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))
-                 (subseq actions 4)))
+         (append actions
+                 '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
         ((string-match (image-file-name-regexp) candidate)
-         (append (subseq actions 0 4)
+         (append actions
                  '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
-                   ("Rotate image left `M-l'" . helm-ff-rotate-image-left))
-                 (subseq actions 4)))
+                   ("Rotate image left `M-l'" . helm-ff-rotate-image-left))))
         ((string-match "\.el$" (helm-aif (helm-marked-candidates)
                                    (car it) candidate))
-         (append (subseq actions 0 4)
+         (append actions
                  '(("Byte compile lisp file(s) `M-B, C-u to load'"
                     . helm-find-files-byte-compile)
-                   ("Load File(s) `M-L'" . helm-find-files-load-files))
-                 (subseq actions 4)))
+                   ("Load File(s) `M-L'" . helm-find-files-load-files))))
         ((and (string-match "\.html?$" candidate)
               (file-exists-p candidate))
-         (append (subseq actions 0 4)
-                 '(("Browse url file" . browse-url-of-file))
-                 (subseq actions 5)))
+         (append actions
+                 '(("Browse url file" . browse-url-of-file))))
         ((or (string= (file-name-extension candidate) "pdf")
              (string= (file-name-extension candidate) "PDF"))
-         (append (subseq actions 0 4)
-                 '(("Pdfgrep File(s)" . helm-ff-pdfgrep))
-                 (subseq actions 5)))
+         (append actions
+                 '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
         (t actions)))
 
 (defun helm-ff-gnus-attach-files (candidate)
