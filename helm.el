@@ -2895,7 +2895,7 @@ See also `helm-sources' docstring."
 
 (defun helm-point-is-moved (proc)
   "If point is moved after executing PROC, return t, otherwise nil."
-  (/= (point) (progn (funcall proc) (point))))
+  (/= (point) (save-excursion (funcall proc) (point))))
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit search-from-end
