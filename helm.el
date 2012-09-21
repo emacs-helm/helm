@@ -1960,7 +1960,8 @@ when emacs is idle for `helm-idle-delay'."
       (helm-log-run-hook 'helm-after-update-hook))))
 
 
-;; Core: *helm* buffer contents
+;;; Core: helm-update
+;;
 (defun helm-update (&optional preselect)
   "Update candidates list in `helm-buffer' according to `helm-pattern'.
 Argument PRESELECT is a string or regexp used to move selection to a particular
@@ -1980,13 +1981,14 @@ is done on whole `helm-buffer' and not on current source."
     (let (delayed-sources
           normal-sources)
       (unwind-protect ; Process normal sources and store delayed one's.
-           (setq delayed-sources
-                 (loop for source in (remove-if-not 'helm-update-source-p
-                                                    (helm-get-sources))
-                       if (helm-delayed-source-p source)
-                       collect source
-                       else do (progn (push source normal-sources)
-                                      (helm-process-source source))))
+           (loop for source in (remove-if-not 'helm-update-source-p
+                                              (helm-get-sources))
+                 if (helm-delayed-source-p source)
+                 collect source into ds
+                 else collect source into ns and do
+                 (helm-process-source source)
+                 finally (setq delayed-sources ds
+                               normal-sources ns))
         (helm-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
         (cond ((and preselect delayed-sources normal-sources)
@@ -2153,7 +2155,8 @@ after the source name by overlay."
   (insert "\n"))
 
 
-;; Core: async process
+;;; Core: async process
+;;
 (defun helm-output-filter (process string)
   "The `process-filter' of PROCESS.
 It will be used by `set-process-filter' in asynchronous sources.
@@ -2327,7 +2330,7 @@ If action buffer is selected, back to the helm buffer."
 
 ;; Core: selection
 (defun helm-move-selection-common (move-func unit direction)
-  "Move the selection marker to a new position wit function MOVE-FUNC.
+  "Move the selection marker to a new position with function MOVE-FUNC.
 It is determined by UNIT and DIRECTION."
   (unless (or (helm-empty-buffer-p (helm-buffer-get))
               (not (helm-window)))
