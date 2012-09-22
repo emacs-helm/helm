@@ -262,10 +262,11 @@ That's mean you can pass prefix args before or after calling a command
 that use `helm-comp-read' See `helm-M-x' for example."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let ((action-fn #'(lambda (candidate)
-                       (if marked-candidates
-                           (helm-marked-candidates)
-                           (identity candidate)))))
+  (let ((action-fn '(("Sole action (Identity)"
+                      . (lambda (candidate)
+                          (if marked-candidates
+                              (helm-marked-candidates)
+                              (identity candidate)))))))
     ;; Assume completion have been already required,
     ;; so always use 'confirm.
     (when (eq must-match 'confirm-after-completion)
@@ -642,10 +643,11 @@ Keys description:
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
 
-  (let ((action-fn #'(lambda (candidate)
-                       (if marked-candidates
-                           (helm-marked-candidates)
-                           (identity candidate)))))
+  (let ((action-fn '(("Sole action (Identity)"
+                      . (lambda (candidate)
+                          (if marked-candidates
+                              (helm-marked-candidates)
+                              (identity candidate)))))))
     (let* ((helm-mp-highlight-delay nil)
            ;; Be sure we don't erase the underlying minibuffer if some.
            (helm-ff-auto-update-initial-value
