@@ -1302,12 +1302,15 @@ purpose."
          (path-name-dir (if (file-directory-p path)
                             (file-name-as-directory path)
                             (file-name-directory path)))
+         invalid-basedir
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     ;; Don't set now `helm-pattern' if `path' == "Invalid tramp file name"
     ;; like that the actual value (e.g /ssh:) is passed to
     ;; `helm-ff-tramp-hostnames'.
-    (unless (string= path "Invalid tramp file name")
+    (when (not (file-directory-p (file-name-directory path)))
+      (setq invalid-basedir t))
+    (unless (or (string= path "Invalid tramp file name") invalid-basedir)
       (setq helm-pattern (helm-ff-transform-fname-for-completion path)))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")
@@ -1327,10 +1330,11 @@ purpose."
                    (setq helm-pattern path)
                    ;; "Invalid tramp file name" is now printed
                    ;; in `helm-buffer'.
-                   (list path))))
+                   (list path)))) 
           ((or (file-regular-p path)
                ;; `ffap-url-regexp' don't match until url is complete.
                (string-match helm-ff-url-regexp path)
+               invalid-basedir
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
@@ -2227,29 +2231,40 @@ Ask to kill buffers associated with that file, too."
 (defun helm-c-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."
   (let ((marked (helm-marked-candidates))
+        (url-p (and ffap-url-regexp
+                    (string-match ffap-url-regexp candidate)))
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
-        (find-file-wildcards nil))
+        (find-file-wildcards nil)
+        (make-dir-fn
+         #'(lambda (dir &optional helm-ff)
+             (when (y-or-n-p (format "Create directory `%s'? " dir))
+               (let ((dirfname (directory-file-name dir)))
+                 (if (file-exists-p dirfname)
+                     (error
+                      "Mkdir: Unable to create directory `%s': file exists."
+                      (helm-c-basename dirfname))
+                     (make-directory dir 'parent)))
+               (or (and helm-ff (helm-find-files-1 dir)) t)))))
     (if (> (length marked) 1)
         ;; Open all marked files in background and display
         ;; the first one.
         (progn (mapc 'find-file-noselect (cdr marked))
                (find-file (car marked)))
         (if (and (not (file-exists-p candidate))
-                 (and ffap-url-regexp
-                      (not (string-match ffap-url-regexp candidate)))
+                 (not url-p)
                  (string-match "/$" candidate))
             ;; A a non--existing filename ending with /
             ;; Create a directory and jump to it.
-            (when (y-or-n-p (format "Create directory `%s'? " candidate))
-              (let ((dirfname (directory-file-name candidate)))
-                (if (file-exists-p dirfname)
-                    (error "Mkdir: Unable to create directory `%s': file exists."
-                           (helm-c-basename dirfname))
-                    (make-directory candidate 'parent)))
-              (helm-find-files-1 candidate))
+            (funcall make-dir-fn candidate 'helm-ff)
             ;; A non--existing filename NOT ending with / or
             ;; an existing filename, create or jump to it.
-            (find-file-at-point (car marked))))))
+            ;; If the basedir of candidate doesn't exists,
+            ;; ask for creating it.
+            (let ((dir (file-name-directory candidate)))
+              (if (or (file-directory-p dir) url-p)
+                  (find-file-at-point (car marked))
+                  (and (funcall make-dir-fn dir)
+                       (find-file-at-point candidate))))))))
 
 (defun helm-c-shadow-boring-files (files)
   "Files matching `helm-c-boring-file-regexp' will be

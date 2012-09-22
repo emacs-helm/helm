@@ -2265,10 +2265,10 @@ If PRESERVE-SAVED-ACTION is non--nil save action."
                         (helm-get-selection)
                         (and (assoc 'accept-empty source) "")))
     (unless preserve-saved-action (setq helm-saved-action nil))
-    (if (and selection action)
-        (helm-funcall-with-source
-         source action
-         (helm-coerce-selection selection source)))))
+    (when (and selection action)
+      (helm-funcall-with-source
+       source action
+       (helm-coerce-selection selection source)))))
 
 (defun helm-coerce-selection (selection source)
   "Apply coerce attribute function to SELECTION in SOURCE.
