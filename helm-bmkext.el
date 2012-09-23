@@ -21,6 +21,8 @@
 (require 'helm-bookmark)
 (require 'helm-adaptative)
 
+(declare-function bookmark-get-filename "bookmark" (bookmark-name-or-record))
+
 ;; Dependency: https://github.com/thierryvolpiatto/emacs-bmk-ext
 ;; If you want to enable google-maps in addressbook you will need
 ;; Julien Danjou google-maps-el package available here:
