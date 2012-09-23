@@ -2635,11 +2635,13 @@ This is the starting point for nearly all actions you can do on files."
   (declare (special org-directory))
   (let ((any-input (if (and arg helm-ff-history)
                        (helm-find-files-history)
-                       (helm-find-files-initial-input)))
-        (presel    (buffer-file-name (current-buffer))))
+                     (helm-find-files-initial-input)))
+        (presel    (buffer-file-name (current-buffer)))
+        (helm-case-fold-search
+         (if (eq system-type 'windows-nt) t helm-case-fold-search)))
     (cond ((and (eq major-mode 'org-agenda-mode)
-               org-directory
-               (not any-input))
+                org-directory
+                (not any-input))
            (setq any-input (expand-file-name org-directory)))
           ((and (eq major-mode 'dired-mode) any-input)
            (setq presel any-input)
@@ -2650,7 +2652,7 @@ This is the starting point for nearly all actions you can do on files."
     (helm-find-files-1
      any-input (if helm-ff-transformer-show-only-basename
                    (and presel (helm-c-basename presel))
-                   presel))))
+                 presel))))
 
 ;;;###autoload
 (defun helm-write-file ()
