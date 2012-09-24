@@ -2486,8 +2486,15 @@ Else return ACTIONS unmodified."
                 . (lambda (candidate)
                     (helm-set-pattern
                      (expand-file-name candidate))
-                    (run-with-idle-timer
-                     0.1 nil 'helm-exit-minibuffer)))
+                    (helm-aif (file-remote-p candidate 'host)
+                        (progn (message (format
+                                         "Wait, connecting to host...`%s'" it))
+                               (find-file-noselect candidate)
+                               (run-with-idle-timer
+                                0.1 nil #'(lambda ()
+                                            (helm-force-update)
+                                            (helm-exit-minibuffer))))
+                      (run-with-idle-timer 0.1 nil 'helm-exit-minibuffer))))
                ("find file in helm"
                 . (lambda (candidate)
                     (helm-set-pattern
