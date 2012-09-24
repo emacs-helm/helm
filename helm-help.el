@@ -1028,6 +1028,16 @@ a specific part of candidate.
 
 NOTE: This have effect only on sources using `candidates-in-buffer'.")
 
+(helm-document-attribute 'match-strict "optional"
+  " When specifying a match function within a source and
+helm-match-plugin is enabled, the result of all matching functions will
+be concatened, which in some cases is not what is wanted.
+When using `match-strict' only this or these functions will be used.
+You can specify those functions as a list of functions or a single
+symbol function.
+For anonymous function don't add the dot, e.g:
+\(match-strict (lambda () (foo))).")
+
 (helm-document-attribute 'nohighlight "optional"
   " Disable highlight match in this source.")
 

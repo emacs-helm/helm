@@ -1843,8 +1843,10 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
     pattern))
 
 (defun helm-match-functions (source)
-  (or (assoc-default 'match source)
-      helm-default-match-functions))
+  (let ((matchfns (or (assoc-default 'match source)
+                      (assoc-default 'match-strict source)
+                      helm-default-match-functions)))
+    (if (listp matchfns) matchfns (list matchfns))))
 
 (defmacro helm-accumulate-candidates-internal (cand newmatches
                                                hash item-count limit)
