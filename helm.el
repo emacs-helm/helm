@@ -636,6 +636,11 @@ Otherwise make a list with one element."
        (setq-default post-command-hook (cdr --post-command-hook-pair))
        (helm-log "restore variables"))))
 
+(defmacro with-helm-default-directory (directory &rest body)
+  (declare (indent 2) (debug t))
+  `(let ((default-directory (file-name-as-directory ,directory)))
+     ,@body))
+
 (defun* helm-attr (attribute-name
                    &optional (src (helm-get-current-source)) compute)
   "Get the value of ATTRIBUTE-NAME of SRC.

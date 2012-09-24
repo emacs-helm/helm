@@ -45,6 +45,8 @@
 (declare-function eshell-read-aliases-list "em-alias")
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (declare-function eshell-bol "esh-mode")
+(declare-function helm-ls-git-ls "ext:helm-ls-git")
+(declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
 
 
 ;;; Type attributes
@@ -255,6 +257,7 @@ This happen only in `helm-find-files'."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
+    (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
@@ -2523,6 +2526,38 @@ Else return ACTIONS unmodified."
                      helm-c-source-locate))))
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
+
+;;; Browse project
+;; Need dependencies:
+;; <https://github.com/emacs-helm/helm-ls-git.git>
+;; <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>
+;; Only hg and git are supported for now.
+(defun helm-browse-project ()
+  "Browse files and see status of project with its vcs.
+Only hg and git are supported for now.
+Fall back to `helm-find-files' if directory is not under
+control of one of those vcs.
+Need dependencies:
+<https://github.com/emacs-helm/helm-ls-git.git>
+and
+<https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>."
+  (interactive)
+  (cond ((and (fboundp 'helm-ls-git-root-dir)
+              (helm-ls-git-root-dir))
+         (helm-ls-git-ls))
+        ((and (fboundp 'helm-hg-root)
+              (helm-hg-root))
+         (helm-hg-find-files-in-project))
+        (t (helm-find-files nil))))
+
+(defun helm-ff-browse-project (candidate)
+  (with-helm-default-directory helm-ff-default-directory
+      (helm-browse-project)))
+
+(defun helm-ff-run-browse-project ()
+  (interactive)
+  (when helm-alive-p
+    (helm-c-quit-and-execute-action 'helm-ff-browse-project)))
 
 ;;; session.el files
 ;;
