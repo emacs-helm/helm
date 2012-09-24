@@ -279,6 +279,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "C-=")           'helm-ff-run-ediff-file)
     (define-key map (kbd "C-c =")         'helm-ff-run-ediff-merge-file)
     (define-key map (kbd "M-p")           'helm-ff-run-switch-to-history)
+    (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "M-i")           'helm-ff-properties-persistent)
     (define-key map (kbd "C-c ?")         'helm-ff-help)
     (define-key map (kbd "C-}")           'helm-narrow-window)
@@ -2476,6 +2477,28 @@ Else return ACTIONS unmodified."
     (candidates . file-name-history)
     (match-strict . helm-c-match-on-basename)
     (type . file)))
+
+(defvar helm-c-source-ff-file-name-history
+  '((name . "File name history")
+    (candidates . file-name-history)
+    (match-strict . helm-c-match-on-basename)
+    (action . (("find file"
+                . (lambda (candidate)
+                    (helm-set-pattern
+                     (expand-file-name candidate))
+                    (run-with-idle-timer
+                     0.1 nil 'helm-exit-minibuffer)))
+               ("find file in helm"
+                . (lambda (candidate)
+                    (helm-set-pattern
+                     (expand-file-name candidate))))))))
+
+(defun helm-ff-file-name-history ()
+  "Switch to `file-name-history' without quitting `helm-find-files'."
+  (interactive)
+  (helm :sources 'helm-c-source-ff-file-name-history
+        :buffer "*helm-file-name-history*"
+        :allow-nest t))
 
 ;;; Recentf files
 ;;
