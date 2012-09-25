@@ -63,6 +63,18 @@ Note that you don't need to enable `ido-mode' for this to work."
   :group 'helm-mode
   :type '(alist :key-type symbol :value-type symbol))
 
+(defcustom helm-comp-read-case-fold-search helm-case-fold-search
+  "Default Local setting of `helm-case-fold-search' for `helm-comp-read'.
+See `helm-case-fold-search' for more info."
+  :group 'helm-mode
+  :type 'symbol)
+
+(defcustom helm-read-file-name-case-fold-search helm-case-fold-search
+  "Default Local setting of `helm-case-fold-search' for `helm-c-read-file-name'.
+See `helm-case-fold-search' for more info."
+  :group 'helm-mode
+  :type 'symbol)
+
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -175,6 +187,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                (requires-pattern 0)
                                (history nil)
                                input-history
+                               (case-fold helm-comp-read-case-fold-search)
                                (del-input t)
                                (persistent-action nil)
                                (persistent-help "DoNothing")
@@ -207,7 +220,7 @@ Keys description:
 - PRESELECT: See preselect arg of `helm'.
 
 - DEFAULT: This option is used only for compatibility with regular
-  Emacs `completing-read'.
+  Emacs `completing-read' (Same as DEFAULT arg of `completing-read').
 
 - BUFFER: Name of helm-buffer.
 
@@ -222,6 +235,8 @@ Keys description:
 - INPUT-HISTORY: A symbol. the minibuffer input history will be
   stored there, if nil or not provided, `minibuffer-history'
   will be used instead.
+
+- CASE-FOLD: Same as `helm-case-fold-search'.
 
 - DEL-INPUT: Boolean, when non--nil (default) remove the partial
   minibuffer input from HISTORY is present.
@@ -367,6 +382,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :preselect preselect
                     :prompt prompt
                     :resume 'noresume
+                    :case-fold-search case-fold
                     :keymap loc-map
                     :history (and (symbolp input-history) input-history)
                     :buffer buffer))
@@ -600,6 +616,7 @@ See documentation of `completing-read' and `all-completions' for details."
      (initial-input (expand-file-name default-directory))
      (buffer "*Helm Completions*")
      test
+     (case-fold helm-read-file-name-case-fold-search)
      (preselect nil)
      (history nil)
      must-match
@@ -621,6 +638,8 @@ Keys description:
 - BUFFER: `helm-buffer' name default to \"*Helm Completions*\".
 
 - TEST: A predicate called with one arg 'candidate'.
+
+- CASE-FOLD: Same as `helm-case-fold-search'.
 
 - PRESELECT: helm preselection.
 
@@ -710,6 +729,7 @@ Keys description:
                     :input initial-input
                     :prompt prompt
                     :resume 'noresume
+                    :case-fold-search case-fold
                     :keymap helm-map
                     :buffer buffer
                     :preselect preselect)))
