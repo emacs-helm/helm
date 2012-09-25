@@ -1329,26 +1329,27 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
 (defun helm-nest (&rest same-as-helm)
   "Allow calling `helm' whithin a running helm session."
   (with-helm-window
-    (let (helm-current-position
-          helm-current-buffer
-          (orig-helm-current-buffer helm-current-buffer)
+    (let ((orig-helm-current-buffer helm-current-buffer)
           (orig-helm-buffer helm-buffer)
           (orig-helm-last-frame-or-window-configuration
-           helm-last-frame-or-window-configuration)
-          helm-pattern
-          (helm-buffer (or (getf same-as-helm :buffer)
-                           (nth 5 same-as-helm)
-                           "*Helm*"))
-          helm-sources
-          helm-compiled-sources
-          (helm-samewindow t)
-          (enable-recursive-minibuffers t))
+           helm-last-frame-or-window-configuration))
       (unwind-protect
-           (apply #'helm same-as-helm)
+           (let (helm-current-position
+                 helm-current-buffer
+                 helm-pattern
+                 (helm-buffer (or (getf same-as-helm :buffer)
+                                  (nth 5 same-as-helm)
+                                  "*Helm*"))
+                 helm-sources
+                 helm-compiled-sources
+                 (helm-samewindow t)
+                 (enable-recursive-minibuffers t))
+             (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
-          (helm-initialize-overlays orig-helm-buffer)
+          (setq helm-alive-p t) ; Nested session set this to nil on exit.
           (setq helm-buffer (current-buffer))
-          (helm-mark-current-line)
+          (helm-initialize-overlays helm-buffer)
+          (helm-mark-current-line t)
           (setq helm-last-frame-or-window-configuration
                 orig-helm-last-frame-or-window-configuration)
           (setq cursor-type t)

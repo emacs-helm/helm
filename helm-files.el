@@ -2508,7 +2508,8 @@ Else return ACTIONS unmodified."
   (interactive)
   (helm :sources 'helm-c-source-ff-file-name-history
         :buffer "*helm-file-name-history*"
-        :allow-nest t))
+        :allow-nest t
+        :resume 'noresume))
 
 ;;; Recentf files
 ;;
