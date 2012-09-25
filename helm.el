@@ -1874,10 +1874,14 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
   "Used to set the value of `case-fold-search' in helm.
 Return t or nil depending of value of `helm-case-fold-search'
 and `helm-pattern'."
-  (case helm-case-fold-search
-    (smart (let ((case-fold-search nil))
-             (if (string-match "[A-Z]" pattern) nil t)))
-    (t helm-case-fold-search)))
+  (let ((helm-case-fold-search
+         (helm-aif (assq 'case-fold-search (helm-get-current-source))
+             (cdr it)
+           helm-case-fold-search)))
+    (case helm-case-fold-search
+      (smart (let ((case-fold-search nil))
+               (if (string-match "[A-Z]" pattern) nil t)))
+      (t helm-case-fold-search))))
 
 (defun helm-match-from-candidates (cands matchfns limit)
   (let (matches)
