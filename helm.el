@@ -1458,6 +1458,7 @@ For how to use ACTION arg see `display-buffer' for more info."
                ;; This can happen when calling helm
                ;; from a dedicated frame with no minibuffer.
                (not (with-helm-window (one-window-p)))
+               (not (minibufferp helm-current-buffer))
                helm-reuse-last-window-split-state)
       (with-helm-window
         (delete-window)
