@@ -1380,11 +1380,13 @@ return FNAME unchanged."
             (memq helm-mp-matching-method
                   helm-ff-smart-completion-incompatible-methods)
             (string-match "\\s-" bn)     ; Fall back to match-plugin.
-            (string-match "[*][.].*" bn) ; Allow entering wilcard.
+            (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
             (string-match "/$" fname)    ; Allow mkdir.
             (file-directory-p fname)
             (string-match helm-ff-url-regexp fname))
-        fname
+        ;; Don't treat wildcards ("*") as regexp char.
+        ;; (e.g ./foo/*.el => ./foo/[*].el)
+        (replace-regexp-in-string "[*]" "[*]" fname)
         (setq bn (if (> (length bn) 2) ; Normal completion on first 2 char.
                      (helm-ff-mapconcat-candidate bn)
                      bn))

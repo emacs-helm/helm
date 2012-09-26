@@ -235,8 +235,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                           (directory-file-name ; Needed for windoze.
                            (file-name-directory (directory-file-name i))))))
                   ;; Candidate use wildcard. Same comments as in [1].
-                  ((string-match "^\*" (helm-c-basename i))
-                   (file-expand-wildcards i t))
+                  ((string-match "\\`[[]?[*][]]?[.].*\\'" (helm-c-basename i))
+                   (file-expand-wildcards
+                    (replace-regexp-in-string "[[]\\|[]]" "" i) t))
                   ;; Else should be one or more file/directory
                   ;; possibly marked.
                   (t (list i))) into all-files
