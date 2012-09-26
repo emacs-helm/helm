@@ -413,14 +413,15 @@ Argument MATCH can be a predicate or a regexp."
                                 ;; Don't recurse in directory symlink.
                                 (unless (file-symlink-p f)
                                   (ls-R f)))
-                      else when
-                      (and ,match
-                           (if (functionp ,match)
-                               (funcall ,match f)
-                               (and (stringp ,match)
-                                    (string-match
-                                     ,match (file-name-nondirectory f)))))
-                      do (push (funcall fn f) result))))
+                      else do
+                      (if ,match
+                          (and (if (functionp ,match)
+                                   (funcall ,match f)
+                                   (and (stringp ,match)
+                                        (string-match
+                                         ,match (file-name-nondirectory f))))
+                               (push (funcall fn f) result))
+                          (push (funcall fn f) result)))))
        (ls-R ,directory)
        (nreverse result))))
 
