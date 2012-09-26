@@ -69,7 +69,11 @@ See `helm-case-fold-search' for more info."
   :group 'helm-mode
   :type 'symbol)
 
-(defcustom helm-read-file-name-case-fold-search helm-case-fold-search
+(defcustom helm-read-file-name-case-fold-search
+  (if (memq system-type
+            '(cygwin windows-nt ms-dos darwin))
+      t
+    helm-case-fold-search)
   "Default Local setting of `helm-case-fold-search' for `helm-c-read-file-name'.
 See `helm-case-fold-search' for more info."
   :group 'helm-mode
