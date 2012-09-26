@@ -1838,7 +1838,7 @@ Use it for non--interactive calls of `helm-find-files'."
         helm-samewindow)
     (helm :sources 'helm-c-source-find-files
           :input fname
-          :case-fold-search helm-read-file-name-case-fold-search
+          :case-fold-search helm-file-name-case-fold-search
           :keymap helm-find-files-map
           :preselect preselect
           :prompt "Find Files or Url: "

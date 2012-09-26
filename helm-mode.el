@@ -69,16 +69,6 @@ See `helm-case-fold-search' for more info."
   :group 'helm-mode
   :type 'symbol)
 
-(defcustom helm-read-file-name-case-fold-search
-  (if (memq system-type
-            '(cygwin windows-nt ms-dos darwin))
-      t
-    helm-case-fold-search)
-  "Default Local setting of `helm-case-fold-search' for `helm-c-read-file-name'.
-See `helm-case-fold-search' for more info."
-  :group 'helm-mode
-  :type 'symbol)
-
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -620,7 +610,7 @@ See documentation of `completing-read' and `all-completions' for details."
      (initial-input (expand-file-name default-directory))
      (buffer "*Helm Completions*")
      test
-     (case-fold helm-read-file-name-case-fold-search)
+     (case-fold helm-file-name-case-fold-search)
      (preselect nil)
      (history nil)
      must-match

@@ -222,6 +222,19 @@ See in helm-grep.el how it is implemented."
   :group 'helm
   :type 'symbol)
 
+
+(defcustom helm-file-name-case-fold-search
+  (if (memq system-type
+            '(cygwin windows-nt ms-dos darwin))
+      t
+    helm-case-fold-search)
+  "Local setting of `helm-case-fold-search' for reading filenames.
+
+See `helm-case-fold-search' for more info."
+  :group 'helm
+  :type 'symbol)
+
+
 (defcustom helm-reuse-last-window-split-state nil
   "Reuse the last state of window split, vertical or horizontal.
 That is when you use `helm-toggle-resplit-window' the next helm session
