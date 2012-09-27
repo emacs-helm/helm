@@ -214,6 +214,11 @@ This happen only in `helm-find-files'."
   :group 'helm-files
   :type 'integer)
 
+(defcustom helm-ff-file-name-history-use-recentf nil
+  "Use `recentf-list' instead of `file-name-history' in `helm-find-files'."
+  :group 'helm-files
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -2485,9 +2490,17 @@ Else return ACTIONS unmodified."
     (type . file)))
 
 (defvar helm-c-source-ff-file-name-history
-  '((name . "File name history")
-    (candidates . file-name-history)
+  `((name . "File name history")
+    (init . (lambda ()
+              (when helm-ff-file-name-history-use-recentf
+                (require 'recentf)
+                (or recentf-mode (recentf-mode 1)))))
+    (candidates . (lambda ()
+                    (if helm-ff-file-name-history-use-recentf
+                        recentf-list
+                        file-name-history)))
     (match-strict . helm-c-match-on-basename)
+    (candidate-number-limit . ,history-length)
     (action . (("find file"
                 . (lambda (candidate)
                     (helm-set-pattern

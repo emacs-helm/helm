@@ -234,7 +234,8 @@ This list is customizable, see `helm-buffers-favorite-modes'.
 \\[helm-ff-rotate-left-persistent]\t\t->Rotate Image Left.
 \\[helm-ff-rotate-right-persistent]\t\t->Rotate Image Right.
 \\[helm-find-files-down-one-level]\t\t->Go down precedent directory.
-\\[helm-ff-run-switch-to-history]\t\t->Switch to helm find-files history.
+\\[helm-ff-run-switch-to-history]\t\t->Switch to last visited directories history.
+\\[helm-ff-file-name-history]\t\t->Switch to file name history.
 \\[helm-ff-properties-persistent]\t\t->Show file properties in a tooltip.
 \\[helm-mark-all]\t\t->Mark all visibles candidates.
 \\[helm-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
