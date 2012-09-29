@@ -224,12 +224,14 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                   ;; without recursing in subdirs though, see that as a one
                   ;; level recursion with ack-grep.
                   ;; So I leave it as it is, considering it is a feature. [1]
-                  ((file-directory-p i)
+                  ((or (file-directory-p i)
+                       (string-match "\\`[[]?[*][]]?\\'" (helm-c-basename i)))
+                   (setq i (replace-regexp-in-string "[[]?[*][]]?" "" i))
                    (file-expand-wildcards
                     (concat (file-name-as-directory (expand-file-name i)) "*") t))
                   ;; Candidate is a file or wildcard and we use recursion, use the
                   ;; current directory instead of candidate.
-                  ((and (or (file-exists-p i) (string-match "\*" i))
+                  ((and (or (file-exists-p i) (string-match "[*]" i))
                         helm-grep-in-recurse)
                    (list (expand-file-name
                           (directory-file-name ; Needed for windoze.
