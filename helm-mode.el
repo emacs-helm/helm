@@ -702,17 +702,19 @@ Keys description:
                                  (setq helm-ff-auto-update-flag
                                        helm-ff-auto-update-initial-value)))
                        (mode-line . helm-read-file-name-mode-line-string)
+                       (match . helm-ff-match-function)
                        (candidates
                         . (lambda ()
-                            (if test
-                                (loop with hn = (helm-ff-tramp-hostnames)
-                                      for i in (helm-find-files-get-candidates
-                                                must-match)
-                                      when (or (member i hn)    ; A tramp host
-                                               (funcall test i) ; Test ok
-                                               (not (file-exists-p i))) ; A new file.
-                                      collect i)
-                                (helm-find-files-get-candidates must-match))))
+                            (append (and (not (file-exists-p helm-pattern))
+                                         (list helm-pattern))
+                                    (if test
+                                        (loop with hn = (helm-ff-tramp-hostnames)
+                                              for i in (helm-find-files-get-candidates
+                                                        must-match)
+                                              when (or (member i hn) ; A tramp host
+                                                       (funcall test i)) ; Test ok
+                                              collect i)
+                                        (helm-find-files-get-candidates must-match)))))
                        (filtered-candidate-transformer
                         helm-c-find-files-transformer)
                        (persistent-action . ,persistent-action)
