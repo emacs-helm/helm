@@ -1472,20 +1472,14 @@ window or frame configuration is saved/restored according to values of
 (defun helm-split-window-default-fn (window)
   (let (split-width-threshold)
     (if (or (one-window-p)
-            helm-split-window-in-side-p
-            (and (or (eq helm-split-window-default-side 'left)
-                     (eq helm-split-window-default-side 'right))
-                 (not helm-split-window-in-side-p)))
+            helm-split-window-in-side-p)
         (split-window
          (selected-window) nil helm-split-window-default-side)
         ;; If more than one window reuse it.
         (case helm-split-window-default-side
-          ((above left) (or (window-left (selected-window))
-                            (selected-window)))
-          ((below right) (or (window-right (selected-window))
-                             (selected-window)))
-          (t (or (window-right (selected-window))
-                 (selected-window)))))))
+          ((above left) (or (window-prev-sibling) (selected-window)))
+          ((below right) (or (window-next-sibling) (selected-window)))
+          (t (or (window-next-sibling) (selected-window)))))))
 
 
 ;; Core: Display *helm* buffer
