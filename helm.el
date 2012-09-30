@@ -246,11 +246,11 @@ will reuse the same window scheme than the one of last session."
   :group 'helm
   :type 'function)
 
-(defcustom helm-split-window-default-side 'bottom
+(defcustom helm-split-window-default-side 'below
   "The default side to display `helm-buffer'.
 Must be one acceptable arg for `split-window' SIDE,
-that is 'bottom, 'above, 'left, 'right.
-A nil value as same effect as 'bottom.
+that is 'below, 'above, 'left, 'right.
+A nil value as same effect as 'below.
 NOTE: this have no effect if `helm-split-window-preferred-function' is not
 `helm-split-window-default-fn' unless this new function handle this."
   :group 'helm
@@ -1470,21 +1470,22 @@ window or frame configuration is saved/restored according to values of
                (select-frame-set-input-focus frame)))))
 
 (defun helm-split-window-default-fn (window)
-  (let ((split-width-threshold nil))
-    (if (and helm-split-window-default-side
-             (not (eq helm-split-window-default-side 'bottom)))
-        (if (or (one-window-p)
-                helm-split-window-in-side-p)
-            (split-window
-             (selected-window) nil helm-split-window-default-side)
-            (case helm-split-window-default-side
-              ((above left) (or (window-left (selected-window))
-                                (selected-window)))
-              ((bottom right) (or (window-right (selected-window))
-                                  (selected-window)))
-              (t (or (window-right (selected-window))
-                     (selected-window)))))
-        (split-window-sensibly window))))
+  (let (split-width-threshold)
+    (if (or (one-window-p)
+            helm-split-window-in-side-p
+            (and (or (eq helm-split-window-default-side 'left)
+                     (eq helm-split-window-default-side 'right))
+                 (not helm-split-window-in-side-p)))
+        (split-window
+         (selected-window) nil helm-split-window-default-side)
+        ;; If more than one window reuse it.
+        (case helm-split-window-default-side
+          ((above left) (or (window-left (selected-window))
+                            (selected-window)))
+          ((below right) (or (window-right (selected-window))
+                             (selected-window)))
+          (t (or (window-right (selected-window))
+                 (selected-window)))))))
 
 
 ;; Core: Display *helm* buffer
@@ -1507,7 +1508,7 @@ The function used to display `helm-buffer'."
                          (eq helm-split-window-default-side 'above))
                     'left)
                    ((and (eq helm-split-window-state 'horizontal)
-                         (eq helm-split-window-default-side 'bottom))
+                         (eq helm-split-window-default-side 'below))
                     'right)
                    (t helm-split-window-default-side))
              helm-split-window-default-side)))
