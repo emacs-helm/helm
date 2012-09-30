@@ -307,27 +307,30 @@ a double quote or between."
               (helm-c-apropos-init 'boundp ,default)))
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
+    (requires-pattern . 2)
     (candidates-in-buffer)
     (action . (("Describe Variable" . helm-c-describe-variable)
                ("Find Variable" . helm-c-find-variable)))))
 
 (defun helm-c-source-emacs-faces (&optional default)
   `((name . "Faces")
-   (init . (lambda ()
-             (helm-c-apropos-init 'facep ,default)))
-   (persistent-action . helm-lisp-completion-persistent-action)
-   (persistent-help . "Show brief doc in mode-line")
-   (candidates-in-buffer)
-   (filtered-candidate-transformer . (lambda (candidates source)
-                                       (loop for c in candidates
-                                             collect (propertize c 'face (intern c)))))
-   (action . (lambda (candidate)
-               (describe-face (intern candidate))))))
+    (init . (lambda ()
+              (helm-c-apropos-init 'facep ,default)))
+    (persistent-action . helm-lisp-completion-persistent-action)
+    (persistent-help . "Show brief doc in mode-line")
+    (requires-pattern . 2)
+    (candidates-in-buffer)
+    (filtered-candidate-transformer . (lambda (candidates source)
+                                        (loop for c in candidates
+                                              collect (propertize c 'face (intern c)))))
+    (action . (lambda (candidate)
+                (describe-face (intern candidate))))))
 
 (defun helm-c-source-helm-attributes (&optional default)
   `((name . "Helm attributes")
     (candidates . (lambda ()
                     (mapcar 'symbol-name helm-additional-attributes)))
+    (requires-pattern . 2)
     (action . (lambda (candidate)
                 (with-output-to-temp-buffer "*Help*"
                   (princ (get (intern candidate) 'helm-attrdoc)))))))
@@ -338,6 +341,7 @@ a double quote or between."
               (helm-c-apropos-init 'commandp ,default)))
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
+    (requires-pattern . 2)
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-c-describe-function)
                ("Find Function" . helm-c-find-function)))))
@@ -350,6 +354,7 @@ a double quote or between."
                                    ,default)))
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
+    (requires-pattern . 2)
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-c-describe-function)
                ("Find Function" . helm-c-find-function)))))
@@ -365,7 +370,8 @@ a double quote or between."
                     helm-c-source-emacs-functions
                     helm-c-source-emacs-variables
                     helm-c-source-emacs-faces
-                    helm-c-source-helm-attributes)))))
+                    helm-c-source-helm-attributes))
+          :buffer "*helm apropos*")))
 
 
 ;;; Advices
