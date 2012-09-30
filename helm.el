@@ -242,16 +242,6 @@ will reuse the same window scheme than the one of last session."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-display-buffer-default-action nil
-  "An action that `helm-display-buffer' can pass to `pop-to-buffer'.
-The default, nil mean reuse other window to display `helm-buffer'
-if there is more than one window.
-The value should be nil, t or an alist.
-See `display-buffer' for how to use action arg.
-This is not available for emacs versions < 24.1."
-  :group 'helm
-  :type 'list)
-
 
 ;;; Faces
 ;;
@@ -1270,8 +1260,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                      (helm-buffer (or any-buffer helm-buffer)))
                  (with-helm-restore-variables
                    (helm-initialize any-resume any-input any-sources)
-                   (helm-display-buffer helm-buffer
-                                        helm-display-buffer-default-action)
+                   (helm-display-buffer helm-buffer)
                    (helm-log "show prompt")
                    (unwind-protect
                         (helm-read-pattern-maybe
@@ -1461,11 +1450,13 @@ window or frame configuration is saved/restored according to values of
 
 (defvar helm-split-window-preferred-function 'helm-split-window-default-fn)
 (defvar helm-split-window-default-side 'bottom)
+(defvar helm-split-window-in-side-p nil)
 (defun helm-split-window-default-fn (window)
   (let ((split-width-threshold nil))
     (if (and helm-split-window-default-side
              (not (eq helm-split-window-default-side 'bottom)))
-        (if (one-window-p)
+        (if (or (one-window-p)
+                helm-split-window-in-side-p)
             (split-window
              (selected-window) nil helm-split-window-default-side)
             (case helm-split-window-default-side
@@ -1479,38 +1470,38 @@ window or frame configuration is saved/restored according to values of
 
 
 ;; Core: Display *helm* buffer
-(defun helm-display-buffer (buf &optional action)
-  "Display *helm* buffer BUF.
-The ACTION arg value used is generally `helm-display-buffer-default-action'.
-For how to use ACTION arg see `display-buffer' for more info."
+(defun helm-display-buffer (buffer)
+  "Display BUFFER.
+The function used to display `helm-buffer'."
   (let (pop-up-frames
         (split-window-preferred-function
-         helm-split-window-preferred-function))
-    (funcall (with-current-buffer buf helm-display-function) buf action)
-    (when (and (not helm-samewindow)
-               ;; This can happen when calling helm
-               ;; from a dedicated frame with no minibuffer.
-               (not (with-helm-window (one-window-p)))
-               (not (minibufferp helm-current-buffer))
-               helm-reuse-last-window-split-state)
-      (with-helm-window
-        (delete-window)
-        (set-window-buffer
-         (select-window
-          (if (eq helm-split-window-state 'horizontal)
-              (split-window-horizontally)
-              (split-window-vertically)))
-         helm-buffer)))))
+         helm-split-window-preferred-function)
+        (helm-split-window-default-side
+         (if (and (not helm-samewindow)
+                  helm-reuse-last-window-split-state)
+             (cond ((and (eq helm-split-window-state 'horizontal)
+                         (eq helm-split-window-default-side 'left))
+                    'left)
+                   ((and (eq helm-split-window-state 'horizontal)
+                         (eq helm-split-window-default-side 'right))
+                    'right)
+                   ((and (eq helm-split-window-state 'horizontal)
+                         (eq helm-split-window-default-side 'above))
+                    'left)
+                   ((and (eq helm-split-window-state 'horizontal)
+                         (eq helm-split-window-default-side 'bottom))
+                    'right)
+                   (t helm-split-window-default-side))
+             helm-split-window-default-side)))
+    (funcall (with-current-buffer buffer helm-display-function) buffer)))
 
-(defun helm-default-display-buffer (buf &rest args)
-  "Default function to display `helm-buffer' BUF.
+(defun helm-default-display-buffer (buffer)
+  "Default function to display `helm-buffer' BUFFER.
 It use `switch-to-buffer' or `pop-to-buffer' depending of value of
-`helm-samewindow'.
-ARGS should be valid arguments for `pop-to-buffer', they have no effect
-when `helm-samewindow' is enabled."
+`helm-samewindow'."
   (if helm-samewindow
-      (switch-to-buffer buf)
-      (apply #'pop-to-buffer (cons buf args))))
+      (switch-to-buffer buffer)
+      (pop-to-buffer buffer)))
 
 
 ;; Core: initialize
