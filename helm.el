@@ -1459,13 +1459,33 @@ window or frame configuration is saved/restored according to values of
                                  (last-nonminibuffer-frame))))
                (select-frame-set-input-focus frame)))))
 
+(defvar helm-split-window-preferred-function 'helm-split-window-default-fn)
+(defvar helm-split-window-default-side 'bottom)
+(defun helm-split-window-default-fn (window)
+  (let ((split-width-threshold nil))
+    (if (and helm-split-window-default-side
+             (not (eq helm-split-window-default-side 'bottom)))
+        (if (one-window-p)
+            (split-window
+             (selected-window) nil helm-split-window-default-side)
+            (case helm-split-window-default-side
+              ((above left) (or (window-left (selected-window))
+                                (selected-window)))
+              ((bottom right) (or (window-right (selected-window))
+                                  (selected-window)))
+              (t (or (window-right (selected-window))
+                     (selected-window)))))
+        (split-window-sensibly window))))
+
 
 ;; Core: Display *helm* buffer
 (defun helm-display-buffer (buf &optional action)
   "Display *helm* buffer BUF.
 The ACTION arg value used is generally `helm-display-buffer-default-action'.
 For how to use ACTION arg see `display-buffer' for more info."
-  (let (pop-up-frames)
+  (let (pop-up-frames
+        (split-window-preferred-function
+         helm-split-window-preferred-function))
     (funcall (with-current-buffer buf helm-display-function) buf action)
     (when (and (not helm-samewindow)
                ;; This can happen when calling helm
