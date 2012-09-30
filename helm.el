@@ -234,11 +234,32 @@ See `helm-case-fold-search' for more info."
   :group 'helm
   :type 'symbol)
 
-
 (defcustom helm-reuse-last-window-split-state nil
   "Reuse the last state of window split, vertical or horizontal.
 That is when you use `helm-toggle-resplit-window' the next helm session
 will reuse the same window scheme than the one of last session."
+  :group 'helm
+  :type 'boolean)
+
+(defcustom helm-split-window-preferred-function 'helm-split-window-default-fn
+  "Default function used for splitting window."
+  :group 'helm
+  :type 'function)
+
+(defcustom helm-split-window-default-side 'bottom
+  "The default side to display `helm-buffer'.
+Must be one acceptable arg for `split-window' SIDE,
+that is 'bottom, 'above, 'left, 'right.
+A nil value as same effect as 'bottom.
+NOTE: this have no effect if `helm-split-window-preferred-function' is not
+`helm-split-window-default-fn' unless this new function handle this."
+  :group 'helm
+  :type 'symbol)
+
+(defcustom helm-split-window-in-side-p nil
+  "Force splitting inside selected window when non--nil.
+NOTE: this have no effect if `helm-split-window-preferred-function' is not
+`helm-split-window-default-fn' unless this new function handle this."
   :group 'helm
   :type 'boolean)
 
@@ -1448,9 +1469,6 @@ window or frame configuration is saved/restored according to values of
                                  (last-nonminibuffer-frame))))
                (select-frame-set-input-focus frame)))))
 
-(defvar helm-split-window-preferred-function 'helm-split-window-default-fn)
-(defvar helm-split-window-default-side 'bottom)
-(defvar helm-split-window-in-side-p nil)
 (defun helm-split-window-default-fn (window)
   (let ((split-width-threshold nil))
     (if (and helm-split-window-default-side
