@@ -606,7 +606,7 @@ These extensions will be added to command line with --include arg of grep."
                        (concat "--type=" type))
                types " ")))
 
-(defun helm-do-grep-1 (targets &optional recurse zgrep)
+(defun helm-do-grep-1 (targets &optional recurse zgrep exts)
   "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
 to set the --include args of grep.
@@ -616,7 +616,7 @@ If you are using ack-grep, you will be prompted for --type
 instead.
 If prompt is empty '--exclude `grep-find-ignored-files'' is used instead.
 ZGREP when non--nil use zgrep instead, without prompting for a choice
-in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
+in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   (when (and (helm-grep-use-ack-p)
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
@@ -629,13 +629,14 @@ in recurse, search beeing made on `helm-zgrep-file-extension-regexp'."
                 (copy-sequence helm-compile-source-functions)))
          (exts (and recurse (not zgrep)
                     (not (helm-grep-use-ack-p :where 'recursive))
-                    (helm-comp-read
-                     "Search Only in: "
-                     (helm-c-grep-guess-extensions targets)
-                     :marked-candidates t
-                     :must-match t
-                     :fc-transformer 'helm-c-adaptive-sort
-                     :buffer "*helm grep exts*")))
+                    (or exts
+                        (helm-comp-read
+                         "Search Only in: "
+                         (helm-c-grep-guess-extensions targets)
+                         :marked-candidates t
+                         :must-match t
+                         :fc-transformer 'helm-c-adaptive-sort
+                         :buffer "*helm grep exts*"))))
          (include-files (and exts
                              (mapconcat #'(lambda (x)
                                             (concat "--include="
