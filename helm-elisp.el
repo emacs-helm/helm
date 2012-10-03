@@ -308,7 +308,6 @@ a double quote or between."
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (candidates-in-buffer)
-    ;(search-strict . helm-apropos-search-fn)
     (action . (("Describe Variable" . helm-c-describe-variable)
                ("Find Variable" . helm-c-find-variable)))))
 
@@ -319,7 +318,6 @@ a double quote or between."
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (candidates-in-buffer)
-    ;(search-strict . helm-apropos-search-fn)
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (loop for c in candidates
                                               collect (propertize c 'face (intern c)))))
@@ -341,7 +339,6 @@ a double quote or between."
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (candidates-in-buffer)
-    ;(search-strict . helm-apropos-search-fn)
     (action . (("Describe Function" . helm-c-describe-function)
                ("Find Function" . helm-c-find-function)))))
 
@@ -353,20 +350,9 @@ a double quote or between."
                                    ,default)))
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
-    ;(search-strict . helm-apropos-search-fn)
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-c-describe-function)
                ("Find Function" . helm-c-find-function)))))
-
-;; (defun helm-apropos-search-fn (pattern)
-;;   "Search function for `helm-c-apropos' sources."
-;;   ;; Start searching after 2 char entered in prompt.
-;;   ;; Unlike requires-pattern all candidates are shown at start.
-;;   (and (>= (length pattern) 2)
-;;        ;; Allow multiple pattern matching because mp is disabled
-;;        ;; by search-strict.
-;;        (loop for p in (split-string pattern " " t)
-;;              always (re-search-forward p nil t))))
 
 ;;;###autoload
 (defun helm-c-apropos ()

@@ -492,6 +492,7 @@ It is disabled by default because *Helm Log* grows quickly.")
           (string-match helm-pattern candidate)))
   "Default functions to match candidates according to `helm-pattern'.")
 (defvar helm-process-delayed-sources-timer nil)
+(defvar helm-update-blacklist-regexp '("^" "$"))
 
 
 ;; Utility: logging
@@ -2092,7 +2093,10 @@ is done on whole `helm-buffer' and not on current source."
        (>= (length helm-pattern)
            (helm-aif (assoc 'requires-pattern source)
                (or (cdr it) 1)
-             0))))
+             0))
+       ;; These incomplete regexps hang helm forever
+       ;; so defer update.
+       (not (member helm-pattern helm-update-blacklist-regexp))))
 
 (defun helm-delayed-source-p (source)
   "Wheter SOURCE is a delayed source or not."
