@@ -636,6 +636,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                          :marked-candidates t
                          :must-match t
                          :fc-transformer 'helm-c-adaptive-sort
+                         :preselect "*"
                          :buffer "*helm grep exts*"))))
          (include-files (and exts
                              (mapconcat #'(lambda (x)
