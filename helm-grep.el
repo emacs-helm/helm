@@ -379,40 +379,40 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defun helm-c-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
-  (with-current-buffer helm-buffer
-    (let* ((split        (helm-c-grep-split-line candidate))
-           (lineno       (string-to-number (nth 1 split)))
-           (loc-fname    (or (get-text-property (point-at-bol) 'help-echo)
-                             (car split)))
-           (tramp-method (file-remote-p helm-ff-default-directory 'method))
-           (tramp-host   (file-remote-p helm-ff-default-directory 'host))
-           (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-           (fname        (if tramp-host
-                             (concat tramp-prefix loc-fname) loc-fname)))
-      (case where
-        (other-window (find-file-other-window fname))
-        (elscreen     (helm-elscreen-find-file fname))
-        (other-frame  (find-file-other-frame fname))
-        (grep         (helm-c-grep-save-results-1))
-        (pdf          (helm-c-pdfgrep-action-1 split lineno (car split)))
-        (t            (find-file fname)))
-      (unless (or (eq where 'grep) (eq where 'pdf))
-        (helm-goto-line lineno))
-      (when mark
-        (set-marker (mark-marker) (point))
-        (push-mark (point) 'nomsg))
-      ;; Save history
-      (unless (or helm-in-persistent-action
-                  (eq major-mode 'helm-grep-mode)
-                  (string= helm-pattern ""))
+  (let* ((split        (helm-c-grep-split-line candidate))
+         (lineno       (string-to-number (nth 1 split)))
+         (loc-fname    (or (with-current-buffer helm-buffer
+                             (get-text-property (point-at-bol) 'help-echo))
+                           (car split)))
+         (tramp-method (file-remote-p helm-ff-default-directory 'method))
+         (tramp-host   (file-remote-p helm-ff-default-directory 'host))
+         (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
+         (fname        (if tramp-host
+                           (concat tramp-prefix loc-fname) loc-fname)))
+    (case where
+      (other-window (find-file-other-window fname))
+      (elscreen     (helm-elscreen-find-file fname))
+      (other-frame  (find-file-other-frame fname))
+      (grep         (helm-c-grep-save-results-1))
+      (pdf          (helm-c-pdfgrep-action-1 split lineno (car split)))
+      (t            (find-file fname)))
+    (unless (or (eq where 'grep) (eq where 'pdf))
+      (helm-goto-line lineno))
+    (when mark
+      (set-marker (mark-marker) (point))
+      (push-mark (point) 'nomsg))
+    ;; Save history
+    (unless (or helm-in-persistent-action
+                (eq major-mode 'helm-grep-mode)
+                (string= helm-pattern ""))
+      (setq helm-c-grep-history
+            (cons helm-pattern
+                  (delete helm-pattern helm-c-grep-history)))
+      (when (> (length helm-c-grep-history)
+               helm-c-grep-max-length-history)
         (setq helm-c-grep-history
-              (cons helm-pattern
-                    (delete helm-pattern helm-c-grep-history)))
-        (when (> (length helm-c-grep-history)
-                 helm-c-grep-max-length-history)
-          (setq helm-c-grep-history
-                (delete (car (last helm-c-grep-history))
-                        helm-c-grep-history)))))))
+              (delete (car (last helm-c-grep-history))
+                      helm-c-grep-history))))))
 
 (defun helm-c-grep-other-window (candidate)
   "Jump to result in other window from helm grep."
