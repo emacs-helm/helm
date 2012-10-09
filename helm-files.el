@@ -2501,27 +2501,10 @@ Else return ACTIONS unmodified."
                         file-name-history)))
     (match-strict . helm-c-match-on-basename)
     (candidate-number-limit . ,history-length)
-    (action . (("find file"
-                . (lambda (candidate)
-                    (helm-set-pattern
-                     (expand-file-name candidate))
-                    (let ((delay (if (file-remote-p candidate)
-                                     0.5 0.1)))
-                      (with-helm-waiting-output delay
-                        (helm-ff-file-name-history-defferred-fn candidate)))))
-               ("find file in helm"
+    (action . (("find file in helm"
                 . (lambda (candidate)
                     (helm-set-pattern
                      (expand-file-name candidate))))))))
-
-(defun helm-ff-file-name-history-defferred-fn (candidate)
-  (helm-aif (file-remote-p candidate 'host)
-      (progn (message (format
-                       "Wait, connecting to host...`%s'" it))
-             (find-file-noselect candidate)
-             (run-with-idle-timer
-              0.1 nil #'(lambda () (helm-exit-minibuffer))))
-    (run-with-idle-timer 0.1 nil #'(lambda () (helm-exit-minibuffer)))))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."

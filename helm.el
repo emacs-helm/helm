@@ -493,8 +493,6 @@ It is disabled by default because *Helm Log* grows quickly.")
   "Default functions to match candidates according to `helm-pattern'.")
 (defvar helm-process-delayed-sources-timer nil)
 (defvar helm-update-blacklist-regexp '("^" "$"))
-(defvar helm-waiting-output-timer nil)
-(defvar helm-updated-p nil)
 
 
 ;; Utility: logging
@@ -667,22 +665,6 @@ Otherwise make a list with one element."
   (declare (indent 2) (debug t))
   `(let ((default-directory (file-name-as-directory ,directory)))
      ,@body))
-
-(defun with-helm-waiting-output (delay &rest body)
-  "Check if helm is updated after DELAY seconds before executing BODY."
-  (declare (indent 1))
-  (setq helm-waiting-output-timer
-         (run-with-idle-timer
-          delay t #'(lambda ()
-                      (with-current-buffer helm-buffer
-                        (condition-case err
-                            (when helm-updated-p
-                              (cancel-timer helm-waiting-output-timer)
-                              (setq helm-waiting-output-timer nil)
-                              (eval body))
-                          (quit
-                           (progn (cancel-timer helm-waiting-output-timer)
-                                  (setq helm-waiting-output-timer nil)))))))))
 
 (defun* helm-attr (attribute-name
                    &optional (src (helm-get-current-source)) compute)
@@ -2050,7 +2032,6 @@ place once updating is done.  It should be used on single source because search
 is done on whole `helm-buffer' and not on current source."
   (helm-log "Start updating")
   (helm-kill-async-processes)
-  (setq helm-updated-p nil)
   ;; When persistent action have been called
   ;; we have two windows even with `helm-samewindow'.
   ;; So go back to one window when updating if `helm-samewindow'
@@ -2104,7 +2085,6 @@ is done on whole `helm-buffer' and not on current source."
               (max helm-idle-delay helm-input-idle-delay 0.1) nil
               'helm-process-delayed-sources delayed-sources preselect))))
         (helm-log "end update")))))
-(add-hook 'helm-after-update-hook #'(lambda () (setq helm-updated-p t)))
 
 (defun helm-update-source-p (source)
   "Wheter SOURCE need updating or not."
