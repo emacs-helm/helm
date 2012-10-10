@@ -2292,13 +2292,14 @@ STRING is the output of PROCESS."
         (helm-maybe-update-keymap))))
 
 (defun helm-kill-async-processes ()
-  "Kill all known asynchronous processes of `helm-async-processes'."
-  (mapc 'helm-kill-async-process (mapcar 'car helm-async-processes))
-  (setq helm-async-processes nil))
-
+  "Kill all asynchronous processes registered in `helm-async-processes'."
+  (while helm-async-processes
+    (helm-kill-async-process (caar helm-async-processes))
+    (setq helm-async-processes (cdr helm-async-processes))))
+    
 (defun helm-kill-async-process (process)
-  "Kill PROCESS and detach the associated functions."
-  (set-process-filter process nil)
+  "Stop output from `helm-output-filter' and kill associated PROCESS."
+  (set-process-filter process t)
   (delete-process process))
 
 
