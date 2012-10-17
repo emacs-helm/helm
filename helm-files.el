@@ -1316,11 +1316,13 @@ purpose."
          invalid-basedir
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
+    ;; Issue #118 allow creation of newdir+newfile.
+    (unless (or (string= path "Invalid tramp file name")
+                (file-directory-p (file-name-directory path)))
+      (setq invalid-basedir t))
     ;; Don't set now `helm-pattern' if `path' == "Invalid tramp file name"
     ;; like that the actual value (e.g /ssh:) is passed to
     ;; `helm-ff-tramp-hostnames'.
-    (when (not (file-directory-p (file-name-directory path)))
-      (setq invalid-basedir t))
     (unless (or (string= path "Invalid tramp file name") invalid-basedir)
       (setq helm-pattern (helm-ff-transform-fname-for-completion path)))
     (setq helm-ff-default-directory
