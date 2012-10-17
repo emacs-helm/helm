@@ -117,6 +117,11 @@ Where '%f' format spec is filename and '%p' is page number"
   :group 'helm-grep
   :type 'boolean)
 
+(defcustom helm-c-grep-preferred-ext nil
+  "This file extension will be preselected for grep."
+  :group 'helm-grep
+  :type  'string)
+
 
 ;;; Faces
 ;;
@@ -635,6 +640,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                          "Search Only in: "
                          (helm-c-grep-guess-extensions targets)
                          :marked-candidates t
+                         :preselect helm-c-grep-preferred-ext
                          :fc-transformer 'helm-c-adaptive-sort
                          :buffer "*helm grep exts*"))))
          (include-files (and exts
