@@ -612,6 +612,27 @@ These extensions will be added to command line with --include arg of grep."
                        (concat "--type=" type))
                types " ")))
 
+(defun helm-grep-get-file-extensions (files)
+  "Try to return a list of file extensions to pass to include arg of grep."
+  (let* ((all-exts (helm-c-grep-guess-extensions
+                    (mapcar 'expand-file-name files)))
+         (extensions (helm-comp-read "Search Only in: " all-exts
+                                     :marked-candidates t
+                                     :preselect helm-c-grep-preferred-ext
+                                     :fc-transformer 'helm-c-adaptive-sort
+                                     :buffer "*helm grep exts*"
+                                     :name "*helm grep extensions*")))
+    (if (listp extensions) ; Otherwise it is empty string returned by C-RET.
+        ;; If extensions is a list of one string containing spaces,
+        ;; assume user entered more than one glob separated by space(s) and
+        ;; split this string to pass it later to mapconcat.
+        ;; e.g '("*.el *.py")
+        (loop for i in extensions
+              append (if (string-match " " i)
+                         (split-string i " " t)
+                         (list i)))
+        (list "*"))))
+
 (defun helm-do-grep-1 (targets &optional recurse zgrep exts)
   "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
@@ -627,22 +648,9 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
-  ;; When called as action from an other source e.g *-find-files
-  ;; we have to kill action buffer.
-  (let* ((helm-compile-source-functions
-          ;; rule out helm-match-plugin because the input is one regexp.
-          (delq 'helm-compile-source--match-plugin
-                (copy-sequence helm-compile-source-functions)))
-         (exts (and recurse (not zgrep)
+  (let* ((exts (and recurse (not zgrep)
                     (not (helm-grep-use-ack-p :where 'recursive))
-                    (or exts
-                        (helm-comp-read
-                         "Search Only in: "
-                         (helm-c-grep-guess-extensions targets)
-                         :marked-candidates t
-                         :preselect helm-c-grep-preferred-ext
-                         :fc-transformer 'helm-c-adaptive-sort
-                         :buffer "*helm grep exts*"))))
+                    (or exts (helm-grep-get-file-extensions targets))))
          (include-files (and exts
                              (mapconcat #'(lambda (x)
                                             (concat "--include="
@@ -655,7 +663,13 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-c-grep-default-command)
-                     (helm-grep-read-ack-type))))
+                     (helm-grep-read-ack-type)))
+         (helm-compile-source-functions
+          ;; rule out helm-match-plugin because the input is one regexp.
+          (delq 'helm-compile-source--match-plugin
+                (copy-sequence helm-compile-source-functions))))
+    ;; When called as action from an other source e.g *-find-files
+    ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
     ;; If `helm-find-files' haven't already started,
