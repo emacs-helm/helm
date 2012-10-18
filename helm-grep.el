@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl)
 (require 'helm)
 (require 'grep)
 (require 'helm-regexp)
@@ -556,7 +556,9 @@ These extensions will be added to command line with --include arg of grep."
                    (member glob glob-list)
                    (member glob grep-find-ignored-files))
         collect glob into glob-list
-        finally return (append glob-list (list "*"))))
+        finally return (append glob-list
+                               (delete-duplicates
+                                (delq nil (list "*" helm-c-grep-preferred-ext))))))
 
 (defun helm-grep-collect-candidates ()
   (let* ((helm-c-grep-default-command
@@ -628,9 +630,7 @@ These extensions will be added to command line with --include arg of grep."
         ;; split this string to pass it later to mapconcat.
         ;; e.g '("*.el *.py")
         (loop for i in extensions
-              append (if (string-match " " i)
-                         (split-string i " " t)
-                         (list i)))
+              append (split-string-and-unquote i " "))
         (list "*"))))
 
 (defun helm-do-grep-1 (targets &optional recurse zgrep exts)
