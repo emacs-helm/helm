@@ -19,6 +19,7 @@
 
 (require 'cl)
 (require 'helm)
+(require 'imenu)
 
 (defvar helm-c-imenu-delimiter " / ")
 
@@ -53,7 +54,6 @@
 
 (defvar helm-c-source-imenu
   '((name . "Imenu")
-    (init . (lambda () (require 'imenu)))
     (candidates . helm-c-imenu-candidates)
     (persistent-action . (lambda (elm)
                            (helm-c-imenu-default-action elm)
