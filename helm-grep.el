@@ -558,7 +558,8 @@ These extensions will be added to command line with --include arg of grep."
         collect glob into glob-list
         finally return (append glob-list
                                (delete-duplicates
-                                (delq nil (list "*" helm-c-grep-preferred-ext))))))
+                                (delq nil (list "*" helm-c-grep-preferred-ext))
+                                :test 'string=))))
 
 (defun helm-grep-collect-candidates ()
   (let* ((helm-c-grep-default-command
