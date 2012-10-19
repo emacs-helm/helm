@@ -21,8 +21,16 @@
 (require 'helm)
 (require 'imenu)
 
-(defvar helm-c-imenu-delimiter " / ")
+(defgroup helm-imenu nil
+  "Imenu related libraries and applications for helm."
+  :group 'helm)
 
+(defcustom helm-c-imenu-delimiter " / "
+  "Delimit type of candidates and his value in `helm-buffer'."
+  :group 'helm-imenu
+  :type 'string)
+
+;;; Internals
 (defvar helm-c-imenu-index-filter nil)
 (make-variable-buffer-local 'helm-c-imenu-index-filter)
 
@@ -34,9 +42,6 @@
 
 (defvar helm-c-cached-imenu-tick nil)
 (make-variable-buffer-local 'helm-c-cached-imenu-tick)
-
-(eval-when-compile (require 'imenu))
-(setq imenu-auto-rescan t)
 
 (defun helm-imenu-create-candidates (entry)
   "Create candidates with ENTRY."
@@ -63,7 +68,6 @@
     (action . helm-c-imenu-default-action))
   "See (info \"(emacs)Imenu\")")
 
-
 (defun helm-c-imenu-candidates ()
   (with-helm-current-buffer
     (let ((tick (buffer-modified-tick)))
@@ -82,12 +86,9 @@
                                index))))))
           (setq helm-c-cached-imenu-candidates
                 (mapcar #'(lambda (x)
-                            (if (stringp x)
-                                x
-                                (car x)))
+                            (if (stringp x) x (car x)))
                         helm-c-cached-imenu-candidates))))))
 
-(setq imenu-default-goto-function 'imenu-default-goto-function)
 (defun helm-c-imenu-default-action (elm)
   "The default action for `helm-c-source-imenu'."
   (let ((path (split-string elm helm-c-imenu-delimiter))
@@ -100,8 +101,10 @@
 (defun helm-imenu ()
   "Preconfigured `helm' for `imenu'."
   (interactive)
-  (helm :sources 'helm-c-source-imenu
-        :buffer "*helm imenu*"))
+  (let ((imenu-auto-rescan t)
+        (imenu-default-goto-function 'imenu-default-goto-function))
+    (helm :sources 'helm-c-source-imenu
+        :buffer "*helm imenu*")))
 
 (provide 'helm-imenu)
 
