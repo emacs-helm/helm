@@ -54,7 +54,7 @@ You will find there instructions to install.
 ### Emacs Prelude
 
 If you're afraid to play with Emacs's configuration, but want to try
-out Helm - have to fear. Have a look at
+out Helm - have NO FEAR. Have a look at
 [Emacs Prelude](https://github.com/bbatsov/prelude) - it has
 Helm built-in and properly set-up.
 
