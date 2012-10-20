@@ -1,6 +1,28 @@
 Welcome to the Emacs-helm wiki!
 
+------
+
+This wiki hosts helm documentation but is not User editable.  Changes are
+welcomed by submitting a Pull Request for [doc/Home.mdpp][1].
+
+------
+
 !TOC
+
+# Wiki maintainer instructions
+
+1. Install wiki submodule
+   
+       git submodule init && git submodule update
+
+2. Install https://github.com/thierryvolpiatto/markdown-pp.git
+   (Run the setup.py I wrote)
+3. Edit on helm repo doc/Home.mdpp
+4. Run markdown.pp:
+   `$ path/to/markdown-pp.py foo.mdpp foo.md`
+   See the readme for more details.
+5. Copy the resulting Home.md to 1)
+
 
 # Install
 
@@ -299,7 +321,7 @@ personal actions for `helm-find-files`.
 
 -   Because eshell accept shell commands but also elisp functions.
 
-All these command should end with $1. You will have completion against
+All these command should end with https://github.com/emacs-helm/helm/blob/master/doc/Home.mdpp. You will have completion against
 all these aliases once eshell is loaded. (start it once before using
 helm-find-files).
 
@@ -310,7 +332,7 @@ helm-find-files).
 
  Go in eshell, an enter at prompt:
 
-    alias my_alias command \$1
+    alias my_alias command $1
 
 NOTE: don`t forget to escape the $.
 
@@ -1104,3 +1126,6 @@ You can ask on the helm mailing-list by subscribing at:
 Or at gmane: [gmane.emacs.helm.user](http://dir.gmane.org/gmane.emacs.helm.user)
 
 !REF
+
+
+[1]: https://github.com/emacs-helm/helm/blob/master/doc/Home.mdpp
