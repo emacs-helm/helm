@@ -39,12 +39,6 @@
   :type 'number
   :group 'helm-adapt)
 
-(defcustom helm-c-use-adaptative-sorting nil
-  "Wheter to use or not adaptative sorting.
-Even if a source use it, it will have no effect when set to nil."
-  :type 'boolean
-  :group 'helm-adapt)
-
 
 ;; Internal
 (defvar helm-c-adaptive-done nil
@@ -55,24 +49,29 @@ selection.")
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
 
-;; Should run at beginning of `helm-initial-setup'.
-(add-hook 'helm-before-initialize-hook #'(lambda ()
-                                           (when helm-c-use-adaptative-sorting
-                                             (setq helm-c-adaptive-done nil))))
+(defun helm-adaptative-done-reset ()
+  (setq helm-c-adaptive-done nil))
 
-;; Should run at beginning of `helm-exit-minibuffer'.
-(add-hook 'helm-before-action-hook #'(lambda ()
-                                       (when helm-c-use-adaptative-sorting
-                                         (helm-c-adaptive-store-selection))))
-
-;; Should run at beginning of `helm-select-action'.
-(add-hook 'helm-select-action-hook #'(lambda ()
-                                       (when helm-c-use-adaptative-sorting
-                                         (helm-c-adaptive-store-selection))))
+(define-minor-mode helm-adaptative-mode
+    "Toggle adaptative sorting in all sources."
+  :group 'helm-adapt
+  :require 'helm-adaptative
+  :global t
+  (if helm-adaptative-mode
+      (progn
+        ;; Should run at beginning of `helm-initial-setup'.
+        (add-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
+        ;; Should run at beginning of `helm-exit-minibuffer'.
+        (add-hook 'helm-before-action-hook 'helm-c-adaptive-store-selection)
+        ;; Should run at beginning of `helm-select-action'.
+        (add-hook 'helm-select-action-hook 'helm-c-adaptive-store-selection))
+      (remove-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
+      (remove-hook 'helm-before-action-hook 'helm-c-adaptive-store-selection)
+      (remove-hook 'helm-select-action-hook 'helm-c-adaptive-store-selection)))
 
 (defun helm-c-source-use-adaptative-p (&optional source-name)
   "Return current source only if it use adaptative history, nil otherwise."
-  (when helm-c-use-adaptative-sorting
+  (when helm-adaptative-mode
     (let* ((source (or source-name (helm-get-current-source)))
            (adapt-source (or (assoc-default 'filtered-candidate-transformer
                                             (assoc (assoc-default 'type source)
@@ -106,7 +105,6 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                                             (if (not found)
                                                 ;; new entry
                                                 (list selection)
-
                                                 ;; move entry to the beginning of the
                                                 ;; list, so that it doesn't get
                                                 ;; trimmed when the history is
@@ -143,7 +141,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                       (subseq (cdr selection-info) 0 helm-c-adaptive-history-length))))))))
 
 (defun helm-c-adaptative-maybe-load-history ()
-  (when (and helm-c-use-adaptative-sorting
+  (when (and helm-adaptative-mode
              (file-readable-p helm-c-adaptive-history-file))
     (load-file helm-c-adaptive-history-file)))
 
@@ -153,7 +151,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
 (defun helm-c-adaptive-save-history (&optional arg)
   "Save history information to file given by `helm-c-adaptive-history-file'."
   (interactive "p")
-  (when helm-c-use-adaptative-sorting
+  (when helm-adaptative-mode
     (with-temp-buffer
       (insert
        ";; -*- mode: emacs-lisp -*-\n"
