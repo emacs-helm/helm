@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'helm)
 (require 'grep)
 (require 'helm-regexp)
@@ -556,10 +556,11 @@ These extensions will be added to command line with --include arg of grep."
                    (member glob glob-list)
                    (member glob grep-find-ignored-files))
         collect glob into glob-list
-        finally return (append glob-list
-                               (delete-duplicates
-                                (delq nil (list "*" helm-c-grep-preferred-ext))
-                                :test 'string=))))
+        finally return (helm-fast-remove-dups
+                        (append glob-list
+                                (delq nil
+                                      (list "*" helm-c-grep-preferred-ext)))
+                                :test 'equal)))
 
 (defun helm-grep-collect-candidates ()
   (let* ((helm-c-grep-default-command
