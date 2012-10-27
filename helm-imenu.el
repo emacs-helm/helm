@@ -102,9 +102,12 @@
   "Preconfigured `helm' for `imenu'."
   (interactive)
   (let ((imenu-auto-rescan t)
-        (imenu-default-goto-function 'imenu-default-goto-function))
+        (imenu-default-goto-function
+         (if (fboundp 'semantic-imenu-goto-function)
+             'semantic-imenu-goto-function
+             'imenu-default-goto-function)))
     (helm :sources 'helm-c-source-imenu
-        :buffer "*helm imenu*")))
+          :buffer "*helm imenu*")))
 
 (provide 'helm-imenu)
 
