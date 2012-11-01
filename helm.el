@@ -2954,7 +2954,8 @@ See also `helm-sources' docstring."
   (when buffer
     (with-current-buffer buffer
       (let ((start-point (if search-from-end (point-max) (point-min)))
-            (endp (if search-from-end #'bobp #'eobp)))
+            (endp (if search-from-end #'bobp #'eobp))
+            (inhibit-point-motion-hooks t))
         (goto-char (1- start-point))
         (if (string= pattern "")
             (helm-initial-candidates-from-candidate-buffer
