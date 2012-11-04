@@ -2308,6 +2308,9 @@ STRING is the output of PROCESS."
 (defun helm-execute-selection-action ()
   "Execute current action and kill the action buffer if present."
   (helm-log-run-hook 'helm-before-action-hook)
+  ;; Position can be different when `helm-current-buffer'
+  ;; is splitted, so jump to this position before executing action.
+  (helm-current-position 'restore)
   (unwind-protect
        (helm-execute-selection-action-1)
     (helm-aif (get-buffer helm-action-buffer)
