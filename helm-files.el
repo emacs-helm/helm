@@ -1302,7 +1302,9 @@ purpose."
           ;; candidate for `helm-ff-default-directory',
           ;; allowing `helm-ff-retrieve-last-expanded' to retrieve it
           ;; when descending level.
-          ((file-directory-p pattern)
+          ;; However, we don't add automatically the "/" when
+          ;; `helm-ff-auto-update-flag' is enabled to avoid quick expansion.
+          ((and (file-directory-p pattern) helm-ff-auto-update-flag)
            (file-name-as-directory pattern))
           ;; Return PATTERN unchanged.
           (t pattern))))
@@ -1310,7 +1312,11 @@ purpose."
 (defun helm-find-files-get-candidates (&optional require-match)
   "Create candidate list for `helm-c-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
-         (path-name-dir (if (file-directory-p path)
+         (path-name-dir (if (and (file-directory-p path)
+                                 ;; Don't add the "/" at the end
+                                 ;; of path when `helm-ff-auto-update-flag'
+                                 ;; is enabled.
+                                 helm-ff-auto-update-flag)
                             (file-name-as-directory path)
                             (file-name-directory path)))
          invalid-basedir
@@ -1354,10 +1360,17 @@ purpose."
           ((string= path "") (helm-ff-directory-files "/" t))
           ((and (file-directory-p path) (not (file-readable-p path)))
            (list (format "Opening directory: access denied, `%s'" path)))
-          ((file-directory-p path) (helm-ff-directory-files path t))
-          (t
-           (append (unless require-match (list path))
-                   (helm-ff-directory-files path-name-dir t))))))
+          ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
+          ;; is enabled.
+          ((and (file-directory-p path) helm-ff-auto-update-flag)
+           (helm-ff-directory-files path t))
+          (t (append (unless (or require-match
+                                 ;; When `helm-ff-auto-update-flag' has been
+                                 ;; disabled, whe don't want PATH to be added on top
+                                 ;; if it is a directory.
+                                 (file-directory-p path))
+                       (list path))
+                     (helm-ff-directory-files path-name-dir t))))))
 
 (defun helm-ff-directory-files (directory &optional full)
   "List contents of DIRECTORY.
