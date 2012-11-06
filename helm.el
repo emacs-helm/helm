@@ -1472,7 +1472,10 @@ window or frame configuration is saved/restored according to values of
 
 (defun helm-split-window-default-fn (window)
   (let (split-width-threshold)
-    (if (fboundp 'window-in-direction)
+    (if (and (fboundp 'window-in-direction)
+             ;; Don't try to split when starting in a minibuffer
+             ;; e.g M-: and try to use helm-show-kill-ring.
+             (not (minibufferp helm-current-buffer)))
         (if (or (one-window-p)
                 helm-split-window-in-side-p)
             (split-window
