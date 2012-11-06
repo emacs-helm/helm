@@ -2437,20 +2437,21 @@ Else return ACTIONS unmodified."
 
 (defun helm-c-ffap-line-candidates ()
   (with-helm-current-buffer
-    (helm-attrset 'ffap-line-location (helm-c-ffap-file-line-at-point)))
+    (helm-attrset 'ffap-line-location
+                  (helm-c-ffap-file-line-at-point)))
   (helm-aif (helm-attr 'ffap-line-location)
-      (destructuring-bind (file . line) it
-        (list (cons (format "%s (line %d)" file line) file)))))
+      (loop for (file . line) in (list it) collect
+            (cons (format "%s (line %d)" file line) file))))
 
 ;;; Goto line after opening file by `helm-c-source-ffap-line'.
 (defun helm-c-ffap-line-goto-line ()
-  (when (car (helm-attr 'ffap-line-location))
+  (helm-aif (helm-attr 'ffap-line-location)
     (unwind-protect
          (ignore-errors
            (with-selected-window
                (get-buffer-window
-                (get-file-buffer (car (helm-attr 'ffap-line-location))))
-             (helm-goto-line (cdr (helm-attr 'ffap-line-location)))))
+                (get-file-buffer (car it)))
+             (helm-goto-line (cdr it))))
       (helm-attrset 'ffap-line-location nil))))
 (add-hook 'helm-after-action-hook 'helm-c-ffap-line-goto-line)
 (add-hook 'helm-after-persistent-action-hook 'helm-c-ffap-line-goto-line)
@@ -2460,8 +2461,7 @@ Else return ACTIONS unmodified."
     (init . (lambda () (require 'ffap)))
     (candidates . helm-c-ffap-line-candidates)
     (keymap . ,helm-map)
-    (type . file)))
-
+    (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))))
 
 
 ;;; Outliner
