@@ -705,7 +705,9 @@ Keys description:
                        (match . helm-ff-match-function)
                        (candidates
                         . (lambda ()
-                            (append (and (not (file-exists-p helm-pattern))
+                            ;; Don't run `file-exists-p' if `helm-pattern' is remote.
+                            (append (and (not (file-remote-p helm-pattern))
+                                         (not (file-exists-p helm-pattern))
                                          (list helm-pattern))
                                     (if test
                                         (loop with hn = (helm-ff-tramp-hostnames)
