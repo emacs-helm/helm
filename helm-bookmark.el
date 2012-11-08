@@ -282,7 +282,6 @@ Return nil if bmk is not a valid bookmark."
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-bookmark.el ends here

@@ -74,7 +74,6 @@
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-elscreen.el ends here

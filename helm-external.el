@@ -211,7 +211,6 @@ You can set your own list of commands with
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-external ends here

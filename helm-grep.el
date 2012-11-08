@@ -1078,7 +1078,6 @@ See also `helm-do-grep-1'."
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-grep.el ends here

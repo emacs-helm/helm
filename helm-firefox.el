@@ -106,7 +106,6 @@ After closing firefox, you will be able to browse you bookmarks.
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-firefox.el ends here

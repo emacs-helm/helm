@@ -354,7 +354,6 @@ First call open the kill-ring browser, next calls move to next line."
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-ring.el ends here

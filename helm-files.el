@@ -2735,7 +2735,6 @@ Run all sources defined in `helm-for-files-preferred-list'."
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-files.el ends here

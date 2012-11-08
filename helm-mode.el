@@ -868,7 +868,6 @@ Note: This mode will work only partially on Emacs23."
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-mode.el ends here

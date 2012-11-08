@@ -167,7 +167,6 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el"
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-yaoddmuse.el ends here

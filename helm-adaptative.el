@@ -242,7 +242,6 @@ candidate can be in (DISPLAY . REAL) format."
 ;; byte-compile-warnings: (not cl-functions obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
-;; byte-compile-dynamic: t
 ;; End:
 
 ;;; helm-adaptative.el ends here
