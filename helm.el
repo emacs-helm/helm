@@ -644,21 +644,14 @@ Otherwise make a list with one element."
      ,@body))
 
 (defmacro with-helm-restore-variables(&rest body)
-  "Restore `helm-restored-variables' after executing BODY.
-`post-command-hook' is handled specially."
+  "Restore `helm-restored-variables' after executing BODY."
   (declare (indent 0) (debug t))
-  `(let ((--orig-vars (mapcar (lambda (v)
+  `(let ((orig-vars (mapcar (lambda (v)
                                 (cons v (symbol-value v)))
-                              helm-restored-variables))
-         (--post-command-hook-pair (cons post-command-hook
-                                         (default-value 'post-command-hook))))
-     (setq post-command-hook '(t))
-     (setq-default post-command-hook nil)
+                              helm-restored-variables)))
      (unwind-protect (progn ,@body)
-       (loop for (var . value) in --orig-vars
+       (loop for (var . value) in orig-vars
              do (set var value))
-       (setq post-command-hook (car --post-command-hook-pair))
-       (setq-default post-command-hook (cdr --post-command-hook-pair))
        (helm-log "restore variables"))))
 
 (defmacro with-helm-default-directory (directory &rest body)
@@ -1284,7 +1277,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-initialize any-resume any-input any-sources)
                    (helm-display-buffer helm-buffer)
                    (helm-log "show prompt")
-                   (unwind-protect
+                   (unwind-protect ; FIXME I can use here the unwind-protect form of helm-read-pattern-maybe.
                         (helm-read-pattern-maybe
                          any-prompt any-input any-preselect
                          any-resume any-keymap any-default
@@ -1393,7 +1386,6 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
   (helm-frame-or-window-configuration 'save)
   (setq helm-sources (helm-normalize-sources any-sources))
   (helm-log "sources = %S" helm-sources)
-  (helm-hooks 'setup)
   (helm-current-position 'save)
   (if (helm-resume-p any-resume)
       (helm-initialize-overlays (helm-buffer-get))
@@ -1578,7 +1570,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
            (src-keymap (assoc-default 'keymap src))
            (hist       (or any-history
                            ;; Needed for resuming. 
-                           (assoc-default 'history src))))
+                           (assoc-default 'history src)))
+           (timer nil))
       ;; Startup with the first keymap found either in current source
       ;; or helm arg, otherwise use global value of `helm-map'.
       ;; This map will be used as a `minibuffer-local-map'.
@@ -1602,9 +1595,19 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
              (let ((tap (or any-default
                             (with-helm-current-buffer
                               (thing-at-point 'symbol)))))
-               (read-from-minibuffer (or any-prompt "pattern: ")
-                                     any-input helm-map
-                                     nil hist tap t)))))))
+               (unwind-protect
+                    (minibuffer-with-setup-hook
+                        #'(lambda ()
+                            (setq timer (run-with-idle-timer
+                                         helm-input-idle-delay 'repeat
+                                         #'(lambda ()
+                                             (helm-check-minibuffer-input-1)
+                                             (helm-print-error-messages)))))
+                      (read-from-minibuffer (or any-prompt "pattern: ")
+                                            any-input helm-map
+                                            nil hist tap t)
+                      (when timer (cancel-timer timer) (setq timer nil)))
+                 (when timer (cancel-timer timer) (setq timer nil)))))))))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
@@ -1652,17 +1655,6 @@ if some when multiples sources are present."
             (make-overlay (point-min) (point-min) (get-buffer buffer)))
       (overlay-put helm-selection-overlay 'face 'helm-selection)))
 
-(defun helm-hooks (setup-or-cleanup)
-  "Add or remove hooks according to SETUP-OR-CLEANUP value.
-if SETUP-OR-CLEANUP value is setup add hooks, any other value
-will remove hooks.
-hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
-  (let ((hooks '((post-command-hook helm-check-minibuffer-input)
-                 (minibuffer-setup-hook helm-print-error-messages))))
-    (if (eq setup-or-cleanup 'setup)
-        (dolist (args hooks) (apply 'add-hook args))
-        (dolist (args (reverse hooks)) (apply 'remove-hook args)))))
-
 
 ;; Core: clean up
 
@@ -1682,7 +1674,6 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
   (helm-new-timer 'helm-check-minibuffer-input-timer nil)
   (helm-kill-async-processes)
   (helm-log-run-hook 'helm-cleanup-hook)
-  (helm-hooks 'cleanup)
   (helm-frame-or-window-configuration 'restore)
   (setq helm-alive-p nil)
   ;; This is needed in some cases where last input
@@ -1700,16 +1691,6 @@ hooks concerned are `post-command-hook' and `minibuffer-setup-hook'."
 
 
 ;; Core: input handling
-(defun helm-check-minibuffer-input ()
-  "Extract input string from the minibuffer and use it maybe."
-  (let ((delay (with-current-buffer helm-buffer
-                 (and helm-input-idle-delay
-                      (max helm-input-idle-delay 0.1)))))
-    (if (or (not delay) (helm-action-window))
-        (helm-check-minibuffer-input-1)
-        (helm-new-timer
-         'helm-check-minibuffer-input-timer
-         (run-with-idle-timer delay nil 'helm-check-minibuffer-input-1)))))
 
 (defun helm-check-minibuffer-input-1 ()
   "Check minibuffer content."
@@ -2379,7 +2360,7 @@ If action buffer is selected, back to the helm buffer."
                (helm-delete-minibuffer-contents)
                ;; Make `helm-pattern' differs from the previous value.
                (setq helm-pattern 'dummy)
-               (helm-check-minibuffer-input))))))
+               (helm-check-minibuffer-input-1))))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
@@ -2807,9 +2788,7 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
     (delete-minibuffer-contents)
     (insert pattern))
   (when noupdate
-    (setq helm-pattern pattern)
-    (helm-hooks 'cleanup)
-    (run-with-idle-timer 0 nil 'helm-hooks 'setup)))
+    (setq helm-pattern pattern)))
 
 ;;;###autoload
 (defun helm-delete-minibuffer-contents ()
