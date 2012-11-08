@@ -1605,8 +1605,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                                              (helm-print-error-messages)))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
-                                            nil hist tap t)
-                      (when timer (cancel-timer timer) (setq timer nil)))
+                                            nil hist tap t))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
 
 (defun helm-maybe-update-keymap ()
