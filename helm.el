@@ -1277,7 +1277,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-initialize any-resume any-input any-sources)
                    (helm-display-buffer helm-buffer)
                    (helm-log "show prompt")
-                   (unwind-protect ; FIXME I can use here the unwind-protect form of helm-read-pattern-maybe.
+                   (unwind-protect
                         (helm-read-pattern-maybe
                          any-prompt any-input any-preselect
                          any-resume any-keymap any-default
@@ -1601,7 +1601,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                             (setq timer (run-with-idle-timer
                                          helm-input-idle-delay 'repeat
                                          #'(lambda ()
-                                             (helm-check-minibuffer-input-1)
+                                             (helm-check-minibuffer-input)
                                              (helm-print-error-messages)))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
@@ -1691,7 +1691,7 @@ if some when multiples sources are present."
 
 ;; Core: input handling
 
-(defun helm-check-minibuffer-input-1 ()
+(defun helm-check-minibuffer-input ()
   "Check minibuffer content."
   (with-helm-quittable
     (with-selected-window (or (active-minibuffer-window)
@@ -2359,7 +2359,7 @@ If action buffer is selected, back to the helm buffer."
                (helm-delete-minibuffer-contents)
                ;; Make `helm-pattern' differs from the previous value.
                (setq helm-pattern 'dummy)
-               (helm-check-minibuffer-input-1))))))
+               (helm-check-minibuffer-input))))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)

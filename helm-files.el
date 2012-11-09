@@ -1184,7 +1184,7 @@ expand to this directory."
                     (helm-set-pattern
                      ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                      (expand-file-name (file-name-as-directory helm-pattern)))))
-              (helm-check-minibuffer-input-1))))))))
+              (helm-check-minibuffer-input))))))))
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 
 ;; Allow expanding to home directory or root
