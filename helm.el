@@ -1726,19 +1726,6 @@ Helm plug-ins are realized by this function."
    sources))
 
 
-;; Core: plug-in attribute documentation hack
-
-;; `helm-document-attribute' is public API.
-(defadvice documentation-property (after helm-document-attribute activate)
-  "Display plug-in attributes' documentation as `helm-sources' docstring."
-  (when (eq (ad-get-arg 0) 'helm-sources)
-    (setq ad-return-value
-          (concat ad-return-value "\n"
-                  (mapconcat (lambda (sym) (get sym 'helm-attrdoc))
-                             helm-additional-attributes
-                             "\n")))))
-
-
 ;; Core: all candidates
 (defun helm-process-delayed-init (source)
   "Initialize delayed SOURCE."
@@ -2818,14 +2805,6 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
   (add-to-list 'helm-types type t)
   (put type 'helm-typeattrdoc
        (concat "- " (symbol-name type) "\n\n" doc "\n")))
-
-(defadvice documentation-property (after helm-document-type-attribute activate)
-  "Display type attributes' documentation as `helm-type-attributes' docstring."
-  (when (eq (ad-get-arg 0) 'helm-type-attributes)
-    (setq ad-return-value
-          (concat ad-return-value "\n\n++++ Types currently defined ++++\n"
-                  (mapconcat (lambda (sym) (get sym 'helm-typeattrdoc))
-                             helm-types "\n")))))
 
 ;; Built-in plug-in: dummy
 (defun helm-dummy-candidate (candidate source)
