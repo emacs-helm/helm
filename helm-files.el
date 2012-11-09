@@ -1518,7 +1518,8 @@ See `helm-ff-transform-fname-for-completion'."
                                (progn (helm-previous-line)
                                       (helm-get-selection))
                                sel)))
-                  (helm-mark-current-line))))
+                  (helm-mark-current-line)))
+        (helm-timer-suspended-p t))
     (setq presel (if (and helm-ff-transformer-show-only-basename
                           (not (helm-ff-dot-file-p presel)))
                      (helm-c-basename presel) presel))
