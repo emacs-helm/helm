@@ -493,9 +493,6 @@ It is disabled by default because *Helm Log* grows quickly.")
   "Default functions to match candidates according to `helm-pattern'.")
 (defvar helm-process-delayed-sources-timer nil)
 (defvar helm-update-blacklist-regexps '("^" "$" "!" " " "\\b" "\\<" "\\>" "\\<_" "\\>_"))
-(defvar helm-timer-suspended-p nil
-  "Allow to suspend helm timer.
-This should not be set globally, unless you are sure value will be restored.")
 
 
 ;; Utility: logging
@@ -1604,7 +1601,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                             (setq timer (run-with-idle-timer
                                          helm-input-idle-delay 'repeat
                                          #'(lambda ()
-                                             (unless helm-timer-suspended-p
+                                             ;; Don't update when in persistent action.
+                                             (unless helm-in-persistent-action
                                                (helm-check-minibuffer-input)
                                                (helm-print-error-messages))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
