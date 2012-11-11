@@ -282,8 +282,9 @@ your eshell aliases. This allow you creating personal actions for
 
 -   Because eshell accept shell commands but also elisp functions.
 
-All these command should end with https://github.com/emacs-helm/helm/blob/master/doc/Home.mdpp. You will have completion against
-all these aliases once eshell is loaded. (start it once before using
+All these command should end with `$1`.
+
+You will have completion against all these aliases once eshell is loaded (start it once before using
 helm-find-files).
 
 ## Setup Aliases
