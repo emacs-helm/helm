@@ -11,7 +11,7 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 
 # Wiki maintainer instructions
 
-1. Checkout wiki repo at https://github.com/emacs-helm/helm.wiki.git
+1. Checkout wiki repo at git@github.com:emacs-helm/helm.wiki.git
 2. Get markdown-pp at https://github.com/thierryvolpiatto/markdown-pp.git
 3. Install markdown-pp
 
@@ -29,7 +29,7 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
    `$ path/to/markdown-pp.py Home.mdpp Home.md`
 
    See the [Readme][2] for more details.
-6. Merge the resulting file `Home.md` with the one on [helm wiki repo](https://github.com/emacs-helm/helm.wiki.git).
+6. Merge the resulting file `Home.md` with the one on the helm wiki repo you checked out in 1.
 
 
 # Install
