@@ -23,12 +23,14 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
    
    `$ sudo python setup.py install`
    
-4. Edit on helm wiki repo `Home.mdpp` NOT `Home.md`!
+4. Edit on helm repo `Home.mdpp`.
 5. Run markdown.pp.py: (This will create the table of contents)
 
    `$ path/to/markdown-pp.py Home.mdpp Home.md`
 
-   See the readme for more details.
+   See the [Readme][2] for more details.
+6. Merge the resulting file `Home.md` with the one on [helm wiki repo](https://github.com/emacs-helm/helm.wiki.git).
+
 
 # Install
 
@@ -1135,3 +1137,4 @@ Or at gmane: [gmane.emacs.helm.user](http://dir.gmane.org/gmane.emacs.helm.user)
 
 
 [1]: https://github.com/emacs-helm/helm/blob/master/doc/Home.mdpp
+[2]: https://github.com/thierryvolpiatto/markdown-pp#readme
