@@ -1849,17 +1849,6 @@ If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
       (or (cdr it) 99999999)
     (or helm-candidate-number-limit 99999999)))
 
-(defun helm-compute-matches (source)
-  "Compute matched results from SOURCE according to its settings."
-  (if debug-on-error
-      (helm-compute-matches-internal source)
-      (condition-case v
-          (helm-compute-matches-internal source)
-        (error (helm-log-error
-                "helm-compute-matches: error when processing source: %s"
-                (assoc-default 'name source))
-               nil))))
-
 (defun helm-candidate-get-display (candidate)
   "Get searched display part from CANDIDATE.
 CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
@@ -1924,7 +1913,7 @@ and `helm-pattern'."
       (invalid-regexp (setq matches nil)))
     matches))
 
-(defun helm-compute-matches-internal (source)
+(defun helm-compute-matches (source)
   (save-current-buffer
     (let ((matchfns (helm-match-functions source))
           (helm-source-name (assoc-default 'name source))
