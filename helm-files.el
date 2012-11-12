@@ -1324,6 +1324,7 @@ purpose."
     (set-text-properties 0 (length path) nil path)
     ;; Issue #118 allow creation of newdir+newfile.
     (unless (or (string= path "Invalid tramp file name")
+                (string= path "")
                 (file-directory-p (file-name-directory path)))
       (setq invalid-basedir t))
     ;; Don't set now `helm-pattern' if `path' == "Invalid tramp file name"
