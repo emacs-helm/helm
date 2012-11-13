@@ -1914,6 +1914,12 @@ and `helm-pattern'."
     matches))
 
 (defun helm-compute-matches (source)
+  "Compute matched results from SOURCE according to its settings."
+  (condition-case nil
+      (helm-compute-matches-internal source)
+    (error nil)))
+
+(defun helm-compute-matches-internal (source)
   (save-current-buffer
     (let ((matchfns (helm-match-functions source))
           (helm-source-name (assoc-default 'name source))
