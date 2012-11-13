@@ -381,7 +381,7 @@ the center of window, otherwise at the top of window.")
                  (copy-sequence helm-compile-source-functions))))
       (when (and (helm-region-active-p)
                  ;; Don't narrow to region if buffer is already narrowed.
-                 (not (helm-current-buffer-narrowed-p)))
+                 (not (helm-current-buffer-narrowed-p (current-buffer))))
         (narrow-to-region (region-beginning) (region-end)))
       (helm :sources helm-c-source-regexp
             :buffer "*helm regexp*"
