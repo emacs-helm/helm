@@ -750,7 +750,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   ;; so don't split until grep line is valid, that is
   ;; once the second part of the line comes with next chunk
   ;; send by process.
-  (when (string-match "^\\(.*\\):\\([0-9]+\\):\\(.*\\)" line)
+  (when (string-match "^\\([^:]*\\):\\([0-9]+\\):\\(.*\\)" line)
     ;; Don't use split-string because buffer/file name or string
     ;; may contain a ":".
     (loop for n from 1 to 3 collect (match-string n line))))
