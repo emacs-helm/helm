@@ -1879,9 +1879,9 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
      (when (= ,item-count ,limit) (return))))
 
 (defun helm-take-first-elements (seq n)
-  (if (> (length seq) n)
-      (setq seq (subseq seq 0 n))
-      seq))
+  "Return the N first element of SEQ if SEQ is longer than N.
+It is used to narrow down list of candidates to `helm-candidate-number-limit'."
+  (if (> (length seq) n) (subseq seq 0 n) seq))
 
 (defun* helm-set-case-fold-search (&optional (pattern helm-pattern))
   "Used to set the value of `case-fold-search' in helm.
