@@ -386,7 +386,10 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split        (helm-c-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
-         (loc-fname    (or (with-current-buffer helm-buffer
+         (loc-fname    (or (with-current-buffer
+                               (if (eq major-mode 'helm-grep-mode)
+                                   "*hgrep*"
+                                   helm-buffer)
                              (get-text-property (point-at-bol) 'help-echo))
                            (car split)))
          (tramp-method (file-remote-p helm-ff-default-directory 'method))
