@@ -492,7 +492,8 @@ It is disabled by default because *Helm Log* grows quickly.")
           (string-match helm-pattern candidate)))
   "Default functions to match candidates according to `helm-pattern'.")
 (defvar helm-process-delayed-sources-timer nil)
-(defvar helm-update-blacklist-regexps '("^" "$" "!" " " "\\b" "\\<" "\\>" "\\<_" "\\>_"))
+(defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
+                                        "\\<" "\\>" "\\<_" "\\>_"))
 
 
 ;; Utility: logging
