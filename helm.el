@@ -1622,7 +1622,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
   "Enable or disable update of display in helm.
 This can be useful for e.g writing quietly a complex regexp."
   (interactive)
-  (setq helm-suspend-update-flag (not helm-suspend-update-flag))
+  (when (setq helm-suspend-update-flag (not helm-suspend-update-flag))
+    (helm-kill-async-processes)
+    (setq helm-pattern ""))
   (message (if helm-suspend-update-flag
                "Helm update suspended!"
                "Helm update reenabled!")))
