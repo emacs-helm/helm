@@ -47,7 +47,7 @@
 ;;
 (defvar helm-command-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "a")         'helm-c-apropos)
+    (define-key map (kbd "a")         'helm-apropos-at-point)
     (define-key map (kbd "e")         'helm-c-etags-select)
     (define-key map (kbd "l")         'helm-locate)
     (define-key map (kbd "s")         'helm-surfraw)
