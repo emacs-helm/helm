@@ -86,6 +86,7 @@
     (define-key map (kbd "C-c C-u")    'helm-force-update)
     (define-key map (kbd "M-p")        'previous-history-element)
     (define-key map (kbd "M-n")        'next-history-element)
+    (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Debugging command
@@ -494,6 +495,7 @@ It is disabled by default because *Helm Log* grows quickly.")
 (defvar helm-process-delayed-sources-timer nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\<_" "\\>_"))
+(defvar helm-suspend-update-flag nil)
 
 
 ;; Utility: logging
@@ -1531,6 +1533,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
   (setq helm-current-prefix-arg nil)
+  (setq helm-suspend-update-flag nil)
   (setq helm-delayed-init-executed nil)
   (setq helm-current-buffer
         (if (minibuffer-window-active-p (minibuffer-window))
@@ -1602,14 +1605,27 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
                             (setq timer (run-with-idle-timer
                                          helm-input-idle-delay 'repeat
                                          #'(lambda ()
-                                             ;; Don't update when in persistent action.
-                                             (unless helm-in-persistent-action
+                                             ;; Stop updating when in persistent action
+                                             ;; or when `helm-suspend-update-flag' is
+                                             ;; non--nil.
+                                             (unless (or helm-in-persistent-action
+                                                         helm-suspend-update-flag)
                                                (helm-check-minibuffer-input)
                                                (helm-print-error-messages))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
                                             nil hist tap t))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
+
+;;;###autoload
+(defun helm-toggle-suspend-update ()
+  "Enable or disable update of display in helm.
+This can be useful for e.g writing quietly a complex regexp."
+  (interactive)
+  (setq helm-suspend-update-flag (not helm-suspend-update-flag))
+  (message (if helm-suspend-update-flag
+               "Helm update suspended!"
+               "Helm update reenabled!")))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
