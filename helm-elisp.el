@@ -369,6 +369,24 @@ a double quote or between."
                     helm-c-source-helm-attributes))
           :buffer "*helm apropos*")))
 
+;;;###autoload
+(defun helm-apropos-at-point (prefix)
+  "Preconfigured helm to describe commands, functions, variables and faces.
+When prefix is given, initial input is the symbol at point. "
+  (interactive "P")
+  (let ((default (thing-at-point 'symbol)))
+    (helm :sources
+          (mapcar (lambda (func)
+                    (funcall func default))
+                  '(helm-c-source-emacs-commands
+                    helm-c-source-emacs-functions
+                    helm-c-source-emacs-variables
+                    helm-c-source-emacs-faces
+                    helm-c-source-helm-attributes))
+          :buffer "*helm apropos*"
+          :input  (and prefix default))))
+
+
 
 ;;; Advices
 ;;
