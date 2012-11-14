@@ -970,7 +970,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
   (let* ((helm-compile-source-functions
           ;; rule out helm-match-plugin because the input is one regexp.
           (delq 'helm-compile-source--match-plugin
-                (copy-sequence helm-compile-source-functions))))
+                (copy-sequence helm-compile-source-functions)))
+         helm-grep-in-recurse) ; recursion is never used in pdfgrep.
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
