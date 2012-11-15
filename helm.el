@@ -1032,15 +1032,15 @@ to VALUE by `helm-create-helm-buffer'."
   "Current line string without properties."
   (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
 
-(defun helm-funcall-with-source (source func &rest args)
-  "Call from SOURCE FUNC list or single function FUNC with ARGS.
-FUNC can be a symbol or a list of functions.
+(defun helm-funcall-with-source (source functions &rest args)
+  "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
+FUNCTIONS can be a symbol or a list of functions.
 Return the result of last function call."
   (let ((helm-source-name (assoc-default 'name source))
-        result)
-    (helm-log-eval helm-source-name func args)
-    (dolist (func (if (functionp func) (list func) func) result)
-      (setq result (apply func args)))))
+        (funs (if (functionp functions) (list functions) functions)))
+    (helm-log-eval helm-source-name functions args)
+    (loop with result for fn in funs
+          do (setq result (apply fn args)) finally return result)))
 
 (defun helm-funcall-foreach (sym)
   "Call the function SYM for each source if any."
