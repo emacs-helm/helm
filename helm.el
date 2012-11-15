@@ -477,7 +477,6 @@ It is disabled by default because *Helm Log* grows quickly.")
   "Internal, store locally `helm-pattern' value for later use in `helm-resume'.")
 (defvar helm-source-name nil)
 (defvar helm-candidate-buffer-alist nil)
-(defvar helm-check-minibuffer-input-timer nil)
 (defvar helm-match-hash (make-hash-table :test 'equal))
 (defvar helm-cib-hash (make-hash-table :test 'equal))
 (defvar helm-tick-hash (make-hash-table :test 'equal))
@@ -492,7 +491,6 @@ It is disabled by default because *Helm Log* grows quickly.")
   (list (lambda (candidate)
           (string-match helm-pattern candidate)))
   "Default functions to match candidates according to `helm-pattern'.")
-(defvar helm-process-delayed-sources-timer nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\<_" "\\>_"))
 (defvar helm-suspend-update-flag nil)
@@ -1119,12 +1117,6 @@ This is used in transformers to modify candidates list."
                (helm-compose args funcs))
              args)))
 
-(defun helm-new-timer (variable timer)
-  "Give VARIABLE value to TIMER and cancel old timer."
-  (helm-aif (symbol-value variable)
-      (cancel-timer it))
-  (set variable timer))
-
 
 ;; Core: entry point
 (defconst helm-argument-keys
@@ -1691,7 +1683,6 @@ if some when multiples sources are present."
     (bury-buffer)
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
-  (helm-new-timer 'helm-check-minibuffer-input-timer nil)
   (helm-kill-async-processes)
   (helm-log-run-hook 'helm-cleanup-hook)
   (helm-frame-or-window-configuration 'restore)
@@ -2061,15 +2052,13 @@ is done on whole `helm-buffer' and not on current source."
                                        for d = (assoc-default 'delayed s)
                                        when d do (setq delay (max delay d))
                                        finally return delay)))
-            (helm-new-timer
-             'helm-process-delayed-sources-timer
-             (run-with-idle-timer
-              ;; Be sure helm-idle-delay is >
-              ;; to helm-input-idle-delay
-              ;; otherwise use value of helm-input-idle-delay
-              ;; or 0.1 if == to 0.
-              (max helm-idle-delay helm-input-idle-delay 0.1) nil
-              'helm-process-delayed-sources delayed-sources preselect))))
+            (run-with-idle-timer
+             ;; Be sure helm-idle-delay is >
+             ;; to helm-input-idle-delay
+             ;; otherwise use value of helm-input-idle-delay
+             ;; or 0.1 if == to 0.
+             (max helm-idle-delay helm-input-idle-delay 0.1) nil
+             'helm-process-delayed-sources delayed-sources preselect)))
         (helm-log "end update")))))
 
 (defun helm-update-source-p (source)
