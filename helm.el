@@ -1101,8 +1101,20 @@ It is used to check if candidate number is 0, 1, or 2+."
 (defun helm-compose (arg-lst func-lst)
   "Apply arguments specified in ARG-LST with each function of FUNC-LST.
 The result of each function will be the new `car' of ARG-LST.
-
-This function allows easy sequencing of transformer functions."
+Each function in FUNC-LST must accept (length ARG-LST) arguments.
+This function allows easy sequencing of transformer functions.
+Where generally, ARG-LST is '(candidates-list source) and FUNC-LST a
+list of transformer functions that take one or two arguments depending
+we are using 'filtered-candidate-transformer' or 'candidate-transformer'.
+e.g
+\(helm-compose '((1 2 3 4 5 6 7)
+                '(\"a\" \"b\" \"c\" \"d\" \"e\"))
+              '((lambda (candidates source)
+                  (loop for i in candidates
+                        when (oddp i) collect i))
+                (lambda (candidates source)
+                  (loop for i in candidates collect (1+ i)))))
+=>(2 4 6 8)."
   (dolist (func func-lst)
     (setcar arg-lst (apply func arg-lst)))
   (car arg-lst))
@@ -1557,7 +1569,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
                                 any-preselect any-resume any-keymap
                                 any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
-For ANY-PRESELECT ANY-RESUME ANY-KEYMAP, See `helm'."
+For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
   (if (and (helm-resume-p any-resume) (not (helm-empty-buffer-p)))
       (helm-mark-current-line t)
       (helm-update any-preselect))
@@ -1806,22 +1818,24 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
         collect (funcall function arg)))
 
 (defun helm-process-candidate-transformer (candidates source)
-  "Execute candidate-transformer function on all CANDIDATES of SOURCE."
+  "Execute `candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'candidate-transformer source)
       (helm-composed-funcall-with-source source it candidates)
     candidates))
 
 (defun helm-process-filtered-candidate-transformer (candidates source)
-  "Execute filtered-candidate-transformer function on all CANDIDATES of SOURCE."
+  "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'filtered-candidate-transformer source)
       (helm-composed-funcall-with-source source it candidates source)
     candidates))
 
 (defun helm-process-filtered-candidate-transformer-maybe
     (candidates source process-p)
-  "Execute filtered-candidate-transformer function on all CANDIDATES of SOURCE.
-This happen if PROCESS-P is non-nil."
+  "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE.
+When PROCESS-P is non-nil execute `filtered-candidate-transformer'
+functions if some, otherwise return CANDIDATES."
   (if process-p
+      ;; When no filter return CANDIDATES unmodified.
       (helm-process-filtered-candidate-transformer candidates source)
       candidates))
 
@@ -1840,7 +1854,10 @@ This happen if PROCESS-P is non-nil."
 
 (defun helm-transform-candidates (candidates source &optional process-p)
   "Transform CANDIDATES of SOURCE according to candidate transformers.
-This happen if PROCESS-P is non-nil."
+When PROCESS-P is non-nil execute the `filtered-candidate-transformer' functions
+otherwise only the `candidate-transformer' functions are processed.
+When attribute `real-to-display' is present, execute its function on all maybe
+filtered CANDIDATES."
   (helm-process-real-to-display
    (helm-process-filtered-candidate-transformer-maybe
     (helm-process-candidate-transformer candidates source) source process-p)
