@@ -1436,10 +1436,15 @@ See `helm-ff-transform-fname-for-completion'."
   (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
 
 (defun helm-ff-save-history ()
-  "Store the last value of `helm-ff-default-directory' in `helm-ff-history'."
+  "Store the last value of `helm-ff-default-directory' in `helm-ff-history'.
+
+Store the selected file-name in the `file-name-history'."
   (when (and helm-ff-default-directory
              (helm-file-completion-source-p))
-    (push helm-ff-default-directory helm-ff-history)))
+    (push helm-ff-default-directory helm-ff-history)
+    ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
+    ;; and we don't want to introduce duplicates.
+    (add-to-history 'file-name-history (abbreviate-file-name (helm-get-selection)))))
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
 
 (defun helm-ff-valid-symlink-p (file)
