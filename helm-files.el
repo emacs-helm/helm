@@ -1400,15 +1400,15 @@ return FNAME unchanged."
     (if (or (not helm-ff-smart-completion)
             (memq helm-mp-matching-method
                   helm-ff-smart-completion-incompatible-methods)
-            (string-match "\\s-" bn)     ; Fall back to match-plugin.
+            (string-match "\\s-" bn)      ; Fall back to match-plugin.
             (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
-            (string-match "/$" fname)    ; Allow mkdir.
+            (string-match "/$" fname)     ; Allow mkdir.
             (file-directory-p fname)
             (string-match helm-ff-url-regexp fname))
         ;; Don't treat wildcards ("*") as regexp char.
         ;; (e.g ./foo/*.el => ./foo/[*].el)
         (replace-regexp-in-string "[*]" "[*]" fname)
-        (setq bn (if (> (length bn) 2) ; Normal completion on first 2 char.
+        (setq bn (if (> (length bn) 1) ; wait 2nd char before concating.
                      (helm-ff-mapconcat-candidate bn)
                      bn))
         (concat (file-name-directory fname) bn))))
@@ -1416,19 +1416,21 @@ return FNAME unchanged."
 (defun helm-ff-mapconcat-candidate (candidate)
   "Transform string CANDIDATE in regexp.
 See `helm-ff-transform-fname-for-completion'."
-  (loop with ls with last-elm
+  (loop with ls
         for i in (split-string candidate "" t)
-        for rev = (reverse ls)
         if (member i (list "." "$" "^"))
+        ;; If we have such a character, remove
+        ;; the previously inserted ".*"
         do (and ls
                 (setq ls (append (butlast ls)
                                  (list (replace-regexp-in-string
                                         "[.*]" "" (car (reverse ls)))))))
+        ;; Treat "." as a character, not a regexp composant.
         and collect (if (string= i ".") "[.]" i) into ls
         else
         collect (concat i ".*") into ls
-        do (setq last-elm i)
-        finally return (mapconcat 'identity ls "")))
+        finally return
+        (concat ".*" (mapconcat 'identity ls ""))))
 
 (defun helm-dir-is-dot (dir)
   (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
