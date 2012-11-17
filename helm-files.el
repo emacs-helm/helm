@@ -1615,7 +1615,8 @@ is non--nil."
                        (helm-c-basename i) i)
         for type = (car (file-attributes i))
         collect
-        (cond (;; A not already saved file.
+        (cond ((string-match "access denied" i) i)
+              (;; A not already saved file.
                (and (stringp type)
                     (not (helm-ff-valid-symlink-p i))
                     (not (string-match "^\.#" (helm-c-basename i))))
