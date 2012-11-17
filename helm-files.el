@@ -1596,7 +1596,7 @@ return FNAME prefixed with [?]."
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
 
-(defun helm-c-find-files-transformer (files sources)
+(defun helm-c-find-files-transformer (files source)
   "Transformer for `helm-c-source-find-files'.
 Tramp files are not highlighted unless `helm-ff-tramp-not-fancy'
 is non--nil."
@@ -1608,10 +1608,12 @@ is non--nil."
                 (if (helm-dir-is-dot i)
                     i (cons (helm-c-basename i) i)))
           files)
-      (helm-ff-highlight-files files sources)))
+      (helm-ff-highlight-files files)))
 
-(defun helm-ff-highlight-files (files sources)
-  "Candidate transformer for `helm-c-source-find-files' without icons."
+(defun helm-ff-highlight-files (files)
+  "Candidate transformer function for `helm-c-source-find-files'.
+Don't use it directly in `filtered-candidate-transformer' use instead
+`helm-c-find-files-transformer'."
   (loop for i in files
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot i))
