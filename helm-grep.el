@@ -451,7 +451,7 @@ WHERE can be one of other-window, elscreen, other-frame."
             do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (set (make-local-variable 'buffer-read-only) t)
+      (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
         (insert "-*- mode: helm-grep -*-\n\n"
