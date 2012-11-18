@@ -198,6 +198,8 @@ Where '%f' format spec is filename and '%p' is page number"
 It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defvar helm-pdfgrep-targets nil)
 (defvar helm-grep-last-cmd-line nil)
+(defvar helm-grep-cmd-line nil)
+(make-variable-buffer-local 'helm-grep-cmd-line)
 
 (defun helm-c-grep-prepare-candidates (candidates)
   "Prepare filenames and directories CANDIDATES for grep command line."
@@ -454,13 +456,17 @@ WHERE can be one of other-window, elscreen, other-frame."
       (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (insert "-*- mode: helm-grep -*-\n\n"
-                (format "Grep Results for `%s':\n\n" helm-pattern))
+        (insert "-*- mode: helm-grep -*-  Press \"g\" to run Emacs grep.\n\n"
+                (format "Grep Results for `%s':\n\n" helm-pattern)
+                )
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max))))))
-      (helm-grep-mode) (pop-to-buffer buf))
+      (helm-grep-mode)
+      (pop-to-buffer buf)
+      (setq default-directory helm-grep-last-default-directory)
+      (setq helm-grep-cmd-line helm-grep-last-cmd-line))
     (message "Helm Grep Results saved in `%s' buffer" buf)))
 
 (defvar helm-grep-mode-map
@@ -468,6 +474,7 @@ WHERE can be one of other-window, elscreen, other-frame."
     (define-key map (kbd "RET")      'helm-grep-mode-jump)
     (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
     (define-key map (kbd "q")        'helm-grep-mode-quit)
+    (define-key map (kbd "g")        'helm-grep-run-real-grep)
     (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
     (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
@@ -532,6 +539,10 @@ Special commands:
     (condition-case nil
         (helm-c-grep-action candidate 'other-window)
       (error nil))))
+
+(defun helm-grep-run-real-grep ()
+  (interactive)
+  (grep helm-grep-cmd-line))
 
 (defun helm-c-grep-persistent-action (candidate)
   "Persistent action for `helm-do-grep'.
