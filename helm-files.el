@@ -2417,7 +2417,8 @@ Else return ACTIONS unmodified."
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
     (candidates . helm-c-file-cache-files)
-    (match helm-c-match-on-file-name)
+    (match helm-c-match-on-file-name
+           helm-c-match-on-directory-name)
     (type . file)))
 
 ;;; ffap
