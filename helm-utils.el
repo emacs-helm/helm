@@ -283,10 +283,6 @@ With a numeric prefix arg show only the ARG number of candidates."
   (helm-aif (file-name-directory candidate)
       (string-match helm-pattern it)))
 
-(defun helm-c-match-on-basename (candidate)
-  "Return non-nil if `helm-pattern' match basename of filename CANDIDATE."
-  (string-match helm-pattern (helm-c-basename candidate)))
-
 (defun helm-c-string-match (candidate)
   "Return non-nil if `helm-pattern' match CANDIDATE.
 The match is done with `string-match'."
