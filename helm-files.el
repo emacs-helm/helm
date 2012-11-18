@@ -2513,7 +2513,8 @@ Else return ACTIONS unmodified."
 (defvar helm-c-source-file-name-history
   '((name . "File Name History")
     (candidates . file-name-history)
-    (match-strict . helm-c-match-on-basename)
+    (match-strict helm-c-match-on-file-name
+                  helm-c-match-on-directory-name)
     (type . file)))
 
 (defvar helm-c-source-ff-file-name-history
@@ -2526,7 +2527,8 @@ Else return ACTIONS unmodified."
                     (if helm-ff-file-name-history-use-recentf
                         recentf-list
                         file-name-history)))
-    (match-strict . helm-c-match-on-basename)
+    (match-strict helm-c-match-on-file-name
+                  helm-c-match-on-directory-name)
     (candidate-number-limit . ,history-length)
     (action . (("find file in helm"
                 . (lambda (candidate)
