@@ -319,6 +319,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-down-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-down-one-level)
+    (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c ?")         'helm-read-file-name-help)
     (when helm-ff-lynx-style-map
