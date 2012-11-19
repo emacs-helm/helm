@@ -245,14 +245,14 @@ Return an alist with elements like (data . number_results)."
 ;;
 ;;
 ;; If default setting of `w3m-command' is not
-;; what you want you and you modify it, you will have to reeval
+;; what you want and you modify it, you will have to reeval
 ;; also `helm-browse-url-default-browser-alist'.
-(defvar w3m-command "/usr/bin/w3m")
 
 (defvar helm-browse-url-chromium-program "chromium-browser")
 (defvar helm-browse-url-uzbl-program "uzbl-browser")
 (defvar helm-browse-url-default-browser-alist
-  `((,w3m-command . w3m-browse-url)
+  `((,(or (and (boundp 'w3m-command) w3m-command)
+          "/usr/bin/w3m") . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
     (,helm-browse-url-chromium-program . helm-browse-url-chromium)
     (,helm-browse-url-uzbl-program . helm-browse-url-uzbl)
@@ -292,7 +292,8 @@ Return an alist with elements like (data . number_results)."
   "Find the first available browser and ask it to load URL."
   (let ((default-browser-fn
          (loop for (exe . fn) in helm-browse-url-default-browser-alist
-               thereis (and exe (executable-find exe) fn))))
+               thereis (and exe (executable-find exe)
+                            (and (fboundp fn) fn)))))
     (if default-browser-fn
         (apply default-browser-fn url args)
         (error "No usable browser found"))))
