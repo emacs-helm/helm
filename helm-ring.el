@@ -61,7 +61,11 @@ If nil or zero, don't truncate candidate, show all."
     (init . (lambda () (helm-attrset 'last-command last-command)))
     (candidates . helm-c-kill-ring-candidates)
     (filtered-candidate-transformer helm-c-kill-ring-transformer)
-    (action . helm-c-kill-ring-action)
+    (action . (("Yank" . helm-c-kill-ring-action)
+               ("Delete" . (lambda (candidate)
+                             (loop for cand in (helm-marked-candidates)
+                                   do (setq kill-ring
+                                            (delete cand kill-ring)))))))
     (keymap . ,helm-kill-ring-map)
     (last-command)
     (migemo)
