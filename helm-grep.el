@@ -390,7 +390,7 @@ WHERE can be one of other-window, elscreen, other-frame."
          (lineno       (string-to-number (nth 1 split)))
          (loc-fname    (or (with-current-buffer
                                (if (eq major-mode 'helm-grep-mode)
-                                   "*hgrep*"
+                                   (current-buffer)
                                    helm-buffer)
                              (get-text-property (point-at-bol) 'help-echo))
                            (car split)))
