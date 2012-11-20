@@ -1633,6 +1633,14 @@ This can be useful for e.g writing quietly a complex regexp."
                "Helm update suspended!"
                "Helm update reenabled!")))
 
+(declare-function tramp-read-passwd "tramp" (proc &optional prompt))
+(defadvice tramp-read-passwd (around disable-helm-update activate)
+  ;; Suspend update when prompting for a tramp password.
+  (setq helm-suspend-update-flag t)
+  (unwind-protect
+       ad-do-it
+    (setq helm-suspend-update-flag nil)))
+
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
 This function is meant to be run in `helm-move-selection-after-hook'.
