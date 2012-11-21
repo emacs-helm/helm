@@ -1961,13 +1961,14 @@ and `helm-pattern'."
           (limit (helm-candidate-number-limit source))
           (helm-pattern (helm-process-pattern-transformer
                          helm-pattern source)))
-      (helm-process-filtered-candidate-transformer
-       (if (or (equal helm-pattern "") (equal matchfns '(identity)))
-           (helm-take-first-elements
-            (helm-get-cached-candidates source) limit)
-           (helm-match-from-candidates
-            (helm-get-cached-candidates source) matchfns limit))
-       source))))
+      (while-no-input
+        (helm-process-filtered-candidate-transformer
+         (if (or (equal helm-pattern "") (equal matchfns '(identity)))
+             (helm-take-first-elements
+              (helm-get-cached-candidates source) limit)
+             (helm-match-from-candidates
+              (helm-get-cached-candidates source) matchfns limit))
+         source)))))
 
 (defun helm-process-source (source)
   "Display matched results from SOURCE according to its settings."
