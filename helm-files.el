@@ -2434,8 +2434,6 @@ Else return ACTIONS unmodified."
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
     (candidates . helm-c-file-cache-files)
-    (match helm-c-match-on-file-name
-           helm-c-match-on-directory-name)
     (type . file)))
 
 ;;; ffap
@@ -2531,12 +2529,10 @@ Else return ACTIONS unmodified."
 (defvar helm-c-source-file-name-history
   '((name . "File Name History")
     (candidates . file-name-history)
-    (match-strict helm-c-match-on-file-name
-                  helm-c-match-on-directory-name)
     (type . file)))
 
 (defvar helm-c-source-ff-file-name-history
-  `((name . "File name history")
+  '((name . "File name history")
     (init . (lambda ()
               (when helm-ff-file-name-history-use-recentf
                 (require 'recentf)
@@ -2545,9 +2541,6 @@ Else return ACTIONS unmodified."
                     (if helm-ff-file-name-history-use-recentf
                         recentf-list
                         file-name-history)))
-    (match-strict helm-c-match-on-file-name
-                  helm-c-match-on-directory-name)
-    (candidate-number-limit . ,history-length)
     (action . (("find file in helm"
                 . (lambda (candidate)
                     (helm-set-pattern
@@ -2612,7 +2605,7 @@ and
 
 ;;; session.el files
 ;;
-;;  sesion (http://emacs-session.sourceforge.net/) is an alternative to
+;;  session (http://emacs-session.sourceforge.net/) is an alternative to
 ;;  recentf that saves recent file history and much more.
 (defvar helm-c-source-session
   `((name . "Session")
@@ -2621,8 +2614,6 @@ and
                                        (or (string-match tramp-file-name-regexp f)
                                            (file-exists-p f)))
                                    (mapcar 'car session-file-alist))))
-    (match helm-c-match-on-file-name
-           helm-c-match-on-directory-name)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
