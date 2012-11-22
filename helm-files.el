@@ -1391,12 +1391,14 @@ systems."
 ;; Internal
 (defvar helm-ff-smart-completion-incompatible-methods '(multi1 multi3p))
 (defun helm-ff-transform-fname-for-completion (fname)
-  "Return FNAME with it's basename modified as a regexp.
-e.g foo => f.*o.*o.*
-Treat special characters (\"^\" \".\" \"$\") differently:
-e.g ^helm.el$ => \"^h.*e.*l.*m[.]e.*l$\"
-If basename contain one or more space or if FNAME is a valid directory name,
-return FNAME unchanged."
+  "Maybe return FNAME with it's basename modified as a regexp.
+This happen only when `helm-ff-smart-completion' is enabled.
+This provide a similar feature as `ido-enable-flex-matching'.
+See `helm-ff-mapconcat-candidate'.
+If FNAME is an url returns it unmodified.
+When FNAME contain a space fallback to match-plugin.
+If basename contain one or more space fallback to match-plugin.
+If FNAME is a valid directory name,return FNAME unchanged."
   (let ((bn (helm-c-basename fname)))
     (if (or (not helm-ff-smart-completion)
             (memq helm-mp-matching-method
@@ -1416,7 +1418,10 @@ return FNAME unchanged."
 
 (defun helm-ff-mapconcat-candidate (candidate)
   "Transform string CANDIDATE in regexp.
-See `helm-ff-transform-fname-for-completion'."
+e.g foo => f.*o.*o.*
+Treat special characters (\"^\" \".\" \"$\") differently:
+e.g helm.el$  => \".*h.*e.*l.*m[.]e.*l$\"
+    ^helm.el$ => \"h.*e.*l.*m[.]e.*l$\"."
   (loop with ls
         for i in (split-string candidate "" t)
         if (member i (list "." "$" "^"))
@@ -1431,7 +1436,11 @@ See `helm-ff-transform-fname-for-completion'."
         else
         collect (concat i ".*") into ls
         finally return
-        (concat ".*" (mapconcat 'identity ls ""))))
+        (if (string= "^" (car ls))
+            ;; If user enter a "^" at start of bn,
+            ;; remove it and don't prepend ".*".
+            (mapconcat 'identity (cdr ls) "")
+            (concat ".*" (mapconcat 'identity ls "")))))
 
 (defun helm-dir-is-dot (dir)
   (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
