@@ -1451,11 +1451,19 @@ e.g helm.el$  => \".*h.*e.*l.*m[.]e.*l$\"
 Store the selected file-name in the `file-name-history'."
   (when (and helm-ff-default-directory
              (helm-file-completion-source-p))
-    (push helm-ff-default-directory helm-ff-history)
-    ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
-    ;; and we don't want to introduce duplicates.
-    (add-to-history 'file-name-history (abbreviate-file-name (helm-get-selection)))))
+    (push helm-ff-default-directory helm-ff-history)))
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
+
+(defun helm-files-save-file-name-history ()
+  (let ((sel (helm-get-selection))
+        (history-delete-duplicates t))
+    (when (and (helm-file-completion-source-p)
+               (file-exists-p sel))
+      ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
+      ;; and we don't want to introduce duplicates.
+      (add-to-history 'file-name-history
+                      (abbreviate-file-name (helm-get-selection))))))
+(add-hook 'helm-after-action-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file)
   (file-exists-p (file-truename file)))
