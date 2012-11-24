@@ -1779,7 +1779,8 @@ Helm plug-ins are realized by this function."
                          (helm-interpret-value candidate-source source)
                        (error (funcall type-error)))))
     (cond ((processp candidates) candidates)
-          ((listp candidates) (helm-transform-candidates candidates source))
+          ((listp candidates) (while-no-input
+                                (helm-transform-candidates candidates source)))
           (t (funcall type-error)))))
 
 
@@ -1944,7 +1945,8 @@ and `helm-pattern'."
                 (when (funcall match (helm-candidate-get-display candidate))
                   (helm-accumulate-candidates-internal
                    candidate newmatches helm-match-hash item-count limit)))
-              (setq matches (append matches (reverse newmatches))))))
+              (setq matches (append matches (reverse newmatches)))
+              (setq cands (loop for i in cands unless (member i matches) collect i)))))
       (invalid-regexp (setq matches nil)))
     matches))
 
@@ -1961,14 +1963,13 @@ and `helm-pattern'."
           (limit (helm-candidate-number-limit source))
           (helm-pattern (helm-process-pattern-transformer
                          helm-pattern source)))
-      (while-no-input
-        (helm-process-filtered-candidate-transformer
-         (if (or (equal helm-pattern "") (equal matchfns '(identity)))
-             (helm-take-first-elements
-              (helm-get-cached-candidates source) limit)
-             (helm-match-from-candidates
-              (helm-get-cached-candidates source) matchfns limit))
-         source)))))
+      (helm-process-filtered-candidate-transformer
+       (if (or (equal helm-pattern "") (equal matchfns '(identity)))
+           (helm-take-first-elements
+            (helm-get-cached-candidates source) limit)
+           (helm-match-from-candidates
+            (helm-get-cached-candidates source) matchfns limit))
+       source))))
 
 (defun helm-process-source (source)
   "Display matched results from SOURCE according to its settings."
