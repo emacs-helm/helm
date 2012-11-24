@@ -1058,35 +1058,35 @@ Return the result of last function call."
         (t helm-sources)))
 
 (defun helm-approximate-candidate-number (&optional in-current-source)
-  "Return approximate number of candidates in `helm-buffer'.
+  "Return candidates number in `helm-buffer'.
 If IN-CURRENT-SOURCE is provided return number of candidates
-in the source where point is.
-It is used to check if candidate number is 0, 1, or 2+."
+in the source where point is."
   (with-current-buffer helm-buffer
-    (save-excursion
-      (if in-current-source
-          (goto-char (helm-get-previous-header-pos))
-          (goto-char (point-min)))
-      (forward-line 1)
-      (let ((count-multi 1))
-        (if (helm-pos-multiline-p)
-            (save-excursion
-              (loop while (and (not (if in-current-source
-                                        (save-excursion
-                                          (forward-line 2)
-                                          (or (helm-pos-header-line-p) (eobp)))
-                                        (eobp)))
-                               (search-forward helm-candidate-separator nil t))
-                    do (incf count-multi)
-                    finally return count-multi))
-            (save-excursion
-              (loop with ln = 0
-                    while (not (if in-current-source
-                                   (or (helm-pos-header-line-p) (eobp))
-                                   (eobp)))
-                    unless (helm-pos-header-line-p)
-                    do (incf ln)
-                    do (forward-line 1) finally return ln)))))))
+    (if (helm-empty-buffer-p) 0
+        (save-excursion
+          (if in-current-source
+              (goto-char (helm-get-previous-header-pos))
+              (goto-char (point-min)))
+          (forward-line 1)
+          (let ((count-multi 1))
+            (if (helm-pos-multiline-p)
+                (save-excursion
+                  (loop while (and (not (if in-current-source
+                                            (save-excursion
+                                              (forward-line 2)
+                                              (or (helm-pos-header-line-p) (eobp)))
+                                            (eobp)))
+                                   (search-forward helm-candidate-separator nil t))
+                        do (incf count-multi)
+                        finally return count-multi))
+                (save-excursion
+                  (loop with ln = 0
+                        while (not (if in-current-source
+                                       (or (helm-pos-header-line-p) (eobp))
+                                       (eobp)))
+                        unless (helm-pos-header-line-p)
+                        do (incf ln)
+                        do (forward-line 1) finally return ln))))))))
 
 (defmacro with-helm-quittable (&rest body)
   "If an error occur in execution of BODY, quit helm safely."
@@ -1779,10 +1779,15 @@ Helm plug-ins are realized by this function."
                          (helm-interpret-value candidate-source source)
                        (error (funcall type-error)))))
     (cond ((processp candidates) candidates)
-          ((listp candidates) (while-no-input
-                                (helm-transform-candidates candidates source)))
+          ((listp candidates)
+           (let* (inhibit-quit
+                  (transformed-lst (while-no-input
+                                     (helm-transform-candidates
+                                      candidates source))))
+             ;; `while-no-input' may return t or nil if user enter
+             ;; input or C-g, so return the list or nil but never t.
+             (and (consp transformed-lst) transformed-lst)))
           (t (funcall type-error)))))
-
 
 (defun helm-get-cached-candidates (source)
   "Return the cached value of candidates for SOURCE.
