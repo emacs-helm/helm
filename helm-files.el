@@ -1411,7 +1411,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
         ;; Don't treat wildcards ("*") as regexp char.
         ;; (e.g ./foo/*.el => ./foo/[*].el)
         (replace-regexp-in-string "[*]" "[*]" fname)
-        (setq bn (if (> (length bn) 1) ; wait 2nd char before concating.
+        (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
                      (helm-ff-mapconcat-candidate bn)
                      bn))
         (expand-file-name bn (file-name-directory fname)))))
