@@ -1448,14 +1448,14 @@ Store the selected file-name in the `file-name-history'."
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
 
 (defun helm-files-save-file-name-history ()
-  (let ((sel (helm-get-selection))
-        (history-delete-duplicates t))
-    (when (and (helm-file-completion-source-p)
-               (file-exists-p sel))
-      ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
-      ;; and we don't want to introduce duplicates.
-      (add-to-history 'file-name-history
-                      (abbreviate-file-name (helm-get-selection))))))
+  (when (helm-file-completion-source-p)
+    (let ((sel (helm-get-selection))
+          (history-delete-duplicates t))
+      (when (file-exists-p sel)
+        ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
+        ;; and we don't want to introduce duplicates.
+        (add-to-history 'file-name-history
+                        (abbreviate-file-name (helm-get-selection)))))))
 (add-hook 'helm-after-action-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file)
