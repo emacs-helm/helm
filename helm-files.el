@@ -1407,13 +1407,16 @@ If FNAME is a valid directory name,return FNAME unchanged."
             (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
             (string-match "/$" fname)     ; Allow mkdir.
             (file-directory-p fname)
-            (string-match helm-ff-url-regexp fname))
+            (string-match helm-ff-url-regexp fname)
+            (loop for i in (mapcar #'(lambda (x)
+                                           (concat "/" (car x)))
+                                       tramp-methods)
+                  thereis (string-match fname i)))
         ;; Don't treat wildcards ("*") as regexp char.
         ;; (e.g ./foo/*.el => ./foo/[*].el)
         (replace-regexp-in-string "[*]" "[*]" fname)
         (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
-                     (helm-ff-mapconcat-candidate bn)
-                     bn))
+                     (helm-ff-mapconcat-candidate bn) bn))
         (expand-file-name bn (file-name-directory fname)))))
 
 (defun helm-ff-mapconcat-candidate (candidate)
