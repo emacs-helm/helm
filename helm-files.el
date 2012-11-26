@@ -1389,8 +1389,8 @@ systems."
 (defun helm-ff-transform-fname-for-completion (fname)
   "Maybe return FNAME with it's basename modified as a regexp.
 This happen only when `helm-ff-smart-completion' is enabled.
-This provide a similar feature as `ido-enable-flex-matching'.
-See `helm-ff-mapconcat-candidate'.
+This provide a similar behavior as `ido-enable-flex-matching'.
+See also `helm-ff-mapconcat-candidate'.
 If FNAME is an url returns it unmodified.
 When FNAME contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
@@ -1412,7 +1412,8 @@ If FNAME is a valid directory name,return FNAME unchanged."
         ;; (e.g ./foo/*.el => ./foo/[*].el)
         (replace-regexp-in-string "[*]" "[*]" fname)
         (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
-                     (helm-ff-mapconcat-candidate bn) bn))
+                     (helm-ff-mapconcat-candidate bn)
+                     (concat ".*" bn)))
         (expand-file-name bn (file-name-directory fname)))))
 
 (defun helm-ff-mapconcat-candidate (candidate)
