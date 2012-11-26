@@ -1404,10 +1404,11 @@ If FNAME is a valid directory name,return FNAME unchanged."
             (string-match "/$" fname)     ; Allow mkdir.
             (file-directory-p fname)
             (string-match helm-ff-url-regexp fname)
-            (loop for i in (mapcar #'(lambda (x)
-                                           (concat "/" (car x)))
-                                       tramp-methods)
-                  thereis (string-match fname i)))
+            (and (string= helm-ff-default-directory "/")
+                 (loop for i in (mapcar #'(lambda (x)
+                                            (concat "/" (car x)))
+                                        tramp-methods)
+                       thereis (string-match fname i))))
         ;; Don't treat wildcards ("*") as regexp char.
         ;; (e.g ./foo/*.el => ./foo/[*].el)
         (replace-regexp-in-string "[*]" "[*]" fname)
