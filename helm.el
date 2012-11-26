@@ -1776,7 +1776,8 @@ Helm plug-ins are realized by this function."
                                       " a variable or a list: %s")
                               candidate-source)))
          (candidates (condition-case err
-                         (helm-interpret-value candidate-source source)
+                         (while-no-input
+                           (helm-interpret-value candidate-source source))
                        (error (funcall type-error)))))
     (cond ((processp candidates) candidates)
           ((listp candidates)
