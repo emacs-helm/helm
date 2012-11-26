@@ -702,7 +702,6 @@ Keys description:
                                  (setq helm-ff-auto-update-flag
                                        helm-ff-auto-update-initial-value)))
                        (mode-line . helm-read-file-name-mode-line-string)
-                       (match . helm-ff-match-function)
                        (candidates
                         . (lambda ()
                             ;; Don't run `file-exists-p' if `helm-pattern' is remote.
