@@ -725,10 +725,18 @@ HELM-ATTRIBUTE should be a symbol."
   output from it, killing it if necessary, etc.). The process
   should return candidates matching the current pattern (see
   variable `helm-pattern'.)
+  You should use instead `candidates-process' attribute for
+  async processes, a warning will popup when using async process
+  in a `candidates' attribute.
 
   Note that currently results from asynchronous sources appear
   last in the helm buffer regardless of their position in
   `helm-sources'.")
+
+(helm-document-attribute 'candidates-process
+    "Same as `candidates' attributes but for process function."
+  "You should use this attribute when using a function involving
+  an async process instead of `candidates'.")
 
 (helm-document-attribute 'action "mandatory if type attribute is not provided"
   "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
