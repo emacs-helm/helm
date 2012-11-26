@@ -1951,6 +1951,8 @@ and `helm-pattern'."
                   (helm-accumulate-candidates-internal
                    candidate newmatches helm-match-hash item-count limit)))
               (setq matches (append matches (reverse newmatches)))
+              ;; Don't recompute matches already found by this match function
+              ;; with the next match function.
               (setq cands (loop for i in cands unless (member i matches) collect i)))))
       (invalid-regexp (setq matches nil)))
     matches))
