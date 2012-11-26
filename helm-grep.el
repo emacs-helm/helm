@@ -707,7 +707,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                                    (helm-grep-command)))))
         (header-name . (lambda (name)
                          (concat name "(C-c ? Help)")))
-        (candidates . helm-grep-collect-candidates)
+        (candidates-process . helm-grep-collect-candidates)
         (filtered-candidate-transformer helm-c-grep-cand-transformer)
         (candidate-number-limit . 9999)
         (nohighlight)
@@ -996,7 +996,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                   (setq helm-ff-default-directory (or helm-ff-default-directory
                                                       default-directory))
                   (setq helm-pdfgrep-targets only)))
-        (candidates
+        (candidates-process
          . (lambda ()
              (funcall helm-c-pdfgrep-default-function helm-pdfgrep-targets)))
         (filtered-candidate-transformer helm-c-grep-cand-transformer)

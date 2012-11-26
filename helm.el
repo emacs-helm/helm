@@ -1770,19 +1770,25 @@ Helm plug-ins are realized by this function."
 (defun helm-get-candidates (source)
   "Retrieve and return the list of candidates from SOURCE."
   (helm-process-delayed-init source)
-  (let* ((candidate-source (assoc-default 'candidates source))
+  (let* (inhibit-quit
+         (candidate-fn (assoc-default 'candidates source))
+         (candidate-proc (assoc-default 'candidates-process source))
          (type-error (lambda ()
                        (error (concat "Candidates must either be a function, "
                                       " a variable or a list: %s")
-                              candidate-source)))
+                              candidate-fn)))
          (candidates (condition-case err
-                         (while-no-input
-                           (helm-interpret-value candidate-source source))
+                         (if candidate-proc
+                             (helm-interpret-value candidate-proc source)
+                             (while-no-input
+                               (helm-interpret-value candidate-fn source)))
                        (error (funcall type-error)))))
+    (when (and (processp candidates) (not candidate-proc))
+      (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
+            candidate-fn))
     (cond ((processp candidates) candidates)
           ((listp candidates)
-           (let* (inhibit-quit
-                  (transformed-lst (while-no-input
+           (let* ((transformed-lst (while-no-input
                                      (helm-transform-candidates
                                       candidates source))))
              ;; `while-no-input' may return t or nil if user enter

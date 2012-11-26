@@ -239,7 +239,7 @@ See also `helm-locate'."
 (defvar helm-c-source-locate
   `((name . "Locate")
     (init . helm-locate-set-command)
-    (candidates . helm-c-locate-init)
+    (candidates-process . helm-c-locate-init)
     (type . file)
     (requires-pattern . 3)
     (history . ,'helm-file-name-history)
@@ -256,7 +256,7 @@ Use argument PROMPT and INIT for `helm' arguments
 prompt and input."
   (helm :sources
         '((name . "Locate")
-          (candidates . helm-c-locate-init)
+          (candidates-process . helm-c-locate-init)
           (action . identity)
           (requires-pattern . 3)
           (candidate-number-limit . 9999)
