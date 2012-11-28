@@ -797,6 +797,7 @@ the entire symbol.
 
 (add-hook 'helm-after-persistent-action-hook 'helm-reset-yank-point)
 (add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
+(add-hook 'helm-after-initialize-hook 'helm-reset-yank-point)
 
 (defun helm-html-bookmarks-to-alist (file url-regexp bmk-regexp)
   "Parse html bookmark FILE and return an alist with (title . url) as elements."
