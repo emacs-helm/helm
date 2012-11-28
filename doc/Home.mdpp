@@ -556,6 +556,9 @@ NOTE: You can save differents named helm grep buffers.
       If you haven't saved your grep session in a named buffer, you can anyway retrieve
       the last session with `helm-resume`.
 
+Editing the `helm-grep-mode` buffer is possible with [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep).
+Saving this buffer will apply changes to corresponding files.
+
 # Helm M-x
 
  It is bound to `helm-command-prefix-key` `M-x`, you should bind it to `M-x`.
