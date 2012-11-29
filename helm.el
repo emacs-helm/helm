@@ -2784,8 +2784,13 @@ to a list of forms.\n\n")
              (forward-line 1)))
           (t
            (delete-region (point-at-bol) (1+ (point-at-eol)))
-           (when (helm-end-of-source-p) (forward-line -1))))
-    (helm-mark-current-line)))
+           (when (helm-end-of-source-p)
+             (let ((headp (save-excursion
+                            (forward-line -1)
+                            (not (helm-pos-header-line-p)))))
+               (and headp (forward-line -1))))))
+    (unless (eq (point-at-bol) (point-at-eol))
+      (helm-mark-current-line))))
 
 (defun helm-end-of-source-p ()
   "Return non--nil if we are at eob or end of source."
