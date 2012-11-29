@@ -68,10 +68,11 @@
 ;;; Tracker desktop search
 (defvar helm-c-source-tracker-search
   '((name . "Tracker Search")
-    (candidates . (lambda ()
-                    (start-process "tracker-search-process" nil
-                                   "tracker-search"
-                                   helm-pattern)))
+    (candidates-process
+     . (lambda ()
+         (start-process "tracker-search-process" nil
+                        "tracker-search"
+                        helm-pattern)))
     (type . file)
     (requires-pattern . 3)
     (delayed))
@@ -81,7 +82,7 @@ with the tracker desktop search.")
 ;;; Spotlight (MacOS X desktop search)
 (defvar helm-c-source-mac-spotlight
   '((name . "mdfind")
-    (candidates
+    (candidates-process
      . (lambda () (start-process "mdfind-process" nil "mdfind" helm-pattern)))
     (type . file)
     (requires-pattern . 3)
