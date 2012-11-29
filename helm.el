@@ -1014,6 +1014,20 @@ Otherwise, return VALUE itself."
 Default value for BUFFER is `helm-buffer'."
   (zerop (buffer-size (and buffer (get-buffer buffer)))))
 
+(defun helm-empty-source-p ()
+  "Check if current source contains candidates.
+This happen only in certains cases when e.g the last element
+of a source is deleted without updating the source."
+  (with-helm-window
+    (or (helm-empty-buffer-p)
+        (and (helm-end-of-source-p)
+             (eq (point-at-bol) (point-at-eol))
+             (or
+              (save-excursion
+                (forward-line -1)
+                (helm-pos-header-line-p))
+              (bobp))))))
+
 (defun helm-let-internal (binding bodyfunc)
   "Set BINDING to helm buffer-local variables and Evaluate BODYFUNC.
 BINDING is a list of (VARNAME . VALUE) pair.
@@ -1062,7 +1076,9 @@ Return the result of last function call."
 If IN-CURRENT-SOURCE is provided return number of candidates
 in the source where point is."
   (with-current-buffer helm-buffer
-    (if (helm-empty-buffer-p) 0
+    (if (or (helm-empty-buffer-p)
+            (helm-empty-source-p))
+        0
         (save-excursion
           (if in-current-source
               (goto-char (helm-get-previous-header-pos))
@@ -1647,7 +1663,9 @@ This function is meant to be run in `helm-move-selection-after-hook'.
 It will override `helm-map' with the keymap attribute of current source
 if some when multiples sources are present."
   (with-helm-window
-    (let ((kmap (assoc-default 'keymap (helm-get-current-source))))
+    (let* ((source (helm-get-current-source))
+           (kmap (and (listp source) ; Check if source is empty.
+                      (assoc-default 'keymap source))))
       (when kmap (setq overriding-local-map kmap)))))
 (add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
 
@@ -2437,8 +2455,8 @@ It is determined by UNIT and DIRECTION."
 
 (defun helm-skip-noncandidate-line (direction)
   (helm-skip-header-and-separator-line direction)
-  (and (bobp) (forward-line 1))     ;skip first header
-  (and (eobp) (forward-line -1)))   ;avoid last empty line
+  (and (bobp) (forward-line 1))     ; skip first header.
+  (and (eobp) (forward-line -1)))   ; avoid last empty line.
 
 
 (defun helm-skip-header-and-separator-line (direction)
@@ -2457,7 +2475,8 @@ Possible value of DIRECTION are 'next or 'previous."
 (defun helm-display-mode-line (source)
   "Setup mode-line and header-line for `helm-buffer'."
   (set (make-local-variable 'helm-mode-line-string)
-       (helm-interpret-value (or (assoc-default 'mode-line source)
+       (helm-interpret-value (or (and (listp source) ; Check if source is empty.
+                                      (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
   ;; Setup mode-line.
@@ -2467,7 +2486,7 @@ Possible value of DIRECTION are 'next or 'previous."
               (line-number-mode "L%l") " " (helm-follow-mode "(HF) ")
               (:eval (helm-show-candidate-number
                       (when (listp helm-mode-line-string)
-                        (car helm-mode-line-string))))
+                        (car-safe helm-mode-line-string))))
               " " helm-mode-line-string-real " -%-")
             helm-mode-line-string-real
             (substitute-command-keys (if (listp helm-mode-line-string)
@@ -2476,7 +2495,8 @@ Possible value of DIRECTION are 'next or 'previous."
       (setq mode-line-format (default-value 'mode-line-format)))
   ;; Setup header-line.
   (let* ((hlstr (helm-interpret-value
-                 (assoc-default 'header-line source) source))
+                 (and (listp source)
+                      (assoc-default 'header-line source)) source))
          (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
     (setq header-line-format
           (propertize (concat " " hlstr hlend) 'face 'helm-header))))
@@ -2485,11 +2505,12 @@ Possible value of DIRECTION are 'next or 'previous."
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g \"Buffers\" otherwise
 it is \"Candidate\(s\)\" by default."
-  (propertize
-   (format "[%s %s]"
-           (helm-approximate-candidate-number 'in-current-source)
-           (or name "Candidate(s)"))
-   'face 'helm-candidate-number))
+  (unless (helm-empty-source-p)
+    (propertize
+     (format "[%s %s]"
+             (helm-approximate-candidate-number 'in-current-source)
+             (or name "Candidate(s)"))
+     'face 'helm-candidate-number)))
 
 ;;;###autoload
 (defun helm-previous-line ()
