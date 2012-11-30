@@ -272,11 +272,11 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
     '((((background dark))
        :background "#22083397778B"
        :foreground "white"
-       :underline t)
+       :weight bold :height 1.3 :family "Sans Serif")
       (((background light))
        :background "#abd7f0"
        :foreground "black"
-       :underline t))
+       :weight bold :height 1.3 :family "Sans Serif"))
   "Face for source header in the helm buffer."
   :group 'helm)
 
@@ -1796,6 +1796,8 @@ Helm plug-ins are realized by this function."
                                       " a variable or a list: %s")
                               candidate-fn)))
          (candidates (condition-case err
+                         ;; Process candidates-(process) function
+                         ;; It may return a process or a list of candidates.
                          (if candidate-proc
                              (helm-interpret-value candidate-proc source)
                              (while-no-input
@@ -1804,8 +1806,12 @@ Helm plug-ins are realized by this function."
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
-    (cond ((processp candidates) candidates)
+    (cond ((processp candidates)
+           ;; Candidates will be filtered later in process filter.
+           candidates)
           ((listp candidates)
+           ;; Filter candidates now with either `candidate-transformer'
+           ;; or `filtered-candidate-transformer' function.
            (let* ((transformed-lst (while-no-input
                                      (helm-transform-candidates
                                       candidates source))))
