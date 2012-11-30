@@ -1287,7 +1287,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log (concat "[Start session] " (make-string 41 ?+)))
     (helm-log-eval any-prompt any-preselect
                    any-buffer any-keymap any-default)
-    (let ((old-overridding-local-map overriding-local-map))
+    (let ((old-overridding-local-map overriding-local-map)
+          (cursor-in-echo-area t)) ; #163 no cursor in minibuffer on Windows.
       (unwind-protect
            (condition-case v
                (let (;; `helm-source-name' is non-nil
