@@ -494,6 +494,7 @@ It is disabled by default because *Helm Log* grows quickly.")
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\<_" "\\>_"))
 (defvar helm-suspend-update-flag nil)
+(defvar helm-force-updating-p nil)
 
 
 ;; Utility: logging
@@ -1801,8 +1802,10 @@ Helm plug-ins are realized by this function."
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
                              (helm-interpret-value candidate-proc source)
-                             (while-no-input
-                               (helm-interpret-value candidate-fn source)))
+                             (if helm-force-updating-p
+                                 (helm-interpret-value candidate-fn source)
+                                 (while-no-input
+                                   (helm-interpret-value candidate-fn source))))
                        (error (funcall type-error)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
@@ -1813,12 +1816,14 @@ Helm plug-ins are realized by this function."
           ((listp candidates)
            ;; Filter candidates now with either `candidate-transformer'
            ;; or `filtered-candidate-transformer' function.
-           (let* ((transformed-lst (while-no-input
-                                     (helm-transform-candidates
-                                      candidates source))))
-             ;; `while-no-input' may return t or nil if user enter
-             ;; input or C-g, so return the list or nil but never t.
-             (and (consp transformed-lst) transformed-lst)))
+           (if helm-force-updating-p
+               (helm-transform-candidates candidates source)
+               (let* ((transformed-lst (while-no-input
+                                         (helm-transform-candidates
+                                          candidates source))))
+                 ;; `while-no-input' may return t or nil if user enter
+                 ;; input or C-g, so return the list or nil but never t.
+                 (and (consp transformed-lst) transformed-lst))))
           (t (funcall type-error)))))
 
 (defun helm-get-cached-candidates (source)
@@ -2063,6 +2068,7 @@ when emacs is idle for `helm-idle-delay'."
       (save-excursion
         (goto-char (point-min))
         (helm-log-run-hook 'helm-update-hook))
+      (setq helm-force-updating-p nil)
       (helm-log-run-hook 'helm-after-update-hook))))
 
 
@@ -2106,6 +2112,7 @@ is done on whole `helm-buffer' and not on current source."
                (helm-update-move-first-line 'without-hook))
               (t              ; No delayed sources, run the hooks now.
                (helm-update-move-first-line)
+               (setq helm-force-updating-p nil)
                (helm-log-run-hook 'helm-after-update-hook)
                (when preselect
                  (helm-log "Update preselect candidate %s" preselect)
@@ -2164,6 +2171,7 @@ call it before update."
   (interactive)
   (let ((source    (helm-get-current-source))
         (selection (helm-get-selection nil t)))
+    (setq helm-force-updating-p t)
     (when source
       (mapc 'helm-force-update--reinit
             (helm-get-sources)))
