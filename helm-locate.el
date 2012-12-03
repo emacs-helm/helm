@@ -204,8 +204,10 @@ See also `helm-locate'."
 
 (defun helm-c-locate-init ()
   "Initialize async locate process for `helm-c-source-locate'."
-  (let ((locate-is-es (string-match "^es" helm-c-locate-command))
-        process-connection-type)
+  (let* ((locate-is-es (string-match "^es" helm-c-locate-command))
+         (case-sensitive-flag (if locate-is-es "-i" ""))
+         (ignore-case-flag (if locate-is-es "" "-i"))
+         process-connection-type)
     (prog1
         (start-process-shell-command
          "locate-process" helm-buffer
@@ -213,11 +215,11 @@ See also `helm-locate'."
                  (case helm-locate-case-fold-search
                    (smart (let ((case-fold-search nil))
                             (if (string-match "[A-Z]" helm-pattern)
-                                (if locate-is-es "-i" "")
-                                (if locate-is-es "" "-i"))))
+                                case-sensitive-flag
+                                ignore-case-flag)))
                    (t (if helm-locate-case-fold-search
-                          (if locate-is-es "-i" "")
-                          (if locate-is-es "" "-i"))))
+                          ignore-case-flag
+                          case-sensitive-flag)))
                  helm-pattern))
       (set-process-sentinel
        (get-process "locate-process")
