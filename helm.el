@@ -2170,7 +2170,10 @@ Selection is preserved to current candidate or moved to PRESELECT
 if specified."
   (interactive)
   (let ((source    (helm-get-current-source))
-        (selection (helm-get-selection nil t)))
+        (selection (helm-get-selection nil t))
+        ;; `helm-goto-source' need to have all sources displayed
+        ;; So disable `helm-quick-update'.
+        helm-quick-update)
     (setq helm-force-updating-p t)
     (when source
       (mapc 'helm-force-update--reinit
@@ -2621,8 +2624,8 @@ it is \"Candidate\(s\)\" by default."
      (let ((name (if (stringp source-or-name) source-or-name
                      (assoc-default 'name source-or-name))))
        (condition-case err
-           (while (not (string= name (helm-current-line-contents)))
-             (goto-char (helm-get-next-header-pos)))
+             (while (not (string= name (helm-current-line-contents)))
+               (goto-char (helm-get-next-header-pos)))
          (error (message "")))))
    'source 'next))
 
@@ -2777,10 +2780,14 @@ to a list of forms.\n\n")
 
 (defun helm-preselect (candidate-or-regexp)
   "Move `helm-selection-overlay' to CANDIDATE-OR-REGEXP on startup."
+  (declare (special source))
   (with-helm-window
     (when candidate-or-regexp
-      (goto-char (point-min))
-      ;; go to first candidate of first source
+      (if helm-force-updating-p
+          (helm-goto-source source)
+          (goto-char (point-min)))
+      ;; Go to first candidate of first source
+      ;; or candidate or current source when force updating.
       (forward-line 1)
       (let ((start (point)))
         (or (re-search-forward
