@@ -2453,6 +2453,10 @@ It is determined by UNIT and DIRECTION."
                       (save-excursion (forward-line -1) (point)))))
 
 (defun helm-skip-noncandidate-line (direction)
+  "Skip source header or candidates separator when going in DIRECTION.
+Possible value of DIRECTION are 'next or 'previous.
+Same as `helm-skip-header-and-separator-line' but ensure
+point is moved to the right place when at bop or eob."
   (helm-skip-header-and-separator-line direction)
   (and (bobp) (forward-line 1))     ; skip first header.
   (and (eobp) (forward-line -1)))   ; avoid last empty line.

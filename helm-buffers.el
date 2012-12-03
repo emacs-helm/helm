@@ -355,6 +355,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-buffer-revert-and-update (candidate)
   (let ((marked (helm-marked-candidates)))
     (loop for buf in marked do (helm-revert-buffer buf))
+    (helm-unmark-all)
     (helm-force-update)))
 
 ;;;###autoload
@@ -370,6 +371,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (loop for buf in marked do
           (with-current-buffer (get-buffer buf)
             (save-buffer)))
+    (helm-unmark-all)
     (helm-force-update)))
 
 ;;;###autoload
