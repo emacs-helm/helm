@@ -2163,11 +2163,11 @@ is done on whole `helm-buffer' and not on current source."
 ;;;###autoload
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
-If arg PRESELECT, a candidate to preselect, is provided,
-It will be preselected by `helm-update', otherwise the current candidate
-will be preselected is available.
-If current source has `update' attribute, a function without argument,
-call it before update."
+The difference with `helm-update' is this function is reevaling
+the `init' and `update' attributes functions when present
+before updating candidates according to pattern i.e calling `helm-update'.
+Selection is preserved to current candidate or moved to PRESELECT
+if specified."
   (interactive)
   (let ((source    (helm-get-current-source))
         (selection (helm-get-selection nil t)))
@@ -2175,11 +2175,7 @@ call it before update."
     (when source
       (mapc 'helm-force-update--reinit
             (helm-get-sources)))
-    (helm-update preselect)
-    ;; If preselect arg exists, `helm-update' should
-    ;; have moved to selection, otherwise do it now.
-    (unless preselect
-      (helm-keep-selection (assoc-default 'name source) selection))
+    (helm-update (or preselect selection))
     (with-helm-window (recenter))))
 
 (defun helm-force-update--reinit (source)
@@ -2191,18 +2187,6 @@ call it before update."
     (helm-aif (assoc-default attr source)
         (helm-funcall-with-source source it)))
   (helm-remove-candidate-cache source))
-
-(defun helm-keep-selection (source selection)
-  "Switch to SOURCE and goto SELECTION."
-  (when (and source selection)
-    (with-helm-window
-      (helm-goto-source source)
-      (forward-char -1)
-      (if (search-forward selection nil t)
-          (forward-line 0)
-          (goto-char (point-min))
-          (forward-line 1))
-      (helm-mark-current-line))))
 
 (defun helm-remove-candidate-cache (source)
   "Remove SOURCE from `helm-candidate-cache'."
