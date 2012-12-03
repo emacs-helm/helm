@@ -2669,13 +2669,14 @@ Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
   (declare (special org-directory))
-  (let ((any-input (if (and arg helm-ff-history)
-                       (helm-find-files-history)
-                       (helm-find-files-initial-input)))
-        (presel    (buffer-file-name (current-buffer))))
+  (let* (histp
+         (any-input (if (and arg helm-ff-history)
+                        (setq histp (helm-find-files-history))
+                        (helm-find-files-initial-input)))
+         (presel    (or histp (buffer-file-name (current-buffer)))))
     (cond ((and (eq major-mode 'org-agenda-mode)
-               org-directory
-               (not any-input))
+                org-directory
+                (not any-input))
            (setq any-input (expand-file-name org-directory)))
           ((and (eq major-mode 'dired-mode) any-input)
            (setq presel any-input)
