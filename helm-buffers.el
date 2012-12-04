@@ -219,7 +219,7 @@ Should be called after others transformers i.e (boring buffers)."
                               'help-echo (car (rassoc buf dired-buffers)))
                              " " str-before-size size "  " mode)
                      i))
-              ;; A buffer file modified somewhere outside of emacs.
+              ;; A buffer file modified somewhere outside of emacs.=>red
               ((and bfname (not (file-remote-p bfname))
                     (file-exists-p bfname)
                     (not (verify-visited-file-modtime buf)))
@@ -227,14 +227,14 @@ Should be called after others transformers i.e (boring buffers)."
                                          'help-echo bfname)
                              " " str-before-size size "  " mode)
                      i))
-              ;; A new buffer file not already saved on disk.
+              ;; A new buffer file not already saved on disk.=>indianred2
               ((and bfname (not (file-remote-p bfname))
                     (not (verify-visited-file-modtime buf)))
                (cons (concat (propertize truncbuf 'face 'helm-buffer-not-saved
                                          'help-echo bfname)
                              " " str-before-size size "  " mode)
                      i))
-              ;; A Remote buffer file modified and not saved on disk.
+              ;; A Remote buffer file modified and not saved on disk.=>@orange
               ((and bfname (file-remote-p bfname) (buffer-modified-p buf))
                (let ((prefix (propertize
                               " " 'display
@@ -243,13 +243,13 @@ Should be called after others transformers i.e (boring buffers)."
                                                   'help-echo bfname)
                                " " str-before-size size "  " mode)
                        i)))
-              ;; A buffer file modified and not saved on disk.
+              ;; A buffer file modified and not saved on disk.=>orange
               ((and bfname (buffer-modified-p buf))
                (cons (concat (propertize truncbuf 'face 'helm-ff-symlink
                                          'help-echo bfname)
                              " " str-before-size size "  " mode)
                      i))
-              ;; A remote buffer file not modified and saved on disk.
+              ;; A remote buffer file not modified and saved on disk.=>@green
               ((and bfname (file-remote-p bfname))
                (let ((prefix (propertize
                               " " 'display
@@ -258,13 +258,13 @@ Should be called after others transformers i.e (boring buffers)."
                                                   'help-echo bfname)
                                " " str-before-size size "  " mode)
                        i)))
-              ;; A buffer file not modified and saved on disk.
+              ;; A buffer file not modified and saved on disk.=>green
               (bfname
                (cons (concat (propertize truncbuf 'face 'font-lock-type-face
                                          'help-echo bfname)
                              " " str-before-size size "  " mode)
                      i))
-              ;; Any non--file buffer.
+              ;; Any non--file buffer.=>grey italic
               (t (cons (concat (propertize truncbuf 'face 'italic
                                            'help-echo i)
                                " " str-before-size size "  " mode) i)))))

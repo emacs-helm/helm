@@ -164,6 +164,13 @@ helm will look for lisp mode buffers starting by \"helm\" and have \"moc\" in th
 When creating a new buffer use \\[universal-argument] to choose a mode for your buffer in a list.
 This list is customizable, see `helm-buffers-favorite-modes'.
 
+Meaning of colors and prefixes for buffers:
+Remote buffers are prefixed with '@'.
+Red        => A buffer saved by an external process.
+Indianred2 => A new buffer file not already saved on disk.
+Orange     => A buffer file modified and not saved.
+
+
 \nSpecific commands for `helm-buffers-list':
 \\<helm-c-buffer-map>
 \\[helm-buffer-run-zgrep]\t\t->Grep Buffer(s) works as zgrep too (C-u grep all buffers but non--file buffers).

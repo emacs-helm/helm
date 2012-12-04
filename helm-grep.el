@@ -585,7 +585,7 @@ If N is positive go forward otherwise go backward."
             do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (set (make-local-variable 'buffer-read-only) t)
+      (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
         (insert "-*- mode: helm-grep -*-\n\n"
