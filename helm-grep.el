@@ -191,7 +191,6 @@ Where '%f' format spec is filename and '%p' is page number"
     (define-key map (kbd "RET")      'helm-grep-mode-jump)
     (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
     (define-key map (kbd "q")        'helm-grep-mode-quit)
-    (define-key map (kbd "g")        'helm-grep-run-real-grep)
     (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
     (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
@@ -216,8 +215,6 @@ Where '%f' format spec is filename and '%p' is page number"
 It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defvar helm-pdfgrep-targets nil)
 (defvar helm-grep-last-cmd-line nil)
-(defvar helm-grep-cmd-line nil)
-(make-variable-buffer-local 'helm-grep-cmd-line)
 (defvar helm-grep-split-line-regexp "^\\([a-zA-Z]?:?[^:]*\\):\\([0-9]+\\):\\(.*\\)")
 
 
@@ -588,20 +585,16 @@ If N is positive go forward otherwise go backward."
             do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (setq buffer-read-only t)
+      (set (make-local-variable 'buffer-read-only) t)
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (insert "-*- mode: helm-grep -*-  Press \"g\" to run Emacs grep.\n\n"
-                (format "Grep Results for `%s':\n\n" helm-pattern)
-                )
+        (insert "-*- mode: helm-grep -*-\n\n"
+                (format "Grep Results for `%s':\n\n" helm-pattern))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max))))))
-      (helm-grep-mode)
-      (pop-to-buffer buf)
-      (setq default-directory helm-grep-last-default-directory)
-      (setq helm-grep-cmd-line helm-grep-last-cmd-line))
+      (helm-grep-mode) (pop-to-buffer buf))
     (message "Helm Grep Results saved in `%s' buffer" buf)))
 
 ;;;###autoload
@@ -662,10 +655,6 @@ Special commands:
     (condition-case nil
         (helm-c-grep-action candidate 'other-window)
       (error nil))))
-
-(defun helm-grep-run-real-grep ()
-  (interactive)
-  (grep helm-grep-cmd-line))
 
 
 ;;; ack-grep types
