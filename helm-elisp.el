@@ -329,8 +329,11 @@ a double quote or between."
     (candidates . (lambda ()
                     (mapcar 'symbol-name helm-additional-attributes)))
     (action . (lambda (candidate)
-                (with-output-to-temp-buffer "*Help*"
-                  (princ (get (intern candidate) 'helm-attrdoc)))))))
+                (let (special-display-buffer-names
+                      special-display-regexps
+                      helm-persistent-action-use-special-display)
+                  (with-output-to-temp-buffer "*Help*"
+                    (princ (get (intern candidate) 'helm-attrdoc))))))))
 
 (defun helm-c-source-emacs-commands (&optional default)
   `((name . "Commands")
@@ -367,7 +370,8 @@ a double quote or between."
                     helm-c-source-emacs-variables
                     helm-c-source-emacs-faces
                     helm-c-source-helm-attributes))
-          :buffer "*helm apropos*")))
+          :buffer "*helm apropos*"
+          :preselect default)))
 
 
 ;;; Advices
