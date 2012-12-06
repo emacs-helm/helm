@@ -107,14 +107,16 @@
 
 (defcustom helm-completion-window-scroll-margin 5
   " `scroll-margin' to use for helm completion window.
-
-Which see.  Set to 0 to disable."
+Which see.  Set to 0 to disable.
+NOTE: This have no effect when `helm-display-source-at-screen-top'
+id non--nil."
   :group 'helm
   :type  'integer)
 
 (defcustom helm-display-source-at-screen-top t
   "Display candidates at the top of screen.
-This happen when using `helm-next-source' and `helm-previous-source'."
+This happen when using `helm-next-source' and `helm-previous-source'.
+NOTE: When non--nil (default) disable `helm-completion-window-scroll-margin'."
   :group 'helm
   :type 'boolean)
 
@@ -1684,7 +1686,9 @@ if some when multiples sources are present."
     (set (make-local-variable 'helm-follow-mode) nil)
     (set (make-local-variable 'helm-display-function) helm-display-function)
     (set (make-local-variable 'helm-selection-point) nil)
-    (set (make-local-variable 'scroll-margin) helm-completion-window-scroll-margin)
+    (set (make-local-variable 'scroll-margin)
+         (if helm-display-source-at-screen-top
+             0 helm-completion-window-scroll-margin))
     (helm-initialize-persistent-action)
     (helm-log-eval helm-display-function helm-let-variables)
     (loop for (var . val) in helm-let-variables
