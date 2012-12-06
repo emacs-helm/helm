@@ -450,7 +450,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
           (kill-buffer buffer))
         (kill-buffer buffer)))
   (helm-delete-current-selection)
-  (when (helm-empty-source-p) (helm-force-update)))
+  (when (helm-empty-source-p)
+    (helm-force-update)
+    (helm-next-source)))
 
 (defun helm-c-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
