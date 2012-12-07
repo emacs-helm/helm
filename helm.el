@@ -1820,14 +1820,7 @@ Helm plug-ins are realized by this function."
           ((listp candidates)
            ;; Filter candidates now with either `candidate-transformer'
            ;; or `filtered-candidate-transformer' function.
-           (if helm-force-updating-p
-               (helm-transform-candidates candidates source)
-               (let* ((transformed-lst (while-no-input
-                                         (helm-transform-candidates
-                                          candidates source))))
-                 ;; `while-no-input' may return t or nil if user enter
-                 ;; input or C-g, so return the list or nil but never t.
-                 (and (consp transformed-lst) transformed-lst))))
+           (helm-transform-candidates candidates source))
           (t (funcall type-error)))))
 
 (defun helm-get-cached-candidates (source)
