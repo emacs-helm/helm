@@ -37,7 +37,7 @@ First get the files from the git repo:
 
 The Helm git repo is at:
  <https://github.com/emacs-helm/helm>
- There, you will find tarballs of differents versions.
+ There, you will find tarballs of differents versions in the `Tags` section.
 
 To get it with git:
 
@@ -48,6 +48,21 @@ Edit your `init.el` file and add:
   
     (add-to-list 'load-path "/path/to/helm/directory")
     (require 'helm-config)
+
+For a quick try, you can also run the shell script provided with helm if your system support it:
+
+    ./emacs-helm.sh
+    
+NOTE: If you install Helm in a different way using your own autoloads and personal configuration,
+      be sure to know and understand what you are doing, otherwise expect diverses bugs and failures.
+      You are warned!
+    
+# Debugging
+
+If you experiment problems with helm, be sure to reproduce the problem starting with `emacs -Q`
+and then installing Helm as described in the Install section.
+You can also run `emacs-helm.sh` directly if supported by your system.
+
 
 # General helm commands
 
