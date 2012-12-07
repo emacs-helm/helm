@@ -363,6 +363,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)))
     (candidates . helm-find-files-get-candidates)
+    (match . helm-ff-match-fn)
     (filtered-candidate-transformer helm-c-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
@@ -409,6 +410,13 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ("View file" . view-file)
            ("Print File `C-c p, C-u to refresh'" . helm-ff-print)
            ("Locate `C-x C-f, C-u to specify locate db'" . helm-ff-locate))))))
+
+(defun helm-ff-match-fn (candidate)
+  "Match function for `helm-c-source-find-files'."
+  (or (string-match (regexp-quote helm-input) candidate)
+      ;; `helm-pattern' have been transformed by
+      ;; `helm-ff-transform-fname-for-completion'.
+      (string-match helm-pattern candidate)))
 
 (defun helm-find-files-set-prompt-for-action (action files)
   "Set prompt for action ACTION for FILES."
