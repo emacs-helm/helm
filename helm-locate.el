@@ -210,8 +210,10 @@ See also `helm-locate'."
 (defun helm-c-locate-init ()
   "Initialize async locate process for `helm-c-source-locate'."
   (let* ((locate-is-es (string-match "^es" helm-c-locate-command))
+         (real-locate (string-match "^locate" helm-c-locate-command))
          (case-sensitive-flag (if locate-is-es "-i" ""))
-         (ignore-case-flag (if locate-is-es "" "-i"))
+         (ignore-case-flag (if (or locate-is-es
+                                   (not real-locate)) "" "-i"))
          process-connection-type)
     (prog1
         (start-process-shell-command
