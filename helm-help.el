@@ -212,6 +212,8 @@ Orange     => A buffer file modified and not saved.
 - Use `C-u C-z' to watch an image.
 - To browse images directories turn on `helm-follow-mode' and navigate with arrow keys.
 - When entered ediff, hitting `C-g' will ask you to use locate to find the file to ediff with.
+- You can switch to locate with `C-x C-f', with one prefix arg use locale db file or create it,
+  with two prefix arg create or refresh db file.
 
 \nSpecific commands for `helm-find-files':
 \\<helm-find-files-map>

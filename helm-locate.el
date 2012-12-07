@@ -127,40 +127,45 @@ fall back to `default-directory' if FROM-FF is nil."
 
 (defun helm-locate-1 (&optional localdb init from-ff default)
   "Generic function to run Locate.
-if LOCALDB is non--nil search and use a local locate db file.
+Prefix arg LOCALDB when (4) search and use a local locate db file when it
+exists or create it, when (16) force update of existing db file
+even if exists.
+It have no effect when locate command is 'es'.
 INIT is a string to use as initial input in prompt.
 See `helm-locate-with-db' and `helm-locate'."
   (require 'helm-mode)
-  (helm-locate-with-db
-   (and localdb
-        (or (helm-ff-find-locatedb from-ff)
-            (helm-c-read-file-name
-             "Choose or create Locate Db file (locate.db): "
-             :initial-input (or helm-ff-default-directory
-                                default-directory)
-             :marked-candidates t
-             :preselect helm-locate-db-file-regexp
-             :persistent-action #'(lambda (candidate)
-                                    (if (file-directory-p candidate)
-                                        (message "Error: The locate Db should be a file")
-                                        (shell-command
-                                         (format helm-locate-create-db-command
-                                                 candidate
-                                                 helm-ff-default-directory))
-                                        (helm-force-update
-                                         (if helm-ff-transformer-show-only-basename
-                                             (helm-c-basename candidate)
-                                             candidate))))
-             :persistent-help "Create locale locate Db"
-             :test #'(lambda (x)
-                       (if helm-locate-db-file-regexp
-                           ;; Select only locate db files and directories
-                           ;; to allow navigation.
-                           (or (string-match
-                                helm-locate-db-file-regexp x)
-                               (file-directory-p x))
-                           x)))))
-   init default))
+  (let ((pfn #'(lambda (candidate)
+                 (if (file-directory-p candidate)
+                     (message "Error: The locate Db should be a file")
+                     (if (= (shell-command
+                             (format helm-locate-create-db-command
+                                     candidate
+                                     helm-ff-default-directory))
+                            0)
+                         (message "New locatedb file `%s' created" candidate)
+                         (error "Failed to create locatedb file `%s'" candidate)))))
+        (locdb (and localdb
+                    (not (string-match "^es" helm-c-locate-command))
+                    (or (and (equal '(4) localdb)
+                             (helm-ff-find-locatedb from-ff))
+                        (helm-c-read-file-name
+                         "Create Locate Db file (RET when done): "
+                         :initial-input (expand-file-name "locate.db"
+                                                          (or helm-ff-default-directory
+                                                              default-directory))
+                         :preselect helm-locate-db-file-regexp
+                         :test #'(lambda (x)
+                                   (if helm-locate-db-file-regexp
+                                       ;; Select only locate db files and directories
+                                       ;; to allow navigation.
+                                       (or (string-match
+                                            helm-locate-db-file-regexp x)
+                                           (file-directory-p x))
+                                       x)))))))
+    (when (and locdb (or (equal localdb '(16))
+                         (not (file-exists-p locdb))))
+      (funcall pfn locdb))
+    (helm-locate-with-db (and localdb locdb) init default)))
 
 (defun helm-locate-set-command ()
   "Setup `helm-c-locate-command' if not already defined."
@@ -274,7 +279,9 @@ prompt and input."
 Note: you can add locate options after entering pattern.
 See 'man locate' for valid options.
 
-You can specify a specific database with prefix argument ARG \(C-u\).
+You can specify a local database with prefix argument ARG.
+With two prefix arg, refresh the current local db or create it
+if it doesn't exists.
 Many databases can be used: navigate and mark them.
 See also `helm-locate-with-db'.
 
