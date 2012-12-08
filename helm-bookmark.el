@@ -199,7 +199,15 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                          isabook
                          (propertize i 'face '((:foreground "Tomato"))))
                         ( ;; directories
-                         (and isfile (file-directory-p isfile))
+                         (and isfile
+                              ;; This is needed because `non-essential'
+                              ;; is not working on Emacs-24.2 and the behavior
+                              ;; of tramp seems to have changed since previous
+                              ;; versions (Need to reenter password even if a first
+                              ;; connection have been established, probably when host
+                              ;; is named differently i.e machine/localhost)
+                              (not (file-remote-p isfile))
+                              (file-directory-p isfile))
                          (propertize i 'face 'helm-bookmark-directory 'help-echo isfile))
                         ( ;; regular files
                          t
