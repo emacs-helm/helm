@@ -1806,10 +1806,13 @@ Helm plug-ins are realized by this function."
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
                              (helm-interpret-value candidate-proc source)
-                             (if helm-force-updating-p
+                             (if (or helm-force-updating-p
+                                     (assoc 'no-delay-on-input source))
                                  (helm-interpret-value candidate-fn source)
-                                 (while-no-input
-                                   (helm-interpret-value candidate-fn source))))
+                                 (let ((result (while-no-input
+                                                 (helm-interpret-value
+                                                  candidate-fn source))))
+                                   (and (listp result) result))))
                        (error (funcall type-error)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"

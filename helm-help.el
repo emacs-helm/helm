@@ -1059,6 +1059,9 @@ For anonymous function don't add the dot, e.g:
 (helm-document-attribute 'nohighlight "optional"
   " Disable highlight match in this source.")
 
+(helm-document-attribute 'no-delay-on-input "optional"
+  " Don't use `while-no-input' when computing candidates.")
+
 (helm-document-attribute 'history "optional"
   " Allow passing history variable to helm from source.
 It should be a quoted symbol evaluated from source.

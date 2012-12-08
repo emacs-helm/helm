@@ -161,48 +161,49 @@
 (defun helm-c-highlight-bookmark (bookmarks source)
   "Used as `candidate-transformer' to colorize bookmarks.
 Work both with standard Emacs bookmarks and bookmark-extensions.el."
-  (loop for i in bookmarks
-        for isfile        = (bookmark-get-filename i)
-        for bufp          = (and (fboundp 'bmkext-get-buffer-name)
-                                 (bmkext-get-buffer-name i))
-        for handlerp      = (and (fboundp 'bookmark-get-handler)
-                                 (bookmark-get-handler i))
-        for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
-                                 (bmkext-w3m-bookmark-p i))
-        for isgnus        = (and (fboundp 'bmkext-gnus-bookmark-p)
-                                 (bmkext-gnus-bookmark-p i))
-        for isman         = (and (fboundp 'bmkext-man-bookmark-p) ; Man
-                                 (bmkext-man-bookmark-p i))
-        for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
-                                 (bmkext-woman-bookmark-p i))
-        for handlerp      = (bookmark-get-handler i)
-        for isannotation  = (bookmark-get-annotation i)
-        for isabook       = (string= (bookmark-prop-get i 'type) "addressbook")
-        for isinfo        = (eq handlerp 'Info-bookmark-jump)
-        ;; Add a * if bookmark have annotation
-        if (and isannotation (not (string-equal isannotation "")))
-        do (setq i (concat "*" i))
-        collect (cond (;; info buffers
-                       isinfo
-                       (propertize i 'face 'helm-bookmark-info 'help-echo isfile))
-                      (;; w3m buffers
-                       isw3m
-                       (propertize i 'face 'helm-bookmark-w3m 'help-echo isfile))
-                      (;; gnus buffers
-                       isgnus
-                       (propertize i 'face 'helm-bookmark-gnus 'help-echo isfile))
-                      (;; Man Woman
-                       (or iswoman isman)
-                       (propertize i 'face 'helm-bookmark-man 'help-echo isfile))
-                      (;; Addressbook
-                       isabook
-                       (propertize i 'face '((:foreground "Tomato"))))
-                      (;; directories
-                       (and isfile (file-directory-p isfile))
-                       (propertize i 'face 'helm-bookmark-directory 'help-echo isfile))
-                      (;; regular files
-                       t
-                       (propertize i 'face 'helm-bookmark-file 'help-echo isfile)))))
+  (let ((non-essential t))
+    (loop for i in bookmarks
+          for isfile        = (bookmark-get-filename i)
+          for bufp          = (and (fboundp 'bmkext-get-buffer-name)
+                                   (bmkext-get-buffer-name i))
+          for handlerp      = (and (fboundp 'bookmark-get-handler)
+                                   (bookmark-get-handler i))
+          for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
+                                   (bmkext-w3m-bookmark-p i))
+          for isgnus        = (and (fboundp 'bmkext-gnus-bookmark-p)
+                                   (bmkext-gnus-bookmark-p i))
+          for isman         = (and (fboundp 'bmkext-man-bookmark-p) ; Man
+                                   (bmkext-man-bookmark-p i))
+          for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
+                                   (bmkext-woman-bookmark-p i))
+          for handlerp      = (bookmark-get-handler i)
+          for isannotation  = (bookmark-get-annotation i)
+          for isabook       = (string= (bookmark-prop-get i 'type) "addressbook")
+          for isinfo        = (eq handlerp 'Info-bookmark-jump)
+          ;; Add a * if bookmark have annotation
+          if (and isannotation (not (string-equal isannotation "")))
+          do (setq i (concat "*" i))
+          collect (cond ( ;; info buffers
+                         isinfo
+                         (propertize i 'face 'helm-bookmark-info 'help-echo isfile))
+                        ( ;; w3m buffers
+                         isw3m
+                         (propertize i 'face 'helm-bookmark-w3m 'help-echo isfile))
+                        ( ;; gnus buffers
+                         isgnus
+                         (propertize i 'face 'helm-bookmark-gnus 'help-echo isfile))
+                        ( ;; Man Woman
+                         (or iswoman isman)
+                         (propertize i 'face 'helm-bookmark-man 'help-echo isfile))
+                        ( ;; Addressbook
+                         isabook
+                         (propertize i 'face '((:foreground "Tomato"))))
+                        ( ;; directories
+                         (and isfile (file-directory-p isfile))
+                         (propertize i 'face 'helm-bookmark-directory 'help-echo isfile))
+                        ( ;; regular files
+                         t
+                         (propertize i 'face 'helm-bookmark-file 'help-echo isfile))))))
 
 (defun helm-c-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
