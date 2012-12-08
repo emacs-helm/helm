@@ -1328,14 +1328,23 @@ purpose."
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     ;; Issue #118 allow creation of newdir+newfile.
-    (unless (or (string= path "Invalid tramp file name")
-                (string= path "")
-                (file-directory-p (file-name-directory path)))
+    ;; Check if base directory of PATH is valid.
+    (unless (or
+             ;; A tramp file name not completed.
+             (string= path "Invalid tramp file name")
+             ;; An empty pattern
+             (string= path "")
+             ;; An existing directory
+             (file-directory-p (file-name-directory path)))
+      ;; basedir is invalid, that's mean user is starting
+      ;; to write a non--existing path in minibuffer
+      ;; probably to create a 'new_dir' or a 'new_dir+new_file'.
       (setq invalid-basedir t))
     ;; Don't set now `helm-pattern' if `path' == "Invalid tramp file name"
     ;; like that the actual value (e.g /ssh:) is passed to
     ;; `helm-ff-tramp-hostnames'.
-    (unless (or (string= path "Invalid tramp file name") invalid-basedir)
+    (unless (or (string= path "Invalid tramp file name")
+            invalid-basedir) ; Leave  helm-pattern unchanged.
       (setq helm-pattern (helm-ff-transform-fname-for-completion path)))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")

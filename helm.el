@@ -599,7 +599,8 @@ If `helm-last-log-file' is nil, switch to \"*Helm Log*\" buffer."
 
 (defun helm-print-error-messages ()
   "Print error messages in `helm-issued-errors'."
-  (message "%s" (mapconcat 'identity (reverse helm-issued-errors) "\n")))
+  (and helm-issued-errors
+       (message "%s" (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
 
 
@@ -1653,7 +1654,6 @@ This can be useful for e.g writing quietly a complex regexp."
                "Helm update suspended!"
                "Helm update reenabled!")))
 
-(declare-function tramp-read-passwd "tramp" (proc &optional prompt))
 (defadvice tramp-read-passwd (around disable-helm-update activate)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
