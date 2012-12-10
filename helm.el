@@ -1514,6 +1514,7 @@ window or frame configuration is saved/restored according to values of
               (below (or (window-in-direction 'below)
                          (window-in-direction 'right)
                          (selected-window)))
+              (same  (selected-window))
               (t     (or (window-next-sibling) (selected-window)))))
         (split-window-sensibly window))))
 
@@ -1540,6 +1541,8 @@ The function used to display `helm-buffer'."
                    ((and (eq helm-split-window-state 'horizontal)
                          (eq helm-split-window-default-side 'below))
                     'right)
+                   ;; When `helm-split-window-default-side' is 'same
+                   ;; Use this value ignoring `helm-split-window-state'. 
                    (t helm-split-window-default-side))
              helm-split-window-default-side)))
     (funcall (with-current-buffer buffer helm-display-function) buffer)))
@@ -1548,7 +1551,9 @@ The function used to display `helm-buffer'."
   "Default function to display `helm-buffer' BUFFER.
 It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 `helm-samewindow'."
-  (if helm-samewindow
+  (if (or helm-samewindow
+          (and (eq helm-split-window-default-side 'same)
+               (one-window-p t)))
       (switch-to-buffer buffer)
       (pop-to-buffer buffer)))
 
