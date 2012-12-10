@@ -1464,6 +1464,8 @@ Argument SAVE-OR-RESTORE is one of save or restore."
 ;; Internal.
 (defvar helm-last-frame-or-window-configuration nil
   "Used to store window or frame configuration when helm start.")
+(defvar helm-onewindow-p nil)
+
 (defun helm-frame-or-window-configuration (save-or-restore)
   "Save or restore last frame or window configuration.
 Possible value of SAVE-OR-RESTORE are 'save and 'restore.
@@ -1545,7 +1547,9 @@ The function used to display `helm-buffer'."
                    ;; Use this value ignoring `helm-split-window-state'. 
                    (t helm-split-window-default-side))
              helm-split-window-default-side)))
-    (funcall (with-current-buffer buffer helm-display-function) buffer)))
+    (prog1
+        (funcall (with-current-buffer buffer helm-display-function) buffer)
+      (setq helm-onewindow-p (one-window-p t)))))
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
@@ -2091,7 +2095,7 @@ is done on whole `helm-buffer' and not on current source."
   ;; So go back to one window when updating if `helm-samewindow'
   ;; is non--nil.
   (with-helm-window
-    (when helm-samewindow (delete-other-windows)))
+    (when helm-onewindow-p (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
     (erase-buffer)
@@ -3333,7 +3337,7 @@ and keep its visibility."
   (with-helm-window
     (save-selected-window
       (helm-select-persistent-action-window
-       (or split-onewindow (and helm-samewindow (one-window-p t))))
+       (or split-onewindow helm-onewindow-p))
       (helm-log-eval (current-buffer))
       (let ((helm-in-persistent-action t))
         (with-helm-display-same-window
@@ -3348,12 +3352,12 @@ and keep its visibility."
         ;; `helm-persistent-action-display-window' and `helm-samewindow'
         ;; is enabled, we end up with the `helm-buffer'
         ;; displayed in two windows.
-        (when (and helm-samewindow
+        (when (and helm-onewindow-p
                    (> (length (window-list)) 1)
                    (equal (buffer-name
                            (window-buffer
                             helm-persistent-action-display-window))
-                          helm-buffer))
+                          (helm-buffer-get)))
           (delete-other-windows))))))
 
 (defun helm-persistent-action-display-window (&optional split-onewindow)
