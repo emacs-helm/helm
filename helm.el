@@ -255,8 +255,14 @@ will reuse the same window scheme than the one of last session."
 (defcustom helm-split-window-default-side 'below
   "The default side to display `helm-buffer'.
 Must be one acceptable arg for `split-window' SIDE,
-that is 'below, 'above, 'left, 'right.
+that is 'below, 'above, 'left or 'right.
+Another acceptable value is 'same which always display `helm-buffer'
+in current window.
 A nil value as same effect as 'below.
+If `helm-full-frame' is non--nil, it take precedence on this.
+
+See also `helm-split-window-in-side-p'.
+
 NOTE: this have no effect if `helm-split-window-preferred-function' is not
 `helm-split-window-default-fn' unless this new function handle this."
   :group 'helm
@@ -264,6 +270,8 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
 
 (defcustom helm-split-window-in-side-p nil
   "Force splitting inside selected window when non--nil.
+See also `helm-split-window-default-side'.
+
 NOTE: this have no effect if `helm-split-window-preferred-function' is not
 `helm-split-window-default-fn' unless this new function handle this."
   :group 'helm
