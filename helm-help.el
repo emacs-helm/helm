@@ -896,10 +896,10 @@ HELM-ATTRIBUTE should be a symbol."
   useful in case of sources with lots of candidates.")
 
 (helm-document-attribute 'persistent-action "optional"
-  "  Function called with one parameter; the selected candidate.
-
-  An action performed by `helm-execute-persistent-action'.
-  If none, use the default action.")
+  "Can be a either a Function called with one parameter (the selected candidate)
+   or a cons cell where first element is this same function and second element
+   a symbol (e.g never-split) that inform `helm-execute-persistent-action'
+   to not split his window to execute this persistent action.")
 
 (helm-document-attribute 'candidates-in-buffer "optional"
   "  Shortcut attribute for making and narrowing candidates using
