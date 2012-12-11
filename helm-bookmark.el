@@ -81,6 +81,7 @@
               (require 'bookmark)
               (helm-init-candidates-in-buffer
                "*hbookmark list*" (bookmark-all-names))))
+    (no-delay-on-input)
     (candidates-in-buffer)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -89,6 +90,7 @@
 (defvar helm-c-source-bookmark-set
   '((name . "Set Bookmark")
     (dummy)
+    (no-delay-on-input)
     (action . bookmark-set))
   "See (info \"(emacs)Bookmarks\").")
 
@@ -100,6 +102,7 @@
               (helm-init-candidates-in-buffer
                "*hbookmark list*" (helm-c-collect-bookmarks :ssh t))))
     (candidates-in-buffer)
+    (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
@@ -110,6 +113,7 @@
               (helm-init-candidates-in-buffer
                "*hbookmark list*" (helm-c-collect-bookmarks :su t))))
     (candidates-in-buffer)
+    (no-delay-on-input)
     (filtered-candidate-transformer . helm-c-highlight-bookmark-su)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
@@ -124,6 +128,7 @@
     (filtered-candidate-transformer
      helm-c-adaptive-sort
      helm-c-highlight-bookmark)
+    (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 

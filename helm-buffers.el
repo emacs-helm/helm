@@ -124,6 +124,7 @@ filtered from the list of candidates if the
     (persistent-action . helm-c-buffers-list-persistent-action)
     (keymap . ,helm-c-buffer-map)
     (volatile)
+    (no-delay-on-input)
     (mode-line . helm-buffer-mode-line-string)
     (persistent-help
      . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
