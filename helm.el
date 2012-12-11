@@ -1501,7 +1501,7 @@ window or frame configuration is saved/restored according to values of
              ;; Don't try to split when starting in a minibuffer
              ;; e.g M-: and try to use helm-show-kill-ring.
              (not (minibufferp helm-current-buffer)))
-        (if (or (one-window-p)
+        (if (or (one-window-p t)
                 helm-split-window-in-side-p)
             (split-window
              (selected-window) nil helm-split-window-default-side)
@@ -1557,11 +1557,11 @@ The function used to display `helm-buffer'."
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
 It use `switch-to-buffer' or `pop-to-buffer' depending of value of
-`helm-full-frame'."
+`helm-full-frame' and/or `helm-split-window-default-side'."
   (if (or helm-full-frame
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
-      (switch-to-buffer buffer)
+      (progn (delete-other-windows) (switch-to-buffer buffer))
       (pop-to-buffer buffer)))
 
 
