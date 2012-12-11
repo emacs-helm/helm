@@ -127,7 +127,7 @@
 (defun helm-top ()
   "Preconfigured `helm' for top command."
   (interactive)
-  (let ((helm-samewindow t)
+  (let ((helm-full-frame t)
         (helm-display-function 'helm-default-display-buffer)
         (helm-candidate-number-limit 9999))
     (save-window-excursion

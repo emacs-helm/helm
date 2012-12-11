@@ -158,11 +158,14 @@ Be sure to know what you are doing when modifying this."
   :group 'helm
   :type 'float)
 
-(defcustom helm-samewindow nil
+(defcustom helm-full-frame nil
   "Use current window to show the candidates.
 If t then Helm doesn't pop up a new window."
   :group 'helm
   :type 'boolean)
+
+(defvaralias 'helm-samewindow 'helm-full-frame)
+(make-obsolete-variable 'helm-samewindow 'helm-full-frame "1.4.8.1")
 
 (defcustom helm-quick-update nil
   "If non-nil, suppress displaying sources which are out of screen at first.
@@ -208,7 +211,7 @@ If you prefer scrolling line by line, set this value to 1."
 (defcustom helm-display-function 'helm-default-display-buffer
   "Function to display *helm* buffer.
 It is `helm-default-display-buffer' by default,
-which affects `helm-samewindow'."
+which affects `helm-full-frame'."
   :group 'helm
   :type 'symbol)
 
@@ -1387,7 +1390,7 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
                                   "*Helm*"))
                  helm-sources
                  helm-compiled-sources
-                 (helm-samewindow t)
+                 (helm-full-frame t)
                  (enable-recursive-minibuffers t))
              (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
@@ -1529,7 +1532,7 @@ The function used to display `helm-buffer'."
         (split-window-preferred-function
          helm-split-window-preferred-function)
         (helm-split-window-default-side
-         (if (and (not helm-samewindow)
+         (if (and (not helm-full-frame)
                   helm-reuse-last-window-split-state)
              (cond ((and (eq helm-split-window-state 'horizontal)
                          (eq helm-split-window-default-side 'left))
@@ -1554,8 +1557,8 @@ The function used to display `helm-buffer'."
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
 It use `switch-to-buffer' or `pop-to-buffer' depending of value of
-`helm-samewindow'."
-  (if (or helm-samewindow
+`helm-full-frame'."
+  (if (or helm-full-frame
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
       (switch-to-buffer buffer)
@@ -2091,8 +2094,8 @@ is done on whole `helm-buffer' and not on current source."
   (helm-log "Start updating")
   (helm-kill-async-processes)
   ;; When persistent action have been called
-  ;; we have two windows even with `helm-samewindow'.
-  ;; So go back to one window when updating if `helm-samewindow'
+  ;; we have two windows even with `helm-full-frame'.
+  ;; So go back to one window when updating if `helm-full-frame'
   ;; is non--nil.
   (with-helm-window
     (when helm-onewindow-p (delete-other-windows)))
@@ -3202,7 +3205,7 @@ Arg DATA can be either a list or a plain string."
 (defun helm-enlarge-window-1 (n)
   "Enlarge or narrow helm window.
 If N is positive enlarge, if negative narrow."
-  (unless helm-samewindow
+  (unless helm-full-frame
     (let ((horizontal-p (eq helm-split-window-state 'horizontal)))
       (with-helm-window
         (enlarge-window n horizontal-p)))))
@@ -3223,7 +3226,7 @@ If N is positive enlarge, if negative narrow."
 (defun helm-swap-windows ()
   "Swap window holding `helm-buffer' with other window."
   (interactive)
-  (if (and helm-samewindow (one-window-p t))
+  (if (and helm-full-frame (one-window-p t))
       (error "Error: Can't swap windows in a single window")
       (let* ((w1          (helm-window))
              (split-state (eq helm-split-window-state 'horizontal))
@@ -3325,9 +3328,10 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
 (defun* helm-execute-persistent-action
     (&optional (attr 'persistent-action) split-onewindow)
   "Perform the associated action ATTR without quitting helm.
-ATTR default is 'persistent-action', but it can be helm else.
+ATTR default is 'persistent-action', but it can be anything else.
 In this case you have to add this new attribute to your source.
-When `helm-samewindow' or SPLIT-ONEWINDOW are non--nil,
+
+When `helm-full-frame' or SPLIT-ONEWINDOW are non--nil,
 and `helm-buffer' is displayed in only one window,
 the helm window is splitted to display
 `helm-select-persistent-action-window' in other window 
@@ -3349,7 +3353,7 @@ and keep its visibility."
           (helm-log-run-hook 'helm-after-persistent-action-hook))
         ;; A typical case is when a persistent action delete
         ;; the buffer already displayed in
-        ;; `helm-persistent-action-display-window' and `helm-samewindow'
+        ;; `helm-persistent-action-display-window' and `helm-full-frame'
         ;; is enabled, we end up with the `helm-buffer'
         ;; displayed in two windows.
         (when (and helm-onewindow-p
