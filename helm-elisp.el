@@ -219,12 +219,16 @@ If SYM is not documented, return \"Not documented\"."
         (buffer-substring-no-properties beg (match-end 0))))))
 
 ;;;###autoload
-(defun helm-c-complete-file-name-at-point ()
+(defun helm-c-complete-file-name-at-point (&optional force)
   "Complete file name at point."
   (interactive)
   (let* ((tap (thing-at-point 'filename))
          (init (and tap
-                    (helm-create-completion-filename
+                    (or force
+                        (save-excursion
+                          (forward-char (- (length tap)))
+                          (looking-back "[^'`( ]")))
+                    (expand-file-name
                      (substring-no-properties tap))))
          (end  (point))
          (beg  (- (point) (length tap)))
@@ -235,7 +239,9 @@ If SYM is not documented, return \"Not documented\"."
       (setq completion (helm-c-read-file-name "FileName: "
                                               :initial-input init)))
     (when (and completion (not (string= completion "")))
-      (delete-region beg end) (insert completion))))
+      (delete-region beg end) (insert (if (string-match "^~" tap)
+                                          (abbreviate-file-name completion)
+                                          completion)))))
 
 ;; Internal
 (defvar helm-lisp-completion-counter 0)
@@ -274,11 +280,9 @@ a double quote or between."
   (interactive)
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
-                   (when (and ;; Allow completing symbols in docstrings
-                          (not (search-backward "`" (point-at-bol) t))
-                          (search-backward "\"" (point-at-bol) t))
-                     (forward-char 1) (not (looking-at " ")))))
-        (helm-c-complete-file-name-at-point)
+                   (forward-char (- (length tap)))
+                   (looking-back "[^'`( ]")))
+        (helm-c-complete-file-name-at-point 'force)
         (helm-lisp-completion-at-point))))
 
 
