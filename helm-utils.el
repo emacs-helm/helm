@@ -815,6 +815,16 @@ the entire symbol.
         (forward-line)))
     (nreverse bookmarks-alist)))
 
+(defun helm-substring-by-width (str max-length)
+  "Return a substring splitting with WIDTH"
+  (loop for y = str then (substring y  0 (- (length y) 1)) do
+        (if (<= (string-width y) max-length)
+            (return
+             (concat y (make-string
+                        (- max-length
+                           (string-width y)) ? )))
+          nil)))
+
 (provide 'helm-utils)
 
 ;; Local Variables:
