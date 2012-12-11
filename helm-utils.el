@@ -213,6 +213,14 @@ all ITEM found in SEQ."
             else return index
             finally return ls))))
 
+(defun helm-substring-by-width (str width)
+  "Return a substring splitting with WIDTH.
+Like `substring' but handle Japonese characters."
+  (loop for ini-str = str
+        then (substring ini-str  0 (- (length ini-str) 1))
+        when (<= (string-width ini-str) width) return
+        (concat ini-str (make-string (- width (string-width ini-str)) ? ))))
+
 (defun helm-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
   (loop with process-list = (list-system-processes)
@@ -815,15 +823,6 @@ the entire symbol.
         (forward-line)))
     (nreverse bookmarks-alist)))
 
-(defun helm-substring-by-width (str max-length)
-  "Return a substring splitting with WIDTH"
-  (loop for y = str then (substring y  0 (- (length y) 1)) do
-        (if (<= (string-width y) max-length)
-            (return
-             (concat y (make-string
-                        (- max-length
-                           (string-width y)) ? )))
-          nil)))
 
 (provide 'helm-utils)
 
