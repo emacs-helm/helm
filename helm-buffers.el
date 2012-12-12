@@ -205,7 +205,7 @@ Should be called after others transformers i.e (boring buffers)."
                                   (make-string it ? ) "")
         do (setq old-len-size (+ len-size (length str-before-size)))
         for truncbuf = (if (> (string-width i) helm-buffer-max-length)
-                           (concat (helm-substring-by-width i helm-buffer-max-length)
+                           (concat (truncate-string-to-width i helm-buffer-max-length)
                                    "...")
                          (concat i (make-string
                                     (- (+ helm-buffer-max-length 3)
