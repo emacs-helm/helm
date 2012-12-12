@@ -1388,7 +1388,8 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
     (let ((orig-helm-current-buffer helm-current-buffer)
           (orig-helm-buffer helm-buffer)
           (orig-helm-last-frame-or-window-configuration
-           helm-last-frame-or-window-configuration))
+           helm-last-frame-or-window-configuration)
+          (orig-one-window-p helm-onewindow-p))
       (unwind-protect
            (let (helm-current-position
                  helm-current-buffer
@@ -1409,7 +1410,8 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
           (setq helm-last-frame-or-window-configuration
                 orig-helm-last-frame-or-window-configuration)
           (setq cursor-type t)
-          (setq helm-current-buffer orig-helm-current-buffer))))))
+          (setq helm-current-buffer orig-helm-current-buffer)
+          (setq helm-onewindow-p orig-one-window-p))))))
 
 
 ;;; Initialize
