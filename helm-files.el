@@ -785,7 +785,7 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-toggle-auto-update ()
   (interactive)
   (when helm-alive-p
-    (helm-attrset 'toggle-auto-update 'helm-ff-toggle-auto-update)
+    (helm-attrset 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
     (helm-execute-persistent-action 'toggle-auto-update)))
 
 ;;;###autoload
@@ -1052,7 +1052,7 @@ The checksum is copied to kill-ring."
 (defun helm-ff-run-toggle-basename ()
   (interactive)
   (when helm-alive-p
-    (helm-attrset 'toggle-basename 'helm-ff-toggle-basename)
+    (helm-attrset 'toggle-basename '(helm-ff-toggle-basename . never-split))
     (helm-execute-persistent-action 'toggle-basename)))
 
 (defun* helm-reduce-file-name (fname level &key unix-close expand)
@@ -1532,14 +1532,14 @@ Store the selected file-name in the `file-name-history'."
 (defun helm-ff-properties-persistent ()
   "Show properties without quitting helm."
   (interactive)
-  (helm-attrset 'properties-action 'helm-ff-properties)
+  (helm-attrset 'properties-action '(helm-ff-properties . never-split))
   (helm-execute-persistent-action 'properties-action))
 
 ;;;###autoload
 (defun helm-ff-persistent-delete ()
   "Delete current candidate without quitting."
   (interactive)
-  (helm-attrset 'quick-delete 'helm-ff-quick-delete)
+  (helm-attrset 'quick-delete '(helm-ff-quick-delete . never-split))
   (helm-execute-persistent-action 'quick-delete))
 
 (defun helm-ff-dot-file-p (file)
