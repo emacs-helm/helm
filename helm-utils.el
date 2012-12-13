@@ -213,6 +213,15 @@ all ITEM found in SEQ."
             else return index
             finally return ls))))
 
+(defun helm-substring-by-width (str width)
+  "Truncate string STR to end at column WIDTH.
+Like using `substring' from 0 to end, but handle multibyte characters."
+  (loop for ini-str = str
+        then (substring ini-str 0 (1- (length ini-str)))
+        for sw = (string-width ini-str)
+        when (<= sw width) return
+        (concat ini-str (make-string (- width sw) ? ))))
+
 (defun helm-c-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
   (loop with process-list = (list-system-processes)
