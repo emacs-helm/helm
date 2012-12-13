@@ -205,11 +205,13 @@ Should be called after others transformers i.e (boring buffers)."
                                   (make-string it ? ) "")
         do (setq old-len-size (+ len-size (length str-before-size)))
         for truncbuf = (if (> (string-width i) helm-buffer-max-length)
-                           (concat (helm-substring-by-width i helm-buffer-max-length)
-                                   "...")
-                         (concat i (make-string
-                                    (- (+ helm-buffer-max-length 3)
-                                       (string-width i)) ? )))
+                           (if (helm-string-multibyte-p i)
+                               (helm-substring-by-width i helm-buffer-max-length)
+                               (concat (substring i 0 helm-buffer-max-length)
+                                   "..."))
+                           (concat i (make-string
+                                      (- (+ helm-buffer-max-length 3)
+                                         (string-width i)) ? )))
         for bfname = (buffer-file-name buf)
         for mode = (with-current-buffer i (symbol-name major-mode))
         collect
