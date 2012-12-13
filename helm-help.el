@@ -214,6 +214,14 @@ Orange     => A buffer file modified and not saved.
 - When entered ediff, hitting `C-g' will ask you to use locate to find the file to ediff with.
 - You can switch to locate with `C-x C-f', with one prefix arg use locale db file or create it,
   with two prefix arg create or refresh db file.
+- When you want to delete backward characters to e.g creating a new file or directory,
+  autoupdate may keep updating to an existent directory
+  preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
+- You can create a new directory an a new file at the same time, just write the path in prompt
+  and press <RET>.
+  e.g You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
+- To create a new directory, add a \"/\" at end of new name and press <RET>.
+- To create a new file just write the filename not ending with \"/\".
 
 \nSpecific commands for `helm-find-files':
 \\<helm-find-files-map>
