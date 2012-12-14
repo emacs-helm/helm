@@ -3351,8 +3351,13 @@ and keep its visibility."
   (let* ((attr-val (assoc-default attr (helm-get-current-source)))
          ;; If attr value is a cons, use its car as persistent function
          ;; and its car to decide if helm window should be splitted.
-         (fn       (if (consp attr-val) (car attr-val) attr-val))
-         (no-split (and (consp attr-val) (cdr attr-val))))
+         (fn       (if (and (consp attr-val)
+                            ;; maybe a lambda.
+                            (not (functionp attr-val)))
+                       (car attr-val) attr-val))
+         (no-split (and (consp attr-val)
+                        (not (functionp attr-val))
+                        (cdr attr-val))))
     (with-helm-window
       (save-selected-window
         (if no-split
