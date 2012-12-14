@@ -205,10 +205,9 @@ Should be called after others transformers i.e (boring buffers)."
                                   (make-string it ? ) "")
         do (setq old-len-size (+ len-size (length str-before-size)))
         for truncbuf = (if (> (string-width i) helm-buffer-max-length)
-                           (if (helm-string-multibyte-p i)
-                               (helm-substring-by-width i helm-buffer-max-length)
-                               (concat (substring i 0 helm-buffer-max-length)
-                                   "..."))
+                           ;; Issue #170, FIXME, this works only with
+                           ;; some fonts.
+                           (helm-substring-by-width i helm-buffer-max-length)
                            (concat i (make-string
                                       (- (+ helm-buffer-max-length 3)
                                          (string-width i)) ? )))
