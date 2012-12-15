@@ -44,17 +44,18 @@ source.")
 
 (defvar helm-c-source-man-pages
   `((name . "Manual Pages")
-    (candidates . (lambda ()
-                    (if helm-c-man-pages
-                        helm-c-man-pages
-                        ;; XEmacs doesn't have a woman :)
-                        (setq helm-c-man-pages
-                              (ignore-errors
-                                (require 'woman)
-                                (woman-file-name "")
-                                (sort (mapcar 'car woman-topic-all-completions)
-                                      'string-lessp))))))
-    (action  ("Show with Woman" . helm-c-man-default-action))
+    (init . (lambda ()
+              (require 'woman)
+              (if helm-c-man-pages
+                  helm-c-man-pages
+                  ;; XEmacs doesn't have a woman :)
+                  (setq helm-c-man-pages
+                        (ignore-errors
+                          (woman-file-name "" t)
+                          (sort (mapcar 'car woman-topic-all-completions)
+                                'string-lessp))))))
+    (candidates . helm-c-man-pages)
+    (action  . (("Show with Woman" . helm-c-man-default-action)))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)
