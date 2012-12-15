@@ -46,14 +46,12 @@ source.")
   `((name . "Manual Pages")
     (init . (lambda ()
               (require 'woman)
-              (if helm-c-man-pages
-                  helm-c-man-pages
-                  ;; XEmacs doesn't have a woman :)
-                  (setq helm-c-man-pages
-                        (ignore-errors
-                          (woman-file-name "" t)
-                          (sort (mapcar 'car woman-topic-all-completions)
-                                'string-lessp))))))
+              (unless helm-c-man-pages
+                (setq helm-c-man-pages
+                      (ignore-errors
+                        (woman-file-name "" t)
+                        (sort (mapcar 'car woman-topic-all-completions)
+                              'string-lessp))))))
     (candidates . helm-c-man-pages)
     (action  . (("Show with Woman" . helm-c-man-default-action)))
     ;; Woman does not work OS X
@@ -65,9 +63,11 @@ source.")
     (requires-pattern . 2)))
 
 ;;;###autoload
-(defun helm-man-woman ()
-  "Preconfigured `helm' for Man and Woman pages."
-  (interactive)
+(defun helm-man-woman (arg)
+  "Preconfigured `helm' for Man and Woman pages.
+With a prefix arg reinitialize the cache."
+  (interactive "P")
+  (when arg (setq helm-c-man-pages nil))
   (helm-other-buffer 'helm-c-source-man-pages "*Helm man woman*"))
 
 (provide 'helm-man)
