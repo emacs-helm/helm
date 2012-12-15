@@ -1138,6 +1138,15 @@ or hitting C-z on \"..\"."
       (setq helm-ff-last-expanded nil))))
 (add-hook 'helm-after-update-hook 'helm-ff-retrieve-last-expanded)
 
+(defun helm-ff-move-to-first-real-candidate ()
+  "When candidate is an incomplete file name move to first real candidate."
+  (let ((cand (helm-get-selection)))
+    (when (and (helm-file-completion-source-p)
+               (not (file-remote-p cand))
+               (not (file-exists-p cand)))
+    (helm-next-line))))
+(add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
+
 ;; Auto-update - helm-find-files auto expansion of directories.
 ;;
 (defun helm-ff-update-when-only-one-matched ()
