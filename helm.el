@@ -1344,12 +1344,14 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions."
   (interactive "P")
-  (let (any-buffer)
+  (let (any-buffer helm-full-frame)
     (if arg
         (setq any-buffer (helm-resume-select-buffer))
         (setq any-buffer helm-last-buffer))
     (assert any-buffer nil
             "helm-resume: No helm buffers found to resume")
+    (setq helm-full-frame
+          (with-current-buffer any-buffer helm-full-frame))
     (setq helm-compiled-sources nil)
     (helm
      :sources (or (buffer-local-value
@@ -1708,6 +1710,7 @@ if some when multiples sources are present."
     (set (make-local-variable 'helm-follow-mode) nil)
     (set (make-local-variable 'helm-display-function) helm-display-function)
     (set (make-local-variable 'helm-selection-point) nil)
+    (set (make-local-variable 'helm-full-frame) helm-full-frame)
     (set (make-local-variable 'scroll-margin)
          (if helm-display-source-at-screen-top
              0 helm-completion-window-scroll-margin))
