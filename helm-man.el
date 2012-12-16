@@ -43,7 +43,7 @@ source.")
              (Man-getpage-in-background candidate)))))
 
 (defvar helm-c-source-man-pages
-  `((name . "Manual Pages")
+  '((name . "Manual Pages")
     (init . (lambda ()
               (require 'woman)
               (unless helm-c-man-pages

@@ -256,8 +256,8 @@ One hit indent, two quick hits maybe indent and complete."
   (interactive "P")
   ;; Be sure `indent-for-tab-command' will not try
   ;; to use `completion-at-point'.
-  (let ((tab-always-indent (if (eq tab-always-indent 'complete)
-                               t tab-always-indent)))
+  (let ((tab-always-indent (or (eq tab-always-indent 'complete)
+                               tab-always-indent)))
     (incf helm-lisp-completion-counter)
     (unwind-protect
          (if (> helm-lisp-completion-counter 1)
