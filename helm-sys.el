@@ -128,10 +128,9 @@
   "Preconfigured `helm' for top command."
   (interactive)
   (save-window-excursion
-    (delete-other-windows)
+    (unless helm-alive-p (delete-other-windows))
     (helm :sources 'helm-c-source-top
           :buffer "*helm top*" :full-frame t
-          :display-function 'helm-default-display-buffer
           :candidate-number-limit 9999)))
 
 ;;;###autoload
