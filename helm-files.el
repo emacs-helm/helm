@@ -1906,8 +1906,7 @@ Use it for non--interactive calls of `helm-find-files'."
   (let (;; Be sure we don't erase the precedent minibuffer if some.
         (helm-ff-auto-update-initial-value
          (and helm-ff-auto-update-initial-value
-              (not (minibuffer-window-active-p (minibuffer-window)))))
-        helm-full-frame)
+              (not (minibuffer-window-active-p (minibuffer-window))))))
     (helm :sources 'helm-c-source-find-files
           :input fname
           :case-fold-search helm-file-name-case-fold-search

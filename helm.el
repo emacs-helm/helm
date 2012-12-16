@@ -1350,8 +1350,8 @@ helm buffers.  i.e choose among various helm sessions."
         (setq any-buffer helm-last-buffer))
     (assert any-buffer nil
             "helm-resume: No helm buffers found to resume")
-    (setq helm-full-frame
-          (with-current-buffer any-buffer helm-full-frame))
+    (setq helm-full-frame (buffer-local-value
+                           'helm-full-frame (get-buffer any-buffer)))
     (setq helm-compiled-sources nil)
     (helm
      :sources (or (buffer-local-value
@@ -1570,7 +1570,7 @@ The function used to display `helm-buffer'."
   "Default function to display `helm-buffer' BUFFER.
 It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 `helm-full-frame' and/or `helm-split-window-default-side'."
-  (if (or helm-full-frame
+  (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
       (progn (delete-other-windows) (switch-to-buffer buffer))
@@ -1710,7 +1710,6 @@ if some when multiples sources are present."
     (set (make-local-variable 'helm-follow-mode) nil)
     (set (make-local-variable 'helm-display-function) helm-display-function)
     (set (make-local-variable 'helm-selection-point) nil)
-    (set (make-local-variable 'helm-full-frame) helm-full-frame)
     (set (make-local-variable 'scroll-margin)
          (if helm-display-source-at-screen-top
              0 helm-completion-window-scroll-margin))

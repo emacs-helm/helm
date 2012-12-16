@@ -127,12 +127,12 @@
 (defun helm-top ()
   "Preconfigured `helm' for top command."
   (interactive)
-  (let ((helm-full-frame t)
-        (helm-display-function 'helm-default-display-buffer)
-        (helm-candidate-number-limit 9999))
-    (save-window-excursion
-      (delete-other-windows)
-      (helm-other-buffer 'helm-c-source-top "*helm top*"))))
+  (save-window-excursion
+    (delete-other-windows)
+    (helm :sources 'helm-c-source-top
+          :buffer "*helm top*" :full-frame t
+          :display-function 'helm-default-display-buffer
+          :candidate-number-limit 9999)))
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
