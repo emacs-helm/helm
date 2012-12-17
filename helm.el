@@ -1303,7 +1303,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log-eval any-prompt any-preselect
                    any-buffer any-keymap any-default)
     (let ((old-overridding-local-map overriding-local-map)
-          (cursor-in-echo-area t)) ; #163 no cursor in minibuffer on Windows.
+          ;; #163 no cursor in minibuffer in <=Emacs-24.2.
+          (cursor-in-echo-area t))
       (unwind-protect
            (condition-case v
                (let (;; `helm-source-name' is non-nil
@@ -3416,6 +3417,14 @@ Argument NOT-THIS-WINDOW if present will be used as
 second argument of `display-buffer'."
   (let* ((name (buffer-name buf))
          display-buffer-function pop-up-windows pop-up-frames
+         ;; Disable `special-display-regexps' and `special-display-buffer-names'
+         ;; unless `helm-persistent-action-use-special-display' is non--nil.
+         (special-display-buffer-names
+          (and helm-persistent-action-use-special-display
+               special-display-buffer-names))
+         (special-display-regexps
+          (and helm-persistent-action-use-special-display
+               special-display-regexps))
          (same-window-regexps
           (unless (and helm-persistent-action-use-special-display
                        (or (member name
