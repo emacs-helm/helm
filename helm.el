@@ -30,6 +30,51 @@
 
 (require 'cl)
 
+
+;;; Multi keys
+;;
+;;
+(defun helm-define-multi-key (keymap key functions &optional delay)
+  "In KEYMAP, define key sequence KEY for function list FUNCTIONS.
+Each function run sequentialy each time the key KEY is pressed.
+If DELAY is specified switch back to initial function of FUNCTIONS list
+after DELAY seconds."
+  (lexical-let ((funs functions)
+                (iter (gensym "iter-key"))
+                (timeout delay))
+    (eval (list 'defvar iter nil))
+    (define-key keymap (kbd key) #'(lambda ()
+                                     (interactive)
+                                     (helm-run-multi-key-command funs iter timeout)))))
+
+(defun helm-run-multi-key-command (functions iterator delay)
+  (let ((fn #'(lambda ()
+                (loop for count from 1 to (length functions)
+                      collect count)))
+        next)
+    (unless (symbol-value iterator)
+      (set iterator (helm-iter-list (funcall fn))))
+    (setq next (helm-iter-next (symbol-value iterator)))
+    (unless next
+      (set iterator (helm-iter-list (funcall fn)))
+      (setq next (helm-iter-next (symbol-value iterator))))
+    (and next (eval iterator) (funcall (nth (1- next) functions)))
+    (when delay (run-with-idle-timer delay nil `(lambda ()
+                                                  (setq ,iterator nil))))))
+
+(defmacro helm-iter-list (seq)
+  "Return an iterator object from SEQ."
+  `(lexical-let ((lis ,seq))
+     (lambda ()
+       (let ((elm (car lis)))
+         (setq lis (cdr lis))
+         elm))))
+
+(defun helm-iter-next (iterator)
+  "Return next elm of ITERATOR."
+  (funcall iterator))
+
+
 ;;; Keymap
 ;;
 ;;
@@ -75,7 +120,6 @@
     (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
     (define-key map (kbd "C-r")        'undefined)
     (define-key map (kbd "C-s")        'undefined)
-    (define-key map (kbd "C-t")        'helm-toggle-resplit-window)
     (define-key map (kbd "C-}")        'helm-narrow-window)
     (define-key map (kbd "C-{")        'helm-enlarge-window)
     (define-key map (kbd "C-c -")      'helm-swap-windows)
@@ -89,6 +133,9 @@
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
+    ;; Multi keys
+    (helm-define-multi-key map "C-t"   '(helm-toggle-resplit-window
+                                         helm-swap-windows) 0.5)
     ;; Debugging command
     (define-key map "\C-c\C-x\C-d"     'helm-debug-output)
     (define-key map "\C-c\C-x\C-m"     'helm-display-all-visible-marks)
