@@ -46,13 +46,6 @@ This is used in macro `with-helm-show-completion'."
   :group 'helm-elisp
   :type  'integer)
 
-(defcustom helm-lisp-completion-or-indent-delay 0.6
-  "After this delay `helm-lisp-completion-counter' is reset to 0.
-This allow to indent again without completing lisp symbol after this delay.
-Default is 0.6 seconds."
-  :group 'helm-elisp
-  :type  'number)
-
 
 ;;; Faces
 ;;
@@ -243,34 +236,15 @@ If SYM is not documented, return \"Not documented\"."
                                           (abbreviate-file-name completion)
                                           completion)))))
 
-;; Internal
-(defvar helm-lisp-completion-counter 0)
 ;;;###autoload
-(defun helm-lisp-completion-at-point-or-indent (arg)
-  "First call indent and second call complete lisp symbol.
-The second call should happen before `helm-lisp-completion-or-indent-delay',
-after this delay, next call will indent again.
-After completion, next call is always indent.
-See that like click and double mouse click.
-One hit indent, two quick hits maybe indent and complete."
-  (interactive "P")
-  ;; Be sure `indent-for-tab-command' will not try
-  ;; to use `completion-at-point'.
+(defun helm-lisp-indent ()
+  ;; It is meant to use with `helm-define-multi-key' which
+  ;; does not support args for functions yet, so use `current-prefix-arg'
+  ;; for now instead of (interactive "P").
+  (interactive)
   (let ((tab-always-indent (or (eq tab-always-indent 'complete)
                                tab-always-indent)))
-    (incf helm-lisp-completion-counter)
-    (unwind-protect
-         (if (> helm-lisp-completion-counter 1)
-             (helm-lisp-completion-or-file-name-at-point)
-             (indent-for-tab-command arg))
-      ;; After `helm-lisp-completion-or-indent-delay' seconds
-      ;; reset to 0.
-      (run-with-timer helm-lisp-completion-or-indent-delay nil
-                      #'(lambda ()
-                          (setq helm-lisp-completion-counter 0)))
-      ;; Always reset to 0 at second hit.
-      (when (eq helm-lisp-completion-counter 2)
-        (setq helm-lisp-completion-counter 0)))))
+    (indent-for-tab-command current-prefix-arg)))
 
 ;;;###autoload
 (defun helm-lisp-completion-or-file-name-at-point ()

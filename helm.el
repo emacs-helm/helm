@@ -39,6 +39,7 @@
 Each function run sequentialy each time the key KEY is pressed.
 If DELAY is specified switch back to initial function of FUNCTIONS list
 after DELAY seconds.
+The functions in FUNCTIONS list are functions with no args.
 e.g
   \(defun foo ()
     (message \"Run foo\"))
@@ -55,7 +56,7 @@ More than 2 seconds, next hit will run again the first function and so on."
                 (iter (gensym "helm-iter-key"))
                 (timeout delay))
     (eval (list 'defvar iter nil))
-    (define-key keymap (kbd key) #'(lambda ()
+    (define-key keymap key #'(lambda ()
                                      (interactive)
                                      (helm-run-multi-key-command
                                       funs iter timeout)))))
@@ -147,8 +148,8 @@ More than 2 seconds, next hit will run again the first function and so on."
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
-    (helm-define-multi-key map "C-t"   '(helm-toggle-resplit-window
-                                         helm-swap-windows) 0.5)
+    (helm-define-multi-key map (kbd "C-t") '(helm-toggle-resplit-window
+                                             helm-swap-windows) 0.5)
     ;; Debugging command
     (define-key map "\C-c\C-x\C-d"     'helm-debug-output)
     (define-key map "\C-c\C-x\C-m"     'helm-display-all-visible-marks)
