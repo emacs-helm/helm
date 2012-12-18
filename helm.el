@@ -2137,11 +2137,11 @@ is done on whole `helm-buffer' and not on current source."
                (helm-update-move-first-line 'without-hook))
               (t              ; No delayed sources, run the hooks now.
                (helm-update-move-first-line)
-               (setq helm-force-updating-p nil)
                (helm-log-run-hook 'helm-after-update-hook)
                (when preselect
                  (helm-log "Update preselect candidate %s" preselect)
-                 (helm-preselect preselect))))
+                 (helm-preselect preselect))
+               (setq helm-force-updating-p nil)))
         (when delayed-sources
           ;; Allow giving a value to `delayed' attr from inside source.
           ;; Retain the biggest value (the slower) found in DELAYED-SOURCES.
@@ -2815,10 +2815,8 @@ to a list of forms.\n\n")
       ;; or candidate or current source when force updating.
       (forward-line 1)
       (let ((start (point)))
-        (or (re-search-forward
-             (concat "^" (regexp-quote candidate-or-regexp) "$") nil t)
+        (or (search-forward candidate-or-regexp nil t)
             (re-search-forward candidate-or-regexp nil t)
-            (search-forward candidate-or-regexp nil t)
             (goto-char start))))
     (helm-mark-current-line)))
 
