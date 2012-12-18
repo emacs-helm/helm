@@ -38,14 +38,27 @@
   "In KEYMAP, define key sequence KEY for function list FUNCTIONS.
 Each function run sequentialy each time the key KEY is pressed.
 If DELAY is specified switch back to initial function of FUNCTIONS list
-after DELAY seconds."
+after DELAY seconds.
+e.g
+  \(defun foo ()
+    (message \"Run foo\"))
+  \(defun bar ()
+    (message \"Run bar\"))
+  \(defun baz ()
+    (message \"Run baz\"))
+
+\(helm-define-multi-key global-map \"<f5> q\" '(foo bar baz) 2)
+
+Each time \"<f5> q\" is pressed the next function is executed, if you wait
+More than 2 seconds, next hit will run again the first function and so on."
   (lexical-let ((funs functions)
-                (iter (gensym "iter-key"))
+                (iter (gensym "helm-iter-key"))
                 (timeout delay))
     (eval (list 'defvar iter nil))
     (define-key keymap (kbd key) #'(lambda ()
                                      (interactive)
-                                     (helm-run-multi-key-command funs iter timeout)))))
+                                     (helm-run-multi-key-command
+                                      funs iter timeout)))))
 
 (defun helm-run-multi-key-command (functions iterator delay)
   (let ((fn #'(lambda ()
