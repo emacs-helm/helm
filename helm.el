@@ -134,6 +134,7 @@ More than 2 seconds, next hit will run again the first function and so on."
     (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
     (define-key map (kbd "C-r")        'undefined)
     (define-key map (kbd "C-s")        'undefined)
+    (define-key map (kbd "M-s")        'undefined)
     (define-key map (kbd "C-}")        'helm-narrow-window)
     (define-key map (kbd "C-{")        'helm-enlarge-window)
     (define-key map (kbd "C-c -")      'helm-swap-windows)
