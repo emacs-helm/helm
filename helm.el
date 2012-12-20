@@ -2905,10 +2905,8 @@ to a list of forms.\n\n")
     (when candidate-or-regexp
       (if helm-force-updating-p
           (helm-goto-source source)
-          (goto-char (point-min)))
-      ;; Go to first candidate of first source
-      ;; or candidate or current source when force updating.
-      (forward-line 1)
+          (goto-char (point-min))
+          (forward-line 1))
       (let ((start (point)))
         (or (search-forward candidate-or-regexp nil t)
             (re-search-forward candidate-or-regexp nil t)
