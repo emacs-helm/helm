@@ -1686,7 +1686,12 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            (hist       (or any-history
                            ;; Needed for resuming. 
                            (assoc-default 'history src)))
-           (timer nil))
+           (timer nil)
+           (first-src (car helm-sources))
+           (source-delayed-p (or (assq 'delayed src)
+                                 (assq 'delayed (if (symbolp first-src)
+                                                    (symbol-value first-src)
+                                                    first-src)))))
       ;; Startup with the first keymap found either in current source
       ;; or helm arg, otherwise use global value of `helm-map'.
       ;; This map will be used as a `minibuffer-local-map'.
@@ -1698,15 +1703,22 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       (helm-log-eval (helm-approximate-candidate-number)
                      helm-execute-action-at-once-if-one
                      helm-quit-if-no-candidate)
+      ;; If source is delayed `helm-execute-action-at-once-if-one'
+      ;; and `helm-quit-if-no-candidate' are handled after update finish.
+      (when source-delayed-p
+        (add-hook 'helm-after-update-hook 'helm-exit-or-quit-maybe))
+      ;; Otherwise handle them now.
       (cond ((and helm-execute-action-at-once-if-one
+                  (not source-delayed-p)
                   (= (helm-approximate-candidate-number) 1))
-             (ignore))
+             (ignore)) ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
+                  (not source-delayed-p)
                   (= (helm-approximate-candidate-number) 0))
              (setq helm-quit t)
              (and (functionp helm-quit-if-no-candidate)
                   (funcall helm-quit-if-no-candidate)))
-            (t
+            (t ; Enter minibuffer and wait for input.
              (let ((tap (or any-default
                             (with-helm-current-buffer
                               (thing-at-point 'symbol)))))
@@ -1727,6 +1739,20 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                             any-input helm-map
                                             nil hist tap t))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
+
+(defun helm-exit-or-quit-maybe ()
+  (with-helm-window
+    (unwind-protect
+         (cond ((and helm-execute-action-at-once-if-one
+                     (= (helm-approximate-candidate-number) 1))
+                (helm-exit-minibuffer))
+               ((and helm-quit-if-no-candidate
+                     (= (helm-approximate-candidate-number) 0))
+                (setq helm-quit t)
+                (and (functionp helm-quit-if-no-candidate)
+                     (funcall helm-quit-if-no-candidate))
+                (keyboard-quit)))
+      (remove-hook 'helm-after-update-hook 'helm-exit-or-quit-maybe))))
 
 ;;;###autoload
 (defun helm-toggle-suspend-update ()
