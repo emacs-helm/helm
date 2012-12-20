@@ -2090,8 +2090,17 @@ and `helm-pattern'."
              (cdr it)
            helm-case-fold-search)))
     (case helm-case-fold-search
-      (smart (let ((case-fold-search nil))
-               (if (string-match "[A-Z]" pattern) nil t)))
+      (smart (let ((case-fold-search nil)
+                   ;; Only parse basename for filenames
+                   ;; to avoid setting case sensitivity
+                   ;; when expanded directories contains upcase
+                   ;; characters.
+                   (bn (if (string-match "[~/]*" pattern)
+                           ;; `helm-c-basename' is not available yet.
+                           (file-name-nondirectory
+                            (directory-file-name pattern))
+                           pattern)))
+               (if (string-match "[A-Z]" bn) nil t)))
       (t helm-case-fold-search))))
 
 (defun helm-match-from-candidates (cands matchfns limit)
