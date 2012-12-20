@@ -349,7 +349,7 @@ a double quote or between."
                     helm-c-source-emacs-faces
                     helm-c-source-helm-attributes))
           :buffer "*helm apropos*"
-          :preselect default)))
+          :preselect (concat "\\_<" default "\\_>"))))
 
 
 ;;; Advices
