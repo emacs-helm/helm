@@ -1706,6 +1706,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; If source is delayed `helm-execute-action-at-once-if-one'
       ;; and `helm-quit-if-no-candidate' are handled after update finish.
       (when source-delayed-p
+        ;; Note that we quickly add the hook now when `helm-update'
+        ;; is already started, but because source is delayed the hook
+        ;; should have the time to be passed !!!
         (add-hook 'helm-after-update-hook 'helm-exit-or-quit-maybe))
       ;; Otherwise handle them now.
       (cond ((and helm-execute-action-at-once-if-one
@@ -1741,6 +1744,11 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
 
 (defun helm-exit-or-quit-maybe ()
+  "Exit and run default action if only one candidate, quit if no candidates.
+This function must run in `helm-after-update-hook' and will
+remove itself from this hook once executed.
+It is handling `helm-execute-action-at-once-if-one' and
+`helm-quit-if-no-candidate' in delayed sources."
   (with-helm-window
     (unwind-protect
          (cond ((and helm-execute-action-at-once-if-one
