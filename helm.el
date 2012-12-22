@@ -505,14 +505,16 @@ and before performing action.")
   "`helm-buffer' of previously `helm' session.")
 
 (defvar helm-execute-action-at-once-if-one nil
-  "Execute default action and exit when only one candidate is remaining.
-It is useful for `helm' applications.")
+  "Execute default action and exit when only one candidate is remaining.")
 
 (defvar helm-quit-if-no-candidate nil
   "Quit when there is no candidates when non--nil.
-This variable accepts a function, which is executed if no candidate.
+This variable accepts a function, which is executed if no candidate.")
 
-It is useful for `helm' applications.")
+(defvar helm-maybe-use-default-as-input nil
+  "Use :default arg of `helm' as input to update display.
+Note that if also :input is specified as `helm' arg, it will take
+precedence on :default.")
 
 (defvar helm-source-in-each-line-flag nil
   "Non-nil means add helm-source text-property in each candidate.
@@ -522,8 +524,7 @@ experimental feature.")
 
 (defvar helm-debug-forms nil
   "Forms to show in `helm-debug-output'.
-Otherwise all variables started with `helm-' are shown.
-It is useful for debug.")
+Otherwise all variables started with `helm-' are shown.")
 
 (defvar helm-debug nil
   "If non-nil, write log message into *Helm Log* buffer.
@@ -1279,7 +1280,10 @@ Initially selected candidate.  Specified by exact candidate or a regexp.
 
 A default argument that will be inserted in minibuffer \
 with \\<minibuffer-local-map>\\[next-history-element].
-When nil of not present `thing-at-point' will be used instead.
+When nil or not present `thing-at-point' will be used instead.
+If `helm-maybe-use-default-as-input' is non--nil display will be
+updated using :default arg as input unless :input is specified,
+which in this case will take precedence on :default.
 
 \:history
 
@@ -1737,7 +1741,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                              ;; non--nil.
                                              (unless (or helm-in-persistent-action
                                                          helm-suspend-update-flag)
-                                               (helm-check-minibuffer-input)
+                                               (helm-check-minibuffer-input tap)
                                                (helm-print-error-messages))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
@@ -1866,17 +1870,25 @@ if some when multiples sources are present."
         (delete-minibuffer-contents)))))
 
 
-;; Core: input handling
-
-(defun helm-check-minibuffer-input ()
-  "Check minibuffer content."
+;;; Core: input handling
+;;
+;;
+(defun helm-check-minibuffer-input (&optional default)
+  "Check minibuffer content.
+The DEFAULT arg when non--nil mean use the :default arg of `helm'
+as default input to update display.
+This will happen when `helm-maybe-use-default-as-input' is non--nil."
   (with-helm-quittable
     (with-selected-window (or (active-minibuffer-window)
                               (minibuffer-window))
-      (helm-check-new-input (minibuffer-contents)))))
+      (helm-check-new-input (minibuffer-contents) default))))
 
-(defun helm-check-new-input (input)
-  "Check INPUT string and update the helm buffer if necessary."
+(defun helm-check-new-input (input &optional default)
+  "Check INPUT string and update the helm buffer if necessary.
+For DEFAULT arg see `helm-check-minibuffer-input'."
+  (when (and (string= input "") default
+             helm-maybe-use-default-as-input)
+    (setq input default))
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
     (unless (helm-action-window)
@@ -1885,7 +1897,9 @@ if some when multiples sources are present."
     (helm-update)))
 
 
-;; Core: source compiler
+;;; Core: source compiler
+;;
+;;
 (defvar helm-compile-source-functions-default helm-compile-source-functions
   "Plug-ins this file provides.")
 (defun helm-compile-sources (sources funcs)
@@ -2265,7 +2279,7 @@ is done on whole `helm-buffer' and not on current source."
         (helm-log "end update")))))
 
 (defun helm-update-source-p (source)
-  "Wheter SOURCE need updating or not."
+  "Whether SOURCE need updating or not."
   (and (or (not helm-source-filter)
            (member (assoc-default 'name source) helm-source-filter))
        (>= (length helm-pattern)
