@@ -34,6 +34,7 @@
 ;;; Multi keys
 ;;
 ;;
+;;;###autoload
 (defun helm-define-multi-key (keymap key functions &optional delay)
   "In KEYMAP, define key sequence KEY for function list FUNCTIONS.
 Each function run sequentialy each time the key KEY is pressed.
