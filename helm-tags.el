@@ -245,6 +245,7 @@ If tag file have been modified reinitialize cache."
     (if (and tag (file-exists-p tag))
         (helm :sources 'helm-c-source-etags-select
               :keymap helm-c-etags-map
+              :default (concat "\\_<" (thing-at-point 'symbol) "\\_>")
               :buffer "*helm etags*")
         (message "Error: No tag file found, please create one with etags shell command."))))
 
