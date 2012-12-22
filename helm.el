@@ -58,9 +58,9 @@ More than 2 seconds, next hit will run again the first function and so on."
                 (timeout delay))
     (eval (list 'defvar iter nil))
     (define-key keymap key #'(lambda ()
-                                     (interactive)
-                                     (helm-run-multi-key-command
-                                      funs iter timeout)))))
+                               (interactive)
+                               (helm-run-multi-key-command
+                                funs iter timeout)))))
 
 (defun helm-run-multi-key-command (functions iterator delay)
   (let ((fn #'(lambda ()
@@ -339,6 +339,15 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
 `helm-split-window-default-fn' unless this new function handle this."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-sources-using-default-as-input '(helm-c-source-imenu
+                                                 helm-c-source-info-elisp
+                                                 helm-c-source-etags-select)
+  "List of helm sources that need to use `helm-maybe-use-default-as-input'.
+When a source is member of this list, default `thing-at-point'
+will be used as input."
+  :group 'helm
+  :type '(repeat (choice symbol)))
 
 
 ;;; Faces
@@ -1371,7 +1380,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    any-buffer any-keymap any-default)
     (let ((old-overridding-local-map overriding-local-map)
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
-          (cursor-in-echo-area t))
+          (cursor-in-echo-area t)
+          (helm-maybe-use-default-as-input
+           (or helm-maybe-use-default-as-input ; maybe let-bounded use this value.
+               (loop for s in (helm-normalize-sources any-sources)
+                     thereis (memq s helm-sources-using-default-as-input)))))
       (unwind-protect
            (condition-case v
                (let (;; `helm-source-name' is non-nil
@@ -1402,6 +1415,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (helm-log-eval (setq helm-alive-p nil))
         (setq overriding-local-map old-overridding-local-map)
         (helm-log-save-maybe)))))
+
 
 
 ;;; Helm resume

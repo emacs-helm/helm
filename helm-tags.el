@@ -237,17 +237,14 @@ Called with two prefix arg reinitialize cache.
 If tag file have been modified reinitialize cache."
   (interactive "P")
   (let ((tag  (helm-c-etags-get-tag-file))
-        (init (and (equal arg '(4)) (thing-at-point 'symbol)))
-        (helm-quit-if-no-candidate t)
         (helm-execute-action-at-once-if-one t))
-    (when (or (equal arg '(16))
+    (when (or (equal arg '(4))
               (and helm-c-etags-mtime-alist
                    (helm-c-etags-file-modified-p tag)))
       (remhash tag helm-c-etags-cache))
     (if (and tag (file-exists-p tag))
         (helm :sources 'helm-c-source-etags-select
               :keymap helm-c-etags-map
-              :input init
               :buffer "*helm etags*")
         (message "Error: No tag file found, please create one with etags shell command."))))
 

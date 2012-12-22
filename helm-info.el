@@ -115,17 +115,17 @@ source.")
     (requires-pattern . 2)))
 
 ;;;###autoload
-(defun helm-info-at-point (arg)
+(defun helm-info-at-point ()
   "Preconfigured `helm' for searching info at point.
 With a prefix-arg insert symbol at point."
-  (interactive "P")
+  (interactive)
   (let ((helm-c-google-suggest-default-function
-         'helm-c-google-suggest-emacs-lisp))
+         'helm-c-google-suggest-emacs-lisp)
+        (helm-maybe-use-default-as-input t))
     (helm :sources '(helm-c-source-info-elisp
                      helm-c-source-info-cl
                      helm-c-source-info-pages
                      helm-c-source-google-suggest)
-          :input (and arg (thing-at-point 'symbol))
           :buffer "*helm info*")))
 
 (provide 'helm-info)
