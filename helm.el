@@ -1380,7 +1380,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                      helm-quit
                      (helm-buffer (or any-buffer helm-buffer)))
                  (with-helm-restore-variables
-                   (helm-initialize any-resume any-input any-sources)
+                   (helm-initialize any-resume any-input
+                                    any-default any-sources)
                    (helm-display-buffer helm-buffer)
                    (helm-log "show prompt")
                    (unwind-protect
@@ -1488,9 +1489,9 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
 ;;
 (defvar helm-buffers nil
   "All of `helm-buffer' in most recently used order.")
-(defun helm-initialize (any-resume any-input any-sources)
+(defun helm-initialize (any-resume any-input any-default any-sources)
   "Start initialization of `helm' session.
-For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
+For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (helm-log "start initialization: any-resume=%S any-input=%S"
             any-resume any-input)
   (helm-frame-or-window-configuration 'save)
@@ -1499,7 +1500,7 @@ For ANY-RESUME ANY-INPUT and ANY-SOURCES See `helm'."
   (helm-current-position 'save)
   (if (helm-resume-p any-resume)
       (helm-initialize-overlays (helm-buffer-get))
-      (helm-initial-setup))
+      (helm-initial-setup any-default))
   (setq helm-alive-p t)
   (unless (eq any-resume 'noresume)
     (helm-recent-push helm-buffer 'helm-buffers)
@@ -1645,7 +1646,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
 
 
 ;; Core: initialize
-(defun helm-initial-setup ()
+(defun helm-initial-setup (any-default)
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
   (setq helm-current-prefix-arg nil)
@@ -1670,7 +1671,11 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
         (setq helm-split-window-state 'horizontal)))
   ;; Call the init function for sources where appropriate
   (helm-funcall-foreach 'init)
-  (setq helm-pattern "")
+  (setq helm-pattern (or (and helm-maybe-use-default-as-input
+                              (or any-default
+                                  (with-helm-current-buffer
+                                    (thing-at-point 'symbol))))
+                         ""))
   (setq helm-input "")
   (setq helm-candidate-cache nil)
   (setq helm-last-sources helm-sources)
