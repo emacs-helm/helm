@@ -1705,6 +1705,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
   (if (and (helm-resume-p any-resume) (not (helm-empty-buffer-p)))
       (helm-mark-current-line t)
       (helm-update any-preselect))
+  (when helm-maybe-use-default-as-input
+    (setq helm-pattern "")
+    (and (helm-empty-buffer-p) (helm-force-update)))
   (with-current-buffer (helm-buffer-get)
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
@@ -1761,7 +1764,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                              ;; non--nil.
                                              (unless (or helm-in-persistent-action
                                                          helm-suspend-update-flag)
-                                               (helm-check-minibuffer-input tap)
+                                               (helm-check-minibuffer-input)
                                                (helm-print-error-messages))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
@@ -1893,7 +1896,7 @@ if some when multiples sources are present."
 ;;; Core: input handling
 ;;
 ;;
-(defun helm-check-minibuffer-input (&optional default)
+(defun helm-check-minibuffer-input ()
   "Check minibuffer content.
 The DEFAULT arg when non--nil mean use the :default arg of `helm'
 as default input to update display.
@@ -1901,14 +1904,11 @@ This will happen when `helm-maybe-use-default-as-input' is non--nil."
   (with-helm-quittable
     (with-selected-window (or (active-minibuffer-window)
                               (minibuffer-window))
-      (helm-check-new-input (minibuffer-contents) default))))
+      (helm-check-new-input (minibuffer-contents)))))
 
-(defun helm-check-new-input (input &optional default)
+(defun helm-check-new-input (input)
   "Check INPUT string and update the helm buffer if necessary.
 For DEFAULT arg see `helm-check-minibuffer-input'."
-  (when (and (string= input "") default
-             helm-maybe-use-default-as-input)
-    (setq input default))
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
     (unless (helm-action-window)
