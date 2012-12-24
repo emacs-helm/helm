@@ -748,6 +748,17 @@ Otherwise make a list with one element."
   `(let ((default-directory (file-name-as-directory ,directory)))
      ,@body))
 
+(defmacro with-helm-after-update-hook (&rest body)
+  "Execute BODY at end of `helm-update'."
+  (declare (indent 0) (debug t))
+  (let ((fun (gensym "helm-hook")))
+    `(progn
+       (defun ,fun ()
+         (unwind-protect
+              (progn ,@body)
+           (remove-hook 'helm-after-update-hook (quote ,fun))))
+       (add-hook 'helm-after-update-hook (quote ,fun)))))
+
 (defun* helm-attr (attribute-name
                    &optional (src (helm-get-current-source)) compute)
   "Get the value of ATTRIBUTE-NAME of SRC.
@@ -1735,7 +1746,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
         ;; is already started, but because source is delayed the hook
         ;; should have the time to be passed !!!
         ;; the hook will remove itself once done.
-        (add-hook 'helm-after-update-hook 'helm-exit-or-quit-maybe))
+        (with-helm-after-update-hook (helm-exit-or-quit-maybe)))
       ;; Reset `helm-pattern' for non--delayed sources and update
       ;; display if no result found with precedent value of `helm-pattern'.
       ;; Reset also `helm-maybe-use-default-as-input' as this checking
@@ -1785,17 +1796,15 @@ remove itself from this hook once executed.
 It is handling `helm-execute-action-at-once-if-one' and
 `helm-quit-if-no-candidate' in delayed sources."
   (with-helm-window
-    (unwind-protect
-         (cond ((and helm-execute-action-at-once-if-one
-                     (= (helm-approximate-candidate-number) 1))
-                (helm-exit-minibuffer))
-               ((and helm-quit-if-no-candidate
-                     (= (helm-approximate-candidate-number) 0))
-                (setq helm-quit t)
-                (and (functionp helm-quit-if-no-candidate)
-                     (funcall helm-quit-if-no-candidate))
-                (keyboard-quit)))
-      (remove-hook 'helm-after-update-hook 'helm-exit-or-quit-maybe))))
+    (cond ((and helm-execute-action-at-once-if-one
+                (= (helm-approximate-candidate-number) 1))
+           (helm-exit-minibuffer))
+          ((and helm-quit-if-no-candidate
+                (= (helm-approximate-candidate-number) 0))
+           (setq helm-quit t)
+           (and (functionp helm-quit-if-no-candidate)
+                (funcall helm-quit-if-no-candidate))
+           (keyboard-quit)))))
 
 ;;;###autoload
 (defun helm-toggle-suspend-update ()
@@ -1904,27 +1913,24 @@ if some when multiples sources are present."
 ;;
 ;;
 (defun helm-check-minibuffer-input ()
-  "Check minibuffer content.
-The DEFAULT arg when non--nil mean use the :default arg of `helm'
-as default input to update display.
-This will happen when `helm-maybe-use-default-as-input' is non--nil."
+  "Check minibuffer content."
   (with-helm-quittable
     (with-selected-window (or (active-minibuffer-window)
                               (minibuffer-window))
       (helm-check-new-input (minibuffer-contents)))))
 
 (defun helm-check-new-input (input)
-  "Check INPUT string and update the helm buffer if necessary.
-For DEFAULT arg see `helm-check-minibuffer-input'."
+  "Check INPUT string and update the helm buffer if necessary."
   ;; First time minibuffer is entered
   ;; we check value of `helm-pattern' that have been set
   ;; in `helm-initial-setup' when `helm-maybe-use-default-as-input'
   ;; is non--nil.  After this initial check, reset
   ;; `helm-maybe-use-default-as-input' and ignore this.
-  ;; This is done only when source is `delayed'.
-  (when helm-maybe-use-default-as-input
+  ;; This happen only when source is `delayed'.
+  (when helm-maybe-use-default-as-input ; nil when non--delayed.
     (setq input helm-pattern)
-    (add-hook 'helm-after-update-hook 'helm-maybe-reset-input-after-update)
+    (with-helm-after-update-hook
+      (when helm-maybe-use-default-as-input (setq helm-pattern "")))
     (setq helm-maybe-use-default-as-input nil))
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
@@ -1932,12 +1938,6 @@ For DEFAULT arg see `helm-check-minibuffer-input'."
       (setq helm-input helm-pattern))
     (helm-log-eval helm-pattern helm-input)
     (helm-update)))
-
-(defun helm-maybe-reset-input-after-update ()
-  "After checking for default input, rest `helm-pattern' for further searching."
-  (unwind-protect
-       (when helm-maybe-use-default-as-input (setq helm-pattern ""))
-    (remove-hook 'helm-after-update-hook 'helm-maybe-reset-input-after-update)))
 
 
 ;;; Core: source compiler
