@@ -120,8 +120,7 @@ source.")
 With a prefix-arg insert symbol at point."
   (interactive)
   (let ((helm-c-google-suggest-default-function
-         'helm-c-google-suggest-emacs-lisp)
-        (helm-maybe-use-default-as-input t))
+         'helm-c-google-suggest-emacs-lisp))
     (helm :sources '(helm-c-source-info-elisp
                      helm-c-source-info-cl
                      helm-c-source-info-pages
