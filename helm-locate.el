@@ -149,7 +149,7 @@ See `helm-locate-with-db' and `helm-locate'."
                     (or (and (equal '(4) localdb)
                              (helm-ff-find-locatedb from-ff))
                         (helm-c-read-file-name
-                         "Create Locate Db file (RET when done): "
+                         "Create Locate Db file: "
                          :initial-input (expand-file-name "locate.db"
                                                           (or helm-ff-default-directory
                                                               default-directory))
