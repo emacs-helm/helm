@@ -158,6 +158,8 @@ More than 2 seconds, next hit will run again the first function and so on."
     (define-key map "\C-c\C-x\C-b"     'helm-send-bug-report-from-helm)
     ;; Use `describe-mode' key in `global-map'.
     (define-key map [f1] nil) ; Allow to eval keymap without errors.
+    (define-key map (kbd "C-h C-h")    'undefined)
+    (define-key map (kbd "C-h h")      'undefined)
     (dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
     map)
@@ -1791,9 +1793,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
 
 (defun helm-exit-or-quit-maybe ()
   "Exit and run default action if only one candidate, quit if no candidates.
-This function must run in `helm-after-update-hook' and will
-remove itself from this hook once executed.
-It is handling `helm-execute-action-at-once-if-one' and
+This function is handling `helm-execute-action-at-once-if-one' and
 `helm-quit-if-no-candidate' in delayed sources."
   (with-helm-window
     (cond ((and helm-execute-action-at-once-if-one
