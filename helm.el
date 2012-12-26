@@ -1929,9 +1929,9 @@ if some when multiples sources are present."
   ;; This happen only when source is `delayed'.
   (when helm-maybe-use-default-as-input ; nil when non--delayed.
     (setq input helm-pattern)
-    (with-helm-after-update-hook
-      (when helm-maybe-use-default-as-input (setq helm-pattern "")))
+    (with-helm-after-update-hook (setq helm-pattern ""))
     (setq helm-maybe-use-default-as-input nil))
+  ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
     (unless (helm-action-window)
@@ -3045,7 +3045,12 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
 (defun helm-delete-minibuffer-contents ()
   "Same as `delete-minibuffer-contents' but this is a command."
   (interactive)
-  (helm-set-pattern ""))
+  (let ((input (minibuffer-contents)))
+    (if (> (length input) 0)
+        ;; minibuffer is not empty, delete contents and update.
+        (helm-set-pattern "")
+        ;; minibuffer is already empty, force update.
+        (helm-force-update))))
 
 
 ;;; Plugins
