@@ -128,7 +128,10 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defvar helm-c-source-regexp
   '((name . "Regexp Builder")
     (init . (lambda ()
-              (helm-candidate-buffer helm-current-buffer)))
+              (helm-init-candidates-in-buffer
+               'global (with-temp-buffer
+                         (insert-buffer-substring helm-current-buffer)
+                         (buffer-string)))))
     (candidates-in-buffer)
     (get-line . helm-c-regexp-get-line)
     (persistent-action . helm-c-regexp-persistent-action)
