@@ -49,6 +49,12 @@ to a specific `major-mode'."
   :type '(alist :key-type symbol :value-type regexp)
   :group 'helm-regexp)
 
+(defcustom helm-browse-code-fontify t
+  "Fontify `current-buffer' when `helm-browse-code' start.
+Slow on large buffers."
+  :type 'boolean
+  :group 'helm-regexp)
+
 (defcustom helm-moccur-always-search-in-current nil
   "Helm multi occur always search in current buffer when non--nil."
   :group 'helm-regexp
@@ -293,12 +299,14 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 
 
 ;;; Helm browse code.
+;;
+;;
 (defun helm-c-browse-code-get-line (beg end)
   "Select line if it match the regexp corresponding to current `major-mode'.
 Line is parsed for BEG position to END position."
   (let ((str-line (buffer-substring beg end))
-        (regexp   (assoc-default major-mode
-                                 helm-c-browse-code-regexp-alist))
+        (regexp   (with-helm-current-buffer
+                    (assoc-default major-mode helm-c-browse-code-regexp-alist)))
         (num-line (if (string= helm-pattern "") beg (1- beg))))
     (when (and regexp (string-match regexp str-line))
       (format "%4d:%s" (line-number-at-pos num-line) str-line))))
@@ -306,9 +314,13 @@ Line is parsed for BEG position to END position."
 (defvar helm-c-source-browse-code
   '((name . "Browse code")
     (init . (lambda ()
-              (helm-candidate-buffer helm-current-buffer)
-              (with-helm-current-buffer
-                (jit-lock-fontify-now))))
+              (helm-init-candidates-in-buffer
+               'global (with-temp-buffer
+                         (insert-buffer-substring helm-current-buffer)
+                         (buffer-string)))
+              (when helm-browse-code-fontify
+                (with-helm-current-buffer
+                  (jit-lock-fontify-now)))))
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (get-line . helm-c-browse-code-get-line)
