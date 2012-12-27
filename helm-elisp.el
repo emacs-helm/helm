@@ -351,7 +351,7 @@ Filename completion happen if string start after or between a double quote."
                     helm-c-source-emacs-faces
                     helm-c-source-helm-attributes))
           :buffer "*helm apropos*"
-          :preselect (concat "\\_<" default "\\_>"))))
+          :preselect (concat "\\_<" (regexp-quote default) "\\_>"))))
 
 
 ;;; Advices
