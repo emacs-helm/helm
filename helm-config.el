@@ -172,23 +172,22 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads (helm-send-bug-report-from-helm helm-send-bug-report
-;;;;;;  helm-follow-mode helm-kill-selection-and-quit helm-yank-selection
-;;;;;;  helm-prev-visible-mark helm-next-visible-mark helm-display-all-visible-marks
-;;;;;;  helm-toggle-all-marks helm-unmark-all helm-mark-all helm-toggle-visible-mark
-;;;;;;  helm-reposition-window-other-window helm-recenter-top-bottom-other-window
-;;;;;;  helm-scroll-other-window-down helm-scroll-other-window helm-execute-persistent-action
-;;;;;;  helm-select-2nd-action-or-end-of-line helm-select-4th-action
-;;;;;;  helm-select-3rd-action helm-select-2nd-action helm-swap-windows
-;;;;;;  helm-enlarge-window helm-narrow-window helm-toggle-resplit-window
-;;;;;;  helm-delete-minibuffer-contents helm-delete-current-selection
-;;;;;;  helm-debug-output helm-keyboard-quit helm-exit-minibuffer
-;;;;;;  helm-confirm-and-exit-minibuffer helm-next-source helm-previous-source
-;;;;;;  helm-end-of-buffer helm-beginning-of-buffer helm-next-page
-;;;;;;  helm-previous-page helm-next-line helm-previous-line helm-select-action
-;;;;;;  helm-force-update helm-toggle-suspend-update helm-other-buffer
-;;;;;;  helm-resume helm-open-last-log helm-define-multi-key) "helm"
-;;;;;;  "helm.el" (20693 42039 924736 759000))
+;;;### (autoloads (helm-follow-mode helm-kill-selection-and-quit
+;;;;;;  helm-yank-selection helm-prev-visible-mark helm-next-visible-mark
+;;;;;;  helm-display-all-visible-marks helm-toggle-all-marks helm-unmark-all
+;;;;;;  helm-mark-all helm-toggle-visible-mark helm-reposition-window-other-window
+;;;;;;  helm-recenter-top-bottom-other-window helm-scroll-other-window-down
+;;;;;;  helm-scroll-other-window helm-execute-persistent-action helm-select-2nd-action-or-end-of-line
+;;;;;;  helm-select-4th-action helm-select-3rd-action helm-select-2nd-action
+;;;;;;  helm-swap-windows helm-enlarge-window helm-narrow-window
+;;;;;;  helm-toggle-resplit-window helm-delete-minibuffer-contents
+;;;;;;  helm-delete-current-selection helm-debug-output helm-keyboard-quit
+;;;;;;  helm-exit-minibuffer helm-confirm-and-exit-minibuffer helm-next-source
+;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
+;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
+;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
+;;;;;;  helm-other-buffer helm-resume helm-open-last-log helm-define-multi-key)
+;;;;;;  "helm" "helm.el" (20699 59504 891435 503000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -458,16 +457,6 @@ You can paste it by typing \\[yank].
 Execute persistent action everytime the cursor is moved when enabled.
 
 \(fn &optional ARG)" t nil)
-
-(autoload 'helm-send-bug-report "helm" "\
-Send a bug report of helm.el.
-
-\(fn)" t nil)
-
-(autoload 'helm-send-bug-report-from-helm "helm" "\
-Send a bug report of helm.el in helm session.
-
-\(fn)" t nil)
 
 ;;;***
 
@@ -1213,7 +1202,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20686 9742 406330 443000))
+;;;;;;  (20699 59726 803463 952000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1330,8 +1319,8 @@ HELM-ATTRIBUTE should be a symbol.
 
 ;;;***
 
-;;;### (autoloads (helm-imenu) "helm-imenu" "helm-imenu.el" (20641
-;;;;;;  62378 4889 124000))
+;;;### (autoloads (helm-imenu) "helm-imenu" "helm-imenu.el" (20693
+;;;;;;  58771 314384 32000))
 ;;; Generated autoloads from helm-imenu.el
 
 (autoload 'helm-imenu "helm-imenu" "\
@@ -1342,19 +1331,19 @@ Preconfigured `helm' for `imenu'.
 ;;;***
 
 ;;;### (autoloads (helm-info-at-point) "helm-info" "helm-info.el"
-;;;;;;  (20670 27857 452274 652000))
+;;;;;;  (20696 39923 716025 306000))
 ;;; Generated autoloads from helm-info.el
 
 (autoload 'helm-info-at-point "helm-info" "\
 Preconfigured `helm' for searching info at point.
 With a prefix-arg insert symbol at point.
 
-\(fn ARG)" t nil)
+\(fn)" t nil)
 
 ;;;***
 
-;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20679
-;;;;;;  10174 640925 76000))
+;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20696
+;;;;;;  20026 316149 148000))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate "helm-locate" "\
@@ -1611,7 +1600,7 @@ Preconfigured helm to show org headlines.
 ;;;***
 
 ;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20675 14932 953343 472000))
+;;;;;;  "helm-regexp" "helm-regexp.el" (20699 18227 378681 527000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1720,7 +1709,7 @@ Preconfigured `helm' for emacs process.
 ;;;***
 
 ;;;### (autoloads (helm-c-etags-select) "helm-tags" "helm-tags.el"
-;;;;;;  (20641 62378 12889 126000))
+;;;;;;  (20696 16379 646404 905000))
 ;;; Generated autoloads from helm-tags.el
 
 (autoload 'helm-c-etags-select "helm-tags" "\
@@ -1813,8 +1802,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20693
-;;;;;;  42047 932831 693000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20699
+;;;;;;  59803 674839 445000))
 
 ;;;***
 

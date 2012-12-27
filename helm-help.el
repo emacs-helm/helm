@@ -50,10 +50,6 @@ Narrow the list by typing some pattern,
 Multiple patterns are allowed by splitting by space.
 Select with natural Emacs operations, choose with RET.
 
-If you have any problems, press C-c C-x C-b!!
-Feel free to send bug reports. I'll fix them.
-The steps are described in the beginning of helm.el file.
-
 == Basic Operations ==
 C-p, Up: Previous Line
 C-n, Down : Next Line
@@ -70,7 +66,6 @@ Left : Previous Source
 Right, C-o : Next Source
 C-k : Delete pattern
 C-z : Persistent Action (Execute action with helm session kept)
-C-c C-x C-b: Send a bug report
 
 == Shortcuts For 2nd/3rd Action ==
 \\[helm-select-2nd-action-or-end-of-line] : Execute 2nd Action (if the minibuffer cursor is at end of line)
@@ -263,7 +258,6 @@ Orange     => A buffer file modified and not saved.
 \\[helm-narrow-window]\t\t->Narrow helm window.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
 \\[helm-ff-run-find-file-as-root]\t\t->Find file as root.
-\\[helm-send-bug-report-from-helm]\t\t->Send Bug report.
 \\[helm-ff-help]\t\t->Display this help info.
 \n== Helm Map ==
 \\{helm-map}")

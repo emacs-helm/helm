@@ -153,9 +153,7 @@ More than 2 seconds, next hit will run again the first function and so on."
     (helm-define-multi-key map (kbd "C-t") '(helm-toggle-resplit-window
                                              helm-swap-windows) 0.5)
     ;; Debugging command
-    (define-key map "\C-c\C-x\C-d"     'helm-debug-output)
-    (define-key map "\C-c\C-x\C-m"     'helm-display-all-visible-marks)
-    (define-key map "\C-c\C-x\C-b"     'helm-send-bug-report-from-helm)
+    (define-key map (kbd "C-c h d")    'helm-debug-output)
     ;; Use `describe-mode' key in `global-map'.
     (define-key map [f1] nil) ; Allow to eval keymap without errors.
     (define-key map (kbd "C-h C-h")    'undefined)
@@ -3881,59 +3879,6 @@ This happen after `helm-input-idle-delay' secs."
        (helm-get-selection)
        (save-excursion
          (helm-execute-persistent-action))))
-
-
-;; Bug Report
-(defvar helm-maintainer-mail-address "emacs-helm@googlegroups.com")
-
-(defvar helm-bug-report-salutation
-  "Describe bug below, using a precise recipe.
-
-When I executed M-x ...
-
-How to send a bug report:
-  1) Be sure to use the LATEST version of helm.el.
-  2) Enable debugger. M-x toggle-debug-on-error or (setq debug-on-error t)
-  3) Use Lisp version instead of compiled one: (load \"helm.el\")
-  4) If you got an error, please paste *Backtrace* buffer.
-  5) Type C-c C-c to send.")
-
-(defvar helm-no-dump-variables
-  '(helm-candidate-buffer-alist
-    helm-help-message
-    helm-candidate-cache
-    )
-  "Variables not to dump in bug report.")
-
-(defun helm-dumped-variables-in-bug-report ()
-  (let ((hash (make-hash-table)))
-    (loop for var in (apropos-internal "helm-" 'boundp)
-          for vname = (symbol-name var)
-          unless (or (string-match "-map$" vname)
-                     (string-match "^helm-c-source-" vname)
-                     (string-match "-hash$" vname)
-                     (string-match "-face$" vname)
-                     (memq var helm-no-dump-variables))
-          collect var)))
-
-;;;###autoload
-(defun helm-send-bug-report ()
-  "Send a bug report of helm.el."
-  (interactive)
-  (with-current-buffer (or helm-last-buffer
-                           (current-buffer))
-    (reporter-submit-bug-report
-     helm-maintainer-mail-address
-     "helm.el"
-     (helm-dumped-variables-in-bug-report)
-     nil nil
-     helm-bug-report-salutation)))
-
-;;;###autoload
-(defun helm-send-bug-report-from-helm ()
-  "Send a bug report of helm.el in helm session."
-  (interactive)
-  (helm-run-after-quit 'helm-send-bug-report))
 
 
 (provide 'helm)
