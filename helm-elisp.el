@@ -216,15 +216,17 @@ If SYM is not documented, return \"Not documented\"."
   "Complete file name at point."
   (interactive)
   (let* ((tap (thing-at-point 'filename))
+         beg
          (init (and tap
                     (or force
                         (save-excursion
-                          (forward-char (- (length tap)))
+                          (end-of-line)
+                          (search-backward tap (point-at-bol) t)
+                          (setq beg (point))
                           (looking-back "[^'`( ]")))
                     (expand-file-name
                      (substring-no-properties tap))))
          (end  (point))
-         (beg  (- (point) (length tap)))
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          completion)
@@ -249,14 +251,14 @@ If SYM is not documented, return \"Not documented\"."
 ;;;###autoload
 (defun helm-lisp-completion-or-file-name-at-point ()
   "Complete lisp symbol or filename at point.
-Filename completion happen if string start after
-a double quote or between."
+Filename completion happen if string start after or between a double quote."
   (interactive)
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
-                   (forward-char (- (length tap)))
+                   (end-of-line)
+                   (search-backward tap (point-at-bol) t)
                    (looking-back "[^'`( ]")))
-        (helm-c-complete-file-name-at-point 'force)
+        (helm-c-complete-file-name-at-point)
         (helm-lisp-completion-at-point))))
 
 
