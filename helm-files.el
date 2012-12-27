@@ -2561,7 +2561,12 @@ Else return ACTIONS unmodified."
                     (if helm-ff-file-name-history-use-recentf
                         recentf-list
                         file-name-history)))
-    (action . (("find file in helm"
+    (action . (("Find file"
+                . (lambda (candidate)
+                    (helm-set-pattern
+                     (expand-file-name candidate))
+                    (with-helm-after-update-hook (helm-exit-minibuffer))))
+               ("Find file in helm"
                 . (lambda (candidate)
                     (helm-set-pattern
                      (expand-file-name candidate))))))))
