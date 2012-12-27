@@ -2231,7 +2231,7 @@ and `helm-pattern'."
       (helm-insert-header-from-source source)
       (insert-buffer-substring content-buf))))
 
-(defun helm-process-delayed-sources (delayed-sources &optional preselect)
+(defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
 Move selection to string or regexp PRESELECT if non--nil.
 This function is called in `helm-process-delayed-sources-timer'
@@ -2249,7 +2249,7 @@ when emacs is idle for `helm-idle-delay'."
                    (= (overlay-start helm-selection-overlay)
                       (overlay-end helm-selection-overlay)))
           (helm-update-move-first-line 'without-hook)))
-      (when preselect (helm-preselect preselect))
+      (when preselect (helm-preselect preselect source))
       (save-excursion
         (goto-char (point-min))
         (helm-log-run-hook 'helm-update-hook))
@@ -2259,7 +2259,7 @@ when emacs is idle for `helm-idle-delay'."
 
 ;;; Core: helm-update
 ;;
-(defun helm-update (&optional preselect)
+(defun helm-update (&optional preselect source)
   "Update candidates list in `helm-buffer' according to `helm-pattern'.
 Argument PRESELECT is a string or regexp used to move selection to a particular
 place once updating is done.  It should be used on single source because search
@@ -2292,7 +2292,7 @@ is done on whole `helm-buffer' and not on current source."
                ;; Preselection run here when there is
                ;; normal AND delayed sources.
                (helm-log "Update preselect candidate %s" preselect)
-               (helm-preselect preselect))
+               (helm-preselect preselect source))
               (delayed-sources ; Preselection and hooks will run later.
                (helm-update-move-first-line 'without-hook))
               (t              ; No delayed sources, run the hooks now.
@@ -2300,7 +2300,7 @@ is done on whole `helm-buffer' and not on current source."
                (helm-log-run-hook 'helm-after-update-hook)
                (when preselect
                  (helm-log "Update preselect candidate %s" preselect)
-                 (helm-preselect preselect))
+                 (helm-preselect preselect source))
                (setq helm-force-updating-p nil)))
         (when delayed-sources
           ;; Allow giving a value to `delayed' attr from inside source.
@@ -2316,7 +2316,7 @@ is done on whole `helm-buffer' and not on current source."
              ;; otherwise use value of helm-input-idle-delay
              ;; or 0.1 if == to 0.
              (max helm-idle-delay helm-input-idle-delay 0.1) nil
-             'helm-process-delayed-sources delayed-sources preselect)))
+             'helm-process-delayed-sources delayed-sources preselect source)))
         (helm-log "end update")))))
 
 (defun helm-update-source-p (source)
@@ -2363,7 +2363,7 @@ if specified."
     (when source
       (mapc 'helm-force-update--reinit
             (helm-get-sources)))
-    (helm-update (or preselect selection))
+    (helm-update (or preselect selection) source)
     (with-helm-window (recenter))))
 
 (defun helm-force-update--reinit (source)
@@ -2963,13 +2963,12 @@ to a list of forms.\n\n")
         do (remhash key helm-tick-hash)))
 (add-hook 'kill-buffer-hook 'helm-kill-buffer-hook)
 
-(defun helm-preselect (candidate-or-regexp)
+(defun helm-preselect (candidate-or-regexp &optional source)
   "Move `helm-selection-overlay' to CANDIDATE-OR-REGEXP on startup."
-  (declare (special source))
   (with-helm-window
     (when candidate-or-regexp
       (if helm-force-updating-p
-          (helm-goto-source source)
+          (and source (helm-goto-source source))
           (goto-char (point-min))
           (forward-line 1))
       (let ((start (point)))
