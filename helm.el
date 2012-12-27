@@ -153,7 +153,8 @@ More than 2 seconds, next hit will run again the first function and so on."
     (helm-define-multi-key map (kbd "C-t") '(helm-toggle-resplit-window
                                              helm-swap-windows) 0.5)
     ;; Debugging command
-    (define-key map (kbd "C-c h d")    'helm-debug-output)
+    (define-key map (kbd "C-h C-d")    'undefined)
+    (define-key map (kbd "C-h C-d")    'helm-debug-output)
     ;; Use `describe-mode' key in `global-map'.
     (define-key map [f1] nil) ; Allow to eval keymap without errors.
     (define-key map (kbd "C-h C-h")    'undefined)
