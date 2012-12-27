@@ -185,14 +185,20 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 ;;; Multi occur
 ;;
 ;;
-(defun helm-m-occur-init (buffers)
+
+;; Internal
+(defvar helm-multi-occur-buffer-list nil)
+
+(defun helm-m-occur-init ()
   "Create the initial helm multi occur buffer with BUFFERS list."
-  (when helm-moccur-always-search-in-current
-    (setq buffers (cons helm-current-buffer
-                        (remove helm-current-buffer buffers))))
+  (set (make-local-variable 'helm-multi-occur-buffer-list)
+       (if helm-moccur-always-search-in-current
+           (cons helm-current-buffer
+                 (remove helm-current-buffer helm-multi-occur-buffer-list))
+           helm-multi-occur-buffer-list))
   (helm-init-candidates-in-buffer
    'global
-   (loop for buf in buffers
+   (loop for buf in helm-multi-occur-buffer-list
          for bufstr = (with-current-buffer buf (buffer-string))
          do (add-text-properties
              0 (length bufstr)
@@ -249,7 +255,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   `((name . "Moccur")
     (init . (lambda ()
               (require 'helm-grep)
-              (helm-m-occur-init buffers)
+              (helm-m-occur-init)
               (helm-attrset 'delayed helm-m-occur-idle-delay)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . helm-m-occur-transformer)
@@ -290,7 +296,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-c-source-moccur' with BUFFERS list."
-  (declare (special buffers))
+  (setq helm-multi-occur-buffer-list buffers)
   (let ((helm-compile-source-functions
          ;; rule out helm-match-plugin because the input is one regexp.
          (delq 'helm-compile-source--match-plugin
