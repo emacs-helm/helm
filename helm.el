@@ -3705,7 +3705,7 @@ second argument of `display-buffer'."
               (unless
                   (and (or (helm-file-completion-source-p)
                            (equal src "Files from Current Directory"))
-                       (or (string-match "^\\.#.*\\|^#.*#$\\|\\.$" bn)
+                       (or (string-match "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
                            ;; We need to test here when not using a transformer
                            ;; that tag prefix (i.e on tramp)
                            (not (file-exists-p cand))))
