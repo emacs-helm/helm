@@ -97,6 +97,21 @@ See `helm-case-fold-search' for more info."
    #'(lambda (_candidate)
        (identity ""))))
 
+(defun helm-this-command ()
+  "Return the actual command in action.
+Like `this-command' but return the real command,
+not `exit-minibuffer' or unwanted functions."
+  (if (commandp this-command)
+      this-command
+      (loop for count from 1 to 50
+            for btf = (backtrace-frame count)
+            for fn = (second btf)
+            if (commandp fn) return fn
+            else
+            if (and (eq fn 'call-interactively)
+                    (> (length btf) 2))
+            return (cadr (cdr btf)))))
+
 (defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp)
   "Convert COLLECTION to list removing elements that don't match TEST.
 See `helm-comp-read' about supported COLLECTION arguments.
@@ -530,7 +545,7 @@ Don't use it directly, use instead `helm-comp-read' in your programs.
 
 See documentation of `completing-read' and `all-completions' for details."
   (declare (special helm-mode))
-  (let* ((current-command this-command)
+  (let* ((current-command (or (helm-this-command) this-command))
          (str-command     (if (consp current-command) ; Maybe a lambda.
                               "Anonymous"
                               (symbol-name current-command)))
@@ -754,7 +769,7 @@ Keys description:
                            default-filename)))
          (init (or default initial dir default-directory))
          (ini-input (and init (expand-file-name init)))
-         (current-command this-command)
+         (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
          (helm-file-completion-sources
           (cons str-command
