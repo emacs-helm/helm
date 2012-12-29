@@ -101,16 +101,16 @@ See `helm-case-fold-search' for more info."
   "Return the actual command in action.
 Like `this-command' but return the real command,
 not `exit-minibuffer' or unwanted functions."
-  (if (commandp this-command)
-      this-command
-      (loop for count from 1 to 50
-            for btf = (backtrace-frame count)
-            for fn = (second btf)
-            if (commandp fn) return fn
-            else
-            if (and (eq fn 'call-interactively)
-                    (> (length btf) 2))
-            return (cadr (cdr btf)))))
+  (loop with bl = '(helm-exit-minibuffer
+                    exit-minibuffer)
+        for count from 1 to 50
+        for btf = (backtrace-frame count)
+        for fn = (second btf)
+        if (and (commandp fn) (not (memq fn bl))) return fn
+        else
+        if (and (eq fn 'call-interactively)
+                (> (length btf) 2))
+        return (cadr (cdr btf))))
 
 (defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp)
   "Convert COLLECTION to list removing elements that don't match TEST.
