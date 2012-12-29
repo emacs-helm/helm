@@ -146,7 +146,7 @@ If FILE1 or FILE2 does not exist, the return value is unspecified."
             (and (setq f1-attr (file-attributes (file-truename file1)))
                  (setq f2-attr (file-attributes (file-truename file2)))
                  (equal f1-attr f2-attr))))))
-  
+
   ;; This is the original loop version, more readable, not the one of 24.1+.
   (defun file-in-directory-p (file dir)
     "Return non-nil if FILE is in DIR or a subdirectory of DIR.
@@ -600,7 +600,7 @@ Useful in dired buffers when there is inserted subdirs."
       (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
-    (recenter-top-bottom)))
+    (recenter)))
 
 (defalias 'helm-persistent-highlight-point 'helm-match-line-color-current-line)
 
