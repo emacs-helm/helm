@@ -127,12 +127,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                                   (set-window-buffer (get-buffer-window hbuf)
                                                      helm-current-buffer))
                                 (setq in-help nil))
-                              ;; Be sure helm-current-buffer
-                              ;; have not a dedicated window.
-                              (set-window-dedicated-p
-                               (get-buffer-window helm-current-buffer) nil)
-                              (describe-function (intern candidate))
-                              (message nil)
+                              (helm-c-describe-function candidate)
                               (setq in-help t))
                           (setq help-cand candidate)))))
     (setq command (helm-comp-read

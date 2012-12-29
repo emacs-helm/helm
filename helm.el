@@ -3569,13 +3569,12 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
    (setq minibuffer-scroll-window
          (helm-persistent-action-display-window split-onewindow))))
 
-(defun helm-persistent-action-display-buffer (buf &optional not-this-window)
+(defun helm-persistent-action-display-buffer (buf &optional  action)
   "Make `pop-to-buffer' and `display-buffer' display in the same window.
 If `helm-persistent-action-use-special-display' is non-nil and
 BUF is to be displayed by `special-display-function', use it.
 Otherwise ignores `special-display-buffer-names' and `special-display-regexps'.
-Argument NOT-THIS-WINDOW if present will be used as
-second argument of `display-buffer'."
+Argument ACTION if present will be used as second argument of `display-buffer'."
   (let* ((name (buffer-name buf))
          display-buffer-function pop-up-windows pop-up-frames
          ;; Disable `special-display-regexps' and `special-display-buffer-names'
@@ -3595,7 +3594,9 @@ second argument of `display-buffer'."
                                  thereis (string-match (or (car-safe x) x)
                                                        name))))
             '("."))))
-    (display-buffer buf not-this-window)))
+    ;; Be sure window of BUF is not dedicated.
+    (set-window-dedicated-p (get-buffer-window buf) nil)
+    (display-buffer buf action)))
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun helm-other-window-base (command &optional scroll-amount)

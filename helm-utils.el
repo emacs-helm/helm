@@ -346,11 +346,13 @@ The match is done with `string-match'."
 
 (defun helm-c-describe-function (func)
   "FUNC is symbol or string."
-  (describe-function (helm-c-symbolify func)))
+  (describe-function (helm-c-symbolify func))
+  (message nil))
 
 (defun helm-c-describe-variable (var)
   "VAR is symbol or string."
-  (describe-variable (helm-c-symbolify var)))
+  (describe-variable (helm-c-symbolify var))
+  (message nil))
 
 (defun helm-c-find-function (func)
   "FUNC is symbol or string."
