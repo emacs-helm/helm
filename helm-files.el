@@ -2694,6 +2694,43 @@ Colorize only symlinks, directories and files."
     (type . file)))
 
 
+;;; Findutils
+;;
+;;
+(defvar helm-c-source-findutils
+  `((name . "Find")
+    (candidates-process . (lambda ()
+                            (helm-find-shell-command-fn directory)))
+    (type . file)
+    (keymap . ,helm-generic-files-map)
+    (requires-pattern . 3)
+    (delayed)))
+
+(defun helm-find-shell-command-fn (directory)
+  (prog1
+      (apply #'start-process "hfind" helm-buffer "find"
+             (list directory
+                   (if case-fold-search "-name" "-iname")
+                   (concat "*" helm-pattern "*") "-type" "f"))
+    (set-process-sentinel (get-process "hfind")
+                          #'(lambda (process event)
+                              (when (string= event "finished\n")
+                                (ignore))))))
+
+
+;;;###autoload
+(defun helm-find (arg)
+  "Preconfigured `helm' for the find shell command."
+  (interactive "P")
+  (progv '(directory
+           helm-ff-transformer-show-only-basename)
+      (list (if arg
+                (file-name-as-directory
+                 (read-directory-name "DefaultDirectory: "))
+                default-directory))
+    (helm :sources 'helm-c-source-findutils :buffer "*helm find*")))
+
+
 ;;;###autoload
 (defun helm-find-files (arg)
   "Preconfigured `helm' for helm implementation of `find-file'.

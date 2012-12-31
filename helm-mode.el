@@ -530,7 +530,7 @@ Don't use it directly, use instead `helm-comp-read' in your programs.
 
 See documentation of `completing-read' and `all-completions' for details."
   (declare (special helm-mode))
-  (let* ((current-command this-command)
+  (let* ((current-command (or (helm-this-command) this-command))
          (str-command     (if (consp current-command) ; Maybe a lambda.
                               "Anonymous"
                               (symbol-name current-command)))
@@ -754,7 +754,7 @@ Keys description:
                            default-filename)))
          (init (or default initial dir default-directory))
          (ini-input (and init (expand-file-name init)))
-         (current-command this-command)
+         (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
          (helm-file-completion-sources
           (cons str-command
