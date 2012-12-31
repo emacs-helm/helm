@@ -65,10 +65,10 @@ the trap of backward compatibility. </p>
 <pre lang="elisp"><code>(add-to-list 'load-path "/path/to/helm/directory")
 (require 'helm-config)
 </code></pre>
-
-<p>Alternatively, you can have a quick try to helm by launching from the helm directory:</p>
 </li>
-</ol><p><code>./emacs-helm.sh</code></p>
+</ol><p>Alternatively, you can have a quick try to helm by launching from the helm directory:</p>
+
+<p><code>./emacs-helm.sh</code></p>
 
 <p>Note that this will not work on Windows systems.</p>
 
@@ -84,7 +84,7 @@ You will find there instructions to install.</p>
 <h3>Emacs Prelude</h3>
 
 <p>If you're afraid to play with Emacs's configuration, but want to try
-out Helm - have no fear. Have a look at
+out Helm - have NO FEAR. Have a look at
 <a href="https://github.com/bbatsov/prelude">Emacs Prelude</a> - it has
 Helm built-in and properly set-up.</p>
 
@@ -97,7 +97,7 @@ a keyboard shortcut. Here's a suggestion:</p>
 </code></pre>
 
 <p>You can also start with <code>M-x helm-mode</code> and enjoy helm completion in your favourites
-Emacs commands (e.g 'M-x', 'C-x C-f', etc...).
+Emacs commands (e.g <code>M-x</code>, <code>C-x C-f</code>, etc...).
 You can enable this by adding in your init file:</p>
 
 <pre lang="elisp"><code>(helm-mode 1)
@@ -108,8 +108,9 @@ discover some of the commands provided by helm.</p>
 
 <h3>Advanced usage</h3>
 
-<p>Helm is capable of a lot.
-You can find all the gory details on the <a href="https://github.com/emacs-helm/helm/wiki">Helm Wiki</a>.</p>
+<p>Helm is capable of a lot.</p>
+
+<p>You can find all the gory details on the <a href="https://github.com/emacs-helm/helm/wiki">Helm Wiki</a>.</p>
 
 <h2>Known issues</h2>
 
@@ -128,47 +129,11 @@ development of Helm.</p>
 <p>Bug reports and suggestions for improvements are always
 welcome. GitHub pull requests are even better! :-)</p>
 
-<h3>Report bug or need help</h3>
+<p>NOTE: When trying if something is working or not, be sure to start helm from <code>Emacs -Q</code> or even better
+Start it from your helm directory with <code>./emacs-helm.sh</code>.</p>
 
-<p><a href="http://groups.google.com/group/emacs-helm">emacs helm mailing list</a></p>
-
-<h3>Send Bug Report from Emacs</h3>
-
-<p>If you have problems, send a bug report via <code>C-c C-x C-b</code> in helm session (best)
-or <code>M-x helm-send-bug-report</code> outside helm session.
-We implemented this bug report feature because we want to know your current state.
-It helps usa solve problems easily.
-The steps are:</p>
-
-<ol>
-<li>
-<p>Setup mail in Emacs, the easiest way is:</p>
-
-<pre lang="elisp"><code>(setq user-mail-address "your@mail.address")
-(setq user-full-name "Your Full Name")
-(setq smtpmail-smtp-server "your.smtp.server.jp")
-(setq mail-user-agent 'message-user-agent)
-(setq message-send-mail-function 'message-smtpmail-send-it)
-</code></pre>
-</li>
-<li><p>Be sure to use the <strong>LATEST</strong> version of <code>helm.el</code>.</p></li>
-<li><p>Enable debugger. <code>M-x toggle-debug-on-error</code> or <code>(setq debug-on-error t)</code></p></li>
-<li><p>Use Lisp version instead of compiled one: <code>(load "helm.el")</code></p></li>
-<li><p>Do it!</p></li>
-<li><p>If you got an error, please do not close <em><em>Backtrace</em></em> buffer.</p></li>
-<li><p>Type <code>C-c C-x C-b</code> (helm session, best!)
- or <code>M-x helm-send-bug-report</code> (outside) and
- then <code>M-x insert-buffer</code> <em>Backtrace</em> (if you got error)</p></li>
-<li><p>Describe the bug using a precise recipe.</p></li>
-<li><p>Type <code>C-c C-c</code> to send.</p></li>
-</ol><p>Cheers,<br>
+<p>Cheers,<br>
 The Helm Team</p>
-
-
-
-<p><a title="Use OpenDNS to make your Internet faster, safer, and smarter." href="http://www.opendns.com/share/"><img src="http://images.opendns.com/buttons/use_opendns_155x52.gif" width="155" height="52" alt="Use OpenDNS"></a></p>
-
-
       </section>
     </div>
 
