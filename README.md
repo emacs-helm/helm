@@ -51,6 +51,12 @@ You will find there instructions to install.
 
 `Only the extensions present in the github emacs-helm organisation are supported.`
 
+### Alternate install warning
+
+Some people are installing `helm` with their own config using diverses `require`, `autoload`
+and other hacks, not using `helm-config`.
+Expect failures and slowdown at startup unless you really know what you are doing when you do so.
+
 ### Emacs Prelude
 
 If you're afraid to play with Emacs's configuration, but want to try
