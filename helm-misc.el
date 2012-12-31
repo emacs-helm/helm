@@ -18,36 +18,11 @@
 ;;; Code:
 (eval-when-compile (require 'cl))
 (require 'helm)
-;(require 'helm-buffers)
-;(require 'helm-files)
 
 
 (defgroup helm-misc nil
   "Various Applications and libraries for Helm."
   :group 'helm)
-
-(defcustom helm-minibuffer-history-key "C-r"
-  "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
-  :type '(choice (string :tag "Key") (const :tag "no binding"))
-  :group 'helm-misc
-  :set
-  (lambda (var key)
-    (dolist (map '(minibuffer-local-completion-map
-                   minibuffer-local-filename-completion-map
-                   minibuffer-local-filename-must-match-map ; Emacs 23.1.+
-                   minibuffer-local-isearch-map
-                   minibuffer-local-map
-                   minibuffer-local-must-match-filename-map ; Older Emacsen
-                   minibuffer-local-must-match-map
-                   minibuffer-local-ns-map))
-      (when (and (boundp map) (keymapp (symbol-value map)))
-        (when (and (boundp var) (symbol-value var))
-          (define-key (symbol-value map)
-            (read-kbd-macro (symbol-value var)) nil))
-        (when key
-          (define-key (symbol-value map)
-            (read-kbd-macro key) 'helm-minibuffer-history))))
-    (set var key)))
 
 (defcustom helm-time-zone-home-location "Paris"
   "The time zone of your home"

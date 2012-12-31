@@ -41,6 +41,29 @@
       (define-key (current-global-map)
         (read-kbd-macro key) 'helm-command-prefix))
     (set var key)))
+
+(defcustom helm-minibuffer-history-key "C-r"
+  "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
+  :type '(choice (string :tag "Key") (const :tag "no binding"))
+  :group 'helm-config
+  :set
+  (lambda (var key)
+    (dolist (map '(minibuffer-local-completion-map
+                   minibuffer-local-filename-completion-map
+                   minibuffer-local-filename-must-match-map ; Emacs 23.1.+
+                   minibuffer-local-isearch-map
+                   minibuffer-local-map
+                   minibuffer-local-must-match-filename-map ; Older Emacsen
+                   minibuffer-local-must-match-map
+                   minibuffer-local-ns-map))
+      (when (and (boundp map) (keymapp (symbol-value map)))
+        (when (and (boundp var) (symbol-value var))
+          (define-key (symbol-value map)
+            (read-kbd-macro (symbol-value var)) nil))
+        (when key
+          (define-key (symbol-value map)
+            (read-kbd-macro key) 'helm-minibuffer-history))))
+    (set var key)))
 
 ;;; Command Keymap
 ;;
@@ -94,12 +117,6 @@
 (define-prefix-command 'helm-command-prefix)
 (fset 'helm-command-prefix helm-command-map)
 (setq  helm-command-prefix helm-command-map)
-
-;;; Minibuffer history
-;; We need this because minibuffer will not be necessary be used
-;; first by an helm command.  This will define `helm-minibuffer-history-key'
-;; as soon minibuffer is in use.
-(add-hook 'minibuffer-setup-hook #'(lambda () (require 'helm-misc)))
 
 
 ;;; Menu
@@ -202,7 +219,7 @@
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
 ;;;;;;  helm-other-buffer helm-resume helm-open-last-log helm-define-multi-key)
-;;;;;;  "helm" "helm.el" (20702 50920 453834 924000))
+;;;;;;  "helm" "helm.el" (20705 43944 820368 416000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -819,7 +836,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20703 7999 389302 233000))
+;;;;;;  "helm-files" "helm-files.el" (20705 43361 492286 974000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1420,8 +1437,8 @@ See `helm-mp-matching-method' for the behavior of each method.
 
 ;;;### (autoloads (helm-minibuffer-history helm-mini helm-stumpwm-commands
 ;;;;;;  helm-ratpoison-commands helm-eev-anchors helm-c-insert-latex-math
-;;;;;;  helm-world-time) "helm-misc" "helm-misc.el" (20701 49478
-;;;;;;  772042 619000))
+;;;;;;  helm-world-time) "helm-misc" "helm-misc.el" (20705 44919
+;;;;;;  252508 833000))
 ;;; Generated autoloads from helm-misc.el
 
 (autoload 'helm-world-time "helm-misc" "\
@@ -1462,7 +1479,7 @@ Preconfigured `helm' for `minibuffer-history'.
 ;;;***
 
 ;;;### (autoloads (helm-mode helm-comp-read helm-cr-empty-string)
-;;;;;;  "helm-mode" "helm-mode.el" (20702 50920 449834 922000))
+;;;;;;  "helm-mode" "helm-mode.el" (20705 43944 816368 415000))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-cr-empty-string "helm-mode" "\
@@ -1821,8 +1838,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20703
-;;;;;;  12117 618847 805000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20705
+;;;;;;  45139 1176 659000))
 
 ;;;***
 
