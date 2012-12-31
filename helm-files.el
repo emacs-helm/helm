@@ -2694,6 +2694,40 @@ Colorize only symlinks, directories and files."
     (type . file)))
 
 
+;;; External searching file tools.
+;;
+;; Tracker desktop search
+(defvar helm-c-source-tracker-search
+  '((name . "Tracker Search")
+    (candidates-process
+     . (lambda ()
+         (start-process "tracker-search-process" nil
+                        "tracker-search"
+                        helm-pattern)))
+    (type . file)
+    (requires-pattern . 3)
+    (delayed))
+  "Source for retrieving files matching the current input pattern
+with the tracker desktop search.")
+
+;; Spotlight (MacOS X desktop search)
+(defvar helm-c-source-mac-spotlight
+  '((name . "mdfind")
+    (candidates-process
+     . (lambda () (start-process "mdfind-process" nil "mdfind" helm-pattern)))
+    (type . file)
+    (requires-pattern . 3)
+    (delayed))
+  "Source for retrieving files via Spotlight's command line
+utility mdfind.")
+
+;; Picklist
+(defvar helm-c-source-picklist
+  '((name . "Picklist")
+    (candidates . (lambda () (mapcar 'car picklist-list)))
+    (type . file)))
+
+
 ;;; Findutils
 ;;
 ;;

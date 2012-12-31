@@ -18,8 +18,8 @@
 ;;; Code:
 (eval-when-compile (require 'cl))
 (require 'helm)
-(require 'helm-buffers)
-(require 'helm-files)
+;(require 'helm-buffers)
+;(require 'helm-files)
 
 
 (defgroup helm-misc nil
@@ -63,38 +63,6 @@
     '((t (:foreground "red")))
   "Face used to colorize home time in `helm-world-time'."
   :group 'helm-misc)
-
-
-;;; Tracker desktop search
-(defvar helm-c-source-tracker-search
-  '((name . "Tracker Search")
-    (candidates-process
-     . (lambda ()
-         (start-process "tracker-search-process" nil
-                        "tracker-search"
-                        helm-pattern)))
-    (type . file)
-    (requires-pattern . 3)
-    (delayed))
-  "Source for retrieving files matching the current input pattern
-with the tracker desktop search.")
-
-;;; Spotlight (MacOS X desktop search)
-(defvar helm-c-source-mac-spotlight
-  '((name . "mdfind")
-    (candidates-process
-     . (lambda () (start-process "mdfind-process" nil "mdfind" helm-pattern)))
-    (type . file)
-    (requires-pattern . 3)
-    (delayed))
-  "Source for retrieving files via Spotlight's command line
-utility mdfind.")
-
-;;; Picklist
-(defvar helm-c-source-picklist
-  '((name . "Picklist")
-    (candidates . (lambda () (mapcar 'car picklist-list)))
-    (type . file)))
 
 
 ;;; Latex completion
@@ -373,6 +341,7 @@ It is added to `extended-command-history'.
 (defun helm-mini ()
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
+  (require 'helm-files)
   (helm-other-buffer '(helm-c-source-buffers-list
                        helm-c-source-recentf
                        helm-c-source-buffer-not-found)
