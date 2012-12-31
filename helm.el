@@ -1791,7 +1791,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                     (minibuffer-with-setup-hook
                         #'(lambda ()
                             (setq timer (run-with-idle-timer
-                                         helm-input-idle-delay 'repeat
+                                         (max helm-input-idle-delay 0.1) 'repeat
                                          #'(lambda ()
                                              ;; Stop updating when in persistent action
                                              ;; or when `helm-suspend-update-flag' is
