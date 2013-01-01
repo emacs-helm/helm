@@ -1478,7 +1478,8 @@ Store the selected file-name in the `file-name-history'."
   (when (helm-file-completion-source-p)
     (let ((sel (helm-get-selection))
           (history-delete-duplicates t))
-      (when (file-exists-p sel)
+      (when (and (file-exists-p sel)
+                 (not (file-directory-p sel)))
         ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
         ;; and we don't want to introduce duplicates.
         (add-to-history 'file-name-history
