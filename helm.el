@@ -1983,6 +1983,7 @@ Helm plug-ins are realized by this function."
             (dolist (f (if (functionp it) (list it) it))
               (add-to-list 'helm-delayed-init-executed name)))))))
 
+(defvar helm-never-delay-on-input t)
 (defun helm-get-candidates (source)
   "Retrieve and return the list of candidates from SOURCE."
   (helm-process-delayed-init source)
@@ -1999,6 +2000,7 @@ Helm plug-ins are realized by this function."
                          (if candidate-proc
                              (helm-interpret-value candidate-proc source)
                              (if (or helm-force-updating-p
+                                     helm-never-delay-on-input
                                      (assoc 'no-delay-on-input source))
                                  (helm-interpret-value candidate-fn source)
                                  (let ((result (while-no-input
