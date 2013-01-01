@@ -2731,19 +2731,21 @@ utility mdfind.")
 ;;; Findutils
 ;;
 ;;
+;; Internal.
+(defvar helm-find-last-directory nil)
 (defvar helm-c-source-findutils
   `((name . "Find")
-    (candidates-process . (lambda ()
-                            (helm-find-shell-command-fn directory)))
+    (candidates-process . helm-find-shell-command-fn)
     (type . file)
     (keymap . ,helm-generic-files-map)
     (requires-pattern . 3)
     (delayed)))
 
-(defun helm-find-shell-command-fn (directory)
+(defun helm-find-shell-command-fn ()
+  "Asynchronously fetch candidates for `helm-find'."
   (prog1
       (apply #'start-process "hfind" helm-buffer "find"
-             (list directory
+             (list helm-find-last-directory
                    (if case-fold-search "-name" "-iname")
                    (concat "*" helm-pattern "*") "-type" "f"))
     (set-process-sentinel (get-process "hfind")
@@ -2751,20 +2753,28 @@ utility mdfind.")
                               (when (string= event "finished\n")
                                 (ignore))))))
 
+(defun helm-find-1 (dir)
+  (helm :sources 'helm-c-source-findutils
+        :buffer "*helm find*"
+        ;; Make these vars local for further resuming.
+        :find-last-directory dir
+        :ff-transformer-show-only-basename nil))
+
 
+;;; Preconfigured commands
+;;
+;;
 ;;;###autoload
 (defun helm-find (arg)
   "Preconfigured `helm' for the find shell command."
   (interactive "P")
-  (progv '(directory
-           helm-ff-transformer-show-only-basename)
-      (list (if arg
-                (file-name-as-directory
-                 (read-directory-name "DefaultDirectory: "))
-                default-directory))
-    (helm :sources 'helm-c-source-findutils :buffer "*helm find*")))
+  (let ((directory
+         (if arg
+             (file-name-as-directory
+              (read-directory-name "DefaultDirectory: "))
+             default-directory)))
+    (helm-find-1 directory)))
 
-
 ;;;###autoload
 (defun helm-find-files (arg)
   "Preconfigured `helm' for helm implementation of `find-file'.
