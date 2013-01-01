@@ -217,10 +217,15 @@ Orange     => A buffer file modified and not saved.
   e.g You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
 - To create a new directory, add a \"/\" at end of new name and press <RET>.
 - To create a new file just write the filename not ending with \"/\".
+- You can start a recursive search with Locate of Find (See commands below).
+  With Locate you can use a local db with a prefix arg; If the localdb doesn't already
+  exists, you will be prompted for its creation, if it exists and you want to refresh it,
+  give two prefix args.
 
 \nSpecific commands for `helm-find-files':
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
+\\[helm-ff-run-find-sh-command]\t\t->Run Find shell command from this directory.
 \\[helm-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[helm-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[helm-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).

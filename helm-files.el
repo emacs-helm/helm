@@ -298,6 +298,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "M-u")           'helm-unmark-all)
     (define-key map (kbd "C-c C-a")       'helm-ff-run-gnus-attach-files)
     (define-key map (kbd "C-c p")         'helm-ff-run-print-file)
+    (define-key map (kbd "C-c /")         'helm-ff-run-find-sh-command)
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")           'helm-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
@@ -382,6 +383,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ("Checksum File" . helm-ff-checksum)
            ("Complete at point `M-tab'"
             . helm-c-insert-file-name-completion-at-point)
+           ("Find shell command" . helm-ff-find-sh-command)
            ("Open file externally `C-c C-x, C-u to choose'"
             . helm-c-open-file-externally)
            ("Open file with default tool" . helm-c-open-file-with-default-tool)
@@ -2732,19 +2734,21 @@ utility mdfind.")
 ;;; Findutils
 ;;
 ;;
+;; Internal.
+(defvar helm-find-last-directory nil)
 (defvar helm-c-source-findutils
   `((name . "Find")
-    (candidates-process . (lambda ()
-                            (helm-find-shell-command-fn directory)))
+    (candidates-process . helm-find-shell-command-fn)
     (type . file)
     (keymap . ,helm-generic-files-map)
     (requires-pattern . 3)
     (delayed)))
 
-(defun helm-find-shell-command-fn (directory)
+(defun helm-find-shell-command-fn ()
+  "Asynchronously fetch candidates for `helm-find'."
   (prog1
       (apply #'start-process "hfind" helm-buffer "find"
-             (list directory
+             (list helm-find-last-directory
                    (if case-fold-search "-name" "-iname")
                    (concat "*" helm-pattern "*") "-type" "f"))
     (set-process-sentinel (get-process "hfind")
@@ -2752,20 +2756,41 @@ utility mdfind.")
                               (when (string= event "finished\n")
                                 (ignore))))))
 
+(defun helm-find-1 (dir)
+  (helm :sources 'helm-c-source-findutils
+        :buffer "*helm find*"
+        ;; Make these vars local for further resuming.
+        :find-last-directory dir
+        :ff-transformer-show-only-basename nil))
+
+;; helm-find-files integration.
+(defun helm-ff-find-sh-command (candidate)
+  "Run `helm-find' from `helm-find-files'."
+  (let ((dir (if (file-directory-p candidate)
+                 candidate (file-name-directory candidate))))
+    (helm-find-1 (expand-file-name dir))))
+
+(defun helm-ff-run-find-sh-command ()
+  "Run find shell command action with key from `helm-find-files'."
+  (interactive)
+  (when helm-alive-p
+    (helm-c-quit-and-execute-action 'helm-ff-find-sh-command)))
+
 
+;;; Preconfigured commands
+;;
+;;
 ;;;###autoload
 (defun helm-find (arg)
   "Preconfigured `helm' for the find shell command."
   (interactive "P")
-  (progv '(directory
-           helm-ff-transformer-show-only-basename)
-      (list (if arg
-                (file-name-as-directory
-                 (read-directory-name "DefaultDirectory: "))
-                default-directory))
-    (helm :sources 'helm-c-source-findutils :buffer "*helm find*")))
+  (let ((directory
+         (if arg
+             (file-name-as-directory
+              (read-directory-name "DefaultDirectory: "))
+             default-directory)))
+    (helm-find-1 directory)))
 
-
 ;;;###autoload
 (defun helm-find-files (arg)
   "Preconfigured `helm' for helm implementation of `find-file'.
