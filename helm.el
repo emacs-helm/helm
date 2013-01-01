@@ -1990,9 +1990,9 @@ Helm plug-ins are realized by this function."
          (candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
          (type-error (lambda ()
-                       (error (concat "Candidates must either be a function, "
-                                      " a variable or a list: %s")
-                              candidate-fn)))
+                       (error
+                        ",`%s' must either be a function, a variable or a list"
+                        candidate-fn)))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
@@ -2197,9 +2197,12 @@ and `helm-pattern'."
 
 (defun helm-compute-matches (source)
   "Compute matched results from SOURCE according to its settings."
-  (condition-case nil
+  (condition-case err
       (helm-compute-matches-internal source)
-    (error nil)))
+    (error (helm-log-error
+            "helm-compute-matches in source `%s': %s %s"
+            (assoc-default 'name source) (car err) (cadr err))
+           nil)))
 
 (defun helm-compute-matches-internal (source)
   (save-current-buffer
