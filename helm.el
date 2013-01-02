@@ -350,6 +350,17 @@ will be used as input."
   :group 'helm
   :type '(repeat (choice symbol)))
 
+(defcustom helm-never-delay-on-input t
+  "Globally disable the use of `while-no-input' in all sources when non--nil.
+This can be done individually by source adding the attribute
+`no-delay-on-input' in source. This have no effect on async source
+that are not using `while-no-input'.
+It is disabled by default because it is not supported on some system
+like \"Mac Osx\" but it is a good idea to enable it if
+supported by your system. Known to works fine on GNU/Linux and Windows."
+  :group 'helm
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -541,13 +552,6 @@ Otherwise all variables started with `helm-' are shown.")
   "If non-nil, write log message into `helm-debug-buffer' buffer.
 If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because `helm-debug-buffer' grows quickly.")
-
-(defvar helm-never-delay-on-input nil
-  "Globally disable the use of `while-no-input' in all sources.
-This can be done individually by source adding the attribute
-`no-delay-on-input' in source. This have no effect on async source
-that are not using `while-no-input'.
-Unless for debugging you should not have to modify this value.")
 
 
 ;;; Internal Variables
