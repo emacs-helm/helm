@@ -542,6 +542,13 @@ Otherwise all variables started with `helm-' are shown.")
 If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because *Helm Log* grows quickly.")
 
+(defvar helm-never-delay-on-input nil
+  "Globally disable the use of `while-no-input' in all sources.
+This can be done individually by source adding the attribute
+`no-delay-on-input' in source. This have no effect on async source
+that are not using `while-no-input'.
+Unless for debugging you should not have to modify this value.")
+
 
 ;;; Internal Variables
 ;;
@@ -1983,7 +1990,6 @@ Helm plug-ins are realized by this function."
             (dolist (f (if (functionp it) (list it) it))
               (add-to-list 'helm-delayed-init-executed name)))))))
 
-(defvar helm-never-delay-on-input t)
 (defun helm-get-candidates (source)
   "Retrieve and return the list of candidates from SOURCE."
   (helm-process-delayed-init source)
