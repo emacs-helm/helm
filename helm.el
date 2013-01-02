@@ -531,10 +531,8 @@ precedence on :default.")
   "Non-nil means add helm-source text-property in each candidate.
 experimental feature.")
 
-(defvaralias 'helm-debug-variables 'helm-debug-forms)
-
-(defvar helm-debug-forms nil
-  "Forms to show in `helm-debug-output'.
+(defvar helm-debug-variables nil
+  "A list of helm variables to show in `helm-debug-output'.
 Otherwise all variables started with `helm-' are shown.")
 
 (defvar helm-debug nil
@@ -2971,10 +2969,10 @@ If action buffer is displayed, kill it."
 
 (defun helm-debug-output-function (&optional vars)
   (message "Calculating all helm-related values...")
-  (insert "If you debug some variables or forms, set `helm-debug-forms'
+  (insert "If you debug some variables or forms, set `helm-debug-variables'
 to a list of forms.\n\n")
   (dolist (v (or vars
-                 helm-debug-forms
+                 helm-debug-variables
                  (apropos-internal "^helm-" 'boundp)))
     (insert "** "
             (pp-to-string v) "\n"
