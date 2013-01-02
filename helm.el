@@ -535,10 +535,12 @@ experimental feature.")
   "A list of helm variables to show in `helm-debug-output'.
 Otherwise all variables started with `helm-' are shown.")
 
+(defvar helm-debug-buffer "*Debug Helm Log*")
+
 (defvar helm-debug nil
-  "If non-nil, write log message into *Helm Log* buffer.
+  "If non-nil, write log message into `helm-debug-buffer' buffer.
 If `debug-on-error' is non-nil, write log message regardless of this variable.
-It is disabled by default because *Helm Log* grows quickly.")
+It is disabled by default because `helm-debug-buffer' grows quickly.")
 
 (defvar helm-never-delay-on-input nil
   "Globally disable the use of `while-no-input' in all sources.
@@ -592,12 +594,12 @@ Unless for debugging you should not have to modify this value.")
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
   "Log message if `debug-on-error' or `helm-debug' is non-nil.
-Messages are written to the *Helm Log* buffer.
+Messages are written to the `helm-debug-buffer' buffer.
 
 Argument FORMAT-STRING is a string to use with `format'.
 Use optional arguments ARGS like in `format'."
   (when (or debug-on-error helm-debug)
-    (with-current-buffer (get-buffer-create "*Helm Log*")
+    (with-current-buffer (get-buffer-create helm-debug-buffer)
       (buffer-disable-undo)
       (set (make-local-variable 'inhibit-read-only) t)
       (goto-char (point-max))
@@ -609,7 +611,7 @@ Use optional arguments ARGS like in `format'."
                         (apply #'format (cons format-string args))))))))
 
 (defmacro helm-log-eval (&rest exprs)
-  "Write each EXPRS evaluation result to the *Helm Log* buffer."
+  "Write each EXPRS evaluation result to the `helm-debug-buffer'."
   `(helm-log-eval-internal ',exprs))
 
 (defun helm-log-run-hook (hook)
@@ -669,7 +671,7 @@ at the date and time of today in this directory."
                                             (format-time-string "%Y%m%d"))
                                     helm-debug-root-directory)))
       (make-directory logdir t)
-      (with-current-buffer (get-buffer-create "*Helm Log*")
+      (with-current-buffer (get-buffer-create helm-debug-buffer)
         (write-region (point-min) (point-max)
                       (setq helm-last-log-file
                             (expand-file-name
@@ -681,11 +683,11 @@ at the date and time of today in this directory."
 ;;;###autoload
 (defun helm-open-last-log ()
   "Open helm log file of last helm session.
-If `helm-last-log-file' is nil, switch to \"*Helm Log*\" buffer."
+If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
   (interactive)
   (if helm-last-log-file
       (view-file helm-last-log-file)
-      (switch-to-buffer "*Helm Log*")))
+      (switch-to-buffer helm-debug-buffer)))
 
 (defun helm-print-error-messages ()
   "Print error messages in `helm-issued-errors'."
