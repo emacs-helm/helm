@@ -267,6 +267,7 @@ Filename completion happen if string start after or between a double quote."
 ;;
 (defun helm-c-apropos-init (test default)
   "Init candidates buffer for `helm-c-apropos' sources."
+  (require 'helm-help)
   (with-current-buffer (helm-candidate-buffer 'global)
     (goto-char (point-min))
     (when (and default (stringp default)
