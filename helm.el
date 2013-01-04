@@ -631,14 +631,17 @@ Use optional arguments ARGS like in `format'."
   "Eval EXPRS and write results to helm log buffer."
   (dolist (expr exprs)
     (condition-case err
-        (helm-log "%S = %S" expr (eval expr))
+        ;; Don't eval expression EXPR
+        ;; when debugging is not turned on.
+        (when (or debug-on-error helm-debug)
+          (helm-log "%S = %S" expr (eval expr)))
       (error (helm-log "%S = ERROR: %S" expr err)))))
 
 (defun helm-log-get-current-function ()
   "Get function name calling `helm-log'.
 The original idea is from `tramp-debug-message'."
   (loop with exclude-func-re = "^helm-\\(?:interpret\\|log\\|.*funcall\\)"
-        for btn from 1 to 40            ;avoid inf-loop
+        for btn from 1 to 40
         for btf = (second (backtrace-frame btn))
         for fn  = (if (symbolp btf) (symbol-name btf) "")
         if (and (string-match "^helm" fn)
@@ -2002,7 +2005,7 @@ Helm plug-ins are realized by this function."
          (candidate-proc (assoc-default 'candidates-process source))
          (type-error (lambda ()
                        (error
-                        ",`%s' must either be a function, a variable or a list"
+                        "Error: `%s' must either be a function, a variable or a list"
                         candidate-fn)))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
@@ -2211,10 +2214,12 @@ and `helm-pattern'."
   "Compute matched results from SOURCE according to its settings."
   (condition-case err
       (helm-compute-matches-internal source)
-    (error (helm-log-error
+    ;; Don't catch the invalid-regexp error from `helm-match-from-candidates'
+    ((invalid-regexp nil)
+     (error (helm-log-error
             "helm-compute-matches in source `%s': %s %s"
             (assoc-default 'name source) (car err) (cadr err))
-           nil)))
+           nil))))
 
 (defun helm-compute-matches-internal (source)
   (save-current-buffer
