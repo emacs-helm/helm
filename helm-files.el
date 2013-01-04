@@ -1469,15 +1469,15 @@ e.g helm.el$
 
 (defun helm-ff-save-history ()
   "Store the last value of `helm-ff-default-directory' in `helm-ff-history'.
-
-Store the selected file-name in the `file-name-history'."
+Note that only directories are saved here."
   (when (and helm-ff-default-directory
              (helm-file-completion-source-p))
     (push helm-ff-default-directory helm-ff-history)))
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
 
-(defun helm-files-save-file-name-history ()
-  (when (helm-file-completion-source-p)
+(defun helm-files-save-file-name-history (&optional force)
+  "Save selected file to `file-name-history'."
+  (when (or force (helm-file-completion-source-p))
     (let ((sel (helm-get-selection))
           (history-delete-duplicates t))
       (when (and (file-exists-p sel)
