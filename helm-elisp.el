@@ -277,9 +277,14 @@ Filename completion happen if string start after or between a double quote."
                (not (string= default "nil"))
                (funcall test (intern default)))
       (insert (concat default "\n")))
-    (loop with all = (all-completions "" obarray test)
+    (loop with bl = (and (eq test 'boundp)
+                         (apropos-internal "^any-" 'symbolp))
+          with all = (all-completions "" obarray test)
           for sym in all
-          unless (and default (string= sym default))
+          for s = (intern sym)
+          unless (or (and default (string= sym default))
+                     (and bl (memq s bl))
+                     (keywordp s))
           do (insert (concat sym "\n")))))
 
 (defun helm-c-source-emacs-variables (&optional default)
