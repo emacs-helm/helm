@@ -69,7 +69,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
       (remove-hook 'helm-before-action-hook 'helm-c-adaptive-store-selection)
       (remove-hook 'helm-select-action-hook 'helm-c-adaptive-store-selection)))
 
-(defun helm-c-source-use-adaptative-p (&optional source-name)
+(defun helm-adapt-use-adaptative-p (&optional source-name)
   "Return current source only if it use adaptative history, nil otherwise."
   (when helm-adaptative-mode
     (let* ((source (or source-name (helm-get-current-source)))
@@ -82,14 +82,14 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                              (assoc-default 'filtered-candidate-transformer source)
                              (assoc-default 'candidate-transformer source))))
       (if (listp adapt-source)
-          (when (member 'helm-c-adaptive-sort adapt-source) source)
-          (when (eq adapt-source 'helm-c-adaptive-sort) source)))))
+          (and (member 'helm-c-adaptive-sort adapt-source) source)
+          (and (eq adapt-source 'helm-c-adaptive-sort) source)))))
 
 (defun helm-c-adaptive-store-selection ()
   "Store history information for the selected candidate."
   (unless helm-c-adaptive-done
     (setq helm-c-adaptive-done t)
-    (let ((source (helm-c-source-use-adaptative-p)))
+    (let ((source (helm-adapt-use-adaptative-p)))
       (when source
         (let* ((source-name (or (assoc-default 'type source)
                                 (assoc-default 'name source)))

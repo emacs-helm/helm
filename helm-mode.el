@@ -444,9 +444,11 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                       (not (string= default "nil"))
                                       (not (string= default "")))
                              (insert (concat default "\n")))
-                           (loop with all = (all-completions "" collection test)
+                           (loop with all = (all-completions "" obarray test)
                                  for sym in all
-                                 unless (and default (eq sym default))
+                                 for s = (intern sym)
+                                 unless (or (and default (string= sym default))
+                                            (keywordp s))
                                  do (insert (concat sym "\n"))))))
                (persistent-action . helm-lisp-completion-persistent-action)
                (persistent-help . "Show brief doc in mode-line")

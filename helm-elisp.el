@@ -267,6 +267,7 @@ Filename completion happen if string start after or between a double quote."
 ;;
 (defun helm-c-apropos-init (test default)
   "Init candidates buffer for `helm-c-apropos' sources."
+  (require 'helm-help)
   (with-current-buffer (helm-candidate-buffer 'global)
     (goto-char (point-min))
     (when (and default (stringp default)
@@ -278,10 +279,12 @@ Filename completion happen if string start after or between a double quote."
       (insert (concat default "\n")))
     (loop with all = (all-completions "" obarray test)
           for sym in all
-          unless (and default (string= sym default))
+          for s = (intern sym)
+          unless (or (and default (string= sym default))
+                     (keywordp s))
           do (insert (concat sym "\n")))))
 
-(defun helm-c-source-emacs-variables (&optional default)
+(defun helm-def-source--emacs-variables (&optional default)
   `((name . "Variables")
     (init . (lambda ()
               (helm-c-apropos-init 'boundp ,default)))
@@ -289,7 +292,7 @@ Filename completion happen if string start after or between a double quote."
     (action . (("Describe Variable" . helm-c-describe-variable)
                ("Find Variable" . helm-c-find-variable)))))
 
-(defun helm-c-source-emacs-faces (&optional default)
+(defun helm-def-source--emacs-faces (&optional default)
   `((name . "Faces")
     (init . (lambda ()
               (helm-c-apropos-init 'facep ,default)))
@@ -300,7 +303,7 @@ Filename completion happen if string start after or between a double quote."
     (action . (lambda (candidate)
                 (describe-face (intern candidate))))))
 
-(defun helm-c-source-helm-attributes (&optional default)
+(defun helm-def-source--helm-attributes (&optional default)
   `((name . "Helm attributes")
     (candidates . (lambda ()
                     (mapcar 'symbol-name helm-additional-attributes)))
@@ -311,7 +314,7 @@ Filename completion happen if string start after or between a double quote."
                   (with-output-to-temp-buffer "*Help*"
                     (princ (get (intern candidate) 'helm-attrdoc))))))))
 
-(defun helm-c-source-emacs-commands (&optional default)
+(defun helm-def-source--emacs-commands (&optional default)
   `((name . "Commands")
     (init . (lambda ()
               (helm-c-apropos-init 'commandp ,default)))
@@ -319,7 +322,7 @@ Filename completion happen if string start after or between a double quote."
     (action . (("Describe Function" . helm-c-describe-function)
                ("Find Function" . helm-c-find-function)))))
 
-(defun helm-c-source-emacs-functions (&optional default)
+(defun helm-def-source--emacs-functions (&optional default)
   `((name . "Functions")
     (init . (lambda ()
               (helm-c-apropos-init #'(lambda (x) (and (fboundp x)
@@ -337,11 +340,11 @@ Filename completion happen if string start after or between a double quote."
     (helm :sources
           (mapcar (lambda (func)
                     (funcall func default))
-                  '(helm-c-source-emacs-commands
-                    helm-c-source-emacs-functions
-                    helm-c-source-emacs-variables
-                    helm-c-source-emacs-faces
-                    helm-c-source-helm-attributes))
+                  '(helm-def-source--emacs-commands
+                    helm-def-source--emacs-functions
+                    helm-def-source--emacs-variables
+                    helm-def-source--emacs-faces
+                    helm-def-source--helm-attributes))
           :buffer "*helm apropos*"
           :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
 
