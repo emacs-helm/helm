@@ -2190,9 +2190,9 @@ and `helm-pattern'."
                (if (string-match "[A-Z]" bn) nil t)))
       (t helm-case-fold-search))))
 
-(defun helm-match-from-candidates (cands matchfns limit)
+(defun helm-match-from-candidates (cands matchfns limit source)
   (let (matches)
-    (condition-case nil
+    (condition-case err
         (let ((item-count 0)
               (case-fold-search (helm-set-case-fold-search))
               exit)
@@ -2206,22 +2206,15 @@ and `helm-pattern'."
               (setq matches (append matches (reverse newmatches)))
               ;; Don't recompute matches already found by this match function
               ;; with the next match function.
-              (setq cands (loop for i in cands unless (member i matches) collect i)))))
-      (invalid-regexp (setq matches nil)))
+              (setq cands (loop for i in cands
+                                unless (member i matches) collect i)))))
+      (invalid-regexp (setq matches nil))
+      (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+               (assoc-default 'name source) (car err) (cadr err))
+              nil))
     matches))
 
 (defun helm-compute-matches (source)
-  "Compute matched results from SOURCE according to its settings."
-  (condition-case err
-      (helm-compute-matches-internal source)
-    ;; Don't catch the invalid-regexp error from `helm-match-from-candidates'
-    ((invalid-regexp nil)
-     (error (helm-log-error
-            "helm-compute-matches in source `%s': %s %s"
-            (assoc-default 'name source) (car err) (cadr err))
-           nil))))
-
-(defun helm-compute-matches-internal (source)
   (save-current-buffer
     (let ((matchfns (helm-match-functions source))
           (helm-source-name (assoc-default 'name source))
@@ -2229,11 +2222,12 @@ and `helm-pattern'."
           (helm-pattern (helm-process-pattern-transformer
                          helm-pattern source)))
       (helm-process-filtered-candidate-transformer
-       (if (or (equal helm-pattern "") (equal matchfns '(identity)))
+       (if (or (equal helm-pattern "")
+               (equal matchfns '(identity)))
            (helm-take-first-elements
             (helm-get-cached-candidates source) limit)
            (helm-match-from-candidates
-            (helm-get-cached-candidates source) matchfns limit))
+            (helm-get-cached-candidates source) matchfns limit source))
        source))))
 
 (defun helm-process-source (source)
