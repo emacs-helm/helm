@@ -56,7 +56,7 @@ Don't search tag file deeply if outside this value."
     makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
     scheme-mode sh-mode slang-mode sql-mode tcl-mode ))
 
-(defun helm-c-source-ctags-init ()
+(defun helm-ctags-init ()
   (when (and buffer-file-name
              (memq major-mode helm-c-ctags-modes)
              (helm-current-buffer-is-modified))
@@ -84,7 +84,7 @@ Don't search tag file deeply if outside this value."
 
 (defvar helm-c-source-ctags
   '((name . "Exuberant ctags")
-    (init . helm-c-source-ctags-init)
+    (init . helm-ctags-init)
     (candidates-in-buffer)
     (adjust)
     (type . line))
@@ -135,7 +135,7 @@ If not found in CURRENT-DIR search in upper directory."
           (setq current-dir (expand-file-name (concat current-dir "../")))
           finally return current-dir)))
 
-(defun helm-c-source-etags-header-name (x)
+(defun helm-etags-get-header-name (x)
   "Create header name for this helm etags session."
   (concat "Etags in "
           (with-helm-current-buffer
@@ -190,7 +190,7 @@ If no entry in cache, create one."
 
 (defvar helm-c-source-etags-select
   `((name . "Etags")
-    (header-name . helm-c-source-etags-header-name)
+    (header-name . helm-etags-get-header-name)
     (init . helm-c-etags-init)
     (candidates-in-buffer)
     (match-part . (lambda (candidate)
