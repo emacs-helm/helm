@@ -2028,8 +2028,10 @@ Helm plug-ins are realized by this function."
            ;; Candidates will be filtered later in process filter.
            candidates)
           ((listp candidates)
-           ;; Filter candidates now with either `candidate-transformer'
-           ;; or `filtered-candidate-transformer' function.
+           ;; Filter candidates now with `candidate-transformer' function maybe
+           ;; otherwise return CANDIDATES which will be passed to
+           ;; `filtered-candidate-transformer', which in turn will maybe filter
+           ;; them or return them unmodified.
            (helm-transform-candidates candidates source))
           (t (funcall type-error)))))
 

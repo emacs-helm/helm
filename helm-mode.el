@@ -31,8 +31,6 @@
     (describe-variable . helm-completing-read-symbols)
     (debug-on-entry . helm-completing-read-symbols)
     (find-function . helm-completing-read-symbols)
-    (trace-function . helm-completing-read-symbols)
-    (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-with-cands-in-buffer)
     (ffap-alternate-file . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
@@ -47,6 +45,12 @@ helm source and BUFFER the name of the buffer we will use.
 This function prefix name must start by \"helm\".
 
 See `helm-completing-read-symbols' for example.
+
+Note that this function will be reused for ALL the `completing-read'
+of this command, so it should handle all cases, e.g
+If first `completing-read' complete against symbols and
+second `completing-read' should handle only buffer,
+your specialized function should handle the both.
 
 If the value of an entry is nil completion will fall back to
 emacs vanilla behavior.
