@@ -2217,17 +2217,23 @@ and `helm-pattern'."
     matches))
 
 (defun helm-compute-matches (source)
+  "Start computing candidates in SOURCE."
   (save-current-buffer
     (let ((matchfns (helm-match-functions source))
           (helm-source-name (assoc-default 'name source))
           (limit (helm-candidate-number-limit source))
           (helm-pattern (helm-process-pattern-transformer
                          helm-pattern source)))
+      ;; If source have a `filtered-candidate-transformer' attr
+      ;; Filter candidates with this func, otherwise just compute
+      ;; candidates.
       (helm-process-filtered-candidate-transformer
        (if (or (equal helm-pattern "")
                (equal matchfns '(identity)))
+           ;; Compute all candidates up to LIMIT.
            (helm-take-first-elements
             (helm-get-cached-candidates source) limit)
+           ;; Compute candidates according to pattern with their match fns.
            (helm-match-from-candidates
             (helm-get-cached-candidates source) matchfns limit source))
        source))))
