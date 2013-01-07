@@ -109,6 +109,11 @@ welcome. GitHub pull requests are even better! :-)
 NOTE: When trying if something is working or not, be sure to start helm from `Emacs -Q` or even better
 Start it from your helm directory with `./emacs-helm.sh`.
 
+## Getting help
+
+If [Helm Wiki](https://github.com/emacs-helm/helm/wiki) is not enough, you can ask for help
+on [emacs-helm google group](https://groups.google.com/group/emacs-helm?hl=en).
+
 
 Cheers,<br>
 The Helm Team
