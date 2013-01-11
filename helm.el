@@ -948,7 +948,8 @@ existing Helm function names."
                         (helm-get-selection nil t))))
     (setq helm-source-filter sources)
     (helm-log-eval helm-source-filter)
-    (helm-update cur-disp-sel)))
+    ;; Use force-update to run init/update functions.
+    (helm-force-update cur-disp-sel)))
 
 (defun helm-set-sources (sources &optional no-init no-update)
   "Set SOURCES during `helm' invocation.
@@ -1191,11 +1192,12 @@ Return the result of last function call."
     (loop with result for fn in funs
           do (setq result (apply fn args)) finally return result)))
 
-(defun helm-funcall-foreach (sym)
+(defun helm-funcall-foreach (sym &optional sources)
   "Call the function SYM for each source if any."
-  (dolist (source (helm-get-sources))
-    (helm-aif (assoc-default sym source)
-        (helm-funcall-with-source source it))))
+  (let ((sources (or sources (helm-get-sources))))
+    (dolist (source sources)
+      (helm-aif (assoc-default sym source)
+          (helm-funcall-with-source source it)))))
 
 (defun helm-normalize-sources (sources)
   "If SOURCES is only one source, make a list of one element."
@@ -1732,7 +1734,12 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
         (setq helm-split-window-state 'vertical)
         (setq helm-split-window-state 'horizontal)))
   ;; Call the init function for sources where appropriate
-  (helm-funcall-foreach 'init)
+  (helm-funcall-foreach
+   'init (and helm-source-filter
+              (remove-if-not #'(lambda (s)
+                                 (member (assoc-default 'name s)
+                                         helm-source-filter))
+                             (helm-get-sources))))
   (setq helm-pattern (or (and helm-maybe-use-default-as-input
                               (or any-default
                                   (with-helm-current-buffer
