@@ -361,6 +361,12 @@ supported by your system. Known to works fine on GNU/Linux and Windows."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-delete-minibuffer-contents-from-point nil
+  "When non--nil, `helm-delete-minibuffer-contents' delete region from `point'.
+Otherwise (default) delete `minibuffer-contents'."
+  :group 'helm
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -3077,13 +3083,18 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
     (setq helm-pattern pattern)))
 
 ;;;###autoload
-(defun helm-delete-minibuffer-contents ()
-  "Same as `delete-minibuffer-contents' but this is a command."
-  (interactive)
-  (let ((input (minibuffer-contents)))
+(defun helm-delete-minibuffer-contents (&optional arg)
+  "Delete minibuffer contents.
+When called with a prefix arg or when
+`helm-delete-minibuffer-contents-from-point' is non--nil,
+delete minibuffer contents from point instead of deleting all."
+  (interactive "P")
+  (let* ((input (minibuffer-contents))
+         (str (if (or arg helm-delete-minibuffer-contents-from-point)
+                  (minibuffer-completion-contents) "")))
     (if (> (length input) 0)
         ;; minibuffer is not empty, delete contents and update.
-        (helm-set-pattern "")
+        (helm-set-pattern str)
         ;; minibuffer is already empty, force update.
         (helm-force-update))))
 
