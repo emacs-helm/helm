@@ -395,24 +395,27 @@ from its directory."
                                 (helm-c-basename f) f))
          (helm-find-files-1 f)))
    (let* ((sel       (helm-get-selection))
-          (grep-line (helm-c-grep-split-line sel)))
-     (helm-aif (get-buffer (or (get-text-property
-                                (1- (length sel)) 'buffer-name sel)
-                               sel))
-         (or (buffer-file-name it)
-             (car (rassoc it dired-buffers))
-             (and (with-current-buffer it
-                    (eq major-mode 'org-agenda-mode))
-                  org-directory
-                  (expand-file-name org-directory))
-             default-directory)
-       (cond ((or (file-remote-p sel)
-                  (file-exists-p sel))
-              (expand-file-name sel))
-             ((file-exists-p (car grep-line))
-              (expand-file-name (car grep-line)))
-             ((string-match ffap-url-regexp sel) sel)
-             (t default-directory))))))
+          (grep-line (and (stringp sel)
+                          (helm-c-grep-split-line sel))))
+     (if (stringp sel)
+         (helm-aif (get-buffer (or (get-text-property
+                                    (1- (length sel)) 'buffer-name sel)
+                                   sel))
+             (or (buffer-file-name it)
+                 (car (rassoc it dired-buffers))
+                 (and (with-current-buffer it
+                        (eq major-mode 'org-agenda-mode))
+                      org-directory
+                      (expand-file-name org-directory))
+                 default-directory)
+           (cond ((or (file-remote-p sel)
+                      (file-exists-p sel))
+                  (expand-file-name sel))
+                 ((and grep-line (file-exists-p (car grep-line)))
+                  (expand-file-name (car grep-line)))
+                 ((string-match ffap-url-regexp sel) sel)
+                 (t default-directory)))
+         default-directory))))
 
 (defmacro* helm-c-walk-directory (directory &key path (directories t) match)
   "Walk through DIRECTORY tree.
