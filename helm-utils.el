@@ -386,6 +386,7 @@ Default is `eq'."
 If current selection is a buffer or a file, `helm-find-files'
 from its directory."
   (interactive)
+  (require 'helm-grep)
   (helm-run-after-quit
    (lambda (f)
      (if (file-exists-p f)
@@ -393,20 +394,24 @@ from its directory."
                             (if helm-ff-transformer-show-only-basename
                                 (helm-c-basename f) f))
          (helm-find-files-1 f)))
-   (helm-aif (get-buffer (helm-get-selection))
-       (or (buffer-file-name it)
-           (car (rassoc it dired-buffers))
-           (and (with-current-buffer it
-                  (eq major-mode 'org-agenda-mode))
-                org-directory
-                (expand-file-name org-directory))
-           default-directory)
-     (let ((sel (helm-get-selection)))
+   (let* ((sel       (helm-get-selection))
+          (grep-line (helm-c-grep-split-line sel)))
+     (helm-aif (get-buffer (or (get-text-property
+                                (1- (length sel)) 'buffer-name sel)
+                               sel))
+         (or (buffer-file-name it)
+             (car (rassoc it dired-buffers))
+             (and (with-current-buffer it
+                    (eq major-mode 'org-agenda-mode))
+                  org-directory
+                  (expand-file-name org-directory))
+             default-directory)
        (cond ((or (file-remote-p sel)
                   (file-exists-p sel))
               (expand-file-name sel))
-             ((string-match ffap-url-regexp sel)
-              sel)
+             ((file-exists-p (car grep-line))
+              (expand-file-name (car grep-line)))
+             ((string-match ffap-url-regexp sel) sel)
              (t default-directory))))))
 
 (defmacro* helm-c-walk-directory (directory &key path (directories t) match)
