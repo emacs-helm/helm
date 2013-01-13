@@ -98,20 +98,22 @@ Should take one arg: the string to display."
   "Return eldoc in mode-line for current minibuffer input."
   (let ((buf (with-selected-window (minibuffer-window)
                (buffer-name))))
-    (when (member buf helm-eldoc-active-minibuffers-list)
-      (let* ((str-all (with-current-buffer buf
-                        (minibuffer-completion-contents)))
-             (sym     (when str-all
-                        (with-temp-buffer
-                          (insert str-all)
-                          (goto-char (point-max))
-                          (unless (looking-back ")\\|\"") (forward-char -1))
-                          (eldoc-current-symbol))))
-             (info-fn (eldoc-fnsym-in-current-sexp))
-             (doc     (or (eldoc-get-var-docstring sym)
-                          (eldoc-get-fnsym-args-string
-                           (car info-fn) (cadr info-fn)))))
-        (when doc (funcall helm-c-eldoc-in-minibuffer-show-fn doc))))))
+    (condition-case err
+        (when (member buf helm-eldoc-active-minibuffers-list)
+          (let* ((str-all (with-current-buffer buf
+                            (minibuffer-completion-contents)))
+                 (sym     (when str-all
+                            (with-temp-buffer
+                              (insert str-all)
+                              (goto-char (point-max))
+                              (unless (looking-back ")\\|\"") (forward-char -1))
+                              (eldoc-current-symbol))))
+                 (info-fn (eldoc-fnsym-in-current-sexp))
+                 (doc     (or (eldoc-get-var-docstring sym)
+                              (eldoc-get-fnsym-args-string
+                               (car info-fn) (cadr info-fn)))))
+            (when doc (funcall helm-c-eldoc-in-minibuffer-show-fn doc))))
+      (error (and debug-on-error (message "Eldoc in minibuffer error: %S" err))))))
 
 (defun helm-c-show-info-in-mode-line (str)
   "Display string STR in mode-line."
