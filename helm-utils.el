@@ -290,6 +290,12 @@ With a numeric prefix arg show only the ARG number of candidates."
         (helm-set-source-filter
          (list (assoc-default 'name (helm-get-current-source))))))))
 
+;;;###autoload
+(defun helm-display-all-sources ()
+  "Display all sources previously hidden by `helm-set-source-filter'."
+  (interactive)
+  (helm-set-source-filter nil))
+
 (defun helm-displaying-source-names ()
   "Return the list of sources name for this helm session."
   (with-current-buffer helm-buffer
