@@ -571,6 +571,8 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
   "Current buffer when `helm' is invoked.")
 (defvar helm-buffer-file-name nil
   "Variable `buffer-file-name' when `helm' is invoked.")
+(defvar helm-default-directory nil
+  "The value of `default-directory' when `helm' is initialized.")
 (defvar helm-candidate-cache nil
   "Holds the available candidate withing a single helm invocation.")
 (defvar helm-pattern ""
@@ -1880,28 +1882,30 @@ if some when multiples sources are present."
 
 (defun helm-create-helm-buffer ()
   "Create and setup `helm-buffer'."
-  (with-current-buffer (get-buffer-create helm-buffer)
-    (helm-log "kill local variables: %S" (buffer-local-variables))
-    (kill-all-local-variables)
-    (set (make-local-variable 'inhibit-read-only) t)
-    (buffer-disable-undo)
-    (erase-buffer)
-    (set (make-local-variable 'helm-map) helm-map)
-    (set (make-local-variable 'helm-last-sources-local) helm-sources)
-    (set (make-local-variable 'helm-follow-mode) nil)
-    (set (make-local-variable 'helm-display-function) helm-display-function)
-    (set (make-local-variable 'helm-selection-point) nil)
-    (set (make-local-variable 'scroll-margin)
-         (if helm-display-source-at-screen-top
-             0 helm-completion-window-scroll-margin))
-    (helm-initialize-persistent-action)
-    (helm-log-eval helm-display-function helm-let-variables)
-    (loop for (var . val) in helm-let-variables
-          do (set (make-local-variable var) val))
-    (setq cursor-type nil)
-    (setq mode-name "Helm"))
-  (helm-initialize-overlays helm-buffer)
-  (get-buffer helm-buffer))
+  (let ((root-dir default-directory))
+    (with-current-buffer (get-buffer-create helm-buffer)
+      (helm-log "kill local variables: %S" (buffer-local-variables))
+      (kill-all-local-variables)
+      (set (make-local-variable 'inhibit-read-only) t)
+      (buffer-disable-undo)
+      (erase-buffer)
+      (set (make-local-variable 'helm-map) helm-map)
+      (set (make-local-variable 'helm-last-sources-local) helm-sources)
+      (set (make-local-variable 'helm-follow-mode) nil)
+      (set (make-local-variable 'helm-display-function) helm-display-function)
+      (set (make-local-variable 'helm-selection-point) nil)
+      (set (make-local-variable 'scroll-margin)
+           (if helm-display-source-at-screen-top
+               0 helm-completion-window-scroll-margin))
+      (set (make-local-variable 'helm-default-directory) root-dir)
+      (helm-initialize-persistent-action)
+      (helm-log-eval helm-display-function helm-let-variables)
+      (loop for (var . val) in helm-let-variables
+            do (set (make-local-variable var) val))
+      (setq cursor-type nil)
+      (setq mode-name "Helm"))
+    (helm-initialize-overlays helm-buffer)
+    (get-buffer helm-buffer)))
 
 (defun helm-initialize-overlays (buffer)
   "Initialize helm overlays in BUFFER."
