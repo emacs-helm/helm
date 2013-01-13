@@ -25,13 +25,16 @@
 (defun helm-custom-faces-init ()
   "Initialize buffer for `helm-c-source-customize-face'."
   (unless (helm-candidate-buffer)
-    (save-selected-window
-      (list-faces-display))
-    (let ((cands (with-current-buffer (get-buffer "*Faces*")
-                   (goto-char (point-min))
-                   (forward-line 3)
-                   (buffer-substring (point) (point-max)))))
-      (helm-init-candidates-in-buffer "*helm faces*" cands))))
+    (save-window-excursion
+      (list-faces-display)
+      (message nil))
+    (helm-init-candidates-in-buffer
+     "*hfaces*"
+     (with-current-buffer (get-buffer "*Faces*")
+       (buffer-substring
+        (next-single-char-property-change (point-min) 'face)
+        (point-max))))
+    (kill-buffer "*Faces*")))
 
 (defvar helm-c-source-customize-face
   '((name . "Customize Face")
@@ -49,13 +52,20 @@
 ;;; Colors browser
 ;;
 ;;
+(defun helm-colors-init ()
+  (unless (helm-candidate-buffer)
+    (save-window-excursion
+      (list-colors-display)
+      (message nil))
+    (helm-init-candidates-in-buffer
+     "*hcolors*"
+     (with-current-buffer (get-buffer "*Colors*")
+       (buffer-string)))
+    (kill-buffer "*Colors*")))
+
 (defvar helm-c-source-colors
   '((name . "Colors")
-    (init . (lambda ()
-              (unless (helm-candidate-buffer)
-                (save-selected-window
-                  (list-colors-display))
-                (helm-candidate-buffer (get-buffer "*Colors*")))))
+    (init . helm-colors-init)
     (candidates-in-buffer)
     (get-line . buffer-substring)
     (action
