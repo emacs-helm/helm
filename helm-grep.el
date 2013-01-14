@@ -21,6 +21,9 @@
 (require 'grep)
 (require 'helm-regexp)
 
+;;; load wgrep proxy if it's available
+(require 'wgrep-helm nil t)
+
 (declare-function helm-c-buffer-list "helm-buffers")
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))
 (declare-function View-quit "view")
