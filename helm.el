@@ -1479,7 +1479,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions."
   (interactive "P")
-  (let (any-buffer helm-full-frame)
+  (let (any-buffer helm-full-frame cur-dir)
     (if arg
         (setq any-buffer (helm-resume-select-buffer))
         (setq any-buffer helm-last-buffer))
@@ -1488,14 +1488,22 @@ helm buffers.  i.e choose among various helm sessions."
     (setq helm-full-frame (buffer-local-value
                            'helm-full-frame (get-buffer any-buffer)))
     (setq helm-compiled-sources nil)
-    (helm
-     :sources (or (buffer-local-value
-                   'helm-last-sources-local (get-buffer any-buffer))
-                  helm-last-sources
-                  helm-sources)
-     :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
-     :resume t
-     :buffer any-buffer)))
+    (setq cur-dir (buffer-local-value
+                   'helm-default-directory (get-buffer any-buffer)))
+    (unless (get-buffer helm-current-buffer)
+      ;; `helm-current-buffer' may have been killed.
+      (setq helm-current-buffer (current-buffer)))
+    ;; Restart with same `default-directory' value this session
+    ;; was initially started with.
+    (with-helm-default-directory cur-dir
+        (helm
+         :sources (or (buffer-local-value
+                       'helm-last-sources-local (get-buffer any-buffer))
+                      helm-last-sources
+                      helm-sources)
+         :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
+         :resume t
+         :buffer any-buffer))))
 
 (defun helm-resume-p (any-resume)
   "Whether current helm session is resumed or not."

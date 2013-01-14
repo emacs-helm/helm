@@ -2625,6 +2625,8 @@ and
 
 (defun helm-ff-browse-project (candidate)
   (with-helm-default-directory helm-ff-default-directory
+      ;; `helm-browse-project' will call `helm-ls-git-ls'
+      ;; which will set locally `helm-default-directory'
       (helm-browse-project)))
 
 (defun helm-ff-run-browse-project ()
