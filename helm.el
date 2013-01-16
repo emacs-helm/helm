@@ -2873,9 +2873,9 @@ it is \"Candidate\(s\)\" by default."
      (let ((name (if (stringp source-or-name) source-or-name
                      (assoc-default 'name source-or-name))))
        (condition-case err
-             (while (not (string= name (helm-current-line-contents)))
-               (goto-char (helm-get-next-header-pos)))
-         (error (message "")))))
+           (while (not (string= name (helm-current-line-contents)))
+             (goto-char (helm-get-next-header-pos)))
+         (error (helm-log "%S" err)))))
    'source 'next))
 
 (defun helm-mark-current-line (&optional resumep)
@@ -2891,8 +2891,7 @@ to mark candidates."
          (let ((header-pos (helm-get-next-header-pos))
                (separator-pos (helm-get-next-candidate-separator-pos)))
            (or (and (null header-pos) separator-pos)
-               (and header-pos separator-pos (< separator-pos header-pos)
-                    separator-pos)
+               (and header-pos separator-pos (< separator-pos header-pos))
                header-pos
                (point-max)))
          (1+ (point-at-eol))))
@@ -3077,13 +3076,17 @@ to a list of forms.\n\n")
 
 (defun helm-edit-current-selection-internal (func)
   (with-helm-window
-    (beginning-of-line)
-    (let ((realvalue (get-text-property (point) 'helm-realvalue)))
+    (forward-line 0)
+    (let ((realvalue (get-text-property (point) 'helm-realvalue))
+          (multiline (get-text-property (point) 'helm-multiline)))
       (funcall func)
-      (beginning-of-line)
+      (forward-line 0)
       (and realvalue
            (put-text-property (point) (point-at-eol)
                               'helm-realvalue realvalue))
+      (and multiline
+           (put-text-property (point) (point-at-eol)
+                              'helm-multiline multiline))
       (helm-mark-current-line))))
 
 (defmacro helm-edit-current-selection (&rest forms)

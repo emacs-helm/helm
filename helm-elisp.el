@@ -385,7 +385,7 @@ Filename completion happen if string start after or between a double quote."
     (cond ((ad-advice-enabled advice)
            (ad-advice-set-enabled advice nil)
            (message "Disabled"))
-          (t                            ;disabled
+          (t
            (ad-advice-set-enabled advice t)
            (message "Enabled")))
     (ad-activate function)
