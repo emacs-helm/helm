@@ -3091,7 +3091,7 @@ to a list of forms.\n\n")
 
 (defmacro helm-edit-current-selection (&rest forms)
   "Evaluate FORMS at current selection in the helm buffer.
-You can edit the line."
+Used generally to modify current selection."
   (declare (indent 0) (debug t))
   `(helm-edit-current-selection-internal
     (lambda () ,@forms)))
