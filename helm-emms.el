@@ -57,7 +57,7 @@
     (save-window-excursion
       (emms-streams)
       (when (re-search-forward (concat "^" name) nil t)
-        (beginning-of-line)
+        (forward-line 0)
         (emms-stream-delete-bookmark)
         (emms-stream-add-bookmark name url (string-to-number fd) type)
         (emms-stream-save-bookmarks-file)
@@ -76,7 +76,7 @@
         (emms-streams)
         (goto-char (point-min))
         (loop while (re-search-forward bmk-reg nil t)
-              do (progn (beginning-of-line)
+              do (progn (forward-line 0)
                         (emms-stream-delete-bookmark))
               finally do (progn
                            (emms-stream-save-bookmarks-file)

@@ -134,7 +134,7 @@ replace with STR as yanked string."
 (defun helm-mark-ring-get-marks (pos)
   (save-excursion
     (goto-char pos)
-    (beginning-of-line)
+    (forward-line 0)
     (let ((line  (car (split-string (thing-at-point 'line) "[\n\r]"))))
       (when (string= "" line)
         (setq line  "<EMPTY LINE>"))
@@ -188,7 +188,7 @@ replace with STR as yanked string."
 (defun helm-global-mark-ring-format-buffer (marker)
   (with-current-buffer (marker-buffer marker)
     (goto-char marker)
-    (beginning-of-line)
+    (forward-line 0)
     (let (line)
       (if (string= "" line)
           (setq line  "<EMPTY LINE>")

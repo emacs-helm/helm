@@ -76,7 +76,7 @@ Don't search tag file deeply if outside this value."
                           lineno-start
                           (1- (search-forward "," (point-at-eol) t)))
             do
-            (beginning-of-line)
+            (forward-line 0)
             (insert (format "%5s:" lineno))
             (search-forward "\177" (point-at-eol) t)
             (delete-region (1- (point)) (point-at-eol))

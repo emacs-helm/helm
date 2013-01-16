@@ -773,7 +773,7 @@ directory, open this directory."
   (and (eq selective-display t)
        (looking-at "\^m")
        (forward-char 1))
-  (beginning-of-line))
+  (forward-line 0))
 
 (defun helm-c-quit-and-execute-action (action)
   "Quit current helm session and execute ACTION."

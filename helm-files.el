@@ -2481,7 +2481,7 @@ Else return ACTIONS unmodified."
   "Get (FILENAME . LINENO) at point."
   (helm-aif (let (ffap-alist) (ffap-file-at-point))
       (save-excursion
-        (beginning-of-line)
+        (forward-line 0)
         (when (and (search-forward it nil t)
                    (looking-at ":\\([0-9]+\\)"))
           (cons it (string-to-number (match-string 1)))))))
