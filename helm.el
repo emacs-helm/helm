@@ -784,8 +784,9 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-default-directory (directory &rest body)
   (declare (indent 2) (debug t))
-  `(let ((default-directory (file-name-as-directory ,directory)))
-     ,@body))
+  `(let ((default-directory (and ,directory
+                                 (file-name-as-directory ,directory))))
+     (if default-directory ,@body)))
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."
