@@ -1661,7 +1661,8 @@ Don't use it directly in `filtered-candidate-transformer' use instead
                             (not (string-match ffap-url-regexp i))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
-        for type = (car (file-attributes i))
+        for attr = (file-attributes i)
+        for type = (car attr)
         collect
         (cond ((string-match "access denied" i) i)
               (;; A not already saved file.
@@ -1682,12 +1683,12 @@ Don't use it directly in `filtered-candidate-transformer' use instead
                       (propertize disp 'face 'helm-ff-directory) t)
                      i))
               ;; An executable file.
-              ((file-executable-p i)
+              ((and attr (string-match "x" (nth 8 attr)))
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-executable) t)
                      i))
               ;; A file.
-              ((file-exists-p i)
+              ((and attr (eq nil type))
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-file) t)
                      i))
