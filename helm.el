@@ -771,6 +771,12 @@ not `exit-minibuffer' or unwanted functions."
   `(with-current-buffer helm-current-buffer
      ,@body))
 
+(defmacro with-helm-buffer (&rest body)
+  "Eval BODY inside `helm-buffer'."
+  (declare (indent 0) (debug t))
+  `(with-current-buffer helm-buffer
+     ,@body))
+
 (defmacro with-helm-restore-variables(&rest body)
   "Restore `helm-restored-variables' after executing BODY."
   (declare (indent 0) (debug t))
