@@ -2275,33 +2275,20 @@ and `helm-pattern'."
 (defun helm-process-source (source)
   "Display matched results from SOURCE according to its settings."
   (helm-log-eval (assoc-default 'name source))
-  (if (assq 'direct-insert-match source) ;experimental
-      (helm-process-source--direct-insert-match source)
-      (let ((matches (helm-compute-matches source)))
-        (when matches
-          (helm-insert-header-from-source source)
-          (if (not (assq 'multiline source))
-              (mapc #'(lambda (m)
-                        (helm-insert-match m 'insert source))
-                    matches)
-              (let ((start (point)) separate)
-                (dolist (match matches)
-                  (if separate
-                      (helm-insert-candidate-separator)
-                      (setq separate t))
-                  (helm-insert-match match 'insert source))
-                (put-text-property start (point) 'helm-multiline t)))))))
-
-(defun helm-process-source--direct-insert-match (source)
-  "[EXPERIMENTAL] Insert candidates from `helm-candidate-buffer' in SOURCE."
-  (helm-log-eval (assoc-default 'name source))
-  (let ((helm-source-name (assoc-default 'name source))
-        content-buf)
-    (funcall (assoc-default 'candidates source))
-    (setq content-buf (helm-candidate-buffer))
-    (unless (helm-empty-buffer-p content-buf)
+  (let ((matches (helm-compute-matches source)))
+    (when matches
       (helm-insert-header-from-source source)
-      (insert-buffer-substring content-buf))))
+      (if (not (assq 'multiline source))
+          (mapc #'(lambda (m)
+                    (helm-insert-match m 'insert source))
+                matches)
+          (let ((start (point)) separate)
+            (dolist (match matches)
+              (if separate
+                  (helm-insert-candidate-separator)
+                  (setq separate t))
+              (helm-insert-match match 'insert source))
+            (put-text-property start (point) 'helm-multiline t))))))
 
 (defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
