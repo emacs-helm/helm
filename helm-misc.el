@@ -220,6 +220,7 @@ It is added to `extended-command-history'.
                (mapcar 'prin1-to-string history)
                history))))
     (migemo)
+    (multiline)
     (action . (lambda (candidate)
                 (delete-minibuffer-contents)
                 (insert candidate)))))

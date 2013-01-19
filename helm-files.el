@@ -2737,33 +2737,46 @@ utility mdfind.")
 ;;; Findutils
 ;;
 ;;
-;; Internal.
-(defvar helm-find-last-directory nil)
 (defvar helm-c-source-findutils
   `((name . "Find")
+    (header-name . (lambda (name)
+                     (concat name " in [" helm-default-directory "]")))
     (candidates-process . helm-find-shell-command-fn)
-    (type . file)
+    (filtered-candidate-transformer . helm-findutils-transformer)
+    (action-transformer helm-c-transform-file-load-el)
+    (action . ,(cdr (helm-inherit-attribute-from-source
+                     'action helm-c-source-locate)))
     (keymap . ,helm-generic-files-map)
     (requires-pattern . 3)
     (delayed)))
 
+(defun helm-findutils-transformer (candidates source)
+  (loop for i in candidates
+        for abs = (expand-file-name i helm-default-directory)
+        for disp = (if (and helm-ff-transformer-show-only-basename
+                            (not (string-match "[.]\\{1,2\\}$" i)))
+                       (helm-c-basename i) abs)
+        collect (cons (propertize disp 'face 'helm-ff-file) abs)))
+
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."
-  (prog1
-      (apply #'start-process "hfind" helm-buffer "find"
-             (list helm-find-last-directory
-                   (if case-fold-search "-name" "-iname")
-                   (concat "*" helm-pattern "*") "-type" "f"))
-    (set-process-sentinel (get-process "hfind")
-                          #'(lambda (process event)
-                              (when (string= event "finished\n")
-                                (ignore))))))
+  (with-helm-default-directory (helm-default-directory)
+      (let (process-connection-type)
+        (prog1
+            (apply #'start-file-process "hfind" helm-buffer "find"
+                   (list "."
+                         (if case-fold-search "-name" "-iname")
+                         (concat "*" helm-pattern "*") "-type" "f"))
+          (set-process-sentinel (get-process "hfind")
+                                #'(lambda (process event)
+                                    (when (string= event "finished\n")
+                                      (ignore))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-c-source-findutils
         :buffer "*helm find*"
         ;; Make these vars local for further resuming.
-        :find-last-directory dir
+        :default-directory dir ; reset it when called from elsewhere.
         :ff-transformer-show-only-basename nil))
 
 ;; helm-find-files integration.
