@@ -774,7 +774,7 @@ not `exit-minibuffer' or unwanted functions."
 (defmacro with-helm-buffer (&rest body)
   "Eval BODY inside `helm-buffer'."
   (declare (indent 0) (debug t))
-  `(with-current-buffer helm-buffer
+  `(with-current-buffer (helm-buffer-get)
      ,@body))
 
 (defmacro with-helm-restore-variables(&rest body)
@@ -792,8 +792,12 @@ not `exit-minibuffer' or unwanted functions."
   (declare (indent 2) (debug t))
   `(let ((default-directory (or (and ,directory
                                      (file-name-as-directory ,directory))
-                                default-directory)))
+                                (helm-default-directory))))
      ,@body))
+
+(defun helm-default-directory ()
+  "Return the value of `helm-default-directory'."
+  (buffer-local-value 'helm-default-directory helm-buffer))
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."
