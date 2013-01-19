@@ -1498,7 +1498,7 @@ helm buffers.  i.e choose among various helm sessions."
     (setq helm-compiled-sources nil)
     (setq cur-dir (buffer-local-value
                    'helm-default-directory (get-buffer any-buffer)))
-    (unless (get-buffer helm-current-buffer)
+    (unless (buffer-live-p helm-current-buffer)
       ;; `helm-current-buffer' may have been killed.
       (setq helm-current-buffer (current-buffer)))
     ;; Restart with same `default-directory' value this session
