@@ -2761,15 +2761,16 @@ utility mdfind.")
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."
   (with-helm-default-directory (with-helm-buffer helm-default-directory)
-      (prog1
-          (apply #'start-file-process "hfind" helm-buffer "find"
-                 (list "."
-                       (if case-fold-search "-name" "-iname")
-                       (concat "*" helm-pattern "*") "-type" "f"))
-        (set-process-sentinel (get-process "hfind")
-                              #'(lambda (process event)
-                                  (when (string= event "finished\n")
-                                    (ignore)))))))
+      (let (process-connection-type)
+        (prog1
+            (apply #'start-file-process "hfind" helm-buffer "find"
+                   (list "."
+                         (if case-fold-search "-name" "-iname")
+                         (concat "*" helm-pattern "*") "-type" "f"))
+          (set-process-sentinel (get-process "hfind")
+                                #'(lambda (process event)
+                                    (when (string= event "finished\n")
+                                      (ignore))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-c-source-findutils
