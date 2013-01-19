@@ -797,7 +797,7 @@ not `exit-minibuffer' or unwanted functions."
 
 (defun helm-default-directory ()
   "Return the value of `helm-default-directory'."
-  (buffer-local-value 'helm-default-directory helm-buffer))
+  (buffer-local-value 'helm-default-directory (get-buffer helm-buffer)))
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."

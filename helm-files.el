@@ -2760,7 +2760,7 @@ utility mdfind.")
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."
-  (with-helm-default-directory (with-helm-buffer helm-default-directory)
+  (with-helm-default-directory (helm-default-directory)
       (let (process-connection-type)
         (prog1
             (apply #'start-file-process "hfind" helm-buffer "find"
