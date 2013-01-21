@@ -420,7 +420,7 @@ from its directory."
                   (expand-file-name sel))
                  ((and grep-line (file-exists-p (car grep-line)))
                   (expand-file-name (car grep-line)))
-                 (((and ffap-url-regexp string-match ffap-url-regexp sel)) sel)
+                 ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
                  (t default-directory)))
          default-directory))))
 
