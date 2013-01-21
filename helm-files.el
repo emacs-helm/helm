@@ -1362,7 +1362,7 @@ purpose."
               (expand-file-name "/") ; Expand to "/" or "c:/"
               ;; If path is an url *default-directory have to be nil.
               (unless (or (string-match helm-ff-url-regexp path)
-                          (string-match ffap-url-regexp path))
+                          (and ffap-url-regexp (string-match ffap-url-regexp path)))
                 path-name-dir)))
     (cond ((string= path "Invalid tramp file name")
            (or (helm-ff-tramp-hostnames) ; Hostnames completion.
@@ -1632,7 +1632,7 @@ return FNAME prefixed with [?]."
                       (propertize "[@]" 'face 'helm-ff-prefix))))
     (cond ((or file-or-symlinkp (file-exists-p fname)) fname)
           ((or (string-match helm-ff-url-regexp fname)
-               (string-match ffap-url-regexp fname))
+               (and ffap-url-regexp (string-match ffap-url-regexp fname)))
            (concat prefix-url " " fname))
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
@@ -1658,7 +1658,7 @@ Don't use it directly in `filtered-candidate-transformer' use instead
   (loop for i in files
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot i))
-                            (not (string-match ffap-url-regexp i))
+                            (not (and ffap-url-regexp (string-match ffap-url-regexp i)))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
         for attr = (file-attributes i)
@@ -1931,7 +1931,7 @@ Use it for non--interactive calls of `helm-find-files'."
   "Try to guess a default input for `helm-find-files'."
   (let* ((def-dir (helm-c-current-directory))
          (abs (and file-at-pt
-                   (not (string-match ffap-url-regexp file-at-pt))
+                   (not (and ffap-url-regexp (string-match ffap-url-regexp file-at-pt)))
                    (expand-file-name file-at-pt def-dir)))
          (lib     (when helm-ff-search-library-in-sexp
                     (helm-find-library-at-point)))
@@ -1968,7 +1968,7 @@ Use it for non--interactive calls of `helm-find-files'."
     (when (and (stringp he) (string-match "^LINK: " he))
       (setq he (replace-match "" t t he)))
     (loop for i in (list he ov-he w3m-l nt-prop)
-          thereis (and (stringp i) (string-match ffap-url-regexp i) i))))
+          thereis (and (stringp i) ffap-url-regexp (string-match ffap-url-regexp i) i))))
 
 (defun helm-find-library-at-point ()
   "Try to find library path at point.
@@ -2663,7 +2663,7 @@ Colorize only symlinks, directories and files."
   (loop for i in (helm-c-skip-boring-files files)
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot i))
-                            (not (string-match ffap-url-regexp i))
+                            (not (and ffap-url-regexp (string-match ffap-url-regexp i)))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-c-basename i) i)
         for type = (car (file-attributes i))
