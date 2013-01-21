@@ -137,6 +137,9 @@ INSERT-CONTENT-FN is the text to be displayed in BUFNAME."
 (defvar helm-c-buffer-help-message
   "== Helm Buffer ==
 \nTips:
+
+Completion:
+
 You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
 Enter then a space and a pattern to narrow down to buffers matching this pattern.
 If you enter a space and a pattern prefixed by \"@\" helm will search for text matching
@@ -156,15 +159,18 @@ if I enter in pattern prompt:
 Notice there is no \"@\" this time
 helm will look for lisp mode buffers starting by \"helm\" and have \"moc\" in their name.
 
+Creating buffers
+
 When creating a new buffer use \\[universal-argument] to choose a mode for your buffer in a list.
 This list is customizable, see `helm-buffers-favorite-modes'.
 
 Meaning of colors and prefixes for buffers:
-Remote buffers are prefixed with '@'.
-Red        => A buffer saved by an external process.
-Indianred2 => A new buffer file not already saved on disk.
-Orange     => A buffer file modified and not saved.
 
+Remote buffers are prefixed with '@'.
+Red        => Buffer have its file modified on disk by an external process.
+Indianred2 => Buffer exists but its file have been deleted.
+Orange     => Buffer is modified and its file not saved to disk.
+Italic     => A non--file buffer.
 
 \nSpecific commands for `helm-buffers-list':
 \\<helm-c-buffer-map>
