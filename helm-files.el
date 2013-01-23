@@ -2475,7 +2475,7 @@ Else return ACTIONS unmodified."
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
-    (type . file)))
+    (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))))
 
 ;;; ffap with line number
 (defun helm-c-ffap-file-line-at-point ()
@@ -2760,17 +2760,17 @@ utility mdfind.")
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."
-  (with-helm-default-directory (helm-default-directory)
-      (let (process-connection-type)
-        (prog1
-            (apply #'start-file-process "hfind" helm-buffer "find"
-                   (list "."
-                         (if case-fold-search "-name" "-iname")
-                         (concat "*" helm-pattern "*") "-type" "f"))
-          (set-process-sentinel (get-process "hfind")
-                                #'(lambda (process event)
-                                    (when (string= event "finished\n")
-                                      (ignore))))))))
+  ;(with-helm-default-directory (helm-default-directory)
+  (let (process-connection-type)
+    (prog1
+        (apply #'helm-start-file-process "hfind" helm-buffer "find" helm-default-directory
+               (list "."
+                     (if case-fold-search "-name" "-iname")
+                     (concat "*" helm-pattern "*") "-type" "f"))
+      (set-process-sentinel (get-process "hfind")
+                            #'(lambda (process event)
+                                (when (string= event "finished\n")
+                                  (ignore)))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-c-source-findutils
