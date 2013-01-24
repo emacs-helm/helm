@@ -2706,7 +2706,7 @@ utility mdfind.")
   (with-helm-default-directory (helm-default-directory)
       (let (process-connection-type)
         (prog1
-            (apply #'start-file-process "hfind" helm-buffer "find" helm-default-directory
+            (apply #'start-file-process "hfind" helm-buffer "find"
                    (list "."
                          (if case-fold-search "-name" "-iname")
                          (concat "*" helm-pattern "*") "-type" "f"))
