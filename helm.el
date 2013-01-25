@@ -2317,7 +2317,8 @@ when emacs is idle for `helm-idle-delay'."
         (goto-char (point-min))
         (helm-log-run-hook 'helm-update-hook))
       (setq helm-force-updating-p nil)
-      (helm-log-run-hook 'helm-after-update-hook))))
+      (unless (assoc 'candidates-process source)
+        (helm-log-run-hook 'helm-after-update-hook)))))
 
 
 ;;; Core: helm-update
@@ -2573,7 +2574,8 @@ STRING is the output of PROCESS."
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line)
         (helm-display-mode-line (helm-get-current-source))
-        (helm-maybe-update-keymap))))
+        (helm-maybe-update-keymap)
+        (helm-log-run-hook 'helm-after-update-hook))))
 
 (defun helm-kill-async-processes ()
   "Kill all asynchronous processes registered in `helm-async-processes'."
