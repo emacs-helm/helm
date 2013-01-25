@@ -2361,7 +2361,8 @@ is done on whole `helm-buffer' and not on current source."
                (helm-update-move-first-line 'without-hook))
               (t              ; No delayed sources, run the hooks now.
                (helm-update-move-first-line)
-               (helm-log-run-hook 'helm-after-update-hook)
+               (unless (assoc 'candidates-process source)
+                 (helm-log-run-hook 'helm-after-update-hook))
                (when preselect
                  (helm-log "Update preselect candidate %s" preselect)
                  (helm-preselect preselect source))
@@ -2568,14 +2569,15 @@ STRING is the output of PROCESS."
          finally do (setcdr incomplete-line-info line))))
 
 (defun helm-output-filter--post-process ()
-  (helm-log-run-hook 'helm-update-hook)
-  (helm-aif (get-buffer-window helm-buffer 'visible)
-      (with-selected-window it
-        (helm-skip-noncandidate-line 'next)
-        (helm-mark-current-line)
-        (helm-display-mode-line (helm-get-current-source))
-        (helm-maybe-update-keymap)
-        (helm-log-run-hook 'helm-after-update-hook))))
+  (let ((src (helm-get-current-source)))
+    (helm-log-run-hook 'helm-update-hook)
+    (helm-aif (get-buffer-window helm-buffer 'visible)
+        (with-selected-window it
+          (helm-skip-noncandidate-line 'next)
+          (helm-mark-current-line)
+          (helm-display-mode-line src)
+          (helm-maybe-update-keymap)
+          (helm-log-run-hook 'helm-after-update-hook)))))
 
 (defun helm-kill-async-processes ()
   "Kill all asynchronous processes registered in `helm-async-processes'."
