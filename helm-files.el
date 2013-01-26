@@ -2717,6 +2717,9 @@ utility mdfind.")
                  (when (or (file-remote-p (helm-default-directory))
                            helm-suspend-update-flag)
                    (setq helm-suspend-update-flag t)
+                   ;; Kill the process but don't delete entry in
+                   ;; `helm-async-processes'.
+                   (helm-kill-async-process process)
                    ;; When tramp tries to open the same connection twice in a
 		   ;; short time frame (less than 5s) it throw 'suppress which
                    ;; call the real-handler on the main "Emacs", so we wait
