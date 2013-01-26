@@ -2710,10 +2710,20 @@ utility mdfind.")
                    (list "."
                          (if case-fold-search "-name" "-iname")
                          (concat "*" helm-pattern "*") "-type" "f"))
-          (set-process-sentinel (get-process "hfind")
-                                #'(lambda (process event)
-                                    (when (string= event "finished\n")
-                                      (ignore))))))))
+          (set-process-sentinel
+           (get-process "hfind")
+           #'(lambda (process event)
+               (when (string= event "finished\n")
+                 (when (file-remote-p (helm-default-directory))
+                   (setq helm-suspend-update-flag t)
+                   ;; When tramp tries to open the same connection twice in a
+		   ;; short time frame (less than 5s) it throw 'suppress which
+                   ;; call the real-handler on the main "Emacs", so we wait
+                   ;; 5s before updating to avoid this, but allowing user to
+                   ;; enter input during this delay.
+                   (run-at-time 5 nil #'(lambda ()
+                                          (setq helm-suspend-update-flag nil)
+                                          (helm-check-minibuffer-input)))))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-c-source-findutils
