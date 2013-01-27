@@ -592,7 +592,7 @@ is called once for each file like this:
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
-  "String displayed in mode-line in `helm-c-source-find-files'")
+  "String displayed in mode-line in `helm-c-source-find-files'.")
 
 ;;;###autoload
 (defvar helm-generic-file-mode-line-string "\
@@ -602,7 +602,8 @@ is called once for each file like this:
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend"
   "String displayed in mode-line in Locate.")
 
 ;;;###autoload
@@ -613,7 +614,8 @@ is called once for each file like this:
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend"
   "String displayed in mode-line in `helm-do-grep'.")
 
 ;;;###autoload
@@ -624,7 +626,8 @@ is called once for each file like this:
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend"
   "String displayed in mode-line in `helm-do-pdfgrep'.")
 
 ;;;###autoload
@@ -671,7 +674,8 @@ is called once for each file like this:
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct")
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
 (defvar helm-moccur-mode-line "\
@@ -681,7 +685,8 @@ is called once for each file like this:
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct")
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
 (defvar helm-comp-read-mode-line "\

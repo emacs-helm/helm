@@ -2689,6 +2689,7 @@ utility mdfind.")
     (action-transformer helm-c-transform-file-load-el)
     (action . ,(cdr (helm-inherit-attribute-from-source
                      'action helm-c-source-locate)))
+    (mode-line  . helm-generic-file-mode-line-string)
     (keymap . ,helm-generic-files-map)
     (requires-pattern . 3)
     (delayed)))
