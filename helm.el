@@ -703,7 +703,8 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
   (interactive)
   (if helm-last-log-file
       (view-file helm-last-log-file)
-      (switch-to-buffer helm-debug-buffer)))
+      (switch-to-buffer helm-debug-buffer)
+      (view-mode 1) (visual-line-mode 1)))
 
 (defun helm-print-error-messages ()
   "Print error messages in `helm-issued-errors'."
