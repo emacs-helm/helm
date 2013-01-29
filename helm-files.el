@@ -2727,8 +2727,9 @@ utility mdfind.")
                    ;; 5s before updating to avoid this, but allowing user to
                    ;; enter input during this delay.
                    (run-at-time 5 nil #'(lambda ()
-                                          (setq helm-suspend-update-flag nil)
-                                          (helm-check-minibuffer-input)))))))))))
+                                          (when helm-alive-p
+                                            (setq helm-suspend-update-flag nil)
+                                            (helm-check-minibuffer-input))))))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-c-source-findutils
