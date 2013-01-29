@@ -2045,7 +2045,7 @@ Helm plug-ins are realized by this function."
          (type-error (lambda ()
                        (error
                         "Error: `%s' must either be a function, a variable or a list"
-                        candidate-fn)))
+                        (or candidate-fn candidate-proc))))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
