@@ -411,11 +411,11 @@ the center of window, otherwise at the top of window.")
 (defun helm-occur ()
   "Preconfigured helm for Occur."
   (interactive)
-  (let ((helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
-        (helm-compile-source-functions
+  (let ((helm-compile-source-functions
          ;; rule out helm-match-plugin because the input is one regexp.
          (delq 'helm-compile-source--match-plugin
                (copy-sequence helm-compile-source-functions))))
+    (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
     (helm-occur-init-source)
     (helm-attrset 'name "Occur" helm-c-source-occur)
     (helm :sources 'helm-c-source-occur
