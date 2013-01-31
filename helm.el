@@ -2682,15 +2682,13 @@ Coerce source with coerce function."
 If action buffer is selected, back to the helm buffer."
   (interactive)
   (helm-log-run-hook 'helm-select-action-hook)
+  (setq helm-saved-selection (helm-get-selection))
   (cond ((get-buffer-window helm-action-buffer 'visible)
          (set-window-buffer (get-buffer-window helm-action-buffer)
                             helm-buffer)
          (kill-buffer helm-action-buffer)
          (helm-set-pattern helm-input 'noupdate))
-        (t
-         (setq helm-saved-selection (helm-get-selection))
-         (unless helm-saved-selection
-           (error "Nothing is selected"))
+        (helm-saved-selection
          (setq helm-saved-current-source (helm-get-current-source))
          (let ((actions (helm-get-action)))
            (if (functionp actions)
@@ -2699,7 +2697,8 @@ If action buffer is selected, back to the helm buffer."
                (helm-delete-minibuffer-contents)
                ;; Make `helm-pattern' differs from the previous value.
                (setq helm-pattern 'dummy)
-               (helm-check-minibuffer-input))))))
+               (helm-check-minibuffer-input))))
+        (t (message "No Actions available"))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
