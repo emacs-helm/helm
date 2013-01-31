@@ -805,8 +805,7 @@ See `helm-find-files-persistent-action' for usage."
   "Yank text at point in invocation buffer into minibuffer.
 
 `helm-yank-symbol-first' controls whether the first yank grabs
-the entire symbol.
-"
+the entire symbol."
   (interactive)
   (with-helm-current-buffer
     ;; Start to initial point if C-w have never been hit.
@@ -814,20 +813,22 @@ the entire symbol.
             (not helm-yank-symbol-first))
         (progn
           (unless helm-yank-point (setq helm-yank-point (point)))
-          (goto-char helm-yank-point)
-          (forward-word 1)
-          (helm-insert-in-minibuffer (buffer-substring-no-properties helm-yank-point (point)))
-          (setq helm-yank-point (point)))
-      (let* ((sym (symbol-at-point))
-             (str (and sym
-                       (symbol-name sym))))
-        (if str
-            (progn
-              (helm-insert-in-minibuffer str)
-              (setq helm-yank-point (cdr (bounds-of-thing-at-point 'symbol)))
-              (goto-char helm-yank-point))
-          (setq helm-yank-point (point))
-          (helm-yank-text-at-point))))))
+          (save-excursion
+            (goto-char helm-yank-point)
+            (forward-word 1)
+            (helm-insert-in-minibuffer (buffer-substring-no-properties
+                                        helm-yank-point (point)))
+            (setq helm-yank-point (point))))
+        (let* ((sym (symbol-at-point))
+               (str (and sym
+                         (symbol-name sym))))
+          (if str
+              (progn
+                (helm-insert-in-minibuffer str)
+                (setq helm-yank-point (cdr (bounds-of-thing-at-point 'symbol)))
+                (goto-char helm-yank-point))
+              (setq helm-yank-point (point))
+              (helm-yank-text-at-point))))))
 
 (defun helm-reset-yank-point ()
   (setq helm-yank-point nil))

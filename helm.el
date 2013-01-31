@@ -3153,6 +3153,7 @@ delete minibuffer contents from point instead of deleting all."
   (let* ((input (minibuffer-contents))
          (str (if (or arg helm-delete-minibuffer-contents-from-point)
                   (minibuffer-completion-contents) "")))
+    (helm-reset-yank-point)
     (if (> (length input) 0)
         ;; minibuffer is not empty, delete contents and update.
         (helm-set-pattern str)
