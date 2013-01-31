@@ -2582,6 +2582,38 @@ STRING is the output of PROCESS."
           (helm-maybe-update-keymap)
           (helm-log-run-hook 'helm-after-update-hook)))))
 
+(defun helm-process-deferred-sentinel-hook (process event file)
+  "Defer remote processes in sentinels.
+Meant to be called at beginning of a sentinel process function."
+  (when (and (string= event "finished\n")
+             (or (file-remote-p file)
+                 ;; `helm-suspend-update-flag'
+                 ;; is non--nil here only during a
+                 ;; running process, this will never be called
+                 ;; when user set it explicitely with `C-!'.
+                 helm-suspend-update-flag))
+    (setq helm-suspend-update-flag t)
+    ;; Kill the process but don't delete entry in
+    ;; `helm-async-processes'.
+    (helm-kill-async-process process)
+    ;; When tramp tries to open the same connection twice in a
+    ;; short time frame (less than 5s) it throw 'suppress which
+    ;; call the real-handler on the main "Emacs", so we wait
+    ;; 5s before updating to avoid this [1], but allowing user to
+    ;; enter input during this delay.
+    ;; [1] On last Emacs versions, this is fixed and tramp return
+    ;; nil in this situation.
+    ;; Note: It is difficult to have a value < to 5 for
+    ;; `tramp-connection-min-time-diff', because the process die
+    ;; when calling too quickly same process.
+    (run-at-time (or (and (boundp 'tramp-connection-min-time-diff)
+                          tramp-connection-min-time-diff)
+                     5)
+                 nil #'(lambda ()
+                         (when helm-alive-p ; Don't run timer fn after quit.
+                           (setq helm-suspend-update-flag nil)
+                           (helm-check-minibuffer-input))))))
+
 (defun helm-kill-async-processes ()
   "Kill all asynchronous processes registered in `helm-async-processes'."
   (while helm-async-processes
