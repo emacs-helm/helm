@@ -1904,15 +1904,18 @@ Like `find-file' but with `helm' support.
 Use it for non--interactive calls of `helm-find-files'."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let (;; Be sure we don't erase the precedent minibuffer if some.
-        (helm-ff-auto-update-initial-value
-         (and helm-ff-auto-update-initial-value
-              (not (minibuffer-window-active-p (minibuffer-window))))))
+  (let* ( ;; Be sure we don't erase the precedent minibuffer if some.
+         (helm-ff-auto-update-initial-value
+          (and helm-ff-auto-update-initial-value
+               (not (minibuffer-window-active-p (minibuffer-window)))))
+         (tap (thing-at-point 'filename))
+         (def (and tap (expand-file-name tap))))
     (helm :sources 'helm-c-source-find-files
           :input fname
           :case-fold-search helm-file-name-case-fold-search
           :keymap helm-find-files-map
           :preselect preselect
+          :default def
           :prompt "Find Files or Url: "
           :buffer "*Helm Find Files*")))
 
