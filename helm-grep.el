@@ -354,6 +354,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
        (get-process "grep")
        #'(lambda (process event)
            (let ((noresult (= (process-exit-status process) 1)))
+             (unless noresult
+               (helm-process-deferred-sentinel-hook
+                process event helm-ff-default-directory))
              (cond ((and noresult
                          ;; [FIXME] This is a workaround for zgrep
                          ;; that exit with code 1
@@ -836,9 +839,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
         (delayed)))
      :buffer (format "*helm %s*" (if zgrep "zgrep" "grep"))
      :keymap helm-c-grep-map ; [1]
-     :input-idle-delay (if (and helm-ff-default-directory
-                                (file-remote-p helm-ff-default-directory))
-                           3 helm-input-idle-delay)
      :history 'helm-c-grep-history)))
 
 
