@@ -2045,7 +2045,7 @@ Helm plug-ins are realized by this function."
          (candidate-proc (assoc-default 'candidates-process source))
          (type-error (lambda ()
                        (error
-                        "Error: `%s' must either be a function, a variable or a list"
+                        "`%s' must either be a function, a variable or a list"
                         (or candidate-fn candidate-proc))))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
@@ -2060,13 +2060,14 @@ Helm plug-ins are realized by this function."
                                                  (helm-interpret-value
                                                   candidate-fn source))))
                                    (and (listp result) result))))
-                       (error (funcall type-error)))))
+                       (error (error "%s: %s" (car err) (cadr err))))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
     (cond ((processp candidates)
            ;; Candidates will be filtered later in process filter.
            candidates)
+          ((null candidates) candidates)
           ((listp candidates)
            ;; Filter candidates now with `candidate-transformer' function maybe
            ;; otherwise return CANDIDATES which will be passed to

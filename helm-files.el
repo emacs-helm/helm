@@ -2714,22 +2714,25 @@ utility mdfind.")
           (set-process-sentinel
            (get-process "hfind")
            #'(lambda (process event)
-               (when (string= event "finished\n")
-                 (when (or (file-remote-p (helm-default-directory))
-                           helm-suspend-update-flag)
-                   (setq helm-suspend-update-flag t)
-                   ;; Kill the process but don't delete entry in
-                   ;; `helm-async-processes'.
-                   (helm-kill-async-process process)
-                   ;; When tramp tries to open the same connection twice in a
-		   ;; short time frame (less than 5s) it throw 'suppress which
-                   ;; call the real-handler on the main "Emacs", so we wait
-                   ;; 5s before updating to avoid this, but allowing user to
-                   ;; enter input during this delay.
-                   (run-at-time 5 nil #'(lambda ()
+               (when (and (string= event "finished\n")
+                          (or (file-remote-p (helm-default-directory))
+                              helm-suspend-update-flag))
+                     (setq helm-suspend-update-flag t)
+                     ;; Kill the process but don't delete entry in
+                     ;; `helm-async-processes'.
+                     (helm-kill-async-process process)
+                     ;; When tramp tries to open the same connection twice in a
+                     ;; short time frame (less than 5s) it throw 'suppress which
+                     ;; call the real-handler on the main "Emacs", so we wait
+                     ;; 5s before updating to avoid this, but allowing user to
+                     ;; enter input during this delay.
+                     (run-at-time (or (and (boundp 'tramp-connection-min-time-diff)
+                                           tramp-connection-min-time-diff)
+                                      5)
+                                  nil #'(lambda ()
                                           (when helm-alive-p
                                             (setq helm-suspend-update-flag nil)
-                                            (helm-check-minibuffer-input))))))))))))
+                                            (helm-check-minibuffer-input)))))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-c-source-findutils
