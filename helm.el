@@ -2060,6 +2060,7 @@ Helm plug-ins are realized by this function."
                                                  (helm-interpret-value
                                                   candidate-fn source))))
                                    (and (listp result) result))))
+                       (invalid-regexp nil)
                        (error (error "%s: %s" (car err) (cadr err))))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
