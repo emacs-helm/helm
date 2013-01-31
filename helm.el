@@ -793,7 +793,7 @@ not `exit-minibuffer' or unwanted functions."
   (declare (indent 2) (debug t))
   `(let ((default-directory (or (and ,directory
                                      (file-name-as-directory ,directory))
-                                (helm-default-directory))))
+                                default-directory)))
      ,@body))
 
 (defun helm-default-directory ()
@@ -1920,6 +1920,7 @@ if some when multiples sources are present."
            (if helm-display-source-at-screen-top
                0 helm-completion-window-scroll-margin))
       (set (make-local-variable 'helm-default-directory) root-dir)
+      (set (make-local-variable 'default-directory) root-dir)
       (helm-initialize-persistent-action)
       (helm-log-eval helm-display-function helm-let-variables)
       (loop for (var . val) in helm-let-variables
