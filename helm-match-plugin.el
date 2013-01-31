@@ -380,13 +380,14 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 ;;
 (defun helm-mp-highlight-match ()
   "Highlight matches after `helm-mp-highlight-delay' seconds."
-  (when (and helm-mp-highlight-delay
-             (not (string= helm-pattern "")))
-    (unless (assoc 'nohighlight (helm-get-current-source))
-      (helm-mp-highlight-match-internal (window-end (helm-window)))
-      (run-with-idle-timer helm-mp-highlight-delay nil
-                           'helm-mp-highlight-match-internal
-                           (with-current-buffer helm-buffer (point-max))))))
+  (unless (or (assoc 'nohighlight (helm-get-current-source))
+              (not helm-mp-highlight-delay)
+              (helm-empty-buffer-p)
+              (string= helm-pattern ""))
+    (helm-mp-highlight-match-internal (window-end (helm-window)))
+    (run-with-idle-timer helm-mp-highlight-delay nil
+                         'helm-mp-highlight-match-internal
+                         (with-current-buffer helm-buffer (point-max)))))
 
 (defun helm-mp-highlight-region (start end regexp face)
   (save-excursion
