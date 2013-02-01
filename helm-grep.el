@@ -218,7 +218,7 @@ Where '%f' format spec is filename and '%p' is page number"
 It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defvar helm-pdfgrep-targets nil)
 (defvar helm-grep-last-cmd-line nil)
-(defvar helm-grep-split-line-regexp "^\\([a-zA-Z]?:?[^:]*\\):\\([0-9]+\\):\\(.*\\)")
+(defvar helm-grep-split-line-regexp "^\\([a-zA-Z]?:?.*\\):\\([0-9]+\\):\\(.*\\)")
 
 
 ;;; Init
