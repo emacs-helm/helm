@@ -1344,7 +1344,8 @@ purpose."
              ;; An empty pattern
              (string= path "")
              ;; An existing directory
-             (file-directory-p (file-name-directory path)))
+             (helm-aif (file-name-directory path)
+                 (file-directory-p it)))
       ;; basedir is invalid, that's mean user is starting
       ;; to write a non--existing path in minibuffer
       ;; probably to create a 'new_dir' or a 'new_dir+new_file'.
@@ -2343,7 +2344,7 @@ Ask to kill buffers associated with that file, too."
             ;; If the basedir of candidate doesn't exists,
             ;; ask for creating it.
             (let ((dir (file-name-directory candidate)))
-              (if (or (file-directory-p dir) url-p)
+              (if (or (and dir (file-directory-p dir)) url-p)
                   (find-file-at-point (car marked))
                   (and (funcall make-dir-fn dir)
                        (find-file-at-point candidate))))))))
