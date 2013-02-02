@@ -2043,10 +2043,10 @@ Helm plug-ins are realized by this function."
   (let* (inhibit-quit
          (candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
-         (type-error (lambda ()
+         (type-error (lambda (&optional err)
                        (error
-                        "`%s' must either be a function, a variable or a list"
-                        (or candidate-fn candidate-proc))))
+                        "`%s' must either be a function, a variable or a list: %S"
+                        (or candidate-fn candidate-proc) (or err ""))))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
@@ -2061,7 +2061,7 @@ Helm plug-ins are realized by this function."
                                                   candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
-                       (error (error "%s: %s" (car err) (cadr err))))))
+                       (error (funcall type-error err)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
