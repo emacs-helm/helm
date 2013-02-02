@@ -400,7 +400,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
           (put-text-property (match-beginning 0) me 'face face))))))
 
 (defun helm-mp-highlight-match-internal (end)
-  (when (helm-window)
+  (when helm-alive-p
     (set-buffer helm-buffer)
     (let ((requote (loop for (pred . re) in
                          (helm-mp-3-get-patterns helm-pattern)
