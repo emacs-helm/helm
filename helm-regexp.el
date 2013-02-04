@@ -219,7 +219,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
           (buffer-substring beg end)))
 
 (defun* helm-m-occur-action (candidate
-                             &optional (method (quote buffer)))
+                             &optional (method (quote buffer)) mark)
   "Jump to CANDIDATE with METHOD.
 arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
@@ -232,7 +232,10 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
     (helm-goto-line lineno)
     (when (re-search-forward helm-pattern (point-at-eol) t)
-      (goto-char (match-beginning 0)))))
+      (goto-char (match-beginning 0)))
+    (when mark
+      (set-marker (mark-marker) (point))
+      (push-mark (point) 'nomsg))))
 
 (defun helm-m-occur-persistent-action (candidate)
   (helm-m-occur-goto-line candidate)
@@ -245,7 +248,10 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 
 (defun helm-m-occur-goto-line (candidate)
   "From multi occur, switch to buffer and go to nth 1 CANDIDATE line."
-  (helm-m-occur-action candidate))
+  (helm-m-occur-action
+   candidate 'buffer (or current-prefix-arg         ; persistent.
+                         helm-current-prefix-arg))) ; exit.
+                         
 
 (defun helm-m-occur-run-default-action ()
   (interactive)
