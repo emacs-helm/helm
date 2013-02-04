@@ -1562,9 +1562,9 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
              (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
           (setq helm-alive-p t) ; Nested session set this to nil on exit.
-          (setq helm-buffer (current-buffer))
+          (setq helm-buffer orig-helm-buffer)
           (helm-initialize-overlays helm-buffer)
-          (helm-mark-current-line t)
+          (unless (helm-empty-buffer-p) (helm-mark-current-line t))
           (setq helm-last-frame-or-window-configuration
                 orig-helm-last-frame-or-window-configuration)
           (setq cursor-type t)
