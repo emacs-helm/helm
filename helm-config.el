@@ -219,8 +219,9 @@
 ;;;;;;  helm-previous-source helm-end-of-buffer helm-beginning-of-buffer
 ;;;;;;  helm-next-page helm-previous-page helm-next-line helm-previous-line
 ;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
-;;;;;;  helm-other-buffer helm-resume helm-open-last-log helm-define-multi-key)
-;;;;;;  "helm" "helm.el" (20739 63227 268782 410000))
+;;;;;;  helm-other-buffer helm-resume-previous-session-after-quit
+;;;;;;  helm-resume helm-open-last-log helm-define-multi-key) "helm"
+;;;;;;  "helm.el" (20753 13619 115294 550000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -254,8 +255,14 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' .
 Resurrect previously invoked `helm'.
 Called with a prefix arg, allow choosing among all existing
 helm buffers.  i.e choose among various helm sessions.
+Called from lisp, you can specify a buffer-name as a string with ARG.
 
 \(fn ARG)" t nil)
+
+(autoload 'helm-resume-previous-session-after-quit "helm" "\
+Resume previous helm session within running helm.
+
+\(fn)" t nil)
 
 (autoload 'helm-other-buffer "helm" "\
 Simplified interface of `helm' with other `helm-buffer'.
@@ -587,7 +594,7 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 ;;;;;;  helm-buffer-run-query-replace-regexp helm-buffer-run-zgrep
 ;;;;;;  helm-buffer-run-grep helm-buffer-run-kill-buffers helm-buffer-save-persistent
 ;;;;;;  helm-buffer-revert-persistent helm-buffer-diff-persistent)
-;;;;;;  "helm-buffers" "helm-buffers.el" (20730 55660 76651 604000))
+;;;;;;  "helm-buffers" "helm-buffers.el" (20748 52869 727772 23000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffer-diff-persistent "helm-buffers" "\
@@ -788,8 +795,8 @@ Preconfigured helm for eshell history.
 ;;;***
 
 ;;;### (autoloads (helm-calcul-expression helm-eval-expression-with-eldoc
-;;;;;;  helm-eval-expression) "helm-eval" "helm-eval.el" (20739 49403
-;;;;;;  170593 733000))
+;;;;;;  helm-eval-expression) "helm-eval" "helm-eval.el" (20751 45649
+;;;;;;  572419 844000))
 ;;; Generated autoloads from helm-eval.el
 
 (autoload 'helm-eval-expression "helm-eval" "\
@@ -840,7 +847,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20740 54832 892041 18000))
+;;;;;;  "helm-files" "helm-files.el" (20749 35913 493947 477000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1135,7 +1142,7 @@ Preconfigured `helm' for gentoo linux.
 ;;;;;;  helm-gm-next-file helm-grep-mode helm-c-grep-run-save-buffer
 ;;;;;;  helm-c-grep-run-other-window-action helm-c-grep-run-default-action
 ;;;;;;  helm-c-grep-run-persistent-action helm-c-goto-next-file helm-c-goto-precedent-file)
-;;;;;;  "helm-grep" "helm-grep.el" (20730 55660 80651 604000))
+;;;;;;  "helm-grep" "helm-grep.el" (20751 35091 729252 795000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-c-goto-precedent-file "helm-grep" "\
@@ -1242,7 +1249,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20740 55216 552098 824000))
+;;;;;;  (20740 55584 792154 554000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1419,7 +1426,7 @@ With a prefix arg reinitialize the cache.
 ;;;***
 
 ;;;### (autoloads (helm-match-plugin-mode) "helm-match-plugin" "helm-match-plugin.el"
-;;;;;;  (20730 55660 80651 604000))
+;;;;;;  (20750 1056 263748 390000))
 ;;; Generated autoloads from helm-match-plugin.el
 
 (defvar helm-match-plugin-mode nil "\
@@ -1640,7 +1647,7 @@ Preconfigured helm to show org headlines.
 ;;;***
 
 ;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20738 51105 45677 362000))
+;;;;;;  "helm-regexp" "helm-regexp.el" (20751 35091 729252 795000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1764,7 +1771,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-display-all-sources helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20732 63811 13599 721000))
+;;;;;;  "helm-utils" "helm-utils.el" (20746 50015 135561 65000))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1847,8 +1854,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20740
-;;;;;;  55408 943598 342000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20753
+;;;;;;  16879 763288 291000))
 
 ;;;***
 
