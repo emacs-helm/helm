@@ -148,6 +148,7 @@ More than 2 seconds, next hit will run again the first function and so on."
     (define-key map (kbd "M-p")        'previous-history-element)
     (define-key map (kbd "M-n")        'next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
+    (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
@@ -1490,11 +1491,14 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 (defun helm-resume (arg)
   "Resurrect previously invoked `helm'.
 Called with a prefix arg, allow choosing among all existing
-helm buffers.  i.e choose among various helm sessions."
+helm buffers.  i.e choose among various helm sessions.
+Called from lisp, you can specify a buffer-name as a string with ARG."
   (interactive "P")
   (let (any-buffer helm-full-frame cur-dir)
     (if arg
-        (setq any-buffer (helm-resume-select-buffer))
+        (if (and (stringp arg) (bufferp (get-buffer arg)))
+            (setq any-buffer arg)
+            (setq any-buffer (helm-resume-select-buffer)))
         (setq any-buffer helm-last-buffer))
     (assert any-buffer nil
             "helm-resume: No helm buffers found to resume")
@@ -1517,6 +1521,15 @@ helm buffers.  i.e choose among various helm sessions."
          :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
          :resume t
          :buffer any-buffer))))
+
+;;;###autoload
+(defun helm-resume-previous-session-after-quit ()
+  "Resume previous helm session within running helm."
+  (interactive)
+  (if (and helm-alive-p
+           (> (length helm-buffers) 1))
+      (helm-run-after-quit #'(lambda () (helm-resume (cadr helm-buffers))))
+      (message "No previous helm sessions to resume yet!")))
 
 (defun helm-resume-p (any-resume)
   "Whether current helm session is resumed or not."
