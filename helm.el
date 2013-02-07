@@ -3204,12 +3204,16 @@ delete minibuffer contents from point instead of deleting all."
 
 (defun helm-compile-source--dummy (source)
   (if (assoc 'dummy source)
-      (append source
-              '((candidates "dummy")
-                (accept-empty)
-                (match identity)
-                (filtered-candidate-transformer . helm-dummy-candidate)
-                (volatile)))
+      (progn
+        (unless (helm-attr-defined
+                 'filtered-candidate-transformer source)
+          (helm-attrset 'filtered-candidate-transformer
+                        'helm-dummy-candidate source))
+        (append source
+                '((candidates "dummy")
+                  (accept-empty)
+                  (match identity)
+                  (volatile))))
       source))
 
 ;; Built-in plug-in: candidates-in-buffer

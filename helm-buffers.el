@@ -132,16 +132,13 @@ filtered from the list of candidates if the
 (defvar helm-c-source-buffer-not-found
   `((name . "Create buffer")
     (dummy)
-    (filtered-candidate-transformer (lambda (cands source)
-                                      (list helm-pattern)))
     (keymap . ,helm-map)
     (action . (lambda (candidate)
                 (let ((mjm (and helm-current-prefix-arg
                                 (intern (helm-comp-read
                                          "Major-mode: "
                                          helm-buffers-favorite-modes))))
-                      buffer)
-                  (setq buffer (get-buffer-create candidate)) 
+                      (buffer (get-buffer-create candidate)))
                   (if mjm
                       (with-current-buffer buffer (funcall mjm))
                       (set-buffer-major-mode buffer))
