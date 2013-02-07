@@ -495,21 +495,7 @@ ACTION must be an action supported by `helm-dired-action'."
         (prompt (if merge "Ediff Merge `%s' With File: "
                     "Ediff `%s' With File: "))
         (fun    (if merge 'ediff-merge-files 'ediff-files)))
-    (funcall fun
-             candidate
-             (condition-case quit
-                 (helm-c-read-file-name
-                  (format prompt bname))
-               (quit ;; Hit C-g ask user to fallback to locate.
-                (if (y-or-n-p "Search file for ediff with locate? ")
-                    (helm-c-locate-read-file-name
-                     (format prompt bname)
-                     ;; Check if -b option is available.
-                     (if (and (eq system-type 'windows-nt)
-                              (string-match "^es" helm-c-locate-command))
-                         bname
-                         (concat bname " -b")))
-                    (error "Error: Ediff Operation aborted")))))))
+    (funcall fun candidate (helm-c-read-file-name (format prompt bname)))))
 
 (defun helm-find-files-ediff-files (candidate)
   (helm-find-files-ediff-files-1 candidate))

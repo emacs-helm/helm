@@ -259,22 +259,6 @@ See also `helm-locate'."
     (delayed))
   "Find files matching the current input pattern with locate.")
 
-(defun helm-c-locate-read-file-name (prompt &optional init)
-  "Search a file with locate and return it's filename.
-Use argument PROMPT and INIT for `helm' arguments
-prompt and input."
-  (helm :sources
-        '((name . "Locate")
-          (candidates-process . helm-c-locate-init)
-          (action . identity)
-          (requires-pattern . 3)
-          (candidate-number-limit . 9999)
-          (mode-line . helm-generic-file-mode-line-string)
-          (delayed))
-        :prompt prompt
-        :input init
-        :buffer "*helm locate rfn*"))
-
 ;;;###autoload
 (defun helm-locate (arg)
   "Preconfigured `helm' for Locate.
