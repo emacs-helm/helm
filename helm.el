@@ -1862,8 +1862,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                              ;; non--nil.
                                              (unless (or helm-in-persistent-action
                                                          helm-suspend-update-flag)
-                                               (helm-check-minibuffer-input)
-                                               (helm-print-error-messages))))))
+                                               (save-selected-window
+                                                 (helm-check-minibuffer-input)
+                                                 (helm-print-error-messages)))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
                                             nil hist tap t))
