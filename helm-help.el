@@ -97,7 +97,7 @@ It also accepts function or variable symbol.")
   "Show long message during `helm' session in BUFNAME.
 INSERT-CONTENT-FN is the function that insert
 text to be displayed in BUFNAME."
-  (let ((winconf (current-window-configuration)))
+  (let ((winconf (current-frame-configuration)))
     (unwind-protect
          (progn
            (setq helm-suspend-update-flag t)
@@ -109,7 +109,7 @@ text to be displayed in BUFNAME."
            (goto-char 1)
            (helm-help-event-loop))
       (setq helm-suspend-update-flag nil)
-      (set-window-configuration winconf))))
+      (set-frame-configuration winconf))))
 
 (defun helm-help-event-loop ()
   (let ((prompt "SPC,C-v:NextPage  b,M-v:PrevPage  C-s/r:Isearch other:Exit"))
