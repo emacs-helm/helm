@@ -100,6 +100,7 @@ text to be displayed in BUFNAME."
   (let ((winconf (current-window-configuration)))
     (unwind-protect
          (progn
+           (setq helm-suspend-update-flag t)
            (switch-to-buffer (get-buffer-create bufname))
            (delete-other-windows)
            (erase-buffer)
@@ -107,6 +108,7 @@ text to be displayed in BUFNAME."
            (setq cursor-type nil)
            (goto-char 1)
            (helm-help-event-loop))
+      (setq helm-suspend-update-flag nil)
       (set-window-configuration winconf))))
 
 (defun helm-help-event-loop ()
@@ -126,14 +128,15 @@ text to be displayed in BUFNAME."
 (defun helm-help ()
   "Help of `helm'."
   (interactive)
-  (helm-help-internal
-   " *Helm Help*"
-   (lambda ()
-     (insert (substitute-command-keys
-              (helm-interpret-value (or (assoc-default
-                                         'help-message
-                                         (helm-get-current-source))
-                                        helm-help-message)))))))
+  (save-selected-window
+    (helm-help-internal
+     " *Helm Help*"
+     (lambda ()
+       (insert (substitute-command-keys
+                (helm-interpret-value (or (assoc-default
+                                           'help-message
+                                           (helm-get-current-source))
+                                          helm-help-message))))))))
 
 ;;; `helm-buffer-list' help
 ;;
