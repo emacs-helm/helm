@@ -888,6 +888,16 @@ without modifying source code."
                       (append actions new-action))
                   source)))
 
+(defun helm-delete-action-from-source (action-or-name source)
+  "Delete ACTION-OR-NAME from SOURCE.
+ACTION-OR-NAME can either be the name of action or the symbol function
+associated to name."
+  (let* ((actions    (helm-attr 'action source))
+         (del-action (if (symbolp action-or-name)
+                         (rassoc action-or-name actions)
+                         (assoc action-or-name actions))))
+    (helm-attrset 'action (delete del-action actions) source)))
+
 (defun* helm-add-action-to-source-if (name fn source predicate
                                            &optional (index 4) test-only)
   "Add new action NAME linked to function FN to SOURCE.
