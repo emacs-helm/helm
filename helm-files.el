@@ -2035,6 +2035,7 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
              (progn
                (setq helm-ff-cand-to-mark
                      (helm-get-dest-fnames-from-list files candidate dirflag))
+               (with-helm-after-update-hook (helm-ff-maybe-mark-candidates))
                (if (and dirflag (eq action 'rename))
                    (helm-find-files-1 (file-name-directory target)
                                       (if helm-ff-transformer-show-only-basename
@@ -2077,8 +2078,6 @@ following files to destination."
             (helm-next-line)))
       (unless (helm-this-visible-mark)
         (helm-prev-visible-mark)))))
-
-(add-hook 'helm-after-update-hook #'helm-ff-maybe-mark-candidates)
 
 
 ;;; Routines for files
