@@ -221,7 +221,7 @@
 ;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
 ;;;;;;  helm-other-buffer helm-resume-previous-session-after-quit
 ;;;;;;  helm-resume helm-open-last-log helm-define-multi-key) "helm"
-;;;;;;  "helm.el" (20753 13619 115294 550000))
+;;;;;;  "helm.el" (20757 22545 233035 259000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -594,7 +594,7 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 ;;;;;;  helm-buffer-run-query-replace-regexp helm-buffer-run-zgrep
 ;;;;;;  helm-buffer-run-grep helm-buffer-run-kill-buffers helm-buffer-save-persistent
 ;;;;;;  helm-buffer-revert-persistent helm-buffer-diff-persistent)
-;;;;;;  "helm-buffers" "helm-buffers.el" (20748 52869 727772 23000))
+;;;;;;  "helm-buffers" "helm-buffers.el" (20756 52258 816991 192000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffer-diff-persistent "helm-buffers" "\
@@ -830,10 +830,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads (helm-recentf helm-for-files helm-dired-hardlink-file
-;;;;;;  helm-dired-symlink-file helm-dired-copy-file helm-dired-rename-file
-;;;;;;  helm-insert-file helm-write-file helm-find-files helm-find
-;;;;;;  helm-dired-mode helm-ff-rotate-right-persistent helm-ff-rotate-left-persistent
+;;;### (autoloads (helm-recentf helm-for-files helm-find-files helm-find
+;;;;;;  helm-ff-rotate-right-persistent helm-ff-rotate-left-persistent
 ;;;;;;  helm-ff-run-kill-buffer-persistent helm-ff-persistent-delete
 ;;;;;;  helm-ff-properties-persistent helm-find-files-down-one-level
 ;;;;;;  helm-ff-run-toggle-basename helm-ff-run-print-file helm-ff-run-etags
@@ -847,7 +845,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20749 35913 493947 477000))
+;;;;;;  "helm-files" "helm-files.el" (20759 31604 534780 216000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1016,22 +1014,6 @@ Rotate image right without quitting helm.
 
 \(fn)" t nil)
 
-(defvar helm-dired-mode nil "\
-Non-nil if Helm-Dired mode is enabled.
-See the command `helm-dired-mode' for a description of this minor mode.
-Setting this variable directly does not take effect;
-either customize it (see the info node `Easy Customization')
-or call the function `helm-dired-mode'.")
-
-(custom-autoload 'helm-dired-mode "helm-files" nil)
-
-(autoload 'helm-dired-mode "helm-files" "\
-Enable helm completion in Dired functions.
-Bindings affected are C, R, S, H.
-This is deprecated for Emacs24+ users, use `helm-mode' instead.
-
-\(fn &optional ARG)" t nil)
-
 (autoload 'helm-find "helm-files" "\
 Preconfigured `helm' for the find shell command.
 
@@ -1044,36 +1026,6 @@ Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files.
 
 \(fn ARG)" t nil)
-
-(autoload 'helm-write-file "helm-files" "\
-Preconfigured `helm' providing completion for `write-file'.
-
-\(fn)" t nil)
-
-(autoload 'helm-insert-file "helm-files" "\
-Preconfigured `helm' providing completion for `insert-file'.
-
-\(fn)" t nil)
-
-(autoload 'helm-dired-rename-file "helm-files" "\
-Preconfigured `helm' to rename files from dired.
-
-\(fn)" t nil)
-
-(autoload 'helm-dired-copy-file "helm-files" "\
-Preconfigured `helm' to copy files from dired.
-
-\(fn)" t nil)
-
-(autoload 'helm-dired-symlink-file "helm-files" "\
-Preconfigured `helm' to symlink files from dired.
-
-\(fn)" t nil)
-
-(autoload 'helm-dired-hardlink-file "helm-files" "\
-Preconfigured `helm' to hardlink files from dired.
-
-\(fn)" t nil)
 
 (autoload 'helm-for-files "helm-files" "\
 Preconfigured `helm' for opening files.
@@ -1249,7 +1201,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20740 55584 792154 554000))
+;;;;;;  (20757 22545 229035 258000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1389,8 +1341,8 @@ With a prefix-arg insert symbol at point.
 
 ;;;***
 
-;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20730
-;;;;;;  55660 80651 604000))
+;;;### (autoloads (helm-locate) "helm-locate" "helm-locate.el" (20755
+;;;;;;  22391 930452 522000))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate "helm-locate" "\
@@ -1490,7 +1442,7 @@ Preconfigured `helm' for `minibuffer-history'.
 ;;;***
 
 ;;;### (autoloads (helm-mode helm-comp-read helm-cr-empty-string)
-;;;;;;  "helm-mode" "helm-mode.el" (20730 55660 84651 604000))
+;;;;;;  "helm-mode" "helm-mode.el" (20759 29345 354504 723000))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-cr-empty-string "helm-mode" "\
@@ -1756,7 +1708,7 @@ Preconfigured `helm' for emacs process.
 ;;;***
 
 ;;;### (autoloads (helm-c-etags-select) "helm-tags" "helm-tags.el"
-;;;;;;  (20730 55660 84651 604000))
+;;;;;;  (20754 4630 388276 350000))
 ;;; Generated autoloads from helm-tags.el
 
 (autoload 'helm-c-etags-select "helm-tags" "\
@@ -1854,8 +1806,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20753
-;;;;;;  16879 763288 291000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20759
+;;;;;;  31938 904030 449000))
 
 ;;;***
 
