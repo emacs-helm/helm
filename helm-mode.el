@@ -857,7 +857,8 @@ Note: This mode will work only partially on Emacs23."
   :group 'helm-mode
   :global t
   :lighter helm-completion-mode-string
-  (declare (special completing-read-function))
+  (assert (boundp 'completing-read-function) nil
+          "`helm-mode' not available, upgrade to Emacs-24")
   (if helm-mode
       (progn
         (setq completing-read-function 'helm-completing-read-default

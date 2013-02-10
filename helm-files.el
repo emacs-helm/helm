@@ -1983,115 +1983,9 @@ Find inside `require' and `declare-function' sexp."
             (t nil)))))
 
 
-;;; Helm completion for `write-file'.==> C-x C-w
+;;; Handle copy, rename, symlink, relsymlink and hardlink from helm.
 ;;
 ;;
-(defvar helm-c-source-write-file
-  `((name . "Write File")
-    (header-name . (lambda (name)
-                     (concat name helm-c-find-files-doc-header)))
-    (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-c-find-files-transformer)
-    (persistent-action . helm-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
-    (keymap . ,helm-c-read-file-map)
-    (volatile)
-    (action .
-            (("Write File" . (lambda (candidate)
-                               (write-file candidate 'confirm)))))))
-
-;;; Helm completion for `insert-file'.==> C-x i
-;;
-;;
-(defvar helm-c-source-insert-file
-  `((name . "Insert File")
-    (header-name . (lambda (name)
-                     (concat name helm-c-find-files-doc-header)))
-    (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-c-find-files-transformer)
-    (persistent-action . helm-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
-    (keymap . ,helm-c-read-file-map)
-    (volatile)
-    (action .
-            (("Insert File" . (lambda (candidate)
-                                (when (y-or-n-p (format "Really insert %s in %s "
-                                                        candidate helm-current-buffer))
-                                  (insert-file-contents candidate))))))))
-
-
-;;; Helm completion for copy, rename and (rel)sym/hard/link files from dired.
-;;
-;;
-(defvar helm-c-source-copy-files
-  `((name . "Copy Files")
-    (header-name . (lambda (name)
-                     (concat name helm-c-find-files-doc-header)))
-    (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-c-find-files-transformer)
-    (persistent-action . helm-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
-    (keymap . ,helm-c-read-file-map)
-    (volatile)
-    (action .
-            (("Copy File"
-              . (lambda (candidate)
-                  (helm-dired-action candidate :action 'copy)))
-             ("Copy and Follow"
-              . (lambda (candidate)
-                  (helm-dired-action candidate :action 'copy :follow t)))))))
-
-(defvar  helm-c-source-rename-files
-  `((name . "Rename Files")
-    (header-name . (lambda (name)
-                     (concat name helm-c-find-files-doc-header)))
-    (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-c-find-files-transformer)
-    (persistent-action . helm-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
-    (keymap . ,helm-c-read-file-map)
-    (volatile)
-    (action .
-            (("Rename File"
-              . (lambda (candidate)
-                  (helm-dired-action candidate :action 'rename)))
-             ("Rename and Follow"
-              . (lambda (candidate)
-                  (helm-dired-action candidate :action 'rename :follow t)))))))
-
-(defvar helm-c-source-symlink-files
-  `((name . "Symlink Files")
-    (header-name . (lambda (name)
-                     (concat name helm-c-find-files-doc-header)))
-    (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-c-find-files-transformer)
-    (persistent-action . helm-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
-    (keymap . ,helm-c-read-file-map)
-    (volatile)
-    (action
-     . (("Symlink File"
-         . (lambda (candidate)
-             (helm-dired-action candidate :action 'symlink)))
-        ("RelSymlink File"
-         . (lambda (candidate)
-             (helm-dired-action candidate :action 'relsymlink)))))))
-
-(defvar helm-c-source-hardlink-files
-  `((name . "Hardlink Files")
-    (header-name . (lambda (name)
-                     (concat name helm-c-find-files-doc-header)))
-    (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-c-find-files-transformer)
-    (persistent-action . helm-find-files-persistent-action)
-    (persistent-help . "Expand Candidate")
-    (keymap . ,helm-c-read-file-map)
-    (volatile)
-    (action
-     . (("Hardlink File"
-         . (lambda (candidate)
-             (helm-dired-action candidate :action 'hardlink)))))))
-
 (defun* helm-dired-action (candidate
                            &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
@@ -2167,7 +2061,9 @@ members of FLIST."
         finally return (sort tmp-list 'string<)))
 
 (defun helm-ff-maybe-mark-candidates ()
-  "Mark all candidates of list `helm-ff-cand-to-mark'."
+  "Mark all candidates of list `helm-ff-cand-to-mark'.
+This is used when copying/renaming/symlinking etc... and
+following files to destination."
   (when (and (string= (assoc-default 'name (helm-get-current-source))
                       (assoc-default 'name helm-c-source-find-files))
              helm-ff-cand-to-mark)
@@ -2183,64 +2079,6 @@ members of FLIST."
         (helm-prev-visible-mark)))))
 
 (add-hook 'helm-after-update-hook #'helm-ff-maybe-mark-candidates)
-
-(defun* helm-dired-do-action-on-file (&key action)
-  (let* ((files     (dired-get-marked-files))
-         (len       (length files))
-         (fname     (if (> len 1)
-                        (format "* %d Files" len)
-                        (car files)))
-         (source    (case action
-                      ('copy     'helm-c-source-copy-files)
-                      ('rename   'helm-c-source-rename-files)
-                      ('symlink  'helm-c-source-symlink-files)
-                      ('hardlink 'helm-c-source-hardlink-files)))
-         (prompt-fm (case action
-                      ('copy     "Copy %s to: ")
-                      ('rename   "Rename %s to: ")
-                      ('symlink  "Symlink %s to: ")
-                      ('hardlink "Hardlink %s to: ")))
-         (buffer    (case action
-                      ('copy     "*Helm Copy Files*")
-                      ('rename   "*Helm Rename Files*")
-                      ('symlink  "*Helm Symlink Files*")
-                      ('hardlink "*Helm Hardlink Files*")))
-         (helm-mp-highlight-delay     nil))
-    (helm :sources source
-          :input (or (dired-dwim-target-directory)
-                     (expand-file-name (helm-c-current-directory)))
-          :preselect (dired-get-filename)
-          :prompt (format prompt-fm fname)
-          :keymap helm-c-read-file-map
-          :buffer buffer)))
-
-;;;###autoload
-(define-minor-mode helm-dired-mode
-  "Enable helm completion in Dired functions.
-Bindings affected are C, R, S, H.
-This is deprecated for Emacs24+ users, use `helm-mode' instead."
-  :group 'helm-files
-  :global t
-  (if helm-dired-mode
-      (progn
-        (substitute-key-definition
-         'dired-do-copy 'helm-dired-copy-file dired-mode-map)
-        (substitute-key-definition
-         'dired-do-rename 'helm-dired-rename-file dired-mode-map)
-        (substitute-key-definition
-         'dired-do-symlink 'helm-dired-symlink-file dired-mode-map)
-        (substitute-key-definition
-         'dired-do-hardlink 'helm-dired-hardlink-file dired-mode-map))
-      (substitute-key-definition
-       'helm-dired-copy-file 'dired-do-copy dired-mode-map)
-      (substitute-key-definition
-       'helm-dired-rename-file 'dired-do-rename dired-mode-map)
-      (substitute-key-definition
-       'helm-dired-symlink-file 'dired-do-symlink dired-mode-map)
-      (substitute-key-definition
-       'helm-dired-hardlink-file 'dired-do-hardlink dired-mode-map)))
-
-(defalias 'helm-dired-bindings 'helm-dired-mode)
 
 
 ;;; Routines for files
@@ -2769,50 +2607,6 @@ This is the starting point for nearly all actions you can do on files."
      any-input (if helm-ff-transformer-show-only-basename
                    (and presel (helm-c-basename presel))
                    presel))))
-
-;;;###autoload
-(defun helm-write-file ()
-  "Preconfigured `helm' providing completion for `write-file'."
-  (interactive)
-  (let ((helm-mp-highlight-delay nil))
-    (helm :sources 'helm-c-source-write-file
-          :input (expand-file-name default-directory)
-          :prompt "Write buffer to file: "
-          :buffer "*Helm write file*")))
-
-;;;###autoload
-(defun helm-insert-file ()
-  "Preconfigured `helm' providing completion for `insert-file'."
-  (interactive)
-  (let ((helm-mp-highlight-delay nil))
-    (helm :sources 'helm-c-source-insert-file
-          :input (expand-file-name default-directory)
-          :prompt "Insert file: "
-          :buffer "*Helm insert file*")))
-
-;;;###autoload
-(defun helm-dired-rename-file ()
-  "Preconfigured `helm' to rename files from dired."
-  (interactive)
-  (helm-dired-do-action-on-file :action 'rename))
-
-;;;###autoload
-(defun helm-dired-copy-file ()
-  "Preconfigured `helm' to copy files from dired."
-  (interactive)
-  (helm-dired-do-action-on-file :action 'copy))
-
-;;;###autoload
-(defun helm-dired-symlink-file ()
-  "Preconfigured `helm' to symlink files from dired."
-  (interactive)
-  (helm-dired-do-action-on-file :action 'symlink))
-
-;;;###autoload
-(defun helm-dired-hardlink-file ()
-  "Preconfigured `helm' to hardlink files from dired."
-  (interactive)
-  (helm-dired-do-action-on-file :action 'hardlink))
 
 ;;;###autoload
 (defun helm-for-files ()
