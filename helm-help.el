@@ -18,6 +18,15 @@
 ;;; Code:
 (require 'helm)
 
+(defgroup helm-help nil
+  "Embedded help for `helm'."
+  :group 'helm)
+
+(defface helm-helper
+  '((t :inherit helm-header))
+  "Face for helm help string in minibuffer."
+  :group 'helm-help)
+
 
 ;;; Embeded documentation.
 ;;
@@ -112,14 +121,17 @@ text to be displayed in BUFNAME."
       (set-frame-configuration winconf))))
 
 (defun helm-help-event-loop ()
-  (let ((prompt "SPC,C-v:NextPage  b,M-v:PrevPage  C-s/r:Isearch other:Exit"))
+  (let ((prompt (propertize
+                 "[SPC,C-v,down:NextPage  b,M-v,up:PrevPage  C-s/r:Isearch Other:Exit]"
+                 'face 'helm-helper))
+        (scroll-error-top-bottom t))
     (condition-case err
         (loop for event = (read-key prompt) do
               (case event
-                ((?\C-v ? down)  (scroll-up helm-scroll-amount))
-                ((?\M-v ?b up)   (scroll-down helm-scroll-amount))
-                ((?\C-s)         (isearch-forward))
-                ((?\C-r)         (isearch-backward))
+                ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
+                ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
+                ((?\C-s)        (isearch-forward))
+                ((?\C-r)        (isearch-backward))
                 (t (return))))
       (beginning-of-buffer (message "Beginning of buffer"))
       (end-of-buffer       (message "End of Buffer")))))
