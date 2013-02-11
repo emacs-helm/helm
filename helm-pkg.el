@@ -1,6 +1,6 @@
 ;;; helm-pkg.el --- define helm for package.el
 
-(define-package "helm" "1.4.9"
+(define-package "helm" "1.5.0"
   "Helm is an Emacs incremental and narrowing framework")
 
 ;; Local Variables:
