@@ -944,7 +944,7 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
 
 This function sets a filter for helm sources and it may be
 called while helm is running. It can be used to toggle
-displaying of sources dinamically. For example, additional keys
+displaying of sources dynamically. For example, additional keys
 can be bound into `helm-map' to display only the file-related
 results if there are too many matches from other sources and
 you're after files only:
@@ -1132,8 +1132,7 @@ Use this function is better than setting `helm-type-attributes' directly."
   (and doc (helm-document-type-attribute type doc))
   nil)
 
-(defvaralias 'helm-attributes 'helm-additional-attributes)
-(defvar helm-additional-attributes nil
+(defvar helm-attributes nil
   "List of all `helm' attributes.")
 
 (defun helm-document-attribute (attribute short-doc &optional long-doc)
@@ -1144,7 +1143,7 @@ LONG-DOC is displayed below attribute name and short documentation."
       (setq short-doc (concat "(" short-doc ")"))
       (setq long-doc short-doc
             short-doc ""))
-  (add-to-list 'helm-additional-attributes attribute t)
+  (add-to-list 'helm-attributes attribute t)
   (put attribute 'helm-attrdoc
        (concat "- " (symbol-name attribute)
                " " short-doc "\n\n" long-doc "\n")))

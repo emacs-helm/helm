@@ -729,7 +729,7 @@ HELM-ATTRIBUTE should be a symbol."
   (interactive (list (intern
                       (completing-read
                        "Describe helm attribute: "
-                       (mapcar 'symbol-name helm-additional-attributes)
+                       (mapcar 'symbol-name helm-attributes)
                        nil t))))
   (with-output-to-temp-buffer "*Help*"
     (princ (get helm-attribute 'helm-attrdoc))))

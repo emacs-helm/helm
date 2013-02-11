@@ -306,7 +306,7 @@ Filename completion happen if string start after or between a double quote."
 (defun helm-def-source--helm-attributes (&optional default)
   `((name . "Helm attributes")
     (candidates . (lambda ()
-                    (mapcar 'symbol-name helm-additional-attributes)))
+                    (mapcar 'symbol-name helm-attributes)))
     (action . (lambda (candidate)
                 (let (special-display-buffer-names
                       special-display-regexps
