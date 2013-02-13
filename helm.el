@@ -3722,9 +3722,18 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                                  thereis (string-match (or (car-safe x) x)
                                                        name))))
             '("."))))
-    ;; Be sure window of BUF is not dedicated.
-    (set-window-dedicated-p (get-buffer-window buf) nil)
-    (display-buffer buf action)))
+    ;; Don't loose minibuffer when displaying persistent window in
+    ;; another frame.
+    ;; This happen when the displayed persistent buffer-name is one of
+    ;; `special-display-buffer-names' or match `special-display-regexps'
+    ;; and `helm-persistent-action-use-special-display' is enabled.
+    (with-selected-window (if (or special-display-regexps
+                                  special-display-buffer-names)
+                              (minibuffer-window)
+                              (selected-window))
+      ;; Be sure window of BUF is not dedicated.
+      (set-window-dedicated-p (get-buffer-window buf) nil)
+      (display-buffer buf action))))
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun helm-other-window-base (command &optional scroll-amount)
