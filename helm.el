@@ -561,6 +561,12 @@ Otherwise all variables started with `helm-' are shown.")
 If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because `helm-debug-buffer' grows quickly.")
 
+(defvar helm-compile-source-functions
+  '(helm-compile-source--type
+    helm-compile-source--dummy
+    helm-compile-source--candidates-in-buffer)
+  "Functions to compile elements of `helm-sources' (plug-in).")
+
 
 ;;; Internal Variables
 ;;
@@ -589,6 +595,13 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
 (defvar helm-cib-hash (make-hash-table :test 'equal))
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
+(defvar helm-debug-root-directory nil
+  "When non--nil, save helm log to `helm-last-log-file'.
+Be aware that if you set that, you will end up with a huge directory
+of log files, so use that only for debugging purpose.
+See `helm-log-save-maybe' for more info.")
+(defvar helm-last-log-file nil
+  "The name of the last helm session log file.")
 (defvar helm-follow-mode nil)
 (defvar helm-let-variables nil)
 (defvar helm-split-window-state nil)
@@ -603,6 +616,32 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
                                         "\\<" "\\>" "\\<_" "\\>_"))
 (defvar helm-suspend-update-flag nil)
 (defvar helm-force-updating-p nil)
+(defvar helm-exit-status 0
+  "Flag to inform whether helm have exited or quitted.
+Exit with 0 mean helm have exited executing an action.
+Exit with 1 mean helm have quitted with \\[keyboard-quit]
+It is useful for example to restore a window config if helm abort
+in special cases.
+See `helm-exit-minibuffer' and `helm-keyboard-quit'.")
+(defvar helm-minibuffer-confirm-state nil)
+(defvar helm-quit nil)
+(defvar helm-attributes nil "List of all `helm' attributes.")
+(defvar helm-buffers nil
+  "All of `helm-buffer' in most recently used order.")
+(defvar helm-current-position nil
+  "Cons of \(point . window-start\)  when `helm' is invoked.
+It is needed to restore position in `helm-current-buffer'
+when `helm' is keyboard-quitted.")
+(defvar helm-last-frame-or-window-configuration nil
+  "Used to store window or frame configuration when helm start.")
+(defvar helm-onewindow-p nil)
+(defvar helm-compile-source-functions-default helm-compile-source-functions
+  "Plug-ins this file provides.")
+(defvar helm-types nil)
+(defvar helm-mode-line-string-real nil) ; The string to display in mode-line.
+(defvar helm-persistent-action-display-window nil)
+(defvar helm-marked-candidates nil
+  "Marked candadates.  List of \(source . real\) pair.")
 
 
 ;; Utility: logging
@@ -665,15 +704,6 @@ ARGS are args given to `format'."
   (let ((msg (apply 'format args)))
     (unless (member msg helm-issued-errors)
       (add-to-list 'helm-issued-errors msg))))
-
-(defvar helm-debug-root-directory nil
-  "When non--nil, save helm log to `helm-last-log-file'.
-Be aware that if you set that, you will end up with a huge directory
-of log files, so use that only for debugging purpose.
-See `helm-log-save-maybe' for more info.")
-;; Internal
-(defvar helm-last-log-file nil
-  "The name of the last helm session log file.")
 
 (defun helm-log-save-maybe ()
   "May be save log buffer to `helm-last-log-file'.
@@ -990,12 +1020,6 @@ If NO-UPDATE is non-nil, skip executing `helm-update'."
   (unless no-init (helm-funcall-foreach 'init))
   (unless no-update (helm-update)))
 
-(defvar helm-compile-source-functions
-  '(helm-compile-source--type
-    helm-compile-source--dummy
-    helm-compile-source--candidates-in-buffer)
-  "Functions to compile elements of `helm-sources' (plug-in).")
-
 (defun helm-get-sources ()
   "Return compiled `helm-sources', which is memoized.
 
@@ -1109,7 +1133,6 @@ of \(action-display . function\)."
   "Check if `helm-current-buffer' is modified since `helm' was invoked."
   (helm-buffer-is-modified helm-current-buffer))
 
-(defvar helm-quit nil)
 (defun helm-run-after-quit (function &rest args)
   "Perform an action after quitting `helm'.
 The action is to call FUNCTION with arguments ARGS."
@@ -1131,9 +1154,6 @@ Use this function is better than setting `helm-type-attributes' directly."
   (helm-add-type-attribute type definition)
   (and doc (helm-document-type-attribute type doc))
   nil)
-
-(defvar helm-attributes nil
-  "List of all `helm' attributes.")
 
 (defun helm-document-attribute (attribute short-doc &optional long-doc)
   "Register ATTRIBUTE documentation introduced by plug-in.
@@ -1597,8 +1617,6 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
 ;;; Initialize
 ;;
 ;;
-(defvar helm-buffers nil
-  "All of `helm-buffer' in most recently used order.")
 (defun helm-initialize (any-resume any-input any-default any-sources)
   "Start initialization of `helm' session.
 For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
@@ -1632,10 +1650,6 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
 
 ;;; Core: Accessors
 ;;
-(defvar helm-current-position nil
-  "Cons of \(point . window-start\)  when `helm' is invoked.
-It is needed to restore position in `helm-current-buffer'
-when `helm' is keyboard-quitted.")
 (defun helm-current-position (save-or-restore)
   "Restore or save current position in `helm-current-buffer'.
 Argument SAVE-OR-RESTORE is one of save or restore."
@@ -1652,12 +1666,6 @@ Argument SAVE-OR-RESTORE is one of save or restore."
      ;; otherwise, if there is some other buffer than `helm-current-buffer'
      ;; one, position will be lost.
      (set-window-start (selected-window) (cdr helm-current-position) t))))
-
-
-;; Internal.
-(defvar helm-last-frame-or-window-configuration nil
-  "Used to store window or frame configuration when helm start.")
-(defvar helm-onewindow-p nil)
 
 (defun helm-frame-or-window-configuration (save-or-restore)
   "Save or restore last frame or window configuration.
@@ -2034,8 +2042,6 @@ if some when multiples sources are present."
 ;;; Core: source compiler
 ;;
 ;;
-(defvar helm-compile-source-functions-default helm-compile-source-functions
-  "Plug-ins this file provides.")
 (defun helm-compile-sources (sources funcs)
   "Compile SOURCES with FUNCS.
 See `helm-compile-source-functions'.
@@ -2785,9 +2791,6 @@ Possible value of DIRECTION are 'next or 'previous."
                            (not (eq (point-at-bol) (point-min))))
                       -1 1))))
 
-;; Internal
-;; The string to display in mode-line.
-(defvar helm-mode-line-string-real nil)
 (defun helm-display-mode-line (source)
   "Setup mode-line and header-line for `helm-buffer'."
   (set (make-local-variable 'helm-mode-line-string)
@@ -2961,16 +2964,6 @@ to mark candidates."
 
 (defun helm-this-command-key ()
   (event-basic-type (elt (this-command-keys-vector) 0)))
-
-(defvar helm-exit-status 0
-  "Flag to inform whether helm have exited or quitted.
-Exit with 0 mean helm have exited executing an action.
-Exit with 1 mean helm have quitted with \\[keyboard-quit]
-It is useful for example to restore a window config if helm abort
-in special cases.
-See `helm-exit-minibuffer' and `helm-keyboard-quit'.")
-
-(defvar helm-minibuffer-confirm-state nil)
 
 ;;;###autoload
 (defun helm-confirm-and-exit-minibuffer ()
@@ -3199,7 +3192,6 @@ delete minibuffer contents from point instead of deleting all."
       (setq helm-type-attributes (delete it helm-type-attributes)))
   (push (cons type definition) helm-type-attributes))
 
-(defvar helm-types nil)
 (defun helm-document-type-attribute (type doc)
   (add-to-list 'helm-types type t)
   (put type 'helm-typeattrdoc
@@ -3633,7 +3625,6 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
   `(let ((display-buffer-function 'helm-persistent-action-display-buffer))
      ,@body))
 
-(defvar helm-persistent-action-display-window nil)
 (defun helm-initialize-persistent-action ()
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
@@ -3775,9 +3766,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
     (mapc 'delete-overlay helm-visible-mark-overlays)
     (set (make-local-variable 'helm-visible-mark-overlays) nil)))
 (add-hook 'helm-after-initialize-hook 'helm-clear-visible-mark)
-
-(defvar helm-marked-candidates nil
-  "Marked candadates.  List of \(source . real\) pair.")
 
 (defun helm-this-visible-mark ()
   (loop for o in helm-visible-mark-overlays
