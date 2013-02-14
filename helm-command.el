@@ -115,7 +115,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
          command sym-com in-help help-cand
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))
-                          (if (and in-help (string= candidate help-cand))
+                          (if (and in-help (string= candidate help-cand)
+                                   (null helm-persistent-action-use-special-display))
                               (progn
                                 ;; When M-x is started from a help buffer,
                                 ;; Don't kill it as it is helm-current-buffer.
