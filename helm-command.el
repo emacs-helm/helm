@@ -113,11 +113,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         when (commandp com)
                         collect i into hist finally return hist))
          command sym-com in-help help-cand
-         helm-persistent-action-use-special-display
          (pers-help #'(lambda (candidate)
-                        (let ((hbuf (get-buffer (help-buffer)))
-                              special-display-buffer-names
-                              special-display-regexps)
+                        (let ((hbuf (get-buffer (help-buffer))))
                           (if (and in-help (string= candidate help-cand))
                               (progn
                                 ;; When M-x is started from a help buffer,
