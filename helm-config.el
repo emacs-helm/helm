@@ -221,7 +221,7 @@
 ;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
 ;;;;;;  helm-other-buffer helm-resume-previous-session-after-quit
 ;;;;;;  helm-resume helm-open-last-log helm-define-multi-key) "helm"
-;;;;;;  "helm.el" (20757 22545 233035 259000))
+;;;;;;  "helm.el" (20764 4072 886296 666000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -695,8 +695,8 @@ Preconfigured `helm' for color.
 
 ;;;***
 
-;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20730
-;;;;;;  55660 76651 604000))
+;;;### (autoloads (helm-M-x) "helm-command" "helm-command.el" (20764
+;;;;;;  41938 304119 799000))
 ;;; Generated autoloads from helm-command.el
 
 (autoload 'helm-M-x "helm-command" "\
@@ -710,7 +710,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 ;;;### (autoloads (helm-complex-command-history helm-timers helm-manage-advice
 ;;;;;;  helm-c-apropos helm-lisp-completion-or-file-name-at-point
 ;;;;;;  helm-lisp-indent helm-c-complete-file-name-at-point helm-lisp-completion-at-point)
-;;;;;;  "helm-elisp" "helm-elisp.el" (20730 55660 80651 604000))
+;;;;;;  "helm-elisp" "helm-elisp.el" (20761 13636 359268 183000))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -831,9 +831,9 @@ You can set your own list of commands with
 ;;;***
 
 ;;;### (autoloads (helm-recentf helm-for-files helm-find-files helm-find
-;;;;;;  helm-ff-rotate-right-persistent helm-ff-rotate-left-persistent
-;;;;;;  helm-ff-run-kill-buffer-persistent helm-ff-persistent-delete
-;;;;;;  helm-ff-properties-persistent helm-find-files-down-one-level
+;;;;;;  helm-ff-file-name-history helm-ff-rotate-right-persistent
+;;;;;;  helm-ff-rotate-left-persistent helm-ff-run-kill-buffer-persistent
+;;;;;;  helm-ff-persistent-delete helm-ff-properties-persistent helm-find-files-down-one-level
 ;;;;;;  helm-ff-run-toggle-basename helm-ff-run-print-file helm-ff-run-etags
 ;;;;;;  helm-ff-run-gnus-attach-files helm-ff-run-find-file-as-root
 ;;;;;;  helm-ff-run-locate helm-ff-run-open-file-with-default-tool
@@ -845,7 +845,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20759 31604 534780 216000))
+;;;;;;  "helm-files" "helm-files.el" (20766 41724 559878 627000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1011,6 +1011,11 @@ Rotate image left without quitting helm.
 
 (autoload 'helm-ff-rotate-right-persistent "helm-files" "\
 Rotate image right without quitting helm.
+
+\(fn)" t nil)
+
+(autoload 'helm-ff-file-name-history "helm-files" "\
+Switch to `file-name-history' without quitting `helm-find-files'.
 
 \(fn)" t nil)
 
@@ -1201,7 +1206,7 @@ Preconfigured helm for pdfgrep.
 ;;;;;;  helm-c-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
 ;;;;;;  helm-c-buffer-help helm-help) "helm-help" "helm-help.el"
-;;;;;;  (20757 22545 229035 258000))
+;;;;;;  (20761 13636 359268 183000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1400,8 +1405,8 @@ See `helm-mp-matching-method' for the behavior of each method.
 
 ;;;### (autoloads (helm-minibuffer-history helm-mini helm-stumpwm-commands
 ;;;;;;  helm-ratpoison-commands helm-eev-anchors helm-c-insert-latex-math
-;;;;;;  helm-world-time) "helm-misc" "helm-misc.el" (20730 57051
-;;;;;;  156639 602000))
+;;;;;;  helm-world-time) "helm-misc" "helm-misc.el" (20759 58418
+;;;;;;  542505 575000))
 ;;; Generated autoloads from helm-misc.el
 
 (autoload 'helm-world-time "helm-misc" "\
@@ -1442,7 +1447,7 @@ Preconfigured `helm' for `minibuffer-history'.
 ;;;***
 
 ;;;### (autoloads (helm-mode helm-comp-read helm-cr-empty-string)
-;;;;;;  "helm-mode" "helm-mode.el" (20759 29345 354504 723000))
+;;;;;;  "helm-mode" "helm-mode.el" (20759 50776 114139 164000))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-cr-empty-string "helm-mode" "\
@@ -1723,7 +1728,7 @@ If tag file have been modified reinitialize cache.
 
 ;;;### (autoloads (helm-yank-text-at-point helm-w32-shell-execute-open-file
 ;;;;;;  helm-quit-and-find-file helm-display-all-sources helm-show-all-in-this-source-only)
-;;;;;;  "helm-utils" "helm-utils.el" (20746 50015 135561 65000))
+;;;;;;  "helm-utils" "helm-utils.el" (20764 41466 100058 866000))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1806,8 +1811,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20759
-;;;;;;  31938 904030 449000))
+;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20766
+;;;;;;  41740 909341 640000))
 
 ;;;***
 

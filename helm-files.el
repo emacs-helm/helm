@@ -2346,14 +2346,7 @@ Else return ACTIONS unmodified."
                         recentf-list
                         file-name-history)))
     (persistent-action . ignore)
-    (filtered-candidate-transformer
-     . (lambda (candidates source)
-         (loop for c in candidates collect
-               (cond ((file-remote-p c)
-                      (cons (propertize c 'face 'helm-history-remote) c))
-                     ((file-exists-p c)
-                      (cons (propertize c 'face 'helm-ff-file) c))
-                     (t (cons (propertize c 'face 'helm-history-deleted) c))))))
+    (filtered-candidate-transformer . helm-file-name-history-transformer)
     (action . (("Find file"
                 . (lambda (candidate)
                     (helm-set-pattern
@@ -2364,6 +2357,15 @@ Else return ACTIONS unmodified."
                     (helm-set-pattern
                      (expand-file-name candidate))))))))
 
+(defun helm-file-name-history-transformer (candidates source)
+  (loop for c in candidates collect
+        (cond ((file-remote-p c)
+               (cons (propertize c 'face 'helm-history-remote) c))
+              ((file-exists-p c)
+               (cons (propertize c 'face 'helm-ff-file) c))
+              (t (cons (propertize c 'face 'helm-history-deleted) c)))))
+
+;;;###autoload
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
