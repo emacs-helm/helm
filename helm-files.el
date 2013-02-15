@@ -251,6 +251,16 @@ This happen only in `helm-find-files'."
   "Face used for file names in `helm-find-files'."
   :group 'helm-files)
 
+(defface helm-history-deleted
+    '((t (:inherit helm-ff-invalid-symlink)))
+  "Face used for deleted files in `file-name-history'."
+  :group 'helm-files)
+
+(defface helm-history-remote
+    '((t (:foreground "Indianred1")))
+  "Face used for remote files in `file-name-history'."
+  :group 'helm-files)
+
 
 ;;; Helm-find-files - The helm file browser.
 ;;
@@ -2335,6 +2345,15 @@ Else return ACTIONS unmodified."
                     (if helm-ff-file-name-history-use-recentf
                         recentf-list
                         file-name-history)))
+    (persistent-action . ignore)
+    (filtered-candidate-transformer
+     . (lambda (candidates source)
+         (loop for c in candidates collect
+               (cond ((file-remote-p c)
+                      (cons (propertize c 'face 'helm-history-remote) c))
+                     ((file-exists-p c)
+                      (cons (propertize c 'face 'helm-ff-file) c))
+                     (t (cons (propertize c 'face 'helm-history-deleted) c))))))
     (action . (("Find file"
                 . (lambda (candidate)
                     (helm-set-pattern
