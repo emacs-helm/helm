@@ -2397,6 +2397,8 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 ;; <https://github.com/emacs-helm/helm-ls-git.git>
 ;; <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>
 ;; Only hg and git are supported for now.
+
+;;;###autoload
 (defun helm-browse-project ()
   "Browse files and see status of project with its vcs.
 Only hg and git are supported for now.
@@ -2421,6 +2423,7 @@ and
       ;; which will set locally `helm-default-directory'
       (helm-browse-project)))
 
+;;;###autoload
 (defun helm-ff-run-browse-project ()
   (interactive)
   (when helm-alive-p
@@ -2579,6 +2582,7 @@ utility mdfind.")
                  candidate (file-name-directory candidate))))
     (helm-find-1 (expand-file-name dir))))
 
+;;;###autoload
 (defun helm-ff-run-find-sh-command ()
   "Run find shell command action with key from `helm-find-files'."
   (interactive)

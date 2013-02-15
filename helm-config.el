@@ -831,6 +831,7 @@ You can set your own list of commands with
 ;;;***
 
 ;;;### (autoloads (helm-recentf helm-for-files helm-find-files helm-find
+;;;;;;  helm-ff-run-find-sh-command helm-ff-run-browse-project helm-browse-project
 ;;;;;;  helm-ff-file-name-history helm-ff-rotate-right-persistent
 ;;;;;;  helm-ff-rotate-left-persistent helm-ff-run-kill-buffer-persistent
 ;;;;;;  helm-ff-persistent-delete helm-ff-properties-persistent helm-find-files-down-one-level
@@ -845,7 +846,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20766 41724 559878 627000))
+;;;;;;  "helm-files" "helm-files.el" (20766 43064 108059 240000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1016,6 +1017,28 @@ Rotate image right without quitting helm.
 
 (autoload 'helm-ff-file-name-history "helm-files" "\
 Switch to `file-name-history' without quitting `helm-find-files'.
+
+\(fn)" t nil)
+
+(autoload 'helm-browse-project "helm-files" "\
+Browse files and see status of project with its vcs.
+Only hg and git are supported for now.
+Fall back to `helm-find-files' if directory is not under
+control of one of those vcs.
+Need dependencies:
+<https://github.com/emacs-helm/helm-ls-git.git>
+and
+<https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>.
+
+\(fn)" t nil)
+
+(autoload 'helm-ff-run-browse-project "helm-files" "\
+
+
+\(fn)" t nil)
+
+(autoload 'helm-ff-run-find-sh-command "helm-files" "\
+Run find shell command action with key from `helm-find-files'.
 
 \(fn)" t nil)
 
@@ -1812,7 +1835,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-pkg.el" "helm-plugin.el") (20766
-;;;;;;  41740 909341 640000))
+;;;;;;  43071 709016 513000))
 
 ;;;***
 
