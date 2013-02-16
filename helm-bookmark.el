@@ -123,7 +123,7 @@
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               "*hlbookmark list*" (helm-c-collect-bookmarks :local t))))
+               " *hlbookmark list*" (helm-c-collect-bookmarks :local t))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
