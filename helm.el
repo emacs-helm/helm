@@ -3166,6 +3166,7 @@ When called with a prefix arg or when
 `helm-delete-minibuffer-contents-from-point' is non--nil,
 delete minibuffer contents from point instead of deleting all."
   (interactive "P")
+  (require 'helm-utils)
   (let* ((input (minibuffer-contents))
          (str (if (or arg helm-delete-minibuffer-contents-from-point)
                   (minibuffer-completion-contents) "")))
