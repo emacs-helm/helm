@@ -730,6 +730,7 @@ Keys description:
                        (candidate-number-limit . 9999)
                        (persistent-help . ,persistent-help)
                        (volatile)
+                       (migemo)
                        (action . ,action-fn)))
                     :input initial-input
                     :prompt prompt
