@@ -35,19 +35,27 @@
     (display-to-real . helm-c-top-display-to-real)
     (persistent-action . helm-c-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
-    (action
-     ("kill (TERM)" . (lambda (pid)
-                        (helm-c-top-sh (format "kill -TERM %s" pid))))
-     ("kill (KILL)" . (lambda (pid)
-                        (helm-c-top-sh (format "kill -KILL %s" pid))))
-     ("Copy PID" . (lambda (pid) (kill-new pid))))))
+    (action . (("[No actions]" . ignore)))
+    (action-transformer . helm-top-action-transformer)))
 
-(defun helm-c-top-sh (cmd)
-  (message "Executed %s\n%s" cmd (shell-command-to-string cmd)))
+(defun helm-top-action-transformer (actions candidate)
+  "Action transformer for `top'.
+Show actions only on line starting by a PID."
+  (let ((disp (helm-get-selection nil t)))
+    (cond ((string-match "^ *[0-9]+" disp)
+           (list '("kill (SIGTERM)" . (lambda (pid) (helm-c-top-sh "TERM" pid)))
+                 '("kill (SIGKILL)" . (lambda (pid) (helm-c-top-sh "KILL" pid)))
+                 '("Copy PID" . (lambda (pid) (kill-new pid)))))
+          (t actions))))
+
+(defun helm-c-top-sh (sig pid)
+  "Run kill shell command with signal SIG on PID for `helm-top'."
+  (let ((cmd (format "kill -%s %s" sig pid)))
+    (message "Executed %s\n%s" cmd (shell-command-to-string cmd))))
 
 (defun helm-c-top-sh-persistent-action (pid)
   (delete-other-windows)
-  (helm-c-top-sh (format "kill -TERM %s" pid))
+  (helm-c-top-sh "TERM" pid)
   (helm-force-update))
 
 (defun helm-c-top-init ()
