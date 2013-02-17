@@ -19,13 +19,30 @@
 
 (eval-when-compile (require 'cl))
 (require 'helm)
+(require 'helm-utils)
 
+
+(defgroup helm-sys nil
+  "System related helm library."
+  :group 'helm)
 
+(defcustom helm-c-top-command nil
+  "Top command used to display output of top.
+A format string where %s will be replaced with `frame-width'."
+  :group 'helm-sys
+  :type 'string)
+
+
 ;;; Top (process)
 ;;
 ;;
-(defvar helm-c-top-command "COLUMNS=%s top -b -n 1"
-  "Top command (batch mode). %s is replaced with `frame-width'.")
+(defun helm-sys-set-top-command ()
+  "Setup `helm-c-top-command' if not already set by user."
+  (unless helm-c-top-command
+    (let ((bn (helm-c-basename shell-file-name)))
+      (setq helm-c-top-command (cond ((string= bn "tcsh")
+                                      "setenv COLUMNS=%s top -b -n 1")
+                                     (t "COLUMNS=%s top -b -n 1"))))))
 
 (defvar helm-c-source-top
   '((name . "Top")
@@ -59,6 +76,8 @@ Show actions only on line starting by a PID."
   (helm-force-update))
 
 (defun helm-c-top-init ()
+  "Insert output of top command in candidate buffer."
+  (helm-sys-set-top-command)
   (with-current-buffer (helm-candidate-buffer 'global)
     (call-process-shell-command
      (format helm-c-top-command (frame-width))
@@ -67,6 +86,7 @@ Show actions only on line starting by a PID."
 (defun helm-c-top-display-to-real (line)
   (car (split-string line)))
 
+
 ;;; X RandR resolution change
 ;;
 ;;
@@ -116,6 +136,7 @@ Show actions only on line starting by a PID."
                         "--output" (helm-c-xrandr-output)
                         "--mode" mode))))))
 
+
 ;;; Emacs process
 ;;
 ;;
@@ -131,6 +152,7 @@ Show actions only on line starting by a PID."
     (action ("Kill Process" . (lambda (elm)
                                 (delete-process (get-process elm)))))))
 
+
 ;;;###autoload
 (defun helm-top ()
   "Preconfigured `helm' for top command."
