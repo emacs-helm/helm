@@ -54,7 +54,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext addressbook*"
+               'global
                (helm-c-bmkext-addressbook-setup-alist))))
     (candidates-in-buffer)
     (persistent-action
@@ -138,7 +138,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext w3m*" (helm-c-bookmark-w3m-setup-alist))))
+               'global (helm-c-bookmark-w3m-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -156,7 +156,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext images*" (helm-c-bookmark-images-setup-alist))))
+               'global (helm-c-bookmark-images-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -174,7 +174,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext man*" (helm-c-bookmark-man-setup-alist))))
+               'global (helm-c-bookmark-man-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -193,7 +193,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext gnus*" (helm-c-bookmark-gnus-setup-alist))))
+               'global (helm-c-bookmark-gnus-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -211,7 +211,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext info*" (helm-c-bookmark-info-setup-alist))))
+               'global (helm-c-bookmark-info-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -229,7 +229,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext files*" (helm-c-bookmark-local-files-setup-alist))))
+               'global (helm-c-bookmark-local-files-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -247,7 +247,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext su*" (helm-c-bookmark-su-files-setup-alist))))
+               'global (helm-c-bookmark-su-files-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort
@@ -276,7 +276,7 @@
               (require 'bookmark-extensions)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-               "*helm bmkext ssh*" (helm-c-bookmark-ssh-files-setup-alist))))
+               'global (helm-c-bookmark-ssh-files-setup-alist))))
     (candidates-in-buffer)
     (filtered-candidate-transformer . helm-c-adaptive-sort)
     (type . bookmark)))

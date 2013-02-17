@@ -187,7 +187,7 @@ The function that call this should set `helm-ec-target' to thing at point."
     (unwind-protect
          (with-helm-show-completion beg end
            (helm :sources 'helm-c-source-eshell-history
-                 :buffer "*Eshell history*"
+                 :buffer "*helm eshell history*"
                  :resume 'noresume
                  :input input))
       (when (and flag-empty

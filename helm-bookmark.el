@@ -80,7 +80,7 @@
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               "*hbookmark list*" (bookmark-all-names))))
+               'global (bookmark-all-names))))
     (no-delay-on-input)
     (candidates-in-buffer)
     (type . bookmark))
@@ -100,7 +100,7 @@
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               "*hbookmark list*" (helm-c-collect-bookmarks :ssh t))))
+               'global (helm-c-collect-bookmarks :ssh t))))
     (candidates-in-buffer)
     (no-delay-on-input)
     (type . bookmark))
@@ -111,7 +111,7 @@
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               "*hbookmark list*" (helm-c-collect-bookmarks :su t))))
+               'global (helm-c-collect-bookmarks :su t))))
     (candidates-in-buffer)
     (no-delay-on-input)
     (filtered-candidate-transformer . helm-c-highlight-bookmark-su)
@@ -123,7 +123,7 @@
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               " *hlbookmark list*" (helm-c-collect-bookmarks :local t))))
+               'global (helm-c-collect-bookmarks :local t))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
      helm-c-adaptive-sort

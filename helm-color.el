@@ -29,7 +29,7 @@
       (list-faces-display)
       (message nil))
     (helm-init-candidates-in-buffer
-     "*hfaces*"
+     'global
      (with-current-buffer (get-buffer "*Faces*")
        (buffer-substring
         (next-single-char-property-change (point-min) 'face)
@@ -58,7 +58,7 @@
       (list-colors-display)
       (message nil))
     (helm-init-candidates-in-buffer
-     "*hcolors*"
+     'global
      (with-current-buffer (get-buffer "*Colors*")
        (buffer-string)))
     (kill-buffer "*Colors*")))
