@@ -92,8 +92,6 @@
     (define-key map (kbd "C-:")       'helm-eval-expression-with-eldoc)
     (define-key map (kbd "C-,")       'helm-calcul-expression)
     (define-key map (kbd "M-x")       'helm-M-x)
-    (define-key map (kbd "C-x C-w")   'helm-write-file)
-    (define-key map (kbd "C-x i")     'helm-insert-file)
     (define-key map (kbd "M-s o")     'helm-occur)
     (define-key map (kbd "M-g s")     'helm-do-grep)
     (define-key map (kbd "c")         'helm-colors)
