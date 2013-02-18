@@ -41,7 +41,7 @@ A format string where %s will be replaced with `frame-width'."
   (unless helm-c-top-command
     (let ((bn (helm-c-basename shell-file-name)))
       (setq helm-c-top-command (cond ((string= bn "tcsh")
-                                      "setenv COLUMNS=%s top -b -n 1")
+                                      "env COLUMNS %s; top -b -n 1")
                                      (t "COLUMNS=%s top -b -n 1"))))))
 
 (defvar helm-c-source-top
