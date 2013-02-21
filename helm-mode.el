@@ -853,7 +853,7 @@ e.g `ffap-alternate-file' and maybe others
 You can add such functions to `helm-completing-read-handlers-alist'
 with a nil value.
 
-Note: This mode will work only partially on Emacs23."
+Note: This mode is incompatible with Emacs23."
   :group 'helm-mode
   :global t
   :lighter helm-completion-mode-string
