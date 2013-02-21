@@ -39,10 +39,7 @@ A format string where %s will be replaced with `frame-width'."
 (defun helm-sys-set-top-command ()
   "Setup `helm-c-top-command' if not already set by user."
   (unless helm-c-top-command
-    (let ((bn (helm-c-basename shell-file-name)))
-      (setq helm-c-top-command (cond ((string= bn "tcsh")
-                                      "env COLUMNS %s; top -b -n 1")
-                                     (t "COLUMNS=%s top -b -n 1"))))))
+    (setq helm-c-top-command  "env COLUMNS=%s top -b -n 1")))
 
 (defvar helm-c-source-top
   '((name . "Top")
