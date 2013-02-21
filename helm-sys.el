@@ -26,7 +26,7 @@
   "System related helm library."
   :group 'helm)
 
-(defcustom helm-c-top-command nil
+(defcustom helm-c-top-command "env COLUMNS=%s top -b -n 1"
   "Top command used to display output of top.
 A format string where %s will be replaced with `frame-width'."
   :group 'helm-sys
@@ -36,11 +36,6 @@ A format string where %s will be replaced with `frame-width'."
 ;;; Top (process)
 ;;
 ;;
-(defun helm-sys-set-top-command ()
-  "Setup `helm-c-top-command' if not already set by user."
-  (unless helm-c-top-command
-    (setq helm-c-top-command  "env COLUMNS=%s top -b -n 1")))
-
 (defvar helm-c-source-top
   '((name . "Top")
     (header-name . (lambda (name) (concat name " (Press C-c C-u to refresh)"))) 
@@ -49,8 +44,14 @@ A format string where %s will be replaced with `frame-width'."
     (display-to-real . helm-c-top-display-to-real)
     (persistent-action . helm-c-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
-    (action . (("[No actions]" . ignore)))
+    (filtered-candidate-transformer . helm-top-transformer)
     (action-transformer . helm-top-action-transformer)))
+
+(defun helm-top-transformer (candidates source)
+  "Transformer for `helm-top'.
+Return empty string for non--valid candidates."
+  (loop for disp in candidates collect
+        (if (string-match "^ *[0-9]+" disp) disp (cons disp ""))))
 
 (defun helm-top-action-transformer (actions candidate)
   "Action transformer for `top'.
@@ -74,13 +75,13 @@ Show actions only on line starting by a PID."
 
 (defun helm-c-top-init ()
   "Insert output of top command in candidate buffer."
-  (helm-sys-set-top-command)
   (with-current-buffer (helm-candidate-buffer 'global)
     (call-process-shell-command
      (format helm-c-top-command (frame-width))
      nil (current-buffer))))
 
 (defun helm-c-top-display-to-real (line)
+  "Return pid only from LINE."
   (car (split-string line)))
 
 
