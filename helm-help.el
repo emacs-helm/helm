@@ -265,7 +265,7 @@ Italic     => A non--file buffer.
 \\[helm-ff-run-kill-buffer-persistent]\t\t->Kill buffer candidate without quitting.
 \\[helm-ff-persistent-delete]\t\t->Delete file without quitting.
 \\[helm-ff-run-switch-to-eshell]\t\t->Switch to Eshell.
-\\[helm-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Run on all marked files at once).
+\\[helm-ff-run-eshell-command-on-file]\t\t->Eshell command on file (C-u Apply on marked files, otherwise treat them sequentially).
 \\[helm-ff-run-ediff-file]\t\t->Ediff file.
 \\[helm-ff-run-ediff-merge-file]\t\t->Ediff merge file.
 \\[helm-ff-run-complete-fn-at-point]\t\t->Complete file name at point.
