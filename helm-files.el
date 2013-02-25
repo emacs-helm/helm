@@ -184,11 +184,6 @@ This can be toggled at anytime from `helm-find-files' with \
   :type 'boolean
   :group 'helm-files)
 
-(defcustom helm-ff-quick-delete-dont-prompt-for-deletion nil
-  "Don't ask in persistent deletion of files when non--nil."
-  :group 'helm-files
-  :type 'boolean)
-
 (defcustom helm-ff-signal-error-on-dot-files t
   "Signal error when file is `.' or `..' on file deletion when non--nil.
 Default is non--nil.
@@ -1554,29 +1549,18 @@ Note that only directories are saved here."
 
 (defun helm-ff-quick-delete (candidate)
   "Delete file CANDIDATE without quitting."
-  (let ((presel (prog1 (save-excursion
-                         (let (sel)
-                           (helm-next-line)
-                           (setq sel (helm-get-selection))
-                           (if (string= sel candidate)
-                               (progn (helm-previous-line)
-                                      (helm-get-selection))
-                               sel)))
-                  (helm-mark-current-line))))
-    (setq presel (if (and helm-ff-transformer-show-only-basename
-                          (not (helm-ff-dot-file-p presel)))
-                     (helm-c-basename presel) presel))
-    (if helm-ff-quick-delete-dont-prompt-for-deletion
-        (helm-c-delete-file candidate
-                            helm-ff-signal-error-on-dot-files
-                            'synchro)
-        (save-selected-window
-          (when (y-or-n-p (format "Really Delete file `%s'? " candidate))
-            (helm-c-delete-file candidate
-                                helm-ff-signal-error-on-dot-files
-                                'synchro)
-            (message nil))))
-    (helm-force-update presel)))
+  (let ((marked (helm-marked-candidates)))
+    (save-selected-window
+      (loop for c in marked do
+            (progn (helm-preselect (if (and helm-ff-transformer-show-only-basename
+                                            (not (helm-ff-dot-file-p c)))
+                                       (helm-c-basename c) c))
+                   (when (y-or-n-p (format "Really Delete file `%s'? " c))
+                     (helm-c-delete-file c helm-ff-signal-error-on-dot-files
+                                         'synchro)
+                     (helm-delete-current-selection)
+                     (message nil)))))
+    (helm-force-update)))
 
 (defun helm-ff-kill-buffer-fname (candidate)
   (let* ((buf (get-file-buffer candidate))
