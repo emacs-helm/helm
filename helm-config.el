@@ -22,6 +22,7 @@
 ;;
 ;;
 (require 'easymenu)
+(require 'helm-aliases)
 
 
 (defgroup helm-config nil
