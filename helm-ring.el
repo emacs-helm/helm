@@ -127,7 +127,7 @@ replace with STR as yanked string."
 
 
 ;;;; <Mark ring>
-;; DO NOT include these sources in `helm-sources' use
+;; DO NOT use these sources with other sources use
 ;; the commands `helm-mark-ring', `helm-global-mark-ring' or
 ;; `helm-all-mark-rings' instead.
 
@@ -150,15 +150,9 @@ replace with STR as yanked string."
           collect m into recip
           finally return recip)))
 
-(defvar helm-mark-ring-cache nil)
 (defvar helm-c-source-mark-ring
   '((name . "mark-ring")
-    (init . (lambda ()
-              (setq helm-mark-ring-cache
-                    (ignore-errors (helm-mark-ring-get-candidates)))))
-    (candidates . (lambda ()
-                    (helm-aif helm-mark-ring-cache
-                        it)))
+    (candidates . helm-mark-ring-get-candidates)
     (action . (("Goto line"
                 . (lambda (candidate)
                     (helm-goto-line (string-to-number candidate))
