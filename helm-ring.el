@@ -313,13 +313,15 @@ replace with STR as yanked string."
 (defun helm-mark-ring ()
   "Preconfigured `helm' for `helm-source-mark-ring'."
   (interactive)
-  (helm :sources 'helm-source-mark-ring))
+  (helm :sources 'helm-source-mark-ring
+        :buffer "*helm mark*"))
 
 ;;;###autoload
 (defun helm-global-mark-ring ()
   "Preconfigured `helm' for `helm-source-global-mark-ring'."
   (interactive)
-  (helm :sources 'helm-source-global-mark-ring))
+  (helm :sources 'helm-source-global-mark-ring
+        :buffer "*helm global mark*"))
 
 ;;;###autoload
 (defun helm-all-mark-rings ()
@@ -327,7 +329,8 @@ replace with STR as yanked string."
 `helm-source-mark-ring'."
   (interactive)
   (helm :sources '(helm-source-mark-ring
-                   helm-source-global-mark-ring)))
+                   helm-source-global-mark-ring)
+        :buffer "*helm mark ring*"))
 
 ;;;###autoload
 (defun helm-register ()
@@ -343,7 +346,7 @@ It is drop-in replacement of `yank-pop'.
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
   (helm :sources helm-source-kill-ring
-        :buffer "*helm kill-ring*"
+        :buffer "*helm kill ring*"
         :allow-nest t))
 
 (provide 'helm-ring)
