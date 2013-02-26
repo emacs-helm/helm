@@ -41,7 +41,7 @@
 
 
 ;;; Latex completion
-(defun helm-c-latex-math-candidates ()
+(defun helm-latex-math-candidates ()
   "Collect candidates for latex math completion."
   (declare (special LaTeX-math-menu))
   (loop for i in (cddr LaTeX-math-menu)
@@ -49,26 +49,26 @@
                         collect (cons (aref s 0) (aref s 1)))
         append elm))
 
-(defvar helm-c-source-latex-math
+(defvar helm-source-latex-math
   '((name . "Latex Math Menu")
     (init . (lambda ()
               (with-helm-current-buffer
                 (LaTeX-math-mode 1))))
     (candidate-number-limit . 9999)
-    (candidates . helm-c-latex-math-candidates)
+    (candidates . helm-latex-math-candidates)
     (action . (lambda (candidate)
                 (call-interactively candidate)))))
 
 
 ;;;; <Headline Extraction>
-(defvar helm-c-source-fixme
+(defvar helm-source-fixme
   '((name . "TODO/FIXME/DRY comments")
     (headline . "^.*\\<\\(TODO\\|FIXME\\|DRY\\)\\>.*$")
     (adjust)
     (recenter))
   "Show TODO/FIXME/DRY comments in current file.")
 
-(defvar helm-c-source-rd-headline
+(defvar helm-source-rd-headline
   '((name . "RD HeadLine")
     (headline  "^= \\(.+\\)$" "^== \\(.+\\)$" "^=== \\(.+\\)$" "^==== \\(.+\\)$")
     (condition . (memq major-mode '(rdgrep-mode rd-mode)))
@@ -79,7 +79,7 @@
 RD is Ruby's POD.
 http://en.wikipedia.org/wiki/Ruby_Document_format")
 
-(defvar helm-c-source-oddmuse-headline
+(defvar helm-source-oddmuse-headline
   '((name . "Oddmuse HeadLine")
     (headline  "^= \\(.+\\) =$" "^== \\(.+\\) ==$"
      "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
@@ -88,14 +88,14 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
     (subexp . 1))
   "Show Oddmuse headlines, such as EmacsWiki.")
 
-(defvar helm-c-source-emacs-source-defun
+(defvar helm-source-emacs-source-defun
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
     (condition . (string-match "/emacs2[0-9].+/src/.+c$"
                   (or buffer-file-name ""))))
   "Show DEFUN/DEFVAR in Emacs C source file.")
 
-(defvar helm-c-source-emacs-lisp-expectations
+(defvar helm-source-emacs-lisp-expectations
   '((name . "Emacs Lisp Expectations")
     (headline . "(desc[ ]\\|(expectations")
     (condition . (eq major-mode 'emacs-lisp-mode)))
@@ -103,7 +103,7 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
 
 http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
 
-(defvar helm-c-source-emacs-lisp-toplevels
+(defvar helm-source-emacs-lisp-toplevels
   '((name . "Emacs Lisp Toplevel / Level 4 Comment / Linkd Star")
     (headline . "^(\\|(@\\*\\|^;;;;")
     (get-line . buffer-substring)
@@ -115,7 +115,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 
 ;;; Eev anchors
-(defvar helm-c-source-eev-anchor
+(defvar helm-source-eev-anchor
   '((name . "Anchors")
     (candidates
      . (lambda ()
@@ -136,7 +136,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
     (action . (("Goto link" . ee-to)))))
 
 ;;; Jabber Contacts (jabber.el)
-(defun helm-c-jabber-online-contacts ()
+(defun helm-jabber-online-contacts ()
   "List online Jabber contacts."
   (with-no-warnings
     (let (jids)
@@ -146,15 +146,15 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
                     (cons (get item 'name) item)
                     (cons (symbol-name item) item)) jids))))))
 
-(defvar helm-c-source-jabber-contacts
+(defvar helm-source-jabber-contacts
   '((name . "Jabber Contacts")
     (init . (lambda () (require 'jabber)))
-    (candidates . (lambda () (mapcar 'car (helm-c-jabber-online-contacts))))
+    (candidates . (lambda () (mapcar 'car (helm-jabber-online-contacts))))
     (action . (lambda (x)
                 (jabber-chat-with
                  (jabber-read-account)
                  (symbol-name
-                  (cdr (assoc x (helm-c-jabber-online-contacts)))))))))
+                  (cdr (assoc x (helm-jabber-online-contacts)))))))))
 
 ;;; World time
 ;;
@@ -167,7 +167,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
                (propertize i 'face 'helm-time-zone-home))
               (t i))))
 
-(defvar helm-c-source-time-world
+(defvar helm-source-time-world
   '((name . "Time World List")
     (init . (lambda ()
               (let ((helm-buffer (helm-candidate-buffer 'global)))
@@ -178,27 +178,27 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 ;;; LaCarte
 ;;
-(defvar helm-c-source-lacarte
+(defvar helm-source-lacarte
   '((name . "Lacarte")
     (init . (lambda () (require 'lacarte)))
     (candidates . (lambda ()
                     (with-helm-current-buffer
                       (delete '(nil) (lacarte-get-overall-menu-item-alist)))))
     (candidate-number-limit . 9999)
-    (action . helm-c-call-interactively))
+    (action . helm-call-interactively))
   "Needs lacarte.el.
 
 http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
 
-(defun helm-c-call-interactively (cmd-or-name)
+(defun helm-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
 It is added to `extended-command-history'.
 `helm-current-prefix-arg' is used as the command's prefix argument."
   (setq extended-command-history
-        (cons (helm-c-stringify cmd-or-name)
-              (delete (helm-c-stringify cmd-or-name) extended-command-history)))
+        (cons (helm-stringify cmd-or-name)
+              (delete (helm-stringify cmd-or-name) extended-command-history)))
   (let ((current-prefix-arg helm-current-prefix-arg)
-        (cmd (helm-c-symbolify cmd-or-name)))
+        (cmd (helm-symbolify cmd-or-name)))
     (if (stringp (symbol-function cmd))
         (execute-kbd-macro (symbol-function cmd))
         (setq this-command cmd)
@@ -207,7 +207,7 @@ It is added to `extended-command-history'.
 ;; Minibuffer History
 ;;
 ;;
-(defvar helm-c-source-minibuffer-history
+(defvar helm-source-minibuffer-history
   '((name . "Minibuffer History")
     (header-name . (lambda (name)
                      (format "%s (%s)" name minibuffer-history-variable)))
@@ -230,15 +230,15 @@ It is added to `extended-command-history'.
 ;;; Helm ratpoison UI
 ;;
 ;;
-(defvar helm-c-source-ratpoison-commands
+(defvar helm-source-ratpoison-commands
   '((name . "Ratpoison Commands")
-    (init . helm-c-ratpoison-commands-init)
+    (init . helm-ratpoison-commands-init)
     (candidates-in-buffer)
-    (action ("Execute the command" . helm-c-ratpoison-commands-execute))
-    (display-to-real . helm-c-ratpoison-commands-display-to-real)
+    (action ("Execute the command" . helm-ratpoison-commands-execute))
+    (display-to-real . helm-ratpoison-commands-display-to-real)
     (candidate-number-limit)))
 
-(defun helm-c-ratpoison-commands-init ()
+(defun helm-ratpoison-commands-init ()
   (unless (helm-candidate-buffer)
     (with-current-buffer (helm-candidate-buffer 'global)
       ;; with ratpoison prefix key
@@ -253,24 +253,24 @@ It is added to `extended-command-history'.
       (while (re-search-forward "^\\([^ ]+\\) \\(.+\\)$" nil t)
         (replace-match "\\1: \\2")))))
 
-(defun helm-c-ratpoison-commands-display-to-real (display)
+(defun helm-ratpoison-commands-display-to-real (display)
   (and (string-match ": " display)
        (substring display (match-end 0))))
 
-(defun helm-c-ratpoison-commands-execute (candidate)
+(defun helm-ratpoison-commands-execute (candidate)
   (call-process "ratpoison" nil nil nil "-ic" candidate))
 
 ;;; Helm stumpwm UI
 ;;
 ;;
-(defvar helm-c-source-stumpwm-commands
+(defvar helm-source-stumpwm-commands
   '((name . "Stumpwm Commands")
-    (init . helm-c-stumpwm-commands-init)
+    (init . helm-stumpwm-commands-init)
     (candidates-in-buffer)
-    (action ("Execute the command" . helm-c-stumpwm-commands-execute))
+    (action ("Execute the command" . helm-stumpwm-commands-execute))
     (candidate-number-limit)))
 
-(defun helm-c-stumpwm-commands-init ()
+(defun helm-stumpwm-commands-init ()
     (with-current-buffer (helm-candidate-buffer 'global)
       (save-excursion
         (call-process "stumpish" nil (current-buffer) nil "commands"))
@@ -278,38 +278,38 @@ It is added to `extended-command-history'.
         (replace-match "\\1\n"))
       (goto-char (point-max))))
 
-(defun helm-c-stumpwm-commands-execute (candidate)
+(defun helm-stumpwm-commands-execute (candidate)
   (call-process "stumpish" nil nil nil  candidate))
 
 ;;;###autoload
 (defun helm-world-time ()
   "Preconfigured `helm' to show world time."
   (interactive)
-  (helm-other-buffer 'helm-c-source-time-world "*helm world time*"))
+  (helm-other-buffer 'helm-source-time-world "*helm world time*"))
 
 ;;;###autoload
-(defun helm-c-insert-latex-math ()
+(defun helm-insert-latex-math ()
   "Preconfigured helm for latex math symbols completion."
   (interactive)
-  (helm-other-buffer 'helm-c-source-latex-math "*helm latex*"))
+  (helm-other-buffer 'helm-source-latex-math "*helm latex*"))
 
 ;;;###autoload
 (defun helm-eev-anchors ()
   "Preconfigured `helm' for eev anchors."
   (interactive)
-  (helm-other-buffer 'helm-c-source-eev-anchor "*Helm eev anchors*"))
+  (helm-other-buffer 'helm-source-eev-anchor "*Helm eev anchors*"))
 
 ;;;###autoload
 (defun helm-ratpoison-commands ()
   "Preconfigured `helm' to execute ratpoison commands."
   (interactive)
-  (helm-other-buffer 'helm-c-source-ratpoison-commands
+  (helm-other-buffer 'helm-source-ratpoison-commands
                      "*helm ratpoison commands*"))
 
 ;;;###autoload
 (defun helm-stumpwm-commands()
   (interactive)
-  (helm-other-buffer 'helm-c-source-stumpwm-commands
+  (helm-other-buffer 'helm-source-stumpwm-commands
                      "*helm stumpwm commands*"))
 
 
@@ -318,9 +318,9 @@ It is added to `extended-command-history'.
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
   (require 'helm-files)
-  (helm-other-buffer '(helm-c-source-buffers-list
-                       helm-c-source-recentf
-                       helm-c-source-buffer-not-found)
+  (helm-other-buffer '(helm-source-buffers-list
+                       helm-source-recentf
+                       helm-source-buffer-not-found)
                      "*helm mini*"))
 
 ;;;###autoload
@@ -328,7 +328,7 @@ It is added to `extended-command-history'.
   "Preconfigured `helm' for `minibuffer-history'."
   (interactive)
   (let ((enable-recursive-minibuffers t))
-    (helm-other-buffer 'helm-c-source-minibuffer-history
+    (helm-other-buffer 'helm-source-minibuffer-history
                        "*helm minibuffer-history*")))
 
 (provide 'helm-misc)

@@ -25,23 +25,23 @@
   "Imenu related libraries and applications for helm."
   :group 'helm)
 
-(defcustom helm-c-imenu-delimiter " / "
+(defcustom helm-imenu-delimiter " / "
   "Delimit type of candidates and his value in `helm-buffer'."
   :group 'helm-imenu
   :type 'string)
 
 ;;; Internals
-(defvar helm-c-imenu-index-filter nil)
-(make-variable-buffer-local 'helm-c-imenu-index-filter)
+(defvar helm-imenu-index-filter nil)
+(make-variable-buffer-local 'helm-imenu-index-filter)
 
-(defvar helm-c-cached-imenu-alist nil)
-(make-variable-buffer-local 'helm-c-cached-imenu-alist)
+(defvar helm-cached-imenu-alist nil)
+(make-variable-buffer-local 'helm-cached-imenu-alist)
 
-(defvar helm-c-cached-imenu-candidates nil)
-(make-variable-buffer-local 'helm-c-cached-imenu-candidates)
+(defvar helm-cached-imenu-candidates nil)
+(make-variable-buffer-local 'helm-cached-imenu-candidates)
 
-(defvar helm-c-cached-imenu-tick nil)
-(make-variable-buffer-local 'helm-c-cached-imenu-tick)
+(defvar helm-cached-imenu-tick nil)
+(make-variable-buffer-local 'helm-cached-imenu-tick)
 
 (defun helm-imenu-create-candidates (entry)
   "Create candidates with ENTRY."
@@ -51,48 +51,48 @@
          (if (consp (cdr sub))
              (mapcar
               (lambda (subentry)
-                (concat (car entry) helm-c-imenu-delimiter subentry))
+                (concat (car entry) helm-imenu-delimiter subentry))
               (helm-imenu-create-candidates sub))
-             (list (concat (car entry) helm-c-imenu-delimiter (car sub)))))
+             (list (concat (car entry) helm-imenu-delimiter (car sub)))))
        (cdr entry))
       (list entry)))
 
-(defvar helm-c-source-imenu
+(defvar helm-source-imenu
   '((name . "Imenu")
-    (candidates . helm-c-imenu-candidates)
+    (candidates . helm-imenu-candidates)
     (persistent-action . (lambda (elm)
-                           (helm-c-imenu-default-action elm)
+                           (helm-imenu-default-action elm)
                            (unless (fboundp 'semantic-imenu-tag-overlay)
                              (helm-match-line-color-current-line))))
     (persistent-help . "Show this entry")
-    (action . helm-c-imenu-default-action))
+    (action . helm-imenu-default-action))
   "See (info \"(emacs)Imenu\")")
 
-(defun helm-c-imenu-candidates ()
+(defun helm-imenu-candidates ()
   (with-helm-current-buffer
     (let ((tick (buffer-modified-tick)))
-      (if (eq helm-c-cached-imenu-tick tick)
-          helm-c-cached-imenu-candidates
+      (if (eq helm-cached-imenu-tick tick)
+          helm-cached-imenu-candidates
           (setq imenu--index-alist nil)
-          (setq helm-c-cached-imenu-tick tick
-                helm-c-cached-imenu-candidates
+          (setq helm-cached-imenu-tick tick
+                helm-cached-imenu-candidates
                 (ignore-errors
                   (mapcan
                    'helm-imenu-create-candidates
-                   (setq helm-c-cached-imenu-alist
+                   (setq helm-cached-imenu-alist
                          (let ((index (imenu--make-index-alist)))
-                           (if helm-c-imenu-index-filter
-                               (funcall helm-c-imenu-index-filter index)
+                           (if helm-imenu-index-filter
+                               (funcall helm-imenu-index-filter index)
                                index))))))
-          (setq helm-c-cached-imenu-candidates
+          (setq helm-cached-imenu-candidates
                 (mapcar #'(lambda (x)
                             (if (stringp x) x (car x)))
-                        helm-c-cached-imenu-candidates))))))
+                        helm-cached-imenu-candidates))))))
 
-(defun helm-c-imenu-default-action (elm)
-  "The default action for `helm-c-source-imenu'."
-  (let ((path (split-string elm helm-c-imenu-delimiter))
-        (alist helm-c-cached-imenu-alist))
+(defun helm-imenu-default-action (elm)
+  "The default action for `helm-source-imenu'."
+  (let ((path (split-string elm helm-imenu-delimiter))
+        (alist helm-cached-imenu-alist))
     (dolist (elm path)
       (setq alist (assoc elm alist)))
     (imenu alist)))
@@ -106,7 +106,7 @@
          (if (fboundp 'semantic-imenu-goto-function)
              'semantic-imenu-goto-function
              'imenu-default-goto-function)))
-    (helm :sources 'helm-c-source-imenu
+    (helm :sources 'helm-source-imenu
           :buffer "*helm imenu*")))
 
 (provide 'helm-imenu)

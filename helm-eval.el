@@ -25,14 +25,14 @@
   "Eval related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-c-eldoc-in-minibuffer-show-fn
-  'helm-c-show-info-in-mode-line
+(defcustom helm-eldoc-in-minibuffer-show-fn
+  'helm-show-info-in-mode-line
   "A function to display eldoc info.
 Should take one arg: the string to display."
   :group 'helm-eval
   :type  'symbol)
 
-(defcustom helm-c-show-info-in-mode-line-delay 12
+(defcustom helm-show-info-in-mode-line-delay 12
   "Eldoc will show info in mode-line during this delay if user is idle."
   :type  'integer
   :group 'helm-eval)
@@ -63,7 +63,7 @@ Should take one arg: the string to display."
     (define-key map (kbd "<left>")     'backward-char)
     map))
 
-(defvar helm-c-source-evaluation-result
+(defvar helm-source-evaluation-result
   '((name . "Evaluation Result")
     (dummy)
     (multiline)
@@ -112,24 +112,24 @@ Should take one arg: the string to display."
                  (doc     (or (eldoc-get-var-docstring sym)
                               (eldoc-get-fnsym-args-string
                                (car info-fn) (cadr info-fn)))))
-            (when doc (funcall helm-c-eldoc-in-minibuffer-show-fn doc))))
+            (when doc (funcall helm-eldoc-in-minibuffer-show-fn doc))))
       (scan-error nil)
       (beginning-of-buffer nil)
       (error (message "Eldoc in minibuffer error: %S" err)))))
 
-(defun helm-c-show-info-in-mode-line (str)
+(defun helm-show-info-in-mode-line (str)
   "Display string STR in mode-line."
   (save-selected-window
     (with-current-buffer helm-buffer
       (let ((mode-line-format (concat " " str)))
         (force-mode-line-update)
-        (sit-for helm-c-show-info-in-mode-line-delay))
+        (sit-for helm-show-info-in-mode-line-delay))
       (force-mode-line-update))))
 
 ;;; Calculation Result
 ;;
 ;;
-(defvar helm-c-source-calculation-result
+(defvar helm-source-calculation-result
   '((name . "Calculation Result")
     (dummy)
     (filtered-candidate-transformer . (lambda (candidates source)
@@ -141,9 +141,9 @@ Should take one arg: the string to display."
 
 ;;;###autoload
 (defun helm-eval-expression (arg)
-  "Preconfigured helm for `helm-c-source-evaluation-result'."
+  "Preconfigured helm for `helm-source-evaluation-result'."
   (interactive "P")
-  (helm :sources 'helm-c-source-evaluation-result
+  (helm :sources 'helm-source-evaluation-result
         :input (when arg (thing-at-point 'sexp))
         :buffer "*helm eval*"
         :history 'read-expression-history
@@ -151,7 +151,7 @@ Should take one arg: the string to display."
 
 ;;;###autoload
 (defun helm-eval-expression-with-eldoc ()
-  "Preconfigured helm for `helm-c-source-evaluation-result' with `eldoc' support. "
+  "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support. "
   (interactive)
   (declare (special eldoc-idle-delay))
   (let ((timer (run-with-idle-timer eldoc-idle-delay
@@ -168,9 +168,9 @@ Should take one arg: the string to display."
 
 ;;;###autoload
 (defun helm-calcul-expression ()
-  "Preconfigured helm for `helm-c-source-calculation-result'."
+  "Preconfigured helm for `helm-source-calculation-result'."
   (interactive)
-  (helm-other-buffer 'helm-c-source-calculation-result "*helm calcul*"))
+  (helm-other-buffer 'helm-source-calculation-result "*helm calcul*"))
 
 (provide 'helm-eval)
 

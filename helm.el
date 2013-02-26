@@ -343,9 +343,9 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-sources-using-default-as-input '(helm-c-source-imenu
-                                                 helm-c-source-info-elisp
-                                                 helm-c-source-etags-select)
+(defcustom helm-sources-using-default-as-input '(helm-source-imenu
+                                                 helm-source-info-elisp
+                                                 helm-source-etags-select)
   "List of helm sources that need to use `helm-maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
 will be used as input."
@@ -944,12 +944,12 @@ This allow user to add a specific `action-tranformer'
 to an existing source without modifying source code.
 E.g
 Add the action \"Byte compile file async\" linked to
-function 'async-byte-compile-file to source `helm-c-source-find-files'
+function 'async-byte-compile-file to source `helm-source-find-files'
 only when predicate helm-ff-candidates-lisp-p return non--nil:
 
 \(helm-add-action-to-source-if \"Byte compile file async\"
                               'async-byte-compile-file
-                              helm-c-source-find-files
+                              helm-source-find-files
                               'helm-ff-candidates-lisp-p\)."
   (let* ((actions     (helm-attr 'action source))
          (action-transformers (helm-attr 'action-transformer source))
@@ -1417,10 +1417,10 @@ However the use of non keyword args is deprecated and should not be used.
 Other keywords are interpreted as local variables of this helm session.
 The `helm-' prefix can be omitted.  For example,
 
-\(helm :sources 'helm-c-source-buffers-list
+\(helm :sources 'helm-source-buffers-list
        :buffer \"*buffers*\" :candidate-number-limit 10\)
 
-means starting helm session with `helm-c-source-buffers'
+means starting helm session with `helm-source-buffers'
 source in *buffers* buffer and set variable `helm-candidate-number-limit'
 to 10 as session local variable."
   (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
@@ -2256,7 +2256,7 @@ and `helm-pattern'."
                    ;; when expanded directories contains upcase
                    ;; characters.
                    (bn (if (string-match "[~/]*" pattern)
-                           ;; `helm-c-basename' is not available yet.
+                           ;; `helm-basename' is not available yet.
                            (file-name-nondirectory
                             (directory-file-name pattern))
                            pattern)))
@@ -3831,7 +3831,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
           (let* ((prefix (get-text-property (point-at-bol) 'display))
                  (cand   (helm-get-selection))
                  (bn     (and (helm-file-completion-source-p)
-                              (helm-c-basename cand)))
+                              (helm-basename cand)))
                  (src    (assoc-default 'name (helm-get-current-source))))
             (when (and (not (helm-this-visible-mark))
                        (not (or (string= prefix "[?]")

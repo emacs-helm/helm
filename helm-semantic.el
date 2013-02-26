@@ -58,7 +58,7 @@
       (push-mark)
       (semantic-go-to-tag tag))))
 
-(defvar helm-c-source-semantic
+(defvar helm-source-semantic
   '((name . "Semantic Tags")
     (init . (lambda ()
               (let ((tags (semantic-fetch-tags)))
@@ -77,7 +77,7 @@
 (defun helm-semantic ()
   "Preconfigured `helm' for `semantic'."
   (interactive)
-  (helm :sources 'helm-c-source-semantic
+  (helm :sources 'helm-source-semantic
         :buffer "*helm semantic*"))
 
 ;;;###autoload
@@ -89,8 +89,8 @@ semantic for generating tags, otherwise fall back to `imenu'.
 Fill in the symbol at point by default."
   (interactive)
   (let ((source (if (semantic-active-p)
-                    'helm-c-source-semantic
-                  'helm-c-source-imenu)))
+                    'helm-source-semantic
+                  'helm-source-imenu)))
     (push-mark)
     (helm :sources source
           :buffer "*helm semantic/imenu*"

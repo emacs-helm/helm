@@ -27,14 +27,14 @@
   "Net related applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-c-google-suggest-default-browser-function nil
+(defcustom helm-google-suggest-default-browser-function nil
   "The browse url function you prefer to use with google suggest.
 When nil, use the first browser function available
 See `helm-browse-url-default-browser-alist'."
   :group 'helm-net
   :type 'symbol)
 
-(defcustom helm-c-home-url "http://www.google.fr"
+(defcustom helm-home-url "http://www.google.fr"
   "Default url to use as home url."
   :group 'helm-net
   :type 'string)
@@ -45,31 +45,31 @@ When nil, fallback to `browse-url-browser-function'."
   :group 'helm-net
   :type 'symbol)
 
-(defcustom helm-c-google-suggest-url
+(defcustom helm-google-suggest-url
   "http://google.com/complete/search?output=toolbar&q="
   "URL used for looking up Google suggestions."
   :type 'string
   :group 'helm-net)
 
-(defcustom helm-c-google-suggest-search-url
+(defcustom helm-google-suggest-search-url
   "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
   "URL used for Google searching."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-google-suggest-use-curl-p nil
-  "When non--nil use CURL to get info from `helm-c-google-suggest-url'.
+  "When non--nil use CURL to get info from `helm-google-suggest-url'.
 Otherwise `url-retrieve-synchronously' is used."
   :type 'boolean
   :group 'helm-net)
 
-(defcustom helm-c-yahoo-suggest-url
+(defcustom helm-yahoo-suggest-url
   "http://search.yahooapis.com/WebSearchService/V1/relatedSuggestion?appid=Generic&query="
   "Url used for looking up Yahoo suggestions."
   :type 'string
   :group 'helm-net)
 
-(defcustom helm-c-yahoo-suggest-search-url
+(defcustom helm-yahoo-suggest-search-url
   "http://search.yahoo.com/search?&ei=UTF-8&fr&h=c&p="
   "Url used for Yahoo searching."
   :type 'string
@@ -83,12 +83,12 @@ Otherwise `url-retrieve-synchronously' is used."
 (defvar helm-ggs-max-length-real-flag 0)
 (defvar helm-ggs-max-length-num-flag 0)
 
-(defun helm-c-google-suggest-fetch (input)
+(defun helm-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
   (setq helm-ggs-max-length-real-flag 0
         helm-ggs-max-length-num-flag 0)
-  (let ((request (concat helm-c-google-suggest-url
+  (let ((request (concat helm-google-suggest-url
                          (url-hexify-string input)))
         (fetch #'(lambda ()
                    (loop
@@ -99,7 +99,7 @@ Return an alist with elements like (data . number_results)."
                          for i in result-alist
                          for data = (cdr (caadr (assoc 'suggestion i)))
                          for nqueries = (cdr (caadr (assoc 'num_queries i)))
-                         for lqueries = (length (helm-c-ggs-set-number-result
+                         for lqueries = (length (helm-ggs-set-number-result
                                                  nqueries))
                          for ldata = (length data)
                          do
@@ -118,17 +118,17 @@ Return an alist with elements like (data . number_results)."
             (url-retrieve-synchronously request)
           (funcall fetch)))))
 
-(defun helm-c-google-suggest-set-candidates (&optional request-prefix)
+(defun helm-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
   (let ((suggestions
-         (loop with suggested-results = (helm-c-google-suggest-fetch
+         (loop with suggested-results = (helm-google-suggest-fetch
                                          (or (and request-prefix
                                                   (concat request-prefix
                                                           " " helm-pattern))
                                              helm-pattern))
                for (real . numresult) in suggested-results
                ;; Prepare number of results with ","
-               for fnumresult = (helm-c-ggs-set-number-result numresult)
+               for fnumresult = (helm-ggs-set-number-result numresult)
                ;; Calculate number of spaces to add before fnumresult
                ;; if it is smaller than longest result
                ;; `helm-ggs-max-length-num-flag'.
@@ -159,7 +159,7 @@ Return an alist with elements like (data . number_results)."
          (list (cons (concat "Search for " "'" helm-input "'" " on Google")
                      helm-input))))))
 
-(defun helm-c-ggs-set-number-result (num)
+(defun helm-ggs-set-number-result (num)
   (if num
       (progn
         (and (numberp num) (setq num (number-to-string num)))
@@ -174,39 +174,39 @@ Return an alist with elements like (data . number_results)."
                "^," "" (mapconcat 'identity (reverse C) ""))))
       "?"))
 
-(defun helm-c-google-suggest-action (candidate)
+(defun helm-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
-  (let ((arg (concat helm-c-google-suggest-search-url
+  (let ((arg (concat helm-google-suggest-search-url
                      (url-hexify-string candidate))))
-    (helm-aif helm-c-google-suggest-default-browser-function
+    (helm-aif helm-google-suggest-default-browser-function
         (funcall it arg)
-      (helm-c-browse-url arg))))
+      (helm-browse-url arg))))
 
-(defvar helm-c-google-suggest-default-function
-  'helm-c-google-suggest-set-candidates
+(defvar helm-google-suggest-default-function
+  'helm-google-suggest-set-candidates
   "Default function to use in helm google suggest.")
 
-(defvar helm-c-source-google-suggest
+(defvar helm-source-google-suggest
   '((name . "Google Suggest")
     (candidates . (lambda ()
-                    (funcall helm-c-google-suggest-default-function)))
-    (action . (("Google Search" . helm-c-google-suggest-action)))
+                    (funcall helm-google-suggest-default-function)))
+    (action . (("Google Search" . helm-google-suggest-action)))
     (volatile)
     (requires-pattern . 3)
     (delayed)))
 
-(defun helm-c-google-suggest-emacs-lisp ()
+(defun helm-google-suggest-emacs-lisp ()
   "Try to emacs lisp complete with google suggestions."
-  (helm-c-google-suggest-set-candidates "emacs lisp"))
+  (helm-google-suggest-set-candidates "emacs lisp"))
 
 
 ;;; Yahoo suggestions
 ;;
 ;;
-(defun helm-c-yahoo-suggest-fetch (input)
+(defun helm-yahoo-suggest-fetch (input)
   "Fetch Yahoo suggestions for INPUT from XML buffer.
 Return an alist with elements like (data . number_results)."
-  (let ((request (concat helm-c-yahoo-suggest-url
+  (let ((request (concat helm-yahoo-suggest-url
                          (url-hexify-string input))))
     (with-current-buffer
         (url-retrieve-synchronously request)
@@ -218,24 +218,24 @@ Return an alist with elements like (data . number_results)."
             for i in result-alist
             collect (caddr i)))))
         
-(defun helm-c-yahoo-suggest-set-candidates ()
+(defun helm-yahoo-suggest-set-candidates ()
   "Set candidates with Yahoo results found."
-  (let ((suggestions (helm-c-yahoo-suggest-fetch helm-input)))
+  (let ((suggestions (helm-yahoo-suggest-fetch helm-input)))
     (or suggestions
         (append
          suggestions
          (list (cons (concat "Search for " "'" helm-input "'" " on Yahoo")
                      helm-input))))))
 
-(defun helm-c-yahoo-suggest-action (candidate)
+(defun helm-yahoo-suggest-action (candidate)
   "Default action to jump to a Yahoo suggested candidate."
-  (helm-c-browse-url (concat helm-c-yahoo-suggest-search-url
+  (helm-browse-url (concat helm-yahoo-suggest-search-url
                              (url-hexify-string candidate))))
 
-(defvar helm-c-source-yahoo-suggest
+(defvar helm-source-yahoo-suggest
   '((name . "Yahoo Suggest")
-    (candidates . helm-c-yahoo-suggest-set-candidates)
-    (action . (("Yahoo Search" . helm-c-yahoo-suggest-action)))
+    (candidates . helm-yahoo-suggest-set-candidates)
+    (action . (("Yahoo Search" . helm-yahoo-suggest-action)))
     (volatile)
     (requires-pattern . 3)
     (delayed)))
@@ -265,7 +265,7 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-xterm-program . browse-url-text-xterm))
   "*Alist of \(executable . function\) to try to find a suitable url browser.")
 
-(defun* helm-c-generic-browser (url name &rest args)
+(defun* helm-generic-browser (url name &rest args)
   "Browse URL with NAME browser."
   (let ((proc (concat name " " url)))
     (message "Starting %s..." name)
@@ -280,13 +280,13 @@ Return an alist with elements like (data . number_results)."
 (defun helm-browse-url-chromium (url)
   "Browse URL with google chrome browser."
   (interactive "sURL: ")
-  (helm-c-generic-browser
+  (helm-generic-browser
    url helm-browse-url-chromium-program))
 
 (defun helm-browse-url-uzbl (url &optional ignore)
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
-  (helm-c-generic-browser url helm-browse-url-uzbl-program "-u"))
+  (helm-generic-browser url helm-browse-url-uzbl-program "-u"))
 
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
@@ -298,7 +298,7 @@ Return an alist with elements like (data . number_results)."
         (apply default-browser-fn url args)
         (error "No usable browser found"))))
 
-(defun helm-c-browse-url (url &rest args)
+(defun helm-browse-url (url &rest args)
   "Default command to browse URL."
   (if browse-url-browser-function
       (browse-url url args)
@@ -314,7 +314,7 @@ Return an alist with elements like (data . number_results)."
 (defvar helm-surfraw-engines-history nil)
 (defvar helm-surfraw-input-history nil)
 
-(defun helm-c-build-elvi-list ()
+(defun helm-build-elvi-list ()
   "Return list of all engines and descriptions handled by surfraw."
   (cdr
    (with-temp-buffer
@@ -329,7 +329,7 @@ Return an alist with elements like (data . number_results)."
                                   nil 'helm-surfraw-input-history)
                      (helm-comp-read
                       "Engine: "
-                      (helm-c-build-elvi-list)
+                      (helm-build-elvi-list)
                       :must-match t
                       :name "Surfraw Search Engines"
                       :del-input nil
@@ -344,8 +344,8 @@ Return an alist with elements like (data . number_results)."
          (browse-url-browser-function (or helm-surfraw-default-browser-function
                                           browse-url-browser-function)))
     (if (string= engine-nodesc "W")
-        (helm-c-browse-url helm-c-home-url)
-        (helm-c-browse-url url)
+        (helm-browse-url helm-home-url)
+        (helm-browse-url url)
         (setq helm-surfraw-engines-history
               (cons engine (delete engine helm-surfraw-engines-history))))))
 
@@ -353,13 +353,13 @@ Return an alist with elements like (data . number_results)."
 (defun helm-google-suggest ()
   "Preconfigured `helm' for google search with google suggest."
   (interactive)
-  (helm-other-buffer 'helm-c-source-google-suggest "*helm google*"))
+  (helm-other-buffer 'helm-source-google-suggest "*helm google*"))
 
 ;;;###autoload
 (defun helm-yahoo-suggest ()
   "Preconfigured `helm' for Yahoo searching with Yahoo suggest."
   (interactive)
-  (helm-other-buffer 'helm-c-source-yahoo-suggest "*helm yahoo*"))
+  (helm-other-buffer 'helm-source-yahoo-suggest "*helm yahoo*"))
 
 
 (provide 'helm-net)

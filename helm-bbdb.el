@@ -38,7 +38,7 @@
   "Commands and function for bbdb."
   :group 'helm)
 
-(defun helm-c-bbdb-candidates ()
+(defun helm-bbdb-candidates ()
   "Return a list of all names in the bbdb database.
 The format is \"Firstname Lastname\"."
   (mapcar (lambda (bbdb-record)
@@ -102,15 +102,15 @@ See docstring of `bbdb-create-internal' for more info on address entries."
         do (setq loc-list (remove loc loc-list))
         finally return address-list))
 
-(defun helm-c-bbdb-create-contact (actions candidate)
-  "Action transformer for `helm-c-source-bbdb'.
+(defun helm-bbdb-create-contact (actions candidate)
+  "Action transformer for `helm-source-bbdb'.
 Returns only an entry to add the current `helm-pattern' as new contact.
 All other actions are removed."
   (if (string= candidate "*Add to contacts*")
       '(("Add to contacts"
          . (lambda (actions)
              (bbdb-create-internal
-              (read-from-minibuffer "Name: " helm-c-bbdb-name)
+              (read-from-minibuffer "Name: " helm-bbdb-name)
               (read-from-minibuffer "Company: ")
               (helm-read-repeat-string "Email " t)
               (helm-bbdb-read-address)
@@ -118,50 +118,50 @@ All other actions are removed."
               (read-from-minibuffer "Note: ")))))
       actions))
 
-(defun helm-c-bbdb-get-record (candidate)
+(defun helm-bbdb-get-record (candidate)
   "Return record that match CANDIDATE."
   (bbdb candidate nil)
   (set-buffer "*BBDB*")
   (bbdb-current-record))
 
-(defvar helm-c-bbdb-name nil
+(defvar helm-bbdb-name nil
   "Only for internal use.")
 
-(defvar helm-c-source-bbdb
+(defvar helm-source-bbdb
   '((name . "BBDB")
-    (candidates . helm-c-bbdb-candidates)
-    (action . (("Send a mail" . helm-c-bbdb-compose-mail)
-               ("View person's data" . helm-c-bbdb-view-person-action)))
+    (candidates . helm-bbdb-candidates)
+    (action . (("Send a mail" . helm-bbdb-compose-mail)
+               ("View person's data" . helm-bbdb-view-person-action)))
     (filtered-candidate-transformer . (lambda (candidates source)
-                                        (setq helm-c-bbdb-name helm-pattern)
+                                        (setq helm-bbdb-name helm-pattern)
                                         (if (not candidates)
                                             (list "*Add to contacts*")
                                             candidates)))
     (action-transformer . (lambda (actions candidate)
-                            (helm-c-bbdb-create-contact actions candidate))))
+                            (helm-bbdb-create-contact actions candidate))))
   "Needs BBDB.
 
 http://bbdb.sourceforge.net/")
 
-(defun helm-c-bbdb-view-person-action (candidate)
+(defun helm-bbdb-view-person-action (candidate)
   "View BBDB data of single CANDIDATE or marked candidates."
   (helm-aif (helm-marked-candidates)
       (let ((bbdb-append-records (length it)))
         (dolist (i it)
-          (bbdb-redisplay-one-record (helm-c-bbdb-get-record i))))
-    (bbdb-redisplay-one-record (helm-c-bbdb-get-record candidate))))
+          (bbdb-redisplay-one-record (helm-bbdb-get-record i))))
+    (bbdb-redisplay-one-record (helm-bbdb-get-record candidate))))
 
-(defun helm-c-bbdb-collect-mail-addresses ()
+(defun helm-bbdb-collect-mail-addresses ()
   "Return a list of all mail addresses of records in bbdb buffer."
   (with-current-buffer bbdb-buffer-name
     (loop for i in bbdb-records
           if (bbdb-record-net (car i))
           collect (bbdb-dwim-net-address (car i)))))
 
-(defun helm-c-bbdb-compose-mail (candidate)
+(defun helm-bbdb-compose-mail (candidate)
   "Compose a mail with all records of bbdb buffer."
-  (helm-c-bbdb-view-person-action candidate)
-  (let* ((address-list (helm-c-bbdb-collect-mail-addresses))
+  (helm-bbdb-view-person-action candidate)
+  (let* ((address-list (helm-bbdb-collect-mail-addresses))
          (address-str  (mapconcat 'identity address-list ",\n    ")))
     (compose-mail address-str)))
 
@@ -173,7 +173,7 @@ Needs BBDB.
 
 http://bbdb.sourceforge.net/"
   (interactive)
-  (helm-other-buffer 'helm-c-source-bbdb "*helm bbdb*"))
+  (helm-other-buffer 'helm-source-bbdb "*helm bbdb*"))
 
 (provide 'helm-bbdb)
 

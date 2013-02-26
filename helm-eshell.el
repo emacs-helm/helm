@@ -40,7 +40,7 @@
     map)
   "Keymap for `helm-eshell-history'.")
 
-(defvar helm-c-source-esh
+(defvar helm-source-esh
   '((name . "Eshell completions")
     (init . (lambda ()
               (setq pcomplete-current-completions nil
@@ -114,7 +114,7 @@ The function that call this should set `helm-ec-target' to thing at point."
 ;;; Eshell history.
 ;;
 ;;
-(defvar helm-c-source-eshell-history
+(defvar helm-source-eshell-history
   `((name . "Eshell history")
     (init . (lambda ()
               (let (eshell-hist-ignoredups)
@@ -122,7 +122,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                 (eshell-write-history eshell-history-file-name)
                 (with-current-buffer (helm-candidate-buffer 'global)
                   (insert-file-contents eshell-history-file-name)))
-              ;; Same comment as in `helm-c-source-esh'
+              ;; Same comment as in `helm-source-esh'
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates-in-buffer)
     (keymap . ,helm-eshell-history-map)
@@ -166,7 +166,7 @@ The function that call this should set `helm-ec-target' to thing at point."
           (t (setq last (car (last (ignore-errors
                                      (pcomplete-parse-arguments)))))
              (with-helm-show-completion beg end
-               (helm :sources 'helm-c-source-esh
+               (helm :sources 'helm-source-esh
                      :buffer "*helm pcomplete*"
                      :resume 'noresume
                      :input (and (stringp last)
@@ -186,7 +186,7 @@ The function that call this should set `helm-ec-target' to thing at point."
       (setq end (point)))
     (unwind-protect
          (with-helm-show-completion beg end
-           (helm :sources 'helm-c-source-eshell-history
+           (helm :sources 'helm-source-eshell-history
                  :buffer "*helm eshell history*"
                  :resume 'noresume
                  :input input))

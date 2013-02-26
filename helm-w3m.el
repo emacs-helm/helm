@@ -41,39 +41,39 @@
 (defvar w3m-bookmark-file "~/.w3m/bookmark.html")
 (defvar helm-w3m-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 (defvar helm-w3m-bookmark-url-regexp "\\(https\\|http\\|ftp\\|file\\)://[^>]*")
-(defvar helm-c-w3m-bookmarks-alist nil)
-(defvar helm-c-source-w3m-bookmarks
+(defvar helm-w3m-bookmarks-alist nil)
+(defvar helm-source-w3m-bookmarks
   '((name . "W3m Bookmarks")
     (init . (lambda ()
-              (setq helm-c-w3m-bookmarks-alist
+              (setq helm-w3m-bookmarks-alist
                     (helm-html-bookmarks-to-alist
                      w3m-bookmark-file
                      helm-w3m-bookmark-url-regexp
                      helm-w3m-bookmarks-regexp))))
     (candidates . (lambda ()
-                    (mapcar #'car helm-c-w3m-bookmarks-alist)))
+                    (mapcar #'car helm-w3m-bookmarks-alist)))
     (filtered-candidate-transformer
-     helm-c-adaptive-sort
-     helm-c-highlight-w3m-bookmarks)
+     helm-adaptive-sort
+     helm-highlight-w3m-bookmarks)
     (action . (("Browse Url"
                 . (lambda (candidate)
-                    (helm-c-w3m-browse-bookmark candidate)))
+                    (helm-w3m-browse-bookmark candidate)))
                ("Copy Url"
                 . (lambda (elm)
-                    (kill-new (helm-c-w3m-bookmarks-get-value elm))))
+                    (kill-new (helm-w3m-bookmarks-get-value elm))))
                ("Browse Url Externally"
                 . (lambda (candidate)
-                    (helm-c-w3m-browse-bookmark candidate t)))
+                    (helm-w3m-browse-bookmark candidate t)))
                ("Delete Bookmark"
                 . (lambda (candidate)
-                    (helm-c-w3m-delete-bookmark candidate)))
+                    (helm-w3m-delete-bookmark candidate)))
                ("Rename Bookmark"
                 . (lambda (candidate)
-                    (helm-c-w3m-rename-bookmark candidate)))))
+                    (helm-w3m-rename-bookmark candidate)))))
     (persistent-action . (lambda (candidate)
                            (if current-prefix-arg
-                               (helm-c-w3m-browse-bookmark candidate t)
-                               (helm-c-w3m-browse-bookmark candidate nil t))))
+                               (helm-w3m-browse-bookmark candidate t)
+                               (helm-w3m-browse-bookmark candidate nil t))))
     (persistent-help . "Open URL with emacs-w3m in new tab / \
 C-u \\[helm-execute-persistent-action]: Open URL with Firefox"))
   "Needs w3m and emacs-w3m.
@@ -82,23 +82,23 @@ http://w3m.sourceforge.net/
 http://emacs-w3m.namazu.org/")
 
 
-(defun helm-c-w3m-bookmarks-get-value (elm)
+(defun helm-w3m-bookmarks-get-value (elm)
   (replace-regexp-in-string
-   "\"" "" (cdr (assoc elm helm-c-w3m-bookmarks-alist))))
+   "\"" "" (cdr (assoc elm helm-w3m-bookmarks-alist))))
 
-(defun helm-c-w3m-browse-bookmark (elm &optional use-external new-tab)
-  (let* ((fn  (if use-external 'helm-c-browse-url 'w3m-browse-url))
+(defun helm-w3m-browse-bookmark (elm &optional use-external new-tab)
+  (let* ((fn  (if use-external 'helm-browse-url 'w3m-browse-url))
          (arg (and (eq fn 'w3m-browse-url) new-tab)))
-    (funcall fn (helm-c-w3m-bookmarks-get-value elm) arg)))
+    (funcall fn (helm-w3m-bookmarks-get-value elm) arg)))
 
-(defun helm-c-highlight-w3m-bookmarks (bookmarks source)
+(defun helm-highlight-w3m-bookmarks (bookmarks source)
   (loop for i in bookmarks
         collect (propertize
                  i 'face 'helm-w3m-bookmarks
-                 'help-echo (helm-c-w3m-bookmarks-get-value i))))
+                 'help-echo (helm-w3m-bookmarks-get-value i))))
 
 
-(defun helm-c-w3m-delete-bookmark (elm)
+(defun helm-w3m-delete-bookmark (elm)
   "Delete w3m bookmark from `w3m-bookmark-file'."
   (with-current-buffer
       (find-file-literally w3m-bookmark-file)
@@ -111,7 +111,7 @@ http://emacs-w3m.namazu.org/")
     (save-buffer)
     (kill-buffer)))
 
-(defun helm-c-w3m-rename-bookmark (elm)
+(defun helm-w3m-rename-bookmark (elm)
   "Rename w3m bookmark in `w3m-bookmark-file'."
   (let* ((old-title (replace-regexp-in-string ">" "" elm))
          (new-title (read-string "NewTitle: " old-title)))
@@ -134,7 +134,7 @@ Needs w3m and emacs-w3m.
 http://w3m.sourceforge.net/
 http://emacs-w3m.namazu.org/"
   (interactive)
-  (helm-other-buffer 'helm-c-source-w3m-bookmarks
+  (helm-other-buffer 'helm-source-w3m-bookmarks
                      "*helm w3m bookmarks*"))
 
 

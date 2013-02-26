@@ -97,7 +97,7 @@ See `helm-case-fold-search' for more info."
 (defun helm-cr-empty-string ()
   "Return empty string."
   (interactive)
-  (helm-c-quit-and-execute-action
+  (helm-quit-and-execute-action
    #'(lambda (_candidate)
        (identity ""))))
 
@@ -609,7 +609,7 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
-(defun* helm-c-read-file-name
+(defun* helm-read-file-name
     (prompt
      &key
      (name "Read File Name")
@@ -683,8 +683,8 @@ Keys description:
                                map)))
            (helm-map (if must-match-map
                          (make-composed-keymap
-                          must-match-map helm-c-read-file-map)
-                         helm-c-read-file-map))
+                          must-match-map helm-read-file-map)
+                         helm-read-file-map))
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-exit-minibuffer"
                           "helm-confirm-and-exit-minibuffer"
@@ -694,7 +694,7 @@ Keys description:
                     `(((name . ,(format "%s History" name))
                        (header-name . (lambda (name)
                                         (concat name
-                                                helm-c-find-files-doc-header)))
+                                                helm-find-files-doc-header)))
                        (mode-line . helm-read-file-name-mode-line-string)
                        (candidates . hist)
                        (persistent-action . ,persistent-action)
@@ -703,7 +703,7 @@ Keys description:
                       ((name . ,name)
                        (header-name . (lambda (name)
                                         (concat name
-                                                helm-c-find-files-doc-header)))
+                                                helm-find-files-doc-header)))
                        (init . (lambda ()
                                  (setq helm-ff-auto-update-flag
                                        helm-ff-auto-update-initial-value)))
@@ -723,7 +723,7 @@ Keys description:
                                               collect i)
                                         (helm-find-files-get-candidates must-match)))))
                        (filtered-candidate-transformer
-                        helm-c-find-files-transformer)
+                        helm-find-files-transformer)
                        (match . helm-ff-match-fn)
                        (no-delay-on-input)
                        (persistent-action . ,persistent-action)
@@ -782,7 +782,7 @@ Keys description:
     ;; brutally to `read-file-name' (e.g find-tag), in this case
     ;; the helm specialized function will fail because it is build
     ;; for `completing-read', so set it to 'incompatible to be sure
-    ;; we switch to `helm-c-read-file-name' and don't try to call it
+    ;; we switch to `helm-read-file-name' and don't try to call it
     ;; with wrong number of args.
     (when (eq def-com 'ido)
       (setq def-com 'ido-read-file-name) (ido-mode 1))
@@ -819,8 +819,8 @@ Keys description:
                       ;; run it with default args.
                       (eq def-com 'read-file-name)
                       (apply def-com def-args))
-                     (t ; Fall back to classic `helm-c-read-file-name'.
-                      (helm-c-read-file-name
+                     (t ; Fall back to classic `helm-read-file-name'.
+                      (helm-read-file-name
                        prompt
                        :name str-command
                        :buffer buf-name

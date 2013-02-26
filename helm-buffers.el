@@ -30,12 +30,12 @@
   "Buffers related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-c-boring-buffer-regexp-list
+(defcustom helm-boring-buffer-regexp-list
   '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*Minibuf")
   "The regexp list that match boring buffers.
 Buffer candidates matching these regular expression will be
 filtered from the list of candidates if the
-`helm-c-skip-boring-buffers' candidate transformer is used."
+`helm-skip-boring-buffers' candidate transformer is used."
   :type  '(repeat (choice regexp))
   :group 'helm-buffers)
 
@@ -74,10 +74,10 @@ filtered from the list of candidates if the
 
 ;;; Buffers keymap
 ;;
-(defvar helm-c-buffer-map
+(defvar helm-buffer-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?")     'helm-c-buffer-help)
+    (define-key map (kbd "C-c ?")     'helm-buffer-help)
     ;; No need to have separate command for grep and zgrep
     ;; as we don't use recursivity for buffers.
     ;; So use zgrep for both as it is capable to handle non--compressed files.
@@ -113,23 +113,23 @@ filtered from the list of candidates if the
     map))
 
 (defvar helm-buffers-list-cache nil)
-(defvar helm-c-source-buffers-list
+(defvar helm-source-buffers-list
   `((name . "Buffers")
     (init . (lambda ()
               ;; Issue #51 Create the list before `helm-buffer' creation.
-              (setq helm-buffers-list-cache (helm-c-buffer-list))))
+              (setq helm-buffers-list-cache (helm-buffer-list))))
     (candidates . helm-buffers-list-cache)
     (type . buffer)
-    (match helm-c-buffer-match-major-mode)
-    (persistent-action . helm-c-buffers-list-persistent-action)
-    (keymap . ,helm-c-buffer-map)
+    (match helm-buffer-match-major-mode)
+    (persistent-action . helm-buffers-list-persistent-action)
+    (keymap . ,helm-buffer-map)
     (volatile)
     (no-delay-on-input)
     (mode-line . helm-buffer-mode-line-string)
     (persistent-help
      . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
 
-(defvar helm-c-source-buffer-not-found
+(defvar helm-source-buffer-not-found
   `((name . "Create buffer")
     (dummy)
     (keymap . ,helm-map)
@@ -142,9 +142,9 @@ filtered from the list of candidates if the
                   (if mjm
                       (with-current-buffer buffer (funcall mjm))
                       (set-buffer-major-mode buffer))
-                  (helm-c-switch-to-buffer buffer))))))
+                  (helm-switch-to-buffer buffer))))))
 
-(defvar helm-c-source-ido-virtual-buffers
+(defvar helm-source-ido-virtual-buffers
   `((name . "Ido virtual buffers")
     (candidates . (lambda ()
                     (let (ido-temp-list
@@ -164,9 +164,9 @@ filtered from the list of candidates if the
                ("View file" . view-file)
                ("Delete file(s)" . helm-delete-marked-files)
                ("Open file externally (C-u to choose)"
-                . helm-c-open-file-externally)))))
+                . helm-open-file-externally)))))
 
-(defun helm-c-buffer-list ()
+(defun helm-buffer-list ()
   "Return the current list of buffers.
 Currently visible buffers are put at the end of the list.
 See `ido-make-buffer-list' for more infos."
@@ -185,7 +185,7 @@ See `ido-make-buffer-list' for more infos."
        (- (position-bytes (point-max))
           (position-bytes (point-min)))))))
 
-(defun helm-c-highlight-buffers (buffers sources)
+(defun helm-highlight-buffers (buffers sources)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
   (loop ;; length of last buffer size string.
@@ -268,7 +268,7 @@ Should be called after others transformers i.e (boring buffers)."
                                            'help-echo i)
                                " " str-before-size size "  " mode) i)))))
 
-(defun helm-c-buffer-match-major-mode (candidate)
+(defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
 If you give a major-mode or partial major-mode,
 it will list all buffers of this major-mode and/or buffers with name
@@ -310,7 +310,7 @@ with name matching pattern."
                    (re-search-forward str nil t))))
               (t (string-match i candidate)))))
 
-(defun helm-c-buffer-query-replace-1 (&optional regexp-flag)
+(defun helm-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace in marked buffers.
 If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
@@ -323,7 +323,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
           for buf in bufs
           do
           (save-window-excursion
-            (helm-c-switch-to-buffer buf)
+            (helm-switch-to-buffer buf)
             (save-excursion
               (let ((case-fold-search t))
                 (goto-char (point-min))
@@ -331,11 +331,11 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                     (apply fn (list (car replace) (cdr replace)))
                     (apply fn (list replace tostring)))))))))
 
-(defun helm-c-buffer-query-replace-regexp (candidate)
-  (helm-c-buffer-query-replace-1 'regexp))
+(defun helm-buffer-query-replace-regexp (candidate)
+  (helm-buffer-query-replace-1 'regexp))
 
-(defun helm-c-buffer-query-replace (candidate)
-  (helm-c-buffer-query-replace-1))
+(defun helm-buffer-query-replace (candidate)
+  (helm-buffer-query-replace-1))
 
 (defun helm-buffer-toggle-diff (candidate)
   "Toggle diff buffer CANDIDATE with it's file."
@@ -382,64 +382,64 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 ;;;###autoload
 (defun helm-buffer-run-kill-buffers ()
-  "Run kill buffer action from `helm-c-source-buffers-list'."
+  "Run kill buffer action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-kill-marked-buffers))
+  (helm-quit-and-execute-action 'helm-kill-marked-buffers))
 
 ;;;###autoload
 (defun helm-buffer-run-grep ()
-  "Run Grep action from `helm-c-source-buffers-list'."
+  "Run Grep action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-c-grep-buffers))
+  (helm-quit-and-execute-action 'helm-grep-buffers))
 
 ;;;###autoload
 (defun helm-buffer-run-zgrep ()
-  "Run Grep action from `helm-c-source-buffers-list'."
+  "Run Grep action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-c-zgrep-buffers))
+  (helm-quit-and-execute-action 'helm-zgrep-buffers))
 
 ;;;###autoload
 (defun helm-buffer-run-query-replace-regexp ()
-  "Run Query replace regexp action from `helm-c-source-buffers-list'."
+  "Run Query replace regexp action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-c-buffer-query-replace-regexp))
+  (helm-quit-and-execute-action 'helm-buffer-query-replace-regexp))
 
 ;;;###autoload
 (defun helm-buffer-run-query-replace ()
-  "Run Query replace action from `helm-c-source-buffers-list'."
+  "Run Query replace action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-c-buffer-query-replace))
+  (helm-quit-and-execute-action 'helm-buffer-query-replace))
 
 ;;;###autoload
 (defun helm-buffer-switch-other-window ()
-  "Run switch to other window action from `helm-c-source-buffers-list'."
+  "Run switch to other window action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'switch-to-buffer-other-window))
+  (helm-quit-and-execute-action 'switch-to-buffer-other-window))
 
 ;;;###autoload
 (defun helm-buffer-switch-other-frame ()
-  "Run switch to other frame action from `helm-c-source-buffers-list'."
+  "Run switch to other frame action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'switch-to-buffer-other-frame))
+  (helm-quit-and-execute-action 'switch-to-buffer-other-frame))
 
 ;;;###autoload
 (defun helm-buffer-switch-to-elscreen ()
-  "Run switch to elscreen  action from `helm-c-source-buffers-list'."
+  "Run switch to elscreen  action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-find-buffer-on-elscreen))
+  (helm-quit-and-execute-action 'helm-find-buffer-on-elscreen))
 
 ;;;###autoload
 (defun helm-buffer-run-ediff ()
-  "Run ediff action from `helm-c-source-buffers-list'."
+  "Run ediff action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-ediff-marked-buffers))
+  (helm-quit-and-execute-action 'helm-ediff-marked-buffers))
 
 (defun helm-buffer-run-ediff-merge ()
-  "Run ediff action from `helm-c-source-buffers-list'."
+  "Run ediff action from `helm-source-buffers-list'."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-ediff-marked-buffers-merge))
+  (helm-quit-and-execute-action 'helm-ediff-marked-buffers-merge))
 
-(defun helm-c-buffers-persistent-kill (buffer)
+(defun helm-buffers-persistent-kill (buffer)
   "Persistent action to kill buffer."
   (with-current-buffer (get-buffer buffer)
     (if (and (buffer-modified-p)
@@ -453,10 +453,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-force-update)
     (helm-next-source)))
 
-(defun helm-c-buffers-list-persistent-action (candidate)
+(defun helm-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
-      (helm-c-buffers-persistent-kill candidate)
-      (helm-c-switch-to-buffer candidate)))
+      (helm-buffers-persistent-kill candidate)
+      (helm-switch-to-buffer candidate)))
 
 (defun helm-ediff-marked-buffers (candidate &optional merge)
   "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
@@ -484,7 +484,7 @@ See `helm-ediff-marked-buffers'."
   (helm-ediff-marked-buffers candidate t))
 
 (defun helm-multi-occur-as-action (_candidate)
-  "Multi occur action for `helm-c-source-buffers-list'.
+  "Multi occur action for `helm-source-buffers-list'.
 Can be used by any source that list buffers."
   (let ((helm-moccur-always-search-in-current
          (or helm-moccur-always-search-in-current
@@ -499,18 +499,18 @@ Can be used by any source that list buffers."
 (defun helm-buffers-run-multi-occur ()
   "Run `helm-multi-occur-as-action' by key."
   (interactive)
-  (helm-c-quit-and-execute-action 'helm-multi-occur-as-action))
+  (helm-quit-and-execute-action 'helm-multi-occur-as-action))
 
 ;;; Candidate Transformers
 ;;
 ;;
-(defun helm-c-skip-boring-buffers (buffers sources)
-  (helm-skip-entries buffers helm-c-boring-buffer-regexp-list))
+(defun helm-skip-boring-buffers (buffers sources)
+  (helm-skip-entries buffers helm-boring-buffer-regexp-list))
 
-(defun helm-c-shadow-boring-buffers (buffers)
-  "Buffers matching `helm-c-boring-buffer-regexp' will be
+(defun helm-shadow-boring-buffers (buffers)
+  "Buffers matching `helm-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
-  (helm-shadow-entries buffers helm-c-boring-buffer-regexp-list))
+  (helm-shadow-entries buffers helm-boring-buffer-regexp-list))
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
@@ -527,16 +527,16 @@ displayed with the `file-name-shadow' face if available."
 
 (define-helm-type-attribute 'buffer
     `((action
-       ("Switch to buffer" . helm-c-switch-to-buffer)
+       ("Switch to buffer" . helm-switch-to-buffer)
        ,(and (locate-library "popwin") '("Switch to buffer in popup window" . popwin:popup-buffer))
        ("Switch to buffer other window" . switch-to-buffer-other-window)
        ("Switch to buffer other frame" . switch-to-buffer-other-frame)
        ,(and (locate-library "elscreen") '("Display buffer in Elscreen" . helm-find-buffer-on-elscreen))
-       ("Query replace regexp" . helm-c-buffer-query-replace-regexp)
-       ("Query replace" . helm-c-buffer-query-replace)
+       ("Query replace regexp" . helm-buffer-query-replace-regexp)
+       ("Query replace" . helm-buffer-query-replace)
        ("View buffer" . view-buffer)
        ("Display buffer"   . display-buffer)
-       ("Grep buffers (C-u grep all buffers)" . helm-c-zgrep-buffers)
+       ("Grep buffers (C-u grep all buffers)" . helm-zgrep-buffers)
        ("Multi occur buffer(s)" . helm-multi-occur-as-action)
        ("Revert buffer(s)" . helm-revert-marked-buffers)
        ("Insert buffer" . insert-buffer)
@@ -546,8 +546,8 @@ displayed with the `file-name-shadow' face if available."
        ("Ediff Merge marked buffers" . (lambda (candidate)
                                          (helm-ediff-marked-buffers candidate t))))
       (persistent-help . "Show this buffer")
-      (filtered-candidate-transformer helm-c-skip-boring-buffers
-                                      helm-c-highlight-buffers))
+      (filtered-candidate-transformer helm-skip-boring-buffers
+                                      helm-highlight-buffers))
   "Buffer or buffer name.")
 
 ;;;###autoload
@@ -555,10 +555,10 @@ displayed with the `file-name-shadow' face if available."
   "Preconfigured `helm' to list buffers.
 It is an enhanced version of `helm-for-buffers'."
   (interactive)
-  (helm :sources '(helm-c-source-buffers-list
-                   helm-c-source-ido-virtual-buffers
-                   helm-c-source-buffer-not-found)
-        :buffer "*helm buffers*" :keymap helm-c-buffer-map))
+  (helm :sources '(helm-source-buffers-list
+                   helm-source-ido-virtual-buffers
+                   helm-source-buffer-not-found)
+        :buffer "*helm buffers*" :keymap helm-buffer-map))
 
 (provide 'helm-buffers)
 

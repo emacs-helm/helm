@@ -153,7 +153,7 @@ text to be displayed in BUFNAME."
 ;;; `helm-buffer-list' help
 ;;
 ;;
-(defvar helm-c-buffer-help-message
+(defvar helm-buffer-help-message
   "== Helm Buffer ==
 \nTips:
 
@@ -192,7 +192,7 @@ Orange     => Buffer is modified and its file not saved to disk.
 Italic     => A non--file buffer.
 
 \nSpecific commands for `helm-buffers-list':
-\\<helm-c-buffer-map>
+\\<helm-buffer-map>
 \\[helm-buffer-run-zgrep]\t\t->Grep Buffer(s) works as zgrep too (C-u grep all buffers but non--file buffers).
 \\[helm-buffers-run-multi-occur]\t\t->Multi Occur buffer or marked buffers. (C-u force searching current-buffer).
 \\[helm-buffer-switch-other-window]\t\t->Switch other window.
@@ -208,15 +208,15 @@ Italic     => A non--file buffer.
 \\[helm-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
 \\[helm-toggle-all-marks]\t\t->Toggle all marks.
 \\[helm-mark-all]\t\t->Mark all.
-\\[helm-c-buffer-help]\t\t->Display this help.
+\\[helm-buffer-help]\t\t->Display this help.
 \n== Helm Map ==
 \\{helm-map}")
 
 ;;;###autoload
-(defun helm-c-buffer-help ()
+(defun helm-buffer-help ()
   "Help command for helm buffers."
   (interactive)
-  (let ((helm-help-message helm-c-buffer-help-message))
+  (let ((helm-help-message helm-buffer-help-message))
     (helm-help)))
 
 ;;; Find files help (`helm-find-files')
@@ -299,13 +299,13 @@ Italic     => A non--file buffer.
   (let ((helm-help-message helm-ff-help-message))
     (helm-help)))
 
-;;; Help for `helm-c-read-file-name'
+;;; Help for `helm-read-file-name'
 ;;
 ;;
 (defvar helm-read-file-name-help-message
   "== Helm read file name Map ==\
-\nSpecific commands for helm-c-read-file-name:
-\\<helm-c-read-file-map>
+\nSpecific commands for helm-read-file-name:
+\\<helm-read-file-map>
 \\[helm-find-files-down-one-level]\t\t->Go down precedent directory.
 \\[helm-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
 \\[helm-next-source]\t->Goto next source.
@@ -364,14 +364,14 @@ You can grep in many differents directories by marking files or wild cards.
 You can save your results in a grep-mode buffer, see below.
 
 \nSpecific commands for Helm Grep:
-\\<helm-c-grep-map>
-\\[helm-c-goto-next-file]\t->Next File.
-\\[helm-c-goto-precedent-file]\t\t->Precedent File.
+\\<helm-grep-map>
+\\[helm-goto-next-file]\t->Next File.
+\\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[helm-c-grep-run-other-window-action]\t\t->Jump other window.
-\\[helm-c-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
-\\[helm-c-grep-run-default-action]\t\t->Run default action (Same as RET).
-\\[helm-c-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
+\\[helm-grep-run-other-window-action]\t\t->Jump other window.
+\\[helm-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
+\\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
+\\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
 \\[helm-grep-help]\t\t->Show this help.
 \n== Helm Map ==
 \\{helm-map}")
@@ -388,9 +388,9 @@ You can save your results in a grep-mode buffer, see below.
 (defvar helm-pdfgrep-help-message
   "== Helm PdfGrep Map ==\
 \nSpecific commands for Pdf Grep:
-\\<helm-c-pdfgrep-map>
-\\[helm-c-goto-next-file]\t->Next File.
-\\[helm-c-goto-precedent-file]\t\t->Precedent File.
+\\<helm-pdfgrep-map>
+\\[helm-goto-next-file]\t->Next File.
+\\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-pdfgrep-help]\t\t->Show this help.
 \n== Helm Map ==
@@ -408,9 +408,9 @@ You can save your results in a grep-mode buffer, see below.
 (defvar helm-etags-help-message
   "== Helm Etags Map ==\
 \nSpecific commands for Etags:
-\\<helm-c-etags-map>
-\\[helm-c-goto-next-file]\t->Next File.
-\\[helm-c-goto-precedent-file]\t\t->Precedent File.
+\\<helm-etags-map>
+\\[helm-goto-next-file]\t->Next File.
+\\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-etags-help]\t\t->Show this help.
 \n== Helm Map ==
@@ -426,24 +426,24 @@ You can save your results in a grep-mode buffer, see below.
 ;;; Ucs help
 ;;
 ;;
-(defvar helm-c-ucs-help-message
+(defvar helm-ucs-help-message
   "== Helm Ucs ==
 \nSpecific commands for `helm-ucs':
-\\<helm-c-ucs-map>
-\\[helm-c-ucs-persistent-insert]\t->Insert char.
-\\[helm-c-ucs-persistent-forward]\t->Forward char.
-\\[helm-c-ucs-persistent-backward]\t->Backward char.
-\\[helm-c-ucs-persistent-delete]\t->Delete char backward.
-\\[helm-c-ucs-help]\t\t->Show this help.
+\\<helm-ucs-map>
+\\[helm-ucs-persistent-insert]\t->Insert char.
+\\[helm-ucs-persistent-forward]\t->Forward char.
+\\[helm-ucs-persistent-backward]\t->Backward char.
+\\[helm-ucs-persistent-delete]\t->Delete char backward.
+\\[helm-ucs-help]\t\t->Show this help.
 
 \n== Helm Map ==
 \\{helm-map}")
 
 ;;;###autoload
-(defun helm-c-ucs-help ()
+(defun helm-ucs-help ()
   "Help command for `helm-ucs'."
   (interactive)
-  (let ((helm-help-message helm-c-ucs-help-message))
+  (let ((helm-help-message helm-ucs-help-message))
     (helm-help)))
 
 ;;; Bookmark help
@@ -452,16 +452,16 @@ You can save your results in a grep-mode buffer, see below.
 (defvar helm-bookmark-help-message
   "== Helm bookmark name Map ==\
 \nSpecific commands for bookmarks:
-\\<helm-c-bookmark-map>
-\\[helm-c-bookmark-run-jump-other-window]\t\t->Jump other window.
-\\[helm-c-bookmark-run-delete]\t\t->Delete bookmark.
-\\[helm-c-bmkext-run-edit]\t\t->Edit bookmark (only for bmkext).
-\\[helm-c-bookmark-help]\t\t->Run this help.
+\\<helm-bookmark-map>
+\\[helm-bookmark-run-jump-other-window]\t\t->Jump other window.
+\\[helm-bookmark-run-delete]\t\t->Delete bookmark.
+\\[helm-bmkext-run-edit]\t\t->Edit bookmark (only for bmkext).
+\\[helm-bookmark-help]\t\t->Run this help.
 \n== Helm Map ==
 \\{helm-map}")
 
 ;;;###autoload
-(defun helm-c-bookmark-help ()
+(defun helm-bookmark-help ()
   "Help command for bookmarks."
   (interactive)
   (let ((helm-help-message helm-bookmark-help-message))
@@ -470,7 +470,7 @@ You can save your results in a grep-mode buffer, see below.
 ;;; Eshell command on file help
 ;;
 ;;
-(defvar helm-c-esh-help-message
+(defvar helm-esh-help-message
   "== Helm eshell on file ==
 \nTips:
 
@@ -513,7 +513,7 @@ is called once for each file like this:
 (defun helm-esh-help ()
   "Help command for `helm-find-files-eshell-command-on-file'."
   (interactive)
-  (let ((helm-help-message helm-c-esh-help-message))
+  (let ((helm-help-message helm-esh-help-message))
     (helm-help)))
 
 ;;; Ido virtual buffer help
@@ -548,9 +548,9 @@ is called once for each file like this:
 \nHelm Moccur tips:
 
 \nSpecific commands for Helm Moccur:
-\\<helm-c-moccur-map>
-\\[helm-c-goto-next-file]\t->Next Buffer.
-\\[helm-c-goto-precedent-file]\t\t->Precedent Buffer.
+\\<helm-moccur-map>
+\\[helm-goto-next-file]\t->Next Buffer.
+\\[helm-goto-precedent-file]\t\t->Precedent Buffer.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-moccur-help]\t\t->Show this help.
 \n== Helm Map ==
@@ -569,14 +569,14 @@ is called once for each file like this:
 ;;;###autoload
 (defvar helm-buffer-mode-line-string
   '("Buffer(s)" "\
-\\<helm-c-buffer-map>\
-\\[helm-c-buffer-help]:Help \
+\\<helm-buffer-map>\
+\\[helm-buffer-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
-    "String displayed in mode-line in `helm-c-source-buffers-list'"))
+    "String displayed in mode-line in `helm-source-buffers-list'"))
 
 ;;;###autoload
 (defvar helm-buffers-ido-virtual-mode-line-string
@@ -588,7 +588,7 @@ is called once for each file like this:
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
-    "String displayed in mode-line in `helm-c-source-buffers-list'"))
+    "String displayed in mode-line in `helm-source-buffers-list'"))
 
 ;;;###autoload
 (defvar helm-ff-mode-line-string "\
@@ -599,11 +599,11 @@ is called once for each file like this:
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
-  "String displayed in mode-line in `helm-c-source-find-files'")
+  "String displayed in mode-line in `helm-source-find-files'")
 
 ;;;###autoload
 (defvar helm-read-file-name-mode-line-string "\
-\\<helm-c-read-file-map>\
+\\<helm-read-file-map>\
 \\[helm-read-file-name-help]:Help \
 \\[helm-cr-empty-string]:Empty \
 \\<helm-map>\
@@ -611,7 +611,7 @@ is called once for each file like this:
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
-  "String displayed in mode-line in `helm-c-source-find-files'.")
+  "String displayed in mode-line in `helm-source-find-files'.")
 
 ;;;###autoload
 (defvar helm-generic-file-mode-line-string "\
@@ -627,7 +627,7 @@ is called once for each file like this:
 
 ;;;###autoload
 (defvar helm-grep-mode-line-string"\
-\\<helm-c-grep-map>\
+\\<helm-grep-map>\
 \\[helm-grep-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
@@ -639,7 +639,7 @@ is called once for each file like this:
 
 ;;;###autoload
 (defvar helm-pdfgrep-mode-line-string "\
-\\<helm-c-pdfgrep-map>\
+\\<helm-pdfgrep-map>\
 \\[helm-pdfgrep-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
@@ -651,19 +651,19 @@ is called once for each file like this:
 
 ;;;###autoload
 (defvar helm-etags-mode-line-string "\
-\\<helm-c-etags-map>\
+\\<helm-etags-map>\
 \\[helm-etags-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
-  "String displayed in mode-line in `helm-c-etags-select'.")
+  "String displayed in mode-line in `helm-etags-select'.")
 
 ;;;###autoload
-(defvar helm-c-ucs-mode-line-string "\
-\\<helm-c-ucs-map>\
-\\[helm-c-ucs-help]:Help \
+(defvar helm-ucs-mode-line-string "\
+\\<helm-ucs-map>\
+\\[helm-ucs-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
@@ -674,14 +674,14 @@ is called once for each file like this:
 ;;;###autoload
 (defvar helm-bookmark-mode-line-string
   '("Bookmark(s)" "\
-\\<helm-c-bookmark-map>\
-\\[helm-c-bookmark-help]:Help \
+\\<helm-bookmark-map>\
+\\[helm-bookmark-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
-  "String displayed in mode-line in `helm-c-source-buffers-list'")
+  "String displayed in mode-line in `helm-source-buffers-list'")
 
 ;;;###autoload
 (defvar helm-occur-mode-line "\
@@ -698,7 +698,7 @@ is called once for each file like this:
 
 ;;;###autoload
 (defvar helm-moccur-mode-line "\
-\\<helm-c-moccur-map>\
+\\<helm-moccur-map>\
 \\[helm-moccur-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \

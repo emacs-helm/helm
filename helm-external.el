@@ -32,14 +32,14 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
   :type 'string
   :group 'helm-external)
 
-(defcustom helm-c-external-programs-associations nil
+(defcustom helm-external-programs-associations nil
   "Alist to store externals programs associated with file extension.
 This variable overhide setting in .mailcap file.
 e.g : '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
   :type '(alist :key-type string :value-type string)
   :group 'helm-external)
 
-(defcustom helm-c-default-external-file-browser "nautilus"
+(defcustom helm-default-external-file-browser "nautilus"
   "Default external file browser for your system.
 Directories will be opened externally with it when
 opening file externally in `helm-find-files'.
@@ -52,19 +52,19 @@ Windows users should set that to \"explorer.exe\"."
 
 ;;; Internals
 (defvar helm-external-command-history nil)
-(defvar helm-c-external-commands-list nil
+(defvar helm-external-commands-list nil
   "A list of all external commands the user can execute.  If this
 variable is not set by the user, it will be calculated
 automatically.")
 
-(defun helm-c-external-commands-list-1 (&optional sort)
+(defun helm-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.
-If `helm-c-external-commands-list' is non-nil it will
+If `helm-external-commands-list' is non-nil it will
 return its contents.  Else it calculates all external commands
-and sets `helm-c-external-commands-list'."
-  (if helm-c-external-commands-list
-      helm-c-external-commands-list
-      (setq helm-c-external-commands-list
+and sets `helm-external-commands-list'."
+  (if helm-external-commands-list
+      helm-external-commands-list
+      (setq helm-external-commands-list
             (loop
                   with paths = (split-string (getenv "PATH") path-separator)
                   with completions = ()
@@ -93,7 +93,7 @@ In this case EXE must be provided as \"EXE %s\"."
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))
             (error "Error: %s is already running" real-com))
-        (when (loop for i in helm-c-external-commands-list thereis real-com)
+        (when (loop for i in helm-external-commands-list thereis real-com)
           (message "Starting %s..." real-com)
           (if file
               (start-process-shell-command
@@ -107,12 +107,12 @@ In this case EXE must be provided as \"EXE %s\"."
            #'(lambda (process event)
                (when (and (string= event "finished\n")
                           helm-raise-command
-                          (not (helm-c-get-pid-from-process-name real-com)))
+                          (not (helm-get-pid-from-process-name real-com)))
                  (shell-command  (format helm-raise-command "emacs")))
                (message "%s process...Finished." process))))
-        (setq helm-c-external-commands-list
+        (setq helm-external-commands-list
               (cons real-com
-                    (delete real-com helm-c-external-commands-list))))))
+                    (delete real-com helm-external-commands-list))))))
 
 (defun helm-get-mailcap-for-file (filename)
   "Get the command to use for FILENAME from mailcap files.
@@ -127,23 +127,23 @@ The command is like <command %s> and is meant to use with `format'."
 
 (defun helm-get-default-program-for-file (filename)
   "Try to find a default program to open FILENAME.
-Try first in `helm-c-external-programs-associations' and then in mailcap file
+Try first in `helm-external-programs-associations' and then in mailcap file
 if nothing found return nil."
   (let* ((ext      (file-name-extension filename))
-         (def-prog (assoc-default ext helm-c-external-programs-associations)))
+         (def-prog (assoc-default ext helm-external-programs-associations)))
     (cond ((and def-prog (not (string= def-prog "")))
            (concat def-prog " %s"))
-          ((and helm-c-default-external-file-browser
+          ((and helm-default-external-file-browser
                 (file-directory-p filename))
-           (concat helm-c-default-external-file-browser " %s"))
+           (concat helm-default-external-file-browser " %s"))
           (t (helm-get-mailcap-for-file filename)))))
 
-(defun helm-c-open-file-externally (file)
+(defun helm-open-file-externally (file)
   "Open FILE with an external program.
 Try to guess which program to use with `helm-get-default-program-for-file'.
 If not found or a prefix arg is given query the user which tool to use."
   (let* ((fname          (expand-file-name file))
-         (collection     (helm-c-external-commands-list-1 'sort))
+         (collection     (helm-external-commands-list-1 'sort))
          (def-prog       (helm-get-default-program-for-file fname))
          (real-prog-name (if (or helm-current-prefix-arg (not def-prog))
                              ;; Prefix arg or no default program.
@@ -168,15 +168,15 @@ If not found or a prefix arg is given query the user which tool to use."
             "Do you want to make `%s' the default program for this kind of files? "
             real-prog-name))
         (helm-aif (assoc (file-name-extension fname)
-                         helm-c-external-programs-associations)
-            (setq helm-c-external-programs-associations
-                  (delete it helm-c-external-programs-associations)))
+                         helm-external-programs-associations)
+            (setq helm-external-programs-associations
+                  (delete it helm-external-programs-associations)))
         (push (cons (file-name-extension fname)
                     (read-string
                      "Program (Add args maybe and confirm): " real-prog-name))
-              helm-c-external-programs-associations)
-        (customize-save-variable 'helm-c-external-programs-associations
-                                 helm-c-external-programs-associations)))
+              helm-external-programs-associations)
+        (customize-save-variable 'helm-external-programs-associations
+                                 helm-external-programs-associations)))
     (helm-run-or-raise program file)
     (setq helm-external-command-history
           (cons real-prog-name
@@ -185,15 +185,15 @@ If not found or a prefix arg is given query the user which tool to use."
                               when (executable-find i) collect i))))))
 
 ;;;###autoload
-(defun helm-c-run-external-command (program)
+(defun helm-run-external-command (program)
   "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
 If program is already running exit with error.
 You can set your own list of commands with
-`helm-c-external-commands-list'."
+`helm-external-commands-list'."
   (interactive (list
                 (helm-comp-read
                  "RunProgram: "
-                 (helm-c-external-commands-list-1 'sort)
+                 (helm-external-commands-list-1 'sort)
                  :must-match t
                  :del-input nil
                  :name "External Commands"

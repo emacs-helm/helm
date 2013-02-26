@@ -62,7 +62,7 @@
         (emms-stream-add-bookmark name url (string-to-number fd) type)
         (emms-stream-save-bookmarks-file)
         (emms-stream-quit)
-        (helm-c-switch-to-buffer cur-buf)))))
+        (helm-switch-to-buffer cur-buf)))))
 
 (defun helm-emms-stream-delete-bookmark (candidate)
   "Delete emms-streams bookmarks from helm."
@@ -82,7 +82,7 @@
                            (emms-stream-save-bookmarks-file)
                            (emms-stream-quit)))))))
 
-(defvar helm-c-source-emms-streams
+(defvar helm-source-emms-streams
   '((name . "Emms Streams")
     (init . (lambda ()
               (emms-stream-init)))
@@ -97,10 +97,10 @@
                              (funcall fn url))))
                ("Delete" . helm-emms-stream-delete-bookmark)
                ("Edit" . helm-emms-stream-edit-bookmark)))
-    (filtered-candidate-transformer . helm-c-adaptive-sort)))
+    (filtered-candidate-transformer . helm-adaptive-sort)))
 
 ;; Don't forget to set `emms-source-file-default-directory'
-(defvar helm-c-source-emms-dired
+(defvar helm-source-emms-dired
   '((name . "Music Directory")
     (candidates . (lambda ()
                     (cddr (directory-files emms-source-file-default-directory))))
@@ -111,14 +111,14 @@
                               item
                               emms-source-file-default-directory))))
       ("Open dired in file's directory" . (lambda (item)
-                                            (helm-c-open-dired
+                                            (helm-open-dired
                                              (expand-file-name
                                               item
                                               emms-source-file-default-directory))))))
-    (filtered-candidate-transformer . helm-c-adaptive-sort)))
+    (filtered-candidate-transformer . helm-adaptive-sort)))
 
 (defvar helm-emms-current-playlist nil)
-(defun helm-c-emms-files-modifier (candidates source)
+(defun helm-emms-files-modifier (candidates source)
   (loop for i in candidates
         if (member (cdr i) helm-emms-current-playlist)
         collect (cons (propertize (car i)
@@ -127,12 +127,12 @@
         else collect i into lis
         finally return (reverse lis)))
 
-(defun helm-c-emms-play-current-playlist ()
+(defun helm-emms-play-current-playlist ()
   "Play current playlist."
   (emms-playlist-first)
   (emms-playlist-mode-play-smart))
 
-(defvar helm-c-source-emms-files
+(defvar helm-source-emms-files
   '((name . "Emms files")
     (init . (lambda ()
               (setq helm-emms-current-playlist
@@ -153,7 +153,7 @@
                           for info      = (concat artist " - " genre " - " tracknum ": " song)
                           unless (string-match "^\\(http\\|mms\\):" name)
                           collect (cons info name))))
-    (filtered-candidate-transformer . helm-c-emms-files-modifier)
+    (filtered-candidate-transformer . helm-emms-files-modifier)
     (candidate-number-limit . 9999)
     (action . (("Play file" . emms-play-file)
                ("Add to Playlist and play (C-u clear current)"
@@ -164,15 +164,15 @@
                       (emms-playlist-new)
                       (mapc 'emms-add-playlist-file (helm-marked-candidates))
                       (unless emms-player-playing-p
-                        (helm-c-emms-play-current-playlist)))))))))
+                        (helm-emms-play-current-playlist)))))))))
 
 ;;;###autoload
 (defun helm-emms ()
   "Preconfigured `helm' for emms sources."
   (interactive)
-  (helm :sources '(helm-c-source-emms-streams
-                   helm-c-source-emms-files
-                   helm-c-source-emms-dired)
+  (helm :sources '(helm-source-emms-streams
+                   helm-source-emms-files
+                   helm-source-emms-dired)
         :buffer "*Helm Emms*"))
 
 

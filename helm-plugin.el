@@ -27,7 +27,7 @@
 ;;; Plug-in: `info-index'
 ;;
 ;;
-(defun* helm-c-info-init (&optional (file (helm-attr 'info-file)))
+(defun* helm-info-init (&optional (file (helm-attr 'info-file)))
   (let (result)
     (unless (helm-candidate-buffer)
       (save-window-excursion
@@ -48,30 +48,30 @@
                   (insert-buffer-substring infobuf s e)
                   (insert "\n"))))))))))
 
-(defun helm-c-info-goto (node-line)
+(defun helm-info-goto (node-line)
   (Info-goto-node (car node-line))
   (helm-goto-line (cdr node-line)))
 
-(defun helm-c-info-display-to-real (line)
+(defun helm-info-display-to-real (line)
   (and (string-match
         ;; This regexp is stolen from Info-apropos-matches
         "\\* +\\([^\n]*.+[^\n]*\\):[ \t]+\\([^\n]*\\)\\.\\(?:[ \t\n]*(line +\\([0-9]+\\))\\)?" line)
        (cons (format "(%s)%s" (helm-attr 'info-file) (match-string 2 line))
              (string-to-number (or (match-string 3 line) "1")))))
 
-(defun helm-c-make-info-source (source file)
+(defun helm-make-info-source (source file)
   `(,@source
     (name . ,(concat "Info Index: " file))
     (info-file . ,file)
-    (init . helm-c-info-init)
-    (display-to-real . helm-c-info-display-to-real)
+    (init . helm-info-init)
+    (display-to-real . helm-info-display-to-real)
     (get-line . buffer-substring)
     (candidates-in-buffer)
-    (action ("Goto node" . helm-c-info-goto))))
+    (action ("Goto node" . helm-info-goto))))
 
 (defun helm-compile-source--info-index (source)
   (helm-aif (helm-interpret-value (assoc-default 'info-index source))
-      (helm-c-make-info-source source it)
+      (helm-make-info-source source it)
     source))
 
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--info-index)
@@ -79,7 +79,7 @@
 (helm-document-attribute 'info-index "info-index plugin"
   "Create a source of info index very easily.
 
-ex. (defvar helm-c-source-info-wget '((info-index . \"wget\"))")
+ex. (defvar helm-source-info-wget '((info-index . \"wget\"))")
 
 (helm-document-attribute 'index-nodes "info-index plugin (optional)"
   "Index nodes of info file.
@@ -87,7 +87,7 @@ ex. (defvar helm-c-source-info-wget '((info-index . \"wget\"))")
 If it is omitted, `Info-index-nodes' is used to collect index nodes.
 Some info files are missing index specification.
 
-ex. See `helm-c-source-info-screen'.")
+ex. See `helm-source-info-screen'.")
 
 ;;; Plug-in: `candidates-file'
 ;;
@@ -124,7 +124,7 @@ If optional 2nd argument is non-nil, the file is opened with
 
 e.g
 
-\(defvar helm-c-source-test-file
+\(defvar helm-source-test-file
   '((name . \"test1\")
     (candidates-file \"~/.emacs.el\" t)))
 
@@ -258,19 +258,19 @@ It also accepts a function or a variable name.")
 ;;
 (defvar helm-additional-type-attributes nil)
 
-(defun helm-c-uniq-list (lst)
+(defun helm-uniq-list (lst)
   "Like `remove-duplicates' in CL.
 But cut deeper duplicates and test by `equal'. "
   (reverse (remove-duplicates (reverse lst) :test 'equal)))
 
-(defun helm-c-arrange-type-attribute (type spec)
+(defun helm-arrange-type-attribute (type spec)
   "Override type attributes by `define-helm-type-attribute'.
 
 The SPEC is like source. The symbol `REST' is replaced
 with original attribute value.
 
  Example: Set `play-sound-file' as default action
-   (helm-c-arrange-type-attribute 'file
+   (helm-arrange-type-attribute 'file
       '((action (\"Play sound\" . play-sound-file)
          REST ;; Rest of actions (find-file, find-file-other-window, etc...)."
   (add-to-list 'helm-additional-type-attributes
@@ -280,7 +280,7 @@ with original attribute value.
                            for (attr . value) in spec
                            if (listp value)
                            collect (cons attr
-                                         (helm-c-uniq-list
+                                         (helm-uniq-list
                                           (loop for v in value
                                                 if (eq v 'REST)
                                                 append
@@ -289,7 +289,7 @@ with original attribute value.
                                                 collect v)))
                            else
                            collect (cons attr value)))))
-(put 'helm-c-arrange-type-attribute 'lisp-indent-function 1)
+(put 'helm-arrange-type-attribute 'lisp-indent-function 1)
 
 (defun helm-compile-source--type-customize (source)
   (helm-aif (assoc-default (assoc-default 'type source)

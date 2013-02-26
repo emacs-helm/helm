@@ -64,18 +64,18 @@
   :group 'helm-bookmark)
 
 
-(defvar helm-c-bookmark-map
+(defvar helm-bookmark-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o") 'helm-c-bookmark-run-jump-other-window)
-    (define-key map (kbd "C-d")   'helm-c-bookmark-run-delete)
+    (define-key map (kbd "C-c o") 'helm-bookmark-run-jump-other-window)
+    (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
     (when (locate-library "bookmark-extensions")
-      (define-key map (kbd "M-e") 'helm-c-bmkext-run-edit))
-    (define-key map (kbd "C-c ?") 'helm-c-bookmark-help)
+      (define-key map (kbd "M-e") 'helm-bmkext-run-edit))
+    (define-key map (kbd "C-c ?") 'helm-bookmark-help)
     (delq nil map))
   "Generic Keymap for emacs bookmark sources.")
 
-(defvar helm-c-source-bookmarks
+(defvar helm-source-bookmarks
   `((name . "Bookmarks")
     (init . (lambda ()
               (require 'bookmark)
@@ -87,7 +87,7 @@
   "See (info \"(emacs)Bookmarks\").")
 
 ;;; bookmark-set
-(defvar helm-c-source-bookmark-set
+(defvar helm-source-bookmark-set
   '((name . "Set Bookmark")
     (dummy)
     (no-delay-on-input)
@@ -95,44 +95,44 @@
   "See (info \"(emacs)Bookmarks\").")
 
 ;;; Special bookmarks
-(defvar helm-c-source-bookmarks-ssh
+(defvar helm-source-bookmarks-ssh
   '((name . "Bookmarks-ssh")
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               'global (helm-c-collect-bookmarks :ssh t))))
+               'global (helm-collect-bookmarks :ssh t))))
     (candidates-in-buffer)
     (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
-(defvar helm-c-source-bookmarks-su
+(defvar helm-source-bookmarks-su
   '((name . "Bookmarks-root")
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               'global (helm-c-collect-bookmarks :su t))))
+               'global (helm-collect-bookmarks :su t))))
     (candidates-in-buffer)
     (no-delay-on-input)
-    (filtered-candidate-transformer . helm-c-highlight-bookmark-su)
+    (filtered-candidate-transformer . helm-highlight-bookmark-su)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
-(defvar helm-c-source-bookmarks-local
+(defvar helm-source-bookmarks-local
   '((name . "Bookmarks-Local")
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               'global (helm-c-collect-bookmarks :local t))))
+               'global (helm-collect-bookmarks :local t))))
     (candidates-in-buffer)
     (filtered-candidate-transformer
-     helm-c-adaptive-sort
-     helm-c-highlight-bookmark)
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
-(defun* helm-c-collect-bookmarks (&key local su sudo ssh)
+(defun* helm-collect-bookmarks (&key local su sudo ssh)
   (let* ((lis-all (bookmark-all-names))
          (lis-loc (cond (local (loop for i in lis-all
                                      unless (string-match "^(ssh)\\|^(su)" i)
@@ -148,22 +148,22 @@
                                    collect i)))))
     (sort lis-loc 'string-lessp)))
 
-(defun helm-c-bookmark-root-logged-p ()
+(defun helm-bookmark-root-logged-p ()
   (catch 'break
     (dolist (i (mapcar #'buffer-name (buffer-list)))
       (when (string-match (format "*tramp/%s ." helm-su-or-sudo) i)
         (throw 'break t)))))
 
-(defun helm-c-highlight-bookmark-su (files source)
-  (if (helm-c-bookmark-root-logged-p)
-      (helm-c-highlight-bookmark files source)
-      (helm-c-highlight-not-logged files source)))
+(defun helm-highlight-bookmark-su (files source)
+  (if (helm-bookmark-root-logged-p)
+      (helm-highlight-bookmark files source)
+      (helm-highlight-not-logged files source)))
 
-(defun helm-c-highlight-not-logged (files source)
+(defun helm-highlight-not-logged (files source)
   (loop for i in files
         collect (propertize i 'face 'helm-bookmarks-su)))
 
-(defun helm-c-highlight-bookmark (bookmarks source)
+(defun helm-highlight-bookmark (bookmarks source)
   "Used as `candidate-transformer' to colorize bookmarks.
 Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (let ((non-essential t))
@@ -218,7 +218,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                          t
                          (propertize i 'face 'helm-bookmark-file 'help-echo isfile))))))
 
-(defun helm-c-bookmark-jump (candidate)
+(defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
   (let ((current-prefix-arg helm-current-prefix-arg))
     (bookmark-jump candidate)))
@@ -226,7 +226,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 (define-helm-type-attribute 'bookmark
     `((coerce . helm-bookmark-get-bookmark-from-name)
       (action
-       ("Jump to bookmark" . helm-c-bookmark-jump)
+       ("Jump to bookmark" . helm-bookmark-jump)
        ("Jump to BM other window" . bookmark-jump-other-window)
        ("Bookmark edit annotation" . bookmark-edit-annotation)
        ("Bookmark show annotation" . bookmark-show-annotation)
@@ -235,22 +235,22 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
               `(("Edit Bookmark" . bmkext-edit-bookmark)))
        ("Rename bookmark" . bookmark-rename)
        ("Relocate bookmark" . bookmark-relocate))
-      (keymap . ,helm-c-bookmark-map)
+      (keymap . ,helm-bookmark-map)
       (mode-line . helm-bookmark-mode-line-string))
   "Bookmark name.")
 
 ;;;###autoload
-(defun helm-c-bookmark-run-jump-other-window ()
+(defun helm-bookmark-run-jump-other-window ()
   "Jump to bookmark from keyboard."
   (interactive)
-  (helm-c-quit-and-execute-action 'bookmark-jump-other-window))
+  (helm-quit-and-execute-action 'bookmark-jump-other-window))
 
 ;;;###autoload
-(defun helm-c-bookmark-run-delete ()
+(defun helm-bookmark-run-delete ()
   "Delete bookmark from keyboard."
   (interactive)
   (when (y-or-n-p "Delete bookmark?")
-    (helm-c-quit-and-execute-action 'helm-delete-marked-bookmarks)))
+    (helm-quit-and-execute-action 'helm-delete-marked-bookmarks)))
 
 (defun helm-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.
@@ -273,19 +273,19 @@ Return nil if bmk is not a valid bookmark."
 (defun helm-bookmarks ()
   "Preconfigured `helm' for bookmarks."
   (interactive)
-  (helm :sources '(helm-c-source-bookmarks
-                   helm-c-source-bookmark-set)
+  (helm :sources '(helm-source-bookmarks
+                   helm-source-bookmark-set)
         :buffer "*helm bookmarks*"
         :default (buffer-name helm-current-buffer)))
 
 ;;;###autoload
-(defun helm-c-pp-bookmarks ()
+(defun helm-pp-bookmarks ()
   "Preconfigured `helm' for bookmarks (pretty-printed)."
   (interactive)
-  (helm :sources '(helm-c-source-bookmarks-local
-                   helm-c-source-bookmarks-su
-                   helm-c-source-bookmarks-ssh
-                   helm-c-source-bookmark-set)
+  (helm :sources '(helm-source-bookmarks-local
+                   helm-source-bookmarks-su
+                   helm-source-bookmarks-ssh
+                   helm-source-bookmark-set)
         :buffer "*helm pp bookmarks*"
         :default (buffer-name helm-current-buffer)))
 

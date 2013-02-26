@@ -49,36 +49,36 @@
   "Return the path of the Firefox bookmarks file."
   (concat (helm-get-firefox-user-init-dir) "bookmarks.html"))
 
-(defvar helm-c-firefox-bookmarks-alist nil)
-(defvar helm-c-source-firefox-bookmarks
+(defvar helm-firefox-bookmarks-alist nil)
+(defvar helm-source-firefox-bookmarks
   '((name . "Firefox Bookmarks")
     (init . (lambda ()
-              (setq helm-c-firefox-bookmarks-alist
+              (setq helm-firefox-bookmarks-alist
                     (helm-html-bookmarks-to-alist
                      (helm-guess-firefox-bookmark-file)
                      helm-firefox-bookmark-url-regexp
                      helm-firefox-bookmarks-regexp))))
     (candidates . (lambda ()
-                    (mapcar #'car helm-c-firefox-bookmarks-alist)))
+                    (mapcar #'car helm-firefox-bookmarks-alist)))
     (filtered-candidate-transformer
-     helm-c-adaptive-sort
-     helm-c-highlight-firefox-bookmarks)
+     helm-adaptive-sort
+     helm-highlight-firefox-bookmarks)
     (action . (("Browse Url"
                 . (lambda (candidate)
-                    (helm-c-browse-url
-                     (helm-c-firefox-bookmarks-get-value candidate))))
+                    (helm-browse-url
+                     (helm-firefox-bookmarks-get-value candidate))))
                ("Copy Url"
                 . (lambda (elm)
-                    (kill-new (helm-c-w3m-bookmarks-get-value elm))))))))
+                    (kill-new (helm-w3m-bookmarks-get-value elm))))))))
 
-(defun helm-c-firefox-bookmarks-get-value (elm)
-  (assoc-default elm helm-c-firefox-bookmarks-alist))
+(defun helm-firefox-bookmarks-get-value (elm)
+  (assoc-default elm helm-firefox-bookmarks-alist))
 
-(defun helm-c-highlight-firefox-bookmarks (bookmarks source)
+(defun helm-highlight-firefox-bookmarks (bookmarks source)
   (loop for i in bookmarks
         collect (propertize
                  i 'face '((:foreground "YellowGreen"))
-                 'help-echo (helm-c-firefox-bookmarks-get-value i))))
+                 'help-echo (helm-firefox-bookmarks-get-value i))))
 
 ;;;###autoload
 (defun helm-firefox-bookmarks ()
@@ -96,7 +96,7 @@ user_pref(\"browser.bookmarks.autoExportHTML\", true);
 After closing firefox, you will be able to browse you bookmarks.
 "
   (interactive)
-  (helm-other-buffer 'helm-c-source-firefox-bookmarks
+  (helm-other-buffer 'helm-source-firefox-bookmarks
                      "*Helm Firefox*"))
 
 

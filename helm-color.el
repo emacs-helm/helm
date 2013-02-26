@@ -23,7 +23,7 @@
 ;;
 ;;
 (defun helm-custom-faces-init ()
-  "Initialize buffer for `helm-c-source-customize-face'."
+  "Initialize buffer for `helm-source-customize-face'."
   (unless (helm-candidate-buffer)
     (save-window-excursion
       (list-faces-display)
@@ -36,7 +36,7 @@
         (point-max))))
     (kill-buffer "*Faces*")))
 
-(defvar helm-c-source-customize-face
+(defvar helm-source-customize-face
   '((name . "Customize Face")
     (init . helm-custom-faces-init)
     (candidates-in-buffer)
@@ -63,24 +63,24 @@
        (buffer-string)))
     (kill-buffer "*Colors*")))
 
-(defvar helm-c-source-colors
+(defvar helm-source-colors
   '((name . "Colors")
     (init . helm-colors-init)
     (candidates-in-buffer)
     (get-line . buffer-substring)
     (action
      ("Copy Name" . (lambda (candidate)
-                      (kill-new (helm-c-colors-get-name candidate))))
+                      (kill-new (helm-colors-get-name candidate))))
      ("Copy RGB" . (lambda (candidate)
-                     (kill-new (helm-c-colors-get-rgb candidate))))
+                     (kill-new (helm-colors-get-rgb candidate))))
      ("Insert Name" . (lambda (candidate)
                         (with-helm-current-buffer
-                          (insert (helm-c-colors-get-name candidate)))))
+                          (insert (helm-colors-get-name candidate)))))
      ("Insert RGB" . (lambda (candidate)
                        (with-helm-current-buffer
-                         (insert (helm-c-colors-get-rgb candidate))))))))
+                         (insert (helm-colors-get-rgb candidate))))))))
 
-(defun helm-c-colors-get-name (candidate)
+(defun helm-colors-get-name (candidate)
   "Get color name."
   (replace-regexp-in-string
    " " ""
@@ -91,7 +91,7 @@
      (delete-region (point) (point-max))
      (buffer-string))))
 
-(defun helm-c-colors-get-rgb (candidate)
+(defun helm-colors-get-rgb (candidate)
   "Get color RGB."
   (replace-regexp-in-string
    " " ""
@@ -107,7 +107,7 @@
   "Preconfigured `helm' for color."
   (interactive)
   (helm-other-buffer
-   '(helm-c-source-colors helm-c-source-customize-face)
+   '(helm-source-colors helm-source-customize-face)
    "*helm colors*"))
 
 (provide 'helm-color)

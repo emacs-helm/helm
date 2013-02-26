@@ -26,7 +26,7 @@
 ;;; Org headlines
 ;;
 ;;
-(defvar helm-c-source-org-headline
+(defvar helm-source-org-headline
   `((name . "Org Headline")
     (headline
      ,@(mapcar
@@ -38,28 +38,28 @@
     (migemo)
     (subexp . 1)
     (persistent-action . (lambda (elm)
-                           (helm-c-action-line-goto elm)
+                           (helm-action-line-goto elm)
                            (org-cycle)))
     (action-transformer
      . (lambda (actions candidate)
-         '(("Go to line" . helm-c-action-line-goto)
-           ("Refile to this headline" . helm-c-org-headline-refile)
+         '(("Go to line" . helm-action-line-goto)
+           ("Refile to this headline" . helm-org-headline-refile)
            ("Insert link to this headline"
-            . helm-c-org-headline-insert-link-to-headline)))))
+            . helm-org-headline-insert-link-to-headline)))))
   "Show Org headlines.
 org-mode is very very much extended text-mode/outline-mode.
 
 See (find-library \"org.el\")
 See http://orgmode.org for the latest version.")
 
-(defun helm-c-org-headline-insert-link-to-headline (lineno-and-content)
+(defun helm-org-headline-insert-link-to-headline (lineno-and-content)
   (insert
    (save-excursion
      (helm-goto-line (car lineno-and-content))
      (and (looking-at org-complex-heading-regexp)
           (org-make-link-string (concat "*" (match-string 4)))))))
 
-(defun helm-c-org-headline-refile (lineno-and-content)
+(defun helm-org-headline-refile (lineno-and-content)
   "Refile current org entry to LINENO-AND-CONTENT."
   (with-helm-current-buffer
     (org-cut-subtree)
@@ -72,17 +72,17 @@ See http://orgmode.org for the latest version.")
 ;;; Org keywords
 ;;
 ;;
-(defvar helm-c-source-org-keywords
+(defvar helm-source-org-keywords
   '((name . "Org Keywords")
-    (init . helm-c-org-keywords-init)
-    (candidates . helm-c-org-keywords-candidates)
-    (action . helm-c-org-keywords-insert)
-    (persistent-action . helm-c-org-keywords-show-help)
+    (init . helm-org-keywords-init)
+    (candidates . helm-org-keywords-candidates)
+    (action . helm-org-keywords-insert)
+    (persistent-action . helm-org-keywords-show-help)
     (persistent-help . "Show an example and info page to describe this keyword.")
     (keywords-examples)
     (keywords)))
 
-(defvar helm-c-org-keywords-info-location
+(defvar helm-org-keywords-info-location
   '(("#+TITLE:" . "(org)Export options")
     ("#+AUTHOR:" . "(org)Export options")
     ("#+DATE:" . "(org)Export options")
@@ -115,7 +115,7 @@ See http://orgmode.org for the latest version.")
     ("#+ATTR_HTML" . "(org)Links")
     ("#+ATTR_LaTeX" . "(org)Images in LaTeX export")))
 
-(defun helm-c-org-keywords-init ()
+(defun helm-org-keywords-init ()
   (unless (helm-attr 'keywords-examples)
     (require 'org)
     (helm-attrset 'keywords-examples
@@ -128,12 +128,12 @@ See http://orgmode.org for the latest version.")
                    (mapcar 'list org-additional-option-like-keywords)))
     (helm-attrset 'keywords (mapcar 'car (helm-attr 'keywords-examples)))))
 
-(defun helm-c-org-keywords-candidates ()
+(defun helm-org-keywords-candidates ()
   (and (or (eq (buffer-local-value 'major-mode helm-current-buffer) 'org-mode)
            (eq (buffer-local-value 'major-mode helm-current-buffer) 'message-mode))
        (helm-attr 'keywords)))
 
-(defun helm-c-org-keywords-insert (keyword)
+(defun helm-org-keywords-insert (keyword)
   (cond ((and (string-match "BEGIN" keyword)
               (helm-region-active-p))
          (let ((beg (region-beginning))
@@ -151,8 +151,8 @@ See http://orgmode.org for the latest version.")
                            "BEGIN" "END" keyword) "\n")))
         (t (insert "#+" keyword " "))))
 
-(defun helm-c-org-keywords-show-help (keyword)
-  (info (or (assoc-default (concat "#+" keyword) helm-c-org-keywords-info-location)
+(defun helm-org-keywords-show-help (keyword)
+  (info (or (assoc-default (concat "#+" keyword) helm-org-keywords-info-location)
             "(org)In-buffer settings"))
   (search-forward (concat "#+" keyword) nil t)
   (helm-persistent-highlight-point)
@@ -162,13 +162,13 @@ See http://orgmode.org for the latest version.")
 (defun helm-org-keywords ()
   "Preconfigured `helm' for org keywords."
   (interactive)
-  (helm-other-buffer 'helm-c-source-org-keywords "*org keywords*"))
+  (helm-other-buffer 'helm-source-org-keywords "*org keywords*"))
 
 ;;;###autoload
 (defun helm-org-headlines ()
   "Preconfigured helm to show org headlines."
   (interactive)
-  (helm-other-buffer 'helm-c-source-org-headline "*org headlines*"))
+  (helm-other-buffer 'helm-source-org-headline "*org headlines*"))
 
 
 (provide 'helm-org)

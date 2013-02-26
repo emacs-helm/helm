@@ -35,58 +35,58 @@
 
 
 ;;; Internals
-(defvar helm-c-gentoo-use-flags nil)
-(defvar helm-c-gentoo-buffer "*helm-gentoo-output*")
-(defvar helm-c-cache-gentoo nil)
-(defvar helm-c-cache-world nil)
-(defvar helm-c-source-gentoo
+(defvar helm-gentoo-use-flags nil)
+(defvar helm-gentoo-buffer "*helm-gentoo-output*")
+(defvar helm-cache-gentoo nil)
+(defvar helm-cache-world nil)
+(defvar helm-source-gentoo
   '((name . "Portage sources")
     (init . (lambda ()
-              (get-buffer-create helm-c-gentoo-buffer)
-              (unless helm-c-cache-gentoo
-                (helm-c-gentoo-setup-cache))
-              (unless helm-c-cache-world
-                (setq helm-c-cache-world (helm-c-gentoo-get-world)))
-              (helm-c-gentoo-init-list)))
+              (get-buffer-create helm-gentoo-buffer)
+              (unless helm-cache-gentoo
+                (helm-gentoo-setup-cache))
+              (unless helm-cache-world
+                (setq helm-cache-world (helm-gentoo-get-world)))
+              (helm-gentoo-init-list)))
     (candidates-in-buffer)
     (match . identity)
-    (candidate-transformer helm-c-highlight-world)
+    (candidate-transformer helm-highlight-world)
     (action . (("Show package" . (lambda (elm)
-                                   (helm-c-gentoo-eshell-action elm "eix")))
+                                   (helm-gentoo-eshell-action elm "eix")))
                ("Show history" . (lambda (elm)
-                                   (if (member elm helm-c-cache-world)
-                                       (helm-c-gentoo-eshell-action elm "genlop -qe")
+                                   (if (member elm helm-cache-world)
+                                       (helm-gentoo-eshell-action elm "genlop -qe")
                                        (message "No infos on packages not yet installed"))))
                ("Copy in kill-ring" . kill-new)
                ("insert at point" . insert)
                ("Browse HomePage" . (lambda (elm)
-                                      (let ((urls (helm-c-gentoo-get-url elm)))
+                                      (let ((urls (helm-gentoo-get-url elm)))
                                         (browse-url (helm-comp-read "Url: " urls :must-match t)))))
                ("Show extra infos" . (lambda (elm)
-                                       (if (member elm helm-c-cache-world)
-                                           (helm-c-gentoo-eshell-action elm "genlop -qi")
+                                       (if (member elm helm-cache-world)
+                                           (helm-gentoo-eshell-action elm "genlop -qi")
                                            (message "No infos on packages not yet installed"))))
                ("Show use flags" . (lambda (elm)
-                                     (helm-c-gentoo-default-action elm "equery" "-C" "u")
+                                     (helm-gentoo-default-action elm "equery" "-C" "u")
                                      (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
                                      (font-lock-mode 1)))
                ("Run emerge pretend" . (lambda (elm)
-                                         (helm-c-gentoo-eshell-action elm "emerge -p")))
+                                         (helm-gentoo-eshell-action elm "emerge -p")))
                ("Emerge" . (lambda (elm)
                              (helm-gentoo-install elm :action 'install)))
                ("Unmerge" . (lambda (elm)
                               (helm-gentoo-install elm :action 'uninstall)))
                ("Show dependencies" . (lambda (elm)
-                                        (helm-c-gentoo-default-action elm "equery" "-C" "d")))
+                                        (helm-gentoo-default-action elm "equery" "-C" "d")))
                ("Show related files" . (lambda (elm)
-                                         (helm-c-gentoo-default-action elm "equery" "files")))
+                                         (helm-gentoo-default-action elm "equery" "files")))
                ("Refresh" . (lambda (elm)
-                              (helm-c-gentoo-setup-cache)
-                              (setq helm-c-cache-world (helm-c-gentoo-get-world))))))))
+                              (helm-gentoo-setup-cache)
+                              (setq helm-cache-world (helm-gentoo-get-world))))))))
 
 
 (defun* helm-gentoo-install (candidate &key action)
-  (setq helm-c-external-commands-list nil)
+  (setq helm-external-commands-list nil)
   (ansi-term (getenv "SHELL") "Gentoo emerge")
   (term-line-mode)
   (let ((command (case action
@@ -100,29 +100,29 @@
     (setq end (point))
     (term-char-mode) (term-send-input)))
 
-(defun helm-c-gentoo-default-action (elm command &rest args)
-  "Gentoo default action that use `helm-c-gentoo-buffer'."
-  (if (member elm helm-c-cache-world)
+(defun helm-gentoo-default-action (elm command &rest args)
+  "Gentoo default action that use `helm-gentoo-buffer'."
+  (if (member elm helm-cache-world)
       (progn
-        (helm-c-switch-to-buffer helm-c-gentoo-buffer)
+        (helm-switch-to-buffer helm-gentoo-buffer)
         (erase-buffer)
         (let ((com-list (append args (list elm))))
           (apply #'call-process command nil t nil
                  com-list)))
       (message "No infos on packages not yet installed")))
 
-(defvar helm-c-source-use-flags
+(defvar helm-source-use-flags
   '((name . "Use Flags")
     (init . (lambda ()
-              (unless helm-c-gentoo-use-flags
-                (helm-c-gentoo-setup-use-flags-cache))
-              (helm-c-gentoo-get-use)))
+              (unless helm-gentoo-use-flags
+                (helm-gentoo-setup-use-flags-cache))
+              (helm-gentoo-get-use)))
     (candidates-in-buffer)
     (match . identity)
-    (candidate-transformer helm-c-highlight-local-use)
+    (candidate-transformer helm-highlight-local-use)
     (action . (("Description"
                 . (lambda (elm)
-                    (helm-c-switch-to-buffer helm-c-gentoo-buffer)
+                    (helm-switch-to-buffer helm-gentoo-buffer)
                     (erase-buffer)
                     (apply #'call-process "euse" nil t nil
                            `("-i"
@@ -131,16 +131,16 @@
                     (font-lock-mode 1)))
                ("Enable"
                 . (lambda (elm)
-                    (helm-c-gentoo-eshell-action elm "*sudo -p Password: euse -E")))
+                    (helm-gentoo-eshell-action elm "*sudo -p Password: euse -E")))
                ("Disable"
                 . (lambda (elm)
-                    (helm-c-gentoo-eshell-action elm "*sudo -p Password: euse -D")))
+                    (helm-gentoo-eshell-action elm "*sudo -p Password: euse -D")))
                ("Remove"
                 . (lambda (elm)
-                    (helm-c-gentoo-eshell-action elm "*sudo -p Password: euse -P")))
+                    (helm-gentoo-eshell-action elm "*sudo -p Password: euse -P")))
                ("Show which dep use this flag"
                 . (lambda (elm)
-                    (helm-c-switch-to-buffer helm-c-gentoo-buffer)
+                    (helm-switch-to-buffer helm-gentoo-buffer)
                     (erase-buffer)
                     (apply #'call-process "equery" nil t nil
                            `("-C"
@@ -149,23 +149,23 @@
 
 
 
-(defun helm-c-gentoo-init-list ()
+(defun helm-gentoo-init-list ()
   "Initialize buffer with all packages in Portage."
   (let* ((portage-buf (get-buffer-create "*helm-gentoo*"))
          (buf (helm-candidate-buffer 'portage-buf)))
     (with-current-buffer buf
-      (dolist (i helm-c-cache-gentoo)
+      (dolist (i helm-cache-gentoo)
         (insert (concat i "\n"))))))
 
-(defun helm-c-gentoo-setup-cache ()
-  "Set up `helm-c-cache-gentoo'"
-  (setq helm-c-cache-gentoo
+(defun helm-gentoo-setup-cache ()
+  "Set up `helm-cache-gentoo'"
+  (setq helm-cache-gentoo
         (split-string (with-temp-buffer
                         (call-process "eix" nil t nil
                                       "--only-names")
                         (buffer-string)))))
 
-(defun helm-c-gentoo-eshell-action (elm command)
+(defun helm-gentoo-eshell-action (elm command)
   (when (get-buffer "*EShell Command Output*")
     (kill-buffer "*EShell Command Output*"))
   (message "Wait searching...")
@@ -178,24 +178,24 @@
           (pop-to-buffer "*EShell Command Output*"))
         (eshell-command (format "%s %s" command elm)))))
 
-(defun helm-c-gentoo-get-use ()
+(defun helm-gentoo-get-use ()
   "Initialize buffer with all use flags."
   (let* ((use-buf (get-buffer-create "*helm-gentoo-use*"))
          (buf (helm-candidate-buffer 'use-buf)))
     (with-current-buffer buf
-      (dolist (i helm-c-gentoo-use-flags)
+      (dolist (i helm-gentoo-use-flags)
         (insert (concat i "\n"))))))
 
 
-(defun helm-c-gentoo-setup-use-flags-cache ()
-  "Setup `helm-c-gentoo-use-flags'"
-  (setq helm-c-gentoo-use-flags
+(defun helm-gentoo-setup-use-flags-cache ()
+  "Setup `helm-gentoo-use-flags'"
+  (setq helm-gentoo-use-flags
         (split-string (with-temp-buffer
                         (call-process "eix" nil t nil
                                       "--print-all-useflags")
                         (buffer-string)))))
 
-(defun helm-c-gentoo-get-url (elm)
+(defun helm-gentoo-get-url (elm)
   "Return a list of urls from eix output."
   (loop with url-list = (split-string
                          (with-temp-buffer
@@ -209,14 +209,14 @@
         collect i into all
         finally return all))
 
-(defun helm-c-gentoo-get-world ()
+(defun helm-gentoo-get-world ()
   "Return list of all installed package on your system."
   (split-string (with-temp-buffer
                   (call-process "qlist" nil t nil
                                 "-I")
                   (buffer-string))))
 
-(defun helm-c-gentoo-get-local-use ()
+(defun helm-gentoo-get-local-use ()
   (split-string (with-temp-buffer
                   (call-process "portageq" nil t nil
                                 "envvar"
@@ -224,16 +224,16 @@
                   (buffer-string))))
 
 
-(defun helm-c-highlight-world (eix)
+(defun helm-highlight-world (eix)
   "Highlight all installed package."
   (loop for i in eix
-        if (member i helm-c-cache-world)
+        if (member i helm-cache-world)
         collect (propertize i 'face 'helm-gentoo-match)
         else
         collect i))
 
-(defun helm-c-highlight-local-use (use-flags)
-  (let ((local-uses (helm-c-gentoo-get-local-use)))
+(defun helm-highlight-local-use (use-flags)
+  (let ((local-uses (helm-gentoo-get-local-use)))
     (loop for i in use-flags
           if (member i local-uses)
           collect (propertize i 'face 'helm-gentoo-match)
@@ -244,8 +244,8 @@
 (defun helm-gentoo ()
   "Preconfigured `helm' for gentoo linux."
   (interactive)
-  (helm-other-buffer '(helm-c-source-gentoo
-                       helm-c-source-use-flags)
+  (helm-other-buffer '(helm-source-gentoo
+                       helm-source-use-flags)
                      "*helm gentoo*"))
 
 

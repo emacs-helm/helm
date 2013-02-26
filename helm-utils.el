@@ -193,12 +193,12 @@ Return nil if DIR is not an existing directory."
             collect printer))))
 
 ;; Shut up byte compiler in emacs24*.
-(defun helm-c-switch-to-buffer (buffer-or-name)
+(defun helm-switch-to-buffer (buffer-or-name)
   "Same as `switch-to-buffer' whithout warnings at compile time."
   (with-no-warnings
     (switch-to-buffer buffer-or-name)))
 
-(defun* helm-c-position (item seq &key (test 'eq) all)
+(defun* helm-position (item seq &key (test 'eq) all)
   "A simple and faster replacement of CL `position'.
 Return position of first occurence of ITEM found in SEQ.
 Argument SEQ can be a string, in this case ITEM have to be a char.
@@ -239,7 +239,7 @@ Add spaces at end if needed to reach WIDTH."
   (loop for c across str
         thereis (> (char-width c) 1)))
 
-(defun helm-c-get-pid-from-process-name (process-name)
+(defun helm-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
   (loop with process-list = (list-system-processes)
         for pid in process-list
@@ -307,16 +307,16 @@ With a numeric prefix arg show only the ARG number of candidates."
           collect (buffer-substring-no-properties (point-at-bol)(point-at-eol))
           do (forward-line 1))))
 
-(defun helm-c-match-on-file-name (candidate)
+(defun helm-match-on-file-name (candidate)
   "Return non-nil if `helm-pattern' match basename of filename CANDIDATE."
   (string-match helm-pattern (file-name-nondirectory candidate)))
 
-(defun helm-c-match-on-directory-name (candidate)
+(defun helm-match-on-directory-name (candidate)
   "Return non-nil if `helm-pattern' match directory part of CANDIDATE."
   (helm-aif (file-name-directory candidate)
       (string-match helm-pattern it)))
 
-(defun helm-c-string-match (candidate)
+(defun helm-string-match (candidate)
   "Return non-nil if `helm-pattern' match CANDIDATE.
 The match is done with `string-match'."
   (string-match helm-pattern candidate))
@@ -339,40 +339,40 @@ The match is done with `string-match'."
           collect (propertize i 'face face)
           else collect i)))
 
-(defun helm-c-stringify (str-or-sym)
+(defun helm-stringify (str-or-sym)
   "Get string of STR-OR-SYM."
   (if (stringp str-or-sym)
       str-or-sym
       (symbol-name str-or-sym)))
 
-(defun helm-c-symbolify (str-or-sym)
+(defun helm-symbolify (str-or-sym)
   "Get symbol of STR-OR-SYM."
   (if (symbolp str-or-sym)
       str-or-sym
       (intern str-or-sym)))
 
-(defun helm-c-describe-function (func)
+(defun helm-describe-function (func)
   "FUNC is symbol or string."
-  (describe-function (helm-c-symbolify func))
+  (describe-function (helm-symbolify func))
   (message nil))
 
-(defun helm-c-describe-variable (var)
+(defun helm-describe-variable (var)
   "VAR is symbol or string."
-  (describe-variable (helm-c-symbolify var))
+  (describe-variable (helm-symbolify var))
   (message nil))
 
-(defun helm-c-find-function (func)
+(defun helm-find-function (func)
   "FUNC is symbol or string."
-  (find-function (helm-c-symbolify func)))
+  (find-function (helm-symbolify func)))
 
-(defun helm-c-find-variable (var)
+(defun helm-find-variable (var)
   "VAR is symbol or string."
-  (find-variable (helm-c-symbolify var)))
+  (find-variable (helm-symbolify var)))
 
-(defun helm-c-kill-new (candidate &optional replace)
+(defun helm-kill-new (candidate &optional replace)
   "CANDIDATE is symbol or string.
 See `kill-new' for argument REPLACE."
-  (kill-new (helm-c-stringify candidate) replace))
+  (kill-new (helm-stringify candidate) replace))
 
 (defun* helm-fast-remove-dups (seq &key (test 'eq))
   "Remove duplicates elements in list SEQ.
@@ -399,11 +399,11 @@ from its directory."
      (if (file-exists-p f)
          (helm-find-files-1 (file-name-directory f)
                             (if helm-ff-transformer-show-only-basename
-                                (helm-c-basename f) f))
+                                (helm-basename f) f))
          (helm-find-files-1 f)))
    (let* ((sel       (helm-get-selection))
           (grep-line (and (stringp sel)
-                          (helm-c-grep-split-line sel))))
+                          (helm-grep-split-line sel))))
      (if (stringp sel)
          (helm-aif (get-buffer (or (get-text-property
                                     (1- (length sel)) 'buffer-name sel)
@@ -424,7 +424,7 @@ from its directory."
                  (t default-directory)))
          default-directory))))
 
-(defmacro* helm-c-walk-directory (directory &key path (directories t) match)
+(defmacro* helm-walk-directory (directory &key path (directories t) match)
   "Walk through DIRECTORY tree.
 Argument PATH can be one of basename, relative, or full, default to basename.
 Argument DIRECTORIES when non--nil (default) return also directories names,
@@ -458,7 +458,7 @@ Argument MATCH can be a predicate or a regexp."
        (ls-R ,directory)
        (nreverse result))))
 
-(defun helm-c-basename (fname &optional ext)
+(defun helm-basename (fname &optional ext)
   "Print FNAME  with any  leading directory  components removed.
 If specified, also remove filename extension EXT."
   (if (and ext (or (string= (file-name-extension fname) ext)
@@ -592,7 +592,7 @@ If STRING is non--nil return instead a space separated string."
             (mapconcat 'identity (list type user group other) " ")
             (list :mode-type type :user user :group group :other other))))
 
-(defun helm-c-current-directory ()
+(defun helm-current-directory ()
   "Return current-directory name at point.
 Useful in dired buffers when there is inserted subdirs."
   (if (eq major-mode 'dired-mode)
@@ -646,12 +646,12 @@ Useful in dired buffers when there is inserted subdirs."
   (with-no-warnings
     (w32-shell-execute "open" (helm-w32-prepare-filename file))))
 
-(defun helm-c-open-file-with-default-tool (file)
+(defun helm-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."
   (let (process-connection-type)
     (if (eq system-type 'windows-nt)
         (helm-w32-shell-execute-open-file file)
-        (start-process "helm-c-open-file-with-default-tool"
+        (start-process "helm-open-file-with-default-tool"
                        nil
                        (cond ((eq system-type 'gnu/linux)
                               "xdg-open")
@@ -660,7 +660,7 @@ Useful in dired buffers when there is inserted subdirs."
                               "open"))
                        file))))
 
-(defun helm-c-open-dired (file)
+(defun helm-open-dired (file)
   "Opens a dired buffer in FILE's directory.  If FILE is a
 directory, open this directory."
   (if (file-directory-p file)
@@ -668,7 +668,7 @@ directory, open this directory."
       (dired (file-name-directory file))
       (dired-goto-file file)))
 
-(defun helm-c-action-line-goto (lineno-and-content)
+(defun helm-action-line-goto (lineno-and-content)
   (apply #'helm-goto-file-line
          (helm-interpret-value (helm-attr 'target-file))
          (append lineno-and-content
@@ -677,13 +677,13 @@ directory, open this directory."
                            'find-file-other-window
                            'find-file)))))
 
-(defun* helm-c-action-file-line-goto (file-line-content
+(defun* helm-action-file-line-goto (file-line-content
                                       &optional
                                       (find-file-function #'find-file))
   (apply #'helm-goto-file-line
          (if (stringp file-line-content)
              ;; Case: filtered-candidate-transformer is skipped
-             (cdr (helm-c-filtered-candidate-transformer-file-line-1
+             (cdr (helm-filtered-candidate-transformer-file-line-1
                    file-line-content))
              file-line-content)))
 
@@ -691,11 +691,11 @@ directory, open this directory."
   (or (require feature nil t)
       (error "Need %s to use `%s'." feature function)))
 
-(defun helm-c-filtered-candidate-transformer-file-line (candidates source)
-  (delq nil (mapcar 'helm-c-filtered-candidate-transformer-file-line-1
+(defun helm-filtered-candidate-transformer-file-line (candidates source)
+  (delq nil (mapcar 'helm-filtered-candidate-transformer-file-line-1
                     candidates)))
 
-(defun helm-c-filtered-candidate-transformer-file-line-1 (candidate)
+(defun helm-filtered-candidate-transformer-file-line-1 (candidate)
   (when (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate)
     (let ((filename (match-string 1 candidate))
           (lineno (match-string 2 candidate))
@@ -718,7 +718,7 @@ directory, open this directory."
       (funcall it))
   (when file (funcall find-file-function file))
   (if (helm-attr-defined 'adjust)
-      (helm-c-goto-line-with-adjustment lineno content)
+      (helm-goto-line-with-adjustment lineno content)
       (helm-goto-line lineno))
   (unless (helm-attr-defined 'recenter)
     (set-window-start (get-buffer-window helm-current-buffer) (point)))
@@ -728,7 +728,7 @@ directory, open this directory."
     (helm-match-line-color-current-line)))
 
 (defun helm-find-file-as-root (candidate)
-  (let ((buf (helm-c-basename candidate)))
+  (let ((buf (helm-basename candidate)))
     (if (buffer-live-p (get-buffer buf))
         (progn
           (set-buffer buf)
@@ -740,7 +740,7 @@ directory, open this directory."
 (defun helm-find-many-files (ignore)
   (mapc 'find-file (helm-marked-candidates)))
 
-(defun helm-c-goto-line-with-adjustment (line line-content)
+(defun helm-goto-line-with-adjustment (line line-content)
   (let ((startpos)
         offset found pat)
     ;; This constant is 1/2 the initial search window.
@@ -775,7 +775,7 @@ directory, open this directory."
        (forward-char 1))
   (forward-line 0))
 
-(defun helm-c-quit-and-execute-action (action)
+(defun helm-quit-and-execute-action (action)
   "Quit current helm session and execute ACTION."
   (setq helm-saved-action action)
   (helm-exit-minibuffer))

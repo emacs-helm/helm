@@ -23,12 +23,12 @@
 (declare-function woman-file-name-all-completions "woman.el" (topic))
 (declare-function Man-getpage-in-background "man.el" (topic))
 
-(defvar helm-c-man-pages nil
+(defvar helm-man-pages nil
   "All man pages on system.
 Will be calculated the first time you invoke helm with this
 source.")
 
-(defun helm-c-man-default-action (candidate)
+(defun helm-man-default-action (candidate)
   "Default action for jumping to a woman or man page from helm."
   (let ((wfiles (mapcar 'car (woman-file-name-all-completions candidate))))
     (condition-case err
@@ -42,18 +42,18 @@ source.")
       (error (kill-buffer) ; Kill woman buffer.
              (Man-getpage-in-background candidate)))))
 
-(defvar helm-c-source-man-pages
+(defvar helm-source-man-pages
   '((name . "Manual Pages")
     (init . (lambda ()
               (require 'woman)
-              (unless helm-c-man-pages
-                (setq helm-c-man-pages
+              (unless helm-man-pages
+                (setq helm-man-pages
                       (ignore-errors
                         (woman-file-name "" t)
                         (sort (mapcar 'car woman-topic-all-completions)
                               'string-lessp))))))
-    (candidates . helm-c-man-pages)
-    (action  . (("Show with Woman" . helm-c-man-default-action)))
+    (candidates . helm-man-pages)
+    (action  . (("Show with Woman" . helm-man-default-action)))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)
@@ -67,8 +67,8 @@ source.")
   "Preconfigured `helm' for Man and Woman pages.
 With a prefix arg reinitialize the cache."
   (interactive "P")
-  (when arg (setq helm-c-man-pages nil))
-  (helm-other-buffer 'helm-c-source-man-pages "*Helm man woman*"))
+  (when arg (setq helm-man-pages nil))
+  (helm-other-buffer 'helm-source-man-pages "*Helm man woman*"))
 
 (provide 'helm-man)
 

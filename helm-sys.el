@@ -26,7 +26,7 @@
   "System related helm library."
   :group 'helm)
 
-(defcustom helm-c-top-command "env COLUMNS=%s top -b -n 1"
+(defcustom helm-top-command "env COLUMNS=%s top -b -n 1"
   "Top command used to display output of top.
 A format string where %s will be replaced with `frame-width'."
   :group 'helm-sys
@@ -36,13 +36,13 @@ A format string where %s will be replaced with `frame-width'."
 ;;; Top (process)
 ;;
 ;;
-(defvar helm-c-source-top
+(defvar helm-source-top
   '((name . "Top")
     (header-name . (lambda (name) (concat name " (Press C-c C-u to refresh)"))) 
-    (init . helm-c-top-init)
+    (init . helm-top-init)
     (candidates-in-buffer)
-    (display-to-real . helm-c-top-display-to-real)
-    (persistent-action . helm-c-top-sh-persistent-action)
+    (display-to-real . helm-top-display-to-real)
+    (persistent-action . helm-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
     (filtered-candidate-transformer . helm-top-transformer)
     (action-transformer . helm-top-action-transformer)))
@@ -58,29 +58,29 @@ Return empty string for non--valid candidates."
 Show actions only on line starting by a PID."
   (let ((disp (helm-get-selection nil t)))
     (cond ((string-match "^ *[0-9]+" disp)
-           (list '("kill (SIGTERM)" . (lambda (pid) (helm-c-top-sh "TERM" pid)))
-                 '("kill (SIGKILL)" . (lambda (pid) (helm-c-top-sh "KILL" pid)))
+           (list '("kill (SIGTERM)" . (lambda (pid) (helm-top-sh "TERM" pid)))
+                 '("kill (SIGKILL)" . (lambda (pid) (helm-top-sh "KILL" pid)))
                  '("Copy PID" . (lambda (pid) (kill-new pid)))))
           (t actions))))
 
-(defun helm-c-top-sh (sig pid)
+(defun helm-top-sh (sig pid)
   "Run kill shell command with signal SIG on PID for `helm-top'."
   (let ((cmd (format "kill -%s %s" sig pid)))
     (message "Executed %s\n%s" cmd (shell-command-to-string cmd))))
 
-(defun helm-c-top-sh-persistent-action (pid)
+(defun helm-top-sh-persistent-action (pid)
   (delete-other-windows)
-  (helm-c-top-sh "TERM" pid)
+  (helm-top-sh "TERM" pid)
   (helm-force-update))
 
-(defun helm-c-top-init ()
+(defun helm-top-init ()
   "Insert output of top command in candidate buffer."
   (with-current-buffer (helm-candidate-buffer 'global)
     (call-process-shell-command
-     (format helm-c-top-command (frame-width))
+     (format helm-top-command (frame-width))
      nil (current-buffer))))
 
-(defun helm-c-top-display-to-real (line)
+(defun helm-top-display-to-real (line)
   "Return pid only from LINE."
   (car (split-string line)))
 
@@ -90,7 +90,7 @@ Show actions only on line starting by a PID."
 ;;
 ;;; FIXME I do not care multi-display.
 
-(defun helm-c-xrandr-info ()
+(defun helm-xrandr-info ()
   "Return a pair with current X screen number and current X display name."
   (with-temp-buffer
     (call-process "xrandr" nil (current-buffer) nil
@@ -104,21 +104,21 @@ Show actions only on line starting by a PID."
         (setq output (match-string 1)))
       (list screen output))))
 
-(defun helm-c-xrandr-screen ()
+(defun helm-xrandr-screen ()
   "Return current X screen number."
-  (car (helm-c-xrandr-info)))
+  (car (helm-xrandr-info)))
 
-(defun helm-c-xrandr-output ()
+(defun helm-xrandr-output ()
   "Return current X display name."
-  (cadr (helm-c-xrandr-info)))
+  (cadr (helm-xrandr-info)))
 
-(defvar helm-c-source-xrandr-change-resolution
+(defvar helm-source-xrandr-change-resolution
   '((name . "Change Resolution")
     (candidates
      . (lambda ()
          (with-temp-buffer
            (call-process "xrandr" nil (current-buffer) nil
-                         "--screen" (helm-c-xrandr-screen) "-q")
+                         "--screen" (helm-xrandr-screen) "-q")
            (goto-char 1)
            (loop with modes = nil
                  while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
@@ -130,15 +130,15 @@ Show actions only on line starting by a PID."
      ("Change Resolution"
       . (lambda (mode)
           (call-process "xrandr" nil nil nil
-                        "--screen" (helm-c-xrandr-screen)
-                        "--output" (helm-c-xrandr-output)
+                        "--screen" (helm-xrandr-screen)
+                        "--output" (helm-xrandr-output)
                         "--mode" mode))))))
 
 
 ;;; Emacs process
 ;;
 ;;
-(defvar helm-c-source-emacs-process
+(defvar helm-source-emacs-process
   '((name . "Emacs Process")
     (init . (lambda () (list-processes--refresh)))
     (candidates . (lambda () (mapcar #'process-name (process-list))))
@@ -157,7 +157,7 @@ Show actions only on line starting by a PID."
   (interactive)
   (save-window-excursion
     (unless helm-alive-p (delete-other-windows))
-    (helm :sources 'helm-c-source-top
+    (helm :sources 'helm-source-top
           :buffer "*helm top*" :full-frame t
           :candidate-number-limit 9999)))
 
@@ -165,12 +165,12 @@ Show actions only on line starting by a PID."
 (defun helm-list-emacs-process ()
   "Preconfigured `helm' for emacs process."
   (interactive)
-  (helm-other-buffer 'helm-c-source-emacs-process "*helm process*"))
+  (helm-other-buffer 'helm-source-emacs-process "*helm process*"))
 
 ;;;###autoload
 (defun helm-xrandr-set ()
   (interactive)
-  (helm :sources 'helm-c-source-xrandr-change-resolution
+  (helm :sources 'helm-source-xrandr-change-resolution
         :buffer "*helm xrandr*"))
 
 (provide 'helm-sys)

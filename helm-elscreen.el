@@ -39,7 +39,7 @@
   (helm-require-or-error 'elscreen 'helm-elscreen-find-file)
   (elscreen-find-file file))
 
-(defvar helm-c-source-elscreen
+(defvar helm-source-elscreen
   '((name . "Elscreen")
     (candidates
      . (lambda ()
@@ -66,7 +66,7 @@
 (defun helm-elscreen ()
   "Preconfigured helm to list elscreen."
   (interactive)
-  (helm-other-buffer 'helm-c-source-elscreen "*Helm Elscreen*"))
+  (helm-other-buffer 'helm-source-elscreen "*Helm Elscreen*"))
 
 (provide 'helm-elscreen)
 

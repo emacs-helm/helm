@@ -34,10 +34,10 @@
 ;;; Build info-index sources with info-index plug-in.
 ;;
 ;;
-(defun helm-c-build-info-index-command (name doc source buffer)
+(defun helm-build-info-index-command (name doc source buffer)
   "Define an helm command NAME with documentation DOC.
 Arg SOURCE will be an existing helm source named
-`helm-c-source-info-<NAME>' and BUFFER a string buffer name."
+`helm-source-info-<NAME>' and BUFFER a string buffer name."
   (eval (list 'defun name nil doc
               (list 'interactive)
               (list 'helm
@@ -45,11 +45,11 @@ Arg SOURCE will be an existing helm source named
                     :buffer buffer
                     :candidate-number-limit 1000))))
 
-(defun helm-c-define-info-index-sources (var-value &optional commands)
-  "Define helm sources named helm-c-source-info-<NAME>.
-Sources are generated for all entries of `helm-c-default-info-index-list'.
+(defun helm-define-info-index-sources (var-value &optional commands)
+  "Define helm sources named helm-source-info-<NAME>.
+Sources are generated for all entries of `helm-default-info-index-list'.
 If COMMANDS arg is non--nil build also commands named `helm-info<NAME>'.
-Where NAME is one of `helm-c-default-info-index-list'."
+Where NAME is one of `helm-default-info-index-list'."
   (loop with symbols = (loop for str in var-value
                              collect
                              (intern (concat "helm-source-info-" str)))
@@ -59,15 +59,15 @@ Where NAME is one of `helm-c-default-info-index-list'."
                           (cons 'info-index str)))
         when commands
         do (let ((com (intern (concat "helm-info-" str))))
-             (helm-c-build-info-index-command
+             (helm-build-info-index-command
               com (format "Predefined helm for %s info." str)
               sym (format "*helm info %s*" str)))))
 
 (defun helm-info-index-set (var value)
   (set var value)
-  (helm-c-define-info-index-sources value t))
+  (helm-define-info-index-sources value t))
 
-(defcustom helm-c-default-info-index-list
+(defcustom helm-default-info-index-list
   '("elisp" "cl" "org" "gnus" "tramp" "ratpoison"
     "zsh" "bash" "coreutils" "fileutils"
     "find" "sh-utils" "textutils" "libc"
@@ -85,15 +85,15 @@ Where NAME is one of `helm-c-default-info-index-list'."
 
 
 ;;; Info pages
-(defvar helm-c-info-pages nil
+(defvar helm-info-pages nil
   "All info pages on system.
 Will be calculated the first time you invoke helm with this
 source.")
 
-(defun helm-c-info-pages-init ()
+(defun helm-info-pages-init ()
   "Collect candidates for initial Info node Top."
-  (if helm-c-info-pages
-      helm-c-info-pages
+  (if helm-info-pages
+      helm-info-pages
       (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
             topics)
         (require 'info)
@@ -103,12 +103,12 @@ source.")
           (while (re-search-forward info-topic-regexp nil t)
             (push (match-string-no-properties 1) topics))
           (kill-buffer))
-        (setq helm-c-info-pages topics))))
+        (setq helm-info-pages topics))))
 
-(defvar helm-c-source-info-pages
+(defvar helm-source-info-pages
   `((name . "Info Pages")
-    (init . helm-c-info-pages-init)
-    (candidates . helm-c-info-pages)
+    (init . helm-info-pages-init)
+    (candidates . helm-info-pages)
     (action . (("Show with Info" .(lambda (node-str)
                                     (info (replace-regexp-in-string
                                            "^[^:]+: " "" node-str))))))
@@ -119,12 +119,12 @@ source.")
   "Preconfigured `helm' for searching info at point.
 With a prefix-arg insert symbol at point."
   (interactive)
-  (let ((helm-c-google-suggest-default-function
-         'helm-c-google-suggest-emacs-lisp))
-    (helm :sources '(helm-c-source-info-elisp
-                     helm-c-source-info-cl
-                     helm-c-source-info-pages
-                     helm-c-source-google-suggest)
+  (let ((helm-google-suggest-default-function
+         'helm-google-suggest-emacs-lisp))
+    (helm :sources '(helm-source-info-elisp
+                     helm-source-info-cl
+                     helm-source-info-pages
+                     helm-source-google-suggest)
           :buffer "*helm info*")))
 
 (provide 'helm-info)
