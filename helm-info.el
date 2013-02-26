@@ -52,7 +52,7 @@ If COMMANDS arg is non--nil build also commands named `helm-info<NAME>'.
 Where NAME is one of `helm-c-default-info-index-list'."
   (loop with symbols = (loop for str in var-value
                              collect
-                             (intern (concat "helm-c-source-info-" str)))
+                             (intern (concat "helm-source-info-" str)))
         for sym in symbols
         for str in var-value
         do (set sym (list (cons 'name (format "Info index: %s" str))
