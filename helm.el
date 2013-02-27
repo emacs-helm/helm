@@ -1531,6 +1531,9 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
         (setq any-buffer helm-last-buffer))
     (assert any-buffer nil
             "helm-resume: No helm buffers found to resume")
+    ;; Reset `cursor-type' to nil as it have been set to t
+    ;; when quitting previous session.
+    (with-current-buffer any-buffer (setq cursor-type nil))
     (setq helm-full-frame (buffer-local-value
                            'helm-full-frame (get-buffer any-buffer)))
     (setq helm-compiled-sources nil)
