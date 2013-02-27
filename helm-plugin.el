@@ -24,6 +24,7 @@
 (declare-function Info-goto-node "info" (&optional fork))
 (declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
 
+
 ;;; Plug-in: `info-index'
 ;;
 ;;
@@ -89,6 +90,7 @@ Some info files are missing index specification.
 
 ex. See `helm-source-info-screen'.")
 
+
 ;;; Plug-in: `candidates-file'
 ;;
 ;; List all lines in a file.
@@ -130,6 +132,7 @@ e.g
 
 Will list all lines in .emacs.el.")
 
+
 ;;; Plug-in: `headline'
 ;;
 ;;
@@ -209,7 +212,6 @@ Will list all lines in .emacs.el.")
               (loop while (re-search-forward regexp nil t)
                     collect (matched))))))))
 
-
 (defun helm-headline-make-candidate-buffer (regexp subexp)
   (with-current-buffer (helm-candidate-buffer 'local)
     (loop for (content . pos) in (helm-headline-get-candidates regexp subexp)
@@ -224,7 +226,7 @@ Will list all lines in .emacs.el.")
   (unless recenter
     (set-window-start (get-buffer-window helm-current-buffer) (point))))
 
-
+
 ;;; Plug-in: `persistent-help'
 ;;
 ;; Add help about persistent action in `helm-buffer' header.
@@ -247,82 +249,29 @@ Will list all lines in .emacs.el.")
                           (or (ignore-errors (caar it))  ""))))
                "")
            " (keeping session)")))
-
+
+;;; Document new attributes
+;;
+;;
 (helm-document-attribute 'persistent-help "persistent-help plug-in"
   "A string to explain persistent-action of this source.
 It also accepts a function or a variable name.")
 
-
-;;; Plug-in: Type `customize'
-;;
-;;
-(defvar helm-additional-type-attributes nil)
-
-(defun helm-uniq-list (lst)
-  "Like `remove-duplicates' in CL.
-But cut deeper duplicates and test by `equal'. "
-  (reverse (remove-duplicates (reverse lst) :test 'equal)))
-
-(defun helm-arrange-type-attribute (type spec)
-  "Override type attributes by `define-helm-type-attribute'.
-
-The SPEC is like source. The symbol `REST' is replaced
-with original attribute value.
-
- Example: Set `play-sound-file' as default action
-   (helm-arrange-type-attribute 'file
-      '((action (\"Play sound\" . play-sound-file)
-         REST ;; Rest of actions (find-file, find-file-other-window, etc...)."
-  (add-to-list 'helm-additional-type-attributes
-               (cons type
-                     (loop with typeattr = (assoc-default
-                                            type helm-type-attributes)
-                           for (attr . value) in spec
-                           if (listp value)
-                           collect (cons attr
-                                         (helm-uniq-list
-                                          (loop for v in value
-                                                if (eq v 'REST)
-                                                append
-                                                (assoc-default attr typeattr)
-                                                else
-                                                collect v)))
-                           else
-                           collect (cons attr value)))))
-(put 'helm-arrange-type-attribute 'lisp-indent-function 1)
-
-(defun helm-compile-source--type-customize (source)
-  (helm-aif (assoc-default (assoc-default 'type source)
-                           helm-additional-type-attributes)
-      (append it source)
-    source))
-
-(add-to-list 'helm-compile-source-functions
-             'helm-compile-source--type-customize t)
-
-;;; Plug-in: `default-action'
-;;
-;;
-(defun helm-compile-source--default-action (source)
-  (helm-aif (assoc-default 'default-action source)
-      (append `((action ,it ,@(remove it (assoc-default 'action source))))
-              source)
-    source))
-(add-to-list 'helm-compile-source-functions
-             'helm-compile-source--default-action t)
-
-(helm-document-attribute 'default-action "default-action plug-in"
-  "Default action.")
 (helm-document-attribute 'default-directory "type . file-line"
   "`default-directory' to interpret file.")
+
 (helm-document-attribute 'before-jump-hook "type . file-line / line"
   "Function to call before jumping to the target location.")
+
 (helm-document-attribute 'after-jump-hook "type . file-line / line"
   "Function to call after jumping to the target location.")
+
 (helm-document-attribute 'adjust "type . file-line"
   "Search around line matching line contents.")
+
 (helm-document-attribute 'recenter "type . file-line / line"
   "`recenter' after jumping.")
+
 (helm-document-attribute 'target-file "type . line"
   "Goto line of target-file.")
 
