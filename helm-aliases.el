@@ -23,21 +23,30 @@
 ;;; Helper functions to create aliases with old helm definitions
 ;;  prefixed with "helm-c-"
 ;;
-(defun helm-check-invalid-prefixes ()
+(defun helm-alias-p (sym)
+  (cond ((boundp sym)
+         (not (eq (indirect-variable sym) sym)))
+        ((fboundp sym)
+         (symbolp (symbol-function sym)))
+        (t nil)))
+
+(defun helm-check-conflicting-prefixes ()
   (loop for s in (all-completions "helm-c-" obarray)
         for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        when (or (fboundp (intern rep))
-                 (boundp (intern rep)))
+        when (or (and (not (helm-alias-p (intern s))) (fboundp (intern rep)))
+                 (and (not (helm-alias-p (intern s))) (boundp (intern rep))))
         collect rep))
 
 (defun helm-collect-functions-with-bad-prefix ()
   (loop for s in (all-completions "helm-c-" obarray)
-        when (fboundp (intern s))
+        for sym = (intern s)
+        when (and (not (helm-alias-p sym)) (fboundp sym))
         collect s))
 
 (defun helm-collect-vars-with-bad-prefix ()
   (loop for s in (all-completions "helm-c-" obarray)
-        when (boundp (intern s))
+        for sym = (intern s)
+        when (and (not (helm-alias-p sym)) (boundp sym))
         collect s))
 
 (defun helm-insert-fn-aliases ()
