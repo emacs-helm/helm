@@ -635,8 +635,6 @@ when `helm' is keyboard-quitted.")
 (defvar helm-last-frame-or-window-configuration nil
   "Used to store window or frame configuration when helm start.")
 (defvar helm-onewindow-p nil)
-(defvar helm-compile-source-functions-default helm-compile-source-functions
-  "Plug-ins this file provides.")
 (defvar helm-types nil)
 (defvar helm-mode-line-string-real nil) ; The string to display in mode-line.
 (defvar helm-persistent-action-display-window nil)
