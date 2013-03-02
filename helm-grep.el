@@ -787,11 +787,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-grep-default-command)
-                     (helm-grep-read-ack-type)))
-         (helm-compile-source-functions
-          ;; rule out helm-match-plugin because the input is one regexp.
-          (delq 'helm-compile-source--match-plugin
-                (copy-sequence helm-compile-source-functions))))
+                     (helm-grep-read-ack-type))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -818,6 +814,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
         (candidates-process . helm-grep-collect-candidates)
         (filtered-candidate-transformer helm-grep-cand-transformer)
         (candidate-number-limit . 9999)
+        (no-matchplugin)
         (nohighlight)
         (mode-line . helm-grep-mode-line-string)
         ;; We need to specify keymap here and as :keymap arg [1]
@@ -1009,11 +1006,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
   "Launch pdfgrep with a list of ONLY files."
   (unless (executable-find "pdfgrep")
     (error "Error: No such program `pdfgrep'."))
-  (let* ((helm-compile-source-functions
-          ;; rule out helm-match-plugin because the input is one regexp.
-          (delq 'helm-compile-source--match-plugin
-                (copy-sequence helm-compile-source-functions)))
-         helm-grep-in-recurse) ; recursion is never used in pdfgrep.
+  (let* (helm-grep-in-recurse) ; recursion is never used in pdfgrep.
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -1032,6 +1025,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
              (funcall helm-pdfgrep-default-function helm-pdfgrep-targets)))
         (filtered-candidate-transformer helm-grep-cand-transformer)
         (candidate-number-limit . 9999)
+        (no-matchplugin)
         (nohighlight)
         (history . ,'helm-grep-history)
         (keymap . ,helm-pdfgrep-map)

@@ -349,30 +349,32 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 ;;
 ;;
 (defun helm-compile-source--match-plugin (source)
-  (let* ((searchers        (if (assoc 'search-from-end source)
-                               helm-mp-default-search-backward-functions
-                               helm-mp-default-search-functions))
-         (defmatch         (helm-aif (assoc-default 'match source)
-                               (if (listp it) it (list it))))
-         (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
-                               (if (listp it) it (list it))))
-         (defsearch        (helm-aif (assoc-default 'search source)
-                               (if (listp it) it (list it))))
-         (defsearch-strict (helm-aif (assoc-default 'search-strict source)
-                               (if (listp it) it (list it))))
-         (matchfns         (cond (defmatch-strict)
-                                 (defmatch
-                                  (append helm-mp-default-match-functions defmatch))
-                                 (t helm-mp-default-match-functions)))
-         (searchfns        (cond (defsearch-strict)
-                                 (defsearch
-                                  (append searchers defsearch))
-                                 (t searchers))))
-    `(,(if (or (assoc 'candidates-in-buffer source)
-               (equal '(identity) matchfns))
-           '(match identity) `(match ,@matchfns))
-       (search ,@searchfns)
-       ,@source)))
+  (if (assoc 'no-matchplugin source)
+      source
+      (let* ((searchers        (if (assoc 'search-from-end source)
+                                   helm-mp-default-search-backward-functions
+                                   helm-mp-default-search-functions))
+             (defmatch         (helm-aif (assoc-default 'match source)
+                                   (if (listp it) it (list it))))
+             (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
+                                   (if (listp it) it (list it))))
+             (defsearch        (helm-aif (assoc-default 'search source)
+                                   (if (listp it) it (list it))))
+             (defsearch-strict (helm-aif (assoc-default 'search-strict source)
+                                   (if (listp it) it (list it))))
+             (matchfns         (cond (defmatch-strict)
+                                     (defmatch
+                                      (append helm-mp-default-match-functions defmatch))
+                                     (t helm-mp-default-match-functions)))
+             (searchfns        (cond (defsearch-strict)
+                                     (defsearch
+                                      (append searchers defsearch))
+                                     (t searchers))))
+        `(,(if (or (assoc 'candidates-in-buffer source)
+                   (equal '(identity) matchfns))
+               '(match identity) `(match ,@matchfns))
+           (search ,@searchfns)
+           ,@source))))
 
 
 ;;; Highlight matches.

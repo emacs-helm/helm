@@ -137,6 +137,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (persistent-action . helm-regexp-persistent-action)
     (persistent-help . "Show this line")
     (multiline)
+    (no-matchplugin)
     (delayed)
     (requires-pattern . 2)
     (mode-line . "Press TAB to select action.")
@@ -272,6 +273,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (persistent-action . helm-m-occur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)
+    (no-matchplugin)
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-moccur-map)
@@ -303,14 +305,10 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-source-moccur' with BUFFERS list."
   (setq helm-multi-occur-buffer-list buffers)
-  (let ((helm-compile-source-functions
-         ;; rule out helm-match-plugin because the input is one regexp.
-         (delq 'helm-compile-source--match-plugin
-               (copy-sequence helm-compile-source-functions))))
-    (helm :sources 'helm-source-moccur
-          :buffer "*helm multi occur*"
-          :history 'helm-grep-history
-          :input input)))
+  (helm :sources 'helm-source-moccur
+        :buffer "*helm multi occur*"
+        :history 'helm-grep-history
+        :input input))
 
 
 ;;; Helm browse code.
@@ -400,33 +398,25 @@ the center of window, otherwise at the top of window.")
 `query-replace-regexp' can be run from there against found regexp."
   (interactive)
   (save-restriction
-    (let ((helm-compile-source-functions
-           ;; rule out helm-match-plugin because the input is one regexp.
-           (delq 'helm-compile-source--match-plugin
-                 (copy-sequence helm-compile-source-functions))))
-      (when (and (helm-region-active-p)
-                 ;; Don't narrow to region if buffer is already narrowed.
-                 (not (helm-current-buffer-narrowed-p (current-buffer))))
-        (narrow-to-region (region-beginning) (region-end)))
-      (helm :sources helm-source-regexp
-            :buffer "*helm regexp*"
-            :prompt "Regexp: "
-            :history 'helm-build-regexp-history))))
+    (when (and (helm-region-active-p)
+               ;; Don't narrow to region if buffer is already narrowed.
+               (not (helm-current-buffer-narrowed-p (current-buffer))))
+      (narrow-to-region (region-beginning) (region-end)))
+    (helm :sources helm-source-regexp
+          :buffer "*helm regexp*"
+          :prompt "Regexp: "
+          :history 'helm-build-regexp-history)))
 
 ;;;###autoload
 (defun helm-occur ()
   "Preconfigured helm for Occur."
   (interactive)
-  (let ((helm-compile-source-functions
-         ;; rule out helm-match-plugin because the input is one regexp.
-         (delq 'helm-compile-source--match-plugin
-               (copy-sequence helm-compile-source-functions))))
-    (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
-    (helm-occur-init-source)
-    (helm-attrset 'name "Occur" helm-source-occur)
-    (helm :sources 'helm-source-occur
-          :buffer "*helm occur*"
-          :history 'helm-grep-history)))
+  (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
+  (helm-occur-init-source)
+  (helm-attrset 'name "Occur" helm-source-occur)
+  (helm :sources 'helm-source-occur
+        :buffer "*helm occur*"
+        :history 'helm-grep-history))
 
 ;;;###autoload
 (defun helm-multi-occur (buffers)
