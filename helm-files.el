@@ -180,7 +180,7 @@ On Unix based systems (lpstat command needed) you don't need to set this,
 (defcustom helm-ff-transformer-show-only-basename t
   "Show only basename of candidates in `helm-find-files'.
 This can be toggled at anytime from `helm-find-files' with \
-\\<helm-find-files-map>0\\[helm-ff-run-toggle-basename]."
+\\<helm-find-files-map>\\[helm-ff-run-toggle-basename]."
   :type 'boolean
   :group 'helm-files)
 
