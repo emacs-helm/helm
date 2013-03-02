@@ -2655,7 +2655,7 @@ Meant to be called at beginning of a sentinel process function."
     
 (defun helm-kill-async-process (process)
   "Stop output from `helm-output-filter' and kill associated PROCESS."
-  (set-process-filter process t)
+  (set-process-filter process nil)
   (delete-process process))
 
 
