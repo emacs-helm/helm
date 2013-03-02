@@ -133,7 +133,6 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (target     (and beg end (buffer-substring-no-properties beg end)))
          (candidates (and data (all-completions target (nth 2 data) pred)))
          (helm-quit-if-no-candidate t)
-
          (helm-execute-action-at-once-if-one t)
          (helm-match-plugin-enabled
           (member 'helm-compile-source--match-plugin
