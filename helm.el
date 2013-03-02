@@ -608,10 +608,6 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-selection-point nil)
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
-(defconst helm-default-match-functions
-  (list (lambda (candidate)
-          (string-match helm-pattern candidate)))
-  "Default functions to match candidates according to `helm-pattern'.")
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\<_" "\\>_"))
 (defvar helm-suspend-update-flag nil)
@@ -2219,10 +2215,15 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
       (helm-composed-funcall-with-source source it pattern)
     pattern))
 
+(defun helm-default-match-function (candidate)
+  "Check if `helm-pattern' match CANDIDATE.
+Default function to match candidates according to `helm-pattern'."
+  (string-match helm-pattern candidate))
+
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
                       (assoc-default 'match-strict source)
-                      helm-default-match-functions)))
+                      #'helm-default-match-function)))
     (if (listp matchfns) matchfns (list matchfns))))
 
 (defmacro helm-accumulate-candidates-internal (cand newmatches
