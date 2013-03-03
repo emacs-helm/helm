@@ -1503,6 +1503,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
               nil))
         (helm-log-eval (setq helm-alive-p nil))
         (setq overriding-local-map old-overridding-local-map)
+        (setq helm-alive-p nil)
         (helm-log-save-maybe)))))
 
 
@@ -2544,14 +2545,12 @@ after the source name by overlay."
 
 ;;; Core: async process
 ;;
-(defun helm-output-filter (process string)
-  "The `process-filter' of PROCESS.
-It will be used by `set-process-filter' in asynchronous sources.
-STRING is the output of PROCESS."
-  (helm-output-filter-1 (assoc process helm-async-processes) string))
+(defun helm-output-filter (process output-string)
+  "The `process-filter' function for helm async sources."
+  (helm-output-filter-1 (assoc process helm-async-processes) output-string))
 
-(defun helm-output-filter-1 (process-assoc string)
-  (helm-log-eval string)
+(defun helm-output-filter-1 (process-assoc output-string)
+  (helm-log-eval output-string)
   (with-current-buffer helm-buffer
     (let ((source (cdr process-assoc)))
       (save-excursion
@@ -2562,14 +2561,14 @@ STRING is the output of PROCESS."
           (setcdr process-assoc
                   (append source `((insertion-marker . ,(point-marker))))))
         (helm-output-filter--process-source
-         (car process-assoc) string source
+         (car process-assoc) output-string source
          (helm-candidate-number-limit source))))
     (helm-output-filter--post-process)))
 
-(defun helm-output-filter--process-source (process string source limit)
+(defun helm-output-filter--process-source (process output-string source limit)
   (dolist (candidate (helm-transform-candidates
                       (helm-output-filter--collect-candidates
-                       (split-string string "\n")
+                       (split-string output-string "\n")
                        (assoc 'incomplete-line source))
                       source t))
     (if (assq 'multiline source)
@@ -2599,7 +2598,7 @@ STRING is the output of PROCESS."
                  (concat (cdr incomplete-line-info) line)
                (setcdr incomplete-line-info nil))
              line)
-         ;; store last incomplete line (last chunk truncated)
+         ;; Store last incomplete line (last chunk truncated)
          ;; until new output arrives.
          finally do (setcdr incomplete-line-info line))))
 
