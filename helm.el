@@ -1083,7 +1083,8 @@ of \(action-display . function\)."
       (helm-attr 'action))))
 
 (defun helm-get-current-source ()
-  "Return the source for the current selection."
+  "Return the source for the current selection.
+Allow also checking if helm-buffer contain candidates."
   (declare (special source))
   ;; `helm-source-name' let-bounded in some function with value of source.
   ;; Return source from this function. (e.g `helm-funcall-with-source').
@@ -1808,7 +1809,10 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
                                 any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
-  (if (and (helm-resume-p any-resume) (not (helm-empty-buffer-p)))
+  (if (and (helm-resume-p any-resume)
+           ;; When no source, helm-buffer is empty
+           ;; or contain non--candidate lines (e.g grep exit status)
+           (helm-get-current-source))
       (helm-mark-current-line t)
       (helm-update any-preselect))
   (with-current-buffer (helm-buffer-get)
