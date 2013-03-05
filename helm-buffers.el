@@ -71,6 +71,11 @@ filtered from the list of candidates if the
   "Face used for buffer size."
   :group 'helm-buffers)
 
+(defface helm-buffer-process
+    '((t (:foreground "Sienna3")))
+  "Face used for process status in buffer."
+  :group 'helm-buffers)
+
 
 ;;; Buffers keymap
 ;;
@@ -194,6 +199,7 @@ Should be called after others transformers i.e (boring buffers)."
         with old-len-size = 10
         for i in buffers
         for buf = (get-buffer i)
+        for proc = (get-buffer-process buf)
         for size = (propertize (helm-buffer-size buf)
                                'face 'helm-buffer-size)
         for len-size = (length size)
@@ -253,7 +259,8 @@ Should be called after others transformers i.e (boring buffers)."
                (let ((prefix (propertize
                               " " 'display
                               (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize truncbuf 'face 'font-lock-type-face
+                 (cons (concat prefix (propertize truncbuf
+                                                  'face 'font-lock-type-face
                                                   'help-echo bfname)
                                " " str-before-size size "  " mode)
                        i)))
@@ -266,7 +273,13 @@ Should be called after others transformers i.e (boring buffers)."
               ;; Any non--file buffer.=>grey italic
               (t (cons (concat (propertize truncbuf 'face 'italic
                                            'help-echo i)
-                               " " str-before-size size "  " mode) i)))))
+                               " " str-before-size size "  " mode
+                               (and proc
+                                    (propertize
+                                     (format " (%s %s)"
+                                             proc (process-status proc))
+                                     'face 'helm-buffer-process)))
+                       i)))))
 
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
