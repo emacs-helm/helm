@@ -343,6 +343,15 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-always-two-windows nil
+  "When non--nil helm will use two windows in this frame.
+That is one window to display `helm-buffer' and one to display
+`helm-current-buffer'.
+Note: this have no effect when `helm-split-window-in-side-p' is non--nil,
+or when `helm-split-window-default-side' is set to 'same."
+  :group 'helm
+  :type 'boolean)
+
 (defcustom helm-sources-using-default-as-input '(helm-source-imenu
                                                  helm-source-info-elisp
                                                  helm-source-etags-select)
@@ -1759,6 +1768,10 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
       (progn (delete-other-windows) (switch-to-buffer buffer))
+      (and helm-always-two-windows
+           (not (eq helm-split-window-default-side 'same))
+           (not helm-split-window-in-side-p)
+           (delete-other-windows))
       (pop-to-buffer buffer)))
 
 
