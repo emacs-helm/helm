@@ -27,6 +27,7 @@
 (declare-function helm-buffer-list "helm-buffers")
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))
 (declare-function View-quit "view")
+(declare-function doc-view-goto-page "doc-view" (page))
 
 
 (defgroup helm-grep nil
@@ -98,9 +99,14 @@ See `helm-grep-default-command' for infos on format specs."
   :group 'helm-grep
   :type  'boolean)
 
-(defcustom helm-pdfgrep-default-read-command "xpdf '%f' %p"
+(defcustom helm-pdfgrep-default-read-command nil
   "Default command to read pdf files from pdfgrep.
-Where '%f' format spec is filename and '%p' is page number"
+Where '%f' format spec is filename and '%p' is page number.
+e.g In Ubuntu you can set it to:
+
+    \"evince --page-label=%p '%f'\"
+
+If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type  'string)
 
@@ -448,7 +454,9 @@ WHERE can be one of other-window, elscreen, other-frame."
       (elscreen     (helm-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
       (grep         (helm-grep-save-results-1))
-      (pdf          (helm-pdfgrep-action-1 split lineno (car split)))
+      (pdf          (if helm-pdfgrep-default-read-command
+                        (helm-pdfgrep-action-1 split lineno (car split))
+                        (find-file (car split)) (doc-view-goto-page lineno)))
       (t            (find-file fname)))
     (unless (or (eq where 'grep) (eq where 'pdf))
       (helm-goto-line lineno))
