@@ -1770,6 +1770,7 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
       (progn (delete-other-windows) (switch-to-buffer buffer))
       (and helm-always-two-windows
            (not (eq helm-split-window-default-side 'same))
+           (not (minibufferp helm-current-buffer))
            (not helm-split-window-in-side-p)
            (delete-other-windows))
       (pop-to-buffer buffer)))
