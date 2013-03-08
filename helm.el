@@ -1478,8 +1478,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log-eval any-prompt any-preselect
                    any-buffer any-keymap any-default)
     (let ((old-overridding-local-map overriding-local-map)
+          ;; #163 no cursor in minibuffer in <=Emacs-24.2.
+          ;; This is not needed in emacs-24.3+
+          (cursor-in-echo-area t)
           (helm-maybe-use-default-as-input
-           (or helm-maybe-use-default-as-input ; maybe let-bounded use this value.
+           (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
                (loop for s in (helm-normalize-sources any-sources)
                      thereis (memq s helm-sources-using-default-as-input)))))
       (unwind-protect
