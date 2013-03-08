@@ -1560,6 +1560,9 @@ Note that only directories are saved here."
                                          'synchro)
                      (helm-delete-current-selection)
                      (message nil)))))
+    (with-helm-buffer
+      (setq helm-marked-candidates nil
+            helm-visible-mark-overlays nil))
     (helm-force-update)))
 
 (defun helm-ff-kill-buffer-fname (candidate)
