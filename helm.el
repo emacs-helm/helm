@@ -4001,7 +4001,8 @@ With a prefix arg set to real value of current selection."
 
 ;;;###autoload
 (defun helm-kill-selection-and-quit (arg)
-  "Store current selection to kill ring."
+  "Store current selection to kill ring.
+With a prefix arg set to real value of current selection."
   (interactive "P")
   (helm-run-after-quit
    (lambda (sel)
