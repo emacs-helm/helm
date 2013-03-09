@@ -44,6 +44,7 @@ A format string where %s will be replaced with `frame-width'."
     (display-to-real . helm-top-display-to-real)
     (persistent-action . helm-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
+    (follow . never)
     (filtered-candidate-transformer . helm-top-transformer)
     (action-transformer . helm-top-action-transformer)))
 
