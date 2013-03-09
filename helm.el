@@ -3991,23 +3991,23 @@ If PREV is non-nil move to precedent."
 
 ;; Utility: Selection Paste
 ;;;###autoload
-(defun helm-yank-selection ()
-  "Set minibuffer contents to current selection."
-  (interactive)
-  (let ((str (helm-get-selection nil t)))
+(defun helm-yank-selection (arg)
+  "Set minibuffer contents to current display selection.
+With a prefix arg set to real value of current selection."
+  (interactive "P")
+  (let ((str (helm-get-selection nil (not arg))))
     (kill-new str)
     (helm-set-pattern str)))
 
 ;;;###autoload
-(defun helm-kill-selection-and-quit ()
-  "Store current selection to kill ring.
-You can paste it by typing \\[yank]."
-  (interactive)
+(defun helm-kill-selection-and-quit (arg)
+  "Store current selection to kill ring."
+  (interactive "P")
   (helm-run-after-quit
    (lambda (sel)
      (kill-new sel)
      (message "Killed: %s" sel))
-   (helm-get-selection nil t)))
+   (helm-get-selection nil (not arg))))
 
 
 ;;; Follow-mode: Automatical execution of persistent-action
