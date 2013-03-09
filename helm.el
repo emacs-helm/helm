@@ -4024,17 +4024,14 @@ to disable/enable this mode interactively.
 Note that when you disable it interactively and `follow' attribute exists,
 `helm-follow-mode' will be disabled on next helm session even if `follow'
 attribute is specified in source. To avoid this set your `follow' attribute
-in source in `helm-after-initialize-hook'.
+in source in `helm-before-initialize-hook'.
 
 e.g:
 
-\(add-hook 'helm-after-initialize-hook
+\(add-hook 'helm-before-initialize-hook
           #'(lambda () (helm-attrset 'follow 1 helm-source-buffers-list)))
 
-This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
-Note that on first call of your source, `helm-follow-mode' will not be enabled
-unless you have added the `follow' attr outside the `helm-after-initialize-hook'
-first."
+This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'."
   :group 'helm
   :init-value t
   (with-current-buffer helm-buffer
