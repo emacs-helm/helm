@@ -4033,7 +4033,7 @@ e.g:
 
 This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
 Note that on first call of your source, `helm-follow-mode' will not be enabled
-unless you have added the `follow' attr ouside the `helm-after-initialize-hook'
+unless you have added the `follow' attr outside the `helm-after-initialize-hook'
 first."
   :group 'helm
   :init-value t

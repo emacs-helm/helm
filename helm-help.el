@@ -1104,6 +1104,13 @@ For anonymous function don't add the dot, e.g:
 It should be a quoted symbol evaluated from source.
 i.e (history . ,'history-var).")
 
+(helm-document-attribute 'follow "optional"
+  " Enable `helm-follow-mode' for this source only.
+You must give it a value of 1 or -1, though giving a -1 value
+is surely not what you want.
+e.g (follow . 1)
+See `helm-follow-mode' for more infos")
+
 (provide 'helm-help)
 
 ;; Local Variables:
