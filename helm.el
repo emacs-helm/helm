@@ -4040,9 +4040,9 @@ first."
   (with-current-buffer helm-buffer
     (let ((src (helm-get-current-source))
           enabled)
-      (if (eq (cdr (assoc 'follow src)) 'never)
+      (if (eq (cdr (assq 'follow src)) 'never)
           (message "helm-follow-mode not allowed in this source")
-          (helm-aif (assoc 'follow src)
+          (helm-aif (assq 'follow src)
               (progn (helm-attrset 'follow (if (eq (cdr it) 1) -1 1) src)
                      (setq enabled (eq (cdr it) 1)))
             (setq helm-follow-mode (not helm-follow-mode)))
