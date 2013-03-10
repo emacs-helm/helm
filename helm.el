@@ -4015,7 +4015,7 @@ With a prefix arg set to real value of current selection."
 ;;
 ;;
 ;;;###autoload
-(define-minor-mode helm-follow-mode
+(defun helm-follow-mode (&optional arg)
     "Execute persistent action everytime the cursor is moved when enabled.
 The mode is enabled for the current source only, you will have to turn it
 on again when you go to next source if you want it there also.
@@ -4035,16 +4035,15 @@ e.g:
           #'(lambda () (helm-attrset 'follow 1 helm-source-buffers-list)))
 
 This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'."
-  :group 'helm
+  (interactive "p")
   (with-current-buffer helm-buffer
     (let* ((src      (helm-get-current-source))
            (fol-attr (assq 'follow src))
-           (enabled  (eq (cdr fol-attr) 1)))
+           (enabled  (or (< arg 0) ; Assume follow is enabled.
+                         (eq (cdr fol-attr) 1))))
       (if (eq (cdr fol-attr) 'never)
           (message "helm-follow-mode not allowed in this source")
-          (if fol-attr
-              (helm-attrset 'follow (if enabled -1 1) src)
-              (helm-attrset 'follow 1 src))
+          (helm-attrset 'follow (if enabled -1 1) src)
           (setq helm-follow-mode (eq (cdr (assq 'follow src)) 1))
           (message "helm-follow-mode is %s"
                    (if helm-follow-mode
