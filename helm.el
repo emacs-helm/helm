@@ -4017,6 +4017,8 @@ With a prefix arg set to real value of current selection."
 ;;;###autoload
 (define-minor-mode helm-follow-mode
     "Execute persistent action everytime the cursor is moved when enabled.
+The mode is enabled for the current source only, you will have to turn it
+on again when you go to next source if you want it there also.
 This mode can be enabled or disabled interactively at anytime during
 helm session or enabled specifically by source by adding the `follow'
 attribute to this source.
@@ -4034,27 +4036,25 @@ e.g:
 
 This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'."
   :group 'helm
-  :init-value t
   (with-current-buffer helm-buffer
-    (let ((src (helm-get-current-source))
-          enabled)
-      (if (eq (cdr (assq 'follow src)) 'never)
+    (let* ((src      (helm-get-current-source))
+           (fol-attr (assq 'follow src))
+           (enabled  (eq (cdr fol-attr) 1)))
+      (if (eq (cdr fol-attr) 'never)
           (message "helm-follow-mode not allowed in this source")
-          (helm-aif (assq 'follow src)
-              (progn (helm-attrset 'follow (if (eq (cdr it) 1) -1 1) src)
-                     (setq enabled (eq (cdr it) 1)))
-            (setq helm-follow-mode (not helm-follow-mode)))
+          (if fol-attr
+              (helm-attrset 'follow (if enabled -1 1) src)
+              (helm-attrset 'follow 1 src))
+          (setq helm-follow-mode (eq (cdr (assq 'follow src)) 1))
           (message "helm-follow-mode is %s"
-                   (if (or helm-follow-mode enabled) "enabled" "disabled"))))))
+                   (if helm-follow-mode
+                       "enabled" "disabled"))))))
 
 (defun helm-follow-execute-persistent-action-maybe ()
   "Execute persistent action in mode `helm-follow-mode'.
 This happen after `helm-input-idle-delay' secs."
   (and (not (get-buffer-window helm-action-buffer 'visible))
-       (or
-        (eq (assoc-default 'follow (helm-get-current-source)) 1)
-        (buffer-local-value 'helm-follow-mode
-                            (get-buffer-create helm-buffer)))
+       (eq (assoc-default 'follow (helm-get-current-source)) 1)
        (sit-for (and helm-input-idle-delay
                      (max helm-input-idle-delay 0.1)))
        (helm-window)
