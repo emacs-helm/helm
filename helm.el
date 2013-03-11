@@ -378,7 +378,7 @@ Otherwise (default) delete `minibuffer-contents'."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-follow-mode-persistent t
+(defcustom helm-follow-mode-persistent nil
   "Retrieve last state of `helm-follow-mode' in next helm session when non--nil.
 This will not make it persistent through emacs sessions though,
 you will have to set explicitely the `follow' attribute in the source where
