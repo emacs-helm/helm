@@ -378,6 +378,14 @@ Otherwise (default) delete `minibuffer-contents'."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-follow-mode-persistent t
+  "Retrieve last state of `helm-follow-mode' in next helm session when non--nil.
+This will not make it persistent through emacs sessions though,
+you will have to set explicitely the `follow' attribute in the source where
+you want this mode enabled definitely."
+  :group 'helm
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -4016,7 +4024,7 @@ With a prefix arg set to real value of current selection."
 ;;
 ;;;###autoload
 (defun helm-follow-mode (&optional arg)
-    "Execute persistent action everytime the cursor is moved when enabled.
+  "Execute persistent action everytime the cursor is moved when enabled.
 The mode is enabled for the current source only, you will have to turn it
 on again when you go to next source if you want it there also.
 This mode can be enabled or disabled interactively at anytime during
@@ -4038,8 +4046,14 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
   (interactive "p")
   (with-current-buffer helm-buffer
     (let* ((src      (helm-get-current-source))
+           (name     (assoc-default 'name src))
+           (sym      (loop for s in helm-sources
+                           for sname = (and (symbolp s)
+                                            (assoc-default
+                                             'name (symbol-value s)))
+                           thereis (and sname (string= sname name) s)))
            (fol-attr (assq 'follow src))
-           (enabled  (or (< arg 0) ; Assume follow is enabled.
+           (enabled  (or (< arg 0)      ; Assume follow is enabled.
                          (eq (cdr fol-attr) 1))))
       (if (eq (cdr fol-attr) 'never)
           (message "helm-follow-mode not allowed in this source")
@@ -4047,7 +4061,10 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
           (setq helm-follow-mode (eq (cdr (assq 'follow src)) 1))
           (message "helm-follow-mode is %s"
                    (if helm-follow-mode
-                       "enabled" "disabled"))))))
+                       "enabled" "disabled")))
+      ;; Make follow attr persistent for this session.
+      (when (and helm-follow-mode-persistent sym)
+        (set (car `(,sym)) src)))))
 
 (defun helm-follow-execute-persistent-action-maybe ()
   "Execute persistent action in mode `helm-follow-mode'.
