@@ -2826,27 +2826,28 @@ Possible value of DIRECTION are 'next or 'previous."
                                       (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
-  ;; Setup mode-line.
-  (if helm-mode-line-string
-      (setq mode-line-format
-            '(" " mode-line-buffer-identification " "
-              (line-number-mode "L%l") " " (helm-follow-mode "(HF) ")
-              (:eval (helm-show-candidate-number
-                      (when (listp helm-mode-line-string)
-                        (car-safe helm-mode-line-string))))
-              " " helm-mode-line-string-real " -%-")
-            helm-mode-line-string-real
-            (substitute-command-keys (if (listp helm-mode-line-string)
-                                         (cadr helm-mode-line-string)
-                                         helm-mode-line-string)))
-      (setq mode-line-format (default-value 'mode-line-format)))
-  ;; Setup header-line.
-  (let* ((hlstr (helm-interpret-value
-                 (and (listp source)
-                      (assoc-default 'header-line source)) source))
-         (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
-    (setq header-line-format
-          (propertize (concat " " hlstr hlend) 'face 'helm-header))))
+  (let ((follow (and (eq (cdr (assq 'follow source)) 1) "(HF) ")))
+    ;; Setup mode-line.
+    (if helm-mode-line-string
+        (setq mode-line-format
+              `(" " mode-line-buffer-identification " "
+                (line-number-mode "L%l") " " ,follow
+                (:eval (helm-show-candidate-number
+                        (when (listp helm-mode-line-string)
+                          (car-safe helm-mode-line-string))))
+                " " helm-mode-line-string-real " -%-")
+              helm-mode-line-string-real
+              (substitute-command-keys (if (listp helm-mode-line-string)
+                                           (cadr helm-mode-line-string)
+                                           helm-mode-line-string)))
+        (setq mode-line-format (default-value 'mode-line-format)))
+    ;; Setup header-line.
+    (let* ((hlstr (helm-interpret-value
+                   (and (listp source)
+                        (assoc-default 'header-line source)) source))
+           (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
+      (setq header-line-format
+            (propertize (concat " " hlstr hlend) 'face 'helm-header)))))
   
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
@@ -4061,7 +4062,8 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
           (setq helm-follow-mode (eq (cdr (assq 'follow src)) 1))
           (message "helm-follow-mode is %s"
                    (if helm-follow-mode
-                       "enabled" "disabled")))
+                       "enabled" "disabled"))
+          (helm-display-mode-line src))
       ;; Make follow attr persistent for this session.
       (when (and helm-follow-mode-persistent sym)
         (set (car `(,sym)) src)))))
