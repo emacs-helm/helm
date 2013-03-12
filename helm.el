@@ -523,27 +523,6 @@ and before performing action.")
     helm-sources)
   "Variables which are restored after `helm' invocation.")
 
-(defvar helm-saved-selection nil
-  "Value of the currently selected object when the action list is shown.")
-
-(defvar helm-current-prefix-arg nil
-  "Record `current-prefix-arg' when exiting minibuffer.")
-
-(defvar helm-saved-action nil
-  "Saved value of the currently selected action by key.")
-
-(defvar helm-saved-current-source nil
-  "Value of the current source when the action list is shown.")
-
-(defvar helm-compiled-sources nil
-  "Compiled version of `helm-sources'.")
-
-(defvar helm-in-persistent-action nil
-  "Flag whether in persistent-action or not.")
-
-(defvar helm-last-buffer nil
-  "`helm-buffer' of previously `helm' session.")
-
 (defvar helm-execute-action-at-once-if-one nil
   "Execute default action and exit when only one candidate is remaining.")
 
@@ -581,6 +560,20 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
 ;;; Internal Variables
 ;;
 ;;
+(defvar helm-current-prefix-arg nil
+  "Record `current-prefix-arg' when exiting minibuffer.")
+(defvar helm-saved-action nil
+  "Saved value of the currently selected action by key.")
+(defvar helm-saved-current-source nil
+  "Value of the current source when the action list is shown.")
+(defvar helm-compiled-sources nil
+  "Compiled version of `helm-sources'.")
+(defvar helm-in-persistent-action nil
+  "Flag whether in persistent-action or not.")
+(defvar helm-last-buffer nil
+  "`helm-buffer' of previously `helm' session.")
+(defvar helm-saved-selection nil
+  "Value of the currently selected object when the action list is shown.")
 (defvar helm-sources nil)
 (defvar helm-delayed-init-executed nil)
 (defvar helm-buffer "*helm*"
@@ -1344,10 +1337,14 @@ Basic keywords are the following:
 
 \:sources
 
-Temporary value of `helm-sources'.  It also accepts a
-symbol, interpreted as a variable of an helm source.  It
-also accepts an alist representing an helm source, which is
-detected by \(assq 'name ANY-SOURCES\)
+A list of sources used for this session.  It also accepts a
+symbol, interpreted as a variable of an helm source
+i.e (a symbol can be passed instead of a list of sources).
+It also accepts an alist representing an helm source, which is
+detected by \(assq 'name ANY-SOURCES\).
+NOTE: In this case the source is embedded in the helm command and
+have no symbol name, so it is not reachable from outside.
+It will be referenced in `helm-sources' as a whole alist.
 
 \:input
 
