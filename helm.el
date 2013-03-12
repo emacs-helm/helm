@@ -1607,40 +1607,6 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
           (setq helm-onewindow-p orig-one-window-p))))))
 
 
-;;; Initialize
-;;
-;;
-(defun helm-initialize (any-resume any-input any-default any-sources)
-  "Start initialization of `helm' session.
-For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
-  (helm-log "start initialization: any-resume=%S any-input=%S"
-            any-resume any-input)
-  (helm-frame-or-window-configuration 'save)
-  (setq helm-sources (helm-normalize-sources any-sources))
-  (helm-log "sources = %S" helm-sources)
-  (helm-current-position 'save)
-  (if (helm-resume-p any-resume)
-      (helm-initialize-overlays (helm-buffer-get))
-      (helm-initial-setup any-default))
-  (setq helm-alive-p t)
-  (unless (eq any-resume 'noresume)
-    (helm-recent-push helm-buffer 'helm-buffers)
-    (setq helm-last-buffer helm-buffer))
-  (when any-input (setq helm-input any-input helm-pattern any-input))
-  (and (helm-resume-p any-resume) (helm-funcall-foreach 'resume))
-  (helm-log "end initialization"))
-
-(defun helm-restore-position-on-quit ()
-  "Restore position in `helm-current-buffer' when quitting."
-  (helm-current-position 'restore))
-
-(defun helm-recent-push (elt list-var)
-  "Add ELT to the value of LIST-VAR as most recently used value."
-  (let ((m (member elt (symbol-value list-var))))
-    (and m (set list-var (delq (car m) (symbol-value list-var))))
-    (push elt (symbol-value list-var))))
-
-
 ;;; Core: Accessors
 ;;
 (defun helm-current-position (save-or-restore)
@@ -1761,7 +1727,51 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
       (pop-to-buffer buffer)))
 
 
-;; Core: initialize
+;;; Core: initialize
+;;
+(defun helm-initialize (any-resume any-input any-default any-sources)
+  "Start initialization of `helm' session.
+For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
+  (helm-log "start initialization: any-resume=%S any-input=%S"
+            any-resume any-input)
+  (helm-frame-or-window-configuration 'save)
+  (setq helm-sources (helm-normalize-sources any-sources))
+  (helm-log "sources = %S" helm-sources)
+  (helm-current-position 'save)
+  (if (helm-resume-p any-resume)
+      (helm-initialize-overlays (helm-buffer-get))
+      (helm-initial-setup any-default))
+  (setq helm-alive-p t)
+  (unless (eq any-resume 'noresume)
+    (helm-recent-push helm-buffer 'helm-buffers)
+    (setq helm-last-buffer helm-buffer))
+  (when any-input (setq helm-input any-input helm-pattern any-input))
+  (and (helm-resume-p any-resume) (helm-funcall-foreach 'resume))
+  (helm-log "end initialization"))
+
+(defun helm-initialize-overlays (buffer)
+  "Initialize helm overlays in BUFFER."
+  (helm-log "overlay setup")
+  (if helm-selection-overlay
+      ;; make sure the overlay belongs to the helm buffer if
+      ;; it's newly created
+      (move-overlay helm-selection-overlay (point-min) (point-min)
+                    (get-buffer buffer))
+
+      (setq helm-selection-overlay
+            (make-overlay (point-min) (point-min) (get-buffer buffer)))
+      (overlay-put helm-selection-overlay 'face 'helm-selection)))
+
+(defun helm-restore-position-on-quit ()
+  "Restore position in `helm-current-buffer' when quitting."
+  (helm-current-position 'restore))
+
+(defun helm-recent-push (elt list-var)
+  "Add ELT to the value of LIST-VAR as most recently used value."
+  (let ((m (member elt (symbol-value list-var))))
+    (and m (set list-var (delq (car m) (symbol-value list-var))))
+    (push elt (symbol-value list-var))))
+
 (defun helm-initial-setup (any-default)
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
@@ -1801,6 +1811,34 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
   (setq helm-candidate-cache nil)
   (helm-create-helm-buffer)
   (helm-log-run-hook 'helm-after-initialize-hook))
+
+(defun helm-create-helm-buffer ()
+  "Create and setup `helm-buffer'."
+  (let ((root-dir default-directory))
+    (with-current-buffer (get-buffer-create helm-buffer)
+      (helm-log "kill local variables: %S" (buffer-local-variables))
+      (kill-all-local-variables)
+      (set (make-local-variable 'inhibit-read-only) t)
+      (buffer-disable-undo)
+      (erase-buffer)
+      (set (make-local-variable 'helm-map) helm-map)
+      (make-local-variable 'helm-sources)
+      (set (make-local-variable 'helm-follow-mode) nil)
+      (set (make-local-variable 'helm-display-function) helm-display-function)
+      (set (make-local-variable 'helm-selection-point) nil)
+      (set (make-local-variable 'scroll-margin)
+           (if helm-display-source-at-screen-top
+               0 helm-completion-window-scroll-margin))
+      (set (make-local-variable 'helm-default-directory) root-dir)
+      (set (make-local-variable 'default-directory) root-dir)
+      (helm-initialize-persistent-action)
+      (helm-log-eval helm-display-function helm-let-variables)
+      (loop for (var . val) in helm-let-variables
+            do (set (make-local-variable var) val))
+      (setq cursor-type nil)
+      (setq mode-name "Helm"))
+    (helm-initialize-overlays helm-buffer)
+    (get-buffer helm-buffer)))
 
 (defun helm-read-pattern-maybe (any-prompt any-input
                                 any-preselect any-resume any-keymap
@@ -1932,47 +1970,6 @@ if some when multiples sources are present."
                       (assoc-default 'keymap source))))
       (when kmap (setq overriding-local-map kmap)))))
 (add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
-
-(defun helm-create-helm-buffer ()
-  "Create and setup `helm-buffer'."
-  (let ((root-dir default-directory))
-    (with-current-buffer (get-buffer-create helm-buffer)
-      (helm-log "kill local variables: %S" (buffer-local-variables))
-      (kill-all-local-variables)
-      (set (make-local-variable 'inhibit-read-only) t)
-      (buffer-disable-undo)
-      (erase-buffer)
-      (set (make-local-variable 'helm-map) helm-map)
-      (make-local-variable 'helm-sources)
-      (set (make-local-variable 'helm-follow-mode) nil)
-      (set (make-local-variable 'helm-display-function) helm-display-function)
-      (set (make-local-variable 'helm-selection-point) nil)
-      (set (make-local-variable 'scroll-margin)
-           (if helm-display-source-at-screen-top
-               0 helm-completion-window-scroll-margin))
-      (set (make-local-variable 'helm-default-directory) root-dir)
-      (set (make-local-variable 'default-directory) root-dir)
-      (helm-initialize-persistent-action)
-      (helm-log-eval helm-display-function helm-let-variables)
-      (loop for (var . val) in helm-let-variables
-            do (set (make-local-variable var) val))
-      (setq cursor-type nil)
-      (setq mode-name "Helm"))
-    (helm-initialize-overlays helm-buffer)
-    (get-buffer helm-buffer)))
-
-(defun helm-initialize-overlays (buffer)
-  "Initialize helm overlays in BUFFER."
-  (helm-log "overlay setup")
-  (if helm-selection-overlay
-      ;; make sure the overlay belongs to the helm buffer if
-      ;; it's newly created
-      (move-overlay helm-selection-overlay (point-min) (point-min)
-                    (get-buffer buffer))
-
-      (setq helm-selection-overlay
-            (make-overlay (point-min) (point-min) (get-buffer buffer)))
-      (overlay-put helm-selection-overlay 'face 'helm-selection)))
 
 
 ;; Core: clean up
