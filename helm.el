@@ -1005,6 +1005,17 @@ existing Helm function names."
     ;; Use force-update to run init/update functions.
     (helm-force-update cur-disp-sel)))
 
+(defun helm-set-sources (sources &optional no-init no-update)
+  "Set SOURCES during `helm' invocation.
+If NO-INIT is non-nil, skip executing init functions of SOURCES.
+If NO-UPDATE is non-nil, skip executing `helm-update'."
+  (with-current-buffer helm-buffer
+    (setq helm-compiled-sources nil
+          helm-sources sources)
+    (helm-log-eval helm-compiled-sources helm-sources))
+  (unless no-init (helm-funcall-foreach 'init))
+  (unless no-update (helm-update)))
+
 (defun helm-get-sources ()
   "Return compiled `helm-sources', which is memoized.
 
