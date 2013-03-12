@@ -541,9 +541,6 @@ and before performing action.")
 (defvar helm-in-persistent-action nil
   "Flag whether in persistent-action or not.")
 
-(defvar helm-last-sources-local nil
-  "Buffer local value of `helm-sources'.")
-
 (defvar helm-last-buffer nil
   "`helm-buffer' of previously `helm' session.")
 
@@ -1544,9 +1541,8 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
     ;; was initially started with.
     (with-helm-default-directory cur-dir
         (helm
-         :sources (or (buffer-local-value
-                       'helm-last-sources-local (get-buffer any-buffer))
-                      helm-sources)
+         :sources (buffer-local-value
+                   'helm-sources (get-buffer any-buffer))
          :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
          :resume t
          :buffer any-buffer))))
@@ -1950,7 +1946,7 @@ if some when multiples sources are present."
       (buffer-disable-undo)
       (erase-buffer)
       (set (make-local-variable 'helm-map) helm-map)
-      (set (make-local-variable 'helm-last-sources-local) helm-sources)
+      (make-local-variable 'helm-sources)
       (set (make-local-variable 'helm-follow-mode) nil)
       (set (make-local-variable 'helm-display-function) helm-display-function)
       (set (make-local-variable 'helm-selection-point) nil)
