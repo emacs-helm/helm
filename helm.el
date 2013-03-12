@@ -532,10 +532,6 @@ and before performing action.")
 (defvar helm-saved-action nil
   "Saved value of the currently selected action by key.")
 
-;; [TODO] Remove.
-(defvar helm-last-sources nil
-  "OBSOLETE!! Sources of previously invoked `helm'.")
-
 (defvar helm-saved-current-source nil
   "Value of the current source when the action list is shown.")
 
@@ -1562,7 +1558,6 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
         (helm
          :sources (or (buffer-local-value
                        'helm-last-sources-local (get-buffer any-buffer))
-                      helm-last-sources
                       helm-sources)
          :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
          :resume t
@@ -1823,7 +1818,6 @@ It use `switch-to-buffer' or `pop-to-buffer' depending of value of
                          ""))
   (setq helm-input "")
   (setq helm-candidate-cache nil)
-  (setq helm-last-sources helm-sources)
   (helm-create-helm-buffer)
   (helm-log-run-hook 'helm-after-initialize-hook))
 
