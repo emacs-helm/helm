@@ -2974,9 +2974,6 @@ to mark candidates."
     (setq helm-selection-point (overlay-start helm-selection-overlay)))
   (helm-follow-execute-persistent-action-maybe))
 
-(defun helm-this-command-key ()
-  (event-basic-type (elt (this-command-keys-vector) 0)))
-
 ;;;###autoload
 (defun helm-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting helm.
