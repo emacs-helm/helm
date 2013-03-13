@@ -89,6 +89,7 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
+  (unless helm-top-sort-fn (helm-top-set-mode-line "CPU"))
   (with-current-buffer (helm-candidate-buffer 'global)
     (call-process-shell-command
      (format helm-top-command (frame-width))
@@ -97,6 +98,13 @@ Show actions only on line starting by a PID."
 (defun helm-top-display-to-real (line)
   "Return pid only from LINE."
   (car (split-string line)))
+
+;; Sort top command
+
+(defun helm-top-set-mode-line (str)
+  (if (string-match "Sort:\\[\\(.*\\)\\] " helm-top-mode-line)
+      (setq helm-top-mode-line (replace-match str nil nil helm-top-mode-line 1))
+      (setq helm-top-mode-line (concat (format "Sort:[%s] " str) helm-top-mode-line))))
 
 (defun helm-top-sort-transformer (candidates source)
   (helm-top-transformer
@@ -133,24 +141,28 @@ Show actions only on line starting by a PID."
 ;;;###autoload
 (defun helm-top-run-sort-by-com ()
   (interactive)
+  (helm-top-set-mode-line "COM")
   (setq helm-top-sort-fn 'helm-top-sort-by-com)
   (helm-force-update))
 
 ;;;###autoload
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
+  (helm-top-set-mode-line "CPU")
   (setq helm-top-sort-fn nil)
   (helm-force-update))
 
 ;;;###autoload
 (defun helm-top-run-sort-by-mem ()
   (interactive)
+  (helm-top-set-mode-line "MEM")
   (setq helm-top-sort-fn 'helm-top-sort-by-mem)
   (helm-force-update))
 
 ;;;###autoload
 (defun helm-top-run-sort-by-user ()
   (interactive)
+  (helm-top-set-mode-line "USER")
   (setq helm-top-sort-fn 'helm-top-sort-by-user)
   (helm-force-update))
 
