@@ -53,14 +53,16 @@ with these default values for different systems:
 
 Gnu/linux: \"locate %s -r %s\"
 berkeley-unix: \"locate %s %s\"
-windows-nt: \"es %s -r %s\"
+windows-nt: \"es %s %s\"
 Others: \"locate %s %s\"
 
 This string will be passed to format so it should end with `%s'.
 The first format spec is used for the \"-i\" value of locate/es,
 So don't set it directly but use `helm-locate-case-fold-search'
 for this.
-The \"-r\" option must be the last option."
+The \"-r\" option must be the last option, however if not specified you will
+be able to specify it during helm invocation by prefixing the pattern
+you enter with \"-r\"."
   :type 'string
   :group 'helm-locate)
 
@@ -174,7 +176,7 @@ See `helm-locate-with-db' and `helm-locate'."
           (case system-type
             ('gnu/linux "locate %s -r %s")
             ('berkeley-unix "locate %s %s")
-            ('windows-nt "es %s -r %s")
+            ('windows-nt "es %s %s")
             (t "locate %s %s")))))
 
 (defvar helm-file-name-history nil)
@@ -263,7 +265,7 @@ See also `helm-locate'."
 (defun helm-locate (arg)
   "Preconfigured `helm' for Locate.
 Note: you can add locate options after entering pattern.
-See 'man locate' for valid options.
+See 'man locate' for valid options and also `helm-locate-command'.
 
 You can specify a local database with prefix argument ARG.
 With two prefix arg, refresh the current local db or create it
