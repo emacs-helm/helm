@@ -36,8 +36,18 @@ A format string where %s will be replaced with `frame-width'."
 ;;; Top (process)
 ;;
 ;;
+(defvar helm-top-sort-fn nil)
+(defvar helm-top-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-P") 'helm-top-run-sort-by-cpu)
+    (define-key map (kbd "M-C") 'helm-top-run-sort-by-com)
+    (define-key map (kbd "M-M") 'helm-top-run-sort-by-mem)
+    (define-key map (kbd "M-U") 'helm-top-run-sort-by-user)
+    map))
+
 (defvar helm-source-top
-  '((name . "Top")
+  `((name . "Top")
     (header-name . (lambda (name) (concat name " (Press C-c C-u to refresh)"))) 
     (init . helm-top-init)
     (candidates-in-buffer)
@@ -45,7 +55,8 @@ A format string where %s will be replaced with `frame-width'."
     (persistent-action . helm-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
     (follow . never)
-    (filtered-candidate-transformer . helm-top-transformer)
+    (keymap . ,helm-top-map)
+    (filtered-candidate-transformer . helm-top-sort-transformer)
     (action-transformer . helm-top-action-transformer)))
 
 (defun helm-top-transformer (candidates source)
@@ -84,6 +95,58 @@ Show actions only on line starting by a PID."
 (defun helm-top-display-to-real (line)
   "Return pid only from LINE."
   (car (split-string line)))
+
+(defun helm-top-sort-transformer (candidates source)
+  (helm-top-transformer
+   (if helm-top-sort-fn
+       (loop for c in candidates
+             if (string-match "^ *[0-9]+" c) collect c into pid-cands
+             else collect c into header-cands
+             finally return (append (butlast header-cands)
+                                    (sort pid-cands helm-top-sort-fn)))
+       candidates)
+   source))
+
+(defun helm-top-sort-by-com (s1 s2)
+  (let* ((split-1 (split-string s1))
+         (split-2 (split-string s2))
+         (com-1 (nth 11 split-1))
+         (com-2 (nth 11 split-2)))
+    (string< com-1 com-2)))
+
+(defun helm-top-sort-by-mem (s1 s2)
+  (let* ((split-1 (split-string s1))
+         (split-2 (split-string s2))
+         (mem-1 (string-to-number (nth 9 split-1)))
+         (mem-2 (string-to-number (nth 9 split-2))))
+    (< mem-1 mem-2)))
+
+(defun helm-top-sort-by-user (s1 s2)
+  (let* ((split-1 (split-string s1))
+         (split-2 (split-string s2))
+         (user-1 (nth 1 split-1))
+         (user-2 (nth 1 split-2)))
+    (string< user-1 user-2)))
+
+(defun helm-top-run-sort-by-com ()
+  (interactive)
+  (setq helm-top-sort-fn 'helm-top-sort-by-com)
+  (helm-force-update))
+
+(defun helm-top-run-sort-by-cpu ()
+  (interactive)
+  (setq helm-top-sort-fn nil)
+  (helm-force-update))
+
+(defun helm-top-run-sort-by-mem ()
+  (interactive)
+  (setq helm-top-sort-fn 'helm-top-sort-by-mem)
+  (helm-force-update))
+
+(defun helm-top-run-sort-by-user ()
+  (interactive)
+  (setq helm-top-sort-fn 'helm-top-sort-by-user)
+  (helm-force-update))
 
 
 ;;; X RandR resolution change
