@@ -40,10 +40,11 @@ A format string where %s will be replaced with `frame-width'."
 (defvar helm-top-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-P") 'helm-top-run-sort-by-cpu)
-    (define-key map (kbd "M-C") 'helm-top-run-sort-by-com)
-    (define-key map (kbd "M-M") 'helm-top-run-sort-by-mem)
-    (define-key map (kbd "M-U") 'helm-top-run-sort-by-user)
+    (define-key map (kbd "C-c ?") 'helm-top-help)
+    (define-key map (kbd "M-P")   'helm-top-run-sort-by-cpu)
+    (define-key map (kbd "M-C")   'helm-top-run-sort-by-com)
+    (define-key map (kbd "M-M")   'helm-top-run-sort-by-mem)
+    (define-key map (kbd "M-U")   'helm-top-run-sort-by-user)
     map))
 
 (defvar helm-source-top
@@ -54,6 +55,7 @@ A format string where %s will be replaced with `frame-width'."
     (display-to-real . helm-top-display-to-real)
     (persistent-action . helm-top-sh-persistent-action)
     (persistent-help . "SIGTERM")
+    (mode-line . helm-top-mode-line)
     (follow . never)
     (keymap . ,helm-top-map)
     (filtered-candidate-transformer . helm-top-sort-transformer)

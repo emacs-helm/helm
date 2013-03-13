@@ -562,6 +562,28 @@ is called once for each file like this:
   (let ((helm-help-message helm-moccur-help-message))
     (helm-help)))
 
+;;; Helm Top
+;;
+;;
+(defvar helm-top-help-message
+  "== Helm Top Map ==\
+\nHelm Top tips:
+
+\nSpecific commands for Helm Top:
+\\<helm-top-map>
+\\[helm-top-run-sort-by-com]\t->Sort by commands.
+\\[helm-top-run-sort-by-cpu]\t->Sort by cpu usage.
+\\[helm-top-run-sort-by-user]\t->Sort alphabetically by user.
+\\[helm-top-run-sort-by-mem]\t->Sort by memory.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-top-help ()
+  (interactive)
+  (let ((helm-help-message helm-top-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -717,6 +739,17 @@ is called once for each file like this:
 \\[helm-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
+
+;;;###autoload
+(defvar helm-top-mode-line "\
+\\<helm-top-map>\
+\\[helm-top-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
 
 
 ;;; Attribute Documentation

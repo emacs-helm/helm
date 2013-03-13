@@ -220,7 +220,7 @@
 ;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
 ;;;;;;  helm-other-buffer helm-resume-previous-session-after-quit
 ;;;;;;  helm-resume helm-open-last-log helm-define-multi-key) "helm"
-;;;;;;  "helm.el" (20780 49446 77568 717000))
+;;;;;;  "helm.el" (20799 1396 939004 827000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -485,18 +485,37 @@ Move previous helm visible mark.
 \(fn)" t nil)
 
 (autoload 'helm-yank-selection "helm" "\
-Set minibuffer contents to current selection.
+Set minibuffer contents to current display selection.
+With a prefix arg set to real value of current selection.
 
-\(fn)" t nil)
+\(fn ARG)" t nil)
 
 (autoload 'helm-kill-selection-and-quit "helm" "\
 Store current selection to kill ring.
-You can paste it by typing \\[yank].
+With a prefix arg set to real value of current selection.
 
-\(fn)" t nil)
+\(fn ARG)" t nil)
 
 (autoload 'helm-follow-mode "helm" "\
 Execute persistent action everytime the cursor is moved when enabled.
+The mode is enabled for the current source only, you will have to turn it
+on again when you go to next source if you want it there also.
+This mode can be enabled or disabled interactively at anytime during
+helm session or enabled specifically by source by adding the `follow'
+attribute to this source.
+Even when the attribute `follow' exists in source, it is still possible
+to disable/enable this mode interactively.
+Note that when you disable it interactively and `follow' attribute exists,
+`helm-follow-mode' will be disabled on next helm session even if `follow'
+attribute is specified in source. To avoid this set your `follow' attribute
+in source in `helm-before-initialize-hook'.
+
+e.g:
+
+\(add-hook 'helm-before-initialize-hook
+          #'(lambda () (helm-attrset 'follow 1 helm-source-buffers-list)))
+
+This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
 
 \(fn &optional ARG)" t nil)
 
@@ -593,7 +612,7 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 ;;;;;;  helm-buffer-run-query-replace-regexp helm-buffer-run-zgrep
 ;;;;;;  helm-buffer-run-grep helm-buffer-run-kill-buffers helm-buffer-save-persistent
 ;;;;;;  helm-buffer-revert-persistent helm-buffer-diff-persistent)
-;;;;;;  "helm-buffers" "helm-buffers.el" (20780 49446 73568 716000))
+;;;;;;  "helm-buffers" "helm-buffers.el" (20789 58149 241245 959000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffer-diff-persistent "helm-buffers" "\
@@ -709,7 +728,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 ;;;### (autoloads (helm-complex-command-history helm-timers helm-manage-advice
 ;;;;;;  helm-apropos helm-lisp-completion-or-file-name-at-point helm-lisp-indent
 ;;;;;;  helm-complete-file-name-at-point helm-lisp-completion-at-point)
-;;;;;;  "helm-elisp" "helm-elisp.el" (20780 49446 73568 716000))
+;;;;;;  "helm-elisp" "helm-elisp.el" (20785 52006 216950 566000))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -845,7 +864,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20780 49446 73568 716000))
+;;;;;;  "helm-files" "helm-files.el" (20798 16459 446653 780000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1121,7 +1140,7 @@ Preconfigured `helm' for gentoo linux.
 ;;;;;;  helm-gm-next-file helm-grep-mode helm-grep-run-save-buffer
 ;;;;;;  helm-grep-run-other-window-action helm-grep-run-default-action
 ;;;;;;  helm-grep-run-persistent-action helm-goto-next-file helm-goto-precedent-file)
-;;;;;;  "helm-grep" "helm-grep.el" (20780 49446 73568 716000))
+;;;;;;  "helm-grep" "helm-grep.el" (20798 16459 446653 780000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-goto-precedent-file "helm-grep" "\
@@ -1223,12 +1242,12 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads (helm-describe-helm-attribute helm-moccur-help
+;;;### (autoloads (helm-describe-helm-attribute helm-top-help helm-moccur-help
 ;;;;;;  helm-buffers-ido-virtual-help helm-esh-help helm-bookmark-help
 ;;;;;;  helm-ucs-help helm-etags-help helm-pdfgrep-help helm-grep-help
 ;;;;;;  helm-generic-file-help helm-read-file-name-help helm-ff-help
-;;;;;;  helm-buffer-help helm-help) "helm-help" "helm-help.el" (20780
-;;;;;;  49446 73568 716000))
+;;;;;;  helm-buffer-help helm-help) "helm-help" "helm-help.el" (20800
+;;;;;;  16288 290942 919000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1303,6 +1322,11 @@ Help command for ido virtual buffers.
 
 \(fn)" t nil)
 
+(autoload 'helm-top-help "helm-help" "\
+
+
+\(fn)" t nil)
+
 (defvar helm-buffer-mode-line-string '("Buffer(s)" "\\<helm-buffer-map>\\[helm-buffer-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "String displayed in mode-line in `helm-source-buffers-list'"))
 
 (defvar helm-buffers-ido-virtual-mode-line-string '("Killed Buffer(s)" "\\<helm-buffers-ido-virtual-map>\\[helm-buffers-ido-virtual-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "String displayed in mode-line in `helm-source-buffers-list'"))
@@ -1336,6 +1360,8 @@ String displayed in mode-line in `helm-source-buffers-list'")
 (defvar helm-moccur-mode-line "\\<helm-moccur-map>\\[helm-moccur-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct \\[helm-toggle-suspend-update]:Tog.suspend")
 
 (defvar helm-comp-read-mode-line "\\<helm-comp-read-map>\\[helm-cr-empty-string]:Empty \\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct")
+
+(defvar helm-top-mode-line "\\<helm-top-map>\\[helm-top-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct \\[helm-toggle-suspend-update]:Tog.suspend")
 
 (autoload 'helm-describe-helm-attribute "helm-help" "\
 Display the full documentation of HELM-ATTRIBUTE.
@@ -1405,7 +1431,7 @@ With a prefix arg reinitialize the cache.
 ;;;***
 
 ;;;### (autoloads (helm-match-plugin-mode) "helm-match-plugin" "helm-match-plugin.el"
-;;;;;;  (20750 1056 263748 390000))
+;;;;;;  (20785 52006 220950 567000))
 ;;; Generated autoloads from helm-match-plugin.el
 
 (defvar helm-match-plugin-mode nil "\
@@ -1626,7 +1652,7 @@ Preconfigured helm to show org headlines.
 ;;;***
 
 ;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20780 49446 77568 717000))
+;;;;;;  "helm-regexp" "helm-regexp.el" (20785 52006 220950 567000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1660,7 +1686,7 @@ Preconfigured helm to browse code.
 
 ;;;### (autoloads (helm-show-kill-ring helm-register helm-all-mark-rings
 ;;;;;;  helm-global-mark-ring helm-mark-ring) "helm-ring" "helm-ring.el"
-;;;;;;  (20780 49446 77568 717000))
+;;;;;;  (20783 54832 146043 187000))
 ;;; Generated autoloads from helm-ring.el
 
 (autoload 'helm-mark-ring "helm-ring" "\
@@ -1713,9 +1739,31 @@ Fill in the symbol at point by default.
 
 ;;;***
 
-;;;### (autoloads (helm-xrandr-set helm-list-emacs-process helm-top)
-;;;;;;  "helm-sys" "helm-sys.el" (20780 49446 77568 717000))
+;;;### (autoloads (helm-xrandr-set helm-list-emacs-process helm-top
+;;;;;;  helm-top-run-sort-by-user helm-top-run-sort-by-mem helm-top-run-sort-by-cpu
+;;;;;;  helm-top-run-sort-by-com) "helm-sys" "helm-sys.el" (20800
+;;;;;;  16439 562962 991000))
 ;;; Generated autoloads from helm-sys.el
+
+(autoload 'helm-top-run-sort-by-com "helm-sys" "\
+
+
+\(fn)" t nil)
+
+(autoload 'helm-top-run-sort-by-cpu "helm-sys" "\
+
+
+\(fn)" t nil)
+
+(autoload 'helm-top-run-sort-by-mem "helm-sys" "\
+
+
+\(fn)" t nil)
+
+(autoload 'helm-top-run-sort-by-user "helm-sys" "\
+
+
+\(fn)" t nil)
 
 (autoload 'helm-top "helm-sys" "\
 Preconfigured `helm' for top command.
@@ -1834,7 +1882,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (20780 49693 607096 5000))
+;;;;;;  (20800 16462 371113 483000))
 
 ;;;***
 
