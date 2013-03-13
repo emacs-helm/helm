@@ -119,7 +119,7 @@ Show actions only on line starting by a PID."
          (split-2 (split-string s2))
          (mem-1 (string-to-number (nth 9 split-1)))
          (mem-2 (string-to-number (nth 9 split-2))))
-    (< mem-1 mem-2)))
+    (> mem-1 mem-2)))
 
 (defun helm-top-sort-by-user (s1 s2)
   (let* ((split-1 (split-string s1))
@@ -128,21 +128,25 @@ Show actions only on line starting by a PID."
          (user-2 (nth 1 split-2)))
     (string< user-1 user-2)))
 
+;;;###autoload
 (defun helm-top-run-sort-by-com ()
   (interactive)
   (setq helm-top-sort-fn 'helm-top-sort-by-com)
   (helm-force-update))
 
+;;;###autoload
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
   (setq helm-top-sort-fn nil)
   (helm-force-update))
 
+;;;###autoload
 (defun helm-top-run-sort-by-mem ()
   (interactive)
   (setq helm-top-sort-fn 'helm-top-sort-by-mem)
   (helm-force-update))
 
+;;;###autoload
 (defun helm-top-run-sort-by-user ()
   (interactive)
   (setq helm-top-sort-fn 'helm-top-sort-by-user)
