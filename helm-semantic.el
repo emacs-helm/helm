@@ -1,6 +1,6 @@
 ;;; helm-semantic.el --- Helm interface for Semantic
 
-;; Copyright (C) 2012 Daniel Hackney <dan@haxney.org>
+;; Copyright (C) 2012 ~ 2013 Daniel Hackney <dan@haxney.org>
 ;; Author: Daniel Hackney <dan@haxney.org>
 
 ;; This program is free software; you can redistribute it and/or modify

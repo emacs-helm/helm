@@ -1,6 +1,6 @@
 ;;; helm-w3m.el --- W3m bookmark - helm interface.
 
-;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 ;;; helm-match-plugin.el --- Multiple regexp matching methods for helm
 
-;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; URL: http://github.com/emacs-helm/helm
