@@ -170,6 +170,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 (defvar helm-source-time-world
   '((name . "Time World List")
     (init . (lambda ()
+              (require 'time)
               (let ((helm-buffer (helm-candidate-buffer 'global)))
                 (with-current-buffer helm-buffer
                   (display-time-world-display display-time-world-list)))))
