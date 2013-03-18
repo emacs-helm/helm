@@ -86,6 +86,8 @@ This setting apply also to `helm-source-occur'."
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-c ?")    'helm-moccur-help)
+    (define-key map (kbd "C-c o")    'helm-m-occur-run-goto-line-ow)
+    (define-key map (kbd "C-c C-o")  'helm-m-occur-run-goto-line-of)
     (when helm-m-occur-use-ioccur-style-keys
       (define-key map (kbd "<right>")  'helm-m-occur-run-persistent-action)
       (define-key map (kbd "<left>")   'helm-m-occur-run-default-action))
@@ -253,6 +255,33 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
    candidate 'buffer (or current-prefix-arg         ; persistent.
                          helm-current-prefix-arg))) ; exit.
                          
+(defun helm-m-occur-goto-line-ow (candidate)
+  "Go to CANDIDATE line in other window.
+Same as `helm-m-occur-goto-line' but go in other window."
+  (helm-m-occur-action
+   candidate 'buffer-other-window
+   (or current-prefix-arg         ; persistent.
+       helm-current-prefix-arg))) ; exit.
+
+(defun helm-m-occur-goto-line-of (candidate)
+  "Go to CANDIDATE line in new frame.
+Same as `helm-m-occur-goto-line' but go in new frame."
+  (helm-m-occur-action
+   candidate 'buffer-other-frame
+   (or current-prefix-arg         ; persistent.
+       helm-current-prefix-arg))) ; exit.
+
+(defun helm-m-occur-run-goto-line-ow ()
+  "Run goto line other window action from `helm-source-moccur'."
+  (interactive)
+  (when helm-alive-p
+    (helm-quit-and-execute-action 'helm-m-occur-goto-line-ow)))
+
+(defun helm-m-occur-run-goto-line-of ()
+  "Run goto line new frame action from `helm-source-moccur'."
+  (interactive)
+  (when helm-alive-p
+    (helm-quit-and-execute-action 'helm-m-occur-goto-line-of)))
 
 (defun helm-m-occur-run-default-action ()
   (interactive)
@@ -269,7 +298,9 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (nohighlight)
     (get-line . helm-m-occur-get-line)
     (migemo)
-    (action . (("Go to Line" . helm-m-occur-goto-line)))
+    (action . (("Go to Line" . helm-m-occur-goto-line)
+               ("Goto line other window" . helm-m-occur-goto-line-ow)
+               ("Goto line new frame" . helm-m-occur-goto-line-of)))
     (persistent-action . helm-m-occur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)

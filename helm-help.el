@@ -552,6 +552,8 @@ is called once for each file like this:
 \\[helm-goto-next-file]\t->Next Buffer.
 \\[helm-goto-precedent-file]\t\t->Precedent Buffer.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
+\\[helm-m-occur-run-goto-line-ow]\t\t->Goto line in other window.
+\\[helm-m-occur-run-goto-line-of]\t\t->Goto line in new frame.
 \\[helm-moccur-help]\t\t->Show this help.
 \n== Helm Map ==
 \\{helm-map}")
