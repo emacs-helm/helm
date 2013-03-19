@@ -176,6 +176,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
     (define-key map (kbd "C-c o")    'helm-grep-run-other-window-action)
+    (define-key map (kbd "C-c C-o")  'helm-grep-run-other-frame-action)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
     (when helm-grep-use-ioccur-style-keys
@@ -571,6 +572,12 @@ If N is positive go forward otherwise go backward."
   "Run grep goto other window action from `helm-do-grep-1'."
   (interactive)
   (helm-quit-and-execute-action 'helm-grep-other-window))
+
+;;;###autoload
+(defun helm-grep-run-other-frame-action ()
+  "Run grep goto other frame action from `helm-do-grep-1'."
+  (interactive)
+  (helm-quit-and-execute-action 'helm-grep-other-frame))
 
 ;;;###autoload
 (defun helm-grep-run-save-buffer ()

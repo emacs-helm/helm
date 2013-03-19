@@ -369,6 +369,7 @@ You can save your results in a grep-mode buffer, see below.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-grep-run-other-window-action]\t\t->Jump other window.
+\\[helm-grep-run-other-frame-action]\t\t->Jump other frame.
 \\[helm-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-z').
 \\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
 \\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
