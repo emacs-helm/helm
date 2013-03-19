@@ -19,6 +19,7 @@
 
 (require 'cl)
 (require 'helm)
+(require 'helm-utils)
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
