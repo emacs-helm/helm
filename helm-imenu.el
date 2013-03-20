@@ -91,6 +91,7 @@
 
 (defun helm-imenu-default-action (elm)
   "The default action for `helm-source-imenu'."
+  (helm-log-run-hook 'helm-goto-line-before-hook)
   (let ((path (split-string elm helm-imenu-delimiter))
         (alist helm-cached-imenu-alist))
     (dolist (elm path)

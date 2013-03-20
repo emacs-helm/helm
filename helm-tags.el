@@ -207,6 +207,7 @@ If no entry in cache, create one."
 
 (defun helm-etags-default-action (candidate)
   "Helm default action to jump to an etags entry."
+  (helm-log-run-hook 'helm-goto-line-before-hook)
   (let* ((split (split-string candidate ": "))
          (fname (expand-file-name
                  (car split) helm-etags-tag-file-dir))

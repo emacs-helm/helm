@@ -46,6 +46,14 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'float)
 
+(defvar helm-goto-line-before-hook nil
+  "Run before jumping to line.
+This hook run when jumping from `helm-goto-line', `helm-etags-default-action',
+and `helm-imenu-default-action'.")
+
+(defvar helm-save-pos-before-jump-register ?_
+  "The register where `helm-save-pos-to-register-before-jump' save position.")
+
 (defface helm-selection-line
     '((t (:background "IndianRed4" :underline t)))
   "Face used in the `helm-current-buffer' when jumping to candidate."
@@ -272,12 +280,20 @@ Default is `helm-current-buffer'."
 (defun helm-goto-line (lineno &optional noanim)
   "Goto LINENO opening only outline headline if needed.
 Animation is used unless NOANIM is non--nil."
+  (helm-log-run-hook 'helm-goto-line-before-hook)
   (goto-char (point-min))
   (helm-goto-char (point-at-bol lineno))
   (unless noanim
     (helm-match-line-color-current-line)
     (sit-for 0.3)
     (helm-match-line-cleanup)))
+
+(defun helm-save-pos-to-register-before-jump ()
+  "Save current buffer position to `helm-save-pos-before-jump-register'.
+To use this add this to `helm-goto-line-before-hook'."
+  (with-helm-current-buffer
+    (unless helm-in-persistent-action
+      (point-to-register helm-save-pos-before-jump-register))))
 
 ;;;###autoload
 (defun helm-show-all-in-this-source-only (arg)
