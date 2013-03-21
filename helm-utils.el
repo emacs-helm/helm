@@ -299,8 +299,9 @@ To use this add it to `helm-goto-line-before-hook'."
   "Save current buffer position to mark ring.
 To use this add it to `helm-goto-line-before-hook'."
   (with-helm-current-buffer
-    (set-marker (mark-marker) (point))
-    (push-mark (point) 'nomsg)))
+    (unless helm-in-persistent-action
+      (set-marker (mark-marker) (point))
+      (push-mark (point) 'nomsg))))
 
 ;;;###autoload
 (defun helm-show-all-in-this-source-only (arg)
