@@ -191,16 +191,17 @@ replace with STR as yanked string."
               (line-number-at-pos) (marker-buffer marker) line))))
 
 (defun helm-global-mark-ring-get-candidates ()
-  (loop with marks = global-mark-ring
-        with recip = nil
-        for i in marks
-        for gm = (unless (or (string-match
-                              "^ " (format "%s" (marker-buffer i)))
-                             (null (marker-buffer i)))
-                   (helm-global-mark-ring-format-buffer i))
-        when (and gm (not (member gm recip)))
-        collect gm into recip
-        finally return recip))
+  (let ((marks global-mark-ring))
+    (when marks
+      (loop with recip = nil
+            for i in marks
+            for gm = (unless (or (string-match
+                                  "^ " (format "%s" (marker-buffer i)))
+                                 (null (marker-buffer i)))
+                       (helm-global-mark-ring-format-buffer i))
+            when (and gm (not (member gm recip)))
+            collect gm into recip
+            finally return recip))))
 
 
 ;;;; <Register>
