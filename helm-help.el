@@ -1063,8 +1063,7 @@ HELM-ATTRIBUTE should be a symbol."
   "  Set `helm-pattern' to candidate. If this attribute is
   specified, The candidates attribute is ignored.
 
-  This attribute is implemented by plug-in.
-  This plug-in implies disable-shortcuts plug-in.")
+  This attribute is implemented by plug-in.")
 
 (helm-document-attribute 'multiline "optional"
   "  Enable to selection multiline candidates.")
