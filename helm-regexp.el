@@ -454,17 +454,18 @@ the center of window, otherwise at the top of window.")
   "Preconfigured helm for multi occur.
 
   BUFFERS is a list of buffers to search through.
-With a prefix arg, force searching in current buffer
-even if `helm-moccur-always-search-in-current' is nil.
+With a prefix arg, reverse the behavior of
+`helm-moccur-always-search-in-current'.
 The prefix arg can be set before calling `helm-multi-occur'
 or during the buffer selection."
   (interactive (list (helm-comp-read
                       "Buffers: " (helm-buffer-list)
                       :marked-candidates t)))
   (let ((helm-moccur-always-search-in-current
-         (or helm-moccur-always-search-in-current
-             (or current-prefix-arg
-                 helm-current-prefix-arg))))
+         (if (or current-prefix-arg
+                 helm-current-prefix-arg)
+             (not helm-moccur-always-search-in-current)
+             helm-moccur-always-search-in-current)))
     (helm-multi-occur-1 buffers)))
 
 ;;;###autoload

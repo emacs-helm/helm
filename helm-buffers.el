@@ -501,8 +501,9 @@ See `helm-ediff-marked-buffers'."
   "Multi occur action for `helm-source-buffers-list'.
 Can be used by any source that list buffers."
   (let ((helm-moccur-always-search-in-current
-         (or helm-moccur-always-search-in-current
-             helm-current-prefix-arg))
+         (if helm-current-prefix-arg
+             (not helm-moccur-always-search-in-current)
+             helm-moccur-always-search-in-current))
         (buffers (helm-marked-candidates))
         (input (loop for i in (split-string helm-pattern " " t)
                      thereis (and (string-match "\\`@\\(.*\\)" i)

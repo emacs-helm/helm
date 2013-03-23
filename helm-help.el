@@ -194,7 +194,7 @@ Italic     => A non--file buffer.
 \nSpecific commands for `helm-buffers-list':
 \\<helm-buffer-map>
 \\[helm-buffer-run-zgrep]\t\t->Grep Buffer(s) works as zgrep too (C-u grep all buffers but non--file buffers).
-\\[helm-buffers-run-multi-occur]\t\t->Multi Occur buffer or marked buffers. (C-u force searching current-buffer).
+\\[helm-buffers-run-multi-occur]\t\t->Multi Occur buffer or marked buffers. (C-u toggle force searching current-buffer).
 \\[helm-buffer-switch-other-window]\t\t->Switch other window.
 \\[helm-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[helm-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
