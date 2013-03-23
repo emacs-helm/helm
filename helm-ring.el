@@ -142,7 +142,7 @@ replace with STR as yanked string."
 
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
-    (loop with marks = (if (mark) (cons (mark-marker) mark-ring) mark-ring)
+    (loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
           with recip = nil
           for i in marks
           for m = (helm-mark-ring-get-marks i)
