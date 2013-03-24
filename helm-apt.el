@@ -72,7 +72,6 @@
     (persistent-action . helm-apt-persistent-action)
     (persistent-help . "Show package description")))
 
-(defvar helm-apt-query "")
 (defvar helm-apt-search-command "apt-cache search '%s'")
 (defvar helm-apt-show-command "apt-cache show '%s'")
 (defvar helm-apt-installed-packages nil)
