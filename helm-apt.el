@@ -60,12 +60,13 @@
     (persistent-action . helm-apt-persistent-action)
     (persistent-help . "Show package description")))
 
-(defvar helm-apt-query "emacs")
+(defvar helm-apt-query "")
 (defvar helm-apt-search-command "apt-cache search '%s'")
 (defvar helm-apt-show-command "apt-cache show '%s'")
 (defvar helm-apt-installed-packages nil)
 (defvar helm-apt-all-packages nil)
 (defvar helm-apt-input-history nil)
+(defvar helm-apt-show-only 'all)
 
 (defun helm-apt-refresh ()
   "Refresh installed candidates list."
@@ -80,15 +81,18 @@
   "Show installed CANDIDATES and the ones to deinstall in a different color."
   (loop for cand in candidates
         for name = (helm-apt-display-to-real cand)
-        collect (cond ((string= (assoc-default
-                                 name helm-apt-installed-packages)
-                                "deinstall")
-                       (propertize cand 'face 'helm-apt-deinstalled))
-                      ((string= (assoc-default
-                                 name helm-apt-installed-packages)
-                                "install")
-                       (propertize cand 'face 'helm-apt-installed))
-                      (t cand))))
+        for show = (cond ((and (string= (assoc-default
+                                         name helm-apt-installed-packages)
+                                        "deinstall")
+                               (memq helm-apt-show-only '(all deinstalled)))
+                          (propertize cand 'face 'helm-apt-deinstalled))
+                         ((and (string= (assoc-default
+                                         name helm-apt-installed-packages)
+                                        "install")
+                               (memq helm-apt-show-only '(all installed)))
+                          (propertize cand 'face 'helm-apt-installed))
+                         ((eq helm-apt-show-only 'all) cand))
+        when show collect show))
 
 (defun helm-apt-init ()
   "Initialize list of debian packages."
