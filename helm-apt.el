@@ -120,17 +120,17 @@ LINE is displayed like:
 package name - description."
   (car (split-string line " - ")))
 
-(defun helm-shell-command-if-needed (command)
-  "Run shell command COMMAND to describe package.
-If a buffer named COMMAND already exists, just switch to it."
-  (let ((buf (get-buffer command)))
-    (helm-switch-to-buffer (get-buffer-create command))
-    (unless buf (insert (shell-command-to-string command)))))
-
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."
-  (helm-shell-command-if-needed
-   (format helm-apt-show-command package)))
+    (let* ((command (format helm-apt-show-command package))
+           (buf (get-buffer command)))
+      (helm-switch-to-buffer (get-buffer-create command))
+      (view-mode 1)
+      (unless buf
+        (let ((inhibit-read-only t))
+          (save-excursion
+            (insert (shell-command-to-string command))))
+        (view-mode 1))))
 
 (defun helm-apt-install (package)
   "Run 'apt-get install' shell command on PACKAGE."
