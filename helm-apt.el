@@ -43,6 +43,16 @@
   :group 'helm-apt)
 
 
+(defvar helm-apt-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c ?") 'helm-apt-help)
+    (define-key map (kbd "M-I")   'helm-apt-show-only-installed)
+    (define-key map (kbd "M-D")   'helm-apt-show-only-deinstalled)
+    (define-key map (kbd "M-A")   'helm-apt-show-all)
+    map))
+
+
 (defvar helm-source-apt
   `((name . "APT")
     (init . helm-apt-init)
@@ -52,6 +62,7 @@
     (requires-pattern . 2)
     (update . helm-apt-refresh)
     (keymap . ,helm-apt-map)
+    (mode-line . helm-apt-mode-line)
     (action
      ("Show package description" . helm-apt-cache-show)
      ("Install package" . helm-apt-install)
@@ -68,15 +79,6 @@
 (defvar helm-apt-all-packages nil)
 (defvar helm-apt-input-history nil)
 (defvar helm-apt-show-only 'all)
-
-(defvar helm-apt-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    ;(define-key map (kbd "C-c ?") 'helm-apt-help)
-    (define-key map (kbd "M-I")   'helm-apt-show-only-installed)
-    (define-key map (kbd "M-D")   'helm-apt-show-only-deinstalled)
-    (define-key map (kbd "M-A")   'helm-apt-show-all)
-    map))
 
 (defun helm-apt-refresh ()
   "Refresh installed candidates list."
@@ -125,6 +127,7 @@
 (defun helm-apt-init ()
   "Initialize list of debian packages."
   (let ((query ""))
+    (setq helm-apt-show-only 'all)
     (unless (and helm-apt-installed-packages
                  helm-apt-all-packages)
       (message "Loading package list...")
