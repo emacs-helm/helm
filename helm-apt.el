@@ -188,10 +188,10 @@ Support install, remove and purge actions."
   (ansi-term (getenv "SHELL") "helm apt")
   (term-line-mode)
   (let ((command   (case action
-                     ('install   "sudo apt-get install ")
-                     ('reinstall "sudo apt-get install --reinstall ")
-                     ('uninstall "sudo apt-get remove ")
-                     ('purge     "sudo apt-get purge ")
+                     (install   "sudo apt-get install ")
+                     (reinstall "sudo apt-get install --reinstall ")
+                     (uninstall "sudo apt-get remove ")
+                     (purge     "sudo apt-get purge ")
                      (t          (error "Unknow action"))))
         (beg       (point))
         end
