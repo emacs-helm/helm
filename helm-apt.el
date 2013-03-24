@@ -44,13 +44,14 @@
 
 
 (defvar helm-source-apt
-  '((name . "APT")
+  `((name . "APT")
     (init . helm-apt-init)
     (candidates-in-buffer)
     (candidate-transformer helm-apt-candidate-transformer)
     (display-to-real . helm-apt-display-to-real)
     (requires-pattern . 2)
     (update . helm-apt-refresh)
+    (keymap . ,helm-apt-map)
     (action
      ("Show package description" . helm-apt-cache-show)
      ("Install package" . helm-apt-install)
@@ -67,6 +68,15 @@
 (defvar helm-apt-all-packages nil)
 (defvar helm-apt-input-history nil)
 (defvar helm-apt-show-only 'all)
+
+(defvar helm-apt-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    ;(define-key map (kbd "C-c ?") 'helm-apt-help)
+    (define-key map (kbd "M-I")   'helm-apt-show-only-installed)
+    (define-key map (kbd "M-D")   'helm-apt-show-only-deinstalled)
+    (define-key map (kbd "M-A")   'helm-apt-show-all)
+    map))
 
 (defun helm-apt-refresh ()
   "Refresh installed candidates list."
@@ -93,6 +103,24 @@
                           (propertize cand 'face 'helm-apt-installed))
                          ((eq helm-apt-show-only 'all) cand))
         when show collect show))
+
+;;;###autoload
+(defun helm-apt-show-only-installed ()
+  (interactive)
+  (setq helm-apt-show-only 'installed)
+  (helm-update))
+
+;;;###autoload
+(defun helm-apt-show-only-deinstalled ()
+  (interactive)
+  (setq helm-apt-show-only 'deinstalled)
+  (helm-update))
+
+;;;###autoload
+(defun helm-apt-show-all ()
+  (interactive)
+  (setq helm-apt-show-only 'all)
+  (helm-update))
 
 (defun helm-apt-init ()
   "Initialize list of debian packages."
