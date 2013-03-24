@@ -587,6 +587,27 @@ is called once for each file like this:
   (let ((helm-help-message helm-top-help-message))
     (helm-help)))
 
+;;; Helm Apt
+;;
+;;
+(defvar helm-apt-help-message
+  "== Helm Apt Map ==\
+\nHelm Apt tips:
+
+\nSpecific commands for Helm Apt:
+\\<helm-apt-map>
+\\[helm-apt-show-all]\t->Show all packages.
+\\[helm-apt-show-only-installed]\t->Show installed packages only.
+\\[helm-apt-show-only-deinstalled]\t-Show deinstalled packages only.>
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-apt-help ()
+  (interactive)
+  (let ((helm-help-message helm-apt-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -747,6 +768,17 @@ is called once for each file like this:
 (defvar helm-top-mode-line "\
 \\<helm-top-map>\
 \\[helm-top-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
+
+;;;###autoload
+(defvar helm-apt-mode-line "\
+\\<helm-apt-map>\
+\\[helm-apt-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
@@ -1063,8 +1095,7 @@ HELM-ATTRIBUTE should be a symbol."
   "  Set `helm-pattern' to candidate. If this attribute is
   specified, The candidates attribute is ignored.
 
-  This attribute is implemented by plug-in.
-  This plug-in implies disable-shortcuts plug-in.")
+  This attribute is implemented by plug-in.")
 
 (helm-document-attribute 'multiline "optional"
   "  Enable to selection multiline candidates.")
