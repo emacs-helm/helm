@@ -174,9 +174,9 @@ See `helm-locate-with-db' and `helm-locate'."
   (unless helm-locate-command
     (setq helm-locate-command
           (case system-type
-            ('gnu/linux "locate %s -r %s")
-            ('berkeley-unix "locate %s %s")
-            ('windows-nt "es %s %s")
+            (gnu/linux "locate %s -r %s")
+            (berkeley-unix "locate %s %s")
+            (windows-nt "es %s %s")
             (t "locate %s %s")))))
 
 (defvar helm-file-name-history nil)
