@@ -57,7 +57,7 @@
   `((name . "APT")
     (init . helm-apt-init)
     (candidates-in-buffer)
-    (candidate-transformer helm-apt-candidate-transformer)
+    (filtered-candidate-transformer . helm-apt-candidate-transformer)
     (display-to-real . helm-apt-display-to-real)
     (requires-pattern . 2)
     (update . helm-apt-refresh)
@@ -88,7 +88,7 @@
   "Persistent action for APT source."
   (helm-apt-cache-show candidate))
 
-(defun helm-apt-candidate-transformer (candidates)
+(defun helm-apt-candidate-transformer (candidates source)
   "Show installed CANDIDATES and the ones to deinstall in a different color."
   (loop for cand in candidates
         for name = (helm-apt-display-to-real cand)
