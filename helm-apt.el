@@ -103,14 +103,14 @@
               (loop for i in (split-string (buffer-string) "\n" t)
                     for p = (split-string i)
                     collect (cons (car p) (cadr p)))))
-      (setq helm-apt-all-packages
-            (with-current-buffer
-                (helm-candidate-buffer
-                 (get-buffer-create (format "*helm-apt*")))
-              (erase-buffer)
-              (call-process-shell-command
-               (format helm-apt-search-command query)
-               nil (current-buffer))))
+      (helm-init-candidates-in-buffer
+       'global
+       (setq helm-apt-all-packages
+             (with-temp-buffer
+               (call-process-shell-command
+                (format helm-apt-search-command query)
+                nil (current-buffer))
+               (buffer-string))))
       (message "Loading package list done")
       (sit-for 0.5))))
 
