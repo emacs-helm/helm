@@ -598,7 +598,8 @@ is called once for each file like this:
 \\<helm-apt-map>
 \\[helm-apt-show-all]\t->Show all packages.
 \\[helm-apt-show-only-installed]\t->Show installed packages only.
-\\[helm-apt-show-only-deinstalled]\t-Show deinstalled packages only.>
+\\[helm-apt-show-only-not-installed]\t->Show not installed packages only.
+\\[helm-apt-show-only-deinstalled]\t-Show deinstalled (not purged yet) packages only.>
 \n== Helm Map ==
 \\{helm-map}")
 

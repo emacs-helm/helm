@@ -48,6 +48,7 @@
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?") 'helm-apt-help)
     (define-key map (kbd "M-I")   'helm-apt-show-only-installed)
+    (define-key map (kbd "M-U")   'helm-apt-show-only-not-installed)
     (define-key map (kbd "M-D")   'helm-apt-show-only-deinstalled)
     (define-key map (kbd "M-A")   'helm-apt-show-all)
     map))
@@ -57,7 +58,7 @@
   `((name . "APT")
     (init . helm-apt-init)
     (candidates-in-buffer)
-    (filtered-candidate-transformer . helm-apt-candidate-transformer)
+    (candidate-transformer . helm-apt-candidate-transformer)
     (display-to-real . helm-apt-display-to-real)
     (requires-pattern . 2)
     (update . helm-apt-refresh)
@@ -88,7 +89,7 @@
   "Persistent action for APT source."
   (helm-apt-cache-show candidate))
 
-(defun helm-apt-candidate-transformer (candidates source)
+(defun helm-apt-candidate-transformer (candidates)
   "Show installed CANDIDATES and the ones to deinstall in a different color."
   (loop for cand in candidates
         for name = (helm-apt-display-to-real cand)
@@ -102,13 +103,19 @@
                                         "install")
                                (memq helm-apt-show-only '(all installed)))
                           (propertize cand 'face 'helm-apt-installed))
-                         ((eq helm-apt-show-only 'all) cand))
+                         ((memq helm-apt-show-only '(noinstalled all)) cand))
         when show collect show))
 
 ;;;###autoload
 (defun helm-apt-show-only-installed ()
   (interactive)
   (setq helm-apt-show-only 'installed)
+  (helm-update))
+
+;;;###autoload
+(defun helm-apt-show-only-not-installed ()
+  (interactive)
+  (setq helm-apt-show-only 'noinstalled)
   (helm-update))
 
 ;;;###autoload
