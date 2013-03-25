@@ -93,19 +93,20 @@
   "Show installed CANDIDATES and the ones to deinstall in a different color."
   (loop for cand in candidates
         for name = (helm-apt-display-to-real cand)
-        for deinstall = (string= (assoc-default
-                                  name helm-apt-installed-packages)
-                                 "deinstall")
-        for install = (string= (assoc-default
-                                name helm-apt-installed-packages)
-                               "install")
+        for deinstall = (string=
+                         (assoc-default name helm-apt-installed-packages)
+                         "deinstall")
+        for install = (string=
+                       (assoc-default name helm-apt-installed-packages)
+                       "install")
         for show = (cond ((and deinstall
                                (memq helm-apt-show-only '(all deinstalled)))
                           (propertize cand 'face 'helm-apt-deinstalled))
                          ((and install
                                (memq helm-apt-show-only '(all installed)))
                           (propertize cand 'face 'helm-apt-installed))
-                         ((and (eq helm-apt-show-only 'noinstalled) (not install)) cand)
+                         ((and (eq helm-apt-show-only 'noinstalled)
+                               (not install)) cand)
                          ((eq helm-apt-show-only 'all) cand))
         when show collect show))
 
