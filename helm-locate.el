@@ -257,6 +257,7 @@ See also `helm-locate'."
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (candidate-number-limit . 9999)
+    (no-matchplugin)
     (mode-line . helm-generic-file-mode-line-string)
     (delayed))
   "Find files matching the current input pattern with locate.")
