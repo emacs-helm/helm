@@ -1,10 +1,12 @@
 ;;; helm-match-plugin.el --- Multiple regexp matching methods for helm
 
+;; Original Author: rubikitch
+
+;; Copyright (C) 2008 ~ 2011 rubikitch
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; URL: http://github.com/emacs-helm/helm
-;; Version: 0.2.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
