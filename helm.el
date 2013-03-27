@@ -639,6 +639,7 @@ when `helm' is keyboard-quitted.")
 (defvar helm-persistent-action-display-window nil)
 (defvar helm-marked-candidates nil
   "Marked candadates.  List of \(source . real\) pair.")
+(defvar helm-in-file-completion-p nil)
 
 
 ;; Utility: logging
@@ -1512,6 +1513,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (helm-log-eval (setq helm-alive-p nil))
         (setq overriding-local-map old-overridding-local-map)
         (setq helm-alive-p nil)
+        (setq helm-in-file-completion-p nil)
         (helm-log-save-maybe)))))
 
 
@@ -3824,6 +3826,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
 (defun helm-mark-all ()
   "Mark all visible unmarked candidates in current source."
   (interactive)
+  (require 'helm-files)
   (with-helm-window
     (save-excursion
       (goto-char (helm-get-previous-header-pos))

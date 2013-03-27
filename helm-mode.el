@@ -707,7 +707,8 @@ Keys description:
                                                 helm-find-files-doc-header)))
                        (init . (lambda ()
                                  (setq helm-ff-auto-update-flag
-                                       helm-ff-auto-update-initial-value)))
+                                       helm-ff-auto-update-initial-value)
+                                 (setq helm-in-file-completion-p t)))
                        (mode-line . helm-read-file-name-mode-line-string)
                        (candidates
                         . (lambda ()

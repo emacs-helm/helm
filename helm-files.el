@@ -364,7 +364,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                      (concat name helm-find-files-doc-header)))
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
-                    helm-ff-auto-update-initial-value)))
+                    helm-ff-auto-update-initial-value)
+              (setq helm-in-file-completion-p t)))
     (candidates . helm-find-files-get-candidates)
     (match . helm-ff-match-fn)
     (filtered-candidate-transformer helm-find-files-transformer)
@@ -1087,9 +1088,10 @@ You should not modify this yourself unless you know what you do.")
 A source is a file completion source if it is
 one of `helm-file-completion-sources'.
 Return nil if helm is not running."
-  (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
-    (loop for i in helm-file-completion-sources
-          thereis (string= cur-source i))))
+  (or helm-in-file-completion-p
+      (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
+        (loop for i in helm-file-completion-sources
+              thereis (string= cur-source i)))))
 
 ;;;###autoload
 (defun helm-find-files-down-one-level (arg)
