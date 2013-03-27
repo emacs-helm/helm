@@ -730,11 +730,10 @@ These extensions will be added to command line with --include arg of grep."
                    (member glob glob-list)
                    (member glob grep-find-ignored-files))
         collect glob into glob-list
-        finally return (helm-fast-remove-dups
-                        (append glob-list
-                                (delq nil
-                                      (list "*" helm-grep-preferred-ext)))
-                                :test 'equal)))
+        finally return (append (helm-aif helm-c-grep-preferred-ext
+                                   (list it))
+                               (list "*")
+                               glob-list)))
 
 (defun helm-grep-get-file-extensions (files)
   "Try to return a list of file extensions to pass to include arg of grep."
@@ -742,7 +741,6 @@ These extensions will be added to command line with --include arg of grep."
                     (mapcar 'expand-file-name files)))
          (extensions (helm-comp-read "Search Only in: " all-exts
                                      :marked-candidates t
-                                     :preselect helm-grep-preferred-ext
                                      :fc-transformer 'helm-adaptive-sort
                                      :buffer "*helm grep exts*"
                                      :name "*helm grep extensions*")))
