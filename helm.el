@@ -2004,6 +2004,7 @@ if some when multiples sources are present."
   (helm-log-run-hook 'helm-cleanup-hook)
   (helm-frame-or-window-configuration 'restore)
   (setq helm-alive-p nil)
+  (setq helm-in-file-completion-p nil)
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after helm session.
   (helm-clean-up-minibuffer))
