@@ -175,13 +175,6 @@ Return nil if DIR is not an existing directory."
                   concat (if p (concat "/" i) (concat i "/")) into root
                   finally return (file-equal-p (file-truename root) f2)))))))
 
-;; (when (and (require 'tramp)
-;;            (fboundp 'tramp-compat-user-error))
-;;   (defadvice tramp-dissect-file-name (around disable-user-error activate)
-;;     "Disable `user-error'."
-;;     (flet ((tramp-compat-user-error (format &rest objects) nil))
-;;       ad-do-it)))
-
 
 ;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
@@ -492,11 +485,21 @@ Argument MATCH can be a predicate or a regexp."
 (defun helm-basename (fname &optional ext)
   "Print FNAME  with any  leading directory  components removed.
 If specified, also remove filename extension EXT."
-  (if (and ext (or (string= (file-name-extension fname) ext)
-                   (string= (file-name-extension fname t) ext))
-           (not (file-directory-p fname)))
-      (file-name-sans-extension (file-name-nondirectory fname))
-      (file-name-nondirectory (directory-file-name fname))))
+  (let ((non-essential t))
+    (if (and ext (or (string= (file-name-extension fname) ext)
+                     (string= (file-name-extension fname t) ext))
+             (not (file-directory-p fname)))
+        (file-name-sans-extension (file-name-nondirectory fname))
+        (file-name-nondirectory (directory-file-name fname)))))
+
+(defun helm-ff-get-host-from-tramp-invalid-fname (fname)
+  "Extract hostname from an incomplete tramp file name.
+Return nil on valid file name remote or not."
+  (let* ((str (helm-basename fname))
+         (split (split-string str ":"))
+         (meth (car (member (car split) (mapcar 'car tramp-methods))))) 
+    (when (and meth (<= (length split) 2))
+      (cadr split))))
 
 (defun helm-file-human-size (size)
   "Return a string showing SIZE of a file in human readable form.

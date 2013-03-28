@@ -1627,7 +1627,8 @@ is non--nil."
       (if helm-ff-transformer-show-only-basename
           (loop for i in files collect
                 (if (helm-dir-is-dot i)
-                    i (cons (helm-basename i) i)))
+                    i (cons (or (helm-ff-get-host-from-tramp-invalid-fname i)
+                                (helm-basename i)) i)))
           files)
       (helm-ff-highlight-files files)))
 
@@ -1638,9 +1639,11 @@ Don't use it directly in `filtered-candidate-transformer' use instead
   (loop for i in files
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot i))
-                            (not (and ffap-url-regexp (string-match ffap-url-regexp i)))
+                            (not (and ffap-url-regexp
+                                      (string-match ffap-url-regexp i)))
                             (not (string-match helm-ff-url-regexp i)))
-                       (helm-basename i) i)
+                       (or (helm-ff-get-host-from-tramp-invalid-fname i)
+                           (helm-basename i)) i)
         for attr = (file-attributes i)
         for type = (car attr)
         collect
