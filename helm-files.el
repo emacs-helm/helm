@@ -1322,6 +1322,7 @@ purpose."
                             (file-name-as-directory path)
                             (file-name-directory path)))
          invalid-basedir
+         non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     ;; Issue #118 allow creation of newdir+newfile.
