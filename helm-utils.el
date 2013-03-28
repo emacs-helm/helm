@@ -175,6 +175,13 @@ Return nil if DIR is not an existing directory."
                   concat (if p (concat "/" i) (concat i "/")) into root
                   finally return (file-equal-p (file-truename root) f2)))))))
 
+(when (and (require 'tramp)
+           (fboundp 'tramp-compat-user-error))
+  (defadvice tramp-dissect-file-name (around disable-user-error activate)
+    "Disable `user-error'."
+    (flet ((tramp-compat-user-error (format &rest objects) nil))
+      ad-do-it)))
+
 
 ;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
