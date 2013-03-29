@@ -1129,10 +1129,10 @@ or hitting C-z on \"..\"."
 
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
-  (let ((cand (helm-get-selection)))
+  (helm-aif (helm-get-selection)
     (when (and (helm-file-completion-source-p)
-               (not (file-remote-p cand))
-               (not (file-exists-p cand)))
+               (not (string-match tramp-file-name-regexp it))
+               (not (file-exists-p it)))
       (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
 
@@ -1324,6 +1324,7 @@ purpose."
                             (file-name-as-directory path)
                             (file-name-directory path)))
          invalid-basedir
+         non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     ;; Issue #118 allow creation of newdir+newfile.
@@ -1628,7 +1629,8 @@ is non--nil."
       (if helm-ff-transformer-show-only-basename
           (loop for i in files collect
                 (if (helm-dir-is-dot i)
-                    i (cons (helm-basename i) i)))
+                    i (cons (or (helm-ff-get-host-from-tramp-invalid-fname i)
+                                (helm-basename i)) i)))
           files)
       (helm-ff-highlight-files files)))
 
@@ -1639,9 +1641,11 @@ Don't use it directly in `filtered-candidate-transformer' use instead
   (loop for i in files
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot i))
-                            (not (and ffap-url-regexp (string-match ffap-url-regexp i)))
+                            (not (and ffap-url-regexp
+                                      (string-match ffap-url-regexp i)))
                             (not (string-match helm-ff-url-regexp i)))
-                       (helm-basename i) i)
+                       (or (helm-ff-get-host-from-tramp-invalid-fname i)
+                           (helm-basename i)) i)
         for attr = (file-attributes i)
         for type = (car attr)
         collect

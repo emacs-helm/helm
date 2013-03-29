@@ -1479,6 +1479,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
           ;; This is not needed in emacs-24.3+
           (cursor-in-echo-area t)
+          (non-essential t)
           (helm-maybe-use-default-as-input
            (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
                (loop for s in (helm-normalize-sources any-sources)
