@@ -1106,7 +1106,9 @@ If prefix numeric arg is given go ARG level down."
         (setq helm-ff-last-expanded helm-ff-default-directory))
     (let ((new-pattern (helm-reduce-file-name helm-pattern arg
                                               :unix-close t :expand t)))
-      (helm-set-pattern new-pattern))))
+      (helm-set-pattern new-pattern t)
+      (run-with-idle-timer helm-input-idle-delay nil
+                           #'(lambda () (helm-update))))))
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
@@ -1131,7 +1133,7 @@ or hitting C-z on \"..\"."
     (when (and (helm-file-completion-source-p)
                (not (file-remote-p cand))
                (not (file-exists-p cand)))
-    (helm-next-line))))
+      (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
 
 ;; Auto-update - helm-find-files auto expansion of directories.
