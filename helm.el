@@ -1558,13 +1558,14 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
          :buffer any-buffer))))
 
 ;;;###autoload
-(defun helm-resume-previous-session-after-quit ()
+(defun helm-resume-previous-session-after-quit (arg)
   "Resume previous helm session within running helm."
-  (interactive)
-  (if (and helm-alive-p
-           (> (length helm-buffers) 1))
-      (helm-run-after-quit #'(lambda () (helm-resume (cadr helm-buffers))))
-      (message "No previous helm sessions to resume yet!")))
+  (interactive "p")
+  (let* ((len (length helm-buffers))
+         (id  (min len (1- arg))))
+    (if (and helm-alive-p (>= len arg))
+        (helm-run-after-quit `(lambda () (helm-resume (nth ,id helm-buffers))))
+        (message "No previous helm sessions to resume yet!"))))
 
 (defun helm-resume-p (any-resume)
   "Whether current helm session is resumed or not."
