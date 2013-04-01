@@ -455,7 +455,7 @@ the center of window, otherwise at the top of window.")
   (interactive)
   (let ((input (if isearch-regexp
                    isearch-string
-                 (regexp-quote isearch-string))))
+                   (regexp-quote isearch-string))))
     (isearch-exit)
     (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
     (helm-occur-init-source)
@@ -497,10 +497,10 @@ The prefix arg can be set before calling
          (if (or current-prefix-arg
                  helm-current-prefix-arg)
              (not helm-moccur-always-search-in-current)
-           helm-moccur-always-search-in-current))
+             helm-moccur-always-search-in-current))
         (input (if isearch-regexp
                    isearch-string
-                 (regexp-quote isearch-string))))
+                   (regexp-quote isearch-string))))
     (isearch-exit)
     (helm-multi-occur-1
      (helm-comp-read "Buffers: " (helm-buffer-list) :marked-candidates t)
