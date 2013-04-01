@@ -1562,7 +1562,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
 (defun helm-resume-previous-session-after-quit (arg)
   "Resume previous helm session within running helm."
   (interactive "p")
-  (if (and helm-alive-p (>= (length helm-buffers) arg))
+  (if (and helm-alive-p (> (length helm-buffers) arg))
       (helm-run-after-quit `(lambda () (helm-resume (nth ,arg helm-buffers))))
       (message "No previous helm sessions to resume yet!")))
 
