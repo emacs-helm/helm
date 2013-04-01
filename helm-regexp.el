@@ -485,6 +485,28 @@ or during the buffer selection."
     (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
+(defun helm-multi-occur-from-isearch (&optional arg)
+  "Invoke `helm-multi-occur' from isearch.
+
+With a prefix arg, reverse the behavior of
+`helm-moccur-always-search-in-current'.
+The prefix arg can be set before calling
+`helm-multi-occur-from-isearch' or during the buffer selection."
+  (interactive "p")
+  (let ((helm-moccur-always-search-in-current
+         (if (or current-prefix-arg
+                 helm-current-prefix-arg)
+             (not helm-moccur-always-search-in-current)
+           helm-moccur-always-search-in-current))
+        (input (if isearch-regexp
+                   isearch-string
+                 (regexp-quote isearch-string))))
+    (isearch-exit)
+    (helm-multi-occur-1
+     (helm-comp-read "Buffers: " (helm-buffer-list) :marked-candidates t)
+     input)))
+
+;;;###autoload
 (defun helm-browse-code ()
   "Preconfigured helm to browse code."
   (interactive)
