@@ -450,6 +450,22 @@ the center of window, otherwise at the top of window.")
         :history 'helm-grep-history))
 
 ;;;###autoload
+(defun helm-occur-from-isearch ()
+  "Invoke `helm-occur' from isearch."
+  (interactive)
+  (let ((input (if isearch-regexp
+                   isearch-string
+                 (regexp-quote isearch-string))))
+    (isearch-exit)
+    (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
+    (helm-occur-init-source)
+    (helm-attrset 'name "Occur" helm-source-occur)
+    (helm :sources 'helm-source-occur
+          :buffer "*helm occur*"
+          :history 'helm-grep-history
+          :input input)))
+
+;;;###autoload
 (defun helm-multi-occur (buffers)
   "Preconfigured helm for multi occur.
 

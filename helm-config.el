@@ -1680,8 +1680,9 @@ Preconfigured helm to show org headlines.
 
 ;;;***
 
-;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20813 57659 911717 901000))
+;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur-from-isearch
+;;;;;;  helm-occur helm-regexp) "helm-regexp" "helm-regexp.el" (20825
+;;;;;;  24627 0 0))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1692,6 +1693,11 @@ Preconfigured helm to build regexps.
 
 (autoload 'helm-occur "helm-regexp" "\
 Preconfigured helm for Occur.
+
+\(fn)" t nil)
+
+(autoload 'helm-occur-from-isearch "helm-regexp" "\
+Invoke `helm-occur' from isearch.
 
 \(fn)" t nil)
 
