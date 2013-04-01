@@ -450,6 +450,22 @@ the center of window, otherwise at the top of window.")
         :history 'helm-grep-history))
 
 ;;;###autoload
+(defun helm-occur-from-isearch ()
+  "Invoke `helm-occur' from isearch."
+  (interactive)
+  (let ((input (if isearch-regexp
+                   isearch-string
+                 (regexp-quote isearch-string))))
+    (isearch-exit)
+    (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
+    (helm-occur-init-source)
+    (helm-attrset 'name "Occur" helm-source-occur)
+    (helm :sources 'helm-source-occur
+          :buffer "*helm occur*"
+          :history 'helm-grep-history
+          :input input)))
+
+;;;###autoload
 (defun helm-multi-occur (buffers)
   "Preconfigured helm for multi occur.
 
@@ -467,6 +483,28 @@ or during the buffer selection."
              (not helm-moccur-always-search-in-current)
              helm-moccur-always-search-in-current)))
     (helm-multi-occur-1 buffers)))
+
+;;;###autoload
+(defun helm-multi-occur-from-isearch (&optional arg)
+  "Invoke `helm-multi-occur' from isearch.
+
+With a prefix arg, reverse the behavior of
+`helm-moccur-always-search-in-current'.
+The prefix arg can be set before calling
+`helm-multi-occur-from-isearch' or during the buffer selection."
+  (interactive "p")
+  (let ((helm-moccur-always-search-in-current
+         (if (or current-prefix-arg
+                 helm-current-prefix-arg)
+             (not helm-moccur-always-search-in-current)
+           helm-moccur-always-search-in-current))
+        (input (if isearch-regexp
+                   isearch-string
+                 (regexp-quote isearch-string))))
+    (isearch-exit)
+    (helm-multi-occur-1
+     (helm-comp-read "Buffers: " (helm-buffer-list) :marked-candidates t)
+     input)))
 
 ;;;###autoload
 (defun helm-browse-code ()

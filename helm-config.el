@@ -1680,8 +1680,9 @@ Preconfigured helm to show org headlines.
 
 ;;;***
 
-;;;### (autoloads (helm-browse-code helm-multi-occur helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20813 57659 911717 901000))
+;;;### (autoloads (helm-browse-code helm-multi-occur-from-isearch
+;;;;;;  helm-multi-occur helm-occur-from-isearch helm-occur helm-regexp)
+;;;;;;  "helm-regexp" "helm-regexp.el" (20825 26373 0 0))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1695,6 +1696,11 @@ Preconfigured helm for Occur.
 
 \(fn)" t nil)
 
+(autoload 'helm-occur-from-isearch "helm-regexp" "\
+Invoke `helm-occur' from isearch.
+
+\(fn)" t nil)
+
 (autoload 'helm-multi-occur "helm-regexp" "\
 Preconfigured helm for multi occur.
 
@@ -1705,6 +1711,16 @@ The prefix arg can be set before calling `helm-multi-occur'
 or during the buffer selection.
 
 \(fn BUFFERS)" t nil)
+
+(autoload 'helm-multi-occur-from-isearch "helm-regexp" "\
+Invoke `helm-multi-occur' from isearch.
+
+With a prefix arg, reverse the behavior of
+`helm-moccur-always-search-in-current'.
+The prefix arg can be set before calling
+`helm-multi-occur-from-isearch' or during the buffer selection.
+
+\(fn &optional ARG)" t nil)
 
 (autoload 'helm-browse-code "helm-regexp" "\
 Preconfigured helm to browse code.
