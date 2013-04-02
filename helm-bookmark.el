@@ -254,7 +254,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                     t
                                     (propertize trunc 'face 'helm-bookmark-file 'help-echo isfile)))))
                     (if helm-bookmark-show-filename
-                        (cons (concat bmk (make-string (- 32 (length trunc)) ? ) loc) i)
+                        (cons (concat bmk sep loc) i)
                         (cons bmk i))))))
 
 (defun helm-bookmark-jump (candidate)
