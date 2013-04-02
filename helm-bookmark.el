@@ -80,6 +80,7 @@
 
 (defvar helm-source-bookmarks
   `((name . "Bookmarks")
+    (init . (lambda () (require 'bookmark)))
     (no-delay-on-input)
     (candidates . bookmark-all-names)
     (filtered-candidate-transformer . helm-bookmark-transformer)
@@ -213,38 +214,48 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
           for isannotation  = (bookmark-get-annotation i)
           for isabook       = (string= (bookmark-prop-get i 'type) "addressbook")
           for isinfo        = (eq handlerp 'Info-bookmark-jump)
+          for loc = (bookmark-location i)
+          for len =  (length i)
+          for trunc = (if (> len bookmark-bmenu-file-column)
+                          (substring i 0 bookmark-bmenu-file-column)
+                          i)
+          for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
+                                    (length trunc)) ? )
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
-          do (setq i (concat "*" i))
-          collect (cond ( ;; info buffers
-                         isinfo
-                         (propertize i 'face 'helm-bookmark-info 'help-echo isfile))
-                        ( ;; w3m buffers
-                         isw3m
-                         (propertize i 'face 'helm-bookmark-w3m 'help-echo isfile))
-                        ( ;; gnus buffers
-                         isgnus
-                         (propertize i 'face 'helm-bookmark-gnus 'help-echo isfile))
-                        ( ;; Man Woman
-                         (or iswoman isman)
-                         (propertize i 'face 'helm-bookmark-man 'help-echo isfile))
-                        ( ;; Addressbook
-                         isabook
-                         (propertize i 'face '((:foreground "Tomato"))))
-                        ( ;; directories
-                         (and isfile
-                              ;; This is needed because `non-essential'
-                              ;; is not working on Emacs-24.2 and the behavior
-                              ;; of tramp seems to have changed since previous
-                              ;; versions (Need to reenter password even if a first
-                              ;; connection have been established, probably when host
-                              ;; is named differently i.e machine/localhost)
-                              (not (file-remote-p isfile))
-                              (file-directory-p isfile))
-                         (propertize i 'face 'helm-bookmark-directory 'help-echo isfile))
-                        ( ;; regular files
-                         t
-                         (propertize i 'face 'helm-bookmark-file 'help-echo isfile))))))
+          do (setq trunc (concat "*" trunc))
+          collect (let ((bmk (cond ( ;; info buffers
+                                    isinfo
+                                    (propertize trunc 'face 'helm-bookmark-info 'help-echo isfile))
+                                   ( ;; w3m buffers
+                                    isw3m
+                                    (propertize trunc 'face 'helm-bookmark-w3m 'help-echo isfile))
+                                   ( ;; gnus buffers
+                                    isgnus
+                                    (propertize trunc 'face 'helm-bookmark-gnus 'help-echo isfile))
+                                   ( ;; Man Woman
+                                    (or iswoman isman)
+                                    (propertize trunc 'face 'helm-bookmark-man 'help-echo isfile))
+                                   ( ;; Addressbook
+                                    isabook
+                                    (propertize trunc 'face '((:foreground "Tomato"))))
+                                   ( ;; directories
+                                    (and isfile
+                                         ;; This is needed because `non-essential'
+                                         ;; is not working on Emacs-24.2 and the behavior
+                                         ;; of tramp seems to have changed since previous
+                                         ;; versions (Need to reenter password even if a first
+                                         ;; connection have been established, probably when host
+                                         ;; is named differently i.e machine/localhost)
+                                         (not (file-remote-p isfile))
+                                         (file-directory-p isfile))
+                                    (propertize trunc 'face 'helm-bookmark-directory 'help-echo isfile))
+                                   ( ;; regular files
+                                    t
+                                    (propertize trunc 'face 'helm-bookmark-file 'help-echo isfile)))))
+                    (if helm-bookmark-show-filename
+                        (cons (concat bmk (make-string (- 32 (length trunc)) ? ) loc) i)
+                        (cons bmk i))))))
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
