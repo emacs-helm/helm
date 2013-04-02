@@ -69,22 +69,50 @@
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c o") 'helm-bookmark-run-jump-other-window)
     (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
+    (define-key map (kbd "M-t")   'helm-bookmark-toggle-filename)
     (when (locate-library "bookmark-extensions")
       (define-key map (kbd "M-e") 'helm-bmkext-run-edit))
     (define-key map (kbd "C-c ?") 'helm-bookmark-help)
     (delq nil map))
   "Generic Keymap for emacs bookmark sources.")
 
+;; (define-key helm-bookmark-map (kbd "M-t") 'helm-bookmark-toggle-filename)
+
 (defvar helm-source-bookmarks
   `((name . "Bookmarks")
-    (init . (lambda ()
-              (require 'bookmark)
-              (helm-init-candidates-in-buffer
-               'global (bookmark-all-names))))
     (no-delay-on-input)
-    (candidates-in-buffer)
+    (candidates . bookmark-all-names)
+    (filtered-candidate-transformer . helm-bookmark-transformer)
+    (match . helm-bookmark-match-fn)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
+
+(defun helm-bookmark-transformer (candidates source)
+  (loop for i in candidates
+        for loc = (bookmark-location i)
+        for len =  (length i)
+        for trunc = (if (> len bookmark-bmenu-file-column)
+                        (substring i 0 bookmark-bmenu-file-column)
+                        i)
+        for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
+                                  (length trunc)) ? )
+        if helm-bookmark-show-filename
+        collect (cons (concat trunc
+                              (make-string (- 32 (length trunc)) ? ) loc) i)
+        else collect i))
+
+(defun helm-bookmark-match-fn (candidate)
+  (if helm-bookmark-show-filename
+      (string-match helm-pattern (bookmark-location candidate))
+      (string-match helm-pattern candidate)))
+
+(defvar helm-bookmark-show-filename t)
+(defun helm-bookmark-toggle-filename ()
+  (interactive)
+  (let ((real (helm-get-selection helm-buffer)))
+    (setq helm-bookmark-show-filename (not helm-bookmark-show-filename))
+    (helm-update (if helm-bookmark-show-filename
+                     (bookmark-location real) real))))
 
 ;;; bookmark-set
 (defvar helm-source-bookmark-set
