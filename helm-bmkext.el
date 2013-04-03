@@ -254,7 +254,7 @@
 
 (defun helm-bookmark-local-files-setup-alist ()
   "Specialized filter function for bookmarks locals files."
-  (helm-bmkext-filter-setup-alist 'bmkext-local-file-alist-only))
+  (helm-bmkext-filter-setup-alist 'bmkext-file-alist-only))
 
 
 ;;;###autoload
