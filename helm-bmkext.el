@@ -15,6 +15,11 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;; Dependency: https://github.com/thierryvolpiatto/emacs-bmk-ext
+;; If you want to enable google-maps in addressbook you will need
+;; Julien Danjou google-maps-el package available here:
+;; http://julien.danjou.info/google-maps-el.html
+
 ;;; Code:
 (eval-when-compile (require 'cl))
 (require 'helm)
@@ -23,11 +28,9 @@
 
 (declare-function bookmark-get-filename "bookmark" (bookmark-name-or-record))
 
-;; Dependency: https://github.com/thierryvolpiatto/emacs-bmk-ext
-;; If you want to enable google-maps in addressbook you will need
-;; Julien Danjou google-maps-el package available here:
-;; http://julien.danjou.info/google-maps-el.html
-
+
+;;; Filter functions
+;;
 (defun helm-bmkext-filter-setup-alist (fn &rest args)
   "Return a filtered `bookmark-alist' sorted alphabetically."
   (loop
@@ -45,6 +48,7 @@
   (interactive)
   (helm-quit-and-execute-action 'bmkext-edit-bookmark))
 
+
 ;;; Addressbook.
 ;;
 ;;
@@ -131,7 +135,9 @@
   "Specialized filter function for bookmarks w3m."
   (helm-bmkext-filter-setup-alist 'bmkext-addressbook-alist-only))
 
-;; W3m bookmarks from bookmark-extensions.
+
+;;; W3m bookmarks from bookmark-extensions.
+;;
 (defvar helm-source-bookmark-w3m
   '((name . "Bookmark W3m")
     (init . (lambda ()
@@ -149,7 +155,9 @@
   "Specialized filter function for bookmarks w3m."
   (helm-bmkext-filter-setup-alist 'bmkext-w3m-alist-only))
 
-;; Images
+
+;;; Images
+;;
 (defvar helm-source-bookmark-images
   '((name . "Bookmark Images")
     (init . (lambda ()
@@ -167,7 +175,9 @@
   "Specialized filter function for images bookmarks."
   (helm-bmkext-filter-setup-alist 'bmkext-image-file-alist-only))
 
-;; Woman Man
+
+;;; Woman Man
+;;
 (defvar helm-source-bookmark-man
   '((name . "Bookmark Woman&Man")
     (init . (lambda ()
@@ -186,7 +196,9 @@
   (append (helm-bmkext-filter-setup-alist 'bmkext-man-alist-only)
           (helm-bmkext-filter-setup-alist 'bmkext-woman-alist-only)))
 
-;; Gnus
+
+;;; Gnus
+;;
 (defvar helm-source-bookmark-gnus
   '((name . "Bookmark Gnus")
     (init . (lambda ()
@@ -204,7 +216,9 @@
   "Specialized filter function for bookmarks gnus."
   (helm-bmkext-filter-setup-alist 'bmkext-gnus-alist-only))
 
-;; Info
+
+;;; Info
+;;
 (defvar helm-source-bookmark-info
   '((name . "Bookmark Info")
     (init . (lambda ()
@@ -222,7 +236,9 @@
   "Specialized filter function for bookmarks info."
   (helm-bmkext-filter-setup-alist 'bmkext-info-alist-only))
 
-;; Local Files&directories
+
+;;; Files and directories
+;;
 (defvar helm-source-bookmark-files&dirs
   '((name . "Bookmark Files&Directories")
     (init . (lambda ()
@@ -240,61 +256,7 @@
   "Specialized filter function for bookmarks locals files."
   (helm-bmkext-filter-setup-alist 'bmkext-local-file-alist-only))
 
-;; Su Files&directories
-(defvar helm-source-bookmark-su-files&dirs
-  '((name . "Bookmark Root-Files&Directories")
-    (init . (lambda ()
-              (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-               'global (helm-bookmark-su-files-setup-alist))))
-    (candidates-in-buffer)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark-su)
-    (type . bookmark)))
-
-(defun helm-bookmark-su-files-setup-alist ()
-  "Specialized filter function for bookmarks su/sudo files."
-  (declare (special bmkext-su-or-sudo-regexp))
-  (loop
-        with l = (helm-bmkext-filter-setup-alist 'bmkext-remote-file-alist-only)
-        for i in l
-        for isfile = (bookmark-get-filename i)
-        for istramp = (and isfile (boundp 'tramp-file-name-regexp)
-                           (save-match-data
-                             (string-match tramp-file-name-regexp isfile)))
-        for issu = (and istramp
-                        (string-match bmkext-su-or-sudo-regexp isfile))
-        if issu
-        collect i))
-
-;; Ssh Files&directories
-(defvar helm-source-bookmark-ssh-files&dirs
-  '((name . "Bookmark Ssh-Files&Directories")
-    (init . (lambda ()
-              (require 'bookmark-extensions)
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-               'global (helm-bookmark-ssh-files-setup-alist))))
-    (candidates-in-buffer)
-    (filtered-candidate-transformer . helm-adaptive-sort)
-    (type . bookmark)))
-
-(defun helm-bookmark-ssh-files-setup-alist ()
-  "Specialized filter function for bookmarks ssh files."
-  (loop
-        with l = (helm-bmkext-filter-setup-alist 'bmkext-remote-file-alist-only)
-        for i in l
-        for isfile = (bookmark-get-filename i)
-        for istramp = (and isfile (boundp 'tramp-file-name-regexp)
-                           (save-match-data
-                             (string-match tramp-file-name-regexp isfile)))
-        for isssh = (and istramp
-                         (string-match "/ssh:" isfile))
-        if isssh
-        collect i))
-
+
 ;;;###autoload
 (defun helm-bookmark-ext ()
   "Preconfigured `helm' for bookmark-extensions sources.
@@ -312,8 +274,6 @@ Contain also `helm-source-google-suggest'."
      helm-source-bookmark-info
      helm-source-bookmark-man
      helm-source-bookmark-images
-     helm-source-bookmark-su-files&dirs
-     helm-source-bookmark-ssh-files&dirs
      helm-source-bookmark-set)
    :prompt "SearchBookmark: "
    :buffer "*helm bmkext*"
