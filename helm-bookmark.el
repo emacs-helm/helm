@@ -28,6 +28,11 @@
   "Predefined configurations for `helm.el'."
   :group 'helm)
 
+(defcustom helm-bookmark-show-location nil
+  "Show location of bookmark on display."
+  :group 'helm-bookmark
+  :type 'boolean)
+
 (defface helm-bookmarks-su
     '((t (:foreground "red")))
   "Face for su/sudo bookmarks."
@@ -76,13 +81,15 @@
     (delq nil map))
   "Generic Keymap for emacs bookmark sources.")
 
-;; (define-key helm-bookmark-map (kbd "M-t") 'helm-bookmark-toggle-filename)
-
+(defvar helm-bookmarks-cache nil)
 (defvar helm-source-bookmarks
   `((name . "Bookmarks")
-    (init . (lambda () (require 'bookmark)))
-    (no-delay-on-input)
-    (candidates . bookmark-all-names)
+    (init . (lambda ()
+              (require 'bookmark)
+              (setq helm-bookmarks-cache
+                    (bookmark-all-names))))
+    (no-delay-on-input) ; needed for helm-for-files.
+    (candidates . helm-bookmarks-cache)
     (filtered-candidate-transformer . helm-bookmark-transformer)
     (match . helm-bookmark-match-fn)
     (type . bookmark))
@@ -97,25 +104,25 @@
                         i)
         for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
                                   (length trunc)) ? )
-        if helm-bookmark-show-filename
+        if helm-bookmark-show-location
         collect (cons (concat trunc
                               (make-string (- 32 (length trunc)) ? ) loc) i)
         else collect i))
 
 (defun helm-bookmark-match-fn (candidate)
-  (if helm-bookmark-show-filename
+  (if helm-bookmark-show-location
       (string-match helm-pattern (bookmark-location candidate))
       (string-match helm-pattern candidate)))
 
-(defvar helm-bookmark-show-filename t)
 (defun helm-bookmark-toggle-filename ()
   (interactive)
   (let ((real (helm-get-selection helm-buffer)))
-    (setq helm-bookmark-show-filename (not helm-bookmark-show-filename))
-    (helm-update (if helm-bookmark-show-filename
+    (setq helm-bookmark-show-location (not helm-bookmark-show-location))
+    (helm-update (if helm-bookmark-show-location
                      (bookmark-location real) real))))
 
 ;;; bookmark-set
+;;
 (defvar helm-source-bookmark-set
   '((name . "Set Bookmark")
     (dummy)
@@ -123,74 +130,21 @@
     (action . bookmark-set))
   "See (info \"(emacs)Bookmarks\").")
 
-;;; Special bookmarks
-(defvar helm-source-bookmarks-ssh
-  '((name . "Bookmarks-ssh")
-    (init . (lambda ()
-              (require 'bookmark)
-              (helm-init-candidates-in-buffer
-               'global (helm-collect-bookmarks :ssh t))))
-    (candidates-in-buffer)
-    (no-delay-on-input)
-    (type . bookmark))
-  "See (info \"(emacs)Bookmarks\").")
-
-(defvar helm-source-bookmarks-su
-  '((name . "Bookmarks-root")
-    (init . (lambda ()
-              (require 'bookmark)
-              (helm-init-candidates-in-buffer
-               'global (helm-collect-bookmarks :su t))))
-    (candidates-in-buffer)
-    (no-delay-on-input)
-    (filtered-candidate-transformer . helm-highlight-bookmark-su)
-    (type . bookmark))
-  "See (info \"(emacs)Bookmarks\").")
-
-(defvar helm-source-bookmarks-local
+;;; Colorize bookmarks by category
+;;
+(defvar helm-source-pp-bookmarks
   '((name . "Bookmarks-Local")
     (init . (lambda ()
               (require 'bookmark)
-              (helm-init-candidates-in-buffer
-               'global (helm-collect-bookmarks :local t))))
-    (candidates-in-buffer)
+              (setq helm-bookmarks-cache
+                    (bookmark-all-names))))
+    (candidates . helm-bookmarks-cache)
+    (match . helm-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
-    (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
-
-(defun* helm-collect-bookmarks (&key local su sudo ssh)
-  (let* ((lis-all (bookmark-all-names))
-         (lis-loc (cond (local (loop for i in lis-all
-                                     unless (string-match "^(ssh)\\|^(su)" i)
-                                     collect i))
-                        (su (loop for i in lis-all
-                                  when (string-match "^(su)" i)
-                                  collect i))
-                        (sudo (loop for i in lis-all
-                                    when (string-match "^(sudo)" i)
-                                    collect i))
-                        (ssh (loop for i in lis-all
-                                   when (string-match "^(ssh)" i)
-                                   collect i)))))
-    (sort lis-loc 'string-lessp)))
-
-(defun helm-bookmark-root-logged-p ()
-  (catch 'break
-    (dolist (i (mapcar #'buffer-name (buffer-list)))
-      (when (string-match (format "*tramp/%s ." helm-su-or-sudo) i)
-        (throw 'break t)))))
-
-(defun helm-highlight-bookmark-su (files source)
-  (if (helm-bookmark-root-logged-p)
-      (helm-highlight-bookmark files source)
-      (helm-highlight-not-logged files source)))
-
-(defun helm-highlight-not-logged (files source)
-  (loop for i in files
-        collect (propertize i 'face 'helm-bookmarks-su)))
 
 (defun helm-highlight-bookmark (bookmarks source)
   "Used as `candidate-transformer' to colorize bookmarks.
@@ -253,7 +207,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                    ( ;; regular files
                                     t
                                     (propertize trunc 'face 'helm-bookmark-file 'help-echo isfile)))))
-                    (if helm-bookmark-show-filename
+                    (if helm-bookmark-show-location
                         (cons (concat bmk sep loc) i)
                         (cons bmk i))))))
 
@@ -321,9 +275,7 @@ Return nil if bmk is not a valid bookmark."
 (defun helm-pp-bookmarks ()
   "Preconfigured `helm' for bookmarks (pretty-printed)."
   (interactive)
-  (helm :sources '(helm-source-bookmarks-local
-                   helm-source-bookmarks-su
-                   helm-source-bookmarks-ssh
+  (helm :sources '(helm-source-pp-bookmarks
                    helm-source-bookmark-set)
         :buffer "*helm pp bookmarks*"
         :default (buffer-name helm-current-buffer)))
