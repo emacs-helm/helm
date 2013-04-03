@@ -33,6 +33,7 @@
   :group 'helm-bookmark
   :type 'boolean)
 
+
 (defface helm-bookmarks-su
     '((t (:foreground "red")))
   "Face for su/sudo bookmarks."
@@ -121,6 +122,12 @@
     (helm-update (if helm-bookmark-show-location
                      (bookmark-location real) real))))
 
+(defun helm-bookmark-jump (candidate)
+  "Jump to bookmark from keyboard."
+  (let ((current-prefix-arg helm-current-prefix-arg))
+    (bookmark-jump candidate)))
+
+
 ;;; bookmark-set
 ;;
 (defvar helm-source-bookmark-set
@@ -130,6 +137,7 @@
     (action . bookmark-set))
   "See (info \"(emacs)Bookmarks\").")
 
+
 ;;; Colorize bookmarks by category
 ;;
 (defvar helm-source-pp-bookmarks
@@ -211,11 +219,9 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                         (cons (concat bmk sep loc) i)
                         (cons bmk i))))))
 
-(defun helm-bookmark-jump (candidate)
-  "Jump to bookmark from keyboard."
-  (let ((current-prefix-arg helm-current-prefix-arg))
-    (bookmark-jump candidate)))
-
+
+;;; Bookmarks attributes
+;;
 (define-helm-type-attribute 'bookmark
     `((coerce . helm-bookmark-get-bookmark-from-name)
       (action
@@ -232,6 +238,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
       (mode-line . helm-bookmark-mode-line-string))
   "Bookmark name.")
 
+
 ;;;###autoload
 (defun helm-bookmark-run-jump-other-window ()
   "Jump to bookmark from keyboard."
