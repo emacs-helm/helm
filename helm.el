@@ -1432,7 +1432,16 @@ to 10 as session local variable."
                    #'helm)
                   (t #'helm-internal))))
     (if (and helm-alive-p (eq fn #'helm))
-        (error "Error: Trying to run helm within a running helm session")
+        (if (helm-alive-p)
+            ;; An helm session is normally running.
+            (error "Error: Trying to run helm within a running helm session")
+            ;; An helm session is already running and user jump somewhere else
+            ;; without desactivating it: weird.
+            (with-helm-buffer
+              (prog1
+                  (message "Aborting an helm session running in background")
+                ;; helm-alive-p will be reset in unwind-protect forms.
+                (helm-keyboard-quit)))) 
         (if (keywordp (car plist))
             (helm-let-internal
              (helm-parse-keys plist)
@@ -1440,6 +1449,15 @@ to 10 as session local variable."
                (apply fn (mapcar #'(lambda (key) (plist-get plist key))
                                  helm-argument-keys))))
             (apply fn plist)))))
+
+(defun helm-alive-p ()
+  "Check if `helm' is alive.
+An `helm' session is considered alive if `helm-alive-p' is non--nil,
+the `helm-buffer' is visible, and cursor is in minibuffer."
+  (and helm-alive-p
+       (get-buffer-window helm-buffer 'visible)
+       (minibuffer-window-active-p (minibuffer-window))
+       (minibufferp (current-buffer))))
 
 (defun helm-parse-keys (keys)
   "Parse the KEYS arguments of `helm'.
