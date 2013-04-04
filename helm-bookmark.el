@@ -114,6 +114,7 @@
 
 ;;;###autoload
 (defun helm-bookmark-toggle-filename ()
+  "Toggle bookmark location visibility."
   (interactive)
   (let ((real (helm-get-selection helm-buffer)))
     (setq helm-bookmark-show-location (not helm-bookmark-show-location))

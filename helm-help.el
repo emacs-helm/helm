@@ -457,6 +457,7 @@ You can save your results in a grep-mode buffer, see below.
 \\[helm-bookmark-run-jump-other-window]\t\t->Jump other window.
 \\[helm-bookmark-run-delete]\t\t->Delete bookmark.
 \\[helm-bmkext-run-edit]\t\t->Edit bookmark (only for bmkext).
+\\[helm-bookmark-toggle-filename]\t\t->Toggle bookmark location visibility.
 \\[helm-bookmark-help]\t\t->Run this help.
 \n== Helm Map ==
 \\{helm-map}")
