@@ -34,11 +34,6 @@
   :type 'boolean)
 
 
-(defface helm-bookmarks-su
-    '((t (:foreground "red")))
-  "Face for su/sudo bookmarks."
-  :group 'helm-bookmark)
-
 (defface helm-bookmark-info
     '((t (:foreground "green")))
   "Face used for W3m Emacs bookmarks (not w3m bookmarks)."
