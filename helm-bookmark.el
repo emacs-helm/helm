@@ -144,15 +144,30 @@
   '((name . "PP-Bookmarks")
     (init . (lambda ()
               (require 'bookmark)
-              (setq helm-bookmarks-cache
-                    (bookmark-all-names))))
-    (candidates . helm-bookmarks-cache)
-    (match . helm-bookmark-match-fn)
+              (helm-init-candidates-in-buffer
+               'global (loop for b in (bookmark-all-names) collect
+                             (propertize b 'location (bookmark-location b))))))
+    (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
+    (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
+
+(defun helm-bookmark-search-fn (pattern)
+  (if helm-bookmark-show-location
+      (helm-aif (next-single-property-change (point) 'location)
+          (goto-char it))
+      (re-search-forward pattern nil t)))
+
+(defun helm-pp-bookmark-match-fn (candidate)
+  (helm-aif (and helm-bookmark-show-location
+                 (bookmark-location candidate))
+      it
+    candidate))
 
 (defun helm-highlight-bookmark (bookmarks source)
   "Used as `candidate-transformer' to colorize bookmarks.
@@ -178,14 +193,16 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
           for isinfo        = (eq handlerp 'Info-bookmark-jump)
           for loc = (bookmark-location i)
           for len =  (length i)
-          for trunc = (if (> len bookmark-bmenu-file-column)
+          for trunc = (if (and helm-bookmark-show-location
+                               (> len bookmark-bmenu-file-column))
                           (substring i 0 bookmark-bmenu-file-column)
                           i)
-          for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
-                                    (length trunc)) ? )
+          for sep = (and helm-bookmark-show-location
+                         (make-string (- (+ bookmark-bmenu-file-column 2)
+                                         (length trunc)) ? ))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
-          do (setq trunc (concat "*" trunc))
+          do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
           collect (let ((bmk (cond ( ;; info buffers
                                     isinfo
                                     (propertize trunc 'face 'helm-bookmark-info 'help-echo isfile))
