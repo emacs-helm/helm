@@ -39,7 +39,7 @@
                          (funcall fn))
         for i in alist
         for b = (car i)
-        collect b into sa
+        collect (propertize b 'location (bookmark-location b)) into sa
         finally return (sort sa 'string-lessp)))
 
 ;;;###autoload
@@ -61,6 +61,8 @@
                'global
                (helm-bmkext-addressbook-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (persistent-action
      . (lambda (candidate)
          (let ((bmk (helm-bookmark-get-bookmark-from-name
@@ -146,6 +148,8 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-w3m-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
@@ -166,6 +170,8 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-images-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
@@ -186,6 +192,8 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-man-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
@@ -207,6 +215,8 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-gnus-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
@@ -227,6 +237,8 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-info-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
@@ -247,6 +259,8 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-local-files-setup-alist))))
     (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
