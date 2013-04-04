@@ -111,10 +111,13 @@
         else collect i))
 
 (defun helm-bookmark-match-fn (candidate)
+  "Match function for bookmark sources using `candidates'."
   (if helm-bookmark-show-location
+      ;; match only location, match-plugin will match also name.
       (string-match helm-pattern (bookmark-location candidate))
       (string-match helm-pattern candidate)))
 
+;;;###autoload
 (defun helm-bookmark-toggle-filename ()
   (interactive)
   (let ((real (helm-get-selection helm-buffer)))
@@ -158,15 +161,19 @@
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-search-fn (pattern)
+  "Search function for bookmark sources using `candidates-in-buffer'.
+Should be used with `helm-pp-bookmark-match-fn' as `match-part' function."
   (if helm-bookmark-show-location
       (helm-aif (next-single-property-change (point) 'location)
           (goto-char it))
       (re-search-forward pattern nil t)))
 
 (defun helm-pp-bookmark-match-fn (candidate)
+  "Search function for bookmark sources using `candidates-in-buffer'.
+Should be used with `helm-bookmark-search-fn' as `search' function."
   (helm-aif (and helm-bookmark-show-location
                  (bookmark-location candidate))
-      it
+      it ; match only location, match-plugin will match also name.
     candidate))
 
 (defun helm-highlight-bookmark (bookmarks source)
