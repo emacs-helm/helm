@@ -141,7 +141,7 @@
 ;;; Colorize bookmarks by category
 ;;
 (defvar helm-source-pp-bookmarks
-  '((name . "Bookmarks-Local")
+  '((name . "PP-Bookmarks")
     (init . (lambda ()
               (require 'bookmark)
               (setq helm-bookmarks-cache
