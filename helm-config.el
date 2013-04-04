@@ -85,7 +85,7 @@
     (define-key map (kbd "i")         'helm-imenu)
     (define-key map (kbd "<tab>")     'helm-lisp-completion-at-point)
     (define-key map (kbd "p")         'helm-list-emacs-process)
-    (define-key map (kbd "C-x r b")   'helm-pp-bookmarks)
+    (define-key map (kbd "C-x r b")   'helm-bookmarks)
     (define-key map (kbd "M-y")       'helm-show-kill-ring)
     (define-key map (kbd "C-c <SPC>") 'helm-all-mark-rings)
     (define-key map (kbd "C-x C-f")   'helm-find-files)
@@ -133,7 +133,7 @@
     ["Recent Files" helm-recentf t]
     ["Locate" helm-locate t]
     ["Search Files with find" helm-find t]
-    ["Bookmarks" helm-pp-bookmarks t])
+    ["Bookmarks" helm-bookmarks t])
    ("Buffers"
     ["Find buffers" helm-buffers-list t])
    ("Commands"
@@ -220,7 +220,7 @@
 ;;;;;;  helm-select-action helm-force-update helm-toggle-suspend-update
 ;;;;;;  helm-other-buffer helm-resume-previous-session-after-quit
 ;;;;;;  helm-resume helm-open-last-log helm-define-multi-key) "helm"
-;;;;;;  "helm.el" (20822 4054 358035 11000))
+;;;;;;  "helm.el" (20827 21030 617084 863000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -582,7 +582,7 @@ http://bbdb.sourceforge.net/
 ;;;***
 
 ;;;### (autoloads (helm-bookmark-ext helm-bmkext-run-edit) "helm-bmkext"
-;;;;;;  "helm-bmkext.el" (20820 27152 468670 638000))
+;;;;;;  "helm-bmkext.el" (20829 11449 225804 253000))
 ;;; Generated autoloads from helm-bmkext.el
 
 (autoload 'helm-bmkext-run-edit "helm-bmkext" "\
@@ -601,9 +601,14 @@ Contain also `helm-source-google-suggest'.
 ;;;***
 
 ;;;### (autoloads (helm-pp-bookmarks helm-bookmarks helm-bookmark-run-delete
-;;;;;;  helm-bookmark-run-jump-other-window) "helm-bookmark" "helm-bookmark.el"
-;;;;;;  (20825 27949 124317 110000))
+;;;;;;  helm-bookmark-run-jump-other-window helm-bookmark-toggle-filename)
+;;;;;;  "helm-bookmark" "helm-bookmark.el" (20829 11449 225804 253000))
 ;;; Generated autoloads from helm-bookmark.el
+
+(autoload 'helm-bookmark-toggle-filename "helm-bookmark" "\
+
+
+\(fn)" t nil)
 
 (autoload 'helm-bookmark-run-jump-other-window "helm-bookmark" "\
 Jump to bookmark from keyboard.
@@ -885,7 +890,7 @@ You can set your own list of commands with
 ;;;;;;  helm-ff-run-load-file helm-ff-run-byte-compile-file helm-ff-run-rename-file
 ;;;;;;  helm-ff-run-copy-file helm-ff-run-zgrep helm-ff-run-pdfgrep
 ;;;;;;  helm-ff-run-grep helm-ff-run-switch-to-history helm-ff-run-toggle-auto-update)
-;;;;;;  "helm-files" "helm-files.el" (20825 12472 301652 21000))
+;;;;;;  "helm-files" "helm-files.el" (20825 64642 845762 741000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1687,7 +1692,7 @@ Preconfigured helm to show org headlines.
 
 ;;;### (autoloads (helm-browse-code helm-multi-occur-from-isearch
 ;;;;;;  helm-multi-occur helm-occur-from-isearch helm-occur helm-regexp)
-;;;;;;  "helm-regexp" "helm-regexp.el" (20825 30650 750275 686000))
+;;;;;;  "helm-regexp" "helm-regexp.el" (20825 31650 370464 303000))
 ;;; Generated autoloads from helm-regexp.el
 
 (autoload 'helm-regexp "helm-regexp" "\
@@ -1932,7 +1937,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (20825 30718 314865 623000))
+;;;;;;  (20829 12313 274740 477000))
 
 ;;;***
 
