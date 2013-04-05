@@ -202,12 +202,12 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                (> len bookmark-bmenu-file-column))
                           (substring i 0 bookmark-bmenu-file-column)
                           i)
-          for sep = (and helm-bookmark-show-location
-                         (make-string (- (+ bookmark-bmenu-file-column 2)
-                                         (length trunc)) ? ))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
+          for sep = (and helm-bookmark-show-location
+                         (make-string (- (+ bookmark-bmenu-file-column 2)
+                                         (length trunc)) ? ))
           collect (let ((bmk (cond ( ;; info buffers
                                     isinfo
                                     (propertize trunc 'face 'helm-bookmark-info 'help-echo isfile))
