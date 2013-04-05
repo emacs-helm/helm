@@ -169,7 +169,9 @@ Should be used with `helm-pp-bookmark-match-fn' as `match-part' function."
 Should be used with `helm-bookmark-search-fn' as `search' function."
   (helm-aif (and helm-bookmark-show-location
                  (bookmark-location candidate))
-      it ; match only location, match-plugin will match also name.
+      ;; Match against bookmark-name and location.
+      (concat candidate " " it)
+    ;; Match against bookmark-name.
     candidate))
 
 (defun helm-highlight-bookmark (bookmarks source)
