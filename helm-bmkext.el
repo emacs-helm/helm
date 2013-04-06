@@ -67,7 +67,7 @@
      . (lambda (candidate)
          (let ((bmk (helm-bookmark-get-bookmark-from-name
                      candidate)))
-           (bookmark--jump-via bmk 'pop-to-buffer))))
+           (bookmark--jump-via bmk 'switch-to-buffer))))
     (persistent-help . "Show contact - Prefix with C-u to append")
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -75,14 +75,14 @@
     (action . (("Show Contact(s)"
                 . (lambda (candidate)
                     (let* ((contacts (helm-marked-candidates))
-                           (current-prefix-arg (or helm-current-prefix-arg
-                                                   (> (length contacts) 1))))
+                           (current-prefix-arg helm-current-prefix-arg))
                       (bookmark-jump
                        (helm-bookmark-get-bookmark-from-name (car contacts)))
                       (helm-aif (cdr contacts)
-                          (loop for bmk in it do
-                                (bookmark-jump
-                                 (helm-bookmark-get-bookmark-from-name bmk)))))))
+                          (let ((current-prefix-arg '(4)))
+                            (loop for bmk in it do
+                                  (bookmark-jump
+                                   (helm-bookmark-get-bookmark-from-name bmk))))))))
                ("Send Mail"
                 . (lambda (candidate)
                     (let* ((contacts (helm-marked-candidates))

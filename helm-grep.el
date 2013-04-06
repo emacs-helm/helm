@@ -717,9 +717,7 @@ Special commands:
                 :fc-transformer '(helm-adaptive-sort
                                   helm-grep-ack-types-transformer)
                 :buffer "*helm ack-types*")))
-    (mapconcat #'(lambda (type)
-                       (concat "--type=" type))
-               types " ")))
+    (mapconcat #'(lambda (type) (concat "--type=" type)) types " ")))
 
 
 ;;; grep extensions
