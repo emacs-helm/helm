@@ -101,7 +101,7 @@
         for loc = (bookmark-location i)
         for len =  (string-width i)
         for trunc = (if (> len bookmark-bmenu-file-column)
-                        (helm-substring-by-width i bookmark-bmenu-file-column "")
+                        (helm-substring i bookmark-bmenu-file-column)
                         i)
         for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
                                   (length trunc)) ? )
@@ -205,8 +205,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
           for len =  (string-width i)
           for trunc = (if (and helm-bookmark-show-location
                                (> len bookmark-bmenu-file-column))
-                          (helm-substring-by-width
-                           i bookmark-bmenu-file-column "")
+                          (helm-substring
+                           i bookmark-bmenu-file-column)
                           i)
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))

@@ -228,14 +228,13 @@ Handle multibyte characters by moving by columns."
     (save-excursion
       (insert str))
     (move-to-column width)
-    (delete-region (point) (point-max))
-    (buffer-string)))
+    (buffer-substring (point-at-bol) (point))))
 
 (defun* helm-substring-by-width (str width &optional (endstr "..."))
   "Truncate string STR to end at column WIDTH.
 Similar to `truncate-string-to-width'.
-Add \"...\" at end of truncated STR.
-Add spaces at end if needed to reach WIDTH."
+Add ENDSTR (default \"...\") at end of truncated STR.
+Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   (loop for ini-str = str
         then (substring ini-str 0 (1- (length ini-str)))
         for sw = (string-width ini-str)
