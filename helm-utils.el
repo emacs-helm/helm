@@ -231,7 +231,7 @@ Handle multibyte characters by moving by columns."
     (delete-region (point) (point-max))
     (buffer-string)))
 
-(defun helm-substring-by-width (str width)
+(defun* helm-substring-by-width (str width &optional (endstr "..."))
   "Truncate string STR to end at column WIDTH.
 Similar to `truncate-string-to-width'.
 Add \"...\" at end of truncated STR.
@@ -240,7 +240,7 @@ Add spaces at end if needed to reach WIDTH."
         then (substring ini-str 0 (1- (length ini-str)))
         for sw = (string-width ini-str)
         when (<= sw width) return
-        (concat ini-str "..." (make-string (- width sw) ? ))))
+        (concat ini-str endstr (make-string (- width sw) ? ))))
 
 (defun helm-string-multibyte-p (str)
   "Check if string STR contains multibyte characters."
