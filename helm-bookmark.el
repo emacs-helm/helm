@@ -64,6 +64,11 @@
   "Face used for file bookmarks."
   :group 'helm-bookmark)
 
+(defface helm-bookmark-addressbook
+    '((t (:foreground "tomato")))
+  "Face used for addressbook bookmarks."
+  :group 'helm-bookmark)
+
 
 (defvar helm-bookmark-map
   (let ((map (make-sparse-keymap)))
@@ -227,7 +232,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                        'help-echo isfile))
                           ( ;; Addressbook
                            isabook
-                           (propertize trunc 'face '((:foreground "Tomato"))))
+                           (propertize trunc 'face 'helm-bookmark-addressbook))
                           ( ;; directories
                            (and isfile
                                 ;; This is needed because `non-essential'
