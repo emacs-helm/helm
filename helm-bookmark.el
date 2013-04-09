@@ -89,7 +89,7 @@
               (require 'bookmark)
               (setq helm-bookmarks-cache
                     (bookmark-all-names))))
-    (no-delay-on-input) ; needed for helm-for-files.
+    (no-delay-on-input) ; Issue #173 needed for helm-for-files.
     (candidates . helm-bookmarks-cache)
     (filtered-candidate-transformer . helm-bookmark-transformer)
     (match . helm-bookmark-match-fn)
