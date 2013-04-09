@@ -206,7 +206,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
           for sep = (and helm-bookmark-show-location
                          (make-string (- (+ bookmark-bmenu-file-column 2)
-                                         (length trunc)) ? ))
+                                         (string-width trunc)) ? ))
           collect (let ((bmk (cond ( ;; info buffers
                                     isinfo
                                     (propertize trunc 'face 'helm-bookmark-info 'help-echo isfile))
