@@ -101,8 +101,7 @@
         for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
                                   (length trunc)) ? )
         if helm-bookmark-show-location
-        collect (cons (concat trunc
-                              (make-string (- 32 (length trunc)) ? ) loc) i)
+        collect (cons (concat trunc sep loc) i)
         else collect i))
 
 (defun helm-bookmark-match-fn (candidate)
