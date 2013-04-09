@@ -198,7 +198,8 @@
      ("(\\<\\(with-helm-show-completion\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-default-directory\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-display-same-window\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-restore-variables\\)\\>" 1 font-lock-keyword-face))))
+     ("(\\<\\(with-helm-restore-variables\\)\\>" 1 font-lock-keyword-face)
+     ("(\\<\\(define-helm-type-attribute\\)\\>" 1 font-lock-keyword-face))))
 
 
 ;;; Start of automatically extracted autoloads.
