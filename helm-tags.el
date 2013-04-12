@@ -205,13 +205,17 @@ If no entry in cache, create one."
                            (helm-match-line-color-current-line))))
   "Helm source for Etags.")
 
+(defvar find-tag-marker-ring)
+
 (defun helm-etags-default-action (candidate)
   "Helm default action to jump to an etags entry."
+  (require 'etags)
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (let* ((split (split-string candidate ": "))
          (fname (expand-file-name
                  (car split) helm-etags-tag-file-dir))
          (elm   (cadr split)))
+    (ring-insert find-tag-marker-ring (point-marker))
     (find-file fname)
     (goto-char (point-min))
     (search-forward elm nil t)
