@@ -212,6 +212,7 @@ If no entry in cache, create one."
          (fname (expand-file-name
                  (car split) helm-etags-tag-file-dir))
          (elm   (cadr split)))
+    (ring-insert find-tag-marker-ring (point-marker))
     (find-file fname)
     (goto-char (point-min))
     (search-forward elm nil t)
