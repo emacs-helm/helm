@@ -447,12 +447,20 @@ from its directory."
                  (t default-directory)))
          default-directory))))
 
-(defmacro* helm-walk-directory (directory &key path (directories t) match)
+;; Same as `vc-directory-exclusion-list'.
+(defvar helm-walk-ignore-directories
+  '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr"
+    "_MTN" "_darcs" "{arch}"))
+
+(defmacro* helm-walk-directory (directory &key path (directories t) match skip-subdirs)
   "Walk through DIRECTORY tree.
 Argument PATH can be one of basename, relative, or full, default to basename.
 Argument DIRECTORIES when non--nil (default) return also directories names,
 otherwise skip directories names.
-Argument MATCH can be a predicate or a regexp."
+Argument MATCH can be a predicate or a regexp.
+Argument SKIP-SUBDIRS when non--nil will skip `helm-walk-ignore-directories'
+unless it is given as a list of directories, in this case this list will be used
+instead of `helm-walk-ignore-directories'."
   `(let (result
          (fn (case ,path
                (basename 'file-name-nondirectory)
@@ -460,24 +468,29 @@ Argument MATCH can be a predicate or a regexp."
                (full     'identity)
                (t        'file-name-nondirectory))))
      (labels ((ls-R (dir)
-                (loop with ls = (directory-files
-                                 dir t directory-files-no-dot-files-regexp)
-                      for f in ls
-                      if (file-directory-p f)
-                      do (progn (when ,directories
-                                  (push (funcall fn f) result))
-                                ;; Don't recurse in directory symlink.
-                                (unless (file-symlink-p f)
-                                  (ls-R f)))
-                      else do
-                      (if ,match
-                          (and (if (functionp ,match)
-                                   (funcall ,match f)
-                                   (and (stringp ,match)
-                                        (string-match
-                                         ,match (file-name-nondirectory f))))
-                               (push (funcall fn f) result))
-                          (push (funcall fn f) result)))))
+                (unless (and ,skip-subdirs
+                             (member (helm-basename dir)
+                                     (if (listp ,skip-subdirs)
+                                         ,skip-subdirs
+                                         helm-walk-ignore-directories)))
+                  (loop with ls = (directory-files
+                                   dir t directory-files-no-dot-files-regexp)
+                        for f in ls
+                        if (file-directory-p f)
+                        do (progn (when ,directories
+                                    (push (funcall fn f) result))
+                                  ;; Don't recurse in directory symlink.
+                                  (unless (file-symlink-p f)
+                                    (ls-R f)))
+                        else do
+                        (if ,match
+                            (and (if (functionp ,match)
+                                     (funcall ,match f)
+                                     (and (stringp ,match)
+                                          (string-match
+                                           ,match (file-name-nondirectory f))))
+                                 (push (funcall fn f) result))
+                            (push (funcall fn f) result))))))
        (ls-R ,directory)
        (nreverse result))))
 
