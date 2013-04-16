@@ -79,6 +79,7 @@
 (defvar helm-apt-all-packages nil)
 (defvar helm-apt-input-history nil)
 (defvar helm-apt-show-only 'all)
+(defvar helm-apt-term-buffer nil)
 
 (defun helm-apt-refresh ()
   "Refresh installed candidates list."
@@ -196,7 +197,11 @@ package name - description."
 (defun* helm-apt-generic-action (&key action)
   "Run 'apt-get ACTION'.
 Support install, remove and purge actions."
-  (ansi-term (getenv "SHELL") "helm apt")
+  (if (and helm-apt-term-buffer
+           (buffer-live-p (get-buffer helm-apt-term-buffer)))
+      (switch-to-buffer helm-apt-term-buffer)
+      (ansi-term (getenv "SHELL") "term apt")
+      (setq helm-apt-term-buffer (buffer-name)))
   (term-line-mode)
   (let ((command   (case action
                      (install   "sudo apt-get install ")
@@ -211,12 +216,12 @@ Support install, remove and purge actions."
     (goto-char (point-max))
     (insert (concat command cand-list))
     (setq end (point))
-    (if (y-or-n-p (format "%s package" (symbol-name action)))
+    (if (y-or-n-p (format "%s package(s)" (symbol-name action)))
         (progn
           (setq helm-external-commands-list nil)
           (setq helm-apt-installed-packages nil)
           (term-char-mode) (term-send-input))
-        (delete-region beg end) (term-send-eof) (kill-buffer))))
+        (delete-region beg end))))
 
 ;;;###autoload
 (defun helm-apt (arg)
