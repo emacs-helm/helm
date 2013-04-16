@@ -166,17 +166,25 @@ LINE is displayed like:
 package name - description."
   (car (split-string line " - ")))
 
+(defvar helm-apt-show-current-package nil)
+(define-derived-mode helm-apt-show-mode
+    special-mode "helm-apt-show"
+    "Mode to display infos on apt packages.")
+
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."
     (let* ((command (format helm-apt-show-command package))
-           (buf (get-buffer command)))
-      (helm-switch-to-buffer (get-buffer-create command))
-      (view-mode 1)
-      (unless buf
+           (buf     (get-buffer-create "*helm apt show*")))
+      (helm-switch-to-buffer buf)
+      (unless (string= package helm-apt-show-current-package)
         (let ((inhibit-read-only t))
+          (erase-buffer)
           (save-excursion
-            (insert (shell-command-to-string command))))
-        (view-mode 1))))
+            (call-process-shell-command
+             command nil (current-buffer) t))))
+      (helm-apt-show-mode)
+      (set (make-local-variable 'helm-apt-show-current-package)
+           package)))
 
 (defun helm-apt-install (package)
   "Run 'apt-get install' shell command on PACKAGE."
