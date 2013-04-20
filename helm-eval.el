@@ -101,7 +101,7 @@ Should take one arg: the string to display."
     (condition-case err
         (when (member buf helm-eldoc-active-minibuffers-list)
           (let* ((str-all (with-current-buffer buf
-                            (minibuffer-completion-contents)))
+                            (helm-minibuffer-completion-contents)))
                  (sym     (when str-all
                             (with-temp-buffer
                               (insert str-all)

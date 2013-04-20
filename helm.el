@@ -3189,6 +3189,11 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
   (when noupdate
     (setq helm-pattern pattern)))
 
+(defun helm-minibuffer-completion-contents ()
+  "Return the user input in a minibuffer before point as a string.
+That is what completion commands operate on."
+  (buffer-substring (field-beginning) (point)))
+
 ;;;###autoload
 (defun helm-delete-minibuffer-contents (&optional arg)
   "Delete minibuffer contents.
@@ -3199,7 +3204,7 @@ delete minibuffer contents from point instead of deleting all."
   (require 'helm-utils)
   (let* ((input (minibuffer-contents))
          (str (if (or arg helm-delete-minibuffer-contents-from-point)
-                  (minibuffer-completion-contents) "")))
+                  (helm-minibuffer-completion-contents) "")))
     (helm-reset-yank-point)
     (if (> (length input) 0)
         ;; minibuffer is not empty, delete contents and update.
