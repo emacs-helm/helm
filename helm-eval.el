@@ -100,19 +100,16 @@ Should take one arg: the string to display."
                (buffer-name))))
     (condition-case err
         (when (member buf helm-eldoc-active-minibuffers-list)
-          (let* ((str-all (with-current-buffer buf
-                            (helm-minibuffer-completion-contents)))
-                 (sym     (when str-all
-                            (with-temp-buffer
-                              (insert str-all)
-                              (goto-char (point-max))
-                              (unless (looking-back ")\\|\"") (forward-char -1))
-                              (eldoc-current-symbol))))
-                 (info-fn (eldoc-fnsym-in-current-sexp))
-                 (doc     (or (eldoc-get-var-docstring sym)
-                              (eldoc-get-fnsym-args-string
-                               (car info-fn) (cadr info-fn)))))
-            (when doc (funcall helm-eldoc-in-minibuffer-show-fn doc))))
+          (with-current-buffer buf
+            (let* ((sym     (save-excursion
+                              (unless (looking-back ")\\|\"")
+                                (forward-char -1))
+                              (eldoc-current-symbol)))
+                   (info-fn (eldoc-fnsym-in-current-sexp))
+                   (doc     (or (eldoc-get-var-docstring sym)
+                                (eldoc-get-fnsym-args-string
+                                 (car info-fn) (cadr info-fn)))))
+              (when doc (funcall helm-eldoc-in-minibuffer-show-fn doc)))))
       (scan-error nil)
       (beginning-of-buffer nil)
       (error (message "Eldoc in minibuffer error: %S" err)))))
