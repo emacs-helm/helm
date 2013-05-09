@@ -231,7 +231,6 @@ Italic     => A non--file buffer.
 - You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
 - Use `C-u C-z' to watch an image.
 - To browse images directories turn on `helm-follow-mode' and navigate with arrow keys.
-- When entered ediff, hitting `C-g' will ask you to use locate to find the file to ediff with.
 - You can switch to locate with `C-x C-f', with one prefix arg use locale db file or create it,
   with two prefix arg create or refresh db file.
 - When you want to delete backward characters to e.g creating a new file or directory,
