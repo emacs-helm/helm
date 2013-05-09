@@ -102,6 +102,7 @@
                                 candidate)))
                       (addressbook-bookmark-edit
                        (assoc bmk bookmark-alist)))))
+               ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
                ("Insert Email at point"
                 . (lambda (candidate)
                     (let* ((bmk   (helm-bookmark-get-bookmark-from-name
