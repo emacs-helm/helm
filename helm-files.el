@@ -284,7 +284,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "M-H")           'helm-ff-run-hardlink-file)
     (define-key map (kbd "M-D")           'helm-ff-run-delete-file)
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
-    (define-key map (kbd "C-d")           'helm-ff-persistent-delete)
+    (define-key map (kbd "C-D")           'helm-ff-persistent-delete)
     (define-key map (kbd "M-e")           'helm-ff-run-switch-to-eshell)
     (define-key map (kbd "<M-tab>")       'helm-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-c o")         'helm-ff-run-switch-other-window)
