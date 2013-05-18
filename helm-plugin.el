@@ -177,41 +177,43 @@ Will list all lines in .emacs.el.")
     (save-excursion
       (goto-char (point-min))
       (if (functionp regexp) (setq regexp (funcall regexp)))
-      (let (hierarchy curhead)
-        (flet ((matched ()
+      (let ((matched 
+             #'(lambda ()
                  (if (numberp subexp)
-                     (cons (match-string-no-properties subexp) (match-beginning subexp))
+                     (cons (match-string-no-properties subexp)
+                           (match-beginning subexp))
                      (cons (buffer-substring (point-at-bol) (point-at-eol))
-                           (point-at-bol))))
-               (hierarchies (headlines)
-                 (1+ (loop for (_ . hierarchy) in headlines
-                           maximize hierarchy)))
-               (vector-0-n (v n)
-                 (loop for i from 0 to hierarchy
-                       collecting (aref curhead i)))
-               (arrange (headlines)
+                           (point-at-bol)))))
+            (arrange
+             #'(lambda (headlines)
                  (unless (null headlines) ; FIX headlines empty bug!
-                   (loop with curhead = (make-vector (hierarchies headlines) "")
+                   (loop with curhead = (make-vector
+                                         (1+ (loop for (_ . hierarchy) in headlines
+                                                   maximize hierarchy))
+                                         "")
                          for ((str . pt) . hierarchy) in headlines
                          do (aset curhead hierarchy str)
                          collecting
                          (cons
                           (format "H%d:%s" (1+ hierarchy)
-                                  (mapconcat 'identity (vector-0-n curhead hierarchy) " / "))
-                          pt)))))
+                                  (mapconcat 'identity
+                                             (loop for i from 0 to hierarchy
+                                                   collecting (aref curhead i))
+                                             " / "))
+                          pt))))))
           (if (listp regexp)
-              (arrange
-               (sort
-                (loop for re in regexp
-                      for hierarchy from 0
-                      do (goto-char (point-min))
-                      appending
-                      (loop
-                            while (re-search-forward re nil t)
-                            collect (cons (matched) hierarchy)))
-                (lambda (a b) (> (cdar b) (cdar a)))))
+              (funcall arrange
+                       (sort
+                        (loop for re in regexp
+                              for hierarchy from 0
+                              do (goto-char (point-min))
+                              appending
+                              (loop
+                                    while (re-search-forward re nil t)
+                                    collect (cons (funcall matched) hierarchy)))
+                        (lambda (a b) (> (cdar b) (cdar a)))))
               (loop while (re-search-forward regexp nil t)
-                    collect (matched))))))))
+                    collect (funcall matched)))))))
 
 (defun helm-headline-make-candidate-buffer (regexp subexp)
   (with-current-buffer (helm-candidate-buffer 'local)
