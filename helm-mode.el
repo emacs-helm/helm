@@ -149,11 +149,10 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ;; elements as string, so intern them to call predicate.
                ((and (symbolp collection) (boundp collection) test)
                 (let ((predicate `(lambda (elm)
-                                    (if (or (eq (quote ,test) 'commandp)
-                                            (eq (quote ,test) 'functionp)
-                                            (eq (quote ,test) 'symbolp))
-                                        (funcall (quote ,test) (intern elm))
-                                        (funcall (quote ,test) elm)))))
+                                    (condition-case err
+                                        (funcall (quote ,test) elm)
+                                      (wrong-type-argument
+                                       (funcall (quote ,test) (intern elm)))))))
                   (all-completions "" (symbol-value collection) predicate)))
                ((and (symbolp collection) (boundp collection))
                 (all-completions "" (symbol-value collection)))
