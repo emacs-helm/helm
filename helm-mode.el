@@ -150,7 +150,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ((and (symbolp collection) (boundp collection) test)
                 (let ((predicate `(lambda (elm)
                                     (condition-case err
-                                        (funcall (quote ,test) elm)
+                                        (if (eq (quote ,test) 'commandp)
+                                            (funcall (quote ,test) (intern elm))
+                                            (funcall (quote ,test) elm))
                                       (wrong-type-argument
                                        (funcall (quote ,test) (intern elm)))))))
                   (all-completions "" (symbol-value collection) predicate)))
