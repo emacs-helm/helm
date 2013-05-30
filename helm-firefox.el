@@ -30,12 +30,22 @@
 ;; user_pref("browser.bookmarks.autoExportHTML", true);
 ;; NOTE: This is also working in the same way for mozilla aka seamonkey.
 
+
+(defgroup helm-firefox nil
+  "Helm libraries and applications for Firefox navigator."
+  :group 'helm)
+
+(defcustom helm-firefox-default-directory "/.mozilla/firefox/"
+  "The root directory containing firefox config."
+  :group 'helm-firefox
+  :type 'string)
+
 (defvar helm-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ \"]*")
 (defvar helm-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 
 (defun helm-get-firefox-user-init-dir ()
   "Guess the default Firefox user directory name."
-  (let* ((moz-dir (concat (getenv "HOME") "/.mozilla/firefox/"))
+  (let* ((moz-dir (concat (getenv "HOME") helm-firefox-default-directory))
          (moz-user-dir
           (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
             (goto-char (point-min))
