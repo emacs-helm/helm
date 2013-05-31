@@ -829,16 +829,20 @@ not `exit-minibuffer' or unwanted functions."
   "Return the value of `helm-default-directory'."
   (buffer-local-value 'helm-default-directory (get-buffer helm-buffer)))
 
-(defmacro with-helm-after-update-hook (&rest body)
-  "Execute BODY at end of `helm-update'."
+(defmacro with-helm-temp-hook (hook &rest body)
+  "Execute temporarily BODY as a function for HOOK."
   (declare (indent 0) (debug t))
   (let ((fun (gensym "helm-hook")))
     `(progn
        (defun ,fun ()
          (unwind-protect
               (progn ,@body)
-           (remove-hook 'helm-after-update-hook (quote ,fun))))
-       (add-hook 'helm-after-update-hook (quote ,fun)))))
+           (remove-hook ,hook (quote ,fun))))
+       (add-hook ,hook (quote ,fun)))))
+
+(defmacro with-helm-after-update-hook (&rest body)
+  "Execute BODY at end of `helm-update'."
+  `(with-helm-temp-hook 'helm-after-update-hook ,@body))
 
 (defun* helm-attr (attribute-name
                    &optional (src (helm-get-current-source)) compute)
