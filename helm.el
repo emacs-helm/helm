@@ -842,6 +842,7 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."
+  (declare (indent 0) (debug t))
   `(with-helm-temp-hook 'helm-after-update-hook ,@body))
 
 (defun* helm-attr (attribute-name
