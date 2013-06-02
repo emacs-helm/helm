@@ -212,6 +212,11 @@ This happen only in `helm-find-files'."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-findutils-ignore-boring-files nil
+  "Ignore files matching regexps in `helm-boring-file-regexp-list'."
+  :group 'helm-files
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -2538,9 +2543,14 @@ utility mdfind.")
 (defun helm-findutils-transformer (candidates source)
   (loop for i in candidates
         for abs = (expand-file-name i helm-default-directory)
+        for boring = (and helm-boring-file-regexp-list
+                          (not helm-findutils-ignore-boring-files)
+                          (loop for reg in helm-boring-file-regexp-list
+                                thereis (string-match reg i)))
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (string-match "[.]\\{1,2\\}$" i)))
                        (helm-basename i) abs)
+        unless boring
         collect (cons (propertize disp 'face 'helm-ff-file) abs)))
 
 (defun helm-find-shell-command-fn ()
