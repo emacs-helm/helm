@@ -367,7 +367,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                     helm-ff-auto-update-initial-value)
               (setq helm-in-file-completion-p t)))
     (candidates . helm-find-files-get-candidates)
-    (match . helm-ff-match-fn)
     (filtered-candidate-transformer helm-find-files-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
@@ -416,13 +415,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ("View file" . view-file)
            ("Print File `C-c p, C-u to refresh'" . helm-ff-print)
            ("Locate `C-x C-f, C-u to specify locate db'" . helm-ff-locate))))))
-
-(defun helm-ff-match-fn (candidate)
-  "Match function for `helm-source-find-files'."
-  (or (string-match (regexp-quote helm-input) candidate)
-      ;; `helm-pattern' have been transformed by
-      ;; `helm-ff-transform-fname-for-completion'.
-      (string-match helm-pattern candidate)))
 
 (defun helm-find-files-set-prompt-for-action (action files)
   "Set prompt for action ACTION for FILES."
@@ -1413,27 +1405,29 @@ If FNAME is an url returns it unmodified.
 When FNAME contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
 If FNAME is a valid directory name,return FNAME unchanged."
-  (let ((bn (helm-basename fname)))
+  (let ((bn      (helm-basename fname))
+        (bd      (file-name-directory fname))
+        (dir-p   (file-directory-p fname))
+        (tramp-p (loop for (m . f) in tramp-methods
+                       thereis (string-match m fname))))
     (if (or (not helm-ff-smart-completion)
             (memq helm-mp-matching-method
                   helm-ff-smart-completion-incompatible-methods)
             (string-match "\\s-" bn)      ; Fall back to match-plugin.
             (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
             (string-match "/$" fname)     ; Allow mkdir.
-            (file-directory-p fname)
+            dir-p
             (string-match helm-ff-url-regexp fname)
-            (and (string= helm-ff-default-directory "/")
-                 (loop for i in (mapcar #'(lambda (x)
-                                            (concat "/" (car x)))
-                                        tramp-methods)
-                       thereis (string-match fname i))))
+            (and (string= helm-ff-default-directory "/") tramp-p))
         ;; Don't treat wildcards ("*") as regexp char.
         ;; (e.g ./foo/*.el => ./foo/[*].el)
-        (replace-regexp-in-string "[*]" "[*]" fname)
+        (cond (dir-p (regexp-quote fname))
+              (t     (concat (regexp-quote bd)
+                             (replace-regexp-in-string "[*]" "[*]" bn))))
         (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
                      (helm-ff-mapconcat-candidate bn)
                      (concat ".*" bn)))
-        (expand-file-name bn (file-name-directory fname)))))
+        (concat (regexp-quote bd) bn))))
 
 (defun helm-ff-mapconcat-candidate (candidate)
   "Transform string CANDIDATE in regexp.
