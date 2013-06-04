@@ -1124,11 +1124,11 @@ or hitting C-z on \"..\"."
 
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
-  (helm-aif (helm-get-selection)
-    (when (and (helm-file-completion-source-p)
-               (not (file-remote-p it))
-               (not (file-exists-p it)))
-      (helm-next-line))))
+  (helm-aif (and (helm-file-completion-source-p)
+                 (helm-get-selection))
+      (unless (or (string-match tramp-file-name-regexp it)
+                  (file-exists-p it))
+        (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
 
 ;; Auto-update - helm-find-files auto expansion of directories.
