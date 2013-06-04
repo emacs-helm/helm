@@ -1117,7 +1117,7 @@ or hitting C-z on \"..\"."
                        (directory-file-name helm-ff-last-expanded))
                       (directory-file-name helm-ff-last-expanded))))
       (with-helm-window
-        (when (re-search-forward (concat "^" presel "$") nil t)
+        (when (re-search-forward (concat "^" (regexp-quote presel) "$") nil t)
           (forward-line 0)
           (helm-mark-current-line)))
       (setq helm-ff-last-expanded nil))))

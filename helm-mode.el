@@ -727,7 +727,6 @@ Keys description:
                                         (helm-find-files-get-candidates must-match)))))
                        (filtered-candidate-transformer
                         helm-find-files-transformer)
-                       (match . helm-ff-match-fn)
                        (no-delay-on-input)
                        (persistent-action . ,persistent-action)
                        (candidate-number-limit . 9999)
