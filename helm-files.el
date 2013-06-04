@@ -1101,34 +1101,32 @@ If prefix numeric arg is given go ARG level down."
              (file-exists-p helm-pattern))
         (setq helm-ff-last-expanded helm-pattern)
         (setq helm-ff-last-expanded helm-ff-default-directory))
-    (let ((new-pattern (helm-reduce-file-name helm-pattern arg
-                                              :unix-close t :expand t)))
+    (let ((new-pattern (helm-reduce-file-name
+                        helm-pattern arg :unix-close t :expand t)))
       (helm-set-pattern new-pattern t)
-      (run-with-idle-timer helm-input-idle-delay nil
-                           #'(lambda () (helm-update))))))
+      (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))
+      (run-with-idle-timer helm-input-idle-delay nil 'helm-update))))
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
 This happen after using `helm-find-files-down-one-level',
 or hitting C-z on \"..\"."
-  (when (and helm-ff-last-expanded
-             (helm-file-completion-source-p))
+  (when helm-ff-last-expanded
     (let ((presel (if helm-ff-transformer-show-only-basename
                       (helm-basename
                        (directory-file-name helm-ff-last-expanded))
                       (directory-file-name helm-ff-last-expanded))))
       (with-helm-window
-        (when (re-search-forward (concat "^" (regexp-quote presel) "$") nil t)
+        (when (re-search-forward (concat "^" presel "$") nil t)
           (forward-line 0)
           (helm-mark-current-line)))
       (setq helm-ff-last-expanded nil))))
-(add-hook 'helm-after-update-hook 'helm-ff-retrieve-last-expanded)
 
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
   (helm-aif (helm-get-selection)
     (when (and (helm-file-completion-source-p)
-               (not (string-match tramp-file-name-regexp it))
+               (not (file-remote-p it))
                (not (file-exists-p it)))
       (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
@@ -1313,7 +1311,8 @@ purpose."
 (defun helm-find-files-get-candidates (&optional require-match)
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
-         (path-name-dir (if (and (file-directory-p path)
+         (dir-p         (file-directory-p path))
+         (path-name-dir (if (and dir-p
                                  ;; Don't add the "/" at the end
                                  ;; of path when `helm-ff-auto-update-flag'
                                  ;; is enabled.
@@ -1375,13 +1374,13 @@ purpose."
            (list (format "Opening directory: access denied, `%s'" path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
-          ((and (file-directory-p path) helm-ff-auto-update-flag)
+          ((and dir-p helm-ff-auto-update-flag)
            (helm-ff-directory-files path t))
           (t (append (unless (or require-match
                                  ;; When `helm-ff-auto-update-flag' has been
                                  ;; disabled, whe don't want PATH to be added on top
                                  ;; if it is a directory.
-                                 (file-directory-p path))
+                                 dir-p)
                        (list path))
                      (helm-ff-directory-files path-name-dir t))))))
 
