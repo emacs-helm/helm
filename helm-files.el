@@ -1097,12 +1097,15 @@ If prefix numeric arg is given go ARG level down."
     ;; When going to precedent level we want to be at the line
     ;; corresponding to actual directory, so store this info
     ;; in `helm-ff-last-expanded'.
-    (if (and (not (file-directory-p helm-pattern))
-             (file-exists-p helm-pattern))
-        (setq helm-ff-last-expanded helm-pattern)
-        (setq helm-ff-last-expanded helm-ff-default-directory))
-    (let ((new-pattern (helm-reduce-file-name
+    (let ((cur-cand (helm-get-selection))
+          (new-pattern (helm-reduce-file-name
                         helm-pattern arg :unix-close t :expand t)))
+      (cond ((file-directory-p helm-pattern)
+             (setq helm-ff-last-expanded helm-ff-default-directory))
+            ((file-exists-p helm-pattern)
+             (setq helm-ff-last-expanded helm-pattern))
+            ((and cur-cand (file-exists-p cur-cand))
+             (setq helm-ff-last-expanded cur-cand)))
       (helm-set-pattern new-pattern t)
       (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))
       (run-with-idle-timer helm-input-idle-delay nil 'helm-update))))
