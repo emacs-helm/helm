@@ -1084,6 +1084,8 @@ You should not modify this yourself unless you know what you do.")
         (loop for i in helm-file-completion-sources
               thereis (string= cur-source i)))))
 
+;; Internal
+(defvar helm-tramp-input-idle-delay 0.6)
 ;;;###autoload
 (defun helm-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
@@ -1108,7 +1110,12 @@ If prefix numeric arg is given go ARG level down."
              (setq helm-ff-last-expanded cur-cand)))
       (helm-set-pattern new-pattern t)
       (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))
-      (run-with-idle-timer helm-input-idle-delay nil 'helm-update))))
+      (run-with-idle-timer (if (file-remote-p new-pattern)
+                               ;; Tramp need a long delay to parse filenames.
+                               (max helm-tramp-input-idle-delay ; 0.6
+                                    helm-input-idle-delay)
+                               helm-input-idle-delay)
+                           nil 'helm-update))))
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.

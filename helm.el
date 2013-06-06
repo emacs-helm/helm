@@ -2117,6 +2117,8 @@ Helm plug-ins are realized by this function."
                              (helm-interpret-value candidate-proc source)
                              (if (or helm-force-updating-p
                                      helm-never-delay-on-input
+                                     ;; Avoid using `while-no-input' with tramp.
+                                     (file-remote-p helm-pattern)
                                      (assoc 'no-delay-on-input source))
                                  (helm-interpret-value candidate-fn source)
                                  (let ((result (while-no-input
