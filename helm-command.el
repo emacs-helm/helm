@@ -100,7 +100,20 @@ Show global bindings and local bindings according to current `major-mode'."
                                        'face 'helm-M-x-key))))
                 cand) into ls
           finally return
-          (sort ls #'(lambda (x y) (string-lessp (car x) (car y)))))))
+          (sort ls #'helm-command-M-x-sort-fn))))
+
+(defun helm-command-M-x-sort-fn (s1 s2)
+  (let* ((reg1 (concat "\\_<" helm-pattern "\\_>"))
+         (reg2 (concat "\\_<" helm-pattern))
+         (sc1  (cond ((string-match reg1 (car s1)) 2)
+                     ((string-match reg2 (car s1)) 1)
+                     (t 0)))
+         (sc2  (cond ((string-match reg1 (car s2)) 2)
+                     ((string-match reg2 (car s2)) 1)
+                     (t 0))))
+    (if (and (zerop sc1) (zerop sc2))
+        (string-lessp (car s1) (car s2))
+        (> sc1 sc2))))
 
 ;;;###autoload
 (defun helm-M-x ()
