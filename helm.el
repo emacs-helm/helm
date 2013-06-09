@@ -69,7 +69,7 @@ More than 2 seconds, next hit will run again the first function and so on."
         next)
     (unless (and (symbol-value iterator)
                  ;; Reset iterator when another key is pressed.
-                 (eq this-command last-command))
+                 (eq this-command real-last-command))
       (set iterator (helm-iter-list (funcall fn))))
     (setq next (helm-iter-next (symbol-value iterator)))
     (unless next
