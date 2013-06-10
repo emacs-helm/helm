@@ -28,7 +28,7 @@
 
 (defcustom helm-M-x-requires-pattern 2
   "Value of requires-pattern for `helm-M-x'.
-Set it to 0 to disable requires-pattern in `helm-M-x'."
+Set it to 0 to show all candidates on startup."
   :group 'helm-command
   :type 'boolean)
 
