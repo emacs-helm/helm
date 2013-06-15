@@ -39,6 +39,11 @@ If nil or zero, don't truncate candidate, show all."
   :type 'integer
   :group 'helm-ring)
 
+(defcustom helm-kill-ring-show-completion t
+  "Show yank contents with an overlay in current buffer."
+  :group 'helm-ring
+  :type 'boolean)
+
 (defcustom helm-register-max-offset 160
   "Max size of string register entries before truncating."
   :group 'helm-ring
@@ -345,9 +350,12 @@ It is drop-in replacement of `yank-pop'.
 
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (helm :sources helm-source-kill-ring
-        :buffer "*helm kill ring*"
-        :allow-nest t))
+  (let ((helm-turn-on-show-completion (and helm-kill-ring-show-completion
+                                           (eq last-command 'yank))))
+    (with-helm-show-completion (mark t) (point)
+      (helm :sources helm-source-kill-ring
+            :buffer "*helm kill ring*"
+            :allow-nest t))))
 
 (provide 'helm-ring)
 
