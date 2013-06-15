@@ -1408,6 +1408,13 @@ systems."
         (dot2 (concat directory "..")))
     (append (list dot dot2) ls)))
 
+(defun helm-ff-handle-backslash (fname)
+  (loop with bad = '((92 . ""))
+        for i across fname
+        for isbad = (assq i bad)
+        if isbad concat (cdr isbad)
+        else concat (string i)))
+
 ;; Internal
 (defvar helm-ff-smart-completion-incompatible-methods '(multi1 multi3p))
 (defun helm-ff-transform-fname-for-completion (fname)
@@ -1419,6 +1426,7 @@ If FNAME is an url returns it unmodified.
 When FNAME contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
 If FNAME is a valid directory name,return FNAME unchanged."
+  (setq fname (helm-ff-handle-backslash fname))
   (let ((bn      (helm-basename fname))
         (bd      (file-name-as-directory (file-name-directory fname)))
         (dir-p   (file-directory-p fname))
