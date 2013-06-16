@@ -181,11 +181,6 @@
   (interactive)
   (customize-group "helm"))
 
-
-;;; We don't want helm source variables to be saved across Emacs sessions.
-(eval-after-load "session"
-  '(push "\\`helm-source" session-globals-exclude))
-
 ;;; Fontlock
 (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
   (font-lock-add-keywords
