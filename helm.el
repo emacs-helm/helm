@@ -53,14 +53,26 @@ e.g
 
 Each time \"<f5> q\" is pressed the next function is executed, if you wait
 More than 2 seconds, next hit will run again the first function and so on."
+   (define-key keymap key (helm-make-multi-command functions delay)))
+
+(defmacro helm-multi-key-defun (name docstring funs &optional delay)
+  "Define NAME as a multi-key command running FUNS.
+After DELAY seconds the FUNS list is reinitialised.
+See `helm-define-multi-key'."
+  (declare (indent 2))
+  (setq docstring (if docstring (concat docstring "\n\n")
+                      "This is a helmish multi-key command."))
+  `(defalias (quote ,name) (helm-make-multi-command ,funs ,delay) ,docstring))
+
+(defun helm-make-multi-command (functions &optional delay)
+  "Return an anonymous multi-key command running FUNCTIONS.
+Run each function of FUNCTIONS list in turn when called within DELAY seconds."
+  (declare (indent 1))
   (lexical-let ((funs functions)
                 (iter (gensym "helm-iter-key"))
                 (timeout delay))
     (eval (list 'defvar iter nil))
-    (define-key keymap key #'(lambda ()
-                               (interactive)
-                               (helm-run-multi-key-command
-                                funs iter timeout)))))
+    #'(lambda () (interactive) (helm-run-multi-key-command funs iter timeout))))
 
 (defun helm-run-multi-key-command (functions iterator delay)
   (let ((fn #'(lambda ()
@@ -90,6 +102,12 @@ More than 2 seconds, next hit will run again the first function and so on."
 (defun helm-iter-next (iterator)
   "Return next elm of ITERATOR."
   (funcall iterator))
+
+(helm-multi-key-defun helm-toggle-resplit-and-swap-windows
+    "Multi key command to resplit and swap helm window.
+First call run `helm-toggle-resplit-window',
+second call within 0.5s run `helm-swap-windows'."
+  '(helm-toggle-resplit-window helm-swap-windows) 0.5)
 
 
 ;;; Keymap
@@ -154,8 +172,7 @@ More than 2 seconds, next hit will run again the first function and so on."
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
-    (helm-define-multi-key map (kbd "C-t") '(helm-toggle-resplit-window
-                                             helm-swap-windows) 0.5)
+    (define-key map (kbd "C-t")        'helm-toggle-resplit-and-swap-windows)
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    'undefined)
     (define-key map (kbd "C-h C-d")    'helm-debug-output)

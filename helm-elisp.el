@@ -260,6 +260,14 @@ Filename completion happen if string start after or between a double quote."
         (helm-complete-file-name-at-point)
         (helm-lisp-completion-at-point))))
 
+(helm-multi-key-defun helm-multi-lisp-complete-at-point
+    "Multi key function for completion in emacs lisp buffers.
+First call indent, second complete symbol, third complete fname."
+  '(helm-lisp-indent
+    helm-lisp-completion-at-point
+    helm-complete-file-name-at-point)
+  0.3)
+
 
 ;;; Apropos
 ;;
