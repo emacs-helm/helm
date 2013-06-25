@@ -20,6 +20,7 @@
 (require 'cl)
 (require 'helm)
 (require 'helm-mode)
+(require 'helm-elisp)
 
 
 (defgroup helm-command nil
@@ -100,32 +101,7 @@ Show global bindings and local bindings according to current `major-mode'."
                                        'face 'helm-M-x-key))))
                 cand) into ls
           finally return
-          (sort ls #'helm-command-M-x-sort-fn))))
-
-(defun helm-command-M-x-sort-fn (s1 s2)
-  (let* ((reg1  (concat "\\_<" helm-pattern "\\_>"))
-         (reg2  (concat "\\_<" helm-pattern))
-         (split (split-string helm-pattern))
-         (str1  (cdr s1))
-         (str2  (cdr s2))
-         (score #'(lambda (str r1 r2 lst)
-                    (cond ((string-match r1 str) 4)
-                          ((and (string-match " " helm-pattern)
-                                (string-match (concat "\\_<" (car lst)) str)
-                                (loop for r in (cdr lst)
-                                      always (string-match r str))) 3)
-                          ((and (string-match " " helm-pattern)
-                                (loop for r in lst always (string-match r str))) 2)
-                          ((string-match r2 str) 1)
-                          (t 0))))
-         (sc1 (funcall score str1 reg1 reg2 split))
-         (sc2 (funcall score str2 reg1 reg2 split)))
-    (cond ((or (zerop (length helm-pattern))
-               (and (zerop sc1) (zerop sc2)))
-           (string-lessp str1 str2))
-          ((= sc1 sc2)
-           (< (length str1) (length str2)))
-          (t (> sc1 sc2)))))
+          (sort ls #'helm-elisp-sort-symbols-fn))))
 
 ;;;###autoload
 (defun helm-M-x ()
