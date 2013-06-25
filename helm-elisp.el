@@ -120,6 +120,25 @@ If `helm-turn-on-show-completion' is nil just do nothing."
 ;;; Lisp symbol completion.
 ;;
 ;;
+(defun helm-lisp-completion-predicate-at-point ()
+  (save-excursion
+    (goto-char beg)
+    (if (not (eq (char-before) ?\())
+        (lambda (sym)                   ;why not just nil ?   -sm
+          (or (boundp sym) (fboundp sym)
+              (symbol-plist sym)))
+        ;; Looks like a funcall position.  Let's double check.
+        (if (condition-case nil
+                (progn (up-list -2) (forward-char 1)
+                       (eq (char-after) ?\())
+              (error nil))
+            ;; If the first element of the parent list is an open
+            ;; paren we are probably not in a funcall position.
+            ;; Maybe a `let' varlist or something.
+            nil
+            ;; Else, we assume that a function name is expected.
+            'fboundp))))
+
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
@@ -128,7 +147,9 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (beg        (car-safe data))
          (end        (point)) ; 'cadr data' is wrong when no space after point.
          (plist      (and (listp data) (nthcdr 3 data)))
-         (pred       (and plist (plist-get plist :predicate)))
+         (pred       (or (and plist (plist-get plist :predicate)) ; emacs-24.3
+                         ;; Regression in emacs-24.3.50.1.
+                         (helm-lisp-completion-predicate-at-point)))
          (lgst-len   0)
          (target     (and beg end (buffer-substring-no-properties beg end)))
          (candidates (and data (listp data)
