@@ -498,7 +498,6 @@ STRING is string to match."
 
 (defun helm-set-variable (var)
   "Set value to VAR interactively."
-  (interactive)
   (let ((sym (helm-symbolify var)))
     (set sym (eval-minibuffer (format "Set %s: " var)
                               (prin1-to-string (symbol-value sym))))))
