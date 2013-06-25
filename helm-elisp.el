@@ -120,7 +120,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
 ;;; Lisp symbol completion.
 ;;
 ;;
-(defun helm-lisp-completion-predicate-at-point ()
+(defun helm-lisp-completion-predicate-at-point (beg)
   (save-excursion
     (goto-char beg)
     (if (not (eq (char-before) ?\())
@@ -149,7 +149,8 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (plist      (and (listp data) (nthcdr 3 data)))
          (pred       (or (and plist (plist-get plist :predicate)) ; emacs-24.3
                          ;; Regression in emacs-24.3.50.1.
-                         (helm-lisp-completion-predicate-at-point)))
+                         ;; predicate is no more calculated.
+                         (helm-lisp-completion-predicate-at-point beg)))
          (lgst-len   0)
          (target     (and beg end (buffer-substring-no-properties beg end)))
          (candidates (and data (listp data)
