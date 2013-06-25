@@ -124,18 +124,16 @@ If `helm-turn-on-show-completion' is nil just do nothing."
   (save-excursion
     (goto-char beg)
     (if (not (eq (char-before) ?\())
-        (lambda (sym)                   ;why not just nil ?   -sm
-          (or (boundp sym) (fboundp sym)
-              (symbol-plist sym)))
+        (lambda (sym)
+          (or (boundp sym) (fboundp sym) (symbol-plist sym)))
         ;; Looks like a funcall position.  Let's double check.
-        (if (condition-case nil
-                (progn (up-list -2) (forward-char 1)
-                       (eq (char-after) ?\())
-              (error nil))
+        (unless (condition-case nil
+                    (progn (up-list -2) (forward-char 1)
+                           (eq (char-after) ?\())
+                  (error nil))
             ;; If the first element of the parent list is an open
             ;; paren we are probably not in a funcall position.
-            ;; Maybe a `let' varlist or something.
-            nil
+            ;; Maybe a `let' varlist or something, so nil is returned.
             ;; Else, we assume that a function name is expected.
             'fboundp))))
 
