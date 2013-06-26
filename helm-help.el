@@ -226,21 +226,29 @@ Italic     => A non--file buffer.
   "== Helm Find Files ==
 \nTips:
 \n- Enter `~/' at end of pattern to quickly reach home directory.
+
 - Enter `/' at end of pattern to quickly reach root of your file system.
+
 - Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
+
 - You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
+
 - Use `C-u C-z' to watch an image.
+
 - To browse images directories turn on `helm-follow-mode' and navigate with arrow keys.
-- You can switch to locate with `C-x C-f', with one prefix arg use locale db file or create it,
-  with two prefix arg create or refresh db file.
+
 - When you want to delete backward characters to e.g creating a new file or directory,
   autoupdate may keep updating to an existent directory
   preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
+
 - You can create a new directory an a new file at the same time, just write the path in prompt
   and press <RET>.
   e.g You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
+
 - To create a new directory, add a \"/\" at end of new name and press <RET>.
+
 - To create a new file just write the filename not ending with \"/\".
+
 - You can start a recursive search with Locate of Find (See commands below).
   With Locate you can use a local db with a prefix arg; If the localdb doesn't already
   exists, you will be prompted for its creation, if it exists and you want to refresh it,
