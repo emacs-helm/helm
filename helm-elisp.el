@@ -148,7 +148,8 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (pred       (or (and plist (plist-get plist :predicate)) ; emacs-24.3
                          ;; Regression in emacs-24.3.50.1.
                          ;; predicate is no more calculated.
-                         (helm-lisp-completion-predicate-at-point beg)))
+                         (and beg
+                              (helm-lisp-completion-predicate-at-point beg))))
          (lgst-len   0)
          (target     (and beg end (buffer-substring-no-properties beg end)))
          (candidates (and data (listp data)
