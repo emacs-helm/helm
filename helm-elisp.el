@@ -144,9 +144,9 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (pred       (and beg (helm-lisp-completion-predicate-at-point beg)))
          (loc-vars   (and (fboundp 'lisp--local-variables)
                           (mapcar #'symbol-name (lisp--local-variables))))
-         (glob-vars  (and target pred (all-completions target obarray pred)))
-         (candidates (append loc-vars glob-vars))
-         (lgst-len   0)
+         (glob-syms  (and target pred (all-completions target obarray pred)))
+         (candidates (append loc-vars glob-syms))
+         (lgst-len   0) ; Special in `helm-lisp-completion-transformer'.
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          (helm-match-plugin-enabled
