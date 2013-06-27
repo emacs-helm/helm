@@ -141,19 +141,12 @@ If `helm-turn-on-show-completion' is nil just do nothing."
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
   (interactive)
-  (let* ((data       (lisp-completion-at-point))
-         (beg        (car-safe data))
-         (end        (point)) ; 'cadr data' is wrong when no space after point.
-         (plist      (and (listp data) (nthcdr 3 data)))
-         (pred       (or (and plist (plist-get plist :predicate)) ; emacs-24.3
-                         ;; Regression in emacs-24.3.50.1.
-                         ;; predicate is no more calculated.
-                         (and beg
-                              (helm-lisp-completion-predicate-at-point beg))))
+  (let* ((target     (thing-at-point 'symbol))
+         (beg        (car (bounds-of-thing-at-point 'symbol)))
+         (end        (point))
+         (pred       (and beg (helm-lisp-completion-predicate-at-point beg)))
+         (candidates (and target pred (all-completions target obarray pred)))
          (lgst-len   0)
-         (target     (and beg end (buffer-substring-no-properties beg end)))
-         (candidates (and data (listp data)
-                          (all-completions target (nth 2 data) pred)))
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          (helm-match-plugin-enabled
