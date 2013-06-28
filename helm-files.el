@@ -1428,7 +1428,7 @@ If basename contain one or more space fallback to match-plugin.
 If FNAME is a valid directory name,return FNAME unchanged."
   (setq fname (helm-ff-handle-backslash fname))
   (let ((bn      (helm-basename fname))
-        (bd      (file-name-as-directory (file-name-directory fname)))
+        (bd      (condition-case nil (file-name-as-directory (file-name-directory fname)) (error nil)))
         (dir-p   (file-directory-p fname))
         (tramp-p (loop for (m . f) in tramp-methods
                        thereis (string-match m fname))))
