@@ -72,6 +72,7 @@
                   (delete-region (car limits) (cdr limits))
                   (insert candidate))))))
 
+;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
   (declare (special dabbrev))

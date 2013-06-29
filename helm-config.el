@@ -726,8 +726,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (20942 43964
-;;;;;;  369817 574000))
+;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (20942 47007
+;;;;;;  226211 920000))
 ;;; Generated autoloads from helm-dabbrev.el
 
 (autoload 'helm-dabbrev "helm-dabbrev" "\
@@ -1892,7 +1892,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (20942 43974 674164 171000))
+;;;;;;  (20942 47027 658696 712000))
 
 ;;;***
 
