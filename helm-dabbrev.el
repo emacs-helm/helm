@@ -31,8 +31,8 @@
         (search #'(lambda (pattern direction)
                     (declare (special result))
                     (while (case direction
-                             (1  (re-search-forward pattern nil t))
-                             (-1 (re-search-backward pattern nil t))) 
+                             (1  (search-forward pattern nil t))
+                             (-1 (search-backward pattern nil t))) 
                       (let ((match (substring-no-properties
                                     (thing-at-point 'symbol)))) 
                         (unless (or (string= str match) (member match result))
