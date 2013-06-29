@@ -20,6 +20,21 @@
 (require 'helm)
 (require 'helm-elisp) ; For show-completion.
 
+(defgroup helm-dabbrev nil
+  "Dabbrev related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-dabbrev-always-search-all t
+  "Always search in all buffers when non--nil."
+  :group 'helm-dabbrev
+  :type 'boolean)
+
+(defcustom helm-dabbrev-max-length-result 10
+  "Max length of candidates before searching in all buffers.
+Have no effect when `helm-dabbrev-always-search-all' is non--nil."
+  :group 'helm-dabbrev
+  :type 'integer)
+
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -53,8 +68,9 @@
                              (helm-collect-dabbrev
                               str helm-candidate-number-limit
                               nil all-bufs)))
-           (lst (funcall dabbrev-get abbrev nil)))
-      (if (<= (length lst) 5)
+           (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
+      (if (and (not helm-dabbrev-always-search-all)
+               (<= (length lst) helm-dabbrev-max-length-result))
           (funcall dabbrev-get abbrev 'all-bufs)
           lst))))
 
