@@ -28,7 +28,7 @@
 
 (defun helm-collect-dabbrev (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
-        (search #'(lambda (buf pattern direction)
+        (search #'(lambda (pattern direction)
                     (declare (special result))
                     (while (case direction
                              (1  (re-search-forward pattern nil t))
@@ -41,9 +41,9 @@
           for buf in (if all (buffer-list) (list (current-buffer)))
           do (with-current-buffer buf
                (save-excursion
-                 (funcall search buf str -1))
+                 (funcall search str -1))
                (save-excursion
-                 (funcall search buf str 1)))
+                 (funcall search str 1)))
           when (> (length result) limit) return (nreverse result)
           finally return (nreverse result))))
 
