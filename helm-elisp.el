@@ -73,10 +73,10 @@ This is used in macro `with-helm-show-completion'."
                  'display (helm-get-selection))))
 
 (defun helm-show-completion-init-overlay (beg end)
-  (and helm-turn-on-show-completion
-       (setq helm-show-completion-overlay (make-overlay beg end))
-       (overlay-put helm-show-completion-overlay
-                    'face 'helm-lisp-show-completion)))
+  (when helm-turn-on-show-completion
+    (setq helm-show-completion-overlay (make-overlay beg end))
+    (overlay-put helm-show-completion-overlay
+                 'face 'helm-lisp-show-completion)))
 
 (defun helm-show-completion-display-function (buffer &rest _args)
   "A special resized helm window is used depending on position in BUFFER."
@@ -113,8 +113,8 @@ If `helm-turn-on-show-completion' is nil just do nothing."
                        'helm-show-completion-display-function
                        'helm-default-display-buffer)))
               ,@body))
-       (and helm-turn-on-show-completion
-            (delete-overlay helm-show-completion-overlay)))))
+       (when helm-turn-on-show-completion
+         (delete-overlay helm-show-completion-overlay)))))
 
 
 ;;; Lisp symbol completion.
