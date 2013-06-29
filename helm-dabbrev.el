@@ -29,6 +29,7 @@
 (defun helm-collect-dabbrev (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
         (search #'(lambda (buf pattern direction)
+                    (declare (special result))
                     (while (case direction
                              (1  (re-search-forward pattern nil t))
                              (-1 (re-search-backward pattern nil t))) 

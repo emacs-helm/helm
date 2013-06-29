@@ -202,7 +202,7 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (20937 16506 973598 525000))
+;;;### (autoloads nil "helm" "helm.el" (20940 17505 192693 988000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -726,8 +726,19 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-elisp" "helm-elisp.el" (20937 18531 997845
-;;;;;;  743000))
+;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (20942 43964
+;;;;;;  369817 574000))
+;;; Generated autoloads from helm-dabbrev.el
+
+(autoload 'helm-dabbrev "helm-dabbrev" "\
+
+
+\(fn)" t nil)
+
+;;;***
+
+;;;### (autoloads nil "helm-elisp" "helm-elisp.el" (20941 18216 281418
+;;;;;;  463000))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -1225,8 +1236,8 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads nil "helm-help" "helm-help.el" (20875 35731 672226
-;;;;;;  947000))
+;;;### (autoloads nil "helm-help" "helm-help.el" (20938 56257 393638
+;;;;;;  435000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1881,7 +1892,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (20937 18629 188337 903000))
+;;;;;;  (20942 43974 674164 171000))
 
 ;;;***
 
