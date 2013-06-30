@@ -47,7 +47,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-abbrev)
 
-(defcustom helm-dabbrev-lineno-around 12
+(defcustom helm-dabbrev-lineno-around 30
   "Search first in this number of lines before an after point."
   :group 'helm-dabbrev
   :type 'integer)
