@@ -35,13 +35,26 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type 'integer)
 
+(defcustom helm-dabbrev-ignored-buffers-regexps
+  '("\\*helm" "\\*Messages" "\\*Minibuf" "\\*Echo Area" "\\*Buffer List")
+  "List of regexps matching names of buffers that helm-dabbrev should not check."
+  :group 'helm-dabbrev
+  :type '(repeat regexp))
+  
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-/") 'helm-next-line)
+    (define-key map (kbd "M-:") 'helm-previous-line)
     map))
 
-(defun helm-collect-dabbrev (str limit ignore-case all)
+(defun helm-dabbrev-buffer-list ()
+  (loop for buf in (buffer-list)
+        unless (loop for r in helm-dabbrev-ignored-buffers-regexps
+                     thereis (string-match r (buffer-name buf)))
+        collect buf))
+  
+(defun helm-dabbrev-collect (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
         (search #'(lambda (pattern direction)
                     (declare (special result))
@@ -53,7 +66,8 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
                         (unless (or (string= str match) (member match result))
                           (push match result)))))))
     (loop with result
-          for buf in (if all (buffer-list) (list (current-buffer)))
+          for buf in (if all (helm-dabbrev-buffer-list)
+                         (list (current-buffer)))
           do (with-current-buffer buf
                (save-excursion
                  (funcall search str -1))
@@ -65,7 +79,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
 (defun helm-dabbrev-get-candidates (abbrev)
   (with-helm-current-buffer
     (let* ((dabbrev-get #'(lambda (str all-bufs)
-                             (helm-collect-dabbrev
+                             (helm-dabbrev-collect
                               str helm-candidate-number-limit
                               nil all-bufs)))
            (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
