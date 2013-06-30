@@ -70,8 +70,14 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
         (search #'(lambda (pattern direction)
                     (declare (special result))
                     (while (case direction
-                             (1  (search-forward pattern nil t))
-                             (-1 (search-backward pattern nil t))) 
+                             (1   (search-forward pattern nil t))
+                             (-1  (search-backward pattern nil t))
+                             (2   (let ((pos (save-excursion
+                                               (forward-line 12) (point))))
+                                    (search-forward pattern pos t)))
+                             (-2  (let ((pos (save-excursion
+                                               (forward-line -12) (point))))
+                                    (search-backward pattern pos t))))
                       (let ((match (substring-no-properties
                                     (thing-at-point 'symbol)))) 
                         (unless (or (string= str match) (member match result))
@@ -81,6 +87,10 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
                          (list (current-buffer)))
           do (with-current-buffer buf
                (when (helm-dabbrev-same-major-mode-p buf)
+                 (save-excursion
+                   (funcall search str -2))
+                 (save-excursion
+                   (funcall search str 2))
                  (save-excursion
                    (funcall search str -1))
                  (save-excursion
