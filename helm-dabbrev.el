@@ -47,6 +47,11 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-abbrev)
 
+(defcustom helm-dabbrev-lineno-around 12
+  "Search first in this number of lines before an after point."
+  :group 'helm-dabbrev
+  :type 'integer)
+
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -72,11 +77,17 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
                     (while (case direction
                              (1   (search-forward pattern nil t))
                              (-1  (search-backward pattern nil t))
-                             (2   (let ((pos (save-excursion
-                                               (forward-line 12) (point))))
+                             (2   (let ((pos
+                                         (save-excursion
+                                           (forward-line
+                                            helm-dabbrev-lineno-around)
+                                               (point))))
                                     (search-forward pattern pos t)))
-                             (-2  (let ((pos (save-excursion
-                                               (forward-line -12) (point))))
+                             (-2  (let ((pos
+                                         (save-excursion
+                                           (forward-line
+                                            (- helm-dabbrev-lineno-around))
+                                           (point))))
                                     (search-backward pattern pos t))))
                       (let ((match (substring-no-properties
                                     (thing-at-point 'symbol)))) 
