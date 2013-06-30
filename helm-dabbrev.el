@@ -40,7 +40,13 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   "List of regexps matching names of buffers that helm-dabbrev should not check."
   :group 'helm-dabbrev
   :type '(repeat regexp))
-  
+
+(defcustom helm-dabbrev-major-mode-assoc
+  '((emacs-lisp-mode . lisp-interaction-mode))
+  "Major mode association alist to decide if helm-abbrev should check a buffer."
+  :type '(alist :key-type symbol :value-type symbol)
+  :group 'helm-abbrev)
+
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -53,7 +59,12 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
         unless (loop for r in helm-dabbrev-ignored-buffers-regexps
                      thereis (string-match r (buffer-name buf)))
         collect buf))
-  
+
+(defun helm-dabbrev-same-major-mode-p (buf)
+  (or (or (assoc major-mode helm-dabbrev-major-mode-assoc)
+          (rassoc major-mode helm-dabbrev-major-mode-assoc))
+      (eq major-mode (with-helm-current-buffer major-mode))))
+
 (defun helm-dabbrev-collect (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
         (search #'(lambda (pattern direction)
@@ -69,10 +80,11 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
           for buf in (if all (helm-dabbrev-buffer-list)
                          (list (current-buffer)))
           do (with-current-buffer buf
-               (save-excursion
-                 (funcall search str -1))
-               (save-excursion
-                 (funcall search str 1)))
+               (when (helm-dabbrev-same-major-mode-p buf)
+                 (save-excursion
+                   (funcall search str -1))
+                 (save-excursion
+                   (funcall search str 1))))
           when (> (length result) limit) return (nreverse result)
           finally return (nreverse result))))
 
