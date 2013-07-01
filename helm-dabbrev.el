@@ -45,7 +45,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   '((emacs-lisp-mode . lisp-interaction-mode))
   "Major mode association alist to decide if helm-abbrev should check a buffer."
   :type '(alist :key-type symbol :value-type symbol)
-  :group 'helm-abbrev)
+  :group 'helm-dabbrev)
 
 (defcustom helm-dabbrev-lineno-around 30
   "Search first in this number of lines before an after point."
