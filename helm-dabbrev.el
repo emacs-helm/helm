@@ -73,7 +73,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
 (defun helm-dabbrev-collect (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
         (search #'(lambda (pattern direction)
-                    (declare (special result))
+                    (declare (special result pos-before pos-after))
                     (while (case direction
                              (1   (search-forward pattern nil t))
                              (-1  (search-backward pattern nil t))
@@ -82,29 +82,37 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
                                            (forward-line
                                             helm-dabbrev-lineno-around)
                                                (point))))
+                                    (setq pos-after pos)
                                     (search-forward pattern pos t)))
                              (-2  (let ((pos
                                          (save-excursion
                                            (forward-line
                                             (- helm-dabbrev-lineno-around))
                                            (point))))
+                                    (setq pos-before pos)
                                     (search-backward pattern pos t))))
                       (let ((match (substring-no-properties
                                     (thing-at-point 'symbol)))) 
                         (unless (or (string= str match) (member match result))
                           (push match result)))))))
-    (loop with result
+    (loop with result with pos-before with pos-after
           for buf in (if all (helm-dabbrev-buffer-list)
                          (list (current-buffer)))
           do (with-current-buffer buf
                (when (helm-dabbrev-same-major-mode-p buf)
                  (save-excursion
-                   (funcall search str -2))
+                   ;; search the last 30 lines before point.
+                   (funcall search str -2)) ; store pos [1]
                  (save-excursion
-                   (funcall search str 2))
+                   ;; search the next 30 lines after point.
+                   (funcall search str 2)) ; store pos [2]
                  (save-excursion
+                   ;; search all before point.
+                   (goto-char pos-before) ; start from [1]
                    (funcall search str -1))
                  (save-excursion
+                   ;; search all after point.
+                   (goto-char pos-after) ; start from [2]
                    (funcall search str 1))))
           when (> (length result) limit) return (nreverse result)
           finally return (nreverse result))))
