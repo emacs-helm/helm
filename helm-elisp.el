@@ -73,7 +73,7 @@ This is used in macro `with-helm-show-completion'."
                  'display (helm-get-selection))))
 
 (defun helm-show-completion-init-overlay (beg end)
-  (when helm-turn-on-show-completion
+  (when (and helm-turn-on-show-completion beg end)
     (setq helm-show-completion-overlay (make-overlay beg end))
     (overlay-put helm-show-completion-overlay
                  'face 'helm-lisp-show-completion)))
@@ -105,15 +105,19 @@ If `helm-turn-on-show-completion' is nil just do nothing."
           (and helm-turn-on-show-completion
                (append (list 'helm-show-completion)
                        helm-move-selection-after-hook))))
+     (with-helm-temp-hook 'helm-after-initialize-hook
+       (with-helm-buffer
+         (set (make-local-variable 'helm-display-function)
+              (if helm-show-completion-use-special-display
+                  'helm-show-completion-display-function
+                  'helm-default-display-buffer))))
      (unwind-protect
           (progn
             (helm-show-completion-init-overlay ,beg ,end)
-            (let ((helm-display-function
-                   (if helm-show-completion-use-special-display
-                       'helm-show-completion-display-function
-                       'helm-default-display-buffer)))
-              ,@body))
-       (when helm-turn-on-show-completion
+            ,@body)
+       (when (and helm-turn-on-show-completion
+                  helm-show-completion-overlay
+                  (overlayp helm-show-completion-overlay))
          (delete-overlay helm-show-completion-overlay)))))
 
 

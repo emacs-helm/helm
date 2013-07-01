@@ -71,6 +71,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
       (eq major-mode (with-helm-current-buffer major-mode))))
 
 (defun helm-dabbrev-collect (str limit ignore-case all)
+  (assert str nil (format "helm-dabbrev: Nothing to complete at point"))
   (let ((case-fold-search ignore-case)
         (search #'(lambda (pattern direction)
                     (declare (special result pos-before pos-after))

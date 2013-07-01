@@ -850,7 +850,7 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-temp-hook (hook &rest body)
   "Execute temporarily BODY as a function for HOOK."
-  (declare (indent 0) (debug t))
+  (declare (indent 1) (debug t))
   (let ((fun (gensym "helm-hook")))
     `(progn
        (defun ,fun ()
