@@ -173,10 +173,13 @@ If `helm-turn-on-show-completion' is nil just do nothing."
              (persistent-help . "Show brief doc in mode-line")
              (filtered-candidate-transformer helm-lisp-completion-transformer)
              (action . (lambda (candidate)
-                         (delete-region beg end)
-                         (insert candidate))))
+                         (with-helm-current-buffer
+                           (run-with-timer 0.01 nil `(lambda ()
+                                                       (delete-region ,beg ,end)
+                                                       (insert ,candidate)))))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
-           :resume 'noresume))
+           :resume 'noresume
+           :allow-nest t))
         (message "[No Match]"))))
 
 (defun helm-lisp-completion-persistent-action (candidate)

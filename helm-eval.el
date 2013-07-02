@@ -54,7 +54,7 @@ Should take one arg: the string to display."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-eval-new-line-and-indent)
     (define-key map (kbd "<tab>")      'lisp-indent-line)
-    (define-key map (kbd "<C-tab>")    'lisp-complete-symbol)
+    (define-key map (kbd "<C-tab>")    'helm-lisp-completion-at-point)
     (define-key map (kbd "C-p")        'previous-line)
     (define-key map (kbd "C-n")        'next-line)
     (define-key map (kbd "<up>")       'previous-line)
@@ -151,10 +151,9 @@ Should take one arg: the string to display."
   "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support. "
   (interactive)
   (declare (special eldoc-idle-delay))
-  (let ((timer (run-with-idle-timer eldoc-idle-delay
-                                    'repeat 'helm-eldoc-show-in-eval))
-        (minibuffer-completing-symbol t) ; Enable lisp completion.
-        (completion-cycle-threshold t))  ; Always cycle, (emacs24* only).
+  (let ((timer (run-with-idle-timer
+                eldoc-idle-delay 'repeat
+                'helm-eldoc-show-in-eval)))
     (unwind-protect
          (minibuffer-with-setup-hook
              'helm-eldoc-store-minibuffer

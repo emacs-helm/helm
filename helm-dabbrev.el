@@ -153,10 +153,13 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
     (candidates-in-buffer)
     (keymap . ,helm-dabbrev-map)
     (action . (lambda (candidate)
-                (let ((limits (with-helm-current-buffer
-                                (bounds-of-thing-at-point 'symbol))))
-                  (delete-region (car limits) (cdr limits))
-                  (insert candidate))))))
+                (with-helm-current-buffer
+                  (let* ((limits (bounds-of-thing-at-point 'symbol))
+                         (beg (car limits))
+                         (end (cdr limits)))
+                    (run-with-timer 0.01 nil `(lambda ()
+                                                (delete-region ,beg ,end)
+                                                (insert ,candidate)))))))))
 
 ;;;###autoload
 (defun helm-dabbrev ()
@@ -170,7 +173,8 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
       (helm :sources 'helm-source-dabbrev
             :buffer "*helm dabbrev*"
             :input (concat "^" dabbrev " ")
-            :resume 'noresume))))
+            :resume 'noresume
+            :allow-nest t))))
 
 (provide 'helm-dabbrev)
 
