@@ -29,8 +29,10 @@
   :group 'helm-dabbrev
   :type 'boolean)
 
-(defcustom helm-dabbrev-max-length-result 10
+(defcustom helm-dabbrev-max-length-result 20
   "Max length of candidates before searching in all buffers.
+If number of candidates found in current-buffer is <= to this,
+search in all buffers.
 Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type 'integer)
@@ -43,7 +45,12 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
 
 (defcustom helm-dabbrev-major-mode-assoc
   '((emacs-lisp-mode . lisp-interaction-mode))
-  "Major mode association alist to decide if helm-abbrev should check a buffer."
+  "Major mode association alist.
+This allow helm-dabbrev searching in buffers with the associated `major-mode'.
+e.g \(emacs-lisp-mode . lisp-interaction-mode\)
+will allow searching in the lisp-interaction-mode buffer when `current-buffer'
+is an `emacs-lisp-mode' buffer and vice versa i.e
+no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-dabbrev)
 
@@ -59,18 +66,23 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
     (define-key map (kbd "M-:") 'helm-previous-line)
     map))
 
-(defun helm-dabbrev-buffer-list ()
-  (loop for buf in (buffer-list)
+;; Internal
+(defvar helm-dabbrev--exclude-current-buffer-flag nil)
+
+(defun helm-dabbrev--buffer-list ()
+  (loop with lst = (buffer-list)
+        for buf in (if helm-dabbrev--exclude-current-buffer-flag
+                       (cdr lst) lst)
         unless (loop for r in helm-dabbrev-ignored-buffers-regexps
                      thereis (string-match r (buffer-name buf)))
         collect buf))
 
-(defun helm-dabbrev-same-major-mode-p (buf)
+(defun helm-dabbrev--same-major-mode-p (buf)
   (or (or (assoc major-mode helm-dabbrev-major-mode-assoc)
           (rassoc major-mode helm-dabbrev-major-mode-assoc))
       (eq major-mode (with-helm-current-buffer major-mode))))
 
-(defun helm-dabbrev-collect (str limit ignore-case all)
+(defun helm-dabbrev--collect (str limit ignore-case all)
   (assert str nil (format "helm-dabbrev: Nothing to complete at point"))
   (let ((case-fold-search ignore-case)
         (search #'(lambda (pattern direction)
@@ -97,10 +109,10 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
                         (unless (or (string= str match) (member match result))
                           (push match result)))))))
     (loop with result with pos-before with pos-after
-          for buf in (if all (helm-dabbrev-buffer-list)
+          for buf in (if all (helm-dabbrev--buffer-list)
                          (list (current-buffer)))
           do (with-current-buffer buf
-               (when (helm-dabbrev-same-major-mode-p buf)
+               (when (helm-dabbrev--same-major-mode-p buf)
                  (save-excursion
                    ;; search the last 30 lines before point.
                    (funcall search str -2)) ; store pos [1]
@@ -118,16 +130,18 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
           when (> (length result) limit) return (nreverse result)
           finally return (nreverse result))))
 
-(defun helm-dabbrev-get-candidates (abbrev)
+(defun helm-dabbrev--get-candidates (abbrev)
   (with-helm-current-buffer
     (let* ((dabbrev-get #'(lambda (str all-bufs)
-                             (helm-dabbrev-collect
+                             (helm-dabbrev--collect
                               str helm-candidate-number-limit
                               nil all-bufs)))
            (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
       (if (and (not helm-dabbrev-always-search-all)
                (<= (length lst) helm-dabbrev-max-length-result))
-          (funcall dabbrev-get abbrev 'all-bufs)
+          ;; Search all but don't recompute current-buffer.
+          (let ((helm-dabbrev--exclude-current-buffer-flag t))
+            (append lst (funcall dabbrev-get abbrev 'all-bufs)))
           lst))))
 
 (defvar helm-source-dabbrev
@@ -135,7 +149,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
     (init . (lambda ()
               (helm-init-candidates-in-buffer
                'global
-               (helm-dabbrev-get-candidates dabbrev))))
+               (helm-dabbrev--get-candidates dabbrev))))
     (candidates-in-buffer)
     (keymap . ,helm-dabbrev-map)
     (action . (lambda (candidate)
