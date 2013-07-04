@@ -153,6 +153,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (lgst-len   0) ; Special in `helm-lisp-completion-transformer'.
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
+         (enable-recursive-minibuffers t)
          (helm-match-plugin-enabled
           (member 'helm-compile-source--match-plugin
                   helm-compile-source-functions)))

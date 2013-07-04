@@ -167,6 +167,7 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   (declare (special dabbrev))
   (let ((dabbrev (thing-at-point 'symbol))
         (limits (bounds-of-thing-at-point 'symbol))
+        (enable-recursive-minibuffers t)
         (helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate t))
     (with-helm-show-completion (car limits) (cdr limits)
