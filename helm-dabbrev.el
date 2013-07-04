@@ -169,7 +169,9 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
         (limits (bounds-of-thing-at-point 'symbol))
         (enable-recursive-minibuffers t)
         (helm-execute-action-at-once-if-one t)
-        (helm-quit-if-no-candidate t))
+        (helm-quit-if-no-candidate
+         #'(lambda ()
+             (message "[Helm-dabbrev: No expansion found]"))))
     (with-helm-show-completion (car limits) (cdr limits)
       (helm :sources 'helm-source-dabbrev
             :buffer "*helm dabbrev*"
