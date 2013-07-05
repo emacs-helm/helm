@@ -467,56 +467,40 @@ First call indent, second complete symbol, third complete fname."
   (helm-other-buffer 'helm-source-advice "*helm advice*"))
 
 
-;;; Elisp library scan
+;;; Locate elisp library
 ;;
 ;;
-(defvar helm-source-elisp-library-scan
+(defvar helm-source-locate-library
   '((name . "Elisp libraries (Scan)")
-    (init . (helm-elisp-library-scan-init))
+    (init . (helm-locate-library-scan-init))
     (candidates-in-buffer)
-    (action ("Find library"
-             . (lambda (candidate) (find-file (find-library-name candidate))))
-     ("Find library other window"
-      . (lambda (candidate)
-          (find-file-other-window (find-library-name candidate))))
-     ("Load library"
-      . (lambda (candidate) (load-library candidate))))))
+    (action . (("Find library"
+                . (lambda (candidate)
+                    (find-file (find-library-name candidate))))
+               ("Find library other window"
+                . (lambda (candidate)
+                    (find-file-other-window
+                     (find-library-name candidate))))
+               ("Load library"
+                . (lambda (candidate) (load-library candidate)))))))
 
-(defun helm-elisp-library-scan-init ()
+(defun helm-locate-library-scan-init ()
   "Init helm buffer status."
-  (let ((helm-buffer (helm-candidate-buffer 'global))
-        (library-list (helm-elisp-library-scan-list)))
-    (with-current-buffer helm-buffer
-      (dolist (library library-list)
-        (insert (format "%s\n" library))))))
+  (helm-init-candidates-in-buffer
+   'global (helm-locate-library-scan-list)))
 
-(defun helm-elisp-library-scan-list (&optional dirs string)
-  "Do completion for file names passed to `locate-file'.
-DIRS is directory to search path.
-STRING is string to match."
-  ;; Use `load-path' as path when ignore `dirs'.
-  (or dirs (setq dirs load-path))
-  ;; Init with blank when ignore `string'.
-  (or string (setq string ""))
-  ;; Get library list.
-  (let ((string-dir (file-name-directory string))
-        ;; File regexp that suffix match `load-file-rep-suffixes'.
-        (match-regexp (format "^.*\\.el%s$" (regexp-opt load-file-rep-suffixes)))
-        name
-        names)
-    (dolist (dir dirs)
-      (unless dir
-        (setq dir default-directory))
-      (if string-dir
-          (setq dir (expand-file-name string-dir dir)))
-      (when (file-directory-p dir)
-        (dolist (file (file-name-all-completions
-                       (file-name-nondirectory string) dir))
-          ;; Suffixes match `load-file-rep-suffixes'.
-          (setq name (if string-dir (concat string-dir file) file))
-          (if (string-match match-regexp name)
-              (add-to-list 'names name)))))
-    names))
+(defun helm-locate-library-scan-list ()
+  (loop for dir in load-path
+        when (file-directory-p dir)
+        append (directory-files dir t (regexp-opt (get-load-suffixes)))
+        into lst
+        finally return (helm-fast-remove-dups lst :test 'equal)))
+
+;;;###autoload
+(defun helm-locate-library ()
+  (interactive)
+  (helm :sources 'helm-source-locate-library
+        :buffer "*helm locate library*"))
 
 (defun helm-set-variable (var)
   "Set value to VAR interactively."
