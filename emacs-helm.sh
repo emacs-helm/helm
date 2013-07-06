@@ -41,4 +41,4 @@ cat > $TMP <<EOF
 (add-hook 'kill-emacs-hook #'(lambda () (delete-file "$TMP")))
 (cd "~/")
 EOF
-emacs -Q -l $TMP
+emacs -Q -l $TMP $@
