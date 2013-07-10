@@ -25,6 +25,20 @@
 TMP="/tmp/helm-cfg.el"
 LOADPATH=`dirname $0`
 cat > $TMP <<EOF
+(setq initial-scratch-message (concat initial-scratch-message
+";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\
+;; This Emacs is Powered by \`HELM'.\n\
+;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\n\
+;; You can retrieve this minimal configuration in \"$TMP\" \n\
+;; Some originals emacs commands have been replaced by own \`helm' commands:\n\n\
+;; - \`find-file'(C-x C-f)           =>\`helm-find-files'\n\
+;; - \`occur'(M-s o)                 =>\`helm-occur'\n\
+;; - \`list-buffers'(C-x C-b)        =>\`helm-buffers-list'\n\
+;; - \`completion-at-point'(tab)     =>\`helm-lisp-completion-at-point'\n\n\
+;; Some others native emacs commands are \"helmized\" by \`helm-mode'.\n\
+;; You will find embeded help for most helm commands with \`C-c ?'.\n\
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
+
 (setq default-frame-alist '((vertical-scroll-bars . nil)
                             (tool-bar-lines . 0)
                             (menu-bar-lines . 0)
