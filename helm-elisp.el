@@ -147,7 +147,8 @@ If `helm-turn-on-show-completion' is nil just do nothing."
         (buffer-substring-no-properties beg (match-end 0))))))
 
 (defun helm-bounds-of-thing-before-point ()
-  "Get symbol name before point."
+  "Get the beginning and end position of `helm-thing-before-point'.
+Return a cons \(beg . end\)."
   (save-excursion
     (let ((beg (point)))
       (when (re-search-backward
