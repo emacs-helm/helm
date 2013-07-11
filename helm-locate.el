@@ -229,7 +229,7 @@ See also `helm-locate'."
                    (t (if helm-locate-case-fold-search
                           ignore-case-flag
                           case-sensitive-flag)))
-                 helm-pattern))
+                 (shell-quote-argument helm-pattern)))
       (set-process-sentinel
        (get-process "locate-process")
        #'(lambda (process event)
