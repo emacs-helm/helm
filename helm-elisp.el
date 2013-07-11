@@ -138,12 +138,28 @@ If `helm-turn-on-show-completion' is nil just do nothing."
           (or (boundp sym) (fboundp sym) (symbol-plist sym)))
         #'fboundp)))
 
+(defun helm-thing-before-point ()
+  "Get symbol name before point."
+  (save-excursion
+    (let ((beg (point)))
+      (when (re-search-backward
+             "\\_<" (field-beginning nil nil (point-at-bol)) t)
+        (buffer-substring-no-properties beg (match-end 0))))))
+
+(defun helm-bounds-of-thing-before-point ()
+  "Get symbol name before point."
+  (save-excursion
+    (let ((beg (point)))
+      (when (re-search-backward
+             "\\_<" (field-beginning nil nil (point-at-bol)) t)
+        (cons (match-beginning 0) (match-end 0))))))
+
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
   (interactive)
-  (let* ((target     (thing-at-point 'symbol))
-         (beg        (car (bounds-of-thing-at-point 'symbol)))
+  (let* ((target     (helm-thing-before-point))
+         (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
          (pred       (and beg (helm-lisp-completion-predicate-at-point beg)))
          (loc-vars   (and (fboundp 'lisp--local-variables)
@@ -172,12 +188,17 @@ If `helm-turn-on-show-completion' is nil just do nothing."
              (candidates-in-buffer)
              (persistent-action . helm-lisp-completion-persistent-action)
              (persistent-help . "Show brief doc in mode-line")
-             (filtered-candidate-transformer helm-lisp-completion-transformer)
+             (filtered-candidate-transformer . helm-lisp-completion-transformer)
              (action . (lambda (candidate)
                          (with-helm-current-buffer
-                           (run-with-timer 0.01 nil `(lambda ()
-                                                       (delete-region ,beg ,end)
-                                                       (insert ,candidate)))))))
+                           (run-with-timer
+                            0.01 nil
+                            `(lambda ()
+                               (delete-region ,beg ,end)
+                               (insert ,candidate)
+                               (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
+                                 (when (< (point) pos)
+                                   (delete-region (point) pos)))))))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
            :allow-nest t))
@@ -253,14 +274,6 @@ If SYM is not documented, return \"Not documented\"."
 ;;; File completion.
 ;;
 ;; Complete file name at point.
-(defun helm-thing-before-point ()
-  "Get symbol name before point."
-  (save-excursion
-    (let ((beg (point)))
-      ;; older regexp "\(\\|\\s-\\|^\\|\\_<\\|\r\\|'\\|#'"
-      (when (re-search-backward
-             "\\_<" (field-beginning nil nil (point-at-bol)) t)
-        (buffer-substring-no-properties beg (match-end 0))))))
 
 ;;;###autoload
 (defun helm-complete-file-name-at-point (&optional force)
