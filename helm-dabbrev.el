@@ -101,8 +101,7 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
                                            (forward-line
                                             (- helm-dabbrev-lineno-around))
                                            (point))))
-                                    ;; Start searching before thing before point.
-                                    (goto-char (setq pos-before pos))
+                                    (setq pos-before pos)
                                     (search-backward pattern pos t))))
                       (let ((match (substring-no-properties
                                     (thing-at-point 'symbol)))) 
@@ -114,6 +113,8 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
           do (with-current-buffer buf
                (when (helm-dabbrev--same-major-mode-p buf)
                  (save-excursion
+                   ;; Start searching before thing before point.
+                   (goto-char (- (point) (length str)))
                    ;; search the last 30 lines before point.
                    (funcall search str -2)) ; store pos [1]
                  (save-excursion
