@@ -138,22 +138,22 @@ If `helm-turn-on-show-completion' is nil just do nothing."
           (or (boundp sym) (fboundp sym) (symbol-plist sym)))
         #'fboundp)))
 
-(defun helm-thing-before-point ()
-  "Get symbol name before point."
+(defun helm-thing-before-point (&optional limits)
+  "Return symbol name before point.
+With LIMITS arg specified return the beginning and en position
+of symbol before point."
   (save-excursion
     (let ((beg (point)))
       (when (re-search-backward
              "\\_<" (field-beginning nil nil (point-at-bol)) t)
-        (buffer-substring-no-properties beg (match-end 0))))))
+        (if limits
+            (cons (match-beginning 0) (match-end 0))
+            (buffer-substring-no-properties beg (match-end 0)))))))
 
 (defun helm-bounds-of-thing-before-point ()
   "Get the beginning and end position of `helm-thing-before-point'.
 Return a cons \(beg . end\)."
-  (save-excursion
-    (let ((beg (point)))
-      (when (re-search-backward
-             "\\_<" (field-beginning nil nil (point-at-bol)) t)
-        (cons (match-beginning 0) (match-end 0))))))
+  (helm-thing-before-point 'limits))
 
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
