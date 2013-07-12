@@ -101,7 +101,8 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
                                            (forward-line
                                             (- helm-dabbrev-lineno-around))
                                            (point))))
-                                    (setq pos-before pos)
+                                    ;; Start searching before thing before point.
+                                    (goto-char (setq pos-before pos))
                                     (search-backward pattern pos t))))
                       (let ((match (substring-no-properties
                                     (thing-at-point 'symbol)))) 
@@ -154,19 +155,24 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
     (keymap . ,helm-dabbrev-map)
     (action . (lambda (candidate)
                 (with-helm-current-buffer
-                  (let* ((limits (bounds-of-thing-at-point 'symbol))
+                  (let* ((limits (helm-bounds-of-thing-before-point))
                          (beg (car limits))
-                         (end (cdr limits)))
-                    (run-with-timer 0.01 nil `(lambda ()
-                                                (delete-region ,beg ,end)
-                                                (insert ,candidate)))))))))
+                         (end (point)))
+                    (run-with-timer
+                     0.01 nil
+                     `(lambda ()
+                        (delete-region ,beg ,end)
+                        (insert ,candidate)
+                        (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
+                          (when (< (point) pos)
+                            (push-mark pos t t)))))))))))
 
 ;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
   (declare (special dabbrev))
-  (let ((dabbrev (thing-at-point 'symbol))
-        (limits (bounds-of-thing-at-point 'symbol))
+  (let ((dabbrev (helm-thing-before-point))
+        (limits (helm-bounds-of-thing-before-point))
         (enable-recursive-minibuffers t)
         (helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate
