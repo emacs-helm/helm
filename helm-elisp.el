@@ -197,9 +197,15 @@ Return a cons \(beg . end\)."
                             `(lambda ()
                                (delete-region ,beg ,end)
                                (insert ,candidate)
+                               ;; When there is no space after point
+                               ;; we are completing inside a symbol or
+                               ;; after a partial symbol with the next arg aside
+                               ;; without space, in this case mark the region.
+                               ;; deleting it would remove the
+                               ;; next arg which is unwanted.
                                (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
                                  (when (< (point) pos)
-                                   (delete-region (point) pos)))))))))
+                                   (push-mark pos t t)))))))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
            :allow-nest t))
