@@ -160,12 +160,8 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
                          (end (point)))
                     (run-with-timer
                      0.01 nil
-                     `(lambda ()
-                        (delete-region ,beg ,end)
-                        (insert ,candidate)
-                        (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
-                          (when (< (point) pos)
-                            (push-mark pos t t)))))))))))
+                     'helm-insert-completion-at-point
+                     beg end candidate)))))))
 
 ;;;###autoload
 (defun helm-dabbrev ()

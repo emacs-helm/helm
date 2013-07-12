@@ -155,6 +155,19 @@ of symbol before point."
 Return a cons \(beg . end\)."
   (helm-thing-before-point 'limits))
 
+(defun helm-insert-completion-at-point (beg end str)
+  ;; When there is no space after point
+  ;; we are completing inside a symbol or
+  ;; after a partial symbol with the next arg aside
+  ;; without space, in this case mark the region.
+  ;; deleting it would remove the
+  ;; next arg which is unwanted.
+  (delete-region beg end)
+  (insert str)
+  (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
+    (when (< (point) pos)
+      (push-mark pos t t))))
+
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
@@ -194,18 +207,8 @@ Return a cons \(beg . end\)."
                          (with-helm-current-buffer
                            (run-with-timer
                             0.01 nil
-                            `(lambda ()
-                               (delete-region ,beg ,end)
-                               (insert ,candidate)
-                               ;; When there is no space after point
-                               ;; we are completing inside a symbol or
-                               ;; after a partial symbol with the next arg aside
-                               ;; without space, in this case mark the region.
-                               ;; deleting it would remove the
-                               ;; next arg which is unwanted.
-                               (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
-                                 (when (< (point) pos)
-                                   (push-mark pos t t)))))))))
+                            'helm-insert-completion-at-point
+                            beg end candidate)))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
            :allow-nest t))
