@@ -764,7 +764,6 @@ Keys description:
                                     default
                                     (file-name-directory default)))
                    initial dir default-directory))
-         (ini-input (and init (expand-file-name init)))
          (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
          (helm-file-completion-sources
