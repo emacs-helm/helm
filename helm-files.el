@@ -2228,20 +2228,6 @@ other candidate transformers."
   "Replaces /home/user with ~."
   (helm-transform-mapcar #'helm-shorten-home-path-1 files))
 
-
-;;; List of files gleaned from every dired buffer
-;;
-;;
-(defun helm-files-in-all-dired-candidates ()
-  (save-excursion
-    (loop for (f . b) in dired-buffers
-          when (buffer-live-p b)
-          append (let ((dir (with-current-buffer b dired-directory)))
-                   (if (listp dir) (cdr dir)
-                       (directory-files f t dired-re-no-dot))))))
-
-;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
-
 (defun helm-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
 file.  Else return ACTIONS unmodified."
@@ -2258,6 +2244,20 @@ Else return ACTIONS unmodified."
           ((string-match "\\.html?$" candidate)
            (append actions (list browse-action)))
           (t actions))))
+
+
+;;; List of files gleaned from every dired buffer
+;;
+;;
+(defun helm-files-in-all-dired-candidates ()
+  (save-excursion
+    (loop for (f . b) in dired-buffers
+          when (buffer-live-p b)
+          append (let ((dir (with-current-buffer b dired-directory)))
+                   (if (listp dir) (cdr dir)
+                       (directory-files f t dired-re-no-dot))))))
+
+;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
 
 (defvar helm-source-files-in-all-dired
   '((name . "Files in all dired buffer.")
