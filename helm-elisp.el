@@ -147,7 +147,7 @@ of symbol before point."
       (when (re-search-backward
              "\\_<" (field-beginning nil nil (point-at-bol)) t)
         (if limits
-            (cons (match-beginning 0) (match-end 0))
+            (cons (match-end 0) beg)
             (buffer-substring-no-properties beg (match-end 0)))))))
 
 (defun helm-bounds-of-thing-before-point ()
