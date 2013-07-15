@@ -2234,23 +2234,13 @@ other candidate transformers."
 ;;
 (defun helm-files-in-all-dired-candidates ()
   (save-excursion
-    (mapcan
-     (lambda (dir)
-       (cond ((listp dir)               ;filelist
-              dir)
-             ((equal "" (file-name-nondirectory dir)) ;dir
-              (directory-files dir t))
-             (t                         ;wildcard
-              (file-expand-wildcards dir t))))
-     (delq nil
-           (mapcar (lambda (buf)
-                     (set-buffer buf)
-                     (when (eq major-mode 'dired-mode)
-                       (if (consp dired-directory)
-                           (cdr dired-directory) ;filelist
-                           dired-directory))) ;dir or wildcard
-                   (buffer-list))))))
-;; (dired '("~/" "~/.emacs-custom.el" "~/.emacs.bmk"))
+    (loop for (f . b) in dired-buffers
+          when (buffer-live-p b)
+          append (let ((dir (with-current-buffer b dired-directory)))
+                   (if (listp dir) (cdr dir)
+                       (directory-files f t dired-re-no-dot))))))
+
+;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
 
 (defun helm-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
