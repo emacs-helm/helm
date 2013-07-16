@@ -820,6 +820,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     ;; to further pass infos to `helm-resume'.
     (with-helm-temp-hook 'helm-after-initialize-hook
       (with-helm-buffer
+        (set (make-local-variable 'helm-zgrep-recurse-flag)
+             (and recurse zgrep))
         (set (make-local-variable 'helm-grep-last-targets) targets)
         (set (make-local-variable 'helm-grep-include-files)
              (or include-files types))
@@ -884,7 +886,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                  :match helm-zgrep-file-extension-regexp)
                                 helm-rzgrep-cache))
                            flist)))
-         (when recursive (setq helm-zgrep-recurse-flag t))
          (helm-do-grep-1 only recursive 'zgrep))
     (setq helm-zgrep-recurse-flag nil)))
 
