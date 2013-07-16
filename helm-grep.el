@@ -816,8 +816,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     ;; give a default value to `helm-ff-default-directory'.
     (unless helm-ff-default-directory
       (setq helm-ff-default-directory default-directory))
-    ;; We need these global vars
-    ;; to further pass infos to `helm-resume'.
+    ;; We need to store these vars locally
+    ;; to pass infos later to `helm-resume'.
     (with-helm-temp-hook 'helm-after-initialize-hook
       (with-helm-buffer
         (set (make-local-variable 'helm-zgrep-recurse-flag)
