@@ -303,7 +303,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
           
 (defun helm-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
-  (let* ((default-directory (expand-file-name helm-ff-default-directory))
+  (let* ((default-directory (or helm-default-directory
+                                (expand-file-name helm-ff-default-directory)))
          (fnargs            (helm-grep-prepare-candidates only-files))
          (ignored-files     (unless (helm-grep-use-ack-p)
                               (mapconcat
@@ -817,12 +818,15 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
       (setq helm-ff-default-directory default-directory))
     ;; We need these global vars
     ;; to further pass infos to `helm-resume'.
-    (setq helm-grep-last-targets targets
-          helm-grep-include-files (or include-files types)
-          helm-grep-in-recurse recurse
-          helm-grep-use-zgrep zgrep
-          helm-grep-last-default-directory
-          helm-ff-default-directory)
+    (with-helm-temp-hook 'helm-after-initialize-hook
+      (with-helm-buffer
+        (set (make-local-variable 'helm-grep-last-targets) targets)
+        (set (make-local-variable 'helm-grep-include-files)
+             (or include-files types))
+        (set (make-local-variable 'helm-grep-in-recurse) recurse)
+        (set (make-local-variable 'helm-grep-use-zgrep) zgrep)
+        (set (make-local-variable 'helm-grep-last-default-directory)
+             helm-ff-default-directory)))
     ;; Setup the source.
     (setq helm-source-grep
           `((name . ,(if zgrep "Zgrep" (capitalize (if recurse
@@ -857,6 +861,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     (helm
      :sources '(helm-source-grep)
      :buffer (format "*helm %s*" (if zgrep "zgrep" "grep"))
+     :default-directory helm-grep-last-default-directory
      :keymap helm-grep-map ; [1]
      :history 'helm-grep-history)))
 
