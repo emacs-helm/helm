@@ -369,7 +369,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          ;; [FIXME] This is a workaround for zgrep
                          ;; that exit with code 1
                          ;; after a certain amount of results.
-                         (not helm-grep-use-zgrep))
+                         (not (with-helm-buffer helm-grep-use-zgrep)))
                     (with-current-buffer helm-buffer
                       (insert (concat "* Exit with code 1, no result found,"
                                       " Command line was:\n\n "
