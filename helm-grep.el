@@ -390,10 +390,6 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                       'face 'helm-grep-finish))))))
                    ((string= event "finished\n")
                     (with-helm-window
-                      ;; Make now `helm-grep-default-command' local
-                      ;; to have it in further resuming session.
-                      (set (make-local-variable 'helm-grep-default-command)
-                           helm-grep-default-command)
                       (setq mode-line-format
                             '(" " mode-line-buffer-identification " "
                               (line-number-mode "%l") " "
@@ -418,18 +414,10 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        (replace-regexp-in-string "\n" "" event))))))))))
 
 (defun helm-grep-collect-candidates ()
-  (let* ((helm-grep-default-command
-          (cond (helm-grep-use-zgrep helm-default-zgrep-command)
-                (helm-grep-in-recurse helm-grep-default-recurse-command)
-                ;; When resuming the local value of
-                ;; `helm-grep-default-command' is used, only git-grep
-                ;; should need this.
-                (t helm-grep-default-command)))
-         (helm-ff-default-directory helm-grep-last-default-directory))
-    (funcall helm-grep-default-function
-             helm-grep-last-targets
-             helm-grep-include-files
-             helm-grep-use-zgrep)))
+  (funcall helm-grep-default-function
+           helm-grep-last-targets
+           helm-grep-include-files
+           helm-grep-use-zgrep))
 
 
 ;;; Actions
@@ -828,7 +816,14 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
         (set (make-local-variable 'helm-grep-in-recurse) recurse)
         (set (make-local-variable 'helm-grep-use-zgrep) zgrep)
         (set (make-local-variable 'helm-grep-last-default-directory)
-             helm-ff-default-directory)))
+             helm-ff-default-directory)
+        (set (make-local-variable 'helm-grep-default-command)
+             (cond (helm-grep-use-zgrep helm-default-zgrep-command)
+                   (helm-grep-in-recurse helm-grep-default-recurse-command)
+                   ;; When resuming the local value of
+                   ;; `helm-grep-default-command' is used, only git-grep
+                   ;; should need this.
+                   (t helm-grep-default-command)))))
     ;; Setup the source.
     (setq helm-source-grep
           `((name . ,(if zgrep "Zgrep" (capitalize (if recurse
