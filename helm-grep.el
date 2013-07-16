@@ -35,7 +35,7 @@
   :group 'helm)
 
 (defcustom helm-grep-default-command
-  "grep -d skip %e -n%cH -e %p %f"
+  "grep -a -d skip %e -n%cH -e %p %f"
   "Default grep format command for `helm-do-grep-1'.
 Where:
 '%e' format spec is for --exclude or --include grep options or
@@ -75,7 +75,7 @@ NOTE: remote grepping is not available with ack-grep."
   :type  'string)
 
 (defcustom helm-grep-default-recurse-command
-  "grep -d recurse %e -n%cH -e %p %f"
+  "grep -a -d recurse %e -n%cH -e %p %f"
   "Default recursive grep format command for `helm-do-grep-1'.
 See `helm-grep-default-command' for format specs and infos about ack-grep."
   :group 'helm-grep
