@@ -345,8 +345,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                          (cons ?p (shell-quote-argument
                                                    helm-pattern))
                                          (cons ?f fnargs)))))
-         ;; Use pipe only with grep or git-grep.
-         (process-connection-type (helm-grep-use-ack-p))
+         ;; Use pipe only with grep, zgrep or git-grep.
+         (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
          (tramp-verbose helm-tramp-verbose))
     (setq helm-grep-last-cmd-line cmd-line)
     ;; Start grep process.
@@ -786,7 +786,9 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
-  (let* ((exts (and recurse (not zgrep)
+  (let* ((exts (and recurse
+                    ;; [FIXME] I could handle this from helm-walk-directory.
+                    (not zgrep) ; zgrep doesn't handle -r opt.
                     (not (helm-grep-use-ack-p :where 'recursive))
                     (or exts (helm-grep-get-file-extensions targets))))
          (include-files (and exts
@@ -797,6 +799,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                             (remove "*" exts)
                                             exts) " ")))
          (types (and (not include-files)
+                     (not zgrep)
                      recurse
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
