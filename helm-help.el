@@ -231,9 +231,17 @@ Italic     => A non--file buffer.
 
 - Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
 
-- You can complete with partial basename \(e.g \"fb\" will complete \"foobar\"\).
+- You can complete with partial basename (start on third char entered)
+
+    e.g \"fob\" or \"fbr\" will complete \"foobar\"
+    but \"fb\" will wait for a third char for completing.
 
 - Use `C-u C-z' to watch an image.
+
+- `C-z' on a filename will expand in helm-buffer to this filename.
+  Second hit on `C-z' will display buffer filename.
+  Third hit on `C-z' will kill buffer filename.
+  NOTE: `C-u C-z' will display buffer directly.
 
 - To browse images directories turn on `helm-follow-mode' and navigate with arrow keys.
 
