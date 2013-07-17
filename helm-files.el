@@ -1433,24 +1433,27 @@ If FNAME is a valid directory name,return FNAME unchanged."
         (dir-p   (file-directory-p fname))
         (tramp-p (loop for (m . f) in tramp-methods
                        thereis (string-match m fname))))
-    (if (or (not helm-ff-smart-completion)
-            (memq helm-mp-matching-method
-                  helm-ff-smart-completion-incompatible-methods)
-            (string-match "\\s-" bn)      ; Fall back to match-plugin.
-            (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
-            (string-match "/$" fname)     ; Allow mkdir.
-            dir-p
-            (string-match helm-ff-url-regexp fname)
-            (and (string= helm-ff-default-directory "/") tramp-p))
-        ;; Don't treat wildcards ("*") as regexp char.
-        ;; (e.g ./foo/*.el => ./foo/[*].el)
-        (cond (dir-p (regexp-quote fname))
-              (t     (concat (regexp-quote bd)
-                             (replace-regexp-in-string "[*]" "[*]" bn))))
-        (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
-                     (helm-ff-mapconcat-candidate bn)
-                     (concat ".*" bn)))
-        (concat (regexp-quote bd) bn))))
+    (cond ((or (not helm-ff-smart-completion)
+               (string-match "\\s-" bn)) ; Fall back to match-plugin.
+           (if dir-p (regexp-quote fname) (concat (regexp-quote bd) bn)))
+          ((or (memq helm-mp-matching-method
+                     helm-ff-smart-completion-incompatible-methods)
+               (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
+               (string-match "/$" fname)     ; Allow mkdir.
+               dir-p
+               (string-match helm-ff-url-regexp fname)
+               (and (string= helm-ff-default-directory "/") tramp-p))
+           ;; Don't treat wildcards ("*") as regexp char.
+           ;; (e.g ./foo/*.el => ./foo/[*].el)
+           (if dir-p
+               (regexp-quote fname)
+               (concat (regexp-quote bd)
+                       (replace-regexp-in-string "[*]" "[*]" bn))))
+          (t
+           (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
+                        (helm-ff-mapconcat-candidate bn)
+                        (concat ".*" bn)))
+           (concat (regexp-quote bd) bn)))))
 
 (defun helm-ff-mapconcat-candidate (candidate)
   "Transform string CANDIDATE in regexp.
