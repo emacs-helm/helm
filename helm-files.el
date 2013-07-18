@@ -1430,11 +1430,12 @@ If basename contain one or more space fallback to match-plugin.
 If FNAME is a valid directory name,return FNAME unchanged."
   (setq fname (helm-ff-handle-backslash fname))
   (let ((bn      (helm-basename fname))
-        (bd      (helm-aif (and fname (file-name-directory fname))
-                     (file-name-as-directory it) ""))
+        (bd      (or (helm-basedir fname) "")) 
         (dir-p   (file-directory-p fname))
         (tramp-p (loop for (m . f) in tramp-methods
                        thereis (string-match m fname))))
+    ;; Always regexp-quote base directory name to handle
+    ;; crap dirnames such e.g bookmark+
     (cond (dir-p (regexp-quote fname))
           ((or (not (helm-ff-smart-completion-p))
                (string-match "\\s-" bn)) ; Fall back to match-plugin.
