@@ -82,7 +82,7 @@ See `helm-grep-default-command' for format specs and infos about ack-grep."
   :type  'string)
 
 (defcustom helm-default-zgrep-command
-  "zgrep -n%cH -e %p %f"
+  "zgrep -a -n%cH -e %p %f"
   "Default command for Zgrep.
 See `helm-grep-default-command' for infos on format specs."
   :group 'helm-grep
@@ -116,7 +116,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :type 'integer)
 
 (defcustom helm-zgrep-file-extension-regexp
-  ".*\\(\.gz\\|\.bz\\|\.xz\\|\.lzma\\)$"
+  ".*\\(\\.gz\\|\\.bz\\|\\.xz\\|\\.lzma\\)$"
   "Default file extensions zgrep will search in."
   :group 'helm-grep
   :type 'string)
