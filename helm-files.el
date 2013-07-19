@@ -1409,6 +1409,7 @@ systems."
     (append (list dot dot2) ls)))
 
 (defun helm-ff-handle-backslash (fname)
+  ;; Allow creation of filenames containing a backslash.
   (loop with bad = '((92 . ""))
         for i across fname
         for isbad = (assq i bad)
@@ -1428,6 +1429,7 @@ If FNAME is an url returns it unmodified.
 When FNAME contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
 If FNAME is a valid directory name,return FNAME unchanged."
+  ;; handle bad filenames containing a backslash.
   (setq fname (helm-ff-handle-backslash fname))
   (let ((bn      (helm-basename fname))
         (bd      (or (helm-basedir fname) "")) 
