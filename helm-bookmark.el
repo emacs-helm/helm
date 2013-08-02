@@ -127,8 +127,13 @@
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
-  (let ((current-prefix-arg helm-current-prefix-arg))
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        non-essential)
     (bookmark-jump candidate)))
+
+(defun helm-bookmark-jump-other-window (candidate)
+  (let (non-essential)
+    (bookmark-jump-other-window candidate)))
 
 
 ;;; bookmark-set
@@ -261,7 +266,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
     `((coerce . helm-bookmark-get-bookmark-from-name)
       (action
        ("Jump to bookmark" . helm-bookmark-jump)
-       ("Jump to BM other window" . bookmark-jump-other-window)
+       ("Jump to BM other window" . helm-bookmark-jump-other-window)
        ("Bookmark edit annotation" . bookmark-edit-annotation)
        ("Bookmark show annotation" . bookmark-show-annotation)
        ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
