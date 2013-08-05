@@ -2149,9 +2149,9 @@ Helm plug-ins are realized by this function."
                                      (file-remote-p helm-pattern)
                                      (assoc 'no-delay-on-input source))
                                  (helm-interpret-value candidate-fn source)
-                                 (let ((result (while-no-input
-                                                 (helm-interpret-value
-                                                  candidate-fn source))))
+                                 (let ((result (helm-while-no-input
+                                                (helm-interpret-value
+                                                 candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
                        (error (funcall type-error err)))))
@@ -2169,6 +2169,15 @@ Helm plug-ins are realized by this function."
            ;; them or return them unmodified.
            (helm-transform-candidates candidates source))
           (t (funcall type-error)))))
+
+(defmacro helm-while-no-input (&rest body)
+  "Same as `while-no-input' but without testing with `input-pending-p'."
+  (declare (debug t) (indent 0))
+  (let ((catch-sym (make-symbol "input")))
+    `(with-local-quit
+       (catch ',catch-sym
+	 (let ((throw-on-input ',catch-sym))
+           ,@body)))))
 
 (defun helm-get-cached-candidates (source)
   "Return the cached value of candidates for SOURCE.
