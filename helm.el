@@ -169,6 +169,7 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "M-n")        'next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
+    (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
@@ -1606,6 +1607,14 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
   (interactive "p")
   (if (and helm-alive-p (> (length helm-buffers) arg))
       (helm-run-after-quit `(lambda () (helm-resume (nth ,arg helm-buffers))))
+      (message "No previous helm sessions to resume yet!")))
+
+;;;###autoload
+(defun helm-resume-list-buffers-after-quit ()
+  "List resumable helm buffers within running helm."
+  (interactive)
+  (if (and helm-alive-p (> (length helm-buffers) 0))
+      (helm-run-after-quit #'(lambda () (helm-resume t)))
       (message "No previous helm sessions to resume yet!")))
 
 (defun helm-resume-p (any-resume)
