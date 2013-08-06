@@ -2506,7 +2506,13 @@ Colorize only symlinks, directories and files."
          (start-process "tracker-search-process" nil
                         "tracker-search"
                         helm-pattern)))
-    (type . file)
+    (filtered-candidate-transformer . (lambda (candidates source)
+                                        (loop for cand in (cdr candidates)
+                                              collect (ansi-color-apply cand))))
+    (action . (helm-get-attribute-from-type 'action 'file))
+    (action-transformer
+     helm-transform-file-load-el
+     helm-transform-file-browse-url)
     (requires-pattern . 3)
     (delayed))
   "Source for retrieving files matching the current input pattern
