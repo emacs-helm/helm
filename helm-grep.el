@@ -715,25 +715,23 @@ Special commands:
 (defun helm-grep-guess-extensions (files)
   "Try to guess file extensions in FILES list when using grep recurse.
 These extensions will be added to command line with --include arg of grep."
-  (loop
-        with glob-list = nil
+  (loop with glob-list
+        with ext-list = (list helm-grep-preferred-ext "*")
         with lst = (if (file-directory-p (car files))
                        (directory-files
                         (car files) nil
                         directory-files-no-dot-files-regexp)
                        files)
         for i in lst
-        for ext = (file-name-extension i t)
+        for ext = (file-name-extension i 'dot)
         for glob = (and ext (not (string= ext ""))
                         (concat "*" ext))
         unless (or (not glob)
                    (member glob glob-list)
+                   (member glob ext-list)
                    (member glob grep-find-ignored-files))
         collect glob into glob-list
-        finally return (append (helm-aif helm-c-grep-preferred-ext
-                                   (list it))
-                               (list "*")
-                               glob-list)))
+        finally return (delq nil (append ext-list glob-list))))
 
 (defun helm-grep-get-file-extensions (files)
   "Try to return a list of file extensions to pass to include arg of grep."
