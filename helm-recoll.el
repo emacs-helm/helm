@@ -1,6 +1,8 @@
 ;;; helm-recoll.el --- helm interface for the recoll desktop search tool.
 
-;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2013 Joe Bloggs <vapniks@yahoo.com> and Michael Heerdegen
+
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,6 +35,8 @@
 ;; and then add a require statement for the library: (require 'helm-recoll)
 
 ;;; Code:
+
+(require 'helm)
 
 (defvar helm-recoll-options
   '("recoll" "-t" "-b")
@@ -93,7 +97,7 @@ The CONFDIR arg should be a string indicating the path to the config directory w
 
 ;; Test:
 ;; (helm-recoll-create-source "main" "~/.recoll")
-;; (helm :sources 'helm-source-recoll-teaching)
+;; (helm :sources 'helm-source-recoll-main)
 
 
 ;;; helm-recoll.el ends here
