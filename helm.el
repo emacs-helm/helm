@@ -87,7 +87,7 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
     (unless next
       (set iterator (helm-iter-list (funcall fn)))
       (setq next (helm-iter-next (symbol-value iterator))))
-    (and next (eval iterator) (call-interactively (nth (1- next) functions)))
+    (and next (symbol-value iterator) (call-interactively (nth (1- next) functions)))
     (when delay (run-with-idle-timer delay nil `(lambda ()
                                                   (setq ,iterator nil))))))
 
