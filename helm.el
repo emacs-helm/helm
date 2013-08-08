@@ -1347,8 +1347,7 @@ This is used in transformers to modify candidates list."
   (if (functionp funcs)
       (apply 'helm-funcall-with-source source funcs args)
       (apply 'helm-funcall-with-source source
-             (lambda (&rest args)
-               (helm-compose args funcs))
+             (lambda (&rest oargs) (helm-compose oargs funcs))
              args)))
 
 
