@@ -101,7 +101,7 @@ Show global bindings and local bindings according to current `major-mode'."
                                        'face 'helm-M-x-key))))
                 cand) into ls
           finally return
-          (sort ls #'helm-elisp-sort-symbols-fn))))
+          (sort ls #'helm-generic-sort-fn))))
 
 ;;;###autoload
 (defun helm-M-x ()

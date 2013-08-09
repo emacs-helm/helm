@@ -22,6 +22,7 @@
 
 (declare-function woman-file-name-all-completions "woman.el" (topic))
 (declare-function Man-getpage-in-background "man.el" (topic))
+(declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
 
 (defvar helm-man-pages nil
   "All man pages on system.
@@ -46,6 +47,7 @@ source.")
   '((name . "Manual Pages")
     (init . (lambda ()
               (require 'woman)
+              (require 'helm-utils)
               (unless helm-man-pages
                 (setq helm-man-pages
                       (ignore-errors
@@ -53,14 +55,16 @@ source.")
                         (sort (mapcar 'car woman-topic-all-completions)
                               'string-lessp))))))
     (candidates . helm-man-pages)
+    (filtered-candidate-transformer
+     . (lambda (candidates source)
+         (sort candidates #'helm-generic-sort-fn)))
     (action  . (("Show with Woman" . helm-man-default-action)))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)
                             (if (eq system-type 'darwin)
                                 '(("Show with Man" . man))
-                                actions)))
-    (requires-pattern . 2)))
+                                actions)))))
 
 ;;;###autoload
 (defun helm-man-woman (arg)
