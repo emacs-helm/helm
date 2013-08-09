@@ -1323,20 +1323,31 @@ in the source where point is."
 (defun helm-compose (arg-lst func-lst)
   "Apply arguments specified in ARG-LST with each function of FUNC-LST.
 The result of each function will be the new `car' of ARG-LST.
-Each function in FUNC-LST must accept (length ARG-LST) arguments.
+Each function in FUNC-LST must accept (length ARG-LST) arguments
+\(See examples below) .
 This function allows easy sequencing of transformer functions.
 Where generally, ARG-LST is '(candidates-list source) and FUNC-LST a
 list of transformer functions that take one or two arguments depending
 we are using 'filtered-candidate-transformer' or 'candidate-transformer'.
 e.g
+filtered-candidate-transformer:
 \(helm-compose '((1 2 3 4 5 6 7)
-                '(\"a\" \"b\" \"c\" \"d\" \"e\"))
+                '((name . \"An helm source\") (candidates . (a b c))))
               '((lambda (candidates source)
                   (loop for i in candidates
                         when (oddp i) collect i))
                 (lambda (candidates source)
                   (loop for i in candidates collect (1+ i)))))
-=>(2 4 6 8)."
+=>(2 4 6 8)
+
+candidate-transformer:
+\(helm-compose '((1 2 3 4 5 6 7))
+                '((lambda (candidates)
+                  (loop for i in candidates
+                        when (oddp i) collect i))
+                (lambda (candidates)
+                  (loop for i in candidates collect (1+ i)))))
+=> (2 4 6 8)."
   (dolist (func func-lst)
     (setcar arg-lst (apply func arg-lst)))
   (car arg-lst))
@@ -2162,10 +2173,8 @@ Helm plug-ins are realized by this function."
            candidates)
           ((null candidates) candidates)
           ((listp candidates)
-           ;; Filter candidates now with `candidate-transformer' function maybe
-           ;; otherwise return CANDIDATES which will be passed to
-           ;; `filtered-candidate-transformer', which in turn will maybe filter
-           ;; them or return them unmodified.
+           ;; Transform candidates with `candidate-transformer' functions if
+           ;; some, otherwise return candidates.
            (helm-transform-candidates candidates source))
           (t (funcall type-error)))))
 
