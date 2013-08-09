@@ -24,6 +24,7 @@
 (declare-function Man-getpage-in-background "man.el" (topic))
 (declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
 
+;; Internal
 (defvar helm-man-pages nil
   "All man pages on system.
 Will be calculated the first time you invoke helm with this
@@ -53,8 +54,9 @@ source.")
                       (ignore-errors
                         (woman-file-name "" t)
                         (sort (mapcar 'car woman-topic-all-completions)
-                              'string-lessp))))))
-    (candidates . helm-man-pages)
+                              'string-lessp))))
+              (helm-init-candidates-in-buffer 'global helm-man-pages)))
+    (candidates-in-buffer)
     (filtered-candidate-transformer
      . (lambda (candidates source)
          (sort candidates #'helm-generic-sort-fn)))
