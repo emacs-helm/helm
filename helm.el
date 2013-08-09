@@ -604,8 +604,8 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-default-directory nil
   "The value of `default-directory' when `helm' is initialized.")
-(defvar helm-candidate-cache nil
-  "Holds the available candidate withing a single helm invocation.")
+(defvar helm-candidate-cache (make-hash-table :test 'equal)
+  "Holds the available candidate within a single helm invocation.")
 (defvar helm-pattern ""
   "The input pattern used to update the helm buffer.")
 (defvar helm-input ""
@@ -1882,7 +1882,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                                     (thing-at-point 'symbol))))
                          ""))
   (setq helm-input "")
-  (setq helm-candidate-cache nil)
+  (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-log-run-hook 'helm-after-initialize-hook))
 
@@ -2191,7 +2191,7 @@ Helm plug-ins are realized by this function."
   "Return the cached value of candidates for SOURCE.
 Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
-         (candidate-cache (assoc name helm-candidate-cache)))
+         (candidate-cache (gethash name helm-candidate-cache)))
     (cond (candidate-cache
            (helm-log "use cached candidates")
            (cdr candidate-cache))
@@ -2207,8 +2207,7 @@ Cache the candidates if there is not yet a cached value."
                     (set-process-filter candidates 'helm-output-filter)
                     (setq candidates nil))
                    ((not (assoc 'volatile source))
-                    (setq candidate-cache (cons name candidates))
-                    (push candidate-cache helm-candidate-cache)))
+                    (puthash name candidates helm-candidate-cache)))
              candidates)))))
 
 
@@ -2562,10 +2561,7 @@ if specified."
 
 (defun helm-remove-candidate-cache (source)
   "Remove SOURCE from `helm-candidate-cache'."
-  (setq helm-candidate-cache
-        (delete (assoc (assoc-default 'name source)
-                       helm-candidate-cache)
-                helm-candidate-cache)))
+  (remhash (assoc-default 'name source) helm-candidate-cache))
 
 (defun helm-insert-match (match insert-function source)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION for SOURCE.
