@@ -59,6 +59,11 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   :group 'helm-dabbrev
   :type 'integer)
 
+(defcustom helm-dabbrev-cycle-thresold nil
+  "Number of time helm-dabbrev cycle before displaying helm completion."
+  :group 'helm-dabbrev
+  :type 'integer)
+
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -176,6 +181,8 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   (let ((dabbrev (helm-thing-before-point))
         (limits (helm-bounds-of-thing-before-point))
         (enable-recursive-minibuffers t)
+        (cycling-disabled-p (or (null helm-dabbrev-cycle-thresold)
+                                (zerop helm-dabbrev-cycle-thresold)))
         (helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate
          #'(lambda ()
@@ -186,29 +193,36 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
                (not (eq last-command 'helm-dabbrev)))
       (setq helm-dabbrev-iterator nil
             helm-dabbrev-data nil))
-    (unless helm-dabbrev-iterator
+    (when cycling-disabled-p
+      (setq helm-dabbrev-cache (helm-dabbrev--get-candidates dabbrev)))
+    (unless (or cycling-disabled-p
+                helm-dabbrev-iterator)
       (setq helm-dabbrev-cache (helm-dabbrev--get-candidates dabbrev))
       (setq helm-dabbrev-iterator (helm-iter-list
                                    (loop for i in helm-dabbrev-cache
                                          when (string-match
                                                (concat "^" dabbrev) i)
                                          collect i into selection
-                                         when (eq (length selection) 3)
+                                         when (eq (length selection)
+                                                  3;helm-dabbrev-cycle-thresold
+                                                  )
                                          return selection)))
       (setq helm-dabbrev-data (make-helm-dabbrev-info :dabbrev dabbrev
                                                       :limits limits)))
-    (helm-aif (helm-iter-next helm-dabbrev-iterator)
+    (helm-aif (and helm-dabbrev-iterator
+                   (helm-iter-next helm-dabbrev-iterator))
         (progn
           (helm-insert-completion-at-point (car limits) (cdr limits) it)
           ;; Move already tried candidates to end of list.
           (setq helm-dabbrev-cache (append (remove it helm-dabbrev-cache)
                                            (list it))))
-      (setq helm-dabbrev-iterator nil)
-      (delete-region (car limits) (point))
-      (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev-data)
-            limits  (helm-dabbrev-info-limits helm-dabbrev-data))
-      (setq helm-dabbrev-data nil)
-      (insert dabbrev)
+      (unless cycling-disabled-p
+        (setq helm-dabbrev-iterator nil)
+        (delete-region (car limits) (point))
+        (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev-data)
+              limits  (helm-dabbrev-info-limits helm-dabbrev-data))
+        (setq helm-dabbrev-data nil)
+        (insert dabbrev))
       (with-helm-show-completion (car limits) (cdr limits)
         (helm :sources 'helm-source-dabbrev
               :buffer "*helm dabbrev*"
