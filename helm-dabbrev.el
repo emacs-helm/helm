@@ -63,7 +63,7 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   "Number of time helm-dabbrev cycle before displaying helm completion.
 When nil or 0 disable cycling."
   :group 'helm-dabbrev
-  :type 'integer)
+  :type '(choice (const :tag "Cycling disabled" nil) integer))
 
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
