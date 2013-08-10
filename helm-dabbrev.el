@@ -153,9 +153,9 @@ When nil or 0 disable cycling."
           lst))))
 
 ;; Internal
-(defvar helm-dabbrev-cache nil)
-(defvar helm-dabbrev-iterator nil)
-(defvar helm-dabbrev-data nil)
+(defvar helm-dabbrev--cache nil)
+(defvar helm-dabbrev--iterator nil)
+(defvar helm-dabbrev--data nil)
 (defstruct helm-dabbrev-info dabbrev limits)
 
 (defvar helm-source-dabbrev
@@ -163,7 +163,7 @@ When nil or 0 disable cycling."
     (init . (lambda ()
               (helm-init-candidates-in-buffer
                'global
-               helm-dabbrev-cache))) 
+               helm-dabbrev--cache))) 
     (candidates-in-buffer)
     (keymap . ,helm-dabbrev-map)
     (action . (lambda (candidate)
@@ -188,40 +188,40 @@ When nil or 0 disable cycling."
         (helm-quit-if-no-candidate
          #'(lambda ()
              (message "[Helm-dabbrev: No expansion found]"))))
-    (when (and helm-dabbrev-iterator ; have been called at least once.
+    (when (and helm-dabbrev--iterator ; have been called at least once.
                ;; But user have moved with some other command
                ;; in the meaning time.
                (not (eq last-command 'helm-dabbrev)))
-      (setq helm-dabbrev-iterator nil
-            helm-dabbrev-data nil))
+      (setq helm-dabbrev--iterator nil
+            helm-dabbrev--data nil))
     (when cycling-disabled-p
-      (setq helm-dabbrev-cache (helm-dabbrev--get-candidates dabbrev)))
+      (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev)))
     (unless (or cycling-disabled-p
-                helm-dabbrev-iterator)
-      (setq helm-dabbrev-cache (helm-dabbrev--get-candidates dabbrev))
-      (setq helm-dabbrev-iterator (helm-iter-list
-                                   (loop for i in helm-dabbrev-cache
+                helm-dabbrev--iterator)
+      (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev))
+      (setq helm-dabbrev--iterator (helm-iter-list
+                                   (loop for i in helm-dabbrev--cache
                                          when (string-match
                                                (concat "^" dabbrev) i)
                                          collect i into selection
                                          when (eq (length selection)
                                                   helm-dabbrev-cycle-thresold)
                                          return selection)))
-      (setq helm-dabbrev-data (make-helm-dabbrev-info :dabbrev dabbrev
+      (setq helm-dabbrev--data (make-helm-dabbrev-info :dabbrev dabbrev
                                                       :limits limits)))
-    (helm-aif (and helm-dabbrev-iterator
-                   (helm-iter-next helm-dabbrev-iterator))
+    (helm-aif (and helm-dabbrev--iterator
+                   (helm-iter-next helm-dabbrev--iterator))
         (progn
           (helm-insert-completion-at-point (car limits) (cdr limits) it)
           ;; Move already tried candidates to end of list.
-          (setq helm-dabbrev-cache (append (remove it helm-dabbrev-cache)
+          (setq helm-dabbrev--cache (append (remove it helm-dabbrev--cache)
                                            (list it))))
       (unless cycling-disabled-p
-        (setq helm-dabbrev-iterator nil)
+        (setq helm-dabbrev--iterator nil)
         (delete-region (car limits) (point))
-        (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev-data)
-              limits  (helm-dabbrev-info-limits helm-dabbrev-data))
-        (setq helm-dabbrev-data nil)
+        (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev--data)
+              limits  (helm-dabbrev-info-limits helm-dabbrev--data))
+        (setq helm-dabbrev--data nil)
         (insert dabbrev))
       (with-helm-show-completion (car limits) (cdr limits)
         (helm :sources 'helm-source-dabbrev
