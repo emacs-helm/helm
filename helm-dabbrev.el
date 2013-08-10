@@ -60,7 +60,8 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   :type 'integer)
 
 (defcustom helm-dabbrev-cycle-thresold nil
-  "Number of time helm-dabbrev cycle before displaying helm completion."
+  "Number of time helm-dabbrev cycle before displaying helm completion.
+When nil or 0 disable cycling."
   :group 'helm-dabbrev
   :type 'integer)
 
