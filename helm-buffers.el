@@ -49,9 +49,10 @@ filtered from the list of candidates if the
 
 (defcustom helm-buffer-max-length 20
   "Max length of buffer names before truncate.
-When nil use the longest buffer-name length found."
+When disabled (nil) use the longest buffer-name length found."
   :group 'helm-buffers
-  :type  'integer)
+  :type  '(choice (const :tag "Disabled" nil)
+                  (integer :tag "Length before truncate")))
 
 ;;; Faces
 ;;
