@@ -146,12 +146,18 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
             (append lst (funcall dabbrev-get abbrev 'all-bufs)))
           lst))))
 
+;; Internal
+(defvar helm-dabbrev-cache nil)
+(defvar helm-dabbrev-iterator nil)
+(defvar helm-dabbrev-data nil)
+(defstruct helm-dabbrev-info dabbrev limits)
+
 (defvar helm-source-dabbrev
   `((name . "Dabbrev Expand")
     (init . (lambda ()
               (helm-init-candidates-in-buffer
                'global
-               (helm-dabbrev--get-candidates dabbrev))))
+               helm-dabbrev-cache))) 
     (candidates-in-buffer)
     (keymap . ,helm-dabbrev-map)
     (action . (lambda (candidate)
@@ -167,7 +173,6 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
 ;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
-  (declare (special dabbrev))
   (let ((dabbrev (helm-thing-before-point))
         (limits (helm-bounds-of-thing-before-point))
         (enable-recursive-minibuffers t)
@@ -175,12 +180,41 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
         (helm-quit-if-no-candidate
          #'(lambda ()
              (message "[Helm-dabbrev: No expansion found]"))))
-    (with-helm-show-completion (car limits) (cdr limits)
-      (helm :sources 'helm-source-dabbrev
-            :buffer "*helm dabbrev*"
-            :input (concat "^" dabbrev " ")
-            :resume 'noresume
-            :allow-nest t))))
+    (when (and helm-dabbrev-iterator ; have been called at least once.
+               ;; But user have moved with some other command
+               ;; in the meaning time.
+               (not (eq last-command 'helm-dabbrev)))
+      (setq helm-dabbrev-iterator nil
+            helm-dabbrev-data nil))
+    (unless helm-dabbrev-iterator
+      (setq helm-dabbrev-cache (helm-dabbrev--get-candidates dabbrev))
+      (setq helm-dabbrev-iterator (helm-iter-list
+                                   (loop for i in helm-dabbrev-cache
+                                         when (string-match
+                                               (concat "^" dabbrev) i)
+                                         collect i into selection
+                                         when (eq (length selection) 3)
+                                         return selection)))
+      (setq helm-dabbrev-data (make-helm-dabbrev-info :dabbrev dabbrev
+                                                      :limits limits)))
+    (helm-aif (helm-iter-next helm-dabbrev-iterator)
+        (progn
+          (helm-insert-completion-at-point (car limits) (cdr limits) it)
+          ;; Move already tried candidates to end of list.
+          (setq helm-dabbrev-cache (append (remove it helm-dabbrev-cache)
+                                           (list it))))
+      (setq helm-dabbrev-iterator nil)
+      (delete-region (car limits) (point))
+      (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev-data)
+            limits  (helm-dabbrev-info-limits helm-dabbrev-data))
+      (setq helm-dabbrev-data nil)
+      (insert dabbrev)
+      (with-helm-show-completion (car limits) (cdr limits)
+        (helm :sources 'helm-source-dabbrev
+              :buffer "*helm dabbrev*"
+              :input (concat "^" dabbrev " ")
+              :resume 'noresume
+              :allow-nest t)))))
 
 (provide 'helm-dabbrev)
 
