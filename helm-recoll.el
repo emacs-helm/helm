@@ -1,8 +1,23 @@
 ;;; helm-recoll.el --- helm interface for the recoll desktop search tool.
 
+;; Filename: helm-recoll.el
+;; Description: helm interface for the recoll desktop search tool.
+;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Maintainer: Joe Bloggs <vapniks@yahoo.com> and Michael Heerdegen
 ;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; Copyright (C) 2013 Joe Bloggs <vapniks@yahoo.com> and Michael Heerdegen
-
+;; Version: 1.1
+;; Last-Updated: 2013-08-10 18:00:00
+;;           By: Joe Bloggs
+;; URL: https://github.com/vapniks/helm/blob/master/helm-recoll.el
+;; Keywords: convenience
+;; Compatibility: GNU Emacs 24.3.1
+;; Package-Requires: ((helm "20130806.1505"))
+;;
+;; Features that might be required by this library:
+;;
+;; helm
+;;
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
