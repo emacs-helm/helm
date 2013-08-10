@@ -204,8 +204,7 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
                                                (concat "^" dabbrev) i)
                                          collect i into selection
                                          when (eq (length selection)
-                                                  3;helm-dabbrev-cycle-thresold
-                                                  )
+                                                  helm-dabbrev-cycle-thresold)
                                          return selection)))
       (setq helm-dabbrev-data (make-helm-dabbrev-info :dabbrev dabbrev
                                                       :limits limits)))
