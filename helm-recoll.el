@@ -12,7 +12,7 @@
 ;; URL: https://github.com/vapniks/helm/blob/master/helm-recoll.el
 ;; Keywords: convenience
 ;; Compatibility: GNU Emacs 24.3.1
-;; Package-Requires: ((helm "20130806.1505"))
+;; Package-Requires: ((helm "1.5.3"))
 ;;
 ;; Features that might be required by this library:
 ;;
