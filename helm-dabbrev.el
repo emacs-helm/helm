@@ -200,12 +200,15 @@ When nil or 0 disable cycling."
                 helm-dabbrev--iterator)
       (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev))
       (setq helm-dabbrev--iterator (helm-iter-list
-                                   (loop for i in helm-dabbrev--cache
+                                   (loop with selection
+                                         for i in helm-dabbrev--cache
                                          when (string-match
                                                (concat "^" dabbrev) i)
                                          collect i into selection
-                                         when (eq (length selection)
-                                                  helm-dabbrev-cycle-thresold)
+                                         when (or (= (length selection)
+                                                     helm-dabbrev-cycle-thresold)
+                                                  (= (length selection)
+                                                     (length helm-dabbrev--cache)))
                                          return selection)))
       (setq helm-dabbrev--data (make-helm-dabbrev-info :dabbrev dabbrev
                                                       :limits limits)))
