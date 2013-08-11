@@ -242,4 +242,4 @@ When nil or 0 disable cycling."
 ;; indent-tabs-mode: nil
 ;; End:
 
-;;; helm-dabbrev ends here
+;;; helm-dabbrev.el ends here
