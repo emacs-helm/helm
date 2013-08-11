@@ -29,15 +29,16 @@
   "Ring related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-kill-ring-threshold 10
+(defcustom helm-kill-ring-threshold 3
   "Minimum length of a candidate to be listed by `helm-source-kill-ring'."
   :type 'integer
   :group 'helm-ring)
 
-(defcustom helm-kill-ring-max-lines-number nil
+(defcustom helm-kill-ring-max-lines-number 5
   "Max number of lines displayed per candidate in kill-ring browser.
-If nil or zero, don't truncate candidate, show all."
-  :type 'integer
+If nil or zero (disabled), don't truncate candidate, show all."
+  :type '(choice (const :tag "Disabled" nil)
+                 (integer :tag "Max number of lines"))
   :group 'helm-ring)
 
 (defcustom helm-kill-ring-show-completion t
