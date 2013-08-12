@@ -215,7 +215,7 @@ few characters to narrow down the list of potential candidates.
 
 Set it to nil if you don't want this limit."
   :group 'helm
-  :type 'integer)
+  :type '(choice (const :tag "Disabled" nil) integer))
 
 (defcustom helm-idle-delay 0.1
   "Be idle for this many seconds, before updating in delayed sources.
