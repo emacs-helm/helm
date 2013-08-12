@@ -632,7 +632,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
-                                        "\\<" "\\>" "\\<_" "\\>_"))
+                                        "\\<" "\\>" "\\<_" "\\>_" ".*"))
 (defvar helm-suspend-update-flag nil)
 (defvar helm-force-updating-p nil)
 (defvar helm-exit-status 0
@@ -2334,20 +2334,23 @@ and `helm-pattern'."
   (let ((helm-case-fold-search
          (helm-aif (assq 'case-fold-search (helm-get-current-source))
              (cdr it)
-           helm-case-fold-search)))
-    (case helm-case-fold-search
-      (smart (let ((case-fold-search nil)
-                   ;; Only parse basename for filenames
-                   ;; to avoid setting case sensitivity
-                   ;; when expanded directories contains upcase
-                   ;; characters.
-                   (bn (if (string-match "[~/]*" pattern)
+           helm-case-fold-search))
+        ;; Only parse basename for filenames
+        ;; to avoid setting case sensitivity
+        ;; when expanded directories contains upcase
+        ;; characters.
+        (bn-or-pattern (if (string-match "[~/]*" pattern)
                            ;; `helm-basename' is not available yet.
                            (file-name-nondirectory
                             (directory-file-name pattern))
                            pattern)))
-               (if (string-match "[A-Z]" bn) nil t)))
-      (t helm-case-fold-search))))
+    (helm-set-case-fold-search-1 bn-or-pattern)))
+
+(defun helm-set-case-fold-search-1 (pattern)
+  (case helm-case-fold-search
+      (smart (let ((case-fold-search nil))
+               (if (string-match "[A-Z]" pattern) nil t)))
+      (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns limit source)
   (let (matches)
