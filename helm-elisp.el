@@ -261,6 +261,7 @@ If SYM is not documented, return \"Not documented\"."
 (defun helm-complete-file-name-at-point (&optional force)
   "Complete file name at point."
   (interactive)
+  (require 'helm-mode)
   (let* ((tap (thing-at-point 'filename))
          beg
          (init (and tap
