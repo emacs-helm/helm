@@ -65,6 +65,14 @@ When nil or 0 disable cycling."
   :group 'helm-dabbrev
   :type '(choice (const :tag "Cycling disabled" nil) integer))
 
+(defcustom helm-dabbrev-case-fold-search 'smart
+  "Set `case-fold-search' in `helm-dabbrev'.
+Same as `helm-case-fold-search' but for `helm-dabbrev'."
+  :group 'helm-dabbrev
+  :type '(choice (const :tag "Ignore case" t)
+                 (const :tag "Respect case" nil)
+                 (other :tag "Smart" 'smart)))
+
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -144,7 +152,10 @@ When nil or 0 disable cycling."
     (let* ((dabbrev-get #'(lambda (str all-bufs)
                              (helm-dabbrev--collect
                               str helm-candidate-number-limit
-                              nil all-bufs)))
+                              (case helm-dabbrev-case-fold-search
+                                (smart (helm-set-case-fold-search-1 abbrev))
+                                (t helm-dabbrev-case-fold-search))
+                              all-bufs)))
            (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
       (if (and (not helm-dabbrev-always-search-all)
                (<= (length lst) helm-dabbrev-max-length-result))

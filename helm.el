@@ -312,8 +312,9 @@ NOTE: This have no effect in asynchronous sources, you will
 have to implement a similar feature directly in the process.
 See in helm-grep.el how it is implemented."
   :group 'helm
-  :type 'symbol)
-
+  :type '(choice (const :tag "Ignore case" t)
+                 (const :tag "Respect case" nil)
+                 (other :tag "Smart" 'smart)))
 
 (defcustom helm-file-name-case-fold-search
   (if (memq system-type
