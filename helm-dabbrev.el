@@ -67,7 +67,9 @@ When nil or 0 disable cycling."
 
 (defcustom helm-dabbrev-case-fold-search 'smart
   "Set `case-fold-search' in `helm-dabbrev'.
-Same as `helm-case-fold-search' but for `helm-dabbrev'."
+Same as `helm-case-fold-search' but for `helm-dabbrev'.
+Note that this is not affecting searching in helm buffer,
+but the initial search for all candidates in buffer(s)."
   :group 'helm-dabbrev
   :type '(choice (const :tag "Ignore case" t)
                  (const :tag "Respect case" nil)
