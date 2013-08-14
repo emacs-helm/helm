@@ -140,7 +140,7 @@ When nil or 0 disable cycling."
 
 (defun helm-dabbrev--get-candidates (abbrev)
   (assert abbrev nil "[No Match]")
-  (with-helm-current-buffer
+  (with-current-buffer (current-buffer)
     (let* ((dabbrev-get #'(lambda (str all-bufs)
                              (helm-dabbrev--collect
                               str helm-candidate-number-limit
