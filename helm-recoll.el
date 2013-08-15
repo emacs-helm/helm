@@ -64,6 +64,7 @@ can be passed as a argument to `helm-recoll-create-source'")
 The source variable will be named `helm-source-recoll-NAME' where NAME is the first arg to the function
  (and should be a valid symbol name - i.e. no spaces).
 The CONFDIR arg should be a string indicating the path to the config directory which recoll should use."
+  (require 'helm-mode)
   (let ((initfunc (intern (concat "helm-recoll-init-" name))))
     (eval
      `(defun ,initfunc nil
