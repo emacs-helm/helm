@@ -2383,8 +2383,10 @@ Else return ACTIONS unmodified."
   `((name . "Recentf")
     (init . (lambda ()
               (require 'recentf)
-              (or recentf-mode (recentf-mode 1))))
-    (candidates . recentf-list)
+              (or recentf-mode (recentf-mode 1))
+              (helm-init-candidates-in-buffer
+               'global recentf-list)))
+    (candidates-in-buffer)
     (no-delay-on-input)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
