@@ -2196,23 +2196,21 @@ Helm plug-ins are realized by this function."
 Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
          (candidate-cache (gethash name helm-candidate-cache)))
-    (cond (candidate-cache
-           (helm-log "use cached candidates")
-           (cdr candidate-cache))
-          (t
-           (helm-log "calculate candidates")
-           (let ((candidates (helm-get-candidates source)))
-             (cond ((processp candidates)
-                    (push (cons candidates
-                                (append source
-                                        (list (cons 'item-count 0)
-                                              (cons 'incomplete-line ""))))
-                          helm-async-processes)
-                    (set-process-filter candidates 'helm-output-filter)
-                    (setq candidates nil))
-                   ((not (assoc 'volatile source))
-                    (puthash name candidates helm-candidate-cache)))
-             candidates)))))
+    (helm-aif candidate-cache 
+        (prog1 it (helm-log "Use cached candidates"))
+      (helm-log "No cached candidates, calculate candidates")
+      (let ((candidates (helm-get-candidates source)))
+        (cond ((processp candidates)
+               (push (cons candidates
+                           (append source
+                                   (list (cons 'item-count 0)
+                                         (cons 'incomplete-line ""))))
+                     helm-async-processes)
+               (set-process-filter candidates 'helm-output-filter)
+               (setq candidates nil))
+              ((not (assoc 'volatile source))
+               (puthash name candidates helm-candidate-cache)))
+        candidates))))
 
 
 ;;; Core: candidate transformers
