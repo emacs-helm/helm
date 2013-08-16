@@ -507,9 +507,9 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; If DEF is not provided, fallback to empty string
      ;; to avoid `thing-at-point' to be appended on top of list
      :default (or default "")
-     ;; Use `regexp-quote' to fix initial input
-     ;; with special characters (e.g nnimap+gmail:)
-     :initial-input (and (stringp init) (regexp-quote init)))))
+     ;; FIXME: May fail with special characters (e.g in gnus "nnimap+gmail:")
+     ;; i.e using regexp-quote is unwanted in some other places e.g w3m.
+     :initial-input (and (stringp init) init))))
 
 (defun helm-completing-read-with-cands-in-buffer
     (prompt collection test require-match
