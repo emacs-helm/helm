@@ -316,8 +316,11 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        (filtered-candidate-transformer
                         . (lambda (candidates sources)
                             (loop for i in candidates
-                                  do (set-text-properties 0 (length i) nil i)
-                                  collect i)))
+                                  ;; Input is added to history in completing-read's
+                                  ;; and may be regexp-quoted, so unquote it.
+                                  for cand = (replace-regexp-in-string "\\s\\" "" i)
+                                  do (set-text-properties 0 (length cand) nil cand)
+                                  collect cand)))
                        (persistent-action . ,persistent-action)
                        (persistent-help . ,persistent-help)
                        (mode-line . ,mode-line)
@@ -509,7 +512,8 @@ It should be used when candidate list don't need to rebuild dynamically."
      :default (or default "")
      ;; Fail with special characters (e.g in gnus "nnimap+gmail:")
      ;; if regexp-quote is not used.
-     ;; FIXME: using regexp-quote is unwanted in some other places e.g w3m.
+     ;; when init is added to history, it will be unquoted by
+     ; helm-comp-read.
      :initial-input (and (stringp init) (regexp-quote init)))))
 
 (defun helm-completing-read-with-cands-in-buffer
