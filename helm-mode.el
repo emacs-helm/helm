@@ -167,7 +167,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
   (loop for cand in candidates
-        if (and (equal cand helm-pattern)
+        if (and (string= (replace-regexp-in-string "\\s\\" "" cand)
+                         (replace-regexp-in-string "\\s\\" "" helm-pattern))
                 helm-cr-unknow-pattern-flag)
         collect
         (cons (concat (propertize " " 'display (propertize
