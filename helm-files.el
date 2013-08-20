@@ -1174,7 +1174,8 @@ expand to this directory."
                                 ;; and one directory candidate, move to it.
                                 (helm-next-line))
                               (helm-get-selection))))
-            (when (and (stringp cur-cand) (file-directory-p cur-cand))
+            (when (and (stringp cur-cand)
+                       (helm-file-directory-p cur-cand))
               (if (and (not (helm-dir-is-dot cur-cand))         ; [1]
                        ;; Maybe we are here because completed-p is true
                        ;; but check this again to be sure. (Windows fix)
@@ -1195,6 +1196,12 @@ expand to this directory."
                      (expand-file-name (file-name-as-directory helm-pattern)))))
               (helm-check-minibuffer-input))))))))
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
+
+(defun helm-file-directory-p (dir)
+  "Like `file-directory-p' but handle whitespaces at end of DIR name.
+This is only useful on Windows system that are not able to handle
+such a case."
+  (eq t (car (file-attributes (file-name-as-directory dir)))))
 
 ;; Allow expanding to home directory or root
 ;; when entering respectively "~/" or "//" at end of pattern.
@@ -1313,7 +1320,8 @@ purpose."
           ;; when descending level.
           ;; However, we don't add automatically the "/" when
           ;; `helm-ff-auto-update-flag' is enabled to avoid quick expansion.
-          ((and (file-directory-p pattern) helm-ff-auto-update-flag)
+          ((and (helm-file-directory-p pattern)
+                helm-ff-auto-update-flag)
            (file-name-as-directory pattern))
           ;; Return PATTERN unchanged.
           (t pattern))))
@@ -1400,13 +1408,14 @@ Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
 dotted filename '.' and '..' even on root directories in Windows
 systems."
-  (setq directory (file-name-as-directory
-                   (expand-file-name directory)))
-  (let ((ls   (directory-files
-               directory full directory-files-no-dot-files-regexp))
-        (dot  (concat directory "."))
-        (dot2 (concat directory "..")))
-    (append (list dot dot2) ls)))
+  (when (helm-file-directory-p directory)
+    (setq directory (file-name-as-directory
+                     (expand-file-name directory)))
+    (let ((ls   (directory-files
+                 directory full directory-files-no-dot-files-regexp))
+          (dot  (concat directory "."))
+          (dot2 (concat directory "..")))
+      (append (list dot dot2) ls))))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
