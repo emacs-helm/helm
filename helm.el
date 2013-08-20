@@ -91,13 +91,13 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
     (when delay (run-with-idle-timer delay nil `(lambda ()
                                                   (setq ,iterator nil))))))
 
-(defmacro helm-iter-list (seq)
+(defun helm-iter-list (seq)
   "Return an iterator object from SEQ."
-  `(lexical-let ((lis ,seq))
-     (lambda ()
-       (let ((elm (car lis)))
-         (setq lis (cdr lis))
-         elm))))
+  (lexical-let ((lis seq))
+    (lambda ()
+      (let ((elm (car lis)))
+        (setq lis (cdr lis))
+        elm))))
 
 (defun helm-iter-next (iterator)
   "Return next elm of ITERATOR."
