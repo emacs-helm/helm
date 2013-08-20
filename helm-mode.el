@@ -166,15 +166,18 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (loop for cand in candidates
-        if (and (string= (replace-regexp-in-string "\\s\\" "" cand)
-                         (replace-regexp-in-string "\\s\\" "" helm-pattern))
-                helm-cr-unknow-pattern-flag)
+  (loop with lst for c in candidates
+        for cand = (replace-regexp-in-string "\\s\\" "" c)
+        for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
+        if (and (equal cand pat) helm-cr-unknow-pattern-flag)
         collect
-        (cons (concat (propertize " " 'display (propertize
-                                                "[?]" 'face 'helm-ff-prefix))
-                      cand) cand)
-        else collect cand))
+        (cons (concat (propertize
+                       " " 'display
+                       (propertize "[?]" 'face 'helm-ff-prefix))
+                      cand)
+              cand) into lst
+        else collect cand into lst
+        finally return (helm-fast-remove-dups lst :test 'equal)))
 
 ;;;###autoload
 (defun* helm-comp-read (prompt collection
