@@ -1329,7 +1329,7 @@ purpose."
 (defun helm-find-files-get-candidates (&optional require-match)
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
-         (dir-p         (file-directory-p path))
+         (dir-p         (helm-file-directory-p path))
          (path-name-dir (if (and dir-p
                                  ;; Don't add the "/" at the end
                                  ;; of path when `helm-ff-auto-update-flag'
@@ -1408,14 +1408,13 @@ Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
 dotted filename '.' and '..' even on root directories in Windows
 systems."
-  (when (helm-file-directory-p directory)
-    (setq directory (file-name-as-directory
-                     (expand-file-name directory)))
-    (let ((ls   (directory-files
-                 directory full directory-files-no-dot-files-regexp))
-          (dot  (concat directory "."))
-          (dot2 (concat directory "..")))
-      (append (list dot dot2) ls))))
+  (setq directory (file-name-as-directory
+                   (expand-file-name directory)))
+  (let ((ls   (directory-files
+               directory full directory-files-no-dot-files-regexp))
+        (dot  (concat directory "."))
+        (dot2 (concat directory "..")))
+    (append (list dot dot2) ls)))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
