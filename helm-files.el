@@ -572,12 +572,7 @@ will not be loaded first time you use this."
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
-    (let* ((cand-list (loop for f in (helm-marked-candidates)
-                            ;; Allow using sudo command file(s).
-                            for rem = (and (member (file-remote-p f 'method)
-                                                   '("sudo" "su"))
-                                           (file-remote-p f 'localname))
-                            collect (helm-aif rem it f)))
+    (let* ((cand-list (helm-marked-candidates))
            (default-directory (or helm-ff-default-directory
                                   ;; If candidate is an url *-ff-default-directory is nil
                                   ;; so keep value of default-directory.
