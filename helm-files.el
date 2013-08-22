@@ -574,7 +574,8 @@ will not be loaded first time you use this."
     (and eshell-command-aliases-list (eshell-read-aliases-list))
     (let* ((cand-list (loop for f in (helm-marked-candidates)
                             ;; Allow using sudo command file(s).
-                            for rem = (and (string= (file-remote-p f 'method) "sudo")
+                            for rem = (and (member (file-remote-p f 'method)
+                                                   '("sudo" "su"))
                                            (file-remote-p f 'localname))
                             collect (helm-aif rem it f)))
            (default-directory (or helm-ff-default-directory
