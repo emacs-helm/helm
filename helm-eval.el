@@ -92,12 +92,11 @@ Should take one arg: the string to display."
 (defun helm-eldoc-store-minibuffer ()
   "Store minibuffer buffer name in `helm-eldoc-active-minibuffers-list'."
   (with-selected-window (minibuffer-window)
-    (push (buffer-name) helm-eldoc-active-minibuffers-list)))
+    (push (current-buffer) helm-eldoc-active-minibuffers-list)))
 
 (defun helm-eldoc-show-in-eval ()
   "Return eldoc in mode-line for current minibuffer input."
-  (let ((buf (with-selected-window (minibuffer-window)
-               (buffer-name))))
+  (let ((buf (window-buffer (active-minibuffer-window))))
     (condition-case err
         (when (member buf helm-eldoc-active-minibuffers-list)
           (with-current-buffer buf
