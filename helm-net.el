@@ -313,14 +313,15 @@ Return an alist with elements like (data . number_results)."
 ;; Internal
 (defvar helm-surfraw-engines-history nil)
 (defvar helm-surfraw-input-history nil)
+(defvar helm-surfraw--elvi-cache nil)
 
 (defun helm-build-elvi-list ()
   "Return list of all engines and descriptions handled by surfraw."
-  (cdr
-   (with-temp-buffer
-     (call-process "surfraw" nil t nil
-                   "-elvi")
-     (split-string (buffer-string) "\n"))))
+  (or helm-surfraw--elvi-cache
+      (setq helm-surfraw--elvi-cache
+            (cdr (with-temp-buffer
+                   (call-process "surfraw" nil t nil "-elvi")
+                   (split-string (buffer-string) "\n"))))))
 
 ;;;###autoload
 (defun helm-surfraw (pattern engine)
