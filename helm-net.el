@@ -335,12 +335,15 @@ Return an alist with elements like (data . number_results)."
                       :del-input nil
                       :history helm-surfraw-engines-history)))
   (let* ((engine-nodesc (car (split-string engine)))
-         (url (with-temp-buffer
-                (apply 'call-process "surfraw" nil t nil
-                       ;;JAVE
-                       (append  (list engine-nodesc "-p") (split-string pattern)))
-                (replace-regexp-in-string
-                 "\n" "" (buffer-string))))
+         (url (if (string= engine-nodesc "duckduckgo")
+                  ;; "sr duckduckgo -p foo" is broken, workaround.
+                  (concat "https://duckduckgo.com/lite/?q=" pattern "&kp=1")
+                  (with-temp-buffer
+                    (apply 'call-process "surfraw" nil t nil
+                           ;;JAVE
+                           (append  (list engine-nodesc "-p") (split-string pattern)))
+                    (replace-regexp-in-string
+                     "\n" "" (buffer-string)))))
          (browse-url-browser-function (or helm-surfraw-default-browser-function
                                           browse-url-browser-function)))
     (if (string= engine-nodesc "W")
