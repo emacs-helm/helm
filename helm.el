@@ -2060,9 +2060,10 @@ if some when multiples sources are present."
     ;; with an helm-buffer staying around (visible),
     ;; we will have no cursor in this buffer when switching to it.
     (setq cursor-type t)
-    ;; Call burry-buffer whithout arg
-    ;; to be sure helm-buffer is removed from window.
-    (bury-buffer)
+    ;; Like bury-buffer, but apply on all windows.
+    (if (fboundp 'replace-buffer-in-windows)
+        (replace-buffer-in-windows)
+        (bury-buffer))
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
