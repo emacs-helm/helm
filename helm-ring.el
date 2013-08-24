@@ -321,6 +321,7 @@ replace with STR as yanked string."
   "Preconfigured `helm' for `helm-source-mark-ring'."
   (interactive)
   (helm :sources 'helm-source-mark-ring
+        :resume 'noresume
         :buffer "*helm mark*"))
 
 ;;;###autoload
@@ -328,6 +329,7 @@ replace with STR as yanked string."
   "Preconfigured `helm' for `helm-source-global-mark-ring'."
   (interactive)
   (helm :sources 'helm-source-global-mark-ring
+        :resume 'noresume
         :buffer "*helm global mark*"))
 
 ;;;###autoload
@@ -337,13 +339,16 @@ replace with STR as yanked string."
   (interactive)
   (helm :sources '(helm-source-mark-ring
                    helm-source-global-mark-ring)
+        :resume 'noresume
         :buffer "*helm mark ring*"))
 
 ;;;###autoload
 (defun helm-register ()
   "Preconfigured `helm' for Emacs registers."
   (interactive)
-  (helm-other-buffer 'helm-source-register "*helm register*"))
+  (helm :source 'helm-source-register
+        :resume 'noresume
+        :buffer "*helm register*"))
 
 ;;;###autoload
 (defun helm-show-kill-ring ()
