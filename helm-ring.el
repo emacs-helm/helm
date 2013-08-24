@@ -357,6 +357,7 @@ First call open the kill-ring browser, next calls move to next line."
     (with-helm-show-completion (mark t) (point)
       (helm :sources helm-source-kill-ring
             :buffer "*helm kill ring*"
+            :resume 'noresume
             :allow-nest t))))
 
 (provide 'helm-ring)
