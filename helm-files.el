@@ -1020,13 +1020,15 @@ The checksum is copied to kill-ring."
                         '(md5 sha1 sha224 sha256 sha384 sha512))))
     (kill-new
      (if algo-list
-         (secure-hash (intern
-                       (helm-comp-read
-                        "Algorithm: " algo-list))
-                      file)
-         (sha1 (with-temp-buffer
-                 (insert-file-contents file)
-                 (buffer-string)))))
+         (with-temp-buffer
+           (insert-file-contents-literally file)
+           (secure-hash (intern
+                         (helm-comp-read
+                          "Algorithm: " algo-list))
+                        (buffer-string)))
+         (with-temp-buffer
+           (insert-file-contents-literally file)
+           (sha1 (buffer-string)))))
     (message "Checksum copied to kill-ring.")))
 
 (defun helm-ff-toggle-basename (candidate)
