@@ -915,17 +915,22 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                   (helm-grep-highlight-match str))
               i)))
 
-(defun helm-grep-highlight-match (str)
+(defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
+  (require 'helm-match-plugin)
   (condition-case nil
       (with-temp-buffer
         (insert str)
         (goto-char (point-min))
-        (while (and (re-search-forward helm-pattern nil t)
-                    (> (- (match-end 0) (match-beginning 0)) 0))
-          (add-text-properties
-           (match-beginning 0) (match-end 0)
-           '(face helm-grep-match)))
+        (loop for reg in (if multi-match
+                             (helm-mp-make-regexps helm-pattern)
+                             (list helm-pattern))
+              while (and (re-search-forward helm-pattern nil t)
+                         (> (- (match-end 0) (match-beginning 0)) 0))
+              do
+              (add-text-properties
+               (match-beginning 0) (match-end 0)
+               '(face helm-grep-match)))
         (buffer-string))
     (error nil)))
 

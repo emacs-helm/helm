@@ -2169,6 +2169,7 @@ Helm plug-ins are realized by this function."
                                                  candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
+                       (wrong-type-argument nil)
                        (error (funcall type-error err)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"

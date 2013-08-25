@@ -295,7 +295,6 @@ Same as `helm-m-occur-goto-line' but go in new frame."
               (helm-attrset 'delayed helm-m-occur-idle-delay)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . helm-m-occur-transformer)
-    (nohighlight)
     (get-line . helm-m-occur-get-line)
     (migemo)
     (action . (("Go to Line" . helm-m-occur-goto-line)
@@ -304,7 +303,6 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (persistent-action . helm-m-occur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)
-    (no-matchplugin)
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-moccur-map)
@@ -330,7 +328,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
                               ":"
                               (propertize lineno 'face 'helm-grep-lineno)
                               ":"
-                              (helm-grep-highlight-match str))
+                              (helm-grep-highlight-match str 'multi-match))
                       i)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
