@@ -918,21 +918,20 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
   (require 'helm-match-plugin)
-  (condition-case nil
-      (with-temp-buffer
-        (insert str)
-        (goto-char (point-min))
-        (loop for reg in (if multi-match
-                             (helm-mp-make-regexps helm-pattern)
-                             (list helm-pattern))
-              while (and (save-excursion (re-search-forward reg nil t))
-                         (> (- (match-end 0) (match-beginning 0)) 0))
-              do
-              (add-text-properties
-               (match-beginning 0) (match-end 0)
-               '(face helm-grep-match)))
-        (buffer-string))
-    (error nil)))
+  (let (beg end)
+    (condition-case nil
+        (with-temp-buffer
+          (insert str)
+          (goto-char (point-min))
+          (loop for reg in (if multi-match
+                               (helm-mp-make-regexps helm-pattern)
+                               (list helm-pattern))
+                while (and (save-excursion (re-search-forward reg nil t))
+                           (> (- (setq end (match-end 0))
+                                 (setq beg (match-beginning 0))) 0))
+                do (add-text-properties beg end '(face helm-grep-match)))
+          (buffer-string))
+      (error nil))))
 
 
 ;;; Grep from buffer list
