@@ -925,7 +925,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
         (loop for reg in (if multi-match
                              (helm-mp-make-regexps helm-pattern)
                              (list helm-pattern))
-              while (and (re-search-forward helm-pattern nil t)
+              while (and (re-search-forward reg nil t)
                          (> (- (match-end 0) (match-beginning 0)) 0))
               do
               (add-text-properties

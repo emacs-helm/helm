@@ -296,6 +296,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (candidates-in-buffer)
     (filtered-candidate-transformer . helm-m-occur-transformer)
     (get-line . helm-m-occur-get-line)
+    (nohighlight)
     (migemo)
     (action . (("Go to Line" . helm-m-occur-goto-line)
                ("Goto line other window" . helm-m-occur-goto-line-ow)
@@ -378,6 +379,7 @@ It is used with type attribute 'line'."
             (match-string 2 candidate))
       (error "Line number not found")))
 
+
 ;;; Type attributes
 ;;
 ;;
