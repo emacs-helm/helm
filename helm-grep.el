@@ -924,7 +924,10 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
           (insert str)
           (goto-char (point-min))
           (loop for reg in (if multi-match
-                               (helm-mp-make-regexps helm-pattern)
+                               (loop for r in (helm-mp-make-regexps
+                                               helm-pattern)
+                                     unless (string-match "\\`!" r)
+                                     collect r)
                                (list helm-pattern))
                 while (and (save-excursion (re-search-forward reg nil t))
                            (> (- (setq end (match-end 0))
