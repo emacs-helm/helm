@@ -287,6 +287,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   (interactive)
   (helm-quit-and-execute-action 'helm-m-occur-goto-line))
 
+;;;###autoload
 (define-minor-mode helm-occur-match-plugin-mode
     "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
   :global t
