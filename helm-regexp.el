@@ -287,6 +287,18 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   (interactive)
   (helm-quit-and-execute-action 'helm-m-occur-goto-line))
 
+(define-minor-mode helm-occur-match-plugin-mode
+    "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
+  :global t
+  :init-value t
+  (if helm-occur-match-plugin-mode
+      (setq helm-source-moccur
+            (remove (assoc 'no-matchplugin helm-source-moccur)
+                    helm-source-moccur)
+            helm-source-occur helm-source-moccur)
+      (helm-attrset 'no-matchplugin nil helm-source-moccur)
+      (setq helm-source-occur helm-source-moccur)))
+
 (defvar helm-source-moccur
   `((name . "Moccur")
     (init . (lambda ()
@@ -329,7 +341,8 @@ Same as `helm-m-occur-goto-line' but go in new frame."
                               ":"
                               (propertize lineno 'face 'helm-grep-lineno)
                               ":"
-                              (helm-grep-highlight-match str 'multi-match))
+                              (helm-grep-highlight-match
+                               str helm-occur-match-plugin-mode))
                       i)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
