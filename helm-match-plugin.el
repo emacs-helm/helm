@@ -128,7 +128,7 @@ See `helm-mp-matching-method' for the behavior of each method."
 (defvar helm-mp-space-regexp "[\\ ] "
   "Regexp to represent space itself in multiple regexp match.")
 
-(defun helm-mp-make-regexps (pattern)
+(defun helm-mp-split-pattern (pattern)
   "Split PATTERN if it contain spaces and return resulting list.
 If spaces in PATTERN are escaped, don't split at this place.
 i.e \"foo bar\"=> (\"foo\" \"bar\")
@@ -143,7 +143,7 @@ but \"foo\ bar\"=> (\"foobar\")."
 
 (defun helm-mp-1-make-regexp (pattern)
   "Replace spaces in PATTERN with \"\.*\"."
-  (mapconcat 'identity (helm-mp-make-regexps pattern) ".*"))
+  (mapconcat 'identity (helm-mp-split-pattern pattern) ".*"))
 
 
 ;;; Exact match.
@@ -268,7 +268,7 @@ This is done only if `helm-mp-3-pattern-str' is same as PATTERN."
   "Return a list of predicate/regexp cons cells.
 e.g ((identity . \"foo\") (identity . \"bar\"))."
   (unless (string= pattern "")
-    (loop for pat in (helm-mp-make-regexps pattern)
+    (loop for pat in (helm-mp-split-pattern pattern)
           collect (if (string= "!" (substring pat 0 1))
                       (cons 'not (substring pat 1))
                       (cons 'identity pat)))))
