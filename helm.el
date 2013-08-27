@@ -2835,20 +2835,6 @@ If action buffer is selected, back to the helm buffer."
 
 
 ;; Core: selection
-(defun helm-move-selection-common (move-func unit direction)
-  "Move the selection marker to a new position with function MOVE-FUNC.
-It is determined by UNIT and DIRECTION."
-  (unless (or (helm-empty-buffer-p (helm-buffer-get))
-              (not (helm-window)))
-    (with-helm-window
-      (helm-log-run-hook 'helm-move-selection-before-hook)
-      (funcall move-func)
-      (helm-skip-noncandidate-line direction)
-      (helm-display-source-at-screen-top-maybe unit)
-      (when (helm-get-previous-header-pos)
-        (helm-mark-current-line))
-      (helm-display-mode-line (helm-get-current-source))
-      (helm-log-run-hook 'helm-move-selection-after-hook))))
 
 (defun helm-display-source-at-screen-top-maybe (unit)
   (when (and helm-display-source-at-screen-top (eq unit 'source))
@@ -2916,116 +2902,163 @@ it is \"Candidate\(s\)\" by default."
              (or name "Candidate(s)"))
      'face 'helm-candidate-number)))
 
+(defun* helm-move-selection-common (&key where direction)
+  "Move the selection marker to a new position.
+Position is determined by WHERE and DIRECTION.
+Key arg WHERE can be one of:
+ - line
+ - page
+ - edge
+ - source
+Key arg DIRECTION can be one of:
+ - previous
+ - next
+ - A source or a source name when used with :WHERE 'source."
+  (let ((move-func (case where
+                     (line (case direction
+                             (previous 'helm-move--previous-line-fn)
+                             (next 'helm-move--next-line-fn)
+                             (t (error "Incorrect DIRECTION value: `%s'"
+                                       direction))))
+                     (page (case direction
+                             (previous 'helm-move--previous-page-fn)
+                             (next 'helm-move--next-page-fn)
+                             (t (error "Incorrect DIRECTION value: `%s'"
+                                       direction))))
+                     (edge (case direction
+                             (previous 'helm-move--beginning-of-buffer-fn)
+                             (next 'helm-move--end-of-buffer-fn)
+                             (t (error "Incorrect DIRECTION value: `%s'"
+                                       direction))))
+                     (source (case direction
+                               (previous 'helm-move--previous-source-fn)
+                               (next 'helm-move--next-source-fn)
+                               (t (lambda ()
+                                    (helm-move--goto-source-fn where))))))))
+    (unless (or (helm-empty-buffer-p (helm-buffer-get))
+                (not (helm-window)))
+      (with-helm-window
+        (helm-log-run-hook 'helm-move-selection-before-hook)
+        (funcall move-func)
+        (helm-skip-noncandidate-line direction)
+        (helm-display-source-at-screen-top-maybe where)
+        (when (helm-get-previous-header-pos)
+          (helm-mark-current-line))
+        (helm-display-mode-line (helm-get-current-source))
+        (helm-log-run-hook 'helm-move-selection-after-hook)))))
+
+(defun helm-move--previous-line-fn ()
+  (if (not (helm-pos-multiline-p))
+      (forward-line -1)         ;double forward-line is meaningful
+      (forward-line -1)         ;because evaluation order is important
+      (helm-skip-header-and-separator-line 'previous)
+      (let ((header-pos (helm-get-previous-header-pos))
+            (separator-pos (helm-get-previous-candidate-separator-pos)))
+        (when header-pos
+          (goto-char (if (or (null separator-pos)
+                             (< separator-pos header-pos))
+                         header-pos     ; first candidate
+                         separator-pos))
+          (forward-line 1)))))
+
+(defun helm-move--next-line-fn ()
+  (if (not (helm-pos-multiline-p))
+      (forward-line 1)
+      (let ((header-pos (helm-get-next-header-pos))
+            (separator-pos (helm-get-next-candidate-separator-pos)))
+        (cond ((and separator-pos
+                    (or (null header-pos) (< separator-pos header-pos)))
+               (goto-char separator-pos))
+              (header-pos
+               (goto-char header-pos))))))
+
+(defun helm-move--previous-page-fn ()
+  (condition-case nil
+      (scroll-down)
+    (beginning-of-buffer (goto-char (point-min)))))
+
+(defun helm-move--next-page-fn ()
+  (condition-case nil
+      (scroll-up)
+    (end-of-buffer (goto-char (point-max)))))
+
+(defun helm-move--beginning-of-buffer-fn ()
+  (goto-char (point-min)))
+
+(defun helm-move--end-of-buffer-fn ()
+  (goto-char (point-max)))
+
+(defun helm-move--previous-source-fn ()
+  (forward-line -1)
+  (if (bobp)
+      (goto-char (point-max))
+      (helm-skip-header-and-separator-line 'previous))
+  (goto-char (helm-get-previous-header-pos))
+  (forward-line 1))
+
+(defun helm-move--next-source-fn ()
+  (goto-char (or (helm-get-next-header-pos) (point-min))))
+
+(defun helm-move--goto-source-fn (source-or-name)
+  (goto-char (point-min))
+  (let ((name (if (stringp source-or-name) source-or-name
+                  (assoc-default 'name source-or-name))))
+    (condition-case err
+        (while (not (string= name (helm-current-line-contents)))
+          (goto-char (helm-get-next-header-pos)))
+      (error (helm-log "%S" err)))))
+
 ;;;###autoload
 (defun helm-previous-line ()
   "Move selection to the previous line."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (if (not (helm-pos-multiline-p))
-         (forward-line -1)      ;double forward-line is meaningful
-         (forward-line -1)        ;because evaluation order is important
-         (helm-skip-header-and-separator-line 'previous)
-         (let ((header-pos (helm-get-previous-header-pos))
-               (separator-pos (helm-get-previous-candidate-separator-pos)))
-           (when header-pos
-             (goto-char (if (or (null separator-pos)
-                                (< separator-pos header-pos))
-                            header-pos ; first candidate
-                            separator-pos))
-             (forward-line 1)))))
-   'line 'previous))
+  (helm-move-selection-common :where 'line :direction 'previous))
 
 ;;;###autoload
 (defun helm-next-line ()
   "Move selection to the next line."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (if (not (helm-pos-multiline-p))
-         (forward-line 1)
-         (let ((header-pos (helm-get-next-header-pos))
-               (separator-pos (helm-get-next-candidate-separator-pos)))
-           (cond ((and separator-pos
-                       (or (null header-pos) (< separator-pos header-pos)))
-                  (goto-char separator-pos))
-                 (header-pos
-                  (goto-char header-pos))))))
-   'line 'next))
+  (helm-move-selection-common :where 'line :direction 'next))
 
 ;;;###autoload
 (defun helm-previous-page ()
   "Move selection back with a pageful."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (condition-case nil
-         (scroll-down)
-       (beginning-of-buffer (goto-char (point-min)))))
-   'page 'previous))
+  (helm-move-selection-common :where 'page :direction 'previous))
 
 ;;;###autoload
 (defun helm-next-page ()
   "Move selection forward with a pageful."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (condition-case nil
-         (scroll-up)
-       (end-of-buffer (goto-char (point-max)))))
-   'page 'next))
+  (helm-move-selection-common :where 'page :direction 'next))
 
 ;;;###autoload
 (defun helm-beginning-of-buffer ()
   "Move selection at the top."
   (interactive)
-  (helm-move-selection-common
-   (lambda () (goto-char (point-min)))
-   'edge 'previous))
+  (helm-move-selection-common :where 'edge :direction 'previous))
 
 ;;;###autoload
 (defun helm-end-of-buffer ()
   "Move selection at the bottom."
   (interactive)
-  (helm-move-selection-common
-   (lambda () (goto-char (point-max)))
-   'edge 'next))
+  (helm-move-selection-common :where 'edge :direction 'next))
 
 ;;;###autoload
 (defun helm-previous-source ()
   "Move selection to the previous source."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (forward-line -1)
-     (if (bobp)
-         (goto-char (point-max))
-         (helm-skip-header-and-separator-line 'previous))
-     (goto-char (helm-get-previous-header-pos))
-     (forward-line 1))
-   'source 'previous))
+  (helm-move-selection-common :where 'source :direction 'previous))
 
 ;;;###autoload
 (defun helm-next-source ()
   "Move selection to the next source."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (goto-char (or (helm-get-next-header-pos) (point-min))))
-   'source 'next))
+  (helm-move-selection-common :where 'source :direction 'next))
 
 (defun helm-goto-source (source-or-name)
   "Move the selection to the source SOURCE-OR-NAME."
-  (helm-move-selection-common
-   (lambda ()
-     (goto-char (point-min))
-     (let ((name (if (stringp source-or-name) source-or-name
-                     (assoc-default 'name source-or-name))))
-       (condition-case err
-           (while (not (string= name (helm-current-line-contents)))
-             (goto-char (helm-get-next-header-pos)))
-         (error (helm-log "%S" err)))))
-   'source 'next))
+  (helm-move-selection-common :where 'source :direction source-or-name))
 
 (defun helm-mark-current-line (&optional resumep)
   "Move `helm-selection-overlay' to current line.
