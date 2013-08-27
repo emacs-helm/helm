@@ -2917,25 +2917,19 @@ Key arg DIRECTION can be one of:
  - next
  - A source or a source name when used with :WHERE 'source."
   (let ((move-func (case where
-                     (line (case direction
+                     (line (ecase direction
                              (previous 'helm-move--previous-line-fn)
-                             (next 'helm-move--next-line-fn)
-                             (t (error "Incorrect DIRECTION value: `%s'"
-                                       direction))))
-                     (page (case direction
+                             (next 'helm-move--next-line-fn)))
+                     (page (ecase direction
                              (previous 'helm-move--previous-page-fn)
-                             (next 'helm-move--next-page-fn)
-                             (t (error "Incorrect DIRECTION value: `%s'"
-                                       direction))))
-                     (edge (case direction
+                             (next 'helm-move--next-page-fn)))
+                     (edge (ecase direction
                              (previous 'helm-move--beginning-of-buffer-fn)
-                             (next 'helm-move--end-of-buffer-fn)
-                             (t (error "Incorrect DIRECTION value: `%s'"
-                                       direction))))
+                             (next 'helm-move--end-of-buffer-fn)))
                      (source (case direction
                                (previous 'helm-move--previous-source-fn)
                                (next 'helm-move--next-source-fn)
-                               (t (lambda ()
+                               (t (lambda () ; A source is passed as arg.
                                     (helm-move--goto-source-fn where))))))))
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
