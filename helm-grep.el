@@ -929,10 +929,12 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                      unless (string-match "\\`!" r)
                                      collect r)
                                (list helm-pattern))
-                while (and (save-excursion (re-search-forward reg nil t))
-                           (> (- (setq end (match-end 0))
-                                 (setq beg (match-beginning 0))) 0))
-                do (add-text-properties beg end '(face helm-grep-match)))
+                do
+                (while (and (re-search-forward reg nil t)
+                            (> (- (setq end (match-end 0))
+                                  (setq beg (match-beginning 0))) 0))
+                  (add-text-properties beg end '(face helm-grep-match)))
+                do (goto-char (point-min))) 
           (buffer-string))
       (error nil))))
 
