@@ -2837,6 +2837,8 @@ If action buffer is selected, back to the helm buffer."
 ;; Core: selection
 
 (defun helm-display-source-at-screen-top-maybe (unit)
+  "Display source at top of screen when UNIT value is 'source.
+With any other value of UNIT return nil."
   (when (and helm-display-source-at-screen-top (eq unit 'source))
     (set-window-start (selected-window)
                       (save-excursion (forward-line -1) (point)))))
@@ -2949,15 +2951,15 @@ Key arg DIRECTION can be one of:
 
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
-      (forward-line -1)         ;double forward-line is meaningful
-      (forward-line -1)         ;because evaluation order is important
+      (forward-line -1)
+      (forward-line -1)
       (helm-skip-header-and-separator-line 'previous)
       (let ((header-pos (helm-get-previous-header-pos))
             (separator-pos (helm-get-previous-candidate-separator-pos)))
         (when header-pos
           (goto-char (if (or (null separator-pos)
                              (< separator-pos header-pos))
-                         header-pos     ; first candidate
+                         header-pos
                          separator-pos))
           (forward-line 1)))))
 
