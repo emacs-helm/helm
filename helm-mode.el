@@ -751,7 +751,9 @@ Keys description:
                     :buffer buffer
                     :preselect preselect)))
       (or
-       (cond ((and result
+       (cond ((and result (stringp result)
+                   (string= result "") ""))
+             ((and result
                    (stringp result)
                    (file-equal-p result initial-input)
                    default)
@@ -771,14 +773,7 @@ Keys description:
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An helm replacement of `read-file-name'."
   (declare (special helm-mode))
-  (let* ((default (and default-filename
-                       (if (listp default-filename)
-                           (car default-filename)
-                           default-filename)))
-         (init (or (and default (if (file-directory-p default)
-                                    default
-                                    (file-name-directory default)))
-                   initial dir default-directory))
+  (let* ((init (or initial dir default-directory))
          (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
          (helm-file-completion-sources
