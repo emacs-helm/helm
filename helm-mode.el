@@ -630,6 +630,7 @@ See documentation of `completing-read' and `all-completions' for details."
      (preselect nil)
      (history nil)
      must-match
+     default
      (marked-candidates nil)
      (alistp t)
      (persistent-action 'helm-find-files-persistent-action)
@@ -745,11 +746,17 @@ Keys description:
                     :prompt prompt
                     :resume 'noresume
                     :case-fold-search case-fold
+                    :default default
                     :keymap helm-map
                     :buffer buffer
                     :preselect preselect)))
       (or
-       (cond ((and result (stringp result))
+       (cond ((and result
+                   (stringp result)
+                   (file-equal-p result initial-input)
+                   default)
+              default)
+             ((and result (stringp result))
               (expand-file-name result))
              ((and result (listp result))
               (mapcar #'expand-file-name result))
@@ -836,6 +843,7 @@ Keys description:
                        prompt
                        :name str-command
                        :buffer buf-name
+                       :default default-filename
                        :initial-input (expand-file-name init dir)
                        :alistp nil
                        :must-match mustmatch
