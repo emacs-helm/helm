@@ -2929,8 +2929,8 @@ Key arg DIRECTION can be one of:
                      (source (case direction
                                (previous 'helm-move--previous-source-fn)
                                (next 'helm-move--next-source-fn)
-                               (t (lambda () ; A source is passed as arg.
-                                    (helm-move--goto-source-fn where))))))))
+                               (t (lambda () ; A source is passed as DIRECTION arg.
+                                    (helm-move--goto-source-fn direction))))))))
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
       (with-helm-window
