@@ -828,7 +828,7 @@ is to enable it with helm support.
 >     (add-hook 'eshell-mode-hook
 >               #'(lambda ()
 >                   (define-key eshell-mode-map
->                     [remap pcomplete]
+>                     [remap eshell-pcomplete]
 >                     'helm-esh-pcomplete)))
 
 Now when hitting `TAB`, you should have helm pcompletion.
