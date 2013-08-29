@@ -213,7 +213,7 @@ these actions whitout quitting, use M-l (rotate left) and M-r (rotate
 right). Of course M-l and M-r have no effect if candidate is not an
 image file.
 
-Don`t forget to use `C-t` to split windows vertically, and then
+Don`t forget to use C-t to split windows vertically, and then
 
     `C-}' and `C-{'
 
