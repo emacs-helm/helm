@@ -346,7 +346,7 @@ replace with STR as yanked string."
 (defun helm-register ()
   "Preconfigured `helm' for Emacs registers."
   (interactive)
-  (helm :source 'helm-source-register
+  (helm :sources 'helm-source-register
         :resume 'noresume
         :buffer "*helm register*"))
 
