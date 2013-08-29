@@ -6,13 +6,14 @@
 ;; Maintainer: Joe Bloggs <vapniks@yahoo.com> and Michael Heerdegen
 ;; Copyright (C) 2012 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; Copyright (C) 2013 Joe Bloggs <vapniks@yahoo.com> and Michael Heerdegen
-;; Version: 1.1
+;; Version: 20130829.2302
+;; X-Original-Version: 1.1
 ;; Last-Updated: 2013-08-10 18:00:00
 ;;           By: Joe Bloggs
 ;; URL: https://github.com/vapniks/helm/blob/master/helm-recoll.el
 ;; Keywords: convenience
 ;; Compatibility: GNU Emacs 24.3.1
-;; Package-Requires: ((helm "20130806.1505"))
+;; Package-Requires: ((helm "1.5.3"))
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -107,7 +108,22 @@ The CONFDIR arg should be a string indicating the path to the config directory w
           (candidate-number-limit . 9999)
           (nohighlight))
         ,(concat "Source for retrieving files matching the current input pattern, using recoll with the configuration in "
-                 confdir)))))
+                 confdir)))
+    (eval
+     `(helm-add-action-to-source
+       "Make link to file(s)"
+       'helm-recoll-make-links
+       (intern ,(concat "helm-source-recoll-" name))))))
+
+(defun helm-recoll-make-links (candidate)
+  "Make symlinks to the selected candidates."
+  (let ((dir (ido-read-directory-name "Dir in which to place symlinks: ")))
+    (dolist (item (helm-marked-candidates))
+      (condition-case err
+          (make-symbolic-link item (concat dir (file-name-nondirectory item)) 1)
+        (error (message "%s" (error-message-string err)))))))
+
+
 
 (provide 'helm-recoll)
 
