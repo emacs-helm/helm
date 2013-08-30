@@ -29,15 +29,16 @@
   "Ring related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-kill-ring-threshold 10
+(defcustom helm-kill-ring-threshold 3
   "Minimum length of a candidate to be listed by `helm-source-kill-ring'."
   :type 'integer
   :group 'helm-ring)
 
-(defcustom helm-kill-ring-max-lines-number nil
+(defcustom helm-kill-ring-max-lines-number 5
   "Max number of lines displayed per candidate in kill-ring browser.
-If nil or zero, don't truncate candidate, show all."
-  :type 'integer
+If nil or zero (disabled), don't truncate candidate, show all."
+  :type '(choice (const :tag "Disabled" nil)
+                 (integer :tag "Max number of lines"))
   :group 'helm-ring)
 
 (defcustom helm-kill-ring-show-completion t
@@ -320,6 +321,7 @@ replace with STR as yanked string."
   "Preconfigured `helm' for `helm-source-mark-ring'."
   (interactive)
   (helm :sources 'helm-source-mark-ring
+        :resume 'noresume
         :buffer "*helm mark*"))
 
 ;;;###autoload
@@ -327,6 +329,7 @@ replace with STR as yanked string."
   "Preconfigured `helm' for `helm-source-global-mark-ring'."
   (interactive)
   (helm :sources 'helm-source-global-mark-ring
+        :resume 'noresume
         :buffer "*helm global mark*"))
 
 ;;;###autoload
@@ -336,13 +339,16 @@ replace with STR as yanked string."
   (interactive)
   (helm :sources '(helm-source-mark-ring
                    helm-source-global-mark-ring)
+        :resume 'noresume
         :buffer "*helm mark ring*"))
 
 ;;;###autoload
 (defun helm-register ()
   "Preconfigured `helm' for Emacs registers."
   (interactive)
-  (helm-other-buffer 'helm-source-register "*helm register*"))
+  (helm :sources 'helm-source-register
+        :resume 'noresume
+        :buffer "*helm register*"))
 
 ;;;###autoload
 (defun helm-show-kill-ring ()
@@ -356,6 +362,7 @@ First call open the kill-ring browser, next calls move to next line."
     (with-helm-show-completion (mark t) (point)
       (helm :sources helm-source-kill-ring
             :buffer "*helm kill ring*"
+            :resume 'noresume
             :allow-nest t))))
 
 (provide 'helm-ring)

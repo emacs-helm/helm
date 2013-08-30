@@ -87,17 +87,17 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
     (unless next
       (set iterator (helm-iter-list (funcall fn)))
       (setq next (helm-iter-next (symbol-value iterator))))
-    (and next (eval iterator) (call-interactively (nth (1- next) functions)))
+    (and next (symbol-value iterator) (call-interactively (nth (1- next) functions)))
     (when delay (run-with-idle-timer delay nil `(lambda ()
                                                   (setq ,iterator nil))))))
 
-(defmacro helm-iter-list (seq)
+(defun helm-iter-list (seq)
   "Return an iterator object from SEQ."
-  `(lexical-let ((lis ,seq))
-     (lambda ()
-       (let ((elm (car lis)))
-         (setq lis (cdr lis))
-         elm))))
+  (lexical-let ((lis seq))
+    (lambda ()
+      (let ((elm (car lis)))
+        (setq lis (cdr lis))
+        elm))))
 
 (defun helm-iter-next (iterator)
   "Return next elm of ITERATOR."
@@ -215,7 +215,7 @@ few characters to narrow down the list of potential candidates.
 
 Set it to nil if you don't want this limit."
   :group 'helm
-  :type 'integer)
+  :type '(choice (const :tag "Disabled" nil) integer))
 
 (defcustom helm-idle-delay 0.1
   "Be idle for this many seconds, before updating in delayed sources.
@@ -312,8 +312,9 @@ NOTE: This have no effect in asynchronous sources, you will
 have to implement a similar feature directly in the process.
 See in helm-grep.el how it is implemented."
   :group 'helm
-  :type 'symbol)
-
+  :type '(choice (const :tag "Ignore case" t)
+                 (const :tag "Respect case" nil)
+                 (other :tag "Smart" 'smart)))
 
 (defcustom helm-file-name-case-fold-search
   (if (memq system-type
@@ -604,8 +605,8 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-default-directory nil
   "The value of `default-directory' when `helm' is initialized.")
-(defvar helm-candidate-cache nil
-  "Holds the available candidate withing a single helm invocation.")
+(defvar helm-candidate-cache (make-hash-table :test 'equal)
+  "Holds the available candidate within a single helm invocation.")
 (defvar helm-pattern ""
   "The input pattern used to update the helm buffer.")
 (defvar helm-input ""
@@ -632,7 +633,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
-                                        "\\<" "\\>" "\\<_" "\\>_"))
+                                        "\\<" "\\>" "\\<_" "\\>_" ".*"))
 (defvar helm-suspend-update-flag nil)
 (defvar helm-force-updating-p nil)
 (defvar helm-exit-status 0
@@ -818,7 +819,10 @@ not `exit-minibuffer' or unwanted functions."
 (defmacro with-helm-current-buffer (&rest body)
   "Eval BODY inside `helm-current-buffer'."
   (declare (indent 0) (debug t))
-  `(with-current-buffer helm-current-buffer
+  `(with-current-buffer (or (and (buffer-live-p helm-current-buffer)
+                                 helm-current-buffer)
+                            (setq helm-current-buffer
+                                  (current-buffer)))
      ,@body))
 
 (defmacro with-helm-buffer (&rest body)
@@ -917,6 +921,8 @@ arg TYPE is an existing type defined in `helm-type-attributes'."
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
   (loop for i in seq
+        for len = (length seq)
+        when (> index len) do (setq index len)
         for count from 1 collect i
         when (= count index)
         if (listp elm) append elm
@@ -931,8 +937,14 @@ If INDEX is specified, action is added in action list at INDEX,
 otherwise it is added at end.
 This allow user to add a specific action to an existing source
 without modifying source code."
+<<<<<<< HEAD
   (let ((actions    (or (cdr (helm-get-attribute-from-source-type 'action source))
                         (helm-attr 'action source)))
+=======
+  (let ((actions    (or (helm-attr 'action source)
+                        (cdr (helm-get-attribute-from-source-type
+                              'action source))))
+>>>>>>> upstream/master
         (new-action (list (cons name fn))))
     (when (symbolp actions)
       (setq actions (list (cons "Default action" actions))))
@@ -1324,20 +1336,31 @@ in the source where point is."
 (defun helm-compose (arg-lst func-lst)
   "Apply arguments specified in ARG-LST with each function of FUNC-LST.
 The result of each function will be the new `car' of ARG-LST.
-Each function in FUNC-LST must accept (length ARG-LST) arguments.
+Each function in FUNC-LST must accept (length ARG-LST) arguments
+\(See examples below) .
 This function allows easy sequencing of transformer functions.
 Where generally, ARG-LST is '(candidates-list source) and FUNC-LST a
 list of transformer functions that take one or two arguments depending
 we are using 'filtered-candidate-transformer' or 'candidate-transformer'.
 e.g
+filtered-candidate-transformer:
 \(helm-compose '((1 2 3 4 5 6 7)
-                '(\"a\" \"b\" \"c\" \"d\" \"e\"))
+                '((name . \"An helm source\") (candidates . (a b c))))
               '((lambda (candidates source)
                   (loop for i in candidates
                         when (oddp i) collect i))
                 (lambda (candidates source)
                   (loop for i in candidates collect (1+ i)))))
-=>(2 4 6 8)."
+=>(2 4 6 8)
+
+candidate-transformer:
+\(helm-compose '((1 2 3 4 5 6 7))
+                '((lambda (candidates)
+                  (loop for i in candidates
+                        when (oddp i) collect i))
+                (lambda (candidates)
+                  (loop for i in candidates collect (1+ i)))))
+=> (2 4 6 8)."
   (dolist (func func-lst)
     (setcar arg-lst (apply func arg-lst)))
   (car arg-lst))
@@ -1348,8 +1371,7 @@ This is used in transformers to modify candidates list."
   (if (functionp funcs)
       (apply 'helm-funcall-with-source source funcs args)
       (apply 'helm-funcall-with-source source
-             (lambda (&rest args)
-               (helm-compose args funcs))
+             (lambda (&rest oargs) (helm-compose oargs funcs))
              args)))
 
 
@@ -1873,7 +1895,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                                     (thing-at-point 'symbol))))
                          ""))
   (setq helm-input "")
-  (setq helm-candidate-cache nil)
+  (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-log-run-hook 'helm-after-initialize-hook))
 
@@ -2047,8 +2069,6 @@ if some when multiples sources are present."
     ;; with an helm-buffer staying around (visible),
     ;; we will have no cursor in this buffer when switching to it.
     (setq cursor-type t)
-    ;; Call burry-buffer whithout arg
-    ;; to be sure helm-buffer is removed from window.
     (bury-buffer)
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
@@ -2155,6 +2175,7 @@ Helm plug-ins are realized by this function."
                                                  candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
+                       (wrong-type-argument nil)
                        (error (funcall type-error err)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
@@ -2164,10 +2185,8 @@ Helm plug-ins are realized by this function."
            candidates)
           ((null candidates) candidates)
           ((listp candidates)
-           ;; Filter candidates now with `candidate-transformer' function maybe
-           ;; otherwise return CANDIDATES which will be passed to
-           ;; `filtered-candidate-transformer', which in turn will maybe filter
-           ;; them or return them unmodified.
+           ;; Transform candidates with `candidate-transformer' functions if
+           ;; some, otherwise return candidates.
            (helm-transform-candidates candidates source))
           (t (funcall type-error)))))
 
@@ -2184,25 +2203,22 @@ Helm plug-ins are realized by this function."
   "Return the cached value of candidates for SOURCE.
 Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
-         (candidate-cache (assoc name helm-candidate-cache)))
-    (cond (candidate-cache
-           (helm-log "use cached candidates")
-           (cdr candidate-cache))
-          (t
-           (helm-log "calculate candidates")
-           (let ((candidates (helm-get-candidates source)))
-             (cond ((processp candidates)
-                    (push (cons candidates
-                                (append source
-                                        (list (cons 'item-count 0)
-                                              (cons 'incomplete-line ""))))
-                          helm-async-processes)
-                    (set-process-filter candidates 'helm-output-filter)
-                    (setq candidates nil))
-                   ((not (assoc 'volatile source))
-                    (setq candidate-cache (cons name candidates))
-                    (push candidate-cache helm-candidate-cache)))
-             candidates)))))
+         (candidate-cache (gethash name helm-candidate-cache)))
+    (helm-aif candidate-cache 
+        (prog1 it (helm-log "Use cached candidates"))
+      (helm-log "No cached candidates, calculate candidates")
+      (let ((candidates (helm-get-candidates source)))
+        (cond ((processp candidates)
+               (push (cons candidates
+                           (append source
+                                   (list (cons 'item-count 0)
+                                         (cons 'incomplete-line ""))))
+                     helm-async-processes)
+               (set-process-filter candidates 'helm-output-filter)
+               (setq candidates nil))
+              ((not (assoc 'volatile source))
+               (puthash name candidates helm-candidate-cache)))
+        candidates))))
 
 
 ;;; Core: candidate transformers
@@ -2327,20 +2343,23 @@ and `helm-pattern'."
   (let ((helm-case-fold-search
          (helm-aif (assq 'case-fold-search (helm-get-current-source))
              (cdr it)
-           helm-case-fold-search)))
-    (case helm-case-fold-search
-      (smart (let ((case-fold-search nil)
-                   ;; Only parse basename for filenames
-                   ;; to avoid setting case sensitivity
-                   ;; when expanded directories contains upcase
-                   ;; characters.
-                   (bn (if (string-match "[~/]*" pattern)
+           helm-case-fold-search))
+        ;; Only parse basename for filenames
+        ;; to avoid setting case sensitivity
+        ;; when expanded directories contains upcase
+        ;; characters.
+        (bn-or-pattern (if (string-match "[~/]*" pattern)
                            ;; `helm-basename' is not available yet.
                            (file-name-nondirectory
                             (directory-file-name pattern))
                            pattern)))
-               (if (string-match "[A-Z]" bn) nil t)))
-      (t helm-case-fold-search))))
+    (helm-set-case-fold-search-1 bn-or-pattern)))
+
+(defun helm-set-case-fold-search-1 (pattern)
+  (case helm-case-fold-search
+      (smart (let ((case-fold-search nil))
+               (if (string-match "[A-Z]" pattern) nil t)))
+      (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns limit source)
   (let (matches)
@@ -2555,10 +2574,7 @@ if specified."
 
 (defun helm-remove-candidate-cache (source)
   "Remove SOURCE from `helm-candidate-cache'."
-  (setq helm-candidate-cache
-        (delete (assoc (assoc-default 'name source)
-                       helm-candidate-cache)
-                helm-candidate-cache)))
+  (remhash (assoc-default 'name source) helm-candidate-cache))
 
 (defun helm-insert-match (match insert-function source)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION for SOURCE.
@@ -2828,22 +2844,10 @@ If action buffer is selected, back to the helm buffer."
 
 
 ;; Core: selection
-(defun helm-move-selection-common (move-func unit direction)
-  "Move the selection marker to a new position with function MOVE-FUNC.
-It is determined by UNIT and DIRECTION."
-  (unless (or (helm-empty-buffer-p (helm-buffer-get))
-              (not (helm-window)))
-    (with-helm-window
-      (helm-log-run-hook 'helm-move-selection-before-hook)
-      (funcall move-func)
-      (helm-skip-noncandidate-line direction)
-      (helm-display-source-at-screen-top-maybe unit)
-      (when (helm-get-previous-header-pos)
-        (helm-mark-current-line))
-      (helm-display-mode-line (helm-get-current-source))
-      (helm-log-run-hook 'helm-move-selection-after-hook))))
 
 (defun helm-display-source-at-screen-top-maybe (unit)
+  "Display source at top of screen when UNIT value is 'source.
+With any other value of UNIT return nil."
   (when (and helm-display-source-at-screen-top (eq unit 'source))
     (set-window-start (selected-window)
                       (save-excursion (forward-line -1) (point)))))
@@ -2909,116 +2913,157 @@ it is \"Candidate\(s\)\" by default."
              (or name "Candidate(s)"))
      'face 'helm-candidate-number)))
 
+(defun* helm-move-selection-common (&key where direction)
+  "Move the selection marker to a new position.
+Position is determined by WHERE and DIRECTION.
+Key arg WHERE can be one of:
+ - line
+ - page
+ - edge
+ - source
+Key arg DIRECTION can be one of:
+ - previous
+ - next
+ - A source or a source name when used with :WHERE 'source."
+  (let ((move-func (case where
+                     (line (ecase direction
+                             (previous 'helm-move--previous-line-fn)
+                             (next 'helm-move--next-line-fn)))
+                     (page (ecase direction
+                             (previous 'helm-move--previous-page-fn)
+                             (next 'helm-move--next-page-fn)))
+                     (edge (ecase direction
+                             (previous 'helm-move--beginning-of-buffer-fn)
+                             (next 'helm-move--end-of-buffer-fn)))
+                     (source (case direction
+                               (previous 'helm-move--previous-source-fn)
+                               (next 'helm-move--next-source-fn)
+                               (t (lambda () ; A source is passed as DIRECTION arg.
+                                    (helm-move--goto-source-fn direction))))))))
+    (unless (or (helm-empty-buffer-p (helm-buffer-get))
+                (not (helm-window)))
+      (with-helm-window
+        (helm-log-run-hook 'helm-move-selection-before-hook)
+        (funcall move-func)
+        (helm-skip-noncandidate-line direction)
+        (helm-display-source-at-screen-top-maybe where)
+        (when (helm-get-previous-header-pos)
+          (helm-mark-current-line))
+        (helm-display-mode-line (helm-get-current-source))
+        (helm-log-run-hook 'helm-move-selection-after-hook)))))
+
+(defun helm-move--previous-line-fn ()
+  (if (not (helm-pos-multiline-p))
+      (forward-line -1)
+      (forward-line -1)
+      (helm-skip-header-and-separator-line 'previous)
+      (let ((header-pos (helm-get-previous-header-pos))
+            (separator-pos (helm-get-previous-candidate-separator-pos)))
+        (when header-pos
+          (goto-char (if (or (null separator-pos)
+                             (< separator-pos header-pos))
+                         header-pos
+                         separator-pos))
+          (forward-line 1)))))
+
+(defun helm-move--next-line-fn ()
+  (if (not (helm-pos-multiline-p))
+      (forward-line 1)
+      (let ((header-pos (helm-get-next-header-pos))
+            (separator-pos (helm-get-next-candidate-separator-pos)))
+        (cond ((and separator-pos
+                    (or (null header-pos) (< separator-pos header-pos)))
+               (goto-char separator-pos))
+              (header-pos
+               (goto-char header-pos))))))
+
+(defun helm-move--previous-page-fn ()
+  (condition-case nil
+      (scroll-down)
+    (beginning-of-buffer (goto-char (point-min)))))
+
+(defun helm-move--next-page-fn ()
+  (condition-case nil
+      (scroll-up)
+    (end-of-buffer (goto-char (point-max)))))
+
+(defun helm-move--beginning-of-buffer-fn ()
+  (goto-char (point-min)))
+
+(defun helm-move--end-of-buffer-fn ()
+  (goto-char (point-max)))
+
+(defun helm-move--previous-source-fn ()
+  (forward-line -1)
+  (if (bobp)
+      (goto-char (point-max))
+      (helm-skip-header-and-separator-line 'previous))
+  (goto-char (helm-get-previous-header-pos))
+  (forward-line 1))
+
+(defun helm-move--next-source-fn ()
+  (goto-char (or (helm-get-next-header-pos) (point-min))))
+
+(defun helm-move--goto-source-fn (source-or-name)
+  (goto-char (point-min))
+  (let ((name (if (stringp source-or-name) source-or-name
+                  (assoc-default 'name source-or-name))))
+    (condition-case err
+        (while (not (string= name (helm-current-line-contents)))
+          (goto-char (helm-get-next-header-pos)))
+      (error (helm-log "%S" err)))))
+
 ;;;###autoload
 (defun helm-previous-line ()
   "Move selection to the previous line."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (if (not (helm-pos-multiline-p))
-         (forward-line -1)      ;double forward-line is meaningful
-         (forward-line -1)        ;because evaluation order is important
-         (helm-skip-header-and-separator-line 'previous)
-         (let ((header-pos (helm-get-previous-header-pos))
-               (separator-pos (helm-get-previous-candidate-separator-pos)))
-           (when header-pos
-             (goto-char (if (or (null separator-pos)
-                                (< separator-pos header-pos))
-                            header-pos ; first candidate
-                            separator-pos))
-             (forward-line 1)))))
-   'line 'previous))
+  (helm-move-selection-common :where 'line :direction 'previous))
 
 ;;;###autoload
 (defun helm-next-line ()
   "Move selection to the next line."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (if (not (helm-pos-multiline-p))
-         (forward-line 1)
-         (let ((header-pos (helm-get-next-header-pos))
-               (separator-pos (helm-get-next-candidate-separator-pos)))
-           (cond ((and separator-pos
-                       (or (null header-pos) (< separator-pos header-pos)))
-                  (goto-char separator-pos))
-                 (header-pos
-                  (goto-char header-pos))))))
-   'line 'next))
+  (helm-move-selection-common :where 'line :direction 'next))
 
 ;;;###autoload
 (defun helm-previous-page ()
   "Move selection back with a pageful."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (condition-case nil
-         (scroll-down)
-       (beginning-of-buffer (goto-char (point-min)))))
-   'page 'previous))
+  (helm-move-selection-common :where 'page :direction 'previous))
 
 ;;;###autoload
 (defun helm-next-page ()
   "Move selection forward with a pageful."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (condition-case nil
-         (scroll-up)
-       (end-of-buffer (goto-char (point-max)))))
-   'page 'next))
+  (helm-move-selection-common :where 'page :direction 'next))
 
 ;;;###autoload
 (defun helm-beginning-of-buffer ()
   "Move selection at the top."
   (interactive)
-  (helm-move-selection-common
-   (lambda () (goto-char (point-min)))
-   'edge 'previous))
+  (helm-move-selection-common :where 'edge :direction 'previous))
 
 ;;;###autoload
 (defun helm-end-of-buffer ()
   "Move selection at the bottom."
   (interactive)
-  (helm-move-selection-common
-   (lambda () (goto-char (point-max)))
-   'edge 'next))
+  (helm-move-selection-common :where 'edge :direction 'next))
 
 ;;;###autoload
 (defun helm-previous-source ()
   "Move selection to the previous source."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (forward-line -1)
-     (if (bobp)
-         (goto-char (point-max))
-         (helm-skip-header-and-separator-line 'previous))
-     (goto-char (helm-get-previous-header-pos))
-     (forward-line 1))
-   'source 'previous))
+  (helm-move-selection-common :where 'source :direction 'previous))
 
 ;;;###autoload
 (defun helm-next-source ()
   "Move selection to the next source."
   (interactive)
-  (helm-move-selection-common
-   (lambda ()
-     (goto-char (or (helm-get-next-header-pos) (point-min))))
-   'source 'next))
+  (helm-move-selection-common :where 'source :direction 'next))
 
 (defun helm-goto-source (source-or-name)
   "Move the selection to the source SOURCE-OR-NAME."
-  (helm-move-selection-common
-   (lambda ()
-     (goto-char (point-min))
-     (let ((name (if (stringp source-or-name) source-or-name
-                     (assoc-default 'name source-or-name))))
-       (condition-case err
-           (while (not (string= name (helm-current-line-contents)))
-             (goto-char (helm-get-next-header-pos)))
-         (error (helm-log "%S" err)))))
-   'source 'next))
+  (helm-move-selection-common :where 'source :direction source-or-name))
 
 (defun helm-mark-current-line (&optional resumep)
   "Move `helm-selection-overlay' to current line.

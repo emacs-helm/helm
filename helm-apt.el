@@ -60,7 +60,6 @@
     (candidates-in-buffer)
     (candidate-transformer . helm-apt-candidate-transformer)
     (display-to-real . helm-apt-display-to-real)
-    (requires-pattern . 2)
     (update . helm-apt-refresh)
     (keymap . ,helm-apt-map)
     (mode-line . helm-apt-mode-line)
@@ -111,29 +110,29 @@
                          ((eq helm-apt-show-only 'all) cand))
         when show collect show))
 
-;;;###autoload
 (defun helm-apt-show-only-installed ()
   (interactive)
-  (setq helm-apt-show-only 'installed)
-  (helm-update))
+  (when helm-alive-p
+    (setq helm-apt-show-only 'installed)
+    (helm-update)))
 
-;;;###autoload
 (defun helm-apt-show-only-not-installed ()
   (interactive)
-  (setq helm-apt-show-only 'noinstalled)
-  (helm-update))
+  (when helm-alive-p
+    (setq helm-apt-show-only 'noinstalled)
+    (helm-update)))
 
-;;;###autoload
 (defun helm-apt-show-only-deinstalled ()
   (interactive)
-  (setq helm-apt-show-only 'deinstalled)
-  (helm-update))
+  (when helm-alive-p
+    (setq helm-apt-show-only 'deinstalled)
+    (helm-update)))
 
-;;;###autoload
 (defun helm-apt-show-all ()
   (interactive)
-  (setq helm-apt-show-only 'all)
-  (helm-update))
+  (when helm-alive-p
+    (setq helm-apt-show-only 'all)
+    (helm-update)))
 
 (defun helm-apt-init ()
   "Initialize list of debian packages."

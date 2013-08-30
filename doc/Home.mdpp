@@ -16,13 +16,13 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 3. Install markdown-pp
 
    For help on setup.py:
-   
+
    `$ sudo python setup.py help`
-   
+
    For installing:
-   
+
    `$ sudo python setup.py install`
-   
+
 4. Edit on helm repo `Home.mdpp`.
 5. Run markdown.pp.py: (This will create the table of contents)
 
@@ -45,18 +45,18 @@ To get it with git:
 
 Once you have the helm directory, `cd` into it and run `make`.
 Edit your `init.el` file and add:
-  
+
     (add-to-list 'load-path "/path/to/helm/directory")
     (require 'helm-config)
 
 For a quick try, you can also run the shell script provided with helm if your system support it:
 
     ./emacs-helm.sh
-    
+
 NOTE: If you install Helm in a different way using your own autoloads and personal configuration,
       be sure to know and understand what you are doing, otherwise expect diverses bugs and failures.
       You are warned!
-    
+
 # Debugging
 
 If you experiment problems with helm, be sure to reproduce the problem starting with `emacs -Q`
@@ -66,7 +66,7 @@ You can also run `emacs-helm.sh` directly if supported by your system.
 
 # General helm commands
 
- Helm needs you to remember only a few binding unlike all others Emacs
+ Helm needs you to remember only a few binding unlike all other Emacs
 applications. Thus, all bindings are auto documented.
 
 By default, Helm shows you the most useful bindings in the mode-line.
@@ -128,7 +128,7 @@ hierarchy easily. All the actions you can apply to files from here are
 described in this section.
 
 You can find it in the menu under `helm-command-prefix-key` or
- as the keychain `C-x C-f`. 
+ as the keychain `C-x C-f`.
 
 If you like it, you can safely bind it to C-x C-f to replace the
 standard find-file:
@@ -213,7 +213,7 @@ these actions whitout quitting, use M-l (rotate left) and M-r (rotate
 right). Of course M-l and M-r have no effect if candidate is not an
 image file.
 
-Don`t forget to use `C-t` to split windows vertically, and then
+Don`t forget to use C-t to split windows vertically, and then
 
     `C-}' and `C-{'
 
@@ -252,16 +252,16 @@ Example of Use:
 various directories.
 
 1) C-x C-f (launch helm-find-files)
- 
+
 2) Navigate to the place of your choice and write new directory name
     ending with `/` and press RET.
- 
+
 3) Navigate and browse images, when you want an image mark it, you can
     mark all in a directory with M-a.
- 
+
 4) When you have marked all files, choose `serial rename by symlinking`
     in action menu.
- 
+
 5) Choose new name and start number.
 
 6) Navigate to initial directory (where files will be
@@ -326,21 +326,6 @@ Add this to your `init.el`:
                                         (command-execute 'eshell)
                                         (bury-buffer))))
 
-## Dired Commands
-
-To enable some of the usual commands of dired, put in `init.el`:
-
-    (helm-dired-bindings 1)
-
-Or run interactively:
-
-    M-x helm-dired-bindings
-
-This will replace in dired C, R, S, and H commands. That is copy,
-rename, symlink, hardlink. When creating a symlink, you will find
-relsymlink in actions menu.(TAB).
-NOTE: This is deprecated for Emacs24 users, use instead `helm-mode`.
-
 ## Copy Files
 
  It is a powerful feature of helm-find-files as you can
@@ -352,7 +337,7 @@ display and copy them somewhere.
 
 So, easy to use, just mark some files, and hit copy files in the action
 menu. That will open a new helm-find-files where you can choose
-destination. 
+destination.
 
 ## Rename Files
 
@@ -389,19 +374,19 @@ enabled recursive-minibuffer
     (setq enable-recursive-minibuffers t)
 
 You can have completion with C-x C-f and then hit tab to choose action
-`Complete at point` 
+`Complete at point`
  once you have found the filename you want. `Create File`
  Navigate to the directory where you want to create
-your new file, then 
- continue typing the name of your file and type enter. 
+your new file, then
+ continue typing the name of your file and type enter.
  NOTE: If your filename ends with a / you will be prompt to create a new
 directory.
 
 ## Create Directory
 
  Navigate to the directory where you want to
-create your new directory, 
- then continue typing the name of new directory - parents accepted - 
+create your new directory,
+ then continue typing the name of new directory - parents accepted -
  and end it with / type enter, you will be prompt to create your new
 directory (possibly with parents).
 
@@ -409,7 +394,7 @@ directory (possibly with parents).
 
  Well, that is easy to use, move cursor to a file, hit
 ediff in action menu, you will jump in another helm-find-files to choose
-second file. 
+second file.
 
 ## Ediff merge files
 move cursor to a file, hit ediff merge in action menu, you will jump in another
@@ -456,10 +441,10 @@ in su/sudo methods).
     used unless you don`t specify the only extensions of files where you
     want to search (you will have a prompt). You can now specify more
     than one extension to search.
-     e.g \*.el \*.py \*.tex 
+     e.g \*.el \*.py \*.tex
      will search only in files with these extensions.
 
--   NOTE: Windows users need grep version `2.5.4` of Gnuwin32 on windoze. 
+-   NOTE: Windows users need grep version `2.5.4` of Gnuwin32 on windoze.
 This version should accept the `--exclude-dir` option.
 
 -   NOTE: Apple OS X users also need a version of grep that accepts `--exclude-dir`
@@ -494,16 +479,16 @@ like:
 
     C-<SPACE>
 
-and launch grep. 
+and launch grep.
 
 ## Grep marked files from differents directories
 
-This is a very nice feature of helm grep implementation that allows to search 
+This is a very nice feature of helm grep implementation that allows to search
 in specific files located not only in current directory but anywhere in your file system.
 
 To use navigate in your file system and mark files with
 
-    C-<SPACE> 
+    C-<SPACE>
 
 When you have marked all files, just launch grep in action menu.
 
@@ -604,7 +589,7 @@ further use in lisp code, with backslash duplicated.
 
  Save the regexp as you write it.
 
-## Helm locate
+# Helm locate
 
  First be sure you have `locate` installed on
 your system. Most GNU/Linux distros come with locate included, you update
@@ -651,7 +636,7 @@ To create a user specific db, use:
 
 Where `dbpath` is a filename matched by `helm-locate-db-file-regexp`
 
-# Windows specificity
+## Windows specificity
 
 On Windows you should use Everything program that mimics locate, it is very
 fast and you don't need to update database manually. To use with
@@ -729,9 +714,9 @@ Put this script somewhere in PATH and make it executable :
 
 Firefox is not aware about this new protocol, you will have to instruct
 it. See Firefox documentation or use firefox-protocol.el package you can
-get here: 
- <https://github.com/thierryvolpiatto/emacs-bmk-ext> 
- Install ffbookmarks: 
+get here:
+ <https://github.com/thierryvolpiatto/emacs-bmk-ext>
+ Install ffbookmarks:
 
     M-x firefox-protocol-installer-install
 
@@ -742,7 +727,7 @@ instead of url:
     javascript:location.href='ffbookmarks://localhost'
 
 Now when you click on ffbookmarks it will bring you in Emacs and allow
-you to browse your bookmarks with helm. 
+you to browse your bookmarks with helm.
  NOTE : Emacs server needs to be started in the running Emacs, see Emacs
 documentation.
 
@@ -764,13 +749,13 @@ Example:
 
 I want to show all my buffer that are in emacs-lisp mode:
 
-    Pattern: lisp 
+    Pattern: lisp
 
 will show all emacs-lisp and lisp related buffers.
 
 Now I want to limit these buffers to the one that match `any`
 
-    Pattern: lisp any 
+    Pattern: lisp any
 
 Now I want to limit these buffers to the one that match `any` but end with `foo`:
 
@@ -781,7 +766,7 @@ Note the space between any and foo.
 I want to match buffers that match `any` but not limited to lisp
 buffers:
 
-    Pattern: any 
+    Pattern: any
 
 ## Different colors for buffers
 
@@ -837,13 +822,13 @@ Not complete.
 ## Enable helm pcomplete
 
 Of course pcomplete is already enabled in Eshell, but what we want here
-is to enable it with helm support. 
+is to enable it with helm support.
  Enabling is easy, just add to `init.el`:
 
 >     (add-hook 'eshell-mode-hook
 >               #'(lambda ()
->                   (define-key eshell-mode-map 
->                     [remap pcomplete]
+>                   (define-key eshell-mode-map
+>                     [remap eshell-pcomplete]
 >                     'helm-esh-pcomplete)))
 
 Now when hitting `TAB`, you should have helm pcompletion.
@@ -852,7 +837,7 @@ Now when hitting `TAB`, you should have helm pcompletion.
 
 You can enhance Emacs pcomplete by writing your own pcomplete
 functions.
- 
+
  Here an example with `find` command:
 
     (defun pcomplete/find ()
@@ -894,7 +879,7 @@ Add this to `init.el`
 
 >     (add-hook 'eshell-mode-hook
 >               #'(lambda ()
->                   (define-key eshell-mode-map 
+>                   (define-key eshell-mode-map
 >                     (kbd "M-p")
 >                     'helm-eshell-history)))
 

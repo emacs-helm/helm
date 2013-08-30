@@ -287,6 +287,19 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   (interactive)
   (helm-quit-and-execute-action 'helm-m-occur-goto-line))
 
+;;;###autoload
+(define-minor-mode helm-occur-match-plugin-mode
+    "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
+  :global t
+  :init-value t
+  (if helm-occur-match-plugin-mode
+      (setq helm-source-moccur
+            (remove (assoc 'no-matchplugin helm-source-moccur)
+                    helm-source-moccur)
+            helm-source-occur helm-source-moccur)
+      (helm-attrset 'no-matchplugin nil helm-source-moccur)
+      (setq helm-source-occur helm-source-moccur)))
+
 (defvar helm-source-moccur
   `((name . "Moccur")
     (init . (lambda ()
@@ -295,8 +308,8 @@ Same as `helm-m-occur-goto-line' but go in new frame."
               (helm-attrset 'delayed helm-m-occur-idle-delay)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . helm-m-occur-transformer)
-    (nohighlight)
     (get-line . helm-m-occur-get-line)
+    (nohighlight)
     (migemo)
     (action . (("Go to Line" . helm-m-occur-goto-line)
                ("Goto line other window" . helm-m-occur-goto-line-ow)
@@ -304,7 +317,6 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (persistent-action . helm-m-occur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)
-    (no-matchplugin)
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-moccur-map)
@@ -330,7 +342,8 @@ Same as `helm-m-occur-goto-line' but go in new frame."
                               ":"
                               (propertize lineno 'face 'helm-grep-lineno)
                               ":"
-                              (helm-grep-highlight-match str))
+                              (helm-grep-highlight-match
+                               str helm-occur-match-plugin-mode))
                       i)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
@@ -380,6 +393,7 @@ It is used with type attribute 'line'."
             (match-string 2 candidate))
       (error "Line number not found")))
 
+
 ;;; Type attributes
 ;;
 ;;

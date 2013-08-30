@@ -216,7 +216,8 @@ See also `helm-locate'."
          (case-sensitive-flag (if locate-is-es "-i" ""))
          (ignore-case-flag (if (or locate-is-es
                                    (not real-locate)) "" "-i"))
-         process-connection-type)
+         process-connection-type
+         (args (split-string helm-pattern " ")))
     (prog1
         (start-process-shell-command
          "locate-process" helm-buffer
@@ -229,7 +230,12 @@ See also `helm-locate'."
                    (t (if helm-locate-case-fold-search
                           ignore-case-flag
                           case-sensitive-flag)))
-                 (shell-quote-argument helm-pattern)))
+                 (concat
+                  ;; The pattern itself.
+                  (shell-quote-argument (car args)) " "
+                  ;; Possible locate args added
+                  ;; after pattern, don't quote them.
+                  (mapconcat 'identity (cdr args) " "))))
       (set-process-sentinel
        (get-process "locate-process")
        #'(lambda (process event)

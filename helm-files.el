@@ -1020,13 +1020,15 @@ The checksum is copied to kill-ring."
                         '(md5 sha1 sha224 sha256 sha384 sha512))))
     (kill-new
      (if algo-list
-         (secure-hash (intern
-                       (helm-comp-read
-                        "Algorithm: " algo-list))
-                      file)
-         (sha1 (with-temp-buffer
-                 (insert-file-contents file)
-                 (buffer-string)))))
+         (with-temp-buffer
+           (insert-file-contents-literally file)
+           (secure-hash (intern
+                         (helm-comp-read
+                          "Algorithm: " algo-list))
+                        (buffer-string)))
+         (with-temp-buffer
+           (insert-file-contents-literally file)
+           (sha1 (buffer-string)))))
     (message "Checksum copied to kill-ring.")))
 
 (defun helm-ff-toggle-basename (candidate)
@@ -1174,7 +1176,8 @@ expand to this directory."
                                 ;; and one directory candidate, move to it.
                                 (helm-next-line))
                               (helm-get-selection))))
-            (when (and (stringp cur-cand) (file-directory-p cur-cand))
+            (when (and (stringp cur-cand)
+                       (file-accessible-directory-p cur-cand))
               (if (and (not (helm-dir-is-dot cur-cand))         ; [1]
                        ;; Maybe we are here because completed-p is true
                        ;; but check this again to be sure. (Windows fix)
@@ -1313,7 +1316,8 @@ purpose."
           ;; when descending level.
           ;; However, we don't add automatically the "/" when
           ;; `helm-ff-auto-update-flag' is enabled to avoid quick expansion.
-          ((and (file-directory-p pattern) helm-ff-auto-update-flag)
+          ((and (file-accessible-directory-p pattern)
+                helm-ff-auto-update-flag)
            (file-name-as-directory pattern))
           ;; Return PATTERN unchanged.
           (t pattern))))
@@ -1321,7 +1325,7 @@ purpose."
 (defun helm-find-files-get-candidates (&optional require-match)
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
-         (dir-p         (file-directory-p path))
+         (dir-p         (file-accessible-directory-p path))
          (path-name-dir (if (and dir-p
                                  ;; Don't add the "/" at the end
                                  ;; of path when `helm-ff-auto-update-flag'
@@ -2383,8 +2387,10 @@ Else return ACTIONS unmodified."
   `((name . "Recentf")
     (init . (lambda ()
               (require 'recentf)
-              (or recentf-mode (recentf-mode 1))))
-    (candidates . recentf-list)
+              (or recentf-mode (recentf-mode 1))
+              (helm-init-candidates-in-buffer
+               'global recentf-list)))
+    (candidates-in-buffer)
     (no-delay-on-input)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
