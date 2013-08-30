@@ -937,14 +937,9 @@ If INDEX is specified, action is added in action list at INDEX,
 otherwise it is added at end.
 This allow user to add a specific action to an existing source
 without modifying source code."
-<<<<<<< HEAD
-  (let ((actions    (or (cdr (helm-get-attribute-from-source-type 'action source))
-                        (helm-attr 'action source)))
-=======
   (let ((actions    (or (helm-attr 'action source)
                         (cdr (helm-get-attribute-from-source-type
                               'action source))))
->>>>>>> upstream/master
         (new-action (list (cons name fn))))
     (when (symbolp actions)
       (setq actions (list (cons "Default action" actions))))
