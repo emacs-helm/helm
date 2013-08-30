@@ -921,6 +921,8 @@ arg TYPE is an existing type defined in `helm-type-attributes'."
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
   (loop for i in seq
+        for len = (length seq)
+        when (> index len) do (setq index len)
         for count from 1 collect i
         when (= count index)
         if (listp elm) append elm
