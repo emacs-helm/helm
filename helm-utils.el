@@ -932,6 +932,41 @@ the entire symbol."
         (forward-line)))
     (nreverse bookmarks-alist)))
 
+(defvar helm-commands-source-buffer "*helm source select*")
+
+(defvar helm-c-source-helm-commands
+  `((name . "Helm commands")
+    (candidate-number-limit . 9999)
+    (candidates
+     . (lambda nil
+         (loop for symname in (all-completions "helm-" obarray)
+               for sym = (intern symname)
+               if (commandp sym) collect
+               (cons
+                (concat
+                 (propertize (format "%s" symname)
+                             'face 'font-lock-function-name-face)
+                 (propertize (format " %s"
+                                     (or (and (documentation sym)
+                                              (car (split-string
+                                                    (documentation sym) "\n\\|\\.")))
+                                         "Not documented"))
+                             'face 'font-lock-doc-face))
+                sym))))
+    (action . (("Execute helm command" .
+                (lambda (candidate)
+                  (call-interactively candidate)))
+               ("Describe command" . describe-command)))
+    (persistent-action . describe-command)))
+
+;;;###autoload
+(defun helm-commands nil
+  "Select from helm commands to execute."
+  (interactive)
+  (helm :sources 'helm-c-source-helm-commands
+        :buffer helm-commands-source-buffer))
+
+
 
 (provide 'helm-utils)
 
