@@ -953,7 +953,9 @@ without modifying source code."
   "Delete ACTION-OR-NAME from SOURCE.
 ACTION-OR-NAME can either be the name of action or the symbol function
 associated to name."
-  (let* ((actions    (helm-attr 'action source))
+  (let* ((actions    (or (helm-attr 'action source)
+                         (cdr (helm-get-attribute-from-source-type
+                               'action source))))
          (del-action (if (symbolp action-or-name)
                          (rassoc action-or-name actions)
                          (assoc action-or-name actions))))
@@ -982,7 +984,9 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
                               'async-byte-compile-file
                               helm-source-find-files
                               'helm-ff-candidates-lisp-p\)."
-  (let* ((actions     (helm-attr 'action source))
+  (let* ((actions     (or (helm-attr 'action source)
+                          (cdr (helm-get-attribute-from-source-type
+                                'action source))))
          (action-transformers (helm-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
          (transformer `(lambda (actions candidate)
