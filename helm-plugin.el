@@ -30,25 +30,30 @@
 ;;
 ;;
 (defun* helm-info-init (&optional (file (helm-attr 'info-file)))
-  (let (result)
-    (unless (helm-candidate-buffer)
-      (save-window-excursion
-        (info file)
-        (let (Info-history
-              (tobuf (helm-candidate-buffer 'global))
-              (infobuf (current-buffer))
-              s e)
-          (dolist (node (or (helm-attr 'index-nodes) (Info-index-nodes)))
-            (Info-goto-node node)
-            (goto-char (point-min))
-            (while (search-forward "\n* " nil t)
-              (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
-                '(save-current-buffer (buffer-substring-no-properties (point-at-bol) (point-at-eol)) result)
-                (setq s (point-at-bol)
-                      e (point-at-eol))
-                (with-current-buffer tobuf
-                  (insert-buffer-substring infobuf s e)
-                  (insert "\n"))))))))))
+  ;; Allow reinit candidate buffer when using edebug.
+  (helm-aif (and debug-on-error
+                 (helm-candidate-buffer))
+      (kill-buffer it))
+  (unless (helm-candidate-buffer)
+    (save-window-excursion
+      (info file)
+      (let (Info-history
+            (tobuf (helm-candidate-buffer 'global))
+            (infobuf (current-buffer))
+            s e
+            (nodes (or (helm-attr 'index-nodes) (Info-index-nodes))))
+        (dolist (node nodes)
+          (Info-goto-node node)
+          (goto-char (point-min))
+          (while (search-forward "\n* " nil t)
+            (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
+              (save-current-buffer (buffer-substring-no-properties
+                                    (point-at-bol) (point-at-eol)))
+              (setq s (point-at-bol)
+                    e (point-at-eol))
+              (with-current-buffer tobuf
+                (insert-buffer-substring infobuf s e)
+                (insert "\n")))))))))
 
 (defun helm-info-goto (node-line)
   (Info-goto-node (car node-line))
