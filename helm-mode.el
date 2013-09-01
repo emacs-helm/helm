@@ -383,7 +383,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                    src))))
            (helm-execute-action-at-once-if-one exec-when-only-one)
            result)
-      (when reverse-history (setq src-list (reverse src-list)))
+      (when reverse-history (setq src-list (nreverse src-list)))
       (setq result (helm
                     :sources src-list
                     :input initial-input
