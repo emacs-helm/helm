@@ -188,6 +188,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                preselect
                                (buffer "*Helm Completions*")
                                must-match
+                               reverse-history
                                (requires-pattern 0)
                                (history nil)
                                input-history
@@ -382,6 +383,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                    src))))
            (helm-execute-action-at-once-if-one exec-when-only-one)
            result)
+      (when reverse-history (setq src-list (reverse src-list)))
       (setq result (helm
                     :sources src-list
                     :input initial-input
@@ -499,6 +501,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      prompt collection
      :test test
      :history history
+     :reverse-history t
      :input-history history
      :must-match require-match
      :alistp nil ; Be sure `all-completions' is used.
