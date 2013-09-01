@@ -231,6 +231,9 @@ Keys description:
 
 - MUST-MATCH: Candidate selected must be one of COLLECTION.
 
+- REVERSE-HISTORY: When non--nil display history source after current
+  source completion.
+
 - REQUIRES-PATTERN: Same as helm attribute, default is 0.
 
 - HISTORY: A list containing specific history, default is nil.
