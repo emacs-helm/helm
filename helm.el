@@ -151,6 +151,8 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "C-k")        'helm-delete-minibuffer-contents)
     (define-key map (kbd "C-x C-f")    'helm-quit-and-find-file)
     (define-key map (kbd "M-m")        'helm-toggle-all-marks)
+    (define-key map (kbd "M-a")        'helm-mark-all)
+    (define-key map (kbd "M-u")        'helm-unmark-all)
     (define-key map (kbd "C-w")        'helm-yank-text-at-point)
     (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
     (define-key map (kbd "C-M-e")      'helm-display-all-sources)
