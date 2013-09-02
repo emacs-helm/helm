@@ -229,7 +229,8 @@ but the initial search for all candidates in buffer(s)."
                                                    (length helm-dabbrev--cache)))
                                        return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
-                     (helm-dabbrev-info-iterator helm-dabbrev--data))))
+                     (helm-dabbrev-info-iterator helm-dabbrev--data)))
+          deactivate-mark)
       (helm-aif (and iter (helm-iter-next iter))
           (progn
             (helm-insert-completion-at-point (car limits) (cdr limits) it)
