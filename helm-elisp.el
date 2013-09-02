@@ -211,6 +211,7 @@ Return a cons \(beg . end\)."
                             beg end candidate)))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
+           :buffer "*helm lisp completion*"
            :allow-nest t))
         (message "[No Match]"))))
 

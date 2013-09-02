@@ -630,7 +630,7 @@ See documentation of `completing-read' and `all-completions' for details."
      &key
      (name "Read File Name")
      (initial-input (expand-file-name default-directory))
-     (buffer "*Helm Completions*")
+     (buffer "*Helm file completions*")
      test
      (case-fold helm-file-name-case-fold-search)
      (preselect nil)
