@@ -515,7 +515,7 @@ that is sorting is done against real value of candidate."
                           (t 0))))
          (sc1 (funcall score str1 reg1 reg2 split))
          (sc2 (funcall score str2 reg1 reg2 split)))
-    (cond ((or (zerop (length helm-pattern))
+    (cond ((or (zerop (string-width helm-pattern))
                (and (zerop sc1) (zerop sc2)))
            (string-lessp str1 str2))
           ((= sc1 sc2)

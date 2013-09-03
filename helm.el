@@ -2520,7 +2520,7 @@ is done on whole `helm-buffer' and not on current source."
   "Whether SOURCE need updating or not."
   (and (or (not helm-source-filter)
            (member (assoc-default 'name source) helm-source-filter))
-       (>= (length helm-pattern)
+       (>= (string-width helm-pattern)
            (helm-aif (assoc 'requires-pattern source)
                (or (cdr it) 1)
              0))
@@ -2899,7 +2899,7 @@ Possible value of DIRECTION are 'next or 'previous."
     (let* ((hlstr (helm-interpret-value
                    (and (listp source)
                         (assoc-default 'header-line source)) source))
-           (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
+           (hlend (make-string (max 0 (- (window-width) (string-width hlstr))) ? )))
       (setq header-line-format
             (propertize (concat " " hlstr hlend) 'face 'helm-header)))))
   

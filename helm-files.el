@@ -1162,7 +1162,7 @@ expand to this directory."
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
                   (and (<= (helm-approximate-candidate-number) 2)
-                       (>= (length (helm-basename helm-pattern)) 2))
+                       (>= (string-width (helm-basename helm-pattern)) 2))
                   ;; Already completed.
                   completed-p)
                  (not history-p)) ; Don't try to auto complete in history.
