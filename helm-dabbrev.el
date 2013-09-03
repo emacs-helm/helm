@@ -99,7 +99,7 @@ but the initial search for all candidates in buffer(s)."
                   (rassq major-mode helm-dabbrev-major-mode-assoc))
         (or (assq cur-maj-mode (list it))
             (rassq cur-maj-mode (list it)))
-      (eq major-mode (with-helm-current-buffer major-mode)))))
+      (eq major-mode cur-maj-mode))))
 
 (defun helm-dabbrev--collect (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
