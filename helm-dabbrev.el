@@ -120,10 +120,17 @@ but the initial search for all candidates in buffer(s)."
                                     (point))))
                              (setq pos-before pos)
                              (search-backward pattern pos t))))
-               (let ((match (substring-no-properties
-                             (thing-at-point 'symbol)))) 
-                 (unless (or (string= str match) (member match result))
-                   (push match result)))))))
+               (let* ((match-1 (substring-no-properties
+                                (thing-at-point 'symbol)))
+                      (match-2 (substring-no-properties
+                                (thing-at-point 'filename)))
+                      (lst (if (string= match-1 match-2)
+                               (list match-1)
+                               (list match-1 match-2))))
+                 (loop for match in lst
+                       unless (or (string= str match)
+                                  (member match result))
+                       do (push match result)))))))
     (loop with result with pos-before with pos-after
           for buf in (if all (helm-dabbrev--buffer-list)
                          (list (current-buffer)))
