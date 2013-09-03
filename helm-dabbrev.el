@@ -94,12 +94,14 @@ but the initial search for all candidates in buffer(s)."
         collect buf))
 
 (defun helm-dabbrev--same-major-mode-p (buf)
-  (let ((cur-maj-mode (with-helm-current-buffer major-mode))) 
-    (helm-aif (or (assq major-mode helm-dabbrev-major-mode-assoc)
-                  (rassq major-mode helm-dabbrev-major-mode-assoc))
-        (or (assq cur-maj-mode (list it))
-            (rassq cur-maj-mode (list it)))
-      (eq major-mode cur-maj-mode))))
+  (or (eq major-mode (with-helm-current-buffer major-mode))
+      (loop with cur-maj-mode = (with-helm-current-buffer major-mode)
+            for (m . a) in helm-dabbrev-major-mode-assoc
+            when (and (or (eq major-mode m)
+                          (eq major-mode a))
+                      (or (eq cur-maj-mode m)
+                          (eq cur-maj-mode a)))
+            return t)))
 
 (defun helm-dabbrev--collect (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
