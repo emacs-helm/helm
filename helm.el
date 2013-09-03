@@ -2176,7 +2176,6 @@ Helm plug-ins are realized by this function."
                                                  candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
-                       (wrong-type-argument nil)
                        (error (funcall type-error err)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
@@ -2518,15 +2517,22 @@ is done on whole `helm-buffer' and not on current source."
 
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
-  (and (or (not helm-source-filter)
-           (member (assoc-default 'name source) helm-source-filter))
-       (>= (string-width helm-pattern)
-           (helm-aif (assoc 'requires-pattern source)
-               (or (cdr it) 1)
-             0))
-       ;; These incomplete regexps hang helm forever
-       ;; so defer update.
-       (not (member helm-pattern helm-update-blacklist-regexps))))
+  (let ((len (string-width
+              (if (or (not (assoc 'no-matchplugin source))
+                      helm-match-plugin-mode)
+                  ;; Don't count spaces entered when using
+                  ;; match-plugin.
+                  (replace-regexp-in-string " " "" helm-pattern)
+                  helm-pattern))))
+    (and (or (not helm-source-filter)
+             (member (assoc-default 'name source) helm-source-filter))
+         (>= len
+             (helm-aif (assoc 'requires-pattern source) (or (cdr it) 1) 0))
+         ;; These incomplete regexps hang helm forever
+         ;; so defer update. Maybe replace spaces quoted when using
+         ;; match-plugin-mode.
+         (not (member (replace-regexp-in-string "\\s\\" "" helm-pattern)
+                      helm-update-blacklist-regexps)))))
 
 (defun helm-delayed-source-p (source)
   "Wheter SOURCE is a delayed source or not."
