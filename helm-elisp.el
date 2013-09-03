@@ -164,8 +164,10 @@ Return a cons \(beg . end\)."
   ;; next arg which is unwanted.
   (delete-region beg end)
   (insert str)
-  (let ((pos (cdr (bounds-of-thing-at-point 'symbol))))
-    (when (< (point) pos)
+  (let ((pos (cdr (or (bounds-of-thing-at-point 'symbol)
+                      ;; needed for helm-dabbrev.
+                      (bounds-of-thing-at-point 'filename)))))
+    (when (and pos (< (point) pos))
       (push-mark pos t t))))
 
 ;;;###autoload
