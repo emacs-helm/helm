@@ -140,7 +140,9 @@ If `helm-turn-on-show-completion' is nil just do nothing."
 
 (defun helm-thing-before-point (&optional limits regexp)
   "Return symbol name before point.
-With LIMITS arg specified return the beginning and en position
+If REGEXP is specified return what REGEXP find before point.
+By default match the beginning of symbol before point.
+With LIMITS arg specified return the beginning and end position
 of symbol before point."
   (save-excursion
     (let (beg (end (point)))
