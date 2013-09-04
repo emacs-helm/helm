@@ -2066,16 +2066,16 @@ if some when multiples sources are present."
   "Clean up the mess when helm exit or quit."
   (helm-log "start cleanup")
   (with-current-buffer helm-buffer
-    ;; If we end up for any reasons (error etc...)
-    ;; with an helm-buffer staying around (visible),
-    ;; we will have no cursor in this buffer when switching to it.
-    (setq cursor-type t)
-    (bury-buffer)
+    ;; bury-buffer from this window.
+    (bury-buffer) ;[1]
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
   (helm-log-run-hook 'helm-cleanup-hook)
   (helm-frame-or-window-configuration 'restore)
+  ;; [1] now bury-buffer from underlying windows otherwise,
+  ;; if this window is killed the underlying buffer will
+  ;; be an helm buffer.
   (replace-buffer-in-windows helm-buffer)
   (setq helm-alive-p nil)
   (setq helm-in-file-completion-p nil)
