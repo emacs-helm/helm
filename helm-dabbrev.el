@@ -201,7 +201,7 @@ but the initial search for all candidates in buffer(s)."
                      'helm-insert-completion-at-point
                      beg end candidate)))))))
 
-(defvar helm-dabbrev--regexp "\\s-\\|(\\|[\[]\\|[\{]\\|[\"]\\|[']\\|^")
+(defvar helm-dabbrev--regexp "\\s-\\|\t\\|(\\|[\[]\\|[\{]\\|[\"]\\|[']\\|^")
 ;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
