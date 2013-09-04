@@ -201,11 +201,12 @@ but the initial search for all candidates in buffer(s)."
                      'helm-insert-completion-at-point
                      beg end candidate)))))))
 
+(defvar helm-dabbrev--regexp "\\s-\\|(\\|[\[]\\|[\{]\\|[\"]\\|[']\\|^")
 ;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
-  (let ((dabbrev (helm-thing-before-point))
-        (limits (helm-bounds-of-thing-before-point))
+  (let ((dabbrev (helm-thing-before-point nil helm-dabbrev--regexp))
+        (limits (helm-bounds-of-thing-before-point helm-dabbrev--regexp))
         (enable-recursive-minibuffers t)
         (cycling-disabled-p (or (null helm-dabbrev-cycle-thresold)
                                 (zerop helm-dabbrev-cycle-thresold)))
