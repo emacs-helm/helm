@@ -2784,7 +2784,8 @@ If PRESERVE-SAVED-ACTION is non--nil save action."
                         (helm-get-selection helm-action-buffer)
                         (helm-get-action)))))
   (let ((source (or helm-saved-current-source
-                    (helm-get-current-source))))
+                    (helm-get-current-source)))
+        non-essential)
     (setq selection (or selection
                         (helm-get-selection)
                         (and (assoc 'accept-empty source) "")))
