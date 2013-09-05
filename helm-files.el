@@ -2602,9 +2602,7 @@ utility mdfind.")
 ;; helm-find-files integration.
 (defun helm-ff-find-sh-command (candidate)
   "Run `helm-find' from `helm-find-files'."
-  (let ((dir (if (file-directory-p candidate)
-                 candidate (file-name-directory candidate))))
-    (helm-find-1 (expand-file-name dir))))
+  (helm-find-1 helm-ff-default-directory))
 
 ;;;###autoload
 (defun helm-ff-run-find-sh-command ()
