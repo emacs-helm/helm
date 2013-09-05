@@ -327,7 +327,8 @@ Return an alist with elements like (data . number_results)."
 (defun helm-surfraw (pattern engine)
   "Preconfigured `helm' to search PATTERN with search ENGINE."
   (interactive (list (read-string "SearchFor: "
-                                  nil 'helm-surfraw-input-history)
+                                  nil 'helm-surfraw-input-history
+                                  (thing-at-point 'symbol))
                      (helm-comp-read
                       "Engine: "
                       (helm-build-elvi-list)
