@@ -93,18 +93,21 @@ but the initial search for all candidates in buffer(s)."
                      thereis (string-match r (buffer-name buf)))
         collect buf))
 
-(defun helm-dabbrev--same-major-mode-p ()
-  (let ((cur-maj-mode (with-helm-current-buffer major-mode)))
+
+(defun helm-dabbrev--same-major-mode-p (start-buffer)
+  (let* ((cur-maj-mode (with-current-buffer start-buffer major-mode))
+         (assoc-mode   (assq cur-maj-mode helm-dabbrev-major-mode-assoc))
+         (rassoc-mode  (rassq cur-maj-mode helm-dabbrev-major-mode-assoc)))
     (or (eq major-mode cur-maj-mode)
-        (loop for (m . a) in helm-dabbrev-major-mode-assoc
-              when (and (or (eq major-mode m)
-                            (eq major-mode a))
-                        (or (eq cur-maj-mode m)
-                            (eq cur-maj-mode a)))
-              return t))))
+        (derived-mode-p cur-maj-mode)
+        (or (eq (cdr assoc-mode) major-mode)
+            (eq (car rassoc-mode) major-mode))
+        (or (derived-mode-p (cdr assoc-mode))
+            (derived-mode-p (car rassoc-mode))))))
 
 (defun helm-dabbrev--collect (str limit ignore-case all)
   (let ((case-fold-search ignore-case)
+        (buffer1 (current-buffer))
         (search-and-store
          #'(lambda (pattern direction)
              (declare (special result pos-before pos-after))
@@ -140,7 +143,7 @@ but the initial search for all candidates in buffer(s)."
           for buf in (if all (helm-dabbrev--buffer-list)
                          (list (current-buffer)))
           do (with-current-buffer buf
-               (when (helm-dabbrev--same-major-mode-p)
+               (when (helm-dabbrev--same-major-mode-p buffer1)
                  (save-excursion
                    ;; Start searching before thing before point.
                    (goto-char (- (point) (length str)))
