@@ -217,6 +217,11 @@ This happen only in `helm-find-files'."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-findutils-find-program "find"
+  "The program used for the Unix shell command 'find'."
+  :group 'helm-files
+  :type 'string)
+
 
 ;;; Faces
 ;;
@@ -2575,7 +2580,8 @@ utility mdfind.")
     (with-helm-default-directory (helm-default-directory)
         (let (process-connection-type)
           (prog1
-              (apply #'start-file-process "hfind" helm-buffer "find"
+              (apply #'start-file-process
+                     "hfind" helm-buffer helm-findutils-find-program
                      (list "."
                            (if case-fold-search "-iname" "-name")
                            (concat "*" helm-pattern "*") "-type" "f"))
