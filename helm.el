@@ -1720,25 +1720,27 @@ Possible value of SAVE-OR-RESTORE are 'save and 'restore.
 window or frame configuration is saved/restored according to values of
 `helm-save-configuration-functions'."
   (helm-log-eval helm-save-configuration-functions)
-  (case save-or-restore
-    (save    (setq helm-last-frame-or-window-configuration
-                   (funcall (cdr helm-save-configuration-functions))))
-    (restore (funcall (car helm-save-configuration-functions)
-                      helm-last-frame-or-window-configuration)
-             ;; Restore frame focus.
-             (let ((frame
-                    (and (listp helm-last-frame-or-window-configuration)
-                         (caadr helm-last-frame-or-window-configuration))))
-               ;; If `helm-save-configuration-functions' are window functions
-               ;; frame should be nil, use current frame.
-               (unless (framep frame)
-                 ;; This is needed for minibuffer own-frame config
-                 ;; when recursive minibuffers are in use.
-                 ;; e.g M-: + helm-minibuffer-history.
-                 (setq frame (if (minibufferp helm-current-buffer)
-                                 (selected-frame)
-                                 (last-nonminibuffer-frame))))
-               (select-frame-set-input-focus frame)))))
+  (let ((window-persistent-parameters (append '((no-other-window . t))
+                                              window-persistent-parameters)))
+    (case save-or-restore
+      (save    (setq helm-last-frame-or-window-configuration
+                     (funcall (cdr helm-save-configuration-functions))))
+      (restore (funcall (car helm-save-configuration-functions)
+                        helm-last-frame-or-window-configuration)
+               ;; Restore frame focus.
+               (let ((frame
+                      (and (listp helm-last-frame-or-window-configuration)
+                           (caadr helm-last-frame-or-window-configuration))))
+                 ;; If `helm-save-configuration-functions' are window functions
+                 ;; frame should be nil, use current frame.
+                 (unless (framep frame)
+                   ;; This is needed for minibuffer own-frame config
+                   ;; when recursive minibuffers are in use.
+                   ;; e.g M-: + helm-minibuffer-history.
+                   (setq frame (if (minibufferp helm-current-buffer)
+                                   (selected-frame)
+                                   (last-nonminibuffer-frame))))
+                 (select-frame-set-input-focus frame))))))
 
 (defun helm-split-window-default-fn (window)
   (let (split-width-threshold)
@@ -1797,7 +1799,9 @@ The function used to display `helm-buffer'."
              helm-split-window-default-side)))
     (prog1
         (funcall (with-current-buffer buffer helm-display-function) buffer)
-      (setq helm-onewindow-p (one-window-p t)))))
+      (setq helm-onewindow-p (one-window-p t))
+      ;; Don't allow other-window and friends switching out of minibuffer.
+      (walk-windows #'(lambda (w) (set-window-parameter w 'no-other-window t)) 0))))
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
