@@ -1771,7 +1771,9 @@ window or frame configuration is saved/restored according to values of
         (split-window-sensibly window))))
 
 
-;; Core: Display *helm* buffer
+;;; Display helm buffer
+;;
+;;
 (defun helm-display-buffer (buffer)
   "Display BUFFER.
 The function used to display `helm-buffer'."
@@ -1801,7 +1803,14 @@ The function used to display `helm-buffer'."
         (funcall (with-current-buffer buffer helm-display-function) buffer)
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
-      (walk-windows #'(lambda (w) (set-window-parameter w 'no-other-window t)) 0))))
+      (helm-prevent-switching-other-window))))
+
+(defun* helm-prevent-switching-other-window (&key (enabled t))
+  "Allow setting `no-other-window' window parameter in all windows.
+Arg ENABLE-OR-DISABLE will be the value of `no-other-window'."
+  (walk-windows
+   #'(lambda (w)
+       (set-window-parameter w 'no-other-window enabled)) 0))
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
@@ -3614,36 +3623,40 @@ Arg DATA can be either a list or a plain string."
     source))
 
 
-;; Utility: resplit helm window
+;;; Resplit helm window
+;;
 ;;;###autoload
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
-  (with-helm-window
-    (if (or helm-full-frame (one-window-p t))
-        (message "Error: Attempt to resplit a single window")
-        (let ((before-height (window-height)))
-          (delete-window)
-          (set-window-buffer
-           (select-window
-            (if (= (window-height) before-height) ; initial split was horizontal.
-                ;; Split window vertically with `helm-buffer' placed
-                ;; on the good side according to actual value of
-                ;; `helm-split-window-default-side'.
-                (prog1
-                    (cond ((or (eq helm-split-window-default-side 'above)
-                               (eq helm-split-window-default-side 'left))
-                           (split-window
-                            (selected-window) nil 'above))
-                          (t (split-window-vertically)))
-                  (setq helm-split-window-state 'vertical))
-                ;; Split window vertically, same comment as above.
-                (setq helm-split-window-state 'horizontal)
-                (cond ((or (eq helm-split-window-default-side 'left)
-                           (eq helm-split-window-default-side 'above))
-                       (split-window (selected-window) nil 'left))
-                      (t (split-window-horizontally)))))
-           helm-buffer)))))
+  (helm-prevent-switching-other-window :enabled nil)
+  (unwind-protect
+       (with-helm-window
+         (if (or helm-full-frame (one-window-p t))
+             (message "Error: Attempt to resplit a single window")
+             (let ((before-height (window-height)))
+               (delete-window)
+               (set-window-buffer
+                (select-window
+                 (if (= (window-height) before-height) ; initial split was horizontal.
+                     ;; Split window vertically with `helm-buffer' placed
+                     ;; on the good side according to actual value of
+                     ;; `helm-split-window-default-side'.
+                     (prog1
+                         (cond ((or (eq helm-split-window-default-side 'above)
+                                    (eq helm-split-window-default-side 'left))
+                                (split-window
+                                 (selected-window) nil 'above))
+                               (t (split-window-vertically)))
+                       (setq helm-split-window-state 'vertical))
+                     ;; Split window vertically, same comment as above.
+                     (setq helm-split-window-state 'horizontal)
+                     (cond ((or (eq helm-split-window-default-side 'left)
+                                (eq helm-split-window-default-side 'above))
+                            (split-window (selected-window) nil 'left))
+                           (t (split-window-horizontally)))))
+                helm-buffer))))
+    (helm-prevent-switching-other-window)))
 
 ;; Utility: Resize helm window.
 (defun helm-enlarge-window-1 (n)
