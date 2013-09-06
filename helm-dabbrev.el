@@ -225,7 +225,7 @@ but the initial search for all candidates in buffer(s)."
                      'helm-insert-completion-at-point
                      beg end candidate)))))))
 
-(defvar helm-dabbrev--regexp "\\s-\\|\t\\|[(\[\{\"']\\|^")
+(defvar helm-dabbrev--regexp "\\s-\\|\t\\|[(\[\{\"'`]\\|^")
 ;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
@@ -238,6 +238,8 @@ but the initial search for all candidates in buffer(s)."
         (helm-quit-if-no-candidate
          #'(lambda ()
              (message "[Helm-dabbrev: No expansion found]"))))
+    (assert (and (stringp dabbrev) (not (string= dabbrev "")))
+            nil "[Helm-dabbrev: Nothing found before point]")
     (when (and
            ;; have been called at least once.
            (helm-dabbrev-info-p helm-dabbrev--data)
