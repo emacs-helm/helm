@@ -409,6 +409,10 @@ you want this mode enabled definitely."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-prevent-escaping-from-minibuffer t
+  "Prevent escaping from minibuffer during helm session."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -1803,7 +1807,8 @@ The function used to display `helm-buffer'."
         (funcall (with-current-buffer buffer helm-display-function) buffer)
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
-      (helm-prevent-switching-other-window))))
+      (when helm-prevent-escaping-from-minibuffer
+        (helm-prevent-switching-other-window)))))
 
 (defun* helm-prevent-switching-other-window (&key (enabled t))
   "Allow setting `no-other-window' window parameter in all windows.
@@ -3629,7 +3634,8 @@ Arg DATA can be either a list or a plain string."
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
-  (helm-prevent-switching-other-window :enabled nil)
+  (when helm-prevent-escaping-from-minibuffer
+    (helm-prevent-switching-other-window :enabled nil))
   (unwind-protect
        (with-helm-window
          (if (or helm-full-frame (one-window-p t))
@@ -3656,7 +3662,8 @@ Arg DATA can be either a list or a plain string."
                             (split-window (selected-window) nil 'left))
                            (t (split-window-horizontally)))))
                 helm-buffer))))
-    (helm-prevent-switching-other-window)))
+    (when helm-prevent-escaping-from-minibuffer
+      (helm-prevent-switching-other-window :enabled nil))))
 
 ;; Utility: Resize helm window.
 (defun helm-enlarge-window-1 (n)
