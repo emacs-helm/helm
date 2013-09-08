@@ -2612,6 +2612,7 @@ and store the real value in a text property."
     (setq dispvalue
           (cond ((symbolp dispvalue) (symbol-name dispvalue))
                 ((numberp dispvalue) (number-to-string dispvalue))
+                ((string= "" dispvalue))
                 (t dispvalue)))
     (when (stringp dispvalue)
       (funcall insert-function dispvalue)
