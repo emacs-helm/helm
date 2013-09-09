@@ -127,64 +127,65 @@ but the initial search for all candidates in buffer(s)."
                 cur-maj-mode)))))
 
 (defun helm-dabbrev--collect (str limit ignore-case all)
-  (let ((case-fold-search ignore-case)
-        (buffer1 (current-buffer))
-        (search-and-store
-         #'(lambda (pattern direction)
-             (declare (special result pos-before pos-after))
-             (while (case direction
-                      (1   (search-forward pattern nil t))
-                      (-1  (search-backward pattern nil t))
-                      (2   (let ((pos
-                                  (save-excursion
-                                    (forward-line
-                                     helm-dabbrev-lineno-around)
-                                    (point))))
-                             (setq pos-after pos)
-                             (search-forward pattern pos t)))
-                      (-2  (let ((pos
-                                  (save-excursion
-                                    (forward-line
-                                     (- helm-dabbrev-lineno-around))
-                                    (point))))
-                             (setq pos-before pos)
-                             (search-backward pattern pos t))))
-               (let* ((match-1 (substring-no-properties
-                                (thing-at-point 'symbol)))
-                      (match-2 (substring-no-properties
-                                (thing-at-point 'filename)))
-                      (lst (if (string= match-1 match-2)
-                               (list match-1)
-                               (list match-1 match-2))))
-                 (loop for match in lst
-                       unless (or (string= str match)
-                                  (member match result))
-                       do (push match result)))))))
-    (loop with result with pos-before with pos-after
-          for buf in (if all (helm-dabbrev--buffer-list)
-                         (list (current-buffer)))
-          for minibuf = (minibufferp (current-buffer))
-          do (with-current-buffer buf
-               (when (or minibuf ; check against all buffers when in minibuffer.
-                      (helm-dabbrev--same-major-mode-p buffer1))
-                 (save-excursion
-                   ;; Start searching before thing before point.
-                   (goto-char (- (point) (length str)))
-                   ;; Search the last 30 lines before point.
-                   (funcall search-and-store str -2)) ; store pos [1]
-                 (save-excursion
-                   ;; Search the next 30 lines after point.
-                   (funcall search-and-store str 2)) ; store pos [2]
-                 (save-excursion
-                   ;; Search all before point.
-                   (goto-char pos-before) ; start from [1]
-                   (funcall search-and-store str -1))
-                 (save-excursion
-                   ;; Search all after point.
-                   (goto-char pos-after) ; start from [2]
-                   (funcall search-and-store str 1))))
-          when (> (length result) limit) return (nreverse result)
-          finally return (nreverse result))))
+  (let* ((case-fold-search ignore-case)
+         (buffer1 (current-buffer)) ; start buffer.
+         (minibuf (minibufferp buffer1))
+         (search-and-store
+          #'(lambda (pattern direction)
+              (declare (special result pos-before pos-after))
+              (while (case direction
+                       (1   (search-forward pattern nil t))
+                       (-1  (search-backward pattern nil t))
+                       (2   (let ((pos
+                                   (save-excursion
+                                     (forward-line
+                                      helm-dabbrev-lineno-around)
+                                     (point))))
+                              (setq pos-after pos)
+                              (search-forward pattern pos t)))
+                       (-2  (let ((pos
+                                   (save-excursion
+                                     (forward-line
+                                      (- helm-dabbrev-lineno-around))
+                                     (point))))
+                              (setq pos-before pos)
+                              (search-backward pattern pos t))))
+                (let* ((match-1 (substring-no-properties
+                                 (thing-at-point 'symbol)))
+                       (match-2 (substring-no-properties
+                                 (thing-at-point 'filename)))
+                       (lst (if (string= match-1 match-2)
+                                (list match-1)
+                                (list match-1 match-2))))
+                  (loop for match in lst
+                        unless (or (string= str match)
+                                   (member match result))
+                        do (push match result)))))))
+         (loop with result with pos-before with pos-after
+               for buf in (if all (helm-dabbrev--buffer-list)
+                              (list (current-buffer)))
+          
+               do (with-current-buffer buf
+                    (when (or minibuf ; check against all buffers when in minibuffer.
+                              (helm-dabbrev--same-major-mode-p buffer1))
+                      (save-excursion
+                        ;; Start searching before thing before point.
+                        (goto-char (- (point) (length str)))
+                        ;; Search the last 30 lines before point.
+                        (funcall search-and-store str -2)) ; store pos [1]
+                      (save-excursion
+                        ;; Search the next 30 lines after point.
+                        (funcall search-and-store str 2)) ; store pos [2]
+                      (save-excursion
+                        ;; Search all before point.
+                        (goto-char pos-before) ; start from [1]
+                        (funcall search-and-store str -1))
+                      (save-excursion
+                        ;; Search all after point.
+                        (goto-char pos-after) ; start from [2]
+                        (funcall search-and-store str 1))))
+               when (> (length result) limit) return (nreverse result)
+               finally return (nreverse result))))
 
 (defun helm-dabbrev--get-candidates (abbrev)
   (assert abbrev nil "[No Match]")
