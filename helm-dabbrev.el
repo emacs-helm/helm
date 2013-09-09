@@ -38,7 +38,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :type 'integer)
 
 (defcustom helm-dabbrev-ignored-buffers-regexps
-  '("\\*helm" "\\*Messages" "\\*Minibuf" "\\*Echo Area" "\\*Buffer List")
+  '("\\*helm" "\\*Messages" "\\*Echo Area" "\\*Buffer List")
   "List of regexps matching names of buffers that helm-dabbrev should not check."
   :group 'helm-dabbrev
   :type '(repeat regexp))
