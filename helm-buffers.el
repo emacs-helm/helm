@@ -206,6 +206,7 @@ Should be called after others transformers i.e (boring buffers)."
         for i in buffers
         for buf = (get-buffer i)
         for proc = (get-buffer-process buf)
+        for dir = (with-current-buffer i default-directory)
         for size = (propertize (helm-buffer-size buf)
                                'face 'helm-buffer-size)
         for len-size = (length size)
@@ -282,8 +283,9 @@ Should be called after others transformers i.e (boring buffers)."
                                " " str-before-size size "  " mode
                                (and proc
                                     (propertize
-                                     (format " (%s %s)"
-                                             proc (process-status proc))
+                                     (format " (%s %s in `%s')"
+                                             (process-name proc)
+                                             (process-status proc) dir)
                                      'face 'helm-buffer-process)))
                        i)))))
 
