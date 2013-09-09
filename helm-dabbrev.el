@@ -164,7 +164,9 @@ but the initial search for all candidates in buffer(s)."
           for buf in (if all (helm-dabbrev--buffer-list)
                          (list (current-buffer)))
           do (with-current-buffer buf
-               (when (helm-dabbrev--same-major-mode-p buffer1)
+               (when (or (helm-dabbrev--same-major-mode-p buffer1)
+                         ;; check against all buffers in minibuffer.
+                         (eq buf (window-buffer (minibuffer-selected-window))))
                  (save-excursion
                    ;; Start searching before thing before point.
                    (goto-char (- (point) (length str)))
