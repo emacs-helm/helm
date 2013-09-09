@@ -163,9 +163,9 @@ but the initial search for all candidates in buffer(s)."
     (loop with result with pos-before with pos-after
           for buf in (if all (helm-dabbrev--buffer-list)
                          (list (current-buffer)))
+          for minibuf = (minibufferp (current-buffer))
           do (with-current-buffer buf
-               (when (or ; check against all buffers when in minibuffer.
-                      (eq buf (window-buffer (minibuffer-selected-window)))
+               (when (or minibuf ; check against all buffers when in minibuffer.
                       (helm-dabbrev--same-major-mode-p buffer1))
                  (save-excursion
                    ;; Start searching before thing before point.
