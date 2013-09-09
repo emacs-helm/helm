@@ -145,11 +145,13 @@ By default match the beginning of symbol before point.
 With LIMITS arg specified return the beginning and end position
 of symbol before point."
   (save-excursion
-    (let (beg (end (point)))
-      (when (re-search-backward
-             (or regexp "\\_<")
-             (field-beginning nil nil (point-at-bol)) t)
-        (setq beg (match-end 0))
+    (let (beg
+          (end (point))
+          (boundary (field-beginning nil nil (point-at-bol))))
+      (if (re-search-backward (or regexp "\\_<") boundary t)
+          (setq beg (match-end 0))
+          (setq beg boundary))
+      (unless (= beg end)
         (if limits
             (cons beg end)
             (buffer-substring-no-properties beg end))))))
