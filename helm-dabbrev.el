@@ -262,8 +262,9 @@ but the initial search for all candidates in buffer(s)."
                                 (helm-iter-list
                                  (loop with selection
                                        for i in helm-dabbrev--cache
-                                       when (string-match
-                                             (concat "^" dabbrev) i)
+                                       when
+                                       (string-match
+                                        (concat "^" (regexp-quote dabbrev)) i)
                                        collect i into selection
                                        when (or (= (length selection)
                                                    helm-dabbrev-cycle-thresold)
