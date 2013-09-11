@@ -24,6 +24,17 @@
 (declare-function Man-getpage-in-background "man.el" (topic))
 (declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
 
+(defgroup helm-man nil
+  "Man and Woman applications for helm."
+  :group 'helm)
+
+(defcustom helm-man-or-woman-function 'Man-getpage-in-background
+  "Default command to display a man page."
+  :group 'helm-man
+  :type '(radio :tag "Preferred command to display a man page"
+          (const :tag "Man" Man-getpage-in-background)
+          (const :tag "Woman" woman)))
+
 ;; Internal
 (defvar helm-man-pages nil
   "All man pages on system.
@@ -32,17 +43,20 @@ source.")
 
 (defun helm-man-default-action (candidate)
   "Default action for jumping to a woman or man page from helm."
-  (let ((wfiles (mapcar 'car (woman-file-name-all-completions candidate))))
-    (condition-case err
-        (if (> (length wfiles) 1)
-            (woman-find-file
-             (helm-comp-read
-              "ManFile: " wfiles :must-match t))
-            (woman candidate))
-      ;; If woman is unable to format correctly
-      ;; use man instead.
-      (error (kill-buffer) ; Kill woman buffer.
-             (Man-getpage-in-background candidate)))))
+  (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
+      (funcall helm-man-or-woman-function candidate)
+      (let ((wfiles (mapcar
+                     'car (woman-file-name-all-completions candidate))))
+        (condition-case err
+            (if (> (length wfiles) 1)
+                (woman-find-file
+                 (helm-comp-read
+                  "ManFile: " wfiles :must-match t))
+                (woman candidate))
+          ;; If woman is unable to format correctly
+          ;; use man instead.
+          (error (kill-buffer)          ; Kill woman buffer.
+                 (Man-getpage-in-background candidate))))))
 
 (defvar helm-source-man-pages
   '((name . "Manual Pages")
