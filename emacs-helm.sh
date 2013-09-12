@@ -24,10 +24,25 @@
 
 TMP="/tmp/helm-cfg.el"
 LOADPATH=`dirname $0`
+EMACS=emacs
+
+case $1 in
+    -P)
+        shift 1
+        declare EMACS=$1
+        shift 1
+        ;;
+    -h)
+        echo "Usage: ${0##*/} [-P} Emacs path [-h} help [--] EMACS ARGS"
+        exit 2
+        ;;
+esac
+
 cat > $TMP <<EOF
 (setq initial-scratch-message (concat initial-scratch-message
 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\
-;; This Emacs is Powered by \`HELM'.\n\
+;; This Emacs is Powered by \`HELM' using\n\
+;; emacs program \"$EMACS\".\n\
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\n\
 ;; You can retrieve this minimal configuration in \"$TMP\" \n\
 ;; Some originals emacs commands have been replaced by own \`helm' commands:\n\n\
@@ -55,4 +70,7 @@ cat > $TMP <<EOF
 (add-hook 'kill-emacs-hook #'(lambda () (delete-file "$TMP")))
 (cd "~/")
 EOF
-emacs -Q -l $TMP $@
+
+$EMACS -Q -l $TMP $@
+
+exit 0
