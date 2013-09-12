@@ -75,6 +75,15 @@ Otherwise `url-retrieve-synchronously' is used."
   :type 'string
   :group 'helm-net)
 
+(defcustom helm-surfraw-duckduckgo-url
+  "https://duckduckgo.com/lite/?q=%s&kp=1"
+  "The duckduckgo url.
+This is a format string, don't forget the `%s'.
+If you have personal settings saved on duckduckgo you should have
+a personal url, see your settings on duckduckgo."
+  :type 'string
+  :group 'helm-net)
+
 
 ;;; Google Suggestions
 ;;
@@ -339,10 +348,9 @@ Return an alist with elements like (data . number_results)."
   (let* ((engine-nodesc (car (split-string engine)))
          (url (if (string= engine-nodesc "duckduckgo")
                   ;; "sr duckduckgo -p foo" is broken, workaround.
-                  (concat "https://duckduckgo.com/lite/?q=" pattern "&kp=1")
+                  (format helm-surfraw-duckduckgo-url pattern)
                   (with-temp-buffer
                     (apply 'call-process "surfraw" nil t nil
-                           ;;JAVE
                            (append  (list engine-nodesc "-p") (split-string pattern)))
                     (replace-regexp-in-string
                      "\n" "" (buffer-string)))))
