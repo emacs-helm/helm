@@ -2279,7 +2279,6 @@ Else return ACTIONS unmodified."
 ;;
 ;;
 (defvar helm-file-cache-initialized-p nil)
-
 (defvar helm-file-cache-files nil)
 
 (defvar helm-source-file-cache
@@ -2303,37 +2302,6 @@ Else return ACTIONS unmodified."
     (candidates . helm-file-cache-files)
     (type . file)))
 
-
-;;; Outliner
-;;
-;;
-(defvar helm-outline-goto-near-line-flag t)
-(defvar helm-outline-using nil)
-(defun helm-after-update-hook--outline ()
-  (if (and (eq helm-outline-using t)
-           (eq helm-outline-goto-near-line-flag t))
-      (helm-outline-goto-near-line)))
-(add-hook 'helm-after-update-hook 'helm-after-update-hook--outline)
-
-(defun helm-outline-goto-near-line ()
-  (with-helm-window
-    ;; TODO need consideration whether to update position by every input.
-    (when t ; (equal helm-pattern "")
-      (helm-goto-line 2)
-      (let ((lineno (with-helm-current-buffer
-                      (line-number-at-pos (car helm-current-position)))))
-        (block exit
-          (while (<= (progn (skip-chars-forward " ")
-                            (or (number-at-point) lineno))
-                     lineno)
-            (forward-line 1)
-            (when (eobp)
-              (forward-line -1)
-              (return-from exit))))
-        (forward-line -1)
-        (and (bobp) (forward-line 1))
-        (and (helm-pos-header-line-p) (forward-line -2))
-        (helm-mark-current-line)))))
 
 ;;; File name history
 ;;
