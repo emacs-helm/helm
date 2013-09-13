@@ -205,8 +205,6 @@
 (make-obsolete 'helm-c-apt-install 'helm-apt-install "1.5.1")
 (defalias 'helm-c-skip-boring-buffers 'helm-skip-boring-buffers)
 (make-obsolete 'helm-c-skip-boring-buffers 'helm-skip-boring-buffers "1.5.1")
-(defalias 'helm-c-shorten-home-path 'helm-shorten-home-path)
-(make-obsolete 'helm-c-shorten-home-path 'helm-shorten-home-path "1.5.1")
 (defalias 'helm-c-register-candidates 'helm-register-candidates)
 (make-obsolete 'helm-c-register-candidates 'helm-register-candidates "1.5.1")
 (defalias 'helm-c-find-function 'helm-find-function)

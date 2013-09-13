@@ -2225,19 +2225,6 @@ other candidate transformers."
        args)
       args))
 
-(defvar helm-canonical-home
-  (regexp-quote (expand-file-name "~")))
-
-(defun helm-shorten-home-path-1 (file)
-  (if (and (stringp file)
-           (string-match (concat "\\`" helm-canonical-home) file))
-      (cons (replace-match "~" nil nil file) file)
-    file))
-
-(defun helm-shorten-home-path (files)
-  "Replaces /home/user with ~."
-  (helm-transform-mapcar #'helm-shorten-home-path-1 files))
-
 (defun helm-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
 file.  Else return ACTIONS unmodified."
