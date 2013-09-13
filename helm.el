@@ -1576,6 +1576,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                            any-history))
                      (helm-cleanup)))
                  (prog1 (unless helm-quit
+                          (with-helm-temp-hook 'helm-cleanup-hook
+                            (setq overriding-local-map old-overridding-local-map))
                           (helm-execute-selection-action))
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
              (quit
