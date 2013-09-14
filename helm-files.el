@@ -212,6 +212,11 @@ This happen only in `helm-find-files'."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-ff-skip-boring-files nil
+  "Non--nil to skip boring files in `helm-find-files'."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-findutils-ignore-boring-files nil
   "Ignore files matching regexps in `helm-boring-file-regexp-list'."
   :group 'helm-files
@@ -365,6 +370,9 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "Same as `ffap-url-regexp' but match earlier possible url.")
 
 
+;;; Helm-find-files
+;;
+;;
 (defvar helm-source-find-files
   `((name . "Find Files")
     (header-name . (lambda (name)
@@ -374,7 +382,11 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                     helm-ff-auto-update-initial-value)
               (setq helm-in-file-completion-p t)))
     (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer helm-find-files-transformer)
+    (filtered-candidate-transformer . ((lambda (candidates source)
+                                         (if helm-ff-skip-boring-files
+                                             (helm-skip-boring-files candidates)
+                                             candidates))
+                                       helm-find-files-transformer))
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . helm-ff-mode-line-string)
