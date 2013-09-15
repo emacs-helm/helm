@@ -260,12 +260,13 @@ See `ido-make-buffer-list' for more infos."
                  (propertize name 'face 'italic
                              'help-echo buffer))
          size mode
-         (and proc
-              (propertize
-               (format "(%s %s in `%s')"
-                       (process-name proc)
-                       (process-status proc) dir)
-               'face 'helm-buffer-process)))))))
+         (propertize
+          (if proc
+              (format "(%s %s in `%s')"
+                      (process-name proc)
+                      (process-status proc) dir)
+              (format "(in `%s')" dir))
+          'face 'helm-buffer-process))))))
 
 (defvar helm-buffer-max-len-mode nil)
 (defun helm-highlight-buffers (buffers sources)
