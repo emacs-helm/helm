@@ -126,9 +126,14 @@ When disabled (nil) use the longest buffer-name length found."
               ;; Issue #51 Create the list before `helm-buffer' creation.
               (setq helm-buffers-list-cache (helm-buffer-list))
               (unless helm-buffer-max-length
-                (setq helm-buffer-max-length
-                      (loop for b in helm-buffers-list-cache
-                            maximize (length b))))))
+                (let ((result (loop for b in helm-buffers-list-cache
+                                    maximize (length b) into len-buf
+                                    maximize (length (with-current-buffer b
+                                                       (symbol-name major-mode)))
+                                    into len-mode
+                                    finally return (cons len-buf len-mode))))
+                (setq helm-buffer-max-length (car result)
+                      helm-buffer-max-len-mode (cdr result))))))
     (candidates . helm-buffers-list-cache)
     (type . buffer)
     (match helm-buffer-match-major-mode)
@@ -202,8 +207,8 @@ See `ido-make-buffer-list' for more infos."
          (size (propertize (helm-buffer-size buf)
                            'face 'helm-buffer-size))
          (proc (get-buffer-process buf))
-         (dir (with-current-buffer buffer default-directory))
-         (file-name (buffer-file-name buf))
+         (dir (with-current-buffer buffer (abbreviate-file-name default-directory)))
+         (file-name (helm-aif (buffer-file-name buf) (abbreviate-file-name it)))
          (name (buffer-name buf))
          (name-prefix (when (file-remote-p dir)
                                (propertize "@ " 'face 'helm-ff-prefix))))
@@ -262,21 +267,30 @@ See `ido-make-buffer-list' for more infos."
                        (process-status proc) dir)
                'face 'helm-buffer-process)))))))
 
+(defvar helm-buffer-max-len-mode nil)
 (defun helm-highlight-buffers (buffers sources)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop
-   for i in buffers
-   for (name size mode meta) = (helm-buffer-details i)
-   for truncbuf = (if (> (string-width name) helm-buffer-max-length)
-                      (helm-substring-by-width name helm-buffer-max-length)
-                    (concat name (make-string
-                                  (- (+ helm-buffer-max-length 3)
-                                     (string-width name)) ? )))
-   ;; The max length of a number should be 1023.9X where X is the
-   ;; units, this is 7 characters.
-   for formatted-size = (format "%7s" size)
-   collect (cons (concat truncbuf "\t" formatted-size "  " mode " " meta) i)))
+  (loop with max-mode-len = (or helm-buffer-max-len-mode
+                                (setq helm-buffer-max-len-mode
+                                      (loop for b in buffers maximize
+                                            (with-current-buffer b
+                                              (length
+                                               (symbol-name major-mode))))))
+        for i in buffers
+        for (name size mode meta) = (helm-buffer-details i)
+        for truncbuf = (if (> (string-width name) helm-buffer-max-length)
+                           (helm-substring-by-width name helm-buffer-max-length)
+                           (concat name (make-string
+                                         (- (+ helm-buffer-max-length 3)
+                                            (string-width name)) ? )))
+        for fmode = (concat (make-string (- max-mode-len (length mode)) ? )
+                            mode)
+        ;; The max length of a number should be 1023.9X where X is the
+        ;; units, this is 7 characters.
+        for formatted-size = (format "%7s" size)
+        collect (cons (concat truncbuf "\t" formatted-size "  " fmode "  " meta)
+                      i)))
 
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
