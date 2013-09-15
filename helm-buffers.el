@@ -196,98 +196,87 @@ See `ido-make-buffer-list' for more infos."
        (- (position-bytes (point-max))
           (position-bytes (point-min)))))))
 
+(defun helm-buffer-details (buffer)
+  (let* ((mode (with-current-buffer buffer (symbol-name major-mode)))
+         (buf (get-buffer buffer))
+         (size (propertize (helm-buffer-size buf)
+                           'face 'helm-buffer-size))
+         (proc (get-buffer-process buf))
+         (dir (with-current-buffer buffer default-directory))
+         (file-name (buffer-file-name buf))
+         (name (buffer-name buf))
+         (name-prefix (when (file-remote-p dir)
+                               (propertize "@ " 'face 'helm-ff-prefix))))
+    (cond
+     ( ;; A dired buffer.
+      (rassoc buf dired-buffers)
+      (list
+       (concat name-prefix
+               (propertize name 'face 'helm-ff-directory
+                           'help-echo dir))
+       size mode
+       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+     ;; A buffer file modified somewhere outside of emacs.=>red
+     ((and file-name (file-exists-p file-name)
+           (not (verify-visited-file-modtime buf)))
+      (list
+       (concat name-prefix
+               (propertize name 'face 'helm-buffer-saved-out
+                           'help-echo file-name))
+       size mode
+       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+     ;; A new buffer file not already saved on disk.=>indianred2
+     ((and file-name (not (verify-visited-file-modtime buf)))
+      (list
+       (concat name-prefix
+               (propertize name 'face 'helm-buffer-not-saved
+                           'help-echo file-name))
+       size mode
+       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+     ;; A buffer file modified and not saved on disk.=>orange
+     ((and file-name (buffer-modified-p buf))
+      (list
+       (concat name-prefix
+               (propertize name 'face 'helm-ff-symlink
+                           'help-echo file-name))
+       size mode
+       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+     ;; A buffer file not modified and saved on disk.=>green
+     (file-name
+      (list
+       (concat name-prefix
+               (propertize name 'face 'font-lock-type-face
+                           'help-echo file-name))
+       size mode
+       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+     ;; Any non--file buffer.=>grey italic
+     (t (list
+         (concat (when proc name-prefix)
+                 (propertize name 'face 'italic
+                             'help-echo buffer))
+         size mode
+         (and proc
+              (propertize
+               (format "(%s %s in `%s')"
+                       (process-name proc)
+                       (process-status proc) dir)
+               'face 'helm-buffer-process)))))))
+
 (defun helm-highlight-buffers (buffers sources)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop ;; length of last buffer size string.
-        ;; Start at ten, such a length should never be reach.
-        ;; e.g 9999K, so the max should be 5 + a space = 6.
-        with old-len-size = 10
-        for i in buffers
-        for buf = (get-buffer i)
-        for proc = (get-buffer-process buf)
-        for dir = (with-current-buffer i default-directory)
-        for size = (propertize (helm-buffer-size buf)
-                               'face 'helm-buffer-size)
-        for len-size = (length size)
-        for str-before-size = (helm-aif (and (> old-len-size len-size)
-                                             (- old-len-size len-size))
-                                  (make-string it ? ) "")
-        do (setq old-len-size (+ len-size (length str-before-size)))
-        for truncbuf = (if (> (string-width i) helm-buffer-max-length)
-                           ;; Issue #170, FIXME, this works only with
-                           ;; some fonts.
-                           (helm-substring-by-width i helm-buffer-max-length)
-                           (concat i (make-string
-                                      (- (+ helm-buffer-max-length 3)
-                                         (string-width i)) ? )))
-        for bfname = (buffer-file-name buf)
-        for mode = (with-current-buffer i (symbol-name major-mode))
-        collect
-        (cond (;; A dired buffer.
-               (rassoc buf dired-buffers)
-               (cons (concat (propertize
-                              truncbuf 'face 'helm-ff-directory
-                              'help-echo (car (rassoc buf dired-buffers)))
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A buffer file modified somewhere outside of emacs.=>red
-              ((and bfname (not (file-remote-p bfname))
-                    (file-exists-p bfname)
-                    (not (verify-visited-file-modtime buf)))
-               (cons (concat (propertize truncbuf 'face 'helm-buffer-saved-out
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A new buffer file not already saved on disk.=>indianred2
-              ((and bfname (not (file-remote-p bfname))
-                    (not (verify-visited-file-modtime buf)))
-               (cons (concat (propertize truncbuf 'face 'helm-buffer-not-saved
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A Remote buffer file modified and not saved on disk.=>@orange
-              ((and bfname (file-remote-p bfname) (buffer-modified-p buf))
-               (let ((prefix (propertize
-                              " " 'display
-                              (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize truncbuf 'face 'helm-ff-symlink
-                                                  'help-echo bfname)
-                               " " str-before-size size "  " mode)
-                       i)))
-              ;; A buffer file modified and not saved on disk.=>orange
-              ((and bfname (buffer-modified-p buf))
-               (cons (concat (propertize truncbuf 'face 'helm-ff-symlink
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A remote buffer file not modified and saved on disk.=>@green
-              ((and bfname (file-remote-p bfname))
-               (let ((prefix (propertize
-                              " " 'display
-                              (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize truncbuf
-                                                  'face 'font-lock-type-face
-                                                  'help-echo bfname)
-                               " " str-before-size size "  " mode)
-                       i)))
-              ;; A buffer file not modified and saved on disk.=>green
-              (bfname
-               (cons (concat (propertize truncbuf 'face 'font-lock-type-face
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; Any non--file buffer.=>grey italic
-              (t (cons (concat (propertize truncbuf 'face 'italic
-                                           'help-echo i)
-                               " " str-before-size size "  " mode
-                               (and proc
-                                    (propertize
-                                     (format " (%s %s in `%s')"
-                                             (process-name proc)
-                                             (process-status proc) dir)
-                                     'face 'helm-buffer-process)))
-                       i)))))
+  (loop
+   for i in buffers
+   for (name size mode meta) = (helm-buffer-details i)
+   for truncbuf = (if (> (string-width name) helm-buffer-max-length)
+                      (helm-substring-by-width name helm-buffer-max-length)
+                    (concat name (make-string
+                                  (- (+ helm-buffer-max-length 3)
+                                     (string-width name)) ? )))
+   ;; The max length of a number should be 1023.9X where X is the
+   ;; units, this is 7 characters.
+   for formatted-size = (format "%7s" size)
+   collect (cons (concat truncbuf "\t" formatted-size "  " mode " " meta) i)))
 
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -578,10 +567,16 @@ displayed with the `file-name-shadow' face if available."
   "Preconfigured `helm' to list buffers.
 It is an enhanced version of `helm-for-buffers'."
   (interactive)
-  (helm :sources '(helm-source-buffers-list
-                   helm-source-ido-virtual-buffers
-                   helm-source-buffer-not-found)
-        :buffer "*helm buffers*" :keymap helm-buffer-map))
+  (let ((helm-after-initialize-hook
+         (cons
+          (lambda ()
+            (with-current-buffer (get-buffer-create helm-buffer)
+              (setq truncate-lines t)))
+          helm-after-initialize-hook)))
+    (helm :sources '(helm-source-buffers-list
+                     helm-source-ido-virtual-buffers
+                     helm-source-buffer-not-found)
+          :buffer "*helm buffers*" :keymap helm-buffer-map)))
 
 (provide 'helm-buffers)
 
