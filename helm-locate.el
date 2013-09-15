@@ -237,7 +237,7 @@ See also `helm-locate'."
                   ;; after pattern, don't quote them.
                   (mapconcat 'identity (cdr args) " "))))
       (set-process-sentinel
-       (get-process "locate-process")
+       (get-buffer-process helm-buffer)
        #'(lambda (process event)
            (if (string= event "finished\n")
                (with-helm-window

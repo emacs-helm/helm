@@ -359,7 +359,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          "grep" helm-buffer cmd-line)
       ;; Init sentinel.
       (set-process-sentinel
-       (get-process "grep")
+       (get-buffer-process helm-buffer)
        #'(lambda (process event)
            (let ((noresult (= (process-exit-status process) 1)))
              (unless noresult
@@ -1014,7 +1014,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
          "pdfgrep" helm-buffer cmd-line)
       (message nil)
       (set-process-sentinel
-       (get-process "pdfgrep")
+       (get-buffer-process helm-buffer)
        #'(lambda (process event)
            (if (string= event "finished\n")
                (with-helm-window
