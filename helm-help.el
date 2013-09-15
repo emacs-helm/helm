@@ -208,6 +208,7 @@ Italic     => A non--file buffer.
 \\[helm-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
 \\[helm-toggle-all-marks]\t\t->Toggle all marks.
 \\[helm-mark-all]\t\t->Mark all.
+\\[helm-toggle-buffers-details]\t\t->Toggle details.
 \\[helm-buffer-help]\t\t->Display this help.
 \n== Helm Map ==
 \\{helm-map}")
