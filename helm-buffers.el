@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-
+
 (require 'cl)
 (require 'helm)
 (require 'helm-utils)
@@ -25,7 +25,7 @@
 (require 'helm-regexp)
 
 (declare-function ido-make-buffer-list "ido" (default))
-
+
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
   :group 'helm)
@@ -53,6 +53,12 @@ When disabled (nil) use the longest buffer-name length found."
   :group 'helm-buffers
   :type  '(choice (const :tag "Disabled" nil)
                   (integer :tag "Length before truncate")))
+
+(defcustom helm-buffer-details-flag t
+  "Always show details in buffer list when non--nil."
+  :group 'helm-buffers
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -102,6 +108,7 @@ When disabled (nil) use the longest buffer-name length found."
     (define-key map (kbd "M-%")       'helm-buffer-run-query-replace)
     (define-key map (kbd "M-m")       'helm-toggle-all-marks)
     (define-key map (kbd "M-a")       'helm-mark-all)
+    (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'helm-buffer-switch-to-elscreen))
     (delq nil map))
@@ -119,6 +126,7 @@ When disabled (nil) use the longest buffer-name length found."
     (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
     map))
 
+
 (defvar helm-buffers-list-cache nil)
 (defvar helm-source-buffers-list
   `((name . "Buffers")
@@ -182,6 +190,7 @@ When disabled (nil) use the longest buffer-name length found."
                ("Open file externally (C-u to choose)"
                 . helm-open-file-externally)))))
 
+
 (defun helm-buffer-list ()
   "Return the current list of buffers.
 Currently visible buffers are put at the end of the list.
@@ -201,7 +210,7 @@ See `ido-make-buffer-list' for more infos."
        (- (position-bytes (point-max))
           (position-bytes (point-min)))))))
 
-(defun helm-buffer-details (buffer)
+(defun helm-buffer-details (buffer &optional details)
   (let* ((mode (with-current-buffer buffer (symbol-name major-mode)))
          (buf (get-buffer buffer))
          (size (propertize (helm-buffer-size buf)
@@ -220,7 +229,7 @@ See `ido-make-buffer-list' for more infos."
                (propertize name 'face 'helm-ff-directory
                            'help-echo dir))
        size mode
-       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+       (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
      ;; A buffer file modified somewhere outside of emacs.=>red
      ((and file-name (file-exists-p file-name)
            (not (verify-visited-file-modtime buf)))
@@ -229,7 +238,7 @@ See `ido-make-buffer-list' for more infos."
                (propertize name 'face 'helm-buffer-saved-out
                            'help-echo file-name))
        size mode
-       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+       (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
      ;; A new buffer file not already saved on disk.=>indianred2
      ((and file-name (not (verify-visited-file-modtime buf)))
       (list
@@ -237,7 +246,7 @@ See `ido-make-buffer-list' for more infos."
                (propertize name 'face 'helm-buffer-not-saved
                            'help-echo file-name))
        size mode
-       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+       (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
      ;; A buffer file modified and not saved on disk.=>orange
      ((and file-name (buffer-modified-p buf))
       (list
@@ -245,7 +254,7 @@ See `ido-make-buffer-list' for more infos."
                (propertize name 'face 'helm-ff-symlink
                            'help-echo file-name))
        size mode
-       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+       (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
      ;; A buffer file not modified and saved on disk.=>green
      (file-name
       (list
@@ -253,20 +262,21 @@ See `ido-make-buffer-list' for more infos."
                (propertize name 'face 'font-lock-type-face
                            'help-echo file-name))
        size mode
-       (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process)))
+       (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
      ;; Any non--file buffer.=>grey italic
      (t (list
          (concat (when proc name-prefix)
                  (propertize name 'face 'italic
                              'help-echo buffer))
          size mode
-         (propertize
-          (if proc
-              (format "(%s %s in `%s')"
-                      (process-name proc)
-                      (process-status proc) dir)
-              (format "(in `%s')" dir))
-          'face 'helm-buffer-process))))))
+         (and details
+              (propertize
+               (if proc
+                   (format "(%s %s in `%s')"
+                           (process-name proc)
+                           (process-status proc) dir)
+                   (format "(in `%s')" dir))
+               'face 'helm-buffer-process)))))))
 
 (defvar helm-buffer-max-len-mode nil)
 (defun helm-highlight-buffers (buffers sources)
@@ -279,13 +289,16 @@ Should be called after others transformers i.e (boring buffers)."
                                               (length
                                                (symbol-name major-mode))))))
         for i in buffers
-        for (name size mode meta) = (helm-buffer-details i)
+        for (name size mode meta) = (if helm-buffer-details-flag
+                                        (helm-buffer-details i 'details)
+                                        (helm-buffer-details i))
         for truncbuf = (if (> (string-width name) helm-buffer-max-length)
                            (helm-substring-by-width name helm-buffer-max-length)
                            (concat name (make-string
                                          (- (+ helm-buffer-max-length 3)
                                             (string-width name)) ? )))
-        for fmode = (concat (make-string (- max-mode-len (length mode)) ? )
+        for len = (length mode)
+        for fmode = (concat (make-string (- (max max-mode-len len) len) ? )
                             mode)
         ;; The max length of a number should be 1023.9X where X is the
         ;; units, this is 7 characters.
@@ -293,6 +306,13 @@ Should be called after others transformers i.e (boring buffers)."
         collect (cons (concat truncbuf "\t" formatted-size "  " fmode "  " meta)
                       i)))
 
+(defun helm-toggle-buffers-details ()
+  (interactive)
+  (when helm-alive-p
+    (setq helm-buffer-details-flag (not helm-buffer-details-flag))
+    (helm-force-update (car (split-string (helm-get-selection nil t))))))
+
+
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
 If you give a major-mode or partial major-mode,
@@ -336,6 +356,7 @@ with name matching pattern."
                    (re-search-forward str nil t))))
               (t (string-match i candidate)))))
 
+
 (defun helm-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace in marked buffers.
 If REGEXP-FLAG is given use `query-replace-regexp'."
@@ -528,6 +549,7 @@ Can be used by any source that list buffers."
   (interactive)
   (helm-quit-and-execute-action 'helm-multi-occur-as-action))
 
+
 ;;; Candidate Transformers
 ;;
 ;;
@@ -552,6 +574,7 @@ displayed with the `file-name-shadow' face if available."
 (defun helm-kill-marked-buffers (ignore)
   (mapc 'kill-buffer (helm-marked-candidates)))
 
+
 (define-helm-type-attribute 'buffer
     `((action
        ("Switch to buffer" . helm-switch-to-buffer)
@@ -576,7 +599,7 @@ displayed with the `file-name-shadow' face if available."
       (filtered-candidate-transformer helm-skip-boring-buffers
                                       helm-highlight-buffers))
   "Buffer or buffer name.")
-
+
 ;;;###autoload
 (defun helm-buffers-list ()
   "Preconfigured `helm' to list buffers.
