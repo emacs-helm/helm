@@ -73,4 +73,3 @@ EOF
 
 $EMACS -Q -l $TMP $@
 
-exit 0
