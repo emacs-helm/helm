@@ -413,6 +413,13 @@ you want this mode enabled definitely."
   "Prevent escaping from minibuffer during helm session."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-truncate-lines nil
+  "Truncate long lines when non--nil.
+See `truncate-lines'."
+  :group 'helm
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -1939,6 +1946,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                0 helm-completion-window-scroll-margin))
       (set (make-local-variable 'helm-default-directory) root-dir)
       (set (make-local-variable 'default-directory) root-dir)
+      (setq truncate-lines helm-truncate-lines) ; already local.
       (helm-initialize-persistent-action)
       (helm-log-eval helm-display-function helm-let-variables)
       (loop for (var . val) in helm-let-variables

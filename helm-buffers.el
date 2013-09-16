@@ -613,7 +613,9 @@ displayed with the `file-name-shadow' face if available."
     (helm :sources '(helm-source-buffers-list
                      helm-source-ido-virtual-buffers
                      helm-source-buffer-not-found)
-          :buffer "*helm buffers*" :keymap helm-buffer-map)))
+          :buffer "*helm buffers*"
+          :keymap helm-buffer-map
+          :truncate-lines t)))
 
 (provide 'helm-buffers)
 
