@@ -604,18 +604,12 @@ displayed with the `file-name-shadow' face if available."
 (defun helm-buffers-list ()
   "Preconfigured `helm' to list buffers."
   (interactive)
-  (let ((helm-after-initialize-hook
-         (cons
-          (lambda ()
-            (with-current-buffer (get-buffer-create helm-buffer)
-              (setq truncate-lines t)))
-          helm-after-initialize-hook)))
-    (helm :sources '(helm-source-buffers-list
-                     helm-source-ido-virtual-buffers
-                     helm-source-buffer-not-found)
-          :buffer "*helm buffers*"
-          :keymap helm-buffer-map
-          :truncate-lines t)))
+  (helm :sources '(helm-source-buffers-list
+                   helm-source-ido-virtual-buffers
+                   helm-source-buffer-not-found)
+        :buffer "*helm buffers*"
+        :keymap helm-buffer-map
+        :truncate-lines t))
 
 (provide 'helm-buffers)
 
