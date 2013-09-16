@@ -602,8 +602,7 @@ displayed with the `file-name-shadow' face if available."
 
 ;;;###autoload
 (defun helm-buffers-list ()
-  "Preconfigured `helm' to list buffers.
-It is an enhanced version of `helm-for-buffers'."
+  "Preconfigured `helm' to list buffers."
   (interactive)
   (let ((helm-after-initialize-hook
          (cons
