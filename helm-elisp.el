@@ -540,18 +540,35 @@ First call indent, second complete symbol, third complete fname."
     "Function. (string or symbol)"))
 
 (define-helm-type-attribute 'variable
-    '((action ("Describe variable" . describe-variable)
+    '((action
+       ("Describe variable" . describe-variable)
        ("Add variable to kill ring" . helm-kill-new)
        ("Go to variable's definition" . find-variable)
        ("Set variable" . helm-set-variable))
       (coerce . helm-symbolify))
   "Variable.")
 
+(defun helm-sexp-eval (cand)
+  (condition-case err
+      (eval (read cand))
+    (error (message "Evaluating gave an error: %S" err)
+           nil)))
 
+(define-helm-type-attribute 'sexp
+  '((action
+     ("Eval" . helm-sexp-eval)
+     ("Edit and eval" .
+      (lambda (cand)
+        (let ((minibuffer-setup-hook
+               (cons (lambda () (insert cand)) minibuffer-setup-hook)))
+          (call-interactively #'eval-expression)))))
+    (persistent-action . helm-sexp-eval))
+  "Sexp.")
 
 (define-helm-type-attribute 'timer
     '((real-to-display . helm-timer-real-to-display)
-      (action ("Cancel Timer" . cancel-timer)
+      (action
+       ("Cancel Timer" . cancel-timer)
        ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
        ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
       (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
