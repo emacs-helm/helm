@@ -1946,11 +1946,11 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                0 helm-completion-window-scroll-margin))
       (set (make-local-variable 'helm-default-directory) root-dir)
       (set (make-local-variable 'default-directory) root-dir)
-      (setq truncate-lines helm-truncate-lines) ; already local.
       (helm-initialize-persistent-action)
       (helm-log-eval helm-display-function helm-let-variables)
       (loop for (var . val) in helm-let-variables
             do (set (make-local-variable var) val))
+      (setq truncate-lines helm-truncate-lines) ; already local.
       (setq cursor-type nil)
       (setq mode-name "Helm"))
     (helm-initialize-overlays helm-buffer)
