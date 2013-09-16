@@ -65,6 +65,7 @@ Should take one arg: the string to display."
 
 (defvar helm-source-evaluation-result
   '((name . "Evaluation Result")
+    (init . (lambda () (require 'edebug)))
     (dummy)
     (multiline)
     (mode-line . "C-RET: nl-and-indent, tab: reindent, C-tab:complete, C-p/n: next/prec-line.")
@@ -73,7 +74,10 @@ Should take one arg: the string to display."
                                          (condition-case nil
                                              (with-helm-current-buffer
                                                (pp-to-string
-                                                (eval (read helm-pattern))))
+                                                (if edebug-active
+                                                    (edebug-eval-expression
+                                                     (read helm-pattern))
+                                                    (eval (read helm-pattern)))))
                                            (error "Error")))))
     (action . (("Copy result to kill-ring" . (lambda (candidate)
                                                (with-current-buffer helm-buffer
