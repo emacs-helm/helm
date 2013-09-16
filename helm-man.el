@@ -43,20 +43,20 @@ source.")
 
 (defun helm-man-default-action (candidate)
   "Default action for jumping to a woman or man page from helm."
-  (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
-      (funcall helm-man-or-woman-function candidate)
-      (let ((wfiles (mapcar
-                     'car (woman-file-name-all-completions candidate))))
-        (condition-case err
-            (if (> (length wfiles) 1)
-                (woman-find-file
-                 (helm-comp-read
-                  "ManFile: " wfiles :must-match t))
-                (woman candidate))
-          ;; If woman is unable to format correctly
-          ;; use man instead.
-          (error (kill-buffer)          ; Kill woman buffer.
-                 (Man-getpage-in-background candidate))))))
+  (let ((wfiles (mapcar
+                 'car (woman-file-name-all-completions candidate))))
+    (condition-case err
+        (if (> (length wfiles) 1)
+            (let ((file (helm-comp-read
+                         "ManFile: " wfiles :must-match t)))
+              (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
+                  (manual-entry (format "-l %s" file))
+                  (woman-find-file file)))
+            (funcall helm-man-or-woman-function candidate))
+      ;; If woman is unable to format correctly
+      ;; use man instead.
+      (error (kill-buffer)              ; Kill woman buffer.
+             (Man-getpage-in-background candidate)))))
 
 (defvar helm-source-man-pages
   '((name . "Manual Pages")
@@ -74,12 +74,12 @@ source.")
     (filtered-candidate-transformer
      . (lambda (candidates source)
          (sort candidates #'helm-generic-sort-fn)))
-    (action  . (("Show with Woman" . helm-man-default-action)))
+    (action  . (("Display Man page" . helm-man-default-action)))
     ;; Woman does not work OS X
     ;; http://xahlee.org/emacs/modernization_man_page.html
     (action-transformer . (lambda (actions candidate)
                             (if (eq system-type 'darwin)
-                                '(("Show with Man" . man))
+                                '(("Display Man page" . man))
                                 actions)))))
 
 ;;;###autoload
