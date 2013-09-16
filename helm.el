@@ -3961,7 +3961,10 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (delq overlay helm-visible-mark-overlays)))
 
 (defun helm-make-visible-mark ()
-  (let ((o (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+  (let ((o (make-overlay (point-at-bol)
+                         (if (helm-pos-multiline-p)
+                             (helm-get-next-candidate-separator-pos)
+                             (1+ (point-at-eol))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
