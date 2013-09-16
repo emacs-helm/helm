@@ -352,7 +352,8 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
-        :input input))
+        :input input
+        :truncate-lines t))
 
 
 ;;; Helm browse code.
@@ -461,7 +462,8 @@ the center of window, otherwise at the top of window.")
   (helm-attrset 'name "Occur" helm-source-occur)
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
-        :history 'helm-grep-history))
+        :history 'helm-grep-history
+        :truncate-lines t))
 
 ;;;###autoload
 (defun helm-occur-from-isearch ()
@@ -477,7 +479,8 @@ the center of window, otherwise at the top of window.")
     (helm :sources 'helm-source-occur
           :buffer "*helm occur*"
           :history 'helm-grep-history
-          :input input)))
+          :input input
+          :truncate-lines t)))
 
 ;;;###autoload
 (defun helm-multi-occur (buffers)

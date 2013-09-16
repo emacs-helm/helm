@@ -856,7 +856,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
      :default-directory helm-grep-last-default-directory
      :keymap helm-grep-map ; [1]
-     :history 'helm-grep-history)))
+     :history 'helm-grep-history
+     :truncate-lines t)))
 
 
 ;;; zgrep
