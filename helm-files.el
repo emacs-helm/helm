@@ -75,7 +75,8 @@
       (persistent-help . "Show this file")
       (action-transformer helm-transform-file-load-el
                           helm-transform-file-browse-url)
-      (candidate-transformer helm-highlight-files
+      (candidate-transformer helm-skip-boring-files
+                             helm-highlight-files
                              helm-w32-pathname-transformer))
   "File name.")
 
@@ -2447,10 +2448,11 @@ and
 (defun helm-highlight-files (files)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
-  (loop for i in (helm-skip-boring-files files)
+  (loop for i in files
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot i))
-                            (not (and ffap-url-regexp (string-match ffap-url-regexp i)))
+                            (not (and ffap-url-regexp
+                                      (string-match ffap-url-regexp i)))
                             (not (string-match helm-ff-url-regexp i)))
                        (helm-basename i) i)
         for type = (car (file-attributes i))
