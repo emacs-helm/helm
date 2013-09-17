@@ -433,7 +433,9 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ("Find file other frame `C-c C-o'" . find-file-other-frame)
            ("View file" . view-file)
            ("Print File `C-c p, C-u to refresh'" . helm-ff-print)
-           ("Locate `C-x C-f, C-u to specify locate db'" . helm-ff-locate))))))
+           ("Locate `C-x C-f, C-u to specify locate db'" . helm-ff-locate)))))
+  "The main source to browse files.
+Should not be used among other sources.")
 
 (defun helm-find-files-set-prompt-for-action (action files)
   "Set prompt for action ACTION for FILES."
