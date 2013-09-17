@@ -508,11 +508,25 @@ ACTION must be an action supported by `helm-dired-action'."
 
 (defun helm-find-files-ediff-files-1 (candidate &optional merge)
   "Generic function to ediff/merge files in `helm-find-files'."
-  (let ((bname  (helm-basename candidate))
-        (prompt (if merge "Ediff Merge `%s' With File: "
-                    "Ediff `%s' With File: "))
-        (fun    (if merge 'ediff-merge-files 'ediff-files)))
-    (funcall fun candidate (helm-read-file-name (format prompt bname)))))
+  (let* ((bname  (helm-basename candidate))
+         (prompt (if merge "Ediff Merge `%s' With File: "
+                     "Ediff `%s' With File: "))
+         (fun    (if merge 'ediff-merge-files 'ediff-files))
+         (wins   (window-list))
+         (input  (if (> (length wins) 1)
+                     (with-selected-window
+                         (cadr wins)
+                       default-directory)
+                     default-directory))
+         (presel (if helm-ff-transformer-show-only-basename
+                     (helm-basename candidate)
+                     (expand-file-name
+                      (helm-basename candidate)
+                      input))))
+    (funcall fun candidate (helm-read-file-name
+                            (format prompt bname)
+                            :initial-input input
+                            :preselect presel))))
 
 (defun helm-find-files-ediff-files (candidate)
   (helm-find-files-ediff-files-1 candidate))
