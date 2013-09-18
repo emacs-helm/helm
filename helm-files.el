@@ -62,6 +62,7 @@
        ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
        ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
        ("Pdfgrep File(s)" . helm-ff-pdfgrep)
+       ("Insert as org link" . helm-files-insert-as-org-link)
        ("Checksum File" . helm-ff-checksum)
        ("Ediff File" . helm-find-files-ediff-files)
        ("Ediff Merge File" . helm-find-files-ediff-merge-files)
@@ -406,6 +407,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ("Checksum File" . helm-ff-checksum)
            ("Complete at point `M-tab'"
             . helm-insert-file-name-completion-at-point)
+           ("Insert as org link" . helm-files-insert-as-org-link)
            ("Find shell command" . helm-ff-find-sh-command)
            ("Open file externally `C-c C-x, C-u to choose'"
             . helm-open-file-externally)
@@ -2190,6 +2192,10 @@ Ask to kill buffers associated with that file, too."
           (set-text-properties 0 (length i) nil i)
           (helm-delete-file i helm-ff-signal-error-on-dot-files))
         (message "%s File(s) deleted" len))))
+
+(defun helm-files-insert-as-org-link (candidate)
+  (insert (format "[[%s][]]" candidate))
+  (goto-char (- (point) 2)))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."
