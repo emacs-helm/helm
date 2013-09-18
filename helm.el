@@ -888,7 +888,8 @@ not `exit-minibuffer' or unwanted functions."
 If SRC is omitted, use current source.
 If COMPUTE is non--nil compute value of ATTRIBUTE-NAME
 with `helm-interpret-value'."
-  (helm-aif (assq attribute-name src)
+  (helm-aif (or (assq attribute-name src)
+                (helm-get-attribute-from-source-type attribute-name src))
       (if compute (helm-interpret-value (cdr it)) (cdr it))))
 
 (defun* helm-attr-defined (attribute-name
@@ -903,7 +904,8 @@ if SRC is omitted, use current source."
   "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
 If ATTRIBUTE-NAME doesn't exists in source it is created with value VALUE.
 If SRC is omitted, use current source."
-  (helm-aif (assq attribute-name src)
+  (helm-aif (or (assq attribute-name src)
+                (helm-get-attribute-from-source-type attribute-name src))
       (setcdr it value)
     (setcdr src (cons (cons attribute-name value) (cdr src))))
   value)
@@ -912,7 +914,7 @@ If SRC is omitted, use current source."
   "Get ATTRIBUTE from type attribute of SOURCE."
   (when (assq 'type source)
     (assq attribute
-          (assq (helm-attr 'type source)
+          (assq (cdr (assq 'type source))
                 helm-type-attributes))))
 
 (defun helm-get-attribute-from-type (attribute type)
@@ -950,9 +952,7 @@ If INDEX is specified, action is added in action list at INDEX,
 otherwise it is added at end.
 This allow user to add a specific action to an existing source
 without modifying source code."
-  (let ((actions    (or (helm-attr 'action source)
-                        (cdr (helm-get-attribute-from-source-type
-                              'action source))))
+  (let ((actions    (helm-attr 'action source))
         (new-action (list (cons name fn))))
     (when (symbolp actions)
       (setq actions (list (cons "Default action" actions))))
@@ -966,9 +966,7 @@ without modifying source code."
   "Delete ACTION-OR-NAME from SOURCE.
 ACTION-OR-NAME can either be the name of action or the symbol function
 associated to name."
-  (let* ((actions    (or (helm-attr 'action source)
-                         (cdr (helm-get-attribute-from-source-type
-                               'action source))))
+  (let* ((actions    (helm-attr 'action source))
          (del-action (if (symbolp action-or-name)
                          (rassoc action-or-name actions)
                          (assoc action-or-name actions))))
@@ -997,9 +995,7 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
                               'async-byte-compile-file
                               helm-source-find-files
                               'helm-ff-candidates-lisp-p\)."
-  (let* ((actions     (or (helm-attr 'action source)
-                          (cdr (helm-get-attribute-from-source-type
-                                'action source))))
+  (let* ((actions     (helm-attr 'action source))
          (action-transformers (helm-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
          (transformer `(lambda (actions candidate)
