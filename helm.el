@@ -896,7 +896,7 @@ with `helm-interpret-value'."
                            &optional (src (helm-get-current-source)))
   "Return non-nil if ATTRIBUTE-NAME of SRC is defined.
 if SRC is omitted, use current source."
-  (and (assq attribute-name src) t))
+  (and (helm-attr attribute-name src) t))
 
 (defun* helm-attrset (attribute-name value
                                      &optional
