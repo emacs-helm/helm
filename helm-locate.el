@@ -269,6 +269,25 @@ See also `helm-locate'."
   "Find files matching the current input pattern with locate.")
 
 ;;;###autoload
+(defun helm-locate-read-file-name (prompt)
+  (let* (helm-ff-transformer-show-only-basename
+         (src `((name . "Locate read fname")
+                (init . helm-locate-set-command)
+                (candidates-process . helm-locate-init)
+                (action . identity)
+                (requires-pattern . 3)
+                (history . ,'helm-file-name-history)
+                (candidate-transformer . (helm-skip-boring-files
+                                          helm-highlight-files))
+                (candidate-number-limit . 9999)
+                (no-matchplugin)
+                (delayed))))
+    (or (helm :sources src
+              :buffer "*helm locate read fname*"
+              :resume 'noresume)
+        (keyboard-quit))))
+
+;;;###autoload
 (defun helm-locate (arg)
   "Preconfigured `helm' for Locate.
 Note: you can add locate options after entering pattern.
