@@ -1919,10 +1919,12 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
     (if buffer-read-only
         (error "Error: Buffer `%s' is read-only" (buffer-name))
         (let* ((end         (point))
-               (guess       (substring-no-properties (thing-at-point 'filename)))
+               (tap         (thing-at-point 'filename))
+               (guess       (and (stringp tap) (substring-no-properties tap)))
                (beg         (- (point) (length guess)))
-               (full-path-p (or (string-match-p (concat "^" (getenv "HOME")) guess)
-                                (string-match-p "^[^\~]" guess))))
+               (full-path-p (and (stringp guess)
+                                 (or (string-match-p (concat "^" (getenv "HOME")) guess)
+                                     (string-match-p "^[^\~]" guess)))))
           (set-text-properties 0 (length candidate) nil candidate)
           (if (and guess (not (string= guess ""))
                    (string-match-p "^\\(~/\\|/\\|[a-zA-Z]:/\\)" guess))
@@ -1931,7 +1933,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                 (insert (if full-path-p
                             (expand-file-name candidate)
                             (abbreviate-file-name candidate))))
-              (error "Aborting completion: No valid file name at point"))))))
+              (insert candidate))))))
 
 (defun* helm-find-files-history (&key (comp-read t))
   "The `helm-find-files' history.
