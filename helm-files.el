@@ -981,7 +981,7 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-insert-org-link ()
   (interactive)
   (when helm-alive-p
-    (helm-quit-and-execute-action 'helm-files-insert-as-org-link))
+    (helm-quit-and-execute-action 'helm-files-insert-as-org-link)))
   
 ;;;###autoload
 (defun helm-ff-run-find-file-as-root ()
