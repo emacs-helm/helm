@@ -323,6 +323,7 @@ This happen only in `helm-find-files'."
     (define-key map (kbd "C-l")           'helm-find-files-down-one-level)
     (define-key map (kbd "C-h C-b")       'helm-send-bug-report-from-helm)
     (define-key map (kbd "C-x @")         'helm-ff-run-find-file-as-root)
+    (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
@@ -973,6 +974,15 @@ See `helm-ff-serial-rename-1'."
   (when helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-locate)))
 
+(defun helm-files-insert-as-org-link (candidate)
+  (insert (format "[[%s][]]" candidate))
+  (goto-char (- (point) 2)))
+
+(defun helm-ff-run-insert-org-link ()
+  (interactive)
+  (when helm-alive-p
+    (helm-quit-and-execute-action 'helm-files-insert-as-org-link))
+  
 ;;;###autoload
 (defun helm-ff-run-find-file-as-root ()
   (interactive)
@@ -2192,10 +2202,6 @@ Ask to kill buffers associated with that file, too."
           (set-text-properties 0 (length i) nil i)
           (helm-delete-file i helm-ff-signal-error-on-dot-files))
         (message "%s File(s) deleted" len))))
-
-(defun helm-files-insert-as-org-link (candidate)
-  (insert (format "[[%s][]]" candidate))
-  (goto-char (- (point) 2)))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."

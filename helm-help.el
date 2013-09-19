@@ -304,6 +304,7 @@ Italic     => A non--file buffer.
 \\[helm-narrow-window]\t\t->Narrow helm window.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
 \\[helm-ff-run-find-file-as-root]\t\t->Find file as root.
+\\[helm-ff-run-insert-org-link]\t\t->Insert org link.
 \\[helm-ff-help]\t\t->Display this help info.
 \n== Helm Map ==
 \\{helm-map}")
@@ -355,6 +356,7 @@ Italic     => A non--file buffer.
 \\[helm-yank-text-at-point]\t\t->Yank text at point.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
+\\[helm-ff-run-insert-org-link]\t\t->Insert org link.
 \nLocate tips:
 You can add after writing search pattern any of the locate command line options.
 e.g -b, -e, -n <number>...etc.
