@@ -106,10 +106,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                                     (file-exists-p file-cand)))
               collect file-cand into ls
               else collect i into ls
-              finally return
-              (if (and entry (not (string= entry "")) (file-exists-p entry))
-                  (append (list (expand-file-name entry default-directory)) ls)
-                  ls))))))
+              finally return ls)))))
 
 ;;; Eshell history.
 ;;
