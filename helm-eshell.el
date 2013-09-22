@@ -99,15 +99,18 @@ The function that call this should set `helm-ec-target' to thing at point."
                          (and (file-name-directory fc) fc))))))
         (loop for i in (all-completions pcomplete-stub table)
               ;; Transform the related names to abs names.
-              for file-cand = (and entry
+              for file-cand = (and (stringp entry)
                                    (if (file-remote-p i) i
                                        (expand-file-name
                                         i (file-name-directory entry))))
               ;; expand entry too to be able to compare it with file-cand.
-              for exp-entry = (file-name-as-directory
-                               (expand-file-name entry default-directory))
+              for exp-entry = (and (stringp entry)
+                                   (file-name-as-directory
+                                    (expand-file-name entry default-directory)))
               ;; Compare them to avoid dups.
-              for file-entry-p = (file-equal-p exp-entry file-cand)
+              for file-entry-p = (and (stringp entry)
+                                      (stringp file-cand)
+                                      (file-equal-p exp-entry file-cand))
               if (and file-cand (or (file-remote-p file-cand)
                                     (file-exists-p file-cand))
                       (not file-entry-p))
@@ -116,7 +119,8 @@ The function that call this should set `helm-ec-target' to thing at point."
               ;; Avoid adding entry here.
               unless file-entry-p collect i into ls
               finally return
-              (if (and entry (not (string= entry ""))
+              (if (and (stringp exp-entry)
+                       (not (string= exp-entry ""))
                        (file-exists-p exp-entry))
                   (append (list exp-entry) (remove entry ls))
                   ls))))))
