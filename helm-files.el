@@ -1526,6 +1526,8 @@ e.g helm.el$
 Note that only directories are saved here."
   (when (and helm-ff-default-directory
              (helm-file-completion-source-p))
+    (set-text-properties 0 (length helm-ff-default-directory)
+                         nil helm-ff-default-directory)
     (push helm-ff-default-directory helm-ff-history)))
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
 
