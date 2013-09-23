@@ -80,23 +80,9 @@ The function that call this should set `helm-ec-target' to thing at point."
              (pcomplete-autolist pcomplete-autolist)
              (pcomplete-suffix-list pcomplete-suffix-list)
              (table (pcomplete-completions))
-             (entry (condition-case nil
-                        ;; On Emacs24 `try-completion' return
-                        ;; pattern when more than one result.
-                        ;; Otherwise Emacs23 return nil, which
-                        ;; is wrong, in this case use pattern
-                        ;; to behave like Emacs24.
-                        (or (try-completion helm-pattern
-                                            (pcomplete-entries))
-                            helm-pattern)
-                      ;; In Emacs23 `pcomplete-entries' may fail
-                      ;; with error, so try this instead.
-                      (error
-                       nil
-                       (let ((fc (car (last
-                                       (pcomplete-parse-arguments)))))
-                         ;; Check if last arg require fname completion.
-                         (and (file-name-directory fc) fc))))))
+             (entry (or (try-completion helm-pattern
+                                        (pcomplete-entries))
+                            helm-pattern)))
         (loop ;; expand entry too to be able to compare it with file-cand.
               with exp-entry = (and (stringp entry)
                                     (not (string= entry ""))
