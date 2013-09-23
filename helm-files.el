@@ -1257,17 +1257,14 @@ This happen only in function using sources that are
                            helm-pattern)
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let ((match (match-string 1 helm-pattern)))
-      (cond ((string= match "//")
-             ;; Expand to "/" or "c:/"
-             (setq helm-pattern (expand-file-name "/")))
-            ((string= match "/~/")
-             (if (eq system-type 'windows-nt)
-                 (setq helm-pattern (file-name-as-directory (getenv "HOME")))
-                 (setq helm-pattern "~/")))
-            ((string= match "/./")
-             (setq helm-pattern
-                   (with-helm-current-buffer
-                     (expand-file-name default-directory))))))
+      (setq helm-pattern
+            (cond ((string= match "//")
+                   ;; Expand to "/" or "c:/"
+                   (expand-file-name "/"))
+                  ((string= match "/~/")
+                   (expand-file-name "~/"))
+                  ((string= match "/./") default-directory)
+                  (t helm-pattern))))
     (setq helm-ff-default-directory helm-pattern)
     ;; For some reasons, i must use here with-current-buffer => mini buffer
     ;; and not `helm-set-pattern' that use with-selected-window => mini win.
@@ -1325,13 +1322,12 @@ purpose."
         cur-method tramp-name)
     (cond ((string= pattern "") "")
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)$" pattern)
-           (with-helm-current-buffer
-             (expand-file-name default-directory)))
+           default-directory)
           ((and (string-match ".*\\(~//\\|//\\)$" pattern)
                 (not (string-match helm-ff-url-regexp helm-pattern)))
            (expand-file-name "/")) ; Expand to "/" or "c:/"
           ((string-match "^~\\|.*/~/$" pattern)
-           (let* ((home (expand-file-name (getenv "HOME"))))
+           (let* ((home (expand-file-name "~/")))
              (replace-match home nil t pattern)))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
