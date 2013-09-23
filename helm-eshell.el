@@ -122,6 +122,11 @@ The function that call this should set `helm-ec-target' to thing at point."
               (if (and (stringp exp-entry)
                        (not (string= exp-entry ""))
                        (file-exists-p exp-entry)
+                       ;; If the car of completion list is
+                       ;; an executable, probably we are in
+                       ;; command completion, so don't add a
+                       ;; possible file related entry here.
+                       (and ls (not (executable-find (car ls))))
                        (not (file-equal-p exp-entry pcomplete-stub)))
                   (append (list exp-entry) (remove entry ls))
                   ls))))))
