@@ -97,18 +97,19 @@ The function that call this should set `helm-ec-target' to thing at point."
                                        (pcomplete-parse-arguments)))))
                          ;; Check if last arg require fname completion.
                          (and (file-name-directory fc) fc))))))
-        (loop for i in (all-completions pcomplete-stub table)
+        (loop ;; expand entry too to be able to compare it with file-cand.
+              with exp-entry = (and (stringp entry)
+                                    (not (string= entry ""))
+                                    (file-name-as-directory
+                                     (expand-file-name entry default-directory)))
+              for i in (all-completions pcomplete-stub table)
               ;; Transform the related names to abs names.
-              for file-cand = (and (stringp entry)
+              for file-cand = (and exp-entry
                                    (if (file-remote-p i) i
                                        (expand-file-name
                                         i (file-name-directory entry))))
-              ;; expand entry too to be able to compare it with file-cand.
-              for exp-entry = (and (stringp entry)
-                                   (file-name-as-directory
-                                    (expand-file-name entry default-directory)))
               ;; Compare them to avoid dups.
-              for file-entry-p = (and (stringp entry)
+              for file-entry-p = (and (stringp exp-entry)
                                       (stringp file-cand)
                                       (file-equal-p exp-entry file-cand))
               if (and file-cand (or (file-remote-p file-cand)
@@ -119,16 +120,18 @@ The function that call this should set `helm-ec-target' to thing at point."
               ;; Avoid adding entry here.
               unless file-entry-p collect i into ls
               finally return
-              (if (and (stringp exp-entry)
-                       (not (string= exp-entry ""))
-                       (file-exists-p exp-entry)
+              (if (and exp-entry
+                       (file-directory-p exp-entry)
                        ;; If the car of completion list is
                        ;; an executable, probably we are in
                        ;; command completion, so don't add a
                        ;; possible file related entry here.
                        (and ls (not (executable-find (car ls))))
+                       ;; Don't add entry if already in prompt.
                        (not (file-equal-p exp-entry pcomplete-stub)))
-                  (append (list exp-entry) (remove entry ls))
+                  (append (list exp-entry)
+                          ;; Entry should not be here now but double check.
+                          (remove entry ls))
                   ls))))))
 
 ;;; Eshell history.
