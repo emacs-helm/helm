@@ -121,7 +121,8 @@ The function that call this should set `helm-ec-target' to thing at point."
               finally return
               (if (and (stringp exp-entry)
                        (not (string= exp-entry ""))
-                       (file-exists-p exp-entry))
+                       (file-exists-p exp-entry)
+                       (not (file-equal-p exp-entry pcomplete-stub)))
                   (append (list exp-entry) (remove entry ls))
                   ls))))))
 
