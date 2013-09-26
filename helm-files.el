@@ -1186,7 +1186,8 @@ or hitting C-z on \"..\"."
         (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
 
-;; Auto-update - helm-find-files auto expansion of directories.
+;;; Auto-update - helm-find-files auto expansion of directories.
+;;
 ;;
 (defun helm-ff-update-when-only-one-matched ()
   "Expand to directory when sole completion.
@@ -1194,6 +1195,12 @@ When only one candidate is remaining and it is a directory,
 expand to this directory."
   (when (and helm-ff-auto-update-flag
              (helm-file-completion-source-p)
+             ;; Issue #295
+             ;; File predicates are returning t
+             ;; with paths like //home/foo.
+             ;; So check it is not the case by regexp
+             ;; to allow user to do C-a / to start e.g
+             ;; entering a tramp method e.g /sudo::.
              (not (string-match "\\`//" helm-pattern))
              (not (helm-ff-invalid-tramp-name-p)))
     (let* ((history-p   (string= (assoc-default
@@ -1241,16 +1248,11 @@ expand to this directory."
                      ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                      (expand-file-name (file-name-as-directory helm-pattern)))))
               (helm-check-minibuffer-input))))))))
+
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 
-;; Allow expanding to home directory or root
-;; when entering respectively "~/" or "//" at end of pattern.
-;; e.g /home/thierry/labo/helm-config-qp/~/
-;; will expand to "~/"
-;; and /home/thierry/labo/helm-config-qp//
-;; will expand to "/"
 (defun helm-ff-auto-expand-to-home-or-root ()
-  "New doc..."
+  "Allow expanding to home directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
              (string-match "/\\./\\|/\\.\\./\\|/?~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
@@ -1281,8 +1283,7 @@ expand to this directory."
     (if (re-search-forward "~/\\|//\\|/[[:alpha:]]:/" nil t)
         (let ((match (match-string 0)))
           (if (or (string= match "//")
-                  (save-match-data
-                    (string-match "/[[:alpha:]]:/" match)))
+                  (string-match-p "/[[:alpha:]]:/" match))
               (goto-char (1+ (match-beginning 0)))
               (goto-char (match-beginning 0)))
           (buffer-substring-no-properties (point) (point-at-eol)))
