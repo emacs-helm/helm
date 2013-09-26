@@ -1253,7 +1253,7 @@ expand to this directory."
 This happen only in function using sources that are
 `helm-file-completion-source-p' compliant."
   (when (and (helm-file-completion-source-p)
-             (string-match ".*\\(/~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)$"
+             (string-match ".*\\(/~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)\\'"
                            helm-pattern)
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let ((match (match-string 1 helm-pattern)))
