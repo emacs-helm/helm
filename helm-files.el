@@ -1235,7 +1235,7 @@ expand to this directory."
                   ;; in prompt, so expansion is already done, just add the "/" at end
                   ;; of name unless helm-pattern ends with "."
                   ;; (i.e we are writing something starting with ".")
-                  (unless (string-match "^.*[.]\\{1\\}$" helm-pattern)
+                  (unless (string-match "\\`.*[.]\\{1\\}\\'" helm-pattern)
                     (helm-set-pattern
                      ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                      (expand-file-name (file-name-as-directory helm-pattern)))))
