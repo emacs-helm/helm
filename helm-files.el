@@ -1278,9 +1278,11 @@ expand to this directory."
   (with-temp-buffer
     (insert fname)
     (goto-char (point-min))
-    (if (re-search-forward "~/\\|//" nil t)
-        (progn
-          (if (string= (match-string 0) "//")
+    (if (re-search-forward "~/\\|//\\|/[[:alpha:]]:/" nil t)
+        (let ((match (match-string 0)))
+          (if (or (string= match "//")
+                  (save-match-data
+                    (string-match "/[[:alpha:]]:/" match)))
               (goto-char (1+ (match-beginning 0)))
               (goto-char (match-beginning 0)))
           (buffer-substring-no-properties (point) (point-at-eol)))
