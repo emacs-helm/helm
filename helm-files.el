@@ -1194,6 +1194,7 @@ When only one candidate is remaining and it is a directory,
 expand to this directory."
   (when (and helm-ff-auto-update-flag
              (helm-file-completion-source-p)
+             (not (string-match "\\`//" helm-pattern))
              (not (helm-ff-invalid-tramp-name-p)))
     (let* ((history-p   (string= (assoc-default
                                   'name (helm-get-current-source))
@@ -1253,6 +1254,9 @@ expand to this directory."
   (when (and (helm-file-completion-source-p)
              (string-match "/\\./\\|/\\.\\./\\|/?~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
+             (with-current-buffer (window-buffer (or (active-minibuffer-window)
+                                                     (minibuffer-window)))
+               (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let ((match (match-string 0 helm-pattern)))
       (setq helm-pattern
