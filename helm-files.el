@@ -1249,29 +1249,38 @@ expand to this directory."
 ;; and /home/thierry/labo/helm-config-qp//
 ;; will expand to "/"
 (defun helm-ff-auto-expand-to-home-or-root ()
-  "Goto home, root or default directory when pattern ends with ~/, /, or ./.
-This happen only in function using sources that are
-`helm-file-completion-source-p' compliant."
+  "New doc..."
   (when (and (helm-file-completion-source-p)
-             (string-match ".*\\(/?~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)\\'"
+             (string-match "/\\./\\|/\\.\\./\\|/?~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (not (string-match helm-ff-url-regexp helm-pattern)))
-    (let ((match (match-string 1 helm-pattern)))
+    (let ((match (match-string 0 helm-pattern)))
       (setq helm-pattern
-            (cond ((string= match "//")
-                   ;; Expand to "/" or "c:/"
-                   (expand-file-name "/"))
-                  ((or (string= match "/~/")
-                       (string= match "~/"))
-                   (expand-file-name "~/"))
-                  ((string= match "/./") default-directory)
-                  (t helm-pattern))))
-    (setq helm-ff-default-directory helm-pattern)
+            (cond ((string= match "/./")
+                   default-directory)
+                  ((string= helm-pattern "/../") "/")
+                  (t
+                   (expand-file-name
+                    (helm-substitute-in-filename helm-pattern))))))
+    (setq helm-ff-default-directory (file-name-directory helm-pattern))
     ;; For some reasons, i must use here with-current-buffer => mini buffer
     ;; and not `helm-set-pattern' that use with-selected-window => mini win.
     (with-current-buffer (window-buffer (minibuffer-window))
       (delete-minibuffer-contents)
-      (insert helm-pattern))))
+      (insert helm-pattern)
+      (helm-update))))
+
+(defun helm-substitute-in-filename (fname)
+  (with-temp-buffer
+    (insert fname)
+    (goto-char (point-min))
+    (if (re-search-forward "~/\\|//" nil t)
+        (progn
+          (if (string= (match-string 0) "//")
+              (goto-char (1+ (match-beginning 0)))
+              (goto-char (match-beginning 0)))
+          (buffer-substring-no-properties (point) (point-at-eol)))
+        fname)))
 
 (add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
 
