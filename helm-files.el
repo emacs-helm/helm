@@ -1253,7 +1253,7 @@ expand to this directory."
 This happen only in function using sources that are
 `helm-file-completion-source-p' compliant."
   (when (and (helm-file-completion-source-p)
-             (string-match ".*\\(/~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)\\'"
+             (string-match ".*\\(/?~/\\|/\\{2\\}\\|/[.]\\{1\\}/\\)\\'"
                            helm-pattern)
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let ((match (match-string 1 helm-pattern)))
@@ -1261,7 +1261,8 @@ This happen only in function using sources that are
             (cond ((string= match "//")
                    ;; Expand to "/" or "c:/"
                    (expand-file-name "/"))
-                  ((string= match "/~/")
+                  ((or (string= match "/~/")
+                       (string= match "~/"))
                    (expand-file-name "~/"))
                   ((string= match "/./") default-directory)
                   (t helm-pattern))))
@@ -1321,14 +1322,13 @@ purpose."
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
     (cond ((string= pattern "") "")
-          ((string-match ".*\\(~?/?[.]\\{1\\}/\\)$" pattern)
+          ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
            default-directory)
-          ((and (string-match ".*\\(~//\\|//\\)$" pattern)
+          ((and (string-match ".*\\(~//\\|//\\)\\'" pattern)
                 (not (string-match helm-ff-url-regexp helm-pattern)))
            (expand-file-name "/")) ; Expand to "/" or "c:/"
-          ((string-match "^~\\|.*/~/$" pattern)
-           (let* ((home (expand-file-name "~/")))
-             (replace-match home nil t pattern)))
+          ((string-match "\\`~/\\|.*/~/\\'" pattern)
+           (expand-file-name "~/"))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
                 (setq cur-method (match-string 1 pattern))
