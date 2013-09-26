@@ -1210,7 +1210,8 @@ expand to this directory."
                                           helm-pattern)
                             (helm-create-tramp-name helm-pattern)
                             helm-pattern))
-           (completed-p (file-equal-p pat helm-ff-default-directory)))
+           (completed-p (and pat helm-ff-default-directory
+                             (file-equal-p pat helm-ff-default-directory))))
       (when (and (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
@@ -1255,9 +1256,7 @@ expand to this directory."
   (when (and (helm-file-completion-source-p)
              (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
-             (with-current-buffer (window-buffer (or (active-minibuffer-window)
-                                                     (minibuffer-window)))
-               (eolp))
+             (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let ((match (match-string 0 helm-pattern)))
       (setq helm-pattern
