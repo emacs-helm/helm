@@ -1210,8 +1210,7 @@ expand to this directory."
                                           helm-pattern)
                             (helm-create-tramp-name helm-pattern)
                             helm-pattern))
-           (completed-p (string= (file-name-as-directory pat)
-                                 helm-ff-default-directory)))
+           (completed-p (file-equal-p pat helm-ff-default-directory)))
       (when (and (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
@@ -1243,7 +1242,7 @@ expand to this directory."
                   ;; in prompt, so expansion is already done, just add the "/" at end
                   ;; of name unless helm-pattern ends with "."
                   ;; (i.e we are writing something starting with ".")
-                  (unless (string-match "^.*[.]\\{1\\}$" helm-pattern)
+                  (unless (string-match "\\`.*[.]\\{1\\}\\'" helm-pattern)
                     (helm-set-pattern
                      ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                      (expand-file-name (file-name-as-directory helm-pattern)))))
@@ -1254,7 +1253,7 @@ expand to this directory."
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/?~/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (or (active-minibuffer-window)
                                                      (minibuffer-window)))
