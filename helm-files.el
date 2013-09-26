@@ -1277,6 +1277,8 @@ expand to this directory."
       (helm-update))))
 
 (defun helm-substitute-in-filename (fname)
+  "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
+On windows system substitute from start up to \"/[a-z]:/\"."
   (with-temp-buffer
     (insert fname)
     (goto-char (point-min))
