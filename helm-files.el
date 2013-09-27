@@ -1210,8 +1210,7 @@ expand to this directory."
                                           helm-pattern)
                             (helm-create-tramp-name helm-pattern)
                             helm-pattern))
-           (completed-p (string= (file-name-as-directory
-                                  (expand-file-name pat))
+           (completed-p (string= (file-name-as-directory pat)
                                  helm-ff-default-directory)))
       (when (and (or
                   ;; Only one candidate remaining
@@ -1250,8 +1249,6 @@ expand to this directory."
                      (expand-file-name (file-name-as-directory helm-pattern)))))
               (helm-check-minibuffer-input))))))))
 
-(add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
-
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
@@ -1259,21 +1256,17 @@ expand to this directory."
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
-    (let ((match (match-string 0 helm-pattern)))
-      (setq helm-pattern
-            (cond ((string= match "/./")
-                   default-directory)
-                  ((string= helm-pattern "/../") "/")
-                  (t
-                   (expand-file-name
-                    (helm-substitute-in-filename helm-pattern))))))
-    (setq helm-ff-default-directory (file-name-directory helm-pattern))
-    ;; For some reasons, i must use here with-current-buffer => mini buffer
-    ;; and not `helm-set-pattern' that use with-selected-window => mini win.
-    (with-current-buffer (window-buffer (minibuffer-window))
-      (delete-minibuffer-contents)
-      (insert helm-pattern)
-      (helm-update))))
+    (let* ((match (match-string 0 helm-pattern))
+           (input (cond ((string= match "/./") default-directory)
+                        ((string= helm-pattern "/../") "/")
+                        (t (expand-file-name
+                            (helm-substitute-in-filename helm-pattern))))))
+      (if (file-directory-p input)
+          (setq helm-ff-default-directory
+                (setq input (file-name-as-directory input)))
+          (setq helm-ff-default-directory (file-name-as-directory
+                                           (file-name-directory input))))
+      (helm-set-pattern input))))
 
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
@@ -1290,6 +1283,7 @@ On windows system substitute from start up to \"/[a-z]:/\"."
           (buffer-substring-no-properties (point) (point-at-eol)))
         fname)))
 
+(add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 (add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
 
 (defun helm-point-file-in-dired (file)
