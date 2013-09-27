@@ -1384,8 +1384,8 @@ purpose."
                                  ;; of path when `helm-ff-auto-update-flag'
                                  ;; is enabled.
                                  helm-ff-auto-update-flag)
-                            (file-name-as-directory path)
-                            (file-name-directory path)))
+                            (file-name-as-directory (expand-file-name path))
+                            (file-name-directory (expand-file-name path))))
          invalid-basedir
          non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
