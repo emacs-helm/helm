@@ -110,7 +110,7 @@ If this action is executed just after `yank',
 replace with STR as yanked string."
   (with-helm-current-buffer
     (setq kill-ring (delete str kill-ring))
-    (if (not (eq (helm-attr 'last-command) 'yank))
+    (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
         (insert-for-yank str)
         ;; from `yank-pop'
         (let ((inhibit-read-only t)
