@@ -1210,7 +1210,8 @@ expand to this directory."
                                           helm-pattern)
                             (helm-create-tramp-name helm-pattern)
                             helm-pattern))
-           (completed-p (string= (file-name-as-directory pat)
+           (completed-p (string= (file-name-as-directory
+                                  (expand-file-name pat))
                                  helm-ff-default-directory)))
       (when (and (or
                   ;; Only one candidate remaining
@@ -1266,7 +1267,9 @@ expand to this directory."
                 (setq input (file-name-as-directory input)))
           (setq helm-ff-default-directory (file-name-as-directory
                                            (file-name-directory input))))
-      (helm-set-pattern input))))
+      (with-helm-window
+        (helm-set-pattern input)
+        (helm-check-minibuffer-input)))))
 
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
