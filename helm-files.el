@@ -383,7 +383,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)
-              (setq helm-in-file-completion-p t)))
+              (set (make-local-variable 'helm-in-file-completion-p) t)))
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer . ((lambda (candidates source)
                                          (if helm-ff-skip-boring-files
@@ -1124,10 +1124,10 @@ You should not modify this yourself unless you know what you do.")
 
 (defun helm-file-completion-source-p ()
   "Return non--nil if current source is a file completion source."
-  (or helm-in-file-completion-p
-      (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
-        (loop for i in helm-file-completion-sources
-              thereis (string= cur-source i)))))
+  (or (with-helm-buffer helm-in-file-completion-p)
+        (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
+          (loop for i in helm-file-completion-sources
+                thereis (string= cur-source i)))))
 
 ;; Internal
 (defvar helm-tramp-input-idle-delay 0.6)
