@@ -563,10 +563,7 @@ displayed with the `file-name-shadow' face if available."
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
-    (when (or (buffer-modified-p)
-              (not (verify-visited-file-modtime
-                    (get-buffer candidate))))
-      (revert-buffer t t))))
+    (revert-buffer t t)))
 
 (defun helm-revert-marked-buffers (ignore)
   (mapc 'helm-revert-buffer (helm-marked-candidates)))
