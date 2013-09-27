@@ -1210,8 +1210,9 @@ expand to this directory."
                                           helm-pattern)
                             (helm-create-tramp-name helm-pattern)
                             helm-pattern))
-           (completed-p (and pat helm-ff-default-directory
-                             (file-equal-p pat helm-ff-default-directory))))
+           (completed-p (string= (file-name-as-directory
+                                  (expand-file-name pat))
+                                 helm-ff-default-directory)))
       (when (and (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
