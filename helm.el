@@ -774,6 +774,19 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
   (and helm-issued-errors
        (message "%s" (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
+(defadvice next-history-element (around delay activate)
+  (interactive "p")
+  (or (zerop n)
+      (run-with-timer
+       0.01 nil `(lambda ()
+                   (goto-history-element (- minibuffer-history-position ,n))))))
+
+(defadvice previous-history-element (around delay activate)
+  (interactive "p")
+  (or (zerop n)
+      (run-with-timer
+       0.01 nil `(lambda ()
+                   (goto-history-element (+ minibuffer-history-position ,n))))))
 
 
 ;; Programming Tools
