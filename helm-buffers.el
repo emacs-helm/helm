@@ -109,6 +109,7 @@ When disabled (nil) use the longest buffer-name length found."
     (define-key map (kbd "M-m")       'helm-toggle-all-marks)
     (define-key map (kbd "M-a")       'helm-mark-all)
     (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
+    (define-key map (kbd "C-c a")     'helm-buffers-toggle-show-hidden-buffers)
     (when (locate-library "elscreen")
       (define-key map (kbd "<C-tab>") 'helm-buffer-switch-to-elscreen))
     (delq nil map))
@@ -549,14 +550,31 @@ Can be used by any source that list buffers."
   (interactive)
   (helm-quit-and-execute-action 'helm-multi-occur-as-action))
 
+(defun helm-buffers-toggle-show-hidden-buffers ()
+  (interactive)
+  (let ((filter-attrs (helm-attr 'filtered-candidate-transformer
+                                 helm-source-buffers-list)))
+    (if (memq 'helm-shadow-boring-buffers filter-attrs)
+        (helm-attrset 'filtered-candidate-transformer
+                      (cons 'helm-skip-boring-buffers
+                            (remove 'helm-shadow-boring-buffers
+                                    filter-attrs))
+                      helm-source-buffers-list t)
+        (helm-attrset 'filtered-candidate-transformer
+                      (cons 'helm-shadow-boring-buffers
+                            (remove 'helm-skip-boring-buffers
+                                    filter-attrs))
+                      helm-source-buffers-list t))
+    (helm-force-update)))
+
 
 ;;; Candidate Transformers
 ;;
 ;;
-(defun helm-skip-boring-buffers (buffers sources)
+(defun helm-skip-boring-buffers (buffers source)
   (helm-skip-entries buffers helm-boring-buffer-regexp-list))
 
-(defun helm-shadow-boring-buffers (buffers)
+(defun helm-shadow-boring-buffers (buffers source)
   "Buffers matching `helm-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
   (helm-shadow-entries buffers helm-boring-buffer-regexp-list))
