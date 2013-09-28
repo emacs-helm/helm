@@ -229,6 +229,10 @@ This happen only in `helm-find-files'."
   :group 'helm-files
   :type 'string)
 
+(defcustom helm-files-save-history-extra-sources '("Find" "Locate")
+  "Extras source that save candidate to `file-name-history'."
+  :group 'helm-files
+  :type '(repeat (choice string)))
 
 ;;; Faces
 ;;
@@ -1547,15 +1551,17 @@ Note that only directories are saved here."
 
 (defun helm-files-save-file-name-history (&optional force)
   "Save selected file to `file-name-history'."
-  (when (or force (helm-file-completion-source-p))
-    (let ((sel (helm-get-selection))
-          (history-delete-duplicates t))
-      (when (and (file-exists-p sel)
-                 (not (file-directory-p sel)))
-        ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
-        ;; and we don't want to introduce duplicates.
-        (add-to-history 'file-name-history
-                        (abbreviate-file-name (helm-get-selection)))))))
+  (let ((helm-file-completion-sources (append helm-files-save-history-extra-sources
+                                              helm-file-completion-sources)))
+    (when (or force (helm-file-completion-source-p))
+      (let ((sel (helm-get-selection))
+            (history-delete-duplicates t))
+        (when (and (file-exists-p sel)
+                   (not (file-directory-p sel)))
+          ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
+          ;; and we don't want to introduce duplicates.
+          (add-to-history 'file-name-history
+                          (abbreviate-file-name (helm-get-selection))))))))
 (add-hook 'helm-after-action-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file)
