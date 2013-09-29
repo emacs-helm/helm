@@ -437,7 +437,7 @@ from its directory."
                         (eq major-mode 'org-agenda-mode))
                       org-directory
                       (expand-file-name org-directory))
-                 default-directory)
+                 (with-current-buffer it default-directory))
            (cond ((or (file-remote-p sel)
                       (file-exists-p sel))
                   (expand-file-name sel))

@@ -1912,6 +1912,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            (helm-switch-to-buffer image-dired-display-image-buffer)
            (with-current-buffer image-dired-display-image-buffer
              (let ((exif-data (helm-ff-exif-data candidate)))
+               (setq default-directory helm-ff-default-directory)
                (image-dired-update-property 'help-echo exif-data))))
           ;; Allow browsing archive on avfs fs.
           ;; Assume volume is already mounted with mountavfs.
