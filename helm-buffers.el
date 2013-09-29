@@ -129,20 +129,24 @@ When disabled (nil) use the longest buffer-name length found."
 
 
 (defvar helm-buffers-list-cache nil)
+(defvar helm-buffer-max-len-mode nil)
 (defvar helm-source-buffers-list
   `((name . "Buffers")
     (init . (lambda ()
               ;; Issue #51 Create the list before `helm-buffer' creation.
               (setq helm-buffers-list-cache (helm-buffer-list))
-              (unless helm-buffer-max-length
-                (let ((result (loop for b in helm-buffers-list-cache
-                                    maximize (length b) into len-buf
-                                    maximize (length (with-current-buffer b
-                                                       (symbol-name major-mode)))
-                                    into len-mode
-                                    finally return (cons len-buf len-mode))))
-                (setq helm-buffer-max-length (car result)
-                      helm-buffer-max-len-mode (cdr result))))))
+              (let ((result (loop for b in helm-buffers-list-cache
+                                  maximize (length b) into len-buf
+                                  maximize (length (with-current-buffer b
+                                                     (symbol-name major-mode)))
+                                  into len-mode
+                                  finally return (cons len-buf len-mode))))
+                (unless helm-buffer-max-length
+                  (setq helm-buffer-max-length (car result)))
+                (unless helm-buffer-max-len-mode
+                  ;; If a new buffer is longer that this value
+                  ;; this value will be updated
+                  (setq helm-buffer-max-len-mode (cdr result))))))
     (candidates . helm-buffers-list-cache)
     (type . buffer)
     (match helm-buffer-match-major-mode)
@@ -279,17 +283,10 @@ See `ido-make-buffer-list' for more infos."
                    (format "(in `%s')" dir))
                'face 'helm-buffer-process)))))))
 
-(defvar helm-buffer-max-len-mode nil)
 (defun helm-highlight-buffers (buffers source)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop with max-mode-len = (or helm-buffer-max-len-mode
-                                (setq helm-buffer-max-len-mode
-                                      (loop for b in buffers maximize
-                                            (with-current-buffer b
-                                              (length
-                                               (symbol-name major-mode))))))
-        for i in buffers
+  (loop for i in buffers
         for (name size mode meta) = (if helm-buffer-details-flag
                                         (helm-buffer-details i 'details)
                                         (helm-buffer-details i))
@@ -299,8 +296,8 @@ Should be called after others transformers i.e (boring buffers)."
                                          (- (+ helm-buffer-max-length 3)
                                             (string-width name)) ? )))
         for len = (length mode)
-        when (> len max-mode-len) do (setq max-mode-len len)
-        for fmode = (concat (make-string (- (max max-mode-len len) len) ? )
+        when (> len helm-buffer-max-len-mode) do (setq helm-buffer-max-len-mode len)
+        for fmode = (concat (make-string (- (max helm-buffer-max-len-mode len) len) ? )
                             mode)
         ;; The max length of a number should be 1023.9X where X is the
         ;; units, this is 7 characters.
