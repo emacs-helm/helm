@@ -280,7 +280,7 @@ See `ido-make-buffer-list' for more infos."
                'face 'helm-buffer-process)))))))
 
 (defvar helm-buffer-max-len-mode nil)
-(defun helm-highlight-buffers (buffers sources)
+(defun helm-highlight-buffers (buffers source)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
   (loop with max-mode-len = (or helm-buffer-max-len-mode
@@ -299,6 +299,7 @@ Should be called after others transformers i.e (boring buffers)."
                                          (- (+ helm-buffer-max-length 3)
                                             (string-width name)) ? )))
         for len = (length mode)
+        when (> len max-mode-len) do (setq max-mode-len len)
         for fmode = (concat (make-string (- (max max-mode-len len) len) ? )
                             mode)
         ;; The max length of a number should be 1023.9X where X is the
