@@ -83,6 +83,14 @@ Where NAME is one of `helm-default-info-index-list'."
   :type  '(repeat (choice string))
   :set   'helm-info-index-set)
 
+(defcustom helm-info-default-sources
+  '(helm-source-info-elisp
+    helm-source-info-cl
+    helm-source-info-pages)
+  "The default sources to use in `helm-info-at-point'."
+  :group 'helm-info
+  :type '(repeat (choice symbol)))
+
 
 ;;; Info pages
 (defvar helm-info-pages nil
@@ -121,10 +129,7 @@ With a prefix-arg insert symbol at point."
   (interactive)
   (let ((helm-google-suggest-default-function
          'helm-google-suggest-emacs-lisp))
-    (helm :sources '(helm-source-info-elisp
-                     helm-source-info-cl
-                     helm-source-info-pages
-                     helm-source-google-suggest)
+    (helm :sources helm-info-default-sources
           :buffer "*helm info*")))
 
 (provide 'helm-info)
