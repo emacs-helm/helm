@@ -354,7 +354,8 @@ First call indent, second complete symbol, third complete fname."
               (helm-apropos-init 'boundp ,default)))
     (candidates-in-buffer)
     (action . (("Describe Variable" . helm-describe-variable)
-               ("Find Variable" . helm-find-variable)))))
+               ("Find Variable" . helm-find-variable)
+               ("Info lookup" . info-lookup-symbol)))))
 
 (defun helm-def-source--emacs-faces (&optional default)
   `((name . "Faces")
@@ -384,7 +385,8 @@ First call indent, second complete symbol, third complete fname."
               (helm-apropos-init 'commandp ,default)))
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-describe-function)
-               ("Find Function" . helm-find-function)))))
+               ("Find Function" . helm-find-function)
+               ("Info lookup" . info-lookup-symbol)))))
 
 (defun helm-def-source--emacs-functions (&optional default)
   `((name . "Functions")
@@ -394,7 +396,8 @@ First call indent, second complete symbol, third complete fname."
                                    ,default)))
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-describe-function)
-               ("Find Function" . helm-find-function)))))
+               ("Find Function" . helm-find-function)
+               ("Info lookup" . info-lookup-symbol)))))
 
 ;;;###autoload
 (defun helm-apropos ()
