@@ -182,7 +182,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defvar helm-source-occur nil)
 (defun helm-occur-init-source ()
   (unless helm-source-occur
-    (setq helm-source-occur (copy-alist helm-source-moccur))))
+    (setq helm-source-occur (copy-alist helm-source-moccur))
+    (helm-attrset 'name "Occur" helm-source-occur)))
 
 
 ;;; Multi occur
@@ -466,7 +467,6 @@ the center of window, otherwise at the top of window.")
   (interactive)
   (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
   (helm-occur-init-source)
-  (helm-attrset 'name "Occur" helm-source-occur)
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
         :history 'helm-grep-history
@@ -482,7 +482,6 @@ the center of window, otherwise at the top of window.")
     (isearch-exit)
     (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
     (helm-occur-init-source)
-    (helm-attrset 'name "Occur" helm-source-occur)
     (helm :sources 'helm-source-occur
           :buffer "*helm occur*"
           :history 'helm-grep-history
