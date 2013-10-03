@@ -86,6 +86,7 @@ Where NAME is one of `helm-default-info-index-list'."
 (defcustom helm-info-default-sources
   '(helm-source-info-elisp
     helm-source-info-cl
+    helm-source-info-eieio
     helm-source-info-pages)
   "The default sources to use in `helm-info-at-point'."
   :group 'helm-info
