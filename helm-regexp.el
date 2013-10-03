@@ -228,14 +228,21 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
   (let* ((split (helm-grep-split-line candidate))
          (buf (car split))
-         (lineno (string-to-number (nth 1 split))))
+         (lineno (string-to-number (nth 1 split)))
+         (split-pat (if helm-occur-match-plugin-mode
+                        (helm-mp-split-pattern helm-pattern)
+                        (list helm-pattern))))
     (case method
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
     (helm-goto-line lineno)
-    (when (re-search-forward helm-pattern (point-at-eol) t)
-      (goto-char (match-beginning 0)))
+    ;; Move point to the nearest matching regexp from bol.
+    (loop for reg in split-pat
+          when (save-excursion
+                 (re-search-forward reg (point-at-eol) t))
+          collect (match-beginning 0) into pos-ls
+          finally (goto-char (apply #'min pos-ls)))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
