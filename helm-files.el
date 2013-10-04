@@ -2001,8 +2001,10 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
   (let* ((def-dir (helm-current-directory))
+         (urlp (and file-at-pt ffap-url-regexp
+                    (string-match ffap-url-regexp file-at-pt)))
          (abs (and file-at-pt
-                   (not (and ffap-url-regexp (string-match ffap-url-regexp file-at-pt)))
+                   (not urlp)
                    (expand-file-name file-at-pt def-dir)))
          (lib     (when helm-ff-search-library-in-sexp
                     (helm-find-library-at-point)))
@@ -2024,8 +2026,9 @@ Use it for non--interactive calls of `helm-find-files'."
            (let (ffap-alist)
              (helm-aif (ffap-file-at-point)
                  (expand-file-name it))))
-          (t (and (not (string= file-at-pt "")) ; possibly an url or email.
-                  file-at-pt)))))
+          (urlp file-at-pt) ; possibly an url or email.
+          ((and file-at-pt (file-exists-p file-at-pt))
+           file-at-pt))))
 
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
@@ -2644,25 +2647,24 @@ Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
   (declare (special org-directory))
-  (let* (histp
-         (any-input (if (and arg helm-ff-history)
-                        (setq histp (helm-find-files-history))
-                        (helm-find-files-initial-input)))
-         (presel    (or histp (buffer-file-name (current-buffer)))))
-    (cond ((and (eq major-mode 'org-agenda-mode)
-                org-directory
-                (not any-input))
-           (setq any-input (expand-file-name org-directory)))
-          ((and (eq major-mode 'dired-mode) any-input)
-           (setq presel any-input)
-           (setq any-input (file-name-directory any-input))))
-    (set-text-properties 0 (length any-input) nil any-input)
-    (unless any-input
-      (setq any-input (expand-file-name (helm-current-directory))))
-    (helm-find-files-1
-     any-input (if helm-ff-transformer-show-only-basename
-                   (and presel (helm-basename presel))
-                   presel))))
+  (let* ((hist          (and arg helm-ff-history (helm-find-files-history)))
+         (default-input (or hist (helm-find-files-initial-input)))
+         (input         (cond ((and (eq major-mode 'org-agenda-mode)
+                                    org-directory
+                                    (not default-input))
+                               (expand-file-name org-directory))
+                              ((and (eq major-mode 'dired-mode) default-input)
+                               (file-name-directory default-input))
+                              (default-input)
+                              (t (expand-file-name (helm-current-directory)))))
+         (presel        (helm-aif (or hist
+                                      (buffer-file-name (current-buffer))
+                                      (and (eq major-mode 'dired-mode)
+                                           default-input))
+                            (if helm-ff-transformer-show-only-basename
+                                (helm-basename it) it))))
+    (set-text-properties 0 (length input) nil input)
+    (helm-find-files-1 input presel)))
 
 ;;;###autoload
 (defun helm-for-files ()
