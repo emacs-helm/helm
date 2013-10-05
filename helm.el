@@ -2499,6 +2499,7 @@ when emacs is idle for `helm-idle-delay'."
         (helm-log-run-hook 'helm-update-hook))
       (setq helm-force-updating-p nil)
       (unless (assoc 'candidates-process source)
+        (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-after-update-hook)))))
 
 
@@ -2543,6 +2544,7 @@ is done on whole `helm-buffer' and not on current source."
               (t              ; No delayed sources, run the hooks now.
                (helm-update-move-first-line)
                (unless (assoc 'candidates-process source)
+                 (helm-display-mode-line (helm-get-current-source))
                  (helm-log-run-hook 'helm-after-update-hook))
                (when preselect
                  (helm-log "Update preselect candidate %s" preselect)
