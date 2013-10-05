@@ -355,7 +355,7 @@ First call indent, second complete symbol, third complete fname."
     (candidates-in-buffer)
     (action . (("Describe Variable" . helm-describe-variable)
                ("Find Variable" . helm-find-variable)
-               ("Info lookup" . info-lookup-symbol)))))
+               ("Info lookup" . helm-info-lookup-symbol)))))
 
 (defun helm-def-source--emacs-faces (&optional default)
   `((name . "Faces")
@@ -386,7 +386,7 @@ First call indent, second complete symbol, third complete fname."
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-describe-function)
                ("Find Function" . helm-find-function)
-               ("Info lookup" . info-lookup-symbol)))))
+               ("Info lookup" . helm-info-lookup-symbol)))))
 
 (defun helm-def-source--emacs-functions (&optional default)
   `((name . "Functions")
@@ -397,7 +397,18 @@ First call indent, second complete symbol, third complete fname."
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-describe-function)
                ("Find Function" . helm-find-function)
-               ("Info lookup" . info-lookup-symbol)))))
+               ("Info lookup" . helm-info-lookup-symbol)))))
+
+(defun helm-info-lookup-symbol (candidate)
+  (let ((helm-execute-action-at-once-if-one t)
+        (helm-quit-if-no-candidate
+         `(lambda ()
+            (message "`%s' Not Documented as a symbol" ,candidate))))
+    (helm :sources '(helm-source-info-elisp
+                     helm-source-info-cl
+                     helm-source-info-eieio)
+          :buffer "*helm lookup*"
+          :input candidate)))
 
 ;;;###autoload
 (defun helm-apropos ()

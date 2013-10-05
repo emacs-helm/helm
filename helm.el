@@ -2016,13 +2016,17 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
         ;; the hook will remove itself once done.
         (with-helm-after-update-hook (helm-exit-or-quit-maybe)))
       ;; Reset `helm-pattern' for non--delayed sources and update
-      ;; display if no result found with precedent value of `helm-pattern'.
+      ;; display if no result found with precedent value of `helm-pattern'
+      ;; unless `helm-quit-if-no-candidate' is non--nil, in this case
+      ;; Don't force update with an empty pattern.
       ;; Reset also `helm-maybe-use-default-as-input' as this checking
       ;; happen only on startup.
       (when (and helm-maybe-use-default-as-input (not source-delayed-p))
         (setq helm-pattern "")
         (setq helm-maybe-use-default-as-input nil)
-        (and (helm-empty-buffer-p) (helm-force-update)))
+        (and (helm-empty-buffer-p)
+             (null helm-quit-if-no-candidate)
+             (helm-force-update)))
       ;; Handle `helm-execute-action-at-once-if-one' and
       ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
       (cond ((and helm-execute-action-at-once-if-one
