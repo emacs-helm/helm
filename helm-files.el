@@ -1334,7 +1334,7 @@ purpose."
         cur-method tramp-name)
     (cond ((string= pattern "") "")
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
-           default-directory)
+           (expand-file-name default-directory))
           ((and (string-match ".*\\(~//\\|//\\)\\'" pattern)
                 (not (string-match helm-ff-url-regexp helm-pattern)))
            (expand-file-name "/")) ; Expand to "/" or "c:/"
