@@ -3139,7 +3139,9 @@ to mark candidates."
          (let ((header-pos (helm-get-next-header-pos))
                (separator-pos (helm-get-next-candidate-separator-pos)))
            (or (and (null header-pos) separator-pos)
-               (and header-pos separator-pos (< separator-pos header-pos))
+               (and header-pos separator-pos
+                    (< separator-pos header-pos)
+                    separator-pos)
                header-pos
                (point-max)))
          (1+ (point-at-eol))))
