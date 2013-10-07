@@ -790,7 +790,12 @@ Keys description:
                       helm-completing-read-handlers-alist))
          (def-com  (cdr-safe entry))
          (str-defcom (symbol-name def-com))
-         (def-args (list prompt dir default-filename mustmatch initial predicate))
+         (def-args (list prompt dir default-filename mustmatch
+                         ;; Fix bug in ido-read-internal that doesn't
+                         ;; support the INITIAL arg.
+                         (unless (or (eq def-com 'ido)
+                                     (eq def-com 'ido-read-file-name))
+                           initial) predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
          (any-args (append def-args (list str-command buf-name)))
