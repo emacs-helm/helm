@@ -359,13 +359,10 @@ It is drop-in replacement of `yank-pop'.
 
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (let ((helm-turn-on-show-completion (and helm-kill-ring-show-completion
-                                           (eq last-command 'yank))))
-    (with-helm-show-completion (mark t) (point)
-      (helm :sources helm-source-kill-ring
-            :buffer "*helm kill ring*"
-            :resume 'noresume
-            :allow-nest t))))
+  (helm :sources helm-source-kill-ring
+        :buffer "*helm kill ring*"
+        :resume 'noresume
+        :allow-nest t))
 
 (provide 'helm-ring)
 
