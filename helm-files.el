@@ -2406,6 +2406,11 @@ Else return ACTIONS unmodified."
               (helm-init-candidates-in-buffer
                'global recentf-list)))
     (candidates-in-buffer)
+    (filtered-candidate-transformer . (lambda (candidates source)
+                                        (loop for i in candidates
+                                              if helm-ff-transformer-show-only-basename
+                                              collect (cons (helm-basename i) i)
+                                              else collect i)))
     (no-delay-on-input)
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
@@ -2678,7 +2683,8 @@ Run all sources defined in `helm-for-files-preferred-list'."
 (defun helm-recentf ()
   "Preconfigured `helm' for `recentf'."
   (interactive)
-  (helm-other-buffer 'helm-source-recentf "*helm recentf*"))
+  (let ((helm-ff-transformer-show-only-basename nil))
+    (helm-other-buffer 'helm-source-recentf "*helm recentf*")))
 
 (provide 'helm-files)
 
