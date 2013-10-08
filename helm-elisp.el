@@ -81,18 +81,20 @@ This is used in macro `with-helm-show-completion'."
 (defun helm-show-completion-display-function (buffer &rest _args)
   "A special resized helm window is used depending on position in BUFFER."
   (with-selected-window (selected-window)
-    (let* ((screen-size  (+ (count-screen-lines (window-start) (point) t)
-                            1                             ; mode-line
-                            (if header-line-format 1 0))) ; header-line
-           (def-size     (- (window-height)
-                            helm-show-completion-min-window-height))
-           (upper-height (max window-min-height (min screen-size def-size)))
-           split-window-keep-point)
-      (recenter -1)
-      (set-window-buffer (if (active-minibuffer-window)
-                             (minibuffer-selected-window)
-                             (split-window nil upper-height))
-                         buffer))))
+    (if (window-dedicated-p)
+        (helm-default-display-buffer buffer)
+        (let* ((screen-size  (+ (count-screen-lines (window-start) (point) t)
+                                1                         ; mode-line
+                                (if header-line-format 1 0))) ; header-line
+               (def-size     (- (window-height)
+                                helm-show-completion-min-window-height))
+               (upper-height (max window-min-height (min screen-size def-size)))
+               split-window-keep-point)
+          (recenter -1)
+          (set-window-buffer (if (active-minibuffer-window)
+                                 (minibuffer-selected-window)
+                                 (split-window nil upper-height))
+                             buffer)))))
 
 (defmacro with-helm-show-completion (beg end &rest body)
   "Show helm candidate in an overlay at point.
