@@ -321,10 +321,11 @@ It is added to `extended-command-history'.
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
   (require 'helm-files)
-  (helm-other-buffer '(helm-source-buffers-list
-                       helm-source-recentf
-                       helm-source-buffer-not-found)
-                     "*helm mini*"))
+  (let ((helm-ff-transformer-show-only-basename nil))
+    (helm-other-buffer '(helm-source-buffers-list
+                         helm-source-recentf
+                         helm-source-buffer-not-found)
+                       "*helm mini*")))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
