@@ -2527,7 +2527,7 @@ Colorize only symlinks, directories and files."
 ;;
 ;; Tracker desktop search
 (defvar helm-source-tracker-search
-  '((name . "Tracker Search")
+  `((name . "Tracker Search")
     (candidates-process
      . (lambda ()
          (start-process "tracker-search-process" nil
@@ -2536,7 +2536,7 @@ Colorize only symlinks, directories and files."
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (loop for cand in (cdr candidates)
                                               collect (ansi-color-apply cand))))
-    (action . (cdr (helm-get-attribute-from-type 'action 'file)))
+    (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
      helm-transform-file-load-el
      helm-transform-file-browse-url)
