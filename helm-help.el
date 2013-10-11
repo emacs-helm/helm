@@ -342,6 +342,16 @@ Italic     => A non--file buffer.
 ;;
 (defvar helm-generic-file-help-message
   "== Helm Generic files Map ==\
+
+\nLocate tips:
+You can add after writing search pattern any of the locate command line options.
+e.g -b, -e, -n <number>...etc.
+See Man locate for more infos.
+
+Note:
+Some other sources (at the moment recentf and file in current directory sources)
+support the -b flag for compatibility with locate when they are used with it.
+
 \nSpecific commands for helm locate and others files sources:
 \\<helm-generic-files-map>
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
@@ -357,10 +367,6 @@ Italic     => A non--file buffer.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \\[helm-ff-run-insert-org-link]\t\t->Insert org link.
-\nLocate tips:
-You can add after writing search pattern any of the locate command line options.
-e.g -b, -e, -n <number>...etc.
-See Man locate for more infos.
 \n== Helm Map ==
 \\{helm-map}")
 

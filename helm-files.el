@@ -2402,10 +2402,9 @@ Else return ACTIONS unmodified."
   `((name . "Recentf")
     (init . (lambda ()
               (require 'recentf)
-              (or recentf-mode (recentf-mode 1))
-              (helm-init-candidates-in-buffer
-               'global recentf-list)))
-    (candidates-in-buffer)
+              (recentf-mode 1)))
+    (candidates . recentf-list)
+    (match . helm-files-match-only-basename)
     (filtered-candidate-transformer . (lambda (candidates source)
                                         (loop for i in candidates
                                               if helm-ff-transformer-show-only-basename
@@ -2516,6 +2515,7 @@ Colorize only symlinks, directories and files."
                       (let ((dir (helm-current-directory)))
                         (when (file-accessible-directory-p dir)
                           (directory-files dir t))))))
+    (match . helm-files-match-only-basename)
     (keymap . ,helm-generic-files-map)
     (no-delay-on-input)
     (help-message . helm-generic-file-help-message)

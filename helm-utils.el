@@ -330,19 +330,22 @@ With a numeric prefix arg show only the ARG number of candidates."
           collect (buffer-substring-no-properties (point-at-bol)(point-at-eol))
           do (forward-line 1))))
 
-(defun helm-match-on-file-name (candidate)
-  "Return non-nil if `helm-pattern' match basename of filename CANDIDATE."
-  (string-match helm-pattern (file-name-nondirectory candidate)))
-
-(defun helm-match-on-directory-name (candidate)
-  "Return non-nil if `helm-pattern' match directory part of CANDIDATE."
-  (helm-aif (file-name-directory candidate)
-      (string-match helm-pattern it)))
-
-(defun helm-string-match (candidate)
-  "Return non-nil if `helm-pattern' match CANDIDATE.
-The match is done with `string-match'."
-  (string-match helm-pattern candidate))
+(defun helm-files-match-only-basename (candidate)
+  "Allow matching only basename of file when \" -b\" is added at end of pattern.
+If pattern contain one or more spaces, fallback to match-plugin
+even is \" -b\" is specified."
+  (let ((source (helm-get-current-source)))
+    (if (string-match "\\([^ ]*\\) -b\\'" helm-pattern)
+        (progn
+          (helm-attrset 'no-matchplugin nil source)
+          (string-match (match-string 1 helm-pattern)
+                        (helm-basename candidate)))
+        ;; Disable no-matchplugin by side effect.
+        (helm-aif (assq 'no-matchplugin source)
+            (setq source (delete it source)))
+        (string-match
+         (replace-regexp-in-string " -b\\'" "" helm-pattern)
+         candidate))))
 
 (defun helm-skip-entries (seq regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
