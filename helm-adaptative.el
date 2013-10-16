@@ -164,9 +164,8 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
 
 (defun helm-adaptive-sort (candidates source)
   "Sort the CANDIDATES for SOURCE by usage frequency.
-This is a filtered candidate transformer you can use for the
-attribute `filtered-candidate-transformer' of a source in
-`helm-sources' or a type in `helm-type-attributes'."
+This is a filtered candidate transformer you can use with the
+`filtered-candidate-transformer' attribute."
   (let* ((source-name (or (assoc-default 'type source)
                           (assoc-default 'name source)))
          (source-info (assoc source-name helm-adaptive-history)))
