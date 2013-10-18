@@ -59,12 +59,18 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
   :global t
   (if helm-adaptative-mode
       (progn
+        (unless helm-adaptive-history
+          (helm-adaptative-maybe-load-history))
+        (add-hook 'kill-emacs-hook 'helm-adaptive-save-history)
         ;; Should run at beginning of `helm-initial-setup'.
         (add-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
         ;; Should run at beginning of `helm-exit-minibuffer'.
         (add-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
         ;; Should run at beginning of `helm-select-action'.
         (add-hook 'helm-select-action-hook 'helm-adaptive-store-selection))
+      (helm-adaptive-save-history)
+      (setq helm-adaptive-history nil)
+      (remove-hook 'kill-emacs-hook 'helm-adaptive-save-history)
       (remove-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
       (remove-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
       (remove-hook 'helm-select-action-hook 'helm-adaptive-store-selection)))
@@ -141,26 +147,23 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                       (subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
 
 (defun helm-adaptative-maybe-load-history ()
-  (when (and helm-adaptative-mode
-             (file-readable-p helm-adaptive-history-file))
+  "Load `helm-adaptive-history-file' which contain `helm-adaptive-history'.
+Returns nil if `helm-adaptive-history-file' doesn't exist."
+  (when (file-readable-p helm-adaptive-history-file)
     (load-file helm-adaptive-history-file)))
-
-(add-hook 'emacs-startup-hook 'helm-adaptative-maybe-load-history)
-(add-hook 'kill-emacs-hook 'helm-adaptive-save-history)
 
 (defun helm-adaptive-save-history (&optional arg)
   "Save history information to file given by `helm-adaptive-history-file'."
   (interactive "p")
-  (when helm-adaptative-mode
-    (with-temp-buffer
-      (insert
-       ";; -*- mode: emacs-lisp -*-\n"
-       ";; History entries used for helm adaptive display.\n")
-      (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
-             (current-buffer))
-      (insert ?\n)
-      (write-region (point-min) (point-max) helm-adaptive-history-file nil
-                    (unless arg 'quiet)))))
+  (with-temp-buffer
+    (insert
+     ";; -*- mode: emacs-lisp -*-\n"
+     ";; History entries used for helm adaptive display.\n")
+    (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
+           (current-buffer))
+    (insert ?\n)
+    (write-region (point-min) (point-max) helm-adaptive-history-file nil
+                  (unless arg 'quiet))))
 
 (defun helm-adaptive-sort (candidates source)
   "Sort the CANDIDATES for SOURCE by usage frequency.
