@@ -26,35 +26,6 @@
   "Regexp related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-browse-code-regexp-lisp
-  "^ *\(def\\(un\\|subst\\|macro\\|face\\|alias\\|advice\\|struct\\|\
-type\\|theme\\|var\\|group\\|custom\\|const\\|method\\|class\\)"
-  "Regexp used to parse lisp buffer when browsing code."
-  :type 'string
-  :group 'helm-regexp)
-
-(defcustom helm-browse-code-regexp-python
-  "\\<def\\>\\|\\<class\\>"
-  "Regexp used to parse python buffer when browsing code."
-  :type 'string
-  :group 'helm-regexp)
-
-(defcustom helm-browse-code-regexp-alist
-  `((lisp-interaction-mode . ,helm-browse-code-regexp-lisp)
-    (emacs-lisp-mode . ,helm-browse-code-regexp-lisp)
-    (lisp-mode . ,helm-browse-code-regexp-lisp)
-    (python-mode . ,helm-browse-code-regexp-python))
-  "Alist to store regexps for browsing code corresponding \
-to a specific `major-mode'."
-  :type '(alist :key-type symbol :value-type regexp)
-  :group 'helm-regexp)
-
-(defcustom helm-browse-code-fontify t
-  "Fontify `current-buffer' when `helm-browse-code' start.
-Slow on large buffers."
-  :type 'boolean
-  :group 'helm-regexp)
-
 (defcustom helm-moccur-always-search-in-current nil
   "Helm multi occur always search in current buffer when non--nil."
   :group 'helm-regexp
@@ -363,36 +334,6 @@ Same as `helm-m-occur-goto-line' but go in new frame."
         :input input
         :truncate-lines t))
 
-
-;;; Helm browse code.
-;;
-;;
-(defun helm-browse-code-get-line (beg end)
-  "Select line if it match the regexp corresponding to current `major-mode'.
-Line is parsed for BEG position to END position."
-  (let ((str-line (buffer-substring beg end))
-        (regexp   (with-helm-current-buffer
-                    (assoc-default major-mode helm-browse-code-regexp-alist)))
-        (num-line (if (string= helm-pattern "") beg (1- beg))))
-    (when (and regexp (string-match regexp str-line))
-      (format "%4d:%s" (line-number-at-pos num-line) str-line))))
-
-(defvar helm-source-browse-code
-  '((name . "Browse code")
-    (init . (lambda ()
-              (helm-init-candidates-in-buffer
-               'global (with-temp-buffer
-                         (insert-buffer-substring helm-current-buffer)
-                         (buffer-string)))
-              (when helm-browse-code-fontify
-                (with-helm-current-buffer
-                  (jit-lock-fontify-now)))))
-    (candidate-number-limit . 9999)
-    (candidates-in-buffer)
-    (get-line . helm-browse-code-get-line)
-    (type . line)
-    (recenter)))
-
 (defun helm-display-to-real-numbered-line (candidate)
   "This is used to display a line in occur style in helm sources.
 e.g \"    12:some_text\".
@@ -528,14 +469,6 @@ The prefix arg can be set before calling
     (helm-multi-occur-1
      (helm-comp-read "Buffers: " (helm-buffer-list) :marked-candidates t)
      input)))
-
-;;;###autoload
-(defun helm-browse-code ()
-  "Preconfigured helm to browse code."
-  (interactive)
-  (helm :sources 'helm-source-browse-code
-        :buffer "*helm browse code*"
-        :default (thing-at-point 'symbol)))
 
 
 (provide 'helm-regexp)

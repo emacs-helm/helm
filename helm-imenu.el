@@ -103,6 +103,8 @@
   "Preconfigured `helm' for `imenu'."
   (interactive)
   (let ((imenu-auto-rescan t)
+        (helm-execute-action-at-once-if-one t)
+        (helm-quit-if-no-candidate t)
         (imenu-default-goto-function
          (if (fboundp 'semantic-imenu-goto-function)
              'semantic-imenu-goto-function
