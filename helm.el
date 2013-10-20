@@ -1784,21 +1784,26 @@ window or frame configuration is saved/restored according to values of
              (selected-window) nil helm-split-window-default-side)
             ;; If more than one window reuse one of them.
             (case helm-split-window-default-side
-              (left  (or (window-in-direction 'left)
-                         (window-in-direction 'above)
+              (left  (or (helm-window-in-direction 'left)
+                         (helm-window-in-direction 'above)
                          (selected-window)))
-              (above (or (window-in-direction 'above)
-                         (window-in-direction 'left)
+              (above (or (helm-window-in-direction 'above)
+                         (helm-window-in-direction 'left)
                          (selected-window)))
-              (right (or (window-in-direction 'right)
-                         (window-in-direction 'below)
+              (right (or (helm-window-in-direction 'right)
+                         (helm-window-in-direction 'below)
                          (selected-window)))
-              (below (or (window-in-direction 'below)
-                         (window-in-direction 'right)
+              (below (or (helm-window-in-direction 'below)
+                         (helm-window-in-direction 'right)
                          (selected-window)))
               (same  (selected-window))
               (t     (or (window-next-sibling) (selected-window)))))
         (split-window-sensibly window))))
+
+(defun helm-window-in-direction (direction)
+  "Same as `window-in-direction' but check if window is dedicated."
+  (helm-aif (window-in-direction direction)
+      (and (not (window-dedicated-p it)) it)))
 
 
 ;;; Display helm buffer
@@ -1841,7 +1846,8 @@ The function used to display `helm-buffer'."
 Arg ENABLE-OR-DISABLE will be the value of `no-other-window'."
   (walk-windows
    #'(lambda (w)
-       (set-window-parameter w 'no-other-window enabled)) 0))
+       (unless (window-dedicated-p w)
+         (set-window-parameter w 'no-other-window enabled)) 0)))
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
