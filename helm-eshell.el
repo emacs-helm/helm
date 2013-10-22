@@ -146,6 +146,9 @@ The function that call this should set `helm-ec-target' to thing at point."
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
   (interactive)
+  (assert (and (called-interactively-p 'any)
+               (eq major-mode 'eshell-mode))
+          nil "Error: This command should run interactively from eshell")
   (let* ((helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
          (end (point-marker))
@@ -184,6 +187,9 @@ The function that call this should set `helm-ec-target' to thing at point."
 (defun helm-eshell-history ()
   "Preconfigured helm for eshell history."
   (interactive)
+  (assert (and (called-interactively-p 'any)
+               (eq major-mode 'eshell-mode))
+          nil "Error: This command should run interactively from eshell")
   (let* ((end (point))
          (beg (save-excursion (eshell-bol) (point)))
          (input (buffer-substring beg end))
