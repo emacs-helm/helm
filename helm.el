@@ -2232,6 +2232,7 @@ Helm plug-ins are realized by this function."
                                                  candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
+                       (wrong-type-argument nil) ; FIXME this is probably triggered by new error messages in timers.
                        (error (funcall type-error err)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
@@ -2568,7 +2569,7 @@ is done on whole `helm-buffer' and not on current source."
              ;; Be sure helm-idle-delay is >
              ;; to helm-input-idle-delay
              ;; otherwise use value of helm-input-idle-delay
-             ;; or 0.1 if == to 0.
+             ;; or 0.01 if == to 0.
              (max helm-idle-delay helm-input-idle-delay 0.01) nil
              'helm-process-delayed-sources delayed-sources preselect source)))
         (helm-log "end update")))))
