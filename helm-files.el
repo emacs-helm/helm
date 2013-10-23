@@ -393,7 +393,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                                          (if helm-ff-skip-boring-files
                                              (helm-skip-boring-files candidates)
                                              candidates))
-                                       helm-ff-sort-candidates
+                                       ;helm-ff-sort-candidates
                                        helm-find-files-transformer))
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
@@ -1728,7 +1728,7 @@ Return candidates prefixed with basename of `helm-input' first."
                             (let ((score (lambda (str)
                                            (if (string-match
                                                 (concat
-                                                 "\\<_"
+                                                 "\\<"
                                                  (helm-basename
                                                   helm-input)) str) 1 0))))
                               (>= (funcall score s1)
