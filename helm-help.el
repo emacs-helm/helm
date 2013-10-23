@@ -199,7 +199,6 @@ Italic     => A non--file buffer.
 \\[helm-buffer-switch-other-frame]\t\t->Switch other frame.
 \\[helm-buffer-run-query-replace-regexp]\t\t->Query replace regexp in marked buffers.
 \\[helm-buffer-run-query-replace]\t\t->Query replace in marked buffers.
-\\[helm-buffer-switch-to-elscreen]\t\t->Find buffer in Elscreen.
 \\[helm-buffer-run-ediff]\t\t->Ediff current buffer with candidate.  If two marked buffers ediff those buffers.
 \\[helm-buffer-run-ediff-merge]\t\t->Ediff merge current buffer with candidate.  If two marked buffers ediff merge those buffers.
 \\[helm-buffer-diff-persistent]\t\t->Toggle Diff buffer with saved file without quitting.
@@ -209,6 +208,7 @@ Italic     => A non--file buffer.
 \\[helm-toggle-all-marks]\t\t->Toggle all marks.
 \\[helm-mark-all]\t\t->Mark all.
 \\[helm-toggle-buffers-details]\t\t->Toggle details.
+\\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers. 
 \\[helm-buffer-help]\t\t->Display this help.
 \n== Helm Map ==
 \\{helm-map}")

@@ -110,9 +110,7 @@ When disabled (nil) use the longest buffer-name length found."
     (define-key map (kbd "M-a")       'helm-mark-all)
     (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
     (define-key map (kbd "C-c a")     'helm-buffers-toggle-show-hidden-buffers)
-    (when (locate-library "elscreen")
-      (define-key map (kbd "<C-tab>") 'helm-buffer-switch-to-elscreen))
-    (delq nil map))
+    map)
   "Keymap for buffer sources in helm.")
 
 (defvar helm-buffers-ido-virtual-map
