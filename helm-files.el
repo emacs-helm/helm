@@ -393,7 +393,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                                          (if helm-ff-skip-boring-files
                                              (helm-skip-boring-files candidates)
                                              candidates))
-                                       ;helm-ff-sort-candidates
+                                       helm-ff-sort-candidates
                                        helm-find-files-transformer))
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
@@ -1725,15 +1725,19 @@ Return candidates prefixed with basename of `helm-input' first."
              (rest-cand (if cand1 (cdr candidates) candidates))
              (all (sort rest-cand
                         #'(lambda (s1 s2)
-                            (let ((score (lambda (str)
-                                           (if (string-match
-                                                (concat
-                                                 "\\<"
-                                                 (helm-basename
-                                                  helm-input)) str) 1 0))))
-                              (>= (funcall score s1)
-                                  (funcall score s2)))))))
-    (if cand1 (cons cand1 all) all))))
+                            (let* ((score (lambda (str)
+                                            (if (string-match
+                                                 (concat
+                                                  "\\_<"
+                                                  (helm-basename
+                                                   helm-input)) str) 1 0)))
+                                   (bn1 (helm-basename s1))
+                                   (bn2 (helm-basename s2))
+                                   (sc1 (funcall score bn1))
+                                   (sc2 (funcall score bn2)))
+                              (cond ((>= sc1 sc2))
+                                    (t (string-lessp bn1 bn2))))))))
+        (if cand1 (cons cand1 all) all))))
 
 (defun helm-ff-highlight-files (files)
   "Candidate transformer function for `helm-source-find-files'.
