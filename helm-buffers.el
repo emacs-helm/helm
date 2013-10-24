@@ -309,6 +309,13 @@ Should be called after others transformers i.e (boring buffers)."
     (setq helm-buffer-details-flag (not helm-buffer-details-flag))
     (helm-force-update (car (split-string (helm-get-selection nil t))))))
 
+(defun helm-buffers-sort-transformer (candidates source)
+  (if (string= helm-pattern "")
+      candidates
+      (sort candidates
+            #'(lambda (s1 s2)
+                (< (string-width s1) (string-width s2))))))
+
 
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -321,7 +328,11 @@ before space matching pattern after space.
 If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
-         (buf  (get-buffer cand)))
+         (buf  (get-buffer cand))
+         (match-mjm (lambda (str mjm)
+                      ;; Avoid matching all modes when entering only "mode".
+                      (and (not (string= str "mode"))
+                           (string-match str mjm)))))
     (when buf
       (with-current-buffer buf
         (let ((mjm   (symbol-name major-mode))
@@ -330,15 +341,15 @@ with name matching pattern."
                  (or (helm-buffers-match-inside cand split)
                      (string-match helm-pattern cand)))
                 ((string-match "\\s-$" helm-pattern)
-                 (string-match (car split) mjm))
+                 (funcall match-mjm (car split) mjm))
                 ((string-match "\\s-[@]" helm-pattern)
-                 (and (or (string-match (car split) mjm)
+                 (and (or (funcall match-mjm (car split) mjm)
                           (string-match (car split) cand))
                       (helm-buffers-match-inside cand (cdr split))))
                 ((string-match "\\s-" helm-pattern)
-                 (and (string-match (car split) mjm)
+                 (and (funcall match-mjm (car split) mjm)
                       (loop for i in (cdr split) always (string-match i cand))))
-                (t (or (string-match helm-pattern mjm)
+                (t (or (funcall match-mjm helm-pattern mjm)
                        (string-match helm-pattern cand)))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
@@ -609,6 +620,7 @@ displayed with the `file-name-shadow' face if available."
                                          (helm-ediff-marked-buffers candidate t))))
       (persistent-help . "Show this buffer")
       (filtered-candidate-transformer helm-skip-boring-buffers
+                                      helm-buffers-sort-transformer
                                       helm-highlight-buffers))
   "Buffer or buffer name.")
 
