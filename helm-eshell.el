@@ -40,6 +40,13 @@
     map)
   "Keymap for `helm-eshell-history'.")
 
+(defvar helm-esh-completion-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "TAB") 'helm-next-line)
+    map)
+  "Keymap for `helm-esh-pcomplete'.")
+
 (defvar helm-source-esh
   '((name . "Eshell completions")
     (init . (lambda ()
@@ -176,6 +183,7 @@ The function that call this should set `helm-ec-target' to thing at point."
              (with-helm-show-completion beg end
                (helm :sources 'helm-source-esh
                      :buffer "*helm pcomplete*"
+                     :keymap helm-esh-completion-map
                      :resume 'noresume
                      :input (and (stringp last)
                                  (helm-ff-set-pattern last))))))))
