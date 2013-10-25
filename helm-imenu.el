@@ -30,6 +30,16 @@
   :group 'helm-imenu
   :type 'string)
 
+(defcustom helm-imenu-execute-action-at-once-if-one t
+  "Goto the candidate when only one is remaining."
+  :group 'helm-imenu
+  :type 'boolean)
+
+(defcustom helm-imenu-quit-if-no-candidate t
+  "Quit when there is no candidates."
+  :group 'helm-imenu
+  :type 'boolean)
+
 ;;; Internals
 (defvar helm-imenu-index-filter nil)
 (make-variable-buffer-local 'helm-imenu-index-filter)
@@ -103,8 +113,10 @@
   "Preconfigured `helm' for `imenu'."
   (interactive)
   (let ((imenu-auto-rescan t)
-        (helm-execute-action-at-once-if-one t)
-        (helm-quit-if-no-candidate t)
+        (helm-execute-action-at-once-if-one
+         helm-imenu-execute-action-at-once-if-one)
+        (helm-quit-if-no-candidate
+         helm-imenu-quit-if-no-candidate)
         (imenu-default-goto-function
          (if (fboundp 'semantic-imenu-goto-function)
              'semantic-imenu-goto-function
