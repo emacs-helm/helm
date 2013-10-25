@@ -1210,11 +1210,12 @@ expand to this directory."
                             helm-pattern))
            (completed-p (string= (file-name-as-directory
                                   (expand-file-name pat))
-                                 helm-ff-default-directory)))
+                                 helm-ff-default-directory))
+           (candnum (helm-approximate-candidate-number)))
       (when (and (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
-                  (and (<= (helm-approximate-candidate-number) 2)
+                  (and (<= candnum 2)
                        (>= (string-width (helm-basename helm-pattern)) 2))
                   ;; Already completed.
                   completed-p)
@@ -1231,7 +1232,7 @@ expand to this directory."
               (if (and (not (helm-dir-is-dot cur-cand))         ; [1]
                        ;; Maybe we are here because completed-p is true
                        ;; but check this again to be sure. (Windows fix)
-                       (<= (helm-approximate-candidate-number) 2)) ; [2]
+                       (<= candnum 2)) ; [2]
                   ;; If after going to next line the candidate
                   ;; is not one of "." or ".." [1]
                   ;; and only one candidate is remaining [2],
@@ -1735,7 +1736,10 @@ Return candidates prefixed with basename of `helm-input' first."
                                    (bn2 (helm-basename s2))
                                    (sc1 (funcall score bn1))
                                    (sc2 (funcall score bn2)))
-                              (cond ((>= sc1 sc2))
+                              (cond ((= sc1 sc2)
+                                     (< (string-width bn1)
+                                        (string-width bn2)))
+                                    ((> sc1 sc2))
                                     (t (string-lessp bn1 bn2))))))))
         (if cand1 (cons cand1 all) all))))
 
