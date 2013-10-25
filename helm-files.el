@@ -682,16 +682,16 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 (defun helm-ff-switch-to-eshell (candidate)
   "Switch to eshell and cd to `helm-ff-default-directory'."
   (let ((cd-eshell #'(lambda ()
+                       (eshell-kill-input)
                        (goto-char (point-max))
                        (insert
                         (format "cd '%s'" helm-ff-default-directory))
                        (eshell-send-input))))
     (if (get-buffer "*eshell*")
-        (progn
-          (helm-switch-to-buffer "*eshell*")
-          (funcall cd-eshell))
-        (call-interactively 'eshell)
-        (funcall cd-eshell))))
+        (helm-switch-to-buffer "*eshell*")
+        (call-interactively 'eshell))
+    (unless (get-buffer-process (current-buffer))
+      (funcall cd-eshell))))
 
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files to `helm-ff-default-directory' with METHOD.
