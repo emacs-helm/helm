@@ -866,11 +866,10 @@ Can be used as value for `completion-in-region-function'."
   (declare (special require-match prompt))
   (let* ((enable-recursive-minibuffers t)
          (input (buffer-substring start end))
-         (must-match require-match)
-         (result (helm-comp-read "prompt: "
+         (result (helm-comp-read prompt
                      (all-completions input collection predicate)
                      :initial-input input
-                     :must-match must-match)))
+                     :must-match require-match)))
     (when result
       (delete-region start end)
       (insert result))))
