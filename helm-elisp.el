@@ -357,7 +357,8 @@ First call indent, second complete symbol, third complete fname."
     (candidates-in-buffer)
     (action . (("Describe Variable" . helm-describe-variable)
                ("Find Variable" . helm-find-variable)
-               ("Info lookup" . helm-info-lookup-symbol)))))
+               ("Info lookup" . helm-info-lookup-symbol)
+               ("Set variable" . helm-set-variable)))))
 
 (defun helm-def-source--emacs-faces (&optional default)
   `((name . "Faces")
