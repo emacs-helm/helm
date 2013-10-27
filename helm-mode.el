@@ -915,7 +915,8 @@ Note: This mode is incompatible with Emacs23."
                                           'completing-read-default)
             read-file-name-function  (and (fboundp 'read-file-name-default)
                                           'read-file-name-default))
-      (when (boundp 'completion-in-region-function)
+      (when (and (boundp 'completion-in-region-function)
+                 (boundp 'helm--old-completion-in-region-function))
         (setq completion-in-region-function helm--old-completion-in-region-function))
       (message helm-completion-mode-quit-message)))
 
