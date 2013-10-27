@@ -1719,7 +1719,8 @@ is non--nil."
 (defun helm-ff-sort-candidates (candidates source)
   "Sort function for `helm-source-find-files'.
 Return candidates prefixed with basename of `helm-input' first."
-  (if (file-directory-p helm-input)
+  (if (or (file-directory-p helm-input)
+          (null candidates))
       candidates
       (let* ((cand1real (car candidates))
              (cand1     (unless (file-exists-p cand1real)
@@ -1728,11 +1729,14 @@ Return candidates prefixed with basename of `helm-input' first."
              (all (sort rest-cand
                         #'(lambda (s1 s2)
                             (let* ((score (lambda (str)
-                                            (if (string-match
-                                                 (concat
-                                                  "\\_<"
-                                                  (helm-basename
-                                                   helm-input)) str) 1 0)))
+                                            (if (condition-case err
+                                                    (string-match
+                                                     (concat
+                                                      "\\_<"
+                                                      (helm-basename
+                                                       helm-input)) str)
+                                                  (invalid-regexp nil))
+                                                1 0)))
                                    (bn1 (helm-basename s1))
                                    (bn2 (helm-basename s2))
                                    (sc1 (funcall score bn1))
