@@ -75,7 +75,8 @@ See `helm-case-fold-search' for more info."
   :type 'symbol)
 
 (defcustom helm-mode-handle-completion-in-region nil
-  "[EXPERIMENTAL] Whether to replace or not `completion-in-region-function'."
+  "[EXPERIMENTAL] Whether to replace or not `completion-in-region-function'.
+This enable support for `completing-read-multiple' when non--nil."
   :group 'helm-mode
   :type 'boolean)
 
