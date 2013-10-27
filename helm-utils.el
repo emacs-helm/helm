@@ -752,9 +752,9 @@ directory, open this directory."
 
 (defun helm-action-line-goto (lineno-and-content)
   (apply #'helm-goto-file-line
-         (helm-interpret-value (helm-attr 'target-file))
          (append lineno-and-content
-                 (list (if (and (helm-attr-defined 'target-file)
+                 (list (helm-interpret-value (helm-attr 'target-file))
+                       (if (and (helm-attr-defined 'target-file)
                                 (not helm-in-persistent-action))
                            'find-file-other-window
                            'find-file)))))
@@ -786,16 +786,15 @@ directory, open this directory."
                     (propertize filename 'face compilation-info-face)
                     (propertize lineno 'face compilation-line-face)
                     content)
-            (list (expand-file-name
+            (list (string-to-number lineno) content
+                  (expand-file-name
                    filename
                    (or (helm-interpret-value (helm-attr 'default-directory))
                        (and (helm-candidate-buffer)
                             (buffer-local-value
-                             'default-directory (helm-candidate-buffer)))))
-                  (string-to-number lineno) content)))))
+                             'default-directory (helm-candidate-buffer))))))))))
 
-(defun* helm-goto-file-line (file lineno content
-                                  &optional (find-file-function #'find-file))
+(defun* helm-goto-file-line (lineno &optional content file (find-file-function #'find-file))
   (helm-aif (helm-attr 'before-jump-hook)
       (funcall it))
   (when file (funcall find-file-function file))
