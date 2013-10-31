@@ -4146,21 +4146,22 @@ It is analogous to `dired-get-marked-files'."
 
 (defun helm-next-point-in-list (curpos points &optional prev)
   (cond
-    ;; rule out special cases
-    ((null points)                        curpos)
-    ((and prev (< curpos (car points)))   curpos)
+    ;; rule out special cases.
+    ((null points) curpos)
+    ((and prev (<= curpos (car points)))
+     (nth (1- (length points)) points))
     ((< (car (last points)) curpos)
-     (if prev (car (last points)) curpos))
+     (if prev (car (last points)) (nth 0 points)))
+    ((and (not prev) (>= curpos (car (last points))))
+     (nth 0 points))
     (t
      (nth (if prev
               (loop for pt in points
                     for i from 0
-                    if (<= curpos pt)
-                    return (1- i))
+                    if (<= curpos pt) return (1- i))
               (loop for pt in points
                     for i from 0
-                    if (< curpos pt)
-                    return i))
+                    if (< curpos pt) return i))
           points))))
 
 ;;;###autoload
