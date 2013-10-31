@@ -642,6 +642,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-follow-mode nil)
 (defvar helm-let-variables nil)
 (defvar helm-split-window-state nil)
+(defvar helm--window-side-state 'below)
 (defvar helm-selection-point nil)
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
@@ -1822,7 +1823,7 @@ The function used to display `helm-buffer'."
          (if (and (not helm-full-frame)
                   helm-reuse-last-window-split-state)
              (cond ((eq helm-split-window-default-side 'same) 'same)
-                   (helm-window-side-state)
+                   (helm--window-side-state)
                    (t helm-split-window-default-side))
              helm-split-window-default-side)))
     (prog1
@@ -1919,13 +1920,13 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (setq helm-saved-current-source nil)
   (unless (and helm-reuse-last-window-split-state
                (or helm-split-window-state
-                   helm-window-side-state))
+                   helm--window-side-state))
     (if (or (not split-width-threshold)
             (and (integerp split-width-threshold)
                  (>= split-width-threshold (+ (frame-width) 4))))
         (setq helm-split-window-state 'vertical)
         (setq helm-split-window-state 'horizontal)
-        (setq helm-window-side-state 'below)))
+        (setq helm--window-side-state 'below)))
   ;; Call the init function for sources where appropriate
   (helm-funcall-foreach
    'init (and helm-source-filter
@@ -3700,7 +3701,7 @@ Arg DATA can be either a list or a plain string."
                             (split-window (selected-window) nil 'left))
                            (t (split-window-horizontally)))))
                 helm-buffer)))
-         (setq helm-window-side-state (helm--window-side-state)))
+         (setq helm--window-side-state (helm--get-window-side-state)))
     (when helm-prevent-escaping-from-minibuffer
       (helm-prevent-switching-other-window :enabled nil))))
 
@@ -3760,10 +3761,9 @@ If N is positive enlarge, if negative narrow."
           (and resize (window-resize w2 resize split-state))
           (set-window-start w1 s2 t)
           (set-window-start w2 s1 t))
-        (setq helm-window-side-state (helm--window-side-state)))))
+        (setq helm--window-side-state (helm--get-window-side-state)))))
 
-(defvar helm-window-side-state 'below)
-(defun helm--window-side-state ()
+(defun helm--get-window-side-state ()
   (let ((side-list '(left right below above)))
     (loop for side in side-list
           thereis (and (equal (helm-window)
