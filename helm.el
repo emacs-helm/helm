@@ -2114,7 +2114,6 @@ if some when multiples sources are present."
            (kmap (and (listp source) ; Check if source is empty.
                       (assoc-default 'keymap source))))
       (when kmap (setq overriding-local-map kmap)))))
-(add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
 
 
 ;; Core: clean up
@@ -3020,6 +3019,7 @@ Key arg DIRECTION can be one of:
         (when (helm-get-previous-header-pos)
           (helm-mark-current-line))
         (helm-display-mode-line (helm-get-current-source))
+        (helm-maybe-update-keymap)
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
 
 (defun helm-move--previous-line-fn ()
