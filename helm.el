@@ -685,11 +685,14 @@ Argument FORMAT-STRING is a string to use with `format'.
 Use optional arguments ARGS like in `format'."
   (when (or debug-on-error helm-debug)
     (with-current-buffer (get-buffer-create helm-debug-buffer)
+      (outline-mode)
       (buffer-disable-undo)
       (set (make-local-variable 'inhibit-read-only) t)
       (goto-char (point-max))
       (insert (let ((tm (current-time)))
-                (format "%s.%06d (%s) %s\n"
+                (format (concat (if (string-match "Start session" format-string)
+                                    "* " "** ")
+                                "%s.%06d (%s)\n %s\n")
                         (format-time-string "%H:%M:%S" tm)
                         (nth 2 tm)
                         (helm-log-get-current-function)
