@@ -1948,6 +1948,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (setq helm-input "")
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
+  (helm-clear-visible-mark)
   (helm-log-run-hook 'helm-after-initialize-hook))
 
 (defun helm-create-helm-buffer ()
@@ -1969,6 +1970,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                0 helm-completion-window-scroll-margin))
       (set (make-local-variable 'helm-default-directory) root-dir)
       (set (make-local-variable 'default-directory) root-dir)
+      (set (make-local-variable 'helm-marked-candidates) nil)
       (helm-initialize-persistent-action)
       (helm-log-eval helm-display-function helm-let-variables)
       (loop for (var . val) in helm-let-variables
@@ -3976,7 +3978,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
   (with-current-buffer (helm-buffer-get)
     (mapc 'delete-overlay helm-visible-mark-overlays)
     (set (make-local-variable 'helm-visible-mark-overlays) nil)))
-(add-hook 'helm-after-initialize-hook 'helm-clear-visible-mark)
 
 (defun helm-this-visible-mark ()
   (loop for o in helm-visible-mark-overlays
@@ -4106,12 +4107,6 @@ It is analogous to `dired-get-marked-files'."
                (list (helm-get-selection)))))
       (helm-log-eval cands)
       cands)))
-
-(defun helm-reset-marked-candidates ()
-  (with-current-buffer (helm-buffer-get)
-    (set (make-local-variable 'helm-marked-candidates) nil)))
-
-(add-hook 'helm-after-initialize-hook 'helm-reset-marked-candidates)
 
 (defun helm-current-source-name= (name)
   (save-excursion
