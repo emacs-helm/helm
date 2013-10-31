@@ -3770,6 +3770,8 @@ If N is positive enlarge, if negative narrow."
         (setq helm--window-side-state (helm--get-window-side-state)))))
 
 (defun helm--get-window-side-state ()
+  "Return the position of `helm-window' from `helm-current-buffer'.
+Possible values are 'left 'right 'below or 'above."
   (let ((side-list '(left right below above)))
     (loop for side in side-list
           thereis (and (equal (helm-window)
