@@ -3739,7 +3739,12 @@ If N is positive enlarge, if negative narrow."
              (b1          (window-buffer w1)) ; helm-buffer
              (s1          (window-start w1))
              (cur-frame   (window-frame w1))
-             (w2          (next-window w1 1 cur-frame))
+             (w2          (with-selected-window (helm-window)
+                            ;; Don't try to display helm-buffer
+                            ;; in a dedicated window.
+                            (get-window-with-predicate
+                             (lambda (w) (not (window-dedicated-p w)))
+                             1 cur-frame)))
              (w2size      (window-total-size w2 split-state))
              (b2          (window-buffer w2)) ; probably helm-current-buffer
              (s2          (window-start w2))
