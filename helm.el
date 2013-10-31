@@ -1821,20 +1821,8 @@ The function used to display `helm-buffer'."
         (helm-split-window-default-side
          (if (and (not helm-full-frame)
                   helm-reuse-last-window-split-state)
-             (cond ((and (eq helm-split-window-state 'horizontal)
-                         (eq helm-split-window-default-side 'left))
-                    'left)
-                   ((and (eq helm-split-window-state 'horizontal)
-                         (eq helm-split-window-default-side 'right))
-                    'right)
-                   ((and (eq helm-split-window-state 'horizontal)
-                         (eq helm-split-window-default-side 'above))
-                    'left)
-                   ((and (eq helm-split-window-state 'horizontal)
-                         (eq helm-split-window-default-side 'below))
-                    'right)
-                   ;; When `helm-split-window-default-side' is 'same
-                   ;; Use this value ignoring `helm-split-window-state'. 
+             (cond ((eq helm-split-window-default-side 'same) 'same)
+                   (helm-window-side-state)
                    (t helm-split-window-default-side))
              helm-split-window-default-side)))
     (prog1
@@ -1930,12 +1918,14 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (setq helm-compiled-sources nil)
   (setq helm-saved-current-source nil)
   (unless (and helm-reuse-last-window-split-state
-               helm-split-window-state)
+               (or helm-split-window-state
+                   helm-window-side-state))
     (if (or (not split-width-threshold)
             (and (integerp split-width-threshold)
                  (>= split-width-threshold (+ (frame-width) 4))))
         (setq helm-split-window-state 'vertical)
-        (setq helm-split-window-state 'horizontal)))
+        (setq helm-split-window-state 'horizontal)
+        (setq helm-window-side-state 'below)))
   ;; Call the init function for sources where appropriate
   (helm-funcall-foreach
    'init (and helm-source-filter
@@ -3709,7 +3699,8 @@ Arg DATA can be either a list or a plain string."
                                 (eq helm-split-window-default-side 'above))
                             (split-window (selected-window) nil 'left))
                            (t (split-window-horizontally)))))
-                helm-buffer))))
+                helm-buffer)))
+         (setq helm-window-side-state (helm--window-side-state)))
     (when helm-prevent-escaping-from-minibuffer
       (helm-prevent-switching-other-window :enabled nil))))
 
@@ -3768,7 +3759,18 @@ If N is positive enlarge, if negative narrow."
           ;; Maybe resize the window holding helm-buffer.
           (and resize (window-resize w2 resize split-state))
           (set-window-start w1 s2 t)
-          (set-window-start w2 s1 t)))))
+          (set-window-start w2 s1 t))
+        (setq helm-window-side-state (helm--window-side-state)))))
+
+(defvar helm-window-side-state 'below)
+(defun helm--window-side-state ()
+  (let ((side-list '(left right below above)))
+    (loop for side in side-list
+          thereis (and (equal (helm-window)
+                              (window-in-direction
+                               side (get-buffer-window helm-current-buffer t)
+                               t))
+                       side))))
 
 (defun helm-replace-buffer-in-window (window buffer1 buffer2)
   "Replace BUFFER1 by BUFFER2 in WINDOW registering BUFFER1."
