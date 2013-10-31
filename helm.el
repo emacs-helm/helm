@@ -107,7 +107,7 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
     "Multi key command to resplit and swap helm window.
 First call run `helm-toggle-resplit-window',
 second call within 0.5s run `helm-swap-windows'."
-  '(helm-toggle-resplit-window helm-swap-windows) 0.5)
+  '(helm-toggle-resplit-window helm-swap-windows) 1)
 
 
 ;;; Keymap
