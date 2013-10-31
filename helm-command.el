@@ -147,7 +147,9 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
     (unless current-prefix-arg
       (setq current-prefix-arg helm-current-prefix-arg))
     ;; Avoid having `this-command' set to *exit-minibuffer.
-    (setq this-command sym-com)
+    (setq this-command sym-com
+          ;; Handle C-x z (repeat) Issue #322
+          real-this-command sym-com)
     ;; This ugly construct is to save history even on error.
     (unless helm-M-x-always-save-history
       (call-interactively sym-com))
