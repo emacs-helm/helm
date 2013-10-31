@@ -642,7 +642,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-follow-mode nil)
 (defvar helm-let-variables nil)
 (defvar helm-split-window-state nil)
-(defvar helm--window-side-state 'below)
+(defvar helm--window-side-state (or helm-split-window-default-side 'below))
 (defvar helm-selection-point nil)
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
@@ -1925,8 +1925,9 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
             (and (integerp split-width-threshold)
                  (>= split-width-threshold (+ (frame-width) 4))))
         (setq helm-split-window-state 'vertical)
-        (setq helm-split-window-state 'horizontal)
-        (setq helm--window-side-state 'below)))
+        (setq helm-split-window-state 'horizontal))
+    (setq helm--window-side-state
+          (or helm-split-window-default-side 'below)))
   ;; Call the init function for sources where appropriate
   (helm-funcall-foreach
    'init (and helm-source-filter
