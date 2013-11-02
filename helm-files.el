@@ -476,6 +476,7 @@ ACTION must be an action supported by `helm-dired-action'."
          (prompt (helm-find-files-set-prompt-for-action
                   (capitalize (symbol-name action)) ifiles))
          (parg   helm-current-prefix-arg)
+         helm-display-source-at-screen-top ; prevent setting window-start.
          (dest   (helm-read-file-name
                   prompt
                   :preselect (if helm-ff-transformer-show-only-basename
