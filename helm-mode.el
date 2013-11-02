@@ -80,6 +80,11 @@ This enable support for `completing-read-multiple' when non--nil."
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-mode-reverse-history t
+  "Display history source after current source in `helm-mode' handled commands."
+  :group 'helm-mode
+  :type 'boolean)
+
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -510,7 +515,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      prompt collection
      :test test
      :history history
-     :reverse-history t
+     :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
      :alistp nil ; Be sure `all-completions' is used.
