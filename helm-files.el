@@ -486,34 +486,34 @@ ACTION must be an action supported by `helm-dired-action'."
     (helm-dired-action
      dest :files ifiles :action action :follow parg)))
 
-(defun helm-find-files-copy (candidate)
+(defun helm-find-files-copy (_candidate)
   "Copy files from `helm-find-files'."
   (helm-find-files-do-action 'copy))
 
-(defun helm-find-files-rename (candidate)
+(defun helm-find-files-rename (_candidate)
   "Rename files from `helm-find-files'."
   (helm-find-files-do-action 'rename))
 
-(defun helm-find-files-symlink (candidate)
+(defun helm-find-files-symlink (_candidate)
   "Symlink files from `helm-find-files'."
   (helm-find-files-do-action 'symlink))
 
-(defun helm-find-files-relsymlink (candidate)
+(defun helm-find-files-relsymlink (_candidate)
   "Relsymlink files from `helm-find-files'."
   (helm-find-files-do-action 'relsymlink))
 
-(defun helm-find-files-hardlink (candidate)
+(defun helm-find-files-hardlink (_candidate)
   "Hardlink files from `helm-find-files'."
   (helm-find-files-do-action 'hardlink))
 
-(defun helm-find-files-byte-compile (candidate)
+(defun helm-find-files-byte-compile (_candidate)
   "Byte compile elisp files from `helm-find-files'."
   (let ((files    (helm-marked-candidates))
         (parg     helm-current-prefix-arg))
     (loop for fname in files
           do (byte-compile-file fname parg))))
 
-(defun helm-find-files-load-files (candidate)
+(defun helm-find-files-load-files (_candidate)
   "Load elisp files from `helm-find-files'."
   (let ((files    (helm-marked-candidates)))
     (loop for fname in files
@@ -547,15 +547,15 @@ ACTION must be an action supported by `helm-dired-action'."
 (defun helm-find-files-ediff-merge-files (candidate)
   (helm-find-files-ediff-files-1 candidate 'merge))
 
-(defun helm-find-files-grep (candidate)
+(defun helm-find-files-grep (_candidate)
   "Default action to grep files from `helm-find-files'."
   (helm-do-grep-1 (helm-marked-candidates) helm-current-prefix-arg))
 
-(defun helm-ff-zgrep (candidate)
+(defun helm-ff-zgrep (_candidate)
   "Default action to zgrep files from `helm-find-files'."
   (helm-ff-zgrep-1 (helm-marked-candidates) helm-current-prefix-arg))
 
-(defun helm-ff-pdfgrep (candidate)
+(defun helm-ff-pdfgrep (_candidate)
   "Default action to pdfgrep files from `helm-find-files'."
   (let ((cands (loop for file in (helm-marked-candidates)
                      if (or (string= (file-name-extension file) "pdf")
@@ -575,13 +575,13 @@ ACTION must be an action supported by `helm-dired-action'."
                                 (file-name-directory candidate))))
     (helm-etags-select helm-current-prefix-arg)))
 
-(defun helm-find-files-switch-to-hist (candidate)
+(defun helm-find-files-switch-to-hist (_candidate)
   "Switch to helm-find-files history."
   (helm-find-files t))
 
 (defvar eshell-command-aliases-list nil)
 (defvar helm-eshell-command-on-file-input-history nil)
-(defun helm-find-files-eshell-command-on-file-1 (candidate &optional map)
+(defun helm-find-files-eshell-command-on-file-1 (&optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates.
 This is done possibly with an eshell alias, if no alias found, you can type in
 an eshell command.
@@ -675,13 +675,12 @@ will not be loaded first time you use this."
                               (format "%s %s" command files))
                 do (eshell-command com))))))
 
-(defun helm-find-files-eshell-command-on-file (candidate)
+(defun helm-find-files-eshell-command-on-file (_candidate)
   "Run `eshell-command' on CANDIDATE or marked candidates.
 See `helm-find-files-eshell-command-on-file-1' for more info."
-  (helm-find-files-eshell-command-on-file-1
-   candidate helm-current-prefix-arg))
+  (helm-find-files-eshell-command-on-file-1 helm-current-prefix-arg))
 
-(defun helm-ff-switch-to-eshell (candidate)
+(defun helm-ff-switch-to-eshell (_candidate)
   "Switch to eshell and cd to `helm-ff-default-directory'."
   (let ((cd-eshell #'(lambda ()
                        (eshell-kill-input)
