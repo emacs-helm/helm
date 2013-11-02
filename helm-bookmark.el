@@ -96,7 +96,7 @@
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
-(defun helm-bookmark-transformer (candidates source)
+(defun helm-bookmark-transformer (candidates _source)
   (loop for i in candidates
         for loc = (bookmark-location i)
         for len =  (string-width i)

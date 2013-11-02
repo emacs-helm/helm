@@ -1379,10 +1379,10 @@ e.g
 filtered-candidate-transformer:
 \(helm-compose '((1 2 3 4 5 6 7)
                 '((name . \"An helm source\") (candidates . (a b c))))
-              '((lambda (candidates source)
+              '((lambda (candidates _source)
                   (loop for i in candidates
                         when (oddp i) collect i))
-                (lambda (candidates source)
+                (lambda (candidates _source)
                   (loop for i in candidates collect (1+ i)))))
 =>(2 4 6 8)
 
@@ -2291,13 +2291,13 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
         else
         collect (funcall function arg)))
 
-(defun helm-process-candidate-transformer (candidates source)
+(defun helm-process-candidate-transformer (candidates _source)
   "Execute `candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'candidate-transformer source)
       (helm-composed-funcall-with-source source it candidates)
     candidates))
 
-(defun helm-process-filtered-candidate-transformer (candidates source)
+(defun helm-process-filtered-candidate-transformer (candidates _source)
   "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'filtered-candidate-transformer source)
       (helm-composed-funcall-with-source source it candidates source)
@@ -2313,7 +2313,7 @@ functions if some, otherwise return CANDIDATES."
       (helm-process-filtered-candidate-transformer candidates source)
       candidates))
 
-(defun helm-process-real-to-display (candidates source)
+(defun helm-process-real-to-display (candidates _source)
   "Execute real-to-display function on all CANDIDATES of SOURCE."
   (helm-aif (assoc-default 'real-to-display source)
       (setq candidates (helm-funcall-with-source

@@ -234,7 +234,7 @@ Return a cons \(beg . end\)."
        (intern candidate))
       'face 'helm-lisp-completion-info))))
 
-(defun helm-lisp-completion-transformer (candidates source)
+(defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for lisp completion."
   (declare (special lgst-len))
   (loop for c in candidates
@@ -365,7 +365,7 @@ First call indent, second complete symbol, third complete fname."
     (init . (lambda ()
               (helm-apropos-init 'facep ,default)))
     (candidates-in-buffer)
-    (filtered-candidate-transformer . (lambda (candidates source)
+    (filtered-candidate-transformer . (lambda (candidates _source)
                                         (loop for c in candidates
                                               collect (propertize c 'face (intern c)))))
     (action . (lambda (candidate)

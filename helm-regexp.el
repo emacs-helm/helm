@@ -304,7 +304,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (delayed . ,helm-m-occur-idle-delay))
   "Helm source for multi occur.")
 
-(defun helm-m-occur-transformer (candidates source)
+(defun helm-m-occur-transformer (candidates _source)
   "Transformer function for `helm-source-moccur'."
   (require 'helm-grep)
   (loop for i in candidates

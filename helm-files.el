@@ -390,7 +390,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                     helm-ff-auto-update-initial-value)
               (set (make-local-variable 'helm-in-file-completion-p) t)))
     (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer . ((lambda (candidates source)
+    (filtered-candidate-transformer . ((lambda (candidates _source)
                                          (if helm-ff-skip-boring-files
                                              (helm-skip-boring-files candidates)
                                              candidates))
@@ -1717,7 +1717,7 @@ is non--nil."
           files)
       (helm-ff-highlight-files files)))
 
-(defun helm-ff-sort-candidates (candidates source)
+(defun helm-ff-sort-candidates (candidates _source)
   "Sort function for `helm-source-find-files'.
 Return candidates prefixed with basename of `helm-input' first."
   (if (or (file-directory-p helm-input)
@@ -2414,7 +2414,7 @@ Else return ACTIONS unmodified."
                     (helm-set-pattern
                      (expand-file-name candidate))))))))
 
-(defun helm-file-name-history-transformer (candidates source)
+(defun helm-file-name-history-transformer (candidates _source)
   (loop for c in candidates collect
         (cond ((file-remote-p c)
                (cons (propertize c 'face 'helm-history-remote) c))
@@ -2441,7 +2441,7 @@ Else return ACTIONS unmodified."
               (recentf-mode 1)))
     (candidates . recentf-list)
     (match . helm-files-match-only-basename)
-    (filtered-candidate-transformer . (lambda (candidates source)
+    (filtered-candidate-transformer . (lambda (candidates _source)
                                         (loop for i in candidates
                                               if helm-ff-transformer-show-only-basename
                                               collect (cons (helm-basename i) i)
@@ -2569,7 +2569,7 @@ Colorize only symlinks, directories and files."
          (start-process "tracker-search-process" nil
                         "tracker-search"
                         helm-pattern)))
-    (filtered-candidate-transformer . (lambda (candidates source)
+    (filtered-candidate-transformer . (lambda (candidates _source)
                                         (loop for cand in (cdr candidates)
                                               collect (ansi-color-apply cand))))
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
@@ -2607,7 +2607,7 @@ utility mdfind.")
     (header-name . (lambda (name)
                      (concat name " in [" helm-default-directory "]")))
     (candidates-process . helm-find-shell-command-fn)
-    (filtered-candidate-transformer . ((lambda (candidates source)
+    (filtered-candidate-transformer . ((lambda (candidates _source)
                                          (if helm-findutils-skip-boring-files
                                              (helm-skip-boring-files candidates)
                                              candidates))
@@ -2620,7 +2620,7 @@ utility mdfind.")
     (requires-pattern . 3)
     (delayed)))
 
-(defun helm-findutils-transformer (candidates source)
+(defun helm-findutils-transformer (candidates _source)
   (loop for i in candidates
         for abs = (expand-file-name i helm-default-directory)
         for disp = (if (and helm-ff-transformer-show-only-basename

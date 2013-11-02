@@ -685,7 +685,7 @@ Special commands:
                                 " [" (match-string 3) "]")
                         (concat "no" (match-string 2))))))
 
-(defun helm-grep-ack-types-transformer (candidates source)
+(defun helm-grep-ack-types-transformer (candidates _source)
   (loop for i in candidates
         if (stringp i)
         collect (rassoc i helm-grep-ack-types-cache)

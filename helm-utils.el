@@ -774,7 +774,7 @@ directory, open this directory."
   (or (require feature nil t)
       (error "Need %s to use `%s'." feature function)))
 
-(defun helm-filtered-candidate-transformer-file-line (candidates source)
+(defun helm-filtered-candidate-transformer-file-line (candidates _source)
   (delq nil (mapcar 'helm-filtered-candidate-transformer-file-line-1
                     candidates)))
 

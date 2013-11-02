@@ -61,7 +61,7 @@ A format string where %s will be replaced with `frame-width'."
     (filtered-candidate-transformer . helm-top-sort-transformer)
     (action-transformer . helm-top-action-transformer)))
 
-(defun helm-top-transformer (candidates source)
+(defun helm-top-transformer (candidates _source)
   "Transformer for `helm-top'.
 Return empty string for non--valid candidates."
   (loop for disp in candidates collect

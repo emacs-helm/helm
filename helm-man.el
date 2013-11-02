@@ -72,7 +72,7 @@ source.")
               (helm-init-candidates-in-buffer 'global helm-man-pages)))
     (candidates-in-buffer)
     (filtered-candidate-transformer
-     . (lambda (candidates source)
+     . (lambda (candidates _source)
          (sort candidates #'helm-generic-sort-fn)))
     (action  . (("Display Man page" . helm-man-default-action)))
     ;; Woman does not work OS X

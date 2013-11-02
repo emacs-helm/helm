@@ -118,7 +118,7 @@
     (filtered-candidate-transformer . helm-adaptive-sort)))
 
 (defvar helm-emms-current-playlist nil)
-(defun helm-emms-files-modifier (candidates source)
+(defun helm-emms-files-modifier (candidates _source)
   (loop for i in candidates
         if (member (cdr i) helm-emms-current-playlist)
         collect (cons (propertize (car i)

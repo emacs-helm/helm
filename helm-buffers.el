@@ -309,7 +309,7 @@ Should be called after others transformers i.e (boring buffers)."
     (setq helm-buffer-details-flag (not helm-buffer-details-flag))
     (helm-force-update (car (split-string (helm-get-selection nil t))))))
 
-(defun helm-buffers-sort-transformer (candidates source)
+(defun helm-buffers-sort-transformer (candidates _source)
   (if (string= helm-pattern "")
       candidates
       (sort candidates

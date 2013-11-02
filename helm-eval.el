@@ -69,7 +69,7 @@ Should take one arg: the string to display."
     (dummy)
     (multiline)
     (mode-line . "C-RET: nl-and-indent, tab: reindent, C-tab:complete, C-p/n: next/prec-line.")
-    (filtered-candidate-transformer . (lambda (candidates source)
+    (filtered-candidate-transformer . (lambda (candidates _source)
                                         (list
                                          (condition-case nil
                                              (with-helm-current-buffer
@@ -132,7 +132,7 @@ Should take one arg: the string to display."
 (defvar helm-source-calculation-result
   '((name . "Calculation Result")
     (dummy)
-    (filtered-candidate-transformer . (lambda (candidates source)
+    (filtered-candidate-transformer . (lambda (candidates _source)
                                         (list
                                          (condition-case nil
                                              (calc-eval helm-pattern)

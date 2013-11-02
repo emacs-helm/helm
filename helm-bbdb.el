@@ -132,7 +132,7 @@ All other actions are removed."
     (candidates . helm-bbdb-candidates)
     (action . (("Send a mail" . helm-bbdb-compose-mail)
                ("View person's data" . helm-bbdb-view-person-action)))
-    (filtered-candidate-transformer . (lambda (candidates source)
+    (filtered-candidate-transformer . (lambda (candidates _source)
                                         (setq helm-bbdb-name helm-pattern)
                                         (if (not candidates)
                                             (list "*Add to contacts*")

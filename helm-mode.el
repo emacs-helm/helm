@@ -170,7 +170,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                (t (all-completions "" collection test)))))
     (if sort-fn (sort cands sort-fn) cands)))
 
-(defun helm-cr-default-transformer (candidates source)
+(defun helm-cr-default-transformer (candidates _source)
   "Default filter candidate function for `helm-comp-read'."
   (loop with lst for c in candidates
         for cand = (if (stringp c) (replace-regexp-in-string "\\s\\" "" c) c)

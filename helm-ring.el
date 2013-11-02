@@ -85,7 +85,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
                    (string-match "\\`[\n[:blank:]]+\\'" kill))
         collect kill))
 
-(defun helm-kill-ring-transformer (candidates source)
+(defun helm-kill-ring-transformer (candidates _source)
   "Display only the `helm-kill-ring-max-lines-number' lines of candidate."
   (loop for i in candidates
         for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
