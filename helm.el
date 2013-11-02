@@ -2184,10 +2184,10 @@ See `helm-compile-source-functions'.
 Helm plug-ins are realized by this function."
   (mapcar
    (lambda (source)
-     (loop with source = (if (listp source) source (symbol-value source))
+     (loop with src = (if (listp source) source (symbol-value source))
            for f in funcs
-           do (setq source (funcall f source))
-           finally (return source)))
+           do (setq src (funcall f src))
+           finally (return src)))
    sources))
 
 
