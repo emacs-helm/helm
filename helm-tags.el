@@ -36,6 +36,12 @@ Don't search tag file deeply if outside this value."
   :type  'number
   :group 'helm-tags)
 
+(defcustom helm-etags-match-part-only t
+  "Whether to match only the tag part of CANDIDATE in
+helm-source-ctags-select."
+  :type 'boolean
+  :group 'helm-tags)
+
 
 (defvar helm-etags-map
   (let ((map (make-sparse-keymap)))
@@ -196,7 +202,9 @@ If no entry in cache, create one."
     (match-part . (lambda (candidate)
                     ;; Match only the tag part of CANDIDATE
                     ;; and not the filename.
-                    (cadr (split-string candidate ":"))))
+                    (if helm-etags-match-part-only
+                        (cadr (split-string candidate ":"))
+                      candidate)))
     (mode-line . helm-etags-mode-line-string)
     (keymap . ,helm-etags-map)
     (action . helm-etags-default-action)
