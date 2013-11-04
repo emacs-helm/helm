@@ -67,12 +67,13 @@ and sets `helm-external-commands-list'."
       (setq helm-external-commands-list
             (cl-loop
                   with paths = (split-string (getenv "PATH") path-separator)
-                  with completions = ()
+                  ;with completions
                   for dir in paths
                   when (and (file-exists-p dir) (file-accessible-directory-p dir))
                   for lsdir = (cl-loop for i in (directory-files dir t)
                                     for bn = (file-name-nondirectory i)
-                                    when (and (not (member bn completions))
+                                    when (and completions
+                                              (not (member bn completions))
                                               (not (file-directory-p i))
                                               (file-executable-p i))
                                     collect bn)
@@ -93,7 +94,7 @@ In this case EXE must be provided as \"EXE %s\"."
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))
             (error "Error: %s is already running" real-com))
-        (when (cl-loop for i in helm-external-commands-list thereis real-com)
+        (when (cl-loop for i in helm-external-commands-list thereis (string= real-com i))
           (message "Starting %s..." real-com)
           (if file
               (start-process-shell-command

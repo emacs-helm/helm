@@ -1360,7 +1360,7 @@ in the source where point is."
   "If an error occur in execution of BODY, quit helm safely."
   (cl-declare (indent 0) (debug t))
   `(let (inhibit-quit)
-     (condition-case v
+     (condition-case _v
          (progn ,@body)
        (quit (setq helm-quit t)
              (exit-minibuffer)
@@ -1584,7 +1584,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                (cl-loop for s in (helm-normalize-sources any-sources)
                      thereis (memq s helm-sources-using-default-as-input)))))
       (unwind-protect
-           (condition-case v
+           (condition-case _v
                (let (;; `helm-source-name' is non-nil
                      ;; when `helm' is invoked by action, reset it.
                      helm-source-name
@@ -2199,7 +2199,7 @@ Helm plug-ins are realized by this function."
       (helm-aif (assoc-default 'delayed-init source)
           (with-current-buffer helm-current-buffer
             (helm-funcall-with-source source it)
-            (cl-dolist (f (if (functionp it) (list it) it))
+            (cl-dolist (_f (if (functionp it) (list it) it))
               (add-to-list 'helm-delayed-init-executed name)))))))
 
 (defun helm-get-candidates (source)
@@ -2418,8 +2418,7 @@ and `helm-pattern'."
   (let (matches)
     (condition-case err
         (let ((item-count 0)
-              (case-fold-search (helm-set-case-fold-search))
-              exit)
+              (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
           (cl-dolist (match matchfns)
             (let (newmatches)
@@ -3391,7 +3390,7 @@ delete minibuffer contents from point instead of deleting all."
        (concat "- " (symbol-name type) "\n\n" doc "\n")))
 
 ;; Built-in plug-in: dummy
-(defun helm-dummy-candidate (candidate source)
+(defun helm-dummy-candidate (_candidate _source)
   "Use `helm-pattern' as CANDIDATE in SOURCE."
   ;; `source' is defined in filtered-candidate-transformer
   (list helm-pattern))
@@ -3523,10 +3522,9 @@ See also `helm-sources' docstring."
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit search-from-end
-                                          start-point endp match-part-fn)
+                                          start-point _endp match-part-fn)
   (let (buffer-read-only
-        matches
-        exit
+        matches 
         newmatches
         (case-fold-search (helm-set-case-fold-search)))
     (helm-search-from-candidate-buffer-internal
@@ -3569,7 +3567,7 @@ See also `helm-sources' docstring."
                                                       limit search-from-end)
   (delq nil (cl-loop with next-line-fn =
                   (if search-from-end
-                      (lambda (x) (goto-char (max (1- (point-at-bol)) 1)))
+                      (lambda (_x) (goto-char (max (1- (point-at-bol)) 1)))
                       #'forward-line)
                   until (funcall endp)
                   for i from 1 to limit
