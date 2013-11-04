@@ -165,7 +165,7 @@ Returns nil if `helm-adaptive-history-file' doesn't exist."
     (write-region (point-min) (point-max) helm-adaptive-history-file nil
                   (unless arg 'quiet))))
 
-(defun helm-adaptive-sort (candidates _source)
+(defun helm-adaptive-sort (candidates source)
   "Sort the CANDIDATES for SOURCE by usage frequency.
 This is a filtered candidate transformer you can use with the
 `filtered-candidate-transformer' attribute."
