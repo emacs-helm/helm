@@ -1159,33 +1159,33 @@ of \(action-display . function\)."
 (defun helm-get-current-source ()
   "Return the source for the current selection.
 Allow also checking if helm-buffer contain candidates."
-  (cl-declare (special source))
-  ;; `helm-source-name' let-bounded in some function with value of source.
-  ;; Return source from this function. (e.g `helm-funcall-with-source').
-  (if (and (boundp 'helm-source-name)
-           (stringp helm-source-name))
-      source
-      (with-current-buffer (helm-buffer-get)
-        (or
-         ;; This happen only when `helm-source-in-each-line-flag'
-         ;; is non--nil and there is candidates in buffer.
-         (get-text-property (point) 'helm-source)
-         ;; Return nil when no--candidates.
-         (cl-block exit
-           ;; This goto-char shouldn't be necessary, but point is moved to
-           ;; point-min somewhere else which shouldn't happen.
-           (goto-char (overlay-start helm-selection-overlay))
-           (let* ((header-pos (or (helm-get-previous-header-pos)
-                                  (helm-get-next-header-pos)))
-                  (source-name
-                   (save-excursion
-                     (unless header-pos
-                       (cl-return-from exit nil))
-                     (goto-char header-pos)
-                     (helm-current-line-contents))))
-             (cl-loop for source in (helm-get-sources) thereis
-                   (and (equal (assoc-default 'name source) source-name)
-                        source))))))))
+  ;; (cl-declare (special source))
+  ;; ;; `helm-source-name' let-bounded in some function with value of source.
+  ;; ;; Return source from this function. (e.g `helm-funcall-with-source').
+  ;; (if (and (boundp 'helm-source-name)
+  ;;          (stringp helm-source-name))
+  ;;     source
+  (with-current-buffer (helm-buffer-get)
+    (or
+     ;; This happen only when `helm-source-in-each-line-flag'
+     ;; is non--nil and there is candidates in buffer.
+     (get-text-property (point) 'helm-source)
+     ;; Return nil when no--candidates.
+     (cl-block exit
+       ;; This goto-char shouldn't be necessary, but point is moved to
+       ;; point-min somewhere else which shouldn't happen.
+       (goto-char (overlay-start helm-selection-overlay))
+       (let* ((header-pos (or (helm-get-previous-header-pos)
+                              (helm-get-next-header-pos)))
+              (source-name
+               (save-excursion
+                 (unless header-pos
+                   (cl-return-from exit nil))
+                 (goto-char header-pos)
+                 (helm-current-line-contents))))
+         (cl-loop for source in (helm-get-sources) thereis
+                  (and (equal (assoc-default 'name source) source-name)
+                       source)))))))
 
 (defun helm-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `helm' was invoked."
@@ -3411,7 +3411,7 @@ delete minibuffer contents from point instead of deleting all."
       source))
 
 ;; Built-in plug-in: candidates-in-buffer
-(defun helm-candidates-in-buffer ()
+(defun helm-candidates-in-buffer (source)
   "Get candidates from the candidates buffer according to `helm-pattern'.
 
 BUFFER is `helm-candidate-buffer' by default.  Each
@@ -3477,7 +3477,7 @@ a specific part of candidate.
 To customize `helm-candidates-in-buffer' behavior, use search,
 get-line, match-part and search-from-end attributes.
 See also `helm-sources' docstring."
-  (cl-declare (special source))
+  ;(cl-declare (special source))
   (helm-candidates-in-buffer-1
    (helm-candidate-buffer)
    helm-pattern
@@ -3663,7 +3663,7 @@ Arg DATA can be either a list or a plain string."
 (defun helm-compile-source--candidates-in-buffer (source)
   (helm-aif (assoc 'candidates-in-buffer source)
       (append source
-              `((candidates . ,(or (cdr it) 'helm-candidates-in-buffer))
+              `((candidates . ,(or (cdr it) (lambda () (helm-candidates-in-buffer source))))
                 (volatile) (match identity)))
     source))
 

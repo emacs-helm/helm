@@ -284,7 +284,8 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (init . (lambda ()
               (require 'helm-grep)
               (helm-m-occur-init)
-              (helm-attrset 'delayed helm-m-occur-idle-delay)))
+              (helm-attrset 'delayed helm-m-occur-idle-delay
+                            helm-source-moccur)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . helm-m-occur-transformer)
     (get-line . helm-m-occur-get-line)
