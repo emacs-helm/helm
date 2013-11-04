@@ -1,4 +1,4 @@
-;;; helm-external.el --- Run Externals commands within Emacs with helm completion.
+;;; helm-external.el --- Run Externals commands within Emacs with helm completion. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

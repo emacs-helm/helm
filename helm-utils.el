@@ -82,16 +82,6 @@ PARENT if non-nil should be a keymap."
       ,@(if (keymapp maps) (list maps) maps)
       ,@parent)))
 
-(unless (fboundp 'apply-partially)
-  (defun apply-partially (fun &rest args)
-    "Return a function that is a partial application of FUN to ARGS.
-ARGS is a list of the first N arguments to pass to FUN.
-The result is a new function which does the same as FUN, except that
-the first N arguments are fixed at the values with which this function
-was called."
-    (let ((fun fun) (args1 args))
-      (lambda (&rest args2) (apply fun (append args1 args2))))))
-
 (unless (fboundp 'assoc-default)
   (defun assoc-default (key alist &optional test default)
     "Find object KEY in a pseudo-alist ALIST.
