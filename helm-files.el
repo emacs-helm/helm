@@ -988,7 +988,7 @@ See `helm-ff-serial-rename-1'."
   (interactive)
   (when helm-alive-p
     (helm-quit-and-execute-action 'helm-files-insert-as-org-link)))
-  
+
 ;;;###autoload
 (defun helm-ff-run-find-file-as-root ()
   (interactive)
@@ -1131,9 +1131,9 @@ You should not modify this yourself unless you know what you do.")
 (defun helm-file-completion-source-p ()
   "Return non--nil if current source is a file completion source."
   (or (with-helm-buffer helm-in-file-completion-p)
-        (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
-          (loop for i in helm-file-completion-sources
-                thereis (string= cur-source i)))))
+      (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
+        (loop for i in helm-file-completion-sources
+              thereis (string= cur-source i)))))
 
 ;;;###autoload
 (defun helm-find-files-down-one-level (arg)
@@ -1408,7 +1408,7 @@ purpose."
     ;; like that the actual value (e.g /ssh:) is passed to
     ;; `helm-ff-tramp-hostnames'.
     (unless (or (string= path "Invalid tramp file name")
-            invalid-basedir) ; Leave  helm-pattern unchanged.
+                invalid-basedir) ; Leave  helm-pattern unchanged.
       (setq helm-pattern (helm-ff-transform-fname-for-completion path)))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")
@@ -1567,7 +1567,7 @@ Note that only directories are saved here."
   "Return the default mode to open FILENAME."
   (let ((mode (loop for (r . m) in auto-mode-alist
                     thereis (and (string-match r filename) m))))
-   (or (and (symbolp mode) mode) "Fundamental")))
+    (or (and (symbolp mode) mode) "Fundamental")))
 
 (defun helm-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
@@ -1639,7 +1639,7 @@ Note that only directories are saved here."
                                        (helm-basename c) c))
                    (when (y-or-n-p (format "Really Delete file `%s'? " c))
                      (helm-delete-file c helm-ff-signal-error-on-dot-files
-                                         'synchro)
+                                       'synchro)
                      (helm-delete-current-selection)
                      (message nil)))))
     (with-helm-buffer

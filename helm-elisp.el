@@ -290,7 +290,7 @@ If SYM is not documented, return \"Not documented\"."
          completion)
     (with-helm-show-completion beg end
       (setq completion (helm-read-file-name "FileName: "
-                                              :initial-input init)))
+                                            :initial-input init)))
     (when (and completion (not (string= completion "")))
       (delete-region beg end) (insert (if (string-match "^~" tap)
                                           (abbreviate-file-name completion)
@@ -395,8 +395,8 @@ First call indent, second complete symbol, third complete fname."
   `((name . "Functions")
     (init . (lambda ()
               (helm-apropos-init #'(lambda (x) (and (fboundp x)
-                                                 (not (commandp x))))
-                                   ,default)))
+                                                    (not (commandp x))))
+                                 ,default)))
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-describe-function)
                ("Find Function" . helm-find-function)
@@ -572,14 +572,14 @@ First call indent, second complete symbol, third complete fname."
            nil)))
 
 (define-helm-type-attribute 'sexp
-  '((action
-     ("Eval" . helm-sexp-eval)
-     ("Edit and eval" .
-      (lambda (cand)
-        (let ((minibuffer-setup-hook
-               (cons (lambda () (insert cand)) minibuffer-setup-hook)))
-          (call-interactively #'eval-expression)))))
-    (persistent-action . helm-sexp-eval))
+    '((action
+       ("Eval" . helm-sexp-eval)
+       ("Edit and eval" .
+        (lambda (cand)
+          (let ((minibuffer-setup-hook
+                 (cons (lambda () (insert cand)) minibuffer-setup-hook)))
+            (call-interactively #'eval-expression)))))
+      (persistent-action . helm-sexp-eval))
   "Sexp.")
 
 (define-helm-type-attribute 'timer
@@ -611,7 +611,7 @@ First call indent, second complete symbol, third complete fname."
           (let ((time (timer--time timer)))
             (if (timer--idle-delay timer)
                 (format-time-string "idle-for=%5s" time)
-              (format-time-string "%m/%d %T" time)))
+                (format-time-string "%m/%d %T" time)))
           (timer--repeat-delay timer)
           (timer--function timer)
           (mapconcat 'prin1-to-string (timer--args timer) " ")))

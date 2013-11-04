@@ -80,7 +80,7 @@
                ("Copy Url"
                 . (lambda (candidate)
                     (let ((url (helm-firefox-bookmarks-get-value
-                               candidate))) 
+                                candidate))) 
                       (kill-new url)
                       (message "`%s' copied to kill-ring" url))))))))
 

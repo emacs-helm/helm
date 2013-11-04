@@ -317,8 +317,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                         (or keymap helm-map)))
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-exit-minibuffer"
-                          "helm-confirm-and-exit-minibuffer"
-                          helm-read-file-name-mode-line-string))
+                                      "helm-confirm-and-exit-minibuffer"
+                                      helm-read-file-name-mode-line-string))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
@@ -534,7 +534,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; Fail with special characters (e.g in gnus "nnimap+gmail:")
      ;; if regexp-quote is not used.
      ;; when init is added to history, it will be unquoted by
-     ; helm-comp-read.
+                                        ; helm-comp-read.
      :initial-input (and (stringp init) (regexp-quote init)))))
 
 (defun helm-completing-read-with-cands-in-buffer
@@ -715,8 +715,8 @@ Keys description:
                          helm-read-file-map))
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-exit-minibuffer"
-                          "helm-confirm-and-exit-minibuffer"
-                          helm-read-file-name-mode-line-string))
+                                      "helm-confirm-and-exit-minibuffer"
+                                      helm-read-file-name-mode-line-string))
            (result (helm
                     :sources
                     `(((name . ,(format "%s History" name))
@@ -873,9 +873,9 @@ Can be used as value for `completion-in-region-function'."
   (let* ((enable-recursive-minibuffers t)
          (input (buffer-substring start end))
          (result (helm-comp-read prompt
-                     (all-completions input collection predicate)
-                     :initial-input input
-                     :must-match require-match)))
+                                 (all-completions input collection predicate)
+                                 :initial-input input
+                                 :must-match require-match)))
     (when result
       (delete-region start end)
       (insert result))))

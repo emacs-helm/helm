@@ -226,7 +226,7 @@ Return an alist with elements like (data . number_results)."
              'Result)
             for i in result-alist
             collect (caddr i)))))
-        
+
 (defun helm-yahoo-suggest-set-candidates ()
   "Set candidates with Yahoo results found."
   (let ((suggestions (helm-yahoo-suggest-fetch helm-input)))
@@ -239,7 +239,7 @@ Return an alist with elements like (data . number_results)."
 (defun helm-yahoo-suggest-action (candidate)
   "Default action to jump to a Yahoo suggested candidate."
   (helm-browse-url (concat helm-yahoo-suggest-search-url
-                             (url-hexify-string candidate))))
+                           (url-hexify-string candidate))))
 
 (defvar helm-source-yahoo-suggest
   '((name . "Yahoo Suggest")

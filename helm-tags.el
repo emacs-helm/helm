@@ -150,28 +150,28 @@ If not found in CURRENT-DIR search in upper directory."
 (defun helm-etags-create-buffer (file)
   "Create the `helm-buffer' based on contents of etags tag FILE."
   (let* ((tag-fname file)
-          max
-          (split (with-current-buffer (find-file-noselect tag-fname)
-                   (prog1
-                       (split-string (buffer-string) "\n" 'omit-nulls)
-                     (setq max (line-number-at-pos (point-max)))
-                     (kill-buffer))))
-          (progress-reporter (make-progress-reporter "Loading tag file..." 0 max)))
-     (loop
-           with fname
-           with cand
-           for i in split for count from 0
-           for elm = (unless (string-match "^\x0c" i)
-                       (helm-aif (string-match "\177" i)
-                           (substring i 0 it)
-                         i))
-           do (cond ((and elm (string-match "^\\([^,]+\\),[0-9]+$" elm))
-                     (setq fname (match-string 1 elm)))
-                    (elm (setq cand (concat fname ": " elm)))
-                    (t (setq cand nil)))
-           when cand do (progn
-                          (insert (concat cand "\n"))
-                          (progress-reporter-update progress-reporter count)))))
+         max
+         (split (with-current-buffer (find-file-noselect tag-fname)
+                  (prog1
+                      (split-string (buffer-string) "\n" 'omit-nulls)
+                    (setq max (line-number-at-pos (point-max)))
+                    (kill-buffer))))
+         (progress-reporter (make-progress-reporter "Loading tag file..." 0 max)))
+    (loop
+          with fname
+          with cand
+          for i in split for count from 0
+          for elm = (unless (string-match "^\x0c" i)
+                      (helm-aif (string-match "\177" i)
+                          (substring i 0 it)
+                        i))
+          do (cond ((and elm (string-match "^\\([^,]+\\),[0-9]+$" elm))
+                    (setq fname (match-string 1 elm)))
+                   (elm (setq cand (concat fname ": " elm)))
+                   (t (setq cand nil)))
+          when cand do (progn
+                         (insert (concat cand "\n"))
+                         (progress-reporter-update progress-reporter count)))))
 
 (defun helm-etags-init ()
   "Feed `helm-buffer' using `helm-etags-cache' or tag file.
@@ -204,7 +204,7 @@ If no entry in cache, create one."
                     ;; and not the filename.
                     (if helm-etags-match-part-only
                         (cadr (split-string candidate ":"))
-                      candidate)))
+                        candidate)))
     (mode-line . helm-etags-mode-line-string)
     (keymap . ,helm-etags-map)
     (action . helm-etags-default-action)

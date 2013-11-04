@@ -495,8 +495,8 @@ instead of `helm-walk-ignore-directories'."
                                             match (file-name-nondirectory f))))
                                   (push (funcall fn f) result))
                              (push (funcall fn f) result))))))
-       (funcall ls-R directory)
-       (nreverse result)))
+    (funcall ls-R directory)
+    (nreverse result)))
 
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.
@@ -649,7 +649,7 @@ you have in `file-attributes'."
             (if human-size
                 (helm-file-human-size (getf all :size))
                 (int-to-string (getf all :size))) " "
-            (getf all :modif-time)))
+                (getf all :modif-time)))
           (human-size (helm-file-human-size (getf all :size)))
           (mode-type (getf modes :mode-type))
           (mode-owner (getf modes :user))
@@ -695,7 +695,7 @@ Useful in dired buffers when there is inserted subdirs."
          (args (list start end buf)))
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
-      (apply 'move-overlay helm-match-line-overlay args))
+        (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
     (recenter)))
@@ -761,8 +761,8 @@ directory, open this directory."
                            'find-file)))))
 
 (defun* helm-action-file-line-goto (file-line-content
-                                      &optional
-                                      (find-file-function #'find-file))
+                                    &optional
+                                    (find-file-function #'find-file))
   (apply #'helm-goto-file-line
          (if (stringp file-line-content)
              ;; Case: filtered-candidate-transformer is skipped

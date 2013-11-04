@@ -89,7 +89,7 @@ The function that call this should set `helm-ec-target' to thing at point."
              (table (pcomplete-completions))
              (entry (or (try-completion helm-pattern
                                         (pcomplete-entries))
-                            helm-pattern)))
+                        helm-pattern)))
         (loop ;; expand entry too to be able to compare it with file-cand.
               with exp-entry = (and (stringp entry)
                                     (not (string= entry ""))

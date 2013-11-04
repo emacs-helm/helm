@@ -61,7 +61,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
 
 (defun helm-simple-call-tree-functions-callers-init ()
   (helm-simple-call-tree-init-base 'simple-call-tree-invert
-                                     " is called by\n"))
+                                   " is called by\n"))
 
 (defun helm-simple-call-tree-candidates ()
   (with-current-buffer (helm-candidate-buffer)

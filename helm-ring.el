@@ -38,7 +38,7 @@
   "Max number of lines displayed per candidate in kill-ring browser.
 If nil or zero (disabled), don't truncate candidate, show all."
   :type '(choice (const :tag "Disabled" nil)
-                 (integer :tag "Max number of lines"))
+          (integer :tag "Max number of lines"))
   :group 'helm-ring)
 
 (defcustom helm-kill-ring-show-completion t

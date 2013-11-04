@@ -300,7 +300,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
     (t (and (not (string= (helm-grep-command) "git-grep"))
             (or (string= (helm-grep-command) "ack-grep")
                 (string= (helm-grep-command t) "ack-grep"))))))
-          
+
 (defun helm-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
   (let* ((default-directory (or helm-default-directory
@@ -499,29 +499,29 @@ If N is positive go forward otherwise go backward."
                          (if (eq major-mode 'helm-grep-mode)
                              (ignore)
                              (helm-mark-current-line)))))
-      (catch 'break
-        (while (not (funcall bob-or-eof))
-          (forward-line n) ; Go forward or backward depending of n value.
-          ;; Exit when current-fname is not matched or in `helm-grep-mode'
-          ;; the line is not a grep line i.e 'fname:num:tag'.
-          (setq sel (buffer-substring (point-at-bol) (point-at-eol)))
-          (unless (or (string= current-fname
-                               (car (if (eq type 'etags)
-                                        (split-string sel ": +" t)
-                                        (helm-grep-split-line sel))))
-                      (and (eq major-mode 'helm-grep-mode)
-                           (not (get-text-property (point-at-bol) 'help-echo))))
-            (funcall mark-maybe)
-            (throw 'break nil))))
-      (cond ((and (> n 0) (eobp))
-             (re-search-backward ".")
-             (forward-line 0)
-             (funcall mark-maybe))
-            ((and (< n 0) (bobp))
-             (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
-                 (goto-char it)
+    (catch 'break
+      (while (not (funcall bob-or-eof))
+        (forward-line n) ; Go forward or backward depending of n value.
+        ;; Exit when current-fname is not matched or in `helm-grep-mode'
+        ;; the line is not a grep line i.e 'fname:num:tag'.
+        (setq sel (buffer-substring (point-at-bol) (point-at-eol)))
+        (unless (or (string= current-fname
+                             (car (if (eq type 'etags)
+                                      (split-string sel ": +" t)
+                                      (helm-grep-split-line sel))))
+                    (and (eq major-mode 'helm-grep-mode)
+                         (not (get-text-property (point-at-bol) 'help-echo))))
+          (funcall mark-maybe)
+          (throw 'break nil))))
+    (cond ((and (> n 0) (eobp))
+           (re-search-backward ".")
+           (forward-line 0)
+           (funcall mark-maybe))
+          ((and (< n 0) (bobp))
+           (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
+               (goto-char it)
              (forward-line 1))
-             (funcall mark-maybe)))))
+           (funcall mark-maybe)))))
 
 ;;;###autoload
 (defun helm-goto-precedent-file ()
@@ -1099,7 +1099,7 @@ See also `helm-do-grep-1'."
                                    (if helm-ff-transformer-show-only-basename
                                        (helm-basename preselection)
                                        preselection))))
-        (prefarg (or current-prefix-arg helm-current-prefix-arg)))
+         (prefarg (or current-prefix-arg helm-current-prefix-arg)))
     (helm-do-grep-1 only prefarg)))
 
 ;;;###autoload
@@ -1138,7 +1138,7 @@ See also `helm-do-grep-1'."
                                     (helm-basename preselection)
                                     preselection))))
          (helm-grep-default-function 'helm-pdfgrep-init))
-  (helm-do-pdfgrep-1 only)))
+    (helm-do-pdfgrep-1 only)))
 
 
 (provide 'helm-grep)

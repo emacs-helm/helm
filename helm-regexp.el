@@ -233,7 +233,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (helm-m-occur-action
    candidate 'buffer (or current-prefix-arg         ; persistent.
                          helm-current-prefix-arg))) ; exit.
-                         
+
 (defun helm-m-occur-goto-line-ow (candidate)
   "Go to CANDIDATE line in other window.
 Same as `helm-m-occur-goto-line' but go in other window."

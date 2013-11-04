@@ -53,7 +53,7 @@ e.g
 
 Each time \"<f5> q\" is pressed the next function is executed, if you wait
 More than 2 seconds, next hit will run again the first function and so on."
-   (define-key keymap key (helm-make-multi-command functions delay)))
+  (define-key keymap key (helm-make-multi-command functions delay)))
 
 (defmacro helm-multi-key-defun (name docstring funs &optional delay)
   "Define NAME as a multi-key command running FUNS.
@@ -315,14 +315,14 @@ have to implement a similar feature directly in the process.
 See in helm-grep.el how it is implemented."
   :group 'helm
   :type '(choice (const :tag "Ignore case" t)
-                 (const :tag "Respect case" nil)
-                 (other :tag "Smart" 'smart)))
+          (const :tag "Respect case" nil)
+          (other :tag "Smart" 'smart)))
 
 (defcustom helm-file-name-case-fold-search
   (if (memq system-type
             '(cygwin windows-nt ms-dos darwin))
       t
-    helm-case-fold-search)
+      helm-case-fold-search)
   "Local setting of `helm-case-fold-search' for reading filenames.
 
 See `helm-case-fold-search' for more info."
@@ -844,7 +844,7 @@ not `exit-minibuffer' or unwanted functions."
   "Be sure BODY is excuted in the helm window."
   (declare (indent 0) (debug t))
   `(with-selected-window (helm-window)
-    ,@body))
+     ,@body))
 
 (defmacro with-helm-current-buffer (&rest body)
   "Eval BODY inside `helm-current-buffer'."
@@ -865,8 +865,8 @@ not `exit-minibuffer' or unwanted functions."
   "Restore `helm-restored-variables' after executing BODY."
   (declare (indent 0) (debug t))
   `(let ((orig-vars (mapcar (lambda (v)
-                                (cons v (symbol-value v)))
-                              helm-restored-variables)))
+                              (cons v (symbol-value v)))
+                            helm-restored-variables)))
      (unwind-protect (progn ,@body)
        (loop for (var . value) in orig-vars
              do (set var value))
@@ -933,7 +933,7 @@ If operation succeed, return value, otherwise nil."
       (unless from-type
         (setcdr src (cons (cons attribute-name value) (cdr src)))
         (setq done t)))
-  (and done value)))
+    (and done value)))
 
 (defun helm-get-attribute-from-source-type (attribute source)
   "Get ATTRIBUTE from type attribute of SOURCE."
@@ -2224,8 +2224,8 @@ Helm plug-ins are realized by this function."
                                      (assoc 'no-delay-on-input source))
                                  (helm-interpret-value candidate-fn source)
                                  (let ((result (helm-while-no-input
-                                                (helm-interpret-value
-                                                 candidate-fn source))))
+                                                 (helm-interpret-value
+                                                  candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
                        (wrong-type-argument nil) ; FIXME this is probably triggered by new error messages in timers.
@@ -2410,9 +2410,9 @@ and `helm-pattern'."
 
 (defun helm-set-case-fold-search-1 (pattern)
   (case helm-case-fold-search
-      (smart (let ((case-fold-search nil))
-               (if (string-match "[A-Z]" pattern) nil t)))
-      (t helm-case-fold-search)))
+    (smart (let ((case-fold-search nil))
+             (if (string-match "[A-Z]" pattern) nil t)))
+    (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns limit source)
   (let (matches)
@@ -2434,8 +2434,8 @@ and `helm-pattern'."
                                 unless (member i matches) collect i)))))
       (invalid-regexp (setq matches nil))
       (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-               (assoc-default 'name source) (car err) (cadr err))
-              nil))
+                             (assoc-default 'name source) (car err) (cadr err))
+             nil))
     matches))
 
 (defun helm-compute-matches (source)
@@ -2805,7 +2805,7 @@ Meant to be called at beginning of a sentinel process function."
   (while helm-async-processes
     (helm-kill-async-process (caar helm-async-processes))
     (setq helm-async-processes (cdr helm-async-processes))))
-    
+
 (defun helm-kill-async-process (process)
   "Stop output from `helm-output-filter' and kill associated PROCESS."
   (set-process-filter process nil)
@@ -2827,8 +2827,8 @@ Meant to be called at beginning of a sentinel process function."
     (helm-log-run-hook 'helm-after-action-hook)))
 
 (defun helm-execute-selection-action-1 (&optional
-                                        selection action
-                                        preserve-saved-action)
+                                          selection action
+                                          preserve-saved-action)
   "Execute ACTION on current SELECTION.
 If PRESERVE-SAVED-ACTION is non--nil save action."
   (helm-log "executing action")
@@ -2948,11 +2948,11 @@ Possible value of DIRECTION are 'next or 'previous."
     (if helm-mode-line-string
         (setq mode-line-format
               `(" " mode-line-buffer-identification " "
-                (line-number-mode "L%l") " " ,follow
-                (:eval (helm-show-candidate-number
-                        (when (listp helm-mode-line-string)
-                          (car-safe helm-mode-line-string))))
-                " " helm-mode-line-string-real " -%-")
+                    (line-number-mode "L%l") " " ,follow
+                    (:eval (helm-show-candidate-number
+                            (when (listp helm-mode-line-string)
+                              (car-safe helm-mode-line-string))))
+                    " " helm-mode-line-string-real " -%-")
               helm-mode-line-string-real
               (substitute-command-keys (if (listp helm-mode-line-string)
                                            (cadr helm-mode-line-string)
@@ -2965,7 +2965,7 @@ Possible value of DIRECTION are 'next or 'previous."
            (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
       (setq header-line-format
             (propertize (concat " " hlstr hlend) 'face 'helm-header)))))
-  
+
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g \"Buffers\" otherwise
@@ -3756,7 +3756,7 @@ If N is positive enlarge, if negative narrow."
                 (cond ( ;; helm-window is smaller than other window.
                        (< w1size w2size)
                        (- (- (max w2size w1size)
-                                      (min w2size w1size))))
+                             (min w2size w1size))))
                       ( ;; helm-window is larger than other window.
                        (> w1size w2size)
                        (- (max w2size w1size)

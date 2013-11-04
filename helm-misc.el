@@ -272,14 +272,14 @@ It is added to `extended-command-history'.
     (candidate-number-limit)))
 
 (defun helm-stumpwm-commands-init ()
-    (with-current-buffer (helm-candidate-buffer 'global)
-      (save-excursion
-        (call-process "stumpish" nil (current-buffer) nil "commands"))
-      (while (re-search-forward "[ ]*\\([^ ]+\\)[ ]*\n?" nil t)
-        (replace-match "\n\\1\n"))
-      (delete-blank-lines)
-      (sort-lines nil (point-min) (point-max))
-      (goto-char (point-max))))
+  (with-current-buffer (helm-candidate-buffer 'global)
+    (save-excursion
+      (call-process "stumpish" nil (current-buffer) nil "commands"))
+    (while (re-search-forward "[ ]*\\([^ ]+\\)[ ]*\n?" nil t)
+      (replace-match "\n\\1\n"))
+    (delete-blank-lines)
+    (sort-lines nil (point-min) (point-max))
+    (goto-char (point-max))))
 
 (defun helm-stumpwm-commands-execute (candidate)
   (call-process "stumpish" nil nil nil  candidate))

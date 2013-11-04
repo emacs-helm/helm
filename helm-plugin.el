@@ -208,19 +208,19 @@
                                                    collecting (aref curhead i))
                                              " / "))
                           pt))))))
-          (if (listp regexp)
-              (funcall arrange
-                       (sort
-                        (loop for re in regexp
-                              for hierarchy from 0
-                              do (goto-char (point-min))
-                              appending
-                              (loop
-                                    while (re-search-forward re nil t)
-                                    collect (cons (funcall matched) hierarchy)))
-                        (lambda (a b) (> (cdar b) (cdar a)))))
-              (loop while (re-search-forward regexp nil t)
-                    collect (funcall matched)))))))
+        (if (listp regexp)
+            (funcall arrange
+                     (sort
+                      (loop for re in regexp
+                            for hierarchy from 0
+                            do (goto-char (point-min))
+                            appending
+                            (loop
+                                  while (re-search-forward re nil t)
+                                  collect (cons (funcall matched) hierarchy)))
+                      (lambda (a b) (> (cdar b) (cdar a)))))
+            (loop while (re-search-forward regexp nil t)
+                  collect (funcall matched)))))))
 
 (defun helm-headline-make-candidate-buffer (regexp subexp)
   (with-current-buffer (helm-candidate-buffer 'local)

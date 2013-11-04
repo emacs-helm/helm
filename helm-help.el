@@ -23,7 +23,7 @@
   :group 'helm)
 
 (defface helm-helper
-  '((t :inherit helm-header))
+    '((t :inherit helm-header))
   "Face for helm help string in minibuffer."
   :group 'helm-help)
 

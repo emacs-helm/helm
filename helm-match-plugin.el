@@ -107,7 +107,7 @@ The smaller  this value is, the slower highlight is."
 
 ;;;###autoload
 (define-minor-mode helm-match-plugin-mode
-  "Add more flexible regexp matching for helm.
+    "Add more flexible regexp matching for helm.
 See `helm-mp-matching-method' for the behavior of each method."
   :group 'helm-match-plugin
   :require 'helm-match-plugin
@@ -116,10 +116,10 @@ See `helm-mp-matching-method' for the behavior of each method."
       (progn
         (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
         (add-hook 'helm-update-hook 'helm-mp-highlight-match))
-    (setq helm-compile-source-functions
-          (delq 'helm-compile-source--match-plugin
-                helm-compile-source-functions))
-    (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
+      (setq helm-compile-source-functions
+            (delq 'helm-compile-source--match-plugin
+                  helm-compile-source-functions))
+      (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
 
 
 ;;; Build regexps
