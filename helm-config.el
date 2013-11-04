@@ -37,10 +37,10 @@
   (lambda (var key)
     (when (and (boundp var) (symbol-value var))
       (define-key (current-global-map)
-        (read-kbd-macro (symbol-value var)) nil))
+          (read-kbd-macro (symbol-value var)) nil))
     (when key
       (define-key (current-global-map)
-        (read-kbd-macro key) 'helm-command-prefix))
+          (read-kbd-macro key) 'helm-command-prefix))
     (set var key)))
 
 (defcustom helm-minibuffer-history-key "C-r"
@@ -50,20 +50,20 @@
   :set
   (lambda (var key)
     (cl-dolist (map '(minibuffer-local-completion-map
-                   minibuffer-local-filename-completion-map
-                   minibuffer-local-filename-must-match-map ; Emacs 23.1.+
-                   minibuffer-local-isearch-map
-                   minibuffer-local-map
-                   minibuffer-local-must-match-filename-map ; Older Emacsen
-                   minibuffer-local-must-match-map
-                   minibuffer-local-ns-map))
+                      minibuffer-local-filename-completion-map
+                      minibuffer-local-filename-must-match-map ; Emacs 23.1.+
+                      minibuffer-local-isearch-map
+                      minibuffer-local-map
+                      minibuffer-local-must-match-filename-map ; Older Emacsen
+                      minibuffer-local-must-match-map
+                      minibuffer-local-ns-map))
       (when (and (boundp map) (keymapp (symbol-value map)))
         (when (and (boundp var) (symbol-value var))
           (define-key (symbol-value map)
-            (read-kbd-macro (symbol-value var)) nil))
+              (read-kbd-macro (symbol-value var)) nil))
         (when key
           (define-key (symbol-value map)
-            (read-kbd-macro key) 'helm-minibuffer-history))))
+              (read-kbd-macro key) 'helm-minibuffer-history))))
     (set var key)))
 
 ;;; Command Keymap

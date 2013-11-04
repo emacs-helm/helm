@@ -98,16 +98,16 @@
 
 (defun helm-bookmark-transformer (candidates _source)
   (cl-loop for i in candidates
-        for loc = (bookmark-location i)
-        for len =  (string-width i)
-        for trunc = (if (> len bookmark-bmenu-file-column)
-                        (helm-substring i bookmark-bmenu-file-column)
-                        i)
-        for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
-                                  (length trunc)) ? )
-        if helm-bookmark-show-location
-        collect (cons (concat trunc sep loc) i)
-        else collect i))
+           for loc = (bookmark-location i)
+           for len =  (string-width i)
+           for trunc = (if (> len bookmark-bmenu-file-column)
+                           (helm-substring i bookmark-bmenu-file-column)
+                           i)
+           for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
+                                     (length trunc)) ? )
+           if helm-bookmark-show-location
+           collect (cons (concat trunc sep loc) i)
+           else collect i))
 
 (defun helm-bookmark-match-fn (candidate)
   "Match function for bookmark sources using `candidates'."
@@ -154,7 +154,7 @@
               (require 'bookmark)
               (helm-init-candidates-in-buffer
                'global (cl-loop for b in (bookmark-all-names) collect
-                             (propertize b 'location (bookmark-location b))))))
+                                (propertize b 'location (bookmark-location b))))))
     (candidates-in-buffer)
     (cl-search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
@@ -188,76 +188,76 @@ Should be used with `helm-bookmark-search-fn' as `search' function."
 Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (let ((non-essential t))
     (cl-loop for i in bookmarks
-          for isfile        = (bookmark-get-filename i)
-          for bufp          = (and (fboundp 'bmkext-get-buffer-name)
-                                   (bmkext-get-buffer-name i))
-          for handlerp      = (and (fboundp 'bookmark-get-handler)
-                                   (bookmark-get-handler i))
-          for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
-                                   (bmkext-w3m-bookmark-p i))
-          for isgnus        = (and (fboundp 'bmkext-gnus-bookmark-p)
-                                   (bmkext-gnus-bookmark-p i))
-          for isman         = (and (fboundp 'bmkext-man-bookmark-p) ; Man
-                                   (bmkext-man-bookmark-p i))
-          for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
-                                   (bmkext-woman-bookmark-p i))
-          for handlerp      = (bookmark-get-handler i)
-          for isannotation  = (bookmark-get-annotation i)
-          for isabook       = (string= (bookmark-prop-get i 'type)
-                                       "addressbook")
-          for isinfo        = (eq handlerp 'Info-bookmark-jump)
-          for loc = (bookmark-location i)
-          for len =  (string-width i)
-          for trunc = (if (and helm-bookmark-show-location
-                               (> len bookmark-bmenu-file-column))
-                          (helm-substring
-                           i bookmark-bmenu-file-column)
-                          i)
-          ;; Add a * if bookmark have annotation
-          if (and isannotation (not (string-equal isannotation "")))
-          do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
-          for sep = (and helm-bookmark-show-location
-                         (make-string (- (+ bookmark-bmenu-file-column 2)
-                                         (string-width trunc)) ? ))
-          for bmk = (cond ( ;; info buffers
-                           isinfo
-                           (propertize trunc 'face 'helm-bookmark-info
-                                       'help-echo isfile))
-                          ( ;; w3m buffers
-                           isw3m
-                           (propertize trunc 'face 'helm-bookmark-w3m
-                                       'help-echo isfile))
-                          ( ;; gnus buffers
-                           isgnus
-                           (propertize trunc 'face 'helm-bookmark-gnus
-                                       'help-echo isfile))
-                          ( ;; Man Woman
-                           (or iswoman isman)
-                           (propertize trunc 'face 'helm-bookmark-man
-                                       'help-echo isfile))
-                          ( ;; Addressbook
-                           isabook
-                           (propertize trunc 'face 'helm-bookmark-addressbook))
-                          ( ;; directories
-                           (and isfile
-                                ;; This is needed because `non-essential'
-                                ;; is not working on Emacs-24.2 and the behavior
-                                ;; of tramp seems to have changed since previous
-                                ;; versions (Need to reenter password even if a
-                                ;; first connection have been established,
-                                ;; probably when host is named differently
-                                ;; i.e machine/localhost)
-                                (not (file-remote-p isfile))
-                                (file-directory-p isfile))
-                           (propertize trunc 'face 'helm-bookmark-directory
-                                       'help-echo isfile))
-                          ( ;; regular files
-                           t
-                           (propertize trunc 'face 'helm-bookmark-file
-                                       'help-echo isfile)))
-          collect (if helm-bookmark-show-location
-                      (cons (concat bmk sep loc) i)
-                      (cons bmk i)))))
+             for isfile        = (bookmark-get-filename i)
+             for bufp          = (and (fboundp 'bmkext-get-buffer-name)
+                                      (bmkext-get-buffer-name i))
+             for handlerp      = (and (fboundp 'bookmark-get-handler)
+                                      (bookmark-get-handler i))
+             for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
+                                      (bmkext-w3m-bookmark-p i))
+             for isgnus        = (and (fboundp 'bmkext-gnus-bookmark-p)
+                                      (bmkext-gnus-bookmark-p i))
+             for isman         = (and (fboundp 'bmkext-man-bookmark-p) ; Man
+                                      (bmkext-man-bookmark-p i))
+             for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
+                                      (bmkext-woman-bookmark-p i))
+             for handlerp      = (bookmark-get-handler i)
+             for isannotation  = (bookmark-get-annotation i)
+             for isabook       = (string= (bookmark-prop-get i 'type)
+                                          "addressbook")
+             for isinfo        = (eq handlerp 'Info-bookmark-jump)
+             for loc = (bookmark-location i)
+             for len =  (string-width i)
+             for trunc = (if (and helm-bookmark-show-location
+                                  (> len bookmark-bmenu-file-column))
+                             (helm-substring
+                              i bookmark-bmenu-file-column)
+                             i)
+             ;; Add a * if bookmark have annotation
+             if (and isannotation (not (string-equal isannotation "")))
+             do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
+             for sep = (and helm-bookmark-show-location
+                            (make-string (- (+ bookmark-bmenu-file-column 2)
+                                            (string-width trunc)) ? ))
+             for bmk = (cond ( ;; info buffers
+                              isinfo
+                              (propertize trunc 'face 'helm-bookmark-info
+                                          'help-echo isfile))
+                             ( ;; w3m buffers
+                              isw3m
+                              (propertize trunc 'face 'helm-bookmark-w3m
+                                          'help-echo isfile))
+                             ( ;; gnus buffers
+                              isgnus
+                              (propertize trunc 'face 'helm-bookmark-gnus
+                                          'help-echo isfile))
+                             ( ;; Man Woman
+                              (or iswoman isman)
+                              (propertize trunc 'face 'helm-bookmark-man
+                                          'help-echo isfile))
+                             ( ;; Addressbook
+                              isabook
+                              (propertize trunc 'face 'helm-bookmark-addressbook))
+                             ( ;; directories
+                              (and isfile
+                                   ;; This is needed because `non-essential'
+                                   ;; is not working on Emacs-24.2 and the behavior
+                                   ;; of tramp seems to have changed since previous
+                                   ;; versions (Need to reenter password even if a
+                                   ;; first connection have been established,
+                                   ;; probably when host is named differently
+                                   ;; i.e machine/localhost)
+                                   (not (file-remote-p isfile))
+                                   (file-directory-p isfile))
+                              (propertize trunc 'face 'helm-bookmark-directory
+                                          'help-echo isfile))
+                             ( ;; regular files
+                              t
+                              (propertize trunc 'face 'helm-bookmark-file
+                                          'help-echo isfile)))
+             collect (if helm-bookmark-show-location
+                         (cons (concat bmk sep loc) i)
+                         (cons bmk i)))))
 
 
 ;;; Bookmarks attributes

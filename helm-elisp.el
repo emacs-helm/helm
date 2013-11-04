@@ -206,9 +206,9 @@ Return a cons \(beg . end\)."
              (init . (lambda ()
                        (with-current-buffer (helm-candidate-buffer 'global)
                          (cl-loop for sym in candidates
-                               for len = (length sym)
-                               when (> len lgst-len) do (setq lgst-len len)
-                               do (insert (concat sym "\n"))))))
+                                  for len = (length sym)
+                                  when (> len lgst-len) do (setq lgst-len len)
+                                  do (insert (concat sym "\n"))))))
              (candidates-in-buffer)
              (persistent-action . helm-lisp-completion-persistent-action)
              (persistent-help . "Show brief doc in mode-line")
@@ -238,14 +238,14 @@ Return a cons \(beg . end\)."
   "Helm candidates transformer for lisp completion."
   (cl-declare (special lgst-len))
   (cl-loop for c in candidates
-        for sym = (intern c)
-        for annot = (cond ((commandp sym) " (Com)")
-                          ((fboundp sym)  " (Fun)")
-                          ((boundp sym)   " (Var)")
-                          ((facep sym)    " (Face)"))
-        for spaces = (make-string (- lgst-len (length c)) ? )
-        collect (cons (concat c spaces annot) c) into lst
-        finally return (sort lst #'helm-generic-sort-fn)))
+           for sym = (intern c)
+           for annot = (cond ((commandp sym) " (Com)")
+                             ((fboundp sym)  " (Fun)")
+                             ((boundp sym)   " (Var)")
+                             ((facep sym)    " (Face)"))
+           for spaces = (make-string (- lgst-len (length c)) ? )
+           collect (cons (concat c spaces annot) c) into lst
+           finally return (sort lst #'helm-generic-sort-fn)))
 
 (defun helm-get-first-line-documentation (sym)
   "Return first line documentation of symbol SYM.
@@ -290,7 +290,7 @@ If SYM is not documented, return \"Not documented\"."
          completion)
     (with-helm-show-completion beg end
       (setq completion (helm-read-file-name "FileName: "
-                                              :initial-input init)))
+                                            :initial-input init)))
     (when (and completion (not (string= completion "")))
       (delete-region beg end) (insert (if (string-match "^~" tap)
                                           (abbreviate-file-name completion)
@@ -344,11 +344,11 @@ First call indent, second complete symbol, third complete fname."
                (funcall test (intern default)))
       (insert (concat default "\n")))
     (cl-loop with all = (all-completions "" obarray test)
-          for sym in all
-          for s = (intern sym)
-          unless (or (and default (string= sym default))
-                     (keywordp s))
-          do (insert (concat sym "\n")))))
+             for sym in all
+             for s = (intern sym)
+             unless (or (and default (string= sym default))
+                        (keywordp s))
+             do (insert (concat sym "\n")))))
 
 (defun helm-def-source--emacs-variables (&optional default)
   `((name . "Variables")
@@ -367,7 +367,7 @@ First call indent, second complete symbol, third complete fname."
     (candidates-in-buffer)
     (filtered-candidate-transformer . (lambda (candidates _source)
                                         (cl-loop for c in candidates
-                                              collect (propertize c 'face (intern c)))))
+                                                 collect (propertize c 'face (intern c)))))
     (action . (lambda (candidate)
                 (describe-face (intern candidate))))))
 
@@ -395,8 +395,8 @@ First call indent, second complete symbol, third complete fname."
   `((name . "Functions")
     (init . (lambda ()
               (helm-apropos-init #'(lambda (x) (and (fboundp x)
-                                                 (not (commandp x))))
-                                   ,default)))
+                                                    (not (commandp x))))
+                                 ,default)))
     (candidates-in-buffer)
     (action . (("Describe Function" . helm-describe-function)
                ("Find Function" . helm-find-function)
@@ -443,18 +443,18 @@ First call indent, second complete symbol, third complete fname."
 
 (defun helm-advice-candidates ()
   (cl-loop for (fname) in ad-advised-functions
-        for function = (intern fname)
-        append
-        (cl-loop for class in ad-advice-classes append
-              (cl-loop for advice in (ad-get-advice-info-field function class)
-                    for enabled = (ad-advice-enabled advice)
-                    collect
-                    (cons (format
-                           "%s %s %s"
-                           (if enabled "Enabled " "Disabled")
-                           (propertize fname 'face 'font-lock-function-name-face)
-                           (ad-make-single-advice-docstring advice class nil))
-                          (list function class advice))))))
+           for function = (intern fname)
+           append
+           (cl-loop for class in ad-advice-classes append
+                    (cl-loop for advice in (ad-get-advice-info-field function class)
+                             for enabled = (ad-advice-enabled advice)
+                             collect
+                             (cons (format
+                                    "%s %s %s"
+                                    (if enabled "Enabled " "Disabled")
+                                    (propertize fname 'face 'font-lock-function-name-face)
+                                    (ad-make-single-advice-docstring advice class nil))
+                                   (list function class advice))))))
 
 (defun helm-advice-persistent-action (func-class-advice)
   (if current-prefix-arg
@@ -513,10 +513,10 @@ First call indent, second complete symbol, third complete fname."
 
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
-        when (file-directory-p dir)
-        append (directory-files dir t (regexp-opt (get-load-suffixes)))
-        into lst
-        finally return (helm-fast-remove-dups lst :test 'equal)))
+           when (file-directory-p dir)
+           append (directory-files dir t (regexp-opt (get-load-suffixes)))
+           into lst
+           finally return (helm-fast-remove-dups lst :test 'equal)))
 
 ;;;###autoload
 (defun helm-locate-library ()
@@ -572,14 +572,14 @@ First call indent, second complete symbol, third complete fname."
            nil)))
 
 (define-helm-type-attribute 'sexp
-  '((action
-     ("Eval" . helm-sexp-eval)
-     ("Edit and eval" .
-      (lambda (cand)
-        (let ((minibuffer-setup-hook
-               (cons (lambda () (insert cand)) minibuffer-setup-hook)))
-          (call-interactively #'eval-expression)))))
-    (persistent-action . helm-sexp-eval))
+    '((action
+       ("Eval" . helm-sexp-eval)
+       ("Edit and eval" .
+        (lambda (cand)
+          (let ((minibuffer-setup-hook
+                 (cons (lambda () (insert cand)) minibuffer-setup-hook)))
+            (call-interactively #'eval-expression)))))
+      (persistent-action . helm-sexp-eval))
   "Sexp.")
 
 (define-helm-type-attribute 'timer
@@ -611,7 +611,7 @@ First call indent, second complete symbol, third complete fname."
           (let ((time (timer--time timer)))
             (if (timer--idle-delay timer)
                 (format-time-string "idle-for=%5s" time)
-              (format-time-string "%m/%d %T" time)))
+                (format-time-string "%m/%d %T" time)))
           (timer--repeat-delay timer)
           (timer--function timer)
           (mapconcat 'prin1-to-string (timer--args timer) " ")))

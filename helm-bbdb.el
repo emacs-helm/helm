@@ -51,56 +51,56 @@ The format is \"Firstname Lastname\"."
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
   (cl-loop with phone-list
-        with loc-list = (cons "[Exit when no more]"
-                              (bbdb-label-completion-list "phones"))
-        with loc ; Defer count
-        do (setq loc (helm-comp-read (format "Phone location[%s]: " count)
-                                     loc-list
-                                     :must-match 'confirm
-                                     :default ""))
-        while (not (string= loc "[Exit when no more]"))
-        for count from 1
-        for phone-number = (read-string (format "Phone number (%s): " loc))
-        collect (vector loc phone-number) into phone-list
-        do (setq loc-list (remove loc loc-list))
-        finally return phone-list))
+           with loc-list = (cons "[Exit when no more]"
+                                 (bbdb-label-completion-list "phones"))
+           with loc ; Defer count
+           do (setq loc (helm-comp-read (format "Phone location[%s]: " count)
+                                        loc-list
+                                        :must-match 'confirm
+                                        :default ""))
+           while (not (string= loc "[Exit when no more]"))
+           for count from 1
+           for phone-number = (read-string (format "Phone number (%s): " loc))
+           collect (vector loc phone-number) into phone-list
+           do (setq loc-list (remove loc loc-list))
+           finally return phone-list))
 
 ;; TODO move this to helm-utils when finish
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.
 If COUNT is non--nil add a number after each prompt."
   (cl-loop with elm with new-prompt = prompt
-        while (not (string= elm ""))
-        for n from 1
-        do (when count
-             (setq new-prompt (concat prompt (int-to-string n) ": ")))
-        collect (setq elm (read-string new-prompt)) into lis
-        finally return (remove "" lis)))
+           while (not (string= elm ""))
+           for n from 1
+           do (when count
+                (setq new-prompt (concat prompt (int-to-string n) ": ")))
+           collect (setq elm (read-string new-prompt)) into lis
+           finally return (remove "" lis)))
 
 (defun helm-bbdb-read-address ()
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
   (cl-loop with address-list
-        with loc-list = (cons "[Exit when no more]"
-                              (bbdb-label-completion-list "addresses"))
-        with loc ; Defer count
-        do (setq loc (helm-comp-read
-                      (format "Address description[%s]: "
-                              (int-to-string count))
-                      loc-list
-                      :must-match 'confirm
-                      :default ""))
-        while (not (string= loc "[Exit when no more]"))
-        for count from 1
-        ;; Create vector
-        for lines =  (helm-read-repeat-string "Line" t)
-        for city = (read-string "City: ")
-        for state = (read-string "State: ")
-        for zip = (read-string "ZipCode: ")
-        for country = (read-string "Country: ")
-        collect (vector loc lines city state zip country) into address-list
-        do (setq loc-list (remove loc loc-list))
-        finally return address-list))
+           with loc-list = (cons "[Exit when no more]"
+                                 (bbdb-label-completion-list "addresses"))
+           with loc ; Defer count
+           do (setq loc (helm-comp-read
+                         (format "Address description[%s]: "
+                                 (int-to-string count))
+                         loc-list
+                         :must-match 'confirm
+                         :default ""))
+           while (not (string= loc "[Exit when no more]"))
+           for count from 1
+           ;; Create vector
+           for lines =  (helm-read-repeat-string "Line" t)
+           for city = (read-string "City: ")
+           for state = (read-string "State: ")
+           for zip = (read-string "ZipCode: ")
+           for country = (read-string "Country: ")
+           collect (vector loc lines city state zip country) into address-list
+           do (setq loc-list (remove loc loc-list))
+           finally return address-list))
 
 (defun helm-bbdb-create-contact (actions candidate)
   "Action transformer for `helm-source-bbdb'.
@@ -155,8 +155,8 @@ http://bbdb.sourceforge.net/")
   "Return a list of all mail addresses of records in bbdb buffer."
   (with-current-buffer bbdb-buffer-name
     (cl-loop for i in bbdb-records
-          if (bbdb-record-net (car i))
-          collect (bbdb-dwim-net-address (car i)))))
+             if (bbdb-record-net (car i))
+             collect (bbdb-dwim-net-address (car i)))))
 
 (defun helm-bbdb-compose-mail (candidate)
   "Compose a mail with all records of bbdb buffer."

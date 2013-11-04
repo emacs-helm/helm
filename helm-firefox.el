@@ -80,7 +80,7 @@
                ("Copy Url"
                 . (lambda (candidate)
                     (let ((url (helm-firefox-bookmarks-get-value
-                               candidate))) 
+                                candidate))) 
                       (kill-new url)
                       (message "`%s' copied to kill-ring" url))))))))
 
@@ -89,9 +89,9 @@
 
 (defun helm-highlight-firefox-bookmarks (bookmarks source)
   (cl-loop for i in bookmarks
-        collect (propertize
-                 i 'face '((:foreground "YellowGreen"))
-                 'help-echo (helm-firefox-bookmarks-get-value i))))
+           collect (propertize
+                    i 'face '((:foreground "YellowGreen"))
+                    'help-echo (helm-firefox-bookmarks-get-value i))))
 
 ;;;###autoload
 (defun helm-firefox-bookmarks ()

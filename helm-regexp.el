@@ -125,10 +125,10 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
         (line    (buffer-substring s e)))
     (propertize
      (cl-loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
-           for i from 0 to (1- (/ (length matches) 2))
-           concat (format "\n         %s'%s'" (format "Group %d: " i)
-                          (match-string i)) into ln1
-           finally return (concat ln ln1))
+              for i from 0 to (1- (/ (length matches) 2))
+              concat (format "\n         %s'%s'" (format "Group %d: " i)
+                             (match-string i)) into ln1
+                             finally return (concat ln ln1))
      ;; match beginning
      ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.
      ;; It is implementation problem of candidates-in-buffer.
@@ -174,12 +174,12 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (helm-init-candidates-in-buffer
    'global
    (cl-loop for buf in helm-multi-occur-buffer-list
-         for bufstr = (with-current-buffer buf (buffer-string))
-         do (add-text-properties
-             0 (length bufstr)
-             `(buffer-name ,(buffer-name (get-buffer buf)))
-             bufstr)
-         concat bufstr)))
+            for bufstr = (with-current-buffer buf (buffer-string))
+            do (add-text-properties
+                0 (length bufstr)
+                `(buffer-name ,(buffer-name (get-buffer buf)))
+                bufstr)
+            concat bufstr)))
 
 (defun helm-m-occur-get-line (beg end)
   "Format line for `helm-source-moccur'."
@@ -194,7 +194,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
           (buffer-substring beg end)))
 
 (cl-defun helm-m-occur-action (candidate
-                             &optional (method (quote buffer)) mark)
+                               &optional (method (quote buffer)) mark)
   "Jump to CANDIDATE with METHOD.
 arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
@@ -211,10 +211,10 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (helm-goto-line lineno)
     ;; Move point to the nearest matching regexp from bol.
     (cl-loop for reg in split-pat
-          when (save-excursion
-                 (re-search-forward reg (point-at-eol) t))
-          collect (match-beginning 0) into pos-ls
-          finally (goto-char (apply #'min pos-ls)))
+             when (save-excursion
+                    (re-search-forward reg (point-at-eol) t))
+             collect (match-beginning 0) into pos-ls
+             finally (goto-char (apply #'min pos-ls)))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
@@ -233,7 +233,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (helm-m-occur-action
    candidate 'buffer (or current-prefix-arg         ; persistent.
                          helm-current-prefix-arg))) ; exit.
-                         
+
 (defun helm-m-occur-goto-line-ow (candidate)
   "Go to CANDIDATE line in other window.
 Same as `helm-m-occur-goto-line' but go in other window."
@@ -309,22 +309,22 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   "Transformer function for `helm-source-moccur'."
   (require 'helm-grep)
   (cl-loop for i in candidates
-        for split = (helm-grep-split-line i)
-        for buf = (car split)
-        for lineno = (nth 1 split)
-        for str = (nth 2 split)
-        collect (cons (concat (propertize
-                               buf
-                               'face 'helm-moccur-buffer
-                               'help-echo (buffer-file-name
-                                           (get-buffer buf))
-                               'buffer-name buf)
-                              ":"
-                              (propertize lineno 'face 'helm-grep-lineno)
-                              ":"
-                              (helm-grep-highlight-match
-                               str helm-occur-match-plugin-mode))
-                      i)))
+           for split = (helm-grep-split-line i)
+           for buf = (car split)
+           for lineno = (nth 1 split)
+           for str = (nth 2 split)
+           collect (cons (concat (propertize
+                                  buf
+                                  'face 'helm-moccur-buffer
+                                  'help-echo (buffer-file-name
+                                              (get-buffer buf))
+                                  'buffer-name buf)
+                                 ":"
+                                 (propertize lineno 'face 'helm-grep-lineno)
+                                 ":"
+                                 (helm-grep-highlight-match
+                                  str helm-occur-match-plugin-mode))
+                         i)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-source-moccur' with BUFFERS list."

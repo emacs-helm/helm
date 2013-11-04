@@ -65,7 +65,7 @@ A format string where %s will be replaced with `frame-width'."
   "Transformer for `helm-top'.
 Return empty string for non--valid candidates."
   (cl-loop for disp in candidates collect
-        (if (string-match "^ *[0-9]+" disp) disp (cons disp ""))))
+           (if (string-match "^ *[0-9]+" disp) disp (cons disp ""))))
 
 (defun helm-top-action-transformer (actions candidate)
   "Action transformer for `top'.
@@ -110,10 +110,10 @@ Show actions only on line starting by a PID."
   (helm-top-transformer
    (if helm-top-sort-fn
        (cl-loop for c in candidates
-             if (string-match "^ *[0-9]+" c) collect c into pid-cands
-             else collect c into header-cands
-             finally return (append (butlast header-cands)
-                                    (sort pid-cands helm-top-sort-fn)))
+                if (string-match "^ *[0-9]+" c) collect c into pid-cands
+                else collect c into header-cands
+                finally return (append (butlast header-cands)
+                                       (sort pid-cands helm-top-sort-fn)))
        candidates)
    source))
 
@@ -203,11 +203,11 @@ Show actions only on line starting by a PID."
                          "--screen" (helm-xrandr-screen) "-q")
            (goto-char 1)
            (cl-loop with modes = nil
-                 while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
-                 for mode = (match-string 1)
-                 unless (member mode modes)
-                 collect mode into modes
-                 finally return modes))))
+                    while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
+                    for mode = (match-string 1)
+                    unless (member mode modes)
+                    collect mode into modes
+                    finally return modes))))
     (action
      ("Change Resolution"
       . (lambda (mode)

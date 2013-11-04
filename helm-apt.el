@@ -92,23 +92,23 @@
 (defun helm-apt-candidate-transformer (candidates)
   "Show installed CANDIDATES and the ones to deinstall in a different color."
   (cl-loop for cand in candidates
-        for name = (helm-apt-display-to-real cand)
-        for deinstall = (string=
-                         (assoc-default name helm-apt-installed-packages)
-                         "deinstall")
-        for install = (string=
-                       (assoc-default name helm-apt-installed-packages)
-                       "install")
-        for show = (cond ((and deinstall
-                               (memq helm-apt-show-only '(all deinstalled)))
-                          (propertize cand 'face 'helm-apt-deinstalled))
-                         ((and install
-                               (memq helm-apt-show-only '(all installed)))
-                          (propertize cand 'face 'helm-apt-installed))
-                         ((and (eq helm-apt-show-only 'noinstalled)
-                               (not install)) cand)
-                         ((eq helm-apt-show-only 'all) cand))
-        when show collect show))
+           for name = (helm-apt-display-to-real cand)
+           for deinstall = (string=
+                            (assoc-default name helm-apt-installed-packages)
+                            "deinstall")
+           for install = (string=
+                          (assoc-default name helm-apt-installed-packages)
+                          "install")
+           for show = (cond ((and deinstall
+                                  (memq helm-apt-show-only '(all deinstalled)))
+                             (propertize cand 'face 'helm-apt-deinstalled))
+                            ((and install
+                                  (memq helm-apt-show-only '(all installed)))
+                             (propertize cand 'face 'helm-apt-installed))
+                            ((and (eq helm-apt-show-only 'noinstalled)
+                                  (not install)) cand)
+                            ((eq helm-apt-show-only 'all) cand))
+           when show collect show))
 
 (defun helm-apt-show-only-installed ()
   (interactive)
@@ -146,8 +146,8 @@
               (call-process-shell-command "dpkg --get-selections"
                                           nil (current-buffer))
               (cl-loop for i in (split-string (buffer-string) "\n" t)
-                    for p = (split-string i)
-                    collect (cons (car p) (cadr p)))))
+                       for p = (split-string i)
+                       collect (cons (car p) (cadr p)))))
       (helm-init-candidates-in-buffer
        'global
        (setq helm-apt-all-packages
@@ -172,18 +172,18 @@ package name - description."
 
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."
-    (let* ((command (format helm-apt-show-command package))
-           (buf     (get-buffer-create "*helm apt show*")))
-      (helm-switch-to-buffer buf)
-      (unless (string= package helm-apt-show-current-package)
-        (let ((inhibit-read-only t))
-          (erase-buffer)
-          (save-excursion
-            (call-process-shell-command
-             command nil (current-buffer) t))))
-      (helm-apt-show-mode)
-      (set (make-local-variable 'helm-apt-show-current-package)
-           package)))
+  (let* ((command (format helm-apt-show-command package))
+         (buf     (get-buffer-create "*helm apt show*")))
+    (helm-switch-to-buffer buf)
+    (unless (string= package helm-apt-show-current-package)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (save-excursion
+          (call-process-shell-command
+           command nil (current-buffer) t))))
+    (helm-apt-show-mode)
+    (set (make-local-variable 'helm-apt-show-current-package)
+         package)))
 
 (defun helm-apt-install (package)
   "Run 'apt-get install' shell command on PACKAGE."

@@ -67,11 +67,11 @@
 (defun helm-calculate-ucs-max-len ()
   "Calculate the length of longest `ucs-names' candidate."
   (cl-loop with count = 0
-        for (n . v) in (ucs-names)
-        for len = (length n)
-        if (> len count)
-        do (setq count len)
-        finally return count))
+           for (n . v) in (ucs-names)
+           for len = (length n)
+           if (> len count)
+           do (setq count len)
+           finally return count))
 
 (defun helm-ucs-init ()
   "Initialize an helm buffer with ucs symbols.
@@ -84,19 +84,19 @@ Only math* symbols are collected."
     ;; `ucs-names' fn will not run again, data is cached in
     ;; var `ucs-names'.
     (cl-loop for (n . v) in (ucs-names)
-          for len = (length n)
-          for diff = (+ (- helm-ucs-max-len len) 2)
-          unless (string= "" n)
-          do (progn (insert (concat
-                             n ":"
-                             (make-string
-                              diff ? )))
-                    (if (fboundp 'ucs-insert)
-                        (ucs-insert v)
-                        ;; call `insert-char' with nil nil
-                        ;; to shutup byte compiler in 24.1.
-                        (insert-char v nil nil))
-                    (insert "\n")))))
+             for len = (length n)
+             for diff = (+ (- helm-ucs-max-len len) 2)
+             unless (string= "" n)
+             do (progn (insert (concat
+                                n ":"
+                                (make-string
+                                 diff ? )))
+                       (if (fboundp 'ucs-insert)
+                           (ucs-insert v)
+                           ;; call `insert-char' with nil nil
+                           ;; to shutup byte compiler in 24.1.
+                           (insert-char v nil nil))
+                       (insert "\n")))))
 
 (defun helm-ucs-forward-char (candidate)
   (with-helm-current-buffer

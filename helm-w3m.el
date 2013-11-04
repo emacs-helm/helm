@@ -93,9 +93,9 @@ http://emacs-w3m.namazu.org/")
 
 (defun helm-highlight-w3m-bookmarks (bookmarks source)
   (cl-loop for i in bookmarks
-        collect (propertize
-                 i 'face 'helm-w3m-bookmarks
-                 'help-echo (helm-w3m-bookmarks-get-value i))))
+           collect (propertize
+                    i 'face 'helm-w3m-bookmarks
+                    'help-echo (helm-w3m-bookmarks-get-value i))))
 
 
 (defun helm-w3m-delete-bookmark (elm)

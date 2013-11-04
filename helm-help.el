@@ -23,7 +23,7 @@
   :group 'helm)
 
 (defface helm-helper
-  '((t :inherit helm-header))
+    '((t :inherit helm-header))
   "Face for helm help string in minibuffer."
   :group 'helm-help)
 
@@ -127,12 +127,12 @@ text to be displayed in BUFNAME."
         (scroll-error-top-bottom t))
     (condition-case err
         (cl-loop for event = (read-key prompt) do
-              (cl-case event
-                ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
-                ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
-                ((?\C-s)        (isearch-forward))
-                ((?\C-r)        (isearch-backward))
-                (t (cl-return))))
+                 (cl-case event
+                   ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
+                   ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
+                   ((?\C-s)        (isearch-forward))
+                   ((?\C-r)        (isearch-backward))
+                   (t (cl-return))))
       (beginning-of-buffer (message "Beginning of buffer"))
       (end-of-buffer       (message "End of Buffer")))))
 

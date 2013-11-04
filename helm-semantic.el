@@ -88,7 +88,7 @@ Fill in the symbol at point by default."
   (interactive)
   (let ((source (if (semantic-active-p)
                     'helm-source-semantic
-                  'helm-source-imenu)))
+                    'helm-source-imenu)))
     (push-mark)
     (helm :sources source
           :buffer "*helm semantic/imenu*"

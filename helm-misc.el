@@ -45,9 +45,9 @@
   "Collect candidates for latex math completion."
   (cl-declare (special LaTeX-math-menu))
   (cl-loop for i in (cddr LaTeX-math-menu)
-        for elm = (cl-loop for s in i when (vectorp s)
-                        collect (cons (aref s 0) (aref s 1)))
-        append elm))
+           for elm = (cl-loop for s in i when (vectorp s)
+                              collect (cons (aref s 0) (aref s 1)))
+           append elm))
 
 (defvar helm-source-latex-math
   '((name . "Latex Math Menu")
@@ -122,13 +122,13 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
          (ignore-errors
            (with-helm-current-buffer
              (cl-loop initially (goto-char (point-min))
-                   while (re-search-forward
-                          (format ee-anchor-format "\\([^\.].+\\)") nil t)
-                   for anchor = (match-string-no-properties 1)
-                   collect (cons (format "%5d:%s"
-                                         (line-number-at-pos (match-beginning 0))
-                                         (format ee-anchor-format anchor))
-                                 anchor))))))
+                      while (re-search-forward
+                             (format ee-anchor-format "\\([^\.].+\\)") nil t)
+                      for anchor = (match-string-no-properties 1)
+                      collect (cons (format "%5d:%s"
+                                            (line-number-at-pos (match-beginning 0))
+                                            (format ee-anchor-format anchor))
+                                    anchor))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
                            (helm-match-line-color-current-line)))
@@ -160,12 +160,12 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;;
 (defun helm-time-zone-transformer (candidates sources)
   (cl-loop for i in candidates
-        collect
-        (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
-               (propertize i 'face 'helm-time-zone-current))
-              ((string-match helm-time-zone-home-location i)
-               (propertize i 'face 'helm-time-zone-home))
-              (t i))))
+           collect
+           (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
+                  (propertize i 'face 'helm-time-zone-current))
+                 ((string-match helm-time-zone-home-location i)
+                  (propertize i 'face 'helm-time-zone-home))
+                 (t i))))
 
 (defvar helm-source-time-world
   '((name . "Time World List")
@@ -215,8 +215,8 @@ It is added to `extended-command-history'.
     (candidates
      . (lambda ()
          (let ((history (cl-loop for i in
-                              (symbol-value minibuffer-history-variable)
-                              unless (string= "" i) collect i)))
+                                 (symbol-value minibuffer-history-variable)
+                                 unless (string= "" i) collect i)))
            (if (consp (car history))
                (mapcar 'prin1-to-string history)
                history))))
@@ -272,14 +272,14 @@ It is added to `extended-command-history'.
     (candidate-number-limit)))
 
 (defun helm-stumpwm-commands-init ()
-    (with-current-buffer (helm-candidate-buffer 'global)
-      (save-excursion
-        (call-process "stumpish" nil (current-buffer) nil "commands"))
-      (while (re-search-forward "[ ]*\\([^ ]+\\)[ ]*\n?" nil t)
-        (replace-match "\n\\1\n"))
-      (delete-blank-lines)
-      (sort-lines nil (point-min) (point-max))
-      (goto-char (point-max))))
+  (with-current-buffer (helm-candidate-buffer 'global)
+    (save-excursion
+      (call-process "stumpish" nil (current-buffer) nil "commands"))
+    (while (re-search-forward "[ ]*\\([^ ]+\\)[ ]*\n?" nil t)
+      (replace-match "\n\\1\n"))
+    (delete-blank-lines)
+    (sort-lines nil (point-min) (point-max))
+    (goto-char (point-max))))
 
 (defun helm-stumpwm-commands-execute (candidate)
   (call-process "stumpish" nil nil nil  candidate))

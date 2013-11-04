@@ -72,8 +72,8 @@ Note that this is not affecting searching in helm buffer,
 but the initial search for all candidates in buffer(s)."
   :group 'helm-dabbrev
   :type '(choice (const :tag "Ignore case" t)
-                 (const :tag "Respect case" nil)
-                 (other :tag "Smart" 'smart)))
+          (const :tag "Respect case" nil)
+          (other :tag "Smart" 'smart)))
 
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
@@ -87,11 +87,11 @@ but the initial search for all candidates in buffer(s)."
 
 (defun helm-dabbrev--buffer-list ()
   (cl-loop with lst = (buffer-list)
-        for buf in (if helm-dabbrev--exclude-current-buffer-flag
-                       (cdr lst) lst)
-        unless (cl-loop for r in helm-dabbrev-ignored-buffers-regexps
-                     thereis (string-match r (buffer-name buf)))
-        collect buf))
+           for buf in (if helm-dabbrev--exclude-current-buffer-flag
+                          (cdr lst) lst)
+           unless (cl-loop for r in helm-dabbrev-ignored-buffers-regexps
+                           thereis (string-match r (buffer-name buf)))
+           collect buf))
 
 (defun helm-dabbrev--same-major-mode-p (start-buffer)
   ;; START-BUFFER is the current-buffer where we start searching.
@@ -158,45 +158,45 @@ but the initial search for all candidates in buffer(s)."
                                 (list match-1)
                                 (list match-1 match-2))))
                   (cl-loop for match in lst
-                        unless (or (string= str match)
-                                   (member match result))
-                        do (push match result)))))))
-         (cl-loop with result with pos-before with pos-after
-               for buf in (if all (helm-dabbrev--buffer-list)
-                              (list (current-buffer)))
-          
-               do (with-current-buffer buf
-                    (when (or minibuf ; check against all buffers when in minibuffer.
-                              (helm-dabbrev--same-major-mode-p buffer1))
-                      (save-excursion
-                        ;; Start searching before thing before point.
-                        (goto-char (- (point) (length str)))
-                        ;; Search the last 30 lines before point.
-                        (funcall search-and-store str -2)) ; store pos [1]
-                      (save-excursion
-                        ;; Search the next 30 lines after point.
-                        (funcall search-and-store str 2)) ; store pos [2]
-                      (save-excursion
-                        ;; Search all before point.
-                        (goto-char pos-before) ; start from [1]
-                        (funcall search-and-store str -1))
-                      (save-excursion
-                        ;; Search all after point.
-                        (goto-char pos-after) ; start from [2]
-                        (funcall search-and-store str 1))))
-               when (> (length result) limit) return (nreverse result)
-               finally return (nreverse result))))
+                           unless (or (string= str match)
+                                      (member match result))
+                           do (push match result)))))))
+    (cl-loop with result with pos-before with pos-after
+             for buf in (if all (helm-dabbrev--buffer-list)
+                            (list (current-buffer)))
+             
+             do (with-current-buffer buf
+                  (when (or minibuf ; check against all buffers when in minibuffer.
+                            (helm-dabbrev--same-major-mode-p buffer1))
+                    (save-excursion
+                      ;; Start searching before thing before point.
+                      (goto-char (- (point) (length str)))
+                      ;; Search the last 30 lines before point.
+                      (funcall search-and-store str -2)) ; store pos [1]
+                    (save-excursion
+                      ;; Search the next 30 lines after point.
+                      (funcall search-and-store str 2)) ; store pos [2]
+                    (save-excursion
+                      ;; Search all before point.
+                      (goto-char pos-before) ; start from [1]
+                      (funcall search-and-store str -1))
+                    (save-excursion
+                      ;; Search all after point.
+                      (goto-char pos-after) ; start from [2]
+                      (funcall search-and-store str 1))))
+             when (> (length result) limit) return (nreverse result)
+             finally return (nreverse result))))
 
 (defun helm-dabbrev--get-candidates (abbrev)
   (cl-assert abbrev nil "[No Match]")
   (with-current-buffer (current-buffer)
     (let* ((dabbrev-get #'(lambda (str all-bufs)
-                             (helm-dabbrev--collect
-                              str helm-candidate-number-limit
-                              (cl-case helm-dabbrev-case-fold-search
-                                (smart (helm-set-case-fold-search-1 abbrev))
-                                (t helm-dabbrev-case-fold-search))
-                              all-bufs)))
+                            (helm-dabbrev--collect
+                             str helm-candidate-number-limit
+                             (cl-case helm-dabbrev-case-fold-search
+                               (smart (helm-set-case-fold-search-1 abbrev))
+                               (t helm-dabbrev-case-fold-search))
+                             all-bufs)))
            (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
       (if (and (not helm-dabbrev-always-search-all)
                (<= (length lst) helm-dabbrev-max-length-result))
@@ -242,7 +242,7 @@ but the initial search for all candidates in buffer(s)."
          #'(lambda ()
              (message "[Helm-dabbrev: No expansion found]"))))
     (cl-assert (and (stringp dabbrev) (not (string= dabbrev "")))
-            nil "[Helm-dabbrev: Nothing found before point]")
+               nil "[Helm-dabbrev: Nothing found before point]")
     (when (and
            ;; have been called at least once.
            (helm-dabbrev-info-p helm-dabbrev--data)
@@ -261,16 +261,16 @@ but the initial search for all candidates in buffer(s)."
                                 :iterator
                                 (helm-iter-list
                                  (cl-loop with selection
-                                       for i in helm-dabbrev--cache
-                                       when
-                                       (string-match
-                                        (concat "^" (regexp-quote dabbrev)) i)
-                                       collect i into selection
-                                       when (or (= (length selection)
-                                                   helm-dabbrev-cycle-thresold)
-                                                (= (length selection)
-                                                   (length helm-dabbrev--cache)))
-                                       return selection)))))
+                                          for i in helm-dabbrev--cache
+                                          when
+                                          (string-match
+                                           (concat "^" (regexp-quote dabbrev)) i)
+                                          collect i into selection
+                                          when (or (= (length selection)
+                                                      helm-dabbrev-cycle-thresold)
+                                                   (= (length selection)
+                                                      (length helm-dabbrev--cache)))
+                                          return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)

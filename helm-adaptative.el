@@ -203,10 +203,10 @@ This is a filtered candidate transformer you can use with the
                 ;; put those candidates first which have the highest usage count
                 (cl-dolist (info usage)
                   (when (cl-member (car info) candidates
-                                 :test 'helm-adaptive-compare)
+                                   :test 'helm-adaptive-compare)
                     (push (car info) sorted)
                     (setq candidates (cl-remove (car info) candidates
-                                              :test 'helm-adaptive-compare))))
+                                                :test 'helm-adaptive-compare))))
 
                 ;; and append the rest
                 (append (reverse sorted) candidates nil))

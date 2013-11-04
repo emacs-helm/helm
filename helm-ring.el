@@ -38,7 +38,7 @@
   "Max number of lines displayed per candidate in kill-ring browser.
 If nil or zero (disabled), don't truncate candidate, show all."
   :type '(choice (const :tag "Disabled" nil)
-                 (integer :tag "Max number of lines"))
+          (integer :tag "Max number of lines"))
   :group 'helm-ring)
 
 (defcustom helm-kill-ring-show-completion t
@@ -71,8 +71,8 @@ If nil or zero (disabled), don't truncate candidate, show all."
     (action . (("Yank" . helm-kill-ring-action)
                ("Delete" . (lambda (candidate)
                              (cl-loop for cand in (helm-marked-candidates)
-                                   do (setq kill-ring
-                                            (delete cand kill-ring)))))))
+                                      do (setq kill-ring
+                                               (delete cand kill-ring)))))))
     (keymap . ,helm-kill-ring-map)
     (last-command)
     (migemo)
@@ -81,28 +81,28 @@ If nil or zero (disabled), don't truncate candidate, show all."
 
 (defun helm-kill-ring-candidates ()
   (cl-loop for kill in (helm-fast-remove-dups kill-ring :test 'equal)
-        unless (or (< (length kill) helm-kill-ring-threshold)
-                   (string-match "\\`[\n[:blank:]]+\\'" kill))
-        collect kill))
+           unless (or (< (length kill) helm-kill-ring-threshold)
+                      (string-match "\\`[\n[:blank:]]+\\'" kill))
+           collect kill))
 
 (defun helm-kill-ring-transformer (candidates _source)
   "Display only the `helm-kill-ring-max-lines-number' lines of candidate."
   (cl-loop for i in candidates
-        for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
-        if (and helm-kill-ring-max-lines-number
-                (> nlines helm-kill-ring-max-lines-number))
-        collect (cons
-                 (with-temp-buffer
-                   (insert i)
-                   (goto-char (point-min))
-                   (concat
-                    (buffer-substring
-                     (point-min)
-                     (save-excursion
-                       (forward-line helm-kill-ring-max-lines-number)
-                       (point)))
-                    "[...]")) i)
-        else collect i))
+           for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
+           if (and helm-kill-ring-max-lines-number
+                   (> nlines helm-kill-ring-max-lines-number))
+           collect (cons
+                    (with-temp-buffer
+                      (insert i)
+                      (goto-char (point-min))
+                      (concat
+                       (buffer-substring
+                        (point-min)
+                        (save-excursion
+                          (forward-line helm-kill-ring-max-lines-number)
+                          (point)))
+                       "[...]")) i)
+           else collect i))
 
 (defun helm-kill-ring-action (str)
   "Insert STR in `kill-ring' and set STR to the head.
@@ -152,12 +152,12 @@ replace with STR as yanked string."
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
     (cl-loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
-          with recip = nil
-          for i in marks
-          for m = (helm-mark-ring-get-marks i)
-          unless (member m recip)
-          collect m into recip
-          finally return recip)))
+             with recip = nil
+             for i in marks
+             for m = (helm-mark-ring-get-marks i)
+             unless (member m recip)
+             collect m into recip
+             finally return recip)))
 
 (defvar helm-source-mark-ring
   '((name . "mark-ring")
@@ -203,14 +203,14 @@ replace with STR as yanked string."
   (let ((marks global-mark-ring))
     (when marks
       (cl-loop with recip = nil
-            for i in marks
-            for gm = (unless (or (string-match
-                                  "^ " (format "%s" (marker-buffer i)))
-                                 (null (marker-buffer i)))
-                       (helm-global-mark-ring-format-buffer i))
-            when (and gm (not (member gm recip)))
-            collect gm into recip
-            finally return recip))))
+               for i in marks
+               for gm = (unless (or (string-match
+                                     "^ " (format "%s" (marker-buffer i)))
+                                    (null (marker-buffer i)))
+                          (helm-global-mark-ring-format-buffer i))
+               when (and gm (not (member gm recip)))
+               collect gm into recip
+               finally return recip))))
 
 
 ;;;; <Register>
@@ -226,97 +226,97 @@ replace with STR as yanked string."
 (defun helm-register-candidates ()
   "Collecting register contents and appropriate commands."
   (cl-loop for (char . val) in register-alist
-        for key    = (single-key-description char)
-        for string-actions =
-        (cond
-          ((numberp val)
-           (list (int-to-string val)
-                 'insert-register
-                 'increment-register))
-          ((markerp val)
-           (let ((buf (marker-buffer val)))
-             (if (null buf)
-                 (list "a marker in no buffer")
-                 (list (concat
-                        "a buffer position:"
-                        (buffer-name buf)
-                        ", position "
-                        (int-to-string (marker-position val)))
-                       'jump-to-register
-                       'insert-register))))
-          ((and (consp val) (window-configuration-p (car val)))
-           (list "window configuration."
-                 'jump-to-register))
-          ((and (consp val) (frame-configuration-p (car val)))
-           (list "frame configuration."
-                 'jump-to-register))
-          ((and (consp val) (eq (car val) 'file))
-           (list (concat "file:"
-                         (prin1-to-string (cdr val))
-                         ".")
-                 'jump-to-register))
-          ((and (consp val) (eq (car val) 'file-query))
-           (list (concat "file:a file-query reference: file "
-                         (car (cdr val))
-                         ", position "
-                         (int-to-string (car (cdr (cdr val))))
-                         ".")
-                 'jump-to-register))
-          ((consp val)
-           (let ((lines (format "%4d" (length val))))
-             (list (format "%s: %s\n" lines
-                           (truncate-string-to-width
-                            (mapconcat 'identity (list (car val))
-                                       "^J") (- (window-width) 15)))
-                   'insert-register)))
-          ((stringp val)
-           (list
-            ;; without properties
-            (concat (substring-no-properties
-                     val 0 (min (length val) helm-register-max-offset))
-                    (if (> (length val) helm-register-max-offset)
-                        "[...]" ""))
-            'insert-register
-            'append-to-register
-            'prepend-to-register))
-          ((vectorp val)
-           (list
-            "Undo-tree entry."
-            'undo-tree-restore-state-from-register))
-          (t
-           "GARBAGE!"))
-        collect (cons (format "Register %3s:\n %s" key (car string-actions))
-                      (cons char (cdr string-actions)))))
+           for key    = (single-key-description char)
+           for string-actions =
+           (cond
+             ((numberp val)
+              (list (int-to-string val)
+                    'insert-register
+                    'increment-register))
+             ((markerp val)
+              (let ((buf (marker-buffer val)))
+                (if (null buf)
+                    (list "a marker in no buffer")
+                    (list (concat
+                           "a buffer position:"
+                           (buffer-name buf)
+                           ", position "
+                           (int-to-string (marker-position val)))
+                          'jump-to-register
+                          'insert-register))))
+             ((and (consp val) (window-configuration-p (car val)))
+              (list "window configuration."
+                    'jump-to-register))
+             ((and (consp val) (frame-configuration-p (car val)))
+              (list "frame configuration."
+                    'jump-to-register))
+             ((and (consp val) (eq (car val) 'file))
+              (list (concat "file:"
+                            (prin1-to-string (cdr val))
+                            ".")
+                    'jump-to-register))
+             ((and (consp val) (eq (car val) 'file-query))
+              (list (concat "file:a file-query reference: file "
+                            (car (cdr val))
+                            ", position "
+                            (int-to-string (car (cdr (cdr val))))
+                            ".")
+                    'jump-to-register))
+             ((consp val)
+              (let ((lines (format "%4d" (length val))))
+                (list (format "%s: %s\n" lines
+                              (truncate-string-to-width
+                               (mapconcat 'identity (list (car val))
+                                          "^J") (- (window-width) 15)))
+                      'insert-register)))
+             ((stringp val)
+              (list
+               ;; without properties
+               (concat (substring-no-properties
+                        val 0 (min (length val) helm-register-max-offset))
+                       (if (> (length val) helm-register-max-offset)
+                           "[...]" ""))
+               'insert-register
+               'append-to-register
+               'prepend-to-register))
+             ((vectorp val)
+              (list
+               "Undo-tree entry."
+               'undo-tree-restore-state-from-register))
+             (t
+              "GARBAGE!"))
+           collect (cons (format "Register %3s:\n %s" key (car string-actions))
+                         (cons char (cdr string-actions)))))
 
 (defun helm-register-action-transformer (actions register-and-functions)
   "Decide actions by the contents of register."
   (cl-loop with func-actions =
-        '((insert-register
-           "Insert Register" .
-           (lambda (c) (insert-register (car c))))
-          (jump-to-register
-           "Jump to Register" .
-           (lambda (c) (jump-to-register (car c))))
-          (append-to-register
-           "Append Region to Register" .
-           (lambda (c) (append-to-register
-                        (car c) (region-beginning) (region-end))))
-          (prepend-to-register
-           "Prepend Region to Register" .
-           (lambda (c) (prepend-to-register
-                        (car c) (region-beginning) (region-end))))
-          (increment-register
-           "Increment Prefix Arg to Register" .
-           (lambda (c) (increment-register
-                        helm-current-prefix-arg (car c))))
-          (undo-tree-restore-state-from-register
-           "Restore Undo-tree register"
-           (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
-                            (undo-tree-restore-state-from-register (car c))))))
-        for func in (cdr register-and-functions)
-        for cell = (assq func func-actions)
-        when cell
-        collect (cdr cell)))
+           '((insert-register
+              "Insert Register" .
+              (lambda (c) (insert-register (car c))))
+             (jump-to-register
+              "Jump to Register" .
+              (lambda (c) (jump-to-register (car c))))
+             (append-to-register
+              "Append Region to Register" .
+              (lambda (c) (append-to-register
+                           (car c) (region-beginning) (region-end))))
+             (prepend-to-register
+              "Prepend Region to Register" .
+              (lambda (c) (prepend-to-register
+                           (car c) (region-beginning) (region-end))))
+             (increment-register
+              "Increment Prefix Arg to Register" .
+              (lambda (c) (increment-register
+                           helm-current-prefix-arg (car c))))
+             (undo-tree-restore-state-from-register
+              "Restore Undo-tree register"
+              (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
+                               (undo-tree-restore-state-from-register (car c))))))
+           for func in (cdr register-and-functions)
+           for cell = (assq func func-actions)
+           when cell
+           collect (cdr cell)))
 
 ;;;###autoload
 (defun helm-mark-ring ()

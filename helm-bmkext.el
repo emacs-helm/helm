@@ -34,13 +34,13 @@
 (defun helm-bmkext-filter-setup-alist (fn &rest args)
   "Return a filtered `bookmark-alist' sorted alphabetically."
   (cl-loop
-        with alist = (if args
-                         (apply #'(lambda (x) (funcall fn x)) args)
-                         (funcall fn))
-        for i in alist
-        for b = (car i)
-        collect (propertize b 'location (bookmark-location b)) into sa
-        finally return (sort sa 'string-lessp)))
+   with alist = (if args
+                    (apply #'(lambda (x) (funcall fn x)) args)
+                    (funcall fn))
+   for i in alist
+   for b = (car i)
+   collect (propertize b 'location (bookmark-location b)) into sa
+   finally return (sort sa 'string-lessp)))
 
 ;;;###autoload
 (defun helm-bmkext-run-edit ()
@@ -81,8 +81,8 @@
                       (helm-aif (cdr contacts)
                           (let ((current-prefix-arg '(4)))
                             (cl-loop for bmk in it do
-                                  (bookmark-jump
-                                   (helm-bookmark-get-bookmark-from-name bmk))))))))
+                                     (bookmark-jump
+                                      (helm-bookmark-get-bookmark-from-name bmk))))))))
                ("Send Mail"
                 . (lambda (candidate)
                     (let* ((contacts (helm-marked-candidates))
@@ -95,7 +95,7 @@
                       (setq contacts (cdr contacts))
                       (when contacts
                         (cl-loop for bmk in contacts do
-                              (addressbook-set-mail-buffer1 bmk 'append))))))
+                                 (addressbook-set-mail-buffer1 bmk 'append))))))
                ("Edit Bookmark"
                 . (lambda (candidate)
                     (let ((bmk (helm-bookmark-get-bookmark-from-name
