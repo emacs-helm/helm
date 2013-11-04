@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 
 
 ;;; Multi keys
@@ -68,7 +68,7 @@ See `helm-define-multi-key'."
   "Return an anonymous multi-key command running FUNCTIONS.
 Run each function of FUNCTIONS list in turn when called within DELAY seconds."
   (cl-declare (indent 1))
-  (lexical-let ((funs functions)
+  (let ((funs functions)
                 (iter (cl-gensym "helm-iter-key"))
                 (timeout delay))
     (eval (list 'defvar iter nil))
@@ -93,7 +93,7 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
 
 (defun helm-iter-list (seq)
   "Return an iterator object from SEQ."
-  (lexical-let ((lis seq))
+  (let ((lis seq))
     (lambda ()
       (let ((elm (car lis)))
         (setq lis (cdr lis))
@@ -114,7 +114,7 @@ second call within 0.5s run `helm-swap-windows'."
 ;;
 ;;
 (defvar helm-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map minibuffer-local-map)
     (define-key map (kbd "<down>")     'helm-next-line)
     (define-key map (kbd "<up>")       'helm-previous-line)
@@ -3507,7 +3507,7 @@ See also `helm-sources' docstring."
   (when buffer
     (with-current-buffer buffer
       (let ((start-point (if search-from-end (point-max) (point-min)))
-            (cl-endp (if search-from-end #'bobp #'eobp))
+            (endp (if search-from-end #'bobp #'eobp))
             (inhibit-point-motion-hooks t))
         (goto-char (1- start-point))
         (if (string= pattern "")
@@ -3564,7 +3564,7 @@ See also `helm-sources' docstring."
               always (string-match i part))
         (string-match pattern part))))
 
-(defun helm-initial-candidates-from-candidate-buffer (cl-endp
+(defun helm-initial-candidates-from-candidate-buffer (endp
                                                       get-line-fn
                                                       limit search-from-end)
   (delq nil (cl-loop with next-line-fn =
@@ -4099,7 +4099,7 @@ visible or invisible in all sources of current helm session"
 Only useful for debugging."
   (interactive)
   (with-helm-window
-    (lexical-let ((overlays (reverse helm-visible-mark-overlays)))
+    (let ((overlays (reverse helm-visible-mark-overlays)))
       (helm-run-after-quit
        (lambda ()
          (with-output-to-temp-buffer "*helm visible marks*"

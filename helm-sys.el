@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 
@@ -38,7 +38,7 @@ A format string where %s will be replaced with `frame-width'."
 ;;
 (defvar helm-top-sort-fn nil)
 (defvar helm-top-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?") 'helm-top-help)
     (define-key map (kbd "M-P")   'helm-top-run-sort-by-cpu)

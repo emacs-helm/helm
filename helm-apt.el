@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-external)
@@ -44,7 +44,7 @@
 
 
 (defvar helm-apt-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?") 'helm-apt-help)
     (define-key map (kbd "M-I")   'helm-apt-show-only-installed)

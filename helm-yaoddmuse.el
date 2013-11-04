@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 
 (declare-function yaoddmuse-update-pagename "ext:yaoddmuse.el" (&optional unforced))

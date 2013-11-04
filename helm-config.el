@@ -49,7 +49,7 @@
   :group 'helm-config
   :set
   (lambda (var key)
-    (cl-dolist (cl-map '(minibuffer-local-completion-map
+    (cl-dolist (map '(minibuffer-local-completion-map
                    minibuffer-local-filename-completion-map
                    minibuffer-local-filename-must-match-map ; Emacs 23.1.+
                    minibuffer-local-isearch-map
@@ -70,7 +70,7 @@
 ;;
 ;;
 (defvar helm-command-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (define-key map (kbd "a")         'helm-apropos)
     (define-key map (kbd "e")         'helm-etags-select)
     (define-key map (kbd "l")         'helm-locate)

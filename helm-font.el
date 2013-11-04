@@ -17,11 +17,11 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 
 (defvar helm-ucs-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-backspace>") 'helm-ucs-persistent-delete)
     (define-key map (kbd "<C-left>")      'helm-ucs-persistent-backward)

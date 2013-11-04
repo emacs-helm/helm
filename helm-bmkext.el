@@ -21,7 +21,7 @@
 ;; http://julien.danjou.info/google-maps-el.html
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-bookmark)
 (require 'helm-adaptative)

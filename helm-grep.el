@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'grep)
 (require 'helm-regexp)
@@ -171,7 +171,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 ;;
 ;;
 (defvar helm-grep-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
@@ -187,7 +187,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   "Keymap used in Grep sources.")
 
 (defvar helm-pdfgrep-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
@@ -197,7 +197,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   "Keymap used in pdfgrep.")
 
 (defvar helm-grep-mode-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET")      'helm-grep-mode-jump)
     (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
     (define-key map (kbd "q")        'helm-grep-mode-quit)

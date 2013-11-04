@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 
 
@@ -85,7 +85,7 @@ If EXE is already running just jump to his window if `helm-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE.
 In this case EXE must be provided as \"EXE %s\"."
-  (lexical-let* ((real-com (car (split-string (replace-regexp-in-string
+  (let* ((real-com (car (split-string (replace-regexp-in-string
                                                "%s" "" exe))))
                  (proc     (if file (concat real-com " " file) real-com))
                  process-connection-type)

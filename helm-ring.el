@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-elisp)
@@ -56,7 +56,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
 ;;
 ;;
 (defvar helm-kill-ring-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-y") 'helm-next-line)
     (define-key map (kbd "M-u") 'helm-previous-line)

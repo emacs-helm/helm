@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 
 (declare-function elscreen-find-screen-by-buffer "ext:elscreen.el" (buffer &optional create))

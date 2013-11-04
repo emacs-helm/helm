@@ -23,7 +23,7 @@
 ;;
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-elisp)
 (require 'helm-regexp)
@@ -34,14 +34,14 @@
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 
 (defvar helm-eshell-history-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-p") 'helm-next-line)
     map)
   "Keymap for `helm-eshell-history'.")
 
 (defvar helm-esh-completion-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "TAB") 'helm-next-line)
     map)
@@ -162,7 +162,7 @@ The function that call this should set `helm-ec-target' to thing at point."
          ;; Use thing-at-point instead of last args value
          ;; to exclude possible delimiters e.g "(".
          (target (thing-at-point 'symbol))
-         (cl-first (car args)) ; Maybe lisp delimiter "(".
+         (first (car args)) ; Maybe lisp delimiter "(".
          last) ; Will be the last but parsed by pcomplete.
     (setq helm-ec-target (or target " ")
           end (point)

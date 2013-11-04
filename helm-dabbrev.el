@@ -76,7 +76,7 @@ but the initial search for all candidates in buffer(s)."
                  (other :tag "Smart" 'smart)))
 
 (defvar helm-dabbrev-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-/") 'helm-next-line)
     (define-key map (kbd "M-:") 'helm-previous-line)

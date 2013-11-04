@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-files)
 
@@ -87,7 +87,7 @@ This enable support for `completing-read-multiple' when non--nil."
 
 
 (defvar helm-comp-read-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-cr-empty-string)
     map)
@@ -307,7 +307,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
       (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm must-match)
            (must-match-map (when must-match
-                             (let ((cl-map (make-sparse-keymap)))
+                             (let ((map (make-sparse-keymap)))
                                (define-key map (kbd "RET")
                                  'helm-confirm-and-exit-minibuffer)
                                map)))
@@ -705,7 +705,7 @@ Keys description:
                                history nil nil alistp)))
            (minibuffer-completion-confirm must-match)
            (must-match-map (when must-match
-                             (let ((cl-map (make-sparse-keymap)))
+                             (let ((map (make-sparse-keymap)))
                                (define-key map (kbd "RET")
                                  'helm-confirm-and-exit-minibuffer)
                                map)))

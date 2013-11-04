@@ -20,7 +20,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'helm)
 
 
@@ -177,7 +177,7 @@ This is a filtered candidate transformer you can use with the
                ;; ... assemble a list containing the (CANIDATE . USAGE-COUNT)
                ;; pairs
                (mapcar (lambda (candidate-info)
-                         (let ((cl-count 0))
+                         (let ((count 0))
                            (cl-dolist (pattern-info (cdr candidate-info))
                              (if (not (equal (car pattern-info)
                                              helm-pattern))
@@ -197,7 +197,7 @@ This is a filtered candidate transformer you can use with the
               ;; sort the list in descending order, so candidates with highest
               ;; priorty come first
               (progn
-                (setq usage (sort usage (lambda (cl-first second)
+                (setq usage (sort usage (lambda (first second)
                                           (> (cdr first) (cdr second)))))
 
                 ;; put those candidates first which have the highest usage count

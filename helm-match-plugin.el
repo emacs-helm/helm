@@ -24,7 +24,7 @@
 ;;; Code:
 
 (require 'helm)
-(require 'cl)
+(require 'cl-lib)
 
 ;;;; Match-plugin
 
@@ -329,7 +329,7 @@ Same as `helm-mp-3-match' but more strict, matching against prefix also.
 e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 `helm-mp-3-match'."
   (let* ((pat (helm-mp-3-get-patterns (or pattern helm-pattern)))
-         (cl-first (car pat)))
+         (first (car pat)))
     (and (funcall (car first) (helm-mp-prefix-match str (cdr first)))
          (cl-loop for (predicate . regexp) in (cdr pat)
                always (funcall predicate (string-match regexp str))))))

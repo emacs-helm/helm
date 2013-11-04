@@ -21,7 +21,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 
 
@@ -85,7 +85,7 @@ the opposite of \"locate\" command."
 
 
 (defvar helm-generic-files-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")     'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-s")     'helm-ff-run-grep)

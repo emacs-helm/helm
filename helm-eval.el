@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'eldoc)
 
@@ -50,7 +50,7 @@ Should take one arg: the string to display."
 (defvar helm-eldoc-active-minibuffers-list nil)
 
 (defvar helm-eval-expression-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-eval-new-line-and-indent)
     (define-key map (kbd "<tab>")      'lisp-indent-line)

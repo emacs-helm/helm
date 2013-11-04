@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-elscreen)
@@ -88,7 +88,7 @@ When disabled (nil) use the longest buffer-name length found."
 ;;; Buffers keymap
 ;;
 (defvar helm-buffer-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")     'helm-buffer-help)
     ;; No need to have separate command for grep and zgrep
@@ -114,7 +114,7 @@ When disabled (nil) use the longest buffer-name length found."
   "Keymap for buffer sources in helm.")
 
 (defvar helm-buffers-ido-virtual-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")   'helm-buffers-ido-virtual-help)
     (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)

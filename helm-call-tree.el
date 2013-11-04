@@ -19,7 +19,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 
 (declare-function simple-call-tree-analyze "ext:simple-call-tree.el" (&optional test))

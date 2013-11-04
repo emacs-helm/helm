@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-mode)
 (require 'helm-elisp)
@@ -75,7 +75,7 @@ Return nil if no mode-map found."
 
 (defun helm-M-x-current-mode-map-alist ()
   "Return mode-map alist of current `major-mode'."
-  (let ((cl-map (helm-get-mode-map-from-mode major-mode)))
+  (let ((map (helm-get-mode-map-from-mode major-mode)))
     (when (and map (boundp map))
       (helm-M-x-get-major-mode-command-alist (symbol-value map)))))
 

@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'helm)
 (require 'compile) ; Fixme: Is this needed?
 (require 'dired)
@@ -89,7 +89,7 @@ ARGS is a list of the first N arguments to pass to FUN.
 The result is a new function which does the same as FUN, except that
 the first N arguments are fixed at the values with which this function
 was called."
-    (lexical-let ((fun fun) (args1 args))
+    (let ((fun fun) (args1 args))
       (lambda (&rest args2) (apply fun (append args1 args2))))))
 
 (unless (fboundp 'assoc-default)

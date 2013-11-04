@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-external)
@@ -283,7 +283,7 @@ This happen only in `helm-find-files'."
 ;;
 ;; Keymaps
 (defvar helm-find-files-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
@@ -336,7 +336,7 @@ This happen only in `helm-find-files'."
   "Keymap for `helm-find-files'.")
 
 (defvar helm-read-file-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
@@ -355,7 +355,7 @@ This happen only in `helm-find-files'."
   "Keymap for `helm-read-file-name'.")
 
 (defvar helm-esh-on-file-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")    'helm-esh-help)
     map)

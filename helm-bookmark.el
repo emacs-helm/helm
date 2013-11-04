@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (eval-when-compile (require 'bookmark))
 (require 'helm)
 (require 'helm-utils)
@@ -71,7 +71,7 @@
 
 
 (defvar helm-bookmark-map
-  (let ((cl-map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c o") 'helm-bookmark-run-jump-other-window)
     (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
