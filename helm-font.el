@@ -21,7 +21,7 @@
 (require 'helm)
 
 (defvar helm-ucs-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-backspace>") 'helm-ucs-persistent-delete)
     (define-key map (kbd "<C-left>")      'helm-ucs-persistent-backward)
@@ -66,7 +66,7 @@
 (defvar helm-ucs-max-len 0)
 (defun helm-calculate-ucs-max-len ()
   "Calculate the length of longest `ucs-names' candidate."
-  (loop with count = 0
+  (cl-loop with count = 0
         for (n . v) in (ucs-names)
         for len = (length n)
         if (> len count)
@@ -83,7 +83,7 @@ Only math* symbols are collected."
                         (get-buffer-create "*helm ucs*"))
     ;; `ucs-names' fn will not run again, data is cached in
     ;; var `ucs-names'.
-    (loop for (n . v) in (ucs-names)
+    (cl-loop for (n . v) in (ucs-names)
           for len = (length n)
           for diff = (+ (- helm-ucs-max-len len) 2)
           unless (string= "" n)

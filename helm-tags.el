@@ -38,7 +38,7 @@ Don't search tag file deeply if outside this value."
 
 
 (defvar helm-etags-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
@@ -70,7 +70,7 @@ Don't search tag file deeply if outside this value."
       (goto-char (point-min))
       (forward-line 2)
       (delete-region (point-min) (point))
-      (loop while (and (not (eobp)) (search-forward "\001" (point-at-eol) t))
+      (cl-loop while (and (not (eobp)) (search-forward "\001" (point-at-eol) t))
             for lineno-start = (point)
             for lineno = (buffer-substring
                           lineno-start
@@ -123,15 +123,15 @@ If not found in CURRENT-DIR search in upper directory."
                             (and (stringp tag-path)
                                  (file-regular-p tag-path)
                                  (file-readable-p tag-path))))))
-    (loop with count = 0
+    (cl-loop with count = 0
           until (funcall file-exists? current-dir)
           ;; Return nil if outside the value of
           ;; `helm-etags-tag-file-search-limit'.
           if (= count helm-etags-tag-file-search-limit)
-          do (return nil)
+          do (cl-return nil)
           ;; Or search upper directories.
           else
-          do (incf count)
+          do (cl-incf count)
           (setq current-dir (expand-file-name (concat current-dir "../")))
           finally return current-dir)))
 
@@ -151,7 +151,7 @@ If not found in CURRENT-DIR search in upper directory."
                      (setq max (line-number-at-pos (point-max)))
                      (kill-buffer))))
           (progress-reporter (make-progress-reporter "Loading tag file..." 0 max)))
-     (loop
+     (cl-loop
            with fname
            with cand
            for i in split for count from 0

@@ -50,7 +50,7 @@ Arg SOURCE will be an existing helm source named
 Sources are generated for all entries of `helm-default-info-index-list'.
 If COMMANDS arg is non--nil build also commands named `helm-info<NAME>'.
 Where NAME is one of `helm-default-info-index-list'."
-  (loop with symbols = (loop for str in var-value
+  (cl-loop with symbols = (cl-loop for str in var-value
                              collect
                              (intern (concat "helm-source-info-" str)))
         for sym in symbols

@@ -102,7 +102,7 @@ BEG and END are the beginning and end position of the current completion
 in `helm-current-buffer'.
 BODY is an helm call where we want to enable show completion.
 If `helm-turn-on-show-completion' is nil just do nothing."
-  (declare (indent 2) (debug t))
+  (cl-declare (indent 2) (debug t))
   `(let ((helm-move-selection-after-hook
           (and helm-turn-on-show-completion
                (append (list 'helm-show-completion)
@@ -205,7 +205,7 @@ Return a cons \(beg . end\)."
            '((name . "Lisp completion")
              (init . (lambda ()
                        (with-current-buffer (helm-candidate-buffer 'global)
-                         (loop for sym in candidates
+                         (cl-loop for sym in candidates
                                for len = (length sym)
                                when (> len lgst-len) do (setq lgst-len len)
                                do (insert (concat sym "\n"))))))
@@ -236,8 +236,8 @@ Return a cons \(beg . end\)."
 
 (defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for lisp completion."
-  (declare (special lgst-len))
-  (loop for c in candidates
+  (cl-declare (special lgst-len))
+  (cl-loop for c in candidates
         for sym = (intern c)
         for annot = (cond ((commandp sym) " (Com)")
                           ((fboundp sym)  " (Fun)")
@@ -343,7 +343,7 @@ First call indent, second complete symbol, third complete fname."
                (not (string= default "nil"))
                (funcall test (intern default)))
       (insert (concat default "\n")))
-    (loop with all = (all-completions "" obarray test)
+    (cl-loop with all = (all-completions "" obarray test)
           for sym in all
           for s = (intern sym)
           unless (or (and default (string= sym default))
@@ -366,7 +366,7 @@ First call indent, second complete symbol, third complete fname."
               (helm-apropos-init 'facep ,default)))
     (candidates-in-buffer)
     (filtered-candidate-transformer . (lambda (candidates _source)
-                                        (loop for c in candidates
+                                        (cl-loop for c in candidates
                                               collect (propertize c 'face (intern c)))))
     (action . (lambda (candidate)
                 (describe-face (intern candidate))))))
@@ -442,11 +442,11 @@ First call indent, second complete symbol, third complete fname."
     (persistent-help . "Describe function / C-u C-z: Toggle advice")))
 
 (defun helm-advice-candidates ()
-  (loop for (fname) in ad-advised-functions
+  (cl-loop for (fname) in ad-advised-functions
         for function = (intern fname)
         append
-        (loop for class in ad-advice-classes append
-              (loop for advice in (ad-get-advice-info-field function class)
+        (cl-loop for class in ad-advice-classes append
+              (cl-loop for advice in (ad-get-advice-info-field function class)
                     for enabled = (ad-advice-enabled advice)
                     collect
                     (cons (format
@@ -462,7 +462,7 @@ First call indent, second complete symbol, third complete fname."
       (describe-function (car func-class-advice))))
 
 (defun helm-advice-toggle (func-class-advice)
-  (destructuring-bind (function class advice) func-class-advice
+  (cl-destructuring-bind (function class advice) func-class-advice
     (cond ((ad-advice-enabled advice)
            (ad-advice-set-enabled advice nil)
            (message "Disabled"))
@@ -512,7 +512,7 @@ First call indent, second complete symbol, third complete fname."
    'global (helm-locate-library-scan-list)))
 
 (defun helm-locate-library-scan-list ()
-  (loop for dir in load-path
+  (cl-loop for dir in load-path
         when (file-directory-p dir)
         append (directory-files dir t (regexp-opt (get-load-suffixes)))
         into lst
@@ -545,7 +545,7 @@ First call indent, second complete symbol, third complete fname."
   (define-helm-type-attribute 'command
       `((action ("Call interactively" . helm-call-interactively)
                 ,@actions)
-        (coerce . helm-symbolify)
+        (cl-coerce . helm-symbolify)
         (persistent-action . describe-function))
     "Command. (string or symbol)")
 
@@ -553,7 +553,7 @@ First call indent, second complete symbol, third complete fname."
       `((action . ,actions)
         (action-transformer helm-transform-function-call-interactively)
         (candidate-transformer helm-mark-interactive-functions)
-        (coerce . helm-symbolify))
+        (cl-coerce . helm-symbolify))
     "Function. (string or symbol)"))
 
 (define-helm-type-attribute 'variable
@@ -562,7 +562,7 @@ First call indent, second complete symbol, third complete fname."
        ("Add variable to kill ring" . helm-kill-new)
        ("Go to variable's definition" . find-variable)
        ("Set variable" . helm-set-variable))
-      (coerce . helm-symbolify))
+      (cl-coerce . helm-symbolify))
   "Variable.")
 
 (defun helm-sexp-eval (cand)

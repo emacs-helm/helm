@@ -92,7 +92,7 @@ http://emacs-w3m.namazu.org/")
     (funcall fn (helm-w3m-bookmarks-get-value elm) arg)))
 
 (defun helm-highlight-w3m-bookmarks (bookmarks source)
-  (loop for i in bookmarks
+  (cl-loop for i in bookmarks
         collect (propertize
                  i 'face 'helm-w3m-bookmarks
                  'help-echo (helm-w3m-bookmarks-get-value i))))

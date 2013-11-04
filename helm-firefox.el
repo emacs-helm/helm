@@ -88,7 +88,7 @@
   (assoc-default elm helm-firefox-bookmarks-alist))
 
 (defun helm-highlight-firefox-bookmarks (bookmarks source)
-  (loop for i in bookmarks
+  (cl-loop for i in bookmarks
         collect (propertize
                  i 'face '((:foreground "YellowGreen"))
                  'help-echo (helm-firefox-bookmarks-get-value i))))

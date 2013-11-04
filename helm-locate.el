@@ -85,7 +85,7 @@ the opposite of \"locate\" command."
 
 
 (defvar helm-generic-files-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-]")     'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-s")     'helm-ff-run-grep)
@@ -174,7 +174,7 @@ See `helm-locate-with-db' and `helm-locate'."
   "Setup `helm-locate-command' if not already defined."
   (unless helm-locate-command
     (setq helm-locate-command
-          (case system-type
+          (cl-case system-type
             (gnu/linux "locate %s -r %s")
             (berkeley-unix "locate %s %s")
             (windows-nt "es %s %s")
@@ -198,7 +198,7 @@ See also `helm-locate'."
                       (mapconcat 'identity
                                  ;; Remove eventually
                                  ;; marked directories by error.
-                                 (loop for i in db
+                                 (cl-loop for i in db
                                        unless (file-directory-p i)
                                        collect i) ":"))
               helm-locate-command)
@@ -223,7 +223,7 @@ See also `helm-locate'."
         (start-process-shell-command
          "locate-process" helm-buffer
          (format helm-locate-command
-                 (case helm-locate-case-fold-search
+                 (cl-case helm-locate-case-fold-search
                    (smart (let ((case-fold-search nil))
                             (if (string-match "[A-Z]" helm-pattern)
                                 case-sensitive-flag

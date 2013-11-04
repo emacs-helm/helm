@@ -38,7 +38,7 @@ A format string where %s will be replaced with `frame-width'."
 ;;
 (defvar helm-top-sort-fn nil)
 (defvar helm-top-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?") 'helm-top-help)
     (define-key map (kbd "M-P")   'helm-top-run-sort-by-cpu)
@@ -64,7 +64,7 @@ A format string where %s will be replaced with `frame-width'."
 (defun helm-top-transformer (candidates _source)
   "Transformer for `helm-top'.
 Return empty string for non--valid candidates."
-  (loop for disp in candidates collect
+  (cl-loop for disp in candidates collect
         (if (string-match "^ *[0-9]+" disp) disp (cons disp ""))))
 
 (defun helm-top-action-transformer (actions candidate)
@@ -109,7 +109,7 @@ Show actions only on line starting by a PID."
 (defun helm-top-sort-transformer (candidates source)
   (helm-top-transformer
    (if helm-top-sort-fn
-       (loop for c in candidates
+       (cl-loop for c in candidates
              if (string-match "^ *[0-9]+" c) collect c into pid-cands
              else collect c into header-cands
              finally return (append (butlast header-cands)
@@ -202,7 +202,7 @@ Show actions only on line starting by a PID."
            (call-process "xrandr" nil (current-buffer) nil
                          "--screen" (helm-xrandr-screen) "-q")
            (goto-char 1)
-           (loop with modes = nil
+           (cl-loop with modes = nil
                  while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
                  for mode = (match-string 1)
                  unless (member mode modes)

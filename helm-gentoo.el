@@ -85,11 +85,11 @@
                               (setq helm-cache-world (helm-gentoo-get-world))))))))
 
 
-(defun* helm-gentoo-install (candidate &key action)
+(cl-defun helm-gentoo-install (candidate &key action)
   (setq helm-external-commands-list nil)
   (ansi-term (getenv "SHELL") "Gentoo emerge")
   (term-line-mode)
-  (let ((command (case action
+  (let ((command (cl-case action
                    ('install "sudo emerge -av ")
                    ('uninstall "sudo emerge -avC ")
                    (t (error "Unknow action"))))
@@ -154,7 +154,7 @@
   (let* ((portage-buf (get-buffer-create "*helm-gentoo*"))
          (buf (helm-candidate-buffer 'portage-buf)))
     (with-current-buffer buf
-      (dolist (i helm-cache-gentoo)
+      (cl-dolist (i helm-cache-gentoo)
         (insert (concat i "\n"))))))
 
 (defun helm-gentoo-setup-cache ()
@@ -183,7 +183,7 @@
   (let* ((use-buf (get-buffer-create "*helm-gentoo-use*"))
          (buf (helm-candidate-buffer 'use-buf)))
     (with-current-buffer buf
-      (dolist (i helm-gentoo-use-flags)
+      (cl-dolist (i helm-gentoo-use-flags)
         (insert (concat i "\n"))))))
 
 
@@ -197,7 +197,7 @@
 
 (defun helm-gentoo-get-url (elm)
   "Return a list of urls from eix output."
-  (loop with url-list = (split-string
+  (cl-loop with url-list = (split-string
                          (with-temp-buffer
                            (call-process "eix" nil t nil
                                          elm "--format" "<homepage>\n")
@@ -226,7 +226,7 @@
 
 (defun helm-highlight-world (eix)
   "Highlight all installed package."
-  (loop for i in eix
+  (cl-loop for i in eix
         if (member i helm-cache-world)
         collect (propertize i 'face 'helm-gentoo-match)
         else
@@ -234,7 +234,7 @@
 
 (defun helm-highlight-local-use (use-flags)
   (let ((local-uses (helm-gentoo-get-local-use)))
-    (loop for i in use-flags
+    (cl-loop for i in use-flags
           if (member i local-uses)
           collect (propertize i 'face 'helm-gentoo-match)
           else

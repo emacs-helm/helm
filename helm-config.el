@@ -49,7 +49,7 @@
   :group 'helm-config
   :set
   (lambda (var key)
-    (dolist (map '(minibuffer-local-completion-map
+    (cl-dolist (cl-map '(minibuffer-local-completion-map
                    minibuffer-local-filename-completion-map
                    minibuffer-local-filename-must-match-map ; Emacs 23.1.+
                    minibuffer-local-isearch-map
@@ -70,7 +70,7 @@
 ;;
 ;;
 (defvar helm-command-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (define-key map (kbd "a")         'helm-apropos)
     (define-key map (kbd "e")         'helm-etags-select)
     (define-key map (kbd "l")         'helm-locate)
@@ -180,7 +180,7 @@
   (customize-group "helm"))
 
 ;;; Fontlock
-(dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+(cl-dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
   (font-lock-add-keywords
    mode
    '(("(\\<\\(with-helm-after-update-hook\\)\\>" 1 font-lock-keyword-face)
@@ -1543,7 +1543,7 @@ Keys description:
   (See `helm-mode-line-string')
 
 - KEYMAP: A keymap to use in this `helm-comp-read'.
-  (The keymap will be shared with history source)
+  (cl-the keymap will be shared with history source)
 
 - NAME: The name related to this local source.
 

@@ -50,7 +50,7 @@ The format is \"Firstname Lastname\"."
 (defun helm-bbdb-read-phone ()
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
-  (loop with phone-list
+  (cl-loop with phone-list
         with loc-list = (cons "[Exit when no more]"
                               (bbdb-label-completion-list "phones"))
         with loc ; Defer count
@@ -69,7 +69,7 @@ See docstring of `bbdb-create-internal' for more info on address entries."
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.
 If COUNT is non--nil add a number after each prompt."
-  (loop with elm with new-prompt = prompt
+  (cl-loop with elm with new-prompt = prompt
         while (not (string= elm ""))
         for n from 1
         do (when count
@@ -80,7 +80,7 @@ If COUNT is non--nil add a number after each prompt."
 (defun helm-bbdb-read-address ()
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
-  (loop with address-list
+  (cl-loop with address-list
         with loc-list = (cons "[Exit when no more]"
                               (bbdb-label-completion-list "addresses"))
         with loc ; Defer count
@@ -147,14 +147,14 @@ http://bbdb.sourceforge.net/")
   "View BBDB data of single CANDIDATE or marked candidates."
   (helm-aif (helm-marked-candidates)
       (let ((bbdb-append-records (length it)))
-        (dolist (i it)
+        (cl-dolist (i it)
           (bbdb-redisplay-one-record (helm-bbdb-get-record i))))
     (bbdb-redisplay-one-record (helm-bbdb-get-record candidate))))
 
 (defun helm-bbdb-collect-mail-addresses ()
   "Return a list of all mail addresses of records in bbdb buffer."
   (with-current-buffer bbdb-buffer-name
-    (loop for i in bbdb-records
+    (cl-loop for i in bbdb-records
           if (bbdb-record-net (car i))
           collect (bbdb-dwim-net-address (car i)))))
 

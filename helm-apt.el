@@ -44,7 +44,7 @@
 
 
 (defvar helm-apt-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?") 'helm-apt-help)
     (define-key map (kbd "M-I")   'helm-apt-show-only-installed)
@@ -91,7 +91,7 @@
 
 (defun helm-apt-candidate-transformer (candidates)
   "Show installed CANDIDATES and the ones to deinstall in a different color."
-  (loop for cand in candidates
+  (cl-loop for cand in candidates
         for name = (helm-apt-display-to-real cand)
         for deinstall = (string=
                          (assoc-default name helm-apt-installed-packages)
@@ -145,7 +145,7 @@
             (with-temp-buffer
               (call-process-shell-command "dpkg --get-selections"
                                           nil (current-buffer))
-              (loop for i in (split-string (buffer-string) "\n" t)
+              (cl-loop for i in (split-string (buffer-string) "\n" t)
                     for p = (split-string i)
                     collect (cons (car p) (cadr p)))))
       (helm-init-candidates-in-buffer
@@ -201,7 +201,7 @@ package name - description."
   "Run 'apt-get purge' shell command on PACKAGE."
   (helm-apt-generic-action :action 'purge))
 
-(defun* helm-apt-generic-action (&key action)
+(cl-defun helm-apt-generic-action (&key action)
   "Run 'apt-get ACTION'.
 Support install, remove and purge actions."
   (if (and helm-apt-term-buffer
@@ -210,7 +210,7 @@ Support install, remove and purge actions."
       (ansi-term (getenv "SHELL") "term apt")
       (setq helm-apt-term-buffer (buffer-name)))
   (term-line-mode)
-  (let ((command   (case action
+  (let ((command   (cl-case action
                      (install   "sudo apt-get install ")
                      (reinstall "sudo apt-get install --reinstall ")
                      (uninstall "sudo apt-get remove ")

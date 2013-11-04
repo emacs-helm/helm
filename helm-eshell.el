@@ -34,14 +34,14 @@
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 
 (defvar helm-eshell-history-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-p") 'helm-next-line)
     map)
   "Keymap for `helm-eshell-history'.")
 
 (defvar helm-esh-completion-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "TAB") 'helm-next-line)
     map)
@@ -58,7 +58,7 @@
     (candidates . helm-esh-get-candidates)
     (filtered-candidate-transformer
      (lambda (candidates _sources)
-       (loop for i in candidates collect
+       (cl-loop for i in candidates collect
              (cons (abbreviate-file-name i) i))))
     (action . helm-ec-insert))
   "Helm source for Eshell completion.")
@@ -90,7 +90,7 @@ The function that call this should set `helm-ec-target' to thing at point."
              (entry (or (try-completion helm-pattern
                                         (pcomplete-entries))
                             helm-pattern)))
-        (loop ;; expand entry too to be able to compare it with file-cand.
+        (cl-loop ;; expand entry too to be able to compare it with file-cand.
               with exp-entry = (and (stringp entry)
                                     (not (string= entry ""))
                                     (file-name-as-directory
@@ -162,7 +162,7 @@ The function that call this should set `helm-ec-target' to thing at point."
          ;; Use thing-at-point instead of last args value
          ;; to exclude possible delimiters e.g "(".
          (target (thing-at-point 'symbol))
-         (first (car args)) ; Maybe lisp delimiter "(".
+         (cl-first (car args)) ; Maybe lisp delimiter "(".
          last) ; Will be the last but parsed by pcomplete.
     (setq helm-ec-target (or target " ")
           end (point)

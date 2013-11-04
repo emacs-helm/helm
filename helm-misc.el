@@ -43,9 +43,9 @@
 ;;; Latex completion
 (defun helm-latex-math-candidates ()
   "Collect candidates for latex math completion."
-  (declare (special LaTeX-math-menu))
-  (loop for i in (cddr LaTeX-math-menu)
-        for elm = (loop for s in i when (vectorp s)
+  (cl-declare (special LaTeX-math-menu))
+  (cl-loop for i in (cddr LaTeX-math-menu)
+        for elm = (cl-loop for s in i when (vectorp s)
                         collect (cons (aref s 0) (aref s 1)))
         append elm))
 
@@ -121,7 +121,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
      . (lambda ()
          (ignore-errors
            (with-helm-current-buffer
-             (loop initially (goto-char (point-min))
+             (cl-loop initially (goto-char (point-min))
                    while (re-search-forward
                           (format ee-anchor-format "\\([^\.].+\\)") nil t)
                    for anchor = (match-string-no-properties 1)
@@ -140,7 +140,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
   "List online Jabber contacts."
   (with-no-warnings
     (let (jids)
-      (dolist (item (jabber-concat-rosters) jids)
+      (cl-dolist (item (jabber-concat-rosters) jids)
         (when (get item 'connected)
           (push (if (get item 'name)
                     (cons (get item 'name) item)
@@ -159,7 +159,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;;; World time
 ;;
 (defun helm-time-zone-transformer (candidates sources)
-  (loop for i in candidates
+  (cl-loop for i in candidates
         collect
         (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
                (propertize i 'face 'helm-time-zone-current))
@@ -214,7 +214,7 @@ It is added to `extended-command-history'.
                      (format "%s (%s)" name minibuffer-history-variable)))
     (candidates
      . (lambda ()
-         (let ((history (loop for i in
+         (let ((history (cl-loop for i in
                               (symbol-value minibuffer-history-variable)
                               unless (string= "" i) collect i)))
            (if (consp (car history))

@@ -36,7 +36,7 @@
 (defun helm-mp-set-matching-method (var key)
   "Default function to set matching methods in helm match plugin."
   (set-default var key)
-  (case (symbol-value var)
+  (cl-case (symbol-value var)
     (multi1 (setq helm-mp-default-match-functions
                   '(helm-mp-exact-match helm-mp-1-match)
                   helm-mp-default-search-functions
@@ -135,7 +135,7 @@ i.e \"foo bar\"=> (\"foo\" \"bar\")
 but \"foo\ bar\"=> (\"foobar\")."
   (if (string= pattern "")
       '("")
-      (loop for s in (split-string
+      (cl-loop for s in (split-string
                       (replace-regexp-in-string helm-mp-space-regexp
                                                 "\000\000" pattern)
                       " " t)
@@ -213,7 +213,7 @@ but \"foo\ bar\"=> (\"foobar\")."
           (concat "^" (helm-mp-1-make-regexp pattern))))
   helm-mp-1-pattern-real)
 
-(defun* helm-mp-1-match (str &optional (pattern helm-pattern))
+(cl-defun helm-mp-1-match (str &optional (pattern helm-pattern))
   (string-match (helm-mp-1-get-pattern pattern) str))
 
 (defun helm-mp-1-search (pattern &rest ignore)
@@ -237,7 +237,7 @@ but \"foo\ bar\"=> (\"foobar\")."
           (concat "^.*" (helm-mp-1-make-regexp pattern))))
   helm-mp-2-pattern-real)
 
-(defun* helm-mp-2-match (str &optional (pattern helm-pattern))
+(cl-defun helm-mp-2-match (str &optional (pattern helm-pattern))
   (string-match (helm-mp-2-get-pattern pattern) str))
 
 (defun helm-mp-2-search (pattern &rest ignore)
@@ -268,7 +268,7 @@ This is done only if `helm-mp-3-pattern-str' is same as PATTERN."
   "Return a list of predicate/regexp cons cells.
 e.g ((identity . \"foo\") (identity . \"bar\"))."
   (unless (string= pattern "")
-    (loop for pat in (helm-mp-split-pattern pattern)
+    (cl-loop for pat in (helm-mp-split-pattern pattern)
           collect (if (string= "!" (substring pat 0 1))
                       (cons 'not (substring pat 1))
                       (cons 'identity pat)))))
@@ -285,7 +285,7 @@ Then each predicate of cons cell(s) is called with regexp of same
 cons cell against STR (a candidate).
 i.e (identity (string-match \"foo\" \"foo bar\")) => t."
   (let ((pat (helm-mp-3-get-patterns (or pattern helm-pattern))))
-    (loop for (predicate . regexp) in pat
+    (cl-loop for (predicate . regexp) in pat
           always (funcall predicate (string-match regexp str)))))
 
 (defun helm-mp-3-search-base (pattern searchfn1 searchfn2)
@@ -294,13 +294,13 @@ This is the search function for `candidates-in-buffer' enabled sources.
 Use the same method as `helm-mp-3-match' except it search in buffer
 instead of matching on a string.
 i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
-  (loop with pat = (if (stringp pattern)
+  (cl-loop with pat = (if (stringp pattern)
                        (helm-mp-3-get-patterns pattern)
                        pattern)
         while (funcall searchfn1 (or (cdar pat) "") nil t)
         for bol = (point-at-bol)
         for eol = (point-at-eol)
-        if (loop for (pred . str) in (cdr pat) always
+        if (cl-loop for (pred . str) in (cdr pat) always
                  (progn (goto-char bol)
                         (funcall pred (funcall searchfn2 str eol t))))
         do (goto-char eol) and return t
@@ -329,9 +329,9 @@ Same as `helm-mp-3-match' but more strict, matching against prefix also.
 e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 `helm-mp-3-match'."
   (let* ((pat (helm-mp-3-get-patterns (or pattern helm-pattern)))
-         (first (car pat)))
+         (cl-first (car pat)))
     (and (funcall (car first) (helm-mp-prefix-match str (cdr first)))
-         (loop for (predicate . regexp) in (cdr pat)
+         (cl-loop for (predicate . regexp) in (cdr pat)
                always (funcall predicate (string-match regexp str))))))
 
 (defun helm-mp-3p-search (pattern &rest ignore)
@@ -375,7 +375,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
         `(,(if (or (assoc 'candidates-in-buffer source)
                    (equal '(identity) matchfns))
                '(match identity) `(match ,@matchfns))
-           (search ,@searchfns)
+           (cl-search ,@searchfns)
            ,@source))))
 
 
@@ -408,7 +408,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 (defun helm-mp-highlight-match-internal (end)
   (when helm-alive-p
     (set-buffer helm-buffer)
-    (let ((requote (loop for (pred . re) in
+    (let ((requote (cl-loop for (pred . re) in
                          (helm-mp-3-get-patterns helm-pattern)
                          when (and (eq pred 'identity)
                                    (>= (length re)

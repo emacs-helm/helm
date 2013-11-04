@@ -71,7 +71,7 @@
 
 
 (defvar helm-bookmark-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c o") 'helm-bookmark-run-jump-other-window)
     (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
@@ -97,7 +97,7 @@
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-transformer (candidates _source)
-  (loop for i in candidates
+  (cl-loop for i in candidates
         for loc = (bookmark-location i)
         for len =  (string-width i)
         for trunc = (if (> len bookmark-bmenu-file-column)
@@ -153,10 +153,10 @@
     (init . (lambda ()
               (require 'bookmark)
               (helm-init-candidates-in-buffer
-               'global (loop for b in (bookmark-all-names) collect
+               'global (cl-loop for b in (bookmark-all-names) collect
                              (propertize b 'location (bookmark-location b))))))
     (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
+    (cl-search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -187,7 +187,7 @@ Should be used with `helm-bookmark-search-fn' as `search' function."
   "Used as `filtered-candidate-transformer' to colorize bookmarks.
 Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (let ((non-essential t))
-    (loop for i in bookmarks
+    (cl-loop for i in bookmarks
           for isfile        = (bookmark-get-filename i)
           for bufp          = (and (fboundp 'bmkext-get-buffer-name)
                                    (bmkext-get-buffer-name i))
@@ -263,7 +263,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;;; Bookmarks attributes
 ;;
 (define-helm-type-attribute 'bookmark
-    `((coerce . helm-bookmark-get-bookmark-from-name)
+    `((cl-coerce . helm-bookmark-get-bookmark-from-name)
       (action
        ("Jump to bookmark" . helm-bookmark-jump)
        ("Jump to BM other window" . helm-bookmark-jump-other-window)
@@ -304,7 +304,7 @@ Return nil if bmk is not a valid bookmark."
 
 (defun helm-delete-marked-bookmarks (ignore)
   "Delete this bookmark or all marked bookmarks."
-  (dolist (i (helm-marked-candidates))
+  (cl-dolist (i (helm-marked-candidates))
     (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
                      'batch)))
 

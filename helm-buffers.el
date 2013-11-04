@@ -88,7 +88,7 @@ When disabled (nil) use the longest buffer-name length found."
 ;;; Buffers keymap
 ;;
 (defvar helm-buffer-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")     'helm-buffer-help)
     ;; No need to have separate command for grep and zgrep
@@ -114,7 +114,7 @@ When disabled (nil) use the longest buffer-name length found."
   "Keymap for buffer sources in helm.")
 
 (defvar helm-buffers-ido-virtual-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?")   'helm-buffers-ido-virtual-help)
     (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
@@ -133,7 +133,7 @@ When disabled (nil) use the longest buffer-name length found."
     (init . (lambda ()
               ;; Issue #51 Create the list before `helm-buffer' creation.
               (setq helm-buffers-list-cache (helm-buffer-list))
-              (let ((result (loop for b in helm-buffers-list-cache
+              (let ((result (cl-loop for b in helm-buffers-list-cache
                                   maximize (length b) into len-buf
                                   maximize (length (with-current-buffer b
                                                      (symbol-name major-mode)))
@@ -284,7 +284,7 @@ See `ido-make-buffer-list' for more infos."
 (defun helm-highlight-buffers (buffers source)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop for i in buffers
+  (cl-loop for i in buffers
         for (name size mode meta) = (if helm-buffer-details-flag
                                         (helm-buffer-details i 'details)
                                         (helm-buffer-details i))
@@ -348,12 +348,12 @@ with name matching pattern."
                       (helm-buffers-match-inside cand (cdr split))))
                 ((string-match "\\s-" helm-pattern)
                  (and (funcall match-mjm (car split) mjm)
-                      (loop for i in (cdr split) always (string-match i cand))))
+                      (cl-loop for i in (cdr split) always (string-match i cand))))
                 (t (or (funcall match-mjm helm-pattern mjm)
                        (string-match helm-pattern cand)))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
-  (loop for i in lst
+  (cl-loop for i in lst
         always
         (cond ((string-match "\\`[\\]@" i)
                (string-match i candidate))
@@ -371,7 +371,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
         (bufs   (helm-marked-candidates)))
-    (loop with replace = (query-replace-read-from prompt regexp-flag)
+    (cl-loop with replace = (query-replace-read-from prompt regexp-flag)
           with tostring = (unless (consp replace)
                             (query-replace-read-to
                              replace prompt regexp-flag))
@@ -409,7 +409,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-buffer-revert-and-update (candidate)
   (let ((marked (helm-marked-candidates)))
-    (loop for buf in marked do (helm-revert-buffer buf))
+    (cl-loop for buf in marked do (helm-revert-buffer buf))
     (when (> (length marked) 1) (helm-unmark-all))
     (helm-force-update candidate)))
 
@@ -423,7 +423,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-buffer-save-and-update (candidate)
   (let ((marked (helm-marked-candidates))
         (enable-recursive-minibuffers t))
-    (loop for buf in marked do
+    (cl-loop for buf in marked do
           (with-current-buffer (get-buffer buf)
             (save-buffer)))
     (when (> (length marked) 1) (helm-unmark-all))
@@ -519,15 +519,15 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 With optional arg MERGE call `ediff-merge-buffers'."
   (let ((lg-lst (length (helm-marked-candidates)))
         buf1 buf2)
-    (case lg-lst
+    (cl-case lg-lst
       (0
        (error "Error:You have to mark at least 1 buffer"))
       (1
        (setq buf1 helm-current-buffer
-             buf2 (first (helm-marked-candidates))))
+             buf2 (cl-first (helm-marked-candidates))))
       (2
-       (setq buf1 (first (helm-marked-candidates))
-             buf2 (second (helm-marked-candidates))))
+       (setq buf1 (cl-first (helm-marked-candidates))
+             buf2 (cl-second (helm-marked-candidates))))
       (t
        (error "Error:To much buffers marked!")))
     (if merge
@@ -547,7 +547,7 @@ Can be used by any source that list buffers."
              (not helm-moccur-always-search-in-current)
              helm-moccur-always-search-in-current))
         (buffers (helm-marked-candidates))
-        (input (loop for i in (split-string helm-pattern " " t)
+        (input (cl-loop for i in (split-string helm-pattern " " t)
                      thereis (and (string-match "\\`@\\(.*\\)" i)
                                   (match-string 1 i)))))
     (helm-multi-occur-1 buffers input)))

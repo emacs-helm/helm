@@ -65,12 +65,12 @@ and sets `helm-external-commands-list'."
   (if helm-external-commands-list
       helm-external-commands-list
       (setq helm-external-commands-list
-            (loop
+            (cl-loop
                   with paths = (split-string (getenv "PATH") path-separator)
                   with completions = ()
                   for dir in paths
                   when (and (file-exists-p dir) (file-accessible-directory-p dir))
-                  for lsdir = (loop for i in (directory-files dir t)
+                  for lsdir = (cl-loop for i in (directory-files dir t)
                                     for bn = (file-name-nondirectory i)
                                     when (and (not (member bn completions))
                                               (not (file-directory-p i))
@@ -93,7 +93,7 @@ In this case EXE must be provided as \"EXE %s\"."
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))
             (error "Error: %s is already running" real-com))
-        (when (loop for i in helm-external-commands-list thereis real-com)
+        (when (cl-loop for i in helm-external-commands-list thereis real-com)
           (message "Starting %s..." real-com)
           (if file
               (start-process-shell-command
@@ -181,7 +181,7 @@ If not found or a prefix arg is given query the user which tool to use."
     (setq helm-external-command-history
           (cons real-prog-name
                 (delete real-prog-name
-                        (loop for i in helm-external-command-history
+                        (cl-loop for i in helm-external-command-history
                               when (executable-find i) collect i))))))
 
 ;;;###autoload
@@ -201,7 +201,7 @@ You can set your own list of commands with
   (helm-run-or-raise program)
   (setq helm-external-command-history
         (cons program (delete program
-                              (loop for i in helm-external-command-history
+                              (cl-loop for i in helm-external-command-history
                                     when (executable-find i) collect i)))))
 
 

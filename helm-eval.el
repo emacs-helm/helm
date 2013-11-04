@@ -50,7 +50,7 @@ Should take one arg: the string to display."
 (defvar helm-eldoc-active-minibuffers-list nil)
 
 (defvar helm-eval-expression-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-eval-new-line-and-indent)
     (define-key map (kbd "<tab>")      'lisp-indent-line)
@@ -153,7 +153,7 @@ Should take one arg: the string to display."
 (defun helm-eval-expression-with-eldoc ()
   "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support. "
   (interactive)
-  (declare (special eldoc-idle-delay))
+  (cl-declare (special eldoc-idle-delay))
   (let ((timer (run-with-idle-timer
                 eldoc-idle-delay 'repeat
                 'helm-eldoc-show-in-eval)))

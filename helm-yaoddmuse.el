@@ -30,7 +30,7 @@
 (defvar helm-yaoddmuse-ew-cache nil)
 
 (defun helm-yaoddmuse-get-candidates ()
-  (declare (special yaoddmuse-pages-hash))
+  (cl-declare (special yaoddmuse-pages-hash))
   (if helm-yaoddmuse-use-cache-file
       (ignore-errors
         (unless helm-yaoddmuse-ew-cache
@@ -114,13 +114,13 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
   "Fetch the list of files on emacswiki and create cache file.
 If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
   (interactive)
-  (declare (special yaoddmuse-pages-hash))
+  (cl-declare (special yaoddmuse-pages-hash))
   (yaoddmuse-update-pagename)
   (save-excursion
     (find-file helm-yaoddmuse-cache-file)
     (erase-buffer)
     (insert "(puthash \"EmacsWiki\" '(")
-    (loop for i in (gethash "EmacsWiki" yaoddmuse-pages-hash)
+    (cl-loop for i in (gethash "EmacsWiki" yaoddmuse-pages-hash)
           do
           (insert (concat "(\"" (car i) "\") ")))
     (insert ") yaoddmuse-pages-hash)\n")
@@ -136,7 +136,7 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
         (library-list (yaoddmuse-get-library-list)))
     (with-current-buffer helm-buffer
       ;; Insert library name.
-      (dolist (library library-list)
+      (cl-dolist (library library-list)
         (insert (format "%s\n" library)))
       ;; Sort lines.
       (sort-lines nil (point-min) (point-max)))))

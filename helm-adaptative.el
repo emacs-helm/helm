@@ -144,7 +144,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
           ;; truncate history if needed
           (if (> (length (cdr selection-info)) helm-adaptive-history-length)
               (setcdr selection-info
-                      (subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
+                      (cl-subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
 
 (defun helm-adaptative-maybe-load-history ()
   "Load `helm-adaptive-history-file' which contain `helm-adaptive-history'.
@@ -177,11 +177,11 @@ This is a filtered candidate transformer you can use with the
                ;; ... assemble a list containing the (CANIDATE . USAGE-COUNT)
                ;; pairs
                (mapcar (lambda (candidate-info)
-                         (let ((count 0))
-                           (dolist (pattern-info (cdr candidate-info))
+                         (let ((cl-count 0))
+                           (cl-dolist (pattern-info (cdr candidate-info))
                              (if (not (equal (car pattern-info)
                                              helm-pattern))
-                                 (incf count (cdr pattern-info))
+                                 (cl-incf count (cdr pattern-info))
 
                                  ;; if current pattern is equal to the previously
                                  ;; used one then this candidate has priority
@@ -189,7 +189,7 @@ This is a filtered candidate transformer you can use with the
                                  ;; it only has to compete with other candidates
                                  ;; which were also selected with the same pattern
                                  (setq count (+ 10000 (cdr pattern-info)))
-                                 (return)))
+                                 (cl-return)))
                            (cons (car candidate-info) count)))
                        (cdr source-info)))
               sorted)
@@ -197,15 +197,15 @@ This is a filtered candidate transformer you can use with the
               ;; sort the list in descending order, so candidates with highest
               ;; priorty come first
               (progn
-                (setq usage (sort usage (lambda (first second)
+                (setq usage (sort usage (lambda (cl-first second)
                                           (> (cdr first) (cdr second)))))
 
                 ;; put those candidates first which have the highest usage count
-                (dolist (info usage)
-                  (when (member* (car info) candidates
+                (cl-dolist (info usage)
+                  (when (cl-member (car info) candidates
                                  :test 'helm-adaptive-compare)
                     (push (car info) sorted)
-                    (setq candidates (remove* (car info) candidates
+                    (setq candidates (cl-remove (car info) candidates
                                               :test 'helm-adaptive-compare))))
 
                 ;; and append the rest

@@ -171,7 +171,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 ;;
 ;;
 (defvar helm-grep-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
@@ -187,7 +187,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   "Keymap used in Grep sources.")
 
 (defvar helm-pdfgrep-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
@@ -197,7 +197,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   "Keymap used in pdfgrep.")
 
 (defvar helm-grep-mode-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (define-key map (kbd "RET")      'helm-grep-mode-jump)
     (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
     (define-key map (kbd "q")        'helm-grep-mode-quit)
@@ -247,7 +247,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        candidates))
   (if helm-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
-      (loop for i in candidates append
+      (cl-loop for i in candidates append
             (cond ((string-match "^git" helm-grep-default-command)
                    (list i))
                   ;; Candidate is a directory and we use recursion.
@@ -291,8 +291,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                     helm-grep-default-command) " "))))
     (if (string= com "git") "git-grep" com)))
 
-(defun* helm-grep-use-ack-p (&key where)
-  (case where
+(cl-defun helm-grep-use-ack-p (&key where)
+  (cl-case where
     (default (string= (helm-grep-command) "ack-grep"))
     (recursive (string= (helm-grep-command t) "ack-grep"))
     (strict (and (string= (helm-grep-command t) "ack-grep")
@@ -439,7 +439,7 @@ WHERE can be one of other-window, elscreen, other-frame."
          (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
          (fname        (if tramp-host
                            (concat tramp-prefix loc-fname) loc-fname)))
-    (case where
+    (cl-case where
       (other-window (find-file-other-window fname))
       (elscreen     (helm-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
@@ -587,7 +587,7 @@ If N is positive go forward otherwise go backward."
         new-buf)
     (when (get-buffer buf)
       (setq new-buf (read-string "GrepBufferName: " buf))
-      (loop for b in (helm-buffer-list)
+      (cl-loop for b in (helm-buffer-list)
             when (and (string= new-buf b)
                       (not (y-or-n-p
                             (format "Buffer `%s' already exists overwrite? "
@@ -676,7 +676,7 @@ Special commands:
     (call-process "ack-grep" nil t nil
                   "--help" "types")
     (goto-char (point-min))
-    (loop while (re-search-forward
+    (cl-loop while (re-search-forward
                  "^ *--\\(\\[no\\]\\)\\([^. ]+\\) *\\(.*\\)" nil t)
           collect (cons (concat (match-string 2)
                                 " [" (match-string 3) "]")
@@ -686,7 +686,7 @@ Special commands:
                         (concat "no" (match-string 2))))))
 
 (defun helm-grep-ack-types-transformer (candidates _source)
-  (loop for i in candidates
+  (cl-loop for i in candidates
         if (stringp i)
         collect (rassoc i helm-grep-ack-types-cache)
         else
@@ -715,7 +715,7 @@ Special commands:
 (defun helm-grep-guess-extensions (files)
   "Try to guess file extensions in FILES list when using grep recurse.
 These extensions will be added to command line with --include arg of grep."
-  (loop with glob-list
+  (cl-loop with glob-list
         with ext-list = (list helm-grep-preferred-ext "*")
         with lst = (if (file-directory-p (car files))
                        (directory-files
@@ -747,7 +747,7 @@ These extensions will be added to command line with --include arg of grep."
         ;; assume user entered more than one glob separated by space(s) and
         ;; split this string to pass it later to mapconcat.
         ;; e.g '("*.el *.py")
-        (loop for i in extensions
+        (cl-loop for i in extensions
               append (split-string-and-unquote i " "))
         (list "*"))))
 
@@ -894,11 +894,11 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   (when (string-match helm-grep-split-line-regexp line)
     ;; Don't use split-string because buffer/file name or string
     ;; may contain a ":".
-    (loop for n from 1 to 3 collect (match-string n line))))
+    (cl-loop for n from 1 to 3 collect (match-string n line))))
 
 (defun helm-grep-cand-transformer (candidates sources)
   "Filtered candidate transformer function for `helm-do-grep'."
-  (loop with root = (and helm-grep-default-directory-fn
+  (cl-loop with root = (and helm-grep-default-directory-fn
                          (funcall helm-grep-default-directory-fn))
         for i in candidates
         for split  = (and i (helm-grep-split-line i))
@@ -924,8 +924,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
         (with-temp-buffer
           (insert str)
           (goto-char (point-min))
-          (loop for reg in (if multi-match
-                               (loop for r in (helm-mp-split-pattern
+          (cl-loop for reg in (if multi-match
+                               (cl-loop for r in (helm-mp-split-pattern
                                                helm-pattern)
                                      unless (string-match "\\`!" r)
                                      collect r)
@@ -961,7 +961,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                     (helm-marked-candidates)))
          (win-conf (current-window-configuration))
          ;; Non--fname and remote buffers are ignored.
-         (bufs (loop for buf in cands
+         (bufs (cl-loop for buf in cands
                      for fname = (buffer-file-name (get-buffer buf))
                      when (and fname (not (file-remote-p fname)))
                      collect (expand-file-name fname))))

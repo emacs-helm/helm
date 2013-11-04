@@ -49,9 +49,9 @@ Set it to 0 to show all candidates on startup."
 
 (defvar helm-M-x-input-history nil)
 
-(defun* helm-M-x-get-major-mode-command-alist (mode-map)
+(cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
-  (loop for key being the key-seqs of mode-map using (key-bindings com)
+  (cl-loop for key being the key-seqs of mode-map using (key-bindings com)
         for str-key  = (key-description key)
         for ismenu   = (string-match "<menu-bar>" str-key)
         unless ismenu collect (cons str-key com)))
@@ -61,7 +61,7 @@ Set it to 0 to show all candidates on startup."
 Some modes don't use conventional mode-map name
 so we need to guess mode-map name. e.g python-mode ==> py-mode-map.
 Return nil if no mode-map found."
-  (loop ;; Start with a conventional mode-map name.
+  (cl-loop ;; Start with a conventional mode-map name.
         with mode-map    = (intern-soft (format "%s-map" mode))
         with mode-string = (symbol-name mode)
         with mode-name   = (replace-regexp-in-string "-mode" "" mode-string)
@@ -75,7 +75,7 @@ Return nil if no mode-map found."
 
 (defun helm-M-x-current-mode-map-alist ()
   "Return mode-map alist of current `major-mode'."
-  (let ((map (helm-get-mode-map-from-mode major-mode)))
+  (let ((cl-map (helm-get-mode-map-from-mode major-mode)))
     (when (and map (boundp map))
       (helm-M-x-get-major-mode-command-alist (symbol-value map)))))
 
@@ -84,7 +84,7 @@ Return nil if no mode-map found."
   "filtered-candidate-transformer to show bindings in emacs commands.
 Show global bindings and local bindings according to current `major-mode'."
   (with-helm-current-buffer
-    (loop with local-map = (helm-M-x-current-mode-map-alist)
+    (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
@@ -108,7 +108,7 @@ Show global bindings and local bindings according to current `major-mode'."
   "Preconfigured `helm' for Emacs commands.
 It is `helm' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
-  (let* ((history (loop with hist
+  (let* ((history (cl-loop with hist
                         for i in extended-command-history
                         for com = (intern i)
                         when (commandp com)

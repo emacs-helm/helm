@@ -56,7 +56,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
 ;;
 ;;
 (defvar helm-kill-ring-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-y") 'helm-next-line)
     (define-key map (kbd "M-u") 'helm-previous-line)
@@ -70,7 +70,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
     (filtered-candidate-transformer helm-kill-ring-transformer)
     (action . (("Yank" . helm-kill-ring-action)
                ("Delete" . (lambda (candidate)
-                             (loop for cand in (helm-marked-candidates)
+                             (cl-loop for cand in (helm-marked-candidates)
                                    do (setq kill-ring
                                             (delete cand kill-ring)))))))
     (keymap . ,helm-kill-ring-map)
@@ -80,14 +80,14 @@ If nil or zero (disabled), don't truncate candidate, show all."
   "Source for browse and insert contents of kill-ring.")
 
 (defun helm-kill-ring-candidates ()
-  (loop for kill in (helm-fast-remove-dups kill-ring :test 'equal)
+  (cl-loop for kill in (helm-fast-remove-dups kill-ring :test 'equal)
         unless (or (< (length kill) helm-kill-ring-threshold)
                    (string-match "\\`[\n[:blank:]]+\\'" kill))
         collect kill))
 
 (defun helm-kill-ring-transformer (candidates _source)
   "Display only the `helm-kill-ring-max-lines-number' lines of candidate."
-  (loop for i in candidates
+  (cl-loop for i in candidates
         for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
         if (and helm-kill-ring-max-lines-number
                 (> nlines helm-kill-ring-max-lines-number))
@@ -151,7 +151,7 @@ replace with STR as yanked string."
 
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
-    (loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
+    (cl-loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
           with recip = nil
           for i in marks
           for m = (helm-mark-ring-get-marks i)
@@ -178,11 +178,11 @@ replace with STR as yanked string."
     (action . (("Goto line"
                 . (lambda (candidate)
                     (let ((items (split-string candidate ":")))
-                      (helm-switch-to-buffer (second items))
+                      (helm-switch-to-buffer (cl-second items))
                       (helm-goto-line (string-to-number (car items))))))))
     (persistent-action . (lambda (candidate)
                            (let ((items (split-string candidate ":")))
-                             (helm-switch-to-buffer (second items))
+                             (helm-switch-to-buffer (cl-second items))
                              (helm-goto-line (string-to-number (car items)))
                              (helm-match-line-color-current-line))))
     (persistent-help . "Show this line")))
@@ -202,7 +202,7 @@ replace with STR as yanked string."
 (defun helm-global-mark-ring-get-candidates ()
   (let ((marks global-mark-ring))
     (when marks
-      (loop with recip = nil
+      (cl-loop with recip = nil
             for i in marks
             for gm = (unless (or (string-match
                                   "^ " (format "%s" (marker-buffer i)))
@@ -225,7 +225,7 @@ replace with STR as yanked string."
 
 (defun helm-register-candidates ()
   "Collecting register contents and appropriate commands."
-  (loop for (char . val) in register-alist
+  (cl-loop for (char . val) in register-alist
         for key    = (single-key-description char)
         for string-actions =
         (cond
@@ -290,7 +290,7 @@ replace with STR as yanked string."
 
 (defun helm-register-action-transformer (actions register-and-functions)
   "Decide actions by the contents of register."
-  (loop with func-actions =
+  (cl-loop with func-actions =
         '((insert-register
            "Insert Register" .
            (lambda (c) (insert-register (car c))))

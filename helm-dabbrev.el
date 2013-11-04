@@ -76,7 +76,7 @@ but the initial search for all candidates in buffer(s)."
                  (other :tag "Smart" 'smart)))
 
 (defvar helm-dabbrev-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-/") 'helm-next-line)
     (define-key map (kbd "M-:") 'helm-previous-line)
@@ -86,10 +86,10 @@ but the initial search for all candidates in buffer(s)."
 (defvar helm-dabbrev--exclude-current-buffer-flag nil)
 
 (defun helm-dabbrev--buffer-list ()
-  (loop with lst = (buffer-list)
+  (cl-loop with lst = (buffer-list)
         for buf in (if helm-dabbrev--exclude-current-buffer-flag
                        (cdr lst) lst)
-        unless (loop for r in helm-dabbrev-ignored-buffers-regexps
+        unless (cl-loop for r in helm-dabbrev-ignored-buffers-regexps
                      thereis (string-match r (buffer-name buf)))
         collect buf))
 
@@ -132,8 +132,8 @@ but the initial search for all candidates in buffer(s)."
          (minibuf (minibufferp buffer1))
          (search-and-store
           #'(lambda (pattern direction)
-              (declare (special result pos-before pos-after))
-              (while (case direction
+              (cl-declare (special result pos-before pos-after))
+              (while (cl-case direction
                        (1   (search-forward pattern nil t))
                        (-1  (search-backward pattern nil t))
                        (2   (let ((pos
@@ -157,11 +157,11 @@ but the initial search for all candidates in buffer(s)."
                        (lst (if (string= match-1 match-2)
                                 (list match-1)
                                 (list match-1 match-2))))
-                  (loop for match in lst
+                  (cl-loop for match in lst
                         unless (or (string= str match)
                                    (member match result))
                         do (push match result)))))))
-         (loop with result with pos-before with pos-after
+         (cl-loop with result with pos-before with pos-after
                for buf in (if all (helm-dabbrev--buffer-list)
                               (list (current-buffer)))
           
@@ -188,12 +188,12 @@ but the initial search for all candidates in buffer(s)."
                finally return (nreverse result))))
 
 (defun helm-dabbrev--get-candidates (abbrev)
-  (assert abbrev nil "[No Match]")
+  (cl-assert abbrev nil "[No Match]")
   (with-current-buffer (current-buffer)
     (let* ((dabbrev-get #'(lambda (str all-bufs)
                              (helm-dabbrev--collect
                               str helm-candidate-number-limit
-                              (case helm-dabbrev-case-fold-search
+                              (cl-case helm-dabbrev-case-fold-search
                                 (smart (helm-set-case-fold-search-1 abbrev))
                                 (t helm-dabbrev-case-fold-search))
                               all-bufs)))
@@ -208,7 +208,7 @@ but the initial search for all candidates in buffer(s)."
 ;; Internal
 (defvar helm-dabbrev--cache nil)
 (defvar helm-dabbrev--data nil)
-(defstruct helm-dabbrev-info dabbrev limits iterator)
+(cl-defstruct helm-dabbrev-info dabbrev limits iterator)
 
 (defvar helm-source-dabbrev
   `((name . "Dabbrev Expand")
@@ -241,7 +241,7 @@ but the initial search for all candidates in buffer(s)."
         (helm-quit-if-no-candidate
          #'(lambda ()
              (message "[Helm-dabbrev: No expansion found]"))))
-    (assert (and (stringp dabbrev) (not (string= dabbrev "")))
+    (cl-assert (and (stringp dabbrev) (not (string= dabbrev "")))
             nil "[Helm-dabbrev: Nothing found before point]")
     (when (and
            ;; have been called at least once.
@@ -260,7 +260,7 @@ but the initial search for all candidates in buffer(s)."
                                 :limits limits
                                 :iterator
                                 (helm-iter-list
-                                 (loop with selection
+                                 (cl-loop with selection
                                        for i in helm-dabbrev--cache
                                        when
                                        (string-match

@@ -126,13 +126,13 @@ text to be displayed in BUFNAME."
                  'face 'helm-helper))
         (scroll-error-top-bottom t))
     (condition-case err
-        (loop for event = (read-key prompt) do
-              (case event
+        (cl-loop for event = (read-key prompt) do
+              (cl-case event
                 ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
                 ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
                 ((?\C-s)        (isearch-forward))
                 ((?\C-r)        (isearch-backward))
-                (t (return))))
+                (t (cl-return))))
       (beginning-of-buffer (message "Beginning of buffer"))
       (end-of-buffer       (message "End of Buffer")))))
 
@@ -898,7 +898,7 @@ HELM-ATTRIBUTE should be a symbol."
   before action function.
 
   Example: converting string to symbol
-    (coerce . intern)")
+    (cl-coerce . intern)")
 
 (helm-document-attribute 'type "optional if action attribute is provided"
   "  Indicates the type of the items the source returns.
@@ -1029,7 +1029,7 @@ HELM-ATTRIBUTE should be a symbol."
   useful in case of sources with lots of candidates.")
 
 (helm-document-attribute 'persistent-action "optional"
-  "  Can be a either a Function called with one parameter (the
+  "  Can be a either a Function called with one parameter (cl-the
   selected candidate) or a cons cell where first element is this
   same function and second element a symbol (e.g never-split)
   that inform `helm-execute-persistent-action'to not split his

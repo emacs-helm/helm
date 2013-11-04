@@ -87,7 +87,7 @@ This enable support for `completing-read-multiple' when non--nil."
 
 
 (defvar helm-comp-read-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-cr-empty-string)
     map)
@@ -146,9 +146,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
          (cond ((eq collection obarray)
                 (all-completions "" collection test))
                ((and (vectorp collection) test)
-                (loop for i across collection when (funcall test i) collect i))
+                (cl-loop for i across collection when (funcall test i) collect i))
                ((vectorp collection)
-                (loop for i across collection collect i))
+                (cl-loop for i across collection collect i))
                ;; When collection is a symbol, most of the time
                ;; it should be a symbol used as a minibuffer-history.
                ;; The value of this symbol in this case return a list
@@ -170,14 +170,14 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ((and (symbolp collection) (boundp collection))
                 (all-completions "" (symbol-value collection)))
                ((and alistp test)
-                (loop for i in collection when (funcall test i) collect i))
+                (cl-loop for i in collection when (funcall test i) collect i))
                (alistp collection)
                (t (all-completions "" collection test)))))
     (if sort-fn (sort cands sort-fn) cands)))
 
 (defun helm-cr-default-transformer (candidates _source)
   "Default filter candidate function for `helm-comp-read'."
-  (loop with lst for c in candidates
+  (cl-loop with lst for c in candidates
         for cand = (if (stringp c) (replace-regexp-in-string "\\s\\" "" c) c)
         for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
         if (and (equal cand pat) helm-cr-unknow-pattern-flag)
@@ -191,7 +191,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
 ;;;###autoload
-(defun* helm-comp-read (prompt collection
+(cl-defun helm-comp-read (prompt collection
                                &key
                                test
                                initial-input
@@ -268,7 +268,7 @@ Keys description:
   (See `helm-mode-line-string')
 
 - KEYMAP: A keymap to use in this `helm-comp-read'.
-  (The keymap will be shared with history source)
+  (cl-the keymap will be shared with history source)
 
 - NAME: The name related to this local source.
 
@@ -307,7 +307,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
       (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm must-match)
            (must-match-map (when must-match
-                             (let ((map (make-sparse-keymap)))
+                             (let ((cl-map (make-sparse-keymap)))
                                (define-key map (kbd "RET")
                                  'helm-confirm-and-exit-minibuffer)
                                map)))
@@ -334,7 +334,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                 :test 'equal)))))
                        (filtered-candidate-transformer
                         . (lambda (candidates sources)
-                            (loop for i in candidates
+                            (cl-loop for i in candidates
                                   ;; Input is added to history in completing-read's
                                   ;; and may be regexp-quoted, so unquote it.
                                   for cand = (replace-regexp-in-string "\\s\\" "" i)
@@ -377,7 +377,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                              (setq cands (append (list helm-pattern) cands))
                              (setq helm-cr-unknow-pattern-flag t))
                            (with-current-buffer (helm-candidate-buffer 'global)
-                             (loop for i in
+                             (cl-loop for i in
                                    (if (and default (not (string= default "")))
                                        (delq nil (cons default (delete default cands)))
                                        cands)
@@ -472,7 +472,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                       (not (string= default "nil"))
                                       (not (string= default "")))
                              (insert (concat default "\n")))
-                           (loop with all = (all-completions "" obarray test)
+                           (cl-loop with all = (all-completions "" obarray test)
                                  for sym in all
                                  for s = (intern sym)
                                  unless (or (and default (string= sym default))
@@ -551,7 +551,7 @@ It should be used when candidate list don't need to rebuild dynamically."
                                     init hist default inherit-input-method
                                     name buffer t)))
 
-(defun* helm-completing-read-default
+(cl-defun helm-completing-read-default
     (prompt collection &optional
             predicate require-match
             initial-input hist def
@@ -562,7 +562,7 @@ This function should be used only as a `completing-read-function'.
 Don't use it directly, use instead `helm-comp-read' in your programs.
 
 See documentation of `completing-read' and `all-completions' for details."
-  (declare (special helm-mode))
+  (cl-declare (special helm-mode))
   (let* ((current-command (or (helm-this-command) this-command))
          (str-command     (if (consp current-command) ; Maybe a lambda.
                               "Anonymous"
@@ -593,7 +593,7 @@ See documentation of `completing-read' and `all-completions' for details."
       ;; a nil value, so we exit from here, disable `helm-mode'
       ;; and run the command again with it original behavior.
       ;; `helm-mode' will be restored on exit.
-      (return-from helm-completing-read-default
+      (cl-return-from helm-completing-read-default
         (unwind-protect
              (progn
                (helm-mode -1)
@@ -636,7 +636,7 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
-(defun* helm-read-file-name
+(cl-defun helm-read-file-name
     (prompt
      &key
      (name "Read File Name")
@@ -705,7 +705,7 @@ Keys description:
                                history nil nil alistp)))
            (minibuffer-completion-confirm must-match)
            (must-match-map (when must-match
-                             (let ((map (make-sparse-keymap)))
+                             (let ((cl-map (make-sparse-keymap)))
                                (define-key map (kbd "RET")
                                  'helm-confirm-and-exit-minibuffer)
                                map)))
@@ -744,7 +744,7 @@ Keys description:
                                          (not (file-exists-p helm-pattern))
                                          (list helm-pattern))
                                     (if test
-                                        (loop with hn = (helm-ff-tramp-hostnames)
+                                        (cl-loop with hn = (helm-ff-tramp-hostnames)
                                               for i in (helm-find-files-get-candidates
                                                         must-match)
                                               when (or (member i hn) ; A tramp host
@@ -786,10 +786,10 @@ Keys description:
          (identity helm-pattern))
        (keyboard-quit)))))
 
-(defun* helm-generic-read-file-name
+(cl-defun helm-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An helm replacement of `read-file-name'."
-  (declare (special helm-mode))
+  (cl-declare (special helm-mode))
   (let* ((init (or initial dir default-directory))
          (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
@@ -820,7 +820,7 @@ Keys description:
     (when (and def-com (> (length (help-function-arglist def-com)) 8))
       (setq def-com 'incompatible))
     (unless (or (not entry) def-com)
-      (return-from helm-generic-read-file-name
+      (cl-return-from helm-generic-read-file-name
         (unwind-protect
              (progn
                (helm-mode -1)
@@ -869,7 +869,7 @@ Keys description:
 (defun helm--completion-in-region (start end collection &optional predicate)
   "[EXPERIMENTAL] Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
-  (declare (special require-match prompt))
+  (cl-declare (special require-match prompt))
   (let* ((enable-recursive-minibuffers t)
          (input (buffer-substring start end))
          (result (helm-comp-read prompt
@@ -906,7 +906,7 @@ Note: This mode is incompatible with Emacs23."
   :group 'helm-mode
   :global t
   :lighter helm-completion-mode-string
-  (assert (boundp 'completing-read-function) nil
+  (cl-assert (boundp 'completing-read-function) nil
           "`helm-mode' not available, upgrade to Emacs-24")
   (if helm-mode
       (progn

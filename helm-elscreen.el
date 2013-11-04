@@ -27,7 +27,7 @@
   "Open buffer in new screen, if marked buffers open all in elscreens."
   (helm-require-or-error 'elscreen 'helm-find-buffer-on-elscreen)
   (helm-aif (helm-marked-candidates)
-      (dolist (i it)
+      (cl-dolist (i it)
         (let ((target-screen (elscreen-find-screen-by-buffer
                               (get-buffer i) 'create)))
           (elscreen-goto target-screen)))
@@ -45,7 +45,7 @@
      . (lambda ()
          (if (cdr (elscreen-get-screen-to-name-alist))
              (sort
-              (loop for sname in (elscreen-get-screen-to-name-alist)
+              (cl-loop for sname in (elscreen-get-screen-to-name-alist)
                     append (list (format "[%d] %s" (car sname) (cdr sname))))
               #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
     (action
@@ -54,7 +54,7 @@
                            (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
         ("Kill Screen(s)" .
                           (lambda (candidate)
-                            (dolist (i (helm-marked-candidates))
+                            (cl-dolist (i (helm-marked-candidates))
                               (elscreen-goto (- (aref i 1) (aref "0" 0)))
                               (elscreen-kill))))
         ("Only Screen" .

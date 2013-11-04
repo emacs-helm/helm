@@ -30,9 +30,9 @@
 
 (defun helm-semantic-init-candidates (tags depth)
   "Write the contents of TAGS to the current buffer."
-  (dolist (tag tags)
+  (cl-dolist (tag tags)
     (when (listp tag)
-      (case (semantic-tag-class tag)
+      (cl-case (semantic-tag-class tag)
 
         ((function variable type)
          (insert

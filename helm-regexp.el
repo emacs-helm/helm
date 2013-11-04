@@ -51,7 +51,7 @@ This setting apply also to `helm-source-occur'."
 
 
 (defvar helm-moccur-map
-  (let ((map (make-sparse-keymap)))
+  (let ((cl-map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
@@ -124,7 +124,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((matches (match-data))
         (line    (buffer-substring s e)))
     (propertize
-     (loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
+     (cl-loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
            for i from 0 to (1- (/ (length matches) 2))
            concat (format "\n         %s'%s'" (format "Group %d: " i)
                           (match-string i)) into ln1
@@ -173,7 +173,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
            helm-multi-occur-buffer-list))
   (helm-init-candidates-in-buffer
    'global
-   (loop for buf in helm-multi-occur-buffer-list
+   (cl-loop for buf in helm-multi-occur-buffer-list
          for bufstr = (with-current-buffer buf (buffer-string))
          do (add-text-properties
              0 (length bufstr)
@@ -193,7 +193,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
             (line-number-at-pos beg))
           (buffer-substring beg end)))
 
-(defun* helm-m-occur-action (candidate
+(cl-defun helm-m-occur-action (candidate
                              &optional (method (quote buffer)) mark)
   "Jump to CANDIDATE with METHOD.
 arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
@@ -204,13 +204,13 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
          (split-pat (if helm-occur-match-plugin-mode
                         (helm-mp-split-pattern helm-pattern)
                         (list helm-pattern))))
-    (case method
+    (cl-case method
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
     (helm-goto-line lineno)
     ;; Move point to the nearest matching regexp from bol.
-    (loop for reg in split-pat
+    (cl-loop for reg in split-pat
           when (save-excursion
                  (re-search-forward reg (point-at-eol) t))
           collect (match-beginning 0) into pos-ls
@@ -307,7 +307,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
 (defun helm-m-occur-transformer (candidates _source)
   "Transformer function for `helm-source-moccur'."
   (require 'helm-grep)
-  (loop for i in candidates
+  (cl-loop for i in candidates
         for split = (helm-grep-split-line i)
         for buf = (car split)
         for lineno = (nth 1 split)

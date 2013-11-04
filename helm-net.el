@@ -100,14 +100,14 @@ Return an alist with elements like (data . number_results)."
   (let ((request (concat helm-google-suggest-url
                          (url-hexify-string input)))
         (fetch #'(lambda ()
-                   (loop
+                   (cl-loop
                          with result-alist = (xml-get-children
                                               (car (xml-parse-region
                                                     (point-min) (point-max)))
                                               'CompleteSuggestion)
                          for i in result-alist
-                         for data = (cdr (caadr (assoc 'suggestion i)))
-                         for nqueries = (cdr (caadr (assoc 'num_queries i)))
+                         for data = (cdr (cl-caadr (assoc 'suggestion i)))
+                         for nqueries = (cdr (cl-caadr (assoc 'num_queries i)))
                          for lqueries = (length (helm-ggs-set-number-result
                                                  nqueries))
                          for ldata = (length data)
@@ -130,7 +130,7 @@ Return an alist with elements like (data . number_results)."
 (defun helm-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
   (let ((suggestions
-         (loop with suggested-results = (helm-google-suggest-fetch
+         (cl-loop with suggested-results = (helm-google-suggest-fetch
                                          (or (and request-prefix
                                                   (concat request-prefix
                                                           " " helm-pattern))
@@ -158,7 +158,7 @@ Return an alist with elements like (data . number_results)."
                for display = (format "%s%s(%s results)"
                                      real spaces align-fnumresult)
                collect (cons display real))))
-    (if (loop for (disp . dat) in suggestions
+    (if (cl-loop for (disp . dat) in suggestions
               thereis (equal dat helm-pattern))
         suggestions
         ;; if there is no suggestion exactly matching the input then
@@ -172,7 +172,7 @@ Return an alist with elements like (data . number_results)."
   (if num
       (progn
         (and (numberp num) (setq num (number-to-string num)))
-        (loop for i in (reverse (split-string num "" t))
+        (cl-loop for i in (reverse (split-string num "" t))
               for count from 1
               append (list i) into C
               when (= count 3)
@@ -219,13 +219,13 @@ Return an alist with elements like (data . number_results)."
                          (url-hexify-string input))))
     (with-current-buffer
         (url-retrieve-synchronously request)
-      (loop with result-alist =
+      (cl-loop with result-alist =
             (xml-get-children
              (car (xml-parse-region
                    (point-min) (point-max)))
              'Result)
             for i in result-alist
-            collect (caddr i)))))
+            collect (cl-caddr i)))))
         
 (defun helm-yahoo-suggest-set-candidates ()
   "Set candidates with Yahoo results found."
@@ -274,7 +274,7 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-xterm-program . browse-url-text-xterm))
   "*Alist of \(executable . function\) to try to find a suitable url browser.")
 
-(defun* helm-generic-browser (url name &rest args)
+(cl-defun helm-generic-browser (url name &rest args)
   "Browse URL with NAME browser."
   (let ((proc (concat name " " url)))
     (message "Starting %s..." name)
@@ -300,7 +300,7 @@ Return an alist with elements like (data . number_results)."
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
   (let ((default-browser-fn
-         (loop for (exe . fn) in helm-browse-url-default-browser-alist
+         (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
                thereis (and exe (executable-find exe)
                             (and (fboundp fn) fn)))))
     (if default-browser-fn
