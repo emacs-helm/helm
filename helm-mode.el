@@ -143,12 +143,8 @@ See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (let ((cands
-         (cond ((eq collection obarray)
+         (cond ((vectorp collection)
                 (all-completions "" collection test))
-               ((and (vectorp collection) test)
-                (loop for i across collection when (funcall test i) collect i))
-               ((vectorp collection)
-                (loop for i across collection collect i))
                ;; When collection is a symbol, most of the time
                ;; it should be a symbol used as a minibuffer-history.
                ;; The value of this symbol in this case return a list
