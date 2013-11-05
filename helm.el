@@ -2418,8 +2418,7 @@ and `helm-pattern'."
   (let (matches)
     (condition-case err
         (let ((item-count 0)
-              (case-fold-search (helm-set-case-fold-search))
-              exit)
+              (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
           (dolist (match matchfns)
             (let (newmatches)
@@ -3525,8 +3524,7 @@ See also `helm-sources' docstring."
                                           limit search-from-end
                                           start-point endp match-part-fn)
   (let (buffer-read-only
-        matches
-        exit
+        matches 
         newmatches
         (case-fold-search (helm-set-case-fold-search)))
     (helm-search-from-candidate-buffer-internal
@@ -3536,7 +3534,8 @@ See also `helm-sources' docstring."
          (goto-char start-point)
          (setq newmatches nil)
          (loop with item-count = 0
-               while (funcall searcher pattern)
+               while (and (funcall searcher pattern)
+                          (not (funcall endp)))
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
                when (or
                      ;; Always collect when cand is matched by searcher funcs
