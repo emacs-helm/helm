@@ -204,7 +204,7 @@ If no entry in cache, create one."
                     ;; and not the filename.
                     (if helm-etags-match-part-only
                         (cadr (split-string candidate ":"))
-                      candidate)))
+                        candidate)))
     (mode-line . helm-etags-mode-line-string)
     (keymap . ,helm-etags-map)
     (action . helm-etags-default-action)
