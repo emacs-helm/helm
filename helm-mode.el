@@ -154,7 +154,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ;; also with a string unless its last arg is provided.
                ;; Also, the history collections generally collect their
                ;; elements as string, so intern them to call predicate.
-               ((and (symbolp collection) (boundp collection) test)
+               ((and (symbolp collection) (boundp collection)
+                     ;; [1] history is let-bounded and given
+                     ;; quoted as hist argument of completing-read.
+                     ;; When test is given this should not happen though.
+                     (not (symbolp (symbol-value collection))) test)
                 (let ((predicate `(lambda (elm)
                                     (condition-case err
                                         (if (eq (quote ,test) 'commandp)
@@ -163,7 +167,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                       (wrong-type-argument
                                        (funcall (quote ,test) (intern elm)))))))
                   (all-completions "" (symbol-value collection) predicate)))
-               ((and (symbolp collection) (boundp collection))
+               ((and (symbolp collection) (boundp collection)
+                     ;; Fix Issue #324 [1]
+                     (not (symbolp (symbol-value collection))))
                 (all-completions "" (symbol-value collection)))
                ((and alistp test)
                 (loop for i in collection when (funcall test i) collect i))
@@ -320,14 +326,15 @@ that use `helm-comp-read' See `helm-M-x' for example."
                         . (lambda ()
                             (let ((all (helm-comp-read-get-candidates
                                         history test nil ,alistp)))
-                              (delete
-                               ""
-                               (helm-fast-remove-dups
-                                (if (and default (not (string= default "")))
-                                    (delq nil (cons default
-                                                    (delete default all)))
-                                    all)
-                                :test 'equal)))))
+                              (when all
+                                (delete
+                                 ""
+                                 (helm-fast-remove-dups
+                                  (if (and default (not (string= default "")))
+                                      (delq nil (cons default
+                                                      (delete default all)))
+                                      all)
+                                  :test 'equal))))))
                        (filtered-candidate-transformer
                         . (lambda (candidates sources)
                             (loop for i in candidates
@@ -507,6 +514,8 @@ It should be used when candidate list don't need to rebuild dynamically."
                            ;; Else COLLECTION is maybe a function or a table.
                            (append default (all-completions "" collection))))
       (setq default (car default)))
+    ;; Issue #324 See comment [1] in helm-comp-read-get-candidates.
+    (when (symbolp (symbol-value history)) (setq history nil))
     (helm-comp-read
      prompt collection
      :test test
