@@ -145,6 +145,12 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (let ((cands
          (cond ((vectorp collection)
                 (all-completions "" collection test))
+               ((and (symbolp collection) (boundp collection)
+                     ;; history is let-bounded and given
+                     ;; quoted as hist argument of completing-read.
+                     ;; When test is given this should not happen though.
+                     (symbolp (symbol-value collection)))
+                nil)
                ;; When collection is a symbol, most of the time
                ;; it should be a symbol used as a minibuffer-history.
                ;; The value of this symbol in this case return a list
@@ -154,11 +160,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                ;; also with a string unless its last arg is provided.
                ;; Also, the history collections generally collect their
                ;; elements as string, so intern them to call predicate.
-               ((and (symbolp collection) (boundp collection)
-                     ;; [1] history is let-bounded and given
-                     ;; quoted as hist argument of completing-read.
-                     ;; When test is given this should not happen though.
-                     (not (symbolp (symbol-value collection))) test)
+               ((and (symbolp collection) (boundp collection) test)
                 (let ((predicate `(lambda (elm)
                                     (condition-case err
                                         (if (eq (quote ,test) 'commandp)
@@ -167,9 +169,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                       (wrong-type-argument
                                        (funcall (quote ,test) (intern elm)))))))
                   (all-completions "" (symbol-value collection) predicate)))
-               ((and (symbolp collection) (boundp collection)
-                     ;; Fix Issue #324 [1]
-                     (not (symbolp (symbol-value collection))))
+               ((and (symbolp collection) (boundp collection))
                 (all-completions "" (symbol-value collection)))
                ((and alistp test)
                 (loop for i in collection when (funcall test i) collect i))
@@ -514,8 +514,6 @@ It should be used when candidate list don't need to rebuild dynamically."
                            ;; Else COLLECTION is maybe a function or a table.
                            (append default (all-completions "" collection))))
       (setq default (car default)))
-    ;; Issue #324 See comment [1] in helm-comp-read-get-candidates.
-    (when (symbolp (symbol-value history)) (setq history nil))
     (helm-comp-read
      prompt collection
      :test test
