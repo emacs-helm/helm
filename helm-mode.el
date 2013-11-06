@@ -323,6 +323,19 @@ that use `helm-comp-read' See `helm-M-x' for example."
             (replace-regexp-in-string "helm-exit-minibuffer"
                                       "helm-confirm-and-exit-minibuffer"
                                       helm-read-file-name-mode-line-string))
+           (get-candidates (lambda ()
+                             (let ((cands (helm-comp-read-get-candidates
+                                           collection test sort alistp)))
+                               (setq helm-cr-unknow-pattern-flag nil)
+                               (unless (or (eq must-match t) (string= helm-pattern "")
+                                           (assoc helm-pattern cands)
+                                           (assoc (intern helm-pattern) cands)
+                                           (member helm-pattern cands))
+                                 (setq cands (append (list helm-pattern) cands))
+                                 (setq helm-cr-unknow-pattern-flag t))
+                               (if (and default (not (string= default "")))
+                                   (delq nil (cons default (delete default cands)))
+                                   cands))))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
@@ -350,20 +363,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        (mode-line . ,mode-line)
                        (action . ,action-fn)))
            (src `((name . ,name)
-                  (candidates
-                   . (lambda ()
-                       (let ((cands (helm-comp-read-get-candidates
-                                     collection test sort alistp)))
-                         (setq helm-cr-unknow-pattern-flag nil)
-                         (unless (or (eq must-match t) (string= helm-pattern "")
-                                     (assoc helm-pattern cands)
-                                     (assoc (intern helm-pattern) cands)
-                                     (member helm-pattern cands))
-                           (setq cands (append (list helm-pattern) cands))
-                           (setq helm-cr-unknow-pattern-flag t))
-                         (if (and default (not (string= default "")))
-                             (delq nil (cons default (delete default cands)))
-                             cands))))
+                  (candidates . ,get-candidates)
                   (filtered-candidate-transformer . ,fc-transformer)
                   (requires-pattern . ,requires-pattern)
                   (persistent-action . ,persistent-action)
@@ -371,22 +371,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   (mode-line . ,mode-line)
                   (action . ,action-fn)))
            (src-1 `((name . ,name)
-                    (init
-                     . (lambda ()
-                         (let ((cands (helm-comp-read-get-candidates
-                                       collection test sort alistp)))
-                           (unless (or (eq must-match t) (string= helm-pattern "")
-                                       (assoc helm-pattern cands)
-                                       (assoc (intern helm-pattern) cands)
-                                       (member helm-pattern cands))
-                             (setq cands (append (list helm-pattern) cands))
-                             (setq helm-cr-unknow-pattern-flag t))
-                           (with-current-buffer (helm-candidate-buffer 'global)
-                             (loop for i in
-                                   (if (and default (not (string= default "")))
-                                       (delq nil (cons default (delete default cands)))
-                                       cands)
-                                   do (insert (concat i "\n")))))))
+                    (init . (lambda ()
+                              (helm-init-candidates-in-buffer
+                               'global (funcall get-candidates))))
                     (candidates-in-buffer)
                     (filtered-candidate-transformer . ,fc-transformer)
                     (requires-pattern . ,requires-pattern)
