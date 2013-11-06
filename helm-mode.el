@@ -142,13 +142,14 @@ e.g
 See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
+  
   (let ((cands
          (cond ((vectorp collection)
                 (all-completions "" collection test))
                ((and (symbolp collection) (boundp collection)
-                     ;; history is let-bounded and given
+                     ;; Issue #324 history is let-bounded and given
                      ;; quoted as hist argument of completing-read.
-                     ;; When test is given this should not happen though.
+                     ;; See example in `rcirc-browse-url'.
                      (symbolp (symbol-value collection)))
                 nil)
                ;; When collection is a symbol, most of the time
@@ -296,6 +297,7 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix args before or after calling a command
 that use `helm-comp-read' See `helm-M-x' for example."
+  
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let ((action-fn '(("Sole action (Identity)"
