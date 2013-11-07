@@ -142,13 +142,16 @@ e.g
 See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
+  
   (let ((cands
-         (cond ((eq collection obarray)
+         (cond ((vectorp collection)
                 (all-completions "" collection test))
-               ((and (vectorp collection) test)
-                (cl-loop for i across collection when (funcall test i) collect i))
-               ((vectorp collection)
-                (cl-loop for i across collection collect i))
+               ((and (symbolp collection) (boundp collection)
+                     ;; Issue #324 history is let-bounded and given
+                     ;; quoted as hist argument of completing-read.
+                     ;; See example in `rcirc-browse-url'.
+                     (symbolp (symbol-value collection)))
+                nil)
                ;; When collection is a symbol, most of the time
                ;; it should be a symbol used as a minibuffer-history.
                ;; The value of this symbol in this case return a list
@@ -294,6 +297,7 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix args before or after calling a command
 that use `helm-comp-read' See `helm-M-x' for example."
+  
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let ((action-fn '(("Sole action (Identity)"
@@ -319,19 +323,33 @@ that use `helm-comp-read' See `helm-M-x' for example."
             (replace-regexp-in-string "helm-exit-minibuffer"
                                       "helm-confirm-and-exit-minibuffer"
                                       helm-read-file-name-mode-line-string))
+           (get-candidates (lambda ()
+                             (let ((cands (helm-comp-read-get-candidates
+                                           collection test sort alistp)))
+                               (setq helm-cr-unknow-pattern-flag nil)
+                               (unless (or (eq must-match t) (string= helm-pattern "")
+                                           (assoc helm-pattern cands)
+                                           (assoc (intern helm-pattern) cands)
+                                           (member helm-pattern cands))
+                                 (setq cands (append (list helm-pattern) cands))
+                                 (setq helm-cr-unknow-pattern-flag t))
+                               (if (and default (not (string= default "")))
+                                   (delq nil (cons default (delete default cands)))
+                                   cands))))
            (src-hist `((name . ,(format "%s History" name))
                        (candidates
                         . (lambda ()
                             (let ((all (helm-comp-read-get-candidates
                                         history test nil ,alistp)))
-                              (delete
-                               ""
-                               (helm-fast-remove-dups
-                                (if (and default (not (string= default "")))
-                                    (delq nil (cons default
-                                                    (delete default all)))
-                                    all)
-                                :test 'equal)))))
+                              (when all
+                                (delete
+                                 ""
+                                 (helm-fast-remove-dups
+                                  (if (and default (not (string= default "")))
+                                      (delq nil (cons default
+                                                      (delete default all)))
+                                      all)
+                                  :test 'equal))))))
                        (filtered-candidate-transformer
                         . (lambda (candidates sources)
                             (cl-loop for i in candidates
@@ -345,20 +363,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        (mode-line . ,mode-line)
                        (action . ,action-fn)))
            (src `((name . ,name)
-                  (candidates
-                   . (lambda ()
-                       (let ((cands (helm-comp-read-get-candidates
-                                     collection test sort alistp)))
-                         (setq helm-cr-unknow-pattern-flag nil)
-                         (unless (or (eq must-match t) (string= helm-pattern "")
-                                     (assoc helm-pattern cands)
-                                     (assoc (intern helm-pattern) cands)
-                                     (member helm-pattern cands))
-                           (setq cands (append (list helm-pattern) cands))
-                           (setq helm-cr-unknow-pattern-flag t))
-                         (if (and default (not (string= default "")))
-                             (delq nil (cons default (delete default cands)))
-                             cands))))
+                  (candidates . ,get-candidates)
                   (filtered-candidate-transformer . ,fc-transformer)
                   (requires-pattern . ,requires-pattern)
                   (persistent-action . ,persistent-action)
@@ -366,22 +371,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   (mode-line . ,mode-line)
                   (action . ,action-fn)))
            (src-1 `((name . ,name)
-                    (init
-                     . (lambda ()
-                         (let ((cands (helm-comp-read-get-candidates
-                                       collection test sort alistp)))
-                           (unless (or (eq must-match t) (string= helm-pattern "")
-                                       (assoc helm-pattern cands)
-                                       (assoc (intern helm-pattern) cands)
-                                       (member helm-pattern cands))
-                             (setq cands (append (list helm-pattern) cands))
-                             (setq helm-cr-unknow-pattern-flag t))
-                           (with-current-buffer (helm-candidate-buffer 'global)
-                             (cl-loop for i in
-                                      (if (and default (not (string= default "")))
-                                          (delq nil (cons default (delete default cands)))
-                                          cands)
-                                      do (insert (concat i "\n")))))))
+                    (init . (lambda ()
+                              (helm-init-candidates-in-buffer
+                               'global (funcall get-candidates))))
                     (candidates-in-buffer)
                     (filtered-candidate-transformer . ,fc-transformer)
                     (requires-pattern . ,requires-pattern)
@@ -411,7 +403,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :buffer buffer))
       ;; Avoid adding an incomplete input to history.
       (when (and result history del-input)
-        (cond ((symbolp history) ; History is a symbol.
+        (cond ((and (symbolp history) ; History is a symbol.
+                    (not (symbolp (symbol-value history)))) ; Fix Issue #324.
                ;; Be sure history is not a symbol with a nil value.
                (helm-aif (symbol-value history) (setcar it result)))
               ((consp history) ; A list with a non--nil value.

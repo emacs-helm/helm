@@ -627,6 +627,7 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
 (defvar helm-input-local nil
   "Internal, store locally `helm-pattern' value for later use in `helm-resume'.")
 (defvar helm-source-name nil)
+(defvar helm-current-source nil)
 (defvar helm-candidate-buffer-alist nil)
 (defvar helm-match-hash (make-hash-table :test 'equal))
 (defvar helm-cib-hash (make-hash-table :test 'equal))
@@ -1159,33 +1160,28 @@ of \(action-display . function\)."
 (defun helm-get-current-source ()
   "Return the source for the current selection.
 Allow also checking if helm-buffer contain candidates."
-  ;; (cl-declare (special source))
-  ;; ;; `helm-source-name' let-bounded in some function with value of source.
-  ;; ;; Return source from this function. (e.g `helm-funcall-with-source').
-  ;; (if (and (boundp 'helm-source-name)
-  ;;          (stringp helm-source-name))
-  ;;     source
-  (with-current-buffer (helm-buffer-get)
-    (or
-     ;; This happen only when `helm-source-in-each-line-flag'
-     ;; is non--nil and there is candidates in buffer.
-     (get-text-property (point) 'helm-source)
-     ;; Return nil when no--candidates.
-     (cl-block exit
-       ;; This goto-char shouldn't be necessary, but point is moved to
-       ;; point-min somewhere else which shouldn't happen.
-       (goto-char (overlay-start helm-selection-overlay))
-       (let* ((header-pos (or (helm-get-previous-header-pos)
-                              (helm-get-next-header-pos)))
-              (source-name
-               (save-excursion
-                 (unless header-pos
-                   (cl-return-from exit nil))
-                 (goto-char header-pos)
-                 (helm-current-line-contents))))
-         (cl-loop for source in (helm-get-sources) thereis
-                  (and (equal (assoc-default 'name source) source-name)
-                       source)))))))
+  (or helm-current-source
+      (with-current-buffer (helm-buffer-get)
+        (or
+         ;; This happen only when `helm-source-in-each-line-flag'
+         ;; is non--nil and there is candidates in buffer.
+         (get-text-property (point) 'helm-source)
+         ;; Return nil when no--candidates.
+         (block exit
+           ;; This goto-char shouldn't be necessary, but point is moved to
+           ;; point-min somewhere else which shouldn't happen.
+           (goto-char (overlay-start helm-selection-overlay))
+           (let* ((header-pos (or (helm-get-previous-header-pos)
+                                  (helm-get-next-header-pos)))
+                  (source-name
+                   (save-excursion
+                     (unless header-pos
+                       (return-from exit nil))
+                     (goto-char header-pos)
+                     (helm-current-line-contents))))
+             (loop for source in (helm-get-sources) thereis
+                   (and (equal (assoc-default 'name source) source-name)
+                        source))))))))
 
 (defun helm-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `helm' was invoked."
@@ -1302,6 +1298,7 @@ to VALUE by `helm-create-helm-buffer'."
 FUNCTIONS can be a symbol or a list of functions.
 Return the result of last function call."
   (let ((helm-source-name (assoc-default 'name source))
+        (helm-current-source source)
         (funs (if (functionp functions) (list functions) functions)))
     (helm-log-eval helm-source-name functions args)
     (cl-loop with result for fn in funs
@@ -1588,6 +1585,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                (let (;; `helm-source-name' is non-nil
                      ;; when `helm' is invoked by action, reset it.
                      helm-source-name
+                     helm-current-source
                      helm-in-persistent-action
                      helm-quit
                      (helm-buffer (or any-buffer helm-buffer)))
@@ -2442,6 +2440,7 @@ and `helm-pattern'."
   (save-current-buffer
     (let ((matchfns (helm-match-functions source))
           (helm-source-name (assoc-default 'name source))
+          (helm-current-source source)
           (limit (helm-candidate-number-limit source))
           (helm-pattern (helm-process-pattern-transformer
                          helm-pattern source)))
@@ -3661,7 +3660,9 @@ Arg DATA can be either a list or a plain string."
 (defun helm-compile-source--candidates-in-buffer (source)
   (helm-aif (assoc 'candidates-in-buffer source)
       (append source
-              `((candidates . ,(or (cdr it) (lambda () (helm-candidates-in-buffer source))))
+              `((candidates . ,(or (cdr it)
+                                   (lambda ()
+                                     (helm-candidates-in-buffer source))))
                 (volatile) (match identity)))
     source))
 
