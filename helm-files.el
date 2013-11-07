@@ -783,28 +783,28 @@ Default METHOD is rename."
                      (rename-file f directory))))
       (delete-directory tmp-dir t))))
 
-(defun helm-ff-serial-rename (candidate)
+(defun helm-ff-serial-rename (_candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
 Rename only file of current directory, and symlink files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'rename))
 
-(defun helm-ff-serial-rename-by-symlink (candidate)
+(defun helm-ff-serial-rename-by-symlink (_candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
 Rename only file of current directory, and symlink files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'symlink))
 
-(defun helm-ff-serial-rename-by-copying (candidate)
+(defun helm-ff-serial-rename-by-copying (_candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
 Rename only file of current directory, and copy files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
 
-(defun helm-ff-toggle-auto-update (candidate)
+(defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
   (message "[Auto expansion %s]"
            (if helm-ff-auto-update-flag "enabled" "disabled")))
@@ -1008,7 +1008,7 @@ See `helm-ff-serial-rename-1'."
   (when helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
-(defun helm-ff-print (candidate)
+(defun helm-ff-print (_candidate)
   "Print marked files.
 You have to set in order
 variables `lpr-command',`lpr-switches' and/or `printer-name'.
@@ -1629,7 +1629,7 @@ Note that only directories are saved here."
   "Check if FILE is `.' or `..'."
   (member (helm-basename file) '("." "..")))
 
-(defun helm-ff-quick-delete (candidate)
+(defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting."
   (let ((marked (helm-marked-candidates)))
     (save-selected-window
@@ -1701,7 +1701,7 @@ return FNAME prefixed with [?]."
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
 
-(defun helm-find-files-transformer (files source)
+(defun helm-find-files-transformer (files _source)
   "Transformer for `helm-source-find-files'.
 Tramp files are not highlighted unless `helm-ff-tramp-not-fancy'
 is non--nil."
@@ -1823,7 +1823,7 @@ Don't use it directly in `filtered-candidate-transformer' use instead
                  '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
         (t actions)))
 
-(defun helm-ff-gnus-attach-files (candidate)
+(defun helm-ff-gnus-attach-files (_candidate)
   "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
   (let ((flist (helm-marked-candidates)))
     (gnus-dired-attach flist)))
@@ -2242,7 +2242,7 @@ Ask to kill buffers associated with that file, too."
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
           (kill-buffer buf))))))
 
-(defun helm-delete-marked-files (ignore)
+(defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates))
          (len (length files)))
     (if (not (y-or-n-p
@@ -2258,7 +2258,7 @@ Ask to kill buffers associated with that file, too."
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."
   (let ((marked (helm-marked-candidates))
-        (url-p (and ffap-url-regexp
+        (url-p (and ffap-url-regexp ; we should have only one candidate.
                     (string-match ffap-url-regexp candidate)))
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
         (find-file-wildcards nil)
