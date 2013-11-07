@@ -351,7 +351,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                       all)
                                   :test 'equal))))))
                        (filtered-candidate-transformer
-                        . (lambda (candidates source)
+                        . (lambda (candidates _source)
                             (loop for i in candidates
                                   ;; Input is added to history in completing-read's
                                   ;; and may be regexp-quoted, so unquote it.
