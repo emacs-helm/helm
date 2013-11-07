@@ -180,7 +180,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates _source)
   "Default filter candidate function for `helm-comp-read'."
-  (cl-loop with lst for c in candidates
+  (cl-loop for c in candidates
            for cand = (if (stringp c) (replace-regexp-in-string "\\s\\" "" c) c)
            for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
            if (and (equal cand pat) helm-cr-unknow-pattern-flag)
