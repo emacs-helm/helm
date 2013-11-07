@@ -3410,7 +3410,7 @@ delete minibuffer contents from point instead of deleting all."
       source))
 
 ;; Built-in plug-in: candidates-in-buffer
-(defun helm-candidates-in-buffer ()
+(defun helm-candidates-in-buffer (source)
   "Get candidates from the candidates buffer according to `helm-pattern'.
 
 BUFFER is `helm-candidate-buffer' by default.  Each
@@ -3476,7 +3476,6 @@ a specific part of candidate.
 To customize `helm-candidates-in-buffer' behavior, use search,
 get-line, match-part and search-from-end attributes.
 See also `helm-sources' docstring."
-  (declare (special source))
   (helm-candidates-in-buffer-1
    (helm-candidate-buffer)
    helm-pattern
@@ -3662,7 +3661,9 @@ Arg DATA can be either a list or a plain string."
 (defun helm-compile-source--candidates-in-buffer (source)
   (helm-aif (assoc 'candidates-in-buffer source)
       (append source
-              `((candidates . ,(or (cdr it) 'helm-candidates-in-buffer))
+              `((candidates . ,(or (cdr it)
+                                   (lambda ()
+                                     (helm-candidates-in-buffer source))))
                 (volatile) (match identity)))
     source))
 
