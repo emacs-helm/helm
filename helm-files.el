@@ -125,6 +125,16 @@ and `helm-read-file-map' for this take effect."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-ff-ido-style-backspace t
+  "Use backspace to navigate with `helm-find-files'.
+You will have to restart Emacs or reeval `helm-find-files-map'
+and `helm-read-file-map' for this to take effect."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "Do not use ido-style backspace")
+          (const :tag "Always Use ido-style backspace in find-file" 'always)
+          (const :tag "Use ido-style backspace while auto-updating" t)))
+
 (defcustom helm-ff-history-max-length 100
   "Number of elements shown in `helm-find-files' history."
   :group 'helm-files
@@ -332,6 +342,8 @@ This happen only in `helm-find-files'."
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
+    (when helm-ff-ido-style-backspace
+      (define-key map (kbd "<backspace>") 'helm-ff-backspace))
     (delq nil map))
   "Keymap for `helm-find-files'.")
 
@@ -803,6 +815,21 @@ Rename only file of current directory, and copy files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
+  
+(defun helm-ff-backspace (&rest args)
+  "Call backsapce or `helm-find-files-down-one-level'.
+If sitting at the end of a file directory, backspace goes up one
+level, like in `ido-find-file'. "
+  (interactive "P")
+  (let (backspace)
+    (cond
+     ((and (looking-back "[/\\]")
+           (or helm-ff-auto-update-flag
+               (eq helm-ff-ido-style-backspace 'always)))
+      (call-interactively 'helm-find-files-down-one-level))
+     (t
+      (setq backspace (lookup-key (current-global-map) (read-kbd-macro "DEL")))
+      (call-interactively backspace)))))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
