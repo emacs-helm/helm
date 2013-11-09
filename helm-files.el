@@ -1249,17 +1249,19 @@ expand to this directory."
                      ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                      (expand-file-name (file-name-as-directory helm-pattern)))))
               (helm-check-minibuffer-input))))))))
-
+              
 (defun helm-ff-auto-expand-to-home-or-root ()
-  "Allow expanding to home directory or root or text yanked after pattern."
+  "Allow expanding to home/user directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~[^/]*/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let* ((match (match-string 0 helm-pattern))
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
+                        ((string-match "/\\(~[^/]+/\\)" match)
+                         (expand-file-name (substring match 1)))
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern))))))
       (if (file-directory-p input)
