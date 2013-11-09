@@ -4179,11 +4179,23 @@ If PREV is non-nil move to precedent."
                   prev)))
     (helm-mark-current-line)))
 
+(defvar helm-prev-visible-mark-timeout 0.02)
 ;;;###autoload
 (defun helm-prev-visible-mark ()
   "Move previous helm visible mark."
   (interactive)
-  (helm-next-visible-mark t))
+  (if window-system
+      (helm-next-visible-mark t)
+    (let ((current-keys (key-description (this-command-keys)))
+          (next-key (with-timeout (helm-prev-visible-mark-timeout nil)
+                      (eval (macroexpand `(key-description [,(read-key)]))))))
+      (cond
+       ((and next-key (string= current-keys "M-["))
+        (setq unread-command-events
+              (listify-key-sequence
+               (read-kbd-macro (concat current-keys " " next-key)))))
+       (t
+        (helm-next-visible-mark t))))))
 
 ;; Utility: Selection Paste
 ;;;###autoload
