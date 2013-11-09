@@ -26,7 +26,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Code:
+;;; Codef
 
 (require 'cl)
 
@@ -4190,7 +4190,7 @@ If PREV is non-nil move to precedent."
           (next-key (with-timeout (helm-prev-visible-mark-timeout nil)
                       (eval (macroexpand `(key-description [,(read-key)]))))))
       (cond
-       (next-key
+       ((and next-key (string= current-keys "M-["))
         (setq unread-command-events
               (listify-key-sequence
                (read-kbd-macro (concat current-keys " " next-key)))))
