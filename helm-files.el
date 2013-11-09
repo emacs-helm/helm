@@ -1288,7 +1288,8 @@ expand to this directory."
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
                         ((string-match "/\\(~[^/]+/\\)" match)
-                         (expand-file-name (substring match 1)))
+                         (expand-file-name
+                          (concat "/" (substring (match-string 1 match) 1))))
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern))))))
       (if (file-directory-p input)
