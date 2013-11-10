@@ -206,20 +206,19 @@ Return nil if DIR is not an existing directory."
   (with-no-warnings
     (switch-to-buffer buffer-or-name)))
 
-(defun* helm-position (item seq &key (test 'eq) all)
+(defmacro* helm-position (item seq &key (test 'eq) all)
   "A simple and faster replacement of CL `position'.
 Return position of first occurence of ITEM found in SEQ.
 Argument SEQ can be a string, in this case ITEM have to be a char.
 Argument ALL, if non--nil specify to return a list of positions of
 all ITEM found in SEQ."
   (let ((key (if (stringp seq) 'across 'in)))
-    (eval
-     `(loop for c ,key seq
-            for index from 0
-            when (funcall test c item)
-            if all collect index into ls
-            else return index
-            finally return ls))))
+    `(loop for c ,key ,seq
+           for index from 0
+           when (funcall ,test c ,item)
+           if ,all collect index into ls
+           else return index
+           finally return ls)))
 
 (defun helm-substring (str width)
   "Return the substring of string STR from 0 to WIDTH.
