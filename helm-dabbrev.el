@@ -265,10 +265,13 @@ but the initial search for all candidates in buffer(s)."
                                        when (and selection
                                                  (= (length selection)
                                                     helm-dabbrev-cycle-thresold))
-                                       ;; When selection len reach e.g 5, return selection.
+                                       ;; When selection len reach
+                                       ;; `helm-dabbrev-cycle-thresold'
+                                       ;; return selection.
                                        return selection
-                                       ;; If selection is full and < 5,
-                                       ;; (e.g 3) return selection.
+                                       ;; selection len never reach
+                                       ;; `helm-dabbrev-cycle-thresold'
+                                       ;; return selection.
                                        finally return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
