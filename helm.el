@@ -2212,7 +2212,7 @@ Helm plug-ins are realized by this function."
                        (error
                         "`%s' must either be a function, a variable or a list"
                         (or candidate-fn candidate-proc))))
-         (candidates (condition-case err
+         (candidates (condition-case err0
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
@@ -2227,10 +2227,10 @@ Helm plug-ins are realized by this function."
                                                  (helm-interpret-value
                                                   candidate-fn source))))
                                    (and (listp result) result))))
-                       (invalid-regexp nil)
-                       (error (and (or helm-debug debug-on-error)
-                                   (helm-log-error "%s %s" (car err) (cdr err)))
-                              nil))))
+                       ((invalid-regexp nil)
+                        (error (and (or helm-debug debug-on-error)
+                                   (helm-log-error "%s %s" (car err0) (cdr err0)))
+                              nil)))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
@@ -2417,7 +2417,7 @@ and `helm-pattern'."
 
 (defun helm-match-from-candidates (cands matchfns limit source)
   (let (matches)
-    (condition-case err
+    (condition-case err1
         (let ((item-count 0)
               (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
@@ -2432,10 +2432,10 @@ and `helm-pattern'."
               ;; with the next match function.
               (setq cands (cl-loop for i in cands
                                    unless (member i matches) collect i)))))
-      (invalid-regexp (setq matches nil))
-      (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                             (assoc-default 'name source) (car err) (cadr err))
-             nil))
+      ((invalid-regexp nil);(setq matches nil))
+       (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+                             (assoc-default 'name source) (car err1) (cadr err1))
+             nil)))
     matches))
 
 (defun helm-compute-matches (source)
