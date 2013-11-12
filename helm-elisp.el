@@ -187,7 +187,8 @@ Return a cons \(beg . end\)."
          (end        (point))
          (pred       (and beg (helm-lisp-completion-predicate-at-point beg)))
          (loc-vars   (and (fboundp 'lisp--local-variables)
-                          (mapcar #'symbol-name (lisp--local-variables))))
+                          (ignore-errors
+                            (mapcar #'symbol-name (lisp--local-variables)))))
          (glob-syms  (and target pred (all-completions target obarray pred)))
          (candidates (append loc-vars glob-syms))
          (lgst-len   0) ; Special in `helm-lisp-completion-transformer'.
@@ -239,10 +240,11 @@ Return a cons \(beg . end\)."
   (declare (special lgst-len))
   (loop for c in candidates
         for sym = (intern c)
-        for annot = (cond ((commandp sym) " (Com)")
-                          ((fboundp sym)  " (Fun)")
-                          ((boundp sym)   " (Var)")
-                          ((facep sym)    " (Face)"))
+        for annot = (typecase sym
+                      (command " (Com)")
+                      (fbound  " (Fun)")
+                      (bound   " (Var)")
+                      (face    " (Face)"))
         for spaces = (make-string (- lgst-len (length c)) ? )
         collect (cons (concat c spaces annot) c) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
