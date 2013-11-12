@@ -1,4 +1,4 @@
-;;; helm-elisp.el --- Elisp symbols completion for helm.
+;;; helm-elisp.el --- Elisp symbols completion for helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -182,6 +182,7 @@ Return a cons \(beg . end\)."
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
   (interactive)
+  (cl-declaim (special lgst-len))
   (let* ((target     (helm-thing-before-point))
          (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
@@ -203,10 +204,10 @@ Return a cons \(beg . end\)."
           ;; Overlay is initialized now in helm-current-buffer.
           (helm
            :sources
-           '((name . "Lisp completion")
+           `((name . "Lisp completion")
              (init . (lambda ()
-                       (with-current-buffer (helm-candidate-buffer 'global)
-                         (cl-loop for sym in candidates
+                       (helm-init-candidates-in-buffer 'global
+                         (cl-loop for sym in ,candidates
                                   for len = (length sym)
                                   when (> len lgst-len) do (setq lgst-len len)
                                   do (insert (concat sym "\n"))))))
@@ -373,7 +374,7 @@ First call indent, second complete symbol, third complete fname."
     (action . (lambda (candidate)
                 (describe-face (intern candidate))))))
 
-(defun helm-def-source--helm-attributes (&optional default)
+(defun helm-def-source--helm-attributes (&optional _default)
   `((name . "Helm attributes")
     (candidates . (lambda ()
                     (mapcar 'symbol-name helm-attributes)))
