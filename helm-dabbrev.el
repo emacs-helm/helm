@@ -130,41 +130,39 @@ but the initial search for all candidates in buffer(s)."
   (let* ((case-fold-search ignore-case)
          (buffer1 (current-buffer)) ; start buffer.
          (minibuf (minibufferp buffer1))
+         result pos-before pos-after
          (search-and-store
-          #'(lambda (pattern direction)
-              (declare (special result pos-before pos-after))
-              (while (case direction
-                       (1   (search-forward pattern nil t))
-                       (-1  (search-backward pattern nil t))
-                       (2   (let ((pos
-                                   (save-excursion
-                                     (forward-line
-                                      helm-dabbrev-lineno-around)
-                                     (point))))
-                              (setq pos-after pos)
-                              (search-forward pattern pos t)))
-                       (-2  (let ((pos
-                                   (save-excursion
-                                     (forward-line
-                                      (- helm-dabbrev-lineno-around))
-                                     (point))))
-                              (setq pos-before pos)
-                              (search-backward pattern pos t))))
-                (let* ((match-1 (substring-no-properties
-                                 (thing-at-point 'symbol)))
-                       (match-2 (substring-no-properties
-                                 (thing-at-point 'filename)))
-                       (lst (if (string= match-1 match-2)
-                                (list match-1)
-                                (list match-1 match-2))))
-                  (loop for match in lst
-                        unless (or (string= str match)
-                                   (member match result))
-                        do (push match result)))))))
-    (loop with result with pos-before with pos-after
-          for buf in (if all (helm-dabbrev--buffer-list)
+          (lambda (pattern direction)
+            (while (case direction
+                     (1   (search-forward pattern nil t))
+                     (-1  (search-backward pattern nil t))
+                     (2   (let ((pos
+                                 (save-excursion
+                                   (forward-line
+                                    helm-dabbrev-lineno-around)
+                                   (point))))
+                            (setq pos-after pos)
+                            (search-forward pattern pos t)))
+                     (-2  (let ((pos
+                                 (save-excursion
+                                   (forward-line
+                                    (- helm-dabbrev-lineno-around))
+                                   (point))))
+                            (setq pos-before pos)
+                            (search-backward pattern pos t))))
+              (let* ((match-1 (substring-no-properties
+                               (thing-at-point 'symbol)))
+                     (match-2 (substring-no-properties
+                               (thing-at-point 'filename)))
+                     (lst (if (string= match-1 match-2)
+                              (list match-1)
+                              (list match-1 match-2))))
+                (loop for match in lst
+                      unless (or (string= str match)
+                                 (member match result))
+                      do (push match result)))))))
+    (loop for buf in (if all (helm-dabbrev--buffer-list)
                          (list (current-buffer)))
-          
           do (with-current-buffer buf
                (when (or minibuf ; check against all buffers when in minibuffer.
                          (helm-dabbrev--same-major-mode-p buffer1))
@@ -260,17 +258,18 @@ but the initial search for all candidates in buffer(s)."
                                 :limits limits
                                 :iterator
                                 (helm-iter-list
-                                 (loop with selection
-                                       for i in helm-dabbrev--cache
-                                       when
+                                 (loop for i in helm-dabbrev--cache when
                                        (string-match
                                         (concat "^" (regexp-quote dabbrev)) i)
                                        collect i into selection
-                                       when (or (= (length selection)
-                                                   helm-dabbrev-cycle-thresold)
-                                                (= (length selection)
-                                                   (length helm-dabbrev--cache)))
-                                       return selection)))))
+                                       when (and selection
+                                                 (= (length selection)
+                                                    helm-dabbrev-cycle-thresold))
+                                       ;; When selection len reach e.g 5, return selection.
+                                       return selection
+                                       ;; If selection is full and < 5,
+                                       ;; (e.g 3) return selection.
+                                       finally return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)
