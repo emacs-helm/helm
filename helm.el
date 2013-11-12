@@ -648,7 +648,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
-                                        "\\<" "\\>" "\\<_" "\\>_" ".*"))
+                                        "\\<" "\\>" "\\_<" "\\_>" ".*"))
 (defvar helm-suspend-update-flag nil)
 (defvar helm-force-updating-p nil)
 (defvar helm-exit-status 0
@@ -736,7 +736,8 @@ The original idea is from `tramp-debug-message'."
 
 (defun helm-log-error (&rest args)
   "Accumulate error messages into `helm-issued-errors'.
-ARGS are args given to `format'."
+ARGS are args given to `format'.
+e.g (helm-log-error \"Error %s: %s\" (car err) (cdr err))."
   (apply 'helm-log (concat "ERROR: " (car args)) (cdr args))
   (let ((msg (apply 'format args)))
     (unless (member msg helm-issued-errors)
@@ -777,7 +778,8 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
 (defun helm-print-error-messages ()
   "Print error messages in `helm-issued-errors'."
   (and helm-issued-errors
-       (message "%s" (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
+       (message "Helm issued errors: %s"
+                (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
 (defadvice next-history-element (around delay activate)
   (interactive "p")
@@ -2206,10 +2208,10 @@ Helm plug-ins are realized by this function."
   (let* (inhibit-quit
          (candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
-         (type-error (lambda (&optional err)
+         (type-error (lambda ()
                        (error
-                        "`%s' must either be a function, a variable or a list: %S"
-                        (or candidate-fn candidate-proc) (or err ""))))
+                        "`%s' must either be a function, a variable or a list"
+                        (or candidate-fn candidate-proc))))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
@@ -2226,8 +2228,9 @@ Helm plug-ins are realized by this function."
                                                   candidate-fn source))))
                                    (and (listp result) result))))
                        (invalid-regexp nil)
-                       (wrong-type-argument nil) ; FIXME this is probably triggered by new error messages in timers.
-                       (error (funcall type-error err)))))
+                       (error (and (or helm-debug debug-on-error)
+                                   (helm-log-error "%s %s" (car err) (cdr err)))
+                              nil))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
@@ -4176,11 +4179,23 @@ If PREV is non-nil move to precedent."
                   prev)))
     (helm-mark-current-line)))
 
+(defvar helm-prev-visible-mark-timeout 0.02)
 ;;;###autoload
 (defun helm-prev-visible-mark ()
   "Move previous helm visible mark."
   (interactive)
-  (helm-next-visible-mark t))
+  (if window-system
+      (helm-next-visible-mark t)
+    (let ((current-keys (key-description (this-command-keys)))
+          (next-key (with-timeout (helm-prev-visible-mark-timeout nil)
+                      (eval (macroexpand `(key-description [,(read-key)]))))))
+      (cond
+       ((and next-key (string= current-keys "M-["))
+        (setq unread-command-events
+              (listify-key-sequence
+               (read-kbd-macro (concat current-keys " " next-key)))))
+       (t
+        (helm-next-visible-mark t))))))
 
 ;; Utility: Selection Paste
 ;;;###autoload

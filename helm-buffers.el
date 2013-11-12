@@ -407,6 +407,13 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (helm-attrset 'diff-action 'helm-buffer-toggle-diff)
   (helm-execute-persistent-action 'diff-action))
 
+(defun helm-revert-buffer (candidate)
+  (with-current-buffer candidate
+    (when (buffer-file-name) (revert-buffer t t))))
+
+(defun helm-revert-marked-buffers (_ignore)
+  (mapc 'helm-revert-buffer (helm-marked-candidates)))
+
 (defun helm-buffer-revert-and-update (candidate)
   (let ((marked (helm-marked-candidates)))
     (cl-loop for buf in marked do (helm-revert-buffer buf))
@@ -425,7 +432,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (enable-recursive-minibuffers t))
     (cl-loop for buf in marked do
              (with-current-buffer (get-buffer buf)
-               (save-buffer)))
+               (when (buffer-file-name) (save-buffer))))
     (when (> (length marked) 1) (helm-unmark-all))
     (helm-force-update candidate)))
 
@@ -435,6 +442,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (interactive)
   (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
   (helm-execute-persistent-action 'save-action))
+
+(defun helm-kill-marked-buffers (_ignore)
+  (mapc 'kill-buffer (helm-marked-candidates)))
 
 ;;;###autoload
 (defun helm-buffer-run-kill-buffers ()
@@ -586,16 +596,6 @@ Can be used by any source that list buffers."
   "Buffers matching `helm-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
   (helm-shadow-entries buffers helm-boring-buffer-regexp-list))
-
-(defun helm-revert-buffer (candidate)
-  (with-current-buffer candidate
-    (revert-buffer t t)))
-
-(defun helm-revert-marked-buffers (ignore)
-  (mapc 'helm-revert-buffer (helm-marked-candidates)))
-
-(defun helm-kill-marked-buffers (ignore)
-  (mapc 'kill-buffer (helm-marked-candidates)))
 
 
 (define-helm-type-attribute 'buffer

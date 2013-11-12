@@ -125,6 +125,16 @@ and `helm-read-file-map' for this take effect."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-ff-ido-style-backspace t
+  "Use backspace to navigate with `helm-find-files'.
+You will have to restart Emacs or reeval `helm-find-files-map'
+and `helm-read-file-map' for this to take effect."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "Do not use ido-style backspace")
+          (const :tag "Always Use ido-style backspace in find-file" 'always)
+          (const :tag "Use ido-style backspace while auto-updating" t)))
+
 (defcustom helm-ff-history-max-length 100
   "Number of elements shown in `helm-find-files' history."
   :group 'helm-files
@@ -332,6 +342,8 @@ This happen only in `helm-find-files'."
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
+    (when helm-ff-ido-style-backspace
+      (define-key map (kbd "<backspace>") 'helm-ff-backspace))
     (delq nil map))
   "Keymap for `helm-find-files'.")
 
@@ -783,28 +795,43 @@ Default METHOD is rename."
                         (rename-file f directory))))
       (delete-directory tmp-dir t))))
 
-(defun helm-ff-serial-rename (candidate)
+(defun helm-ff-serial-rename (_candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
 Rename only file of current directory, and symlink files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'rename))
 
-(defun helm-ff-serial-rename-by-symlink (candidate)
+(defun helm-ff-serial-rename-by-symlink (_candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
 Rename only file of current directory, and symlink files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'symlink))
 
-(defun helm-ff-serial-rename-by-copying (candidate)
+(defun helm-ff-serial-rename-by-copying (_candidate)
   "Serial rename all marked files to `helm-ff-default-directory'.
 Rename only file of current directory, and copy files coming from
 other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
+  
+(defun helm-ff-backspace (&rest args)
+  "Call backsapce or `helm-find-files-down-one-level'.
+If sitting at the end of a file directory, backspace goes up one
+level, like in `ido-find-file'. "
+  (interactive "P")
+  (let (backspace)
+    (cond
+     ((and (looking-back "[/\\]")
+           (or helm-ff-auto-update-flag
+               (eq helm-ff-ido-style-backspace 'always)))
+      (call-interactively 'helm-find-files-down-one-level))
+     (t
+      (setq backspace (lookup-key (current-global-map) (read-kbd-macro "DEL")))
+      (call-interactively backspace)))))
 
-(defun helm-ff-toggle-auto-update (candidate)
+(defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
   (message "[Auto expansion %s]"
            (if helm-ff-auto-update-flag "enabled" "disabled")))
@@ -1008,7 +1035,7 @@ See `helm-ff-serial-rename-1'."
   (when helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
-(defun helm-ff-print (candidate)
+(defun helm-ff-print (_candidate)
   "Print marked files.
 You have to set in order
 variables `lpr-command',`lpr-switches' and/or `printer-name'.
@@ -1249,17 +1276,20 @@ expand to this directory."
                      ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                      (expand-file-name (file-name-as-directory helm-pattern)))))
               (helm-check-minibuffer-input))))))))
-
+              
 (defun helm-ff-auto-expand-to-home-or-root ()
-  "Allow expanding to home directory or root or text yanked after pattern."
+  "Allow expanding to home/user directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~[^/]*/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let* ((match (match-string 0 helm-pattern))
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
+                        ((string-match "/\\(~[^/]+/\\)" match)
+                         (expand-file-name
+                          (concat "/" (substring (match-string 1 match) 1))))
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern))))))
       (if (file-directory-p input)
@@ -1629,7 +1659,7 @@ Note that only directories are saved here."
   "Check if FILE is `.' or `..'."
   (member (helm-basename file) '("." "..")))
 
-(defun helm-ff-quick-delete (candidate)
+(defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting."
   (let ((marked (helm-marked-candidates)))
     (save-selected-window
@@ -1701,7 +1731,7 @@ return FNAME prefixed with [?]."
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
 
-(defun helm-find-files-transformer (files source)
+(defun helm-find-files-transformer (files _source)
   "Transformer for `helm-source-find-files'.
 Tramp files are not highlighted unless `helm-ff-tramp-not-fancy'
 is non--nil."
@@ -1823,7 +1853,7 @@ Don't use it directly in `filtered-candidate-transformer' use instead
                  '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
         (t actions)))
 
-(defun helm-ff-gnus-attach-files (candidate)
+(defun helm-ff-gnus-attach-files (_candidate)
   "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
   (let ((flist (helm-marked-candidates)))
     (gnus-dired-attach flist)))
@@ -2242,7 +2272,7 @@ Ask to kill buffers associated with that file, too."
         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
           (kill-buffer buf))))))
 
-(defun helm-delete-marked-files (ignore)
+(defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates))
          (len (length files)))
     (if (not (y-or-n-p
@@ -2258,7 +2288,7 @@ Ask to kill buffers associated with that file, too."
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."
   (let ((marked (helm-marked-candidates))
-        (url-p (and ffap-url-regexp
+        (url-p (and ffap-url-regexp ; we should have only one candidate.
                     (string-match ffap-url-regexp candidate)))
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
         (find-file-wildcards nil)
