@@ -1169,7 +1169,7 @@ Allow also checking if helm-buffer contain candidates."
          ;; is non--nil and there is candidates in buffer.
          (get-text-property (point) 'helm-source)
          ;; Return nil when no--candidates.
-         (block exit
+         (cl-block exit
            ;; This goto-char shouldn't be necessary, but point is moved to
            ;; point-min somewhere else which shouldn't happen.
            (goto-char (overlay-start helm-selection-overlay))
@@ -1178,12 +1178,12 @@ Allow also checking if helm-buffer contain candidates."
                   (source-name
                    (save-excursion
                      (unless header-pos
-                       (return-from exit nil))
+                       (cl-return-from exit nil))
                      (goto-char header-pos)
                      (helm-current-line-contents))))
-             (loop for source in (helm-get-sources) thereis
-                   (and (equal (assoc-default 'name source) source-name)
-                        source))))))))
+             (cl-loop for source in (helm-get-sources) thereis
+                      (and (equal (assoc-default 'name source) source-name)
+                           source))))))))
 
 (defun helm-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since `helm' was invoked."
