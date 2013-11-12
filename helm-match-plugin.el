@@ -163,11 +163,11 @@ but \"foo\ bar\"=> (\"foobar\")."
 (defun helm-mp-exact-match (str &optional pattern)
   (string= str (or pattern helm-pattern)))
 
-(defun helm-mp-exact-search (pattern &rest ignore)
+(defun helm-mp-exact-search (pattern &rest _ignore)
   (and (search-forward (helm-mp-exact-get-pattern pattern) nil t)
        (forward-line -1)))
 
-(defun helm-mp-exact-search-backward (pattern &rest ignore)
+(defun helm-mp-exact-search-backward (pattern &rest _ignore)
   (and (search-backward (helm-mp-exact-get-pattern pattern) nil t)
        (forward-line 1)))
 
@@ -191,10 +191,10 @@ but \"foo\ bar\"=> (\"foobar\")."
     (and (<= len (length str))
          (string= (substring str 0 len) pattern ))))
 
-(defun helm-mp-prefix-search (pattern &rest ignore)
+(defun helm-mp-prefix-search (pattern &rest _ignore)
   (search-forward (helm-mp-prefix-get-pattern pattern) nil t))
 
-(defun helm-mp-prefix-search-backward (pattern &rest ignore)
+(defun helm-mp-prefix-search-backward (pattern &rest _ignore)
   (and (search-backward (helm-mp-prefix-get-pattern pattern) nil t)
        (forward-line 1)))
 
@@ -216,10 +216,10 @@ but \"foo\ bar\"=> (\"foobar\")."
 (defun* helm-mp-1-match (str &optional (pattern helm-pattern))
   (string-match (helm-mp-1-get-pattern pattern) str))
 
-(defun helm-mp-1-search (pattern &rest ignore)
+(defun helm-mp-1-search (pattern &rest _ignore)
   (re-search-forward (helm-mp-1-get-pattern pattern) nil t))
 
-(defun helm-mp-1-search-backward (pattern &rest ignore)
+(defun helm-mp-1-search-backward (pattern &rest _ignore)
   (re-search-backward (helm-mp-1-get-pattern pattern) nil t))
 
 
@@ -240,10 +240,10 @@ but \"foo\ bar\"=> (\"foobar\")."
 (defun* helm-mp-2-match (str &optional (pattern helm-pattern))
   (string-match (helm-mp-2-get-pattern pattern) str))
 
-(defun helm-mp-2-search (pattern &rest ignore)
+(defun helm-mp-2-search (pattern &rest _ignore)
   (re-search-forward (helm-mp-2-get-pattern pattern) nil t))
 
-(defun helm-mp-2-search-backward (pattern &rest ignore)
+(defun helm-mp-2-search-backward (pattern &rest _ignore)
   (re-search-backward (helm-mp-2-get-pattern pattern) nil t))
 
 
@@ -307,13 +307,13 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
         else do (goto-char eol)
         finally return nil))
 
-(defun helm-mp-3-search (pattern &rest ignore)
+(defun helm-mp-3-search (pattern &rest _ignore)
   (when (stringp pattern)
     (setq pattern (helm-mp-3-get-patterns pattern)))
   (helm-mp-3-search-base
    pattern 're-search-forward 're-search-forward))
 
-(defun helm-mp-3-search-backward (pattern &rest ignore)
+(defun helm-mp-3-search-backward (pattern &rest _ignore)
   (when (stringp pattern)
     (setq pattern (helm-mp-3-get-patterns pattern)))
   (helm-mp-3-search-base
@@ -334,13 +334,13 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
          (loop for (predicate . regexp) in (cdr pat)
                always (funcall predicate (string-match regexp str))))))
 
-(defun helm-mp-3p-search (pattern &rest ignore)
+(defun helm-mp-3p-search (pattern &rest _ignore)
   (when (stringp pattern)
     (setq pattern (helm-mp-3-get-patterns pattern)))
   (helm-mp-3-search-base
    pattern 'helm-mp-prefix-search 're-search-forward))
 
-(defun helm-mp-3p-search-backward (pattern &rest ignore)
+(defun helm-mp-3p-search-backward (pattern &rest _ignore)
   (when (stringp pattern)
     (setq pattern (helm-mp-3-get-patterns pattern)))
   (helm-mp-3-search-base
