@@ -237,17 +237,17 @@ Return a cons \(beg . end\)."
 
 (defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for lisp completion."
-  (declare (special lgst-len))
-  (loop for c in candidates
-        for sym = (intern c)
-        for annot = (typecase sym
-                      (command " (Com)")
-                      (fbound  " (Fun)")
-                      (bound   " (Var)")
-                      (face    " (Face)"))
-        for spaces = (make-string (- lgst-len (length c)) ? )
-        collect (cons (concat c spaces annot) c) into lst
-        finally return (sort lst #'helm-generic-sort-fn)))
+  (cl-declaim (special lgst-len))
+  (cl-loop for c in candidates
+           for sym = (intern c)
+           for annot = (cl-typecase sym
+                         (command " (Com)")
+                         (fbound  " (Fun)")
+                         (bound   " (Var)")
+                         (face    " (Face)"))
+           for spaces = (make-string (- lgst-len (length c)) ? )
+           collect (cons (concat c spaces annot) c) into lst
+           finally return (sort lst #'helm-generic-sort-fn)))
 
 (defun helm-get-first-line-documentation (sym)
   "Return first line documentation of symbol SYM.
