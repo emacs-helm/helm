@@ -1963,7 +1963,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; An image file and it is the second hit on C-z,
           ;; show the file in `image-dired'.
           ((string-match (image-file-name-regexp) candidate)
-           (when (buffer-live-p image-dired-display-image-buffer)
+           (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
              (kill-buffer image-dired-display-image-buffer))
            (image-dired-display-image candidate)
            (message nil)
