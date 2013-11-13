@@ -1239,7 +1239,7 @@ expand to this directory."
            (completed-p (string= (file-name-as-directory
                                   (expand-file-name pat))
                                  helm-ff-default-directory))
-           (candnum (helm-approximate-candidate-number)))
+           (candnum (helm-get-candidate-number)))
       (when (and (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
