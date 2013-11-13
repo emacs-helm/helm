@@ -4119,7 +4119,8 @@ It is analogous to `dired-get-marked-files'."
                      for (source . real) in (reverse helm-marked-candidates)
                      when (equal current-src source)
                      collect (helm-coerce-selection real source))
-               (list (helm-get-selection)))))
+             (list (helm-coerce-selection (helm-get-selection)
+                                          (helm-get-current-source))))))
       (helm-log-eval cands)
       cands)))
 
