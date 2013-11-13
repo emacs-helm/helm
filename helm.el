@@ -1335,25 +1335,25 @@ in the source where point is."
               (goto-char (helm-get-previous-header-pos))
               (goto-char (point-min)))
           (forward-line 1)
-          (let ((count-multi 1))
-            (if (helm-pos-multiline-p)
-                (save-excursion
-                  (loop while (and (not (if in-current-source
-                                            (save-excursion
-                                              (forward-line 2)
-                                              (or (helm-pos-header-line-p) (eobp)))
-                                            (eobp)))
-                                   (search-forward helm-candidate-separator nil t))
-                        do (incf count-multi)
-                        finally return count-multi))
-                (save-excursion
-                  (loop with ln = 0
-                        while (not (if in-current-source
-                                       (or (helm-pos-header-line-p) (eobp))
-                                       (eobp)))
-                        unless (helm-pos-header-line-p)
-                        do (incf ln)
-                        do (forward-line 1) finally return ln))))))))
+          (if (helm-pos-multiline-p)
+              (save-excursion
+                (loop with count-multi = 1
+                      while (and (not (if in-current-source
+                                          (save-excursion
+                                            (forward-line 2)
+                                            (or (helm-pos-header-line-p) (eobp)))
+                                          (eobp)))
+                                 (search-forward helm-candidate-separator nil t))
+                      do (incf count-multi)
+                      finally return count-multi))
+              (save-excursion
+                (loop with ln = 0
+                      while (not (if in-current-source
+                                     (or (helm-pos-header-line-p) (eobp))
+                                     (eobp)))
+                      unless (helm-pos-header-line-p)
+                      do (incf ln)
+                      do (forward-line 1) finally return ln)))))))
 
 (defmacro with-helm-quittable (&rest body)
   "If an error occur in execution of BODY, quit helm safely."
