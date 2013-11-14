@@ -480,7 +480,7 @@ for current buffer."
           (car helm-ff-history)))))
 
 (defun helm-find-files-do-action (action)
-  "Generic function for creating action from `helm-source-find-files'.
+  "Generic function for creating actions from `helm-source-find-files'.
 ACTION must be an action supported by `helm-dired-action'."
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates)))
@@ -489,6 +489,7 @@ ACTION must be an action supported by `helm-dired-action'."
                   (capitalize (symbol-name action)) ifiles))
          (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
+         helm-ff-auto-update-flag
          (dest   (helm-read-file-name
                   prompt
                   :preselect (if helm-ff-transformer-show-only-basename
