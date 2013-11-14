@@ -194,6 +194,11 @@ If no entry in cache, create one."
             (add-to-list 'helm-etags-mtime-alist
                          (cons tagfile (helm-etags-mtime tagfile)))))))))
 
+(defun helm-etags-split-line (line)
+  (let ((regexp "\\`\\([a-zA-Z]?:?.*?\\): \\(.*\\)"))
+    (when (string-match regexp line)
+      (loop for n from 1 to 2 collect (match-string n line)))))
+
 (defvar helm-source-etags-select
   `((name . "Etags")
     (header-name . helm-etags-get-header-name)
@@ -203,7 +208,7 @@ If no entry in cache, create one."
                     ;; Match only the tag part of CANDIDATE
                     ;; and not the filename.
                     (if helm-etags-match-part-only
-                        (cadr (split-string candidate ":"))
+                        (cadr (helm-etags-split-line candidate))
                         candidate)))
     (mode-line . helm-etags-mode-line-string)
     (keymap . ,helm-etags-map)
@@ -219,7 +224,7 @@ If no entry in cache, create one."
   "Helm default action to jump to an etags entry."
   (require 'etags)
   (helm-log-run-hook 'helm-goto-line-before-hook)
-  (let* ((split (split-string candidate ": "))
+  (let* ((split (helm-etags-split-line candidate))
          (fname (expand-file-name
                  (car split) helm-etags-tag-file-dir))
          (elm   (cadr split)))

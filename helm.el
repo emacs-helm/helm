@@ -1322,7 +1322,7 @@ Return the result of last function call."
         (sources)
         (t helm-sources)))
 
-(defun helm-approximate-candidate-number (&optional in-current-source)
+(defun helm-get-candidate-number (&optional in-current-source)
   "Return candidates number in `helm-buffer'.
 If IN-CURRENT-SOURCE is provided return number of candidates
 in the source where point is."
@@ -1335,25 +1335,25 @@ in the source where point is."
               (goto-char (helm-get-previous-header-pos))
               (goto-char (point-min)))
           (forward-line 1)
-          (let ((count-multi 1))
-            (if (helm-pos-multiline-p)
-                (save-excursion
-                  (cl-loop while (and (not (if in-current-source
-                                               (save-excursion
-                                                 (forward-line 2)
-                                                 (or (helm-pos-header-line-p) (eobp)))
-                                               (eobp)))
-                                      (search-forward helm-candidate-separator nil t))
-                           do (cl-incf count-multi)
-                           finally return count-multi))
-                (save-excursion
-                  (cl-loop with ln = 0
-                           while (not (if in-current-source
-                                          (or (helm-pos-header-line-p) (eobp))
-                                          (eobp)))
-                           unless (helm-pos-header-line-p)
-                           do (cl-incf ln)
-                           do (forward-line 1) finally return ln))))))))
+          (if (helm-pos-multiline-p)
+              (save-excursion
+                (cl-loop with count-multi = 1
+                         while (and (not (if in-current-source
+                                             (save-excursion
+                                               (forward-line 2)
+                                               (or (helm-pos-header-line-p) (eobp)))
+                                             (eobp)))
+                                    (search-forward helm-candidate-separator nil t))
+                         do (incf count-multi)
+                         finally return count-multi))
+              (save-excursion
+                (cl-loop with ln = 0
+                         while (not (if in-current-source
+                                        (or (helm-pos-header-line-p) (eobp))
+                                        (eobp)))
+                         unless (helm-pos-header-line-p)
+                         do (incf ln)
+                         do (forward-line 1) finally return ln)))))))
 
 (defmacro with-helm-quittable (&rest body)
   "If an error occur in execution of BODY, quit helm safely."
@@ -2007,7 +2007,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; Note that helm-map have been made buffer-local
       ;; in `helm-create-helm-buffer'.
       (setq helm-map (or src-keymap any-keymap helm-map))
-      (helm-log-eval (helm-approximate-candidate-number)
+      (helm-log-eval (helm-get-candidate-number)
                      helm-execute-action-at-once-if-one
                      helm-quit-if-no-candidate)
       ;; If source is delayed `helm-execute-action-at-once-if-one'
@@ -2034,11 +2034,11 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
       (cond ((and helm-execute-action-at-once-if-one
                   (not source-delayed-p)
-                  (= (helm-approximate-candidate-number) 1))
+                  (= (helm-get-candidate-number) 1))
              (ignore)) ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
                   (not source-delayed-p)
-                  (= (helm-approximate-candidate-number) 0))
+                  (= (helm-get-candidate-number) 0))
              (setq helm-quit t)
              (and (functionp helm-quit-if-no-candidate)
                   (funcall helm-quit-if-no-candidate)))
@@ -2071,10 +2071,10 @@ This function is handling `helm-execute-action-at-once-if-one' and
 `helm-quit-if-no-candidate' in delayed sources."
   (with-helm-window
     (cond ((and helm-execute-action-at-once-if-one
-                (= (helm-approximate-candidate-number) 1))
+                (= (helm-get-candidate-number) 1))
            (helm-exit-minibuffer))
           ((and helm-quit-if-no-candidate
-                (= (helm-approximate-candidate-number) 0))
+                (= (helm-get-candidate-number) 0))
            (setq helm-quit t)
            (and (functionp helm-quit-if-no-candidate)
                 (funcall helm-quit-if-no-candidate))
@@ -2974,7 +2974,7 @@ it is \"Candidate\(s\)\" by default."
   (unless (helm-empty-source-p)
     (propertize
      (format "[%s %s]"
-             (helm-approximate-candidate-number 'in-current-source)
+             (helm-get-candidate-number 'in-current-source)
              (or name "Candidate(s)"))
      'face 'helm-candidate-number)))
 

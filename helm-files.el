@@ -480,7 +480,7 @@ for current buffer."
           (car helm-ff-history)))))
 
 (defun helm-find-files-do-action (action)
-  "Generic function for creating action from `helm-source-find-files'.
+  "Generic function for creating actions from `helm-source-find-files'.
 ACTION must be an action supported by `helm-dired-action'."
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates)))
@@ -489,6 +489,7 @@ ACTION must be an action supported by `helm-dired-action'."
                   (capitalize (symbol-name action)) ifiles))
          (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
+         helm-ff-auto-update-flag
          (dest   (helm-read-file-name
                   prompt
                   :preselect (if helm-ff-transformer-show-only-basename
@@ -1239,7 +1240,7 @@ expand to this directory."
            (completed-p (string= (file-name-as-directory
                                   (expand-file-name pat))
                                  helm-ff-default-directory))
-           (candnum (helm-approximate-candidate-number)))
+           (candnum (helm-get-candidate-number)))
       (when (and (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
@@ -1963,7 +1964,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; An image file and it is the second hit on C-z,
           ;; show the file in `image-dired'.
           ((string-match (image-file-name-regexp) candidate)
-           (when (buffer-live-p image-dired-display-image-buffer)
+           (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
              (kill-buffer image-dired-display-image-buffer))
            (image-dired-display-image candidate)
            (message nil)

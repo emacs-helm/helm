@@ -130,9 +130,9 @@ but the initial search for all candidates in buffer(s)."
   (let* ((case-fold-search ignore-case)
          (buffer1 (current-buffer)) ; start buffer.
          (minibuf (minibufferp buffer1))
+         result pos-before pos-after
          (search-and-store
           #'(lambda (pattern direction)
-              (cl-declare (special result pos-before pos-after))
               (while (cl-case direction
                        (1   (search-forward pattern nil t))
                        (-1  (search-backward pattern nil t))
@@ -260,17 +260,21 @@ but the initial search for all candidates in buffer(s)."
                                 :limits limits
                                 :iterator
                                 (helm-iter-list
-                                 (cl-loop with selection
-                                          for i in helm-dabbrev--cache
-                                          when
+                                 (cl-loop for i in helm-dabbrev--cache when
                                           (string-match
                                            (concat "^" (regexp-quote dabbrev)) i)
                                           collect i into selection
-                                          when (or (= (length selection)
-                                                      helm-dabbrev-cycle-thresold)
-                                                   (= (length selection)
-                                                      (length helm-dabbrev--cache)))
-                                          return selection)))))
+                                          when (and selection
+                                                    (= (length selection)
+                                                       helm-dabbrev-cycle-thresold))
+                                          ;; When selection len reach
+                                          ;; `helm-dabbrev-cycle-thresold'
+                                          ;; return selection.
+                                          return selection
+                                          ;; selection len never reach
+                                          ;; `helm-dabbrev-cycle-thresold'
+                                          ;; return selection.
+                                          finally return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)

@@ -549,6 +549,8 @@
 (make-obsolete 'helm-c-adaptive-save-history 'helm-adaptive-save-history "1.5.1")
 (defalias 'helm-c-get-first-line-documentation 'helm-get-first-line-documentation)
 (make-obsolete 'helm-c-get-first-line-documentation 'helm-get-first-line-documentation "1.5.1")
+(defalias 'helm-approximate-candidate-number 'helm-get-candidate-number)
+(make-obsolete 'helm-approximate-candidate-number 'helm-get-candidate-number "1.5.5")
 
 
 ;;; variables
