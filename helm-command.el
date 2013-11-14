@@ -1,4 +1,4 @@
-;;; helm-command.el --- Helm execute-exended-command.
+;;; helm-command.el --- Helm execute-exended-command. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

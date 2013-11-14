@@ -1,4 +1,4 @@
-;;; helm-plugin.el --- Helm plugins
+;;; helm-plugin.el --- Helm plugins -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; helm-elscreen.el -- Elscreen support
+;;; helm-elscreen.el -- Elscreen support -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

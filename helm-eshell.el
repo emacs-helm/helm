@@ -1,4 +1,4 @@
-;;; helm-eshell.el --- pcomplete and eshell completion for helm.
+;;; helm-eshell.el --- pcomplete and eshell completion for helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

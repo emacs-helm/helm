@@ -1,4 +1,4 @@
-;;; helm-utils.el --- Utilities Functions for helm.
+;;; helm-utils.el --- Utilities Functions for helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

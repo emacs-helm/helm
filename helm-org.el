@@ -1,4 +1,4 @@
-;;; helm-org.el --- Helm for org headlines and keywords completion
+;;; helm-org.el --- Helm for org headlines and keywords completion -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

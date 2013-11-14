@@ -1,4 +1,4 @@
-;;; helm-config.el --- Applications library for `helm.el'
+;;; helm-config.el --- Applications library for `helm.el' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

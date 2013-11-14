@@ -1,4 +1,4 @@
-;;; helm-pkg.el --- define helm for package.el
+;;; helm-pkg.el --- define helm for package.el -*- lexical-binding: t -*-
 
 (define-package "helm" "1.5.5"
   "Helm is an Emacs incremental and narrowing framework")

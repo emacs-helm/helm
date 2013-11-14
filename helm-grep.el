@@ -1,4 +1,4 @@
-;;; helm-grep.el --- Helm Incremental Grep.
+;;; helm-grep.el --- Helm Incremental Grep. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; helm-regexp.el --- In buffer regexp searching and replacement for helm.
+;;; helm-regexp.el --- In buffer regexp searching and replacement for helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

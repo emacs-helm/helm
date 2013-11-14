@@ -1,4 +1,4 @@
-;;; helm-help.el --- Help messages for Helm.
+;;; helm-help.el --- Help messages for Helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

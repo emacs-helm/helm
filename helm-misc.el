@@ -1,4 +1,4 @@
-;;; helm-misc.el --- Various functions for helm
+;;; helm-misc.el --- Various functions for helm -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

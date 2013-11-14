@@ -1,4 +1,4 @@
-;;; helm-files.el --- helm file browser and related.
+;;; helm-files.el --- helm file browser and related. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; helm-w3m.el --- W3m bookmark - helm interface.
+;;; helm-w3m.el --- W3m bookmark - helm interface. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; helm-tags.el --- Helm for Etags and Ctags.
+;;; helm-tags.el --- Helm for Etags and Ctags. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -197,7 +197,7 @@ If no entry in cache, create one."
 (defun helm-etags-split-line (line)
   (let ((regexp "\\`\\([a-zA-Z]?:?.*?\\): \\(.*\\)"))
     (when (string-match regexp line)
-      (loop for n from 1 to 2 collect (match-string n line)))))
+      (cl-loop for n from 1 to 2 collect (match-string n line)))))
 
 (defvar helm-source-etags-select
   `((name . "Etags")

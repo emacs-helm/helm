@@ -1,4 +1,4 @@
-;;; helm-gentoo.el --- Helm UI for gentoo portage.
+;;; helm-gentoo.el --- Helm UI for gentoo portage. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

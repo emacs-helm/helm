@@ -1,4 +1,4 @@
-;;; helm-bookmark.el --- Helm for Emacs regular Bookmarks.
+;;; helm-bookmark.el --- Helm for Emacs regular Bookmarks. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

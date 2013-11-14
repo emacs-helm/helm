@@ -1,4 +1,4 @@
-;;; helm-color.el --- colors and faces
+;;; helm-color.el --- colors and faces -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

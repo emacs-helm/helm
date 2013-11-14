@@ -1,4 +1,4 @@
-;;; helm-ring.el --- kill-ring, mark-ring, and register browsers for helm.
+;;; helm-ring.el --- kill-ring, mark-ring, and register browsers for helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

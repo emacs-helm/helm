@@ -1,4 +1,4 @@
-;;; helm-yaoddmuse.el --- Helm extension for yaoddmuse
+;;; helm-yaoddmuse.el --- Helm extension for yaoddmuse -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

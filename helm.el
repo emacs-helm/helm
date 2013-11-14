@@ -1344,7 +1344,7 @@ in the source where point is."
                                                (or (helm-pos-header-line-p) (eobp)))
                                              (eobp)))
                                     (search-forward helm-candidate-separator nil t))
-                         do (incf count-multi)
+                         do (cl-incf count-multi)
                          finally return count-multi))
               (save-excursion
                 (cl-loop with ln = 0
@@ -1352,7 +1352,7 @@ in the source where point is."
                                         (or (helm-pos-header-line-p) (eobp))
                                         (eobp)))
                          unless (helm-pos-header-line-p)
-                         do (incf ln)
+                         do (cl-incf ln)
                          do (forward-line 1) finally return ln)))))))
 
 (defmacro with-helm-quittable (&rest body)

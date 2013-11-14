@@ -1,4 +1,4 @@
-;;; helm-aliases.el --- Helm aliases for helm obsoletes functions.
+;;; helm-aliases.el --- Helm aliases for helm obsoletes functions. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; helm-semantic.el --- Helm interface for Semantic
+;;; helm-semantic.el --- Helm interface for Semantic -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Daniel Hackney <dan@haxney.org>
 ;; Author: Daniel Hackney <dan@haxney.org>

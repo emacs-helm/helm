@@ -1,4 +1,4 @@
-;;; helm-sys.el --- System related functions for helm.
+;;; helm-sys.el --- System related functions for helm. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

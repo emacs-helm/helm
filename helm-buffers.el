@@ -1,4 +1,4 @@
-;;; helm-buffers.el --- helm support for buffers.
+;;; helm-buffers.el --- helm support for buffers. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

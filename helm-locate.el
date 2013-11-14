@@ -1,4 +1,4 @@
-;;; helm-locate.el --- helm interface for locate.
+;;; helm-locate.el --- helm interface for locate. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

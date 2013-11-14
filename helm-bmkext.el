@@ -1,4 +1,4 @@
-;;; helm-bmkext.el --- Sources to filter bookmark-extensions bookmarks.
+;;; helm-bmkext.el --- Sources to filter bookmark-extensions bookmarks. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 

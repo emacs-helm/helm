@@ -1,4 +1,4 @@
-;;; helm-mode.el --- Enable helm completion everywhere.
+;;; helm-mode.el --- Enable helm completion everywhere. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
