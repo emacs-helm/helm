@@ -578,8 +578,8 @@ If N is positive go forward otherwise go backward."
 ;;; helm-grep-mode
 ;;
 ;;
-(defun helm-grep-save-results (_candidate)
-  (helm-grep-action _candidate 'grep))
+(defun helm-grep-save-results (candidate)
+  (helm-grep-action candidate 'grep))
 
 (defun helm-grep-save-results-1 ()
   "Save helm grep result in a `grep-mode' buffer."
