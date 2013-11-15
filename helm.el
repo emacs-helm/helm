@@ -766,7 +766,7 @@ at the date and time of today in this directory."
         (kill-buffer)))))
 
 ;;;###autoload
-(defun helm-open-last-log ()
+(defun helm-debug-open-last-log ()
   "Open helm log file of last helm session.
 If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
   (interactive)
