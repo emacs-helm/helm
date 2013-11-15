@@ -68,7 +68,7 @@
     (get-line . buffer-substring)
     (persistent-action . (lambda (elm)
                            (helm-semantic-default-action elm)
-                           (helm-match-line-color-current-line)))
+                           (helm-highlight-current-line)))
     (persistent-help . "Show this entry")
     (action . helm-semantic-default-action)
     "Source to search tags using Semantic from CEDET."))

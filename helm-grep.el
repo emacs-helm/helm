@@ -472,7 +472,7 @@ With a prefix arg record CANDIDATE in `mark-ring'."
   (if current-prefix-arg
       (helm-grep-action candidate nil 'mark)
       (helm-grep-action candidate))
-  (helm-match-line-color-current-line))
+  (helm-highlight-current-line))
 
 (defun helm-grep-other-window (candidate)
   "Jump to result in other window from helm grep."

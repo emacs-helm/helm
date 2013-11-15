@@ -215,7 +215,7 @@ If no entry in cache, create one."
     (action . helm-etags-default-action)
     (persistent-action . (lambda (candidate)
                            (helm-etags-default-action candidate)
-                           (helm-match-line-color-current-line))))
+                           (helm-highlight-current-line))))
   "Helm source for Etags.")
 
 (defvar find-tag-marker-ring)

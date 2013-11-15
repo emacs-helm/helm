@@ -282,7 +282,7 @@ Animation is used unless NOANIM is non--nil."
   (goto-char (point-min))
   (helm-goto-char (point-at-bol lineno))
   (unless noanim
-    (helm-match-line-color-current-line)
+    (helm-highlight-current-line)
     (sit-for 0.3)
     (helm-match-line-cleanup)))
 
@@ -687,7 +687,7 @@ Useful in dired buffers when there is inserted subdirs."
 ;; Internal
 (defvar helm-match-line-overlay nil)
 
-(defun helm-match-line-color-current-line (&optional start end buf face)
+(defun helm-highlight-current-line (&optional start end buf face)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
@@ -699,8 +699,6 @@ Useful in dired buffers when there is inserted subdirs."
                  'face (or face 'helm-selection-line))
     (recenter)))
 
-(defalias 'helm-persistent-highlight-point 'helm-match-line-color-current-line)
-
 (defun helm-match-line-cleanup ()
   (when helm-match-line-overlay
     (delete-overlay helm-match-line-overlay)
@@ -709,7 +707,7 @@ Useful in dired buffers when there is inserted subdirs."
 (defun helm-match-line-update ()
   (when helm-match-line-overlay
     (delete-overlay helm-match-line-overlay)
-    (helm-match-line-color-current-line)))
+    (helm-highlight-current-line)))
 
 (add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
 (add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
@@ -806,7 +804,7 @@ directory, open this directory."
   (helm-aif (helm-attr 'after-jump-hook)
       (funcall it))
   (when helm-in-persistent-action
-    (helm-match-line-color-current-line)))
+    (helm-highlight-current-line)))
 
 (defun helm-find-file-as-root (candidate)
   (let ((buf (helm-basename candidate))
