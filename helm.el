@@ -2212,7 +2212,7 @@ Helm plug-ins are realized by this function."
                        (error
                         "`%s' must either be a function, a variable or a list"
                         (or candidate-fn candidate-proc))))
-         (candidates (condition-case err
+         (candidates (condition-case nil
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
@@ -2227,10 +2227,7 @@ Helm plug-ins are realized by this function."
                                                  (helm-interpret-value
                                                   candidate-fn source))))
                                    (and (listp result) result))))
-                       (invalid-regexp nil)
-                       (error (and (or helm-debug debug-on-error)
-                                   (helm-log-error "%s %s" (car err) (cdr err)))
-                              nil))))
+                       (error nil))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
@@ -2432,10 +2429,9 @@ and `helm-pattern'."
               ;; with the next match function.
               (setq cands (loop for i in cands
                                 unless (member i matches) collect i)))))
-      (invalid-regexp (setq matches nil))
       (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                             (assoc-default 'name source) (car err) (cadr err))
-             nil))
+                             (assoc-default 'name source) (car err) (cdr err))
+             (setq matches nil)))
     matches))
 
 (defun helm-compute-matches (source)
