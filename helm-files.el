@@ -823,15 +823,14 @@ and `helm-ff-auto-update-flag' is turned off,
 run `helm-find-files-down-one-level', otherwise run the global command
 bounded to <backspace>."
   (interactive "P")
-  (let (backspace)
-    (cond
-     ((and (looking-back "[/\\]")
-           (or helm-ff-auto-update-flag
-               (eq helm-ff-ido-style-backspace 'always)))
-      (call-interactively 'helm-find-files-down-one-level))
-     (t
-      (setq backspace (lookup-key (current-global-map) (read-kbd-macro "DEL")))
-      (call-interactively backspace)))))
+  (cond
+    ((and (looking-back "[/\\]")
+          (or helm-ff-auto-update-flag
+              (eq helm-ff-ido-style-backspace 'always)))
+     (call-interactively 'helm-find-files-down-one-level))
+    (t (call-interactively
+        (lookup-key (current-global-map)
+                    (read-kbd-macro "DEL"))))))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
