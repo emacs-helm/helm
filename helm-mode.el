@@ -675,14 +675,13 @@ Keys description:
 - PERSISTENT-ACTION: a persistent action function.
 
 - PERSISTENT-HELP: persistent help message."
+  
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-
   ;; Assume completion have been already required,
   ;; so always use 'confirm.
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
-
   (let ((action-fn '(("Sole action (Identity)"
                       . (lambda (candidate)
                           (if marked-candidates
@@ -693,7 +692,7 @@ Keys description:
            (helm-ff-auto-update-initial-value
             (and helm-ff-auto-update-initial-value
                  (not (minibuffer-window-active-p (minibuffer-window)))))
-           helm-same-window
+           helm-full-frame
            (hist (and history (helm-comp-read-get-candidates
                                history nil nil alistp)))
            (minibuffer-completion-confirm must-match)
