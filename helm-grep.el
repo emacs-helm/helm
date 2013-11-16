@@ -472,7 +472,7 @@ With a prefix arg record CANDIDATE in `mark-ring'."
   (if current-prefix-arg
       (helm-grep-action candidate nil 'mark)
       (helm-grep-action candidate))
-  (helm-match-line-color-current-line))
+  (helm-highlight-current-line))
 
 (defun helm-grep-other-window (candidate)
   "Jump to result in other window from helm grep."
@@ -578,8 +578,8 @@ If N is positive go forward otherwise go backward."
 ;;; helm-grep-mode
 ;;
 ;;
-(defun helm-grep-save-results (_candidate)
-  (helm-grep-action _candidate 'grep))
+(defun helm-grep-save-results (candidate)
+  (helm-grep-action candidate 'grep))
 
 (defun helm-grep-save-results-1 ()
   "Save helm grep result in a `grep-mode' buffer."

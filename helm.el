@@ -766,7 +766,7 @@ at the date and time of today in this directory."
         (kill-buffer)))))
 
 ;;;###autoload
-(defun helm-open-last-log ()
+(defun helm-debug-open-last-log ()
   "Open helm log file of last helm session.
 If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
   (interactive)
@@ -2227,10 +2227,7 @@ Helm plug-ins are realized by this function."
                                                  (helm-interpret-value
                                                   candidate-fn source))))
                                    (and (listp result) result))))
-                       ((invalid-regexp nil)
-                        (error (and (or helm-debug debug-on-error)
-                                   (helm-log-error "%s %s" (car err0) (cdr err0)))
-                              nil)))))
+                       (error (helm-log "Error: %S" err) nil))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
@@ -2430,12 +2427,11 @@ and `helm-pattern'."
               (setq matches (append matches (reverse newmatches)))
               ;; Don't recompute matches already found by this match function
               ;; with the next match function.
-              (setq cands (cl-loop for i in cands
-                                   unless (member i matches) collect i)))))
-      ((invalid-regexp nil);(setq matches nil))
-       (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                             (assoc-default 'name source) (car err1) (cadr err1))
-             nil)))
+              (setq cands (loop for i in cands
+                                unless (member i matches) collect i)))))
+      (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+                             (assoc-default 'name source) (car err) (cdr err))
+             (setq matches nil)))
     matches))
 
 (defun helm-compute-matches (source)

@@ -155,7 +155,7 @@ See http://orgmode.org for the latest version.")
   (info (or (assoc-default (concat "#+" keyword) helm-org-keywords-info-location)
             "(org)In-buffer settings"))
   (search-forward (concat "#+" keyword) nil t)
-  (helm-persistent-highlight-point)
+  (helm-highlight-current-line)
   (message "%s" (or (cdr (assoc keyword (helm-attr 'keywords-examples))) "")))
 
 ;;;###autoload

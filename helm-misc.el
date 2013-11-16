@@ -131,7 +131,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
                                     anchor))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
-                           (helm-match-line-color-current-line)))
+                           (helm-highlight-current-line)))
     (persistent-help . "Show this entry")
     (action . (("Goto link" . ee-to)))))
 

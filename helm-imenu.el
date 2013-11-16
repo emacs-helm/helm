@@ -68,7 +68,7 @@
     (persistent-action . (lambda (elm)
                            (helm-imenu-default-action elm)
                            (unless (fboundp 'semantic-imenu-tag-overlay)
-                             (helm-match-line-color-current-line))))
+                             (helm-highlight-current-line))))
     (persistent-help . "Show this entry")
     (action . helm-imenu-default-action))
   "See (info \"(emacs)Imenu\")")

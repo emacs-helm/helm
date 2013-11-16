@@ -80,12 +80,9 @@ Should take one arg: the string to display."
                                                     (eval (read helm-pattern)))))
                                            (error "Error")))))
     (action . (("Copy result to kill-ring" . (lambda (candidate)
-                                               (with-current-buffer helm-buffer
-                                                 (let ((end (save-excursion
-                                                              (goto-char (point-max))
-                                                              (search-backward "\n")
-                                                              (point))))
-                                                   (kill-region (point) end)))))
+                                               (kill-new
+                                                (replace-regexp-in-string
+                                                 "\n" "" candidate))))
                ("copy sexp to kill-ring" . (lambda (candidate)
                                              (kill-new helm-input)))))))
 

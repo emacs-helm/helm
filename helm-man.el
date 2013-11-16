@@ -45,7 +45,7 @@ source.")
   "Default action for jumping to a woman or man page from helm."
   (let ((wfiles (mapcar
                  'car (woman-file-name-all-completions candidate))))
-    (condition-case err
+    (condition-case nil
         (if (> (length wfiles) 1)
             (let ((file (helm-comp-read
                          "ManFile: " wfiles :must-match t)))

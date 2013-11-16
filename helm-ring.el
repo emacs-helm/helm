@@ -167,7 +167,7 @@ replace with STR as yanked string."
                     (helm-goto-line (string-to-number candidate)))))) 
     (persistent-action . (lambda (candidate)
                            (helm-goto-line (string-to-number candidate))
-                           (helm-match-line-color-current-line)))
+                           (helm-highlight-current-line)))
     (persistent-help . "Show this line")))
 
 
@@ -184,7 +184,7 @@ replace with STR as yanked string."
                            (let ((items (split-string candidate ":")))
                              (helm-switch-to-buffer (cl-second items))
                              (helm-goto-line (string-to-number (car items)))
-                             (helm-match-line-color-current-line))))
+                             (helm-highlight-current-line))))
     (persistent-help . "Show this line")))
 
 (defun helm-global-mark-ring-format-buffer (marker)

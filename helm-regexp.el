@@ -136,7 +136,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 
 (defun helm-regexp-persistent-action (pt)
   (helm-goto-char pt)
-  (helm-persistent-highlight-point))
+  (helm-highlight-current-line))
 
 (defun helm-regexp-kill-new (input)
   (kill-new input)
@@ -221,7 +221,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 
 (defun helm-m-occur-persistent-action (candidate)
   (helm-m-occur-goto-line candidate)
-  (helm-match-line-color-current-line))
+  (helm-highlight-current-line))
 
 (defun helm-m-occur-run-persistent-action ()
   (interactive)
