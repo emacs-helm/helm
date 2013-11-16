@@ -65,22 +65,21 @@ See docstring of `bbdb-create-internal' for more info on address entries."
            finally return phone-list))
 
 ;; TODO move this to helm-utils when finish
-(defun helm-read-repeat-string (prompt &optional count)
+(defun helm-read-repeat-string (bbdb--prompt &optional count)
   "Prompt as many time PROMPT is not empty.
 If COUNT is non--nil add a number after each prompt."
-  (cl-loop with elm with new-prompt
+  (cl-loop with elm
            while (not (string= elm ""))
            for n from 1
            do (when count
-                (setq new-prompt (concat prompt (int-to-string n) ": ")))
-           collect (setq elm (read-string new-prompt)) into lis
+                (setq bbdb--prompt (concat bbdb--prompt (int-to-string n) ": ")))
+           collect (setq elm (read-string bbdb--prompt)) into lis
            finally return (remove "" lis)))
 
 (defun helm-bbdb-read-address ()
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
-  (cl-loop with address-list
-           with loc-list = (cons "[Exit when no more]"
+  (cl-loop with loc-list = (cons "[Exit when no more]"
                                  (bbdb-label-completion-list "addresses"))
            with loc ; Defer count
            do (setq loc (helm-comp-read
@@ -142,6 +141,7 @@ All other actions are removed."
 
 http://bbdb.sourceforge.net/")
 
+(defvar bbdb-append-records)
 (defun helm-bbdb-view-person-action (candidate)
   "View BBDB data of single CANDIDATE or marked candidates."
   (helm-aif (helm-marked-candidates)

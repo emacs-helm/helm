@@ -185,19 +185,19 @@ package name - description."
     (set (make-local-variable 'helm-apt-show-current-package)
          package)))
 
-(defun helm-apt-install (package)
+(defun helm-apt-install (_package)
   "Run 'apt-get install' shell command on PACKAGE."
   (helm-apt-generic-action :action 'install))
 
-(defun helm-apt-reinstall (package)
+(defun helm-apt-reinstall (_package)
   "Run 'apt-get install --reinstall' shell command on PACKAGE."
   (helm-apt-generic-action :action 'reinstall))
 
-(defun helm-apt-uninstall (package)
+(defun helm-apt-uninstall (_package)
   "Run 'apt-get remove' shell command on PACKAGE."
   (helm-apt-generic-action :action 'uninstall))
 
-(defun helm-apt-purge (package)
+(defun helm-apt-purge (_package)
   "Run 'apt-get purge' shell command on PACKAGE."
   (helm-apt-generic-action :action 'purge))
 
