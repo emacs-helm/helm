@@ -158,7 +158,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 ;;; World time
 ;;
-(defun helm-time-zone-transformer (candidates sources)
+(defun helm-time-zone-transformer (candidates _source)
   (cl-loop for i in candidates
            collect
            (cond ((string-match (format-time-string "%H:%M" (current-time)) i)

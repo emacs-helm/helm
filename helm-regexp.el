@@ -67,7 +67,7 @@ This setting apply also to `helm-source-occur'."
 
 
 (defvar helm-build-regexp-history nil)
-(defun helm-query-replace-regexp (candidate)
+(defun helm-query-replace-regexp (_candidate)
   "Query replace regexp from `helm-regexp'.
 With a prefix arg replace only matches surrounded by word boundaries,
 i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
@@ -75,12 +75,12 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (apply 'query-replace-regexp
            (helm-query-replace-args regexp))))
 
-(defun helm-kill-regexp-as-sexp (candidate)
+(defun helm-kill-regexp-as-sexp (_candidate)
   "Kill regexp in a format usable in lisp code."
   (helm-regexp-kill-new
    (prin1-to-string (funcall (helm-attr 'regexp)))))
 
-(defun helm-kill-regexp (candidate)
+(defun helm-kill-regexp (_candidate)
   "Kill regexp as it is in `helm-pattern'."
   (helm-regexp-kill-new (funcall (helm-attr 'regexp))))
 
@@ -450,7 +450,7 @@ or during the buffer selection."
     (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
-(defun helm-multi-occur-from-isearch (&optional arg)
+(defun helm-multi-occur-from-isearch (&optional _arg)
   "Invoke `helm-multi-occur' from isearch.
 
 With a prefix arg, reverse the behavior of

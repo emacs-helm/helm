@@ -67,7 +67,7 @@ Return empty string for non--valid candidates."
   (cl-loop for disp in candidates collect
            (if (string-match "^ *[0-9]+" disp) disp (cons disp ""))))
 
-(defun helm-top-action-transformer (actions candidate)
+(defun helm-top-action-transformer (actions _candidate)
   "Action transformer for `top'.
 Show actions only on line starting by a PID."
   (let ((disp (helm-get-selection nil t)))

@@ -152,10 +152,9 @@ replace with STR as yanked string."
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
     (cl-loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
-             with recip = nil
              for i in marks
              for m = (helm-mark-ring-get-marks i)
-             unless (member m recip)
+             unless (and recip (member m recip))
              collect m into recip
              finally return recip)))
 
@@ -202,13 +201,12 @@ replace with STR as yanked string."
 (defun helm-global-mark-ring-get-candidates ()
   (let ((marks global-mark-ring))
     (when marks
-      (cl-loop with recip = nil
-               for i in marks
+      (cl-loop for i in marks
                for gm = (unless (or (string-match
                                      "^ " (format "%s" (marker-buffer i)))
                                     (null (marker-buffer i)))
                           (helm-global-mark-ring-format-buffer i))
-               when (and gm (not (member gm recip)))
+               when (and gm recip (not (member gm recip)))
                collect gm into recip
                finally return recip))))
 
@@ -288,7 +286,7 @@ replace with STR as yanked string."
            collect (cons (format "Register %3s:\n %s" key (car string-actions))
                          (cons char (cdr string-actions)))))
 
-(defun helm-register-action-transformer (actions register-and-functions)
+(defun helm-register-action-transformer (_actions register-and-functions)
   "Decide actions by the contents of register."
   (cl-loop with func-actions =
            '((insert-register

@@ -91,7 +91,7 @@ http://emacs-w3m.namazu.org/")
          (arg (and (eq fn 'w3m-browse-url) new-tab)))
     (funcall fn (helm-w3m-bookmarks-get-value elm) arg)))
 
-(defun helm-highlight-w3m-bookmarks (bookmarks source)
+(defun helm-highlight-w3m-bookmarks (bookmarks _source)
   (cl-loop for i in bookmarks
            collect (propertize
                     i 'face 'helm-w3m-bookmarks

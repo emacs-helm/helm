@@ -239,7 +239,7 @@ See also `helm-locate'."
                   (mapconcat 'identity (cdr args) " "))))
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       #'(lambda (process event)
+       #'(lambda (_process event)
            (if (string= event "finished\n")
                (with-helm-window
                  (setq mode-line-format
@@ -296,6 +296,7 @@ Do nothing when `helm-locate-command' is 'es'."
                 (no-matchplugin)
                 (delayed))))
     (or (helm :sources src
+              :prompt prompt
               :buffer "*helm locate read fname*"
               :resume 'noresume)
         (keyboard-quit))))

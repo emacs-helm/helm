@@ -158,7 +158,7 @@ Return an alist with elements like (data . number_results)."
                   for display = (format "%s%s(%s results)"
                                         real spaces align-fnumresult)
                   collect (cons display real))))
-    (if (cl-loop for (disp . dat) in suggestions
+    (if (cl-loop for (_disp . dat) in suggestions
                  thereis (equal dat helm-pattern))
         suggestions
         ;; if there is no suggestion exactly matching the input then
@@ -292,7 +292,7 @@ Return an alist with elements like (data . number_results)."
   (helm-generic-browser
    url helm-browse-url-chromium-program))
 
-(defun helm-browse-url-uzbl (url &optional ignore)
+(defun helm-browse-url-uzbl (url &optional _ignore)
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
   (helm-generic-browser url helm-browse-url-uzbl-program "-u"))

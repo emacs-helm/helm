@@ -141,7 +141,7 @@ If not found in CURRENT-DIR search in upper directory."
              (setq current-dir (expand-file-name (concat current-dir "../")))
              finally return current-dir)))
 
-(defun helm-etags-get-header-name (x)
+(defun helm-etags-get-header-name (_x)
   "Create header name for this helm etags session."
   (concat "Etags in "
           (with-helm-current-buffer

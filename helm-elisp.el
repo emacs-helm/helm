@@ -212,8 +212,8 @@ Return a cons \(beg . end\)."
                             (mapcar #'symbol-name (lisp--local-variables)))))
          (glob-syms  (and target pred (all-completions target obarray pred)))
          (candidates (append loc-vars glob-syms))
-         ;(helm-quit-if-no-candidate t)
-         ;(helm-execute-action-at-once-if-one t)
+         (helm-quit-if-no-candidate t)
+         (helm-execute-action-at-once-if-one t)
          (enable-recursive-minibuffers t)
          (helm-match-plugin-enabled
           (member 'helm-compile-source--match-plugin

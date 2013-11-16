@@ -64,7 +64,7 @@ and `helm-imenu-default-action'.")
 ;;
 ;;
 (unless (fboundp 'window-system)
-  (defun window-system (&optional arg)
+  (defun window-system (&optional _arg)
     window-system))
 
 (unless (fboundp 'make-composed-keymap)
@@ -747,9 +747,7 @@ directory, open this directory."
                            'find-file-other-window
                            'find-file)))))
 
-(cl-defun helm-action-file-line-goto (file-line-content
-                                      &optional
-                                      (find-file-function #'find-file))
+(cl-defun helm-action-file-line-goto (file-line-content)
   (apply #'helm-goto-file-line
          (if (stringp file-line-content)
              ;; Case: filtered-candidate-transformer is skipped
@@ -806,7 +804,7 @@ directory, open this directory."
                                        "::" (expand-file-name candidate))))
         (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))))
 
-(defun helm-find-many-files (ignore)
+(defun helm-find-many-files (_ignore)
   (mapc 'find-file (helm-marked-candidates)))
 
 (defun helm-goto-line-with-adjustment (line line-content)

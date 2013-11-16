@@ -297,7 +297,7 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix args before or after calling a command
 that use `helm-comp-read' See `helm-M-x' for example."
-  
+  (cl-declaim (special marked-candidates))
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let ((action-fn '(("Sole action (Identity)"
@@ -449,8 +449,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
 ;;
 ;;
 (defun helm-completing-read-symbols
-    (prompt collection test require-match init
-     hist default inherit-input-method name buffer)
+    (prompt _collection _test _require-match init
+     hist default _inherit-input-method name buffer)
   "Specialized function for fast symbols completion in `helm-mode'."
   (or
    (helm
@@ -489,7 +489,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
 ;;
 (defun helm-completing-read-default-1
     (prompt collection test require-match
-     init hist default inherit-input-method
+     init hist default _inherit-input-method
      name buffer &optional cands-in-buffer exec-when-only-one)
   "Call `helm-comp-read' with same args as `completing-read'.
 Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
@@ -675,6 +675,7 @@ Keys description:
 - PERSISTENT-ACTION: a persistent action function.
 
 - PERSISTENT-HELP: persistent help message."
+  (cl-declaim (special hist test))
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
 
@@ -693,7 +694,7 @@ Keys description:
            (helm-ff-auto-update-initial-value
             (and helm-ff-auto-update-initial-value
                  (not (minibuffer-window-active-p (minibuffer-window)))))
-           helm-same-window
+           helm-full-frame
            (hist (and history (helm-comp-read-get-candidates
                                history nil nil alistp)))
            (minibuffer-completion-confirm must-match)
