@@ -2212,7 +2212,7 @@ Helm plug-ins are realized by this function."
                        (error
                         "`%s' must either be a function, a variable or a list"
                         (or candidate-fn candidate-proc))))
-         (candidates (condition-case err0
+         (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
@@ -2414,7 +2414,7 @@ and `helm-pattern'."
 
 (defun helm-match-from-candidates (cands matchfns limit source)
   (let (matches)
-    (condition-case err1
+    (condition-case err
         (let ((item-count 0)
               (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
@@ -2427,8 +2427,8 @@ and `helm-pattern'."
               (setq matches (append matches (reverse newmatches)))
               ;; Don't recompute matches already found by this match function
               ;; with the next match function.
-              (setq cands (loop for i in cands
-                                unless (member i matches) collect i)))))
+              (setq cands (cl-loop for i in cands
+                                   unless (member i matches) collect i)))))
       (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                              (assoc-default 'name source) (car err) (cdr err))
              (setq matches nil)))
