@@ -1523,12 +1523,16 @@ to 10 as session local variable."
                 ;; helm-alive-p will be reset in unwind-protect forms.
                 (helm-keyboard-quit)))) 
         (if (keywordp (car plist))
+            ;; Recursion: [1] Call `helm' on itself with plist args converted
+            ;; to simple args will end up to [2] and call `helm-internal' with
+            ;; simple args.
+            ;; (`helm-let-internal' is not exited until recursion finish)
             (helm-let-internal
              (helm-parse-keys plist)
-             (lambda ()
+             (lambda () ; [1]
                (apply fn (mapcar #'(lambda (key) (plist-get plist key))
                                  helm-argument-keys))))
-            (apply fn plist)))))
+            (apply fn plist))))) ; [2]
 
 (defun helm-alive-p ()
   "Check if `helm' is alive.
