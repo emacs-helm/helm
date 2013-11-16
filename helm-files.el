@@ -816,10 +816,12 @@ other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
   
-(defun helm-ff-backspace (&rest args)
-  "Call backsapce or `helm-find-files-down-one-level'.
-If sitting at the end of a file directory, backspace goes up one
-level, like in `ido-find-file'. "
+(defun helm-ff-backspace (arg)
+  "Call global backspace or `helm-find-files-down-one-level'.
+If sitting at the end of a file directory ending with \"/\"
+and `helm-ff-auto-update-flag' is turned off,
+run `helm-find-files-down-one-level', otherwise run the global command
+bounded to <backspace>."
   (interactive "P")
   (let (backspace)
     (cond
