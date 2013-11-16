@@ -29,6 +29,7 @@
 ;;; Plug-in: `info-index'
 ;;
 ;;
+(defvar Info-history)
 (cl-defun helm-info-init (&optional (file (helm-attr 'info-file)))
   ;; Allow reinit candidate buffer when using edebug.
   (helm-aif (and debug-on-error

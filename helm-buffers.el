@@ -198,6 +198,7 @@ When disabled (nil) use the longest buffer-name length found."
                 . helm-open-file-externally)))))
 
 
+(defvar ido-use-virtual-buffers)
 (defun helm-buffer-list ()
   "Return the current list of buffers.
 Currently visible buffers are put at the end of the list.
@@ -285,7 +286,7 @@ See `ido-make-buffer-list' for more infos."
                     (format "(in `%s')" dir))
                 'face 'helm-buffer-process)))))))
 
-(defun helm-highlight-buffers (buffers source)
+(defun helm-highlight-buffers (buffers _source)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
   (cl-loop for i in buffers
@@ -390,10 +391,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                        (apply fn (list (car replace) (cdr replace)))
                        (apply fn (list replace tostring)))))))))
 
-(defun helm-buffer-query-replace-regexp (candidate)
+(defun helm-buffer-query-replace-regexp (_candidate)
   (helm-buffer-query-replace-1 'regexp))
 
-(defun helm-buffer-query-replace (candidate)
+(defun helm-buffer-query-replace (_candidate)
   (helm-buffer-query-replace-1))
 
 (defun helm-buffer-toggle-diff (candidate)
@@ -528,7 +529,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
       (helm-buffers-persistent-kill candidate)
       (helm-switch-to-buffer candidate)))
 
-(defun helm-ediff-marked-buffers (candidate &optional merge)
+(defun helm-ediff-marked-buffers (_candidate &optional merge)
   "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
 With optional arg MERGE call `ediff-merge-buffers'."
   (let ((lg-lst (length (helm-marked-candidates)))
@@ -593,10 +594,10 @@ Can be used by any source that list buffers."
 ;;; Candidate Transformers
 ;;
 ;;
-(defun helm-skip-boring-buffers (buffers source)
+(defun helm-skip-boring-buffers (buffers _source)
   (helm-skip-entries buffers helm-boring-buffer-regexp-list))
 
-(defun helm-shadow-boring-buffers (buffers source)
+(defun helm-shadow-boring-buffers (buffers _source)
   "Buffers matching `helm-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
   (helm-shadow-entries buffers helm-boring-buffer-regexp-list))

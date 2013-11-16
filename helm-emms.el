@@ -64,7 +64,7 @@
         (emms-stream-quit)
         (helm-switch-to-buffer cur-buf)))))
 
-(defun helm-emms-stream-delete-bookmark (candidate)
+(defun helm-emms-stream-delete-bookmark (_candidate)
   "Delete emms-streams bookmarks from helm."
   (let* ((cands   (helm-marked-candidates))
          (bmks    (cl-loop for bm in cands collect

@@ -715,8 +715,7 @@ Special commands:
 (defun helm-grep-guess-extensions (files)
   "Try to guess file extensions in FILES list when using grep recurse.
 These extensions will be added to command line with --include arg of grep."
-  (cl-loop with glob-list
-           with ext-list = (list helm-grep-preferred-ext "*")
+  (cl-loop with ext-list = (list helm-grep-preferred-ext "*")
            with lst = (if (file-directory-p (car files))
                           (directory-files
                            (car files) nil
@@ -727,9 +726,9 @@ These extensions will be added to command line with --include arg of grep."
            for glob = (and ext (not (string= ext ""))
                            (concat "*" ext))
            unless (or (not glob)
-                      (member glob glob-list)
-                      (member glob ext-list)
-                      (member glob grep-find-ignored-files))
+                      (and glob-list (member glob glob-list))
+                      (and glob-list (member glob ext-list))
+                      (and glob-list (member glob grep-find-ignored-files)))
            collect glob into glob-list
            finally return (delq nil (append ext-list glob-list))))
 
@@ -896,7 +895,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     ;; may contain a ":".
     (cl-loop for n from 1 to 3 collect (match-string n line))))
 
-(defun helm-grep-cand-transformer (candidates sources)
+(defun helm-grep-cand-transformer (candidates _source)
   "Filtered candidate transformer function for `helm-do-grep'."
   (cl-loop with root = (and helm-grep-default-directory-fn
                             (funcall helm-grep-default-directory-fn))
@@ -1016,7 +1015,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
       (message nil)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       #'(lambda (process event)
+       #'(lambda (_process event)
            (if (string= event "finished\n")
                (with-helm-window
                  (setq mode-line-format
@@ -1040,6 +1039,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
+    (setq helm-pdfgrep-targets only)
     (helm
      :sources
      `(((name . "PdfGrep")
@@ -1047,8 +1047,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                   ;; If `helm-find-files' haven't already started,
                   ;; give a default value to `helm-ff-default-directory'.
                   (setq helm-ff-default-directory (or helm-ff-default-directory
-                                                      default-directory))
-                  (setq helm-pdfgrep-targets only)))
+                                                      default-directory))))
         (candidates-process
          . (lambda ()
              (funcall helm-pdfgrep-default-function helm-pdfgrep-targets)))
@@ -1069,7 +1068,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 (defun helm-pdfgrep-action (candidate)
   (helm-grep-action candidate 'pdf))
 
-(defun helm-pdfgrep-action-1 (split pageno fname)
+(defun helm-pdfgrep-action-1 (_split pageno fname)
   (save-selected-window
     (start-file-process-shell-command
      "pdf-reader" nil

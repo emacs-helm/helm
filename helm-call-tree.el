@@ -81,7 +81,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
   (cl-incf helm-simple-call-tree-function-index)
   (helm-simple-call-tree-find-definition candidate))
 
-(defun helm-simple-call-tree-find-definition (candidate)
+(defun helm-simple-call-tree-find-definition (_candidate)
   (find-function
    (intern
     (nth (mod helm-simple-call-tree-function-index

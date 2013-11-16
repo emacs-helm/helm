@@ -50,8 +50,7 @@ The format is \"Firstname Lastname\"."
 (defun helm-bbdb-read-phone ()
   "Return a list of vector address objects.
 See docstring of `bbdb-create-internal' for more info on address entries."
-  (cl-loop with phone-list
-           with loc-list = (cons "[Exit when no more]"
+  (cl-loop with loc-list = (cons "[Exit when no more]"
                                  (bbdb-label-completion-list "phones"))
            with loc ; Defer count
            do (setq loc (helm-comp-read (format "Phone location[%s]: " count)
@@ -69,7 +68,7 @@ See docstring of `bbdb-create-internal' for more info on address entries."
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.
 If COUNT is non--nil add a number after each prompt."
-  (cl-loop with elm with new-prompt = prompt
+  (cl-loop with elm with new-prompt
            while (not (string= elm ""))
            for n from 1
            do (when count

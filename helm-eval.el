@@ -110,9 +110,7 @@ Should take one arg: the string to display."
                                 (eldoc-get-fnsym-args-string
                                  (car info-fn) (cadr info-fn)))))
               (when doc (funcall helm-eldoc-in-minibuffer-show-fn doc)))))
-      (scan-error nil)
-      (beginning-of-buffer nil)
-      (error (message "Eldoc in minibuffer error: %S" err)))))
+      (error (message "Eldoc in minibuffer error: %S" err) nil))))
 
 (defun helm-show-info-in-mode-line (str)
   "Display string STR in mode-line."

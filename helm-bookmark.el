@@ -183,14 +183,12 @@ Should be used with `helm-bookmark-search-fn' as `search' function."
     ;; Match against bookmark-name.
     candidate))
 
-(defun helm-highlight-bookmark (bookmarks source)
+(defun helm-highlight-bookmark (bookmarks _source)
   "Used as `filtered-candidate-transformer' to colorize bookmarks.
 Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (let ((non-essential t))
     (cl-loop for i in bookmarks
              for isfile        = (bookmark-get-filename i)
-             for bufp          = (and (fboundp 'bmkext-get-buffer-name)
-                                      (bmkext-get-buffer-name i))
              for handlerp      = (and (fboundp 'bookmark-get-handler)
                                       (bookmark-get-handler i))
              for isw3m         = (and (fboundp 'bmkext-w3m-bookmark-p)
@@ -201,7 +199,6 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                       (bmkext-man-bookmark-p i))
              for iswoman       = (and (fboundp 'bmkext-woman-bookmark-p) ; Woman
                                       (bmkext-woman-bookmark-p i))
-             for handlerp      = (bookmark-get-handler i)
              for isannotation  = (bookmark-get-annotation i)
              for isabook       = (string= (bookmark-prop-get i 'type)
                                           "addressbook")
@@ -302,7 +299,7 @@ Return nil if bmk is not a valid bookmark."
         (when (assoc bmk bookmark-alist)
           bmk))))
 
-(defun helm-delete-marked-bookmarks (ignore)
+(defun helm-delete-marked-bookmarks (_ignore)
   "Delete this bookmark or all marked bookmarks."
   (cl-dolist (i (helm-marked-candidates))
     (bookmark-delete (helm-bookmark-get-bookmark-from-name i)

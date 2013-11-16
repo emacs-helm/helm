@@ -80,7 +80,7 @@ Return nil if no mode-map found."
       (helm-M-x-get-major-mode-command-alist (symbol-value map)))))
 
 
-(defun helm-M-x-transformer (candidates sources)
+(defun helm-M-x-transformer (candidates _source)
   "filtered-candidate-transformer to show bindings in emacs commands.
 Show global bindings and local bindings according to current `major-mode'."
   (with-helm-current-buffer
@@ -108,11 +108,10 @@ Show global bindings and local bindings according to current `major-mode'."
   "Preconfigured `helm' for Emacs commands.
 It is `helm' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
-  (let* ((history (cl-loop with hist
-                           for i in extended-command-history
+  (let* ((history (cl-loop for i in extended-command-history
                            for com = (intern i)
                            when (commandp com)
-                           collect i into hist finally return hist))
+                           collect i))
          command sym-com in-help help-cand
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))

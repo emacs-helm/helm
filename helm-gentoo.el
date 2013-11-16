@@ -85,19 +85,17 @@
                               (setq helm-cache-world (helm-gentoo-get-world))))))))
 
 
-(cl-defun helm-gentoo-install (candidate &key action)
+(cl-defun helm-gentoo-install (_candidate &key action)
   (setq helm-external-commands-list nil)
   (ansi-term (getenv "SHELL") "Gentoo emerge")
   (term-line-mode)
   (let ((command (cl-case action
-                   ('install "sudo emerge -av ")
-                   ('uninstall "sudo emerge -avC ")
+                   (install "sudo emerge -av ")
+                   (uninstall "sudo emerge -avC ")
                    (t (error "Unknow action"))))
-        (elms (mapconcat 'identity (helm-marked-candidates) " "))
-        (beg (point)) end)
+        (elms (mapconcat 'identity (helm-marked-candidates) " ")))
     (goto-char (point-max))
-    (insert (concat command elms))
-    (setq end (point))
+    (insert (concat command elms)) 
     (term-char-mode) (term-send-input)))
 
 (defun helm-gentoo-default-action (elm command &rest args)
@@ -152,7 +150,7 @@
 (defun helm-gentoo-init-list ()
   "Initialize buffer with all packages in Portage."
   (let* ((portage-buf (get-buffer-create "*helm-gentoo*"))
-         (buf (helm-candidate-buffer 'portage-buf)))
+         (buf (helm-candidate-buffer portage-buf)))
     (with-current-buffer buf
       (cl-dolist (i helm-cache-gentoo)
         (insert (concat i "\n"))))))
@@ -181,7 +179,7 @@
 (defun helm-gentoo-get-use ()
   "Initialize buffer with all use flags."
   (let* ((use-buf (get-buffer-create "*helm-gentoo-use*"))
-         (buf (helm-candidate-buffer 'use-buf)))
+         (buf (helm-candidate-buffer use-buf)))
     (with-current-buffer buf
       (cl-dolist (i helm-gentoo-use-flags)
         (insert (concat i "\n"))))))
@@ -202,9 +200,9 @@
                               (call-process "eix" nil t nil
                                             elm "--format" "<homepage>\n")
                               (buffer-string)))
-           with all
            for i in url-list
            when (and (string-match "^http://.*" i)
+                     all
                      (not (member i all)))
            collect i into all
            finally return all))

@@ -125,7 +125,7 @@ text to be displayed in BUFNAME."
                  "[SPC,C-v,down:NextPage  b,M-v,up:PrevPage  C-s/r:Isearch Other:Exit]"
                  'face 'helm-helper))
         (scroll-error-top-bottom t))
-    (condition-case err
+    (condition-case _err
         (cl-loop for event = (read-key prompt) do
                  (cl-case event
                    ((?\C-v ? down) (scroll-up-command helm-scroll-amount))

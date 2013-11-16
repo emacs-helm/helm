@@ -471,7 +471,7 @@ First call indent, second complete symbol, third complete fname."
       (describe-function (car func-class-advice))))
 
 (defun helm-advice-toggle (func-class-advice)
-  (cl-destructuring-bind (function class advice) func-class-advice
+  (cl-destructuring-bind (function _class advice) func-class-advice
     (cond ((ad-advice-enabled advice)
            (ad-advice-set-enabled advice nil)
            (message "Disabled"))
@@ -485,8 +485,7 @@ First call indent, second complete symbol, third complete fname."
 (defun helm-advice-update-current-display-string ()
   (helm-edit-current-selection
     (let ((newword (cond ((looking-at "Disabled") "Enabled")
-                         ((looking-at "Enabled")  "Disabled")))
-          realvalue)
+                         ((looking-at "Enabled")  "Disabled"))))
       (when newword
         (delete-region (point) (progn (forward-word 1) (point)))
         (insert newword)))))

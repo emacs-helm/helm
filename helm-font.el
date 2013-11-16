@@ -98,15 +98,15 @@ Only math* symbols are collected."
                            (insert-char v nil nil))
                        (insert "\n")))))
 
-(defun helm-ucs-forward-char (candidate)
+(defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
     (forward-char 1)))
 
-(defun helm-ucs-backward-char (candidate)
+(defun helm-ucs-backward-char (_candidate)
   (with-helm-current-buffer
     (forward-char -1)))
 
-(defun helm-ucs-delete-backward (candidate)
+(defun helm-ucs-delete-backward (_candidate)
   (with-helm-current-buffer
     (delete-char -1)))
 
