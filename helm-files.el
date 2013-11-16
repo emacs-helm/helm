@@ -679,7 +679,6 @@ will not be loaded first time you use this."
 
           ;; Run eshell-command on EACH marked files.
           (loop for i in cand-list
-                for bn = (helm-basename i)
                 for files = (format "'%s'" i)
                 for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                               ;; [1] This allow to enter other args AFTER filename
@@ -1679,8 +1678,7 @@ Note that only directories are saved here."
     (helm-force-update)))
 
 (defun helm-ff-kill-buffer-fname (candidate)
-  (let* ((buf (get-file-buffer candidate))
-         (buf-name (buffer-name buf)))
+  (let ((buf (get-file-buffer candidate)))
     (if buf
         (progn
           (kill-buffer buf) (message "Buffer `%s' killed" buf))
@@ -1760,7 +1758,7 @@ Return candidates prefixed with basename of `helm-input' first."
              (all (sort rest-cand
                         #'(lambda (s1 s2)
                             (let* ((score (lambda (str)
-                                            (if (condition-case err
+                                            (if (condition-case _err
                                                     (string-match
                                                      (concat
                                                       "\\_<"
@@ -2510,7 +2508,7 @@ and
          (helm-hg-find-files-in-project))
         (t (helm-find-files nil))))
 
-(defun helm-ff-browse-project (candidate)
+(defun helm-ff-browse-project (_candidate)
   (with-helm-default-directory helm-ff-default-directory
       ;; `helm-browse-project' will call `helm-ls-git-ls'
       ;; which will set locally `helm-default-directory'
@@ -2684,7 +2682,7 @@ utility mdfind.")
         :case-fold-search helm-file-name-case-fold-search))
 
 ;; helm-find-files integration.
-(defun helm-ff-find-sh-command (candidate)
+(defun helm-ff-find-sh-command (_candidate)
   "Run `helm-find' from `helm-find-files'."
   (helm-find-1 helm-ff-default-directory))
 
