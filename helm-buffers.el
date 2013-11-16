@@ -171,6 +171,10 @@ When disabled (nil) use the longest buffer-name length found."
                       (set-buffer-major-mode buffer))
                   (helm-switch-to-buffer buffer))))))
 
+(defvar ido-temp-list)
+(defvar ido-ignored-list)
+(defvar ido-process-ignore-lists)
+
 (defvar helm-source-ido-virtual-buffers
   `((name . "Ido virtual buffers")
     (candidates . (lambda ()

@@ -178,11 +178,31 @@ Return a cons \(beg . end\)."
     (when (and pos (< (point) pos))
       (push-mark pos t t))))
 
+(defvar helm-lisp-completion--cache nil)
+(defvar helm-source-lisp-completion
+  '((name . "Lisp completion")
+    ;; (init . (lambda ()
+    ;;           (helm-init-candidates-in-buffer
+    ;;            'global helm-lisp-completion--cache)))
+    ;; (candidates-in-buffer)
+    (candidates . helm-lisp-completion--cache)
+    (persistent-action . helm-lisp-completion-persistent-action)
+    (persistent-help . "Show brief doc in mode-line")
+    (filtered-candidate-transformer . helm-lisp-completion-transformer)
+    (action . (lambda (candidate)
+                (with-helm-current-buffer
+                  (run-with-timer
+                   0.01 nil
+                   'helm-insert-completion-at-point
+                   beg end candidate))))))
+
+(defvar helm-lgst-len nil)
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
   (interactive)
-  (cl-declaim (special lgst-len))
+  (cl-declaim (special beg end))
+  (setq helm-lgst-len 0)
   (let* ((target     (helm-thing-before-point))
          (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
@@ -192,35 +212,22 @@ Return a cons \(beg . end\)."
                             (mapcar #'symbol-name (lisp--local-variables)))))
          (glob-syms  (and target pred (all-completions target obarray pred)))
          (candidates (append loc-vars glob-syms))
-         (lgst-len   0) ; Special in `helm-lisp-completion-transformer'.
-         (helm-quit-if-no-candidate t)
-         (helm-execute-action-at-once-if-one t)
+         ;(helm-quit-if-no-candidate t)
+         ;(helm-execute-action-at-once-if-one t)
          (enable-recursive-minibuffers t)
          (helm-match-plugin-enabled
           (member 'helm-compile-source--match-plugin
                   helm-compile-source-functions)))
+    (setq helm-lisp-completion--cache (cl-loop for sym in candidates
+                                               for len = (length sym)
+                                               when (> len helm-lgst-len)
+                                               do (setq helm-lgst-len len)
+                                               collect sym))
     (if candidates
         (with-helm-show-completion beg end
           ;; Overlay is initialized now in helm-current-buffer.
           (helm
-           :sources
-           `((name . "Lisp completion")
-             (init . (lambda ()
-                       (helm-init-candidates-in-buffer 'global
-                         (cl-loop for sym in ,candidates
-                                  for len = (length sym)
-                                  when (> len lgst-len) do (setq lgst-len len)
-                                  do (insert (concat sym "\n"))))))
-             (candidates-in-buffer)
-             (persistent-action . helm-lisp-completion-persistent-action)
-             (persistent-help . "Show brief doc in mode-line")
-             (filtered-candidate-transformer . helm-lisp-completion-transformer)
-             (action . (lambda (candidate)
-                         (with-helm-current-buffer
-                           (run-with-timer
-                            0.01 nil
-                            'helm-insert-completion-at-point
-                            beg end candidate)))))
+           :sources '(helm-source-lisp-completion)
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
            :buffer "*helm lisp completion*"
@@ -238,7 +245,6 @@ Return a cons \(beg . end\)."
 
 (defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for lisp completion."
-  (cl-declaim (special lgst-len))
   (cl-loop for c in candidates
            for sym = (intern c)
            for annot = (cl-typecase sym
@@ -246,7 +252,7 @@ Return a cons \(beg . end\)."
                          (fbound  " (Fun)")
                          (bound   " (Var)")
                          (face    " (Face)"))
-           for spaces = (make-string (- lgst-len (length c)) ? )
+           for spaces = (make-string (- helm-lgst-len (length c)) ? )
            collect (cons (concat c spaces annot) c) into lst
            finally return (sort lst #'helm-generic-sort-fn)))
 
