@@ -716,7 +716,7 @@ Use optional arguments ARGS like in `format'."
         ;; Don't eval expression EXPR
         ;; when debugging is not turned on.
         (when (or debug-on-error helm-debug)
-          (helm-log "%S = %S" expr (eval expr t)))
+          (helm-log "%S = %S" expr (eval expr)))
       (error (helm-log "%S = ERROR: %S" expr err)))))
 
 (defun helm-log-get-current-function ()
