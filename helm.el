@@ -710,7 +710,7 @@ Use optional arguments ARGS like in `format'."
 
 (defmacro helm-log-eval (&rest exprs)
   "Eval EXPRS and write results to helm log buffer."
-  (cl-dolist (expr exprs)
+  (dolist (expr exprs)
     `(condition-case err
         ;; Don't eval expression EXPR
         ;; when debugging is not turned on.
