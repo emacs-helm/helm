@@ -703,9 +703,8 @@ Use optional arguments ARGS like in `format'."
 (defun helm-log-run-hook (hook)
   "Run HOOK like `run-hooks' but write these actions to helm log buffer."
   (helm-log "executing %s" hook)
-  (when (boundp hook)
-    (helm-log-eval (symbol-value hook))
-    (helm-log-eval (default-value hook)))
+  (helm-log-eval (symbol-value hook))
+  (helm-log-eval (default-value hook))
   (run-hooks hook)
   (helm-log "executed %s" hook))
 
