@@ -1281,16 +1281,13 @@ expand to this directory."
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home/user directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/~[^/]*/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let* ((match (match-string 0 helm-pattern))
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
-                        ((string-match "/\\(~[^/]+/\\)" match)
-                         (expand-file-name
-                          (concat "/" (substring (match-string 1 match) 1))))
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern))))))
       (if (file-directory-p input)
