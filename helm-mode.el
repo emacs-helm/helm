@@ -675,7 +675,7 @@ Keys description:
 - PERSISTENT-ACTION: a persistent action function.
 
 - PERSISTENT-HELP: persistent help message."
-  (cl-declaim (special hist test))
+  
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
 
@@ -710,14 +710,12 @@ Keys description:
           (replace-regexp-in-string "helm-exit-minibuffer"
                                     "helm-confirm-and-exit-minibuffer"
                                     helm-read-file-name-mode-line-string))
-         (result (helm
-                  :sources
-                  `(((name . ,(format "%s History" name))
+         (src-list `(((name . ,(format "%s History" name))
                      (header-name . (lambda (name)
                                       (concat name
                                               helm-find-files-doc-header)))
                      (mode-line . helm-read-file-name-mode-line-string)
-                     (candidates . hist)
+                     (candidates . ,hist)
                      (persistent-action . ,persistent-action)
                      (persistent-help . ,persistent-help)
                      (action . ,action-fn))
@@ -736,12 +734,12 @@ Keys description:
                           (append (and (not (file-remote-p helm-pattern))
                                        (not (file-exists-p helm-pattern))
                                        (list helm-pattern))
-                                  (if test
+                                  (if ,test
                                       (cl-loop with hn = (helm-ff-tramp-hostnames)
                                                for i in (helm-find-files-get-candidates
                                                          must-match)
                                                when (or (member i hn) ; A tramp host
-                                                        (funcall test i)) ; Test ok
+                                                        (funcall ,test i)) ; Test ok
                                                collect i)
                                       (helm-find-files-get-candidates must-match)))))
                      (filtered-candidate-transformer
@@ -751,7 +749,9 @@ Keys description:
                      (candidate-number-limit . 9999)
                      (persistent-help . ,persistent-help)
                      (volatile)
-                     (action . ,action-fn)))
+                     (action . ,action-fn))))
+         (result (helm
+                  :sources src-list
                   :input initial-input
                   :prompt prompt
                   :resume 'noresume
