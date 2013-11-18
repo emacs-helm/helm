@@ -134,6 +134,12 @@ and `helm-read-file-map' for this to take effect."
           (const :tag "Do not use ido-style backspace")
           (const :tag "Always Use ido-style backspace in find-file" 'always)
           (const :tag "Use ido-style backspace while auto-updating" t)))
+          
+(defcustom helm-ff-ido-style-return nil
+  "Use ido-style return to navigate with `helm-find-files'.
+This expands the file directory without exiting helm."
+  :group 'helm-files
+  :type 'boolean)
 
 (defcustom helm-ff-history-max-length 100
   "Number of elements shown in `helm-find-files' history."
@@ -1827,9 +1833,16 @@ Don't use it directly in `filtered-candidate-transformer' use instead
                       (propertize disp 'face 'helm-ff-file) nil 'new-file)
                      i)))))
 
+(defun helm-ff-expand-dir (candidate)
+  "Expand Directory Candidate."
+  (let ((default-directory candidate))
+    (call-interactively 'helm-find-files)))
+
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
-  (cond ((with-helm-current-buffer
+  (cond ((and helm-ff-ido-style-return (file-directory-p candidate))
+         (append '(("Expand Directory with helm" . helm-ff-expand-dir))))
+        ((with-helm-current-buffer
            (eq major-mode 'message-mode))
          (append actions
                  '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
