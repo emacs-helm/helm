@@ -167,8 +167,8 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
     (define-key map (kbd "C-c C-u")    'helm-force-update)
-    (define-key map (kbd "M-p")        'previous-history-element)
-    (define-key map (kbd "M-n")        'next-history-element)
+    (define-key map (kbd "M-p")        'helm-previous-history-element)
+    (define-key map (kbd "M-n")        'helm-next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
@@ -776,14 +776,14 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
        (message "Helm issued errors: %s"
                 (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
-(defadvice next-history-element (around delay activate)
+(defun helm-next-history-element (n)
   (interactive "p")
   (or (zerop n)
       (run-with-timer
        0.01 nil `(lambda ()
                    (goto-history-element (- minibuffer-history-position ,n))))))
 
-(defadvice previous-history-element (around delay activate)
+(defun helm-previous-history-element (n)
   (interactive "p")
   (or (zerop n)
       (run-with-timer
