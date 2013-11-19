@@ -816,7 +816,7 @@ other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
   
-(defun helm-ff-backspace (arg)
+(defun helm-ff-backspace (_arg)
   "Call global backspace or `helm-find-files-down-one-level'.
 If sitting at the end of a file directory ending with \"/\"
 and `helm-ff-auto-update-flag' is turned off,
