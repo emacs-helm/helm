@@ -678,7 +678,6 @@ Keys description:
   
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-
   ;; Assume completion have been already required,
   ;; so always use 'confirm.
   (when (eq must-match 'confirm-after-completion)

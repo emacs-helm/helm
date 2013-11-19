@@ -109,9 +109,7 @@ Show global bindings and local bindings according to current `major-mode'."
 It is `helm' replacement of regular `M-x' `execute-extended-command'."
   (interactive)
   (let* ((history (cl-loop for i in extended-command-history
-                           for com = (intern i)
-                           when (commandp com)
-                           collect i))
+                           when (commandp (intern i)) collect i))
          command sym-com in-help help-cand
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))

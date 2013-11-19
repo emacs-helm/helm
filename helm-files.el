@@ -816,20 +816,21 @@ other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
   
-(defun helm-ff-backspace (&rest _args)
-  "Call backsapce or `helm-find-files-down-one-level'.
-If sitting at the end of a file directory, backspace goes up one
-level, like in `ido-find-file'. "
+(defun helm-ff-backspace (arg)
+  "Call global backspace or `helm-find-files-down-one-level'.
+If sitting at the end of a file directory ending with \"/\"
+and `helm-ff-auto-update-flag' is turned off,
+run `helm-find-files-down-one-level', otherwise run the global command
+bounded to <backspace>."
   (interactive "P")
-  (let (backspace)
-    (cond
-     ((and (looking-back "[/\\]")
-           (or helm-ff-auto-update-flag
-               (eq helm-ff-ido-style-backspace 'always)))
-      (call-interactively 'helm-find-files-down-one-level))
-     (t
-      (setq backspace (lookup-key (current-global-map) (read-kbd-macro "DEL")))
-      (call-interactively backspace)))))
+  (cond
+    ((and (looking-back "[/\\]")
+          (or helm-ff-auto-update-flag
+              (eq helm-ff-ido-style-backspace 'always)))
+     (call-interactively 'helm-find-files-down-one-level))
+    (t (call-interactively
+        (lookup-key (current-global-map)
+                    (read-kbd-macro "DEL"))))))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
@@ -1280,16 +1281,13 @@ expand to this directory."
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home/user directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/~[^/]*/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
     (let* ((match (match-string 0 helm-pattern))
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
-                        ((string-match "/\\(~[^/]+/\\)" match)
-                         (expand-file-name
-                          (concat "/" (substring (match-string 1 match) 1))))
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern))))))
       (if (file-directory-p input)
@@ -1678,7 +1676,7 @@ Note that only directories are saved here."
     (helm-force-update)))
 
 (defun helm-ff-kill-buffer-fname (candidate)
-  (let* ((buf (get-file-buffer candidate)))
+  (let ((buf (get-file-buffer candidate)))
     (if buf
         (progn
           (kill-buffer buf) (message "Buffer `%s' killed" buf))
