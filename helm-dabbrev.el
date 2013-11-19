@@ -161,8 +161,7 @@ but the initial search for all candidates in buffer(s)."
                            unless (or (string= str match)
                                       (member match result))
                            do (push match result)))))))
-    (cl-loop with result
-             for buf in (if all (helm-dabbrev--buffer-list)
+    (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
                             (list (current-buffer)))
              
              do (with-current-buffer buf
