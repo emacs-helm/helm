@@ -157,13 +157,15 @@ See http://orgmode.org for the latest version.")
               "(org)In-buffer settings"))
     (search-forward (concat "#+" keyword) nil t)
     (helm-highlight-current-line)
-    (message "%s" (or (cdr (assoc keyword (helm-attr 'keywords-examples))) "")))
+    (message "%s" (or (cdr (assoc keyword (helm-attr 'keywords-examples))) ""))))
 
 ;;;###autoload
-  (defun helm-org-keywords ()
-    "Preconfigured `helm' for org keywords."
-    (interactive)
-    (helm-other-buffer 'helm-source-org-keywords "*org keywords*")))
+(defun helm-org-keywords ()
+  "Preconfigured `helm' for org keywords."
+  (interactive)
+  (cl-assert (boundp 'org-additional-option-like-keywords) nil
+             "Helm-org-keyword not supported in %s" emacs-version)
+  (helm-other-buffer 'helm-source-org-keywords "*org keywords*"))
 
 ;;;###autoload
 (defun helm-org-headlines ()
