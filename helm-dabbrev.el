@@ -209,7 +209,7 @@ but the initial search for all candidates in buffer(s)."
 (defstruct helm-dabbrev-info dabbrev limits iterator)
 
 (defvar helm-source-dabbrev
-  `((name . "Dabbrev Expand")
+  '((name . "Dabbrev Expand")
     (init . (lambda ()
               (helm-init-candidates-in-buffer
                'global
