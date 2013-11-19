@@ -2463,8 +2463,7 @@ Else return ACTIONS unmodified."
 (defvar helm-source-recentf
   `((name . "Recentf")
     (init . (lambda ()
-              (require 'recentf)
-              (recentf-mode 1)))
+              (require 'recentf)))
     (candidates . recentf-list)
     (match . helm-files-match-only-basename)
     (filtered-candidate-transformer . (lambda (candidates _source)
