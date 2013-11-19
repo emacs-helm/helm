@@ -211,7 +211,6 @@ but the initial search for all candidates in buffer(s)."
 
 (defvar helm-source-dabbrev
   `((name . "Dabbrev Expand")
-    (candidates-in-buffer)
     (candidates . helm-dabbrev--cache) 
     (keymap . ,helm-dabbrev-map)
     (action . (lambda (candidate)
