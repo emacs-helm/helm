@@ -702,10 +702,10 @@ Keys description:
                              (define-key map (kbd "RET")
                                'helm-confirm-and-exit-minibuffer)
                              map)))
-         (helm-map (if must-match-map
-                       (make-composed-keymap
-                        must-match-map helm-read-file-map)
-                       helm-read-file-map))
+         (cmap (if must-match-map
+                   (make-composed-keymap
+                    must-match-map helm-read-file-map)
+                   helm-read-file-map))
          (helm-read-file-name-mode-line-string
           (replace-regexp-in-string "helm-exit-minibuffer"
                                     "helm-confirm-and-exit-minibuffer"
@@ -737,13 +737,14 @@ Keys description:
                                    (if ,test
                                        (cl-loop with hn = (helm-ff-tramp-hostnames)
                                                 for i in (helm-find-files-get-candidates
-                                                          must-match)
+                                                          ',must-match)
                                                 when (or (member i hn) ; A tramp host
                                                          (funcall ,test i)) ; Test ok
                                                 collect i)
-                                       (helm-find-files-get-candidates ,must-match)))))
+                                       (helm-find-files-get-candidates ',must-match)))))
                       (filtered-candidate-transformer
                        helm-find-files-transformer)
+                      (keymap . ,cmap)
                       (no-delay-on-input)
                       (persistent-action . ,persistent-action)
                       (candidate-number-limit . 9999)
@@ -757,7 +758,6 @@ Keys description:
                   :resume 'noresume
                   :case-fold-search case-fold
                   :default default
-                  :keymap helm-map
                   :buffer buffer
                   :preselect preselect)))
     (or
@@ -779,10 +779,9 @@ Keys description:
        (identity helm-pattern))
      (keyboard-quit))))
 
-(cl-defun helm-generic-read-file-name
+(defun helm-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An helm replacement of `read-file-name'."
-  (cl-declare (special helm-mode))
   (let* ((init (or initial dir default-directory))
          (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
@@ -793,7 +792,7 @@ Keys description:
          (entry (assq current-command
                       helm-completing-read-handlers-alist))
          (def-com  (cdr-safe entry))
-         (str-defcom (symbol-name def-com))
+         (str-defcom (and def-com (symbol-name def-com)))
          (def-args (list prompt dir default-filename mustmatch initial predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
