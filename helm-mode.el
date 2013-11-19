@@ -682,103 +682,104 @@ Keys description:
   ;; so always use 'confirm.
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
-  (let ((action-fn '(("Sole action (Identity)"
-                      . (lambda (candidate)
-                          (if marked-candidates
-                              (helm-marked-candidates)
-                              (identity candidate)))))))
-    (let* ((helm-mp-highlight-delay nil)
-           ;; Be sure we don't erase the underlying minibuffer if some.
-           (helm-ff-auto-update-initial-value
-            (and helm-ff-auto-update-initial-value
-                 (not (minibuffer-window-active-p (minibuffer-window)))))
-           helm-full-frame
-           (hist (and history (helm-comp-read-get-candidates
-                               history nil nil alistp)))
-           (minibuffer-completion-confirm must-match)
-           (must-match-map (when must-match
-                             (let ((map (make-sparse-keymap)))
-                               (define-key map (kbd "RET")
-                                 'helm-confirm-and-exit-minibuffer)
-                               map)))
-           (helm-map (if must-match-map
-                         (make-composed-keymap
-                          must-match-map helm-read-file-map)
-                         helm-read-file-map))
-           (helm-read-file-name-mode-line-string
-            (replace-regexp-in-string "helm-exit-minibuffer"
-                                      "helm-confirm-and-exit-minibuffer"
-                                      helm-read-file-name-mode-line-string))
-           (result (helm
-                    :sources
-                    `(((name . ,(format "%s History" name))
-                       (header-name . (lambda (name)
-                                        (concat name
-                                                helm-find-files-doc-header)))
-                       (mode-line . helm-read-file-name-mode-line-string)
-                       (candidates . hist)
-                       (persistent-action . ,persistent-action)
-                       (persistent-help . ,persistent-help)
-                       (action . ,action-fn))
-                      ((name . ,name)
-                       (header-name . (lambda (name)
-                                        (concat name
-                                                helm-find-files-doc-header)))
-                       (init . (lambda ()
-                                 (setq helm-ff-auto-update-flag
-                                       helm-ff-auto-update-initial-value)
-                                 (setq helm-in-file-completion-p t)))
-                       (mode-line . helm-read-file-name-mode-line-string)
-                       (candidates
-                        . (lambda ()
-                            ;; Don't run `file-exists-p' if `helm-pattern' is remote.
-                            (append (and (not (file-remote-p helm-pattern))
-                                         (not (file-exists-p helm-pattern))
-                                         (list helm-pattern))
-                                    (if test
-                                        (loop with hn = (helm-ff-tramp-hostnames)
-                                              for i in (helm-find-files-get-candidates
-                                                        must-match)
-                                              when (or (member i hn) ; A tramp host
-                                                       (funcall test i)) ; Test ok
-                                              collect i)
-                                        (helm-find-files-get-candidates must-match)))))
-                       (filtered-candidate-transformer
-                        helm-find-files-transformer)
-                       (no-delay-on-input)
-                       (persistent-action . ,persistent-action)
-                       (candidate-number-limit . 9999)
-                       (persistent-help . ,persistent-help)
-                       (volatile)
-                       (action . ,action-fn)))
-                    :input initial-input
-                    :prompt prompt
-                    :resume 'noresume
-                    :case-fold-search case-fold
-                    :default default
-                    :keymap helm-map
-                    :buffer buffer
-                    :preselect preselect)))
-      (or
-       (cond ((and result (stringp result)
-                   (string= result "") ""))
-             ((and result
-                   (stringp result)
-                   (file-equal-p result initial-input)
-                   default)
-              default)
-             ((and result (stringp result))
-              (expand-file-name result))
-             ((and result (listp result))
-              (mapcar #'expand-file-name result))
-             (t result))
-       (when (and (not (string= helm-pattern ""))
-                  (eq helm-exit-status 0)
-                  (eq must-match 'confirm))
-         (identity helm-pattern))
-       (keyboard-quit)))))
+  (let* ((action-fn '(("Sole action (Identity)"
+                       . (lambda (candidate)
+                           (if marked-candidates
+                               (helm-marked-candidates)
+                               (identity candidate))))))
+         (helm-mp-highlight-delay nil)
+         ;; Be sure we don't erase the underlying minibuffer if some.
+         (helm-ff-auto-update-initial-value
+          (and helm-ff-auto-update-initial-value
+               (not (minibuffer-window-active-p (minibuffer-window)))))
+         helm-full-frame
+         (hist (and history (helm-comp-read-get-candidates
+                             history nil nil alistp)))
+         (minibuffer-completion-confirm must-match)
+         (must-match-map (when must-match
+                           (let ((map (make-sparse-keymap)))
+                             (define-key map (kbd "RET")
+                               'helm-confirm-and-exit-minibuffer)
+                             map)))
+         (cmap (if must-match-map
+                   (make-composed-keymap
+                    must-match-map helm-read-file-map)
+                   helm-read-file-map))
+         (helm-read-file-name-mode-line-string
+          (replace-regexp-in-string "helm-exit-minibuffer"
+                                    "helm-confirm-and-exit-minibuffer"
+                                    helm-read-file-name-mode-line-string))
+         (src-list `(((name . ,(format "%s History" name))
+                      (header-name . (lambda (hname)
+                                       (concat hname
+                                               helm-find-files-doc-header)))
+                      (mode-line . helm-read-file-name-mode-line-string)
+                      (candidates . ,hist)
+                      (persistent-action . ,persistent-action)
+                      (persistent-help . ,persistent-help)
+                      (action . ,action-fn))
+                     ((name . ,name)
+                      (header-name . (lambda (hname)
+                                       (concat hname
+                                               helm-find-files-doc-header)))
+                      (init . (lambda ()
+                                (setq helm-ff-auto-update-flag
+                                      helm-ff-auto-update-initial-value)
+                                (setq helm-in-file-completion-p t)))
+                      (mode-line . helm-read-file-name-mode-line-string)
+                      (candidates
+                       . (lambda ()
+                           ;; Don't run `file-exists-p' if `helm-pattern' is remote.
+                           (append (and (not (file-remote-p helm-pattern))
+                                        (not (file-exists-p helm-pattern))
+                                        (list helm-pattern))
+                                   (if ,test
+                                       (loop with hn = (helm-ff-tramp-hostnames)
+                                                for i in (helm-find-files-get-candidates
+                                                          ',must-match)
+                                                when (or (member i hn) ; A tramp host
+                                                         (funcall ,test i)) ; Test ok
+                                                collect i)
+                                       (helm-find-files-get-candidates ',must-match)))))
+                      (filtered-candidate-transformer
+                       helm-find-files-transformer)
+                      (keymap . ,cmap)
+                      (no-delay-on-input)
+                      (persistent-action . ,persistent-action)
+                      (candidate-number-limit . 9999)
+                      (persistent-help . ,persistent-help)
+                      (volatile)
+                      (action . ,action-fn))))
+         (result (helm
+                  :sources src-list
+                  :input initial-input
+                  :prompt prompt
+                  :resume 'noresume
+                  :case-fold-search case-fold
+                  :default default
+                  :buffer buffer
+                  :preselect preselect)))
+    (or
+     (cond ((and result (stringp result)
+                 (string= result "") ""))
+           ((and result
+                 (stringp result)
+                 (file-equal-p result initial-input)
+                 default)
+            default)
+           ((and result (stringp result))
+            (expand-file-name result))
+           ((and result (listp result))
+            (mapcar #'expand-file-name result))
+           (t result))
+     (when (and (not (string= helm-pattern ""))
+                (eq helm-exit-status 0)
+                (eq must-match 'confirm))
+       (identity helm-pattern))
+     (keyboard-quit))))
 
-(defun* helm-generic-read-file-name
+
+(defun helm-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An helm replacement of `read-file-name'."
   (declare (special helm-mode))
