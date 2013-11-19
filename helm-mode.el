@@ -711,45 +711,45 @@ Keys description:
                                     "helm-confirm-and-exit-minibuffer"
                                     helm-read-file-name-mode-line-string))
          (src-list `(((name . ,(format "%s History" name))
-                     (header-name . (lambda (name)
-                                      (concat name
-                                              helm-find-files-doc-header)))
-                     (mode-line . helm-read-file-name-mode-line-string)
-                     (candidates . ,hist)
-                     (persistent-action . ,persistent-action)
-                     (persistent-help . ,persistent-help)
-                     (action . ,action-fn))
-                    ((name . ,name)
-                     (header-name . (lambda (name)
-                                      (concat name
-                                              helm-find-files-doc-header)))
-                     (init . (lambda ()
-                               (setq helm-ff-auto-update-flag
-                                     helm-ff-auto-update-initial-value)
-                               (setq helm-in-file-completion-p t)))
-                     (mode-line . helm-read-file-name-mode-line-string)
-                     (candidates
-                      . (lambda ()
-                          ;; Don't run `file-exists-p' if `helm-pattern' is remote.
-                          (append (and (not (file-remote-p helm-pattern))
-                                       (not (file-exists-p helm-pattern))
-                                       (list helm-pattern))
-                                  (if ,test
-                                      (cl-loop with hn = (helm-ff-tramp-hostnames)
-                                               for i in (helm-find-files-get-candidates
-                                                         must-match)
-                                               when (or (member i hn) ; A tramp host
-                                                        (funcall ,test i)) ; Test ok
-                                               collect i)
-                                      (helm-find-files-get-candidates must-match)))))
-                     (filtered-candidate-transformer
-                      helm-find-files-transformer)
-                     (no-delay-on-input)
-                     (persistent-action . ,persistent-action)
-                     (candidate-number-limit . 9999)
-                     (persistent-help . ,persistent-help)
-                     (volatile)
-                     (action . ,action-fn))))
+                      (header-name . (lambda (hname)
+                                       (concat hname
+                                               helm-find-files-doc-header)))
+                      (mode-line . helm-read-file-name-mode-line-string)
+                      (candidates . ,hist)
+                      (persistent-action . ,persistent-action)
+                      (persistent-help . ,persistent-help)
+                      (action . ,action-fn))
+                     ((name . ,name)
+                      (header-name . (lambda (hname)
+                                       (concat hname
+                                               helm-find-files-doc-header)))
+                      (init . (lambda ()
+                                (setq helm-ff-auto-update-flag
+                                      helm-ff-auto-update-initial-value)
+                                (setq helm-in-file-completion-p t)))
+                      (mode-line . helm-read-file-name-mode-line-string)
+                      (candidates
+                       . (lambda ()
+                           ;; Don't run `file-exists-p' if `helm-pattern' is remote.
+                           (append (and (not (file-remote-p helm-pattern))
+                                        (not (file-exists-p helm-pattern))
+                                        (list helm-pattern))
+                                   (if ,test
+                                       (cl-loop with hn = (helm-ff-tramp-hostnames)
+                                                for i in (helm-find-files-get-candidates
+                                                          must-match)
+                                                when (or (member i hn) ; A tramp host
+                                                         (funcall ,test i)) ; Test ok
+                                                collect i)
+                                       (helm-find-files-get-candidates ,must-match)))))
+                      (filtered-candidate-transformer
+                       helm-find-files-transformer)
+                      (no-delay-on-input)
+                      (persistent-action . ,persistent-action)
+                      (candidate-number-limit . 9999)
+                      (persistent-help . ,persistent-help)
+                      (volatile)
+                      (action . ,action-fn))))
          (result (helm
                   :sources src-list
                   :input initial-input
