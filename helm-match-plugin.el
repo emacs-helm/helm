@@ -375,7 +375,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
         `(,(if (or (assoc 'candidates-in-buffer source)
                    (equal '(identity) matchfns))
                '(match identity) `(match ,@matchfns))
-           (cl-search ,@searchfns)
+           (search ,@searchfns)
            ,@source))))
 
 
