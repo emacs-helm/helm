@@ -167,8 +167,8 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
     (define-key map (kbd "C-c C-u")    'helm-force-update)
-    (define-key map (kbd "M-p")        'helm-previous-history-element)
-    (define-key map (kbd "M-n")        'helm-next-history-element)
+    (define-key map (kbd "M-p")        'previous-history-element)
+    (define-key map (kbd "M-n")        'next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
@@ -776,19 +776,30 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
        (message "Helm issued errors: %s"
                 (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
-(defun helm-next-history-element (n)
+;; These advices are needed to fix cursor position in minibuffer
+;; after insertion (otherwise cursor stay at beginning of insertion)
+;; Activate deactivate them by hook because they may not work outside
+;; of helm (Issue #338).
+(defadvice next-history-element (around delay)
   (interactive "p")
   (or (zerop n)
       (run-with-timer
        0.01 nil `(lambda ()
                    (goto-history-element (- minibuffer-history-position ,n))))))
 
-(defun helm-previous-history-element (n)
+(defadvice previous-history-element (around delay)
   (interactive "p")
   (or (zerop n)
       (run-with-timer
        0.01 nil `(lambda ()
                    (goto-history-element (+ minibuffer-history-position ,n))))))
+
+(add-hook 'helm-before-initialize-hook (lambda ()
+                                         (ad-activate 'next-history-element)
+                                         (ad-activate 'previous-history-element)))
+(add-hook 'helm-cleanup-hook (lambda ()
+                               (ad-deactivate 'next-history-element)
+                               (ad-deactivate 'previous-history-element)))
 
 
 ;; Programming Tools
