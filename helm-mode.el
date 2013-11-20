@@ -204,7 +204,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                  must-match
                                  reverse-history
                                  (requires-pattern 0)
-                                 (history nil)
+                                 history
                                  input-history
                                  (case-fold helm-comp-read-case-fold-search)
                                  (del-input t)
@@ -336,20 +336,20 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                (if (and default (not (string= default "")))
                                    (delq nil (cons default (delete default cands)))
                                    cands))))
+           (history-get-candidates (lambda ()
+                                     (let ((all (helm-comp-read-get-candidates
+                                                 history test nil alistp)))
+                                       (when all
+                                         (delete
+                                          ""
+                                          (helm-fast-remove-dups
+                                           (if (and default (not (string= default "")))
+                                               (delq nil (cons default
+                                                               (delete default all)))
+                                               all)
+                                           :test 'equal))))))
            (src-hist `((name . ,(format "%s History" name))
-                       (candidates
-                        . (lambda ()
-                            (let ((all (helm-comp-read-get-candidates
-                                        history test nil ,alistp)))
-                              (when all
-                                (delete
-                                 ""
-                                 (helm-fast-remove-dups
-                                  (if (and default (not (string= default "")))
-                                      (delq nil (cons default
-                                                      (delete default all)))
-                                      all)
-                                  :test 'equal))))))
+                       (candidates . ,history-get-candidates)
                        (filtered-candidate-transformer
                         . (lambda (candidates sources)
                             (cl-loop for i in candidates
