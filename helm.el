@@ -3473,7 +3473,7 @@ a specific part of candidate.
 To customize `helm-candidates-in-buffer' behavior, use search,
 get-line, match-part and search-from-end attributes.
 See also `helm-sources' docstring."
-                                        ;(cl-declare (special source))
+            
   (helm-candidates-in-buffer-1
    (helm-candidate-buffer)
    helm-pattern
@@ -3643,6 +3643,7 @@ Acceptable values of CREATE-OR-BUFFER:
 Arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
 either 'local or 'global which is passed to `helm-candidate-buffer'.
 Arg DATA can be either a list or a plain string."
+  (declare (indent 1))
   (let ((buf (helm-candidate-buffer
               (if (or (stringp buffer)
                       (bufferp buffer))
