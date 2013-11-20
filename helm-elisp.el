@@ -102,7 +102,7 @@ BEG and END are the beginning and end position of the current completion
 in `helm-current-buffer'.
 BODY is an helm call where we want to enable show completion.
 If `helm-turn-on-show-completion' is nil just do nothing."
-  (cl-declare (indent 2) (debug t))
+  (declare (indent 2) (debug t))
   `(let ((helm-move-selection-after-hook
           (and helm-turn-on-show-completion
                (append (list 'helm-show-completion)

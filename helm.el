@@ -59,7 +59,7 @@ More than 2 seconds, next hit will run again the first function and so on."
   "Define NAME as a multi-key command running FUNS.
 After DELAY seconds the FUNS list is reinitialised.
 See `helm-define-multi-key'."
-  (cl-declare (indent 2))
+  (declare (indent 2))
   (setq docstring (if docstring (concat docstring "\n\n")
                       "This is a helmish multi-key command."))
   `(defalias (quote ,name) (helm-make-multi-command ,funs ,delay) ,docstring))
@@ -67,7 +67,7 @@ See `helm-define-multi-key'."
 (defun helm-make-multi-command (functions &optional delay)
   "Return an anonymous multi-key command running FUNCTIONS.
 Run each function of FUNCTIONS list in turn when called within DELAY seconds."
-  (cl-declare (indent 1))
+  (declare (indent 1))
   (let ((funs functions)
         (iter (cl-gensym "helm-iter-key"))
         (timeout delay))
@@ -806,7 +806,7 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
 (defmacro helm-aif (test-form then-form &rest else-forms)
   "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
 THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
-  (cl-declare (indent 2) (debug t))
+  (declare (indent 2) (debug t))
   `(let ((it ,test-form))
      (if it ,then-form ,@else-forms)))
 
@@ -851,13 +851,13 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-window (&rest body)
   "Be sure BODY is excuted in the helm window."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(with-selected-window (helm-window)
      ,@body))
 
 (defmacro with-helm-current-buffer (&rest body)
   "Eval BODY inside `helm-current-buffer'."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(with-current-buffer (or (and (buffer-live-p helm-current-buffer)
                                  helm-current-buffer)
                             (setq helm-current-buffer
@@ -866,13 +866,13 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-buffer (&rest body)
   "Eval BODY inside `helm-buffer'."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(with-current-buffer (helm-buffer-get)
      ,@body))
 
 (defmacro with-helm-restore-variables(&rest body)
   "Restore `helm-restored-variables' after executing BODY."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(let ((orig-vars (mapcar (lambda (v)
                               (cons v (symbol-value v)))
                             helm-restored-variables)))
@@ -882,7 +882,7 @@ not `exit-minibuffer' or unwanted functions."
        (helm-log "restore variables"))))
 
 (defmacro with-helm-default-directory (directory &rest body)
-  (cl-declare (indent 2) (debug t))
+  (declare (indent 2) (debug t))
   `(let ((default-directory (or (and ,directory
                                      (file-name-as-directory ,directory))
                                 default-directory)))
@@ -894,7 +894,7 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-temp-hook (hook &rest body)
   "Execute temporarily BODY as a function for HOOK."
-  (cl-declare (indent 1) (debug t))
+  (declare (indent 1) (debug t))
   (let ((fun (cl-gensym "helm-hook")))
     `(progn
        (defun ,fun ()
@@ -905,7 +905,7 @@ not `exit-minibuffer' or unwanted functions."
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(with-helm-temp-hook 'helm-after-update-hook ,@body))
 
 (cl-defun helm-attr (attribute-name
@@ -1363,7 +1363,7 @@ in the source where point is."
 
 (defmacro with-helm-quittable (&rest body)
   "If an error occur in execution of BODY, quit helm safely."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(let (inhibit-quit)
      (condition-case _v
          (progn ,@body)
@@ -2253,7 +2253,7 @@ Helm plug-ins are realized by this function."
 
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but without testing with `input-pending-p'."
-  (cl-declare (debug t) (indent 0))
+  (declare (debug t) (indent 0))
   (let ((catch-sym (make-symbol "input")))
     `(with-local-quit
        (catch ',catch-sym
@@ -3340,7 +3340,7 @@ to a list of forms.\n\n")
 (defmacro helm-edit-current-selection (&rest forms)
   "Evaluate FORMS at current selection in the helm buffer.
 Used generally to modify current selection."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(helm-edit-current-selection-internal
     (lambda () ,@forms)))
 
@@ -3849,7 +3849,7 @@ Otherwise goto the end of minibuffer."
 (defmacro with-helm-display-same-window (&rest body)
   "Execute BODY in the window used for persistent action.
 Make `pop-to-buffer' and `display-buffer' display in the same window."
-  (cl-declare (indent 0) (debug t))
+  (declare (indent 0) (debug t))
   `(let ((display-buffer-function 'helm-persistent-action-display-buffer))
      ,@body))
 
