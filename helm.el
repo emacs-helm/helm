@@ -1853,7 +1853,7 @@ Arg ENABLE-OR-DISABLE will be the value of `no-other-window'."
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
-It use `switch-to-buffer' or `pop-to-buffer' depending of value of
+It uses `switch-to-buffer' or `pop-to-buffer' depending of value of
 `helm-full-frame' and/or `helm-split-window-default-side'."
   (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
           (and (eq helm-split-window-default-side 'same)
