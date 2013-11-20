@@ -49,7 +49,8 @@ cat > $TMP <<EOF
 ;; - \`find-file'(C-x C-f)           =>\`helm-find-files'\n\
 ;; - \`occur'(M-s o)                 =>\`helm-occur'\n\
 ;; - \`list-buffers'(C-x C-b)        =>\`helm-buffers-list'\n\
-;; - \`completion-at-point'(M-tab)   =>\`helm-lisp-completion-at-point'\n\n\
+;; - \`completion-at-point'(M-tab)   =>\`helm-lisp-completion-at-point'\n\
+;; - \`dabbrev-expand'(M-/)          =>\`helm-dabbrev'\n\n\
 ;; Some others native emacs commands are \"helmized\" by \`helm-mode'.\n\
 ;; You will find embeded help for most helm commands with \`C-c ?'.\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
