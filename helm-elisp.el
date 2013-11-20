@@ -179,28 +179,11 @@ Return a cons \(beg . end\)."
       (push-mark pos t t))))
 
 (defvar helm-lisp-completion--cache nil)
-(defvar helm-source-lisp-completion
-  '((name . "Lisp completion")
-    (init . (lambda ()
-              (helm-init-candidates-in-buffer 'global
-                helm-lisp-completion--cache)))
-    (candidates-in-buffer)
-    (persistent-action . helm-lisp-completion-persistent-action)
-    (persistent-help . "Show brief doc in mode-line")
-    (filtered-candidate-transformer . helm-lisp-completion-transformer)
-    (action . (lambda (candidate)
-                (with-helm-current-buffer
-                  (run-with-timer
-                   0.01 nil
-                   'helm-insert-completion-at-point
-                   beg end candidate))))))
-
 (defvar helm-lgst-len nil)
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
   "Helm lisp symbol completion at point."
   (interactive)
-  (cl-declaim (special beg end))
   (setq helm-lgst-len 0)
   (let* ((target     (helm-thing-before-point))
          (beg        (car (helm-bounds-of-thing-before-point)))
@@ -226,7 +209,20 @@ Return a cons \(beg . end\)."
         (with-helm-show-completion beg end
           ;; Overlay is initialized now in helm-current-buffer.
           (helm
-           :sources '(helm-source-lisp-completion)
+           :sources `((name . "Lisp completion")
+                      (init . (lambda ()
+                                (helm-init-candidates-in-buffer 'global
+                                  helm-lisp-completion--cache)))
+                      (candidates-in-buffer)
+                      (persistent-action . helm-lisp-completion-persistent-action)
+                      (persistent-help . "Show brief doc in mode-line")
+                      (filtered-candidate-transformer . helm-lisp-completion-transformer)
+                      (action . (lambda (candidate)
+                                  (with-helm-current-buffer
+                                    (run-with-timer
+                                     0.01 nil
+                                     'helm-insert-completion-at-point
+                                     ,beg ,end candidate)))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
            :buffer "*helm lisp completion*"
