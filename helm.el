@@ -3654,6 +3654,7 @@ Acceptable values of CREATE-OR-BUFFER:
 Arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
 either 'local or 'global which is passed to `helm-candidate-buffer'.
 Arg DATA can be either a list or a plain string."
+  (declare (indent 1))
   (let ((buf (helm-candidate-buffer
               (if (or (stringp buffer)
                       (bufferp buffer))

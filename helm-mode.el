@@ -204,7 +204,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                must-match
                                reverse-history
                                (requires-pattern 0)
-                               (history nil)
+                               history
                                input-history
                                (case-fold helm-comp-read-case-fold-search)
                                (del-input t)
@@ -218,7 +218,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                (volatile t)
                                sort
                                (fc-transformer 'helm-cr-default-transformer)
-                               (marked-candidates nil)
+                               marked-candidates
                                (alistp t))
   "Read a string in the minibuffer, with helm completion.
 
@@ -271,7 +271,7 @@ Keys description:
   (See `helm-mode-line-string')
 
 - KEYMAP: A keymap to use in this `helm-comp-read'.
-  (The keymap will be shared with history source)
+  (cl-the keymap will be shared with history source)
 
 - NAME: The name related to this local source.
 
@@ -336,22 +336,22 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                (if (and default (not (string= default "")))
                                    (delq nil (cons default (delete default cands)))
                                    cands))))
+           (history-get-candidates (lambda ()
+                                     (let ((all (helm-comp-read-get-candidates
+                                                 history test nil alistp)))
+                                       (when all
+                                         (delete
+                                          ""
+                                          (helm-fast-remove-dups
+                                           (if (and default (not (string= default "")))
+                                               (delq nil (cons default
+                                                               (delete default all)))
+                                               all)
+                                           :test 'equal))))))
            (src-hist `((name . ,(format "%s History" name))
-                       (candidates
-                        . (lambda ()
-                            (let ((all (helm-comp-read-get-candidates
-                                        history test nil ,alistp)))
-                              (when all
-                                (delete
-                                 ""
-                                 (helm-fast-remove-dups
-                                  (if (and default (not (string= default "")))
-                                      (delq nil (cons default
-                                                      (delete default all)))
-                                      all)
-                                  :test 'equal))))))
+                       (candidates . ,history-get-candidates)
                        (filtered-candidate-transformer
-                        . (lambda (candidates _source)
+                        . (lambda (candidates sources)
                             (loop for i in candidates
                                   ;; Input is added to history in completing-read's
                                   ;; and may be regexp-quoted, so unquote it.
@@ -373,7 +373,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (src-1 `((name . ,name)
                     (init . (lambda ()
                               (helm-init-candidates-in-buffer
-                               'global (funcall get-candidates))))
+                                  'global (funcall ,get-candidates))))
                     (candidates-in-buffer)
                     (filtered-candidate-transformer . ,fc-transformer)
                     (requires-pattern . ,requires-pattern)
@@ -403,13 +403,13 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :buffer buffer))
       ;; Avoid adding an incomplete input to history.
       (when (and result history del-input)
-        (cond ((and (symbolp history) ; History is a symbol.
+        (cond ((and (symbolp history)   ; History is a symbol.
                     (not (symbolp (symbol-value history)))) ; Fix Issue #324.
                ;; Be sure history is not a symbol with a nil value.
                (helm-aif (symbol-value history) (setcar it result)))
-              ((consp history) ; A list with a non--nil value.
+              ((consp history)         ; A list with a non--nil value.
                (setcar history result))
-              (t ; Possibly a symbol with a nil value.
+              (t                 ; Possibly a symbol with a nil value.
                (set history (list result)))))
       (or
        result
