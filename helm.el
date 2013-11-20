@@ -4116,20 +4116,20 @@ Only useful for debugging."
 
 (defun helm-marked-candidates ()
   "Return marked candidates of current source if any.
-Otherwise one element list of current selection.
+Otherwise one element list of current candidate.
 
 It is analogous to `dired-get-marked-files'."
   (with-current-buffer (helm-buffer-get)
-    (let ((cands
-           (if helm-marked-candidates
-               (loop with current-src = (helm-get-current-source)
-                     for (source . real) in (reverse helm-marked-candidates)
-                     when (equal current-src source)
-                     collect (helm-coerce-selection real source))
-               (list (helm-get-selection)))))
+    (let* ((current-src (helm-get-current-source))
+           (cands
+            (if helm-marked-candidates
+                (loop for (source . real) in (reverse helm-marked-candidates)
+                      when (equal current-src source)
+                      collect (helm-coerce-selection real source))
+              (list (helm-coerce-selection (helm-get-selection) source)))))
       (helm-log-eval cands)
       cands)))
-
+      
 (defun helm-current-source-name= (name)
   (save-excursion
     (goto-char (helm-get-previous-header-pos))
