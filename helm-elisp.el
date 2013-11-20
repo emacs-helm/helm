@@ -181,11 +181,10 @@ Return a cons \(beg . end\)."
 (defvar helm-lisp-completion--cache nil)
 (defvar helm-source-lisp-completion
   '((name . "Lisp completion")
-    ;; (init . (lambda ()
-    ;;           (helm-init-candidates-in-buffer
-    ;;            'global helm-lisp-completion--cache)))
-    ;; (candidates-in-buffer)
-    (candidates . helm-lisp-completion--cache)
+    (init . (lambda ()
+              (helm-init-candidates-in-buffer 'global
+                helm-lisp-completion--cache)))
+    (candidates-in-buffer)
     (persistent-action . helm-lisp-completion-persistent-action)
     (persistent-help . "Show brief doc in mode-line")
     (filtered-candidate-transformer . helm-lisp-completion-transformer)
