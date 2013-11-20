@@ -3430,7 +3430,7 @@ eg.
  '((name . \"many files\")
    (init . (lambda () (with-current-buffer (helm-candidate-buffer 'local)
                         (insert-many-filenames))))
-   (cl-search re-search-forward)  ; optional
+   (search re-search-forward)  ; optional
    (candidates-in-buffer)
    (type . file))
 

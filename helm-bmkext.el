@@ -61,7 +61,7 @@
                'global
                (helm-bmkext-addressbook-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (persistent-action
      . (lambda (candidate)
@@ -149,7 +149,7 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-w3m-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -171,7 +171,7 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-images-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -193,7 +193,7 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-man-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -216,7 +216,7 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-gnus-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -238,7 +238,7 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-info-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
@@ -260,7 +260,7 @@
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-local-files-setup-alist))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort

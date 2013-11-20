@@ -156,7 +156,7 @@
                'global (cl-loop for b in (bookmark-all-names) collect
                                 (propertize b 'location (bookmark-location b))))))
     (candidates-in-buffer)
-    (cl-search helm-bookmark-search-fn)
+    (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
     (filtered-candidate-transformer
      helm-adaptive-sort
