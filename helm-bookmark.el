@@ -260,7 +260,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 ;;; Bookmarks attributes
 ;;
 (define-helm-type-attribute 'bookmark
-    `((cl-coerce . helm-bookmark-get-bookmark-from-name)
+    `((coerce . helm-bookmark-get-bookmark-from-name)
       (action
        ("Jump to bookmark" . helm-bookmark-jump)
        ("Jump to BM other window" . helm-bookmark-jump-other-window)

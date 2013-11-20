@@ -552,7 +552,7 @@ First call indent, second complete symbol, third complete fname."
   (define-helm-type-attribute 'command
       `((action ("Call interactively" . helm-call-interactively)
                 ,@actions)
-        (cl-coerce . helm-symbolify)
+        (coerce . helm-symbolify)
         (persistent-action . describe-function))
     "Command. (string or symbol)")
 
@@ -560,7 +560,7 @@ First call indent, second complete symbol, third complete fname."
       `((action . ,actions)
         (action-transformer helm-transform-function-call-interactively)
         (candidate-transformer helm-mark-interactive-functions)
-        (cl-coerce . helm-symbolify))
+        (coerce . helm-symbolify))
     "Function. (string or symbol)"))
 
 (define-helm-type-attribute 'variable
@@ -569,7 +569,7 @@ First call indent, second complete symbol, third complete fname."
        ("Add variable to kill ring" . helm-kill-new)
        ("Go to variable's definition" . find-variable)
        ("Set variable" . helm-set-variable))
-      (cl-coerce . helm-symbolify))
+      (coerce . helm-symbolify))
   "Variable.")
 
 (defun helm-sexp-eval (cand)

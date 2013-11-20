@@ -898,7 +898,7 @@ HELM-ATTRIBUTE should be a symbol."
   before action function.
 
   Example: converting string to symbol
-    (cl-coerce . intern)")
+    (coerce . intern)")
 
 (helm-document-attribute 'type "optional if action attribute is provided"
   "  Indicates the type of the items the source returns.
