@@ -3514,10 +3514,11 @@ See also `helm-sources' docstring."
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
-      (let ((start-point (if search-from-end (point-max) (point-min)))
+      (let ((start-point (if search-from-end
+                             (1+ (point-max)) (1- (point-min))))
             (endp (if search-from-end #'bobp #'eobp))
             (inhibit-point-motion-hooks t))
-        (goto-char (1- start-point))
+        (goto-char start-point)
         (if (string= pattern "")
             (helm-initial-candidates-from-candidate-buffer
              endp get-line-fn limit search-from-end)
