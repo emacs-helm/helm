@@ -569,7 +569,7 @@ Availables keys are:
 - UID: See nth 2 `files-attributes'.
 - GID: See nth 3 `files-attributes'.
 - ACCESS-TIME: See nth 4 `files-attributes', however format time
-               when STRING is non--nil (cl-the default).
+               when STRING is non--nil (the default).
 - MODIF-TIME: See nth 5 `files-attributes', same as above.
 - STATUS: See nth 6 `files-attributes', same as above.
 - SIZE: See nth 7 `files-attributes'.

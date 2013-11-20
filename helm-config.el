@@ -1544,7 +1544,7 @@ Keys description:
   (See `helm-mode-line-string')
 
 - KEYMAP: A keymap to use in this `helm-comp-read'.
-  (cl-the keymap will be shared with history source)
+  (the keymap will be shared with history source)
 
 - NAME: The name related to this local source.
 

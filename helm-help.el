@@ -1029,7 +1029,7 @@ HELM-ATTRIBUTE should be a symbol."
   useful in case of sources with lots of candidates.")
 
 (helm-document-attribute 'persistent-action "optional"
-  "  Can be a either a Function called with one parameter (cl-the
+  "  Can be a either a Function called with one parameter (the
   selected candidate) or a cons cell where first element is this
   same function and second element a symbol (e.g never-split)
   that inform `helm-execute-persistent-action'to not split his

@@ -2562,7 +2562,7 @@ is done on whole `helm-buffer' and not on current source."
                (setq helm-force-updating-p nil)))
         (when delayed-sources
           ;; Allow giving a value to `delayed' attr from inside source.
-          ;; Retain the biggest value (cl-the slower) found in DELAYED-SOURCES.
+          ;; Retain the biggest value (the slower) found in DELAYED-SOURCES.
           (let ((helm-idle-delay (cl-loop with delay = helm-idle-delay
                                           for s in delayed-sources
                                           for d = (assoc-default 'delayed s)
