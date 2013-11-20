@@ -218,7 +218,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                  (volatile t)
                                  sort
                                  (fc-transformer 'helm-cr-default-transformer)
-                                 (marked-candidates nil)
+                                 marked-candidates
                                  (alistp t))
   "Read a string in the minibuffer, with helm completion.
 
@@ -297,12 +297,12 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That's mean you can pass prefix args before or after calling a command
 that use `helm-comp-read' See `helm-M-x' for example."
-  (cl-declaim (special marked-candidates))
+
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let ((action-fn '(("Sole action (Identity)"
+  (let ((action-fn `(("Sole action (Identity)"
                       . (lambda (candidate)
-                          (if marked-candidates
+                          (if ,marked-candidates
                               (helm-marked-candidates)
                               (identity candidate)))))))
     ;; Assume completion have been already required,
@@ -637,11 +637,11 @@ See documentation of `completing-read' and `all-completions' for details."
      (buffer "*Helm file completions*")
      test
      (case-fold helm-file-name-case-fold-search)
-     (preselect nil)
-     (history nil)
+     preselect
+     history
      must-match
      default
-     (marked-candidates nil)
+     marked-candidates
      (alistp t)
      (persistent-action 'helm-find-files-persistent-action)
      (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
@@ -682,9 +682,9 @@ Keys description:
   ;; so always use 'confirm.
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
-  (let* ((action-fn '(("Sole action (Identity)"
+  (let* ((action-fn `(("Sole action (Identity)"
                        . (lambda (candidate)
-                           (if marked-candidates
+                           (if ,marked-candidates
                                (helm-marked-candidates)
                                (identity candidate))))))
          (helm-mp-highlight-delay nil)
