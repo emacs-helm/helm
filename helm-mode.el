@@ -778,7 +778,7 @@ Keys description:
        (identity helm-pattern))
      (keyboard-quit))))
 
-(defun helm-generic-read-file-name
+(cl-defun helm-generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
   "An helm replacement of `read-file-name'."
   (let* ((init (or initial dir default-directory))
