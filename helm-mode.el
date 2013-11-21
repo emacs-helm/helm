@@ -733,12 +733,12 @@ Keys description:
                            (append (and (not (file-remote-p helm-pattern))
                                         (not (file-exists-p helm-pattern))
                                         (list helm-pattern))
-                                   (if ,test
+                                   (if ',test
                                        (cl-loop with hn = (helm-ff-tramp-hostnames)
                                                 for i in (helm-find-files-get-candidates
                                                           ',must-match)
                                                 when (or (member i hn) ; A tramp host
-                                                         (funcall ,test i)) ; Test ok
+                                                         (funcall ',test i)) ; Test ok
                                                 collect i)
                                        (helm-find-files-get-candidates ',must-match)))))
                       (filtered-candidate-transformer
