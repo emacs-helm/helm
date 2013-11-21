@@ -53,8 +53,8 @@ Windows users should set that to \"explorer.exe\"."
 ;;; Internals
 (defvar helm-external-command-history nil)
 (defvar helm-external-commands-list nil
-  "A list of all external commands the user can execute.  If this
-variable is not set by the user, it will be calculated
+  "A list of all external commands the user can execute.
+If this variable is not set by the user, it will be calculated
 automatically.")
 
 (defun helm-external-commands-list-1 (&optional sort)
@@ -62,23 +62,21 @@ automatically.")
 If `helm-external-commands-list' is non-nil it will
 return its contents.  Else it calculates all external commands
 and sets `helm-external-commands-list'."
-  (if helm-external-commands-list
-      helm-external-commands-list
-      (setq helm-external-commands-list
-            (cl-loop
-             with paths = (split-string (getenv "PATH") path-separator)
-                                        ;with completions
-             for dir in paths
-             when (and (file-exists-p dir) (file-accessible-directory-p dir))
-             for lsdir = (cl-loop for i in (directory-files dir t)
-                                  for bn = (file-name-nondirectory i)
-                                  when (and completions
-                                            (not (member bn completions))
-                                            (not (file-directory-p i))
-                                            (file-executable-p i))
-                                  collect bn)
-             append lsdir into completions
-             finally return (if sort (sort completions 'string-lessp) completions)))))
+  (helm-aif helm-external-commands-list
+      it
+    (setq helm-external-commands-list
+          (cl-loop
+           for dir in (split-string (getenv "PATH") path-separator)
+           when (and (file-exists-p dir) (file-accessible-directory-p dir))
+           for lsdir = (cl-loop for i in (directory-files dir t)
+                                for bn = (file-name-nondirectory i)
+                                when (and (not (member bn completions))
+                                          (not (file-directory-p i))
+                                          (file-executable-p i))
+                                collect bn)
+           append lsdir into completions
+           finally return
+           (if sort (sort completions 'string-lessp) completions)))))
 
 (defun helm-run-or-raise (exe &optional file)
   "Generic command that run asynchronously EXE.
