@@ -449,7 +449,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
 ;;
 ;;
 (defun helm-completing-read-symbols
-    (prompt _collection _test _require-match init
+    (prompt _collection test _require-match init
      hist default _inherit-input-method name buffer)
   "Specialized function for fast symbols completion in `helm-mode'."
   (or
@@ -458,17 +458,16 @@ that use `helm-comp-read' See `helm-M-x' for example."
                (init . (lambda ()
                          (with-current-buffer (helm-candidate-buffer 'global)
                            (goto-char (point-min))
-                           (when (and default (stringp default)
+                           (when (and ,default (stringp ,default)
                                       ;; Some defaults args result as
                                       ;; (symbol-name nil) == "nil".
                                       ;; e.g debug-on-entry.
-                                      (not (string= default "nil"))
-                                      (not (string= default "")))
-                             (insert (concat default "\n")))
-                           (cl-loop with all = (all-completions "" obarray test)
-                                    for sym in all
+                                      (not (string= ,default "nil"))
+                                      (not (string= ,default "")))
+                             (insert (concat ,default "\n")))
+                           (cl-loop for sym in (all-completions "" obarray ',test)
                                     for s = (intern sym)
-                                    unless (or (and default (string= sym default))
+                                    unless (or (and ,default (string= sym ,default))
                                                (keywordp s))
                                     do (insert (concat sym "\n"))))))
                (persistent-action . helm-lisp-completion-persistent-action)
