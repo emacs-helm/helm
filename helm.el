@@ -4122,15 +4122,13 @@ Otherwise one element list of current selection.
 
 It is analogous to `dired-get-marked-files'."
   (with-current-buffer (helm-buffer-get)
-    (let ((cands
-           (if helm-marked-candidates
-               (cl-loop with current-src = (helm-get-current-source)
-                        for (source . real) in (reverse helm-marked-candidates)
-                        when (equal current-src source)
-                        collect (helm-coerce-selection real source))
-               (list (helm-get-selection)))))
-      (helm-log-eval cands)
-      cands)))
+    (cl-loop with current-src = (helm-get-current-source)
+             for (source . real) in
+             (or (reverse helm-marked-candidates)
+                 (list (cons current-src (helm-get-selection))))
+             when (equal current-src source)
+             collect (helm-coerce-selection real source) into cands
+             finally do (prog1 (cl-return cands) (helm-log-eval cands)))))
 
 (defun helm-current-source-name= (name)
   (save-excursion
