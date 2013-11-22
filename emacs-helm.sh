@@ -23,7 +23,7 @@
 # Run it from this directory.
 
 TMP="/tmp/helm-cfg.el"
-LOADPATH=`dirname $0`
+LOADPATH=$(readlink -f $0 | xargs dirname)
 EMACS=emacs
 
 case $1 in
