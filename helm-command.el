@@ -27,9 +27,9 @@
   "Emacs command related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-M-x-requires-pattern 2
+(defcustom helm-M-x-requires-pattern 0
   "Value of requires-pattern for `helm-M-x'.
-Set it to 0 to show all candidates on startup."
+Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
@@ -37,6 +37,11 @@ Set it to 0 to show all candidates on startup."
   "`helm-M-x' Save command in `extended-command-history' even when it fail."
   :group 'helm-command
   :type  'boolean)
+
+(defcustom helm-M-x-reverse-history nil
+  "The history source of `helm-M-x' appear in second position when non--nil."
+  :group 'helm-command
+  :type 'boolean)
 
 
 ;;; Faces
@@ -135,6 +140,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                    :persistent-action pers-help
                    :persistent-help "Describe this command"
                    :history history
+                   :reverse-history helm-M-x-reverse-history
                    :del-input nil
                    :mode-line helm-mode-line-string
                    :must-match t
