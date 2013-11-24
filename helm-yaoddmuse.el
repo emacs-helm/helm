@@ -28,9 +28,9 @@
 (defvar helm-yaoddmuse-use-cache-file nil)
 (defvar helm-yaoddmuse-cache-file "~/.emacs.d/yaoddmuse-cache.el")
 (defvar helm-yaoddmuse-ew-cache nil)
+(defvar yaoddmuse-pages-hash)
 
 (defun helm-yaoddmuse-get-candidates ()
-  (cl-declare (special yaoddmuse-pages-hash))
   (if helm-yaoddmuse-use-cache-file
       (ignore-errors
         (unless helm-yaoddmuse-ew-cache
@@ -114,7 +114,6 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
   "Fetch the list of files on emacswiki and create cache file.
 If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
   (interactive)
-  (cl-declare (special yaoddmuse-pages-hash))
   (yaoddmuse-update-pagename)
   (save-excursion
     (find-file helm-yaoddmuse-cache-file)

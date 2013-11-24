@@ -554,7 +554,6 @@ This function should be used only as a `completing-read-function'.
 Don't use it directly, use instead `helm-comp-read' in your programs.
 
 See documentation of `completing-read' and `all-completions' for details."
-  (cl-declare (special helm-mode))
   (let* ((current-command (or (helm-this-command) this-command))
          (str-command     (if (consp current-command) ; Maybe a lambda.
                               "Anonymous"

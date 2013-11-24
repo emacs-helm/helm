@@ -1855,10 +1855,10 @@ Don't use it directly in `filtered-candidate-transformer' use instead
   (let ((flist (helm-marked-candidates)))
     (gnus-dired-attach flist)))
 
+(defvar image-dired-display-image-buffer)
 (defun helm-ff-rotate-current-image-1 (file &optional num-arg)
   "Rotate current image at NUM-ARG degrees.
 This is a destructive operation on FILE made by external tool mogrify."
-  (cl-declare (special image-dired-display-image-buffer))
   (setq file (file-truename file)) ; For symlinked images.
   ;; When FILE is not an image-file, do nothing.
   (when (string-match (image-file-name-regexp) file)
@@ -2134,13 +2134,13 @@ Find inside `require' and `declare-function' sexp."
 ;;; Handle copy, rename, symlink, relsymlink and hardlink from helm.
 ;;
 ;;
+(defvar helm-async-be-async)
 (cl-defun helm-dired-action (candidate
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
 Where ACTION is a symbol that can be one of:
 'copy, 'rename, 'symlink,'relsymlink, 'hardlink.
 Argument FOLLOW when non--nil specify to follow FILES to destination."
-  (cl-declare (special helm-async-be-async))
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
   (let ((fn     (cl-case action
                   (copy       'dired-copy-file)
@@ -2706,6 +2706,7 @@ utility mdfind.")
              default-directory)))
     (helm-find-1 directory)))
 
+(defvar org-directory)
 ;;;###autoload
 (defun helm-find-files (arg)
   "Preconfigured `helm' for helm implementation of `find-file'.
@@ -2713,7 +2714,6 @@ Called with a prefix arg show history if some.
 Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
-  (cl-declare (special org-directory))
   (let* ((hist          (and arg helm-ff-history (helm-find-files-history)))
          (default-input (or hist (helm-find-files-initial-input)))
          (input         (cond ((and (eq major-mode 'org-agenda-mode)

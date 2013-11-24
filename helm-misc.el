@@ -41,9 +41,9 @@
 
 
 ;;; Latex completion
+(defvar LaTeX-math-menu)
 (defun helm-latex-math-candidates ()
   "Collect candidates for latex math completion."
-  (cl-declare (special LaTeX-math-menu))
   (cl-loop for i in (cddr LaTeX-math-menu)
            for elm = (cl-loop for s in i when (vectorp s)
                               collect (cons (aref s 0) (aref s 1)))

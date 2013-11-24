@@ -41,9 +41,9 @@
   :group 'helm-emms)
 
 
+(defvar emms-stream-list)
 (defun helm-emms-stream-edit-bookmark (elm)
   "Change the information of current emms-stream bookmark from helm."
-  (cl-declare (special emms-stream-list))
   (let* ((cur-buf helm-current-buffer)
          (bookmark (assoc elm emms-stream-list))
          (name     (read-from-minibuffer "Description: "
@@ -87,10 +87,8 @@
     (init . (lambda ()
               (emms-stream-init)))
     (candidates . (lambda ()
-                    (cl-declare (special emms-stream-list))
                     (mapcar 'car emms-stream-list)))
     (action . (("Play" . (lambda (elm)
-                           (cl-declare (special emms-stream-list))
                            (let* ((stream (assoc elm emms-stream-list))
                                   (fn (intern (concat "emms-play-" (symbol-name (car (last stream))))))
                                   (url (cl-second stream)))

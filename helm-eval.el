@@ -144,11 +144,11 @@ Should take one arg: the string to display."
         :history 'read-expression-history
         :keymap helm-eval-expression-map))
 
+(defvar eldoc-idle-delay)
 ;;;###autoload
 (defun helm-eval-expression-with-eldoc ()
   "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support. "
   (interactive)
-  (cl-declare (special eldoc-idle-delay))
   (let ((timer (run-with-idle-timer
                 eldoc-idle-delay 'repeat
                 'helm-eldoc-show-in-eval)))
