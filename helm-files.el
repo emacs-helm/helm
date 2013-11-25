@@ -2233,12 +2233,11 @@ following files to destination."
 ;;
 (defun helm-file-buffers (filename)
   "Returns a list of buffer names corresponding to FILENAME."
-  (let ((name     (expand-file-name filename))
-        (buf-list ()))
-    (cl-dolist (buf (buffer-list) buf-list)
-      (let ((bfn (buffer-file-name buf)))
-        (when (and bfn (string= name bfn))
-          (push (buffer-name buf) buf-list))))))
+  (cl-loop with name = (expand-file-name filename)
+           for buf in (buffer-list)
+           for bfn = (buffer-file-name buf)
+           when (and bfn (string= name bfn))
+           collect (buffer-name buf)))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro)
   "Delete the given file after querying the user.

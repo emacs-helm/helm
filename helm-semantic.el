@@ -59,8 +59,9 @@
   ;; Fix this.
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (with-current-buffer helm-buffer
-    (goto-char (next-single-property-change
-                (point-at-bol) 'semantic-tag nil (point-at-eol)))
+    (when (looking-at " ")
+      (goto-char (next-single-property-change
+                  (point-at-bol) 'semantic-tag nil (point-at-eol)))) 
     (let ((tag (get-text-property (point) 'semantic-tag)))
       (semantic-go-to-tag tag))))
 

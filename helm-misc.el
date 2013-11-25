@@ -139,12 +139,12 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 (defun helm-jabber-online-contacts ()
   "List online Jabber contacts."
   (with-no-warnings
-    (let (jids)
-      (cl-dolist (item (jabber-concat-rosters) jids)
-        (when (get item 'connected)
-          (push (if (get item 'name)
-                    (cons (get item 'name) item)
-                    (cons (symbol-name item) item)) jids))))))
+    (cl-loop for item in (jabber-concat-rosters)
+             when (get item 'connected)
+             collect
+             (if (get item 'name)
+                 (cons (get item 'name) item)
+                 (cons (symbol-name item) item)))))
 
 (defvar helm-source-jabber-contacts
   '((name . "Jabber Contacts")
