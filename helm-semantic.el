@@ -54,11 +54,11 @@
 (defun helm-semantic-default-action (_candidate)
   ;; By default, helm doesn't pass on the text properties of the selection.
   ;; Fix this.
+  (helm-log-run-hook 'helm-goto-line-before-hook)
   (with-current-buffer helm-buffer
     (goto-char (next-single-property-change
                 (point-at-bol) 'semantic-tag nil (point-at-eol)))
     (let ((tag (get-text-property (point) 'semantic-tag)))
-      (push-mark)
       (semantic-go-to-tag tag))))
 
 (defvar helm-source-semantic
@@ -94,7 +94,6 @@ Fill in the symbol at point by default."
   (let ((source (if (semantic-active-p)
                     'helm-source-semantic
                     'helm-source-imenu)))
-    (push-mark)
     (helm :sources source
           :buffer "*helm semantic/imenu*"
           :preselect (thing-at-point 'symbol))))
