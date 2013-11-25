@@ -37,9 +37,12 @@
                  (type-p (eq cur-type 'type)))
              (insert
               (if (and class (not type-p))
-                  (format "%s|Class(%s) " spaces class) spaces)
+                  (format "%s%sClass(%s) "
+                          spaces (if (< depth 2) "" "├►") class)
+                  spaces)
               ;; Save the tag for later
-              (propertize (semantic-format-tag-summarize tag nil t) 'semantic-tag tag)
+              (propertize (semantic-format-tag-summarize tag nil t)
+                          'semantic-tag tag)
               "\n")
              (and type-p (setq class (car tag)))
              ;; Recurse to children
