@@ -26,32 +26,37 @@
 (require 'semantic)
 (require 'helm-imenu)
 
-(defun helm-semantic-init-candidates (tags depth)
+(defun helm-semantic-init-candidates (tags depth &optional class)
   "Write the contents of TAGS to the current buffer."
-  (cl-dolist (tag tags)
-    (when (listp tag)
-      (cl-case (semantic-tag-class tag)
+  (let ((class class) cur-type)
+    (cl-dolist (tag tags)
+      (when (listp tag)
+        (cl-case (setq cur-type (semantic-tag-class tag))
+          ((function variable type)
+           (let ((spaces (make-string (* depth 2) ?\s))
+                 (type-p (eq cur-type 'type)))
+             (insert
+              (if (and class (not type-p))
+                  (format "%s|Class(%s) " spaces class) spaces)
+              ;; Save the tag for later
+              (propertize (semantic-format-tag-summarize tag nil t) 'semantic-tag tag)
+              "\n")
+             (and type-p (setq class (car tag)))
+             ;; Recurse to children
+             (helm-semantic-init-candidates
+              (semantic-tag-components tag) (1+ depth) class)))
 
-        ((function variable type)
-         (insert
-          (make-string (* depth 2) ?\s)
-          ;; Save the tag for later
-          (propertize (semantic-format-tag-summarize tag nil t) 'semantic-tag tag)
-          "\n")
-         ;; Recurse to children
-         (helm-semantic-init-candidates
-          (semantic-tag-components tag) (1+ depth)))
-
-        ;; Don't do anything with packages or includes for now
-        ((package include))
-        ;; Catch-all
-        (t)))))
+          ;; Don't do anything with packages or includes for now
+          ((package include))
+          ;; Catch-all
+          (t))))))
 
 (defun helm-semantic-default-action (_candidate)
   ;; By default, helm doesn't pass on the text properties of the selection.
   ;; Fix this.
   (with-current-buffer helm-buffer
-    (skip-chars-forward " " (point-at-eol))
+    (goto-char (next-single-property-change
+                (point-at-bol) 'semantic-tag nil (point-at-eol)))
     (let ((tag (get-text-property (point) 'semantic-tag)))
       (push-mark)
       (semantic-go-to-tag tag))))
