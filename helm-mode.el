@@ -373,7 +373,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (src-1 `((name . ,name)
                     (init . (lambda ()
                               (helm-init-candidates-in-buffer
-                               'global (funcall ,get-candidates))))
+                               'global (funcall ',get-candidates))))
                     (candidates-in-buffer)
                     (filtered-candidate-transformer . ,fc-transformer)
                     (requires-pattern . ,requires-pattern)
