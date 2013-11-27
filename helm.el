@@ -2381,12 +2381,13 @@ Default function to match candidates according to `helm-pattern'."
     (if (listp matchfns) matchfns (list matchfns))))
 
 (defmacro helm--accumulate-candidates (cand newmatches
-                                       hash item-count limit)
+                                       hash item-count limit source)
   "Add CAND into NEWMATCHES and use HASH to uniq NEWMATCHES.
 Argument ITEM-COUNT count the matches.
 if ITEM-COUNT reaches LIMIT, exit from inner loop."
   `(unless (gethash ,cand ,hash)
-     (puthash ,cand t ,hash)
+     (unless (assq 'allow-dups ,source)
+       (puthash ,cand t ,hash))
      (push ,cand ,newmatches)
      (cl-incf ,item-count)
      (when (= ,item-count ,limit) (cl-return))))
@@ -2432,7 +2433,7 @@ and `helm-pattern'."
               (cl-dolist (candidate cands)
                 (when (funcall match (helm-candidate-get-display candidate))
                   (helm--accumulate-candidates
-                   candidate newmatches helm-match-hash item-count limit)))
+                   candidate newmatches helm-match-hash item-count limit source)))
               (setq matches (append matches (reverse newmatches)))
               ;; Don't recompute matches already found by this match function
               ;; with the next match function.
@@ -3496,7 +3497,8 @@ See also `helm-sources' docstring."
            '(helm-candidates-in-buffer-search-from-start)))
    (helm-candidate-number-limit source)
    (assoc 'search-from-end source)
-   (helm-attr 'match-part)))
+   (helm-attr 'match-part)
+   source))
 
 (defun helm-candidates-in-buffer-search-from-start (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
@@ -3508,7 +3510,7 @@ See also `helm-sources' docstring."
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
                                     search-fns limit search-from-end
-                                    match-part-fn)
+                                    match-part-fn source)
   "Return the list of candidates inserted in BUFFER matching PATTERN."
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
@@ -3523,7 +3525,7 @@ See also `helm-sources' docstring."
              endp get-line-fn limit search-from-end)
             (helm-search-from-candidate-buffer
              pattern get-line-fn search-fns limit search-from-end
-             start-point match-part-fn))))))
+             start-point match-part-fn source))))))
 
 (defun helm-point-is-moved (proc)
   "If point is moved after executing PROC, return t, otherwise nil."
@@ -3531,7 +3533,7 @@ See also `helm-sources' docstring."
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit search-from-end
-                                          start-point match-part-fn)
+                                          start-point match-part-fn source)
   (let (buffer-read-only
         matches 
         newmatches
@@ -3553,7 +3555,7 @@ See also `helm-sources' docstring."
                         ;; match the part of CAND specified by the match-part func.
                         (helm-search-match-part cand pattern match-part-fn))
                   do (helm--accumulate-candidates
-                      cand newmatches helm-cib-hash item-count limit)
+                      cand newmatches helm-cib-hash item-count limit source)
                   unless (helm-point-is-moved
                           (lambda ()
                             (if search-from-end

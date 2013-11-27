@@ -72,6 +72,7 @@
                 (with-current-buffer (helm-candidate-buffer 'global)
                   (helm-semantic-init-candidates tags 0)))))
     (candidates-in-buffer)
+    (allow-dups)
     (get-line . buffer-substring)
     (persistent-action . (lambda (elm)
                            (helm-semantic-default-action elm)

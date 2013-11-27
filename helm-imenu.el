@@ -65,6 +65,7 @@
 (defvar helm-source-imenu
   '((name . "Imenu")
     (candidates . helm-imenu-candidates)
+    (allow-dups)
     (persistent-action . (lambda (elm)
                            (helm-imenu-default-action elm)
                            (unless (fboundp 'semantic-imenu-tag-overlay)

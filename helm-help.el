@@ -1196,6 +1196,9 @@ HELM-ATTRIBUTE should be a symbol."
 (helm-document-attribute 'nohighlight "optional"
   "  Disable highlight match in this source.")
 
+(helm-document-attribute 'no-matchplugin "optional"
+  "  Disable matchplugin for this source.")
+
 (helm-document-attribute 'no-delay-on-input "optional"
   "  Don't use `while-no-input' when computing candidates.")
 
@@ -1210,6 +1213,9 @@ HELM-ATTRIBUTE should be a symbol."
   is surely not what you want, e.g: (follow . 1)
 
   See `helm-follow-mode' for more infos")
+
+(helm-document-attribute 'allow-dups "optional"
+  "  Allow helm collecting duplicates candidates.")
 
 (provide 'helm-help)
 
