@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'imenu)
 
+
 (defgroup helm-imenu nil
   "Imenu related libraries and applications for helm."
   :group 'helm)
@@ -34,11 +35,8 @@
   "Goto the candidate when only one is remaining."
   :group 'helm-imenu
   :type 'boolean)
-
+
 ;;; Internals
-(defvar helm-imenu-index-filter nil)
-(make-variable-buffer-local 'helm-imenu-index-filter)
-
 (defvar helm-cached-imenu-alist nil)
 (make-variable-buffer-local 'helm-cached-imenu-alist)
 
@@ -47,33 +45,20 @@
 
 (defvar helm-cached-imenu-tick nil)
 (make-variable-buffer-local 'helm-cached-imenu-tick)
-
-(defun helm-imenu-create-candidates (entry)
-  "Create candidates with ENTRY."
-  (if (listp (cdr entry))
-      (cl-mapcan
-       (lambda (sub)
-         (if (consp (cdr sub))
-             (mapcar
-              (lambda (subentry)
-                (concat (car entry) helm-imenu-delimiter subentry))
-              (helm-imenu-create-candidates sub))
-             (list (concat (car entry) helm-imenu-delimiter (car sub)))))
-       (cdr entry))
-      (list entry)))
-
+
 (defvar helm-source-imenu
   '((name . "Imenu")
     (candidates . helm-imenu-candidates)
     (allow-dups)
+    (filtered-candidate-transformer . helm-imenu-transformer)
     (persistent-action . (lambda (elm)
-                           (helm-imenu-default-action elm)
+                           (imenu elm)
                            (unless (fboundp 'semantic-imenu-tag-overlay)
                              (helm-highlight-current-line))))
     (persistent-help . "Show this entry")
-    (action . helm-imenu-default-action))
+    (action . imenu))
   "See (info \"(emacs)Imenu\")")
-
+
 (defun helm-imenu-candidates ()
   (with-helm-current-buffer
     (let ((tick (buffer-modified-tick)))
@@ -82,28 +67,27 @@
           (setq imenu--index-alist nil)
           (setq helm-cached-imenu-tick tick
                 helm-cached-imenu-candidates
-                (ignore-errors
-                  (cl-mapcan
-                   'helm-imenu-create-candidates
-                   (setq helm-cached-imenu-alist
-                         (let ((index (imenu--make-index-alist)))
-                           (if helm-imenu-index-filter
-                               (funcall helm-imenu-index-filter index)
-                               index))))))
-          (setq helm-cached-imenu-candidates
-                (mapcar #'(lambda (x)
-                            (if (stringp x) x (car x)))
-                        helm-cached-imenu-candidates))))))
+                (let ((index (imenu--make-index-alist))) 
+                  (helm-imenu--candidates-1
+                   (delete (assoc "*Rescan*" index) index))))))))
 
-(defun helm-imenu-default-action (elm)
-  "The default action for `helm-source-imenu'."
-  (helm-log-run-hook 'helm-goto-line-before-hook)
-  (let ((path (split-string elm helm-imenu-delimiter))
-        (alist helm-cached-imenu-alist))
-    (cl-dolist (elm path)
-      (setq alist (assoc elm alist)))
-    (imenu alist)))
+(defun helm-imenu--candidates-1 (alist)
+  (cl-loop for elm in alist
+           append (if (consp (cdr elm))
+                      (helm-imenu--candidates-1
+                       (cl-loop for (e . v) in (cdr elm) collect
+                                (cons (propertize
+                                       e 'helm-imenu-type (car elm))
+                                      v)))
+                      (list elm))))
 
+(defun helm-imenu-transformer (candidates _source)
+  (cl-loop for (k . v) in candidates collect
+           (cons (concat
+                  (or (get-text-property 0 'helm-imenu-type k)
+                      "Function") " / " k)
+                 (cons k v))))
+
 ;;;###autoload
 (defun helm-imenu ()
   "Preconfigured `helm' for `imenu'."
