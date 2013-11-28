@@ -85,7 +85,7 @@
   (cl-loop for (k . v) in candidates collect
            (cons (concat
                   (or (get-text-property 0 'helm-imenu-type k)
-                      "Function") " / " k)
+                      "Function") helm-imenu-delimiter k)
                  (cons k v))))
 
 ;;;###autoload
