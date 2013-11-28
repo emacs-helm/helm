@@ -50,7 +50,7 @@
   '((name . "Imenu")
     (candidates . helm-imenu-candidates)
     (allow-dups)
-    (filtered-candidate-transformer . helm-imenu-transformer)
+    (candidate-transformer . helm-imenu-transformer)
     (persistent-action . (lambda (elm)
                            (imenu elm)
                            (unless (fboundp 'semantic-imenu-tag-overlay)
@@ -81,7 +81,7 @@
                                       v)))
                       (list elm))))
 
-(defun helm-imenu-transformer (candidates _source)
+(defun helm-imenu-transformer (candidates)
   (cl-loop for (k . v) in candidates collect
            (cons (concat
                   (or (get-text-property 0 'helm-imenu-type k)
