@@ -79,7 +79,8 @@
                                 (cons (propertize
                                        e 'helm-imenu-type (car elm))
                                       v)))
-                      (list elm))))
+                      (and (cdr elm) ; bug in imenu, should not be needed.
+                           (list elm)))))
 
 (defun helm-imenu-transformer (candidates)
   (cl-loop for (k . v) in candidates collect
