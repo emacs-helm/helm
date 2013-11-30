@@ -100,12 +100,17 @@ If `semantic-mode' is active in the current buffer, then use
 semantic for generating tags, otherwise fall back to `imenu'.
 Fill in the symbol at point by default."
   (interactive)
-  (let ((source (if (semantic-active-p)
-                    'helm-source-semantic
-                    'helm-source-imenu)))
+  (let* ((source (if (semantic-active-p)
+                     'helm-source-semantic
+                     'helm-source-imenu))
+         (imenu-p (eq source 'helm-source-imenu))
+         (imenu-auto-rescan imenu-p)
+         (helm-execute-action-at-once-if-one
+          (and imenu-p
+               helm-imenu-execute-action-at-once-if-one)))
     (helm :sources source
           :buffer "*helm semantic/imenu*"
-          :preselect (thing-at-point 'symbol))))
+          :preselect (unless imenu-p (thing-at-point 'symbol)))))
 
 (provide 'helm-semantic)
 
