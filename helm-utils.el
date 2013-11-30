@@ -272,9 +272,7 @@ Animation is used unless NOANIM is non--nil."
   (goto-char (point-min))
   (helm-goto-char (point-at-bol lineno))
   (unless noanim
-    (helm-highlight-current-line)
-    (sit-for 0.3)
-    (helm-match-line-cleanup)))
+    (helm-highlight-current-line nil nil nil nil 'pulse)))
 
 (defun helm-save-pos-to-register-before-jump ()
   "Save current buffer position to `helm-save-pos-before-jump-register'.
@@ -677,7 +675,7 @@ Useful in dired buffers when there is inserted subdirs."
 ;; Internal
 (defvar helm-match-line-overlay nil)
 
-(defun helm-highlight-current-line (&optional start end buf face)
+(defun helm-highlight-current-line (&optional start end buf face pulse)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
@@ -687,7 +685,10 @@ Useful in dired buffers when there is inserted subdirs."
         (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
-    (recenter)))
+    (recenter)
+    (when pulse
+      (sit-for 0.3)
+      (helm-match-line-cleanup))))
 
 (defun helm-match-line-cleanup ()
   (when helm-match-line-overlay
