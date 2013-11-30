@@ -73,7 +73,7 @@
 
 (defun helm-imenu--candidates-1 (alist)
   (cl-loop for elm in alist
-           append (if (consp (cdr elm))
+           append (if (imenu--subalist-p elm)
                       (helm-imenu--candidates-1
                        (cl-loop for (e . v) in (cdr elm) collect
                                 (cons (propertize
