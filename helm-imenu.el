@@ -53,11 +53,18 @@
     (candidate-transformer . helm-imenu-transformer)
     (persistent-action . (lambda (elm)
                            (imenu elm)
-                           (unless (fboundp 'semantic-imenu-tag-overlay)
-                             (helm-highlight-current-line))))
+                           (helm-highlight-current-line)))
     (persistent-help . "Show this entry")
-    (action . imenu))
-  "See (info \"(emacs)Imenu\")")
+    (action . (lambda (candidate)
+                (imenu candidate)
+                ;; If semantic is supported in this buffer
+                ;; imenu used `semantic-imenu-goto-function'
+                ;; and position have been highlighted,
+                ;; no need to highlight again.
+                (unless (eq imenu-default-goto-function
+                            'semantic-imenu-goto-function)
+                  (helm-highlight-current-line nil nil nil nil 'pulse))))
+  "See (info \"(emacs)Imenu\")"))
 
 (defun helm-imenu-candidates ()
   (with-helm-current-buffer
@@ -95,11 +102,7 @@
   (interactive)
   (let ((imenu-auto-rescan t)
         (helm-execute-action-at-once-if-one
-         helm-imenu-execute-action-at-once-if-one)
-        (imenu-default-goto-function
-         (if (fboundp 'semantic-imenu-goto-function)
-             'semantic-imenu-goto-function
-             'imenu-default-goto-function)))
+         helm-imenu-execute-action-at-once-if-one))
     (helm :sources 'helm-source-imenu
           :buffer "*helm imenu*")))
 

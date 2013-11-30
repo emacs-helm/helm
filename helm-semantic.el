@@ -26,6 +26,8 @@
 (require 'semantic)
 (require 'helm-imenu)
 
+(declare-function pulse-momentary-highlight-one-line "pulse.el" (point &optional face))
+
 (defun helm-semantic-init-candidates (tags depth &optional class)
   "Write the contents of TAGS to the current buffer."
   (let ((class class) cur-type)
@@ -54,7 +56,7 @@
           ;; Catch-all
           (t))))))
 
-(defun helm-semantic-default-action (_candidate)
+(defun helm-semantic-default-action (_candidate &optional persistent)
   ;; By default, helm doesn't pass on the text properties of the selection.
   ;; Fix this.
   (helm-log-run-hook 'helm-goto-line-before-hook)
@@ -64,7 +66,8 @@
                   (point-at-bol) 'semantic-tag nil (point-at-eol)))) 
     (let ((tag (get-text-property (point) 'semantic-tag)))
       (semantic-go-to-tag tag)
-      (helm-highlight-current-line nil nil nil nil 'pulse))))
+      (unless persistent
+        (pulse-momentary-highlight-one-line (point))))))
 
 (defvar helm-source-semantic
   '((name . "Semantic Tags")
@@ -76,7 +79,7 @@
     (allow-dups)
     (get-line . buffer-substring)
     (persistent-action . (lambda (elm)
-                           (helm-semantic-default-action elm)
+                           (helm-semantic-default-action elm t)
                            (helm-highlight-current-line)))
     (persistent-help . "Show this entry")
     (action . helm-semantic-default-action)
