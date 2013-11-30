@@ -90,10 +90,19 @@
                            (list elm)))))
 
 (defun helm-imenu-transformer (candidates)
-  (cl-loop for (k . v) in candidates collect
+  (cl-loop for (k . v) in candidates
+           for type = (or (get-text-property 0 'helm-imenu-type k)
+                          "Function")
+           collect
            (cons (concat
-                  (or (get-text-property 0 'helm-imenu-type k)
-                      "Function") helm-imenu-delimiter k)
+                  type helm-imenu-delimiter
+                  (propertize
+                   k 'face (cond ((string= type "Variables")
+                                  'font-lock-variable-name-face)
+                                 ((string= type "Function")
+                                  'font-lock-function-name-face)
+                                 ((string= type "Types")
+                                  'font-lock-type-face))))
                  (cons k v))))
 
 ;;;###autoload
