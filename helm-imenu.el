@@ -20,6 +20,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'imenu)
+(require 'helm-utils)
 
 
 (defgroup helm-imenu nil
