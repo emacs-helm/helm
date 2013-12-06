@@ -414,6 +414,7 @@ First call indent, second complete symbol, third complete fname."
     (helm :sources '(helm-source-info-elisp
                      helm-source-info-cl
                      helm-source-info-eieio)
+          :resume 'noresume
           :buffer "*helm lookup*"
           :input candidate)))
 
