@@ -357,13 +357,13 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                                    helm-mp-default-search-backward-functions
                                    helm-mp-default-search-functions))
              (defmatch         (helm-aif (assoc-default 'match source)
-                                   (if (listp it) it (list it))))
+                                   (helm-mklist it)))
              (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
-                                   (if (listp it) it (list it))))
+                                   (helm-mklist it)))
              (defsearch        (helm-aif (assoc-default 'search source)
-                                   (if (listp it) it (list it))))
+                                   (helm-mklist it)))
              (defsearch-strict (helm-aif (assoc-default 'search-strict source)
-                                   (if (listp it) it (list it))))
+                                   (helm-mklist it)))
              (matchfns         (cond (defmatch-strict)
                                      (defmatch
                                       (append helm-mp-default-match-functions defmatch))
