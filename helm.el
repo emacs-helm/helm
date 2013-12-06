@@ -2439,8 +2439,9 @@ and `helm-pattern'."
               ;; with the next match function.
               (setq cands (cl-loop for i in cands
                                    unless (member i matches) collect i)))))
-      (error (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                             (assoc-default 'name source) (car err) (cdr err))
+      (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
+               (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+                               (assoc-default 'name source) (car err) (cdr err)))
              (setq matches nil)))
     matches))
 
