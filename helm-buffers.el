@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 's)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-elscreen)
@@ -58,6 +59,11 @@ When disabled (nil) use the longest buffer-name length found."
   "Always show details in buffer list when non--nil."
   :group 'helm-buffers
   :type 'boolean)
+
+(defcustom helm-buffer-list-format "${truncbuf}\t${formatted-size}  ${fmode}  ${meta}"
+  "Buffer list format"
+  :group 'helm-buffers
+  :type 'string)
 
 
 ;;; Faces
@@ -305,8 +311,12 @@ Should be called after others transformers i.e (boring buffers)."
            ;; The max length of a number should be 1023.9X where X is the
            ;; units, this is 7 characters.
            for formatted-size = (format "%7s" size)
-           collect (cons (concat truncbuf "\t" formatted-size "  " fmode "  " meta)
-                         i)))
+           collect (cons (s-format helm-buffer-list-format
+                                   'aget `(("name" . ,name)
+                                           ("truncbuf" . ,truncbuf)
+                                           ("formatted-size" . ,formatted-size)
+                                           ("fmode" . ,fmode)
+                                           ("meta" . ,(or meta "")))) i)))
 
 (defun helm-toggle-buffers-details ()
   (interactive)
