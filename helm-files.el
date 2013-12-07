@@ -388,6 +388,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff-url-regexp
   "\\`\\(news\\(post\\)?:\\|nntp:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\):/?/?\\).*"
   "Same as `ffap-url-regexp' but match earlier possible url.")
+(defvar helm-tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):")
 
 
 ;;; Helm-find-files
@@ -1206,7 +1207,7 @@ or hitting C-z on \"..\"."
   "When candidate is an incomplete file name move to first real candidate."
   (helm-aif (and (helm-file-completion-source-p)
                  (helm-get-selection))
-      (unless (or (string-match tramp-file-name-regexp it)
+      (unless (or (string-match helm-tramp-file-name-regexp it)
                   (file-exists-p it))
         (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
@@ -1231,7 +1232,7 @@ expand to this directory."
     (let* ((history-p   (string= (assoc-default
                                   'name (helm-get-current-source))
                                  "Read File Name History"))
-           (pat         (if (string-match tramp-file-name-regexp
+           (pat         (if (string-match helm-tramp-file-name-regexp
                                           helm-pattern)
                             (helm-create-tramp-name helm-pattern)
                             helm-pattern))
@@ -1330,7 +1331,7 @@ On windows system substitute from start up to \"/[a-z]:/\"."
   "Get a list of hosts for tramp method found in `helm-pattern'.
 Argument PATTERN default to `helm-pattern', it is here only for debugging
 purpose."
-  (when (string-match tramp-file-name-regexp pattern)
+  (when (string-match helm-tramp-file-name-regexp pattern)
     (let ((method      (match-string 1 pattern))
           (tn          (match-string 0 pattern))
           (all-methods (mapcar 'car tramp-methods)))
@@ -1377,7 +1378,7 @@ purpose."
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
-          ((and (string-match  tramp-file-name-regexp pattern)
+          ((and (string-match  helm-tramp-file-name-regexp pattern)
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
            (setq tramp-name (helm-create-tramp-name
@@ -1385,7 +1386,7 @@ purpose."
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
           ((and (not (string-match reg pattern))
-                (string-match tramp-file-name-regexp pattern)
+                (string-match helm-tramp-file-name-regexp pattern)
                 (member (match-string 1 pattern) methods))
            "Invalid tramp file name")   ; Write in helm-buffer.
           ;; PATTERN is a directory, end it with "/".
@@ -1730,7 +1731,7 @@ return FNAME prefixed with [?]."
   "Transformer for `helm-source-find-files'.
 Tramp files are not highlighted unless `helm-ff-tramp-not-fancy'
 is non--nil."
-  (if (or (and (string-match tramp-file-name-regexp helm-pattern)
+  (if (or (and (string-match helm-tramp-file-name-regexp helm-pattern)
                helm-ff-tramp-not-fancy)
           (> (length files) helm-ff-maximum-candidate-to-decorate))
       (if helm-ff-transformer-show-only-basename
@@ -1932,7 +1933,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                        (insert fname))))))
     (cond ((and (string= (helm-ff-set-pattern helm-pattern)
                          "Invalid tramp file name")
-                (string-match tramp-file-name-regexp candidate))
+                (string-match helm-tramp-file-name-regexp candidate))
            ;; First hit insert hostname and
            ;; second hit insert ":" and expand.
            (if (string= candidate helm-pattern)
@@ -2523,7 +2524,7 @@ and
   `((name . "Session")
     (candidates . (lambda ()
                     (cl-delete-if-not #'(lambda (f)
-                                          (or (string-match tramp-file-name-regexp f)
+                                          (or (string-match helm-tramp-file-name-regexp f)
                                               (file-exists-p f)))
                                       (mapcar 'car session-file-alist))))
     (keymap . ,helm-generic-files-map)
@@ -2550,7 +2551,7 @@ Colorize only symlinks, directories and files."
            for type = (car (file-attributes i))
            collect
            (cond ((and helm-ff-tramp-not-fancy
-                       (string-match tramp-file-name-regexp i))
+                       (string-match helm-tramp-file-name-regexp i))
                   (cons disp i))
                  ((stringp type)
                   (cons (propertize disp
