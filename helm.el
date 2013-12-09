@@ -2432,7 +2432,7 @@ and `helm-pattern'."
             (let (newmatches)
               (cl-dolist (candidate cands)
                 (when (funcall match (helm-candidate-get-display candidate))
-                  (helm-aif (assoc-default 'filter-one-transformer source)
+                  (helm-aif (assoc-default 'filter-one-by-one source)
                       (setq candidate (funcall it candidate)))
                   (and candidate
                        (helm--accumulate-candidates

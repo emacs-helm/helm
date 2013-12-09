@@ -403,14 +403,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                     helm-ff-auto-update-initial-value)
               (set (make-local-variable 'helm-in-file-completion-p) t)))
     (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer . (;; (lambda (candidates _source)
-                                       ;;   (if helm-ff-skip-boring-files
-                                       ;;     (helm-skip-boring-files candidates)
-                                       ;;     candidates))
-                                       helm-ff-sort-candidates
-                                       ;helm-find-files-transformer
-                                       ))
-    (filter-one-transformer . helm-ff-filter-one-transformer)
+    (filtered-candidate-transformer . helm-ff-sort-candidates)
+    (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . helm-ff-mode-line-string)
@@ -1777,7 +1771,7 @@ Return candidates prefixed with basename of `helm-input' first."
                                     (t (string-lessp bn1 bn2))))))))
         (if cand1 (cons cand1 all) all))))
 
-(defun helm-ff-filter-one-transformer (file)
+(defun helm-ff-filter-candidate-one-by-one (file)
   "Candidate transformer function for `helm-source-find-files'.
 Don't use it directly in `filtered-candidate-transformer' use instead
 `helm-find-files-transformer'."
