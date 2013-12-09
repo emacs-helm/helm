@@ -202,7 +202,7 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21142 65350 655250 814000))
+;;;### (autoloads nil "helm" "helm.el" (21155 5481 899334 408000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -721,8 +721,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-elisp" "helm-elisp.el" (21133 41665 674678
-;;;;;;  717000))
+;;;### (autoloads nil "helm-elisp" "helm-elisp.el" (21153 36270 910627
+;;;;;;  575000))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -846,8 +846,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads nil "helm-files" "helm-files.el" (21139 27233 272108
-;;;;;;  353000))
+;;;### (autoloads nil "helm-files" "helm-files.el" (21155 20654 990867
+;;;;;;  993000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-ff-run-toggle-auto-update "helm-files" "\
@@ -1357,8 +1357,8 @@ HELM-ATTRIBUTE should be a symbol.
 
 ;;;***
 
-;;;### (autoloads nil "helm-imenu" "helm-imenu.el" (21143 25939 732125
-;;;;;;  902000))
+;;;### (autoloads nil "helm-imenu" "helm-imenu.el" (21149 33320 995603
+;;;;;;  152000))
 ;;; Generated autoloads from helm-imenu.el
 
 (autoload 'helm-imenu "helm-imenu" "\
@@ -1422,7 +1422,7 @@ With a prefix arg reinitialize the cache.
 ;;;***
 
 ;;;### (autoloads nil "helm-match-plugin" "helm-match-plugin.el"
-;;;;;;  (21133 41665 678678 718000))
+;;;;;;  (21153 39469 679107 229000))
 ;;; Generated autoloads from helm-match-plugin.el
 
 (defvar helm-match-plugin-mode nil "\
@@ -1442,9 +1442,14 @@ See `helm-mp-matching-method' for the behavior of each method.
 
 ;;;***
 
-;;;### (autoloads nil "helm-misc" "helm-misc.el" (21139 27233 272108
-;;;;;;  353000))
+;;;### (autoloads nil "helm-misc" "helm-misc.el" (21157 21064 466741
+;;;;;;  795000))
 ;;; Generated autoloads from helm-misc.el
+
+(autoload 'helm-browse-menubar "helm-misc" "\
+Helm interface to the menubar using lacarte.el.
+
+\(fn)" t nil)
 
 (autoload 'helm-world-time "helm-misc" "\
 Preconfigured `helm' to show world time.
@@ -1734,8 +1739,8 @@ First call open the kill-ring browser, next calls move to next line.
 
 ;;;***
 
-;;;### (autoloads nil "helm-semantic" "helm-semantic.el" (21141 38875
-;;;;;;  304982 882000))
+;;;### (autoloads nil "helm-semantic" "helm-semantic.el" (21145 42216
+;;;;;;  691266 281000))
 ;;; Generated autoloads from helm-semantic.el
 
 (autoload 'helm-semantic "helm-semantic" "\
@@ -1809,8 +1814,8 @@ If tag file have been modified reinitialize cache.
 
 ;;;***
 
-;;;### (autoloads nil "helm-utils" "helm-utils.el" (21137 38161 862781
-;;;;;;  998000))
+;;;### (autoloads nil "helm-utils" "helm-utils.el" (21145 31330 257703
+;;;;;;  736000))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1893,7 +1898,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21143 26383 268555 973000))
+;;;;;;  (21157 21077 187545 413000))
 
 ;;;***
 

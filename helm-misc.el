@@ -179,7 +179,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 
 ;;; LaCarte
 ;;
-
+;;
 (defun helm-create-lacarte-source (name &optional maps)
   "Create lacarte source named NAME for MAPS.
 MAPS is like in `lacarte-get-overall-menu-item-alist'.
@@ -198,11 +198,12 @@ See
 See
     http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
 
+;;;###autoload
 (defun helm-browse-menubar ()
   "Helm interface to the menubar using lacarte.el."
   (interactive)
   (require 'lacarte)
-  (helm :sources 'helm-source-lacarte))
+  (helm :sources 'helm-source-lacarte :buffer "*helm lacarte*"))
 
 (defun helm-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
