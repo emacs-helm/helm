@@ -2432,6 +2432,8 @@ and `helm-pattern'."
             (let (newmatches)
               (cl-dolist (candidate cands)
                 (when (funcall match (helm-candidate-get-display candidate))
+                  (helm-aif (assoc-default 'filter-one-transformer source)
+                      (setq candidate (funcall it candidate)))
                   (helm--accumulate-candidates
                    candidate newmatches helm-match-hash item-count limit source)))
               (setq matches (append matches (reverse newmatches)))

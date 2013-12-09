@@ -403,12 +403,13 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                     helm-ff-auto-update-initial-value)
               (set (make-local-variable 'helm-in-file-completion-p) t)))
     (candidates . helm-find-files-get-candidates)
-    (filtered-candidate-transformer . ((lambda (candidates _source)
-                                         (if helm-ff-skip-boring-files
-                                             (helm-skip-boring-files candidates)
-                                             candidates))
-                                       helm-ff-sort-candidates
-                                       helm-find-files-transformer))
+    ;; (filtered-candidate-transformer . ((lambda (candidates _source)
+    ;;                                      (if helm-ff-skip-boring-files
+    ;;                                          (helm-skip-boring-files candidates)
+    ;;                                          candidates))
+    ;;                                    helm-ff-sort-candidates
+    ;;                                    helm-find-files-transformer))
+    (filter-one-transformer . helm-ff-filter-one-transformer)
     (persistent-action . helm-find-files-persistent-action)
     (persistent-help . "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
     (mode-line . helm-ff-mode-line-string)
@@ -1773,6 +1774,54 @@ Return candidates prefixed with basename of `helm-input' first."
                                     ((> sc1 sc2))
                                     (t (string-lessp bn1 bn2))))))))
         (if cand1 (cons cand1 all) all))))
+
+(defun helm-ff-filter-one-transformer (file)
+  "Candidate transformer function for `helm-source-find-files'.
+Don't use it directly in `filtered-candidate-transformer' use instead
+`helm-find-files-transformer'."
+  (let* ((disp (if (and helm-ff-transformer-show-only-basename
+                        (not (helm-dir-is-dot file))
+                        (not (and ffap-url-regexp
+                                  (string-match ffap-url-regexp file)))
+                        (not (string-match helm-ff-url-regexp file)))
+                   (or (helm-ff-get-host-from-tramp-invalid-fname file)
+                       (helm-basename file)) file))
+         (attr (file-attributes file))
+         (type (car attr)))
+          
+    (cond ((string-match "access denied" file) file)
+          ( ;; A not already saved file.
+           (and (stringp type)
+                (not (helm-ff-valid-symlink-p file))
+                (not (string-match "^\.#" (helm-basename file))))
+           (cons (helm-ff-prefix-filename
+                  (propertize disp 'face 'helm-ff-invalid-symlink) t)
+                 file))
+          ;; A symlink.
+          ((stringp type)
+           (cons (helm-ff-prefix-filename
+                  (propertize disp 'face 'helm-ff-symlink) t)
+                 file)) 
+          ;; A directory.
+          ((eq t type)
+           (cons (helm-ff-prefix-filename
+                  (propertize disp 'face 'helm-ff-directory) t)
+                 file))
+          ;; An executable file.
+          ((and attr (string-match "x" (nth 8 attr)))
+           (cons (helm-ff-prefix-filename
+                  (propertize disp 'face 'helm-ff-executable) t)
+                 file))
+          ;; A file.
+          ((and attr (null type))
+           (cons (helm-ff-prefix-filename
+                  (propertize disp 'face 'helm-ff-file) t)
+                 file))
+          ;; A non--existing file.
+          (t
+           (cons (helm-ff-prefix-filename
+                  (propertize disp 'face 'helm-ff-file) nil 'new-file)
+                 file)))))
 
 (defun helm-ff-highlight-files (files)
   "Candidate transformer function for `helm-source-find-files'.
