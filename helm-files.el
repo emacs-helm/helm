@@ -214,12 +214,6 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :group 'helm-files
   :type 'integer)
 
-(defcustom helm-ff-maximum-candidate-to-decorate 2000
-  "If length of candidates is superior to this value do not highlight them.
-This happen only in `helm-find-files'."
-  :group 'helm-files
-  :type 'integer)
-
 (defcustom helm-ff-file-name-history-use-recentf nil
   "Use `recentf-list' instead of `file-name-history' in `helm-find-files'."
   :group 'helm-files
@@ -1723,21 +1717,6 @@ return FNAME prefixed with [?]."
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
 
-(defun helm-find-files-transformer (files _source)
-  "Transformer for `helm-source-find-files'.
-Tramp files are not highlighted unless `helm-ff-tramp-not-fancy'
-is non--nil."
-  (if (or (and (string-match helm-tramp-file-name-regexp helm-pattern)
-               helm-ff-tramp-not-fancy)
-          (> (length files) helm-ff-maximum-candidate-to-decorate))
-      (if helm-ff-transformer-show-only-basename
-          (cl-loop for i in files collect
-                   (if (helm-dir-is-dot i)
-                       i (cons (or (helm-ff-get-host-from-tramp-invalid-fname i)
-                                   (helm-basename i)) i)))
-          files)
-      (helm-ff-highlight-files files)))
-
 (defun helm-ff-sort-candidates (candidates _source)
   "Sort function for `helm-source-find-files'.
 Return candidates prefixed with basename of `helm-input' first."
@@ -1831,55 +1810,6 @@ Return candidates prefixed with basename of `helm-input' first."
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-file) nil 'new-file)
                        file)))))))
-
-(defun helm-ff-highlight-files (files)
-  "Candidate transformer function for `helm-source-find-files'.
-Don't use it directly in `filtered-candidate-transformer' use instead
-`helm-find-files-transformer'."
-  (cl-loop for i in files
-           for disp = (if (and helm-ff-transformer-show-only-basename
-                               (not (helm-dir-is-dot i))
-                               (not (and ffap-url-regexp
-                                         (string-match ffap-url-regexp i)))
-                               (not (string-match helm-ff-url-regexp i)))
-                          (or (helm-ff-get-host-from-tramp-invalid-fname i)
-                              (helm-basename i)) i)
-           for attr = (file-attributes i)
-           for type = (car attr)
-           collect
-           (cond ((string-match "access denied" i) i)
-                 (;; A not already saved file.
-                  (and (stringp type)
-                       (not (helm-ff-valid-symlink-p i))
-                       (not (string-match "^\.#" (helm-basename i))))
-                  (cons (helm-ff-prefix-filename
-                         (propertize disp 'face 'helm-ff-invalid-symlink) t)
-                        i))
-                 ;; A symlink.
-                 ((stringp type)
-                  (cons (helm-ff-prefix-filename
-                         (propertize disp 'face 'helm-ff-symlink) t)
-                        i))
-                 ;; A directory.
-                 ((eq t type)
-                  (cons (helm-ff-prefix-filename
-                         (propertize disp 'face 'helm-ff-directory) t)
-                        i))
-                 ;; An executable file.
-                 ((and attr (string-match "x" (nth 8 attr)))
-                  (cons (helm-ff-prefix-filename
-                         (propertize disp 'face 'helm-ff-executable) t)
-                        i))
-                 ;; A file.
-                 ((and attr (null type))
-                  (cons (helm-ff-prefix-filename
-                         (propertize disp 'face 'helm-ff-file) t)
-                        i))
-                 ;; A non--existing file.
-                 (t
-                  (cons (helm-ff-prefix-filename
-                         (propertize disp 'face 'helm-ff-file) nil 'new-file)
-                        i)))))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
