@@ -2434,7 +2434,7 @@ and `helm-pattern'."
                 (when (funcall match (helm-candidate-get-display candidate))
                   (helm-aif (assoc-default 'filter-one-by-one source)
                       (setq candidate (funcall it candidate)))
-                  (and candidate
+                  (and candidate ; candidate returned by filter-one-by-one maybe nil.
                        (helm--accumulate-candidates
                         candidate newmatches helm-match-hash item-count limit source))))
               (setq matches (append matches (reverse newmatches)))
