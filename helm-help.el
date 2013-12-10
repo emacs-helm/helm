@@ -1217,6 +1217,16 @@ HELM-ATTRIBUTE should be a symbol."
 (helm-document-attribute 'allow-dups "optional"
   "  Allow helm collecting duplicates candidates.")
 
+(helm-document-attribute 'filter-one-by-one "optional"
+  "  A transformer function that treat candidates one by one.
+  It is called with one arg the candidate.
+  Faster than `filtered-candidate-transformer' or `candidates-transformer'.
+  Unlike other transformers this happen early and FILE is treated
+  once fetching candidates instead of re-looping on all candidates.
+  If used with `filtered-candidate-transformer' or `candidates-transformer'
+  these functions should treat the candidates transformed by the `filter-one-by-one'
+  function.")
+
 (provide 'helm-help)
 
 ;; Local Variables:
