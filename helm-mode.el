@@ -739,8 +739,8 @@ Keys description:
                                                          (funcall ',test i)) ; Test ok
                                                 collect i)
                                        (helm-find-files-get-candidates ',must-match)))))
-                      (filtered-candidate-transformer
-                       helm-find-files-transformer)
+                      (filtered-candidate-transformer . helm-ff-sort-candidates)
+                      (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
                       (keymap . ,cmap)
                       (no-delay-on-input)
                       (persistent-action . ,persistent-action)
