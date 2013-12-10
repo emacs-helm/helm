@@ -2433,7 +2433,10 @@ and `helm-pattern'."
               (cl-dolist (candidate cands)
                 (when (funcall match (helm-candidate-get-display candidate))
                   (helm-aif (assoc-default 'filter-one-by-one source)
-                      (setq candidate (funcall it candidate)))
+                      (if (listp it)
+                          (cl-loop for f in it
+                                   do (setq candidate (funcall f candidate)))
+                          (setq candidate (funcall it candidate))))
                   (and candidate ; candidate returned by filter-one-by-one maybe nil.
                        (helm--accumulate-candidates
                         candidate newmatches helm-match-hash item-count limit source))))
