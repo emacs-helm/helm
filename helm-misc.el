@@ -190,8 +190,19 @@ See
     (candidates . (lambda ()
                     (with-helm-current-buffer
                       (delete '(nil) (lacarte-get-overall-menu-item-alist ,@maps)))))
+    (candidate-transformer . helm-lacarte-candidate-transformer)
     (candidate-number-limit . 9999)
     (type . command)))
+
+(defun helm-lacarte-candidate-transformer (cands)
+  (mapcar (lambda (cand)
+          (let* ((item (car cand))
+                 (match (string-match "[^>] \\((.*)\\)$" item)))
+            (when match
+              (put-text-property (match-beginning 1) (match-end 1)
+                                 'face 'helm-M-x-key item))
+            cand))
+          cands))
 
 (defvar helm-source-lacarte (helm-create-lacarte-source "Lacarte")
   "Helm interface for lacarte.el.
