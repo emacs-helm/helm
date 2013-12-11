@@ -2742,7 +2742,8 @@ after the source name by overlay."
   (cl-dolist (candidate (helm-transform-candidates
                          (helm-output-filter--collect-candidates
                           (split-string output-string "\n")
-                          (assoc 'incomplete-line source))
+                          (assoc 'incomplete-line source)
+                          source)
                          source t))
     (if (assq 'multiline source)
         (let ((start (point)))
@@ -2755,8 +2756,8 @@ after the source name by overlay."
       (helm-kill-async-process process)
       (cl-return))))
 
-(defun helm-output-filter--collect-candidates (lines incomplete-line-info)
-  "Collect lines in LINES maybe completing the truncated first and last lines."
+(defun helm-output-filter--collect-candidates (lines incomplete-line-info source)
+  "Collect LINES maybe completing the truncated first and last lines."
   ;; The output of process may come in chunks of any size,
   ;; so the last line of LINES come truncated, this truncated line is
   ;; stored in INCOMPLETE-LINE-INFO and will be concated with the first
@@ -2765,12 +2766,15 @@ after the source name by overlay."
   ;; with an empty string when the source is computed => (incomplete-line . "")
   (helm-log-eval (cdr incomplete-line-info))
   (butlast ; The last line is the incomplete line, remove it.
-   (cl-loop for line in lines collect
-            (if (cdr incomplete-line-info) ; On start it is an empty string.
-                (prog1
-                    (concat (cdr incomplete-line-info) line)
-                  (setcdr incomplete-line-info nil))
-                line)
+   (cl-loop for line in lines
+            ;; On start `incomplete-line-info' value is empty.
+            for newline = (helm-aif (cdr incomplete-line-info)
+                              (prog1
+                                  (concat it line)
+                                (setcdr incomplete-line-info nil))
+                              line)
+            do (helm--maybe-process-filter-one-by-one-candidate newline source)
+            and collect newline
             ;; Store last incomplete line (last chunk truncated)
             ;; until new output arrives.
             finally do (setcdr incomplete-line-info line))))

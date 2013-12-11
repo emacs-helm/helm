@@ -827,7 +827,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
             (header-name . (lambda (name)
                              (concat name "(C-c ? Help)")))
             (candidates-process . helm-grep-collect-candidates)
-            (filtered-candidate-transformer helm-grep-cand-transformer)
+            (filter-one-by-one . helm-grep-filter-one-by-one)
             (candidate-number-limit . 9999)
             (no-matchplugin)
             (nohighlight)
@@ -895,25 +895,23 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     ;; may contain a ":".
     (cl-loop for n from 1 to 3 collect (match-string n line))))
 
-(defun helm-grep-cand-transformer (candidates _source)
+(defun helm-grep-filter-one-by-one (candidate)
   "Filtered candidate transformer function for `helm-do-grep'."
-  (cl-loop with root = (and helm-grep-default-directory-fn
-                            (funcall helm-grep-default-directory-fn))
-           for i in candidates
-           for split  = (and i (helm-grep-split-line i))
-           for fname  = (if (and root split)
-                            (expand-file-name (car split) root)
-                            (car-safe split))
-           for lineno = (nth 1 split)
-           for str    = (nth 2 split)
-           when (and fname lineno str)
-           collect
-           (cons (concat (propertize (file-name-nondirectory fname)
-                                     'face 'helm-grep-file
-                                     'help-echo fname) ":"
-                                     (propertize lineno 'face 'helm-grep-lineno) ":"
-                                     (helm-grep-highlight-match str))
-                 i)))
+  (let* ((root   (and helm-grep-default-directory-fn
+                      (funcall helm-grep-default-directory-fn)))
+         (split  (helm-grep-split-line candidate))
+         (fname  (if (and root split)
+                     (expand-file-name (car split) root)
+                     (car-safe split)))
+         (lineno (nth 1 split))
+         (str    (nth 2 split)))
+    (when (and fname lineno str)
+      (cons (concat (propertize (file-name-nondirectory fname)
+                                'face 'helm-grep-file
+                                'help-echo fname) ":"
+                                (propertize lineno 'face 'helm-grep-lineno) ":"
+                                (helm-grep-highlight-match str))
+            candidate))))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
@@ -1051,7 +1049,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (candidates-process
          . (lambda ()
              (funcall helm-pdfgrep-default-function helm-pdfgrep-targets)))
-        (filtered-candidate-transformer helm-grep-cand-transformer)
+        (filter-one-by-one . helm-grep-filter-one-by-one)
         (candidate-number-limit . 9999)
         (no-matchplugin)
         (nohighlight)
