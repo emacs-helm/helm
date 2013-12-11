@@ -23,6 +23,7 @@
 (require 'xml)
 (require 'browse-url)
 
+
 (defgroup helm-net nil
   "Net related applications and libraries for Helm."
   :group 'helm)
@@ -271,7 +272,8 @@ Return an alist with elements like (data . number_results)."
     (,browse-url-galeon-program . browse-url-galeon)
     (,browse-url-netscape-program . browse-url-netscape)
     (,browse-url-mosaic-program . browse-url-mosaic)
-    (,browse-url-xterm-program . browse-url-text-xterm))
+    (,browse-url-xterm-program . browse-url-text-xterm)
+    ("emacs" . eww-browse-url))
   "*Alist of \(executable . function\) to try to find a suitable url browser.")
 
 (cl-defun helm-generic-browser (url name &rest args)
@@ -301,8 +303,7 @@ Return an alist with elements like (data . number_results)."
   "Find the first available browser and ask it to load URL."
   (let ((default-browser-fn
          (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
-                  thereis (and exe (executable-find exe)
-                               (and (fboundp fn) fn)))))
+                  thereis (and exe (executable-find exe) (fboundp fn) fn))))
     (if default-browser-fn
         (apply default-browser-fn url args)
         (error "No usable browser found"))))
