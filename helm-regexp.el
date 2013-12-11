@@ -306,7 +306,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   "Helm source for multi occur.")
 
 (defun helm-m-occur-filter-one-by-one (candidate)
-  "Transformer function for `helm-source-moccur'."
+  "`filter-one-by-one' function for `helm-source-moccur'."
   (require 'helm-grep)
   (let* ((split  (helm-grep-split-line candidate))
          (buf    (car split))
