@@ -3563,6 +3563,11 @@ See also `helm-sources' docstring."
                         ;; If match-part attr is present, collect only if PATTERN
                         ;; match the part of CAND specified by the match-part func.
                         (helm-search-match-part cand pattern match-part-fn))
+                  do (helm-aif (assoc-default 'filter-one-by-one source)
+                      (if (listp it)
+                          (cl-loop for f in it
+                                   do (setq cand (funcall f cand)))
+                          (setq cand (funcall it cand))))
                   do (helm--accumulate-candidates
                       cand newmatches helm-cib-hash item-count limit source)
                   unless (helm-point-is-moved

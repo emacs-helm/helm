@@ -287,7 +287,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
               (helm-attrset 'delayed helm-m-occur-idle-delay
                             helm-source-moccur)))
     (candidates-in-buffer)
-    (filtered-candidate-transformer . helm-m-occur-transformer)
+    (filter-one-by-one . helm-m-occur-filter-one-by-one)
     (get-line . helm-m-occur-get-line)
     (nohighlight)
     (migemo)
@@ -305,26 +305,25 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (delayed . ,helm-m-occur-idle-delay))
   "Helm source for multi occur.")
 
-(defun helm-m-occur-transformer (candidates _source)
+(defun helm-m-occur-filter-one-by-one (candidate)
   "Transformer function for `helm-source-moccur'."
   (require 'helm-grep)
-  (cl-loop for i in candidates
-           for split = (helm-grep-split-line i)
-           for buf = (car split)
-           for lineno = (nth 1 split)
-           for str = (nth 2 split)
-           collect (cons (concat (propertize
-                                  buf
-                                  'face 'helm-moccur-buffer
-                                  'help-echo (buffer-file-name
-                                              (get-buffer buf))
-                                  'buffer-name buf)
-                                 ":"
-                                 (propertize lineno 'face 'helm-grep-lineno)
-                                 ":"
-                                 (helm-grep-highlight-match
-                                  str helm-occur-match-plugin-mode))
-                         i)))
+  (let* ((split (helm-grep-split-line candidate))
+         (buf (car split))
+         (lineno (nth 1 split))
+         (str (nth 2 split)))
+    (cons (concat (propertize
+                   buf
+                   'face 'helm-moccur-buffer
+                   'help-echo (buffer-file-name
+                               (get-buffer buf))
+                   'buffer-name buf)
+                  ":"
+                  (propertize lineno 'face 'helm-grep-lineno)
+                  ":"
+                  (helm-grep-highlight-match
+                   str helm-occur-match-plugin-mode))
+          candidate)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-source-moccur' with BUFFERS list."
