@@ -2311,6 +2311,14 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
       (helm-composed-funcall-with-source source it candidates source)
     candidates))
 
+(defmacro helm--maybe-process-filter-one-by-one-candidate (candidate source)
+  "Execute `filter-one-by-one' function(s) on CANDIDATE in SOURCE."
+  `(helm-aif (assoc-default 'filter-one-by-one ,source)
+       (if (listp it)
+           (cl-loop for f in it
+                    do (setq ,candidate (funcall f ,candidate)))
+           (setq ,candidate (funcall it ,candidate)))))
+
 (defun helm-process-filtered-candidate-transformer-maybe
     (candidates source process-p)
   "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE.
@@ -2436,11 +2444,7 @@ and `helm-pattern'."
                 (when (and (not (gethash candidate helm-match-hash))
                            (funcall match
                                     (helm-candidate-get-display candidate)))
-                  (helm-aif (assoc-default 'filter-one-by-one source)
-                      (if (listp it)
-                          (cl-loop for f in it
-                                   do (setq candidate (funcall f candidate)))
-                          (setq candidate (funcall it candidate))))
+                  (helm--maybe-process-filter-one-by-one-candidate candidate source)
                   ;; candidate returned by filter-one-by-one maybe nil.
                   (and candidate
                        (helm--accumulate-candidates
@@ -3563,11 +3567,7 @@ See also `helm-sources' docstring."
                         ;; If match-part attr is present, collect only if PATTERN
                         ;; match the part of CAND specified by the match-part func.
                         (helm-search-match-part cand pattern match-part-fn))
-                  do (helm-aif (assoc-default 'filter-one-by-one source)
-                      (if (listp it)
-                          (cl-loop for f in it
-                                   do (setq cand (funcall f cand)))
-                          (setq cand (funcall it cand))))
+                  do (helm--maybe-process-filter-one-by-one-candidate cand source)
                   do (helm--accumulate-candidates
                       cand newmatches helm-cib-hash item-count limit source)
                   unless (helm-point-is-moved
