@@ -249,6 +249,7 @@ Italic     => A non--file buffer.
 - When you want to delete backward characters to e.g creating a new file or directory,
   autoupdate may keep updating to an existent directory
   preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
+  NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
 
 - You can create a new directory an a new file at the same time, just write the path in prompt
   and press <RET>.
@@ -320,7 +321,14 @@ Italic     => A non--file buffer.
 ;;
 ;;
 (defvar helm-read-file-name-help-message
-  "== Helm read file name Map ==\
+  "== Helm read file name ==\
+
+\nTips:
+\n- When you want to delete backward characters to e.g creating a new file or directory,
+  autoupdate may keep updating to an existent directory
+  preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
+  NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
+
 \nSpecific commands for helm-read-file-name:
 \\<helm-read-file-map>
 \\[helm-find-files-down-one-level]\t\t->Go down precedent directory.

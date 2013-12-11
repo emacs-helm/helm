@@ -112,9 +112,13 @@ If you want to have the default tramp messages set it to 3."
   :type 'integer
   :group 'helm-files)
 
-(defcustom helm-ff-auto-update-initial-value t
+(defcustom helm-ff-auto-update-initial-value nil
   "Auto update when only one candidate directory is matched.
-This is the default value when starting `helm-find-files'."
+Default value when starting `helm-find-files' is nil because
+it prevent using <backspace> to delete char backward and by the way
+confuse beginners.
+For a better experience with `helm-find-files' set this to non--nil
+and use C-<backspace> to toggle it."
   :group 'helm-files
   :type  'boolean)
 
@@ -322,6 +326,7 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
     (define-key map (kbd "C-}")           'helm-narrow-window)
     (define-key map (kbd "C-{")           'helm-enlarge-window)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
+    (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c C-a")       'helm-ff-run-gnus-attach-files)
     (define-key map (kbd "C-c p")         'helm-ff-run-print-file)
     (define-key map (kbd "C-c /")         'helm-ff-run-find-sh-command)
