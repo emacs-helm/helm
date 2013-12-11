@@ -2439,13 +2439,11 @@ and `helm-pattern'."
           (cl-dolist (match matchfns)
             (let (newmatches)
               (cl-dolist (candidate cands)
-                ;; check if candidate have been computed
-                ;; in previous match function.
-                (when (and (not (gethash candidate helm-match-hash))
-                           (funcall match
-                                    (helm-candidate-get-display candidate)))
-                  (helm--maybe-process-filter-one-by-one-candidate candidate source)
-                  ;; candidate returned by filter-one-by-one maybe nil.
+                (when (funcall match
+                               (helm-candidate-get-display candidate))
+                  (helm--maybe-process-filter-one-by-one-candidate
+                   candidate source)
+                  ;; candidate returned by filter-one-by-one fn maybe nil.
                   (and candidate
                        (helm--accumulate-candidates
                         candidate newmatches

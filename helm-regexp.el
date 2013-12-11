@@ -308,10 +308,10 @@ Same as `helm-m-occur-goto-line' but go in new frame."
 (defun helm-m-occur-filter-one-by-one (candidate)
   "Transformer function for `helm-source-moccur'."
   (require 'helm-grep)
-  (let* ((split (helm-grep-split-line candidate))
-         (buf (car split))
+  (let* ((split  (helm-grep-split-line candidate))
+         (buf    (car split))
          (lineno (nth 1 split))
-         (str (nth 2 split)))
+         (str    (nth 2 split)))
     (cons (concat (propertize
                    buf
                    'face 'helm-moccur-buffer
