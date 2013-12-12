@@ -2388,15 +2388,16 @@ Default function to match candidates according to `helm-pattern'."
                       #'helm-default-match-function)))
     (if (listp matchfns) matchfns (list matchfns))))
 
-(defmacro helm--accumulate-candidates (cand newmatches
+(defmacro helm--accumulate-candidates (candidate newmatches
                                        hash item-count limit source)
   "Add CAND into NEWMATCHES and use HASH to uniq NEWMATCHES.
 Argument ITEM-COUNT count the matches.
 if ITEM-COUNT reaches LIMIT, exit from inner loop."
-  `(unless (gethash ,cand ,hash)
+  `(unless (gethash ,candidate ,hash)
      (unless (assq 'allow-dups ,source)
-       (puthash ,cand t ,hash))
-     (push ,cand ,newmatches)
+       (puthash ,candidate t ,hash))
+     (helm--maybe-process-filter-one-by-one-candidate ,candidate source)
+     (push ,candidate ,newmatches)
      (cl-incf ,item-count)
      (when (= ,item-count ,limit) (cl-return))))
 
@@ -2439,16 +2440,13 @@ and `helm-pattern'."
           (cl-dolist (match matchfns)
             (let (newmatches)
               (cl-dolist (candidate cands)
-                (when (funcall match
-                               (helm-candidate-get-display candidate))
-                  (helm--maybe-process-filter-one-by-one-candidate
-                   candidate source)
-                  ;; candidate returned by filter-one-by-one fn maybe nil.
-                  (and candidate
-                       (helm--accumulate-candidates
-                        candidate newmatches
-                        helm-match-hash item-count limit source))))
-              (setq matches (append matches (reverse newmatches))))))
+                (unless (gethash candidate helm-match-hash)
+                  (when (funcall match
+                                 (helm-candidate-get-display candidate))
+                    (helm--accumulate-candidates
+                     candidate newmatches
+                     helm-match-hash item-count limit source))))
+              (setq matches (append matches (nreverse newmatches))))))
       (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
                (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                                (assoc-default 'name source) (car err) (cdr err)))
@@ -3562,14 +3560,14 @@ See also `helm-sources' docstring."
          (cl-loop with item-count = 0
                   while (funcall searcher pattern)
                   for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
-                  when (or
-                        ;; Always collect when cand is matched by searcher funcs
-                        ;; and match-part attr is not present.
-                        (not match-part-fn)
-                        ;; If match-part attr is present, collect only if PATTERN
-                        ;; match the part of CAND specified by the match-part func.
-                        (helm-search-match-part cand pattern match-part-fn))
-                  do (helm--maybe-process-filter-one-by-one-candidate cand source)
+                  when (and (not (gethash cand helm-cib-hash))
+                            (or
+                             ;; Always collect when cand is matched by searcher funcs
+                             ;; and match-part attr is not present.
+                             (not match-part-fn)
+                             ;; If match-part attr is present, collect only if PATTERN
+                             ;; match the part of CAND specified by the match-part func.
+                             (helm-search-match-part cand pattern match-part-fn)))
                   do (helm--accumulate-candidates
                       cand newmatches helm-cib-hash item-count limit source)
                   unless (helm-point-is-moved
