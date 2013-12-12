@@ -74,12 +74,6 @@ See `helm-case-fold-search' for more info."
   :group 'helm-mode
   :type 'symbol)
 
-(defcustom helm-mode-handle-completion-in-region nil
-  "[EXPERIMENTAL] Whether to replace or not `completion-in-region-function'.
-This enable support for `completing-read-multiple' when non--nil."
-  :group 'helm-mode
-  :type 'boolean)
-
 (defcustom helm-mode-reverse-history t
   "Display history source after current source in `helm-mode' handled commands."
   :group 'helm-mode
@@ -855,23 +849,6 @@ Keys description:
       (setq this-command current-command))
     fname))
 
-(defun helm--completion-in-region (start end collection &optional predicate)
-  "[EXPERIMENTAL] Helm replacement of `completion--in-region'.
-Can be used as value for `completion-in-region-function'."
-  (cl-declare (special require-match prompt))
-  (let* ((enable-recursive-minibuffers t)
-         (input (buffer-substring start end))
-         (result (helm-comp-read prompt
-                                 (all-completions input collection predicate)
-                                 :initial-input input
-                                 :must-match require-match)))
-    (when result
-      (delete-region start end)
-      (insert result))))
-
-(when (boundp 'completion-in-region-function)
-  (defconst helm--old-completion-in-region-function completion-in-region-function))
-
 ;;;###autoload
 (define-minor-mode helm-mode
     "Toggle generic helm completion.
@@ -901,17 +878,11 @@ Note: This mode is incompatible with Emacs23."
       (progn
         (setq completing-read-function 'helm-completing-read-default
               read-file-name-function  'helm-generic-read-file-name)
-        (when (and (boundp 'completion-in-region-function)
-                   helm-mode-handle-completion-in-region)
-          (setq completion-in-region-function #'helm--completion-in-region))
         (message helm-completion-mode-start-message))
       (setq completing-read-function (and (fboundp 'completing-read-default)
                                           'completing-read-default)
             read-file-name-function  (and (fboundp 'read-file-name-default)
                                           'read-file-name-default))
-      (when (and (boundp 'completion-in-region-function)
-                 (boundp 'helm--old-completion-in-region-function))
-        (setq completion-in-region-function helm--old-completion-in-region-function))
       (message helm-completion-mode-quit-message)))
 
 (provide 'helm-mode)
