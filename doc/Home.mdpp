@@ -118,8 +118,13 @@ prefixed with `helm-command-prefix-key` (default to `C-x c`).
 To discover more helm commands run `helm all commands`
 (helm-execute-helm-command) from the menu. Or run helm-M-x (`helm-command-prefix-key` `M-x`) and type helm.
 
-When you like a command, e.g `helm-command-prefix-key` `M-x` you should bind it to something
-more convenient like M-x to replace the Emacs original keybinding.
+Typing `helm-command-prefix-key` before a normal command like `M-x`
+will run the helm version of that command: `helm-M-x`. If you prefer
+the helm version of a command, you should bind it to something more
+convenient like `M-x`. To replace the Emacs original keybinding, paste
+this in your init.el:
+
+    (global-set-key (kbd "M-x") 'helm-M-x)
 
 # Helm Find Files
 
@@ -130,8 +135,8 @@ described in this section.
 You can find it in the menu under `helm-command-prefix-key` or
  as the keychain `C-x C-f`.
 
-If you like it, you can safely bind it to C-x C-f to replace the
-standard find-file:
+If you prefer the helm version of the file finder, you can bind it to
+C-x C-f to replace the standard find-file:
 
     (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
@@ -142,11 +147,11 @@ of the last visited directories.
 
 ## Navigation
 
- Helm-find-files is not by default on / but on
-default-directory or thing-at-point as it uses ffap. If you are on a url,
-a mail adress etc.. it will do the right thing.
+ Helm-find-files does not start your working directory at / but on
+default-directory or thing-at-point which it gets from ffap. If you
+are on a url, a mail address, etc... it will do the right thing.
 
-So helm-find-files work like find-file (C-x C-f), but if you use it with
+`helm-find-files` works like find-file (C-x C-f), but if you use it with
 helm-match-plugin.el, you have to add a space and then the next part of
 pattern you want to match:
 
@@ -164,21 +169,25 @@ Example:
     Find Files or url: ~/ el$
     Will show all what finish with el
 
-You can move in the helm buffer with C-n C-p or arrow keys, when you are
-on a file, you can hit C-z to show only this file-name in the helm
-buffer. On a directory, C-z will switch to this directory to continue
-searching in it. On a symlink C-z will expand to the true name of
-symlink.(moving your mouse cursor over a symlink will show the true name
-of it).
+    
+Inside the `helm-find-files` buffer, you can move your selected row up
+or down with C-n C-p or arrow keys. When a row is selected, `C-z` performs the
+default action, which is different depending on the context.
+
+When you are on a file, `C-z` will show only this file-name in the
+helm buffer. On a directory, `C-z` will step down into this directory
+to continue searching in it. On a symlink, `C-z` will expand to the
+true name of symlink (moving your mouse cursor over a symlink will
+also show the true name).
 
 So it is quite easy to navigate in your files with helm-find-files.
 
-Forget to mention C-. that go to root of current dir or to precedent
-level of dir. So for example you can hit C-z and then come back
-immediatly where you were with C-. instead of erasing minibuffer input
-with DEL. On non graphic display, it is bound to C-l.
- If `helm-ff-lynx-style-map` is non–nil, you will be able to use `left`
-instead of C-l and `right` instead of C-z.
+C-. will navigate to the root of current dir or to precedent level of
+dir. A common operation is to hit C-z and then return immediately where
+you were with C-. instead of erasing minibuffer input with DEL. On
+non-graphic displays, it is bound to C-l. If `helm-ff-lynx-style-map`
+is non–nil, you will be able to use `left` instead of C-l and `right`
+instead of C-z.
 
 ## Jump with nth commands
 
