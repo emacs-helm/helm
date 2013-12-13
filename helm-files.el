@@ -30,7 +30,6 @@
 (require 'helm-buffers)
 (require 'thingatpt)
 (require 'ffap)
-(eval-when-compile (require 'dired))
 (require 'dired-aux)
 (require 'dired-x)
 (require 'tramp)
