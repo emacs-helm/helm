@@ -17,7 +17,7 @@
 
 ;;; Code:
 (require 'cl-lib)
-(eval-when-compile (require 'bookmark))
+(require 'bookmark)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-info)
