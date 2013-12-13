@@ -862,6 +862,9 @@ Can be used as value for `completion-in-region-function'."
   (cl-declare (special require-match prompt))
   (let* ((enable-recursive-minibuffers t)
          (input (buffer-substring start end))
+         (current-command (or (helm-this-command) this-command))
+         (str-command (symbol-name current-command))
+         (buf-name (format "*helm-mode-%s*" str-command))
          (require-match (or (and (boundp 'require-match) require-match)
                             minibuffer-completion-confirm
                             ;; If prompt have not been propagated here, that's
@@ -872,7 +875,9 @@ Can be used as value for `completion-in-region-function'."
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
                                  (all-completions input collection predicate)
+                                 :name str-command
                                  :initial-input input
+                                 :buffer buf-name
                                  :must-match require-match)))
     (when result
       (delete-region start end)
