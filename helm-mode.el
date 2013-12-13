@@ -858,10 +858,12 @@ Keys description:
 (defun helm--completion-in-region (start end collection &optional predicate)
   "[EXPERIMENTAL] Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
-  (cl-declare (special require-match prompt))
+  (cl-declare (special prompt))
   (let* ((enable-recursive-minibuffers t)
          (input (buffer-substring start end))
-         (result (helm-comp-read prompt
+         (require-match minibuffer-completion-confirm)
+         ;; Completion-at-point and friends have no prompt.
+         (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
                                  (all-completions input collection predicate)
                                  :initial-input input
                                  :must-match require-match)))
