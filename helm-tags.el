@@ -42,6 +42,12 @@ helm-source-ctags-select."
   :type 'boolean
   :group 'helm-tags)
 
+(defcustom helm-etags-execute-action-at-once-if-one t
+  "Whether to jump straight to the selected tag if there's only
+one match."
+  :type 'boolean
+  :group 'helm-tags)
+
 
 (defvar helm-etags-map
   (let ((map (make-sparse-keymap)))
@@ -255,7 +261,7 @@ Called with two prefix arg reinitialize cache.
 If tag file have been modified reinitialize cache."
   (interactive "P")
   (let ((tag  (helm-etags-get-tag-file))
-        (helm-execute-action-at-once-if-one t))
+        (helm-execute-action-at-once-if-one helm-etags-execute-action-at-once-if-one))
     (when (or (equal arg '(4))
               (and helm-etags-mtime-alist
                    (helm-etags-file-modified-p tag)))
