@@ -876,7 +876,7 @@ Can be used as value for `completion-in-region-function'."
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
                                  (all-completions input collection predicate)
                                  :name str-command
-                                 :initial-input input
+                                 :initial-input (concat input " ")
                                  :buffer buf-name
                                  :must-match require-match)))
     (when result
