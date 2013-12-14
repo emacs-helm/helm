@@ -18,6 +18,10 @@ and can be considered to be its successor.
 and provide a cleaner, leaner and more modular tool, that's not tied in
 the trap of backward compatibility. 
 
+## Requirements
+
+You need a recent Emacs to use latest helm, at least Emacs-24.3.
+
 ## Getting Started
 
 ### Quick install
