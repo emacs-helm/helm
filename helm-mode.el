@@ -861,7 +861,7 @@ Keys description:
 Can be used as value for `completion-in-region-function'."
   (cl-declare (special require-match prompt))
   (let* ((enable-recursive-minibuffers t)
-         (input (buffer-substring start end))
+         (input (buffer-substring-no-properties start end))
          (current-command (or (helm-this-command) this-command))
          (str-command (symbol-name current-command))
          (buf-name (format "*helm-mode-%s*" str-command))
