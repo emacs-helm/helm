@@ -872,17 +872,12 @@ Can be used as value for `completion-in-region-function'."
                             ;; completion-at-point or friend, so use a non--nil
                             ;; value for require-match.
                             (not (boundp 'prompt))))
-         (args (split-string (buffer-substring-no-properties (or (previous-single-property-change
-                                                                  (point) 'read-only) start)
-                                                             (point))))
-         (file-comp-p (> (length args) 1))
+         (data (all-completions input collection predicate))
+         (file-comp-p (expand-file-name
+                       (car data) (with-helm-current-buffer default-directory)))
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
-                                 (all-completions (if (and file-comp-p (not (string-match "~?/" input)))
-                                                      (expand-file-name
-                                                       input
-                                                       (with-helm-current-buffer default-directory))
-                                                      input) collection predicate)
+                                 data
                                  :name str-command
                                  :initial-input (if file-comp-p
                                                     (helm-basename input)
