@@ -2772,7 +2772,7 @@ after the source name by overlay."
                                 (setcdr incomplete-line-info nil))
                               line)
             do (helm--maybe-process-filter-one-by-one-candidate newline source)
-            and collect newline
+            and if newline collect newline
             ;; Store last incomplete line (last chunk truncated)
             ;; until new output arrives.
             finally do (setcdr incomplete-line-info line))))
