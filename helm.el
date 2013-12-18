@@ -2602,7 +2602,7 @@ is done on whole `helm-buffer' and not on current source."
          ;; These incomplete regexps hang helm forever
          ;; so defer update. Maybe replace spaces quoted when using
          ;; match-plugin-mode.
-         (not (member (replace-regexp-in-string "\\s\\" "" helm-pattern)
+         (not (member (replace-regexp-in-string "\\s\\ " " " helm-pattern)
                       helm-update-blacklist-regexps)))))
 
 (defun helm-delayed-source-p (source)
