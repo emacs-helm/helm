@@ -885,7 +885,8 @@ Can be used as value for `completion-in-region-function'."
                                  :initial-input
                                  (cond ((and file-comp-p
                                              (not (string-match "/\\'" input)))
-                                        (concat (helm-basename input) " "))
+                                        (concat (helm-basename input)
+                                                (unless (string= input "") " ")))
                                        ((string-match "/\\'" input) nil)
                                        ((or (null require-match)
                                             (stringp require-match))
