@@ -873,22 +873,37 @@ Can be used as value for `completion-in-region-function'."
                             ;; value for require-match.
                             (not (boundp 'prompt))))
          (data (all-completions input collection predicate))
+         (file-comp-p (helm-mode--in-file-completion-p input (car data)))
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
                                  data
                                  :name str-command
-                                 :initial-input (concat input " ")
-                                 :buffer buf-name
-                                 :must-match require-match)))
+                                 :initial-input
+                                 (cond ((and file-comp-p
+                                             (not (string-match "/\\'" input)))
+                                        (concat (helm-basename input) " "))
+                                       ((string-match "/\\'" input) nil)
+                                       (t (concat input " ")))
+                                  :buffer buf-name
+                                  :must-match require-match)))
     (when result
-      (delete-region (if (save-excursion
-                           (re-search-backward
-                            "~?/"
-                            (previous-single-property-change
-                             (point) 'read-only) t))
+      (delete-region (if (and file-comp-p
+                              (save-excursion
+                                (re-search-backward
+                                 "~?/"
+                                 (previous-single-property-change
+                                  (point) 'read-only) t)))
                          (match-end 0) start)
                      end)
       (insert result))))
+
+(defun helm-mode--in-file-completion-p (target candidate)
+  (or (string-match "/\\'" candidate)
+      (if (string-match "~?/" target)
+          (file-exists-p (expand-file-name candidate (helm-basedir target)))
+          (file-exists-p (expand-file-name
+                          candidate (with-helm-current-buffer
+                                      default-directory))))))
 
 (when (boundp 'completion-in-region-function)
   (defconst helm--old-completion-in-region-function completion-in-region-function))
