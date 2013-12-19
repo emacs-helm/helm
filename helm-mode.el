@@ -887,6 +887,9 @@ Can be used as value for `completion-in-region-function'."
                                              (not (string-match "/\\'" input)))
                                         (concat (helm-basename input) " "))
                                        ((string-match "/\\'" input) nil)
+                                       ((or (null require-match)
+                                            (stringp require-match))
+                                        input)
                                        (t (concat input " ")))
                                   :buffer buf-name
                                   :exec-when-only-one t
