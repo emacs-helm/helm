@@ -873,24 +873,19 @@ Can be used as value for `completion-in-region-function'."
                             ;; value for require-match.
                             (not (boundp 'prompt))))
          (data (all-completions input collection predicate))
-         (file-comp-p (expand-file-name
-                       (car data) (with-helm-current-buffer default-directory)))
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
                                  data
                                  :name str-command
-                                 :initial-input (if file-comp-p
-                                                    (helm-basename input)
-                                                    (concat input " "))
+                                 :initial-input (concat input " ")
                                  :buffer buf-name
                                  :must-match require-match)))
     (when result
-      (delete-region (if (and file-comp-p
-                              (save-excursion
-                                (re-search-backward
-                                 "~?/"
-                                 (previous-single-property-change
-                                  (point) 'read-only) t)))
+      (delete-region (if (save-excursion
+                           (re-search-backward
+                            "~?/"
+                            (previous-single-property-change
+                             (point) 'read-only) t))
                          (match-end 0) start)
                      end)
       (insert result))))
