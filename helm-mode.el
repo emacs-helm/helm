@@ -876,7 +876,11 @@ Can be used as value for `completion-in-region-function'."
          (file-comp-p (helm-mode--in-file-completion-p input (car data)))
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
-                                 data
+                                 (if file-comp-p
+                                     (loop for f in data unless
+                                           (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                                           collect f)
+                                     data)
                                  :name str-command
                                  :initial-input
                                  (cond ((and file-comp-p
