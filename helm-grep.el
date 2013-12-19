@@ -88,6 +88,11 @@ See `helm-grep-default-command' for infos on format specs."
   :group 'helm-grep
   :type  'string)
 
+(defcustom helm-ack-grep-executable "ack-grep"
+  "Default ack-grep command."
+  :group 'helm-grep
+  :type  'string)
+
 (defcustom helm-pdfgrep-default-command
   "pdfgrep --color never -niH %s %s"
   "Default command for pdfgrep."
@@ -293,13 +298,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 
 (cl-defun helm-grep-use-ack-p (&key where)
   (cl-case where
-    (default (string= (helm-grep-command) "ack-grep"))
-    (recursive (string= (helm-grep-command t) "ack-grep"))
-    (strict (and (string= (helm-grep-command t) "ack-grep")
-                 (string= (helm-grep-command) "ack-grep")))
+    (default (string= (helm-grep-command) helm-ack-grep-executable))
+    (recursive (string= (helm-grep-command t) helm-ack-grep-executable))
+    (strict (and (string= (helm-grep-command t) helm-ack-grep-executable)
+                 (string= (helm-grep-command) helm-ack-grep-executable)))
     (t (and (not (string= (helm-grep-command) "git-grep"))
-            (or (string= (helm-grep-command) "ack-grep")
-                (string= (helm-grep-command t) "ack-grep"))))))
+            (or (string= (helm-grep-command) helm-ack-grep-executable)
+                (string= (helm-grep-command t) helm-ack-grep-executable))))))
 
 (defun helm-grep-init (only-files &optional include zgrep)
   "Start an asynchronous grep process in ONLY-FILES list."
@@ -673,7 +678,7 @@ Special commands:
 (defun helm-grep-hack-types ()
   "Return a list of known ack-grep types."
   (with-temp-buffer
-    (call-process "ack-grep" nil t nil
+    (call-process helm-ack-grep-executable nil t nil
                   "--help" "types")
     (goto-char (point-min))
     (cl-loop while (re-search-forward
