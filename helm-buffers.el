@@ -142,13 +142,12 @@ When disabled (nil) use the longest buffer-name length found."
                 (unless helm-buffer-max-length
                   (setq helm-buffer-max-length (car result)))
                 (unless helm-buffer-max-len-mode
-                  ;; If a new buffer is longer than this value
+                  ;; If a new buffer is longer that this value
                   ;; this value will be updated
                   (setq helm-buffer-max-len-mode (cdr result))))))
     (candidates . helm-buffers-list-cache)
     (type . buffer)
-    (match . helm-buffer-match-major-mode)
-    (no-matchplugin)
+    (match helm-buffer-match-major-mode)
     (persistent-action . helm-buffers-list-persistent-action)
     (keymap . ,helm-buffer-map)
     (volatile)
@@ -338,13 +337,7 @@ with name matching pattern."
          (match-mjm (lambda (str mjm)
                       ;; Avoid matching all modes when entering only "mode".
                       (and (not (string= str "mode"))
-                           (if (string-match "\\`!" str)
-                               (not (string-match (substring str 1) mjm))
-                               (string-match str mjm)))))
-         (match-pattern (lambda (pattern str)
-                          (if (string-match "\\`!" pattern)
-                              (not (string-match (substring pattern 1) str))
-                              (string-match pattern str)))))
+                           (string-match str mjm)))))
     (when buf
       (with-current-buffer buf
         (let ((mjm   (symbol-name major-mode))
@@ -359,16 +352,10 @@ with name matching pattern."
                           (string-match (car split) cand))
                       (helm-buffers-match-inside cand (cdr split))))
                 ((string-match "\\s-" helm-pattern)
-                 (if (funcall match-mjm (car split) mjm)
-                     (cl-loop for i in (cdr split) always
-                              (funcall match-pattern i cand))
-                     (cl-loop for i in split always
-                              (unless (not (funcall match-mjm (car split) mjm))
-                                (funcall match-pattern i cand)))))
-                (t (if (funcall match-mjm helm-pattern mjm)
-                       (funcall match-pattern helm-pattern cand)
-                       (unless (not (funcall match-mjm helm-pattern mjm))
-                         (funcall match-pattern helm-pattern cand))))))))))
+                 (and (funcall match-mjm (car split) mjm)
+                      (cl-loop for i in (cdr split) always (string-match i cand))))
+                (t (or (funcall match-mjm helm-pattern mjm)
+                       (string-match helm-pattern cand)))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
   (cl-loop for i in lst
