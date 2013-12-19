@@ -877,9 +877,9 @@ Can be used as value for `completion-in-region-function'."
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
                                  (if file-comp-p
-                                     (loop for f in data unless
-                                           (string-match "\\`\\.\\{1,2\\}/\\'" f)
-                                           collect f)
+                                     (cl-loop for f in data unless
+                                              (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                                              collect f)
                                      data)
                                  :name str-command
                                  :initial-input
