@@ -889,6 +889,7 @@ Can be used as value for `completion-in-region-function'."
                                        ((string-match "/\\'" input) nil)
                                        (t (concat input " ")))
                                   :buffer buf-name
+                                  :exec-when-only-one t
                                   :must-match require-match)))
     (when result
       (delete-region (if (and file-comp-p
