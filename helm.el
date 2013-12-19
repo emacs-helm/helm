@@ -1588,10 +1588,14 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
           ;; This is not needed in emacs-24.3+
           (cursor-in-echo-area t)
           (non-essential t)
+          (old--cua cua-mode)
           (helm-maybe-use-default-as-input
            (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
                (cl-loop for s in (helm-normalize-sources any-sources)
                         thereis (memq s helm-sources-using-default-as-input)))))
+      ;; cua-mode overhide local helm bindings.
+      ;; disable this stupid thing if enabled.
+      (and cua-mode (cua-mode -1))
       (unwind-protect
            (condition-case _v
                (let (;; `helm-source-name' is non-nil
@@ -1626,8 +1630,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (setq overriding-local-map old-overridding-local-map)
         (setq helm-alive-p nil)
         (setq helm-in-file-completion-p nil)
+        (and old--cua (cua-mode 1))
         (helm-log-save-maybe)))))
-
 
 
 ;;; Helm resume
