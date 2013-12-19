@@ -907,12 +907,13 @@ Can be used as value for `completion-in-region-function'."
       (insert result))))
 
 (defun helm-mode--in-file-completion-p (target candidate)
-  (or (string-match "/\\'" candidate)
-      (if (string-match "~?/" target)
-          (file-exists-p (expand-file-name candidate (helm-basedir target)))
-          (file-exists-p (expand-file-name
-                          candidate (with-helm-current-buffer
-                                      default-directory))))))
+  (when (and candidate target)
+    (or (string-match "/\\'" candidate)
+        (if (string-match "~?/" target)
+            (file-exists-p (expand-file-name candidate (helm-basedir target)))
+            (file-exists-p (expand-file-name
+                            candidate (with-helm-current-buffer
+                                        default-directory)))))))
 
 (when (boundp 'completion-in-region-function)
   (defconst helm--old-completion-in-region-function completion-in-region-function))
