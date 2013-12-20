@@ -160,6 +160,9 @@ text to be displayed in BUFNAME."
 Completion:
 
 You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
+To specify the major-mode, prefix it with \"*\" e.g \"*lisp\".
+If you want to match all buffers but the ones with a specific major-mode (negation),
+prefix the major-mode with \"!\" e.g \"*!lisp\".
 Enter then a space and a pattern to narrow down to buffers matching this pattern.
 If you enter a space and a pattern prefixed by \"@\" helm will search for text matching
 this pattern INSIDE the buffer (i.e not in the name of buffer).
@@ -169,14 +172,18 @@ matching \"@pattern\" but will not search inside.
 e.g
 
 if I enter in pattern prompt:
-\"lisp ^helm @moc\"
+\"*lisp ^helm @moc\"
 helm will narrow down the list by selecting only buffers that are in lisp mode, start by helm
 and match \"moc\" in their contents.
 
 if I enter in pattern prompt:
-\"lisp ^helm moc\"
+\"*lisp ^helm moc\"
 Notice there is no \"@\" this time
 helm will look for lisp mode buffers starting by \"helm\" and have \"moc\" in their name.
+
+if I enter in pattern prompt:
+\"*!lisp !helm\"
+helm will narrow down to buffers that are not in \"lisp\" mode and that do not match \"helm\"
 
 Creating buffers
 
