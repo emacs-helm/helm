@@ -146,6 +146,7 @@ When disabled (nil) use the longest buffer-name length found."
                   ;; this value will be updated
                   (setq helm-buffer-max-len-mode (cdr result))))))
     (candidates . helm-buffers-list-cache)
+    (no-matchplugin)
     (type . buffer)
     (match helm-buffer-match-major-mode)
     (persistent-action . helm-buffers-list-persistent-action)
@@ -322,6 +323,22 @@ Should be called after others transformers i.e (boring buffers)."
                 (< (string-width s1) (string-width s2))))))
 
 
+;;; match functions
+;;
+(defun helm-buffer--match-mjm (pattern mjm)
+  ;; Avoid matching all modes when entering only "mode".
+  (when (string-match "\\`\\*" pattern)
+    (setq pattern (substring pattern 1))
+    (and (not (string= pattern "mode"))
+         (if (string-match "\\`!" pattern)
+             (not (string-match (substring pattern 1) mjm))
+             (string-match pattern mjm)))))
+
+(defun helm-buffer--match-pattern (pattern candidate)
+  (if (string-match "\\`!" pattern)
+      (not (string-match (substring pattern 1) candidate))
+      (string-match pattern candidate)))
+  
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
 If you give a major-mode or partial major-mode,
@@ -333,41 +350,40 @@ before space matching pattern after space.
 If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
-         (buf  (get-buffer cand))
-         (match-mjm (lambda (str mjm)
-                      ;; Avoid matching all modes when entering only "mode".
-                      (and (not (string= str "mode"))
-                           (string-match str mjm)))))
+         (buf  (get-buffer cand)))
     (when buf
       (with-current-buffer buf
         (let ((mjm   (symbol-name major-mode))
               (split (split-string helm-pattern)))
           (cond ((string-match "^@" helm-pattern)
                  (or (helm-buffers-match-inside cand split)
-                     (string-match helm-pattern cand)))
-                ((string-match "\\s-$" helm-pattern)
-                 (funcall match-mjm (car split) mjm))
+                     (helm-buffer--match-pattern helm-pattern cand)))
+                ((string-match "\\`\\*.*\\s-$" helm-pattern)
+                 (helm-buffer--match-mjm (car split) mjm))
                 ((string-match "\\s-[@]" helm-pattern)
-                 (and (or (funcall match-mjm (car split) mjm)
+                 (and (or (helm-buffer--match-mjm (car split) mjm)
                           (string-match (car split) cand))
                       (helm-buffers-match-inside cand (cdr split))))
+                ((string-match "\\`\\*" helm-pattern)
+                 (and (helm-buffer--match-mjm (car split) mjm)
+                      (cl-loop for i in (cdr split) always
+                               (helm-buffer--match-pattern i cand))))
                 ((string-match "\\s-" helm-pattern)
-                 (and (funcall match-mjm (car split) mjm)
-                      (cl-loop for i in (cdr split) always (string-match i cand))))
-                (t (or (funcall match-mjm helm-pattern mjm)
-                       (string-match helm-pattern cand)))))))))
+                 (cl-loop for i in split always
+                          (helm-buffer--match-pattern i cand)))
+                (t (or (helm-buffer--match-mjm helm-pattern mjm)
+                       (helm-buffer--match-pattern helm-pattern cand)))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
-  (cl-loop for i in lst
-           always
+  (cl-loop for i in lst always
            (cond ((string-match "\\`[\\]@" i)
-                  (string-match i candidate))
+                  (helm-buffer--match-pattern i candidate))
                  ((string-match "\\`@\\(.*\\)" i)
                   (save-excursion
                     (let ((str (match-string 1 i)))
                       (goto-char (point-min))
                       (re-search-forward str nil t))))
-                 (t (string-match i candidate)))))
+                 (t (helm-buffer--match-pattern i candidate)))))
 
 
 (defun helm-buffer-query-replace-1 (&optional regexp-flag)
