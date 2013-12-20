@@ -842,6 +842,20 @@ is to enable it with helm support.
 
 Now when hitting `TAB`, you should have helm pcompletion.
 
+## Fix completion after SUDO.
+
+In eshell when you use sudo, there is no completion on the command you enter
+after sudo, this is true in shell also with or without helm.
+To fix this problem, you can define a `pcomplete/sudo`  function and put it in your configuration.
+
+    (defun pcomplete/sudo ()
+      (let ((prec (pcomplete-arg 'last -1)))
+        (cond ((string= "sudo" prec)
+               (while (pcomplete-here*
+                        (funcall pcomplete-command-completion-function)
+                        (pcomplete-arg 'last) t))))))
+
+
 ## Write your own pcomplete functions
 
 You can enhance Emacs pcomplete by writing your own pcomplete
