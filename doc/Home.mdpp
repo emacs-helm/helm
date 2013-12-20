@@ -811,6 +811,9 @@ Not complete.
  `helm-mode` will enable
 helm completion in all Emacs commands using `completing-read` or `read-file-name`.
 
+Starting with emacs-24.4 `helm-mode` provide also completion with `completion-at-point`
+and `completing-read-multiple`.
+
  To use it:
 
     M-x helm-mode
