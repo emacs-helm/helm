@@ -216,6 +216,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                  (name "Helm Completions")
                                  candidates-in-buffer
                                  exec-when-only-one
+                                 quit-when-no-cand
                                  (volatile t)
                                  sort
                                  (fc-transformer 'helm-cr-default-transformer)
@@ -389,6 +390,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                    (append src '((volatile)))
                                    src))))
            (helm-execute-action-at-once-if-one exec-when-only-one)
+           (helm-quit-if-no-candidate quit-when-no-cand)
            result)
       (when reverse-history (setq src-list (nreverse src-list)))
       (setq result (helm
@@ -894,6 +896,7 @@ Can be used as value for `completion-in-region-function'."
                                        (t (concat input " ")))
                                   :buffer buf-name
                                   :exec-when-only-one t
+                                  :quit-when-no-cand t
                                   :must-match require-match)))
     (when result
       (delete-region (if (and file-comp-p
