@@ -457,18 +457,22 @@ With a prefix arg, reverse the behavior of
 The prefix arg can be set before calling
 `helm-multi-occur-from-isearch' or during the buffer selection."
   (interactive "p")
-  (let ((helm-moccur-always-search-in-current
-         (if (or current-prefix-arg
-                 helm-current-prefix-arg)
-             (not helm-moccur-always-search-in-current)
-             helm-moccur-always-search-in-current))
+  (let (buf-list
+        helm-moccur-always-search-in-current
         (input (if isearch-regexp
                    isearch-string
                    (regexp-quote isearch-string))))
     (isearch-exit)
-    (helm-multi-occur-1
-     (helm-comp-read "Buffers: " (helm-buffer-list) :marked-candidates t)
-     input)))
+    (setq buf-list (helm-comp-read "Buffers: "
+                                   (helm-buffer-list)
+                                   :name "Occur in buffer(s)"
+                                   :marked-candidates t))
+    (setq helm-moccur-always-search-in-current
+          (if (or current-prefix-arg
+                 helm-current-prefix-arg)
+              (not helm-moccur-always-search-in-current)
+              helm-moccur-always-search-in-current))
+    (helm-multi-occur-1 buf-list input)))
 
 
 (provide 'helm-regexp)
