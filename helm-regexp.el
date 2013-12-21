@@ -403,31 +403,26 @@ the center of window, otherwise at the top of window.")
           :history 'helm-build-regexp-history)))
 
 ;;;###autoload
-(defun helm-occur ()
+(defun helm-occur (&rest args)
   "Preconfigured helm for Occur."
   (interactive)
   (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
   (helm-occur-init-source)
-  (helm :sources 'helm-source-occur
-        :buffer "*helm occur*"
-        :history 'helm-grep-history
-        :truncate-lines t))
+  (apply 'helm 
+         :sources 'helm-source-occur
+         :buffer "*helm occur*"
+         :history 'helm-grep-history
+         :truncate-lines t
+         args))
 
 ;;;###autoload
 (defun helm-occur-from-isearch ()
   "Invoke `helm-occur' from isearch."
   (interactive)
-  (let ((input (if isearch-regexp
-                   isearch-string
-                   (regexp-quote isearch-string))))
-    (isearch-exit)
-    (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
-    (helm-occur-init-source)
-    (helm :sources 'helm-source-occur
-          :buffer "*helm occur*"
-          :history 'helm-grep-history
-          :input input
-          :truncate-lines t)))
+  (isearch-exit)
+  (helm-occur :input (if isearch-regexp
+                         isearch-string
+                       (regexp-quote isearch-string))))
 
 ;;;###autoload
 (defun helm-multi-occur (buffers)
