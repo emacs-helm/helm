@@ -328,11 +328,15 @@ Should be called after others transformers i.e (boring buffers)."
 (defun helm-buffer--match-mjm (pattern mjm)
   (when (string-match "\\`\\*" pattern)
     (setq pattern (split-string (substring pattern 1) ","))
-    ;; FIXME allow selecting more than one positive mode.
-    (cl-loop for pat in pattern always
-             (if (string-match "\\`!" pat)
-                 (not (string-match (substring pat 1) mjm))
-                 (string-match pat mjm)))))
+    (cl-loop for pat in pattern
+             if (string-match "\\`!" pat)
+             collect (string-match (substring pat 1) mjm) into neg
+             else collect (string-match pat mjm) into pos
+             finally return
+             (or (and pos (cl-loop for i in pos
+                                   thereis (numberp i)))
+                 (and neg (not (cl-loop for i in neg
+                                        thereis (numberp i))))))))
 
 (defun helm-buffer--match-pattern (pattern candidate)
   (if (string-match "\\`!" pattern)
