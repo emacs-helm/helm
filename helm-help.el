@@ -163,6 +163,9 @@ You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers
 To specify the major-mode, prefix it with \"*\" e.g \"*lisp\".
 If you want to match all buffers but the ones with a specific major-mode (negation),
 prefix the major-mode with \"!\" e.g \"*!lisp\".
+If you want to specify more than one major-mode, separate them with \",\",
+e.g \"*!lisp,!sh,!fun\" will list all buffers but the ones in lisp-mode, sh-mode and
+fundamental-mode.
 Enter then a space and a pattern to narrow down to buffers matching this pattern.
 If you enter a space and a pattern prefixed by \"@\" helm will search for text matching
 this pattern INSIDE the buffer (i.e not in the name of buffer).
