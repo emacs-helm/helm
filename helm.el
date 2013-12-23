@@ -2480,10 +2480,10 @@ and `helm-pattern'."
             (helm-get-cached-candidates source) matchfns limit source))
        source))))
 
-(defun helm-process-source (source)
+(defun helm-process-source (source &optional precomputed-matches)
   "Display matched results from SOURCE according to its settings."
   (helm-log-eval (assoc-default 'name source))
-  (let ((matches (helm-compute-matches source)))
+  (let ((matches (or precomputed-matches (helm-compute-matches source))))
     (when matches
       (helm-insert-header-from-source source)
       (if (not (assq 'multiline source))
@@ -2543,18 +2543,27 @@ is done on whole `helm-buffer' and not on current source."
     (when helm-onewindow-p (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (erase-buffer)
-    (let (delayed-sources
+    (let ((sources (cl-remove-if-not 'helm-update-source-p (helm-get-sources)))
+          (sources-candidates (list))
+          delayed-sources
           normal-sources)
-      (unwind-protect ; Process normal sources and store delayed one's.
-           (cl-loop for source in (cl-remove-if-not 'helm-update-source-p
-                                                    (helm-get-sources))
-                    if (helm-delayed-source-p source)
-                    collect source into ds
-                    else collect source into ns and do
-                    (helm-process-source source)
-                    finally (setq delayed-sources ds
-                                  normal-sources ns))
+      (unwind-protect
+           ;; Separate normal and delayed sources and collect matching
+           ;; candidates from normal ones.
+          (progn
+            (cl-loop for source in sources
+                     if (helm-delayed-source-p source)
+                     collect source into ds
+                     else collect source into ns and
+                     collect (helm-compute-matches source) into sc
+                     finally (setq delayed-sources ds
+                                   normal-sources ns
+                                   sources-candidates sc))
+            (erase-buffer)
+            (cl-loop for source in normal-sources
+                     for source-candidates in sources-candidates
+                     do
+                     (helm-process-source source source-candidates)))
         (helm-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
         (cond ((and preselect delayed-sources normal-sources)
