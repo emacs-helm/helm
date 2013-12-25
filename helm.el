@@ -2511,7 +2511,7 @@ when emacs is idle for `helm-idle-delay'."
         (goto-char (point-max))
         (mapc (lambda (source)
                 (helm-render-source source (helm-compute-matches source)))
-                 delayed-sources)
+              delayed-sources)
         (when (and (not (helm-empty-buffer-p))
                    ;; No selection yet.
                    (= (overlay-start helm-selection-overlay)
@@ -2552,21 +2552,25 @@ is done on whole `helm-buffer' and not on current source."
             ;; Iterate over all the sources
             (cl-loop for source in (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
                      if (helm-delayed-source-p source)
-                     ;;; Delayed sources just get collected for later
-                     ;;; processing
+                     ;; Delayed sources just get collected for later
+                     ;; processing
                      collect source into ds
-                     ;;; Normal sources also get their matching
-                     ;;; candidates collected here, before erasing the
-                     ;;; current contents of the helm buffer, so that
-                     ;;; their computation doesn't delay the redraw of
-                     ;;; the helm buffer and doesn't trigger flicker
                      else
+                     ;; Normal sources also get their matching
+                     ;; candidates collected here, before erasing the
+                     ;; current contents of the helm buffer, so that
+                     ;; their computation doesn't delay the redraw of
+                     ;; the helm buffer and doesn't trigger flicker
                      collect source into ns and
                      collect (helm-compute-matches source) into nsc
+                     ;; Export the variables from cl-loop
                      finally (setq delayed-sources ds
                                    normal-sources ns
                                    normal-sources-candidates nsc))
+            ;;; Finally the helm buffer can be erased
             (erase-buffer)
+            ;;; Render all the sources into the helm buffer using the
+            ;;; candidates calculated before the erase
             (cl-loop for source in normal-sources
                      for candidates in normal-sources-candidates
                      do
