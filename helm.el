@@ -2480,23 +2480,22 @@ and `helm-pattern'."
             (helm-get-cached-candidates source) matchfns limit source))
        source))))
 
-(defun helm-process-source (source)
-  "Display matched results from SOURCE according to its settings."
+(defun helm-render-source (source matches)
+  "Display MATCHES from SOURCE according to its settings."
   (helm-log-eval (assoc-default 'name source))
-  (let ((matches (helm-compute-matches source)))
-    (when matches
-      (helm-insert-header-from-source source)
-      (if (not (assq 'multiline source))
-          (mapc #'(lambda (m)
-                    (helm-insert-match m 'insert source))
-                matches)
-          (let ((start (point)) separate)
-            (cl-dolist (match matches)
-              (if separate
-                  (helm-insert-candidate-separator)
-                  (setq separate t))
-              (helm-insert-match match 'insert source))
-            (put-text-property start (point) 'helm-multiline t))))))
+  (when matches
+    (helm-insert-header-from-source source)
+    (if (not (assq 'multiline source))
+        (mapc #'(lambda (m)
+                  (helm-insert-match m 'insert source))
+              matches)
+      (let ((start (point)) separate)
+        (cl-dolist (match matches)
+          (if separate
+              (helm-insert-candidate-separator)
+            (setq separate t))
+          (helm-insert-match match 'insert source))
+        (put-text-property start (point) 'helm-multiline t)))))
 
 (defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
@@ -2510,7 +2509,9 @@ when emacs is idle for `helm-idle-delay'."
     (with-current-buffer helm-buffer
       (save-excursion
         (goto-char (point-max))
-        (mapc 'helm-process-source delayed-sources)
+        (mapc (lambda (source)
+                (helm-render-source source (helm-compute-matches source)))
+              delayed-sources)
         (when (and (not (helm-empty-buffer-p))
                    ;; No selection yet.
                    (= (overlay-start helm-selection-overlay)
@@ -2543,18 +2544,37 @@ is done on whole `helm-buffer' and not on current source."
     (when helm-onewindow-p (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (erase-buffer)
-    (let (delayed-sources
-          normal-sources)
-      (unwind-protect ; Process normal sources and store delayed one's.
-           (cl-loop for source in (cl-remove-if-not 'helm-update-source-p
-                                                    (helm-get-sources))
-                    if (helm-delayed-source-p source)
-                    collect source into ds
-                    else collect source into ns and do
-                    (helm-process-source source)
-                    finally (setq delayed-sources ds
-                                  normal-sources ns))
+    (let (normal-sources
+          normal-sources-candidates
+          delayed-sources)
+      (unwind-protect
+          (progn
+            ;; Iterate over all the sources
+            (cl-loop for source in (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
+                     if (helm-delayed-source-p source)
+                     ;; Delayed sources just get collected for later
+                     ;; processing
+                     collect source into ds
+                     else
+                     ;; Normal sources also get their matching
+                     ;; candidates collected here, before erasing the
+                     ;; current contents of the helm buffer, so that
+                     ;; their computation doesn't delay the redraw of
+                     ;; the helm buffer and doesn't trigger flicker
+                     collect source into ns and
+                     collect (helm-compute-matches source) into nsc
+                     ;; Export the variables from cl-loop
+                     finally (setq delayed-sources ds
+                                   normal-sources ns
+                                   normal-sources-candidates nsc))
+            ;;; Finally the helm buffer can be erased
+            (erase-buffer)
+            ;;; Render all the sources into the helm buffer using the
+            ;;; candidates calculated before the erase
+            (cl-loop for source in normal-sources
+                     for candidates in normal-sources-candidates
+                     do
+                     (helm-render-source source candidates)))
         (helm-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
         (cond ((and preselect delayed-sources normal-sources)
