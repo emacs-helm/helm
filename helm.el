@@ -2787,19 +2787,18 @@ after the source name by overlay."
   ;; INCOMPLETE-LINE-INFO is an attribute of source which is created
   ;; with an empty string when the source is computed => (incomplete-line . "")
   (helm-log-eval (cdr incomplete-line-info))
-  (butlast ; The last line is the incomplete line, remove it.
-   (cl-loop for line in lines
-            ;; On start `incomplete-line-info' value is empty.
-            for newline = (helm-aif (cdr incomplete-line-info)
-                              (prog1
-                                  (concat it line)
-                                (setcdr incomplete-line-info nil))
-                              line)
-            do (helm--maybe-process-filter-one-by-one-candidate newline source)
-            and if newline collect newline
-            ;; Store last incomplete line (last chunk truncated)
-            ;; until new output arrives.
-            finally do (setcdr incomplete-line-info line))))
+  (cl-loop for line in lines
+           ;; On start `incomplete-line-info' value is empty.
+           for newline = (helm-aif (cdr incomplete-line-info)
+                             (prog1
+                                 (concat it line)
+                               (setcdr incomplete-line-info nil))
+                           line)
+           do (helm--maybe-process-filter-one-by-one-candidate newline source)
+           if newline collect newline
+           ;; Store last incomplete line (last chunk truncated)
+           ;; until new output arrives.
+           finally do (setcdr incomplete-line-info line)))
 
 (defun helm-output-filter--post-process ()
   (let ((src (helm-get-current-source)))
