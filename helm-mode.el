@@ -896,7 +896,14 @@ Can be used as value for `completion-in-region-function'."
                                        (t (concat input " ")))
                                   :buffer buf-name
                                   :exec-when-only-one t
-                                  :quit-when-no-cand t
+                                  :quit-when-no-cand
+                                  #'(lambda ()
+                                      ;; Delay message to overwrite "Quit".
+                                      (run-with-timer
+                                       0.01 nil
+                                       #'(lambda ()
+                                           (message "[No matches]")))
+                                            t) ; exit minibuffer immediately.
                                   :must-match require-match)))
     (when result
       (delete-region (if (and file-comp-p
