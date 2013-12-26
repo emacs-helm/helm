@@ -925,8 +925,9 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   "`filtered-candidate-transformer' function for `helm-do-grep'."
   (cl-loop with root = (and helm-grep-default-directory-fn
                             (funcall helm-grep-default-directory-fn))
-           for i in candidates collect
-           (helm-grep--filter-candidate-1 i root)))
+           for i in candidates
+           for cand = (helm-grep--filter-candidate-1 i root)
+           when cand collect cand))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
