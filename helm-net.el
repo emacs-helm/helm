@@ -202,8 +202,7 @@ Return an alist with elements like (data . number_results)."
                     (funcall helm-google-suggest-default-function)))
     (action . (("Google Search" . helm-google-suggest-action)))
     (volatile)
-    (requires-pattern . 3)
-    (delayed)))
+    (requires-pattern . 3)))
 
 (defun helm-google-suggest-emacs-lisp ()
   "Try to emacs lisp complete with google suggestions."
@@ -247,8 +246,7 @@ Return an alist with elements like (data . number_results)."
     (candidates . helm-yahoo-suggest-set-candidates)
     (action . (("Yahoo Search" . helm-yahoo-suggest-action)))
     (volatile)
-    (requires-pattern . 3)
-    (delayed)))
+    (requires-pattern . 3)))
 
 
 ;;; Web browser functions.
