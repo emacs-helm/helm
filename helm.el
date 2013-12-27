@@ -2767,16 +2767,17 @@ after the source name by overlay."
                           (assoc 'incomplete-line source)
                           source)
                          source t))
-    (if (assq 'multiline source)
-        (let ((start (point)))
-          (helm-insert-candidate-separator)
-          (helm-insert-match candidate 'insert-before-markers source)
-          (put-text-property start (point) 'helm-multiline t))
-        (helm-insert-match candidate 'insert-before-markers source))
-    (cl-incf (cdr (assoc 'item-count source)))
-    (when (>= (assoc-default 'item-count source) limit)
-      (helm-kill-async-process process)
-      (cl-return))))
+    (when candidate ; filter-one-by-one may return nil candidates.
+      (if (assq 'multiline source)
+          (let ((start (point)))
+            (helm-insert-candidate-separator)
+            (helm-insert-match candidate 'insert-before-markers source)
+            (put-text-property start (point) 'helm-multiline t))
+          (helm-insert-match candidate 'insert-before-markers source))
+      (cl-incf (cdr (assoc 'item-count source)))
+      (when (>= (assoc-default 'item-count source) limit)
+        (helm-kill-async-process process)
+        (cl-return)))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info source)
   "Collect LINES maybe completing the truncated first and last lines."
@@ -2787,18 +2788,19 @@ after the source name by overlay."
   ;; INCOMPLETE-LINE-INFO is an attribute of source which is created
   ;; with an empty string when the source is computed => (incomplete-line . "")
   (helm-log-eval (cdr incomplete-line-info))
-  (cl-loop for line in lines
-           ;; On start `incomplete-line-info' value is empty.
-           for newline = (helm-aif (cdr incomplete-line-info)
-                             (prog1
-                                 (concat it line)
-                               (setcdr incomplete-line-info nil))
-                           line)
-           do (helm--maybe-process-filter-one-by-one-candidate newline source)
-           if newline collect newline
-           ;; Store last incomplete line (last chunk truncated)
-           ;; until new output arrives.
-           finally do (setcdr incomplete-line-info line)))
+  (butlast
+   (cl-loop for line in lines
+            ;; On start `incomplete-line-info' value is empty string.
+            for newline = (helm-aif (cdr incomplete-line-info)
+                              (prog1
+                                  (concat it line)
+                                (setcdr incomplete-line-info nil))
+                            line)
+            do (helm--maybe-process-filter-one-by-one-candidate newline source)
+            collect newline
+            ;; Store last incomplete line (last chunk truncated)
+            ;; until new output arrives.
+            finally do (setcdr incomplete-line-info line))))
 
 (defun helm-output-filter--post-process ()
   (let ((src (helm-get-current-source)))
