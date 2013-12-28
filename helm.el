@@ -1476,7 +1476,10 @@ with \\<minibuffer-local-map>\\[next-history-element].
 When nil or not present `thing-at-point' will be used instead.
 If `helm-maybe-use-default-as-input' is non--nil display will be
 updated using :default arg as input unless :input is specified,
-which in this case will take precedence on :default.
+which in this case will take precedence on :default
+This is a string or a list, in this case the car of the list will
+be used as initial default input, but you will be able to cycle in this
+list with \\<minibuffer-local-map>\\[next-history-element].
 
 \:history
 
