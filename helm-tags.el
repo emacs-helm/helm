@@ -129,11 +129,12 @@ Lookes recursively in parents directorys for a
   1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
   2) `tags-file-name', which is commonly set by `find-tag' command.
   3) `tags-table-list' which is commonly set by `visit-tags-table' command."
-  (delete-dups
+  (helm-fast-remove-dups
    (delq nil
     (append (list (helm-etags-get-tag-file)
                   tags-file-name)
-            (copy-sequence tags-table-list)))))
+            (copy-sequence tags-table-list)))
+   :test 'equal))
 
 (defun helm-etags-find-tag-file-directory (current-dir)
   "Try to find the directory containing tag file.
