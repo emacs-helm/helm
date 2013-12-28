@@ -108,23 +108,33 @@ http://ctags.sourceforge.net/")
 ;;; Etags
 ;;
 ;;
-(defvar helm-etags-tag-file-dir nil
-  "Etags file directory.")
 (defvar helm-etags-mtime-alist nil
   "Store the last modification time of etags files here.")
 (defvar helm-etags-cache (make-hash-table :test 'equal)
   "Cache content of etags files used here for faster access.")
 
 (defun helm-etags-get-tag-file (&optional directory)
-  "Return the path of etags file if found."
+  "Return the path of etags file if found.
+Lookes recursively in parents directorys for a
+`helm-etags-tag-file-name' file."
   ;; Get tag file from `default-directory' or upper directory.
   (let ((current-dir (helm-etags-find-tag-file-directory
                       (or directory default-directory))))
     ;; Return nil if not find tag file.
     (when current-dir
-      ;; Set tag file directory.
-      (setq helm-etags-tag-file-dir current-dir)
       (expand-file-name helm-etags-tag-file-name current-dir))))
+
+(defun helm-etags-all-tag-files (&optional directory)
+  "Return files from the following sources;
+  1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
+  2) `tags-file-name', which is commonly set by `find-tag' command.
+  3) `tags-table-list' which is commonly set by `visit-tags-table' command.
+"
+  (delete-dups
+   (delq nil
+    (append (list (helm-etags-get-tag-file)
+                  tags-file-name)
+            (copy-sequence tags-table-list)))))
 
 (defun helm-etags-find-tag-file-directory (current-dir)
   "Try to find the directory containing tag file.
@@ -182,23 +192,24 @@ If not found in CURRENT-DIR search in upper directory."
 (defun helm-etags-init ()
   "Feed `helm-buffer' using `helm-etags-cache' or tag file.
 If no entry in cache, create one."
-  (let ((tagfile (helm-etags-get-tag-file)))
-    (when tagfile
+  (let ((tagfiles (helm-etags-all-tag-files)))
+    (when tagfiles
       (with-current-buffer (helm-candidate-buffer 'global)
-        (helm-aif (gethash tagfile helm-etags-cache)
-            ;; An entry is present in cache, insert it.
-            (insert it)
-          ;; No entry, create a new buffer using content of tag file (slower).
-          (helm-etags-create-buffer tagfile)
-          ;; Store content of buffer in cache.
-          (puthash tagfile (buffer-string) helm-etags-cache)
-          ;; Store or set the last modification of tag file.
-          (helm-aif (assoc tagfile helm-etags-mtime-alist)
-              ;; If an entry exists modify it.
-              (setcdr it (helm-etags-mtime tagfile))
-            ;; No entry create a new one.
-            (add-to-list 'helm-etags-mtime-alist
-                         (cons tagfile (helm-etags-mtime tagfile)))))))))
+        (dolist (f tagfiles)
+         (helm-aif (gethash f helm-etags-cache)
+             ;; An entry is present in cache, insert it.
+             (insert it)
+           ;; No entry, create a new buffer using content of tag file (slower).
+           (helm-etags-create-buffer f)
+           ;; Store content of buffer in cache.
+           (puthash f (buffer-string) helm-etags-cache)
+           ;; Store or set the last modification of tag file.
+           (helm-aif (assoc f helm-etags-mtime-alist)
+               ;; If an entry exists modify it.
+               (setcdr it (helm-etags-mtime f))
+             ;; No entry create a new one.
+             (add-to-list 'helm-etags-mtime-alist
+                          (cons f (helm-etags-mtime f))))))))))
 
 (defun helm-etags-split-line (line)
   (let ((regexp "\\`\\([a-zA-Z]?:?.*?\\): \\(.*\\)"))
@@ -231,14 +242,19 @@ If no entry in cache, create one."
   (require 'etags)
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (let* ((split (helm-etags-split-line candidate))
-         (fname (expand-file-name
-                 (car split) helm-etags-tag-file-dir))
+         (fname (cl-loop for tagf being the hash-keys of helm-etags-cache
+                         for f = (expand-file-name
+                                  (car split) (file-name-directory tagf))
+                         when (file-exists-p f)
+                         return f))
          (elm   (cadr split)))
-    (ring-insert find-tag-marker-ring (point-marker))
-    (find-file fname)
-    (goto-char (point-min))
-    (search-forward elm nil t)
-    (goto-char (match-beginning 0))))
+    (if (null fname)
+        (error "file %s not found" fname)
+      (ring-insert find-tag-marker-ring (point-marker))
+      (find-file fname)
+      (goto-char (point-min))
+      (search-forward elm nil t)
+      (goto-char (match-beginning 0)))))
 
 (defun helm-etags-mtime (file)
   "Last modification time of etags tag FILE."
@@ -256,22 +272,31 @@ If FILE is nil return nil."
 ;;;###autoload
 (defun helm-etags-select (arg)
   "Preconfigured helm for etags.
-Called with one prefix arg use symbol at point as initial input.
-Called with two prefix arg reinitialize cache.
-If tag file have been modified reinitialize cache."
+If called with a prefix argument or if any of the tag files have
+been modified, reinitialize cache.
+
+This function aggregates three sources of tag files:
+
+  1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
+  2) `tags-file-name', which is commonly set by `find-tag' command.
+  3) `tags-table-list' which is commonly set by `visit-tags-table' command.
+"
   (interactive "P")
-  (let ((tag  (helm-etags-get-tag-file))
+  (let ((tag-files (helm-etags-all-tag-files))
         (helm-execute-action-at-once-if-one helm-etags-execute-action-at-once-if-one))
-    (when (or (equal arg '(4))
-              (and helm-etags-mtime-alist
-                   (helm-etags-file-modified-p tag)))
-      (remhash tag helm-etags-cache))
-    (if (and tag (file-exists-p tag))
-        (helm :sources 'helm-source-etags-select
-              :keymap helm-etags-map
-              :default (concat "\\_<" (thing-at-point 'symbol) "\\_>")
-              :buffer "*helm etags*")
-        (message "Error: No tag file found, please create one with etags shell command."))))
+    (if (cl-notany 'file-exists-p tag-files)
+        (message "Error: No tag file found. Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
+      (cl-mapc (lambda (f)
+                 (when (or (equal arg '(4))
+                           (and helm-etags-mtime-alist
+                                (helm-etags-file-modified-p f)))
+                   (remhash f helm-etags-cache)))
+               tag-files)
+      (helm :sources 'helm-source-etags-select
+            :keymap helm-etags-map
+            :default (thing-at-point 'symbol)
+            :buffer "*helm etags*")
+      )))
 
 (provide 'helm-tags)
 
