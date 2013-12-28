@@ -133,7 +133,7 @@ Lookes recursively in parents directorys for a
    (delq nil
     (append (list (helm-etags-get-tag-file)
                   tags-file-name)
-            (copy-sequence tags-table-list)))
+            tags-table-list))
    :test 'equal))
 
 (defun helm-etags-find-tag-file-directory (current-dir)
