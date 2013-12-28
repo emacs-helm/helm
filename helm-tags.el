@@ -282,7 +282,8 @@ This function aggregates three sources of tag files:
   3) `tags-table-list' which is commonly set by `visit-tags-table' command."
   (interactive "P")
   (let ((tag-files (helm-etags-all-tag-files))
-        (helm-execute-action-at-once-if-one helm-etags-execute-action-at-once-if-one))
+        (helm-execute-action-at-once-if-one helm-etags-execute-action-at-once-if-one)
+        (str (thing-at-point 'symbol)))
     (if (cl-notany 'file-exists-p tag-files)
         (message "Error: No tag file found. Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
         (mapc (lambda (f)
@@ -293,9 +294,7 @@ This function aggregates three sources of tag files:
               tag-files)
         (helm :sources 'helm-source-etags-select
               :keymap helm-etags-map
-              ;; fixme: can we first display using  \\_<foo\\_>  but insert foo on M-n?
-              ;; :default (concat "\\_<" (thing-at-point 'symbol) "\\_>")
-              :default (thing-at-point 'symbol)
+              :default (list (concat "\\_<" str "\\_>") str)
               :buffer "*helm etags*"))))
 
 (provide 'helm-tags)

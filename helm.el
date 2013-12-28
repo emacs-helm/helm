@@ -1950,7 +1950,8 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                                             helm-source-filter))
                                 (helm-get-sources))))
   (setq helm-pattern (or (and helm-maybe-use-default-as-input
-                              (or any-default
+                              (or (if (listp any-default)
+                                      (car any-default) any-default)
                                   (with-helm-current-buffer
                                     (thing-at-point 'symbol))))
                          ""))
