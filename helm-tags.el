@@ -294,6 +294,8 @@ This function aggregates three sources of tag files:
                tag-files)
       (helm :sources 'helm-source-etags-select
             :keymap helm-etags-map
+            ;; fixme: can we first display using  \\_<foo\\_>  but insert foo on M-n?
+            ;; :default (concat "\\_<" (thing-at-point 'symbol) "\\_>")
             :default (thing-at-point 'symbol)
             :buffer "*helm etags*")
       )))
