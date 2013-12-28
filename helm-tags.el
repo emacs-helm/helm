@@ -124,12 +124,11 @@ Lookes recursively in parents directorys for a
     (when current-dir
       (expand-file-name helm-etags-tag-file-name current-dir))))
 
-(defun helm-etags-all-tag-files (&optional directory)
+(defun helm-etags-all-tag-files ()
   "Return files from the following sources;
   1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
   2) `tags-file-name', which is commonly set by `find-tag' command.
-  3) `tags-table-list' which is commonly set by `visit-tags-table' command.
-"
+  3) `tags-table-list' which is commonly set by `visit-tags-table' command."
   (delete-dups
    (delq nil
     (append (list (helm-etags-get-tag-file)
@@ -279,26 +278,24 @@ This function aggregates three sources of tag files:
 
   1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
   2) `tags-file-name', which is commonly set by `find-tag' command.
-  3) `tags-table-list' which is commonly set by `visit-tags-table' command.
-"
+  3) `tags-table-list' which is commonly set by `visit-tags-table' command."
   (interactive "P")
   (let ((tag-files (helm-etags-all-tag-files))
         (helm-execute-action-at-once-if-one helm-etags-execute-action-at-once-if-one))
     (if (cl-notany 'file-exists-p tag-files)
         (message "Error: No tag file found. Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
-      (cl-mapc (lambda (f)
-                 (when (or (equal arg '(4))
-                           (and helm-etags-mtime-alist
-                                (helm-etags-file-modified-p f)))
-                   (remhash f helm-etags-cache)))
-               tag-files)
-      (helm :sources 'helm-source-etags-select
-            :keymap helm-etags-map
-            ;; fixme: can we first display using  \\_<foo\\_>  but insert foo on M-n?
-            ;; :default (concat "\\_<" (thing-at-point 'symbol) "\\_>")
-            :default (thing-at-point 'symbol)
-            :buffer "*helm etags*")
-      )))
+        (mapc (lambda (f)
+                (when (or (equal arg '(4))
+                          (and helm-etags-mtime-alist
+                               (helm-etags-file-modified-p f)))
+                  (remhash f helm-etags-cache)))
+              tag-files)
+        (helm :sources 'helm-source-etags-select
+              :keymap helm-etags-map
+              ;; fixme: can we first display using  \\_<foo\\_>  but insert foo on M-n?
+              ;; :default (concat "\\_<" (thing-at-point 'symbol) "\\_>")
+              :default (thing-at-point 'symbol)
+              :buffer "*helm etags*"))))
 
 (provide 'helm-tags)
 
