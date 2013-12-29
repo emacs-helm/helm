@@ -111,9 +111,11 @@
   "Preconfigured `helm' for `imenu'."
   (interactive)
   (let ((imenu-auto-rescan t)
+        (str (thing-at-point 'symbol))
         (helm-execute-action-at-once-if-one
          helm-imenu-execute-action-at-once-if-one))
     (helm :sources 'helm-source-imenu
+          :default (list (concat "\\_<" str "\\_>") str)
           :buffer "*helm imenu*")))
 
 (provide 'helm-imenu)

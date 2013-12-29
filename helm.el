@@ -376,6 +376,7 @@ or when `helm-split-window-default-side' is set to 'same."
   :type 'boolean)
 
 (defcustom helm-sources-using-default-as-input '(helm-source-imenu
+                                                 helm-source-semantic
                                                  helm-source-info-elisp
                                                  helm-source-etags-select)
   "List of helm sources that need to use `helm-maybe-use-default-as-input'.
