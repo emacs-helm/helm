@@ -286,16 +286,19 @@ This function aggregates three sources of tag files:
         (str (thing-at-point 'symbol)))
     (if (cl-notany 'file-exists-p tag-files)
         (message "Error: No tag file found. Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
-        (mapc (lambda (f)
-                (when (or (equal arg '(4))
-                          (and helm-etags-mtime-alist
-                               (helm-etags-file-modified-p f)))
-                  (remhash f helm-etags-cache)))
-              tag-files)
-        (helm :sources 'helm-source-etags-select
-              :keymap helm-etags-map
-              :default (list (concat "\\_<" str "\\_>") str)
-              :buffer "*helm etags*"))))
+      (cl-loop for k being the hash-keys of helm-etags-cache
+               unless (member k tag-files)
+               do (remhash k helm-etags-cache))
+      (mapc (lambda (f)
+              (when (or (equal arg '(4))
+                        (and helm-etags-mtime-alist
+                             (helm-etags-file-modified-p f)))
+                (remhash f helm-etags-cache)))
+            tag-files)
+      (helm :sources 'helm-source-etags-select
+            :keymap helm-etags-map
+            :default (list (concat "\\_<" str "\\_>") str)
+            :buffer "*helm etags*"))))
 
 (provide 'helm-tags)
 
