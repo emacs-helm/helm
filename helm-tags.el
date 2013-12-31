@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-utils)
 
 
 (defgroup helm-tags nil
