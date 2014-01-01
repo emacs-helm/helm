@@ -283,7 +283,6 @@ Contain also `helm-source-google-suggest'."
    :sources
    '(helm-source-bookmark-files&dirs
      helm-source-bookmark-w3m
-     helm-source-google-suggest
      helm-source-bmkext-addressbook
      helm-source-bookmark-gnus
      helm-source-bookmark-info
