@@ -27,6 +27,8 @@
 (require 'helm-adaptative)
 
 (declare-function bookmark-get-filename "bookmark" (bookmark-name-or-record))
+(declare-function bmkext-bmenu-maybe-sort "ext:bookmark-extensions.el" (&optional alist))
+(defvar bmkext-bmenu-sort-function)
 
 
 ;;; Filter functions
@@ -42,6 +44,27 @@
    for b = (car i)
    collect (propertize b 'location (bookmark-location b)) into sa
    finally return sa))
+
+;;;###autoload
+(defun helm-bmkext-run-sort-by-frequency ()
+  (interactive)
+  ;(helm-bmkext-set-mode-line "FREQ")
+  (setq bmkext-bmenu-sort-function 'bmkext-visited-more-p)
+  (helm-force-update))
+
+;;;###autoload
+(defun helm-bmkext-run-sort-by-last-visit ()
+  (interactive)
+  ;(helm-bmkext-set-mode-line "LAST")
+  (setq bmkext-bmenu-sort-function 'bmkext-last-time-more-p)
+  (helm-force-update))
+
+;;;###autoload
+(defun helm-bmkext-run-sort-alphabetically ()
+  (interactive)
+  ;(helm-bmkext-set-mode-line "ALPHA")
+  (setq bmkext-bmenu-sort-function 'bmkext-alpha-more-p)
+  (helm-force-update))
 
 ;;;###autoload
 (defun helm-bmkext-run-edit ()
@@ -266,6 +289,7 @@ Needs bookmark-ext.el:
 <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>.
 Contain also `helm-source-google-suggest'."
   (interactive)
+  (require 'bookmark-extensions)
   (helm
    :sources
    '(helm-source-bookmark-files&dirs
