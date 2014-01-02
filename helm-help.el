@@ -499,6 +499,9 @@ You can save your results in a grep-mode buffer, see below.
 \\[helm-bookmark-run-jump-other-window]\t\t->Jump other window.
 \\[helm-bookmark-run-delete]\t\t->Delete bookmark.
 \\[helm-bmkext-run-edit]\t\t->Edit bookmark (only for bmkext).
+\\[helm-bmkext-run-sort-by-frequency]\t\t->Sort by frequency (only for bmkext).
+\\[helm-bmkext-run-sort-by-last-visit]\t\t->Sort by last visited (only for bmkext).
+\\[helm-bmkext-run-sort-alphabetically]\t\t->Sort alphabetically (only for bmkext).
 \\[helm-bookmark-toggle-filename]\t\t->Toggle bookmark location visibility.
 \\[helm-bookmark-help]\t\t->Run this help.
 \n== Helm Map ==
