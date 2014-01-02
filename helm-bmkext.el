@@ -73,6 +73,13 @@
                                                  (concat (format "Sort:[%s] " str)
                                                          (cadr helm-bookmark-mode-line-string))))))
 
+(defun helm-bmkext-init-mode-line ()
+  (helm-bmkext-set-mode-line (cl-case bmkext-bmenu-sort-function
+                               (bmkext-visited-more-p "FREQ")
+                               (bmkext-last-time-more-p "LAST")
+                               (bmkext-alpha-more-p "ALPHA")
+                               (t "ALPHA"))))
+
 (defun helm-bmkext-run-edit ()
   "Run `bmkext-edit-bookmark' from keyboard."
   (interactive)
@@ -86,7 +93,7 @@
   '((name . "Bookmark Addressbook")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global
@@ -174,7 +181,7 @@
   '((name . "Bookmark W3m")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-w3m-setup-alist))))
@@ -195,7 +202,7 @@
   '((name . "Bookmark Images")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-images-setup-alist))))
@@ -216,7 +223,7 @@
   '((name . "Bookmark Woman&Man")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-man-setup-alist))))
@@ -238,7 +245,7 @@
   '((name . "Bookmark Gnus")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-gnus-setup-alist))))
@@ -259,7 +266,7 @@
   '((name . "Bookmark Info")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-info-setup-alist))))
@@ -280,7 +287,7 @@
   '((name . "Bookmark Files&Directories")
     (init . (lambda ()
               (require 'bookmark-extensions)
-              (helm-bmkext-set-mode-line "FREQ")
+              (helm-bmkext-init-mode-line)
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-local-files-setup-alist))))
