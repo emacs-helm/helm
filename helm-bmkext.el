@@ -42,8 +42,7 @@
                      (funcall fn)))
    for i in alist
    for b = (car i)
-   collect (propertize b 'location (bookmark-location b)) into sa
-   finally return sa))
+   collect (propertize b 'location (bookmark-location b))))
 
 (defun helm-bmkext-run-sort-by-frequency ()
   (interactive)
@@ -235,8 +234,7 @@
 
 (defun helm-bookmark-man-setup-alist ()
   "Specialized filter function for bookmarks w3m."
-  (append (helm-bmkext-filter-setup-alist 'bmkext-man-alist-only)
-          (helm-bmkext-filter-setup-alist 'bmkext-woman-alist-only)))
+  (helm-bmkext-filter-setup-alist 'bmkext-woman-man-alist-only))
 
 
 ;;; Gnus
