@@ -34,13 +34,14 @@
 (defun helm-bmkext-filter-setup-alist (fn &rest args)
   "Return a filtered `bookmark-alist' sorted alphabetically."
   (cl-loop
-   with alist = (if args
-                    (apply #'(lambda (x) (funcall fn x)) args)
-                    (funcall fn))
+   with alist = (bmkext-bmenu-maybe-sort
+                 (if args
+                     (apply #'(lambda (x) (funcall fn x)) args)
+                     (funcall fn)))
    for i in alist
    for b = (car i)
    collect (propertize b 'location (bookmark-location b)) into sa
-   finally return (sort sa 'string-lessp)))
+   finally return sa))
 
 ;;;###autoload
 (defun helm-bmkext-run-edit ()
@@ -69,9 +70,7 @@
                      candidate)))
            (bookmark--jump-via bmk 'switch-to-buffer))))
     (persistent-help . "Show contact - Prefix with C-u to append")
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (action . (("Show Contact(s)"
                 . (lambda (candidate)
                     (let* ((contacts (helm-marked-candidates))
@@ -151,9 +150,7 @@
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-w3m-setup-alist ()
@@ -173,9 +170,7 @@
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-images-setup-alist ()
@@ -195,9 +190,7 @@
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-man-setup-alist ()
@@ -218,9 +211,7 @@
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-gnus-setup-alist ()
@@ -240,9 +231,7 @@
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-info-setup-alist ()
@@ -262,9 +251,7 @@
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
+    (filtered-candidate-transformer . helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-local-files-setup-alist ()
