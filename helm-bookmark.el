@@ -90,6 +90,10 @@
   `((name . "Bookmarks")
     (init . (lambda ()
               (require 'bookmark)
+              (setq helm-bookmark-mode-line-string
+                    (list (car helm-bookmark-mode-line-string)
+                          (replace-regexp-in-string "Sort:\\[.*\\] " ""
+                                                    (cadr helm-bookmark-mode-line-string))))                          
               (setq helm-bookmarks-cache
                     (bookmark-all-names))))
     (no-delay-on-input) ; Issue #173 needed for helm-for-files.
@@ -155,6 +159,10 @@
   '((name . "PP-Bookmarks")
     (init . (lambda ()
               (require 'bookmark)
+              (setq helm-bookmark-mode-line-string
+                    (list (car helm-bookmark-mode-line-string)
+                          (replace-regexp-in-string "Sort:\\[.*\\] " ""
+                                                    (cadr helm-bookmark-mode-line-string))))
               (helm-init-candidates-in-buffer
                'global (cl-loop for b in (bookmark-all-names) collect
                                 (propertize b 'location (bookmark-location b))))))

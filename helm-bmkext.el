@@ -45,28 +45,34 @@
    collect (propertize b 'location (bookmark-location b)) into sa
    finally return sa))
 
-;;;###autoload
 (defun helm-bmkext-run-sort-by-frequency ()
   (interactive)
-  ;(helm-bmkext-set-mode-line "FREQ")
+  (helm-bmkext-set-mode-line "FREQ")
   (setq bmkext-bmenu-sort-function 'bmkext-visited-more-p)
   (helm-force-update))
 
-;;;###autoload
 (defun helm-bmkext-run-sort-by-last-visit ()
   (interactive)
-  ;(helm-bmkext-set-mode-line "LAST")
+  (helm-bmkext-set-mode-line "LAST")
   (setq bmkext-bmenu-sort-function 'bmkext-last-time-more-p)
   (helm-force-update))
 
-;;;###autoload
 (defun helm-bmkext-run-sort-alphabetically ()
   (interactive)
-  ;(helm-bmkext-set-mode-line "ALPHA")
+  (helm-bmkext-set-mode-line "ALPHA")
   (setq bmkext-bmenu-sort-function 'bmkext-alpha-more-p)
   (helm-force-update))
 
-;;;###autoload
+(defun helm-bmkext-set-mode-line (str)
+  (if (string-match "Sort:\\[\\(.*\\)\\] " (cadr helm-bookmark-mode-line-string))
+      (setq helm-bookmark-mode-line-string (list (car helm-bookmark-mode-line-string)
+                                                 (replace-match
+                                                  str nil nil
+                                                  (cadr helm-bookmark-mode-line-string) 1)))
+      (setq helm-bookmark-mode-line-string (list (car helm-bookmark-mode-line-string)
+                                                 (concat (format "Sort:[%s] " str)
+                                                         (cadr helm-bookmark-mode-line-string))))))
+
 (defun helm-bmkext-run-edit ()
   "Run `bmkext-edit-bookmark' from keyboard."
   (interactive)
@@ -80,6 +86,7 @@
   '((name . "Bookmark Addressbook")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global
@@ -167,6 +174,7 @@
   '((name . "Bookmark W3m")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-w3m-setup-alist))))
@@ -187,6 +195,7 @@
   '((name . "Bookmark Images")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-images-setup-alist))))
@@ -207,6 +216,7 @@
   '((name . "Bookmark Woman&Man")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-man-setup-alist))))
@@ -228,6 +238,7 @@
   '((name . "Bookmark Gnus")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-gnus-setup-alist))))
@@ -248,6 +259,7 @@
   '((name . "Bookmark Info")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-info-setup-alist))))
@@ -268,6 +280,7 @@
   '((name . "Bookmark Files&Directories")
     (init . (lambda ()
               (require 'bookmark-extensions)
+              (helm-bmkext-set-mode-line "FREQ")
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                'global (helm-bookmark-local-files-setup-alist))))
@@ -289,7 +302,6 @@ Needs bookmark-ext.el:
 <http://mercurial.intuxication.org/hg/emacs-bookmark-extension>.
 Contain also `helm-source-google-suggest'."
   (interactive)
-  (require 'bookmark-extensions)
   (helm
    :sources
    '(helm-source-bookmark-files&dirs
