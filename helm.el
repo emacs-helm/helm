@@ -2328,6 +2328,16 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
                     do (setq ,candidate (funcall f ,candidate)))
            (setq ,candidate (funcall it ,candidate)))))
 
+(defun helm--initialize-one-by-one-candidates (candidates source)
+  "Process the CANDIDATES with the `filter-one-by-one' function in SOURCE.
+Return CANDIDATES when pattern is empty."
+  (helm-aif (and (string= helm-pattern "")
+                 (assoc-default 'filter-one-by-one source))
+      (cl-loop for cand in candidates
+               do (helm--maybe-process-filter-one-by-one-candidate cand source)
+               collect cand)
+    candidates))
+
 (defun helm-process-filtered-candidate-transformer-maybe
     (candidates source process-p)
   "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE.
@@ -2359,7 +2369,9 @@ When attribute `real-to-display' is present, execute its function on all maybe
 filtered CANDIDATES."
   (helm-process-real-to-display
    (helm-process-filtered-candidate-transformer-maybe
-    (helm-process-candidate-transformer candidates source) source process-p)
+    (helm-process-candidate-transformer
+     (helm--initialize-one-by-one-candidates candidates source) source)
+    source process-p)
    source))
 
 
