@@ -2523,7 +2523,7 @@ when emacs is idle for `helm-idle-delay'."
     (helm-log-eval (mapcar (lambda (s)
                              (assoc-default 'name s))
                            delayed-sources))
-    (with-current-buffer helm-buffer
+    (with-current-buffer (helm-buffer-get)
       (save-excursion
         (goto-char (point-max))
         (mapc (lambda (source)
