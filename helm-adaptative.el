@@ -191,8 +191,7 @@ This is a filtered candidate transformer you can use with the
                                  (setq count (+ 10000 (cdr pattern-info)))
                                  (cl-return)))
                            (cons (car candidate-info) count)))
-                       (cdr source-info)))
-              sorted)
+                       (cdr source-info))))
           (if (and usage (consp usage))
               ;; sort the list in descending order, so candidates with highest
               ;; priorty come first
@@ -201,15 +200,14 @@ This is a filtered candidate transformer you can use with the
                                           (> (cdr first) (cdr second)))))
 
                 ;; put those candidates first which have the highest usage count
-                (cl-dolist (info usage)
-                  (when (cl-member (car info) candidates
-                                   :test 'helm-adaptive-compare)
-                    (push (car info) sorted)
-                    (setq candidates (cl-remove (car info) candidates
-                                                :test 'helm-adaptive-compare))))
-
-                ;; and append the rest
-                (append (reverse sorted) candidates nil))
+                (cl-loop for (info . _freq) in usage
+                         for member = (cl-member info candidates
+                                                 :test 'helm-adaptive-compare)
+                         when member collect (car member) into sorted
+                         and do
+                         (setq candidates (cl-remove info candidates
+                                                     :test 'helm-adaptive-compare))
+                         finally return (append sorted candidates)))
               (message "Your `%s' is maybe corrupted or too old, \
 you should reinitialize it with `helm-reset-adaptative-history'"
                        helm-adaptive-history-file)
@@ -230,12 +228,8 @@ Useful when you have a old or corrupted `helm-adaptive-history-file'."
 (defun helm-adaptive-compare (x y)
   "Compare candidates X and Y taking into account that the
 candidate can be in (DISPLAY . REAL) format."
-  (equal (if (listp x)
-             (cdr x)
-             x)
-         (if (listp y)
-             (cdr y)
-             y)))
+  (equal (if (listp x) (cdr x) x)
+         (if (listp y) (cdr y) y)))
 
 
 (provide 'helm-adaptative)
