@@ -71,6 +71,7 @@ source.")
                               'string-lessp))))
               (helm-init-candidates-in-buffer 'global helm-man-pages)))
     (candidates-in-buffer)
+    (persistent-action . ignore)
     (filtered-candidate-transformer
      . (lambda (candidates _source)
          (sort candidates #'helm-generic-sort-fn)))
