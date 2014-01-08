@@ -411,6 +411,8 @@ the center of window, otherwise at the top of window.")
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
         :history 'helm-grep-history
+        :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
+                        (format "%s:%d:" (buffer-name) (line-number-at-pos (point))))
         :truncate-lines t))
 
 ;;;###autoload
