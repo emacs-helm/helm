@@ -32,6 +32,15 @@
   "Apt related Applications and libraries for Helm."
   :group 'helm)
 
+(defcustom helm-apt-cache-show-function nil
+  "You can set the function with your own to show apt package.
+Example, we can use `apt-utils-show-package-1' instead `helm-apt-cache-show' like below:
+
+  (setq helm-apt-cache-show-function 'apt-utils-show-package-1)
+"
+  :type 'function
+  :group 'helm-apt)
+
 (defface helm-apt-installed
     '((t (:foreground "green")))
   "Face used for apt installed candidates."
@@ -172,7 +181,9 @@ package name - description."
 
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."
-  (let* ((command (format helm-apt-show-command package))
+  (if (functionp helm-apt-cache-show-function)
+      (funcall helm-apt-cache-show-function package)
+    (let* ((command (format helm-apt-show-command package))
          (buf     (get-buffer-create "*helm apt show*")))
     (helm-switch-to-buffer buf)
     (unless (string= package helm-apt-show-current-package)
@@ -183,7 +194,7 @@ package name - description."
            command nil (current-buffer) t))))
     (helm-apt-show-mode)
     (set (make-local-variable 'helm-apt-show-current-package)
-         package)))
+         package))))
 
 (defun helm-apt-install (_package)
   "Run 'apt-get install' shell command on PACKAGE."
