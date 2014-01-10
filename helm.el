@@ -3174,16 +3174,18 @@ Key arg DIRECTION can be one of:
       (error (helm-log "%S" err)))))
 
 ;;;###autoload
-(defun helm-previous-line ()
+(defun helm-previous-line (&optional arg)
   "Move selection to the previous line."
-  (interactive)
-  (helm-move-selection-common :where 'line :direction 'previous))
+  (interactive "p")
+  (let ((helm-move-to-line-cycle-in-source arg))
+    (helm-move-selection-common :where 'line :direction 'previous)))
 
 ;;;###autoload
-(defun helm-next-line ()
+(defun helm-next-line (&optional arg)
   "Move selection to the next line."
-  (interactive)
-  (helm-move-selection-common :where 'line :direction 'next))
+  (interactive "p")
+  (let ((helm-move-to-line-cycle-in-source arg))  
+    (helm-move-selection-common :where 'line :direction 'next)))
 
 ;;;###autoload
 (defun helm-previous-page ()
