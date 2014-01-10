@@ -421,6 +421,12 @@ See `truncate-lines'."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-move-to-line-cycle-in-source nil
+  "Move to end or beginning of source when reaching top or bottom of source.
+This happen when using `helm-next/previous-line'."
+  :group 'helm
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -3079,30 +3085,49 @@ Key arg DIRECTION can be one of:
         (helm-maybe-update-keymap)
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
 
+(defun helm-move--previous-multi-line-fn ()
+  (forward-line -1)
+  (helm-skip-header-and-separator-line 'previous)
+  (let ((header-pos (helm-get-previous-header-pos))
+        (separator-pos (helm-get-previous-candidate-separator-pos)))
+    (when header-pos
+      (goto-char (if (or (null separator-pos)
+                         (< separator-pos header-pos))
+                     header-pos
+                     separator-pos))
+      (forward-line 1))))
+
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
       (forward-line -1)
-      (forward-line -1)
-      (helm-skip-header-and-separator-line 'previous)
-      (let ((header-pos (helm-get-previous-header-pos))
-            (separator-pos (helm-get-previous-candidate-separator-pos)))
-        (when header-pos
-          (goto-char (if (or (null separator-pos)
-                             (< separator-pos header-pos))
-                         header-pos
-                         separator-pos))
-          (forward-line 1)))))
+      (helm-move--previous-multi-line-fn))
+  (when (and helm-move-to-line-cycle-in-source
+             (helm-pos-header-line-p))
+    (forward-line 1)
+    (helm-move--end-of-source)
+    (and (save-excursion (forward-line -1) (helm-pos-multiline-p))
+         (helm-move--previous-multi-line-fn))))
+
+(defun helm-move--next-multi-line-fn ()
+  (let ((header-pos (helm-get-next-header-pos))
+        (separator-pos (helm-get-next-candidate-separator-pos)))
+    (cond ((and separator-pos
+                (or (null header-pos) (< separator-pos header-pos)))
+           (goto-char separator-pos))
+          (header-pos
+           (goto-char header-pos)))))
 
 (defun helm-move--next-line-fn ()
   (if (not (helm-pos-multiline-p))
       (forward-line 1)
-      (let ((header-pos (helm-get-next-header-pos))
-            (separator-pos (helm-get-next-candidate-separator-pos)))
-        (cond ((and separator-pos
-                    (or (null header-pos) (< separator-pos header-pos)))
-               (goto-char separator-pos))
-              (header-pos
-               (goto-char header-pos))))))
+      (helm-move--next-multi-line-fn))
+  (when (and helm-move-to-line-cycle-in-source
+             (or (save-excursion (and (helm-pos-multiline-p)
+                                      (goto-char (overlay-end
+                                                  helm-selection-overlay))
+                                      (helm-end-of-source-p t)))
+                 (helm-end-of-source-p t)))
+    (helm-move--beginning-of-source)))
 
 (defun helm-move--previous-page-fn ()
   (condition-case nil
@@ -3119,6 +3144,14 @@ Key arg DIRECTION can be one of:
 
 (defun helm-move--end-of-buffer-fn ()
   (goto-char (point-max)))
+
+(defun helm-move--end-of-source ()
+  (goto-char (or (helm-get-next-header-pos) (point-max)))
+  (when (helm-pos-header-line-p) (forward-line -2)))
+
+(defun helm-move--beginning-of-source ()
+  (goto-char (helm-get-previous-header-pos))
+  (forward-line 1))
 
 (defun helm-move--previous-source-fn ()
   (forward-line -1)
