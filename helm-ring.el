@@ -206,7 +206,7 @@ replace with STR as yanked string."
                                      "^ " (format "%s" (marker-buffer i)))
                                     (null (marker-buffer i)))
                           (helm-global-mark-ring-format-buffer i))
-               when (and gm recip (not (member gm recip)))
+               when (and gm (not (member gm recip)))
                collect gm into recip
                finally return recip))))
 
