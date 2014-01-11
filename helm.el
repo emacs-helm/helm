@@ -3177,14 +3177,18 @@ Key arg DIRECTION can be one of:
 (defun helm-previous-line (&optional arg)
   "Move selection to the previous line."
   (interactive "p")
-  (let ((helm-move-to-line-cycle-in-source arg))
+  ;; Be sure to not use this in non--interactives calls.
+  (let ((helm-move-to-line-cycle-in-source
+         (and helm-move-to-line-cycle-in-source arg)))
     (helm-move-selection-common :where 'line :direction 'previous)))
 
 ;;;###autoload
 (defun helm-next-line (&optional arg)
   "Move selection to the next line."
   (interactive "p")
-  (let ((helm-move-to-line-cycle-in-source arg))  
+  ;; Be sure to not use this in non--interactives calls.
+  (let ((helm-move-to-line-cycle-in-source
+         (and helm-move-to-line-cycle-in-source arg)))
     (helm-move-selection-common :where 'line :direction 'next)))
 
 ;;;###autoload
