@@ -2529,25 +2529,27 @@ when emacs is idle for `helm-idle-delay'."
     (helm-log-eval (mapcar (lambda (s)
                              (assoc-default 'name s))
                            delayed-sources))
-    (with-current-buffer (helm-buffer-get)
-      (save-excursion
-        (goto-char (point-max))
-        (mapc (lambda (source)
-                (helm-render-source source (helm-compute-matches source)))
-              delayed-sources)
-        (when (and (not (helm-empty-buffer-p))
-                   ;; No selection yet.
-                   (= (overlay-start helm-selection-overlay)
-                      (overlay-end helm-selection-overlay)))
-          (helm-update-move-first-line 'without-hook)))
-      (when preselect (helm-preselect preselect source))
-      (save-excursion
-        (goto-char (point-min))
-        (helm-log-run-hook 'helm-update-hook))
-      (setq helm-force-updating-p nil)
-      (unless (assoc 'candidates-process source)
-        (helm-display-mode-line (helm-get-current-source))
-        (helm-log-run-hook 'helm-after-update-hook)))))
+    (let ((matches (cl-loop for src in delayed-sources
+                            collect (helm-compute-matches src))))
+      (with-current-buffer (helm-buffer-get)
+        (save-excursion
+          (goto-char (point-max))
+          (cl-loop for src in delayed-sources
+                   for mtc in matches
+                   do (helm-render-source src mtc))
+          (when (and (not (helm-empty-buffer-p))
+                     ;; No selection yet.
+                     (= (overlay-start helm-selection-overlay)
+                        (overlay-end helm-selection-overlay)))
+            (helm-update-move-first-line 'without-hook)))
+        (when preselect (helm-preselect preselect source))
+        (save-excursion
+          (goto-char (point-min))
+          (helm-log-run-hook 'helm-update-hook))
+        (setq helm-force-updating-p nil)
+        (unless (assoc 'candidates-process source)
+          (helm-display-mode-line (helm-get-current-source))
+          (helm-log-run-hook 'helm-after-update-hook))))))
 
 
 ;;; Core: helm-update
