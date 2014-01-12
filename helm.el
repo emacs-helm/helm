@@ -2530,18 +2530,19 @@ when emacs is idle for `helm-idle-delay'."
                              (assoc-default 'name s))
                            delayed-sources))
     (with-current-buffer (helm-buffer-get)
-      (goto-char (point-max))
-      (helm-while-no-input
-        (cl-loop with matches = (cl-loop for src in delayed-sources
-                                         collect (helm-compute-matches src))
-                 for src in delayed-sources
-                 for mtc in matches
-                 do (helm-render-source src mtc)))
-      (when (and (not (helm-empty-buffer-p))
-                 ;; No selection yet.
-                 (= (overlay-start helm-selection-overlay)
-                    (overlay-end helm-selection-overlay)))
-        (helm-update-move-first-line 'without-hook))
+      (save-excursion
+        (goto-char (point-max))
+        (helm-while-no-input
+          (cl-loop with matches = (cl-loop for src in delayed-sources
+                                           collect (helm-compute-matches src))
+                   for src in delayed-sources
+                   for mtc in matches
+                   do (helm-render-source src mtc)))
+        (when (and (not (helm-empty-buffer-p))
+                   ;; No selection yet.
+                   (= (overlay-start helm-selection-overlay)
+                      (overlay-end helm-selection-overlay)))
+          (helm-update-move-first-line 'without-hook)))
       (when preselect (helm-preselect preselect source))
       (save-excursion
         (goto-char (point-min))
