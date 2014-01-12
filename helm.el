@@ -2529,9 +2529,9 @@ when emacs is idle for `helm-idle-delay'."
     (helm-log-eval (mapcar (lambda (s)
                              (assoc-default 'name s))
                            delayed-sources))
-    (let ((matches (cl-loop for src in delayed-sources
-                            collect (helm-compute-matches src))))
-      (with-current-buffer (helm-buffer-get)
+    (with-current-buffer (helm-buffer-get)
+      (let ((matches (cl-loop for src in delayed-sources
+                              collect (helm-compute-matches src))))
         (save-excursion
           (goto-char (point-max))
           (cl-loop for src in delayed-sources
