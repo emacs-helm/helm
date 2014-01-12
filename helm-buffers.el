@@ -152,7 +152,6 @@ When disabled (nil) use the longest buffer-name length found."
     (persistent-action . helm-buffers-list-persistent-action)
     (keymap . ,helm-buffer-map)
     (volatile)
-    (no-delay-on-input)
     (mode-line . helm-buffer-mode-line-string)
     (persistent-help
      . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))

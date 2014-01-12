@@ -385,17 +385,6 @@ will be used as input."
   :group 'helm
   :type '(repeat (choice symbol)))
 
-(defcustom helm-never-delay-on-input t
-  "Globally disable the use of `while-no-input' in all sources when non--nil.
-This can be done individually by source adding the attribute
-`no-delay-on-input' in source. This have no effect on async source
-that are not using `while-no-input'.
-It is disabled by default because it is not supported on some system
-like \"Mac Osx\" but it is a good idea to enable it if
-supported by your system. Known to works fine on GNU/Linux and Windows."
-  :group 'helm
-  :type 'boolean)
-
 (defcustom helm-delete-minibuffer-contents-from-point nil
   "When non--nil, `helm-delete-minibuffer-contents' delete region from `point'.
 Otherwise (default) delete `minibuffer-contents'."
@@ -2242,16 +2231,7 @@ Helm plug-ins are realized by this function."
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
                              (helm-interpret-value candidate-proc source)
-                             (if (or helm-force-updating-p
-                                     helm-never-delay-on-input
-                                     ;; Avoid using `while-no-input' with tramp.
-                                     (file-remote-p helm-pattern)
-                                     (assoc 'no-delay-on-input source))
-                                 (helm-interpret-value candidate-fn source)
-                                 (let ((result (helm-while-no-input
-                                                 (helm-interpret-value
-                                                  candidate-fn source))))
-                                   (and (listp result) result))))
+                             (helm-interpret-value candidate-fn source))
                        (error (helm-log "Error: %S" err) nil))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
@@ -2520,7 +2500,7 @@ and `helm-pattern'."
           (helm-insert-match match 'insert source))
         (put-text-property start (point) 'helm-multiline t)))))
 
-(defun helm-process-delayed-sources (delayed-sources &optional preselect source)
+(cl-defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
 Move selection to string or regexp PRESELECT if non--nil.
 This function is called in `helm-process-delayed-sources-timer'
@@ -2532,9 +2512,13 @@ when emacs is idle for `helm-idle-delay'."
     (with-current-buffer (helm-buffer-get)
       (save-excursion
         (goto-char (point-max))
-        (mapc (lambda (source)
-                (helm-render-source source (helm-compute-matches source)))
-              delayed-sources)
+        (helm-while-no-input
+          (cl-loop with matches = (cl-loop for src in delayed-sources
+                                           collect (helm-compute-matches src))
+                   unless matches do (cl-return)
+                   for src in delayed-sources
+                   for mtc in matches
+                   do (helm-render-source src mtc)))
         (when (and (not (helm-empty-buffer-p))
                    ;; No selection yet.
                    (= (overlay-start helm-selection-overlay)
@@ -2571,7 +2555,7 @@ is done on whole `helm-buffer' and not on current source."
           normal-sources-candidates
           delayed-sources)
       (unwind-protect
-          (progn
+           (helm-while-no-input
             ;; Iterate over all the sources
             (cl-loop for source in (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
                      if (helm-delayed-source-p source)

@@ -1220,9 +1220,6 @@ HELM-ATTRIBUTE should be a symbol."
 (helm-document-attribute 'no-matchplugin "optional"
   "  Disable matchplugin for this source.")
 
-(helm-document-attribute 'no-delay-on-input "optional"
-  "  Don't use `while-no-input' when computing candidates.")
-
 (helm-document-attribute 'history "optional"
   "  Allow passing history variable to helm from source.
   It should be a quoted symbol evaluated from source, i.e:
