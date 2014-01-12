@@ -745,7 +745,6 @@ Keys description:
                       (filtered-candidate-transformer . helm-ff-sort-candidates)
                       (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
                       (keymap . ,cmap)
-                      (no-delay-on-input)
                       (persistent-action . ,persistent-action)
                       (candidate-number-limit . 9999)
                       (persistent-help . ,persistent-help)

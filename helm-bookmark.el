@@ -96,8 +96,8 @@
                                                     (cadr helm-bookmark-mode-line-string))))                          
               (setq helm-bookmarks-cache
                     (bookmark-all-names))))
-    (no-delay-on-input) ; Issue #173 needed for helm-for-files.
     (candidates . helm-bookmarks-cache)
+    (delayed)
     (filtered-candidate-transformer . helm-bookmark-transformer)
     (match . helm-bookmark-match-fn)
     (type . bookmark))
@@ -148,7 +148,6 @@
 (defvar helm-source-bookmark-set
   '((name . "Set Bookmark")
     (dummy)
-    (no-delay-on-input)
     (action . bookmark-set))
   "See (info \"(emacs)Bookmarks\").")
 
@@ -172,7 +171,6 @@
     (filtered-candidate-transformer
      helm-adaptive-sort
      helm-highlight-bookmark)
-    (no-delay-on-input)
     (type . bookmark))
   "See (info \"(emacs)Bookmarks\").")
 
