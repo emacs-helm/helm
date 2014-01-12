@@ -2530,7 +2530,7 @@ when emacs is idle for `helm-idle-delay'."
                              (assoc-default 'name s))
                            delayed-sources))
     (with-current-buffer (helm-buffer-get)
-      (erase-buffer)
+      (goto-char (point-max))
       (helm-while-no-input
         (cl-loop with matches = (cl-loop for src in delayed-sources
                                          collect (helm-compute-matches src))
@@ -2573,7 +2573,7 @@ is done on whole `helm-buffer' and not on current source."
           normal-sources-candidates
           delayed-sources)
       (unwind-protect
-          (progn
+           (helm-while-no-input
             ;; Iterate over all the sources
             (cl-loop for source in (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
                      if (helm-delayed-source-p source)
