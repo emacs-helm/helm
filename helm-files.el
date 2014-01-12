@@ -1761,8 +1761,8 @@ Return candidates prefixed with basename of `helm-input' first."
                (cl-loop for r in helm-boring-file-regexp-list
                         thereis (string-match r file)))
     ;; Handle tramp files.
-    (if (or (and (string-match helm-tramp-file-name-regexp helm-pattern)
-                 helm-ff-tramp-not-fancy))
+    (if (and (string-match helm-tramp-file-name-regexp helm-pattern)
+             helm-ff-tramp-not-fancy)
         (if helm-ff-transformer-show-only-basename
             (if (helm-dir-is-dot file)
                 file
