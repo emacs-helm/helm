@@ -479,12 +479,13 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff-auto-update-flag
          (dest   (with-helm-display-marked-candidates
                    "*helm marked*" ifiles
-                   (helm-read-file-name
-                    prompt
-                    :preselect (if helm-ff-transformer-show-only-basename
-                                   (helm-basename cand) cand)
-                    :initial-input (helm-dwim-target-directory)
-                    :history (helm-find-files-history :comp-read nil)))))
+                   (with-helm-current-buffer
+                     (helm-read-file-name
+                      prompt
+                      :preselect (if helm-ff-transformer-show-only-basename
+                                     (helm-basename cand) cand)
+                      :initial-input (helm-dwim-target-directory)
+                      :history (helm-find-files-history :comp-read nil))))))
     (helm-dired-action
      dest :files ifiles :action action :follow parg)))
 
