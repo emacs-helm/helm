@@ -453,14 +453,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "The main source to browse files.
 Should not be used among other sources.")
 
-(defun helm-find-files-set-prompt-for-action (action files)
-  "Set prompt for action ACTION for FILES."
-  (let ((len (length files)))
-    (format "%s *%s File(s)\n%s to: "
-            action len
-            (mapconcat (lambda (f)
-                         (format "- %s\n" f)) files ""))))
-
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
 If there is only one window return the value ot `default-directory'
@@ -479,17 +471,20 @@ ACTION must be an action supported by `helm-dired-action'."
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates)))
          (cand   (helm-get-selection)) ; Target
-         (prompt (helm-find-files-set-prompt-for-action
-                  (capitalize (symbol-name action)) ifiles))
+         (prompt (format "%s %s file(s) to: "
+                         (capitalize (symbol-name action))
+                         (length ifiles)))
          (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-flag
-         (dest   (helm-read-file-name
-                  prompt
-                  :preselect (if helm-ff-transformer-show-only-basename
-                                 (helm-basename cand) cand)
-                  :initial-input (helm-dwim-target-directory)
-                  :history (helm-find-files-history :comp-read nil))))
+         (dest   (with-helm-display-marked-candidates
+                   "*helm marked*" ifiles
+                   (helm-read-file-name
+                    prompt
+                    :preselect (if helm-ff-transformer-show-only-basename
+                                   (helm-basename cand) cand)
+                    :initial-input (helm-dwim-target-directory)
+                    :history (helm-find-files-history :comp-read nil)))))
     (helm-dired-action
      dest :files ifiles :action action :follow parg)))
 
@@ -2260,16 +2255,16 @@ Ask to kill buffers associated with that file, too."
 
 (defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates))
-         (len (length files)))
-    (if (not (y-or-n-p
-              (format "Delete *%s File(s):\n%s"
-                      len
-                      (mapconcat (lambda (f) (format "- %s\n" f)) files ""))))
-        (message "(No deletions performed)")
-        (cl-dolist (i files)
-          (set-text-properties 0 (length i) nil i)
-          (helm-delete-file i helm-ff-signal-error-on-dot-files))
-        (message "%s File(s) deleted" len))))
+         (len (length files))
+         (buf (get-buffer-create "*helm marked*")))
+    (with-helm-display-marked-candidates buf
+      files
+      (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
+          (message "(No deletions performed)")
+          (cl-dolist (i files)
+            (set-text-properties 0 (length i) nil i)
+            (helm-delete-file i helm-ff-signal-error-on-dot-files))
+          (message "%s File(s) deleted" len)))))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."

@@ -669,6 +669,19 @@ Useful in dired buffers when there is inserted subdirs."
       (dired-current-directory)
       default-directory))
 
+(defmacro with-helm-display-marked-candidates (buf candidates &rest body)
+  (declare (indent 0) (debug t))
+  `(unwind-protect
+        (with-temp-buffer-window ,buf
+          '(display-buffer-below-selected
+            (window-height . fit-window-to-buffer))
+          (lambda (window _ignore)
+            (with-selected-window window
+              ,@body))
+          (save-excursion
+            (insert (mapconcat (lambda (f) (format "- %s\n" f)) ,candidates ""))))
+     (quit-window 'kill (get-buffer-window ,buf))))
+
 ;;; Persistent Action Helpers
 ;;
 ;;
