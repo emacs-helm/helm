@@ -678,8 +678,9 @@ Useful in dired buffers when there is inserted subdirs."
           (lambda (window _ignore)
             (with-selected-window window
               ,@body))
-          (save-excursion
-            (insert (mapconcat (lambda (f) (format "- %s\n" f)) ,candidates ""))))
+          (dired-format-columns-of-files ,candidates)) 
+          ;; (save-excursion
+          ;;   (insert (mapconcat (lambda (f) (format "- %s\n" f)) ,candidates ""))))
      (quit-window 'kill (get-buffer-window ,buf))))
 
 ;;; Persistent Action Helpers
