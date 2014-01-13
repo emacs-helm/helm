@@ -97,7 +97,6 @@
               (setq helm-bookmarks-cache
                     (bookmark-all-names))))
     (candidates . helm-bookmarks-cache)
-    (delayed)
     (filtered-candidate-transformer . helm-bookmark-transformer)
     (match . helm-bookmark-match-fn)
     (type . bookmark))

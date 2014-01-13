@@ -277,8 +277,7 @@ Do nothing when `helm-locate-command' is 'es'."
     (help-message . helm-generic-file-help-message)
     (candidate-number-limit . 9999)
     (no-matchplugin)
-    (mode-line . helm-generic-file-mode-line-string)
-    (delayed))
+    (mode-line . helm-generic-file-mode-line-string))
   "Find files matching the current input pattern with locate.")
 
 ;;;###autoload
@@ -293,8 +292,7 @@ Do nothing when `helm-locate-command' is 'es'."
                 (candidate-transformer . (helm-skip-boring-files
                                           helm-highlight-files))
                 (candidate-number-limit . 9999)
-                (no-matchplugin)
-                (delayed))))
+                (no-matchplugin))))
     (or (helm :sources src
               :prompt prompt
               :buffer "*helm locate read fname*"

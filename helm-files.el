@@ -2584,8 +2584,7 @@ Colorize only symlinks, directories and files."
     (action-transformer
      helm-transform-file-load-el
      helm-transform-file-browse-url)
-    (requires-pattern . 3)
-    (delayed))
+    (requires-pattern . 3))
   "Source for retrieving files matching the current input pattern
 with the tracker desktop search.")
 
@@ -2595,8 +2594,7 @@ with the tracker desktop search.")
     (candidates-process
      . (lambda () (start-process "mdfind-process" nil "mdfind" helm-pattern)))
     (type . file)
-    (requires-pattern . 3)
-    (delayed))
+    (requires-pattern . 3))
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
@@ -2625,8 +2623,7 @@ utility mdfind.")
                      'action helm-source-locate)))
     (mode-line  . helm-generic-file-mode-line-string)
     (keymap . ,helm-generic-files-map)
-    (requires-pattern . 3)
-    (delayed)))
+    (requires-pattern . 3)))
 
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates

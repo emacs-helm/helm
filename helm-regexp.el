@@ -31,13 +31,6 @@
   :group 'helm-regexp
   :type 'boolean)
 
-(defcustom helm-m-occur-idle-delay helm-idle-delay
-  "Delay before updating display in `helm-source-moccur'.
-It is similar to `helm-idle-delay' but local to `helm-source-moccur'.
-This setting apply also to `helm-source-occur'."
-  :group 'helm-regexp
-  :type 'float)
-
 (defcustom helm-m-occur-use-ioccur-style-keys t
   "Similar to `helm-grep-use-ioccur-style-keys' but for multi occur."
   :group 'helm-regexp
@@ -111,7 +104,6 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (persistent-help . "Show this line")
     (multiline)
     (no-matchplugin)
-    (delayed)
     (requires-pattern . 2)
     (mode-line . "Press TAB to select action.")
     (regexp . (lambda () helm-input))
@@ -301,8 +293,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-moccur-map)
     (history . ,'helm-grep-history)
-    (requires-pattern . 2)
-    (delayed . ,helm-m-occur-idle-delay))
+    (requires-pattern . 2))
   "Helm source for multi occur.")
 
 (defun helm-m-occur-filter-one-by-one (candidate)
