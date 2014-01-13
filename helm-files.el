@@ -478,7 +478,7 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-flag
          (dest   (with-helm-display-marked-candidates
-                   "*helm marked*" ifiles
+                   "*helm marked*" (mapcar 'helm-basename ifiles)
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
@@ -2258,8 +2258,8 @@ Ask to kill buffers associated with that file, too."
   (let* ((files (helm-marked-candidates))
          (len (length files))
          (buf (get-buffer-create "*helm marked*")))
-    (with-helm-display-marked-candidates buf
-      files
+    (with-helm-display-marked-candidates
+      buf (mapcar 'helm-basename files)
       (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
           (message "(No deletions performed)")
           (cl-dolist (i files)
