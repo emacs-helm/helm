@@ -275,9 +275,7 @@ Same as `helm-m-occur-goto-line' but go in new frame."
   `((name . "Moccur")
     (init . (lambda ()
               (require 'helm-grep)
-              (helm-m-occur-init)
-              (helm-attrset 'delayed helm-m-occur-idle-delay
-                            helm-source-moccur)))
+              (helm-m-occur-init)))
     (candidates-in-buffer)
     (filter-one-by-one . helm-m-occur-filter-one-by-one)
     (get-line . helm-m-occur-get-line)
