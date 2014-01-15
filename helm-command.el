@@ -155,7 +155,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         :must-match t
                         :candidates-in-buffer t
                         :fc-transformer 'helm-M-x-transformer))
-      (cancel-timer tm))
+      (cancel-timer tm)
+      (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))
     (unless current-prefix-arg
       (setq current-prefix-arg helm-current-prefix-arg))
