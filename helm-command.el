@@ -108,6 +108,12 @@ Show global bindings and local bindings according to current `major-mode'."
                    finally return
                    (sort ls #'helm-generic-sort-fn))))
 
+(defun helm-M-x--notify-prefix-arg ()
+  ;; Notify a prefix-arg set AFTER calling M-x.
+  (when prefix-arg
+    (with-helm-window
+      (helm-display-mode-line (helm-get-current-source) 'force))))
+
 ;;;###autoload
 (defun helm-M-x ()
   "Preconfigured `helm' for Emacs commands.
@@ -116,6 +122,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
   (let* ((history (cl-loop for i in extended-command-history
                            when (commandp (intern i)) collect i))
          command sym-com in-help help-cand
+         (helm--mode-line-display-prefarg t)
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))
                           (if (and in-help (string= candidate help-cand)
@@ -130,22 +137,25 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                                 (setq in-help nil))
                               (helm-describe-function candidate)
                               (setq in-help t))
-                          (setq help-cand candidate)))))
-    (setq command (helm-comp-read
-                   "M-x " obarray
-                   :test 'commandp
-                   :requires-pattern helm-M-x-requires-pattern
-                   :name "Emacs Commands"
-                   :buffer "*helm M-x*"
-                   :persistent-action pers-help
-                   :persistent-help "Describe this command"
-                   :history history
-                   :reverse-history helm-M-x-reverse-history
-                   :del-input nil
-                   :mode-line helm-mode-line-string
-                   :must-match t
-                   :candidates-in-buffer t
-                   :fc-transformer 'helm-M-x-transformer))
+                          (setq help-cand candidate))))
+         (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg)))
+    (unwind-protect
+         (setq command (helm-comp-read
+                        "M-x " obarray
+                        :test 'commandp
+                        :requires-pattern helm-M-x-requires-pattern
+                        :name "Emacs Commands"
+                        :buffer "*helm M-x*"
+                        :persistent-action pers-help
+                        :persistent-help "Describe this command"
+                        :history history
+                        :reverse-history helm-M-x-reverse-history
+                        :del-input nil
+                        :mode-line helm-mode-line-string
+                        :must-match t
+                        :candidates-in-buffer t
+                        :fc-transformer 'helm-M-x-transformer))
+      (cancel-timer tm))
     (setq sym-com (intern command))
     (unless current-prefix-arg
       (setq current-prefix-arg helm-current-prefix-arg))

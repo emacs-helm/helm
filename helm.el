@@ -672,6 +672,7 @@ when `helm' is keyboard-quitted.")
 (defvar helm-marked-candidates nil
   "Marked candadates.  List of \(source . real\) pair.")
 (defvar helm-in-file-completion-p nil)
+(defvar helm--mode-line-display-prefarg nil)
 
 
 ;; Utility: logging
@@ -2988,7 +2989,7 @@ Possible value of DIRECTION are 'next or 'previous."
                            (not (eq (point-at-bol) (point-min))))
                       -1 1))))
 
-(defun helm-display-mode-line (source)
+(defun helm-display-mode-line (source &optional force)
   "Setup mode-line and header-line for `helm-buffer'."
   (set (make-local-variable 'helm-mode-line-string)
        (helm-interpret-value (or (and (listp source) ; Check if source is empty.
@@ -3001,6 +3002,12 @@ Possible value of DIRECTION are 'next or 'previous."
         (setq mode-line-format
               `(" " mode-line-buffer-identification " "
                     (line-number-mode "L%l") " " ,follow
+                    (:eval (when ,helm--mode-line-display-prefarg
+                             (let ((arg (prefix-numeric-value (or prefix-arg
+                                                                  current-prefix-arg))))
+                               (unless (= arg 1)
+                                 (propertize (format "[prefarg:%s] " arg)
+                                             'face '((:foreground "green")))))))
                     (:eval (helm-show-candidate-number
                             (when (listp helm-mode-line-string)
                               (car-safe helm-mode-line-string))))
@@ -3016,7 +3023,8 @@ Possible value of DIRECTION are 'next or 'previous."
                         (assoc-default 'header-line source)) source))
            (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
       (setq header-line-format
-            (propertize (concat " " hlstr hlend) 'face 'helm-header)))))
+            (propertize (concat " " hlstr hlend) 'face 'helm-header))))
+  (when force (force-mode-line-update)))
 
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
