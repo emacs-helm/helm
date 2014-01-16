@@ -2455,7 +2455,7 @@ and `helm-pattern'."
                      candidate newmatches
                      helm-match-hash item-count limit source))))
               ;; filter-one-by-one may return nil candidates, so delq them if some.
-              (setq matches (append matches (nreverse (delq nil newmatches)))))))
+              (setq matches (nconc matches (nreverse (delq nil newmatches)))))))
       (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
                (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                                (assoc-default 'name source) (car err) (cdr err)))
