@@ -75,7 +75,7 @@
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c o") 'helm-bookmark-run-jump-other-window)
     (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
-    (define-key map (kbd "M-t")   'helm-bookmark-toggle-filename)
+    (define-key map (kbd "C-]")   'helm-bookmark-toggle-filename)
     (when (locate-library "bookmark-extensions")
       (define-key map (kbd "M-e") 'helm-bmkext-run-edit)
       (define-key map (kbd "M-F") 'helm-bmkext-run-sort-by-frequency)

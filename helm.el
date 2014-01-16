@@ -2627,6 +2627,9 @@ is done on whole `helm-buffer' and not on current source."
              'helm-process-delayed-sources delayed-sources preselect source)))
         (helm-log "end update")))))
 
+;; Update keymap after updating.
+(add-hook 'helm-after-update-hook 'helm-maybe-update-keymap)
+
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
   (let ((len (string-width
