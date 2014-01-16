@@ -905,6 +905,14 @@ not `exit-minibuffer' or unwanted functions."
   (declare (indent 0) (debug t))
   `(with-helm-temp-hook 'helm-after-update-hook ,@body))
 
+(defmacro with-helm-alive-p (&rest body)
+  "Return error when BODY run ouside helm context."
+  (declare (indent 0) (debug t))
+  `(progn
+     (if helm-alive-p
+         (progn ,@body)
+         (error "Running helm command outside of context"))))
+
 (cl-defun helm-attr (attribute-name
                      &optional (src (helm-get-current-source)) compute)
   "Get the value of ATTRIBUTE-NAME of SRC.

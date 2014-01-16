@@ -832,154 +832,134 @@ bounded to <backspace>."
   (message "[Auto expansion %s]"
            (if helm-ff-auto-update-flag "enabled" "disabled")))
 
-;;;###autoload
 (defun helm-ff-run-toggle-auto-update ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-attrset 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
     (helm-execute-persistent-action 'toggle-auto-update)))
 
-;;;###autoload
 (defun helm-ff-run-switch-to-history ()
   "Run Switch to history action from `helm-source-find-files'."
   (interactive)
-  (when (helm-file-completion-source-p)
-    (helm-quit-and-execute-action 'helm-find-files-switch-to-hist)))
+  (with-helm-alive-p
+    (when (helm-file-completion-source-p)
+      (helm-quit-and-execute-action 'helm-find-files-switch-to-hist))))
 
-;;;###autoload
 (defun helm-ff-run-grep ()
   "Run Grep action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-grep)))
 
-;;;###autoload
 (defun helm-ff-run-pdfgrep ()
   "Run Pdfgrep action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-pdfgrep)))
 
-;;;###autoload
 (defun helm-ff-run-zgrep ()
   "Run Grep action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-zgrep)))
 
-;;;###autoload
 (defun helm-ff-run-copy-file ()
   "Run Copy file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-copy)))
 
-;;;###autoload
 (defun helm-ff-run-rename-file ()
   "Run Rename file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-rename)))
 
-;;;###autoload
 (defun helm-ff-run-byte-compile-file ()
   "Run Byte compile file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-byte-compile)))
 
-;;;###autoload
 (defun helm-ff-run-load-file ()
   "Run Load file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-load-files)))
 
-;;;###autoload
 (defun helm-ff-run-eshell-command-on-file ()
   "Run eshell command on file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action
      'helm-find-files-eshell-command-on-file)))
 
-;;;###autoload
 (defun helm-ff-run-ediff-file ()
   "Run Ediff file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-ediff-files)))
 
-;;;###autoload
 (defun helm-ff-run-ediff-merge-file ()
   "Run Ediff merge file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action
      'helm-find-files-ediff-merge-files)))
 
-;;;###autoload
 (defun helm-ff-run-symlink-file ()
   "Run Symlink file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-symlink)))
 
-;;;###autoload
 (defun helm-ff-run-hardlink-file ()
   "Run Hardlink file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-find-files-hardlink)))
 
-;;;###autoload
 (defun helm-ff-run-delete-file ()
   "Run Delete file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-delete-marked-files)))
 
-;;;###autoload
 (defun helm-ff-run-complete-fn-at-point ()
   "Run complete file name action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action
      'helm-insert-file-name-completion-at-point)))
 
-;;;###autoload
 (defun helm-ff-run-switch-to-eshell ()
   "Run switch to eshell action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-switch-to-eshell)))
 
-;;;###autoload
 (defun helm-ff-run-switch-other-window ()
   "Run switch to other window action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'find-file-other-window)))
 
-;;;###autoload
 (defun helm-ff-run-switch-other-frame ()
   "Run switch to other frame action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'find-file-other-frame)))
 
-;;;###autoload
 (defun helm-ff-run-open-file-externally ()
   "Run open file externally command action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-open-file-externally)))
 
-;;;###autoload
 (defun helm-ff-run-open-file-with-default-tool ()
   "Run open file externally command action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-open-file-with-default-tool)))
 
 (defun helm-ff-locate (candidate)
@@ -996,11 +976,10 @@ bounded to <backspace>."
                          " -b"))))
     (helm-locate-1 helm-current-prefix-arg nil 'from-ff input)))
 
-;;;###autoload
 (defun helm-ff-run-locate ()
   "Run locate action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-locate)))
 
 (defun helm-files-insert-as-org-link (candidate)
@@ -1009,26 +988,24 @@ bounded to <backspace>."
 
 (defun helm-ff-run-insert-org-link ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-files-insert-as-org-link)))
 
-;;;###autoload
 (defun helm-ff-run-find-file-as-root ()
   (interactive)
-  (helm-quit-and-execute-action 'helm-find-file-as-root))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-find-file-as-root)))
 
-;;;###autoload
 (defun helm-ff-run-gnus-attach-files ()
   "Run gnus attach files command action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-gnus-attach-files)))
 
-;;;###autoload
 (defun helm-ff-run-etags ()
   "Run Etags command action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
 (defun helm-ff-print (_candidate)
@@ -1076,11 +1053,10 @@ Same as `dired-do-print' but for helm."
         (start-process-shell-command "helm-print" nil cmd-line)
         (error "Error: Please verify your printer settings in Emacs."))))
 
-;;;###autoload
 (defun helm-ff-run-print-file ()
   "Run Print file action from `helm-source-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-print)))
 
 (defun helm-ff-checksum (file)
@@ -1110,10 +1086,9 @@ The checksum is copied to kill-ring."
                     (helm-basename candidate) candidate)))
     (helm-force-update target)))
 
-;;;###autoload
 (defun helm-ff-run-toggle-basename ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-attrset 'toggle-basename '(helm-ff-toggle-basename . never-split))
     (helm-execute-persistent-action 'toggle-basename)))
 
@@ -1158,31 +1133,31 @@ You should not modify this yourself unless you know what you do.")
         (cl-loop for i in helm-file-completion-sources
                  thereis (string= cur-source i)))))
 
-;;;###autoload
 (defun helm-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level down."
   (interactive "p")
-  (when (and (helm-file-completion-source-p)
-             (not (helm-ff-invalid-tramp-name-p)))
-    (with-helm-window
-      (when helm-follow-mode
-        (helm-follow-mode -1) (message nil)))
-    ;; When going to precedent level we want to be at the line
-    ;; corresponding to actual directory, so store this info
-    ;; in `helm-ff-last-expanded'.
-    (let ((cur-cand (helm-get-selection))
-          (new-pattern (helm-reduce-file-name
-                        helm-pattern arg :unix-close t :expand t)))
-      (cond ((file-directory-p helm-pattern)
-             (setq helm-ff-last-expanded helm-ff-default-directory))
-            ((file-exists-p helm-pattern)
-             (setq helm-ff-last-expanded helm-pattern))
-            ((and cur-cand (file-exists-p cur-cand))
-             (setq helm-ff-last-expanded cur-cand)))
-      (helm-set-pattern new-pattern)
-      (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))
-      (helm-check-minibuffer-input))))
+  (with-helm-alive-p
+    (when (and (helm-file-completion-source-p)
+               (not (helm-ff-invalid-tramp-name-p)))
+      (with-helm-window
+        (when helm-follow-mode
+          (helm-follow-mode -1) (message nil)))
+      ;; When going to precedent level we want to be at the line
+      ;; corresponding to actual directory, so store this info
+      ;; in `helm-ff-last-expanded'.
+      (let ((cur-cand (helm-get-selection))
+            (new-pattern (helm-reduce-file-name
+                          helm-pattern arg :unix-close t :expand t)))
+        (cond ((file-directory-p helm-pattern)
+               (setq helm-ff-last-expanded helm-ff-default-directory))
+              ((file-exists-p helm-pattern)
+               (setq helm-ff-last-expanded helm-pattern))
+              ((and cur-cand (file-exists-p cur-cand))
+               (setq helm-ff-last-expanded cur-cand)))
+        (helm-set-pattern new-pattern)
+        (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))
+        (helm-check-minibuffer-input)))))
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
@@ -1634,19 +1609,19 @@ Note that only directories are saved here."
           (format "Accessed: %s\n" access)))
         (message dired-line) (sit-for 5))))
 
-;;;###autoload
 (defun helm-ff-properties-persistent ()
   "Show properties without quitting helm."
   (interactive)
-  (helm-attrset 'properties-action '(helm-ff-properties . never-split))
-  (helm-execute-persistent-action 'properties-action))
+  (with-helm-alive-p
+    (helm-attrset 'properties-action '(helm-ff-properties . never-split))
+    (helm-execute-persistent-action 'properties-action)))
 
-;;;###autoload
 (defun helm-ff-persistent-delete ()
   "Delete current candidate without quitting."
   (interactive)
-  (helm-attrset 'quick-delete '(helm-ff-quick-delete . never-split))
-  (helm-execute-persistent-action 'quick-delete))
+  (with-helm-alive-p
+    (helm-attrset 'quick-delete '(helm-ff-quick-delete . never-split))
+    (helm-execute-persistent-action 'quick-delete)))
 
 (defun helm-ff-dot-file-p (file)
   "Check if FILE is `.' or `..'."
@@ -1696,11 +1671,10 @@ in `helm-find-files-persistent-action'."
           (message "Buffer `%s' killed" buf-name))
         (find-file candidate))))
 
-;;;###autoload
 (defun helm-ff-run-kill-buffer-persistent ()
   "Execute `helm-ff-kill-buffer-fname' whitout quitting."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-attrset 'kill-buffer-fname 'helm-ff-kill-buffer-fname)
     (helm-execute-persistent-action 'kill-buffer-fname)))
 
@@ -1877,19 +1851,19 @@ This affect directly file CANDIDATE."
 This affect directly file CANDIDATE."
   (helm-ff-rotate-current-image-1 candidate))
 
-;;;###autoload
 (defun helm-ff-rotate-left-persistent ()
   "Rotate image left without quitting helm."
   (interactive)
-  (helm-attrset 'image-action1 'helm-ff-rotate-image-left)
-  (helm-execute-persistent-action 'image-action1))
+  (with-helm-alive-p
+    (helm-attrset 'image-action1 'helm-ff-rotate-image-left)
+    (helm-execute-persistent-action 'image-action1)))
 
-;;;###autoload
 (defun helm-ff-rotate-right-persistent ()
   "Rotate image right without quitting helm."
   (interactive)
-  (helm-attrset 'image-action2 'helm-ff-rotate-image-right)
-  (helm-execute-persistent-action 'image-action2))
+  (with-helm-alive-p
+    (helm-attrset 'image-action2 'helm-ff-rotate-image-right)
+    (helm-execute-persistent-action 'image-action2)))
 
 (defun helm-ff-exif-data (candidate)
   "Extract exif data from file CANDIDATE using `helm-ff-exif-data-program'."
@@ -2439,14 +2413,14 @@ Else return ACTIONS unmodified."
                   (cons (propertize c 'face 'helm-ff-file) c))
                  (t (cons (propertize c 'face 'helm-history-deleted) c)))))
 
-;;;###autoload
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
-  (helm :sources 'helm-source-ff-file-name-history
-        :buffer "*helm-file-name-history*"
-        :allow-nest t
-        :resume 'noresume))
+  (with-helm-alive-p
+    (helm :sources 'helm-source-ff-file-name-history
+          :buffer "*helm-file-name-history*"
+          :allow-nest t
+          :resume 'noresume)))
 
 ;;; Recentf files
 ;;
@@ -2502,10 +2476,9 @@ and
       ;; which will set locally `helm-default-directory'
       (helm-browse-project)))
 
-;;;###autoload
 (defun helm-ff-run-browse-project ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-browse-project)))
 
 ;;; session.el files
@@ -2670,11 +2643,10 @@ utility mdfind.")
   "Run `helm-find' from `helm-find-files'."
   (helm-find-1 helm-ff-default-directory))
 
-;;;###autoload
 (defun helm-ff-run-find-sh-command ()
   "Run find shell command action with key from `helm-find-files'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-find-sh-command)))
 
 
