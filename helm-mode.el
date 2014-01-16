@@ -717,6 +717,7 @@ Keys description:
                                                helm-find-files-doc-header)))
                       (mode-line . helm-read-file-name-mode-line-string)
                       (candidates . ,hist)
+                      (keymap . ,cmap)
                       (persistent-action . ,persistent-action)
                       (persistent-help . ,persistent-help)
                       (action . ,action-fn))
