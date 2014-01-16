@@ -387,6 +387,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "\\`\\(news\\(post\\)?:\\|nntp:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\):/?/?\\).*"
   "Same as `ffap-url-regexp' but match earlier possible url.")
 (defvar helm-tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):")
+(defvar helm-marked-buffer-name "*helm marked*")
 
 
 ;;; Helm-find-files
@@ -458,7 +459,8 @@ Should not be used among other sources.")
 If there is only one window return the value ot `default-directory'
 for current buffer."
   (with-helm-current-buffer
-    (let ((num-windows (length (window-list))))
+    (let ((num-windows (length (remove (get-buffer-window helm-marked-buffer-name)
+                                       (window-list)))))
       (if (> num-windows 1)
           (save-selected-window
             (other-window 1)
@@ -478,7 +480,7 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-flag
          (dest   (with-helm-display-marked-candidates
-                   "*helm marked*" (mapcar 'helm-basename ifiles)
+                   helm-marked-buffer-name (mapcar 'helm-basename ifiles)
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
@@ -2257,7 +2259,7 @@ Ask to kill buffers associated with that file, too."
 (defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates))
          (len (length files))
-         (buf (get-buffer-create "*helm marked*")))
+         (buf (get-buffer-create helm-marked-buffer-name)))
     (with-helm-display-marked-candidates
       buf (mapcar 'helm-basename files)
       (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
