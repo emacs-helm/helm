@@ -548,36 +548,36 @@ If N is positive go forward otherwise go backward."
     (with-helm-window
       (helm-goto-next-or-prec-file 1 etagp))))
 
-;;;###autoload
 (defun helm-grep-run-persistent-action ()
   "Run grep persistent action from `helm-do-grep-1'."
   (interactive)
-  (helm-attrset 'jump-persistent 'helm-grep-persistent-action)
-  (helm-execute-persistent-action 'jump-persistent))
+  (with-helm-alive-p
+    (helm-attrset 'jump-persistent 'helm-grep-persistent-action)
+    (helm-execute-persistent-action 'jump-persistent)))
 
-;;;###autoload
 (defun helm-grep-run-default-action ()
   "Run grep default action from `helm-do-grep-1'."
   (interactive)
-  (helm-quit-and-execute-action 'helm-grep-action))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-grep-action)))
 
-;;;###autoload
 (defun helm-grep-run-other-window-action ()
   "Run grep goto other window action from `helm-do-grep-1'."
   (interactive)
-  (helm-quit-and-execute-action 'helm-grep-other-window))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-grep-other-window)))
 
-;;;###autoload
 (defun helm-grep-run-other-frame-action ()
   "Run grep goto other frame action from `helm-do-grep-1'."
   (interactive)
-  (helm-quit-and-execute-action 'helm-grep-other-frame))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-grep-other-frame)))
 
-;;;###autoload
 (defun helm-grep-run-save-buffer ()
   "Run grep save results action from `helm-do-grep-1'."
   (interactive)
-  (helm-quit-and-execute-action 'helm-grep-save-results))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-grep-save-results)))
 
 
 ;;; helm-grep-mode

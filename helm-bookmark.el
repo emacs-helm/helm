@@ -122,14 +122,14 @@
       (string-match helm-pattern (bookmark-location candidate))
       (string-match helm-pattern candidate)))
 
-;;;###autoload
 (defun helm-bookmark-toggle-filename ()
   "Toggle bookmark location visibility."
   (interactive)
-  (let ((real (helm-get-selection helm-buffer)))
-    (setq helm-bookmark-show-location (not helm-bookmark-show-location))
-    (helm-update (if helm-bookmark-show-location
-                     (bookmark-location real) real))))
+  (with-helm-alive-p
+    (let ((real (helm-get-selection helm-buffer)))
+      (setq helm-bookmark-show-location (not helm-bookmark-show-location))
+      (helm-update (if helm-bookmark-show-location
+                       (bookmark-location real) real)))))
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
@@ -284,18 +284,18 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   "Bookmark name.")
 
 
-;;;###autoload
 (defun helm-bookmark-run-jump-other-window ()
   "Jump to bookmark from keyboard."
   (interactive)
-  (helm-quit-and-execute-action 'bookmark-jump-other-window))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'bookmark-jump-other-window)))
 
-;;;###autoload
 (defun helm-bookmark-run-delete ()
   "Delete bookmark from keyboard."
   (interactive)
-  (when (y-or-n-p "Delete bookmark?")
-    (helm-quit-and-execute-action 'helm-delete-marked-bookmarks)))
+  (with-helm-alive-p
+    (when (y-or-n-p "Delete bookmark?")
+      (helm-quit-and-execute-action 'helm-delete-marked-bookmarks))))
 
 (defun helm-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.

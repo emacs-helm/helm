@@ -106,13 +106,13 @@ when non--nil."
 ;;; Helm `completing-read' replacement
 ;;
 ;;
-;;;###autoload
 (defun helm-cr-empty-string ()
   "Return empty string."
   (interactive)
-  (helm-quit-and-execute-action
-   #'(lambda (_candidate)
-       (identity ""))))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action
+     #'(lambda (_candidate)
+         (identity "")))))
 
 (defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp)
   "Convert COLLECTION to list removing elements that don't match TEST.

@@ -119,23 +119,27 @@ Only math* symbols are collected."
 
 (defun helm-ucs-persistent-insert ()
   (interactive)
-  (helm-attrset 'action-insert 'helm-ucs-insert-char)
-  (helm-execute-persistent-action 'action-insert))
+  (with-helm-alive-p
+    (helm-attrset 'action-insert 'helm-ucs-insert-char)
+    (helm-execute-persistent-action 'action-insert)))
 
 (defun helm-ucs-persistent-forward ()
   (interactive)
-  (helm-attrset 'action-forward 'helm-ucs-forward-char)
-  (helm-execute-persistent-action 'action-forward))
+  (with-helm-alive-p
+    (helm-attrset 'action-forward 'helm-ucs-forward-char)
+    (helm-execute-persistent-action 'action-forward)))
 
 (defun helm-ucs-persistent-backward ()
   (interactive)
-  (helm-attrset 'action-back 'helm-ucs-backward-char)
-  (helm-execute-persistent-action 'action-back))
+  (with-helm-alive-p
+    (helm-attrset 'action-back 'helm-ucs-backward-char)
+    (helm-execute-persistent-action 'action-back)))
 
 (defun helm-ucs-persistent-delete ()
   (interactive)
-  (helm-attrset 'action-delete 'helm-ucs-delete-backward)
-  (helm-execute-persistent-action 'action-delete))
+  (with-helm-alive-p
+    (helm-attrset 'action-delete 'helm-ucs-delete-backward)
+    (helm-execute-persistent-action 'action-delete)))
 
 (defvar helm-source-ucs
   '((name . "Ucs names")

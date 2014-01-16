@@ -217,7 +217,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 
 (defun helm-m-occur-run-persistent-action ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-execute-persistent-action)))
 
 (defun helm-m-occur-goto-line (candidate)
@@ -245,18 +245,19 @@ Same as `helm-m-occur-goto-line' but go in new frame."
 (defun helm-m-occur-run-goto-line-ow ()
   "Run goto line other window action from `helm-source-moccur'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-m-occur-goto-line-ow)))
 
 (defun helm-m-occur-run-goto-line-of ()
   "Run goto line new frame action from `helm-source-moccur'."
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-m-occur-goto-line-of)))
 
 (defun helm-m-occur-run-default-action ()
   (interactive)
-  (helm-quit-and-execute-action 'helm-m-occur-goto-line))
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-m-occur-goto-line)))
 
 ;;;###autoload
 (define-minor-mode helm-occur-match-plugin-mode
