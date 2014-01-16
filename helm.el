@@ -2830,7 +2830,6 @@ after the source name by overlay."
           (helm-skip-noncandidate-line 'next)
           (helm-mark-current-line)
           (helm-display-mode-line src)
-          (helm-maybe-update-keymap)
           (helm-log-run-hook 'helm-after-update-hook)))))
 
 (defun helm-process-deferred-sentinel-hook (process event file)
