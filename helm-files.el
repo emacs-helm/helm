@@ -1449,7 +1449,7 @@ purpose."
                        (list path))
                      (helm-ff-directory-files path-name-dir t))))))
 
-(defun helm-ff-directory-files (directory &optional full)
+(defsubst helm-ff-directory-files (directory &optional full)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
