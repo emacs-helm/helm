@@ -480,7 +480,12 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-flag
          (dest   (with-helm-display-marked-candidates
-                   helm-marked-buffer-name (mapcar 'helm-basename ifiles)
+                   helm-marked-buffer-name
+                   (mapcar #'(lambda (f)
+                               (if (file-directory-p f)
+                                   (concat (helm-basename f) "/")
+                                   (helm-basename f)))
+                           ifiles)
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
