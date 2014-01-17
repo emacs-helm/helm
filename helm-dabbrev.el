@@ -150,10 +150,10 @@ but the initial search for all candidates in buffer(s)."
                                      (point))))
                               (setq pos-before pos)
                               (search-backward pattern pos t))))
-                (let* ((match-1 (substring-no-properties
-                                 (thing-at-point 'symbol)))
-                       (match-2 (substring-no-properties
-                                 (thing-at-point 'filename)))
+                (let* ((match-1 (helm-aif (thing-at-point 'symbol)
+                                    (substring-no-properties it)))
+                       (match-2 (helm-aif (thing-at-point 'filename)
+                                    (substring-no-properties it)))
                        (lst (if (string= match-1 match-2)
                                 (list match-1)
                                 (list match-1 match-2))))
@@ -259,8 +259,8 @@ but the initial search for all candidates in buffer(s)."
                                 :iterator
                                 (helm-iter-list
                                  (cl-loop for i in helm-dabbrev--cache when
-                                          (string-match
-                                           (concat "^" (regexp-quote dabbrev)) i)
+                                          (and i (string-match
+                                                  (concat "^" (regexp-quote dabbrev)) i))
                                           collect i into selection
                                           when (and selection
                                                     (= (length selection)
