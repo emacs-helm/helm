@@ -2383,12 +2383,13 @@ Else return ACTIONS unmodified."
     (candidates . file-name-history)
     (type . file)))
 
-(defvar helm-source-ff-file-name-history
+(defvar helm-source--ff-file-name-history
   '((name . "File name history")
     (init . (lambda ()
-              (when helm-ff-file-name-history-use-recentf
-                (require 'recentf)
-                (or recentf-mode (recentf-mode 1)))))
+              (with-helm-alive-p
+                (when helm-ff-file-name-history-use-recentf
+                  (require 'recentf)
+                  (or recentf-mode (recentf-mode 1))))))
     (candidates . (lambda ()
                     (if helm-ff-file-name-history-use-recentf
                         recentf-list
@@ -2403,7 +2404,9 @@ Else return ACTIONS unmodified."
                ("Find file in helm"
                 . (lambda (candidate)
                     (helm-set-pattern
-                     (expand-file-name candidate))))))))
+                     (expand-file-name candidate)))))))
+  "[Internal] This source is build to be used with `helm-find-files'.
+Don't use it in your own code unless you know what you are doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
   (cl-loop for c in candidates collect
@@ -2417,7 +2420,7 @@ Else return ACTIONS unmodified."
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm :sources 'helm-source-ff-file-name-history
+    (helm :sources 'helm-source--ff-file-name-history
           :buffer "*helm-file-name-history*"
           :allow-nest t
           :resume 'noresume)))
