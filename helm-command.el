@@ -139,6 +139,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                               (setq in-help t))
                           (setq help-cand candidate))))
          (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg)))
+    (setq current-prefix-arg nil)
     (unwind-protect
          (setq command (helm-comp-read
                         "M-x " obarray
@@ -158,8 +159,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
       (cancel-timer tm)
       (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))
-    (unless current-prefix-arg
-      (setq current-prefix-arg helm-current-prefix-arg))
+    (setq current-prefix-arg helm-current-prefix-arg)
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command sym-com
           ;; Handle C-x z (repeat) Issue #322
