@@ -24,7 +24,6 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-bookmark)
-(require 'helm-adaptative)
 
 (declare-function bookmark-get-filename "bookmark" (bookmark-name-or-record))
 (declare-function bmkext-bmenu-maybe-sort "ext:bookmark-extensions.el" (&optional alist))
