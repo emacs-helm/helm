@@ -496,7 +496,9 @@ With a prefix arg record CANDIDATE in `mark-ring'."
 (defun helm-goto-next-or-prec-file (n &optional type)
   "Go to next or precedent candidate file in helm grep/etags buffers.
 If N is positive go forward otherwise go backward."
-  (let* ((sel (helm-get-selection nil t))
+  (let* ((sel (if (eq major-mode 'helm-grep-mode)
+                  (buffer-substring (point-at-bol) (point-at-eol))
+                  (helm-get-selection nil t)))
          (current-line-list  (if (eq type 'etags)
                                  (split-string sel ": +" t)
                                  (helm-grep-split-line sel)))
