@@ -52,6 +52,7 @@
     (define-key map (kbd "C-c ?")    'helm-moccur-help)
     (define-key map (kbd "C-c o")    'helm-m-occur-run-goto-line-ow)
     (define-key map (kbd "C-c C-o")  'helm-m-occur-run-goto-line-of)
+    (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
     (when helm-m-occur-use-ioccur-style-keys
       (define-key map (kbd "<right>")  'helm-m-occur-run-persistent-action)
       (define-key map (kbd "<left>")   'helm-m-occur-run-default-action))

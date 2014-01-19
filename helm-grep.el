@@ -439,8 +439,10 @@ WHERE can be one of other-window, elscreen, other-frame."
                                    helm-buffer)
                              (get-text-property (point-at-bol) 'help-echo))
                            (car split)))
-         (tramp-method (file-remote-p helm-ff-default-directory 'method))
-         (tramp-host   (file-remote-p helm-ff-default-directory 'host))
+         (tramp-method (file-remote-p (or helm-ff-default-directory
+                                          default-directory) 'method))
+         (tramp-host   (file-remote-p (or helm-ff-default-directory
+                                          default-directory) 'host))
          (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
          (fname        (if tramp-host
                            (concat tramp-prefix loc-fname) loc-fname)))
@@ -573,6 +575,7 @@ If N is positive go forward otherwise go backward."
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-grep-other-frame)))
 
+;;;###autoload
 (defun helm-grep-run-save-buffer ()
   "Run grep save results action from `helm-do-grep-1'."
   (interactive)
