@@ -2122,6 +2122,15 @@ This can be useful for e.g writing quietly a complex regexp."
        ad-do-it
     (setq helm-suspend-update-flag nil)))
 
+;; Use this once `defadvice' will be made obsolete.
+;; (defun helm--advice-tramp-read-passwd (old--fn &rest args)
+;;   ;; Suspend update when prompting for a tramp password.
+;;   (setq helm-suspend-update-flag t)
+;;   (unwind-protect
+;;        (apply old--fn args)
+;;     (setq helm-suspend-update-flag nil)))
+;; (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
+
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
 This function is meant to be run in `helm-move-selection-after-hook'.
