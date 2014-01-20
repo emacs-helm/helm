@@ -2240,7 +2240,11 @@ Ask to kill buffers associated with that file, too."
          (len (length files))
          (buf (get-buffer-create helm-marked-buffer-name)))
     (with-helm-display-marked-candidates
-      buf (mapcar 'helm-basename files)
+      buf (mapcar #'(lambda (f)
+                      (if (file-directory-p f)
+                          (concat (helm-basename f) "/")
+                          (helm-basename f)))
+                  files)
       (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
           (message "(No deletions performed)")
           (cl-dolist (i files)
