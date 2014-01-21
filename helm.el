@@ -2593,10 +2593,10 @@ is done on whole `helm-buffer' and not on current source."
                      finally (setq delayed-sources ds
                                    normal-sources ns
                                    normal-sources-candidates nsc))
-            ;;; Finally the helm buffer can be erased
+            ;; Finally the helm buffer can be erased
             (erase-buffer)
-            ;;; Render all the sources into the helm buffer using the
-            ;;; candidates calculated before the erase
+            ;; Render all the sources into the helm buffer using the
+            ;; candidates calculated before the erase
             (cl-loop for source in normal-sources
                      for candidates in normal-sources-candidates
                      do
