@@ -722,18 +722,21 @@ See `helm-ff-serial-rename-1'."
                       (expand-file-name helm-ff-default-directory)
                       :test 'file-directory-p
                       :must-match t)))
-         (res       (cl-loop for f in cands
-                             for bn = (helm-basename f)
-                             for count from start
-                             concat (format "%s <-> %s%s.%s\n"
-                                            bn name count extension))))
-    (if (y-or-n-p
-         (format "Result:\n %sRename like this to <%s> ? " res dir))
-        (progn
-          (helm-ff-serial-rename-1
-           dir cands name start extension :method method)
-          (message nil)
-          (helm-find-files-1 dir))
+         done)
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name (mapcar 'helm-basename cands)
+      (if (y-or-n-p
+           (format "Rename %s file(s) to <%s> like this ?\n%s "
+                   (length cands) dir (format "%s <-> %s%s.%s"
+                                              (helm-basename (car cands))
+                                              name start extension)))
+          (progn
+            (helm-ff-serial-rename-1
+             dir cands name start extension :method method)
+            (setq done t)
+            (message nil))))
+    (if done
+        (with-helm-current-buffer (helm-find-files-1 dir))
         (message "Operation aborted"))))
 
 (defun helm-ff-member-directory-p (file directory)
