@@ -758,24 +758,32 @@ Example:
 
 I want to show all my buffer that are in emacs-lisp mode:
 
-    Pattern: lisp
+    Pattern: *lisp
 
 will show all emacs-lisp and lisp related buffers.
 
-Now I want to limit these buffers to the one that match `any`
+Now I want to limit these buffers to the one that start with `helm`
 
-    Pattern: lisp any
+    Pattern: *lisp ^helm
 
-Now I want to limit these buffers to the one that match `any` but end with `foo`:
+Now I want to limit these buffers to the one that match `helm` but end with `foo`:
 
-    Pattern: lisp any foo
+    Pattern: *lisp helm foo
 
-Note the space between any and foo.
+Note the space between `helm` and `foo`.
 
-I want to match buffers that match `any` but not limited to lisp
+Now match buffers that are in `emacs-lisp-mode` and `sh-mode` or `shell-mode`:
+
+    Pattern: *lisp,sh
+
+You can use also negation to match all but `lisp` and `info` buffers:
+
+    Pattern: *!lisp,!info
+
+I want to match buffers that match `helm` but not limited to lisp
 buffers:
 
-    Pattern: any
+    Pattern: helm
 
 ## Different colors for buffers
 
