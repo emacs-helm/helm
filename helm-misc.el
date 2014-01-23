@@ -230,7 +230,7 @@ It is added to `extended-command-history'.
         (setq this-command cmd)
         (call-interactively cmd))))
 
-;; Minibuffer History
+;;; Minibuffer History
 ;;
 ;;
 (defvar helm-source-minibuffer-history
@@ -251,6 +251,23 @@ It is added to `extended-command-history'.
                 (delete-minibuffer-contents)
                 (insert candidate)))))
 
+;;; Shell history
+;;
+;;
+(defun helm-comint-input-ring-action (candidate)
+  "Default action for comint history."
+  (with-helm-current-buffer
+    (delete-region (comint-line-beginning-position) (point-max))
+    (insert candidate)))
+
+(defvar helm-source-comint-input-ring
+  '((name . "Shell history")
+    (candidates . (lambda ()
+                    (with-helm-current-buffer
+                      (cl-loop for i across (cddr comint-input-ring)
+                               collect i))))
+    (action . helm-comint-input-ring-action))
+  "Source that provide helm completion against `comint-input-ring'.")
 
 
 ;;; Helm ratpoison UI
@@ -359,6 +376,17 @@ It is added to `extended-command-history'.
   (let ((enable-recursive-minibuffers t))
     (helm-other-buffer 'helm-source-minibuffer-history
                        "*helm minibuffer-history*")))
+
+;;;###autoload
+(defun helm-comint-input-ring ()
+  "Predefined `helm' that provide completion of `shell' history."
+  (interactive)
+  (when (eq major-mode 'shell-mode)
+    (helm :sources 'helm-source-comint-input-ring
+          :input (buffer-substring-no-properties (comint-line-beginning-position)
+                                                 (point-at-eol))
+          :buffer "*helm shell history*")))
+
 
 (provide 'helm-misc)
 
