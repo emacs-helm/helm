@@ -28,7 +28,7 @@
   :group 'helm)
 
 (defcustom helm-imenu-delimiter " / "
-  "Delimit type of candidates and his value in `helm-buffer'."
+  "Delimit types of candidates and his value in `helm-buffer'."
   :group 'helm-imenu
   :type 'string)
 
@@ -90,20 +90,31 @@
                       (and (cdr elm) ; bug in imenu, should not be needed.
                            (list elm)))))
 
+(defun helm-imenu-get-prop (item)
+  (let* ((prop (get-text-property 0 'helm-imenu-type item))
+         (lst  (list prop item)))
+    (when prop
+      (while prop
+        (setq prop (get-text-property
+                    0 'helm-imenu-type
+                    prop))
+        (and prop (push prop lst)))
+      lst)))
+
 (defun helm-imenu-transformer (candidates)
   (cl-loop for (k . v) in candidates
-           for type = (or (get-text-property 0 'helm-imenu-type k)
-                          "Function")
+           for types = (or (helm-imenu-get-prop k)
+                           (list "Function" k))
            collect
-           (cons (concat
-                  type helm-imenu-delimiter
-                  (propertize
-                   k 'face (cond ((string= type "Variables")
-                                  'font-lock-variable-name-face)
-                                 ((string= type "Function")
-                                  'font-lock-function-name-face)
-                                 ((string= type "Types")
-                                  'font-lock-type-face))))
+           (cons (mapconcat (lambda (x)
+                              (propertize
+                               x 'face (cond ((string= x "Variables")
+                                              'font-lock-variable-name-face)
+                                             ((string= x "Function")
+                                              'font-lock-function-name-face)
+                                             ((string= x "Types")
+                                              'font-lock-type-face))))
+                            types " / ")
                  (cons k v))))
 
 ;;;###autoload
