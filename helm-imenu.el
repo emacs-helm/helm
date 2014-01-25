@@ -91,13 +91,15 @@
                            (list elm)))))
 
 (defun helm-imenu--get-prop (item)
+  ;; property value of ITEM can have itself
+  ;; a property value which have itself a property value
+  ;; ...and so on; Return a list of all these
+  ;; properties values starting at ITEM.
   (let* ((prop (get-text-property 0 'helm-imenu-type item))
          (lst  (list prop item)))
     (when prop
       (while prop
-        (setq prop (get-text-property
-                    0 'helm-imenu-type
-                    prop))
+        (setq prop (get-text-property 0 'helm-imenu-type prop))
         (and prop (push prop lst)))
       lst)))
 
