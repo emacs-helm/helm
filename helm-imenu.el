@@ -114,7 +114,7 @@
                                               'font-lock-function-name-face)
                                              ((string= x "Types")
                                               'font-lock-type-face))))
-                            types " / ")
+                            types helm-imenu-delimiter)
                  (cons k v))))
 
 ;;;###autoload
