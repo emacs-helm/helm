@@ -90,7 +90,7 @@
                       (and (cdr elm) ; bug in imenu, should not be needed.
                            (list elm)))))
 
-(defun helm-imenu-get-prop (item)
+(defun helm-imenu--get-prop (item)
   (let* ((prop (get-text-property 0 'helm-imenu-type item))
          (lst  (list prop item)))
     (when prop
@@ -103,7 +103,7 @@
 
 (defun helm-imenu-transformer (candidates)
   (cl-loop for (k . v) in candidates
-           for types = (or (helm-imenu-get-prop k)
+           for types = (or (helm-imenu--get-prop k)
                            (list "Function" k))
            collect
            (cons (mapconcat (lambda (x)
