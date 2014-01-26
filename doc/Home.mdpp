@@ -830,10 +830,15 @@ Turn it on in `init.el` with:
 
     (helm-mode 1)
 
-Customize with:
- `helm-completing-read-handlers-alist`
+You can disable or change the completion interface you want to use for a specific command by
+customizing `helm-completing-read-handlers-alist`.
 
 See C-h v `helm-completing-read-handlers-alist` for more infos.
+
+NOTE:
+Even if `helm-mode` is enabling helm completion for most emacs commands, you have better time
+to use a native helm command which will be more featured, if this one is provided.
+(e.g use `helm-M-x` for `M-x` even if enabling `helm-mode` provide helm completion in regular emacs `M-x`.)
 
 Not complete.
 
