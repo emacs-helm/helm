@@ -1857,7 +1857,7 @@ The function used to display `helm-buffer'."
 
 (cl-defun helm-prevent-switching-other-window (&key (enabled t))
   "Allow setting `no-other-window' window parameter in all windows.
-Arg ENABLE-OR-DISABLE will be the value of `no-other-window'."
+Arg ENABLE will be the value of the `no-other-window' window property."
   (walk-windows
    #'(lambda (w)
        (unless (window-dedicated-p w)
