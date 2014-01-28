@@ -172,6 +172,19 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
+    ;; Disable usage of the mouse while in helm.
+    (define-key map (kbd "<down-mouse-1>")   'ignore)
+    (define-key map (kbd "<mouse-1>")        'ignore)
+    (define-key map (kbd "<double-mouse-1>") 'ignore)
+    (define-key map (kbd "<triple-mouse-1>") 'ignore)
+    (define-key map (kbd "<down-mouse-2>")   'ignore)
+    (define-key map (kbd "<mouse-2>")        'ignore)
+    (define-key map (kbd "<double-mouse-2>") 'ignore)
+    (define-key map (kbd "<triple-mouse-2>") 'ignore)
+    (define-key map (kbd "<down-mouse-3>")   'ignore)
+    (define-key map (kbd "<mouse-3>")        'ignore)
+    (define-key map (kbd "<double-mouse-3>") 'ignore)
+    (define-key map (kbd "<triple-mouse-3>") 'ignore)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys

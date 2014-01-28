@@ -362,6 +362,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                      collect cand)))
                        (persistent-action . ,persistent-action)
                        (persistent-help . ,persistent-help)
+                       (keymap . ,loc-map)
                        (mode-line . ,mode-line)
                        (action . ,action-fn)))
            (src `((name . ,name)
@@ -370,6 +371,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   (requires-pattern . ,requires-pattern)
                   (persistent-action . ,persistent-action)
                   (persistent-help . ,persistent-help)
+                  (keymap . ,loc-map)
                   (mode-line . ,mode-line)
                   (action . ,action-fn)))
            (src-1 `((name . ,name)
@@ -381,6 +383,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     (requires-pattern . ,requires-pattern)
                     (persistent-action . ,persistent-action)
                     (persistent-help . ,persistent-help)
+                    (keymap . ,loc-map)
                     (mode-line . ,mode-line)
                     (action . ,action-fn)))
            (src-list (list src-hist

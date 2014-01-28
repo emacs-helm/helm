@@ -154,6 +154,7 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         :del-input nil
                         :mode-line helm-mode-line-string
                         :must-match t
+                        :keymap helm-map
                         :candidates-in-buffer t
                         :fc-transformer 'helm-M-x-transformer))
       (cancel-timer tm)
