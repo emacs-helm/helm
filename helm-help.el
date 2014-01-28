@@ -343,6 +343,9 @@ Italic     => A non--file buffer.
 \\<helm-read-file-map>
 \\[helm-find-files-down-one-level]\t\t->Go down precedent directory.
 \\[helm-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
+\\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
+\\[helm-ff-file-name-history]\t\t->File name history.
+\\[helm-cr-empty-string]\t->Maybe return empty string (unless `must-match').
 \\[helm-next-source]\t->Goto next source.
 \\[helm-previous-source]\t->Goto previous source.
 \\[helm-read-file-name-help]\t\t->Display this help info.
