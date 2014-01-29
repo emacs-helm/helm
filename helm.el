@@ -146,8 +146,9 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "<C-M-up>")   'helm-scroll-other-window-down)
     (define-key map (kbd "C-SPC")      'helm-toggle-visible-mark)
     (define-key map (kbd "M-SPC")      'helm-toggle-visible-mark)
-    (define-key map (kbd "M-[")        'helm-prev-visible-mark)
-    (define-key map (kbd "M-]")        'helm-next-visible-mark)
+    (define-key map (kbd "M-[")        nil)
+    (define-key map (kbd "M-(")        'helm-prev-visible-mark)
+    (define-key map (kbd "M-)")        'helm-next-visible-mark)
     (define-key map (kbd "C-k")        'helm-delete-minibuffer-contents)
     (define-key map (kbd "C-x C-f")    'helm-quit-and-find-file)
     (define-key map (kbd "M-m")        'helm-toggle-all-marks)
@@ -4311,23 +4312,11 @@ If PREV is non-nil move to precedent."
                   prev)))
     (helm-mark-current-line)))
 
-(defvar helm-prev-visible-mark-timeout 0.02)
 ;;;###autoload
 (defun helm-prev-visible-mark ()
   "Move previous helm visible mark."
   (interactive)
-  (if window-system
-      (helm-next-visible-mark t)
-    (let ((current-keys (key-description (this-command-keys)))
-          (next-key (with-timeout (helm-prev-visible-mark-timeout nil)
-                      (eval (macroexpand `(key-description [,(read-key)]))))))
-      (cond
-       ((and next-key (string= current-keys "M-["))
-        (setq unread-command-events
-              (listify-key-sequence
-               (read-kbd-macro (concat current-keys " " next-key)))))
-       (t
-        (helm-next-visible-mark t))))))
+  (helm-next-visible-mark t))
 
 ;; Utility: Selection Paste
 ;;;###autoload
