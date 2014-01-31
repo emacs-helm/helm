@@ -863,7 +863,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
       (setq this-command current-command))
     fname))
 
-(defun helm--completion-in-region (start end collection &optional predicate)
+(defun helm--completion-in-region (start end collection &optional _predicate)
   "[EXPERIMENTAL] Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
   (cl-declare (special require-match prompt))
@@ -879,7 +879,7 @@ Can be used as value for `completion-in-region-function'."
                             ;; completion-at-point or friend, so use a non--nil
                             ;; value for require-match.
                             (not (boundp 'prompt))))
-         (data (all-completions input collection predicate))
+         (data (all-completions input collection))
          (file-comp-p (helm-mode--in-file-completion-p input (car data)))
          ;; Completion-at-point and friends have no prompt.
          (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
