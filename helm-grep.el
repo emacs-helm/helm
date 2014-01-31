@@ -252,6 +252,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        candidates))
   (if helm-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
+      ;; When candidate is a directory, search in all its files.
+      ;; NOTE that `file-expand-wildcards' will return also
+      ;; directories, they will be ignored by grep but not
+      ;; by ack-grep that will grep all files of this directory
+      ;; without recursing in their subdirs though, see that as a one
+      ;; level recursion with ack-grep.
+      ;; So I leave it as it is, considering it is a feature. [1]
       (cl-loop for i in candidates append
                (cond ((string-match "^git" helm-grep-default-command)
                       (list i))
@@ -259,18 +266,6 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                      ((and (file-directory-p i)
                            helm-grep-in-recurse)
                       (list (expand-file-name i)))
-                     ;; Candidate is a directory, search in all files.
-                     ;; NOTE that `file-expand-wildcards' will return also
-                     ;; directories, they will be ignored by grep but not
-                     ;; by ack-grep that will grep all files of this directory
-                     ;; without recursing in subdirs though, see that as a one
-                     ;; level recursion with ack-grep.
-                     ;; So I leave it as it is, considering it is a feature. [1]
-                     ((or (file-directory-p i)
-                          (string-match "\\`[[]?[*][]]?\\'" (helm-basename i)))
-                      (setq i (replace-regexp-in-string "[[]?[*][]]?" "" i))
-                      (file-expand-wildcards
-                       (concat (file-name-as-directory (expand-file-name i)) "*") t))
                      ;; Candidate is a file or wildcard and we use recursion, use the
                      ;; current directory instead of candidate.
                      ((and (or (file-exists-p i) (string-match "[*]" i))
@@ -278,13 +273,11 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                       (list (expand-file-name
                              (directory-file-name ; Needed for windoze.
                               (file-name-directory (directory-file-name i))))))
-                     ;; Candidate use wildcard. Same comments as in [1].
-                     ((string-match "\\`[[]?[*][]]?[.].*\\'" (helm-basename i))
-                      (file-expand-wildcards
-                       (replace-regexp-in-string "[[]\\|[]]" "" i) t))
                      ;; Else should be one or more file/directory
                      ;; possibly marked.
-                     (t (list i))) into all-files
+                     ;; When real is a normal filename without wildcard
+                     ;; file-expand-wildcards returns a list of one file.
+                     (t (file-expand-wildcards i t))) into all-files ; [1]
                      finally return
                      (if (string-match "^git" helm-grep-default-command)
                          (mapconcat 'identity all-files " ")
