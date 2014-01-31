@@ -277,6 +277,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                      ;; possibly marked.
                      ;; When real is a normal filename without wildcard
                      ;; file-expand-wildcards returns a list of one file.
+                     ;; wildcards should have been already handled by
+                     ;; helm-read-file-name or helm-find-files but do it from
+                     ;; here too in case we are called from elsewhere.
                      (t (file-expand-wildcards i t))) into all-files ; [1]
                      finally return
                      (if (string-match "^git" helm-grep-default-command)

@@ -689,7 +689,7 @@ Keys description:
   (let* ((action-fn `(("Sole action (Identity)"
                        . (lambda (candidate)
                            (if ,marked-candidates
-                               (helm-marked-candidates)
+                               (helm-marked-candidates :files t)
                                (identity candidate))))))
          (helm-mp-highlight-delay nil)
          ;; Be sure we don't erase the underlying minibuffer if some.
