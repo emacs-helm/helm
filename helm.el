@@ -4242,7 +4242,7 @@ Only useful for debugging."
          (with-output-to-temp-buffer "*helm visible marks*"
            (cl-dolist (o overlays) (princ (overlay-get o 'string)))))))))
 
-(defun helm-marked-candidates ()
+(cl-defun helm-marked-candidates (&key files)
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
 
@@ -4253,6 +4253,11 @@ It is analogous to `dired-get-marked-files'."
              (or (reverse helm-marked-candidates)
                  (list (cons current-src (helm-get-selection))))
              when (equal current-src source)
+             if files
+             ;; When real is a normal filename without wildcard
+             ;; file-expand-wildcards returns a list of one file.
+             append (file-expand-wildcards real t) into cands
+             else
              collect (helm-coerce-selection real source) into cands
              finally do (prog1 (cl-return cands) (helm-log-eval cands)))))
 
