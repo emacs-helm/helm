@@ -420,20 +420,20 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
            ,(and (locate-library "elscreen")
                  '("Find file in Elscreen"  . helm-elscreen-find-file))
            ("Checksum File" . helm-ff-checksum)
-           ("Complete at point `M-tab'"
+           ("Complete at point `C-c i'"
             . helm-insert-file-name-completion-at-point)
-           ("Insert as org link" . helm-files-insert-as-org-link)
-           ("Find shell command" . helm-ff-find-sh-command)
+           ("Insert as org link `C-c @'" . helm-files-insert-as-org-link)
+           ("Find shell command `C-c /'" . helm-ff-find-sh-command)
            ("Open file externally `C-c C-x, C-u to choose'"
             . helm-open-file-externally)
            ("Open file with default tool" . helm-open-file-with-default-tool)
-           ("Grep File(s) `M-g s, C-u Recurse'" . helm-find-files-grep)
+           ("Grep File(s) `C-s, C-u Recurse'" . helm-find-files-grep)
            ("Zgrep File(s) `M-g z, C-u Recurse'" . helm-ff-zgrep)
            ("Switch to Eshell `M-e'" . helm-ff-switch-to-eshell)
-           ("Etags `M-., C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
-           ("Eshell command on file(s) `M-!, C-u run on all marked at once.'"
+           ("Etags `M-., C-u reload tag file'" . helm-ff-etags-select)
+           ("Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
             . helm-find-files-eshell-command-on-file)
-           ("Find file as root" . helm-find-file-as-root)
+           ("Find file as root `C-x @'" . helm-find-file-as-root)
            ("Find file in hex dump" . hexl-find-file)
            ("Ediff File `C-='" . helm-find-files-ediff-files)
            ("Ediff Merge File `C-c ='" . helm-find-files-ediff-merge-files)
