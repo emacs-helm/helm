@@ -904,7 +904,7 @@ Can be used as value for `completion-in-region-function'."
                                             (propertize
                                              ann
                                              'face 'completions-annotations))
-                                                s)
+                                           s)
                                           s)))
                                   data)
                           data))
