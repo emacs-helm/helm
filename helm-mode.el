@@ -888,39 +888,48 @@ Can be used as value for `completion-in-region-function'."
          (data (all-completions input collection predicate))
          (file-comp-p (helm-mode--in-file-completion-p input (car data)))
          ;; Completion-at-point and friends have no prompt.
-         (result (helm-comp-read (or (and (boundp 'prompt) prompt) "Pattern: ")
-                                 (if file-comp-p
-                                     (cl-loop for f in data unless
-                                              (string-match "\\`\\.\\{1,2\\}/\\'" f)
-                                              collect f)
-                                     (if afun
-                                         (mapcar (lambda (s)
-                                                   (let ((ann (funcall afun s)))
-                                                     (if ann (cons (concat s ann) s) s)))
-                                                 data)
-                                         data))
-                                 :name str-command
-                                 :initial-input
-                                 (cond ((and file-comp-p
-                                             (not (string-match "/\\'" input)))
-                                        (concat (helm-basename input)
-                                                (unless (string= input "") " ")))
-                                       ((string-match "/\\'" input) nil)
-                                       ((or (null require-match)
-                                            (stringp require-match))
-                                        input)
-                                       (t (concat input " ")))
-                                  :buffer buf-name
-                                  :exec-when-only-one t
-                                  :quit-when-no-cand
-                                  #'(lambda ()
-                                      ;; Delay message to overwrite "Quit".
-                                      (run-with-timer
-                                       0.01 nil
-                                       #'(lambda ()
-                                           (message "[No matches]")))
-                                            t) ; exit minibuffer immediately.
-                                  :must-match require-match)))
+         (result (helm-comp-read
+                  (or (and (boundp 'prompt) prompt) "Pattern: ")
+                  (if file-comp-p
+                      (cl-loop for f in data unless
+                               (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                               collect f)
+                      (if afun
+                          (mapcar (lambda (s)
+                                    (let ((ann (funcall afun s)))
+                                      (if ann
+                                          (cons
+                                           (concat
+                                            s
+                                            (propertize
+                                             ann
+                                             'face 'completions-annotations))
+                                                s)
+                                          s)))
+                                  data)
+                          data))
+                  :name str-command
+                  :initial-input
+                  (cond ((and file-comp-p
+                              (not (string-match "/\\'" input)))
+                         (concat (helm-basename input)
+                                 (unless (string= input "") " ")))
+                        ((string-match "/\\'" input) nil)
+                        ((or (null require-match)
+                             (stringp require-match))
+                         input)
+                        (t (concat input " ")))
+                  :buffer buf-name
+                  :exec-when-only-one t
+                  :quit-when-no-cand
+                  #'(lambda ()
+                      ;; Delay message to overwrite "Quit".
+                      (run-with-timer
+                       0.01 nil
+                       #'(lambda ()
+                           (message "[No matches]")))
+                      t)                ; exit minibuffer immediately.
+                  :must-match require-match)))
     (when result
       (delete-region (if (and file-comp-p
                               (save-excursion
