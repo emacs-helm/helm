@@ -879,6 +879,11 @@ Can be used as value for `completion-in-region-function'."
                             ;; completion-at-point or friend, so use a non--nil
                             ;; value for require-match.
                             (not (boundp 'prompt))))
+         ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
+         ;; `afun' is a closure to call against each string in `data'.
+         ;; it provide the annotation info for each string.
+         ;; e.g "foo" => "foo <f>" where foo is a function.
+         ;; See Issue #407.
          (afun (plist-get completion-extra-properties :annotation-function))
          (data (all-completions input collection predicate))
          (file-comp-p (helm-mode--in-file-completion-p input (car data)))
