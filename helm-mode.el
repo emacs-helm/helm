@@ -879,6 +879,7 @@ Can be used as value for `completion-in-region-function'."
                             ;; completion-at-point or friend, so use a non--nil
                             ;; value for require-match.
                             (not (boundp 'prompt))))
+         (afun (plist-get completion-extra-properties :annotation-function))
          (data (all-completions input collection predicate))
          (file-comp-p (helm-mode--in-file-completion-p input (car data)))
          ;; Completion-at-point and friends have no prompt.
@@ -887,7 +888,12 @@ Can be used as value for `completion-in-region-function'."
                                      (cl-loop for f in data unless
                                               (string-match "\\`\\.\\{1,2\\}/\\'" f)
                                               collect f)
-                                     data)
+                                     (if afun
+                                         (mapcar (lambda (s)
+                                                   (let ((ann (funcall afun s)))
+                                                     (if ann (cons (concat s ann) s) s)))
+                                                 data)
+                                         data))
                                  :name str-command
                                  :initial-input
                                  (cond ((and file-comp-p
