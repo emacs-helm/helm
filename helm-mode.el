@@ -902,8 +902,10 @@ Can be used as value for `completion-in-region-function'."
                                            (concat
                                             s
                                             (propertize
-                                             ann
-                                             'face 'completions-annotations))
+                                             " " 'display
+                                             (propertize
+                                              ann
+                                              'face 'completions-annotations)))
                                            s)
                                           s)))
                                   data)
