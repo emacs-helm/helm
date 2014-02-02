@@ -4245,8 +4245,7 @@ Only useful for debugging."
 (cl-defun helm-marked-candidates (&key files)
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
-
-It is analogous to `dired-get-marked-files'."
+When key FILES is specified try to expand a wilcard if some."
   (with-current-buffer (helm-buffer-get)
     (cl-loop with current-src = (helm-get-current-source)
              for (source . real) in
