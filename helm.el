@@ -4256,7 +4256,10 @@ It is analogous to `dired-get-marked-files'."
              if files
              ;; When real is a normal filename without wildcard
              ;; file-expand-wildcards returns a list of one file.
-             append (file-expand-wildcards real t) into cands
+             ;; When real is a non--existent file it return nil.
+             append (helm-aif (file-expand-wildcards real t)
+                        it
+                      (list (helm-coerce-selection real source))) into cands
              else
              collect (helm-coerce-selection real source) into cands
              finally do (prog1 (cl-return cands) (helm-log-eval cands)))))
