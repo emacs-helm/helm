@@ -4245,7 +4245,7 @@ Only useful for debugging."
 (cl-defun helm-marked-candidates (&key with-wildcard)
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
-When key FILES is specified try to expand a wilcard if some."
+When key WITH-WILDCARD is specified try to expand a wilcard if some."
   (with-current-buffer (helm-buffer-get)
     (cl-loop with current-src = (helm-get-current-source)
              for (source . real) in
