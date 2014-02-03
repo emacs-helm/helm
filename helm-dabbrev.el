@@ -19,7 +19,7 @@
 
 (require 'helm)
 (require 'helm-elisp) ; For show-completion.
-
+
 (defgroup helm-dabbrev nil
   "Dabbrev related Applications and libraries for Helm."
   :group 'helm)
@@ -75,6 +75,7 @@ but the initial search for all candidates in buffer(s)."
           (const :tag "Respect case" nil)
           (other :tag "Smart" 'smart)))
 
+
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -84,7 +85,12 @@ but the initial search for all candidates in buffer(s)."
 
 ;; Internal
 (defvar helm-dabbrev--exclude-current-buffer-flag nil)
+(defvar helm-dabbrev--cache nil)
+(defvar helm-dabbrev--data nil)
+(defvar helm-dabbrev--regexp "\\s-\\|\t\\|[(\[\{\"'`=<$]\\|\\s\\\\|^")
+(cl-defstruct helm-dabbrev-info dabbrev limits iterator)
 
+
 (defun helm-dabbrev--buffer-list ()
   (cl-loop with lst = (buffer-list)
            for buf in (if helm-dabbrev--exclude-current-buffer-flag
@@ -203,12 +209,7 @@ but the initial search for all candidates in buffer(s)."
           (let ((helm-dabbrev--exclude-current-buffer-flag t))
             (append lst (funcall dabbrev-get abbrev 'all-bufs)))
           lst))))
-
-;; Internal
-(defvar helm-dabbrev--cache nil)
-(defvar helm-dabbrev--data nil)
-(cl-defstruct helm-dabbrev-info dabbrev limits iterator)
-
+
 (defvar helm-source-dabbrev
   `((name . "Dabbrev Expand")
     (init . (lambda ()
@@ -229,7 +230,6 @@ but the initial search for all candidates in buffer(s)."
        'helm-insert-completion-at-point
        beg end candidate))))
 
-(defvar helm-dabbrev--regexp "\\s-\\|\t\\|[(\[\{\"'`=<$]\\|\\s\\\\|^")
 ;;;###autoload
 (defun helm-dabbrev ()
   (interactive)
