@@ -58,7 +58,8 @@
     (candidates . helm-esh-get-candidates)
     (filtered-candidate-transformer
      (lambda (candidates _sources)
-       (cl-loop for i in candidates collect
+       (cl-loop for i in (sort candidates 'helm-generic-sort-fn)
+                collect
                 (cons (abbreviate-file-name i) i))))
     (action . helm-ec-insert))
   "Helm source for Eshell completion.")
