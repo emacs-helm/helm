@@ -4242,7 +4242,7 @@ Only useful for debugging."
          (with-output-to-temp-buffer "*helm visible marks*"
            (cl-dolist (o overlays) (princ (overlay-get o 'string)))))))))
 
-(cl-defun helm-marked-candidates (&key files)
+(cl-defun helm-marked-candidates (&key with-wildcard)
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
 When key FILES is specified try to expand a wilcard if some."
@@ -4252,15 +4252,15 @@ When key FILES is specified try to expand a wilcard if some."
              (or (reverse helm-marked-candidates)
                  (list (cons current-src (helm-get-selection))))
              when (equal current-src source)
-             if files
              ;; When real is a normal filename without wildcard
              ;; file-expand-wildcards returns a list of one file.
              ;; When real is a non--existent file it return nil.
-             append (let ((c (file-expand-wildcards
-                              (helm-coerce-selection real source) t)))
-                      (or c (list (helm-coerce-selection real source)))) into cands
-             else
-             collect (helm-coerce-selection real source) into cands
+             append (let* ((elm (helm-coerce-selection real source))
+                           (c   (and with-wildcard
+                                     (condition-case nil
+                                         (file-expand-wildcards elm t)
+                                       (error nil)))))
+                      (or c (list elm))) into cands
              finally do (prog1 (cl-return cands) (helm-log-eval cands)))))
 
 (defun helm-current-source-name= (name)

@@ -472,7 +472,7 @@ for current buffer."
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION must be an action supported by `helm-dired-action'."
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
-                         (helm-marked-candidates :files t)))
+                         (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
          (prompt (format "%s %s file(s) to: "
                          (capitalize (symbol-name action))
@@ -519,21 +519,21 @@ ACTION must be an action supported by `helm-dired-action'."
 
 (defun helm-find-files-byte-compile (_candidate)
   "Byte compile elisp files from `helm-find-files'."
-  (let ((files    (helm-marked-candidates :files t))
+  (let ((files    (helm-marked-candidates :with-wildcard t))
         (parg     helm-current-prefix-arg))
     (cl-loop for fname in files
              do (byte-compile-file fname parg))))
 
 (defun helm-find-files-load-files (_candidate)
   "Load elisp files from `helm-find-files'."
-  (let ((files    (helm-marked-candidates :files t)))
+  (let ((files    (helm-marked-candidates :with-wildcard t)))
     (cl-loop for fname in files
              do (load fname))))
 
 (defun helm-find-files-ediff-files-1 (candidate &optional merge)
   "Generic function to ediff/merge files in `helm-find-files'."
   (let* ((bname  (helm-basename candidate))
-         (marked (helm-marked-candidates :files t))
+         (marked (helm-marked-candidates :with-wildcard t))
          (prompt (if merge "Ediff Merge `%s' With File: "
                      "Ediff `%s' With File: "))
          (fun    (if merge 'ediff-merge-files 'ediff-files))
@@ -558,15 +558,15 @@ ACTION must be an action supported by `helm-dired-action'."
 
 (defun helm-find-files-grep (_candidate)
   "Default action to grep files from `helm-find-files'."
-  (helm-do-grep-1 (helm-marked-candidates :files t) helm-current-prefix-arg))
+  (helm-do-grep-1 (helm-marked-candidates :with-wildcard t) helm-current-prefix-arg))
 
 (defun helm-ff-zgrep (_candidate)
   "Default action to zgrep files from `helm-find-files'."
-  (helm-ff-zgrep-1 (helm-marked-candidates :files t) helm-current-prefix-arg))
+  (helm-ff-zgrep-1 (helm-marked-candidates :with-wildcard t) helm-current-prefix-arg))
 
 (defun helm-ff-pdfgrep (_candidate)
   "Default action to pdfgrep files from `helm-find-files'."
-  (let ((cands (cl-loop for file in (helm-marked-candidates :files t)
+  (let ((cands (cl-loop for file in (helm-marked-candidates :with-wildcard t)
                         if (or (string= (file-name-extension file) "pdf")
                                (string= (file-name-extension file) "PDF"))
                         collect file))
@@ -622,7 +622,7 @@ will not be loaded first time you use this."
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
-    (let* ((cand-list (helm-marked-candidates :files t))
+    (let* ((cand-list (helm-marked-candidates :with-wildcard t))
            (default-directory (or helm-ff-default-directory
                                   ;; If candidate is an url *-ff-default-directory is nil
                                   ;; so keep value of default-directory.
@@ -705,7 +705,7 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files to `helm-ff-default-directory' with METHOD.
 See `helm-ff-serial-rename-1'."
-  (let* ((cands     (helm-marked-candidates :files t))
+  (let* ((cands     (helm-marked-candidates :with-wildcard t))
          (def-name  (car cands))
          (name      (read-string "NewName: "
                                  (replace-regexp-in-string
@@ -1027,7 +1027,7 @@ Same as `dired-do-print' but for helm."
             (not helm-ff-printer-list))
     (setq helm-ff-printer-list
           (helm-ff-find-printers)))
-  (let* ((file-list (helm-marked-candidates :files t))
+  (let* ((file-list (helm-marked-candidates :with-wildcard t))
          (len (length file-list))
          (printer-name (if helm-ff-printer-list
                            (helm-comp-read
@@ -1823,7 +1823,7 @@ Return candidates prefixed with basename of `helm-input' first."
 
 (defun helm-ff-gnus-attach-files (_candidate)
   "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
-  (let ((flist (helm-marked-candidates :files t)))
+  (let ((flist (helm-marked-candidates :with-wildcard t)))
     (gnus-dired-attach flist)))
 
 (defvar image-dired-display-image-buffer)
@@ -2240,7 +2240,7 @@ Ask to kill buffers associated with that file, too."
           (kill-buffer buf))))))
 
 (defun helm-delete-marked-files (_ignore)
-  (let* ((files (helm-marked-candidates :files t))
+  (let* ((files (helm-marked-candidates :with-wildcard t))
          (len (length files))
          (buf (get-buffer-create helm-marked-buffer-name)))
     (with-helm-display-marked-candidates
@@ -2258,7 +2258,7 @@ Ask to kill buffers associated with that file, too."
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in background."
-  (let ((marked (helm-marked-candidates :files t))
+  (let ((marked (helm-marked-candidates :with-wildcard t))
         (url-p (and ffap-url-regexp ; we should have only one candidate.
                     (string-match ffap-url-regexp candidate)))
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
