@@ -216,15 +216,18 @@ but the initial search for all candidates in buffer(s)."
                 helm-dabbrev--cache)))
     (candidates-in-buffer)
     (keymap . ,helm-dabbrev-map)
-    (action . (lambda (candidate)
-                (with-helm-current-buffer
-                  (let* ((limits (helm-bounds-of-thing-before-point))
-                         (beg (car limits))
-                         (end (point)))
-                    (run-with-timer
-                     0.01 nil
-                     'helm-insert-completion-at-point
-                     beg end candidate)))))))
+    (action . helm-dabbrev-default-action)))
+
+(defun helm-dabbrev-default-action (candidate)
+  (with-helm-current-buffer
+    (let* ((limits (helm-bounds-of-thing-before-point
+                    helm-dabbrev--regexp))
+           (beg (car limits))
+           (end (point)))
+      (run-with-timer
+       0.01 nil
+       'helm-insert-completion-at-point
+       beg end candidate))))
 
 (defvar helm-dabbrev--regexp "\\s-\\|\t\\|[(\[\{\"'`=<$]\\|\\s\\\\|^")
 ;;;###autoload
