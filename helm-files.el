@@ -477,6 +477,7 @@ ACTION must be an action supported by `helm-dired-action'."
          (prompt (format "%s %s file(s) to: "
                          (capitalize (symbol-name action))
                          (length ifiles)))
+         (helm-always-two-windows t)
          (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-flag
