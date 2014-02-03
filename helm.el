@@ -4256,10 +4256,9 @@ When key FILES is specified try to expand a wilcard if some."
              ;; When real is a normal filename without wildcard
              ;; file-expand-wildcards returns a list of one file.
              ;; When real is a non--existent file it return nil.
-             append (helm-aif (file-expand-wildcards
-                               (helm-coerce-selection real source) t)
-                        it
-                      (list (helm-coerce-selection real source))) into cands
+             append (let ((c (file-expand-wildcards
+                              (helm-coerce-selection real source) t)))
+                      (or c (list (helm-coerce-selection real source)))) into cands
              else
              collect (helm-coerce-selection real source) into cands
              finally do (prog1 (cl-return cands) (helm-log-eval cands)))))
