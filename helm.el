@@ -144,6 +144,7 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "M-<prior>")  'helm-scroll-other-window-down)
     (define-key map (kbd "<C-M-down>") 'helm-scroll-other-window)
     (define-key map (kbd "<C-M-up>")   'helm-scroll-other-window-down)
+    (define-key map (kbd "C-@")        'helm-toggle-visible-mark)
     (define-key map (kbd "C-SPC")      'helm-toggle-visible-mark)
     (define-key map (kbd "M-SPC")      'helm-toggle-visible-mark)
     (define-key map (kbd "M-[")        nil)
