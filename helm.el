@@ -657,7 +657,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-follow-mode nil)
 (defvar helm-let-variables nil)
 (defvar helm-split-window-state nil)
-(defvar helm--window-side-state (or helm-split-window-default-side 'below))
+(defvar helm--window-side-state nil)
 (defvar helm-selection-point nil)
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
@@ -1889,11 +1889,11 @@ It uses `switch-to-buffer' or `pop-to-buffer' depending of value of
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
       (progn (delete-other-windows) (switch-to-buffer buffer))
-      (and helm-always-two-windows
-           (not (eq helm-split-window-default-side 'same))
-           (not (minibufferp helm-current-buffer))
-           (not helm-split-window-in-side-p)
-           (delete-other-windows))
+      (when (and helm-always-two-windows
+                 (not (eq helm-split-window-default-side 'same))
+                 (not (minibufferp helm-current-buffer))
+                 (not helm-split-window-in-side-p))
+        (delete-other-windows))
       (pop-to-buffer buffer)))
 
 
@@ -1958,14 +1958,14 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (setq helm-issued-errors nil)
   (setq helm-compiled-sources nil)
   (setq helm-saved-current-source nil)
-  (unless (and helm-reuse-last-window-split-state
-               (or helm-split-window-state
-                   helm--window-side-state))
-    (if (or (not split-width-threshold)
-            (and (integerp split-width-threshold)
-                 (>= split-width-threshold (+ (frame-width) 4))))
-        (setq helm-split-window-state 'vertical)
-        (setq helm-split-window-state 'horizontal))
+  (unless (and (or helm-split-window-state
+                   helm--window-side-state)
+               helm-reuse-last-window-split-state)
+    (setq helm-split-window-state
+          (if (or (null split-width-threshold)
+                  (and (integerp split-width-threshold)
+                       (>= split-width-threshold (+ (frame-width) 4))))
+              'vertical 'horizontal))
     (setq helm--window-side-state
           (or helm-split-window-default-side 'below)))
   ;; Call the init function for sources where appropriate
