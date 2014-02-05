@@ -115,9 +115,10 @@ Show global bindings and local bindings according to current `major-mode'."
       (helm-display-mode-line (helm-get-current-source) 'force))))
 
 ;;;###autoload
-(defun helm-M-x ()
+(defun helm-M-x (&optional initial-input)
   "Preconfigured `helm' for Emacs commands.
-It is `helm' replacement of regular `M-x' `execute-extended-command'."
+It is `helm' replacement of regular `M-x' `execute-extended-command'.
+Optional INITIAL-INPUT will be used to complete command name."
   (interactive)
   (let* ((history (cl-loop for i in extended-command-history
                            when (commandp (intern i)) collect i))
@@ -156,7 +157,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'."
                         :must-match t
                         :keymap helm-map
                         :candidates-in-buffer t
-                        :fc-transformer 'helm-M-x-transformer))
+                        :fc-transformer 'helm-M-x-transformer
+                        :initial-input initial-input))
       (cancel-timer tm)
       (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))
