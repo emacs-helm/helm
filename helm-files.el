@@ -1554,17 +1554,21 @@ Note that only directories are saved here."
 
 (defun helm-files-save-file-name-history (&optional force)
   "Save selected file to `file-name-history'."
-  (let ((helm-file-completion-sources (append helm-files-save-history-extra-sources
-                                              helm-file-completion-sources)))
+  (let ((helm-file-completion-sources
+         (append helm-files-save-history-extra-sources
+                 helm-file-completion-sources)))
     (when (or force (helm-file-completion-source-p))
-      (let ((sel (helm-get-selection))
+      (let ((mkd (helm-marked-candidates :with-wildcard t))
             (history-delete-duplicates t))
-        (when (and (file-exists-p sel)
-                   (not (file-directory-p sel)))
-          ;; we use `abbreviate-file-name' here because other parts of Emacs seems to,
-          ;; and we don't want to introduce duplicates.
-          (add-to-history 'file-name-history
-                          (abbreviate-file-name (helm-get-selection))))))))
+        (cl-loop for sel in mkd
+                 when (and (file-exists-p sel)
+                           (not (file-directory-p sel)))
+                 do
+                 ;; we use `abbreviate-file-name' here because
+                 ;; other parts of Emacs seems to,
+                 ;; and we don't want to introduce duplicates.
+                 (add-to-history 'file-name-history
+                                 (abbreviate-file-name sel)))))))
 (add-hook 'helm-after-action-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file)
