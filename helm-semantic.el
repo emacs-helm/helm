@@ -37,6 +37,8 @@
           ((function variable type)
            (let ((spaces (make-string (* depth 2) ?\s))
                  (type-p (eq cur-type 'type)))
+             (unless (and (> depth 0) (not type-p))
+               (setq class nil))
              (insert
               (if (and class (not type-p))
                   (format "%s%sClass(%s) "
