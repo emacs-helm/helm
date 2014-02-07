@@ -71,9 +71,17 @@
       (unless persistent
         (pulse-momentary-highlight-one-line (point))))))
 
+(defun helm-semantic--maybe-set-needs-update ()
+  (with-helm-current-buffer
+    (let ((tick (buffer-modified-tick)))
+      (unless (eq helm-cached-imenu-tick tick)
+        (setq helm-cached-imenu-tick tick)
+        (semantic-parse-tree-set-needs-update)))))
+
 (defvar helm-source-semantic
   '((name . "Semantic Tags")
     (init . (lambda ()
+              (helm-semantic--maybe-set-needs-update)
               (let ((tags (semantic-fetch-tags)))
                 (with-current-buffer (helm-candidate-buffer 'global)
                   (helm-semantic-init-candidates tags 0)))))
