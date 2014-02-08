@@ -830,12 +830,33 @@ Turn it on in `init.el` with:
 
     (helm-mode 1)
 
+## Customize how helm-mode behave
+
 You can disable or change the completion interface you want to use for a specific command by
 customizing `helm-completing-read-handlers-alist`.
 
 See C-h v `helm-completing-read-handlers-alist` for more infos.
 
-NOTE:
+### Use helm-mode and ido-mode
+
+If you like ido for some commands and helm for other commands, you should not enable `ido-mode`,
+instead customize `helm-completing-read-handlers-alist`; For example, you want `ido-mode`
+for `find-file-read-only` and `helm-mode` for `find-file`:
+1) In your config you turn on `helm-mode`.
+2) In customize-group `helm-mode` add to `helm-completing-read-handlers-alist`
+`find-file-read-only` as key and `ido` as value.
+In elisp it looks like this:
+     (find-file-read-only . ido)
+
+That's it, now `find-file-read-only` is now using ido an `find-file` (because you did nothing)
+is using `helm-mode`.
+
+Now you want `find-alternate-file` to not use ido and to not use helm, only the vanilla emacs
+completion:
+Add an entry to `helm-completing-read-handlers-alist` like this:
+     (find-alternate-file . nil)
+
+_NOTE:_
 Even if `helm-mode` is enabling helm completion for most emacs commands, you have better time
 to use a native helm command which will be more featured, if this one is provided.
 (e.g use `helm-M-x` for `M-x` even if enabling `helm-mode` provide helm completion in regular emacs `M-x`.)
@@ -872,10 +893,18 @@ To fix this problem, you can define a `pcomplete/sudo`  function and put it in y
                         (pcomplete-arg 'last) t))))))
 
 
+However this an incomplete definition of `pcomplete/sudo` which will not work in some case
+without modifications to some emacs functions due to bugs unresolved in emacs, to fix this
+you can use my [pcomplete-extension](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/pcomplete-extension.el)
+which will provide more completions working well with helm like `apt-get` or `find`.
+
 ## Write your own pcomplete functions
 
 You can enhance Emacs pcomplete by writing your own pcomplete
 functions.
+
+See [pcomplete-extension](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/pcomplete-extension.el)
+For more enhanced completions.
 
  Here an example with `find` command:
 
@@ -916,15 +945,24 @@ functions.
 
 Add this to `init.el`
 
->     (add-hook 'eshell-mode-hook
->               #'(lambda ()
->                   (define-key eshell-mode-map
->                     (kbd "M-p")
->                     'helm-eshell-history)))
+     (add-hook 'eshell-mode-hook
+               #'(lambda ()
+                   (define-key eshell-mode-map
+                     (kbd "M-p")
+                     'helm-eshell-history)))
+
+# Completion in emacs shell
+
+Completion in emacs `shell` is using `completion-at-point`, `helm-mode` provide completion for this
+starting from emacs-24.4 and is not available in emacs-24.3.
+Same as above, you should use [pcomplete-extension](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/pcomplete-extension.el)
+to have a better experience.
 
 # Usefuls extensions
 
- Not complete.
+If you are using git, I suggest you use [helm-ls-git](https://github.com/emacs-helm/helm-ls-git)
+
+Not complete.
 
 # Usefuls links
 
