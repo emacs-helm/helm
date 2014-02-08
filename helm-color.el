@@ -25,7 +25,7 @@
 (defun helm-custom-faces-init ()
   "Initialize buffer for `helm-source-customize-face'."
   (unless (helm-candidate-buffer)
-    (save-window-excursion
+    (save-selected-window
       (list-faces-display)
       (message nil))
     (helm-init-candidates-in-buffer
@@ -54,7 +54,7 @@
 ;;
 (defun helm-colors-init ()
   (unless (helm-candidate-buffer)
-    (save-window-excursion
+    (save-selected-window
       (list-colors-display)
       (message nil))
     (helm-init-candidates-in-buffer
