@@ -659,6 +659,28 @@ is called once for each file like this:
   (let ((helm-help-message helm-apt-help-message))
     (helm-help)))
 
+;;; Helm elisp package
+;;
+;;
+(defvar helm-el-package-help-message
+  "== Helm elisp package Map ==\
+\nHelm elisp package tips:
+
+\nSpecific commands for Helm elisp package:
+\\<helm-el-package-map>
+\\[helm-el-package-show-all]\t->Show all packages.
+\\[helm-el-package-show-installed]\t->Show installed packages only.
+\\[helm-el-package-show-uninstalled]\t->Show not installed packages only.
+\\[helm-el-package-help]\t->Show this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-el-package-help ()
+  (interactive)
+  (let ((helm-help-message helm-el-package-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -830,6 +852,17 @@ is called once for each file like this:
 (defvar helm-apt-mode-line "\
 \\<helm-apt-map>\
 \\[helm-apt-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
+
+;;;###autoload
+(defvar helm-el-package-mode-line "\
+\\<helm-el-package-map>\
+\\[helm-el-package-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\
