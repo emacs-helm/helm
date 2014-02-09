@@ -202,7 +202,7 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21215 51889 673703 893000))
+;;;### (autoloads nil "helm" "helm.el" (21235 25667 564823 169000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -602,8 +602,8 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
 
 ;;;***
 
-;;;### (autoloads nil "helm-color" "helm-color.el" (21210 9717 854688
-;;;;;;  570000))
+;;;### (autoloads nil "helm-color" "helm-color.el" (21238 29468 673651
+;;;;;;  642000))
 ;;; Generated autoloads from helm-color.el
 
 (autoload 'helm-colors "helm-color" "\
@@ -613,8 +613,8 @@ Preconfigured `helm' for color.
 
 ;;;***
 
-;;;### (autoloads nil "helm-command" "helm-command.el" (21210 9717
-;;;;;;  854688 570000))
+;;;### (autoloads nil "helm-command" "helm-command.el" (21232 43456
+;;;;;;  502583 506000))
 ;;; Generated autoloads from helm-command.el
 
 (autoload 'helm-M-x "helm-command" "\
@@ -625,8 +625,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (21212 49075
-;;;;;;  53549 235000))
+;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (21231 41506
+;;;;;;  861442 252000))
 ;;; Generated autoloads from helm-dabbrev.el
 
 (autoload 'helm-dabbrev "helm-dabbrev" "\
@@ -636,8 +636,8 @@ It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-elisp" "helm-elisp.el" (21210 9717 854688
-;;;;;;  570000))
+;;;### (autoloads nil "helm-elisp" "helm-elisp.el" (21234 23426 138524
+;;;;;;  388000))
 ;;; Generated autoloads from helm-elisp.el
 
 (autoload 'helm-lisp-completion-at-point "helm-elisp" "\
@@ -688,6 +688,17 @@ Preconfigured `helm' for timers.
 
 ;;;***
 
+;;;### (autoloads nil "helm-elisp-package" "helm-elisp-package.el"
+;;;;;;  (21239 13208 669539 190000))
+;;; Generated autoloads from helm-elisp-package.el
+
+(autoload 'helm-list-elisp-packages "helm-elisp-package" "\
+
+
+\(fn)" t nil)
+
+;;;***
+
 ;;;### (autoloads nil "helm-elscreen" "helm-elscreen.el" (21210 9717
 ;;;;;;  854688 570000))
 ;;; Generated autoloads from helm-elscreen.el
@@ -710,8 +721,8 @@ Preconfigured `helm' for emms sources.
 
 ;;;***
 
-;;;### (autoloads nil "helm-eshell" "helm-eshell.el" (21210 9717
-;;;;;;  858688 588000))
+;;;### (autoloads nil "helm-eshell" "helm-eshell.el" (21231 51311
+;;;;;;  409347 682000))
 ;;; Generated autoloads from helm-eshell.el
 
 (autoload 'helm-esh-pcomplete "helm-eshell" "\
@@ -761,8 +772,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads nil "helm-files" "helm-files.el" (21214 39470 710482
-;;;;;;  884000))
+;;;### (autoloads nil "helm-files" "helm-files.el" (21235 19008 809946
+;;;;;;  615000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-browse-project "helm-files" "\
@@ -851,8 +862,8 @@ Preconfigured `helm' for gentoo linux.
 
 ;;;***
 
-;;;### (autoloads nil "helm-grep" "helm-grep.el" (21212 49075 57549
-;;;;;;  235000))
+;;;### (autoloads nil "helm-grep" "helm-grep.el" (21227 45568 113838
+;;;;;;  837000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-goto-precedent-file "helm-grep" "\
@@ -939,8 +950,8 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads nil "helm-help" "helm-help.el" (21212 49075 57549
-;;;;;;  235000))
+;;;### (autoloads nil "helm-help" "helm-help.el" (21239 12794 365535
+;;;;;;  714000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1025,6 +1036,11 @@ Help command for ido virtual buffers.
 
 \(fn)" t nil)
 
+(autoload 'helm-el-package-help "helm-help" "\
+
+
+\(fn)" t nil)
+
 (defvar helm-buffer-mode-line-string '("Buffer(s)" "\\<helm-buffer-map>\\[helm-buffer-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "String displayed in mode-line in `helm-source-buffers-list'"))
 
 (defvar helm-buffers-ido-virtual-mode-line-string '("Killed Buffer(s)" "\\<helm-buffers-ido-virtual-map>\\[helm-buffers-ido-virtual-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "String displayed in mode-line in `helm-source-buffers-list'"))
@@ -1063,6 +1079,8 @@ String displayed in mode-line in `helm-source-buffers-list'")
 
 (defvar helm-apt-mode-line "\\<helm-apt-map>\\[helm-apt-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct \\[helm-toggle-suspend-update]:Tog.suspend")
 
+(defvar helm-el-package-mode-line "\\<helm-el-package-map>\\[helm-el-package-help]:Help \\<helm-map>\\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct \\[helm-toggle-suspend-update]:Tog.suspend")
+
 (autoload 'helm-describe-helm-attribute "helm-help" "\
 Display the full documentation of HELM-ATTRIBUTE.
 HELM-ATTRIBUTE should be a symbol.
@@ -1071,8 +1089,8 @@ HELM-ATTRIBUTE should be a symbol.
 
 ;;;***
 
-;;;### (autoloads nil "helm-imenu" "helm-imenu.el" (21210 9717 858688
-;;;;;;  588000))
+;;;### (autoloads nil "helm-imenu" "helm-imenu.el" (21220 48149 917639
+;;;;;;  309000))
 ;;; Generated autoloads from helm-imenu.el
 
 (autoload 'helm-imenu "helm-imenu" "\
@@ -1136,7 +1154,7 @@ With a prefix arg reinitialize the cache.
 ;;;***
 
 ;;;### (autoloads nil "helm-match-plugin" "helm-match-plugin.el"
-;;;;;;  (21210 9717 862688 613000))
+;;;;;;  (21229 63730 5571 53000))
 ;;; Generated autoloads from helm-match-plugin.el
 
 (defvar helm-match-plugin-mode nil "\
@@ -1156,8 +1174,8 @@ See `helm-mp-matching-method' for the behavior of each method.
 
 ;;;***
 
-;;;### (autoloads nil "helm-misc" "helm-misc.el" (21217 8251 461763
-;;;;;;  122000))
+;;;### (autoloads nil "helm-misc" "helm-misc.el" (21217 8634 581766
+;;;;;;  336000))
 ;;; Generated autoloads from helm-misc.el
 
 (autoload 'helm-browse-menubar "helm-misc" "\
@@ -1207,8 +1225,8 @@ Predefined `helm' that provide completion of `shell' history.
 
 ;;;***
 
-;;;### (autoloads nil "helm-mode" "helm-mode.el" (21210 9717 862688
-;;;;;;  613000))
+;;;### (autoloads nil "helm-mode" "helm-mode.el" (21232 42046 270571
+;;;;;;  675000))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-comp-read "helm-mode" "\
@@ -1453,8 +1471,8 @@ First call open the kill-ring browser, next calls move to next line.
 
 ;;;***
 
-;;;### (autoloads nil "helm-semantic" "helm-semantic.el" (21210 9717
-;;;;;;  862688 613000))
+;;;### (autoloads nil "helm-semantic" "helm-semantic.el" (21237 56763
+;;;;;;  783460 192000))
 ;;; Generated autoloads from helm-semantic.el
 
 (autoload 'helm-semantic "helm-semantic" "\
@@ -1617,7 +1635,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21217 8265 116501 463000))
+;;;;;;  (21239 13328 157586 719000))
 
 ;;;***
 

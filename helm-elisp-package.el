@@ -18,6 +18,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'package)
 
 ;; internals vars
 (defvar helm-el-package--show-only 'all)
@@ -58,12 +59,13 @@
              for id = (get-text-property 0 'tabulated-list-id p)
              do
              (condition-case-unless-debug err
-                 (if (fboundp 'package-desc-full-name)
-                     ;; emacs 24.4
-                     (package-delete id)
-                     ;; emacs 24.3
-                     (package-delete (symbol-name (car id))
-                                     (package-version-join (cdr id))))
+                 (with-no-warnings
+                   (if (fboundp 'package-desc-full-name)
+                       ;; emacs 24.4
+                       (package-delete id)
+                       ;; emacs 24.3
+                       (package-delete (symbol-name (car id))
+                                       (package-version-join (cdr id)))))
                (error (message (cadr err))))
              and collect (if (fboundp 'package-desc-full-name)
                              id
