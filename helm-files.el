@@ -2064,10 +2064,7 @@ Use it for non--interactive calls of `helm-find-files'."
           (hlink)    ; String at point is an hyperlink.
           (remp abs) ; A remote file
           (file-p    ; a regular file
-           ;; Avoid ffap annoyances, don't use `ffap-alist'.
-           (let (ffap-alist)
-             (helm-aif (ffap-file-at-point)
-                 (expand-file-name it))))
+           (helm-aif (ffap-file-at-point) (expand-file-name it)))
           (urlp file-at-pt) ; possibly an url or email.
           ((and file-at-pt (file-exists-p file-at-pt))
            file-at-pt))))
