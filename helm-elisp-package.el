@@ -33,6 +33,7 @@
       'global
     (with-current-buffer (get-buffer "*Packages*")
       (buffer-string)))
+  (setq helm-el-package--show-only 'all)
   (kill-buffer "*Packages*"))
 
 (defun helm-el-package-install (_candidate)
