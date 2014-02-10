@@ -264,8 +264,7 @@ It is added to `extended-command-history'.
   '((name . "Shell history")
     (candidates . (lambda ()
                     (with-helm-current-buffer
-                      (cl-loop for i across (cddr comint-input-ring)
-                               collect i))))
+                      (ring-elements comint-input-ring))))
     (action . helm-comint-input-ring-action))
   "Source that provide helm completion against `comint-input-ring'.")
 
