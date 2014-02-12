@@ -679,8 +679,9 @@ Special commands:
 (defun helm-grep-hack-types ()
   "Return a list of known ack-grep types."
   (with-temp-buffer
-    (call-process helm-ack-grep-executable nil t nil
-                  "--help" "types")
+    ;; "--help-types" works with both 1.96 and 2.1+, while
+    ;; "--help types" works only with 1.96 Issue #422
+    (call-process helm-ack-grep-executable nil t nil "--help-types")
     (goto-char (point-min))
     (cl-loop while (re-search-forward
                     "^ *--\\(\\[no\\]\\)\\([^. ]+\\) *\\(.*\\)" nil t)
