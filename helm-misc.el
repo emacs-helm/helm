@@ -261,7 +261,7 @@ It is added to `extended-command-history'.
     (insert candidate)))
 
 (defvar helm-source-comint-input-ring
-  '((name . "Shell history")
+  '((name . "Comint history")
     (candidates . (lambda ()
                     (with-helm-current-buffer
                       (ring-elements comint-input-ring))))
@@ -378,13 +378,13 @@ It is added to `extended-command-history'.
 
 ;;;###autoload
 (defun helm-comint-input-ring ()
-  "Predefined `helm' that provide completion of `shell' history."
+  "Predefined `helm' that provide completion of `comint' history."
   (interactive)
-  (when (eq major-mode 'shell-mode)
+  (when (derived-mode-p 'comint-mode)
     (helm :sources 'helm-source-comint-input-ring
           :input (buffer-substring-no-properties (comint-line-beginning-position)
                                                  (point-at-eol))
-          :buffer "*helm shell history*")))
+          :buffer "*helm comint history*")))
 
 
 (provide 'helm-misc)
