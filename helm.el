@@ -4165,7 +4165,8 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
     (helm-aif (helm-this-visible-mark)
         (helm-delete-visible-mark it)
       (helm-make-visible-mark))
-    (helm-next-line)))
+    (unless (helm-end-of-source-p)
+      (helm-next-line))))
 
 ;;;###autoload
 (defun helm-mark-all ()
