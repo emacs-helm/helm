@@ -266,6 +266,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                      ((and (file-directory-p i)
                            helm-grep-in-recurse)
                       (list (expand-file-name i)))
+                     ((file-directory-p i)
+                      (file-expand-wildcards
+                       (concat (file-name-as-directory (expand-file-name i)) "*") t))
                      ;; Candidate is a file or wildcard and we use recursion, use the
                      ;; current directory instead of candidate.
                      ((and (or (file-exists-p i) (string-match "[*]" i))
