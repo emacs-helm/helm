@@ -306,7 +306,7 @@ because flickering can occur in some environment."
   :type 'boolean)
 
 (defcustom helm-scroll-amount nil
-  "Scroll amount when scrolling other window in an helm session.
+  "Scroll amount when scrolling other window in a helm session.
 It is used by `helm-scroll-other-window'
 and `helm-scroll-other-window-down'.
 
@@ -1406,7 +1406,7 @@ we are using 'filtered-candidate-transformer' or 'candidate-transformer'.
 e.g
 filtered-candidate-transformer:
 \(helm-compose '((1 2 3 4 5 6 7)
-                '((name . \"An helm source\") (candidates . (a b c))))
+                '((name . \"A helm source\") (candidates . (a b c))))
               '((lambda (candidates _source)
                   (cl-loop for i in candidates
                         when (cl-oddp i) collect i))
@@ -1459,9 +1459,9 @@ Basic keywords are the following:
 \:sources
 
 A list of sources used for this session.  It also accepts a
-symbol, interpreted as a variable of an helm source
+symbol, interpreted as a variable of a helm source
 i.e (a symbol can be passed instead of a list of sources).
-It also accepts an alist representing an helm source, which is
+It also accepts an alist representing a helm source, which is
 detected by \(assq 'name ANY-SOURCES\).
 NOTE: In this case the source is embedded in the helm command and
 have no symbol name, so it is not reachable from outside.
@@ -1545,9 +1545,9 @@ to 10 as session local variable."
                   (t #'helm-internal))))
     (if (and helm-alive-p (eq fn #'helm))
         (if (helm-alive-p)
-            ;; An helm session is normally running.
+            ;; A helm session is normally running.
             (error "Error: Trying to run helm within a running helm session")
-            ;; An helm session is already running and user jump somewhere else
+            ;; A helm session is already running and user jump somewhere else
             ;; without desactivating it: weird.
             (with-helm-buffer
               (prog1
@@ -1720,7 +1720,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
   (eq any-resume t))
 
 (defun helm-resume-select-buffer ()
-  "Select an `helm-buffer' in `helm-buffers' list to resume an helm session.
+  "Select an `helm-buffer' in `helm-buffers' list to resume a helm session.
 Return nil if no `helm-buffer' found."
   (when helm-buffers
     (or (helm :sources '(((name . "Resume helm buffer")
@@ -2176,7 +2176,7 @@ if some when multiples sources are present."
   (helm-frame-or-window-configuration 'restore)
   ;; [1] now bury-buffer from underlying windows otherwise,
   ;; if this window is killed the underlying buffer will
-  ;; be an helm buffer.
+  ;; be a helm buffer.
   (replace-buffer-in-windows helm-buffer)
   (setq helm-alive-p nil)
   (setq helm-in-file-completion-p nil)
@@ -3779,7 +3779,7 @@ Acceptable values of CREATE-OR-BUFFER:
     (funcall return-func)))
 
 (defun helm-init-candidates-in-buffer (buffer data)
-  "Register BUFFER with DATA for an helm candidates-in-buffer session.
+  "Register BUFFER with DATA for a helm candidates-in-buffer session.
 Arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
 either 'local or 'global which is passed to `helm-candidate-buffer'.
 Arg DATA can be either a list or a plain string."
