@@ -622,7 +622,8 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
   "`helm-buffer' of previously `helm' session.")
 (defvar helm-saved-selection nil
   "Value of the currently selected object when the action list is shown.")
-(defvar helm-sources nil)
+(defvar helm-sources nil
+  "[INTERNAL] Value of current sources in used, a list.")
 (defvar helm-delayed-init-executed nil)
 (defvar helm-buffer "*helm*"
   "Buffer showing completions.")
@@ -3606,9 +3607,8 @@ on part of candidate returned by the call of function provided by this attribute
 The function should have one arg, candidate, and return only
 a specific part of candidate.
 
-To customize `helm-candidates-in-buffer' behavior, use search,
-get-line, match-part and search-from-end attributes.
-See also `helm-sources' docstring."
+To customize `helm-candidates-in-buffer' behavior, use `search',
+`get-line', `match-part' and `search-from-end' attributes."
 
   (helm-candidates-in-buffer-1
    (helm-candidate-buffer)
