@@ -400,7 +400,9 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)
-              (set (make-local-variable 'helm-in-file-completion-p) t)))
+              (with-helm-temp-hook 'helm-after-initialize-hook
+                (with-helm-buffer  
+                  (set (make-local-variable 'helm-in-file-completion-p) t))))) 
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer . helm-ff-sort-candidates)
     (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
@@ -1268,7 +1270,9 @@ expand to this directory."
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
                         (t (expand-file-name
-                            (helm-substitute-in-filename helm-pattern))))))
+                            (helm-substitute-in-filename helm-pattern)
+                            (getenv "SystemDrive") ; nil on Unix.
+                            )))))
       (if (file-directory-p input)
           (setq helm-ff-default-directory
                 (setq input (file-name-as-directory input)))
