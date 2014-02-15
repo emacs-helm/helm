@@ -46,6 +46,22 @@ This is used in macro `with-helm-show-completion'."
   :group 'helm-elisp
   :type  'integer)
 
+(defcustom helm-lisp-quoted-function-list
+  '(funcall apply mapc cl-mapc mapcar cl-mapcar
+    callf callf2 cl-callf cl-callf2 fset
+    fboundp fmakunbound symbol-function)
+  "List of function where quoted function completion happen.
+e.g give only function names after \(funcall '."
+  :group 'helm-elisp
+  :type '(repeat (choice symbol)))
+  
+(defcustom helm-lisp-unquoted-function-list
+  '(function defadvice)
+    "List of function where unquoted function completion happen.
+e.g give only function names after \(function ."
+  :group 'helm-elisp
+  :type '(repeat (choice symbol)))
+
 
 ;;; Faces
 ;;
@@ -126,19 +142,37 @@ If `helm-turn-on-show-completion' is nil just do nothing."
 ;;; Lisp symbol completion.
 ;;
 ;;
-(defun helm-lisp-completion-predicate-at-point (beg)
+(defun helm-lisp-completion--predicate-at-point (beg)
   ;; Return a predicate for `all-completions'.
-  (save-excursion
-    (goto-char beg)
-    (if (or (not (eq (char-before) ?\()) ; no paren before str.
-            ;; Looks like we are in a let statement.
-            (condition-case nil
-                (progn (up-list -2) (forward-char 1)
-                       (eq (char-after) ?\())
-              (error nil)))
-        (lambda (sym)
-          (or (boundp sym) (fboundp sym) (symbol-plist sym)))
-        #'fboundp)))
+  (let ((fn-sym-p (lambda ()
+                    (or
+                     (and (eq (char-before) ?\ )
+                          (save-excursion
+                            (skip-syntax-backward " " (point-at-bol))
+                            (memq (symbol-at-point)
+                                  helm-lisp-unquoted-function-list)))
+                     (and (eq (char-before) ?\')
+                          (save-excursion
+                            (forward-char -1)
+                            (eq (char-before) ?\#)))))))
+    (save-excursion
+      (goto-char beg)
+      (if (or (not (or (funcall fn-sym-p)
+                       (and (eq (char-before) ?\')
+                            (save-excursion
+                              (forward-char (if (funcall fn-sym-p) -2 -1))
+                              (skip-syntax-backward " " (point-at-bol))
+                              (memq (symbol-at-point)
+                                    helm-lisp-quoted-function-list)))
+                       (eq (char-before) ?\())) ; no paren before str.
+              ;; Looks like we are in a let statement.
+              (condition-case nil
+                  (progn (up-list -2) (forward-char 1)
+                         (eq (char-after) ?\())
+                (error nil)))
+          (lambda (sym)
+            (or (boundp sym) (fboundp sym) (symbol-plist sym)))
+          #'fboundp))))
 
 (defun helm-thing-before-point (&optional limits regexp)
   "Return symbol name before point.
@@ -188,7 +222,7 @@ Return a cons \(beg . end\)."
   (let* ((target     (helm-thing-before-point))
          (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
-         (pred       (and beg (helm-lisp-completion-predicate-at-point beg)))
+         (pred       (and beg (helm-lisp-completion--predicate-at-point beg)))
          (loc-vars   (and (fboundp 'lisp--local-variables)
                           (ignore-errors
                             (mapcar #'symbol-name (lisp--local-variables)))))
