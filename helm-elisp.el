@@ -157,19 +157,23 @@ If `helm-turn-on-show-completion' is nil just do nothing."
                             (eq (char-before) ?\#)))))))
     (save-excursion
       (goto-char beg)
-      (if (or (not (or (funcall fn-sym-p)
-                       (and (eq (char-before) ?\')
-                            (save-excursion
-                              (forward-char (if (funcall fn-sym-p) -2 -1))
-                              (skip-syntax-backward " " (point-at-bol))
-                              (memq (symbol-at-point)
-                                    helm-lisp-quoted-function-list)))
-                       (eq (char-before) ?\())) ; no paren before str.
-              ;; Looks like we are in a let statement.
-              (condition-case nil
-                  (progn (up-list -2) (forward-char 1)
-                         (eq (char-after) ?\())
-                (error nil)))
+      (if (or
+           ;; Complete on all symbols in non--lisp modes (logs mail etc..)
+           (not (memq major-mode
+                      '(emacs-lisp-mode lisp-interaction-mode)))
+           (not (or (funcall fn-sym-p)
+                    (and (eq (char-before) ?\')
+                         (save-excursion
+                           (forward-char (if (funcall fn-sym-p) -2 -1))
+                           (skip-syntax-backward " " (point-at-bol))
+                           (memq (symbol-at-point)
+                                 helm-lisp-quoted-function-list)))
+                    (eq (char-before) ?\())) ; no paren before str.
+           ;; Looks like we are in a let statement.
+           (condition-case nil
+               (progn (up-list -2) (forward-char 1)
+                      (eq (char-after) ?\())
+             (error nil)))
           (lambda (sym)
             (or (boundp sym) (fboundp sym) (symbol-plist sym)))
           #'fboundp))))
