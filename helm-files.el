@@ -1271,7 +1271,10 @@ expand to this directory."
                         ((string= helm-pattern "/../") "/")
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern)
-                            (getenv "SystemDrive") ; nil on Unix.
+                            ;; [Windows] On UNC paths "/" expand to current machine,
+                            ;; so use the root of current Drive. (i.e "C:/")
+                            (and (memq system-type '(windows-nt ms-dos))
+                                 (getenv "SystemDrive")) ; nil on Unix.
                             )))))
       (if (file-directory-p input)
           (setq helm-ff-default-directory
