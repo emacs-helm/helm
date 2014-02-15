@@ -159,8 +159,9 @@ If `helm-turn-on-show-completion' is nil just do nothing."
       (goto-char beg)
       (if (or
            ;; Complete on all symbols in non--lisp modes (logs mail etc..)
-           (not (memq major-mode
-                      '(emacs-lisp-mode lisp-interaction-mode)))
+           (not (memq major-mode '(emacs-lisp-mode
+                                   lisp-interaction-mode
+                                   inferior-emacs-lisp-mode)))
            (not (or (funcall fn-sym-p)
                     (and (eq (char-before) ?\')
                          (save-excursion
