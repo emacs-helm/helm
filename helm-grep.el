@@ -266,7 +266,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                      ((and (file-directory-p i)
                            helm-grep-in-recurse)
                       (list (expand-file-name i)))
-                     ((file-directory-p i)
+                     ((and (file-directory-p i)
+                           ;; ack-grep accept directory [1].
+                           (not (helm-grep-use-ack-p)))
                       (file-expand-wildcards
                        (concat (file-name-as-directory (expand-file-name i)) "*") t))
                      ;; Candidate is a file or wildcard and we use recursion, use the
@@ -773,7 +775,7 @@ You can give more than one arg separated by space.
 e.g *.el *.py *.tex.
 If you are using ack-grep, you will be prompted for --type
 instead.
-If prompt is empty '--exclude `grep-find-ignored-files'' is used instead.
+If prompt is empty '--exclude `grep-find-ignored-files' is used instead.
 ZGREP when non--nil use zgrep instead, without prompting for a choice
 in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   (when (and (helm-grep-use-ack-p)
