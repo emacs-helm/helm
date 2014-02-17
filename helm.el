@@ -554,6 +554,9 @@ and before performing action.")
 (defvar helm-after-action-hook nil
   "Run after executing action.")
 
+(defvar helm-exit-minibuffer-hook nil
+  "Run just before exiting minibuffer.")
+
 (defvar helm-after-persistent-action-hook nil
   "Run after executing persistent action.")
 
@@ -3328,6 +3331,7 @@ don't exit and send message 'no match'."
   (unless helm-current-prefix-arg
     (setq helm-current-prefix-arg current-prefix-arg))
   (setq helm-exit-status 0)
+  (helm-log-run-hook 'helm-exit-minibuffer-hook)
   (exit-minibuffer))
 
 ;;;###autoload

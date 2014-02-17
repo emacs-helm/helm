@@ -1577,7 +1577,7 @@ Note that only directories are saved here."
                  ;; and we don't want to introduce duplicates.
                  (add-to-history 'file-name-history
                                  (abbreviate-file-name sel)))))))
-(add-hook 'helm-after-action-hook 'helm-files-save-file-name-history)
+(add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file)
   (file-exists-p (file-truename file)))
