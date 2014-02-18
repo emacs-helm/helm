@@ -105,6 +105,8 @@ The function that call this should set `helm-ec-target' to thing at point."
          ;; Compare them to avoid dups.
          for file-entry-p = (and (stringp exp-entry)
                                  (stringp file-cand)
+                                 ;; Fix :/tmp/foo/ $ cd foo
+                                 (not (file-directory-p file-cand))
                                  (file-equal-p exp-entry file-cand))
          if (and file-cand (or (file-remote-p file-cand)
                                (file-exists-p file-cand))
