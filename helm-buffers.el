@@ -220,7 +220,7 @@ See `ido-make-buffer-list' for more infos."
 
 (defun helm-buffer--show-details (buf-name prefix help-echo
                                   size mode dir face1 face2
-                                  proc &optional details)
+                                  proc details)
   (append
    (list
     (concat prefix
@@ -252,28 +252,28 @@ See `ido-make-buffer-list' for more infos."
        (rassoc buf dired-buffers)
        (helm-buffer--show-details
         name name-prefix dir size mode dir
-        'helm-ff-directory 'helm-buffer-process details))
+        'helm-ff-directory 'helm-buffer-process nil details))
       ;; A buffer file modified somewhere outside of emacs.=>red
       ((and file-name (file-exists-p file-name)
             (not (verify-visited-file-modtime buf)))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'helm-buffer-saved-out 'helm-buffer-process proc details))
+        'helm-buffer-saved-out 'helm-buffer-process nil details))
       ;; A new buffer file not already saved on disk.=>indianred2
       ((and file-name (not (verify-visited-file-modtime buf)))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'helm-buffer-not-saved 'helm-buffer-process proc details))
+        'helm-buffer-not-saved 'helm-buffer-process nil details))
       ;; A buffer file modified and not saved on disk.=>orange
       ((and file-name (buffer-modified-p buf))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'helm-ff-symlink 'helm-buffer-process proc details))
+        'helm-ff-symlink 'helm-buffer-process nil details))
       ;; A buffer file not modified and saved on disk.=>green
       (file-name
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'font-lock-type-face 'helm-buffer-process proc details))
+        'font-lock-type-face 'helm-buffer-process nil details))
       ;; Any non--file buffer.=>grey italic
       (t
        (helm-buffer--show-details
