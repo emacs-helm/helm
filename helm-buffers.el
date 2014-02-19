@@ -311,13 +311,16 @@ Should be called after others transformers i.e (boring buffers)."
 (defun helm-toggle-buffers-details ()
   (interactive)
   (let* ((name      (helm-get-selection))
-         (preselect (if (and (null helm-buffer-details-flag)
-                             (numberp helm-buffer-max-length)
-                             (> (string-width name)
-                                helm-buffer-max-length))
-                        (helm-substring-by-width
-                         name helm-buffer-max-length)
-                        name)))
+         (preselect (concat "^"
+                            (if (and (null helm-buffer-details-flag)
+                                     (numberp helm-buffer-max-length)
+                                     (> (string-width name)
+                                        helm-buffer-max-length))
+                                (helm-substring-by-width
+                                 name helm-buffer-max-length)
+                                (concat (regexp-quote name)
+                                        (if helm-buffer-details-flag
+                                            "$" "[[:blank:]]+"))))))
     (when helm-alive-p
       (setq helm-buffer-details-flag (not helm-buffer-details-flag))
       (helm-force-update preselect))))
