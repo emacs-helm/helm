@@ -29,6 +29,13 @@
   :group 'helm-misc
   :type 'string)
 
+(defcustom helm-mini-default-sources '(helm-source-buffers-list
+                                       helm-source-recentf
+                                       helm-source-buffer-not-found)
+  "Default sources list used in `helm-mini'."
+  :group 'helm-misc
+  :type '(repeat (choice symbol)))
+
 (defface helm-time-zone-current
     '((t (:foreground "green")))
   "Face used to colorize current time in `helm-world-time'."
@@ -363,10 +370,7 @@ It is added to `extended-command-history'.
   (interactive)
   (require 'helm-files)
   (let ((helm-ff-transformer-show-only-basename nil))
-    (helm-other-buffer '(helm-source-buffers-list
-                         helm-source-recentf
-                         helm-source-buffer-not-found)
-                       "*helm mini*")))
+    (helm-other-buffer helm-mini-default-sources "*helm mini*")))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()

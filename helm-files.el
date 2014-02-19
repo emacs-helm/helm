@@ -2401,9 +2401,12 @@ Else return ACTIONS unmodified."
 ;;
 ;;
 (defvar helm-source-file-name-history
-  '((name . "File Name History")
+  `((name . "File Name History")
     (candidates . file-name-history)
-    (type . file)))
+    (persistent-action . ignore)
+    (filtered-candidate-transformer . helm-file-name-history-transformer)
+    (action . ,(cdr (helm-get-actions-from-type
+                     helm-source-locate)))))
 
 (defvar helm-source--ff-file-name-history
   '((name . "File name history")
