@@ -2119,7 +2119,7 @@ Find inside `require' and `declare-function' sexp."
 ;;; Handle copy, rename, symlink, relsymlink and hardlink from helm.
 ;;
 ;;
-(defvar helm-async-be-async)
+(defvar dired-async-be-async)
 (cl-defun helm-dired-action (candidate
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
@@ -2143,8 +2143,8 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
                       (not (file-directory-p candidate))))
         ;; When FOLLOW is enabled, disable helm-async.
         ;; If it is globally disabled use this nil value.
-        (helm-async-be-async (and (boundp 'helm-async-be-async)
-                                  helm-async-be-async
+        (dired-async-be-async (and (boundp 'dired-async-be-async)
+                                  dired-async-be-async
                                   (not follow))))
     (dired-create-files
      fn (symbol-name action) files

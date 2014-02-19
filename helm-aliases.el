@@ -910,6 +910,8 @@
 (make-obsolete-variable 'helm-c-apt-input-history 'helm-apt-input-history "1.5.1")
 (defvaralias 'helm-c-source-emms-files 'helm-source-emms-files)
 (make-obsolete-variable 'helm-c-source-emms-files 'helm-source-emms-files "1.5.1")
+(defvaralias 'helm-async-be-async 'dired-async-be-async)
+(make-obsolete-variable 'helm-async-be-async 'dired-async-be-async "1.5.9")
 
 
 (provide 'helm-aliases)
