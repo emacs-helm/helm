@@ -1806,18 +1806,14 @@ window or frame configuration is saved/restored according to values of
                      (funcall (cdr helm-save-configuration-functions))))
       (restore (funcall (car helm-save-configuration-functions)
                         helm-last-frame-or-window-configuration)
-               ;; Restore a frame configuration.
-               (let ((frame (listp helm-last-frame-or-window-configuration)))
-                 ;; If `helm-save-configuration-functions' are window functions
-                 ;; frame should be nil, use current frame.
-                 (unless (null frame)
-                   ;; This is needed for minibuffer own-frame config
-                   ;; when recursive minibuffers are in use.
-                   ;; e.g M-: + helm-minibuffer-history.
-                   (setq frame (if (minibufferp helm-current-buffer)
-                                   (selected-frame)
-                                   (last-nonminibuffer-frame)))
-		   (select-frame-set-input-focus frame)))))))
+               ;; Restore frame focus.
+               ;; This is needed for minibuffer own-frame config
+               ;; when recursive minibuffers are in use.
+               ;; e.g M-: + helm-minibuffer-history.
+               (let ((frame (if (minibufferp helm-current-buffer)
+                                (selected-frame)
+                                (last-nonminibuffer-frame))))
+                 (select-frame-set-input-focus frame))))))
 
 (defun helm-split-window-default-fn (window)
   (let (split-width-threshold)
