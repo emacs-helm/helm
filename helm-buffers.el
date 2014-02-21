@@ -308,19 +308,23 @@ Should be called after others transformers i.e (boring buffers)."
                              name)
                          i)))
 
+(defun helm-buffer--get-preselection (buffer-name)
+  (concat "^"
+          (if (and (null helm-buffer-details-flag)
+                   (numberp helm-buffer-max-length)
+                   (> (string-width buffer-name)
+                      helm-buffer-max-length))
+              (regexp-quote
+               (helm-substring-by-width
+                buffer-name helm-buffer-max-length))
+              (concat (regexp-quote buffer-name)
+                      (if helm-buffer-details-flag
+                          "$" "[[:blank:]]+")))))
+
 (defun helm-toggle-buffers-details ()
   (interactive)
-  (let* ((name      (helm-get-selection))
-         (preselect (concat "^"
-                            (if (and (null helm-buffer-details-flag)
-                                     (numberp helm-buffer-max-length)
-                                     (> (string-width name)
-                                        helm-buffer-max-length))
-                                (helm-substring-by-width
-                                 name helm-buffer-max-length)
-                                (concat (regexp-quote name)
-                                        (if helm-buffer-details-flag
-                                            "$" "[[:blank:]]+"))))))
+  (let ((preselect (helm-buffer--get-preselection
+                    (helm-get-selection))))
     (when helm-alive-p
       (setq helm-buffer-details-flag (not helm-buffer-details-flag))
       (helm-force-update preselect))))
@@ -449,11 +453,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-revert-marked-buffers (_ignore)
   (mapc 'helm-revert-buffer (helm-marked-candidates)))
 
-(defun helm-buffer-revert-and-update (candidate)
-  (let ((marked (helm-marked-candidates)))
+(defun helm-buffer-revert-and-update (_candidate)
+  (let ((marked (helm-marked-candidates))
+        (preselect (helm-get-selection nil t)))
     (cl-loop for buf in marked do (helm-revert-buffer buf))
     (when (> (length marked) 1) (helm-unmark-all))
-    (helm-force-update candidate)))
+    (helm-force-update (regexp-quote preselect))))
 
 (defun helm-buffer-revert-persistent ()
   "Revert buffer without quitting helm."
@@ -462,14 +467,15 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-attrset 'revert-action '(helm-buffer-revert-and-update . never-split))
     (helm-execute-persistent-action 'revert-action)))
 
-(defun helm-buffer-save-and-update (candidate)
+(defun helm-buffer-save-and-update (_candidate)
   (let ((marked (helm-marked-candidates))
+        (preselect (helm-get-selection nil t))
         (enable-recursive-minibuffers t))
     (cl-loop for buf in marked do
              (with-current-buffer (get-buffer buf)
                (when (buffer-file-name) (save-buffer))))
     (when (> (length marked) 1) (helm-unmark-all))
-    (helm-force-update candidate)))
+    (helm-force-update (regexp-quote preselect))))
 
 (defun helm-buffer-save-persistent ()
   "Save buffer without quitting helm."
