@@ -32,12 +32,11 @@
   "Apt related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-apt-cache-show-function nil
-  "You can set the function with your own to show apt package.
-Example, we can use `apt-utils-show-package-1' instead `helm-apt-cache-show' like below:
-
-  (setq helm-apt-cache-show-function 'apt-utils-show-package-1)
-"
+(defcustom helm-apt-cache-show-function 'helm-apt-cache-show-1
+  "Function of one argument used to show apt package.
+Default is `helm-apt-cache-show-1' but you can use `apt-utils-show-package-1'
+from `apt-utils.el' to have something more enhanced.
+If nil default `helm-apt-cache-show-1' will be used."
   :type 'function
   :group 'helm-apt)
 
@@ -181,9 +180,16 @@ package name - description."
 
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."
-  (if (functionp helm-apt-cache-show-function)
+  (if (and (functionp helm-apt-cache-show-function)
+           (not (eq helm-apt-cache-show-function
+                    'helm-apt-cache-show)))
+      ;; A function, call it.
       (funcall helm-apt-cache-show-function package)
-    (let* ((command (format helm-apt-show-command package))
+      ;; nil or whatever use default.
+      (helm-apt-cache-show-1 package)))
+
+(defun helm-apt-cache-show-1 (package)
+  (let* ((command (format helm-apt-show-command package))
          (buf     (get-buffer-create "*helm apt show*")))
     (helm-switch-to-buffer buf)
     (unless (string= package helm-apt-show-current-package)
@@ -194,7 +200,7 @@ package name - description."
            command nil (current-buffer) t))))
     (helm-apt-show-mode)
     (set (make-local-variable 'helm-apt-show-current-package)
-         package))))
+         package)))
 
 (defun helm-apt-install (_package)
   "Run 'apt-get install' shell command on PACKAGE."
