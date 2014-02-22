@@ -3411,6 +3411,7 @@ to a list of forms.\n\n")
         (or (search-forward candidate-or-regexp nil t)
             (re-search-forward candidate-or-regexp nil t)
             (goto-char start))))
+    (forward-line 0) ; Avoid scrolling right on long lines.
     (helm-mark-current-line)))
 
 ;;;###autoload
