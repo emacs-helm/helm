@@ -561,7 +561,7 @@ menu also, in the tool section.
  If you want to save the results of your grep
 session, doing `C-x C-s` will save your grep results in a `helm-grep-mode` buffer.
 
-NOTE: You can save differents named helm grep buffers.
+_NOTE:_ You can save differents named helm grep buffers.
       If you haven't saved your grep session in a named buffer, you can anyway retrieve
       the last session with `helm-resume`.
 
@@ -574,11 +574,17 @@ Saving this buffer will apply changes to corresponding files.
 
 Features:
 
--   You can use prefix arguments before or during M-x session
+-   You can use prefix arguments during M-x session and they are shown in `mode-line`.
 
 -   C-z is a toggle documentation for this command
 
 -   The key binding of command are shown.
+
+-   Smart sorting.
+
+_NOTE:_Prefix args passed before calling `helm-M-x` have no effects.
+Passing the prefix args AFTER calling `helm-M-x` allow you to read the documentation
+of the command you want to run and know exactly what effect they have.
 
 # Helm regexp
 
