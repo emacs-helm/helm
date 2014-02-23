@@ -731,13 +731,13 @@ Keys description:
                       (init . (lambda ()
                                 (setq helm-ff-auto-update-flag
                                       helm-ff-auto-update-initial-value)
-                                (setq helm-in-file-completion-p t)))
+                                (with-helm-temp-hook 'helm-after-initialize-hook
+                                  (with-helm-buffer  
+                                    (set (make-local-variable 'helm-in-file-completion-p) t)))))
                       (mode-line . helm-read-file-name-mode-line-string)
                       (candidates
                        . (lambda ()
-                           ;; Don't run `file-exists-p' if `helm-pattern' is remote.
-                           (append (and (not (file-remote-p helm-pattern))
-                                        (not (file-exists-p helm-pattern))
+                           (append (and (not (file-exists-p helm-pattern))
                                         (list helm-pattern))
                                    (if ',test
                                        (cl-loop with hn = (helm-ff-tramp-hostnames)
