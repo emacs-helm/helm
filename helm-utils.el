@@ -669,10 +669,28 @@ Useful in dired buffers when there is inserted subdirs."
       (dired-current-directory)
       default-directory))
 
+(defmacro with-helm--temp-buffer-window (buffer-or-name action quit-function &rest body)
+  "Bind `standard-output' to BUFFER-OR-NAME, eval BODY, show the buffer.
+Same as emacs-24.3 version of `with-temp-buffer-window.'"
+  (declare (debug t))
+  (let ((buffer (make-symbol "buffer"))
+	(window (make-symbol "window"))
+	(value (make-symbol "value")))
+    `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
+	    (standard-output ,buffer)
+	    ,window ,value)
+       (with-current-buffer ,buffer
+	 (setq ,value (progn ,@body))
+	 (setq ,window (temp-buffer-window-show ,buffer ,action)))
+
+       (if (functionp ,quit-function)
+	   (funcall ,quit-function ,window ,value)
+	 ,value))))
+
 (defmacro with-helm-display-marked-candidates (buf candidates &rest body)
   (declare (indent 0) (debug t))
   `(unwind-protect
-        (with-temp-buffer-window ,buf
+        (helm-utils.elwith-helm--temp-buffer-window ,buf
           '(display-buffer-below-selected
             (window-height . fit-window-to-buffer))
           (lambda (window _ignore)
