@@ -697,8 +697,6 @@ Same as emacs-24.3 version of `with-temp-buffer-window.'"
             (with-selected-window window
               ,@body))
           (dired-format-columns-of-files ,candidates)) 
-          ;; (save-excursion
-          ;;   (insert (mapconcat (lambda (f) (format "- %s\n" f)) ,candidates ""))))
      (quit-window 'kill (get-buffer-window ,buf))))
 
 ;;; Persistent Action Helpers
