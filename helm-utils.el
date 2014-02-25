@@ -690,7 +690,7 @@ Same as emacs-24.3 version of `with-temp-buffer-window.'"
 (defmacro with-helm-display-marked-candidates (buf candidates &rest body)
   (declare (indent 0) (debug t))
   `(unwind-protect
-        (helm-utils.elwith-helm--temp-buffer-window ,buf
+        (with-helm--temp-buffer-window ,buf
           '(display-buffer-below-selected
             (window-height . fit-window-to-buffer))
           (lambda (window _ignore)
