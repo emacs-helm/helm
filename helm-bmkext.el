@@ -78,12 +78,6 @@
                                (bmkext-alpha-more-p "ALPHA")
                                (t "ALPHA"))))
 
-(defun helm-bmkext-run-edit ()
-  "Run `bmkext-edit-bookmark' from keyboard."
-  (interactive)
-  (with-helm-alive-p
-    (helm-quit-and-execute-action 'bmkext-edit-bookmark)))
-
 
 ;;; Addressbook.
 ;;

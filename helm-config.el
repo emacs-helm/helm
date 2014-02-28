@@ -202,7 +202,7 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21249 51695 738860 45000))
+;;;### (autoloads nil "helm" "helm.el" (21261 55482 132946 47000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -520,8 +520,8 @@ Useful when you have a old or corrupted `helm-adaptive-history-file'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-apt" "helm-apt.el" (21210 9717 854688
-;;;;;;  570000))
+;;;### (autoloads nil "helm-apt" "helm-apt.el" (21260 53563 197555
+;;;;;;  67000))
 ;;; Generated autoloads from helm-apt.el
 
 (autoload 'helm-apt "helm-apt" "\
@@ -547,8 +547,8 @@ http://bbdb.sourceforge.net/
 
 ;;;***
 
-;;;### (autoloads nil "helm-bmkext" "helm-bmkext.el" (21212 49075
-;;;;;;  53549 235000))
+;;;### (autoloads nil "helm-bmkext" "helm-bmkext.el" (21264 39805
+;;;;;;  561851 576000))
 ;;; Generated autoloads from helm-bmkext.el
 
 (autoload 'helm-bookmark-ext "helm-bmkext" "\
@@ -561,8 +561,8 @@ Contain also `helm-source-google-suggest'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-bookmark" "helm-bookmark.el" (21210 9717
-;;;;;;  854688 570000))
+;;;### (autoloads nil "helm-bookmark" "helm-bookmark.el" (21264 42320
+;;;;;;  637872 676000))
 ;;; Generated autoloads from helm-bookmark.el
 
 (autoload 'helm-bookmarks "helm-bookmark" "\
@@ -575,10 +575,15 @@ Preconfigured `helm' for bookmarks (pretty-printed).
 
 \(fn)" t nil)
 
+(autoload 'helm-filtered-bookmarks "helm-bookmark" "\
+
+
+\(fn)" t nil)
+
 ;;;***
 
-;;;### (autoloads nil "helm-buffers" "helm-buffers.el" (21252 18763
-;;;;;;  877632 915000))
+;;;### (autoloads nil "helm-buffers" "helm-buffers.el" (21260 53563
+;;;;;;  237555 67000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffers-list "helm-buffers" "\
@@ -710,8 +715,8 @@ Preconfigured helm to list elscreen.
 
 ;;;***
 
-;;;### (autoloads nil "helm-emms" "helm-emms.el" (21210 9717 854688
-;;;;;;  570000))
+;;;### (autoloads nil "helm-emms" "helm-emms.el" (21260 53563 269555
+;;;;;;  67000))
 ;;; Generated autoloads from helm-emms.el
 
 (autoload 'helm-emms "helm-emms" "\
@@ -772,8 +777,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads nil "helm-files" "helm-files.el" (21253 43570 173088
-;;;;;;  625000))
+;;;### (autoloads nil "helm-files" "helm-files.el" (21264 20066 343515
+;;;;;;  958000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-browse-project "helm-files" "\
@@ -851,8 +856,8 @@ Preconfigured helm for `ucs-names' math symbols.
 
 ;;;***
 
-;;;### (autoloads nil "helm-gentoo" "helm-gentoo.el" (21210 9717
-;;;;;;  858688 588000))
+;;;### (autoloads nil "helm-gentoo" "helm-gentoo.el" (21260 53563
+;;;;;;  337555 68000))
 ;;; Generated autoloads from helm-gentoo.el
 
 (autoload 'helm-gentoo "helm-gentoo" "\
@@ -862,8 +867,8 @@ Preconfigured `helm' for gentoo linux.
 
 ;;;***
 
-;;;### (autoloads nil "helm-grep" "helm-grep.el" (21249 51695 738860
-;;;;;;  45000))
+;;;### (autoloads nil "helm-grep" "helm-grep.el" (21261 49177 976589
+;;;;;;  690000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-goto-precedent-file "helm-grep" "\
@@ -1225,8 +1230,8 @@ Predefined `helm' that provide completion of `comint' history.
 
 ;;;***
 
-;;;### (autoloads nil "helm-mode" "helm-mode.el" (21232 42046 270571
-;;;;;;  675000))
+;;;### (autoloads nil "helm-mode" "helm-mode.el" (21258 51603 306009
+;;;;;;  887000))
 ;;; Generated autoloads from helm-mode.el
 
 (autoload 'helm-comp-read "helm-mode" "\
@@ -1380,8 +1385,8 @@ Preconfigured helm to show org headlines.
 
 ;;;***
 
-;;;### (autoloads nil "helm-regexp" "helm-regexp.el" (21212 49075
-;;;;;;  57549 235000))
+;;;### (autoloads nil "helm-regexp" "helm-regexp.el" (21260 52335
+;;;;;;  349544 766000))
 ;;; Generated autoloads from helm-regexp.el
 
 (defvar helm-occur-match-plugin-mode t "\
@@ -1437,8 +1442,8 @@ The prefix arg can be set before calling
 
 ;;;***
 
-;;;### (autoloads nil "helm-ring" "helm-ring.el" (21210 9717 862688
-;;;;;;  613000))
+;;;### (autoloads nil "helm-ring" "helm-ring.el" (21260 53563 449555
+;;;;;;  69000))
 ;;; Generated autoloads from helm-ring.el
 
 (autoload 'helm-mark-ring "helm-ring" "\
@@ -1551,8 +1556,8 @@ This function aggregates three sources of tag files:
 
 ;;;***
 
-;;;### (autoloads nil "helm-utils" "helm-utils.el" (21210 9717 938688
-;;;;;;  941000))
+;;;### (autoloads nil "helm-utils" "helm-utils.el" (21262 1304 920823
+;;;;;;  187000))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1635,7 +1640,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21253 45180 464858 259000))
+;;;;;;  (21264 42433 366699 389000))
 
 ;;;***
 
