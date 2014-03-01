@@ -615,7 +615,7 @@ words from the buffer into the new bookmark name."
   "Run `helm-bookmark-edit-bookmark' from keyboard."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'bmkext-edit-bookmark)))
+    (helm-quit-and-execute-action 'helm-bookmark-edit-bookmark)))
 
 
 ;;; Bookmarks attributes
