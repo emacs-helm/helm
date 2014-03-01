@@ -270,6 +270,7 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
 (defvar w3m-async-exec)
 (defun helm-bookmark-jump-w3m (bookmark)
   "Jump to W3m bookmark BOOKMARK, setting a new tab."
+  (require 'helm-net)
   (let ((file  (or (bookmark-prop-get bookmark 'filename)
                    (bookmark-prop-get bookmark 'url)))
         (buf   (generate-new-buffer-name "*w3m*"))
