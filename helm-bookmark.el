@@ -265,8 +265,8 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
            collect (propertize name 'location (bookmark-location name))))
 
 
-;;;; Filtered bookmark sources
-
+;;; Bookmark handlers
+;;
 (defvar w3m-async-exec)
 (defun helm-bookmark-jump-w3m (bookmark)
   "Jump to W3m bookmark BOOKMARK, setting a new tab."
@@ -290,6 +290,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
 (defalias 'bookmarkp-jump-woman 'woman-bookmark-jump)
 (defalias 'bookmarkp-jump-man 'Man-bookmark-jump)
 
+
+;;;; Filtered bookmark sources
+
 ;;; W3m bookmarks.
 ;;
 (defvar helm-source-bookmark-w3m
@@ -301,7 +304,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-w3m-setup-alist ()
@@ -319,7 +324,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-images-setup-alist ()
@@ -337,7 +344,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-man-setup-alist ()
@@ -355,7 +364,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-gnus-setup-alist ()
@@ -373,7 +384,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-info-setup-alist ()
@@ -391,7 +404,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (candidates-in-buffer)
     (search helm-bookmark-search-fn)
     (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (type . bookmark)))
 
 (defun helm-bookmark-local-files-setup-alist ()
@@ -418,7 +433,9 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
                      candidate)))
            (bookmark--jump-via bmk 'switch-to-buffer))))
     (persistent-help . "Show contact - Prefix with C-u to append")
-    (filtered-candidate-transformer . helm-highlight-bookmark)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
     (action . (("Show Contact(s)"
                 . (lambda (candidate)
                     (let* ((contacts (helm-marked-candidates))
