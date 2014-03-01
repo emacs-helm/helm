@@ -267,6 +267,28 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
 
 ;;;; Filtered bookmark sources
 
+(defvar w3m-async-exec)
+(defun helm-bookmark-jump-w3m (bookmark)
+  "Jump to W3m bookmark BOOKMARK, setting a new tab."
+  (let ((file  (or (bookmark-prop-get bookmark 'filename)
+                   (bookmark-prop-get bookmark 'url)))
+        (buf   (generate-new-buffer-name "*w3m*"))
+        (w3m-async-exec nil)
+        (really-use-w3m (equal browse-url-browser-function 'w3m-browse-url)))
+    (helm-browse-url file really-use-w3m)
+    (when really-use-w3m
+      (bookmark-default-handler
+       `("" (buffer . ,buf) . ,(bookmark-get-bookmark-record bookmark))))))
+
+(defalias 'bmkext-jump-woman 'woman-bookmark-jump)
+(defalias 'bmkext-jump-man 'Man-bookmark-jump)
+(defalias 'bmkext-jump-w3m 'helm-bookmark-jump-w3m)
+(defalias 'bmkext-jump-gnus 'gnus-summary-bookmark-jump)
+(defalias 'bookmarkp-jump-gnus 'gnus-summary-bookmark-jump)
+(defalias 'bookmarkp-jump-w3m 'helm-bookmark-jump-w3m)
+(defalias 'bookmarkp-jump-woman 'woman-bookmark-jump)
+(defalias 'bookmarkp-jump-man 'Man-bookmark-jump)
+
 ;;; W3m bookmarks.
 ;;
 (defvar helm-source-bookmark-w3m
