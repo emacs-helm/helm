@@ -251,10 +251,23 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
     (and filename (not isnonfile) (not (bookmark-get-handler bookmark)))))
 
 (defun helm-bookmark-addressbook-p (bookmark)
+  "Return non--nil if BOOKMARK is a contact recorded with addressbook-bookmark.
+BOOKMARK is a bookmark name or a bookmark record."
   (if (listp bookmark)
       (string= (assoc-default 'type bookmark) "addressbook")
       (string= (assoc-default
                 'type (assoc bookmark bookmark-alist)) "addressbook")))
+
+(defun helm-bookmark-uncategorized-bookmark-p (bookmark)
+  "Return non--nil if BOOKMARK match no known category."
+  (and (not (helm-bookmark-addressbook-p bookmark))
+       (not (helm-bookmark-gnus-bookmark-p bookmark))
+       (not (helm-bookmark-w3m-bookmark-p bookmark))
+       (not (helm-bookmark-woman-man-bookmark-p bookmark))
+       (not (helm-bookmark-info-bookmark-p bookmark))
+       (not (helm-bookmark-image-bookmark-p bookmark))
+       (not (helm-bookmark-file-p bookmark))
+       (not (helm-bookmark-addressbook-p bookmark))))
 
 (defun helm-bookmark-filter-setup-alist (fn)
   "Return a filtered `bookmark-alist' sorted alphabetically."
@@ -501,6 +514,24 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
   "Specialized filter function for addressbook bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-addressbook-p))
 
+(defvar helm-source-bookmark-uncategorized
+  '((name . "Bookmark uncategorized")
+    (init . (lambda ()
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+               'global (helm-bookmark-uncategorized-setup-alist))))
+    (candidates-in-buffer)
+    (search helm-bookmark-search-fn)
+    (match-part . helm-pp-bookmark-match-fn)
+    (filtered-candidate-transformer
+     helm-adaptive-sort
+     helm-highlight-bookmark)
+    (type . bookmark)))
+
+(defun helm-bookmark-uncategorized-setup-alist ()
+  "Specialized filter function for uncategorized bookmarks."
+  (helm-bookmark-filter-setup-alist 'helm-bookmark-uncategorized-bookmark-p))
+
 ;;; Transformer
 ;;
 
@@ -713,7 +744,8 @@ only if external library addressbook-bookmark.el is available."
                            helm-source-bookmark-gnus
                            helm-source-bookmark-man
                            helm-source-bookmark-images
-                           helm-source-bookmark-w3m)
+                           helm-source-bookmark-w3m
+                           helm-source-bookmark-uncategorized)
                          (and (locate-library "addressbook-bookmark")
                               (list helm-source-bookmark-addressbook)))
         :buffer "*helm filtered bookmarks*"))
