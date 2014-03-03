@@ -84,6 +84,11 @@ When disabled (nil) use the longest buffer-name length found."
   "Face used for process status in buffer."
   :group 'helm-buffers)
 
+(defface helm-buffer-directory
+    '((t (:foreground "DarkRed" :background "LightGray")))
+  "Face used for directories in `helm-buffers-list'."
+  :group 'helm-files)
+
 
 ;;; Buffers keymap
 ;;
@@ -252,7 +257,7 @@ See `ido-make-buffer-list' for more infos."
        (rassoc buf dired-buffers)
        (helm-buffer--show-details
         name name-prefix dir size mode dir
-        'helm-ff-directory 'helm-buffer-process nil details))
+        'helm-buffer-directory 'helm-buffer-process nil details))
       ;; A buffer file modified somewhere outside of emacs.=>red
       ((and file-name (file-exists-p file-name)
             (not (verify-visited-file-modtime buf)))
