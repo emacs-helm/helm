@@ -939,9 +939,7 @@ Can be used as value for `completion-in-region-function'."
       (delete-region (if (and file-comp-p
                               (save-excursion
                                 (re-search-backward
-                                 "~?/"
-                                 (previous-single-property-change
-                                  (point) 'read-only) t)))
+                                 "~?/" (comint-line-beginning-position) t)))
                          (match-end 0) start)
                      end)
       (insert result))))
