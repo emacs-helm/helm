@@ -565,7 +565,7 @@ ACTION must be an action supported by `helm-dired-action'."
 
 (defun helm-find-files-grep (_candidate)
   "Default action to grep files from `helm-find-files'."
-  (apply 'run-with-idle-timer 0.01 nil
+  (apply 'run-with-timer 0.01 nil
          #'helm-do-grep-1
          (helm-marked-candidates :with-wildcard t)
          helm-current-prefix-arg))
