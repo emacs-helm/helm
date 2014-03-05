@@ -938,8 +938,7 @@ Can be used as value for `completion-in-region-function'."
     (when result
       (delete-region (if (and file-comp-p
                               (save-excursion
-                                (re-search-backward
-                                 "~?/" (comint-line-beginning-position) t)))
+                                (re-search-backward "~?/" start t)))
                          (match-end 0) start)
                      end)
       (insert result))))
