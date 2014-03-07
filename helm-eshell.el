@@ -74,9 +74,12 @@ The function that call this should set `helm-ec-target' to thing at point."
                (search-backward helm-ec-target nil t)
                (string= (buffer-substring (point) pt) helm-ec-target))
       (delete-region (point) pt)))
-  (if (string-match "\\`~/" helm-ec-target)
-      (insert (helm-quote-whitespace (abbreviate-file-name candidate)))
-      (insert (helm-quote-whitespace candidate))))
+  (cond ((string-match "\\`~/?" helm-ec-target)
+         (insert (helm-quote-whitespace (abbreviate-file-name candidate))))
+        ((string-match "\\`/" helm-ec-target)
+         (insert (helm-quote-whitespace candidate)))
+        (t
+         (insert (helm-quote-whitespace (file-relative-name candidate))))))
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
