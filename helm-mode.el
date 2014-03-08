@@ -941,7 +941,7 @@ Can be used as value for `completion-in-region-function'."
                                 (re-search-backward "~?/" start t)))
                          (match-end 0) start)
                      end)
-      (insert result))))
+      (insert (shell-quote-argument result)))))
 
 (defun helm-mode--in-file-completion-p (target candidate)
   (when (and candidate target)
