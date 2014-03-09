@@ -925,15 +925,11 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 
 (defun helm-grep-filter-one-by-one (candidate)
   "`filter-one-by-one' transformer function for `helm-do-grep'."
-  (helm-grep--filter-candidate-1 candidate))
-  
-(defun helm-grep-cand-transformer (candidates _source)
-  "`filtered-candidate-transformer' function for `helm-do-grep'."
-  (cl-loop with root = (and helm-grep-default-directory-fn
-                            (funcall helm-grep-default-directory-fn))
-           for i in candidates
-           for cand = (helm-grep--filter-candidate-1 i root)
-           when cand collect cand))
+  (let ((helm-grep-default-directory-fn
+         (lambda () (or helm-ff-default-directory
+                        helm-default-directory
+                        default-directory))))
+    (helm-grep--filter-candidate-1 candidate)))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
