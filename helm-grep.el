@@ -926,9 +926,10 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 (defun helm-grep-filter-one-by-one (candidate)
   "`filter-one-by-one' transformer function for `helm-do-grep'."
   (let ((helm-grep-default-directory-fn
-         (lambda () (or helm-ff-default-directory
-                        helm-default-directory
-                        default-directory))))
+         (or helm-grep-default-directory-fn
+             (lambda () (or helm-ff-default-directory
+                            helm-default-directory
+                            default-directory)))))
     (helm-grep--filter-candidate-1 candidate)))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
