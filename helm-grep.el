@@ -262,13 +262,14 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
       (cl-loop for i in candidates append
                (cond ((string-match "^git" helm-grep-default-command)
                       (list i))
-                     ;; Candidate is a directory and we use recursion.
+                     ;; Candidate is a directory and we use recursion or ack.
                      ((and (file-directory-p i)
-                           helm-grep-in-recurse)
+                           (or helm-grep-in-recurse
+                               ;; ack-grep accept directory [1].
+                               (helm-grep-use-ack-p)))
                       (list (expand-file-name i)))
-                     ((and (file-directory-p i)
-                           ;; ack-grep accept directory [1].
-                           (not (helm-grep-use-ack-p)))
+                     ;; Grep doesn't support directory only when not in recurse.
+                     ((file-directory-p i)
                       (file-expand-wildcards
                        (concat (file-name-as-directory (expand-file-name i)) "*") t))
                      ;; Candidate is a file or wildcard and we use recursion, use the
