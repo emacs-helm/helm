@@ -29,8 +29,8 @@
 (defun helm-top-command-set-fn (var _value)
   (set var
        (cl-case system-type
-         (darwin "ps --columns %s axo pid,user,priority,psr,ni,c,sz,start,%%cpu,%%mem,time,comm")
-         (t "env COLUMNS=%s top -b -n 1"))))
+         (darwin "env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start,vsz,%%cpu,%%mem,etime,command")
+         (t      "env COLUMNS=%s top -b -n 1"))))
 
 (defcustom helm-top-command "env COLUMNS=%s top -b -n 1"
   "Top command used to display output of top.
@@ -39,7 +39,8 @@ On Mac OSX top command doesn't support this, so ps command
 is used by default instead.
 If you modify this the number and order of elements displayed
 should be the same as top command to have the sort commands
-working properly. 
+working properly, that is 12 elements with the 2 first being
+PID and USER and the last 4 being %CPU, %MEM, TIME and COMMAND.
 A format string where %s will be replaced with `frame-width'."
   :group 'helm-sys
   :type 'string
