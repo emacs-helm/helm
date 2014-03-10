@@ -694,9 +694,8 @@ Keys description:
          (helm-mp-highlight-delay nil)
          ;; Be sure we don't erase the underlying minibuffer if some.
          (helm-ff-auto-update-initial-value
-          (unless (null helm-ff-auto-update-flag)
-            (and helm-ff-auto-update-initial-value
-                 (not (minibuffer-window-active-p (minibuffer-window))))))
+          (and helm-ff-auto-update-initial-value
+               (not (minibuffer-window-active-p (minibuffer-window)))))
          helm-full-frame
          (hist (and history (helm-comp-read-get-candidates
                              history nil nil alistp)))

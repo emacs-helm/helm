@@ -486,7 +486,7 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-split-window-in-side-p
          (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
-         helm-ff-auto-update-flag
+         helm-ff-auto-update-initial-value
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
                    (mapcar #'(lambda (f)
