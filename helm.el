@@ -350,7 +350,8 @@ See `helm-case-fold-search' for more info."
 (defcustom helm-reuse-last-window-split-state nil
   "Reuse the last state of window split, vertical or horizontal.
 That is when you use `helm-toggle-resplit-window' the next helm session
-will reuse the same window scheme than the one of last session."
+will reuse the same window scheme than the one of last session unless
+`helm-split-window-default-side' is 'same or 'other."
   :group 'helm
   :type 'boolean)
 
@@ -363,12 +364,16 @@ will reuse the same window scheme than the one of last session."
   "The default side to display `helm-buffer'.
 Must be one acceptable arg for `split-window' SIDE,
 that is 'below, 'above, 'left or 'right.
-Another acceptable value is 'same which always display `helm-buffer'
-in current window.
+
+Other acceptable values are 'same which always display `helm-buffer'
+in current window and 'other that display `helm-buffer' below if only one
+window or in `other-window-for-scrolling' if available.
+
 A nil value as same effect as 'below.
 If `helm-full-frame' is non--nil, it take precedence on this.
 
-See also `helm-split-window-in-side-p'.
+See also `helm-split-window-in-side-p' and `helm-always-two-windows' that
+take precedence on this.
 
 NOTE: this have no effect if `helm-split-window-preferred-function' is not
 `helm-split-window-default-fn' unless this new function handle this."
@@ -1824,7 +1829,8 @@ window or frame configuration is saved/restored according to values of
         (if (or (one-window-p t)
                 helm-split-window-in-side-p)
             (split-window
-             (selected-window) nil helm-split-window-default-side)
+             (selected-window) nil (if (eq helm-split-window-default-side 'other)
+                                       'below helm-split-window-default-side))
             ;; If more than one window reuse one of them.
             (cl-case helm-split-window-default-side
               (left  (or (helm-window-in-direction 'left)
@@ -1840,6 +1846,7 @@ window or frame configuration is saved/restored according to values of
                          (helm-window-in-direction 'right)
                          (selected-window)))
               (same  (selected-window))
+              (other (other-window-for-scrolling))
               (t     (or (window-next-sibling) (selected-window)))))
         (split-window-sensibly window))))
 
@@ -1862,6 +1869,7 @@ The function used to display `helm-buffer'."
          (if (and (not helm-full-frame)
                   helm-reuse-last-window-split-state)
              (cond ((eq helm-split-window-default-side 'same) 'same)
+                   ((eq helm-split-window-default-side 'other) 'other)
                    (helm--window-side-state)
                    (t helm-split-window-default-side))
              helm-split-window-default-side)))
