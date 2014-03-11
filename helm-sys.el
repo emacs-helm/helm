@@ -88,7 +88,18 @@ Show actions only on line starting by a PID."
     (cond ((string-match "^ *[0-9]+" disp)
            (list '("kill (SIGTERM)" . (lambda (pid) (helm-top-sh "TERM" pid)))
                  '("kill (SIGKILL)" . (lambda (pid) (helm-top-sh "KILL" pid)))
-                 '("Copy PID" . (lambda (pid) (kill-new pid)))))
+                 '("kill (SIGINT)" .  (lambda (pid) (helm-top-sh "INT" pid)))
+                 '("kill (Choose signal)"
+                   . (lambda (pid)
+                       (helm-top-sh
+                        (helm-comp-read (format "Kill [%s] with signal: " pid)
+                                        '("ALRM" "HUP" "INT" "KILL" "PIPE" "POLL"
+                                          "PROF" "TERM" "USR1" "USR2" "VTALRM"
+                                          "STKFLT" "PWR" "WINCH" "CHLD" "URG"
+                                          "TSTP" "TTIN" "TTOU" "STOP" "CONT"
+                                          "ABRT" "FPE" "ILL" "QUIT" "SEGV"
+                                          "TRAP" "SYS" "EMT" "BUS" "XCPU" "XFSZ"))
+                        pid)))))
           (t actions))))
 
 (defun helm-top-sh (sig pid)
