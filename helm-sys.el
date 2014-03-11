@@ -98,7 +98,8 @@ Show actions only on line starting by a PID."
                                           "STKFLT" "PWR" "WINCH" "CHLD" "URG"
                                           "TSTP" "TTIN" "TTOU" "STOP" "CONT"
                                           "ABRT" "FPE" "ILL" "QUIT" "SEGV"
-                                          "TRAP" "SYS" "EMT" "BUS" "XCPU" "XFSZ"))
+                                          "TRAP" "SYS" "EMT" "BUS" "XCPU" "XFSZ")
+                                        :must-match t)
                         pid)))))
           (t actions))))
 
