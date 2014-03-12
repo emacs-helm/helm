@@ -860,7 +860,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                           ("Find file other window" . helm-grep-other-window))))
             (persistent-action . helm-grep-persistent-action)
             (persistent-help . "Jump to line (`C-u' Record in mark ring)")
-            (requires-pattern . 3)))
+            (requires-pattern . 2)))
     (and follow (helm-attrset 'follow follow helm-source-grep))
     (helm
      :sources '(helm-source-grep)
@@ -1078,7 +1078,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (mode-line . helm-pdfgrep-mode-line-string)
         (action . helm-pdfgrep-action)
         (persistent-help . "Jump to PDF Page")
-        (requires-pattern . 3)))
+        (requires-pattern . 2)))
      :buffer "*helm pdfgrep*"
      :history 'helm-grep-history)))
 
