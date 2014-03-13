@@ -85,6 +85,74 @@ a personal url, see your settings on duckduckgo."
   :type 'string
   :group 'helm-net)
 
+(defcustom helm-search-suggest-action-wikipedia-url
+  "https://en.wikipedia.org/wiki/Special:Search?search=%s"
+  "The Wikipedia search url.
+This is a format string, don't forget the `%s'."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-search-suggest-action-youtube-url
+  "http://www.youtube.com/results?aq=f&search_query=%s"
+  "The Youtube search url.
+This is a format string, don't forget the `%s'."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-search-suggest-action-imdb-url
+  "http://www.imdb.com/find?s=all&q=%s"
+  "The IMDb search url.
+This is a format string, don't forget the `%s'."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-search-suggest-action-google-maps-url
+  "http://maps.google.com/maps?f=q&source=s_q&q=%s"
+  "The Google Maps search url.
+This is a format string, don't forget the `%s'."
+  :type 'string
+  :group 'helm-net)
+
+(defcustom helm-search-suggest-action-google-news-url
+  "http://www.google.com/search?safe=off&prmd=nvlifd&source=lnms&tbs=nws:1&q=%s"
+  "The Google News search url.
+This is a format string, don't forget the `%s'."
+  :type 'string
+  :group 'helm-net)
+
+
+;;; Additional actions for search suggestions
+;;
+;;
+;; Internal
+
+(defun helm-search-suggest-perform-additional-action (url query)
+  "Perform the search via URL using QUERY as input."
+  (browse-url (format url (url-hexify-string query))))
+
+(defvar helm-search-suggest-additional-actions
+  '(("Wikipedia" . (lambda (candidate)
+                     (helm-search-suggest-perform-additional-action
+                      helm-search-suggest-action-wikipedia-url
+                      candidate)))
+    ("Youtube" . (lambda (candidate)
+                   (helm-search-suggest-perform-additional-action
+                    helm-search-suggest-action-youtube-url
+                    candidate)))
+    ("IMDb" . (lambda (candidate)
+                (helm-search-suggest-perform-additional-action
+                 helm-search-suggest-action-imdb-url
+                 candidate)))
+    ("Google Maps" . (lambda (candidate)
+                       (helm-search-suggest-perform-additional-action
+                        helm-search-suggest-action-google-maps-url
+                        candidate)))
+    ("Google News" . (lambda (candidate)
+                       (helm-search-suggest-perform-additional-action
+                        helm-search-suggest-action-google-news-url
+                        candidate))))
+  "List of additional actions for suggest sources.")
+
 
 ;;; Google Suggestions
 ;;
@@ -197,10 +265,11 @@ Return an alist with elements like (data . number_results)."
   "Default function to use in helm google suggest.")
 
 (defvar helm-source-google-suggest
-  '((name . "Google Suggest")
+  `((name . "Google Suggest")
     (candidates . (lambda ()
                     (funcall helm-google-suggest-default-function)))
-    (action . (("Google Search" . helm-google-suggest-action)))
+    (action . ,(cons '("Google Search" . helm-google-suggest-action)
+                     helm-search-suggest-additional-actions))
     (volatile)
     (requires-pattern . 3)))
 
