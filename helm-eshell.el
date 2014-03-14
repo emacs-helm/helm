@@ -84,7 +84,9 @@ The function that call this should set `helm-ec-target' to thing at point."
         ((string-match "\\`/" helm-ec-target)
          (insert (helm-quote-whitespace candidate)))
         (t
-         (insert (helm-quote-whitespace (file-relative-name candidate))))))
+         (insert (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
+                         (helm-quote-whitespace
+                          (file-relative-name candidate)))))))
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
