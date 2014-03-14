@@ -282,7 +282,9 @@ BOOKMARK is a bookmark name or a bookmark record."
 ;;
 (defvar w3m-async-exec)
 (defun helm-bookmark-jump-w3m (bookmark)
-  "Jump to W3m bookmark BOOKMARK, setting a new tab."
+  "Jump to W3m bookmark BOOKMARK, setting a new tab.
+If `browse-url-browser-function' is set to something else
+than `w3m-browse-url' use it."
   (require 'helm-net)
   (let ((file  (or (bookmark-prop-get bookmark 'filename)
                    (bookmark-prop-get bookmark 'url)))
@@ -294,6 +296,14 @@ BOOKMARK is a bookmark name or a bookmark record."
       (bookmark-default-handler
        `("" (buffer . ,buf) . ,(bookmark-get-bookmark-record bookmark))))))
 
+;; All bookmarks recorded with the handler provided with w3m
+;; (`bookmark-w3m-bookmark-jump') will use our handler which open
+;; the bookmark in a new tab or in an external browser depending
+;; on `browse-url-browser-function'.
+(defalias 'bookmark-w3m-bookmark-jump 'helm-bookmark-jump-w3m)
+
+;; Provide compatibility with old handlers provided in external
+;; packages bookmark-extensions.el and bookmark+.
 (defalias 'bmkext-jump-woman 'woman-bookmark-jump)
 (defalias 'bmkext-jump-man 'Man-bookmark-jump)
 (defalias 'bmkext-jump-w3m 'helm-bookmark-jump-w3m)
