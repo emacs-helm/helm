@@ -745,10 +745,13 @@ only if external library addressbook-bookmark.el is available."
                            helm-source-bookmark-man
                            helm-source-bookmark-images
                            helm-source-bookmark-w3m
-                           helm-source-bookmark-uncategorized)
+                           helm-source-bookmark-uncategorized
+                           helm-source-bookmark-set)
                          (and (locate-library "addressbook-bookmark")
                               (list helm-source-bookmark-addressbook)))
-        :buffer "*helm filtered bookmarks*"))
+        :prompt "Search Bookmark: "
+        :buffer "*helm filtered bookmarks*"
+        :default (buffer-name helm-current-buffer)))
 
 (provide 'helm-bookmark)
 
