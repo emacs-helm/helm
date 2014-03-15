@@ -921,9 +921,9 @@ Can be used as value for `completion-in-region-function'."
                          input)
                         (t (concat input " ")))
                   :buffer buf-name
-                  :fc-transformer (append (list (lambda (candidates _source)
-                                                  (sort candidates 'helm-generic-sort-fn)))
-                                          (list 'helm-cr-default-transformer))
+                  :fc-transformer (append (list 'helm-cr-default-transformer)
+                                          (list (lambda (candidates _source)
+                                                  (sort candidates 'helm-generic-sort-fn))))
                   :exec-when-only-one t
                   :quit-when-no-cand
                   #'(lambda ()
