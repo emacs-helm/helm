@@ -576,9 +576,14 @@ See documentation of `completing-read' and `all-completions' for details."
          (any-args        (append def-args (list str-command buf-name)))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message
-         (minibuffer-completion-table collection)
-         (minibuffer-completion-predicate predicate)
          ;; Be sure this pesty *completion* buffer doesn't popup.
+         ;; Note: `minibuffer-with-setup-hook' may setup a lambda
+         ;; calling `minibuffer-completion-help' or other minibuffer
+         ;; functions we DONT WANT here, in these cases removing the hook
+         ;; (a symbol) have no effect. Issue #448.
+         ;; But because `minibuffer-completion-table' and
+         ;; `minibuffer-completion-predicate' are not bound
+         ;; anymore here, these functions should have no effect now.
          (minibuffer-setup-hook (remove 'minibuffer-completion-help
                                         minibuffer-setup-hook))
          ;; Disable hack that could be used before `completing-read'.
