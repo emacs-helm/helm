@@ -1927,8 +1927,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                        (set-text-properties 0 (length fname)
                                                             nil fname)
                                        (insert fname))))))
-    (cond ((and (string= (helm-ff-set-pattern helm-pattern)
-                         "Invalid tramp file name")
+    (cond ((and (helm-ff-invalid-tramp-name-p)
                 (string-match helm-tramp-file-name-regexp candidate))
            ;; First hit insert hostname and
            ;; second hit insert ":" and expand.
