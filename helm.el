@@ -2546,6 +2546,12 @@ and `helm-pattern'."
             (helm-insert-match match 'insert source))
           (put-text-property start (point) 'helm-multiline t)))))
 
+(defmacro helm--maybe-use-while-no-input (&rest body)
+  `(progn
+     (if (string-match helm-tramp-file-name-regexp helm-pattern)
+         ,@body
+         (helm-while-no-input ,@body))))
+
 (cl-defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
 Move selection to string or regexp PRESELECT if non--nil.
@@ -2558,9 +2564,9 @@ when emacs is idle for `helm-idle-delay'."
     (with-current-buffer (helm-buffer-get)
       (save-excursion
         (goto-char (point-max))
-        (cl-loop with matches = (helm-while-no-input
-                                  (cl-loop for src in delayed-sources
-                                           collect (helm-compute-matches src)))
+        (cl-loop with matches = (helm--maybe-use-while-no-input
+                                 (cl-loop for src in delayed-sources
+                                          collect (helm-compute-matches src)))
                  when (eq matches t) do (setq matches nil)
                  for src in delayed-sources
                  for mtc in matches
