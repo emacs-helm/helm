@@ -2603,7 +2603,8 @@ is done on whole `helm-buffer' and not on current source."
       (unwind-protect
            (helm-while-no-input
             ;; Iterate over all the sources
-            (cl-loop for source in (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
+             (cl-loop for source in (cl-remove-if-not
+                                     'helm-update-source-p (helm-get-sources))
                      if (helm-delayed-source-p source)
                      ;; Delayed sources just get collected for later
                      ;; processing
