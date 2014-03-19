@@ -2143,6 +2143,7 @@ This can be useful for e.g writing quietly a complex regexp."
 (defadvice tramp-read-passwd (around disable-helm-update activate)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
+  (setq inhibit-quit t)
   (unwind-protect
        ad-do-it
     (setq helm-suspend-update-flag nil)))
@@ -2292,7 +2293,8 @@ Helm plug-ins are realized by this function."
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but without testing with `input-pending-p'."
   (declare (debug t) (indent 0))
-  (let ((catch-sym (make-symbol "input")))
+  (let ((catch-sym (make-symbol "input"))
+        inhibit-quit)
     `(with-local-quit
        (catch ',catch-sym
 	 (let ((throw-on-input ',catch-sym))
@@ -2536,13 +2538,13 @@ and `helm-pattern'."
         (mapc #'(lambda (m)
                   (helm-insert-match m 'insert source))
               matches)
-      (let ((start (point)) separate)
-        (cl-dolist (match matches)
-          (if separate
-              (helm-insert-candidate-separator)
-            (setq separate t))
-          (helm-insert-match match 'insert source))
-        (put-text-property start (point) 'helm-multiline t)))))
+        (let ((start (point)) separate)
+          (cl-dolist (match matches)
+            (if separate
+                (helm-insert-candidate-separator)
+                (setq separate t))
+            (helm-insert-match match 'insert source))
+          (put-text-property start (point) 'helm-multiline t)))))
 
 (cl-defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
@@ -2556,13 +2558,13 @@ when emacs is idle for `helm-idle-delay'."
     (with-current-buffer (helm-buffer-get)
       (save-excursion
         (goto-char (point-max))
-        (helm-while-no-input
-          (cl-loop with matches = (cl-loop for src in delayed-sources
-                                           collect (helm-compute-matches src))
-                   unless matches do (cl-return)
-                   for src in delayed-sources
-                   for mtc in matches
-                   do (helm-render-source src mtc)))
+        (cl-loop with matches = (helm-while-no-input
+                                  (cl-loop for src in delayed-sources
+                                           collect (helm-compute-matches src)))
+                 when (eq matches t) do (setq matches nil)
+                 for src in delayed-sources
+                 for mtc in matches
+                 do (helm-render-source src mtc))
         (when (and (not (helm-empty-buffer-p))
                    ;; No selection yet.
                    (= (overlay-start helm-selection-overlay)
