@@ -2143,7 +2143,7 @@ This can be useful for e.g writing quietly a complex regexp."
 (defadvice tramp-read-passwd (around disable-helm-update activate)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
-  (setq inhibit-quit t)
+  (setq inhibit-quit t) ; Send `inhibit-quit' to `helm-while-no-input'.
   (unwind-protect
        ad-do-it
     (setq helm-suspend-update-flag nil)))
