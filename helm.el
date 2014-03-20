@@ -2548,7 +2548,8 @@ and `helm-pattern'."
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
   `(progn
-     (if (string-match helm-tramp-file-name-regexp helm-pattern)
+     (if (and (file-remote-p helm-pattern)
+              (not (file-remote-p helm-pattern nil t)))
          ,@body
          (helm-while-no-input ,@body))))
 
