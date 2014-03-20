@@ -242,7 +242,7 @@ See `ido-make-buffer-list' for more infos."
                           'face face2)))))
 
 (defun helm-buffer--details (buffer &optional details)
-  (let* ((mode (with-current-buffer buffer (symbol-name major-mode)))
+  (let* ((mode (with-current-buffer buffer mode-name))
          (buf (get-buffer buffer))
          (size (propertize (helm-buffer-size buf)
                            'face 'helm-buffer-size))
