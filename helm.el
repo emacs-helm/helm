@@ -2553,6 +2553,7 @@ and `helm-pattern'."
               (not (file-remote-p helm-pattern nil t)))
          ;; Tramp will ask for passwd, don't use `helm-while-no-input'.
          ,@body
+         (helm-log "Using here `helm-while-no-input'")
          (helm-while-no-input ,@body))))
 
 (cl-defun helm-process-delayed-sources (delayed-sources &optional preselect source)
