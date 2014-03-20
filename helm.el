@@ -2547,9 +2547,11 @@ and `helm-pattern'."
           (put-text-property start (point) 'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
+  "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
   `(progn
      (if (and (file-remote-p helm-pattern)
               (not (file-remote-p helm-pattern nil t)))
+         ;; Tramp will ask for passwd, don't use `helm-while-no-input'.
          ,@body
          (helm-while-no-input ,@body))))
 
