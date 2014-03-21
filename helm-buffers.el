@@ -376,7 +376,7 @@ with name matching pattern."
          (buf  (get-buffer cand)))
     (when buf
       (with-current-buffer buf
-        (let ((mjm   (symbol-name major-mode))
+        (let ((mjm   (format-mode-line mode-name))
               (split (split-string helm-pattern)))
           (cond ((string-match "^@" helm-pattern)
                  (or (helm-buffers-match-inside cand split)
