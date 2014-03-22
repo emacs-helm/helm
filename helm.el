@@ -2579,14 +2579,14 @@ when emacs is idle for `helm-idle-delay'."
                    (= (overlay-start helm-selection-overlay)
                       (overlay-end helm-selection-overlay)))
           (helm-update-move-first-line 'without-hook)))
-      (when preselect (helm-preselect preselect source))
       (save-excursion
         (goto-char (point-min))
         (helm-log-run-hook 'helm-update-hook))
       (setq helm-force-updating-p nil)
       (unless (assoc 'candidates-process source)
         (helm-display-mode-line (helm-get-current-source))
-        (helm-log-run-hook 'helm-after-update-hook)))))
+        (helm-log-run-hook 'helm-after-update-hook))
+      (when preselect (helm-preselect preselect source)))))
 
 
 ;;; Core: helm-update
