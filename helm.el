@@ -1614,6 +1614,10 @@ in source."
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
+  ;; Activate the advice for `tramp-read-passwd'.
+  (if (fboundp 'advice-add)
+      (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
+      (ad-activate 'tramp-read-passwd))
   (catch 'exit ; `exit-minibuffer' use this tag on exit.
     (helm-log (concat "[Start session] " (make-string 41 ?+)))
     (helm-log-eval any-prompt any-preselect
@@ -1661,6 +1665,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
               (helm-restore-position-on-quit)
               (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
               nil))
+        (if (fboundp 'advice-add)
+            (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
+            (ad-deactivate 'tramp-read-passwd))
         (helm-log-eval (setq helm-alive-p nil))
         (setq overriding-local-map old-overridding-local-map)
         (setq helm-alive-p nil)
@@ -2140,21 +2147,24 @@ This can be useful for e.g writing quietly a complex regexp."
                "Helm update suspended!"
                "Helm update reenabled!")))
 
-(defadvice tramp-read-passwd (around disable-helm-update activate)
+(defadvice tramp-read-passwd (around disable-helm-update)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (unwind-protect
-       ad-do-it
+       (progn
+         (with-timeout-suspend)
+         ad-do-it)
     (setq helm-suspend-update-flag nil)))
 
 ;; Use this once `defadvice' will be made obsolete.
-;; (defun helm--advice-tramp-read-passwd (old--fn &rest args)
-;;   ;; Suspend update when prompting for a tramp password.
-;;   (setq helm-suspend-update-flag t)
-;;   (unwind-protect
-;;        (apply old--fn args)
-;;     (setq helm-suspend-update-flag nil)))
-;; (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
+(defun helm--advice-tramp-read-passwd (old--fn &rest args)
+  ;; Suspend update when prompting for a tramp password.
+  (setq helm-suspend-update-flag t)
+  (unwind-protect
+       (progn
+         (with-timeout-suspend)
+         (apply old--fn args))
+    (setq helm-suspend-update-flag nil)))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
