@@ -2162,8 +2162,9 @@ This can be useful for e.g writing quietly a complex regexp."
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (unwind-protect
-       (apply old--fn args))
-  (setq helm-suspend-update-flag nil))
+       ;; No need to suspend timer in emacs-24.4
+       (apply old--fn args)
+    (setq helm-suspend-update-flag nil)))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
