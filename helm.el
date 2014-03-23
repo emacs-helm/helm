@@ -2161,13 +2161,9 @@ This can be useful for e.g writing quietly a complex regexp."
 (defun helm--advice-tramp-read-passwd (old--fn &rest args)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
-  (let (stimers)
-    (unwind-protect
-         (progn
-           (setq stimers (with-timeout-suspend))
-           (apply old--fn args))
-      (with-timeout-unsuspend stimers)
-      (setq helm-suspend-update-flag nil))))
+  (unwind-protect
+       (apply old--fn args))
+  (setq helm-suspend-update-flag nil))
 
 (defun helm-maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
