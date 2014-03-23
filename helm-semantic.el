@@ -102,6 +102,7 @@
   (let ((str (thing-at-point 'symbol)))
     (helm :sources 'helm-source-semantic
           :default (list (concat "\\_<" str "\\_>") str)
+          :candidate-number-limit 9999
           :buffer "*helm semantic*")))
 
 ;;;###autoload
@@ -124,6 +125,7 @@ Fill in the symbol at point by default."
     (helm :sources source
           :default (list (concat "\\_<" str "\\_>") str)
           :buffer "*helm semantic/imenu*"
+          :candidate-number-limit 9999
           :preselect (unless imenu-p (thing-at-point 'symbol)))))
 
 (provide 'helm-semantic)
