@@ -1071,7 +1071,7 @@ The checksum is copied to kill-ring."
         (not helm-ff-transformer-show-only-basename))
   (let ((target (if helm-ff-transformer-show-only-basename
                     (helm-basename candidate) candidate)))
-    (helm-force-update target)))
+    (helm-force-update (regexp-quote target))))
 
 (defun helm-ff-run-toggle-basename ()
   (interactive)
