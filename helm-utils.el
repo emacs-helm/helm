@@ -411,8 +411,9 @@ from its directory."
    (lambda (f)
      (if (file-exists-p f)
          (helm-find-files-1 (file-name-directory f)
-                            (if helm-ff-transformer-show-only-basename
-                                (helm-basename f) f))
+                            (regexp-quote
+                             (if helm-ff-transformer-show-only-basename
+                                 (helm-basename f) f)))
          (helm-find-files-1 f)))
    (let* ((sel       (helm-get-selection))
           (grep-line (and (stringp sel)
