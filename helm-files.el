@@ -1544,7 +1544,7 @@ Note that only directories are saved here."
          (append helm-files-save-history-extra-sources
                  helm-file-completion-sources)))
     (when (or force (helm-file-completion-source-p))
-      (let ((mkd (helm-marked-candidates :with-wildcard t))
+      (let ((mkd (helm-marked-candidates))
             (history-delete-duplicates t))
         (cl-loop for sel in mkd
                  when (and sel
