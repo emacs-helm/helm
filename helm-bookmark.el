@@ -705,7 +705,7 @@ words from the buffer into the new bookmark name."
   "Delete bookmark from keyboard."
   (interactive)
   (with-helm-alive-p
-    (when (y-or-n-p "Delete bookmark?")
+    (when (y-or-n-p "Delete bookmark(s)?")
       (helm-quit-and-execute-action 'helm-delete-marked-bookmarks))))
 
 (defun helm-bookmark-get-bookmark-from-name (bmk)
