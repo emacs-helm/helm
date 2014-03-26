@@ -1334,7 +1334,7 @@ purpose."
           ((and (string-match ".*\\(~//\\|//\\)\\'" pattern)
                 (not (string-match helm-ff-url-regexp helm-pattern)))
            (expand-file-name "/")) ; Expand to "/" or "c:/"
-          ((string-match "\\`~/\\|.*/~/\\'" pattern)
+          ((string-match "\\`\\(~/\\|.*/~/\\)\\'" pattern)
            (expand-file-name "~/"))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
@@ -1364,7 +1364,7 @@ purpose."
           ;; `helm-ff-auto-update-flag' is enabled to avoid quick expansion.
           ((and (file-accessible-directory-p pattern)
                 helm-ff-auto-update-flag)
-           (file-name-as-directory pattern))
+           (file-name-as-directory (expand-file-name pattern)))
           ;; Return PATTERN unchanged.
           (t pattern))))
 
