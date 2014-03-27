@@ -2650,7 +2650,10 @@ is done on whole `helm-buffer' and not on current source."
                                     normal-sources ns))
              (erase-buffer)
              ;; Render all the sources into the helm buffer after
-             ;; calculating all candidates
+             ;; calculating all candidates.
+             ;; Candidates must be computed AFTER erasing buffer
+             ;; even if it cause flickering; Doing so avoid
+             ;; unexpected results when executing actions.
              (cl-loop with matches = (helm--maybe-use-while-no-input
                                       (cl-loop for src in normal-sources
                                                collect (helm-compute-matches src)))
