@@ -56,6 +56,7 @@
               ;; Remove it for the helm one. (Fixed in Emacs24)
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates . helm-esh-get-candidates)
+    (nomark)
     (persistent-action . ignore)
     (filtered-candidate-transformer
      (lambda (candidates _sources)
@@ -153,6 +154,7 @@ The function that call this should set `helm-ec-target' to thing at point."
               ;; Same comment as in `helm-source-esh'
               (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
     (candidates-in-buffer)
+    (nomark)
     (keymap . ,helm-eshell-history-map)
     (filtered-candidate-transformer . (lambda (candidates sources)
                                         (reverse candidates)))

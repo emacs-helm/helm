@@ -1284,6 +1284,9 @@ HELM-ATTRIBUTE should be a symbol."
   these functions should treat the candidates transformed by the `filter-one-by-one'
   function in consequence.")
 
+(helm-document-attribute 'nomark "optional"
+  "  Don't allow marking candidates when this attribute is present.")
+
 (provide 'helm-help)
 
 ;; Local Variables:

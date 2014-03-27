@@ -66,6 +66,7 @@ A format string where %s will be replaced with `frame-width'."
     (header-name . (lambda (name) (concat name " (Press C-c C-u to refresh)"))) 
     (init . helm-top-init)
     (candidates-in-buffer)
+    (nomark)
     (display-to-real . helm-top-display-to-real)
     (persistent-action . helm-top-sh-persistent-action)
     (persistent-help . "SIGTERM")

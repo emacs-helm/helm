@@ -221,6 +221,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                  sort
                                  (fc-transformer 'helm-cr-default-transformer)
                                  marked-candidates
+                                 nomark
                                  (alistp t))
   "Read a string in the minibuffer, with helm completion.
 
@@ -287,6 +288,8 @@ Keys description:
 - FC-TRANSFORMER: A `filtered-candidate-transformer' function.
 
 - MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
+
+- NOMARK: When non--nil don't allow marking candidates.
 
 - ALISTP: \(default is non--nil\) See `helm-comp-read-get-candidates'.
 
@@ -395,6 +398,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (helm-execute-action-at-once-if-one exec-when-only-one)
            (helm-quit-if-no-candidate quit-when-no-cand)
            result)
+      (when nomark
+        (setq src-list (cl-loop for src in src-list
+                                collect (cons '(nomark) src))))
       (when reverse-history (setq src-list (nreverse src-list)))
       (setq result (helm
                     :sources src-list
@@ -651,6 +657,7 @@ See documentation of `completing-read' and `all-completions' for details."
      must-match
      default
      marked-candidates
+     nomark
      (alistp t)
      (persistent-action 'helm-find-files-persistent-action)
      (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
@@ -678,6 +685,8 @@ Keys description:
 - MUST-MATCH: Can be 'confirm, nil, or t.
 
 - MARKED-CANDIDATES: When non--nil return a list of marked candidates.
+
+- NOMARK: When non--nil don't allow marking candidates.
 
 - ALISTP: Don't use `all-completions' in history (take effect only on history).
 
@@ -761,7 +770,10 @@ Keys description:
                       (volatile)
                       (action . ,action-fn))))
          (result (helm
-                  :sources src-list
+                  :sources (if nomark
+                               (cl-loop for src in src-list
+                                        collect (cons '(nomark) src))
+                               src-list)
                   :input initial-input
                   :prompt prompt
                   :resume 'noresume
@@ -916,6 +928,7 @@ Can be used as value for `completion-in-region-function'."
                                   data)
                           data))
                   :name str-command
+                  :nomark t
                   :initial-input
                   (cond ((and file-comp-p
                               (not (string-match "/\\'" input)))
