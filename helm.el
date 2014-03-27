@@ -2643,19 +2643,14 @@ is done on whole `helm-buffer' and not on current source."
                       ;; processing
                       collect source into ds
                       else
-                      ;; Normal sources also get their matching
-                      ;; candidates collected here, before erasing the
-                      ;; current contents of the helm buffer, so that
-                      ;; their computation doesn't delay the redraw of
-                      ;; the helm buffer and doesn't trigger flicker
+                      ;; Collect the normal sources
                       collect source into ns
                       ;; Export the variables from cl-loop
                       finally (setq delayed-sources ds
                                     normal-sources ns))
-             ;; Finally the helm buffer can be erased
              (erase-buffer)
-             ;; Render all the sources into the helm buffer using the
-             ;; candidates calculated before the erase
+             ;; Render all the sources into the helm buffer after
+             ;; calculating all candidates
              (cl-loop with matches = (helm--maybe-use-while-no-input
                                       (cl-loop for src in normal-sources
                                                collect (helm-compute-matches src)))
