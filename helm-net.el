@@ -85,6 +85,12 @@ a personal url, see your settings on duckduckgo."
   :type 'string
   :group 'helm-net)
 
+(defcustom helm-wikipedia-suggest-url
+  "http://en.wikipedia.org/w/api.php?action=opensearch&search="
+  "Url used for looking up Wikipedia suggestions."
+  :type 'string
+  :group 'helm-net)
+
 (defcustom helm-search-suggest-action-wikipedia-url
   "https://en.wikipedia.org/wiki/Special:Search?search=%s"
   "The Wikipedia search url.
@@ -317,6 +323,40 @@ Return an alist with elements like (data . number_results)."
     (volatile)
     (requires-pattern . 3)))
 
+;;; Wikipedia suggestions
+;;
+;;
+(defun helm-wikipedia-suggest-fetch (input)
+  "Fetch Wikipedia suggestions and return them as a list."
+  (with-current-buffer
+      (url-retrieve-synchronously (concat helm-wikipedia-suggest-url
+                                          (url-hexify-string input)))
+    (goto-char (point-min))
+    (if (re-search-forward "^\\[.+\\[\\(.*\\)\\]\\]" nil t)
+        (let ((results (match-string 1)))
+          (if (> (length results) 0)
+              (mapcar (lambda (item)
+                        ;; convert unicode codes in the string to unicode characterss
+                        (read
+                         (replace-regexp-in-string
+                          "^\\([^\"]\\)" "\"\\1"
+                          (replace-regexp-in-string
+                           "\\([^\"]\\)$" "\\1\""
+                           item))))
+
+                      (split-string results "\",\"")))))))
+
+(defvar helm-source-wikipedia-suggest
+  '((name . "Wikipedia Suggest")
+    (candidates . (lambda ()
+                    (helm-wikipedia-suggest-fetch helm-pattern)))
+    (action . (("Wikipedia" . (lambda (candidate)
+                                (helm-search-suggest-perform-additional-action
+                                 helm-search-suggest-action-wikipedia-url
+                                 candidate)))))
+    (volatile)
+    (requires-pattern . 3)))
+
 
 ;;; Web browser functions.
 ;;
@@ -441,6 +481,12 @@ Return an alist with elements like (data . number_results)."
   "Preconfigured `helm' for Yahoo searching with Yahoo suggest."
   (interactive)
   (helm-other-buffer 'helm-source-yahoo-suggest "*helm yahoo*"))
+
+;;;###autoload
+(defun helm-wikipedia-suggest ()
+  "Preconfigured `helm' for Wikipedia lookup with Wikipedia suggest."
+  (interactive)
+  (helm-other-buffer 'helm-source-wikipedia-suggest "*helm wikipedia*"))
 
 
 (provide 'helm-net)
