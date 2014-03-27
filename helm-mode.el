@@ -762,7 +762,6 @@ Keys description:
                                        (helm-find-files-get-candidates ',must-match)))))
                       (filtered-candidate-transformer . helm-ff-sort-candidates)
                       (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
-                      (delayed)
                       (keymap . ,cmap)
                       (persistent-action . ,persistent-action)
                       (candidate-number-limit . 9999)

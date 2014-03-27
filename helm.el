@@ -2632,37 +2632,36 @@ is done on whole `helm-buffer' and not on current source."
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
     (let (normal-sources
-          normal-sources-candidates
           delayed-sources)
       (unwind-protect
-           (helm-while-no-input
-            ;; Iterate over all the sources
+           (progn
+             ;; Iterate over all the sources
              (cl-loop for source in (cl-remove-if-not
                                      'helm-update-source-p (helm-get-sources))
-                     if (helm-delayed-source-p source)
-                     ;; Delayed sources just get collected for later
-                     ;; processing
-                     collect source into ds
-                     else
-                     ;; Normal sources also get their matching
-                     ;; candidates collected here, before erasing the
-                     ;; current contents of the helm buffer, so that
-                     ;; their computation doesn't delay the redraw of
-                     ;; the helm buffer and doesn't trigger flicker
-                     collect source into ns and
-                     collect (helm-compute-matches source) into nsc
-                     ;; Export the variables from cl-loop
-                     finally (setq delayed-sources ds
-                                   normal-sources ns
-                                   normal-sources-candidates nsc))
-            ;; Finally the helm buffer can be erased
-            (erase-buffer)
-            ;; Render all the sources into the helm buffer using the
-            ;; candidates calculated before the erase
-            (cl-loop for source in normal-sources
-                     for candidates in normal-sources-candidates
-                     do
-                     (helm-render-source source candidates)))
+                      if (helm-delayed-source-p source)
+                      ;; Delayed sources just get collected for later
+                      ;; processing
+                      collect source into ds
+                      else
+                      ;; Normal sources also get their matching
+                      ;; candidates collected here, before erasing the
+                      ;; current contents of the helm buffer, so that
+                      ;; their computation doesn't delay the redraw of
+                      ;; the helm buffer and doesn't trigger flicker
+                      collect source into ns
+                      ;; Export the variables from cl-loop
+                      finally (setq delayed-sources ds
+                                    normal-sources ns))
+             ;; Finally the helm buffer can be erased
+             (erase-buffer)
+             ;; Render all the sources into the helm buffer using the
+             ;; candidates calculated before the erase
+             (cl-loop with matches = (helm--maybe-use-while-no-input
+                                      (cl-loop for src in normal-sources
+                                               collect (helm-compute-matches src)))
+                      for source in normal-sources
+                      for mtc in matches
+                      do (helm-render-source source mtc)))
         (helm-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
         (cond ((and preselect delayed-sources normal-sources)
