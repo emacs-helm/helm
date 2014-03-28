@@ -330,20 +330,28 @@ Return an alist with elements like (data . number_results)."
 (defun helm-wikipedia-suggest-fetch ()
   "Fetch Wikipedia suggestions and return them as a list."
   (require 'json)
-  (with-current-buffer
-      (url-retrieve-synchronously (concat helm-wikipedia-suggest-url
-                                          (url-hexify-string helm-pattern)))
-    (goto-char (point-min))
-    (when (re-search-forward "^\\[.+\\[\\(.*\\)\\]\\]" nil t)
-      (cl-loop for i across (aref (json-read-from-string (match-string 0)) 1)
-               collect i into result
-               finally return (or result
-                                  (append
-                                   result
-                                   (list (cons (format "Search for '%s' on wikipedia"
-                                                       helm-pattern)
-                                               helm-pattern))))))))
+  (let ((request (concat helm-wikipedia-suggest-url
+                         (url-hexify-string helm-pattern))))
+    (if helm-google-suggest-use-curl-p
+        (with-temp-buffer
+          (call-process "curl" nil t nil request)
+          (helm-wikipedia--parse-buffer))
+        (with-current-buffer
+            (url-retrieve-synchronously request t)
+          (helm-wikipedia--parse-buffer)))))
 
+(defun helm-wikipedia--parse-buffer ()
+  (goto-char (point-min))
+  (when (re-search-forward "^\\[.+\\[\\(.*\\)\\]\\]" nil t)
+    (cl-loop for i across (aref (json-read-from-string (match-string 0)) 1)
+             collect i into result
+             finally return (or result
+                                (append
+                                 result
+                                 (list (cons (format "Search for '%s' on wikipedia"
+                                                     helm-pattern)
+                                             helm-pattern)))))))
+      
 (defvar helm-source-wikipedia-suggest
   '((name . "Wikipedia Suggest")
     (candidates . helm-wikipedia-suggest-fetch)
