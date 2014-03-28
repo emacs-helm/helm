@@ -337,12 +337,50 @@ Italic     => A non--file buffer.
 ;;
 (defvar helm-read-file-name-help-message
   "== Helm read file name ==\
-
 \nTips:
-\n- When you want to delete backward characters to e.g creating a new file or directory,
+\n- Enter `~/' at end of pattern to quickly reach home directory.
+
+- Enter `/' at end of pattern to quickly reach root of your file system.
+
+- Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
+  If you are in `default-directory' move cursor on top.
+
+- Enter `../' at end of pattern will reach upper directory, moving cursor on top.
+  NOTE: This different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
+  subdir name.
+
+- You can complete with partial basename (start on third char entered)
+
+    e.g \"fob\" or \"fbr\" will complete \"foobar\"
+    but \"fb\" will wait for a third char for completing.
+
+Persistent actions:
+
+By default `helm-read-file-name' use the persistent actions of `helm-find-files'.
+
+- Use `C-u C-z' to watch an image.
+
+- `C-z' on a filename will expand in helm-buffer to this filename.
+  Second hit on `C-z' will display buffer filename.
+  Third hit on `C-z' will kill buffer filename.
+  NOTE: `C-u C-z' will display buffer directly.
+
+- To browse images directories turn on `helm-follow-mode' and navigate with arrow keys.
+
+- When you want to delete backward characters to e.g creating a new file or directory,
   autoupdate may keep updating to an existent directory
   preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
+  This should not needed when copying/renaming files because autoupdate is disabled
+  by default in this case.
   NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
+
+- You can create a new directory and a new file at the same time, just write the path in prompt
+  and press <RET>.
+  e.g You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
+
+- To create a new directory, add a \"/\" at end of new name and press <RET>.
+
+- To create a new file just write the filename not ending with \"/\".
 
 \nSpecific commands for helm-read-file-name:
 \\<helm-read-file-map>
