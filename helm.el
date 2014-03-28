@@ -2580,6 +2580,15 @@ and `helm-pattern'."
          (helm-log "Using here `helm-while-no-input'")
          (helm-while-no-input ,@body))))
 
+(defun helm--compute-sources (src-list)
+  (cl-loop with matches = (helm--maybe-use-while-no-input
+                           (cl-loop for src in src-list
+                                    collect (helm-compute-matches src)))
+           when (eq matches t) do (setq matches nil)
+           for src in src-list
+           for mtc in matches
+           do (helm-render-source src mtc)))
+
 (cl-defun helm-process-delayed-sources (delayed-sources &optional preselect source)
   "Process helm DELAYED-SOURCES.
 Move selection to string or regexp PRESELECT if non--nil.
@@ -2592,13 +2601,7 @@ when emacs is idle for `helm-idle-delay'."
     (with-current-buffer (helm-buffer-get)
       (save-excursion
         (goto-char (point-max))
-        (cl-loop with matches = (helm--maybe-use-while-no-input
-                                 (cl-loop for src in delayed-sources
-                                          collect (helm-compute-matches src)))
-                 when (eq matches t) do (setq matches nil)
-                 for src in delayed-sources
-                 for mtc in matches
-                 do (helm-render-source src mtc))
+        (helm--compute-sources delayed-sources)
         (when (and (not (helm-empty-buffer-p))
                    ;; No selection yet.
                    (= (overlay-start helm-selection-overlay)
@@ -2654,12 +2657,7 @@ is done on whole `helm-buffer' and not on current source."
              ;; Candidates must be computed AFTER erasing buffer
              ;; even if it cause flickering; Doing so avoid
              ;; unexpected results when executing actions.
-             (cl-loop with matches = (helm--maybe-use-while-no-input
-                                      (cl-loop for src in normal-sources
-                                               collect (helm-compute-matches src)))
-                      for source in normal-sources
-                      for mtc in matches
-                      do (helm-render-source source mtc)))
+             (helm--compute-sources normal-sources))
         (helm-log-eval
          (mapcar (lambda (s) (assoc-default 'name s)) delayed-sources))
         (cond ((and preselect delayed-sources normal-sources)
