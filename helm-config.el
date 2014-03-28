@@ -85,7 +85,7 @@
     (define-key map (kbd "i")         'helm-semantic-or-imenu)
     (define-key map (kbd "<tab>")     'helm-lisp-completion-at-point)
     (define-key map (kbd "p")         'helm-list-emacs-process)
-    (define-key map (kbd "C-x r b")   'helm-bookmarks)
+    (define-key map (kbd "C-x r b")   'helm-filtered-bookmarks)
     (define-key map (kbd "M-y")       'helm-show-kill-ring)
     (define-key map (kbd "C-c <SPC>") 'helm-all-mark-rings)
     (define-key map (kbd "C-x C-f")   'helm-find-files)
@@ -132,7 +132,7 @@
     ["Recent Files" helm-recentf t]
     ["Locate" helm-locate t]
     ["Search Files with find" helm-find t]
-    ["Bookmarks" helm-bookmarks t])
+    ["Bookmarks" helm-filtered-bookmarks t])
    ("Buffers"
     ["Find buffers" helm-buffers-list t])
    ("Commands"
