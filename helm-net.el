@@ -337,7 +337,7 @@ Return an alist with elements like (data . number_results)."
           (call-process "curl" nil t nil request)
           (helm-wikipedia--parse-buffer))
         (with-current-buffer
-            (url-retrieve-synchronously request t)
+            (url-retrieve-synchronously request)
           (helm-wikipedia--parse-buffer)))))
 
 (defun helm-wikipedia--parse-buffer ()
