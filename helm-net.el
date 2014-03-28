@@ -326,30 +326,26 @@ Return an alist with elements like (data . number_results)."
 ;;; Wikipedia suggestions
 ;;
 ;;
-(defun helm-wikipedia-suggest-fetch (input)
+(defun helm-wikipedia-suggest-fetch ()
   "Fetch Wikipedia suggestions and return them as a list."
+  (require 'json)
   (with-current-buffer
       (url-retrieve-synchronously (concat helm-wikipedia-suggest-url
-                                          (url-hexify-string input)))
+                                          (url-hexify-string helm-pattern)))
     (goto-char (point-min))
-    (if (re-search-forward "^\\[.+\\[\\(.*\\)\\]\\]" nil t)
-        (let ((results (match-string 1)))
-          (if (> (length results) 0)
-              (mapcar (lambda (item)
-                        ;; convert unicode codes in the string to unicode characterss
-                        (read
-                         (replace-regexp-in-string
-                          "^\\([^\"]\\)" "\"\\1"
-                          (replace-regexp-in-string
-                           "\\([^\"]\\)$" "\\1\""
-                           item))))
-
-                      (split-string results "\",\"")))))))
+    (when (re-search-forward "^\\[.+\\[\\(.*\\)\\]\\]" nil t)
+      (cl-loop for i across (aref (json-read-from-string (match-string 0)) 1)
+               collect i into result
+               finally return (or result
+                                  (append
+                                   result
+                                   (list (cons (format "Search for '%s' on wikipedia"
+                                                       helm-pattern)
+                                               helm-pattern))))))))
 
 (defvar helm-source-wikipedia-suggest
   '((name . "Wikipedia Suggest")
-    (candidates . (lambda ()
-                    (helm-wikipedia-suggest-fetch helm-pattern)))
+    (candidates . helm-wikipedia-suggest-fetch)
     (action . (("Wikipedia" . (lambda (candidate)
                                 (helm-search-suggest-perform-additional-action
                                  helm-search-suggest-action-wikipedia-url
