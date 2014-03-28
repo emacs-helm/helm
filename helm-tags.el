@@ -49,7 +49,22 @@ one match."
   :type 'boolean
   :group 'helm-tags)
 
-
+(defun helm-etags-run-switch-other-window ()
+  "Run switch to other window action from `helm-source-etags-select'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-quit-and-execute-action
+     (lambda (c)
+            (helm-etags-action-goto 'find-file-other-window c)))))
+
+(defun helm-etags-run-switch-other-frame ()
+  "Run switch to other frame action from `helm-source-etags-select'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-quit-and-execute-action
+     (lambda (c)
+       (helm-etags-action-goto 'find-file-other-frame c)))))
+
 (defvar helm-etags-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -57,6 +72,8 @@ one match."
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-c ?")    'helm-etags-help)
+    (define-key map (kbd "C-c o")    'helm-etags-run-switch-other-window)
+    (define-key map (kbd "C-c C-o")  'helm-etags-run-switch-other-frame)
     map)
   "Keymap used in Etags.")
 
@@ -230,16 +247,26 @@ If no entry in cache, create one."
                         candidate)))
     (mode-line . helm-etags-mode-line-string)
     (keymap . ,helm-etags-map)
-    (action . helm-etags-default-action)
+    (action . (("Go to tag" . (lambda (c)
+                                (helm-etags-action-goto 'find-file c)))
+               ("Go to tag in other window" . (lambda (c)
+                                                (helm-etags-action-goto
+                                                 'find-file-other-window
+                                                 c)))
+               ("Go to tag in other frame" . (lambda (c)
+                                                (helm-etags-action-goto
+                                                 'find-file-other-frame
+                                                 c)))))
+    (persistent-help . "Go to line")
     (persistent-action . (lambda (candidate)
-                           (helm-etags-default-action candidate)
+                           (helm-etags-action-goto 'find-file candidate)
                            (helm-highlight-current-line))))
   "Helm source for Etags.")
 
 (defvar find-tag-marker-ring)
 
-(defun helm-etags-default-action (candidate)
-  "Helm default action to jump to an etags entry."
+(defun helm-etags-action-goto (switcher candidate)
+  "Helm default action to jump to an etags entry in other window."
   (require 'etags)
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (let* ((split (helm-etags-split-line candidate))
@@ -252,7 +279,7 @@ If no entry in cache, create one."
     (if (null fname)
         (error "file %s not found" fname)
       (ring-insert find-tag-marker-ring (point-marker))
-      (find-file fname)
+      (funcall switcher fname)
       (goto-char (point-min))
       (search-forward elm nil t)
       (goto-char (match-beginning 0)))))
