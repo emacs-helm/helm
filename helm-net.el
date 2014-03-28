@@ -326,6 +326,7 @@ Return an alist with elements like (data . number_results)."
 ;;; Wikipedia suggestions
 ;;
 ;;
+(declare-function json-read-from-string "json" (string))
 (defun helm-wikipedia-suggest-fetch ()
   "Fetch Wikipedia suggestions and return them as a list."
   (require 'json)
