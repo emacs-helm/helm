@@ -241,6 +241,11 @@ Italic     => A non--file buffer.
 - Enter `/' at end of pattern to quickly reach root of your file system.
 
 - Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
+  If you are in `default-directory' move cursor on top.
+
+- Enter `../' at end of pattern will reach upper directory, moving cursor on top.
+  NOTE: This different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
+  subdir name.
 
 - You can complete with partial basename (start on third char entered)
 
@@ -261,7 +266,7 @@ Italic     => A non--file buffer.
   preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
   NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
 
-- You can create a new directory an a new file at the same time, just write the path in prompt
+- You can create a new directory and a new file at the same time, just write the path in prompt
   and press <RET>.
   e.g You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
 
