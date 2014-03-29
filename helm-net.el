@@ -371,13 +371,12 @@ Return an alist with elements like (data . number_results)."
 
     (if (not result)
         (message "Error when getting summary.")
-
-      (switch-to-buffer "*wikipedia*")
-      (erase-buffer)
-      (setq cursor-type nil)
-      (insert result)
-      (goto-char (point-min))
-      (message "Done."))))
+        (switch-to-buffer "*wikipedia*")
+        (erase-buffer)
+        (setq cursor-type nil)
+        (insert result)
+        (goto-char (point-min))
+        (message "Done."))))
 
 
 (defun helm-wikipedia-fetch-summary (input)
@@ -386,42 +385,42 @@ Return an alist with elements like (data . number_results)."
         (with-temp-buffer
           (call-process "curl" nil t nil request)
           (helm-wikipedia--parse-summary))
-      (with-current-buffer
-          (url-retrieve-synchronously request)
-        (helm-wikipedia--parse-summary)))))
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (helm-wikipedia--parse-summary)))))
 
 
 (defun helm-wikipedia--parse-summary ()
   (goto-char (point-min))
-  (if (search-forward "{" nil t)
-      (let ((result (cdr (assoc '*
-                                (assoc 'text
-                                       (assoc 'parse
-                                              (json-read-from-string
-                                               (buffer-substring-no-properties
-                                                (1- (point)) (point-max)))))))))
-        (if result
-            (if (string-match "<span class=\"redirectText\"><a href=[^>]+>\\([^<]+\\)" result)
-                (cons 'redirect (match-string 1 result))
+  (when (search-forward "{" nil t)
+    (let ((result (cdr (assoc '*
+                              (assoc 'text
+                                     (assoc 'parse
+                                            (json-read-from-string
+                                             (buffer-substring-no-properties
+                                              (1- (point)) (point-max)))))))))
+      (when result
+        (if (string-match "<span class=\"redirectText\"><a href=[^>]+>\\([^<]+\\)" result)
+            (cons 'redirect (match-string 1 result))
 
-              ;; find the beginning of the summary text in the result
+            ;; find the beginning of the summary text in the result
 
-              ;; check if there is a table before the summary and skip that
-              (if (or (string-match "</table>\\(\n<div.*?</div>\\)?\n<p>" result)
+            ;; check if there is a table before the summary and skip that
+            (when (or (string-match "</table>\\(\n<div.*?</div>\\)?\n<p>" result)
                       ;; otherwise just find the first paragraph
                       (string-match "<p>" result))
-                  ;; remove cruft and do a simple formatting 
+              ;; remove cruft and do a simple formatting 
+              (replace-regexp-in-string
+               "Cite error: .*" ""
+               (replace-regexp-in-string
+                "&#160;" ""
+                (replace-regexp-in-string
+                 "\\[[^\]]+\\]" ""
+                 (replace-regexp-in-string
+                  "<[^>]*>" ""
                   (replace-regexp-in-string
-                   "Cite error: .*" ""
-                   (replace-regexp-in-string
-                    "&#160;" ""
-                    (replace-regexp-in-string
-                     "\\[[^\]]+\\]" ""
-                     (replace-regexp-in-string
-                      "<[^>]*>" ""
-                      (replace-regexp-in-string
-                       "</p>\n<p>" "\n\n"
-                       (substring result (match-end 0)))))))))))))
+                   "</p>\n<p>" "\n\n"
+                   (substring result (match-end 0)))))))))))))
 
 
 (defvar helm-source-wikipedia-suggest
