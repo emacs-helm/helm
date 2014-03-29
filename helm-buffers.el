@@ -564,7 +564,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (helm-delete-current-selection)
   (when (helm-empty-source-p) (helm-next-source))
   (with-helm-temp-hook 'helm-after-persistent-action-hook
-    (helm-force-update)))
+    (helm-force-update (regexp-quote (helm-get-selection nil t)))))
 
 (defun helm-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
