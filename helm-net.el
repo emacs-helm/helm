@@ -360,30 +360,33 @@ Return an alist with elements like (data . number_results)."
 
 (defvar helm-wikipedia--summary-cache (make-hash-table :test 'equal))
 (defun helm-wikipedia-persistent-action (candidate)
-  (message "Fetching summary from Wikipedia...")
-  (let (result mess)
-    (while (progn
-             (setq result (or (gethash candidate helm-wikipedia--summary-cache)
-                              (puthash candidate
-                                       (prog1
-                                           (helm-wikipedia-fetch-summary candidate)
-                                         (setq mess "Done"))
-                                       helm-wikipedia--summary-cache)))
-             (when (and result
-                        (listp result))
-               (setq candidate (cdr result))
-               (message "Redirected to %s" candidate)
-               t)))
+  (unless (string= (format "Search for '%s' on wikipedia"
+                           helm-pattern)
+                   (helm-get-selection nil t))
+    (message "Fetching summary from Wikipedia...")
+    (let (result mess)
+      (while (progn
+               (setq result (or (gethash candidate helm-wikipedia--summary-cache)
+                                (puthash candidate
+                                         (prog1
+                                             (helm-wikipedia-fetch-summary candidate)
+                                           (setq mess "Done"))
+                                         helm-wikipedia--summary-cache)))
+               (when (and result
+                          (listp result))
+                 (setq candidate (cdr result))
+                 (message "Redirected to %s" candidate)
+                 t)))
 
-    (if (not result)
-        (message "Error when getting summary.")
-        (switch-to-buffer "*wikipedia*")
-        (erase-buffer)
-        (setq cursor-type nil)
-        (insert result)
-        (fill-region (point-min) (point-max))
-        (goto-char (point-min))
-        (message mess))))
+      (if (not result)
+          (message "Error when getting summary.")
+          (switch-to-buffer "*wikipedia*")
+          (erase-buffer)
+          (setq cursor-type nil)
+          (insert result)
+          (fill-region (point-min) (point-max))
+          (goto-char (point-min))
+          (message mess)))))
 
 
 (defun helm-wikipedia-fetch-summary (input)
