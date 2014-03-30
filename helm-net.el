@@ -104,6 +104,11 @@ This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
+(defcustom helm-wikipedia-follow-delay 2
+  "Delay before wikipedia summary popup."
+  :type 'number
+  :group 'helm-net)
+
 (defcustom helm-search-suggest-action-youtube-url
   "http://www.youtube.com/results?aq=f&search_query=%s"
   "The Youtube search url.
@@ -434,7 +439,7 @@ Return an alist with elements like (data . number_results)."
 
 
 (defvar helm-source-wikipedia-suggest
-  '((name . "Wikipedia Suggest")
+  `((name . "Wikipedia Suggest")
     (candidates . helm-wikipedia-suggest-fetch)
     (action . (("Wikipedia" . (lambda (candidate)
                                 (helm-search-suggest-perform-additional-action
@@ -443,7 +448,7 @@ Return an alist with elements like (data . number_results)."
     (persistent-action . helm-wikipedia-persistent-action)
     (volatile)
     (follow . 1)
-    (follow-delay . 2)
+    (follow-delay . ,helm-wikipedia-follow-delay)
     (requires-pattern . 3)))
 
 
