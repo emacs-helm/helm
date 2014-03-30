@@ -443,6 +443,7 @@ Return an alist with elements like (data . number_results)."
     (persistent-action . helm-wikipedia-persistent-action)
     (volatile)
     (follow . 1)
+    (follow-delay . 2)
     (requires-pattern . 3)))
 
 
@@ -575,8 +576,7 @@ Return an alist with elements like (data . number_results)."
   "Preconfigured `helm' for Wikipedia lookup with Wikipedia suggest."
   (interactive)
   (helm :sources 'helm-source-wikipedia-suggest
-        :buffer "*helm wikipedia*"
-        :follow-input-idle-delay 2))
+        :buffer "*helm wikipedia*"))
 
 
 (provide 'helm-net)

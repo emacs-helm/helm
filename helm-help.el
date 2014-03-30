@@ -1312,6 +1312,11 @@ HELM-ATTRIBUTE should be a symbol."
 
   See `helm-follow-mode' for more infos")
 
+(helm-document-attribute 'follow-delay "optional"
+  "  `helm-follow-mode' will execute persistent-action after this delay.
+Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
+If none of these are found fallback to `helm-input-idle-delay'.")
+
 (helm-document-attribute 'allow-dups "optional"
   "  Allow helm collecting duplicates candidates.")
 
