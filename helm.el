@@ -4442,13 +4442,15 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
       (when (and helm-follow-mode-persistent sym)
         (set (car `(,sym)) src)))))
 
+(defvar helm-follow-input-idle-delay nil)
 (defun helm-follow-execute-persistent-action-maybe ()
   "Execute persistent action in mode `helm-follow-mode'.
 This happen after `helm-input-idle-delay' secs."
   (and (not (get-buffer-window helm-action-buffer 'visible))
        (eq (assoc-default 'follow (helm-get-current-source)) 1)
-       (sit-for (and helm-input-idle-delay
-                     (max helm-input-idle-delay 0.01)))
+       (sit-for (or helm-follow-input-idle-delay
+                    (and helm-input-idle-delay
+                     (max helm-input-idle-delay 0.01))))
        (helm-window)
        (helm-get-selection)
        (save-excursion
