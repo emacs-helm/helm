@@ -2694,6 +2694,7 @@ is done on whole `helm-buffer' and not on current source."
         (helm-log "end update")))))
 
 ;; Update keymap after updating.
+;; Putting this in a hook allow users to disable it.
 (add-hook 'helm-after-update-hook 'helm-maybe-update-keymap)
 
 (defun helm-update-source-p (source)
@@ -3152,8 +3153,10 @@ Key arg DIRECTION can be one of:
         (when (helm-get-previous-header-pos)
           (helm-mark-current-line))
         (helm-display-mode-line (helm-get-current-source))
-        (helm-maybe-update-keymap)
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
+
+;; Putting this in a hook allow users to disable it.
+(add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
 
 (defun helm-move--previous-multi-line-fn ()
   (forward-line -1)
