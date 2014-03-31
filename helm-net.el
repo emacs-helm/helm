@@ -288,6 +288,7 @@ Return an alist with elements like (data . number_results)."
     (action . ,(cons '("Google Search" . helm-google-suggest-action)
                      helm-search-suggest-additional-actions))
     (volatile)
+    (keymap . ,helm-map)
     (requires-pattern . 3)))
 
 (defun helm-google-suggest-emacs-lisp ()
@@ -328,10 +329,11 @@ Return an alist with elements like (data . number_results)."
                            (url-hexify-string candidate))))
 
 (defvar helm-source-yahoo-suggest
-  '((name . "Yahoo Suggest")
+  `((name . "Yahoo Suggest")
     (candidates . helm-yahoo-suggest-set-candidates)
     (action . (("Yahoo Search" . helm-yahoo-suggest-action)))
     (volatile)
+    (keymap . ,helm-map)
     (requires-pattern . 3)))
 
 ;;; Wikipedia suggestions
@@ -369,7 +371,8 @@ Return an alist with elements like (data . number_results)."
                            helm-pattern)
                    (helm-get-selection nil t))
     (message "Fetching summary from Wikipedia...")
-    (let (result mess)
+    (let ((buf (get-buffer-create "*wikipedia*"))
+          result mess)
       (while (progn
                (setq result (or (gethash candidate helm-wikipedia--summary-cache)
                                 (puthash candidate
@@ -382,15 +385,15 @@ Return an alist with elements like (data . number_results)."
                  (setq candidate (cdr result))
                  (message "Redirected to %s" candidate)
                  t)))
-
       (if (not result)
           (message "Error when getting summary.")
-          (switch-to-buffer "*wikipedia*")
-          (erase-buffer)
-          (setq cursor-type nil)
-          (insert result)
-          (fill-region (point-min) (point-max))
-          (goto-char (point-min))
+          (with-current-buffer buf
+            (erase-buffer)
+            (setq cursor-type nil)
+            (insert result)
+            (fill-region (point-min) (point-max))
+            (goto-char (point-min)))
+          (display-buffer buf)
           (message mess)))))
 
 
@@ -448,6 +451,7 @@ Return an alist with elements like (data . number_results)."
     (persistent-action . helm-wikipedia-persistent-action)
     (volatile)
     (follow . 1)
+    (keymap . ,helm-map)
     (follow-delay . ,helm-wikipedia-follow-delay)
     (requires-pattern . 3)))
 
