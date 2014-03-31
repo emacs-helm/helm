@@ -371,7 +371,7 @@ Return an alist with elements like (data . number_results)."
                            helm-pattern)
                    (helm-get-selection nil t))
     (message "Fetching summary from Wikipedia...")
-    (let ((buf (get-buffer-create "*wikipedia*"))
+    (let ((buf (get-buffer-create "*helm wikipedia summary*"))
           result mess)
       (while (progn
                (setq result (or (gethash candidate helm-wikipedia--summary-cache)
