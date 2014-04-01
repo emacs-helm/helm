@@ -2193,8 +2193,7 @@ if some when multiples sources are present."
       (when kmap
         (setq overriding-local-map
               (make-composed-keymap
-               (append (list kmap) (current-minor-mode-maps))
-                       minibuffer-local-map))))))
+               (append (list kmap) (current-minor-mode-maps))))))))
 
 
 ;; Core: clean up
