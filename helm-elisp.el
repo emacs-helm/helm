@@ -634,9 +634,11 @@ First call indent, second complete symbol, third complete fname."
   "Sexp.")
 
 (define-helm-type-attribute 'timer
-    '((real-to-display . helm-timer-real-to-display)
-      (action
-       ("Cancel Timer" . cancel-timer)
+    '((action
+       ("Cancel Timer" . (lambda (_timer)
+                           (let ((mkd (helm-marked-candidates)))
+                             (cl-loop for timer in mkd
+                                      do (cancel-timer timer)))))
        ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
        ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
       (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
@@ -649,24 +651,36 @@ First call indent, second complete symbol, third complete fname."
 ;;
 (defvar helm-source-absolute-time-timers
   '((name . "Absolute Time Timers")
-    (nomark)
     (candidates . timer-list)
+    (filtered-candidate-transformer
+     . (lambda (candidates _source)
+         (cl-loop for timer in candidates
+                  collect (cons (helm-elisp--format-timer timer) timer))))
+    (allow-dups)
+    (volatile)
     (type . timer)))
 
 (defvar helm-source-idle-time-timers
   '((name . "Idle Time Timers")
     (candidates . timer-idle-list)
-    (nomark)
+    (allow-dups)
+    (volatile)
+    (filtered-candidate-transformer
+     . (lambda (candidates _source)
+         (cl-loop for timer in candidates
+                  collect (cons (helm-elisp--format-timer timer) timer))))
     (type . timer)))
 
-(defun helm-timer-real-to-display (timer)
-  (format "%s repeat=%5S %s(%s)"
+(defun helm-elisp--format-timer (timer)
+  (format "%s repeat=%s %s(%s)"
           (let ((time (timer--time timer)))
             (if (timer--idle-delay timer)
                 (format-time-string "idle-for=%5s" time)
                 (format-time-string "%m/%d %T" time)))
-          (timer--repeat-delay timer)
-          (timer--function timer)
+          (or (timer--repeat-delay timer) "nil")
+          (mapconcat 'identity (split-string
+                                (prin1-to-string (timer--function timer))
+                                "\n") " ")
           (mapconcat 'prin1-to-string (timer--args timer) " ")))
 
 ;;;###autoload
