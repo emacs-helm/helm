@@ -3160,15 +3160,16 @@ Key arg DIRECTION can be one of:
 
 (defun helm-move--previous-multi-line-fn ()
   (forward-line -1)
-  (helm-skip-header-and-separator-line 'previous)
-  (let ((header-pos (helm-get-previous-header-pos))
-        (separator-pos (helm-get-previous-candidate-separator-pos)))
-    (when header-pos
-      (goto-char (if (or (null separator-pos)
-                         (< separator-pos header-pos))
-                     header-pos
-                     separator-pos))
-      (forward-line 1))))
+  (unless (helm-pos-header-line-p)
+    (helm-skip-header-and-separator-line 'previous)
+    (let ((header-pos (helm-get-previous-header-pos))
+          (separator-pos (helm-get-previous-candidate-separator-pos)))
+      (when header-pos
+        (goto-char (if (or (null separator-pos)
+                           (< separator-pos header-pos))
+                       header-pos
+                       separator-pos))
+        (forward-line 1)))))
 
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
@@ -3178,8 +3179,12 @@ Key arg DIRECTION can be one of:
              (helm-pos-header-line-p))
     (forward-line 1)
     (helm-move--end-of-source)
-    (and (save-excursion (forward-line -1) (helm-pos-multiline-p))
-         (helm-move--previous-multi-line-fn))))
+    ;; We are at end of helm-buffer
+    ;; check if last candidate is a multiline candidate
+    ;; and jump to it
+    (when (and (eobp)
+               (save-excursion (forward-line -1) (helm-pos-multiline-p)))
+      (helm-move--previous-multi-line-fn))))
 
 (defun helm-move--next-multi-line-fn ()
   (let ((header-pos (helm-get-next-header-pos))
