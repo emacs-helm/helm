@@ -2190,7 +2190,9 @@ if some when multiples sources are present."
     (let* ((source (helm-get-current-source))
            (kmap (and (listp source) ; Check if source is empty.
                       (assoc-default 'keymap source))))
-      (when kmap (setq overriding-local-map kmap)))))
+      (when kmap
+        (setq overriding-local-map
+              (make-composed-keymap (current-minor-mode-maps) kmap))))))
 
 
 ;; Core: clean up
