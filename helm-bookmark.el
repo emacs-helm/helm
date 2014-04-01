@@ -126,10 +126,15 @@
   "Toggle bookmark location visibility."
   (interactive)
   (with-helm-alive-p
-    (let ((real (helm-get-selection helm-buffer)))
+    (let* ((real (helm-get-selection helm-buffer))
+           (trunc (if (> (string-width real) bookmark-bmenu-file-column)
+                      (helm-substring real bookmark-bmenu-file-column)
+                      real)))
       (setq helm-bookmark-show-location (not helm-bookmark-show-location))
-      (helm-update (if helm-bookmark-show-location
-                       (bookmark-location real) real)))))
+      (helm-force-update (if helm-bookmark-show-location
+                             (concat (regexp-quote trunc)
+                                     " +"
+                                     (regexp-quote (bookmark-location real))) real)))))
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
