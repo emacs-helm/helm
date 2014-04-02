@@ -2127,6 +2127,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                              ;; non--nil.
                                              (unless (or helm-in-persistent-action
                                                          helm-suspend-update-flag)
+                                               (helm-maybe-update-keymap)
                                                (save-selected-window
                                                  (helm-check-minibuffer-input)
                                                  (helm-print-error-messages)))))))
@@ -2190,7 +2191,7 @@ if some when multiples sources are present."
     (let* ((source (helm-get-current-source))
            (kmap (and (listp source) ; Check if source is empty.
                       (assoc-default 'keymap source))))
-      (when kmap (setq overriding-local-map kmap)))))
+      (when kmap (set-transient-map kmap)))))
 
 
 ;; Core: clean up
