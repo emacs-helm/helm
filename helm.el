@@ -1622,7 +1622,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log (concat "[Start session] " (make-string 41 ?+)))
     (helm-log-eval any-prompt any-preselect
                    any-buffer any-keymap any-default)
-    (let ((old-overriding-local-map overriding-local-map)
+    (let ((old-overriding-local-map overriding-terminal-local-map)
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
           ;; This is not needed in emacs-24.3+
           (cursor-in-echo-area t)
@@ -1658,7 +1658,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                      (helm-cleanup)))
                  (prog1 (unless helm-quit
                           (with-helm-temp-hook 'helm-cleanup-hook
-                            (setq overriding-local-map old-overriding-local-map))
+                            (setq overriding-terminal-local-map old-overriding-local-map))
                           (helm-execute-selection-action))
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
              (quit
@@ -1669,7 +1669,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
             (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
             (ad-deactivate 'tramp-read-passwd))
         (helm-log-eval (setq helm-alive-p nil))
-        (setq overriding-local-map old-overriding-local-map)
+        (setq overriding-terminal-local-map old-overriding-local-map)
         (setq helm-alive-p nil)
         (setq helm-in-file-completion-p nil)
         (and old--cua (cua-mode 1))
@@ -2166,6 +2166,7 @@ This can be useful for e.g writing quietly a complex regexp."
 (defadvice tramp-read-passwd (around disable-helm-update)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
+  (setq overriding-terminal-local-map nil)
   (let (stimers)
     (unwind-protect
          (progn
@@ -2177,6 +2178,7 @@ This can be useful for e.g writing quietly a complex regexp."
 (defun helm--advice-tramp-read-passwd (old--fn &rest args)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
+  (setq overriding-terminal-local-map nil)
   (unwind-protect
        ;; No need to suspend timer in emacs-24.4
        (apply old--fn args)
