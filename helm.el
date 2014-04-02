@@ -2191,7 +2191,10 @@ if some when multiples sources are present."
     (let* ((source (helm-get-current-source))
            (kmap (and (listp source) ; Check if source is empty.
                       (assoc-default 'keymap source))))
-      (when kmap (set-transient-map kmap)))))
+      (when kmap
+        (if (fboundp 'set-transient-map)
+            (set-transient-map kmap)
+            (set-temporary-overlay-map kmap))))))
 
 
 ;; Core: clean up
