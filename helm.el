@@ -2194,7 +2194,7 @@ It will override `helm-map' with the keymap attribute of current source
 if some when multiples sources are present."
   (with-helm-window
     (let* ((source (helm-get-current-source))
-           (kmap (and (listp source)    ; Check if source is empty.
+           (kmap (and source    ; Check if source is empty.
                       (assoc-default 'keymap source))))
       ;; Fix #466; we use here set-transient-map
       ;; to not overhide other minor-mode-map's.
