@@ -1,6 +1,6 @@
 ;;; helm-pkg.el --- define helm for package.el -*- lexical-binding: t -*-
 
-(define-package "helm" "1.6.0"
+(define-package "helm" "1.6.1"
   "Helm is an Emacs incremental and narrowing framework")
 
 ;; Local Variables:
