@@ -2073,7 +2073,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; or helm arg, otherwise use global value of `helm-map'.
       ;; This map will be used as a `minibuffer-local-map'.
       ;; Maybe it will be overriden when changing source
-      ;; by `helm-maybe-update-keymap'.
+      ;; by `helm--maybe-update-keymap'.
       ;; Note that helm-map have been made buffer-local
       ;; in `helm-create-helm-buffer'.
       (setq helm-map (or src-keymap any-keymap helm-map))
@@ -2127,7 +2127,10 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                              ;; non--nil.
                                              (unless (or helm-in-persistent-action
                                                          helm-suspend-update-flag)
-                                               (helm-maybe-update-keymap)
+                                               ;; With set-transient-map we need to
+                                               ;; constantly update keymap to make
+                                               ;; next helm-map key available.
+                                               (helm--maybe-update-keymap)
                                                (save-selected-window
                                                  (helm-check-minibuffer-input)
                                                  (helm-print-error-messages)))))))
@@ -2184,15 +2187,17 @@ This can be useful for e.g writing quietly a complex regexp."
        (apply old--fn args)
     (setq helm-suspend-update-flag nil)))
 
-(defun helm-maybe-update-keymap ()
+(defun helm--maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
 This function is meant to be run in `helm-move-selection-after-hook'.
 It will override `helm-map' with the keymap attribute of current source
 if some when multiples sources are present."
   (with-helm-window
     (let* ((source (helm-get-current-source))
-           (kmap (and (listp source) ; Check if source is empty.
+           (kmap (and (listp source)    ; Check if source is empty.
                       (assoc-default 'keymap source))))
+      ;; Fix #466; we use here set-transient-map
+      ;; to not overhide other minor-mode-map's.
       (when kmap
         (if (fboundp 'set-transient-map)
             (set-transient-map kmap)
@@ -2701,7 +2706,7 @@ is done on whole `helm-buffer' and not on current source."
 
 ;; Update keymap after updating.
 ;; Putting this in a hook allow users to disable it.
-(add-hook 'helm-after-update-hook 'helm-maybe-update-keymap)
+(add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
 
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
@@ -3162,7 +3167,7 @@ Key arg DIRECTION can be one of:
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
 
 ;; Putting this in a hook allow users to disable it.
-(add-hook 'helm-move-selection-after-hook 'helm-maybe-update-keymap)
+(add-hook 'helm-move-selection-after-hook 'helm--maybe-update-keymap)
 
 (defun helm-move--previous-multi-line-fn ()
   (forward-line -1)

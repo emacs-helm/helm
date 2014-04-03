@@ -134,7 +134,8 @@
       (helm-force-update (if helm-bookmark-show-location
                              (concat (regexp-quote trunc)
                                      " +"
-                                     (regexp-quote (bookmark-location real))) real)))))
+                                     (regexp-quote (bookmark-location real)))
+                             real)))))
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
