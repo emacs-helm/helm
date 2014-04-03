@@ -107,6 +107,7 @@ When disabled (nil) use the longest buffer-name length found."
     (define-key map (kbd "M-=")       'helm-buffer-run-ediff-merge)
     (define-key map (kbd "C-=")       'helm-buffer-diff-persistent)
     (define-key map (kbd "M-U")       'helm-buffer-revert-persistent)
+    (define-key map (kbd "C-c d")     'helm-buffer-run-kill-persistent)
     (define-key map (kbd "M-D")       'helm-buffer-run-kill-buffers)
     (define-key map (kbd "C-x C-s")   'helm-buffer-save-persistent)
     (define-key map (kbd "C-M-%")     'helm-buffer-run-query-replace-regexp)
@@ -488,6 +489,13 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
     (helm-execute-persistent-action 'save-action)))
+
+(defun helm-buffer-run-kill-persistent ()
+  "Kill buffer without quitting helm."
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'kill-action '(helm-buffers-persistent-kill . never-split))
+    (helm-execute-persistent-action 'kill-action)))
 
 (defun helm-kill-marked-buffers (_ignore)
   (mapc 'kill-buffer (helm-marked-candidates)))

@@ -193,6 +193,14 @@ Creating buffers
 When creating a new buffer use \\[universal-argument] to choose a mode for your buffer in a list.
 This list is customizable, see `helm-buffers-favorite-modes'.
 
+Killing buffers
+
+You have a command to kill buffer(s) and quit emacs and a command to kill buffers one by one
+\(no marked\) without quitting helm.
+You can run this persistent kill buffer command either with the regular
+`helm-execute-persistent-action' called with a prefix arg (C-u C-z) or with its specific command
+`helm-buffer-run-kill-persistent' see binding below.
+
 Meaning of colors and prefixes for buffers:
 
 Remote buffers are prefixed with '@'.
@@ -215,6 +223,7 @@ Italic     => A non--file buffer.
 \\[helm-buffer-revert-persistent]\t\t->Revert buffer without quitting.
 \\[helm-buffer-save-persistent]\t\t->Save buffer without quitting.
 \\[helm-buffer-run-kill-buffers]\t\t->Delete marked buffers and quit.
+\\[helm-buffer-run-kill-persistent]\t\t->Delete buffer without quitting helm.
 \\[helm-toggle-all-marks]\t\t->Toggle all marks.
 \\[helm-mark-all]\t\t->Mark all.
 \\[helm-toggle-buffers-details]\t\t->Toggle details.
