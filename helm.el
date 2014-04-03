@@ -1635,6 +1635,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       ;; cua-mode overhide local helm bindings.
       ;; disable this stupid thing if enabled.
       (and cua-mode (cua-mode -1))
+      (add-hook 'post-command-hook 'helm--maybe-update-keymap)
       (unwind-protect
            (condition-case _v
                (let (;; `helm-source-name' is non-nil
@@ -1665,6 +1666,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
               (helm-restore-position-on-quit)
               (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
               nil))
+        (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
         (if (fboundp 'advice-add)
             (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
             (ad-deactivate 'tramp-read-passwd))
@@ -2127,10 +2129,6 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                              ;; non--nil.
                                              (unless (or helm-in-persistent-action
                                                          helm-suspend-update-flag)
-                                               ;; With set-transient-map we need to
-                                               ;; constantly update keymap to make
-                                               ;; next helm-map key available.
-                                               (helm--maybe-update-keymap)
                                                (save-selected-window
                                                  (helm-check-minibuffer-input)
                                                  (helm-print-error-messages)))))))
@@ -2193,15 +2191,12 @@ This function is meant to be run in `helm-move-selection-after-hook'.
 It will override `helm-map' with the keymap attribute of current source
 if some when multiples sources are present."
   (with-helm-window
-    (let* ((source (helm-get-current-source))
-           (kmap (and source    ; Check if source is empty.
-                      (assoc-default 'keymap source))))
-      ;; Fix #466; we use here set-transient-map
-      ;; to not overhide other minor-mode-map's.
-      (when kmap
+    (helm-aif (assoc-default 'keymap (helm-get-current-source))
+        ;; Fix #466; we use here set-transient-map
+        ;; to not overhide other minor-mode-map's.
         (if (fboundp 'set-transient-map)
-            (set-transient-map kmap)
-            (set-temporary-overlay-map kmap))))))
+            (set-transient-map it))
+            (set-temporary-overlay-map it))))
 
 
 ;; Core: clean up
