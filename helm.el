@@ -2190,13 +2190,13 @@ This can be useful for e.g writing quietly a complex regexp."
 This function is meant to be run in `helm-move-selection-after-hook'.
 It will override `helm-map' with the keymap attribute of current source
 if some when multiples sources are present."
-  (with-helm-window
+  (with-helm-buffer
     (helm-aif (assoc-default 'keymap (helm-get-current-source))
         ;; Fix #466; we use here set-transient-map
         ;; to not overhide other minor-mode-map's.
         (if (fboundp 'set-transient-map)
-            (set-transient-map it))
-            (set-temporary-overlay-map it))))
+            (set-transient-map it)
+            (set-temporary-overlay-map it)))))
 
 
 ;; Core: clean up
@@ -3160,9 +3160,6 @@ Key arg DIRECTION can be one of:
           (helm-mark-current-line))
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
-
-;; Putting this in a hook allow users to disable it.
-(add-hook 'helm-move-selection-after-hook 'helm--maybe-update-keymap)
 
 (defun helm-move--previous-multi-line-fn ()
   (forward-line -1)
