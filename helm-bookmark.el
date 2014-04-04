@@ -87,7 +87,7 @@
 
 (defvar helm-bookmarks-cache nil)
 (defvar helm-source-bookmarks
-  `((name . "Bookmarks")
+  '((name . "Bookmarks")
     (init . (lambda ()
               (require 'bookmark)
               (setq helm-bookmark-mode-line-string

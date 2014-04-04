@@ -3855,6 +3855,23 @@ Arg DATA can be either a list or a plain string."
                 (volatile) (match identity)))
     source))
 
+;; Built-in plugin: keymap
+;;
+;; Ensure each source fallback to original `helm-map'
+;; when no keymap attribute is found in source,
+;; otherwise without this, after a source is updated with
+;; `helm--maybe-update-keymap' the next source we switch to
+;; and have no keymap attribute will inherit from the precedent
+;; source which maybe wrong.
+;;
+(defun helm-compile-source--keymap (source)
+  (if (assq 'keymap source)
+      source
+      (append source `((keymap . ,helm-map)) source)))
+;; This should be appended after type plugin in case keymap attr is defined
+;; in `helm-type-attributes.'
+(add-to-list 'helm-compile-source-functions 'helm-compile-source--keymap t)
+
 
 ;;; Resplit helm window
 ;;

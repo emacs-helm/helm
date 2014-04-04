@@ -165,7 +165,6 @@ When disabled (nil) use the longest buffer-name length found."
 (defvar helm-source-buffer-not-found
   `((name . "Create buffer")
     (dummy)
-    (keymap . ,helm-map)
     (action . (lambda (candidate)
                 (let ((mjm (and helm-current-prefix-arg
                                 (intern (helm-comp-read

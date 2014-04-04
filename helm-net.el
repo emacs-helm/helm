@@ -288,7 +288,6 @@ Return an alist with elements like (data . number_results)."
     (action . ,(cons '("Google Search" . helm-google-suggest-action)
                      helm-search-suggest-additional-actions))
     (volatile)
-    (keymap . ,helm-map)
     (requires-pattern . 3)))
 
 (defun helm-google-suggest-emacs-lisp ()
@@ -333,7 +332,6 @@ Return an alist with elements like (data . number_results)."
     (candidates . helm-yahoo-suggest-set-candidates)
     (action . (("Yahoo Search" . helm-yahoo-suggest-action)))
     (volatile)
-    (keymap . ,helm-map)
     (requires-pattern . 3)))
 
 ;;; Wikipedia suggestions
@@ -451,7 +449,6 @@ Return an alist with elements like (data . number_results)."
     (persistent-action . helm-wikipedia-persistent-action)
     (volatile)
     (follow . 1)
-    (keymap . ,helm-map)
     (follow-delay . ,helm-wikipedia-follow-delay)
     (requires-pattern . 3)))
 
