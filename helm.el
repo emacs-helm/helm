@@ -2187,9 +2187,9 @@ This can be useful for e.g writing quietly a complex regexp."
 
 (defun helm--maybe-update-keymap ()
   "Handle differents keymaps in multiples sources.
-This function is meant to be run in `helm-move-selection-after-hook'.
-It will override `helm-map' with the keymap attribute of current source
-if some when multiples sources are present."
+
+It will override `helm-map' with the local map of current source.
+If no map is found in current source do nothing (keep previous map)."
   (with-helm-buffer
     (helm-aif (assoc-default 'keymap (helm-get-current-source))
         ;; Fix #466; we use here set-transient-map
