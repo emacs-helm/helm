@@ -163,7 +163,7 @@ When disabled (nil) use the longest buffer-name length found."
      . "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
 
 (defvar helm-source-buffer-not-found
-  `((name . "Create buffer")
+  '((name . "Create buffer")
     (dummy)
     (action . (lambda (candidate)
                 (let ((mjm (and helm-current-prefix-arg
