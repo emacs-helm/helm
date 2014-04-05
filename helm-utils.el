@@ -894,27 +894,19 @@ See `helm-find-files-persistent-action' for usage."
 the entire symbol."
   (interactive)
   (with-helm-current-buffer
-    ;; Start to initial point if C-w have never been hit.
-    (if (or helm-yank-point
-            (not helm-yank-symbol-first))
-        (progn
-          (unless helm-yank-point (setq helm-yank-point (point)))
-          (save-excursion
-            (goto-char helm-yank-point)
-            (forward-word 1)
-            (helm-insert-in-minibuffer (buffer-substring-no-properties
-                                        helm-yank-point (point)))
-            (setq helm-yank-point (point))))
-        (let* ((sym (symbol-at-point))
-               (str (and sym
-                         (symbol-name sym))))
-          (if str
-              (progn
-                (helm-insert-in-minibuffer str)
-                (setq helm-yank-point (cdr (bounds-of-thing-at-point 'symbol)))
-                (goto-char helm-yank-point))
-              (setq helm-yank-point (point))
-              (helm-yank-text-at-point))))))
+    (let ((fwd-fn (if helm-yank-symbol-first
+                      'forward-symbol 'forward-word)))
+      ;; Start to initial point if C-w have never been hit.
+      (unless helm-yank-point (setq helm-yank-point (point)))
+      (save-excursion
+        (goto-char helm-yank-point)
+        (funcall fwd-fn 1)
+        (helm-insert-in-minibuffer
+         (replace-regexp-in-string
+          "\\`\n" ""
+          (buffer-substring-no-properties
+           helm-yank-point (point))))
+        (setq helm-yank-point (point))))))
 
 (defun helm-reset-yank-point ()
   (setq helm-yank-point nil))
