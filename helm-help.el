@@ -733,6 +733,32 @@ is called once for each file like this:
   (let ((helm-help-message helm-el-package-help-message))
     (helm-help)))
 
+;;; Helm M-x
+;;
+;;
+(defvar helm-M-x-help-message
+  "== Helm M-x ==\
+\nHelm M-x tips:
+
+You can get help on any command with persistent action (C-z).
+
+All the prefix args passed BEFORE running `helm-M-x' are ignored.
+When you want to pass prefix args, pass them AFTER starting `helm-M-x',
+you will have a prefix arg counter appearing in mode-line notifying you
+the amount of prefix args entered.
+
+\nSpecific commands for Helm M-x:
+\\<helm-M-x-map>
+\\[helm-M-x-help]\t\t->Show this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-M-x-help ()
+  (interactive)
+  (let ((helm-help-message helm-M-x-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -915,6 +941,17 @@ is called once for each file like this:
 (defvar helm-el-package-mode-line "\
 \\<helm-el-package-map>\
 \\[helm-el-package-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
+
+;;;###autoload
+(defvar helm-M-x-mode-line "\
+\\<helm-M-x-map>\
+\\[helm-M-x-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\

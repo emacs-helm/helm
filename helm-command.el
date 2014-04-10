@@ -54,6 +54,14 @@ Show all candidates on startup when 0 (default)."
 
 (defvar helm-M-x-input-history nil)
 
+(defvar helm-M-x-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c ?") 'helm-M-x-help)
+    map)
+  "Keymap for `helm-M-x'.")
+
+
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
   (cl-loop for key being the key-seqs of mode-map using (key-bindings com)
@@ -157,10 +165,10 @@ You can get help on each command by persistent action."
                         :history history
                         :reverse-history helm-M-x-reverse-history
                         :del-input nil
-                        :mode-line helm-mode-line-string
+                        :mode-line helm-M-x-mode-line
                         :must-match t
                         :nomark t
-                        :keymap helm-map
+                        :keymap helm-M-x-map
                         :candidates-in-buffer t
                         :fc-transformer 'helm-M-x-transformer))
       (cancel-timer tm)
