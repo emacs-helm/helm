@@ -271,7 +271,7 @@ Keys description:
 - PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
 
 - MODE-LINE: A string or list to display in mode line.
-  (See `helm-mode-line-string')
+  Default is `helm-comp-read-mode-line'.
 
 - KEYMAP: A keymap to use in this `helm-comp-read'.
   (the keymap will be shared with history source)
@@ -660,7 +660,8 @@ See documentation of `completing-read' and `all-completions' for details."
      nomark
      (alistp t)
      (persistent-action 'helm-find-files-persistent-action)
-     (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"))
+     (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
+     (mode-line helm-read-file-name-mode-line-string))
   "Read a file name with helm completion.
 It is helm `read-file-name' emulation.
 
@@ -692,7 +693,9 @@ Keys description:
 
 - PERSISTENT-ACTION: a persistent action function.
 
-- PERSISTENT-HELP: persistent help message."
+- PERSISTENT-HELP: persistent help message.
+
+- MODE-LINE: A mode line message, default is `helm-read-file-name-mode-line-string'."
   
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
@@ -731,7 +734,7 @@ Keys description:
                       (header-name . (lambda (hname)
                                        (concat hname
                                                helm-find-files-doc-header)))
-                      (mode-line . helm-read-file-name-mode-line-string)
+                      (mode-line . ,mode-line)
                       (candidates . ,hist)
                       (keymap . ,cmap)
                       (persistent-action . ,persistent-action)
@@ -747,7 +750,7 @@ Keys description:
                                 (with-helm-temp-hook 'helm-after-initialize-hook
                                   (with-helm-buffer  
                                     (set (make-local-variable 'helm-in-file-completion-p) t)))))
-                      (mode-line . helm-read-file-name-mode-line-string)
+                      (mode-line . ,mode-line)
                       (candidates
                        . (lambda ()
                            (append (and (not (file-exists-p helm-pattern))

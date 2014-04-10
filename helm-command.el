@@ -117,7 +117,12 @@ Show global bindings and local bindings according to current `major-mode'."
 ;;;###autoload
 (defun helm-M-x ()
   "Preconfigured `helm' for Emacs commands.
-It is `helm' replacement of regular `M-x' `execute-extended-command'."
+It is `helm' replacement of regular `M-x' `execute-extended-command'.
+
+Unlike regular `M-x' emacs vanilla `execute-extended-command' command,
+the prefix args if needed, are passed AFTER starting `helm-M-x'.
+
+You can get help on each command by persistent action."
   (interactive)
   (let* ((history (cl-loop for i in extended-command-history
                            when (commandp (intern i)) collect i))
