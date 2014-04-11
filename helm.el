@@ -603,7 +603,6 @@ Otherwise all variables started with `helm-' are shown.")
 
 (defvar helm-debug nil
   "If non-nil, write log message into `helm-debug-buffer' buffer.
-If `debug-on-error' is non-nil, write log message regardless of this variable.
 It is disabled by default because `helm-debug-buffer' grows quickly.")
 
 (defvar helm-compile-source-functions
@@ -704,12 +703,12 @@ when `helm' is keyboard-quitted.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
-  "Log message if `debug-on-error' or `helm-debug' is non-nil.
+  "Log message `helm-debug' is non-nil.
 Messages are written to the `helm-debug-buffer' buffer.
 
 Argument FORMAT-STRING is a string to use with `format'.
 Use optional arguments ARGS like in `format'."
-  (when (or debug-on-error helm-debug)
+  (when helm-debug
     (with-current-buffer (get-buffer-create helm-debug-buffer)
       (outline-mode)
       (buffer-disable-undo)
@@ -738,7 +737,7 @@ Use optional arguments ARGS like in `format'."
     `(condition-case err
         ;; Don't eval expression EXPR
         ;; when debugging is not turned on.
-        (when (or debug-on-error helm-debug)
+        (when helm-debug
           (helm-log "%S = %S" ,expr (eval ,expr t)))
       (error (helm-log "%S = ERROR: %S" ,expr err)))))
 
@@ -770,7 +769,7 @@ will be created there and the log recorded in a file named
 at the date and time of today in this directory."
   (when (and (stringp helm-debug-root-directory)
              (file-directory-p helm-debug-root-directory)
-             (or debug-on-error helm-debug))
+             helm-debug)
     (let ((logdir (expand-file-name (concat "helm-debug-"
                                             (format-time-string "%Y%m%d"))
                                     helm-debug-root-directory)))
