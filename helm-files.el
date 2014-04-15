@@ -1325,6 +1325,9 @@ purpose."
   (let ((methods (mapcar 'car tramp-methods))
         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
         cur-method tramp-name)
+    ;; In some rare cases tramp can return a nil input,
+    ;; so be sure pattern is a string for safety (Issue #476).
+    (unless pattern (setq pattern ""))
     (cond ((string= pattern "") "")
           ((string-match pattern "\\`[.]\\{1,2\\}/\\'")
            (expand-file-name pattern))
