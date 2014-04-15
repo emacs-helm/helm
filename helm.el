@@ -723,14 +723,6 @@ Use optional arguments ARGS like in `format'."
                         (helm-log-get-current-function)
                         (apply #'format (cons format-string args))))))))
 
-(defun helm-log-run-hook (hook)
-  "Run HOOK like `run-hooks' but write these actions to helm log buffer."
-  (helm-log "executing %s" hook)
-  (helm-log-eval (symbol-value hook))
-  (helm-log-eval (default-value hook))
-  (run-hooks hook)
-  (helm-log "executed %s" hook))
-
 (defmacro helm-log-eval (&rest exprs)
   "Eval EXPRS and write results to helm log buffer."
   (cl-dolist (expr exprs)
@@ -740,6 +732,14 @@ Use optional arguments ARGS like in `format'."
         (when helm-debug
           (helm-log "%S = %S" ,expr (eval ,expr t)))
       (error (helm-log "%S = ERROR: %S" ,expr err)))))
+
+(defun helm-log-run-hook (hook)
+  "Run HOOK like `run-hooks' but write these actions to helm log buffer."
+  (helm-log "executing %s" hook)
+  (helm-log-eval (symbol-value hook))
+  (helm-log-eval (default-value hook))
+  (run-hooks hook)
+  (helm-log "executed %s" hook))
 
 (defun helm-log-get-current-function ()
   "Get function name calling `helm-log'.
