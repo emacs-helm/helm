@@ -897,8 +897,11 @@ the entire symbol."
     (let ((fwd-fn (if helm-yank-symbol-first
                       'forward-symbol 'forward-word)))
       ;; Start to initial point if C-w have never been hit.
-      (unless helm-yank-point (setq helm-yank-point (point)))
       (save-excursion
+        (unless helm-yank-point
+          (setq helm-yank-point (progn
+                                  (funcall fwd-fn -1)
+                                  (point))))
         (goto-char helm-yank-point)
         (funcall fwd-fn 1)
         (helm-insert-in-minibuffer
