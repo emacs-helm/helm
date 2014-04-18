@@ -120,6 +120,8 @@ second call within 0.5s run `helm-swap-windows'."
     (define-key map (kbd "<up>")       'helm-previous-line)
     (define-key map (kbd "C-n")        'helm-next-line)
     (define-key map (kbd "C-p")        'helm-previous-line)
+    (define-key map (kbd "<C-down>")   'helm-follow-action-forward)
+    (define-key map (kbd "<C-up>")     'helm-follow-action-backward)
     (define-key map (kbd "<prior>")    'helm-previous-page)
     (define-key map (kbd "<next>")     'helm-next-page)
     (define-key map (kbd "M-v")        'helm-previous-page)
@@ -3310,6 +3312,22 @@ Key arg DIRECTION can be one of:
 (defun helm-goto-source (source-or-name)
   "Move the selection to the source SOURCE-OR-NAME."
   (helm-move-selection-common :where 'source :direction source-or-name))
+
+(defun helm--follow-action (arg)
+  (if (> arg 0)
+      (helm-next-line)
+      (helm-previous-line))
+  (helm-execute-persistent-action))
+
+(defun helm-follow-action-forward ()
+  "Go to next line and execute persistent action."
+  (interactive)
+  (helm--follow-action 1))
+
+(defun helm-follow-action-backward ()
+  "Go to previous line and execute persistent action."
+  (interactive)
+  (helm--follow-action -1))
 
 (defun helm-mark-current-line (&optional resumep)
   "Move `helm-selection-overlay' to current line.
