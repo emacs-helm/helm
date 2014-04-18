@@ -1885,9 +1885,10 @@ If CANDIDATE is alone, open file CANDIDATE filename.
 That's mean:
 First hit on C-z expand CANDIDATE second hit open file.
 If a prefix arg is given or `helm-follow-mode' is on open file."
-  (let* ((follow        (buffer-local-value
-                         'helm-follow-mode
-                         (get-buffer-create helm-buffer)))
+  (let* ((follow        (or (buffer-local-value
+                             'helm-follow-mode
+                             (get-buffer-create helm-buffer))
+                            helm--temp-follow-flag))
          (new-pattern   (helm-get-selection))
          (num-lines-buf (with-current-buffer helm-buffer
                           (count-lines (point-min) (point-max))))
