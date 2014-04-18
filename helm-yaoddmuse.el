@@ -38,8 +38,8 @@
           (setq helm-yaoddmuse-ew-cache
                 (gethash "EmacsWiki" yaoddmuse-pages-hash)))
         helm-yaoddmuse-ew-cache)
-      (yaoddmuse-update-pagename t)
-      (gethash "EmacsWiki" yaoddmuse-pages-hash)))
+    (yaoddmuse-update-pagename t)
+    (gethash "EmacsWiki" yaoddmuse-pages-hash)))
 
 (defvar helm-source-yaoddmuse-emacswiki-edit-or-view
   '((name . "Yaoddmuse Edit or View (EmacsWiki)")
@@ -71,7 +71,7 @@
                           (helm-yaoddmuse-cache-pages t)
                           (setq helm-yaoddmuse-ew-cache
                                 (gethash "EmacsWiki" yaoddmuse-pages-hash)))
-                        (yaoddmuse-update-pagename))))))
+                      (yaoddmuse-update-pagename))))))
     (action-transformer helm-yaoddmuse-action-transformer))
   "Needs yaoddmuse.el.
 
@@ -107,7 +107,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el")
       (append actions '(("Install Elisp"
                          . (lambda (elm)
                              (install-elisp-from-emacswiki elm)))))
-      actions))
+    actions))
 
 ;;;###autoload
 (defun helm-yaoddmuse-cache-pages (&optional load)
@@ -120,8 +120,8 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
     (erase-buffer)
     (insert "(puthash \"EmacsWiki\" '(")
     (cl-loop for i in (gethash "EmacsWiki" yaoddmuse-pages-hash)
-             do
-             (insert (concat "(\"" (car i) "\") ")))
+          do
+          (insert (concat "(\"" (car i) "\") ")))
     (insert ") yaoddmuse-pages-hash)\n")
     (save-buffer)
     (kill-buffer (current-buffer))

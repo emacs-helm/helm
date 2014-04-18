@@ -56,7 +56,7 @@
                ("Show history" . (lambda (elm)
                                    (if (member elm helm-cache-world)
                                        (helm-gentoo-eshell-action elm "genlop -qe")
-                                       (message "No infos on packages not yet installed"))))
+                                     (message "No infos on packages not yet installed"))))
                ("Copy in kill-ring" . kill-new)
                ("insert at point" . insert)
                ("Browse HomePage" . (lambda (elm)
@@ -65,7 +65,7 @@
                ("Show extra infos" . (lambda (elm)
                                        (if (member elm helm-cache-world)
                                            (helm-gentoo-eshell-action elm "genlop -qi")
-                                           (message "No infos on packages not yet installed"))))
+                                         (message "No infos on packages not yet installed"))))
                ("Show use flags" . (lambda (elm)
                                      (helm-gentoo-default-action elm "equery" "-C" "u")
                                      (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
@@ -107,7 +107,7 @@
         (let ((com-list (append args (list elm))))
           (apply #'call-process command nil t nil
                  com-list)))
-      (message "No infos on packages not yet installed")))
+    (message "No infos on packages not yet installed")))
 
 (defvar helm-source-use-flags
   '((name . "Use Flags")
@@ -174,7 +174,7 @@
             (pop-to-buffer "*scratch*")
             (eshell-command (format "%s %s" command elm)))
           (pop-to-buffer "*EShell Command Output*"))
-        (eshell-command (format "%s %s" command elm)))))
+      (eshell-command (format "%s %s" command elm)))))
 
 (defun helm-gentoo-get-use ()
   "Initialize buffer with all use flags."
@@ -200,12 +200,12 @@
                               (call-process "eix" nil t nil
                                             elm "--format" "<homepage>\n")
                               (buffer-string)))
-           for i in url-list
-           when (and (string-match "^http://.*" i)
-                     all
-                     (not (member i all)))
-           collect i into all
-           finally return all))
+        for i in url-list
+        when (and (string-match "^http://.*" i)
+                  all
+                  (not (member i all)))
+        collect i into all
+        finally return all))
 
 (defun helm-gentoo-get-world ()
   "Return list of all installed package on your system."
@@ -225,18 +225,18 @@
 (defun helm-highlight-world (eix)
   "Highlight all installed package."
   (cl-loop for i in eix
-           if (member i helm-cache-world)
-           collect (propertize i 'face 'helm-gentoo-match)
-           else
-           collect i))
+        if (member i helm-cache-world)
+        collect (propertize i 'face 'helm-gentoo-match)
+        else
+        collect i))
 
 (defun helm-highlight-local-use (use-flags)
   (let ((local-uses (helm-gentoo-get-local-use)))
     (cl-loop for i in use-flags
-             if (member i local-uses)
-             collect (propertize i 'face 'helm-gentoo-match)
-             else
-             collect i)))
+          if (member i local-uses)
+          collect (propertize i 'face 'helm-gentoo-match)
+          else
+          collect i)))
 
 ;;;###autoload
 (defun helm-gentoo ()

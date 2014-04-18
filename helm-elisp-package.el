@@ -39,68 +39,68 @@
 (defun helm-el-package-install (_candidate)
   (let ((mkd (helm-marked-candidates)))
     (cl-loop for p in mkd
-             for sym = (intern p)
-             for id = (get-text-property 0 'tabulated-list-id p)
-             do (package-install sym)
-             and collect (if (fboundp 'package-desc-full-name)
-                             id
-                             (car id)) into installed-list
-             finally do (if (fboundp 'package-desc-full-name)
-                            (message (format "%d packages installed:\n(%s)"
-                                             (length installed-list)
-                                             (mapconcat #'package-desc-full-name
-                                                        installed-list ", ")))
-                            (message (format "%d packages installed:\n(%s)"
-                                             (length installed-list)
-                                             (mapconcat 'symbol-name installed-list ", ")))))))
+          for sym = (intern p)
+          for id = (get-text-property 0 'tabulated-list-id p)
+          do (package-install sym)
+          and collect (if (fboundp 'package-desc-full-name)
+                          id
+                        (car id)) into installed-list
+          finally do (if (fboundp 'package-desc-full-name)
+                         (message (format "%d packages installed:\n(%s)"
+                                          (length installed-list)
+                                          (mapconcat #'package-desc-full-name
+                                                     installed-list ", ")))
+                       (message (format "%d packages installed:\n(%s)"
+                                        (length installed-list)
+                                        (mapconcat 'symbol-name installed-list ", ")))))))
 
 (defun helm-el-package-uninstall (_candidate)
   (let ((mkd (helm-marked-candidates)))
     (cl-loop for p in mkd
-             for id = (get-text-property 0 'tabulated-list-id p)
-             do
-             (condition-case-unless-debug err
-                 (with-no-warnings
-                   (if (fboundp 'package-desc-full-name)
-                       ;; emacs 24.4
-                       (package-delete id)
+          for id = (get-text-property 0 'tabulated-list-id p)
+          do
+          (condition-case-unless-debug err
+              (with-no-warnings
+                (if (fboundp 'package-desc-full-name)
+                    ;; emacs 24.4
+                    (package-delete id)
+                  ;; emacs 24.3
+                  (package-delete (symbol-name (car id))
+                                  (package-version-join (cdr id)))))
+            (error (message (cadr err))))
+          and collect (if (fboundp 'package-desc-full-name)
+                          id
+                        (cons (symbol-name (car id))
+                              (package-version-join (cdr id)))) into delete-list
+          finally do (if (fboundp 'package-desc-full-name)
+                         ;; emacs 24.4
+                         (message (format "%d packages deleted:\n(%s)"
+                                          (length delete-list)
+                                          (mapconcat #'package-desc-full-name
+                                                     delete-list ", ")))
                        ;; emacs 24.3
-                       (package-delete (symbol-name (car id))
-                                       (package-version-join (cdr id)))))
-               (error (message (cadr err))))
-             and collect (if (fboundp 'package-desc-full-name)
-                             id
-                             (cons (symbol-name (car id))
-                                   (package-version-join (cdr id)))) into delete-list
-             finally do (if (fboundp 'package-desc-full-name)
-                            ;; emacs 24.4
-                            (message (format "%d packages deleted:\n(%s)"
-                                             (length delete-list)
-                                             (mapconcat #'package-desc-full-name
-                                                        delete-list ", ")))
-                            ;; emacs 24.3
-                            (message (format "%d packages deleted:\n(%s)"
-                                             (length delete-list)
-                                             (mapconcat (lambda (x)
-                                                          (concat (car x) "-" (cdr x)))
-                                                        delete-list ", ")))
-                            ;; emacs 24.3 doesn't update
-                            ;; its `package-alist' after deleting.
-                            (cl-loop for p in package-alist
-                                     when (assq (symbol-name (car p)) delete-list)
-                                     do (setq package-alist (delete p package-alist)))))))
+                       (message (format "%d packages deleted:\n(%s)"
+                                        (length delete-list)
+                                        (mapconcat (lambda (x)
+                                                     (concat (car x) "-" (cdr x)))
+                                                   delete-list ", ")))
+                       ;; emacs 24.3 doesn't update
+                       ;; its `package-alist' after deleting.
+                       (cl-loop for p in package-alist
+                             when (assq (symbol-name (car p)) delete-list)
+                             do (setq package-alist (delete p package-alist)))))))
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
-           for installed-p = (assq (intern (car (split-string c)))
-                                   package-alist)
-           for cand = (cons c (car (split-string c)))
-           when (or (and installed-p
-                         (eq helm-el-package--show-only 'installed))
-                    (and (not installed-p)
-                         (eq helm-el-package--show-only 'uninstalled)) 
-                    (eq helm-el-package--show-only 'all))
-           collect cand))
+        for installed-p = (assq (intern (car (split-string c)))
+                                package-alist)
+        for cand = (cons c (car (split-string c)))
+        when (or (and installed-p
+                      (eq helm-el-package--show-only 'installed))
+                 (and (not installed-p)
+                      (eq helm-el-package--show-only 'uninstalled)) 
+                 (eq helm-el-package--show-only 'all))
+        collect cand))
 
 (defun helm-el-package-show-installed ()
   (interactive)

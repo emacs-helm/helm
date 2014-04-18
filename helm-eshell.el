@@ -61,12 +61,12 @@
     (filtered-candidate-transformer
      (lambda (candidates _sources)
        (cl-loop for i in (sort candidates 'helm-generic-sort-fn)
-                collect
-                (cond ((string-match "\\`~/?" helm-ec-target)
-                       (abbreviate-file-name i))
-                      ((string-match "\\`/" helm-ec-target) i)
-                      (t
-                       (file-relative-name i))))))
+             collect
+             (cond ((string-match "\\`~/?" helm-ec-target)
+                    (abbreviate-file-name i))
+                   ((string-match "\\`/" helm-ec-target) i)
+                   (t
+                    (file-relative-name i))))))
     (action . helm-ec-insert))
   "Helm source for Eshell completion.")
 
@@ -103,43 +103,43 @@ The function that call this should set `helm-ec-target' to thing at point."
                                         (pcomplete-entries))
                         helm-pattern)))
         (cl-loop ;; expand entry too to be able to compare it with file-cand.
-         with exp-entry = (and (stringp entry)
-                               (not (string= entry ""))
-                               (file-name-as-directory
-                                (expand-file-name entry default-directory)))
-         for i in (all-completions pcomplete-stub table)
-         ;; Transform the related names to abs names.
-         for file-cand = (and exp-entry
-                              (if (file-remote-p i) i
-                                  (expand-file-name
-                                   i (file-name-directory entry))))
-         ;; Compare them to avoid dups.
-         for file-entry-p = (and (stringp exp-entry)
-                                 (stringp file-cand)
-                                 ;; Fix :/tmp/foo/ $ cd foo
-                                 (not (file-directory-p file-cand))
-                                 (file-equal-p exp-entry file-cand))
-         if (and file-cand (or (file-remote-p file-cand)
-                               (file-exists-p file-cand))
-                 (not file-entry-p))
-         collect file-cand into ls
-         else
-         ;; Avoid adding entry here.
-         unless file-entry-p collect i into ls
-         finally return
-         (if (and exp-entry
-                  (file-directory-p exp-entry)
-                  ;; If the car of completion list is
-                  ;; an executable, probably we are in
-                  ;; command completion, so don't add a
-                  ;; possible file related entry here.
-                  (and ls (not (executable-find (car ls))))
-                  ;; Don't add entry if already in prompt.
-                  (not (file-equal-p exp-entry pcomplete-stub)))
-             (append (list exp-entry)
-                     ;; Entry should not be here now but double check.
-                     (remove entry ls))
-             ls))))))
+              with exp-entry = (and (stringp entry)
+                                    (not (string= entry ""))
+                                    (file-name-as-directory
+                                     (expand-file-name entry default-directory)))
+              for i in (all-completions pcomplete-stub table)
+              ;; Transform the related names to abs names.
+              for file-cand = (and exp-entry
+                                   (if (file-remote-p i) i
+                                     (expand-file-name
+                                      i (file-name-directory entry))))
+              ;; Compare them to avoid dups.
+              for file-entry-p = (and (stringp exp-entry)
+                                      (stringp file-cand)
+                                      ;; Fix :/tmp/foo/ $ cd foo
+                                      (not (file-directory-p file-cand))
+                                      (file-equal-p exp-entry file-cand))
+              if (and file-cand (or (file-remote-p file-cand)
+                                    (file-exists-p file-cand))
+                      (not file-entry-p))
+              collect file-cand into ls
+              else
+              ;; Avoid adding entry here.
+              unless file-entry-p collect i into ls
+              finally return
+              (if (and exp-entry
+                       (file-directory-p exp-entry)
+                       ;; If the car of completion list is
+                       ;; an executable, probably we are in
+                       ;; command completion, so don't add a
+                       ;; possible file related entry here.
+                       (and ls (not (executable-find (car ls))))
+                       ;; Don't add entry if already in prompt.
+                       (not (file-equal-p exp-entry pcomplete-stub)))
+                  (append (list exp-entry)
+                          ;; Entry should not be here now but double check.
+                          (remove entry ls))
+                ls))))))
 
 ;;; Eshell history.
 ;;

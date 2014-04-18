@@ -140,11 +140,11 @@ When disabled (nil) use the longest buffer-name length found."
               ;; Issue #51 Create the list before `helm-buffer' creation.
               (setq helm-buffers-list-cache (helm-buffer-list))
               (let ((result (cl-loop for b in helm-buffers-list-cache
-                                     maximize (length b) into len-buf
-                                     maximize (length (with-current-buffer b
-                                                        (symbol-name major-mode)))
-                                     into len-mode
-                                     finally return (cons len-buf len-mode))))
+                                  maximize (length b) into len-buf
+                                  maximize (length (with-current-buffer b
+                                                     (symbol-name major-mode)))
+                                  into len-mode
+                                  finally return (cons len-buf len-mode))))
                 (unless helm-buffer-max-length
                   (setq helm-buffer-max-length (car result)))
                 (unless helm-buffer-max-len-mode
@@ -174,7 +174,7 @@ When disabled (nil) use the longest buffer-name length found."
                       (buffer (get-buffer-create candidate)))
                   (if mjm
                       (with-current-buffer buffer (funcall mjm))
-                      (set-buffer-major-mode buffer))
+                    (set-buffer-major-mode buffer))
                   (helm-switch-to-buffer buffer))))))
 
 (defvar ido-temp-list)
@@ -239,8 +239,8 @@ See `ido-make-buffer-list' for more infos."
                    (format "(%s %s in `%s')"
                            (process-name proc)
                            (process-status proc) dir)
-                   (format "(in `%s')" dir))
-                          'face face2)))))
+                 (format "(in `%s')" dir))
+               'face face2)))))
 
 (defun helm-buffer--details (buffer &optional details)
   (let* ((mode (with-current-buffer buffer (format-mode-line mode-name)))
@@ -290,29 +290,29 @@ See `ido-make-buffer-list' for more infos."
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
   (cl-loop for i in buffers
-           for (name size mode meta) = (if helm-buffer-details-flag
-                                           (helm-buffer--details i 'details)
-                                           (helm-buffer--details i))
-           for truncbuf = (if (> (string-width name) helm-buffer-max-length)
-                              (helm-substring-by-width
-                               name helm-buffer-max-length)
-                              (concat name (make-string
-                                            (- (+ helm-buffer-max-length 3)
-                                               (string-width name)) ? )))
-           for len = (length mode)
-           when (> len helm-buffer-max-len-mode)
-           do (setq helm-buffer-max-len-mode len)
-           for fmode = (concat (make-string
-                                (- (max helm-buffer-max-len-mode len) len) ? )
-                               mode)
-           ;; The max length of a number should be 1023.9X where X is the
-           ;; units, this is 7 characters.
-           for formatted-size = (and size (format "%7s" size))
-           collect (cons (if helm-buffer-details-flag
-                             (concat truncbuf "\t" formatted-size
-                                     "  " fmode "  " meta)
-                             name)
-                         i)))
+        for (name size mode meta) = (if helm-buffer-details-flag
+                                        (helm-buffer--details i 'details)
+                                      (helm-buffer--details i))
+        for truncbuf = (if (> (string-width name) helm-buffer-max-length)
+                           (helm-substring-by-width
+                            name helm-buffer-max-length)
+                         (concat name (make-string
+                                       (- (+ helm-buffer-max-length 3)
+                                          (string-width name)) ? )))
+        for len = (length mode)
+        when (> len helm-buffer-max-len-mode)
+        do (setq helm-buffer-max-len-mode len)
+        for fmode = (concat (make-string
+                             (- (max helm-buffer-max-len-mode len) len) ? )
+                            mode)
+        ;; The max length of a number should be 1023.9X where X is the
+        ;; units, this is 7 characters.
+        for formatted-size = (and size (format "%7s" size))
+        collect (cons (if helm-buffer-details-flag
+                          (concat truncbuf "\t" formatted-size
+                                  "  " fmode "  " meta)
+                        name)
+                      i)))
 
 (defun helm-buffer--get-preselection (buffer-name)
   (concat "^"
@@ -323,9 +323,9 @@ Should be called after others transformers i.e (boring buffers)."
               (regexp-quote
                (helm-substring-by-width
                 buffer-name helm-buffer-max-length))
-              (concat (regexp-quote buffer-name)
-                      (if helm-buffer-details-flag
-                          "$" "[[:blank:]]+")))))
+            (concat (regexp-quote buffer-name)
+                    (if helm-buffer-details-flag
+                        "$" "[[:blank:]]+")))))
 
 (defun helm-toggle-buffers-details ()
   (interactive)
@@ -338,9 +338,9 @@ Should be called after others transformers i.e (boring buffers)."
 (defun helm-buffers-sort-transformer (candidates _source)
   (if (string= helm-pattern "")
       candidates
-      (sort candidates
-            #'(lambda (s1 s2)
-                (< (string-width s1) (string-width s2))))))
+    (sort candidates
+          #'(lambda (s1 s2)
+              (< (string-width s1) (string-width s2))))))
 
 
 ;;; match functions
@@ -349,19 +349,19 @@ Should be called after others transformers i.e (boring buffers)."
   (when (string-match "\\`\\*" pattern)
     (setq pattern (split-string (substring pattern 1) ","))
     (cl-loop for pat in pattern
-             if (string-match "\\`!" pat)
-             collect (string-match (substring pat 1) mjm) into neg
-             else collect (string-match pat mjm) into pos
-             finally return
-             (or (and pos (cl-loop for i in pos
-                                   thereis (numberp i)))
-                 (and neg (not (cl-loop for i in neg
-                                        thereis (numberp i))))))))
+          if (string-match "\\`!" pat)
+          collect (string-match (substring pat 1) mjm) into neg
+          else collect (string-match pat mjm) into pos
+          finally return
+          (or (and pos (cl-loop for i in pos
+                             thereis (numberp i)))
+              (and neg (not (cl-loop for i in neg
+                                  thereis (numberp i))))))))
 
 (defun helm-buffer--match-pattern (pattern candidate)
   (if (string-match "\\`!" pattern)
       (not (string-match (substring pattern 1) candidate))
-      (string-match pattern candidate)))
+    (string-match pattern candidate)))
 
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
@@ -391,23 +391,23 @@ with name matching pattern."
                 ((string-match "\\`\\*" helm-pattern)
                  (and (helm-buffer--match-mjm (car split) mjm)
                       (cl-loop for i in (cdr split) always
-                               (helm-buffer--match-pattern i cand))))
+                            (helm-buffer--match-pattern i cand))))
                 ((string-match "\\s-" helm-pattern)
                  (cl-loop for i in split always
-                          (helm-buffer--match-pattern i cand)))
+                       (helm-buffer--match-pattern i cand)))
                 (t (or (helm-buffer--match-mjm helm-pattern mjm)
                        (helm-buffer--match-pattern helm-pattern cand)))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
   (cl-loop for i in lst always
-           (cond ((string-match "\\`[\\]@" i)
-                  (helm-buffer--match-pattern i candidate))
-                 ((string-match "\\`@\\(.*\\)" i)
-                  (save-excursion
-                    (let ((str (match-string 1 i)))
-                      (goto-char (point-min))
-                      (re-search-forward str nil t))))
-                 (t (helm-buffer--match-pattern i candidate)))))
+        (cond ((string-match "\\`[\\]@" i)
+               (helm-buffer--match-pattern i candidate))
+              ((string-match "\\`@\\(.*\\)" i)
+               (save-excursion
+                 (let ((str (match-string 1 i)))
+                   (goto-char (point-min))
+                   (re-search-forward str nil t))))
+              (t (helm-buffer--match-pattern i candidate)))))
 
 
 (defun helm-buffer-query-replace-1 (&optional regexp-flag)
@@ -417,19 +417,19 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
         (bufs   (helm-marked-candidates)))
     (cl-loop with replace = (query-replace-read-from prompt regexp-flag)
-             with tostring = (unless (consp replace)
-                               (query-replace-read-to
-                                replace prompt regexp-flag))
-             for buf in bufs
-             do
-             (save-window-excursion
-               (helm-switch-to-buffer buf)
-               (save-excursion
-                 (let ((case-fold-search t))
-                   (goto-char (point-min))
-                   (if (consp replace)
-                       (apply fn (list (car replace) (cdr replace)))
-                       (apply fn (list replace tostring)))))))))
+          with tostring = (unless (consp replace)
+                            (query-replace-read-to
+                             replace prompt regexp-flag))
+          for buf in bufs
+          do
+          (save-window-excursion
+            (helm-switch-to-buffer buf)
+            (save-excursion
+              (let ((case-fold-search t))
+                (goto-char (point-min))
+                (if (consp replace)
+                    (apply fn (list (car replace) (cdr replace)))
+                  (apply fn (list replace tostring)))))))))
 
 (defun helm-buffer-query-replace-regexp (_candidate)
   (helm-buffer-query-replace-1 'regexp))
@@ -478,8 +478,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (preselect (helm-get-selection nil t))
         (enable-recursive-minibuffers t))
     (cl-loop for buf in marked do
-             (with-current-buffer (get-buffer buf)
-               (when (buffer-file-name) (save-buffer))))
+          (with-current-buffer (get-buffer buf)
+            (when (buffer-file-name) (save-buffer))))
     (when (> (length marked) 1) (helm-unmark-all))
     (helm-force-update (regexp-quote preselect))))
 
@@ -568,7 +568,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (progn
           (save-buffer)
           (kill-buffer buffer))
-        (kill-buffer buffer)))
+      (kill-buffer buffer)))
   (helm-delete-current-selection)
   (when (helm-empty-source-p) (helm-next-source))
   (with-helm-temp-hook 'helm-after-persistent-action-hook
@@ -577,7 +577,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
       (helm-buffers-persistent-kill candidate)
-      (helm-switch-to-buffer candidate)))
+    (helm-switch-to-buffer candidate)))
 
 (defun helm-ediff-marked-buffers (_candidate &optional merge)
   "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
@@ -597,7 +597,7 @@ With optional arg MERGE call `ediff-merge-buffers'."
        (error "Error:To much buffers marked!")))
     (if merge
         (ediff-merge-buffers buf1 buf2)
-        (ediff-buffers buf1 buf2))))
+      (ediff-buffers buf1 buf2))))
 
 (defun helm-ediff-marked-buffers-merge (candidate)
   "Ediff merge `helm-current-buffer' with CANDIDATE.
@@ -610,11 +610,11 @@ Can be used by any source that list buffers."
   (let ((helm-moccur-always-search-in-current
          (if helm-current-prefix-arg
              (not helm-moccur-always-search-in-current)
-             helm-moccur-always-search-in-current))
+           helm-moccur-always-search-in-current))
         (buffers (helm-marked-candidates))
         (input (cl-loop for i in (split-string helm-pattern " " t)
-                        thereis (and (string-match "\\`@\\(.*\\)" i)
-                                     (match-string 1 i)))))
+                     thereis (and (string-match "\\`@\\(.*\\)" i)
+                                  (match-string 1 i)))))
     (helm-multi-occur-1 buffers input)))
 
 (defun helm-buffers-run-multi-occur ()
@@ -634,11 +634,11 @@ Can be used by any source that list buffers."
                               (remove 'helm-shadow-boring-buffers
                                       filter-attrs))
                         helm-source-buffers-list t)
-          (helm-attrset 'filtered-candidate-transformer
-                        (cons 'helm-shadow-boring-buffers
-                              (remove 'helm-skip-boring-buffers
-                                      filter-attrs))
-                        helm-source-buffers-list t))
+        (helm-attrset 'filtered-candidate-transformer
+                      (cons 'helm-shadow-boring-buffers
+                            (remove 'helm-skip-boring-buffers
+                                    filter-attrs))
+                      helm-source-buffers-list t))
       (helm-force-update))))
 
 

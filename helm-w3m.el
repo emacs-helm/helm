@@ -73,7 +73,7 @@
     (persistent-action . (lambda (candidate)
                            (if current-prefix-arg
                                (helm-w3m-browse-bookmark candidate t)
-                               (helm-w3m-browse-bookmark candidate nil t))))
+                             (helm-w3m-browse-bookmark candidate nil t))))
     (persistent-help . "Open URL with emacs-w3m in new tab / \
 C-u \\[helm-execute-persistent-action]: Open URL with Firefox"))
   "Needs w3m and emacs-w3m.
@@ -93,9 +93,9 @@ http://emacs-w3m.namazu.org/")
 
 (defun helm-highlight-w3m-bookmarks (bookmarks _source)
   (cl-loop for i in bookmarks
-           collect (propertize
-                    i 'face 'helm-w3m-bookmarks
-                    'help-echo (helm-w3m-bookmarks-get-value i))))
+        collect (propertize
+                 i 'face 'helm-w3m-bookmarks
+                 'help-echo (helm-w3m-bookmarks-get-value i))))
 
 
 (defun helm-w3m-delete-bookmark (elm)

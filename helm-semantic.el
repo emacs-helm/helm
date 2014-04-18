@@ -43,7 +43,7 @@
               (if (and class (not type-p))
                   (format "%s%sClass(%s) "
                           spaces (if (< depth 2) "" "├►") class)
-                  spaces)
+                spaces)
               ;; Save the tag for later
               (propertize (semantic-format-tag-summarize tag nil t)
                           'semantic-tag tag)
@@ -115,7 +115,7 @@ Fill in the symbol at point by default."
   (interactive)
   (let* ((source (if (semantic-active-p)
                      'helm-source-semantic
-                     'helm-source-imenu))
+                   'helm-source-imenu))
          (imenu-p (eq source 'helm-source-imenu))
          (str (thing-at-point 'symbol))
          (imenu-auto-rescan imenu-p)

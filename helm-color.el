@@ -29,11 +29,11 @@
       (list-faces-display)
       (message nil))
     (helm-init-candidates-in-buffer
-     'global
-     (with-current-buffer (get-buffer "*Faces*")
-       (buffer-substring
-        (next-single-char-property-change (point-min) 'face)
-        (point-max))))
+        'global
+      (with-current-buffer (get-buffer "*Faces*")
+        (buffer-substring
+         (next-single-char-property-change (point-min) 'face)
+         (point-max))))
     (kill-buffer "*Faces*")))
 
 (defvar helm-source-customize-face
@@ -58,9 +58,9 @@
       (list-colors-display)
       (message nil))
     (helm-init-candidates-in-buffer
-     'global
-     (with-current-buffer (get-buffer "*Colors*")
-       (buffer-string)))
+        'global
+      (with-current-buffer (get-buffer "*Colors*")
+        (buffer-string)))
     (kill-buffer "*Colors*")))
 
 (defvar helm-source-colors

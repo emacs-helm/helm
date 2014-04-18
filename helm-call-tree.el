@@ -56,7 +56,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el")
               (insert (car entry) message
                       (if (string= funcs "  ")
                           "  no functions."
-                          funcs)
+                        funcs)
                       "\n\n"))))))))
 
 (defun helm-simple-call-tree-functions-callers-init ()
