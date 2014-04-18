@@ -269,6 +269,8 @@ Italic     => A non--file buffer.
   NOTE: `C-u C-z' will display buffer directly.
 
 - To browse images directories turn on `helm-follow-mode' and navigate with arrow keys.
+  You can also use `helm-follow-action-forward' and `helm-follow-action-backward'
+  (`C-<down' and `C-<left>').
 
 - When you want to delete backward characters to e.g creating a new file or directory,
   autoupdate may keep updating to an existent directory
@@ -276,7 +278,7 @@ Italic     => A non--file buffer.
   NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
 
 - You can create a new directory and a new file at the same time, just write the path in prompt
-  and press <RET>.
+  and press `<RET>'.
   e.g You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
 
 - To create a new directory, add a \"/\" at end of new name and press <RET>.
