@@ -609,6 +609,7 @@ If N is positive go forward otherwise go backward."
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
       (let ((inhibit-read-only t))
+        (setq default-directory (with-helm-buffer helm-grep-last-default-directory))
         (erase-buffer)
         (insert "-*- mode: helm-grep -*-\n\n"
                 (format "Grep Results for `%s':\n\n" helm-pattern))
