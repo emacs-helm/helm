@@ -34,9 +34,14 @@
   :type 'string
   :group 'helm-utils)
 
-(defcustom helm-yank-symbol-first nil
-  "`helm-yank-text-at-point' yanks symbol at point on first
-invocation if this is non-nil."
+(defcustom helm-yank-text-use-symbol nil
+  "`helm-yank-text-at-point' yanks works with symbols instead of words."
+  :type  'boolean
+  :group 'helm-utils)
+
+(defcustom helm-yank-text-only-whole nil
+  "First invocation of `helm-yank-text-at-point' to yank whole
+  word or symbol (see `helm-yank-text-use-whole')."
   :type  'boolean
   :group 'helm-utils)
 
@@ -890,15 +895,18 @@ See `helm-find-files-persistent-action' for usage."
 (defun helm-yank-text-at-point ()
   "Yank text at point in invocation buffer into minibuffer.
 
-`helm-yank-symbol-first' controls whether the first yank grabs
-the entire symbol."
+see also: `helm-yank-text-use-symbol' to yank symbols."
   (interactive)
   (with-helm-current-buffer
-    (let ((fwd-fn (if helm-yank-symbol-first
+    (let ((fwd-fn (if helm-yank-text-use-symbol
                       'forward-symbol 'forward-word)))
       ;; Start to initial point if C-w have never been hit.
-      (unless helm-yank-point (setq helm-yank-point (point)))
       (save-excursion
+        (unless helm-yank-point
+          (setq helm-yank-point (progn
+                                  (when helm-yank-text-use-whole
+                                    (funcall fwd-fn -1))
+                                  (point))))
         (goto-char helm-yank-point)
         (funcall fwd-fn 1)
         (helm-insert-in-minibuffer
