@@ -915,14 +915,11 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                      (expand-file-name (car split) root)
                    (car-safe split)))
          (lineno (nth 1 split))
-         (str    (nth 2 split))
-         (real   (format "%s:%s:%s" fname lineno str)))
+         (str    (nth 2 split)))
     (when (and fname lineno str)
       (cons (concat (propertize (file-name-nondirectory fname)
                                 'face 'helm-grep-file
-                                'help-echo fname
-                                ;; Wgrep need this value (Issue #480).
-                                'helm-realvalue real) ":"
+                                'help-echo fname) ":"
                                 (propertize lineno 'face 'helm-grep-lineno) ":"
                                 (helm-grep-highlight-match str))
             candidate))))
