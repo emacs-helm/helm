@@ -1050,19 +1050,20 @@ Same as `dired-do-print' but for helm."
 Provide completion on different algorithms to use on Emacs24.
 On Emacs23 only 'sha1' is available.
 The checksum is copied to kill-ring."
-  (let ((algo-list (and (fboundp 'secure-hash)
-                        '(md5 sha1 sha224 sha256 sha384 sha512))))
+  (let ((algo (and (fboundp 'secure-hash)
+                   (intern
+                    (helm-comp-read
+                     "Algorithm: "
+                     '(md5 sha1 sha224
+                       sha256 sha384 sha512))))))
     (kill-new
-     (if algo-list
+     (if algo
          (with-temp-buffer
            (insert-file-contents-literally file)
-           (secure-hash (intern
-                         (helm-comp-read
-                          "Algorithm: " algo-list))
-                        (buffer-string)))
+           (secure-hash algo (current-buffer)))
        (with-temp-buffer
          (insert-file-contents-literally file)
-         (sha1 (buffer-string)))))
+         (sha1 (current-buffer)))))
     (message "Checksum copied to kill-ring.")))
 
 (defun helm-ff-toggle-basename (candidate)
