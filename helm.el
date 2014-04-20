@@ -701,7 +701,8 @@ when `helm' is keyboard-quitted.")
   "Marked candadates.  List of \(source . real\) pair.")
 (defvar helm-in-file-completion-p nil)
 (defvar helm--mode-line-display-prefarg nil)
-(defvar helm--temp-follow-flag nil)
+(defvar helm--temp-follow-flag nil
+  "[INTERNAL] A simple flag to notify persistent action we are following.")
 
 
 ;; Utility: logging
@@ -3316,9 +3317,11 @@ Key arg DIRECTION can be one of:
 
 (defun helm--follow-action (arg)
   (let ((helm--temp-follow-flag t))
-    (if (> arg 0)
-        (helm-next-line)
-      (helm-previous-line))
+    (when (or (eq last-command 'helm-follow-action-forward)
+              (eq last-command 'helm-follow-action-backward))
+      (if (> arg 0)
+          (helm-next-line)
+        (helm-previous-line)))
     (helm-execute-persistent-action)))
 
 (defun helm-follow-action-forward ()
