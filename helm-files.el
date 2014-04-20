@@ -1893,9 +1893,6 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
          (new-pattern   (helm-get-selection))
          (num-lines-buf (with-current-buffer helm-buffer
                           (count-lines (point-min) (point-max))))
-         ;; `helm-insert-in-minibuffer' don't expand correctly fnames
-         ;; (#Bugfix cursor coming back at bol).
-         ;; So use a function using `minibuffer-window' instead.
          (insert-in-minibuffer #'(lambda (fname)
                                    (with-selected-window (minibuffer-window)
                                      (unless follow
