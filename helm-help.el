@@ -761,6 +761,44 @@ the amount of prefix args entered.
   (let ((helm-help-message helm-M-x-help-message))
     (helm-help)))
 
+;;; helm-imenu
+;;
+;;
+(defvar helm-imenu-help-message
+  "== Helm imenu ==\
+\nHelm imenu tips:
+
+\nSpecific commands for Helm imenu:
+\\<helm-imenu-map>
+\\[helm-imenu-help]\t->Show this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-imenu-help ()
+  (interactive)
+  (let ((helm-help-message helm-imenu-help-message))
+    (helm-help)))
+
+;;; helm semantic
+;;
+;;
+(defvar helm-semantic-help-message
+  "== Helm semantic ==\
+\nHelm semantic tips:
+
+\nSpecific commands for Helm semantic:
+\\<helm-semantic-map>
+\\[helm-semantic-help]\t->Show this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-semantic-help ()
+  (interactive)
+  (let ((helm-help-message helm-semantic-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
@@ -954,6 +992,28 @@ the amount of prefix args entered.
 (defvar helm-M-x-mode-line "\
 \\<helm-M-x-map>\
 \\[helm-M-x-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
+
+;;;###autoload
+(defvar helm-imenu-mode-line "\
+\\<helm-imenu-map>\
+\\[helm-imenu-help]:Help \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
+
+;;;###autoload
+(defvar helm-semantic-mode-line "\
+\\<helm-semantic-map>\
+\\[helm-semantic-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-exit-minibuffer]/\

@@ -36,6 +36,23 @@
   "Goto the candidate when only one is remaining."
   :group 'helm-imenu
   :type 'boolean)
+
+(defcustom helm-imenu-lynx-style-map t
+  "Use Arrow keys to jump to occurences."
+  :group 'helm-imenu
+  :type  'boolean)
+
+
+;;; keymap
+(defvar helm-imenu-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c ?") 'helm-imenu-help)
+    (when helm-imenu-lynx-style-map
+      (define-key map (kbd "<left>")  'helm-exit-minibuffer)
+      (define-key map (kbd "<right>") 'helm-execute-persistent-action))
+    (delq nil map)))
+
 
 ;;; Internals
 (defvar helm-cached-imenu-alist nil)
@@ -46,27 +63,37 @@
 
 (defvar helm-cached-imenu-tick nil)
 (make-variable-buffer-local 'helm-cached-imenu-tick)
+
 
 (defvar helm-source-imenu
-  '((name . "Imenu")
+  `((name . "Imenu")
     (candidates . helm-imenu-candidates)
     (allow-dups)
     (candidate-transformer . helm-imenu-transformer)
-    (persistent-action . (lambda (elm)
-                           (imenu elm)
-                           (helm-highlight-current-line)))
+    (persistent-action . helm-imenu-persistent-action)
     (persistent-help . "Show this entry")
-    (action . (lambda (candidate)
-                (imenu candidate)
-                ;; If semantic is supported in this buffer
-                ;; imenu used `semantic-imenu-goto-function'
-                ;; and position have been highlighted,
-                ;; no need to highlight again.
-                (unless (eq imenu-default-goto-function
-                            'semantic-imenu-goto-function)
-                  (helm-highlight-current-line nil nil nil nil 'pulse))))
+    (keymap . ,helm-imenu-map)
+    (mode-line . helm-imenu-mode-line)
+    (action . helm-imenu-action)
     "See (info \"(emacs)Imenu\")"))
+
 
+(defun helm-imenu-action (candidate)
+  "Default action for `helm-source-imenu'."
+  (imenu candidate)
+  ;; If semantic is supported in this buffer
+  ;; imenu used `semantic-imenu-goto-function'
+  ;; and position have been highlighted,
+  ;; no need to highlight again.
+  (unless (eq imenu-default-goto-function
+              'semantic-imenu-goto-function)
+    (helm-highlight-current-line nil nil nil nil 'pulse)))
+
+(defun helm-imenu-persistent-action (candidate)
+  "Default persistent action for `helm-source-imenu'."
+  (imenu candidate)
+  (helm-highlight-current-line))
+
 (defun helm-imenu-candidates ()
   (with-helm-current-buffer
     (let ((tick (buffer-modified-tick)))

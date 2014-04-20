@@ -28,6 +28,21 @@
 
 (declare-function pulse-momentary-highlight-one-line "pulse.el" (point &optional face))
 
+(defcustom helm-semantic-lynx-style-map t
+  "Use Arrow keys to jump to occurences."
+  :group 'helm-imenu
+  :type  'boolean)
+
+;;; keymap
+(defvar helm-semantic-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c ?") 'helm-semantic-help)
+    (when helm-imenu-lynx-style-map
+      (define-key map (kbd "<left>")  'helm-exit-minibuffer)
+      (define-key map (kbd "<right>") 'helm-execute-persistent-action))
+    (delq nil map)))
+
 (defun helm-semantic-init-candidates (tags depth &optional class)
   "Write the contents of TAGS to the current buffer."
   (let ((class class) cur-type)
@@ -79,7 +94,7 @@
         (semantic-parse-tree-set-needs-update)))))
 
 (defvar helm-source-semantic
-  '((name . "Semantic Tags")
+  `((name . "Semantic Tags")
     (init . (lambda ()
               (helm-semantic--maybe-set-needs-update)
               (let ((tags (semantic-fetch-tags)))
@@ -92,6 +107,8 @@
                            (helm-semantic-default-action elm t)
                            (helm-highlight-current-line)))
     (persistent-help . "Show this entry")
+    (keymap . ,helm-semantic-map)
+    (mode-line . helm-semantic-mode-line)
     (action . helm-semantic-default-action)
     "Source to search tags using Semantic from CEDET."))
 
