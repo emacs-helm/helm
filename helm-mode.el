@@ -100,7 +100,7 @@ when non--nil."
 ;;
 ;; Flag to know if `helm-pattern' have been added
 ;; to candidate list in `helm-comp-read'.
-(defvar helm-cr-unknow-pattern-flag nil)
+(defvar helm-cr-unknown-pattern-flag nil)
 
 
 ;;; Helm `completing-read' replacement
@@ -184,7 +184,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (cl-loop for c in candidates
         for cand = (if (stringp c) (replace-regexp-in-string "\\s\\" "" c) c)
         for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
-        if (and (equal cand pat) helm-cr-unknow-pattern-flag)
+        if (and (equal cand pat) helm-cr-unknown-pattern-flag)
         collect
         (cons (concat (propertize
                        " " 'display
@@ -331,13 +331,13 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (get-candidates (lambda ()
                              (let ((cands (helm-comp-read-get-candidates
                                            collection test sort alistp)))
-                               (setq helm-cr-unknow-pattern-flag nil)
+                               (setq helm-cr-unknown-pattern-flag nil)
                                (unless (or (eq must-match t) (string= helm-pattern "")
                                            (assoc helm-pattern cands)
                                            (assoc (intern helm-pattern) cands)
                                            (member helm-pattern cands))
                                  (setq cands (append (list helm-pattern) cands))
-                                 (setq helm-cr-unknow-pattern-flag t))
+                                 (setq helm-cr-unknown-pattern-flag t))
                                (if (and default (not (string= default "")))
                                    (delq nil (cons default (delete default cands)))
                                  cands))))

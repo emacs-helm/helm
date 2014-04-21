@@ -232,7 +232,7 @@ Support install, remove and purge actions."
                      (reinstall "sudo apt-get install --reinstall ")
                      (uninstall "sudo apt-get remove ")
                      (purge     "sudo apt-get purge ")
-                     (t          (error "Unknow action"))))
+                     (t          (error "Unknown action"))))
         (beg       (point))
         end
         (cand-list (mapconcat #'(lambda (x) (format "'%s'" x))
