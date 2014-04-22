@@ -901,7 +901,7 @@ To fix this problem, you can define a `pcomplete/sudo`  function and put it in y
 
 However this an incomplete definition of `pcomplete/sudo` which will not work in some case
 without modifications to some emacs functions due to bugs unresolved in emacs, to fix this
-you can use my [pcomplete-extension](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/pcomplete-extension.el)
+you can use my [pcomplete-extension](https://github.com/thierryvolpiatto/pcomplete-extension)
 which will provide more completions working well with helm like `apt-get` or `find`.
 
 ## Write your own pcomplete functions
@@ -909,7 +909,7 @@ which will provide more completions working well with helm like `apt-get` or `fi
 You can enhance Emacs pcomplete by writing your own pcomplete
 functions.
 
-See [pcomplete-extension](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/pcomplete-extension.el)
+See [pcomplete-extension](https://github.com/thierryvolpiatto/pcomplete-extension)
 For more enhanced completions.
 
  Here an example with `find` command:
@@ -961,7 +961,7 @@ Add this to `init.el`
 
 Completion in emacs `shell` is using `completion-at-point`, `helm-mode` provide completion for this
 starting from emacs-24.4 and is not available in emacs-24.3.
-Same as above, you should use [pcomplete-extension](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/pcomplete-extension.el)
+Same as above, you should use [pcomplete-extension](https://github.com/thierryvolpiatto/pcomplete-extension)
 to have a better experience.
 
 # Usefuls extensions
