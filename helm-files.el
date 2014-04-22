@@ -763,7 +763,7 @@ Default METHOD is rename."
                      (copy    'copy-file)
                      (symlink 'make-symbolic-link)
                      (rename  'rename-file)
-                     (t (error "Error: Unknow method %s" method)))))
+                     (t (error "Error: Unknown method %s" method)))))
     (make-directory tmp-dir)
     (unwind-protect
          (progn
@@ -1313,7 +1313,7 @@ purpose."
     (when (and (helm-file-completion-source-p)
                (helm-ff-invalid-tramp-name-p cand) ; Check candidate.
                (helm-ff-invalid-tramp-name-p)) ; check helm-pattern.
-      (error "Error: Unknow file or directory `%s'" cand))))
+      (error "Error: Unknown file or directory `%s'" cand))))
 (add-hook 'helm-before-action-hook 'helm-ff-before-action-hook-fn)
 
 (cl-defun helm-ff-invalid-tramp-name-p (&optional (pattern helm-pattern))

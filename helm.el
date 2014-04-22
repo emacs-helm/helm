@@ -3367,17 +3367,17 @@ don't exit and send message 'no match'."
   (interactive)
   (let* ((empty-buffer-p (with-current-buffer helm-buffer
                            (eq (point-min) (point-max))))
-         (unknow (and (not empty-buffer-p)
+         (unknown (and (not empty-buffer-p)
                       (string= (get-text-property
                                 0 'display (helm-get-selection nil 'withprop))
                                "[?]"))))
-    (cond ((and (or empty-buffer-p unknow)
+    (cond ((and (or empty-buffer-p unknown)
                 (eq minibuffer-completion-confirm 'confirm))
            (setq helm-minibuffer-confirm-state
                  'confirm)
            (setq minibuffer-completion-confirm nil)
            (minibuffer-message " [confirm]"))
-          ((and (or empty-buffer-p unknow)
+          ((and (or empty-buffer-p unknown)
                 (eq minibuffer-completion-confirm t))
            (minibuffer-message " [No match]"))
           (t

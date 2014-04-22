@@ -92,7 +92,7 @@
   (let ((command (cl-case action
                    (install "sudo emerge -av ")
                    (uninstall "sudo emerge -avC ")
-                   (t (error "Unknow action"))))
+                   (t (error "Unknown action"))))
         (elms (mapconcat 'identity (helm-marked-candidates) " ")))
     (goto-char (point-max))
     (insert (concat command elms)) 

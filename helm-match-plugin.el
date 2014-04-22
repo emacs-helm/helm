@@ -65,7 +65,7 @@
                    helm-mp-default-search-backward-functions
                    '(helm-mp-exact-search-backward
                      helm-mp-3p-search-backward)))
-    (t (error "Unknow value: %s" helm-mp-matching-method))))
+    (t (error "Unknown value: %s" helm-mp-matching-method))))
 
 (defgroup helm-match-plugin nil
   "Helm match plugin."
