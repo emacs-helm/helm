@@ -77,7 +77,7 @@ Otherwise `url-retrieve-synchronously' is used."
   :group 'helm-net)
 
 (defcustom helm-surfraw-duckduckgo-url
-  "https://duckduckgo.com/lite/?q='%s'&kp=1"
+  "https://duckduckgo.com/lite/?q=%s&kp=1"
   "The duckduckgo url.
 This is a format string, don't forget the `%s'.
 If you have personal settings saved on duckduckgo you should have
@@ -554,7 +554,8 @@ Return an alist with elements like (data . number_results)."
   (let* ((engine-nodesc (car (split-string engine)))
          (url (if (string= engine-nodesc "duckduckgo")
                   ;; "sr duckduckgo -p foo" is broken, workaround.
-                  (format helm-surfraw-duckduckgo-url pattern)
+                  (format helm-surfraw-duckduckgo-url
+                          (url-hexify-string pattern))
                 (with-temp-buffer
                   (apply 'call-process "surfraw" nil t nil
                          (append  (list engine-nodesc "-p") (split-string pattern)))
