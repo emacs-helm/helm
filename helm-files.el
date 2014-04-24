@@ -2000,6 +2000,7 @@ Show the first `helm-ff-history-max-length' elements of
   "Find FNAME with `helm' completion.
 Like `find-file' but with `helm' support.
 Use it for non--interactive calls of `helm-find-files'."
+  (setq fname (expand-file-name fname))
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let* ( ;; Be sure we don't erase the precedent minibuffer if some.
@@ -2153,7 +2154,7 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
                                       (if helm-ff-transformer-show-only-basename
                                           (helm-basename target) target))
                  (helm-find-files-1 (file-name-as-directory
-                                     (expand-file-name candidate)))))
+                                     candidate))))
           (setq helm-ff-cand-to-mark nil))))))
 
 (defun helm-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
@@ -2685,11 +2686,11 @@ This is the starting point for nearly all actions you can do on files."
          (input         (cond ((and (eq major-mode 'org-agenda-mode)
                                     org-directory
                                     (not default-input))
-                               (expand-file-name org-directory))
+                               org-directory)
                               ((and (eq major-mode 'dired-mode) default-input)
                                (file-name-directory default-input))
                               (default-input)
-                              (t (expand-file-name (helm-current-directory)))))
+                              (t (helm-current-directory))))
          (presel        (helm-aif (or hist
                                       (buffer-file-name (current-buffer))
                                       (and (eq major-mode 'dired-mode)
