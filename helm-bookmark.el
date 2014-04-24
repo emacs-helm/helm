@@ -716,13 +716,9 @@ words from the buffer into the new bookmark name."
 
 (defun helm-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.
-e.g prepended with *.
-Return nil if bmk is not a valid bookmark."
-  (let ((bookmark (replace-regexp-in-string "\*" "" bmk)))
-    (if (assoc bookmark bookmark-alist)
-        bookmark
-      (when (assoc bmk bookmark-alist)
-        bmk))))
+e.g prepended with *."
+  (let ((bookmark (replace-regexp-in-string "\\*" "" bmk)))
+    (if (assoc bookmark bookmark-alist) bookmark bmk)))
 
 (defun helm-delete-marked-bookmarks (_ignore)
   "Delete this bookmark or all marked bookmarks."
