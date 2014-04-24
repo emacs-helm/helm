@@ -36,12 +36,15 @@
   (setq helm-el-package--show-only 'all)
   (kill-buffer "*Packages*"))
 
+(defun helm-el-package-describe (candidate)
+  (let ((id (get-text-property 0 'tabulated-list-id candidate)))
+    (describe-package (package-desc-name id))))
+
 (defun helm-el-package-install (_candidate)
   (let ((mkd (helm-marked-candidates)))
     (cl-loop for p in mkd
-          for sym = (intern p)
           for id = (get-text-property 0 'tabulated-list-id p)
-          do (package-install sym)
+          do (package-install (package-desc-name id))
           and collect (if (fboundp 'package-desc-full-name)
                           id
                         (car id)) into installed-list
@@ -139,8 +142,7 @@
     (mode-line . helm-el-package-mode-line)
     (keymap . ,helm-el-package-map)
     (candidate-number-limit . 9999)
-    (action . (("Describe" . (lambda (candidate)
-                               (describe-package (intern candidate))))
+    (action . (("Describe" . helm-el-package-describe)
                ("Install" . helm-el-package-install)
                ("Uninstall" . helm-el-package-uninstall)))))
 
