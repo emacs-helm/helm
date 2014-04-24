@@ -628,10 +628,18 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   "Edit bookmark's name and file name, and maybe save them.
 BOOKMARK-NAME is the current (old) name of the bookmark to be renamed."
   (let* ((bookmark-fname (bookmark-get-filename bookmark-name))
+         (handler        (bookmark-prop-get bookmark-name 'handler))
          (bookmark-loc   (bookmark-prop-get bookmark-name 'location))
          (new-name       (read-from-minibuffer "Name: " bookmark-name))
          (new-loc        (read-from-minibuffer "FileName or Location: "
-                                               (or bookmark-fname bookmark-loc))))
+                                               (or bookmark-fname
+                                                   (if (consp bookmark-loc)
+                                                       (car bookmark-loc)
+                                                     bookmark-loc))))
+         (docid (and (eq handler 'mu4e-bookmark-jump)
+                     (read-number "Docid: " (cdr bookmark-loc)))))
+    (when docid
+      (setq new-loc (cons new-loc docid)))
     (when (and (not (equal new-name "")) (not (equal new-loc ""))
                (y-or-n-p "Save changes? "))
       (if bookmark-fname
