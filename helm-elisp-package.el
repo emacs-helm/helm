@@ -38,13 +38,18 @@
 
 (defun helm-el-package-describe (candidate)
   (let ((id (get-text-property 0 'tabulated-list-id candidate)))
-    (describe-package (package-desc-name id))))
+    (describe-package (if (fboundp 'package-desc-name)
+                          (package-desc-name id)
+                        (car id)))))
 
 (defun helm-el-package-install (_candidate)
   (let ((mkd (helm-marked-candidates)))
     (cl-loop for p in mkd
           for id = (get-text-property 0 'tabulated-list-id p)
-          do (package-install (package-desc-name id))
+          do (package-install
+              (if (fboundp 'package-desc-name)
+                  (package-desc-name id)
+                (car id)))
           and collect (if (fboundp 'package-desc-full-name)
                           id
                         (car id)) into installed-list
@@ -95,7 +100,10 @@
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
-        for installed-p = (assq (intern (car (split-string c)))
+        for id = (get-text-property 0 'tabulated-list-id c) 
+        for installed-p = (assq (if (fboundp 'package-desc-name)
+                                    (package-desc-name id)
+                                  (car id))
                                 package-alist)
         for cand = (cons c (car (split-string c)))
         when (or (and installed-p
