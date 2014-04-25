@@ -200,12 +200,12 @@
                               (call-process "eix" nil t nil
                                             elm "--format" "<homepage>\n")
                               (buffer-string)))
-        for i in url-list
-        when (and (string-match "^http://.*" i)
-                  all
-                  (not (member i all)))
-        collect i into all
-        finally return all))
+           for i in url-list
+           when (and (string-match "^http://.*" i)
+                     all
+                     (not (member i all)))
+           collect i into all
+           finally return all))
 
 (defun helm-gentoo-get-world ()
   "Return list of all installed package on your system."
@@ -225,18 +225,18 @@
 (defun helm-highlight-world (eix)
   "Highlight all installed package."
   (cl-loop for i in eix
-        if (member i helm-cache-world)
-        collect (propertize i 'face 'helm-gentoo-match)
-        else
-        collect i))
+           if (member i helm-cache-world)
+           collect (propertize i 'face 'helm-gentoo-match)
+           else
+           collect i))
 
 (defun helm-highlight-local-use (use-flags)
   (let ((local-uses (helm-gentoo-get-local-use)))
     (cl-loop for i in use-flags
-          if (member i local-uses)
-          collect (propertize i 'face 'helm-gentoo-match)
-          else
-          collect i)))
+             if (member i local-uses)
+             collect (propertize i 'face 'helm-gentoo-match)
+             else
+             collect i)))
 
 ;;;###autoload
 (defun helm-gentoo ()

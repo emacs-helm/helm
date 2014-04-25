@@ -32,32 +32,32 @@
 
 (defun helm-check-conflicting-prefixes ()
   (cl-loop for s in (all-completions "helm-c-" obarray)
-        for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        when (or (and (not (helm-alias-p (intern s))) (fboundp (intern rep)))
-                 (and (not (helm-alias-p (intern s))) (boundp (intern rep))))
-        collect rep))
+           for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
+           when (or (and (not (helm-alias-p (intern s))) (fboundp (intern rep)))
+                    (and (not (helm-alias-p (intern s))) (boundp (intern rep))))
+           collect rep))
 
 (defun helm-collect-functions-with-bad-prefix ()
   (cl-loop for s in (all-completions "helm-c-" obarray)
-        for sym = (intern s)
-        when (and (not (helm-alias-p sym)) (fboundp sym))
-        collect s))
+           for sym = (intern s)
+           when (and (not (helm-alias-p sym)) (fboundp sym))
+           collect s))
 
 (defun helm-collect-vars-with-bad-prefix ()
   (cl-loop for s in (all-completions "helm-c-" obarray)
-        for sym = (intern s)
-        when (and (not (helm-alias-p sym)) (boundp sym))
-        collect s))
+           for sym = (intern s)
+           when (and (not (helm-alias-p sym)) (boundp sym))
+           collect s))
 
 (defun helm-insert-fn-aliases ()
   (cl-loop for s in (helm-collect-functions-with-bad-prefix)
-        for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        do (insert (format "(defalias '%s '%s)\n(make-obsolete '%s '%s \"1.5.1\")\n" s rep s rep))))
+           for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
+           do (insert (format "(defalias '%s '%s)\n(make-obsolete '%s '%s \"1.5.1\")\n" s rep s rep))))
 
 (defun helm-insert-var-aliases ()
   (cl-loop for s in (helm-collect-vars-with-bad-prefix)
-        for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        do (insert (format "(defvaralias '%s '%s)\n(make-obsolete-variable '%s '%s \"1.5.1\")\n" s rep s rep))))
+           for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
+           do (insert (format "(defvaralias '%s '%s)\n(make-obsolete-variable '%s '%s \"1.5.1\")\n" s rep s rep))))
 
 
 ;;; Alias old functions prefixed with "helm-c-"

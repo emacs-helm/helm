@@ -23,7 +23,7 @@
   :group 'helm)
 
 (defface helm-helper
-    '((t :inherit helm-header))
+  '((t :inherit helm-header))
   "Face for helm help string in minibuffer."
   :group 'helm-help)
 
@@ -108,15 +108,15 @@ INSERT-CONTENT-FN is the function that insert
 text to be displayed in BUFNAME."
   (let ((winconf (current-frame-configuration)))
     (unwind-protect
-         (progn
-           (setq helm-suspend-update-flag t)
-           (switch-to-buffer (get-buffer-create bufname))
-           (delete-other-windows)
-           (erase-buffer)
-           (funcall insert-content-fn)
-           (setq cursor-type nil)
-           (goto-char 1)
-           (helm-help-event-loop))
+        (progn
+          (setq helm-suspend-update-flag t)
+          (switch-to-buffer (get-buffer-create bufname))
+          (delete-other-windows)
+          (erase-buffer)
+          (funcall insert-content-fn)
+          (setq cursor-type nil)
+          (goto-char 1)
+          (helm-help-event-loop))
       (setq helm-suspend-update-flag nil)
       (set-frame-configuration winconf))))
 
@@ -127,12 +127,12 @@ text to be displayed in BUFNAME."
         (scroll-error-top-bottom t))
     (condition-case _err
         (cl-loop for event = (read-key prompt) do
-              (cl-case event
-                ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
-                ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
-                ((?\C-s)        (isearch-forward))
-                ((?\C-r)        (isearch-backward))
-                (t (cl-return))))
+                 (cl-case event
+                   ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
+                   ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
+                   ((?\C-s)        (isearch-forward))
+                   ((?\C-r)        (isearch-backward))
+                   (t (cl-return))))
       (beginning-of-buffer (message "Beginning of buffer"))
       (end-of-buffer       (message "End of Buffer")))))
 

@@ -66,17 +66,17 @@ and sets `helm-external-commands-list'."
       it
     (setq helm-external-commands-list
           (cl-loop
-                for dir in (split-string (getenv "PATH") path-separator)
-                when (and (file-exists-p dir) (file-accessible-directory-p dir))
-                for lsdir = (cl-loop for i in (directory-files dir t)
-                                  for bn = (file-name-nondirectory i)
-                                  when (and (not (member bn completions))
-                                            (not (file-directory-p i))
-                                            (file-executable-p i))
-                                  collect bn)
-                append lsdir into completions
-                finally return
-                (if sort (sort completions 'string-lessp) completions)))))
+           for dir in (split-string (getenv "PATH") path-separator)
+           when (and (file-exists-p dir) (file-accessible-directory-p dir))
+           for lsdir = (cl-loop for i in (directory-files dir t)
+                                for bn = (file-name-nondirectory i)
+                                when (and (not (member bn completions))
+                                          (not (file-directory-p i))
+                                          (file-executable-p i))
+                                collect bn)
+           append lsdir into completions
+           finally return
+           (if sort (sort completions 'string-lessp) completions)))))
 
 (defun helm-run-or-raise (exe &optional file)
   "Generic command that run asynchronously EXE.
@@ -181,7 +181,7 @@ If not found or a prefix arg is given query the user which tool to use."
           (cons real-prog-name
                 (delete real-prog-name
                         (cl-loop for i in helm-external-command-history
-                              when (executable-find i) collect i))))))
+                                 when (executable-find i) collect i))))))
 
 ;;;###autoload
 (defun helm-run-external-command (program)
@@ -201,7 +201,7 @@ You can set your own list of commands with
   (setq helm-external-command-history
         (cons program (delete program
                               (cl-loop for i in helm-external-command-history
-                                    when (executable-find i) collect i)))))
+                                       when (executable-find i) collect i)))))
 
 
 (provide 'helm-external)

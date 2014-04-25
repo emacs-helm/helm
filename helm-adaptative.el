@@ -53,7 +53,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
   (setq helm-adaptive-done nil))
 
 (define-minor-mode helm-adaptative-mode
-    "Toggle adaptative sorting in all sources."
+  "Toggle adaptative sorting in all sources."
   :group 'helm-adapt
   :require 'helm-adaptative
   :global t
@@ -201,13 +201,13 @@ This is a filtered candidate transformer you can use with the
 
                 ;; put those candidates first which have the highest usage count
                 (cl-loop for (info . _freq) in usage
-                      for member = (cl-member info candidates
-                                              :test 'helm-adaptive-compare)
-                      when member collect (car member) into sorted
-                      and do
-                      (setq candidates (cl-remove info candidates
-                                                  :test 'helm-adaptive-compare))
-                      finally return (append sorted candidates)))
+                         for member = (cl-member info candidates
+                                                 :test 'helm-adaptive-compare)
+                         when member collect (car member) into sorted
+                         and do
+                         (setq candidates (cl-remove info candidates
+                                                     :test 'helm-adaptive-compare))
+                         finally return (append sorted candidates)))
             (message "Your `%s' is maybe corrupted or too old, \
 you should reinitialize it with `helm-reset-adaptative-history'"
                      helm-adaptive-history-file)

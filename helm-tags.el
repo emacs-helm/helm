@@ -83,8 +83,8 @@ one match."
 ;;
 (defvar helm-ctags-modes
   '( c-mode c++-mode awk-mode csharp-mode java-mode javascript-mode lua-mode
-    makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
-    scheme-mode sh-mode slang-mode sql-mode tcl-mode ))
+            makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
+            scheme-mode sh-mode slang-mode sql-mode tcl-mode ))
 
 (defun helm-ctags-init ()
   (when (and buffer-file-name
@@ -101,16 +101,16 @@ one match."
       (forward-line 2)
       (delete-region (point-min) (point))
       (cl-loop while (and (not (eobp)) (search-forward "\001" (point-at-eol) t))
-            for lineno-start = (point)
-            for lineno = (buffer-substring
-                          lineno-start
-                          (1- (search-forward "," (point-at-eol) t)))
-            do
-            (forward-line 0)
-            (insert (format "%5s:" lineno))
-            (search-forward "\177" (point-at-eol) t)
-            (delete-region (1- (point)) (point-at-eol))
-            (forward-line 1)))))
+               for lineno-start = (point)
+               for lineno = (buffer-substring
+                             lineno-start
+                             (1- (search-forward "," (point-at-eol) t)))
+               do
+               (forward-line 0)
+               (insert (format "%5s:" lineno))
+               (search-forward "\177" (point-at-eol) t)
+               (delete-region (1- (point)) (point-at-eol))
+               (forward-line 1)))))
 
 (defvar helm-source-ctags
   '((name . "Exuberant ctags")
@@ -164,16 +164,16 @@ If not found in CURRENT-DIR search in upper directory."
                                  (file-regular-p tag-path)
                                  (file-readable-p tag-path))))))
     (cl-loop with count = 0
-          until (funcall file-exists? current-dir)
-          ;; Return nil if outside the value of
-          ;; `helm-etags-tag-file-search-limit'.
-          if (= count helm-etags-tag-file-search-limit)
-          do (cl-return nil)
-          ;; Or search upper directories.
-          else
-          do (cl-incf count)
-          (setq current-dir (expand-file-name (concat current-dir "../")))
-          finally return current-dir)))
+             until (funcall file-exists? current-dir)
+             ;; Return nil if outside the value of
+             ;; `helm-etags-tag-file-search-limit'.
+             if (= count helm-etags-tag-file-search-limit)
+             do (cl-return nil)
+             ;; Or search upper directories.
+             else
+             do (cl-incf count)
+             (setq current-dir (expand-file-name (concat current-dir "../")))
+             finally return current-dir)))
 
 (defun helm-etags-get-header-name (_x)
   "Create header name for this helm etags session."
@@ -192,20 +192,20 @@ If not found in CURRENT-DIR search in upper directory."
                     (kill-buffer))))
          (progress-reporter (make-progress-reporter "Loading tag file..." 0 max)))
     (cl-loop
-          with fname
-          with cand
-          for i in split for count from 0
-          for elm = (unless (string-match "^\x0c" i)
-                      (helm-aif (string-match "\177" i)
-                          (substring i 0 it)
-                        i))
-          do (cond ((and elm (string-match "^\\([^,]+\\),[0-9]+$" elm))
-                    (setq fname (match-string 1 elm)))
-                   (elm (setq cand (concat fname ": " elm)))
-                   (t (setq cand nil)))
-          when cand do (progn
-                         (insert (concat cand "\n"))
-                         (progress-reporter-update progress-reporter count)))))
+     with fname
+     with cand
+     for i in split for count from 0
+     for elm = (unless (string-match "^\x0c" i)
+                 (helm-aif (string-match "\177" i)
+                     (substring i 0 it)
+                   i))
+     do (cond ((and elm (string-match "^\\([^,]+\\),[0-9]+$" elm))
+               (setq fname (match-string 1 elm)))
+              (elm (setq cand (concat fname ": " elm)))
+              (t (setq cand nil)))
+     when cand do (progn
+                    (insert (concat cand "\n"))
+                    (progress-reporter-update progress-reporter count)))))
 
 (defun helm-etags-init ()
   "Feed `helm-buffer' using `helm-etags-cache' or tag file.
@@ -271,10 +271,10 @@ If no entry in cache, create one."
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (let* ((split (helm-etags-split-line candidate))
          (fname (cl-loop for tagf being the hash-keys of helm-etags-cache
-                      for f = (expand-file-name
-                               (car split) (file-name-directory tagf))
-                      when (file-exists-p f)
-                      return f))
+                         for f = (expand-file-name
+                                  (car split) (file-name-directory tagf))
+                         when (file-exists-p f)
+                         return f))
          (elm   (cadr split)))
     (if (null fname)
         (error "file %s not found" fname)
@@ -315,8 +315,8 @@ This function aggregates three sources of tag files:
     (if (cl-notany 'file-exists-p tag-files)
         (message "Error: No tag file found. Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
       (cl-loop for k being the hash-keys of helm-etags-cache
-            unless (member k tag-files)
-            do (remhash k helm-etags-cache))
+               unless (member k tag-files)
+               do (remhash k helm-etags-cache))
       (mapc (lambda (f)
               (when (or (equal arg '(4))
                         (and helm-etags-mtime-alist

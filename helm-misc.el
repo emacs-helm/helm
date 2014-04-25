@@ -37,12 +37,12 @@
   :type '(repeat (choice symbol)))
 
 (defface helm-time-zone-current
-    '((t (:foreground "green")))
+  '((t (:foreground "green")))
   "Face used to colorize current time in `helm-world-time'."
   :group 'helm-misc)
 
 (defface helm-time-zone-home
-    '((t (:foreground "red")))
+  '((t (:foreground "red")))
   "Face used to colorize home time in `helm-world-time'."
   :group 'helm-misc)
 
@@ -52,9 +52,9 @@
 (defun helm-latex-math-candidates ()
   "Collect candidates for latex math completion."
   (cl-loop for i in (cddr LaTeX-math-menu)
-        for elm = (cl-loop for s in i when (vectorp s)
-                        collect (cons (aref s 0) (aref s 1)))
-        append elm))
+           for elm = (cl-loop for s in i when (vectorp s)
+                              collect (cons (aref s 0) (aref s 1)))
+           append elm))
 
 (defvar helm-source-latex-math
   '((name . "Latex Math Menu")
@@ -89,7 +89,7 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
 (defvar helm-source-oddmuse-headline
   '((name . "Oddmuse HeadLine")
     (headline  "^= \\(.+\\) =$" "^== \\(.+\\) ==$"
-     "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
+               "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
     (condition . (memq major-mode '(oddmuse-mode yaoddmuse-mode)))
     (migemo)
     (subexp . 1))
@@ -99,7 +99,7 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
     (condition . (string-match "/emacs2[0-9].+/src/.+c$"
-                  (or buffer-file-name ""))))
+                               (or buffer-file-name ""))))
   "Show DEFUN/DEFVAR in Emacs C source file.")
 
 (defvar helm-source-emacs-lisp-expectations
@@ -129,13 +129,13 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
          (ignore-errors
            (with-helm-current-buffer
              (cl-loop initially (goto-char (point-min))
-                   while (re-search-forward
-                          (format ee-anchor-format "\\([^\.].+\\)") nil t)
-                   for anchor = (match-string-no-properties 1)
-                   collect (cons (format "%5d:%s"
-                                         (line-number-at-pos (match-beginning 0))
-                                         (format ee-anchor-format anchor))
-                                 anchor))))))
+                      while (re-search-forward
+                             (format ee-anchor-format "\\([^\.].+\\)") nil t)
+                      for anchor = (match-string-no-properties 1)
+                      collect (cons (format "%5d:%s"
+                                            (line-number-at-pos (match-beginning 0))
+                                            (format ee-anchor-format anchor))
+                                    anchor))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
                            (helm-highlight-current-line)))
@@ -147,11 +147,11 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
   "List online Jabber contacts."
   (with-no-warnings
     (cl-loop for item in (jabber-concat-rosters)
-          when (get item 'connected)
-          collect
-          (if (get item 'name)
-              (cons (get item 'name) item)
-            (cons (symbol-name item) item)))))
+             when (get item 'connected)
+             collect
+             (if (get item 'name)
+                 (cons (get item 'name) item)
+               (cons (symbol-name item) item)))))
 
 (defvar helm-source-jabber-contacts
   '((name . "Jabber Contacts")
@@ -167,12 +167,12 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;;
 (defun helm-time-zone-transformer (candidates _source)
   (cl-loop for i in candidates
-        collect
-        (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
-               (propertize i 'face 'helm-time-zone-current))
-              ((string-match helm-time-zone-home-location i)
-               (propertize i 'face 'helm-time-zone-home))
-              (t i))))
+           collect
+           (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
+                  (propertize i 'face 'helm-time-zone-current))
+                 ((string-match helm-time-zone-home-location i)
+                  (propertize i 'face 'helm-time-zone-home))
+                 (t i))))
 
 (defvar helm-source-time-world
   '((name . "Time World List")
@@ -247,8 +247,8 @@ It is added to `extended-command-history'.
     (candidates
      . (lambda ()
          (let ((history (cl-loop for i in
-                              (symbol-value minibuffer-history-variable)
-                              unless (string= "" i) collect i)))
+                                 (symbol-value minibuffer-history-variable)
+                                 unless (string= "" i) collect i)))
            (if (consp (car history))
                (mapcar 'prin1-to-string history)
              history))))

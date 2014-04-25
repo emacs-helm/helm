@@ -37,10 +37,10 @@
   (lambda (var key)
     (when (and (boundp var) (symbol-value var))
       (define-key (current-global-map)
-          (read-kbd-macro (symbol-value var)) nil))
+        (read-kbd-macro (symbol-value var)) nil))
     (when key
       (define-key (current-global-map)
-          (read-kbd-macro key) 'helm-command-prefix))
+        (read-kbd-macro key) 'helm-command-prefix))
     (set var key)))
 
 (defcustom helm-minibuffer-history-key "C-r"
@@ -60,10 +60,10 @@
       (when (and (boundp map) (keymapp (symbol-value map)))
         (when (and (boundp var) (symbol-value var))
           (define-key (symbol-value map)
-              (read-kbd-macro (symbol-value var)) nil))
+            (read-kbd-macro (symbol-value var)) nil))
         (when key
           (define-key (symbol-value map)
-              (read-kbd-macro key) 'helm-minibuffer-history))))
+            (read-kbd-macro key) 'helm-minibuffer-history))))
     (set var key)))
 
 ;;; Command Keymap

@@ -153,9 +153,9 @@ Should take one arg: the string to display."
                 eldoc-idle-delay 'repeat
                 'helm-eldoc-show-in-eval)))
     (unwind-protect
-         (minibuffer-with-setup-hook
-             'helm-eldoc-store-minibuffer
-           (call-interactively 'helm-eval-expression))
+        (minibuffer-with-setup-hook
+            'helm-eldoc-store-minibuffer
+          (call-interactively 'helm-eval-expression))
       (and timer (cancel-timer timer))
       (setq helm-eldoc-active-minibuffers-list
             (cdr helm-eldoc-active-minibuffers-list)))))

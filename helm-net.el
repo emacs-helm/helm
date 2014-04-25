@@ -187,24 +187,24 @@ Return an alist with elements like (data . number_results)."
                          (url-hexify-string input)))
         (fetch #'(lambda ()
                    (cl-loop
-                         with result-alist = (xml-get-children
-                                              (car (xml-parse-region
-                                                    (point-min) (point-max)))
-                                              'CompleteSuggestion)
-                         for i in result-alist
-                         for data = (cdr (cl-caadr (assoc 'suggestion i)))
-                         for nqueries = (cdr (cl-caadr (assoc 'num_queries i)))
-                         for lqueries = (length (helm-ggs-set-number-result
-                                                 nqueries))
-                         for ldata = (length data)
-                         do
-                         (progn
-                           (when (> ldata helm-ggs-max-length-real-flag)
-                             (setq helm-ggs-max-length-real-flag ldata))
-                           (when (> lqueries helm-ggs-max-length-num-flag)
-                             (setq helm-ggs-max-length-num-flag lqueries)))
-                         collect (cons data nqueries) into cont
-                         finally return cont))))
+                    with result-alist = (xml-get-children
+                                         (car (xml-parse-region
+                                               (point-min) (point-max)))
+                                         'CompleteSuggestion)
+                    for i in result-alist
+                    for data = (cdr (cl-caadr (assoc 'suggestion i)))
+                    for nqueries = (cdr (cl-caadr (assoc 'num_queries i)))
+                    for lqueries = (length (helm-ggs-set-number-result
+                                            nqueries))
+                    for ldata = (length data)
+                    do
+                    (progn
+                      (when (> ldata helm-ggs-max-length-real-flag)
+                        (setq helm-ggs-max-length-real-flag ldata))
+                      (when (> lqueries helm-ggs-max-length-num-flag)
+                        (setq helm-ggs-max-length-num-flag lqueries)))
+                    collect (cons data nqueries) into cont
+                    finally return cont))))
     (if helm-google-suggest-use-curl-p
         (with-temp-buffer
           (call-process "curl" nil t nil request)
@@ -221,31 +221,31 @@ Return an alist with elements like (data . number_results)."
                                                      (concat request-prefix
                                                              " " helm-pattern))
                                                 helm-pattern))
-               for (real . numresult) in suggested-results
-               ;; Prepare number of results with ","
-               for fnumresult = (helm-ggs-set-number-result numresult)
-               ;; Calculate number of spaces to add before fnumresult
-               ;; if it is smaller than longest result
-               ;; `helm-ggs-max-length-num-flag'.
-               ;; e.g 1,234,567
-               ;;       345,678
-               ;; To be sure it is aligned properly.
-               for nspaces = (if (< (length fnumresult)
-                                    helm-ggs-max-length-num-flag)
-                                 (- helm-ggs-max-length-num-flag
-                                    (length fnumresult))
-                               0)
-               ;; Add now the spaces before fnumresult.
-               for align-fnumresult = (concat (make-string nspaces ? )
-                                              fnumresult)
-               for interval = (- helm-ggs-max-length-real-flag
-                                 (length real))
-               for spaces   = (make-string (+ 2 interval) ? )
-               for display = (format "%s%s(%s results)"
-                                     real spaces align-fnumresult)
-               collect (cons display real))))
+                  for (real . numresult) in suggested-results
+                  ;; Prepare number of results with ","
+                  for fnumresult = (helm-ggs-set-number-result numresult)
+                  ;; Calculate number of spaces to add before fnumresult
+                  ;; if it is smaller than longest result
+                  ;; `helm-ggs-max-length-num-flag'.
+                  ;; e.g 1,234,567
+                  ;;       345,678
+                  ;; To be sure it is aligned properly.
+                  for nspaces = (if (< (length fnumresult)
+                                       helm-ggs-max-length-num-flag)
+                                    (- helm-ggs-max-length-num-flag
+                                       (length fnumresult))
+                                  0)
+                  ;; Add now the spaces before fnumresult.
+                  for align-fnumresult = (concat (make-string nspaces ? )
+                                                 fnumresult)
+                  for interval = (- helm-ggs-max-length-real-flag
+                                    (length real))
+                  for spaces   = (make-string (+ 2 interval) ? )
+                  for display = (format "%s%s(%s results)"
+                                        real spaces align-fnumresult)
+                  collect (cons display real))))
     (if (cl-loop for (_disp . dat) in suggestions
-              thereis (equal dat helm-pattern))
+                 thereis (equal dat helm-pattern))
         suggestions
       ;; if there is no suggestion exactly matching the input then
       ;; prepend a Search on Google item to the list
@@ -259,14 +259,14 @@ Return an alist with elements like (data . number_results)."
       (progn
         (and (numberp num) (setq num (number-to-string num)))
         (cl-loop for i in (reverse (split-string num "" t))
-              for count from 1
-              append (list i) into C
-              when (= count 3)
-              append (list ",") into C
-              and do (setq count 0)
-              finally return
-              (replace-regexp-in-string
-               "^," "" (mapconcat 'identity (reverse C) ""))))
+                 for count from 1
+                 append (list i) into C
+                 when (= count 3)
+                 append (list ",") into C
+                 and do (setq count 0)
+                 finally return
+                 (replace-regexp-in-string
+                  "^," "" (mapconcat 'identity (reverse C) ""))))
     "?"))
 
 (defun helm-google-suggest-action (candidate)
@@ -307,12 +307,12 @@ Return an alist with elements like (data . number_results)."
     (with-current-buffer
         (url-retrieve-synchronously request)
       (cl-loop with result-alist =
-            (xml-get-children
-             (car (xml-parse-region
-                   (point-min) (point-max)))
-             'Result)
-            for i in result-alist
-            collect (cl-caddr i)))))
+               (xml-get-children
+                (car (xml-parse-region
+                      (point-min) (point-max)))
+                'Result)
+               for i in result-alist
+               collect (cl-caddr i)))))
 
 (defun helm-yahoo-suggest-set-candidates ()
   "Set candidates with Yahoo results found."
@@ -357,13 +357,13 @@ Return an alist with elements like (data . number_results)."
   (goto-char (point-min))
   (when (re-search-forward "^\\[.+\\[\\(.*\\)\\]\\]" nil t)
     (cl-loop for i across (aref (json-read-from-string (match-string 0)) 1)
-          collect i into result
-          finally return (or result
-                             (append
-                              result
-                              (list (cons (format "Search for '%s' on wikipedia"
-                                                  helm-pattern)
-                                          helm-pattern)))))))
+             collect i into result
+             finally return (or result
+                                (append
+                                 result
+                                 (list (cons (format "Search for '%s' on wikipedia"
+                                                     helm-pattern)
+                                             helm-pattern)))))))
 
 (defvar helm-wikipedia--summary-cache (make-hash-table :test 'equal))
 (defun helm-wikipedia-persistent-action (candidate)
@@ -507,8 +507,8 @@ Return an alist with elements like (data . number_results)."
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
   (let ((default-browser-fn
-         (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
-               thereis (and exe (executable-find exe) (fboundp fn) fn))))
+          (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
+                   thereis (and exe (executable-find exe) (fboundp fn) fn))))
     (if default-browser-fn
         (apply default-browser-fn url args)
       (error "No usable browser found"))))

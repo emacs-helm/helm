@@ -81,15 +81,15 @@ Here are the possible value of this symbol and their meaning:
 - multi3p: Same but prefix must match.
 Default is multi3."
   :type  '(radio :tag "Matching methods for helm"
-           (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
-           (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
-           (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
-           (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
+                 (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
+                 (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
+                 (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
+                 (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
   :set   'helm-mp-set-matching-method
   :group 'helm-match-plugin)
 
 (defface helm-match
-    '((t (:inherit match)))
+  '((t (:inherit match)))
   "Face used to highlight matches."
   :group 'helm-match-plugin)
 
@@ -107,7 +107,7 @@ The smaller  this value is, the slower highlight is."
 
 ;;;###autoload
 (define-minor-mode helm-match-plugin-mode
-    "Add more flexible regexp matching for helm.
+  "Add more flexible regexp matching for helm.
 See `helm-mp-matching-method' for the behavior of each method."
   :group 'helm-match-plugin
   :require 'helm-match-plugin
@@ -139,7 +139,7 @@ but \"foo\ bar\"=> (\"foobar\")."
                        (replace-regexp-in-string helm-mp-space-regexp
                                                  "\000\000" pattern)
                        " " t)
-          collect (replace-regexp-in-string "\000\000" " " s))))
+             collect (replace-regexp-in-string "\000\000" " " s))))
 
 (defun helm-mp-1-make-regexp (pattern)
   "Replace spaces in PATTERN with \"\.*\"."
@@ -269,9 +269,9 @@ This is done only if `helm-mp-3-pattern-str' is same as PATTERN."
 e.g ((identity . \"foo\") (identity . \"bar\"))."
   (unless (string= pattern "")
     (cl-loop for pat in (helm-mp-split-pattern pattern)
-          collect (if (string= "!" (substring pat 0 1))
-                      (cons 'not (substring pat 1))
-                    (cons 'identity pat)))))
+             collect (if (string= "!" (substring pat 0 1))
+                         (cons 'not (substring pat 1))
+                       (cons 'identity pat)))))
 
 (defun helm-mp-3-match (str &optional pattern)
   "Check if PATTERN match STR.
@@ -286,7 +286,7 @@ cons cell against STR (a candidate).
 i.e (identity (string-match \"foo\" \"foo bar\")) => t."
   (let ((pat (helm-mp-3-get-patterns (or pattern helm-pattern))))
     (cl-loop for (predicate . regexp) in pat
-          always (funcall predicate (string-match regexp str)))))
+             always (funcall predicate (string-match regexp str)))))
 
 (defun helm-mp-3-search-base (pattern searchfn1 searchfn2)
   "Try to find PATTERN in `helm-buffer' with SEARCHFN1 and SEARCHFN2.
@@ -297,15 +297,15 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (cl-loop with pat = (if (stringp pattern)
                           (helm-mp-3-get-patterns pattern)
                         pattern)
-        while (funcall searchfn1 (or (cdar pat) "") nil t)
-        for bol = (point-at-bol)
-        for eol = (point-at-eol)
-        if (cl-loop for (pred . str) in (cdr pat) always
-                 (progn (goto-char bol)
-                        (funcall pred (funcall searchfn2 str eol t))))
-        do (goto-char eol) and return t
-        else do (goto-char eol)
-        finally return nil))
+           while (funcall searchfn1 (or (cdar pat) "") nil t)
+           for bol = (point-at-bol)
+           for eol = (point-at-eol)
+           if (cl-loop for (pred . str) in (cdr pat) always
+                       (progn (goto-char bol)
+                              (funcall pred (funcall searchfn2 str eol t))))
+           do (goto-char eol) and return t
+           else do (goto-char eol)
+           finally return nil))
 
 (defun helm-mp-3-search (pattern &rest _ignore)
   (when (stringp pattern)
@@ -332,7 +332,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
          (first (car pat)))
     (and (funcall (car first) (helm-mp-prefix-match str (cdr first)))
          (cl-loop for (predicate . regexp) in (cdr pat)
-               always (funcall predicate (string-match regexp str))))))
+                  always (funcall predicate (string-match regexp str))))))
 
 (defun helm-mp-3p-search (pattern &rest _ignore)
   (when (stringp pattern)
@@ -366,17 +366,17 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                                  (helm-mklist it)))
            (matchfns         (cond (defmatch-strict)
                                    (defmatch
-                                    (append helm-mp-default-match-functions defmatch))
+                                     (append helm-mp-default-match-functions defmatch))
                                    (t helm-mp-default-match-functions)))
            (searchfns        (cond (defsearch-strict)
                                    (defsearch
-                                    (append searchers defsearch))
+                                     (append searchers defsearch))
                                    (t searchers))))
       `(,(if (or (assoc 'candidates-in-buffer source)
                  (equal '(identity) matchfns))
              '(match identity) `(match ,@matchfns))
-         (search ,@searchfns)
-         ,@source))))
+        (search ,@searchfns)
+        ,@source))))
 
 
 ;;; Highlight matches.
@@ -409,15 +409,15 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
   (when helm-alive-p
     (set-buffer helm-buffer)
     (let ((requote (cl-loop for (pred . re) in
-                         (helm-mp-3-get-patterns helm-pattern)
-                         when (and (eq pred 'identity)
-                                   (>= (length re)
-                                       helm-mp-highlight-threshold))
-                         collect re into re-list
-                         finally return
-                         (if (and re-list (>= (length re-list) 1))
-                             (mapconcat 'identity re-list "\\|")
-                           (regexp-quote helm-pattern)))))
+                            (helm-mp-3-get-patterns helm-pattern)
+                            when (and (eq pred 'identity)
+                                      (>= (length re)
+                                          helm-mp-highlight-threshold))
+                            collect re into re-list
+                            finally return
+                            (if (and re-list (>= (length re-list) 1))
+                                (mapconcat 'identity re-list "\\|")
+                              (regexp-quote helm-pattern)))))
       (when (>= (length requote) helm-mp-highlight-threshold)
         (helm-mp-highlight-region
          (point-min) end requote 'helm-match)))))

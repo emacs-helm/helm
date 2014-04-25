@@ -141,33 +141,33 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 ;;
 ;;
 (defface helm-grep-match
-    '((t (:inherit match)))
+  '((t (:inherit match)))
   "Face used to highlight grep matches."
   :group 'helm-grep)
 
 (defface helm-grep-file
-    '((t (:foreground "BlueViolet"
-          :underline t)))
+  '((t (:foreground "BlueViolet"
+                    :underline t)))
   "Face used to highlight grep results filenames."
   :group 'helm-grep)
 
 (defface helm-grep-lineno
-    '((t (:foreground "Darkorange1")))
+  '((t (:foreground "Darkorange1")))
   "Face used to highlight grep number lines."
   :group 'helm-grep)
 
 (defface helm-grep-running
-    '((t (:foreground "Red")))
+  '((t (:foreground "Red")))
   "Face used in mode line when grep is running."
   :group 'helm-grep)
 
 (defface helm-grep-finish
-    '((t (:foreground "Green")))
+  '((t (:foreground "Green")))
   "Face used in mode line when grep is finish."
   :group 'helm-grep)
 
 (defface helm-grep-cmd-line
-    '((t (:inherit diff-added)))
+  '((t (:inherit diff-added)))
   "Face used to highlight grep command line when no results."
   :group 'helm-grep)
 
@@ -260,37 +260,37 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
     ;; level recursion with ack-grep.
     ;; So I leave it as it is, considering it is a feature. [1]
     (cl-loop for i in candidates append
-          (cond ((string-match "^git" helm-grep-default-command)
-                 (list i))
-                ;; Candidate is a directory and we use recursion or ack.
-                ((and (file-directory-p i)
-                      (or helm-grep-in-recurse
-                          ;; ack-grep accept directory [1].
-                          (helm-grep-use-ack-p)))
-                 (list (expand-file-name i)))
-                ;; Grep doesn't support directory only when not in recurse.
-                ((file-directory-p i)
-                 (file-expand-wildcards
-                  (concat (file-name-as-directory (expand-file-name i)) "*") t))
-                ;; Candidate is a file or wildcard and we use recursion, use the
-                ;; current directory instead of candidate.
-                ((and (or (file-exists-p i) (string-match "[*]" i))
-                      helm-grep-in-recurse)
-                 (list (expand-file-name
-                        (directory-file-name ; Needed for windoze.
-                         (file-name-directory (directory-file-name i))))))
-                ;; Else should be one or more file/directory
-                ;; possibly marked.
-                ;; When real is a normal filename without wildcard
-                ;; file-expand-wildcards returns a list of one file.
-                ;; wildcards should have been already handled by
-                ;; helm-read-file-name or helm-find-files but do it from
-                ;; here too in case we are called from elsewhere.
-                (t (file-expand-wildcards i t))) into all-files ; [1]
-          finally return
-          (if (string-match "^git" helm-grep-default-command)
-              (mapconcat 'identity all-files " ")
-            (mapconcat 'shell-quote-argument all-files " ")))))
+             (cond ((string-match "^git" helm-grep-default-command)
+                    (list i))
+                   ;; Candidate is a directory and we use recursion or ack.
+                   ((and (file-directory-p i)
+                         (or helm-grep-in-recurse
+                             ;; ack-grep accept directory [1].
+                             (helm-grep-use-ack-p)))
+                    (list (expand-file-name i)))
+                   ;; Grep doesn't support directory only when not in recurse.
+                   ((file-directory-p i)
+                    (file-expand-wildcards
+                     (concat (file-name-as-directory (expand-file-name i)) "*") t))
+                   ;; Candidate is a file or wildcard and we use recursion, use the
+                   ;; current directory instead of candidate.
+                   ((and (or (file-exists-p i) (string-match "[*]" i))
+                         helm-grep-in-recurse)
+                    (list (expand-file-name
+                           (directory-file-name ; Needed for windoze.
+                            (file-name-directory (directory-file-name i))))))
+                   ;; Else should be one or more file/directory
+                   ;; possibly marked.
+                   ;; When real is a normal filename without wildcard
+                   ;; file-expand-wildcards returns a list of one file.
+                   ;; wildcards should have been already handled by
+                   ;; helm-read-file-name or helm-find-files but do it from
+                   ;; here too in case we are called from elsewhere.
+                   (t (file-expand-wildcards i t))) into all-files ; [1]
+                   finally return
+                   (if (string-match "^git" helm-grep-default-command)
+                       (mapconcat 'identity all-files " ")
+                     (mapconcat 'shell-quote-argument all-files " ")))))
 
 (defun helm-grep-command (&optional recursive)
   (let ((com (car (split-string (if recursive
@@ -600,11 +600,11 @@ If N is positive go forward otherwise go backward."
     (when (get-buffer buf)
       (setq new-buf (read-string "GrepBufferName: " buf))
       (cl-loop for b in (helm-buffer-list)
-            when (and (string= new-buf b)
-                      (not (y-or-n-p
-                            (format "Buffer `%s' already exists overwrite? "
-                                    new-buf))))
-            do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
+               when (and (string= new-buf b)
+                         (not (y-or-n-p
+                               (format "Buffer `%s' already exists overwrite? "
+                                       new-buf))))
+               do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
@@ -621,8 +621,8 @@ If N is positive go forward otherwise go backward."
 
 ;;;###autoload
 (define-derived-mode helm-grep-mode
-    text-mode "helm-grep"
-    "Major mode to provide actions in helm grep saved buffer.
+  text-mode "helm-grep"
+  "Major mode to provide actions in helm grep saved buffer.
 
 Special commands:
 \\{helm-grep-mode-map}")
@@ -691,19 +691,19 @@ Special commands:
     (goto-char (point-min))
     (cl-loop while (re-search-forward
                     "^ *--\\(\\[no\\]\\)\\([^. ]+\\) *\\(.*\\)" nil t)
-          collect (cons (concat (match-string 2)
-                                " [" (match-string 3) "]")
-                        (match-string 2))
-          collect (cons (concat "no" (match-string 2)
-                                " [" (match-string 3) "]")
-                        (concat "no" (match-string 2))))))
+             collect (cons (concat (match-string 2)
+                                   " [" (match-string 3) "]")
+                           (match-string 2))
+             collect (cons (concat "no" (match-string 2)
+                                   " [" (match-string 3) "]")
+                           (concat "no" (match-string 2))))))
 
 (defun helm-grep-ack-types-transformer (candidates _source)
   (cl-loop for i in candidates
-        if (stringp i)
-        collect (rassoc i helm-grep-ack-types-cache)
-        else
-        collect i))
+           if (stringp i)
+           collect (rassoc i helm-grep-ack-types-cache)
+           else
+           collect i))
 
 (defvar helm-grep-ack-types-cache nil)
 (defun helm-grep-read-ack-type ()
@@ -729,21 +729,21 @@ Special commands:
   "Try to guess file extensions in FILES list when using grep recurse.
 These extensions will be added to command line with --include arg of grep."
   (cl-loop with ext-list = (list helm-grep-preferred-ext "*")
-        with lst = (if (file-directory-p (car files))
-                       (directory-files
-                        (car files) nil
-                        directory-files-no-dot-files-regexp)
-                     files)
-        for i in lst
-        for ext = (file-name-extension i 'dot)
-        for glob = (and ext (not (string= ext ""))
-                        (concat "*" ext))
-        unless (or (not glob)
-                   (and glob-list (member glob glob-list))
-                   (and glob-list (member glob ext-list))
-                   (and glob-list (member glob grep-find-ignored-files)))
-        collect glob into glob-list
-        finally return (delq nil (append ext-list glob-list))))
+           with lst = (if (file-directory-p (car files))
+                          (directory-files
+                           (car files) nil
+                           directory-files-no-dot-files-regexp)
+                        files)
+           for i in lst
+           for ext = (file-name-extension i 'dot)
+           for glob = (and ext (not (string= ext ""))
+                           (concat "*" ext))
+           unless (or (not glob)
+                      (and glob-list (member glob glob-list))
+                      (and glob-list (member glob ext-list))
+                      (and glob-list (member glob grep-find-ignored-files)))
+           collect glob into glob-list
+           finally return (delq nil (append ext-list glob-list))))
 
 (defun helm-grep-get-file-extensions (files)
   "Try to return a list of file extensions to pass to include arg of grep."
@@ -760,7 +760,7 @@ These extensions will be added to command line with --include arg of grep."
         ;; split this string to pass it later to mapconcat.
         ;; e.g '("*.el *.py")
         (cl-loop for i in extensions
-              append (split-string-and-unquote i " "))
+                 append (split-string-and-unquote i " "))
       (list "*"))))
 
 
@@ -876,20 +876,20 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 ;;
 (defun helm-ff-zgrep-1 (flist recursive)
   (unwind-protect
-       (let* ((def-dir (or helm-ff-default-directory
-                           default-directory))
-              (only    (if recursive
-                           (or (gethash def-dir helm-rzgrep-cache)
-                               (puthash
+      (let* ((def-dir (or helm-ff-default-directory
+                          default-directory))
+             (only    (if recursive
+                          (or (gethash def-dir helm-rzgrep-cache)
+                              (puthash
+                               def-dir
+                               (helm-walk-directory
                                 def-dir
-                                (helm-walk-directory
-                                 def-dir
-                                 :directories nil
-                                 :path 'full
-                                 :match helm-zgrep-file-extension-regexp)
-                                helm-rzgrep-cache))
-                         flist)))
-         (helm-do-grep-1 only recursive 'zgrep))
+                                :directories nil
+                                :path 'full
+                                :match helm-zgrep-file-extension-regexp)
+                               helm-rzgrep-cache))
+                        flist)))
+        (helm-do-grep-1 only recursive 'zgrep))
     (setq helm-zgrep-recurse-flag nil)))
 
 
@@ -944,15 +944,15 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
           (cl-loop for reg in (if multi-match
                                   (cl-loop for r in (helm-mp-split-pattern
                                                      helm-pattern)
-                                        unless (string-match "\\`!" r)
-                                        collect r)
+                                           unless (string-match "\\`!" r)
+                                           collect r)
                                 (list helm-pattern))
-                do
-                (while (and (re-search-forward reg nil t)
-                            (> (- (setq end (match-end 0))
-                                  (setq beg (match-beginning 0))) 0))
-                  (add-text-properties beg end '(face helm-grep-match)))
-                do (goto-char (point-min))) 
+                   do
+                   (while (and (re-search-forward reg nil t)
+                               (> (- (setq end (match-end 0))
+                                     (setq beg (match-beginning 0))) 0))
+                     (add-text-properties beg end '(face helm-grep-match)))
+                   do (goto-char (point-min))) 
           (buffer-string))
       (error nil))))
 
@@ -979,9 +979,9 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
          (win-conf (current-window-configuration))
          ;; Non--fname and remote buffers are ignored.
          (bufs (cl-loop for buf in cands
-                     for fname = (buffer-file-name (get-buffer buf))
-                     when (and fname (not (file-remote-p fname)))
-                     collect (expand-file-name fname))))
+                        for fname = (buffer-file-name (get-buffer buf))
+                        when (and fname (not (file-remote-p fname)))
+                        collect (expand-file-name fname))))
     (if bufs
         (if zgrep
             (helm-do-grep-1 bufs nil 'zgrep)

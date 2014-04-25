@@ -120,8 +120,8 @@ If load is non--nil load the file and feed `yaoddmuse-pages-hash'."
     (erase-buffer)
     (insert "(puthash \"EmacsWiki\" '(")
     (cl-loop for i in (gethash "EmacsWiki" yaoddmuse-pages-hash)
-          do
-          (insert (concat "(\"" (car i) "\") ")))
+             do
+             (insert (concat "(\"" (car i) "\") ")))
     (insert ") yaoddmuse-pages-hash)\n")
     (save-buffer)
     (kill-buffer (current-buffer))

@@ -38,7 +38,7 @@
 
 
 (defface helm-moccur-buffer
-    '((t (:foreground "DarkTurquoise" :underline t)))
+  '((t (:foreground "DarkTurquoise" :underline t)))
   "Face used to highlight moccur buffer names."
   :group 'helm-regexp)
 
@@ -118,10 +118,10 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
         (line    (buffer-substring s e)))
     (propertize
      (cl-loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
-           for i from 0 to (1- (/ (length matches) 2))
-           concat (format "\n         %s'%s'" (format "Group %d: " i)
-                          (match-string i)) into ln1
-           finally return (concat ln ln1))
+              for i from 0 to (1- (/ (length matches) 2))
+              concat (format "\n         %s'%s'" (format "Group %d: " i)
+                             (match-string i)) into ln1
+                             finally return (concat ln ln1))
      ;; match beginning
      ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.
      ;; It is implementation problem of candidates-in-buffer.
@@ -167,12 +167,12 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (helm-init-candidates-in-buffer
       'global
     (cl-loop for buf in helm-multi-occur-buffer-list
-          for bufstr = (with-current-buffer buf (buffer-string))
-          do (add-text-properties
-              0 (length bufstr)
-              `(buffer-name ,(buffer-name (get-buffer buf)))
-              bufstr)
-          concat bufstr)))
+             for bufstr = (with-current-buffer buf (buffer-string))
+             do (add-text-properties
+                 0 (length bufstr)
+                 `(buffer-name ,(buffer-name (get-buffer buf)))
+                 bufstr)
+             concat bufstr)))
 
 (defun helm-moccur-get-line (beg end)
   "Format line for `helm-source-moccur'."
@@ -187,7 +187,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
           (buffer-substring beg end)))
 
 (cl-defun helm-moccur-action (candidate
-                               &optional (method (quote buffer)) mark)
+                              &optional (method (quote buffer)) mark)
   "Jump to CANDIDATE with METHOD.
 arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
@@ -204,10 +204,10 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (helm-goto-line lineno)
     ;; Move point to the nearest matching regexp from bol.
     (cl-loop for reg in split-pat
-          when (save-excursion
-                 (re-search-forward reg (point-at-eol) t))
-          collect (match-beginning 0) into pos-ls
-          finally (goto-char (apply #'min pos-ls)))
+             when (save-excursion
+                    (re-search-forward reg (point-at-eol) t))
+             collect (match-beginning 0) into pos-ls
+             finally (goto-char (apply #'min pos-ls)))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
@@ -262,7 +262,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 ;;;###autoload
 (define-minor-mode helm-occur-match-plugin-mode
-    "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
+  "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
   :global t
   :init-value t
   (if helm-occur-match-plugin-mode
@@ -339,8 +339,8 @@ It is used with type attribute 'line'."
 ;;
 ;;
 (define-helm-type-attribute 'line
-    '((display-to-real . helm-display-to-real-numbered-line)
-      (action ("Go to Line" . helm-action-line-goto)))
+  '((display-to-real . helm-display-to-real-numbered-line)
+    (action ("Go to Line" . helm-action-line-goto)))
   "LINENO:CONTENT string, eg. \"  16:foo\".
 
 Optional `target-file' attribute is a name of target file.
@@ -358,9 +358,9 @@ If `recenter' attribute is specified, the line is displayed at
 the center of window, otherwise at the top of window.")
 
 (define-helm-type-attribute 'file-line
-    `((filtered-candidate-transformer helm-filtered-candidate-transformer-file-line)
-      (multiline)
-      (action ("Go to" . helm-action-file-line-goto)))
+  `((filtered-candidate-transformer helm-filtered-candidate-transformer-file-line)
+    (multiline)
+    (action ("Go to" . helm-action-file-line-goto)))
   "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
 
 Optional `default-directory' attribute is a default-directory

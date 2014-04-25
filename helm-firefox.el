@@ -89,9 +89,9 @@
 
 (defun helm-highlight-firefox-bookmarks (bookmarks _source)
   (cl-loop for i in bookmarks
-        collect (propertize
-                 i 'face '((:foreground "YellowGreen"))
-                 'help-echo (helm-firefox-bookmarks-get-value i))))
+           collect (propertize
+                    i 'face '((:foreground "YellowGreen"))
+                    'help-echo (helm-firefox-bookmarks-get-value i))))
 
 ;;;###autoload
 (defun helm-firefox-bookmarks ()

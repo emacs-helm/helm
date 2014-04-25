@@ -32,8 +32,8 @@
   "Default command to display a man page."
   :group 'helm-man
   :type '(radio :tag "Preferred command to display a man page"
-          (const :tag "Man" Man-getpage-in-background)
-          (const :tag "Woman" woman)))
+                (const :tag "Man" Man-getpage-in-background)
+                (const :tag "Woman" woman)))
 
 ;; Internal
 (defvar helm-man-pages nil

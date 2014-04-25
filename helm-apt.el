@@ -41,12 +41,12 @@ If nil default `helm-apt-cache-show-1' will be used."
   :group 'helm-apt)
 
 (defface helm-apt-installed
-    '((t (:foreground "green")))
+  '((t (:foreground "green")))
   "Face used for apt installed candidates."
   :group 'helm-apt)
 
 (defface helm-apt-deinstalled
-    '((t (:foreground "DimGray")))
+  '((t (:foreground "DimGray")))
   "Face used for apt deinstalled candidates."
   :group 'helm-apt)
 
@@ -100,23 +100,23 @@ If nil default `helm-apt-cache-show-1' will be used."
 (defun helm-apt-candidate-transformer (candidates)
   "Show installed CANDIDATES and the ones to deinstall in a different color."
   (cl-loop for cand in candidates
-        for name = (helm-apt-display-to-real cand)
-        for deinstall = (string=
-                         (assoc-default name helm-apt-installed-packages)
-                         "deinstall")
-        for install = (string=
-                       (assoc-default name helm-apt-installed-packages)
-                       "install")
-        for show = (cond ((and deinstall
-                               (memq helm-apt-show-only '(all deinstalled)))
-                          (propertize cand 'face 'helm-apt-deinstalled))
-                         ((and install
-                               (memq helm-apt-show-only '(all installed)))
-                          (propertize cand 'face 'helm-apt-installed))
-                         ((and (eq helm-apt-show-only 'noinstalled)
-                               (not install)) cand)
-                         ((eq helm-apt-show-only 'all) cand))
-        when show collect show))
+           for name = (helm-apt-display-to-real cand)
+           for deinstall = (string=
+                            (assoc-default name helm-apt-installed-packages)
+                            "deinstall")
+           for install = (string=
+                          (assoc-default name helm-apt-installed-packages)
+                          "install")
+           for show = (cond ((and deinstall
+                                  (memq helm-apt-show-only '(all deinstalled)))
+                             (propertize cand 'face 'helm-apt-deinstalled))
+                            ((and install
+                                  (memq helm-apt-show-only '(all installed)))
+                             (propertize cand 'face 'helm-apt-installed))
+                            ((and (eq helm-apt-show-only 'noinstalled)
+                                  (not install)) cand)
+                            ((eq helm-apt-show-only 'all) cand))
+           when show collect show))
 
 (defun helm-apt-show-only-installed ()
   (interactive)
@@ -154,8 +154,8 @@ If nil default `helm-apt-cache-show-1' will be used."
               (call-process-shell-command "dpkg --get-selections"
                                           nil (current-buffer))
               (cl-loop for i in (split-string (buffer-string) "\n" t)
-                    for p = (split-string i)
-                    collect (cons (car p) (cadr p)))))
+                       for p = (split-string i)
+                       collect (cons (car p) (cadr p)))))
       (helm-init-candidates-in-buffer
           'global
         (setq helm-apt-all-packages
@@ -175,8 +175,8 @@ package name - description."
 
 (defvar helm-apt-show-current-package nil)
 (define-derived-mode helm-apt-show-mode
-    special-mode "helm-apt-show"
-    "Mode to display infos on apt packages.")
+  special-mode "helm-apt-show"
+  "Mode to display infos on apt packages.")
 
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."

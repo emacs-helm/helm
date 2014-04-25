@@ -53,32 +53,32 @@
 ;;
 ;;
 (define-helm-type-attribute 'file
-    `((action
-       ("Find file" . helm-find-many-files)
-       ("Find file as root" . helm-find-file-as-root)
-       ("Find file other window" . find-file-other-window)
-       ("Find file other frame" . find-file-other-frame)
-       ("Open dired in file's directory" . helm-open-dired)
-       ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
-       ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
-       ("Pdfgrep File(s)" . helm-ff-pdfgrep)
-       ("Insert as org link" . helm-files-insert-as-org-link)
-       ("Checksum File" . helm-ff-checksum)
-       ("Ediff File" . helm-find-files-ediff-files)
-       ("Ediff Merge File" . helm-find-files-ediff-merge-files)
-       ("Etags `M-., C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
-       ("View file" . view-file)
-       ("Insert file" . insert-file)
-       ("Delete file(s)" . helm-delete-marked-files)
-       ("Open file externally (C-u to choose)" . helm-open-file-externally)
-       ("Open file with default tool" . helm-open-file-with-default-tool)
-       ("Find file in hex dump" . hexl-find-file))
-      (persistent-help . "Show this file")
-      (action-transformer helm-transform-file-load-el
-                          helm-transform-file-browse-url)
-      (candidate-transformer helm-skip-boring-files
-                             helm-highlight-files
-                             helm-w32-pathname-transformer))
+  `((action
+     ("Find file" . helm-find-many-files)
+     ("Find file as root" . helm-find-file-as-root)
+     ("Find file other window" . find-file-other-window)
+     ("Find file other frame" . find-file-other-frame)
+     ("Open dired in file's directory" . helm-open-dired)
+     ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
+     ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
+     ("Pdfgrep File(s)" . helm-ff-pdfgrep)
+     ("Insert as org link" . helm-files-insert-as-org-link)
+     ("Checksum File" . helm-ff-checksum)
+     ("Ediff File" . helm-find-files-ediff-files)
+     ("Ediff Merge File" . helm-find-files-ediff-merge-files)
+     ("Etags `M-., C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
+     ("View file" . view-file)
+     ("Insert file" . insert-file)
+     ("Delete file(s)" . helm-delete-marked-files)
+     ("Open file externally (C-u to choose)" . helm-open-file-externally)
+     ("Open file with default tool" . helm-open-file-with-default-tool)
+     ("Find file in hex dump" . hexl-find-file))
+    (persistent-help . "Show this file")
+    (action-transformer helm-transform-file-load-el
+                        helm-transform-file-browse-url)
+    (candidate-transformer helm-skip-boring-files
+                           helm-highlight-files
+                           helm-w32-pathname-transformer))
   "File name.")
 
 
@@ -236,42 +236,42 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
 ;;
 ;;
 (defface helm-ff-prefix
-    '((t (:background "yellow" :foreground "black")))
+  '((t (:background "yellow" :foreground "black")))
   "Face used to prefix new file or url paths in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-executable
-    '((t (:foreground "green")))
+  '((t (:foreground "green")))
   "Face used for executable files in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-directory
-    '((t (:foreground "DarkRed" :background "LightGray")))
+  '((t (:foreground "DarkRed" :background "LightGray")))
   "Face used for directories in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-symlink
-    '((t (:foreground "DarkOrange")))
+  '((t (:foreground "DarkOrange")))
   "Face used for symlinks in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-invalid-symlink
-    '((t (:foreground "black" :background "red")))
+  '((t (:foreground "black" :background "red")))
   "Face used for invalid symlinks in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-ff-file
-    '((t (:inherit font-lock-builtin-face)))
+  '((t (:inherit font-lock-builtin-face)))
   "Face used for file names in `helm-find-files'."
   :group 'helm-files)
 
 (defface helm-history-deleted
-    '((t (:inherit helm-ff-invalid-symlink)))
+  '((t (:inherit helm-ff-invalid-symlink)))
   "Face used for deleted files in `file-name-history'."
   :group 'helm-files)
 
 (defface helm-history-remote
-    '((t (:foreground "Indianred1")))
+  '((t (:foreground "Indianred1")))
   "Face used for remote files in `file-name-history'."
   :group 'helm-files)
 
@@ -517,13 +517,13 @@ ACTION must be an action supported by `helm-dired-action'."
   (let ((files    (helm-marked-candidates :with-wildcard t))
         (parg     helm-current-prefix-arg))
     (cl-loop for fname in files
-          do (byte-compile-file fname parg))))
+             do (byte-compile-file fname parg))))
 
 (defun helm-find-files-load-files (_candidate)
   "Load elisp files from `helm-find-files'."
   (let ((files    (helm-marked-candidates :with-wildcard t)))
     (cl-loop for fname in files
-          do (load fname))))
+             do (load fname))))
 
 (defun helm-find-files-ediff-files-1 (candidate &optional merge)
   "Generic function to ediff/merge files in `helm-find-files'."
@@ -565,9 +565,9 @@ ACTION must be an action supported by `helm-dired-action'."
 (defun helm-ff-pdfgrep (_candidate)
   "Default action to pdfgrep files from `helm-find-files'."
   (let ((cands (cl-loop for file in (helm-marked-candidates :with-wildcard t)
-                     if (or (string= (file-name-extension file) "pdf")
-                            (string= (file-name-extension file) "PDF"))
-                     collect file))
+                        if (or (string= (file-name-extension file) "pdf")
+                               (string= (file-name-extension file) "PDF"))
+                        collect file))
         (helm-pdfgrep-default-function 'helm-pdfgrep-init))
     (when cands
       (helm-do-pdfgrep-1 cands))))
@@ -628,9 +628,9 @@ will not be loaded first time you use this."
            (command (helm-comp-read
                      "Command: "
                      (cl-loop for (a . c) in eshell-command-aliases-list
-                           when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
-                           collect (propertize a 'help-echo (car c)) into ls
-                           finally return (sort ls 'string<))
+                              when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
+                              collect (propertize a 'help-echo (car c)) into ls
+                              finally return (sort ls 'string<))
                      :buffer "*helm eshell on file*"
                      :name "Eshell command"
                      :keymap helm-esh-on-file-map
@@ -673,13 +673,13 @@ will not be loaded first time you use this."
 
         ;; Run eshell-command on EACH marked files.
         (cl-loop for i in cand-list
-              for files = (format "'%s'" i)
-              for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
-                            ;; [1] This allow to enter other args AFTER filename
-                            ;; i.e <command %s some_more_args>
-                            (format command files)
-                          (format "%s %s" command files))
-              do (eshell-command com))))))
+                 for files = (format "'%s'" i)
+                 for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
+                               ;; [1] This allow to enter other args AFTER filename
+                               ;; i.e <command %s some_more_args>
+                               (format command files)
+                             (format "%s %s" command files))
+                 do (eshell-command com))))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
   "Run `eshell-command' on CANDIDATE or marked candidates.
@@ -766,30 +766,30 @@ Default METHOD is rename."
                      (t (error "Error: Unknown method %s" method)))))
     (make-directory tmp-dir)
     (unwind-protect
-         (progn
-           ;; Rename all files to tmp-dir with new-name.
-           ;; If files are not from start directory, use method
-           ;; to move files to tmp-dir.
-           (cl-loop for i in collection
-                 for count from start-at-num
-                 for fnum = (if (< count 10) "0%s" "%s")
-                 for nname = (concat tmp-dir new-name (format fnum count)
-                                     (if (not (string= extension ""))
-                                         (format ".%s" (replace-regexp-in-string
-                                                        "[.]" "" extension))
-                                       (file-name-extension i 'dot)))
-                 do (if (helm-ff-member-directory-p i directory)
-                        (rename-file i nname)
-                      (funcall fn i nname)))
-           ;; Now move all from tmp-dir to destination.
-           (cl-loop with dirlist = (directory-files
-                                    tmp-dir t directory-files-no-dot-files-regexp)
-                 for f in dirlist do
-                 (if (file-symlink-p f)
-                     (make-symbolic-link (file-truename f)
-                                         (concat (file-name-as-directory directory)
-                                                 (helm-basename f)))
-                   (rename-file f directory))))
+        (progn
+          ;; Rename all files to tmp-dir with new-name.
+          ;; If files are not from start directory, use method
+          ;; to move files to tmp-dir.
+          (cl-loop for i in collection
+                   for count from start-at-num
+                   for fnum = (if (< count 10) "0%s" "%s")
+                   for nname = (concat tmp-dir new-name (format fnum count)
+                                       (if (not (string= extension ""))
+                                           (format ".%s" (replace-regexp-in-string
+                                                          "[.]" "" extension))
+                                         (file-name-extension i 'dot)))
+                   do (if (helm-ff-member-directory-p i directory)
+                          (rename-file i nname)
+                        (funcall fn i nname)))
+          ;; Now move all from tmp-dir to destination.
+          (cl-loop with dirlist = (directory-files
+                                   tmp-dir t directory-files-no-dot-files-regexp)
+                   for f in dirlist do
+                   (if (file-symlink-p f)
+                       (make-symbolic-link (file-truename f)
+                                           (concat (file-name-as-directory directory)
+                                                   (helm-basename f)))
+                     (rename-file f directory))))
       (delete-directory tmp-dir t))))
 
 (defun helm-ff-serial-rename (_candidate)
@@ -1055,7 +1055,7 @@ The checksum is copied to kill-ring."
                     (helm-comp-read
                      "Algorithm: "
                      '(md5 sha1 sha224
-                       sha256 sha384 sha512))))))
+                           sha256 sha384 sha512))))))
     (kill-new
      (if algo
          (with-temp-buffer
@@ -1118,7 +1118,7 @@ You should not modify this yourself unless you know what you do.")
   (or (with-helm-buffer helm-in-file-completion-p)
       (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
         (cl-loop for i in helm-file-completion-sources
-              thereis (string= cur-source i)))))
+                 thereis (string= cur-source i)))))
 
 (defun helm-find-files-down-one-level (arg)
   "Go down one level like unix command `cd ..'.
@@ -1289,7 +1289,7 @@ On windows system substitute from start up to \"/[a-z]:/\"."
   "Build filename for `helm-pattern' like /su:: or /sudo::."
   (apply #'tramp-make-tramp-file-name
          (cl-loop with v = (tramp-dissect-file-name fname)
-               for i across v collect i)))
+                  for i across v collect i)))
 
 (cl-defun helm-ff-tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
@@ -1301,10 +1301,10 @@ purpose."
           (all-methods (mapcar 'car tramp-methods)))
       (helm-fast-remove-dups
        (cl-loop for (f . h) in (tramp-get-completion-function method)
-             append (cl-loop for e in (funcall f (car h))
-                          for host = (and (consp e) (cadr e))
-                          when (and host (not (member host all-methods)))
-                          collect (concat tn host)))
+                append (cl-loop for e in (funcall f (car h))
+                                for host = (and (consp e) (cadr e))
+                                when (and host (not (member host all-methods)))
+                                collect (concat tn host)))
        :test 'equal))))
 
 (defun helm-ff-before-action-hook-fn ()
@@ -1464,10 +1464,10 @@ systems."
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
   (cl-loop with bad = '((92 . ""))
-        for i across fname
-        for isbad = (assq i bad)
-        if isbad concat (cdr isbad)
-        else concat (string i)))
+           for i across fname
+           for isbad = (assq i bad)
+           if isbad concat (cdr isbad)
+           else concat (string i)))
 
 (defun helm-ff-smart-completion-p ()
   (and helm-ff-smart-completion
@@ -1488,7 +1488,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
         (bd      (or (helm-basedir fname) ""))
         (dir-p   (file-directory-p fname))
         (tramp-p (cl-loop for (m . f) in tramp-methods
-                       thereis (string-match m fname))))
+                          thereis (string-match m fname))))
     ;; Always regexp-quote base directory name to handle
     ;; crap dirnames such e.g bookmark+
     (cond (dir-p (regexp-quote fname))
@@ -1550,15 +1550,15 @@ Note that only directories are saved here."
       (let ((mkd (helm-marked-candidates))
             (history-delete-duplicates t))
         (cl-loop for sel in mkd
-              when (and sel
-                        (file-exists-p sel)
-                        (not (file-directory-p sel)))
-              do
-              ;; we use `abbreviate-file-name' here because
-              ;; other parts of Emacs seems to,
-              ;; and we don't want to introduce duplicates.
-              (add-to-history 'file-name-history
-                              (abbreviate-file-name sel)))))))
+                 when (and sel
+                           (file-exists-p sel)
+                           (not (file-directory-p sel)))
+                 do
+                 ;; we use `abbreviate-file-name' here because
+                 ;; other parts of Emacs seems to,
+                 ;; and we don't want to introduce duplicates.
+                 (add-to-history 'file-name-history
+                                 (abbreviate-file-name sel)))))))
 (add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file)
@@ -1567,7 +1567,7 @@ Note that only directories are saved here."
 (defun helm-get-default-mode-for-file (filename)
   "Return the default mode to open FILENAME."
   (let ((mode (cl-loop for (r . m) in auto-mode-alist
-                    thereis (and (string-match r filename) m))))
+                       thereis (and (string-match r filename) m))))
     (or (and (symbolp mode) mode) "Fundamental")))
 
 (defun helm-ff-properties (candidate)
@@ -1635,14 +1635,14 @@ Note that only directories are saved here."
   (let ((marked (helm-marked-candidates)))
     (save-selected-window
       (cl-loop for c in marked do
-            (progn (helm-preselect (if (and helm-ff-transformer-show-only-basename
-                                            (not (helm-ff-dot-file-p c)))
-                                       (helm-basename c) c))
-                   (when (y-or-n-p (format "Really Delete file `%s'? " c))
-                     (helm-delete-file c helm-ff-signal-error-on-dot-files
-                                       'synchro)
-                     (helm-delete-current-selection)
-                     (message nil)))))
+               (progn (helm-preselect (if (and helm-ff-transformer-show-only-basename
+                                               (not (helm-ff-dot-file-p c)))
+                                          (helm-basename c) c))
+                      (when (y-or-n-p (format "Really Delete file `%s'? " c))
+                        (helm-delete-file c helm-ff-signal-error-on-dot-files
+                                          'synchro)
+                        (helm-delete-current-selection)
+                        (message nil)))))
     (with-helm-buffer
       (setq helm-marked-candidates nil
             helm-visible-mark-overlays nil))
@@ -1738,7 +1738,7 @@ Return candidates prefixed with basename of `helm-input' first."
   ;; Handle boring files
   (unless (and helm-ff-skip-boring-files
                (cl-loop for r in helm-boring-file-regexp-list
-                     thereis (string-match r file)))
+                        thereis (string-match r file)))
     ;; Handle tramp files.
     (if (and (string-match helm-tramp-file-name-regexp helm-pattern)
              helm-ff-tramp-not-fancy)
@@ -2068,7 +2068,7 @@ Use it for non--interactive calls of `helm-find-files'."
     (when (and (stringp he) (string-match "^LINK: " he))
       (setq he (replace-match "" t t he)))
     (cl-loop for i in (list he ov-he w3m-l nt-prop)
-          thereis (and (stringp i) ffap-url-regexp (string-match ffap-url-regexp i) i))))
+             thereis (and (stringp i) ffap-url-regexp (string-match ffap-url-regexp i) i))))
 
 (defun helm-find-library-at-point ()
   "Try to find library path at point.
@@ -2144,16 +2144,16 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
     (when (and follow (not (get-buffer dired-log-buffer)))
       (let ((target (directory-file-name candidate)))
         (unwind-protect
-             (progn
-               (setq helm-ff-cand-to-mark
-                     (helm-get-dest-fnames-from-list files candidate dirflag))
-               (with-helm-after-update-hook (helm-ff-maybe-mark-candidates))
-               (if (and dirflag (eq action 'rename))
-                   (helm-find-files-1 (file-name-directory target)
-                                      (if helm-ff-transformer-show-only-basename
-                                          (helm-basename target) target))
-                 (helm-find-files-1 (file-name-as-directory
-                                     (expand-file-name candidate)))))
+            (progn
+              (setq helm-ff-cand-to-mark
+                    (helm-get-dest-fnames-from-list files candidate dirflag))
+              (with-helm-after-update-hook (helm-ff-maybe-mark-candidates))
+              (if (and dirflag (eq action 'rename))
+                  (helm-find-files-1 (file-name-directory target)
+                                     (if helm-ff-transformer-show-only-basename
+                                         (helm-basename target) target))
+                (helm-find-files-1 (file-name-as-directory
+                                    (expand-file-name candidate)))))
           (setq helm-ff-cand-to-mark nil))))))
 
 (defun helm-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
@@ -2163,16 +2163,16 @@ members of FLIST."
   ;; At this point files have been renamed/copied at destination.
   ;; That's mean DEST-CAND exists.
   (cl-loop
-        with dest = (expand-file-name dest-cand)
-        for src in flist
-        for basename-src = (helm-basename src)
-        for fname = (cond (rename-dir-flag (directory-file-name dest))
-                          ((file-directory-p dest)
-                           (concat (file-name-as-directory dest) basename-src))
-                          (t dest))
-        when (file-exists-p fname)
-        collect fname into tmp-list
-        finally return (sort tmp-list 'string<)))
+   with dest = (expand-file-name dest-cand)
+   for src in flist
+   for basename-src = (helm-basename src)
+   for fname = (cond (rename-dir-flag (directory-file-name dest))
+                     ((file-directory-p dest)
+                      (concat (file-name-as-directory dest) basename-src))
+                     (t dest))
+   when (file-exists-p fname)
+   collect fname into tmp-list
+   finally return (sort tmp-list 'string<)))
 
 (defun helm-ff-maybe-mark-candidates ()
   "Mark all candidates of list `helm-ff-cand-to-mark'.
@@ -2199,10 +2199,10 @@ following files to destination."
 (defun helm-file-buffers (filename)
   "Returns a list of buffer names corresponding to FILENAME."
   (cl-loop with name = (expand-file-name filename)
-        for buf in (buffer-list)
-        for bfn = (buffer-file-name buf)
-        when (and bfn (string= name bfn))
-        collect (buffer-name buf)))
+           for buf in (buffer-list)
+           for bfn = (buffer-file-name buf)
+           when (and bfn (string= name bfn))
+           collect (buffer-name buf)))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro)
   "Delete the given file after querying the user.
@@ -2337,10 +2337,10 @@ Else return ACTIONS unmodified."
 (defun helm-files-in-all-dired-candidates ()
   (save-excursion
     (cl-loop for (f . b) in dired-buffers
-          when (buffer-live-p b)
-          append (let ((dir (with-current-buffer b dired-directory)))
-                   (if (listp dir) (cdr dir)
-                     (directory-files f t dired-re-no-dot))))))
+             when (buffer-live-p b)
+             append (let ((dir (with-current-buffer b dired-directory)))
+                      (if (listp dir) (cdr dir)
+                        (directory-files f t dired-re-no-dot))))))
 
 ;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
 
@@ -2364,9 +2364,9 @@ Else return ACTIONS unmodified."
          (unless helm-file-cache-initialized-p
            (setq helm-file-cache-files
                  (cl-loop for item in file-cache-alist append
-                       (cl-destructuring-bind (base &rest dirs) item
-                         (cl-loop for dir in dirs collect
-                               (concat dir base)))))
+                          (cl-destructuring-bind (base &rest dirs) item
+                            (cl-loop for dir in dirs collect
+                                     (concat dir base)))))
            (defadvice file-cache-add-file (after file-cache-list activate)
              (add-to-list 'helm-file-cache-files (expand-file-name file)))
            (setq helm-file-cache-initialized-p t))))
@@ -2415,11 +2415,11 @@ Don't use it in your own code unless you know what you are doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
   (cl-loop for c in candidates collect
-        (cond ((file-remote-p c)
-               (cons (propertize c 'face 'helm-history-remote) c))
-              ((file-exists-p c)
-               (cons (propertize c 'face 'helm-ff-file) c))
-              (t (cons (propertize c 'face 'helm-history-deleted) c)))))
+           (cond ((file-remote-p c)
+                  (cons (propertize c 'face 'helm-history-remote) c))
+                 ((file-exists-p c)
+                  (cons (propertize c 'face 'helm-ff-file) c))
+                 (t (cons (propertize c 'face 'helm-history-deleted) c)))))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
@@ -2442,9 +2442,9 @@ Don't use it in your own code unless you know what you are doing.")
     (match . helm-files-match-only-basename)
     (filtered-candidate-transformer . (lambda (candidates _source)
                                         (cl-loop for i in candidates
-                                              if helm-ff-transformer-show-only-basename
-                                              collect (cons (helm-basename i) i)
-                                              else collect i)))
+                                                 if helm-ff-transformer-show-only-basename
+                                                 collect (cons (helm-basename i) i)
+                                                 else collect i)))
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
@@ -2515,31 +2515,31 @@ and
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
   (cl-loop for i in files
-        for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (helm-dir-is-dot i))
-                            (not (and ffap-url-regexp
-                                      (string-match ffap-url-regexp i)))
-                            (not (string-match helm-ff-url-regexp i)))
-                       (helm-basename i) i)
-        for type = (car (file-attributes i))
-        collect
-        (cond ((and helm-ff-tramp-not-fancy
-                    (string-match helm-tramp-file-name-regexp i))
-               (cons disp i))
-              ((stringp type)
-               (cons (propertize disp
-                                 'face 'helm-ff-symlink
-                                 'help-echo (expand-file-name i))
-                     i))
-              ((eq type t)
-               (cons (propertize disp
-                                 'face 'helm-ff-directory
-                                 'help-echo (expand-file-name i))
-                     i))
-              (t (cons (propertize disp
-                                   'face 'helm-ff-file
-                                   'help-echo (expand-file-name i))
-                       i)))))
+           for disp = (if (and helm-ff-transformer-show-only-basename
+                               (not (helm-dir-is-dot i))
+                               (not (and ffap-url-regexp
+                                         (string-match ffap-url-regexp i)))
+                               (not (string-match helm-ff-url-regexp i)))
+                          (helm-basename i) i)
+           for type = (car (file-attributes i))
+           collect
+           (cond ((and helm-ff-tramp-not-fancy
+                       (string-match helm-tramp-file-name-regexp i))
+                  (cons disp i))
+                 ((stringp type)
+                  (cons (propertize disp
+                                    'face 'helm-ff-symlink
+                                    'help-echo (expand-file-name i))
+                        i))
+                 ((eq type t)
+                  (cons (propertize disp
+                                    'face 'helm-ff-directory
+                                    'help-echo (expand-file-name i))
+                        i))
+                 (t (cons (propertize disp
+                                      'face 'helm-ff-file
+                                      'help-echo (expand-file-name i))
+                          i)))))
 
 (defvar helm-source-files-in-current-dir
   `((name . "Files from Current Directory")
@@ -2567,7 +2567,7 @@ Colorize only symlinks, directories and files."
                         helm-pattern)))
     (filtered-candidate-transformer . (lambda (candidates _source)
                                         (cl-loop for cand in (cdr candidates)
-                                              collect (ansi-color-apply cand))))
+                                                 collect (ansi-color-apply cand))))
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
      helm-transform-file-load-el
@@ -2615,11 +2615,11 @@ utility mdfind.")
 
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates
-        for abs = (expand-file-name i helm-default-directory)
-        for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (string-match "[.]\\{1,2\\}$" i)))
-                       (helm-basename i) abs)
-        collect (cons (propertize disp 'face 'helm-ff-file) abs)))
+           for abs = (expand-file-name i helm-default-directory)
+           for disp = (if (and helm-ff-transformer-show-only-basename
+                               (not (string-match "[.]\\{1,2\\}$" i)))
+                          (helm-basename i) abs)
+           collect (cons (propertize disp 'face 'helm-ff-file) abs)))
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."

@@ -199,8 +199,8 @@ See also `helm-locate'."
                                  ;; Remove eventually
                                  ;; marked directories by error.
                                  (cl-loop for i in db
-                                       unless (file-directory-p i)
-                                       collect i) ":"))
+                                          unless (file-directory-p i)
+                                          collect i) ":"))
               helm-locate-command)
            helm-locate-command)))
     (setq helm-file-name-history (mapcar 'helm-basename file-name-history))

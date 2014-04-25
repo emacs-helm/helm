@@ -65,9 +65,9 @@ Show all candidates on startup when 0 (default)."
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
   (cl-loop for key being the key-seqs of mode-map using (key-bindings com)
-        for str-key  = (key-description key)
-        for ismenu   = (string-match "<menu-bar>" str-key)
-        unless ismenu collect (cons str-key com)))
+           for str-key  = (key-description key)
+           for ismenu   = (string-match "<menu-bar>" str-key)
+           unless ismenu collect (cons str-key com)))
 
 (defun helm-get-mode-map-from-mode (mode)
   "Guess the mode-map name according to MODE.
@@ -75,16 +75,16 @@ Some modes don't use conventional mode-map name
 so we need to guess mode-map name. e.g python-mode ==> py-mode-map.
 Return nil if no mode-map found."
   (cl-loop ;; Start with a conventional mode-map name.
-        with mode-map    = (intern-soft (format "%s-map" mode))
-        with mode-string = (symbol-name mode)
-        with mode-name   = (replace-regexp-in-string "-mode" "" mode-string)
-        while (not mode-map)
-        for count downfrom (length mode-name)
-        ;; Return when no result after parsing entire string.
-        when (eq count 0) return nil
-        for sub-name = (substring mode-name 0 count)
-        do (setq mode-map (intern-soft (format "%s-map" (concat sub-name "-mode"))))
-        finally return mode-map))
+   with mode-map    = (intern-soft (format "%s-map" mode))
+   with mode-string = (symbol-name mode)
+   with mode-name   = (replace-regexp-in-string "-mode" "" mode-string)
+   while (not mode-map)
+   for count downfrom (length mode-name)
+   ;; Return when no result after parsing entire string.
+   when (eq count 0) return nil
+   for sub-name = (substring mode-name 0 count)
+   do (setq mode-map (intern-soft (format "%s-map" (concat sub-name "-mode"))))
+   finally return mode-map))
 
 (defun helm-M-x-current-mode-map-alist ()
   "Return mode-map alist of current `major-mode'."
@@ -98,23 +98,23 @@ Return nil if no mode-map found."
 Show global bindings and local bindings according to current `major-mode'."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
-          for cand in candidates
-          for local-key  = (car (rassq cand local-map))
-          for key        = (substitute-command-keys (format "\\[%s]" cand))
-          collect
-          (cons (cond ((and (string-match "^M-x" key) local-key)
-                       (format "%s (%s)"
-                               cand (propertize
-                                     local-key
-                                     'face 'helm-M-x-key)))
-                      ((string-match "^M-x" key) cand)
-                      (t (format "%s (%s)"
-                                 cand (propertize
-                                       key
-                                       'face 'helm-M-x-key))))
-                cand) into ls
-          finally return
-          (sort ls #'helm-generic-sort-fn))))
+             for cand in candidates
+             for local-key  = (car (rassq cand local-map))
+             for key        = (substitute-command-keys (format "\\[%s]" cand))
+             collect
+             (cons (cond ((and (string-match "^M-x" key) local-key)
+                          (format "%s (%s)"
+                                  cand (propertize
+                                        local-key
+                                        'face 'helm-M-x-key)))
+                         ((string-match "^M-x" key) cand)
+                         (t (format "%s (%s)"
+                                    cand (propertize
+                                          key
+                                          'face 'helm-M-x-key))))
+                   cand) into ls
+                   finally return
+                   (sort ls #'helm-generic-sort-fn))))
 
 (defun helm-M-x--notify-prefix-arg ()
   ;; Notify a prefix-arg set AFTER calling M-x.
@@ -133,7 +133,7 @@ the prefix args if needed, are passed AFTER starting `helm-M-x'.
 You can get help on each command by persistent action."
   (interactive)
   (let* ((history (cl-loop for i in extended-command-history
-                        when (commandp (intern i)) collect i))
+                           when (commandp (intern i)) collect i))
          command sym-com in-help help-cand
          (helm--mode-line-display-prefarg t)
          (pers-help #'(lambda (candidate)
@@ -154,23 +154,23 @@ You can get help on each command by persistent action."
          (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg)))
     (setq current-prefix-arg nil)
     (unwind-protect
-         (setq command (helm-comp-read
-                        "M-x " obarray
-                        :test 'commandp
-                        :requires-pattern helm-M-x-requires-pattern
-                        :name "Emacs Commands"
-                        :buffer "*helm M-x*"
-                        :persistent-action pers-help
-                        :persistent-help "Describe this command"
-                        :history history
-                        :reverse-history helm-M-x-reverse-history
-                        :del-input nil
-                        :mode-line helm-M-x-mode-line
-                        :must-match t
-                        :nomark t
-                        :keymap helm-M-x-map
-                        :candidates-in-buffer t
-                        :fc-transformer 'helm-M-x-transformer))
+        (setq command (helm-comp-read
+                       "M-x " obarray
+                       :test 'commandp
+                       :requires-pattern helm-M-x-requires-pattern
+                       :name "Emacs Commands"
+                       :buffer "*helm M-x*"
+                       :persistent-action pers-help
+                       :persistent-help "Describe this command"
+                       :history history
+                       :reverse-history helm-M-x-reverse-history
+                       :del-input nil
+                       :mode-line helm-M-x-mode-line
+                       :must-match t
+                       :nomark t
+                       :keymap helm-M-x-map
+                       :candidates-in-buffer t
+                       :fc-transformer 'helm-M-x-transformer))
       (cancel-timer tm)
       (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))
