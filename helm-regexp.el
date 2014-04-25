@@ -38,7 +38,7 @@
 
 
 (defface helm-moccur-buffer
-  '((t (:foreground "DarkTurquoise" :underline t)))
+    '((t (:foreground "DarkTurquoise" :underline t)))
   "Face used to highlight moccur buffer names."
   :group 'helm-regexp)
 
@@ -163,7 +163,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
        (if helm-moccur-always-search-in-current
            (cons helm-current-buffer
                  (remove helm-current-buffer helm-multi-occur-buffer-list))
-         helm-multi-occur-buffer-list))
+           helm-multi-occur-buffer-list))
   (helm-init-candidates-in-buffer
       'global
     (cl-loop for buf in helm-multi-occur-buffer-list
@@ -196,7 +196,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
          (lineno (string-to-number (nth 1 split)))
          (split-pat (if helm-occur-match-plugin-mode
                         (helm-mp-split-pattern helm-pattern)
-                      (list helm-pattern))))
+                        (list helm-pattern))))
     (cl-case method
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
@@ -262,7 +262,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 ;;;###autoload
 (define-minor-mode helm-occur-match-plugin-mode
-  "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
+    "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
   :global t
   :init-value t
   (if helm-occur-match-plugin-mode
@@ -270,8 +270,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
             (remove (assoc 'no-matchplugin helm-source-moccur)
                     helm-source-moccur)
             helm-source-occur helm-source-moccur)
-    (helm-attrset 'no-matchplugin nil helm-source-moccur)
-    (setq helm-source-occur helm-source-moccur)))
+      (helm-attrset 'no-matchplugin nil helm-source-moccur)
+      (setq helm-source-occur helm-source-moccur)))
 
 (defvar helm-source-moccur
   `((name . "Moccur")
@@ -332,15 +332,15 @@ It is used with type attribute 'line'."
   (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
       (list (string-to-number (match-string 1 candidate))
             (match-string 2 candidate))
-    (error "Line number not found")))
+      (error "Line number not found")))
 
 
 ;;; Type attributes
 ;;
 ;;
 (define-helm-type-attribute 'line
-  '((display-to-real . helm-display-to-real-numbered-line)
-    (action ("Go to Line" . helm-action-line-goto)))
+    '((display-to-real . helm-display-to-real-numbered-line)
+      (action ("Go to Line" . helm-action-line-goto)))
   "LINENO:CONTENT string, eg. \"  16:foo\".
 
 Optional `target-file' attribute is a name of target file.
@@ -358,9 +358,9 @@ If `recenter' attribute is specified, the line is displayed at
 the center of window, otherwise at the top of window.")
 
 (define-helm-type-attribute 'file-line
-  `((filtered-candidate-transformer helm-filtered-candidate-transformer-file-line)
-    (multiline)
-    (action ("Go to" . helm-action-file-line-goto)))
+    `((filtered-candidate-transformer helm-filtered-candidate-transformer-file-line)
+      (multiline)
+      (action ("Go to" . helm-action-file-line-goto)))
   "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
 
 Optional `default-directory' attribute is a default-directory
@@ -412,7 +412,7 @@ the center of window, otherwise at the top of window.")
   (interactive)
   (let ((input (if isearch-regexp
                    isearch-string
-                 (regexp-quote isearch-string))))
+                   (regexp-quote isearch-string))))
     (isearch-exit)
     (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
     (helm-occur-init-source)
@@ -438,7 +438,7 @@ or during the buffer selection."
          (if (or current-prefix-arg
                  helm-current-prefix-arg)
              (not helm-moccur-always-search-in-current)
-           helm-moccur-always-search-in-current)))
+             helm-moccur-always-search-in-current)))
     (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
@@ -454,7 +454,7 @@ The prefix arg can be set before calling
         helm-moccur-always-search-in-current
         (input (if isearch-regexp
                    isearch-string
-                 (regexp-quote isearch-string))))
+                   (regexp-quote isearch-string))))
     (isearch-exit)
     (setq buf-list (helm-comp-read "Buffers: "
                                    (helm-buffer-list)
@@ -464,7 +464,7 @@ The prefix arg can be set before calling
           (if (or current-prefix-arg
                   helm-current-prefix-arg)
               (not helm-moccur-always-search-in-current)
-            helm-moccur-always-search-in-current))
+              helm-moccur-always-search-in-current))
     (helm-multi-occur-1 buf-list input)))
 
 

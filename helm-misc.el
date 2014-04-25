@@ -37,12 +37,12 @@
   :type '(repeat (choice symbol)))
 
 (defface helm-time-zone-current
-  '((t (:foreground "green")))
+    '((t (:foreground "green")))
   "Face used to colorize current time in `helm-world-time'."
   :group 'helm-misc)
 
 (defface helm-time-zone-home
-  '((t (:foreground "red")))
+    '((t (:foreground "red")))
   "Face used to colorize home time in `helm-world-time'."
   :group 'helm-misc)
 
@@ -89,7 +89,7 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
 (defvar helm-source-oddmuse-headline
   '((name . "Oddmuse HeadLine")
     (headline  "^= \\(.+\\) =$" "^== \\(.+\\) ==$"
-               "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
+     "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
     (condition . (memq major-mode '(oddmuse-mode yaoddmuse-mode)))
     (migemo)
     (subexp . 1))
@@ -99,7 +99,7 @@ http://en.wikipedia.org/wiki/Ruby_Document_format")
   '((name . "Emacs Source DEFUN")
     (headline . "DEFUN\\|DEFVAR")
     (condition . (string-match "/emacs2[0-9].+/src/.+c$"
-                               (or buffer-file-name ""))))
+                  (or buffer-file-name ""))))
   "Show DEFUN/DEFVAR in Emacs C source file.")
 
 (defvar helm-source-emacs-lisp-expectations
@@ -151,7 +151,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
              collect
              (if (get item 'name)
                  (cons (get item 'name) item)
-               (cons (symbol-name item) item)))))
+                 (cons (symbol-name item) item)))))
 
 (defvar helm-source-jabber-contacts
   '((name . "Jabber Contacts")
@@ -234,8 +234,8 @@ It is added to `extended-command-history'.
         (cmd (helm-symbolify cmd-or-name)))
     (if (stringp (symbol-function cmd))
         (execute-kbd-macro (symbol-function cmd))
-      (setq this-command cmd)
-      (call-interactively cmd))))
+        (setq this-command cmd)
+        (call-interactively cmd))))
 
 ;;; Minibuffer History
 ;;
@@ -251,7 +251,7 @@ It is added to `extended-command-history'.
                                  unless (string= "" i) collect i)))
            (if (consp (car history))
                (mapcar 'prin1-to-string history)
-             history))))
+               history))))
     (migemo)
     (multiline)
     (action . (lambda (candidate)

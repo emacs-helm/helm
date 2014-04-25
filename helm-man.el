@@ -32,8 +32,8 @@
   "Default command to display a man page."
   :group 'helm-man
   :type '(radio :tag "Preferred command to display a man page"
-                (const :tag "Man" Man-getpage-in-background)
-                (const :tag "Woman" woman)))
+          (const :tag "Man" Man-getpage-in-background)
+          (const :tag "Woman" woman)))
 
 ;; Internal
 (defvar helm-man-pages nil
@@ -51,8 +51,8 @@ source.")
                          "ManFile: " wfiles :must-match t)))
               (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
                   (manual-entry (format "-l %s" file))
-                (woman-find-file file)))
-          (funcall helm-man-or-woman-function candidate))
+                  (woman-find-file file)))
+            (funcall helm-man-or-woman-function candidate))
       ;; If woman is unable to format correctly
       ;; use man instead.
       (error (kill-buffer)              ; Kill woman buffer.
@@ -81,7 +81,7 @@ source.")
     (action-transformer . (lambda (actions candidate)
                             (if (eq system-type 'darwin)
                                 '(("Display Man page" . man))
-                              actions)))))
+                                actions)))))
 
 ;;;###autoload
 (defun helm-man-woman (arg)

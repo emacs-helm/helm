@@ -209,9 +209,9 @@ Return an alist with elements like (data . number_results)."
         (with-temp-buffer
           (call-process "curl" nil t nil request)
           (funcall fetch))
-      (with-current-buffer
-          (url-retrieve-synchronously request)
-        (funcall fetch)))))
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (funcall fetch)))))
 
 (defun helm-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
@@ -234,7 +234,7 @@ Return an alist with elements like (data . number_results)."
                                        helm-ggs-max-length-num-flag)
                                     (- helm-ggs-max-length-num-flag
                                        (length fnumresult))
-                                  0)
+                                    0)
                   ;; Add now the spaces before fnumresult.
                   for align-fnumresult = (concat (make-string nspaces ? )
                                                  fnumresult)
@@ -247,12 +247,12 @@ Return an alist with elements like (data . number_results)."
     (if (cl-loop for (_disp . dat) in suggestions
                  thereis (equal dat helm-pattern))
         suggestions
-      ;; if there is no suggestion exactly matching the input then
-      ;; prepend a Search on Google item to the list
-      (append
-       suggestions
-       (list (cons (concat "Search for " "'" helm-input "'" " on Google")
-                   helm-input))))))
+        ;; if there is no suggestion exactly matching the input then
+        ;; prepend a Search on Google item to the list
+        (append
+         suggestions
+         (list (cons (concat "Search for " "'" helm-input "'" " on Google")
+                     helm-input))))))
 
 (defun helm-ggs-set-number-result (num)
   (if num
@@ -267,7 +267,7 @@ Return an alist with elements like (data . number_results)."
                  finally return
                  (replace-regexp-in-string
                   "^," "" (mapconcat 'identity (reverse C) ""))))
-    "?"))
+      "?"))
 
 (defun helm-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
@@ -349,9 +349,9 @@ Return an alist with elements like (data . number_results)."
         (with-temp-buffer
           (call-process "curl" nil t nil request)
           (helm-wikipedia--parse-buffer))
-      (with-current-buffer
-          (url-retrieve-synchronously request)
-        (helm-wikipedia--parse-buffer)))))
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (helm-wikipedia--parse-buffer)))))
 
 (defun helm-wikipedia--parse-buffer ()
   (goto-char (point-min))
@@ -387,14 +387,14 @@ Return an alist with elements like (data . number_results)."
                  t)))
       (if (not result)
           (message "Error when getting summary.")
-        (with-current-buffer buf
-          (erase-buffer)
-          (setq cursor-type nil)
-          (insert result)
-          (fill-region (point-min) (point-max))
-          (goto-char (point-min)))
-        (display-buffer buf)
-        (message mess)))))
+          (with-current-buffer buf
+            (erase-buffer)
+            (setq cursor-type nil)
+            (insert result)
+            (fill-region (point-min) (point-max))
+            (goto-char (point-min)))
+          (display-buffer buf)
+          (message mess)))))
 
 
 (defun helm-wikipedia-fetch-summary (input)
@@ -403,9 +403,9 @@ Return an alist with elements like (data . number_results)."
         (with-temp-buffer
           (call-process "curl" nil t nil request)
           (helm-wikipedia--parse-summary))
-      (with-current-buffer
-          (url-retrieve-synchronously request)
-        (helm-wikipedia--parse-summary)))))
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (helm-wikipedia--parse-summary)))))
 
 
 (defun helm-wikipedia--parse-summary ()
@@ -421,24 +421,24 @@ Return an alist with elements like (data . number_results)."
         (if (string-match "<span class=\"redirectText\"><a href=[^>]+>\\([^<]+\\)" result)
             (cons 'redirect (match-string 1 result))
 
-          ;; find the beginning of the summary text in the result
+            ;; find the beginning of the summary text in the result
 
-          ;; check if there is a table before the summary and skip that
-          (when (or (string-match "</table>\\(\n<div.*?</div>\\)?\n<p>" result)
-                    ;; otherwise just find the first paragraph
-                    (string-match "<p>" result))
-            ;; remove cruft and do a simple formatting 
-            (replace-regexp-in-string
-             "Cite error: .*" ""
-             (replace-regexp-in-string
-              "&#160;" ""
+            ;; check if there is a table before the summary and skip that
+            (when (or (string-match "</table>\\(\n<div.*?</div>\\)?\n<p>" result)
+                      ;; otherwise just find the first paragraph
+                      (string-match "<p>" result))
+              ;; remove cruft and do a simple formatting 
               (replace-regexp-in-string
-               "\\[[^\]]+\\]" ""
+               "Cite error: .*" ""
                (replace-regexp-in-string
-                "<[^>]*>" ""
+                "&#160;" ""
                 (replace-regexp-in-string
-                 "</p>\n<p>" "\n\n"
-                 (substring result (match-end 0)))))))))))))
+                 "\\[[^\]]+\\]" ""
+                 (replace-regexp-in-string
+                  "<[^>]*>" ""
+                  (replace-regexp-in-string
+                   "</p>\n<p>" "\n\n"
+                   (substring result (match-end 0)))))))))))))
 
 
 (defvar helm-source-wikipedia-suggest
@@ -507,17 +507,17 @@ Return an alist with elements like (data . number_results)."
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
   (let ((default-browser-fn
-          (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
-                   thereis (and exe (executable-find exe) (fboundp fn) fn))))
+         (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
+                  thereis (and exe (executable-find exe) (fboundp fn) fn))))
     (if default-browser-fn
         (apply default-browser-fn url args)
-      (error "No usable browser found"))))
+        (error "No usable browser found"))))
 
 (defun helm-browse-url (url &rest args)
   "Default command to browse URL."
   (if browse-url-browser-function
       (browse-url url args)
-    (helm-browse-url-default-browser url args)))
+      (helm-browse-url-default-browser url args)))
 
 
 ;;; Surfraw
@@ -556,18 +556,18 @@ Return an alist with elements like (data . number_results)."
                   ;; "sr duckduckgo -p foo" is broken, workaround.
                   (format helm-surfraw-duckduckgo-url
                           (url-hexify-string pattern))
-                (with-temp-buffer
-                  (apply 'call-process "surfraw" nil t nil
-                         (append  (list engine-nodesc "-p") (split-string pattern)))
-                  (replace-regexp-in-string
-                   "\n" "" (buffer-string)))))
+                  (with-temp-buffer
+                    (apply 'call-process "surfraw" nil t nil
+                           (append  (list engine-nodesc "-p") (split-string pattern)))
+                    (replace-regexp-in-string
+                     "\n" "" (buffer-string)))))
          (browse-url-browser-function (or helm-surfraw-default-browser-function
                                           browse-url-browser-function)))
     (if (string= engine-nodesc "W")
         (helm-browse-url helm-home-url)
-      (helm-browse-url url)
-      (setq helm-surfraw-engines-history
-            (cons engine (delete engine helm-surfraw-engines-history))))))
+        (helm-browse-url url)
+        (setq helm-surfraw-engines-history
+              (cons engine (delete engine helm-surfraw-engines-history))))))
 
 ;;;###autoload
 (defun helm-google-suggest ()

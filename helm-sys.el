@@ -131,7 +131,7 @@ Show actions only on line starting by a PID."
 (defun helm-top-set-mode-line (str)
   (if (string-match "Sort:\\[\\(.*\\)\\] " helm-top-mode-line)
       (setq helm-top-mode-line (replace-match str nil nil helm-top-mode-line 1))
-    (setq helm-top-mode-line (concat (format "Sort:[%s] " str) helm-top-mode-line))))
+      (setq helm-top-mode-line (concat (format "Sort:[%s] " str) helm-top-mode-line))))
 
 (defun helm-top-sort-transformer (candidates source)
   (helm-top-transformer
@@ -141,9 +141,9 @@ Show actions only on line starting by a PID."
                 else collect c into header-cands
                 finally return (append (if (cdr header-cands)
                                            (butlast header-cands)
-                                         header-cands)
+                                           header-cands)
                                        (sort pid-cands helm-top-sort-fn)))
-     candidates)
+       candidates)
    source))
 
 (defun helm-top-sort-by-com (s1 s2)

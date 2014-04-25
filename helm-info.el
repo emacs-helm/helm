@@ -103,16 +103,16 @@ source.")
   "Collect candidates for initial Info node Top."
   (if helm-info-pages
       helm-info-pages
-    (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-          topics)
-      (require 'info)
-      (with-temp-buffer
-        (Info-find-node "dir" "top")
-        (goto-char (point-min))
-        (while (re-search-forward info-topic-regexp nil t)
-          (push (match-string-no-properties 1) topics))
-        (kill-buffer))
-      (setq helm-info-pages topics))))
+      (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+            topics)
+        (require 'info)
+        (with-temp-buffer
+          (Info-find-node "dir" "top")
+          (goto-char (point-min))
+          (while (re-search-forward info-topic-regexp nil t)
+            (push (match-string-no-properties 1) topics))
+          (kill-buffer))
+        (setq helm-info-pages topics))))
 
 (defvar helm-source-info-pages
   `((name . "Info Pages")

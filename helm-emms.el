@@ -36,7 +36,7 @@
   :group 'helm)
 
 (defface helm-emms-playlist
-  '((t (:foreground "Springgreen4" :underline t)))
+    '((t (:foreground "Springgreen4" :underline t)))
   "Face used for tracks in current emms playlist."
   :group 'helm-emms)
 
@@ -103,16 +103,16 @@
     (candidates . (lambda ()
                     (cddr (directory-files emms-source-file-default-directory))))
     (action .
-            (("Play Directory" . (lambda (item)
-                                   (emms-play-directory
-                                    (expand-file-name
-                                     item
-                                     emms-source-file-default-directory))))
-             ("Open dired in file's directory" . (lambda (item)
-                                                   (helm-open-dired
-                                                    (expand-file-name
-                                                     item
-                                                     emms-source-file-default-directory))))))
+     (("Play Directory" . (lambda (item)
+                            (emms-play-directory
+                             (expand-file-name
+                              item
+                              emms-source-file-default-directory))))
+      ("Open dired in file's directory" . (lambda (item)
+                                            (helm-open-dired
+                                             (expand-file-name
+                                              item
+                                              emms-source-file-default-directory))))))
     (filtered-candidate-transformer . helm-adaptive-sort)))
 
 (defvar helm-emms-current-playlist nil)

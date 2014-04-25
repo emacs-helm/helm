@@ -41,12 +41,12 @@ If nil default `helm-apt-cache-show-1' will be used."
   :group 'helm-apt)
 
 (defface helm-apt-installed
-  '((t (:foreground "green")))
+    '((t (:foreground "green")))
   "Face used for apt installed candidates."
   :group 'helm-apt)
 
 (defface helm-apt-deinstalled
-  '((t (:foreground "DimGray")))
+    '((t (:foreground "DimGray")))
   "Face used for apt deinstalled candidates."
   :group 'helm-apt)
 
@@ -175,8 +175,8 @@ package name - description."
 
 (defvar helm-apt-show-current-package nil)
 (define-derived-mode helm-apt-show-mode
-  special-mode "helm-apt-show"
-  "Mode to display infos on apt packages.")
+    special-mode "helm-apt-show"
+    "Mode to display infos on apt packages.")
 
 (defun helm-apt-cache-show (package)
   "Show information on apt package PACKAGE."
@@ -185,8 +185,8 @@ package name - description."
                     'helm-apt-cache-show)))
       ;; A function, call it.
       (funcall helm-apt-cache-show-function package)
-    ;; nil or whatever use default.
-    (helm-apt-cache-show-1 package)))
+      ;; nil or whatever use default.
+      (helm-apt-cache-show-1 package)))
 
 (defun helm-apt-cache-show-1 (package)
   (let* ((command (format helm-apt-show-command package))
@@ -224,8 +224,8 @@ Support install, remove and purge actions."
   (if (and helm-apt-term-buffer
            (buffer-live-p (get-buffer helm-apt-term-buffer)))
       (switch-to-buffer helm-apt-term-buffer)
-    (ansi-term (getenv "SHELL") "term apt")
-    (setq helm-apt-term-buffer (buffer-name)))
+      (ansi-term (getenv "SHELL") "term apt")
+      (setq helm-apt-term-buffer (buffer-name)))
   (term-line-mode)
   (let ((command   (cl-case action
                      (install   "sudo apt-get install ")
@@ -245,7 +245,7 @@ Support install, remove and purge actions."
           (setq helm-external-commands-list nil)
           (setq helm-apt-installed-packages nil)
           (term-char-mode) (term-send-input))
-      (delete-region beg end))))
+        (delete-region beg end))))
 
 ;;;###autoload
 (defun helm-apt (arg)

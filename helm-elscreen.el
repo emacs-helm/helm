@@ -50,17 +50,17 @@
               #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
     (action
      . (("Change Screen" .
-         (lambda (candidate)
-           (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
+                         (lambda (candidate)
+                           (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
         ("Kill Screen(s)" .
-         (lambda (candidate)
-           (cl-dolist (i (helm-marked-candidates))
-             (elscreen-goto (- (aref i 1) (aref "0" 0)))
-             (elscreen-kill))))
+                          (lambda (candidate)
+                            (cl-dolist (i (helm-marked-candidates))
+                              (elscreen-goto (- (aref i 1) (aref "0" 0)))
+                              (elscreen-kill))))
         ("Only Screen" .
-         (lambda (candidate)
-           (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
-           (elscreen-kill-others)))))))
+                       (lambda (candidate)
+                         (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
+                         (elscreen-kill-others)))))))
 
 ;;;###autoload
 (defun helm-elscreen ()

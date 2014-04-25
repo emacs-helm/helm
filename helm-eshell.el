@@ -111,8 +111,8 @@ The function that call this should set `helm-ec-target' to thing at point."
          ;; Transform the related names to abs names.
          for file-cand = (and exp-entry
                               (if (file-remote-p i) i
-                                (expand-file-name
-                                 i (file-name-directory entry))))
+                                  (expand-file-name
+                                   i (file-name-directory entry))))
          ;; Compare them to avoid dups.
          for file-entry-p = (and (stringp exp-entry)
                                  (stringp file-cand)
@@ -139,7 +139,7 @@ The function that call this should set `helm-ec-target' to thing at point."
              (append (list exp-entry)
                      ;; Entry should not be here now but double check.
                      (remove entry ls))
-           ls))))))
+             ls))))))
 
 ;;; Eshell history.
 ;;
@@ -216,11 +216,11 @@ The function that call this should set `helm-ec-target' to thing at point."
       (setq flag-empty t)
       (setq end (point)))
     (unwind-protect
-        (with-helm-show-completion beg end
-          (helm :sources 'helm-source-eshell-history
-                :buffer "*helm eshell history*"
-                :resume 'noresume
-                :input input))
+         (with-helm-show-completion beg end
+           (helm :sources 'helm-source-eshell-history
+                 :buffer "*helm eshell history*"
+                 :resume 'noresume
+                 :input input))
       (when (and flag-empty
                  (looking-back " "))
         (delete-char -1)))))

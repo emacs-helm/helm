@@ -81,15 +81,15 @@ Here are the possible value of this symbol and their meaning:
 - multi3p: Same but prefix must match.
 Default is multi3."
   :type  '(radio :tag "Matching methods for helm"
-                 (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
-                 (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
-                 (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
-                 (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
+           (const :tag "Multiple regexp 1 ordered with prefix match"         multi1)
+           (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
+           (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
+           (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
   :set   'helm-mp-set-matching-method
   :group 'helm-match-plugin)
 
 (defface helm-match
-  '((t (:inherit match)))
+    '((t (:inherit match)))
   "Face used to highlight matches."
   :group 'helm-match-plugin)
 
@@ -107,7 +107,7 @@ The smaller  this value is, the slower highlight is."
 
 ;;;###autoload
 (define-minor-mode helm-match-plugin-mode
-  "Add more flexible regexp matching for helm.
+    "Add more flexible regexp matching for helm.
 See `helm-mp-matching-method' for the behavior of each method."
   :group 'helm-match-plugin
   :require 'helm-match-plugin
@@ -116,10 +116,10 @@ See `helm-mp-matching-method' for the behavior of each method."
       (progn
         (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
         (add-hook 'helm-update-hook 'helm-mp-highlight-match))
-    (setq helm-compile-source-functions
-          (delq 'helm-compile-source--match-plugin
-                helm-compile-source-functions))
-    (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
+      (setq helm-compile-source-functions
+            (delq 'helm-compile-source--match-plugin
+                  helm-compile-source-functions))
+      (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
 
 
 ;;; Build regexps
@@ -135,11 +135,11 @@ i.e \"foo bar\"=> (\"foo\" \"bar\")
 but \"foo\ bar\"=> (\"foobar\")."
   (if (string= pattern "")
       '("")
-    (cl-loop for s in (split-string
-                       (replace-regexp-in-string helm-mp-space-regexp
-                                                 "\000\000" pattern)
-                       " " t)
-             collect (replace-regexp-in-string "\000\000" " " s))))
+      (cl-loop for s in (split-string
+                         (replace-regexp-in-string helm-mp-space-regexp
+                                                   "\000\000" pattern)
+                         " " t)
+               collect (replace-regexp-in-string "\000\000" " " s))))
 
 (defun helm-mp-1-make-regexp (pattern)
   "Replace spaces in PATTERN with \"\.*\"."
@@ -271,7 +271,7 @@ e.g ((identity . \"foo\") (identity . \"bar\"))."
     (cl-loop for pat in (helm-mp-split-pattern pattern)
              collect (if (string= "!" (substring pat 0 1))
                          (cons 'not (substring pat 1))
-                       (cons 'identity pat)))))
+                         (cons 'identity pat)))))
 
 (defun helm-mp-3-match (str &optional pattern)
   "Check if PATTERN match STR.
@@ -296,7 +296,7 @@ instead of matching on a string.
 i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (cl-loop with pat = (if (stringp pattern)
                           (helm-mp-3-get-patterns pattern)
-                        pattern)
+                          pattern)
            while (funcall searchfn1 (or (cdar pat) "") nil t)
            for bol = (point-at-bol)
            for eol = (point-at-eol)
@@ -353,30 +353,30 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 (defun helm-compile-source--match-plugin (source)
   (if (assoc 'no-matchplugin source)
       source
-    (let* ((searchers        (if (assoc 'search-from-end source)
-                                 helm-mp-default-search-backward-functions
-                               helm-mp-default-search-functions))
-           (defmatch         (helm-aif (assoc-default 'match source)
-                                 (helm-mklist it)))
-           (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
-                                 (helm-mklist it)))
-           (defsearch        (helm-aif (assoc-default 'search source)
-                                 (helm-mklist it)))
-           (defsearch-strict (helm-aif (assoc-default 'search-strict source)
-                                 (helm-mklist it)))
-           (matchfns         (cond (defmatch-strict)
-                                   (defmatch
-                                     (append helm-mp-default-match-functions defmatch))
-                                   (t helm-mp-default-match-functions)))
-           (searchfns        (cond (defsearch-strict)
-                                   (defsearch
-                                     (append searchers defsearch))
-                                   (t searchers))))
-      `(,(if (or (assoc 'candidates-in-buffer source)
-                 (equal '(identity) matchfns))
-             '(match identity) `(match ,@matchfns))
-        (search ,@searchfns)
-        ,@source))))
+      (let* ((searchers        (if (assoc 'search-from-end source)
+                                   helm-mp-default-search-backward-functions
+                                   helm-mp-default-search-functions))
+             (defmatch         (helm-aif (assoc-default 'match source)
+                                   (helm-mklist it)))
+             (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
+                                   (helm-mklist it)))
+             (defsearch        (helm-aif (assoc-default 'search source)
+                                   (helm-mklist it)))
+             (defsearch-strict (helm-aif (assoc-default 'search-strict source)
+                                   (helm-mklist it)))
+             (matchfns         (cond (defmatch-strict)
+                                     (defmatch
+                                      (append helm-mp-default-match-functions defmatch))
+                                     (t helm-mp-default-match-functions)))
+             (searchfns        (cond (defsearch-strict)
+                                     (defsearch
+                                      (append searchers defsearch))
+                                     (t searchers))))
+        `(,(if (or (assoc 'candidates-in-buffer source)
+                   (equal '(identity) matchfns))
+               '(match identity) `(match ,@matchfns))
+           (search ,@searchfns)
+           ,@source))))
 
 
 ;;; Highlight matches.
@@ -417,7 +417,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                             finally return
                             (if (and re-list (>= (length re-list) 1))
                                 (mapconcat 'identity re-list "\\|")
-                              (regexp-quote helm-pattern)))))
+                                (regexp-quote helm-pattern)))))
       (when (>= (length requote) helm-mp-highlight-threshold)
         (helm-mp-highlight-region
          (point-min) end requote 'helm-match)))))

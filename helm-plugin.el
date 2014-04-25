@@ -107,12 +107,12 @@
   (if (assoc-default 'candidates-file source)
       `((init helm-p-candidates-file-init
               ,@(let ((orig-init (assoc-default 'init source)))
-                  (cond ((null orig-init) nil)
-                        ((functionp orig-init) (list orig-init))
-                        (t orig-init))))
+                     (cond ((null orig-init) nil)
+                           ((functionp orig-init) (list orig-init))
+                           (t orig-init))))
         (candidates-in-buffer)
         ,@source)
-    source))
+      source))
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--candidates-file)
 
 (defun helm-p-candidates-file-init ()
@@ -162,7 +162,7 @@
               source
               '((candidates-in-buffer)
                 (persistent-help . "Show this line")))
-    source))
+      source))
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--helm-headline)
 
 (defun helm-headline-init ()
@@ -190,8 +190,8 @@
                  (if (numberp subexp)
                      (cons (match-string-no-properties subexp)
                            (match-beginning subexp))
-                   (cons (buffer-substring (point-at-bol) (point-at-eol))
-                         (point-at-bol)))))
+                     (cons (buffer-substring (point-at-bol) (point-at-eol))
+                           (point-at-bol)))))
             (arrange
              #'(lambda (headlines)
                  (unless (null headlines) ; FIX headlines empty bug!
@@ -220,8 +220,8 @@
                                 while (re-search-forward re nil t)
                                 collect (cons (funcall matched) hierarchy)))
                       (lambda (a b) (> (cdar b) (cdar a)))))
-          (cl-loop while (re-search-forward regexp nil t)
-                   collect (funcall matched)))))))
+            (cl-loop while (re-search-forward regexp nil t)
+                     collect (funcall matched)))))))
 
 (defun helm-headline-make-candidate-buffer (regexp subexp)
   (with-current-buffer (helm-candidate-buffer 'local)

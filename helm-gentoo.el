@@ -56,7 +56,7 @@
                ("Show history" . (lambda (elm)
                                    (if (member elm helm-cache-world)
                                        (helm-gentoo-eshell-action elm "genlop -qe")
-                                     (message "No infos on packages not yet installed"))))
+                                       (message "No infos on packages not yet installed"))))
                ("Copy in kill-ring" . kill-new)
                ("insert at point" . insert)
                ("Browse HomePage" . (lambda (elm)
@@ -65,7 +65,7 @@
                ("Show extra infos" . (lambda (elm)
                                        (if (member elm helm-cache-world)
                                            (helm-gentoo-eshell-action elm "genlop -qi")
-                                         (message "No infos on packages not yet installed"))))
+                                           (message "No infos on packages not yet installed"))))
                ("Show use flags" . (lambda (elm)
                                      (helm-gentoo-default-action elm "equery" "-C" "u")
                                      (font-lock-add-keywords nil '(("^\+.*" . font-lock-variable-name-face)))
@@ -107,7 +107,7 @@
         (let ((com-list (append args (list elm))))
           (apply #'call-process command nil t nil
                  com-list)))
-    (message "No infos on packages not yet installed")))
+      (message "No infos on packages not yet installed")))
 
 (defvar helm-source-use-flags
   '((name . "Use Flags")
@@ -174,7 +174,7 @@
             (pop-to-buffer "*scratch*")
             (eshell-command (format "%s %s" command elm)))
           (pop-to-buffer "*EShell Command Output*"))
-      (eshell-command (format "%s %s" command elm)))))
+        (eshell-command (format "%s %s" command elm)))))
 
 (defun helm-gentoo-get-use ()
   "Initialize buffer with all use flags."

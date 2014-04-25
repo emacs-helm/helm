@@ -83,8 +83,8 @@ one match."
 ;;
 (defvar helm-ctags-modes
   '( c-mode c++-mode awk-mode csharp-mode java-mode javascript-mode lua-mode
-            makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
-            scheme-mode sh-mode slang-mode sql-mode tcl-mode ))
+    makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
+    scheme-mode sh-mode slang-mode sql-mode tcl-mode ))
 
 (defun helm-ctags-init ()
   (when (and buffer-file-name
@@ -95,7 +95,7 @@ one match."
        (if (string-match "\\.el\\.gz$" helm-buffer-file-name)
            (format "ctags -e -u -f- --language-force=lisp --fields=n =(zcat %s) "
                    helm-buffer-file-name)
-         (format "ctags -e -u -f- --fields=n %s " helm-buffer-file-name))
+           (format "ctags -e -u -f- --fields=n %s " helm-buffer-file-name))
        nil (current-buffer))
       (goto-char (point-min))
       (forward-line 2)
@@ -244,7 +244,7 @@ If no entry in cache, create one."
                     ;; and not the filename.
                     (if helm-etags-match-part-only
                         (cadr (helm-etags-split-line candidate))
-                      candidate)))
+                        candidate)))
     (mode-line . helm-etags-mode-line-string)
     (keymap . ,helm-etags-map)
     (action . (("Go to tag" . (lambda (c)
@@ -278,11 +278,11 @@ If no entry in cache, create one."
          (elm   (cadr split)))
     (if (null fname)
         (error "file %s not found" fname)
-      (ring-insert find-tag-marker-ring (point-marker))
-      (funcall switcher fname)
-      (goto-char (point-min))
-      (search-forward elm nil t)
-      (goto-char (match-beginning 0)))))
+        (ring-insert find-tag-marker-ring (point-marker))
+        (funcall switcher fname)
+        (goto-char (point-min))
+        (search-forward elm nil t)
+        (goto-char (match-beginning 0)))))
 
 (defun helm-etags-mtime (file)
   "Last modification time of etags tag FILE."
@@ -314,19 +314,19 @@ This function aggregates three sources of tag files:
         (str (thing-at-point 'symbol)))
     (if (cl-notany 'file-exists-p tag-files)
         (message "Error: No tag file found. Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
-      (cl-loop for k being the hash-keys of helm-etags-cache
-               unless (member k tag-files)
-               do (remhash k helm-etags-cache))
-      (mapc (lambda (f)
-              (when (or (equal arg '(4))
-                        (and helm-etags-mtime-alist
-                             (helm-etags-file-modified-p f)))
-                (remhash f helm-etags-cache)))
-            tag-files)
-      (helm :sources 'helm-source-etags-select
-            :keymap helm-etags-map
-            :default (list (concat "\\_<" str "\\_>") str)
-            :buffer "*helm etags*"))))
+        (cl-loop for k being the hash-keys of helm-etags-cache
+                 unless (member k tag-files)
+                 do (remhash k helm-etags-cache))
+        (mapc (lambda (f)
+                (when (or (equal arg '(4))
+                          (and helm-etags-mtime-alist
+                               (helm-etags-file-modified-p f)))
+                  (remhash f helm-etags-cache)))
+              tag-files)
+        (helm :sources 'helm-source-etags-select
+              :keymap helm-etags-map
+              :default (list (concat "\\_<" str "\\_>") str)
+              :buffer "*helm etags*"))))
 
 (provide 'helm-tags)
 

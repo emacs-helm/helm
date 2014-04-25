@@ -114,7 +114,7 @@ All other actions are removed."
               (helm-bbdb-read-address)
               (helm-bbdb-read-phone)
               (read-from-minibuffer "Note: ")))))
-    actions))
+      actions))
 
 (defun helm-bbdb-get-record (candidate)
   "Return record that match CANDIDATE."
@@ -134,7 +134,7 @@ All other actions are removed."
                                         (setq helm-bbdb-name helm-pattern)
                                         (if (not candidates)
                                             (list "*Add to contacts*")
-                                          candidates)))
+                                            candidates)))
     (action-transformer . (lambda (actions candidate)
                             (helm-bbdb-create-contact actions candidate))))
   "Needs BBDB.

@@ -55,7 +55,7 @@ and `helm-imenu-default-action'.")
   "The register where `helm-save-pos-to-register-before-jump' save position.")
 
 (defface helm-selection-line
-  '((t (:background "IndianRed4" :underline t)))
+    '((t (:background "IndianRed4" :underline t)))
   "Face used in the `helm-current-buffer' when jumping to candidate."
   :group 'helm-utils)
 
@@ -127,7 +127,7 @@ buffer as BUFFER."
     (with-current-buffer (or buffer (current-buffer))
       (if (listp buffer-undo-list)
           (length buffer-undo-list)
-        (buffer-modified-tick)))))
+          (buffer-modified-tick)))))
 
 ;; Functions not available in versions < emacs-24.
 ;; Allow using helm-async.el in Emacs-23 among other things.
@@ -140,10 +140,10 @@ If FILE1 or FILE2 does not exist, the return value is unspecified."
                        (find-file-name-handler file2 'file-equal-p))))
       (if handler
           (funcall handler 'file-equal-p file1 file2)
-        (let (f1-attr f2-attr)
-          (and (setq f1-attr (file-attributes (file-truename file1)))
-               (setq f2-attr (file-attributes (file-truename file2)))
-               (equal f1-attr f2-attr))))))
+          (let (f1-attr f2-attr)
+            (and (setq f1-attr (file-attributes (file-truename file1)))
+                 (setq f2-attr (file-attributes (file-truename file2)))
+                 (equal f1-attr f2-attr))))))
 
   ;; This is the original loop version, more readable, not the one of 24.1+.
   (defun file-in-directory-p (file dir)
@@ -154,16 +154,16 @@ Return nil if DIR is not an existing directory."
                        (find-file-name-handler dir 'file-in-directory-p))))
       (if handler
           (funcall handler 'file-in-directory-p file dir)
-        (when (file-directory-p dir)
-          (cl-loop with f1 = (file-truename file)
-                   with f2 = (file-truename dir)
-                   with ls1 = (or (split-string f1 "/" t) (list "/"))
-                   with ls2 = (or (split-string f2 "/" t) (list "/"))
-                   for p = (string-match "^/" f1)
-                   for i in ls1 for j in ls2
-                   when (string= i j)
-                   concat (if p (concat "/" i) (concat i "/")) into root
-                   finally return (file-equal-p (file-truename root) f2)))))))
+          (when (file-directory-p dir)
+            (cl-loop with f1 = (file-truename file)
+                     with f2 = (file-truename dir)
+                     with ls1 = (or (split-string f1 "/" t) (list "/"))
+                     with ls2 = (or (split-string f2 "/" t) (list "/"))
+                     for p = (string-match "^/" f1)
+                     for i in ls1 for j in ls2
+                     when (string= i j)
+                     concat (if p (concat "/" i) (concat i "/")) into root
+                     finally return (file-equal-p (file-truename root) f2)))))))
 
 
 ;; CUA workaround
@@ -173,7 +173,7 @@ Return nil if DIR is not an existing directory."
 (defadvice copy-region-as-kill (around helm-avoid-cua activate)
   (if cua-mode
       (ignore-errors ad-do-it)
-    ad-do-it))
+      ad-do-it))
 
 
 ;;; Utils functions
@@ -327,12 +327,12 @@ even is \" -b\" is specified."
           (helm-attrset 'no-matchplugin nil source)
           (string-match (match-string 1 helm-pattern)
                         (helm-basename candidate)))
-      ;; Disable no-matchplugin by side effect.
-      (helm-aif (assq 'no-matchplugin source)
-          (setq source (delete it source)))
-      (string-match
-       (replace-regexp-in-string " -b\\'" "" helm-pattern)
-       candidate))))
+        ;; Disable no-matchplugin by side effect.
+        (helm-aif (assq 'no-matchplugin source)
+            (setq source (delete it source)))
+        (string-match
+         (replace-regexp-in-string " -b\\'" "" helm-pattern)
+         candidate))))
 
 (defun helm-skip-entries (seq regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
@@ -356,13 +356,13 @@ even is \" -b\" is specified."
   "Get string of STR-OR-SYM."
   (if (stringp str-or-sym)
       str-or-sym
-    (symbol-name str-or-sym)))
+      (symbol-name str-or-sym)))
 
 (defun helm-symbolify (str-or-sym)
   "Get symbol of STR-OR-SYM."
   (if (symbolp str-or-sym)
       str-or-sym
-    (intern str-or-sym)))
+      (intern str-or-sym)))
 
 (defun helm-describe-function (func)
   "FUNC is symbol or string."
@@ -414,7 +414,7 @@ from its directory."
                             (regexp-quote
                              (if helm-ff-transformer-show-only-basename
                                  (helm-basename f) f)))
-       (helm-find-files-1 f)))
+         (helm-find-files-1 f)))
    (let* ((sel       (helm-get-selection))
           (grep-line (and (stringp sel)
                           (helm-grep-split-line sel))))
@@ -436,7 +436,7 @@ from its directory."
                   (expand-file-name (car grep-line)))
                  ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
                  (t default-directory)))
-       default-directory))))
+         default-directory))))
 
 ;; Same as `vc-directory-exclusion-list'.
 (defvar helm-walk-ignore-directories
@@ -464,7 +464,7 @@ instead of `helm-walk-ignore-directories'."
                               (member (helm-basename dir)
                                       (if (listp skip-subdirs)
                                           skip-subdirs
-                                        helm-walk-ignore-directories)))
+                                          helm-walk-ignore-directories)))
                    (cl-loop with ls = (directory-files
                                        dir t directory-files-no-dot-files-regexp)
                             for f in ls
@@ -478,11 +478,11 @@ instead of `helm-walk-ignore-directories'."
                             (if match
                                 (and (if (functionp match)
                                          (funcall match f)
-                                       (and (stringp match)
-                                            (string-match
-                                             match (file-name-nondirectory f))))
+                                         (and (stringp match)
+                                              (string-match
+                                               match (file-name-nondirectory f))))
                                      (push (funcall fn f) result))
-                              (push (funcall fn f) result))))))
+                                (push (funcall fn f) result))))))
     (funcall ls-R directory)
     (nreverse result)))
 
@@ -522,7 +522,7 @@ If specified, also remove filename extension EXT."
                      (string= (file-name-extension fname t) ext))
              (not (file-directory-p fname)))
         (file-name-sans-extension (file-name-nondirectory fname))
-      (file-name-nondirectory (directory-file-name fname)))))
+        (file-name-nondirectory (directory-file-name fname)))))
 
 (defun helm-basedir (fname)
   "Return the base directory of filename."
@@ -554,7 +554,7 @@ KBSIZE if a floating point number, default value is 1024.0."
              when (< b (cdr result)) do (setq result (cons a b))
              finally return (if (string= (car result) "B")
                                 (format "%s" size)
-                              (format "%.1f%s" (cdr result) (car result))))))
+                                (format "%.1f%s" (cdr result) (car result))))))
 
 (cl-defun helm-file-attributes
     (file &key type links uid gid access-time modif-time
@@ -594,22 +594,22 @@ you have in `file-attributes'."
                                        (cond ((stringp type) "symlink") ; fname
                                              (type "directory")         ; t
                                              (t "file"))                ; nil
-                                     type)
+                                       type)
                       :links       links
                       :uid         uid
                       :gid         gid
                       :access-time (if string
                                        (format-time-string
                                         "%Y-%m-%d %R" access-time)
-                                     access-time)
+                                       access-time)
                       :modif-time  (if string
                                        (format-time-string
                                         "%Y-%m-%d %R" modif-time)
-                                     modif-time)
+                                       modif-time)
                       :status      (if string
                                        (format-time-string
                                         "%Y-%m-%d %R" status)
-                                     status)
+                                       status)
                       :size        size
                       :mode        mode
                       :gid-change  gid-change
@@ -636,8 +636,8 @@ you have in `file-attributes'."
             (cl-getf all :gid) " "
             (if human-size
                 (helm-file-human-size (cl-getf all :size))
-              (int-to-string (cl-getf all :size))) " "
-              (cl-getf all :modif-time)))
+                (int-to-string (cl-getf all :size))) " "
+                (cl-getf all :modif-time)))
           (human-size (helm-file-human-size (cl-getf all :size)))
           (mode-type (cl-getf modes :mode-type))
           (mode-owner (cl-getf modes :user))
@@ -661,14 +661,14 @@ If STRING is non--nil return instead a space separated string."
            finally return
            (if string
                (mapconcat 'identity (list type user group other) " ")
-             (list :mode-type type :user user :group group :other other))))
+               (list :mode-type type :user user :group group :other other))))
 
 (defun helm-current-directory ()
   "Return current-directory name at point.
 Useful in dired buffers when there is inserted subdirs."
   (if (eq major-mode 'dired-mode)
       (dired-current-directory)
-    default-directory))
+      default-directory))
 
 (defmacro with-helm-display-marked-candidates (buffer-or-name candidates &rest body)
   (declare (indent 0) (debug t))
@@ -677,14 +677,14 @@ Useful in dired buffers when there is inserted subdirs."
     `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
             ,window)
        (unwind-protect
-           (with-current-buffer ,buffer
-             (dired-format-columns-of-files ,candidates)
-             (select-window
-              (setq ,window (temp-buffer-window-show
-                             ,buffer
-                             '(display-buffer-below-selected
-                               (window-height . fit-window-to-buffer)))))
-             (progn ,@body))
+            (with-current-buffer ,buffer
+              (dired-format-columns-of-files ,candidates)
+              (select-window
+               (setq ,window (temp-buffer-window-show
+                              ,buffer
+                              '(display-buffer-below-selected
+                                (window-height . fit-window-to-buffer)))))
+              (progn ,@body))
          (quit-window 'kill ,window)))))
 
 ;;; Persistent Action Helpers
@@ -700,7 +700,7 @@ Useful in dired buffers when there is inserted subdirs."
          (args (list start end buf)))
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
-      (apply 'move-overlay helm-match-line-overlay args))
+        (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
     (recenter)
@@ -740,22 +740,22 @@ Useful in dired buffers when there is inserted subdirs."
   (let (process-connection-type)
     (if (eq system-type 'windows-nt)
         (helm-w32-shell-execute-open-file file)
-      (start-process "helm-open-file-with-default-tool"
-                     nil
-                     (cond ((eq system-type 'gnu/linux)
-                            "xdg-open")
-                           ((or (eq system-type 'darwin) ;; Mac OS X
-                                (eq system-type 'macos)) ;; Mac OS 9
-                            "open"))
-                     file))))
+        (start-process "helm-open-file-with-default-tool"
+                       nil
+                       (cond ((eq system-type 'gnu/linux)
+                              "xdg-open")
+                             ((or (eq system-type 'darwin) ;; Mac OS X
+                                  (eq system-type 'macos)) ;; Mac OS 9
+                              "open"))
+                       file))))
 
 (defun helm-open-dired (file)
   "Opens a dired buffer in FILE's directory.  If FILE is a
 directory, open this directory."
   (if (file-directory-p file)
       (dired file)
-    (dired (file-name-directory file))
-    (dired-goto-file file)))
+      (dired (file-name-directory file))
+      (dired-goto-file file)))
 
 (defun helm-action-line-goto (lineno-and-content)
   (apply #'helm-goto-file-line
@@ -764,7 +764,7 @@ directory, open this directory."
                        (if (and (helm-attr-defined 'target-file)
                                 (not helm-in-persistent-action))
                            'find-file-other-window
-                         'find-file)))))
+                           'find-file)))))
 
 (cl-defun helm-action-file-line-goto (file-line-content)
   (apply #'helm-goto-file-line
@@ -772,7 +772,7 @@ directory, open this directory."
              ;; Case: filtered-candidate-transformer is skipped
              (cdr (helm-filtered-candidate-transformer-file-line-1
                    file-line-content))
-           file-line-content)))
+             file-line-content)))
 
 (defun helm-require-or-error (feature function)
   (or (require feature nil t)
@@ -805,7 +805,7 @@ directory, open this directory."
   (when file (funcall find-file-function file))
   (if (helm-attr-defined 'adjust)
       (helm-goto-line-with-adjustment lineno content)
-    (helm-goto-line lineno))
+      (helm-goto-line lineno))
   (unless (helm-attr-defined 'recenter)
     (set-window-start (get-buffer-window helm-current-buffer) (point)))
   (helm-aif (helm-attr 'after-jump-hook)
@@ -821,7 +821,7 @@ directory, open this directory."
           (set-buffer buf)
           (find-alternate-file (concat "/" helm-su-or-sudo
                                        "::" (expand-file-name candidate))))
-      (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))))
+        (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))))
 
 (defun helm-find-many-files (_ignore)
   (mapc 'find-file (helm-marked-candidates)))

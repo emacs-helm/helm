@@ -99,12 +99,12 @@
     (let ((tick (buffer-modified-tick)))
       (if (eq helm-cached-imenu-tick tick)
           helm-cached-imenu-candidates
-        (setq imenu--index-alist nil)
-        (setq helm-cached-imenu-tick tick
-              helm-cached-imenu-candidates
-              (let ((index (imenu--make-index-alist))) 
-                (helm-imenu--candidates-1
-                 (delete (assoc "*Rescan*" index) index))))))))
+          (setq imenu--index-alist nil)
+          (setq helm-cached-imenu-tick tick
+                helm-cached-imenu-candidates
+                (let ((index (imenu--make-index-alist))) 
+                  (helm-imenu--candidates-1
+                   (delete (assoc "*Rescan*" index) index))))))))
 
 (defun helm-imenu--candidates-1 (alist)
   (cl-loop for elm in alist
@@ -114,8 +114,8 @@
                                 (cons (propertize
                                        e 'helm-imenu-type (car elm))
                                       v)))
-                    (and (cdr elm) ; bug in imenu, should not be needed.
-                         (list elm)))))
+                      (and (cdr elm) ; bug in imenu, should not be needed.
+                           (list elm)))))
 
 (defun helm-imenu--get-prop (item)
   ;; property value of ITEM can have itself

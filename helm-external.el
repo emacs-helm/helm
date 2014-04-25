@@ -91,27 +91,27 @@ In this case EXE must be provided as \"EXE %s\"."
     (if (get-process proc)
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))
-          (error "Error: %s is already running" real-com))
-      (when (cl-loop for i in helm-external-commands-list thereis (string= real-com i))
-        (message "Starting %s..." real-com)
-        (if file
-            (start-process-shell-command
-             proc nil (format exe (shell-quote-argument
-                                   (if (eq system-type 'windows-nt)
-                                       (helm-w32-prepare-filename file)
-                                     file))))
-          (start-process-shell-command proc nil real-com))
-        (set-process-sentinel
-         (get-process proc)
-         #'(lambda (process event)
-             (when (and (string= event "finished\n")
-                        helm-raise-command
-                        (not (helm-get-pid-from-process-name real-com)))
-               (shell-command  (format helm-raise-command "emacs")))
-             (message "%s process...Finished." process))))
-      (setq helm-external-commands-list
-            (cons real-com
-                  (delete real-com helm-external-commands-list))))))
+            (error "Error: %s is already running" real-com))
+        (when (cl-loop for i in helm-external-commands-list thereis (string= real-com i))
+          (message "Starting %s..." real-com)
+          (if file
+              (start-process-shell-command
+               proc nil (format exe (shell-quote-argument
+                                     (if (eq system-type 'windows-nt)
+                                         (helm-w32-prepare-filename file)
+                                         file))))
+              (start-process-shell-command proc nil real-com))
+          (set-process-sentinel
+           (get-process proc)
+           #'(lambda (process event)
+               (when (and (string= event "finished\n")
+                          helm-raise-command
+                          (not (helm-get-pid-from-process-name real-com)))
+                 (shell-command  (format helm-raise-command "emacs")))
+               (message "%s process...Finished." process))))
+        (setq helm-external-commands-list
+              (cons real-com
+                    (delete real-com helm-external-commands-list))))))
 
 (defun helm-get-mailcap-for-file (filename)
   "Get the command to use for FILENAME from mailcap files.
@@ -155,8 +155,8 @@ If not found or a prefix arg is given query the user which tool to use."
                                   :history helm-external-command-history)
                                ;; Always prompt to set this program as default.
                                (setq def-prog nil))
-                           ;; No prefix arg or default program exists.
-                           (replace-regexp-in-string " %s\\| '%s'" "" def-prog)))
+                             ;; No prefix arg or default program exists.
+                             (replace-regexp-in-string " %s\\| '%s'" "" def-prog)))
          (program        (concat real-prog-name " %s")))
     (unless (or def-prog ; Association exists, no need to record it.
                 ;; Don't try to record non--filenames associations (e.g urls).

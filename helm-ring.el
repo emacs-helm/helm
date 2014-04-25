@@ -38,7 +38,7 @@
   "Max number of lines displayed per candidate in kill-ring browser.
 If nil or zero (disabled), don't truncate candidate, show all."
   :type '(choice (const :tag "Disabled" nil)
-                 (integer :tag "Max number of lines"))
+          (integer :tag "Max number of lines"))
   :group 'helm-ring)
 
 (defcustom helm-kill-ring-show-completion t
@@ -112,24 +112,24 @@ replace with STR as yanked string."
     (setq kill-ring (delete str kill-ring))
     (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
         (run-with-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
-      ;; from `yank-pop'
-      (let ((inhibit-read-only t)
-            (before (< (point) (mark t))))
-        (if before
-            (funcall (or yank-undo-function 'delete-region) (point) (mark t))
-          (funcall (or yank-undo-function 'delete-region) (mark t) (point)))
-        (setq yank-undo-function nil)
-        (set-marker (mark-marker) (point) helm-current-buffer)
-        (run-with-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
-        ;; Set the window start back where it was in the yank command,
-        ;; if possible.
-        (set-window-start (selected-window) yank-window-start t)
-        (when before
-          ;; This is like exchange-point-and-mark, but doesn't activate the mark.
-          ;; It is cleaner to avoid activation, even though the command
-          ;; loop would deactivate the mark because we inserted text.
-          (goto-char (prog1 (mark t)
-                       (set-marker (mark-marker) (point) helm-current-buffer))))))
+        ;; from `yank-pop'
+        (let ((inhibit-read-only t)
+              (before (< (point) (mark t))))
+          (if before
+              (funcall (or yank-undo-function 'delete-region) (point) (mark t))
+              (funcall (or yank-undo-function 'delete-region) (mark t) (point)))
+          (setq yank-undo-function nil)
+          (set-marker (mark-marker) (point) helm-current-buffer)
+          (run-with-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
+          ;; Set the window start back where it was in the yank command,
+          ;; if possible.
+          (set-window-start (selected-window) yank-window-start t)
+          (when before
+            ;; This is like exchange-point-and-mark, but doesn't activate the mark.
+            ;; It is cleaner to avoid activation, even though the command
+            ;; loop would deactivate the mark because we inserted text.
+            (goto-char (prog1 (mark t)
+                         (set-marker (mark-marker) (point) helm-current-buffer))))))
     (kill-new str)))
 
 
@@ -193,8 +193,8 @@ replace with STR as yanked string."
     (let (line)
       (if (string= "" line)
           (setq line  "<EMPTY LINE>")
-        (setq line (car (split-string (thing-at-point 'line)
-                                      "[\n\r]"))))
+          (setq line (car (split-string (thing-at-point 'line)
+                                        "[\n\r]"))))
       (format "%7d:%s:    %s"
               (line-number-at-pos) (marker-buffer marker) line))))
 
@@ -227,62 +227,62 @@ replace with STR as yanked string."
            for key    = (single-key-description char)
            for string-actions =
            (cond
-            ((numberp val)
-             (list (int-to-string val)
-                   'insert-register
-                   'increment-register))
-            ((markerp val)
-             (let ((buf (marker-buffer val)))
-               (if (null buf)
-                   (list "a marker in no buffer")
-                 (list (concat
-                        "a buffer position:"
-                        (buffer-name buf)
-                        ", position "
-                        (int-to-string (marker-position val)))
-                       'jump-to-register
-                       'insert-register))))
-            ((and (consp val) (window-configuration-p (car val)))
-             (list "window configuration."
-                   'jump-to-register))
-            ((and (consp val) (frame-configuration-p (car val)))
-             (list "frame configuration."
-                   'jump-to-register))
-            ((and (consp val) (eq (car val) 'file))
-             (list (concat "file:"
-                           (prin1-to-string (cdr val))
-                           ".")
-                   'jump-to-register))
-            ((and (consp val) (eq (car val) 'file-query))
-             (list (concat "file:a file-query reference: file "
-                           (car (cdr val))
+             ((numberp val)
+              (list (int-to-string val)
+                    'insert-register
+                    'increment-register))
+             ((markerp val)
+              (let ((buf (marker-buffer val)))
+                (if (null buf)
+                    (list "a marker in no buffer")
+                    (list (concat
+                           "a buffer position:"
+                           (buffer-name buf)
                            ", position "
-                           (int-to-string (car (cdr (cdr val))))
-                           ".")
-                   'jump-to-register))
-            ((consp val)
-             (let ((lines (format "%4d" (length val))))
-               (list (format "%s: %s\n" lines
-                             (truncate-string-to-width
-                              (mapconcat 'identity (list (car val))
-                                         "^J") (- (window-width) 15)))
-                     'insert-register)))
-            ((stringp val)
-             (list
-              ;; without properties
-              (concat (substring-no-properties
-                       val 0 (min (length val) helm-register-max-offset))
-                      (if (> (length val) helm-register-max-offset)
-                          "[...]" ""))
-              'insert-register
-              'append-to-register
-              'prepend-to-register))
-            ((vectorp val)
-             (list
-              "Undo-tree entry."
-              'undo-tree-restore-state-from-register))
-            (t
-             "GARBAGE!"))
+                           (int-to-string (marker-position val)))
+                          'jump-to-register
+                          'insert-register))))
+             ((and (consp val) (window-configuration-p (car val)))
+              (list "window configuration."
+                    'jump-to-register))
+             ((and (consp val) (frame-configuration-p (car val)))
+              (list "frame configuration."
+                    'jump-to-register))
+             ((and (consp val) (eq (car val) 'file))
+              (list (concat "file:"
+                            (prin1-to-string (cdr val))
+                            ".")
+                    'jump-to-register))
+             ((and (consp val) (eq (car val) 'file-query))
+              (list (concat "file:a file-query reference: file "
+                            (car (cdr val))
+                            ", position "
+                            (int-to-string (car (cdr (cdr val))))
+                            ".")
+                    'jump-to-register))
+             ((consp val)
+              (let ((lines (format "%4d" (length val))))
+                (list (format "%s: %s\n" lines
+                              (truncate-string-to-width
+                               (mapconcat 'identity (list (car val))
+                                          "^J") (- (window-width) 15)))
+                      'insert-register)))
+             ((stringp val)
+              (list
+               ;; without properties
+               (concat (substring-no-properties
+                        val 0 (min (length val) helm-register-max-offset))
+                       (if (> (length val) helm-register-max-offset)
+                           "[...]" ""))
+               'insert-register
+               'append-to-register
+               'prepend-to-register))
+             ((vectorp val)
+              (list
+               "Undo-tree entry."
+               'undo-tree-restore-state-from-register))
+             (t
+              "GARBAGE!"))
            collect (cons (format "Register %3s:\n %s" key (car string-actions))
                          (cons char (cdr string-actions)))))
 

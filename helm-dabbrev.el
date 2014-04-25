@@ -72,8 +72,8 @@ Note that this is not affecting searching in helm buffer,
 but the initial search for all candidates in buffer(s)."
   :group 'helm-dabbrev
   :type '(choice (const :tag "Ignore case" t)
-                 (const :tag "Respect case" nil)
-                 (other :tag "Smart" 'smart)))
+          (const :tag "Respect case" nil)
+          (other :tag "Smart" 'smart)))
 
 
 (defvar helm-dabbrev-map
@@ -162,13 +162,13 @@ but the initial search for all candidates in buffer(s)."
                                     (substring-no-properties it)))
                        (lst (if (string= match-1 match-2)
                                 (list match-1)
-                              (list match-1 match-2))))
+                                (list match-1 match-2))))
                   (cl-loop for match in lst
                            unless (or (string= str match)
                                       (member match result))
                            do (push match result)))))))
     (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
-                          (list (current-buffer)))
+                            (list (current-buffer)))
              
              do (with-current-buffer buf
                   (when (or minibuf ; check against all buffers when in minibuffer.
@@ -208,7 +208,7 @@ but the initial search for all candidates in buffer(s)."
           ;; Search all but don't recompute current-buffer.
           (let ((helm-dabbrev--exclude-current-buffer-flag t))
             (append lst (funcall dabbrev-get abbrev 'all-bufs)))
-        lst))))
+          lst))))
 
 (defvar helm-source-dabbrev
   `((name . "Dabbrev Expand")

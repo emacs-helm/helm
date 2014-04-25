@@ -48,8 +48,8 @@ This is used in macro `with-helm-show-completion'."
 
 (defcustom helm-lisp-quoted-function-list
   '(funcall apply mapc cl-mapc mapcar cl-mapcar
-            callf callf2 cl-callf cl-callf2 fset
-            fboundp fmakunbound symbol-function)
+    callf callf2 cl-callf cl-callf2 fset
+    fboundp fmakunbound symbol-function)
   "List of function where quoted function completion happen.
 e.g give only function names after \(funcall '."
   :group 'helm-elisp
@@ -67,12 +67,12 @@ e.g give only function names after \(function ."
 ;;
 ;;
 (defface helm-lisp-show-completion
-  '((t (:background "DarkSlateGray")))
+    '((t (:background "DarkSlateGray")))
   "Face used for showing candidates in `helm-lisp-completion'."
   :group 'helm-elisp)
 
 (defface helm-lisp-completion-info
-  '((t (:foreground "red")))
+    '((t (:foreground "red")))
   "Face used for showing info in `helm-lisp-completion'."
   :group 'helm-elisp)
 
@@ -99,18 +99,18 @@ e.g give only function names after \(function ."
   (with-selected-window (selected-window)
     (if (window-dedicated-p)
         (helm-default-display-buffer buffer)
-      (let* ((screen-size  (+ (count-screen-lines (window-start) (point) t)
-                              1                         ; mode-line
-                              (if header-line-format 1 0))) ; header-line
-             (def-size     (- (window-height)
-                              helm-show-completion-min-window-height))
-             (upper-height (max window-min-height (min screen-size def-size)))
-             split-window-keep-point)
-        (recenter -1)
-        (set-window-buffer (if (active-minibuffer-window)
-                               (minibuffer-selected-window)
-                             (split-window nil upper-height))
-                           buffer)))))
+        (let* ((screen-size  (+ (count-screen-lines (window-start) (point) t)
+                                1                         ; mode-line
+                                (if header-line-format 1 0))) ; header-line
+               (def-size     (- (window-height)
+                                helm-show-completion-min-window-height))
+               (upper-height (max window-min-height (min screen-size def-size)))
+               split-window-keep-point)
+          (recenter -1)
+          (set-window-buffer (if (active-minibuffer-window)
+                                 (minibuffer-selected-window)
+                                 (split-window nil upper-height))
+                             buffer)))))
 
 (defmacro with-helm-show-completion (beg end &rest body)
   "Show helm candidate in an overlay at point.
@@ -128,11 +128,11 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (set (make-local-variable 'helm-display-function)
               (if helm-show-completion-use-special-display
                   'helm-show-completion-display-function
-                'helm-default-display-buffer))))
+                  'helm-default-display-buffer))))
      (unwind-protect
-         (progn
-           (helm-show-completion-init-overlay ,beg ,end)
-           ,@body)
+          (progn
+            (helm-show-completion-init-overlay ,beg ,end)
+            ,@body)
        (when (and helm-turn-on-show-completion
                   helm-show-completion-overlay
                   (overlayp helm-show-completion-overlay))
@@ -177,7 +177,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
              (error nil)))
           (lambda (sym)
             (or (boundp sym) (fboundp sym) (symbol-plist sym)))
-        #'fboundp))))
+          #'fboundp))))
 
 (defun helm-thing-before-point (&optional limits regexp)
   "Return symbol name before point.
@@ -191,11 +191,11 @@ of symbol before point."
           (boundary (field-beginning nil nil (point-at-bol))))
       (if (re-search-backward (or regexp "\\_<") boundary t)
           (setq beg (match-end 0))
-        (setq beg boundary))
+          (setq beg boundary))
       (unless (= beg end)
         (if limits
             (cons beg end)
-          (buffer-substring-no-properties beg end))))))
+            (buffer-substring-no-properties beg end))))))
 
 (defun helm-bounds-of-thing-before-point (&optional regexp)
   "Get the beginning and end position of `helm-thing-before-point'.
@@ -267,7 +267,7 @@ Return a cons \(beg . end\)."
            :resume 'noresume
            :buffer "*helm lisp completion*"
            :allow-nest t))
-      (message "[No Match]"))))
+        (message "[No Match]"))))
 
 (defun helm-lisp-completion-persistent-action (candidate)
   (let ((cursor-in-echo-area t)
@@ -306,7 +306,7 @@ If SYM is not documented, return \"Not documented\"."
              ;; for CL-style functions.
              (not (string-match-p "^\n\n" doc)))
         (car (split-string doc "\n"))
-      "Not documented")))
+        "Not documented")))
 
 ;;; File completion.
 ;;
@@ -338,7 +338,7 @@ If SYM is not documented, return \"Not documented\"."
     (when (and completion (not (string= completion "")))
       (delete-region beg end) (insert (if (string-match "^~" tap)
                                           (abbreviate-file-name completion)
-                                        completion)))))
+                                          completion)))))
 
 ;;;###autoload
 (defun helm-lisp-indent ()
@@ -361,7 +361,7 @@ Filename completion happen if string start after or between a double quote."
                    (search-backward tap (point-at-bol) t)
                    (looking-back "[^'`( ]")))
         (helm-complete-file-name-at-point)
-      (helm-lisp-completion-at-point))))
+        (helm-lisp-completion-at-point))))
 
 (helm-multi-key-defun helm-multi-lisp-complete-at-point
     "Multi key function for completion in emacs lisp buffers.
@@ -510,7 +510,7 @@ First call indent, second complete symbol, third complete fname."
 (defun helm-advice-persistent-action (func-class-advice)
   (if current-prefix-arg
       (helm-advice-toggle func-class-advice)
-    (describe-function (car func-class-advice))))
+      (describe-function (car func-class-advice))))
 
 (defun helm-advice-toggle (func-class-advice)
   (cl-destructuring-bind (function _class advice) func-class-advice
@@ -594,26 +594,26 @@ First call indent, second complete symbol, third complete fname."
                  ("Trace function (background)" . trace-function-background)
                  ("Untrace function" . untrace-function))))
   (define-helm-type-attribute 'command
-    `((action ("Call interactively" . helm-call-interactively)
-              ,@actions)
-      (coerce . helm-symbolify)
-      (persistent-action . describe-function))
+      `((action ("Call interactively" . helm-call-interactively)
+                ,@actions)
+        (coerce . helm-symbolify)
+        (persistent-action . describe-function))
     "Command. (string or symbol)")
 
   (define-helm-type-attribute 'function
-    `((action . ,actions)
-      (action-transformer helm-transform-function-call-interactively)
-      (candidate-transformer helm-mark-interactive-functions)
-      (coerce . helm-symbolify))
+      `((action . ,actions)
+        (action-transformer helm-transform-function-call-interactively)
+        (candidate-transformer helm-mark-interactive-functions)
+        (coerce . helm-symbolify))
     "Function. (string or symbol)"))
 
 (define-helm-type-attribute 'variable
-  '((action
-     ("Describe variable" . describe-variable)
-     ("Add variable to kill ring" . helm-kill-new)
-     ("Go to variable's definition" . find-variable)
-     ("Set variable" . helm-set-variable))
-    (coerce . helm-symbolify))
+    '((action
+       ("Describe variable" . describe-variable)
+       ("Add variable to kill ring" . helm-kill-new)
+       ("Go to variable's definition" . find-variable)
+       ("Set variable" . helm-set-variable))
+      (coerce . helm-symbolify))
   "Variable.")
 
 (defun helm-sexp-eval (cand)
@@ -623,26 +623,26 @@ First call indent, second complete symbol, third complete fname."
            nil)))
 
 (define-helm-type-attribute 'sexp
-  '((action
-     ("Eval" . helm-sexp-eval)
-     ("Edit and eval" .
-      (lambda (cand)
-        (let ((minibuffer-setup-hook
-               (cons (lambda () (insert cand)) minibuffer-setup-hook)))
-          (call-interactively #'eval-expression)))))
-    (persistent-action . helm-sexp-eval))
+    '((action
+       ("Eval" . helm-sexp-eval)
+       ("Edit and eval" .
+        (lambda (cand)
+          (let ((minibuffer-setup-hook
+                 (cons (lambda () (insert cand)) minibuffer-setup-hook)))
+            (call-interactively #'eval-expression)))))
+      (persistent-action . helm-sexp-eval))
   "Sexp.")
 
 (define-helm-type-attribute 'timer
-  '((action
-     ("Cancel Timer" . (lambda (_timer)
-                         (let ((mkd (helm-marked-candidates)))
-                           (cl-loop for timer in mkd
-                                    do (cancel-timer timer)))))
-     ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
-     ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
-    (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
-    (persistent-help . "Describe Function"))
+    '((action
+       ("Cancel Timer" . (lambda (_timer)
+                           (let ((mkd (helm-marked-candidates)))
+                             (cl-loop for timer in mkd
+                                      do (cancel-timer timer)))))
+       ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
+       ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
+      (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
+      (persistent-help . "Describe Function"))
   "Timer.")
 
 
@@ -676,7 +676,7 @@ First call indent, second complete symbol, third complete fname."
           (let ((time (timer--time timer)))
             (if (timer--idle-delay timer)
                 (format-time-string "idle-for=%5s" time)
-              (format-time-string "%m/%d %T" time)))
+                (format-time-string "%m/%d %T" time)))
           (or (timer--repeat-delay timer) "nil")
           (mapconcat 'identity (split-string
                                 (prin1-to-string (timer--function timer))
