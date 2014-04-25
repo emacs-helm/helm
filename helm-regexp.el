@@ -118,10 +118,10 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
         (line    (buffer-substring s e)))
     (propertize
      (cl-loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
-              for i from 0 to (1- (/ (length matches) 2))
-              concat (format "\n         %s'%s'" (format "Group %d: " i)
-                             (match-string i)) into ln1
-                             finally return (concat ln ln1))
+           for i from 0 to (1- (/ (length matches) 2))
+           concat (format "\n         %s'%s'" (format "Group %d: " i)
+                          (match-string i)) into ln1
+           finally return (concat ln ln1))
      ;; match beginning
      ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.
      ;; It is implementation problem of candidates-in-buffer.
@@ -163,16 +163,16 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
        (if helm-moccur-always-search-in-current
            (cons helm-current-buffer
                  (remove helm-current-buffer helm-multi-occur-buffer-list))
-           helm-multi-occur-buffer-list))
+         helm-multi-occur-buffer-list))
   (helm-init-candidates-in-buffer
       'global
     (cl-loop for buf in helm-multi-occur-buffer-list
-             for bufstr = (with-current-buffer buf (buffer-string))
-             do (add-text-properties
-                 0 (length bufstr)
-                 `(buffer-name ,(buffer-name (get-buffer buf)))
-                 bufstr)
-             concat bufstr)))
+          for bufstr = (with-current-buffer buf (buffer-string))
+          do (add-text-properties
+              0 (length bufstr)
+              `(buffer-name ,(buffer-name (get-buffer buf)))
+              bufstr)
+          concat bufstr)))
 
 (defun helm-moccur-get-line (beg end)
   "Format line for `helm-source-moccur'."
@@ -196,7 +196,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
          (lineno (string-to-number (nth 1 split)))
          (split-pat (if helm-occur-match-plugin-mode
                         (helm-mp-split-pattern helm-pattern)
-                        (list helm-pattern))))
+                      (list helm-pattern))))
     (cl-case method
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
@@ -204,10 +204,10 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (helm-goto-line lineno)
     ;; Move point to the nearest matching regexp from bol.
     (cl-loop for reg in split-pat
-             when (save-excursion
-                    (re-search-forward reg (point-at-eol) t))
-             collect (match-beginning 0) into pos-ls
-             finally (goto-char (apply #'min pos-ls)))
+          when (save-excursion
+                 (re-search-forward reg (point-at-eol) t))
+          collect (match-beginning 0) into pos-ls
+          finally (goto-char (apply #'min pos-ls)))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
@@ -270,8 +270,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
             (remove (assoc 'no-matchplugin helm-source-moccur)
                     helm-source-moccur)
             helm-source-occur helm-source-moccur)
-      (helm-attrset 'no-matchplugin nil helm-source-moccur)
-      (setq helm-source-occur helm-source-moccur)))
+    (helm-attrset 'no-matchplugin nil helm-source-moccur)
+    (setq helm-source-occur helm-source-moccur)))
 
 (defvar helm-source-moccur
   `((name . "Moccur")
@@ -332,7 +332,7 @@ It is used with type attribute 'line'."
   (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
       (list (string-to-number (match-string 1 candidate))
             (match-string 2 candidate))
-      (error "Line number not found")))
+    (error "Line number not found")))
 
 
 ;;; Type attributes
@@ -412,7 +412,7 @@ the center of window, otherwise at the top of window.")
   (interactive)
   (let ((input (if isearch-regexp
                    isearch-string
-                   (regexp-quote isearch-string))))
+                 (regexp-quote isearch-string))))
     (isearch-exit)
     (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
     (helm-occur-init-source)
@@ -438,7 +438,7 @@ or during the buffer selection."
          (if (or current-prefix-arg
                  helm-current-prefix-arg)
              (not helm-moccur-always-search-in-current)
-             helm-moccur-always-search-in-current)))
+           helm-moccur-always-search-in-current)))
     (helm-multi-occur-1 buffers)))
 
 ;;;###autoload
@@ -454,7 +454,7 @@ The prefix arg can be set before calling
         helm-moccur-always-search-in-current
         (input (if isearch-regexp
                    isearch-string
-                   (regexp-quote isearch-string))))
+                 (regexp-quote isearch-string))))
     (isearch-exit)
     (setq buf-list (helm-comp-read "Buffers: "
                                    (helm-buffer-list)
@@ -464,7 +464,7 @@ The prefix arg can be set before calling
           (if (or current-prefix-arg
                   helm-current-prefix-arg)
               (not helm-moccur-always-search-in-current)
-              helm-moccur-always-search-in-current))
+            helm-moccur-always-search-in-current))
     (helm-multi-occur-1 buf-list input)))
 
 

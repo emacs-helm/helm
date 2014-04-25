@@ -99,23 +99,23 @@
     (let ((tick (buffer-modified-tick)))
       (if (eq helm-cached-imenu-tick tick)
           helm-cached-imenu-candidates
-          (setq imenu--index-alist nil)
-          (setq helm-cached-imenu-tick tick
-                helm-cached-imenu-candidates
-                (let ((index (imenu--make-index-alist))) 
-                  (helm-imenu--candidates-1
-                   (delete (assoc "*Rescan*" index) index))))))))
+        (setq imenu--index-alist nil)
+        (setq helm-cached-imenu-tick tick
+              helm-cached-imenu-candidates
+              (let ((index (imenu--make-index-alist))) 
+                (helm-imenu--candidates-1
+                 (delete (assoc "*Rescan*" index) index))))))))
 
 (defun helm-imenu--candidates-1 (alist)
   (cl-loop for elm in alist
-           append (if (imenu--subalist-p elm)
-                      (helm-imenu--candidates-1
-                       (cl-loop for (e . v) in (cdr elm) collect
-                                (cons (propertize
-                                       e 'helm-imenu-type (car elm))
-                                      v)))
-                      (and (cdr elm) ; bug in imenu, should not be needed.
-                           (list elm)))))
+        append (if (imenu--subalist-p elm)
+                   (helm-imenu--candidates-1
+                    (cl-loop for (e . v) in (cdr elm) collect
+                          (cons (propertize
+                                 e 'helm-imenu-type (car elm))
+                                v)))
+                 (and (cdr elm) ; bug in imenu, should not be needed.
+                      (list elm)))))
 
 (defun helm-imenu--get-prop (item)
   ;; property value of ITEM can have itself
@@ -132,19 +132,19 @@
 
 (defun helm-imenu-transformer (candidates)
   (cl-loop for (k . v) in candidates
-           for types = (or (helm-imenu--get-prop k)
-                           (list "Function" k))
-           collect
-           (cons (mapconcat (lambda (x)
-                              (propertize
-                               x 'face (cond ((string= x "Variables")
-                                              'font-lock-variable-name-face)
-                                             ((string= x "Function")
-                                              'font-lock-function-name-face)
-                                             ((string= x "Types")
-                                              'font-lock-type-face))))
-                            types helm-imenu-delimiter)
-                 (cons k v))))
+        for types = (or (helm-imenu--get-prop k)
+                        (list "Function" k))
+        collect
+        (cons (mapconcat (lambda (x)
+                           (propertize
+                            x 'face (cond ((string= x "Variables")
+                                           'font-lock-variable-name-face)
+                                          ((string= x "Function")
+                                           'font-lock-function-name-face)
+                                          ((string= x "Types")
+                                           'font-lock-type-face))))
+                         types helm-imenu-delimiter)
+              (cons k v))))
 
 ;;;###autoload
 (defun helm-imenu ()

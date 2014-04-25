@@ -52,9 +52,9 @@
 (defun helm-latex-math-candidates ()
   "Collect candidates for latex math completion."
   (cl-loop for i in (cddr LaTeX-math-menu)
-           for elm = (cl-loop for s in i when (vectorp s)
-                              collect (cons (aref s 0) (aref s 1)))
-           append elm))
+        for elm = (cl-loop for s in i when (vectorp s)
+                        collect (cons (aref s 0) (aref s 1)))
+        append elm))
 
 (defvar helm-source-latex-math
   '((name . "Latex Math Menu")
@@ -129,13 +129,13 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
          (ignore-errors
            (with-helm-current-buffer
              (cl-loop initially (goto-char (point-min))
-                      while (re-search-forward
-                             (format ee-anchor-format "\\([^\.].+\\)") nil t)
-                      for anchor = (match-string-no-properties 1)
-                      collect (cons (format "%5d:%s"
-                                            (line-number-at-pos (match-beginning 0))
-                                            (format ee-anchor-format anchor))
-                                    anchor))))))
+                   while (re-search-forward
+                          (format ee-anchor-format "\\([^\.].+\\)") nil t)
+                   for anchor = (match-string-no-properties 1)
+                   collect (cons (format "%5d:%s"
+                                         (line-number-at-pos (match-beginning 0))
+                                         (format ee-anchor-format anchor))
+                                 anchor))))))
     (persistent-action . (lambda (item)
                            (ee-to item)
                            (helm-highlight-current-line)))
@@ -147,11 +147,11 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
   "List online Jabber contacts."
   (with-no-warnings
     (cl-loop for item in (jabber-concat-rosters)
-             when (get item 'connected)
-             collect
-             (if (get item 'name)
-                 (cons (get item 'name) item)
-                 (cons (symbol-name item) item)))))
+          when (get item 'connected)
+          collect
+          (if (get item 'name)
+              (cons (get item 'name) item)
+            (cons (symbol-name item) item)))))
 
 (defvar helm-source-jabber-contacts
   '((name . "Jabber Contacts")
@@ -167,12 +167,12 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;;
 (defun helm-time-zone-transformer (candidates _source)
   (cl-loop for i in candidates
-           collect
-           (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
-                  (propertize i 'face 'helm-time-zone-current))
-                 ((string-match helm-time-zone-home-location i)
-                  (propertize i 'face 'helm-time-zone-home))
-                 (t i))))
+        collect
+        (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
+               (propertize i 'face 'helm-time-zone-current))
+              ((string-match helm-time-zone-home-location i)
+               (propertize i 'face 'helm-time-zone-home))
+              (t i))))
 
 (defvar helm-source-time-world
   '((name . "Time World List")
@@ -234,8 +234,8 @@ It is added to `extended-command-history'.
         (cmd (helm-symbolify cmd-or-name)))
     (if (stringp (symbol-function cmd))
         (execute-kbd-macro (symbol-function cmd))
-        (setq this-command cmd)
-        (call-interactively cmd))))
+      (setq this-command cmd)
+      (call-interactively cmd))))
 
 ;;; Minibuffer History
 ;;
@@ -247,11 +247,11 @@ It is added to `extended-command-history'.
     (candidates
      . (lambda ()
          (let ((history (cl-loop for i in
-                                 (symbol-value minibuffer-history-variable)
-                                 unless (string= "" i) collect i)))
+                              (symbol-value minibuffer-history-variable)
+                              unless (string= "" i) collect i)))
            (if (consp (car history))
                (mapcar 'prin1-to-string history)
-               history))))
+             history))))
     (migemo)
     (multiline)
     (action . (lambda (candidate)

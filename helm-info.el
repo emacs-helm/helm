@@ -51,17 +51,17 @@ Sources are generated for all entries of `helm-default-info-index-list'.
 If COMMANDS arg is non--nil build also commands named `helm-info<NAME>'.
 Where NAME is one of `helm-default-info-index-list'."
   (cl-loop with symbols = (cl-loop for str in var-value
-                                   collect
-                                   (intern (concat "helm-source-info-" str)))
-           for sym in symbols
-           for str in var-value
-           do (set sym (list (cons 'name (format "Info index: %s" str))
-                             (cons 'info-index str)))
-           when commands
-           do (let ((com (intern (concat "helm-info-" str))))
-                (helm-build-info-index-command
-                 com (format "Predefined helm for %s info." str)
-                 sym (format "*helm info %s*" str)))))
+                                collect
+                                (intern (concat "helm-source-info-" str)))
+        for sym in symbols
+        for str in var-value
+        do (set sym (list (cons 'name (format "Info index: %s" str))
+                          (cons 'info-index str)))
+        when commands
+        do (let ((com (intern (concat "helm-info-" str))))
+             (helm-build-info-index-command
+              com (format "Predefined helm for %s info." str)
+              sym (format "*helm info %s*" str)))))
 
 (defun helm-info-index-set (var value)
   (set var value)
@@ -103,16 +103,16 @@ source.")
   "Collect candidates for initial Info node Top."
   (if helm-info-pages
       helm-info-pages
-      (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-            topics)
-        (require 'info)
-        (with-temp-buffer
-          (Info-find-node "dir" "top")
-          (goto-char (point-min))
-          (while (re-search-forward info-topic-regexp nil t)
-            (push (match-string-no-properties 1) topics))
-          (kill-buffer))
-        (setq helm-info-pages topics))))
+    (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+          topics)
+      (require 'info)
+      (with-temp-buffer
+        (Info-find-node "dir" "top")
+        (goto-char (point-min))
+        (while (re-search-forward info-topic-regexp nil t)
+          (push (match-string-no-properties 1) topics))
+        (kill-buffer))
+      (setq helm-info-pages topics))))
 
 (defvar helm-source-info-pages
   `((name . "Info Pages")

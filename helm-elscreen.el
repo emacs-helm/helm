@@ -46,7 +46,7 @@
          (if (cdr (elscreen-get-screen-to-name-alist))
              (sort
               (cl-loop for sname in (elscreen-get-screen-to-name-alist)
-                       append (list (format "[%d] %s" (car sname) (cdr sname))))
+                    append (list (format "[%d] %s" (car sname) (cdr sname))))
               #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
     (action
      . (("Change Screen" .

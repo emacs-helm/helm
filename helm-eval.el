@@ -77,7 +77,7 @@ Should take one arg: the string to display."
                                                 (if edebug-active
                                                     (edebug-eval-expression
                                                      (read helm-pattern))
-                                                    (eval (read helm-pattern)))))
+                                                  (eval (read helm-pattern)))))
                                            (error "Error")))))
     (action . (("Copy result to kill-ring" . (lambda (candidate)
                                                (kill-new
