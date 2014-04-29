@@ -60,7 +60,9 @@ When disabled (nil) use the longest buffer-name length found."
   :type 'boolean)
 
 (defcustom helm-buffers-fuzzy-matching nil
-  "Fuzzy matching buffers when non--nil."
+  "Fuzzy matching buffer names when non--nil.
+Only buffer names are fuzzy matched when this is enabled,
+`major-mode' matching is not affected by this."
   :group 'helm-buffers
   :type 'boolean)
 
