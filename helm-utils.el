@@ -334,6 +334,25 @@ even is \" -b\" is specified."
        (replace-regexp-in-string " -b\\'" "" helm-pattern)
        candidate))))
 
+(defun helm--mapconcat-candidate (candidate)
+  "Transform string CANDIDATE in regexp.
+e.g helm.el$
+    => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
+    ^helm.el$
+    => \"helm[.]el$\"."
+  (let ((ls (split-string candidate "" t)))
+    (if (string= "^" (car ls))
+        (mapconcat (lambda (c)
+                     (if (string= c ".")
+                         (concat "[" c "]") c))
+                   (cdr ls) "")
+      (mapconcat (lambda (c)
+                   (cond ((string= c ".")
+                          (concat "[^" c "]*" (concat "[" c "]")))
+                         ((string= c "$") c)
+                         (t (concat "[^" c "]*" c))))
+                 ls ""))))
+
 (defun helm-skip-entries (seq regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
   (cl-loop for i in seq

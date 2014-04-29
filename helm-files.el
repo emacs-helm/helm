@@ -1477,7 +1477,7 @@ systems."
   "Maybe return FNAME with it's basename modified as a regexp.
 This happen only when `helm-ff-smart-completion' is enabled.
 This provide a similar behavior as `ido-enable-flex-matching'.
-See also `helm-ff-mapconcat-candidate'.
+See also `helm--mapconcat-candidate'.
 If FNAME is an url returns it unmodified.
 When FNAME contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
@@ -1505,28 +1505,9 @@ If FNAME is a valid directory name,return FNAME unchanged."
                    (replace-regexp-in-string "[*]" "[*]" bn)))
           (t
            (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
-                        (helm-ff-mapconcat-candidate bn)
+                        (helm--mapconcat-candidate bn)
                       (concat ".*" bn)))
            (concat (regexp-quote bd) bn)))))
-
-(defun helm-ff-mapconcat-candidate (candidate)
-  "Transform string CANDIDATE in regexp.
-e.g helm.el$
-    => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
-    ^helm.el$
-    => \"helm[.]el$\"."
-  (let ((ls (split-string candidate "" t)))
-    (if (string= "^" (car ls))
-        (mapconcat (lambda (c)
-                     (if (string= c ".")
-                         (concat "[" c "]") c))
-                   (cdr ls) "")
-      (mapconcat (lambda (c)
-                   (cond ((string= c ".")
-                          (concat "[^" c "]*" (concat "[" c "]")))
-                         ((string= c "$") c)
-                         (t (concat "[^" c "]*" c))))
-                 ls ""))))
 
 (defun helm-dir-is-dot (dir)
   (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
