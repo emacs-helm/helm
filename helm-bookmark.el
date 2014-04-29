@@ -23,6 +23,8 @@
 (require 'helm-info)
 (require 'helm-adaptative)
 
+(declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
+
 
 (defgroup helm-bookmark nil
   "Predefined configurations for `helm.el'."
@@ -627,8 +629,15 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
 (defun helm-bookmark-edit-bookmark (bookmark-name)
   "Edit bookmark's name and file name, and maybe save them.
 BOOKMARK-NAME is the current (old) name of the bookmark to be renamed."
+  (let ((bmk (helm-bookmark-get-bookmark-from-name bookmark-name))
+        (handler (bookmark-prop-get bookmark-name 'handler)))
+    (if (eq handler 'addressbook-bookmark-jump)
+        (addressbook-bookmark-edit
+         (assoc bmk bookmark-alist))
+      (helm-bookmark-edit-bookmark-1 bookmark-name handler))))
+
+(defun helm-bookmark-edit-bookmark-1 (bookmark-name handler)
   (let* ((bookmark-fname (bookmark-get-filename bookmark-name))
-         (handler        (bookmark-prop-get bookmark-name 'handler))
          (bookmark-loc   (bookmark-prop-get bookmark-name 'location))
          (new-name       (read-from-minibuffer "Name: " bookmark-name))
          (new-loc        (read-from-minibuffer "FileName or Location: "
@@ -636,8 +645,8 @@ BOOKMARK-NAME is the current (old) name of the bookmark to be renamed."
                                                    (if (consp bookmark-loc)
                                                        (car bookmark-loc)
                                                      bookmark-loc))))
-         (docid (and (eq handler 'mu4e-bookmark-jump)
-                     (read-number "Docid: " (cdr bookmark-loc)))))
+         (docid           (and (eq handler 'mu4e-bookmark-jump)
+                               (read-number "Docid: " (cdr bookmark-loc)))))
     (when docid
       (setq new-loc (cons new-loc docid)))
     (when (and (not (equal new-name "")) (not (equal new-loc ""))
