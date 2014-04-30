@@ -617,10 +617,13 @@ First call indent, second complete symbol, third complete fname."
   "Variable.")
 
 (defun helm-sexp-eval (cand)
-  (condition-case err
-      (eval (read cand))
-    (error (message "Evaluating gave an error: %S" err)
-           nil)))
+  (let ((sexp (read cand)))
+    (condition-case err
+        (if (> (length (remove nil sexp)) 1)
+            (eval sexp)
+          (apply 'call-interactively sexp))
+      (error (message "Evaluating gave an error: %S" err)
+             nil))))
 
 (define-helm-type-attribute 'sexp
     '((action
