@@ -627,8 +627,8 @@ First call indent, second complete symbol, third complete fname."
        ("Eval" . helm-sexp-eval)
        ("Edit and eval" .
         (lambda (cand)
-          (let ((minibuffer-setup-hook
-                 (cons (lambda () (insert cand)) minibuffer-setup-hook)))
+          (minibuffer-with-setup-hook
+              (lambda () (insert cand))
             (call-interactively #'eval-expression)))))
       (persistent-action . helm-sexp-eval))
   "Sexp.")
