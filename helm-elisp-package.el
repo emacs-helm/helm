@@ -52,7 +52,8 @@
               (car id)))
         and collect (if (fboundp 'package-desc-full-name)
                         id
-                      (car id)) into installed-list
+                      (car id))
+        into installed-list
         finally do (if (fboundp 'package-desc-full-name)
                        (message (format "%d packages installed:\n(%s)"
                                         (length installed-list)
@@ -79,7 +80,8 @@
         and collect (if (fboundp 'package-desc-full-name)
                         id
                       (cons (symbol-name (car id))
-                            (package-version-join (cdr id)))) into delete-list
+                            (package-version-join (cdr id))))
+        into delete-list
         finally do (if (fboundp 'package-desc-full-name)
                        ;; emacs 24.4
                        (message (format "%d packages deleted:\n(%s)"

@@ -120,7 +120,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
      (cl-loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
            for i from 0 to (1- (/ (length matches) 2))
            concat (format "\n         %s'%s'" (format "Group %d: " i)
-                          (match-string i)) into ln1
+                          (match-string i))
+           into ln1
            finally return (concat ln ln1))
      ;; match beginning
      ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.

@@ -121,7 +121,8 @@
         if (member (cdr i) helm-emms-current-playlist)
         collect (cons (propertize (car i)
                                   'face 'helm-emms-playlist)
-                      (cdr i)) into lis
+                      (cdr i))
+        into lis
         else collect i into lis
         finally return (reverse lis)))
 

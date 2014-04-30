@@ -112,7 +112,8 @@ Show global bindings and local bindings according to current `major-mode'."
                                  cand (propertize
                                        key
                                        'face 'helm-M-x-key))))
-                cand) into ls
+                cand)
+          into ls
           finally return
           (sort ls #'helm-generic-sort-fn))))
 

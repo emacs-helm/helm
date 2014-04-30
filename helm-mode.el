@@ -190,7 +190,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                        " " 'display
                        (propertize "[?]" 'face 'helm-ff-prefix))
                       cand)
-              cand) into lst
+              cand)
+        into lst
         else collect cand into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 

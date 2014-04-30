@@ -4340,7 +4340,8 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
                                   (condition-case nil
                                       (file-expand-wildcards elm t)
                                     (error nil)))))
-                   (or c (list elm))) into cands
+                   (or c (list elm)))
+          into cands
           finally do (prog1 (cl-return cands) (helm-log-eval cands)))))
 
 (defun helm-current-source-name= (name)
