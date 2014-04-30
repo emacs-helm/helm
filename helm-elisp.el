@@ -698,10 +698,11 @@ First call indent, second complete symbol, third complete fname."
 (defvar helm-source-complex-command-history
   '((name . "Complex Command History")
     (candidates . (lambda ()
-                    (mapcar 'prin1-to-string
-                            ;; Use cdr to avoid adding
-                            ;; `helm-complex-command-history' here.
-                            (cdr command-history))))
+                    ;; Use cdr to avoid adding
+                    ;; `helm-complex-command-history' here.
+                    (cl-loop for i in command-history
+                          unless (equal i '(helm-complex-command-history))
+                          collect (prin1-to-string i))))
     (type . sexp)))
 
 ;;;###autoload
