@@ -780,7 +780,8 @@ only if external library addressbook-bookmark.el is available."
                                'helm-source-bookmark-set))
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"
-        :default (buffer-name helm-current-buffer)))
+        :default (list (thing-at-point 'symbol)
+                       (buffer-name helm-current-buffer))))
 
 (provide 'helm-bookmark)
 
