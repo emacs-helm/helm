@@ -2193,13 +2193,14 @@ This can be useful for e.g writing quietly a complex regexp."
 
 It will override `helm-map' with the local map of current source.
 If no map is found in current source do nothing (keep previous map)."
-  (with-helm-buffer
-    (helm-aif (assoc-default 'keymap (helm-get-current-source))
-        ;; Fix #466; we use here set-transient-map
-        ;; to not overhide other minor-mode-map's.
-        (if (fboundp 'set-transient-map)
-            (set-transient-map it)
-          (set-temporary-overlay-map it)))))
+  (when (buffer-live-p (helm-buffer-get))
+    (with-helm-buffer
+      (helm-aif (assoc-default 'keymap (helm-get-current-source))
+          ;; Fix #466; we use here set-transient-map
+          ;; to not overhide other minor-mode-map's.
+          (if (fboundp 'set-transient-map)
+              (set-transient-map it)
+            (set-temporary-overlay-map it))))))
 
 
 ;; Core: clean up
