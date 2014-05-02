@@ -115,7 +115,7 @@
                                   (length trunc))
                                ? )
         if helm-bookmark-show-location
-        collect (cons (concat trunc sep loc) i)
+        collect (cons (concat trunc sep (if (listp loc) (car loc) loc)) i)
         else collect i))
 
 (defun helm-bookmark-match-fn (candidate)
