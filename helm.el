@@ -1638,7 +1638,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       ;; cua-mode overhide local helm bindings.
       ;; disable this stupid thing if enabled.
       (and cua-mode (cua-mode -1))
-      (add-hook 'post-command-hook 'helm--maybe-update-keymap)
       (unwind-protect
            (condition-case _v
                (let (;; `helm-source-name' is non-nil
@@ -1652,6 +1651,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-initialize any-resume any-input
                                     any-default any-sources)
                    (helm-display-buffer helm-buffer)
+                   (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                    (helm-log "show prompt")
                    (unwind-protect
                         (helm-read-pattern-maybe
