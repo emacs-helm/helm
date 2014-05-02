@@ -112,7 +112,8 @@
                         (helm-substring i bookmark-bmenu-file-column)
                       i)
         for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
-                                  (length trunc)) ? )
+                                  (length trunc))
+                               ? )
         if helm-bookmark-show-location
         collect (cons (concat trunc sep loc) i)
         else collect i))
@@ -131,12 +132,14 @@
     (let* ((real (helm-get-selection helm-buffer))
            (trunc (if (> (string-width real) bookmark-bmenu-file-column)
                       (helm-substring real bookmark-bmenu-file-column)
-                    real)))
+                    real))
+           (loc (bookmark-location real)))
       (setq helm-bookmark-show-location (not helm-bookmark-show-location))
       (helm-force-update (if helm-bookmark-show-location
                              (concat (regexp-quote trunc)
                                      " +"
-                                     (regexp-quote (bookmark-location real)))
+                                     (regexp-quote
+                                      (if (listp loc) (car loc) loc)))
                            real)))))
 
 (defun helm-bookmark-jump (candidate)
@@ -585,7 +588,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
           for sep = (and helm-bookmark-show-location
                          (make-string (- (+ bookmark-bmenu-file-column 2)
-                                         (string-width trunc)) ? ))
+                                         (string-width trunc))
+                                      ? ))
           for bmk = (cond ( ;; info buffers
                            isinfo
                            (propertize trunc 'face 'helm-bookmark-info
@@ -623,7 +627,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                            (propertize trunc 'face 'helm-bookmark-file
                                        'help-echo isfile)))
           collect (if helm-bookmark-show-location
-                      (cons (concat bmk sep loc) i)
+                      (cons (concat bmk sep (if (listp loc) (car loc) loc))
+                                    i)
                     (cons bmk i)))))
 
 (defun helm-bookmark-edit-bookmark (bookmark-name)
