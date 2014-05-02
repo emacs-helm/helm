@@ -227,7 +227,7 @@ Italic     => A non--file buffer.
 \\[helm-toggle-all-marks]\t\t->Toggle all marks.
 \\[helm-mark-all]\t\t->Mark all.
 \\[helm-toggle-buffers-details]\t\t->Toggle details.
-\\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers. 
+\\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers.
 \\[helm-buffer-help]\t\t->Display this help.
 \n== Helm Map ==
 \\{helm-map}")
@@ -596,7 +596,7 @@ But you can also pass an argument or more after 'candidate_file' like this:
 
 e.g <command> file1 file2 ...
 
-Call `helm-find-files-eshell-command-on-file' with one prefix-arg 
+Call `helm-find-files-eshell-command-on-file' with one prefix-arg
 Otherwise you can pass one prefix-arg from the command selection buffer.
 
 With two prefix-arg before starting or from the command selection buffer
@@ -627,7 +627,7 @@ is called once for each file like this:
   "== Helm ido virtual buffers Map ==\
 \nSpecific commands for ido virtuals buffers:
 \\<helm-buffers-ido-virtual-map>
-\\[helm-ff-run-switch-other-window]\t\t->Switch other window. 
+\\[helm-ff-run-switch-other-window]\t\t->Switch other window.
 \\[helm-ff-run-switch-other-frame]\t\t->Switch other frame.
 \\[helm-ff-run-grep]\t\t->Grep file.
 \\[helm-ff-run-zgrep]\t\t->Zgrep file.
@@ -780,6 +780,27 @@ the amount of prefix args entered.
   (let ((helm-help-message helm-imenu-help-message))
     (helm-help)))
 
+;;; helm-colors
+;;
+;;
+(defvar helm-colors-help-message
+  "== Helm colors ==\
+\nSpecific commands for Helm colors:
+\\<helm-color-map>
+\\[helm-color-run-insert-name]\t\tInsert the entry'name.
+\\[helm-color-run-kill-name]\t\tKill the entry's name.
+\\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
+\\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.
+\\[helm-color-help]\t\tShow this help.
+\n== Helm Map ==
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-color-help ()
+  (interactive)
+  (let ((helm-help-message helm-colors-help-message))
+    (helm-help)))
+
 ;;; helm semantic
 ;;
 ;;
@@ -814,6 +835,15 @@ the amount of prefix args entered.
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-source-buffers-list'"))
+
+;;;###autoload
+(defvar helm-color-mode-line-string
+  '("Colors" "\
+\\<helm-color-map>\
+\\[helm-color-help]:Help/\
+\\[helm-color-run-insert-name]:Insert name/\
+\\[helm-color-run-insert-rgb]:Insert RGB/\
+with shift: Kill"))
 
 ;;;###autoload
 (defvar helm-buffers-ido-virtual-mode-line-string
@@ -1379,7 +1409,7 @@ HELM-ATTRIBUTE should be a symbol."
   filename:candidate-containing-the-word-filename
 
   What you want is to ignore \"filename\" part and match only
-  \"candidate-containing-the-word-filename\" 
+  \"candidate-containing-the-word-filename\"
 
   So give a function matching only the part of candidate after \":\"
 
