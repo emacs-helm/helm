@@ -63,22 +63,68 @@
         (buffer-string)))
     (kill-buffer "*Colors*")))
 
+(defun helm-color-insert-name (candidate)
+  (interactive)
+  (with-helm-current-buffer
+    (insert (helm-colors-get-name candidate))))
+
+(defun helm-color-kill-name (candidate)
+  (interactive)
+  (kill-new (helm-colors-get-name candidate)))
+
+(defun helm-color-insert-rgb (candidate)
+  (interactive)
+  (with-helm-current-buffer
+    (insert (helm-colors-get-rgb candidate))))
+
+(defun helm-color-kill-rgb (candidate)
+  (interactive)
+  (kill-new (helm-colors-get-rgb candidate)))
+
+(defun helm-color-run-insert-name ()
+  "Insert name of color from `helm-source-colors'"
+  (interactive)
+  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-insert-name)))
+
+(defun helm-color-run-kill-name ()
+  "Kill name of color from `helm-source-colors'"
+  (interactive)
+  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-kill-name)))
+
+(defun helm-color-run-insert-rgb ()
+  "Insert RGB of color from `helm-source-colors'"
+  (interactive)
+  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-insert-rgb)))
+
+(defun helm-color-run-kill-rgb ()
+  "Kill RGB of color from `helm-source-colors'"
+  (interactive)
+  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-kill-rgb)))
+
+(defvar helm-color-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c n") 'helm-color-run-insert-name)
+    (define-key map (kbd "C-c N") 'helm-color-run-kill-name)
+    (define-key map (kbd "C-c r") 'helm-color-run-insert-rgb)
+    (define-key map (kbd "C-c R") 'helm-color-run-kill-rgb)
+    (define-key map (kbd "C-c ?") 'helm-color-help)
+    map))
+
 (defvar helm-source-colors
-  '((name . "Colors")
+  `((name . "Colors")
     (init . helm-colors-init)
     (candidates-in-buffer)
     (get-line . buffer-substring)
+    (keymap . ,helm-color-map)
+    (persistent-help . "Kill entry in RGB format.")
+    (persistent-action . helm-color-kill-rgb)
+    (mode-line . helm-color-mode-line-string)
     (action
-     ("Copy Name" . (lambda (candidate)
-                      (kill-new (helm-colors-get-name candidate))))
-     ("Copy RGB" . (lambda (candidate)
-                     (kill-new (helm-colors-get-rgb candidate))))
-     ("Insert Name" . (lambda (candidate)
-                        (with-helm-current-buffer
-                          (insert (helm-colors-get-name candidate)))))
-     ("Insert RGB" . (lambda (candidate)
-                       (with-helm-current-buffer
-                         (insert (helm-colors-get-rgb candidate))))))))
+     ("Copy Name (C-c N)" . helm-color-kill-name)
+     ("Copy RGB (C-c R)" . helm-color-kill-rgb)
+     ("Insert Name (C-c n)" . helm-color-insert-name)
+     ("Insert RGB (C-c r)" . helm-color-insert-rgb))))
 
 (defun helm-colors-get-name (candidate)
   "Get color name."
