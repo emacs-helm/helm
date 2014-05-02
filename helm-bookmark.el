@@ -628,7 +628,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                        'help-echo isfile)))
           collect (if helm-bookmark-show-location
                       (cons (concat bmk sep (if (listp loc) (car loc) loc))
-                                    i)
+                            i)
                     (cons bmk i)))))
 
 (defun helm-bookmark-edit-bookmark (bookmark-name)
