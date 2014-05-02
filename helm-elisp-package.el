@@ -22,12 +22,14 @@
 
 ;; internals vars
 (defvar helm-el-package--show-only 'all)
+(defvar helm-el-package--initialized-p nil)
 
 (defun helm-el-package--init ()
   (when (null package-alist)
     (setq helm-el-package--show-only 'all))
   (save-selected-window
-    (list-packages)
+    (list-packages helm-el-package--initialized-p)
+    (setq helm-el-package--initialized-p t)
     (message nil))
   (helm-init-candidates-in-buffer
       'global
@@ -157,8 +159,9 @@
                ("Uninstall" . helm-el-package-uninstall)))))
 
 ;;;###autoload
-(defun helm-list-elisp-packages ()
-  (interactive)
+(defun helm-list-elisp-packages (arg)
+  (interactive "P")
+  (when arg (setq helm-el-package--initialized-p nil))
   (helm :sources 'helm-source-list-el-package
         :buffer "*helm list packages*"))
 
