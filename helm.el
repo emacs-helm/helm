@@ -109,7 +109,8 @@ First call run `helm-toggle-resplit-window',
 second call within 0.5s run `helm-swap-windows'."
   '(helm-toggle-resplit-window helm-swap-windows) 1)
 
-(defmacro helm-define-key-with-subkeys (map key subkey command &optional other-subkeys menu exit-fn)
+(defmacro helm-define-key-with-subkeys (map key subkey command
+                                        &optional other-subkeys menu exit-fn)
   "Allow defining a KEY without having to type its prefix again on next calls.
 Arg MAP is the keymap to use, SUBKEY is the initial long keybinding to
 call COMMAND.
@@ -151,7 +152,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                                        (this-single-command-raw-keys))
                                                unread-command-events)))
                                 nil)))))
-             (funcall ,exit-fn))))))
+             (and ,exit-fn (funcall ,exit-fn)))))))
 
 
 ;;; Keymap
