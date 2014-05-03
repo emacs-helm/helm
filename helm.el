@@ -55,6 +55,7 @@ Each time \"<f5> q\" is pressed the next function is executed, if you wait
 More than 2 seconds, next hit will run again the first function and so on."
   (define-key keymap key (helm-make-multi-command functions delay)))
 
+;;;###autoload
 (defmacro helm-multi-key-defun (name docstring funs &optional delay)
   "Define NAME as a multi-key command running FUNS.
 After DELAY seconds the FUNS list is reinitialised.
@@ -109,6 +110,7 @@ First call run `helm-toggle-resplit-window',
 second call within 0.5s run `helm-swap-windows'."
   '(helm-toggle-resplit-window helm-swap-windows) 1)
 
+;;;###autoload
 (defmacro helm-define-key-with-subkeys (map key subkey command
                                         &optional other-subkeys menu exit-fn)
   "Allow defining a KEY without having to type its prefix again on next calls.
