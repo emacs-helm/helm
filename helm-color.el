@@ -64,21 +64,17 @@
     (kill-buffer "*Colors*")))
 
 (defun helm-color-insert-name (candidate)
-  (interactive)
   (with-helm-current-buffer
     (insert (helm-colors-get-name candidate))))
 
 (defun helm-color-kill-name (candidate)
-  (interactive)
   (kill-new (helm-colors-get-name candidate)))
 
 (defun helm-color-insert-rgb (candidate)
-  (interactive)
   (with-helm-current-buffer
     (insert (helm-colors-get-rgb candidate))))
 
 (defun helm-color-kill-rgb (candidate)
-  (interactive)
   (kill-new (helm-colors-get-rgb candidate)))
 
 (defun helm-color-run-insert-name ()
