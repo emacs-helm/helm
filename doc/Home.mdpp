@@ -12,7 +12,7 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 # Wiki maintainer instructions
 
 1. Checkout wiki repo at `git@github.com:emacs-helm/helm.wiki.git`
-2. Get markdown-pp at https://github.com/thierryvolpiatto/markdown-pp.git
+2. Get markdown-pp at https://github.com/jreese/markdown-pp
 3. Install markdown-pp
 
    For help on setup.py:
