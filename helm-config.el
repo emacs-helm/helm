@@ -202,7 +202,7 @@
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21349 6565 435233 570000))
+;;;### (autoloads nil "helm" "helm.el" (21349 15441 279116 28000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -232,8 +232,6 @@ After DELAY seconds the FUNS list is reinitialised.
 See `helm-define-multi-key'.
 
 \(fn NAME DOCSTRING FUNS &optional DELAY)" nil t)
-
-(put 'helm-multi-key-defun 'lisp-indent-function '2)
 
 (autoload 'helm-define-key-with-subkeys "helm" "\
 Allow defining a KEY without having to type its prefix again on next calls.
@@ -1698,7 +1696,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21349 6580 196367 86000))
+;;;;;;  (21349 15454 446024 897000))
 
 ;;;***
 
