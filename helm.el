@@ -109,6 +109,50 @@ First call run `helm-toggle-resplit-window',
 second call within 0.5s run `helm-swap-windows'."
   '(helm-toggle-resplit-window helm-swap-windows) 1)
 
+(defmacro helm-define-key-with-subkeys (map key subkey command &optional other-subkeys menu exit-fn)
+  "Allow defining a KEY without having to type its prefix again on next calls.
+Arg MAP is the keymap to use, SUBKEY is the initial long keybinding to
+call COMMAND.
+Arg OTHER-SUBKEYS is an unquoted alist specifying other short keybindings
+to use once started.
+e.g:
+
+\(helm-define-key-with-subkeys global-map
+      \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk ((?p 'git-gutter:previous-hunk))\)
+
+
+In this example, `C-x v n' will run `git-gutter:next-hunk' subsequent hit on \"n\"
+will run this command again and subsequent hit on \"p\" will run `git-gutter:previous-hunk'.
+
+Arg MENU is a string to display in minibuffer to describe SUBKEY and OTHER-SUBKEYS.
+Arg EXIT-FN specify a function to run on exit.
+
+Any other keys pressed run their assigned command defined in MAP and exit the loop."
+
+  (let ((other-keys (and other-subkeys
+                         (cl-loop for (x . y) in other-subkeys
+                               collect (list x (list 'call-interactively y) t)))))
+    `(define-key ,map ,key
+       #'(lambda ()
+           (interactive)
+           (unwind-protect
+                (progn
+                  (call-interactively ,command)
+                  (while (let ((input (read-key ,menu)) kb com)
+                           (cl-case input
+                             (,subkey (call-interactively ,command) t)
+                             ,@other-keys
+                             (t (setq kb  (this-command-keys-vector))
+                                (setq com (lookup-key ,map kb))
+                                (if (commandp com)
+                                    (call-interactively com)
+                                  (setq unread-command-events
+                                        (nconc (mapcar 'identity
+                                                       (this-single-command-raw-keys))
+                                               unread-command-events)))
+                                nil)))))
+             (funcall ,exit-fn))))))
+
 
 ;;; Keymap
 ;;

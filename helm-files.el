@@ -327,6 +327,8 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
     (define-key map (kbd "C-h C-b")       'helm-send-bug-report-from-helm)
     (define-key map (kbd "C-x @")         'helm-ff-run-find-file-as-root)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
+    (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
+                                  nil nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
@@ -823,6 +825,17 @@ See `helm-ff-serial-rename-1'."
   (with-helm-alive-p
     (helm-attrset 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
     (helm-execute-persistent-action 'toggle-auto-update)))
+
+(defun helm-ff-delete-char-backward ()
+  "Disable helm find files auto update and delete char backward."
+  (interactive)
+  (setq helm-ff-auto-update-flag nil)
+  (call-interactively
+   (lookup-key (current-global-map)
+               (read-kbd-macro "DEL"))))
+
+(defun helm-ff-delete-char-backward--exit-fn ()
+  (setq helm-ff-auto-update-flag helm-ff-auto-update-initial-value))
 
 (defun helm-ff-run-switch-to-history ()
   "Run Switch to history action from `helm-source-find-files'."

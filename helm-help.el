@@ -272,9 +272,7 @@ Italic     => A non--file buffer.
   You can also use `helm-follow-action-forward' and `helm-follow-action-backward'
   (`C-<down' and `C-<left>').
 
-- When you want to delete backward characters to e.g creating a new file or directory,
-  autoupdate may keep updating to an existent directory
-  preventing you to do so, in this case just hit C-<backspace> and then <backspace>.
+- You can turn off/on (toggle) autoupdate completion at any moment with `C-DEL'.
   NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
 
 - You can create a new directory and a new file at the same time, just write the path in prompt
