@@ -368,6 +368,7 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
 (defvar helm-ff-auto-update-flag nil
   "Internal, flag to turn on/off auto-update in `helm-find-files'.
 Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
+(defvar helm-ff-auto-update--state nil)
 (defvar helm-ff-last-expanded nil
   "Store last expanded directory or file.")
 (defvar helm-ff-default-directory nil)
@@ -390,6 +391,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)
+              (setq helm-ff-auto-update--state
+                    helm-ff-auto-update-flag)
               (with-helm-temp-hook 'helm-after-initialize-hook
                 (with-helm-buffer  
                   (set (make-local-variable 'helm-in-file-completion-p) t))))) 
@@ -817,6 +820,7 @@ See `helm-ff-serial-rename-1'."
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
+  (setq helm-ff-auto-update--state helm-ff-auto-update-flag)
   (message "[Auto expansion %s]"
            (if helm-ff-auto-update-flag "enabled" "disabled")))
 
@@ -835,7 +839,7 @@ See `helm-ff-serial-rename-1'."
                (read-kbd-macro "DEL"))))
 
 (defun helm-ff-delete-char-backward--exit-fn ()
-  (setq helm-ff-auto-update-flag helm-ff-auto-update-initial-value))
+  (setq helm-ff-auto-update-flag helm-ff-auto-update--state))
 
 (defun helm-ff-run-switch-to-history ()
   "Run Switch to history action from `helm-source-find-files'."
