@@ -54,8 +54,43 @@ For a quick try, you can also run the shell script provided with helm if your sy
     ./emacs-helm.sh
 
 NOTE: If you install Helm in a different way using your own autoloads and personal configuration,
-      be sure to know and understand what you are doing, otherwise expect diverses bugs and failures.
+      be sure to know and understand what you are doing, otherwise expect diverse bugs and failures.
       You are warned!
+
+# Emacs completion vs Helm
+
+Emacs' default minibuffer completion is subtly different to Helm, and many
+([1][mental1], [2][mental2], [3][mental3]) new comers struggle with the difference.
+
+## Emacs default completion is **minibuffer centric**
+
+Emacs helps you narrow down your selection by transforming your minibuffer
+input when you hit `<tab>`.  And then your give it some more detail and hit
+`<tab>` again, until finally,the **minibuffer** contains the desired input and
+you hit `<enter>` to select it.
+
+## Helm is **completion window centric**
+
+In Helm, you don't pay attention to the minibuffer.  Instead, you look at the
+completion window *and* the currently highlighted item.
+
+You narrow the list shown in the **completion window** by providing more input.
+
+When the item is close enough to the current highlight, you navigate to it
+with `<C-n>` and hit `<enter>` to select it.
+
+## The key implications of the helm "mental model"
+
+1. `<tab>` is not needed to expand the minibuffer input.
+
+    - The minibuffer need not *ever* contain the selection you want, so
+      there is no point in transforming it.
+
+2. Therefore `<tab>` is used to select a different action in Helm.
+
+    - In Emacs completion, there is only one action available, but Helm
+      offers many actions.
+    - This is a feature.  Please don't ask how to make `<tab>` do expansion.
 
 # Debugging
 
@@ -169,7 +204,7 @@ Example:
     Find Files or url: ~/ el$
     Will show all what finish with el
 
-    
+
 Inside the `helm-find-files` buffer, you can move your selected row up
 or down with C-n C-p or arrow keys. When a row is selected, `C-z` performs the
 default action, which is different depending on the context.
@@ -306,7 +341,7 @@ your eshell aliases. This allow you creating personal actions for
 
 -   Because eshell accept shell commands but also elisp functions.
 
-All these command should end with `$1`.
+All these command should end with `https://github.com/emacs-helm/helm/issues/495`.
 
 You will have completion against all these aliases once eshell is loaded (start it once before using
 helm-find-files).
@@ -315,7 +350,7 @@ helm-find-files).
 
  Go in eshell, an enter at prompt:
 
-    alias my_alias command $1
+    alias my_alias command https://github.com/emacs-helm/helm/issues/495
 
 NOTE: don`t forget to escape the $.
 
@@ -984,3 +1019,7 @@ Or at gmane: [gmane.emacs.helm.user](http://dir.gmane.org/gmane.emacs.helm.user)
 
 [1]: https://github.com/emacs-helm/helm/blob/master/doc/Home.mdpp
 [2]: https://github.com/thierryvolpiatto/markdown-pp#readme
+[mental1]: https://github.com/emacs-helm/helm/issues/495
+[mental2]: https://github.com/emacs-helm/helm/issues/222
+[mental3]: https://groups.google.com/forum/#!topic/emacs-helm/zaBbg2tFAuM
+
