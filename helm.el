@@ -60,7 +60,7 @@ More than 2 seconds, next hit will run again the first function and so on."
   "Define NAME as a multi-key command running FUNS.
 After DELAY seconds the FUNS list is reinitialised.
 See `helm-define-multi-key'."
-  (cl-declare (indent 2))
+  (declare (indent 2))
   (setq docstring (if docstring (concat docstring "\n\n")
                     "This is a helmish multi-key command."))
   `(defalias (quote ,name) (helm-make-multi-command ,funs ,delay) ,docstring))

@@ -198,11 +198,22 @@
      ("(\\<\\(helm-while-no-input\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(helm-aif\\)\\>" 1 font-lock-keyword-face))))
 
+;;; Compatibility emacs-24.4+
+;; Inlined from Emacs trunk.
+(defalias 'function-put
+  ;; We don't want people to just use `put' because we can't conveniently
+  ;; hook into `put' to remap old properties to new ones.  But for now, there's
+  ;; no such remapping, so we just call `put'.
+  #'(lambda (f prop value) (put f prop value))
+  "Set function F's property PROP to VALUE.
+The namespace for PROP is shared with symbols.
+So far, F can only be a symbol, not a lambda expression.")
+
 
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21349 15441 279116 28000))
+;;;### (autoloads nil "helm" "helm.el" (21349 49973 304297 833000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -232,6 +243,8 @@ After DELAY seconds the FUNS list is reinitialised.
 See `helm-define-multi-key'.
 
 \(fn NAME DOCSTRING FUNS &optional DELAY)" nil t)
+
+(function-put 'helm-multi-key-defun 'lisp-indent-function '2)
 
 (autoload 'helm-define-key-with-subkeys "helm" "\
 Allow defining a KEY without having to type its prefix again on next calls.
@@ -1696,7 +1709,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21349 15454 446024 897000))
+;;;;;;  (21349 49981 380618 324000))
 
 ;;;***
 
