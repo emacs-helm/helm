@@ -2691,7 +2691,6 @@ This is the starting point for nearly all actions you can do on files."
                               (default-input)
                               (t (expand-file-name (helm-current-directory)))))
          (presel        (helm-aif (or hist
-                                      (buffer-file-name (current-buffer))
                                       (and (eq major-mode 'dired-mode)
                                            default-input))
                             (if helm-ff-transformer-show-only-basename
