@@ -254,22 +254,10 @@ See also `helm-locate'."
              (helm-log "Error: Locate %s"
                        (replace-regexp-in-string "\n" "" event))))))))
 
-(defun helm-locate-pattern-transformer (pattern)
-  "Replace spaces in PATTERN with \".*\".
-Don't affect space at end of PATTERN preceding a possible locate option.
-Do nothing when `helm-locate-command' is 'es'."
-  (if (and (string-match
-            " " (replace-regexp-in-string
-                 " -[a-z]\\'" "" pattern))
-           (not (string-match-p "\\`es" helm-locate-command)))
-      (replace-match ".*" nil t pattern)
-    pattern))
-
 (defvar helm-source-locate
   `((name . "Locate")
     (init . helm-locate-set-command)
     (candidates-process . helm-locate-init)
-    (pattern-transformer . helm-locate-pattern-transformer)
     (type . file)
     (requires-pattern . 3)
     (history . ,'helm-file-name-history)
