@@ -72,7 +72,7 @@ cat > $TMP <<EOF
 (unless (boundp 'completion-in-region-function)
   (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
   (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
-(add-hook 'kill-emacs-hook #'(lambda () (delete-file "$TMP")))
+(add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$TMP") (delete-file "$TMP"))))
 EOF
 
 $EMACS -Q -l $TMP $@
