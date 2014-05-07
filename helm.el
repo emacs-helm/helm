@@ -4264,12 +4264,22 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (delq overlay helm-visible-mark-overlays)))
 
 (defun helm-make-visible-mark ()
-  (let ((o (make-overlay (point-at-bol)
-                         (if (helm-pos-multiline-p)
-                             (or (helm-get-next-candidate-separator-pos)
-                                 ;; Last candidate have no separator (#505).
-                                 (point-max))
-                           (1+ (point-at-eol))))))
+  (let* ((hp (helm-get-next-header-pos))
+         (mp (helm-get-next-candidate-separator-pos))
+         (o (make-overlay (point-at-bol)
+                          (if (helm-pos-multiline-p)
+                              (or
+                               ;; Be sure we don't catch
+                               ;; the separator of next source.
+                               (and hp mp (< mp hp) mp)
+                               ;; The separator found is in next source
+                               ;; we are at last cand, so use the header pos.
+                               (and hp mp (< hp mp) hp)
+                               ;; A single source, just try next separator.
+                               mp
+                               ;; No more separator go to eob.
+                               (point-max))
+                            (1+ (point-at-eol))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
