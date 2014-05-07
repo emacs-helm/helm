@@ -4266,7 +4266,9 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
 (defun helm-make-visible-mark ()
   (let ((o (make-overlay (point-at-bol)
                          (if (helm-pos-multiline-p)
-                             (helm-get-next-candidate-separator-pos)
+                             (or (helm-get-next-candidate-separator-pos)
+                                 ;; Last candidate have no separator (#505).
+                                 (point-max))
                            (1+ (point-at-eol))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
