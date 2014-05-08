@@ -3483,10 +3483,7 @@ If action buffer is displayed, kill it."
          ;; we are at last cand, so use the header pos.
          (and hp (< hp it) hp)
          ;; A single source, just try next separator.
-         it)
-      ;; No more separator go to eob.
-      (point-max))))
-
+         it))))
 
 (defun helm-get-previous-candidate-separator-pos ()
   "Return the position of the previous candidate separator from point."
@@ -4279,7 +4276,8 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
 (defun helm-make-visible-mark ()
   (let ((o (make-overlay (point-at-bol)
                           (if (helm-pos-multiline-p)
-                              (helm-get-next-candidate-separator-pos)
+                              (or (helm-get-next-candidate-separator-pos)
+                                  (point-max))
                             (1+ (point-at-eol))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
@@ -4344,7 +4342,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                     (helm-make-visible-mark))))
               (if (helm-pos-multiline-p)
                   (progn
-                    (goto-char (helm-get-next-candidate-separator-pos))
+                    (goto-char (or (helm-get-next-candidate-separator-pos) (point-max)))
                     (forward-line 1))
                 (forward-line 1))
               (end-of-line))))
