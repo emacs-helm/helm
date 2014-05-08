@@ -3083,6 +3083,7 @@ If action buffer is selected, back to the helm buffer."
     (set (make-local-variable 'helm-sources)
          `(((name . "Actions")
             (volatile)
+            (nomark)
             (candidates . ,actions)
             (candidate-transformer
              . (lambda (candidates)
@@ -4389,7 +4390,7 @@ Only useful for debugging."
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
 When key WITH-WILDCARD is specified try to expand a wilcard if some."
-  (with-current-buffer (helm-buffer-get)
+  (with-current-buffer helm-buffer
     (cl-loop with current-src = (helm-get-current-source)
           for (source . real) in
           (or (reverse helm-marked-candidates)
