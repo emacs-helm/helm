@@ -3473,7 +3473,20 @@ If action buffer is displayed, kill it."
 
 (defun helm-get-next-candidate-separator-pos ()
   "Return the position of the next candidate separator from point."
-  (next-single-property-change (point) 'helm-candidate-separator))
+  (let ((hp (helm-get-next-header-pos)))
+    (helm-aif (next-single-property-change (point) 'helm-candidate-separator)
+        (or
+         ;; Be sure we don't catch
+         ;; the separator of next source.
+         (and hp (< it hp) it)
+         ;; The separator found is in next source
+         ;; we are at last cand, so use the header pos.
+         (and hp (< hp it) hp)
+         ;; A single source, just try next separator.
+         it)
+      ;; No more separator go to eob.
+      (point-max))))
+
 
 (defun helm-get-previous-candidate-separator-pos ()
   "Return the position of the previous candidate separator from point."
@@ -4264,21 +4277,9 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (delq overlay helm-visible-mark-overlays)))
 
 (defun helm-make-visible-mark ()
-  (let* ((hp (helm-get-next-header-pos))
-         (mp (helm-get-next-candidate-separator-pos))
-         (o (make-overlay (point-at-bol)
+  (let ((o (make-overlay (point-at-bol)
                           (if (helm-pos-multiline-p)
-                              (or
-                               ;; Be sure we don't catch
-                               ;; the separator of next source.
-                               (and hp mp (< mp hp) mp)
-                               ;; The separator found is in next source
-                               ;; we are at last cand, so use the header pos.
-                               (and hp mp (< hp mp) hp)
-                               ;; A single source, just try next separator.
-                               mp
-                               ;; No more separator go to eob.
-                               (point-max))
+                              (helm-get-next-candidate-separator-pos)
                             (1+ (point-at-eol))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
@@ -4341,7 +4342,12 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                                ;; that tag prefix (i.e on tramp)
                                (not (file-exists-p cand))))
                     (helm-make-visible-mark))))
-              (forward-line 1) (end-of-line))))
+              (if (helm-pos-multiline-p)
+                  (progn
+                    (goto-char (helm-get-next-candidate-separator-pos))
+                    (forward-line 1))
+                (forward-line 1))
+              (end-of-line))))
         (helm-mark-current-line)
         (message "%s candidates marked" (length helm-marked-candidates))))))
 
