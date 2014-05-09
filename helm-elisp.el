@@ -616,27 +616,38 @@ First call indent, second complete symbol, third complete fname."
       (coerce . helm-symbolify))
   "Variable.")
 
-(dont-compile
-  (defun helm-sexp-eval-1 ()
-    (interactive)
-    (unwind-protect
-         (progn
-           ;; Trick called-interactively-p into thinking that `cand' is
-           ;; an interactive call, See `repeat-complex-command'.
-           (add-hook 'called-interactively-p-functions
-                     #'helm-complex-command-history--called-interactively-skip)
-           (eval (read (helm-get-selection))))
-      (remove-hook 'called-interactively-p-functions
-                   #'helm-complex-command-history--called-interactively-skip)))
+;;; Incompatible change for 24.3 and lower.
+;;
+(if (version<  emacs-version "24.4")
+    (defun helm-sexp-eval (cand)
+      (let ((sexp (read cand)))
+        (condition-case err
+            (if (> (length (remove nil sexp)) 1)
+                (eval sexp)
+              (apply 'call-interactively sexp))
+          (error (message "Evaluating gave an error: %S" err)
+                 nil))))
+  (dont-compile
+    (defun helm-sexp-eval-1 ()
+      (interactive)
+      (unwind-protect
+           (progn
+             ;; Trick called-interactively-p into thinking that `cand' is
+             ;; an interactive call, See `repeat-complex-command'.
+             (add-hook 'called-interactively-p-functions
+                       #'helm-complex-command-history--called-interactively-skip)
+             (eval (read (helm-get-selection))))
+        (remove-hook 'called-interactively-p-functions
+                     #'helm-complex-command-history--called-interactively-skip)))
 
-  (defun helm-complex-command-history--called-interactively-skip (i _frame1 frame2)
-    (and (eq 'eval (cadr frame2))
-         (eq 'helm-sexp-eval-1
-             (cadr (backtrace-frame (+ i 2) #'called-interactively-p)))
-         1))
+    (defun helm-complex-command-history--called-interactively-skip (i _frame1 frame2)
+      (and (eq 'eval (cadr frame2))
+           (eq 'helm-sexp-eval-1
+               (cadr (backtrace-frame (+ i 2) #'called-interactively-p)))
+           1))
 
-  (defun helm-sexp-eval (_candidate)
-    (call-interactively #'helm-sexp-eval-1)))
+    (defun helm-sexp-eval (_candidate)
+      (call-interactively #'helm-sexp-eval-1))))
 
 (define-helm-type-attribute 'sexp
     '((action
