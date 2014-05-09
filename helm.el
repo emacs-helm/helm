@@ -3573,10 +3573,12 @@ to a list of forms.\n\n")
 (defun helm-end-of-source-p (&optional at-point)
   "Return non--nil if we are at eob or end of source."
   (save-excursion
-    (forward-line (if at-point 0 1))
-    (or (eq (point-at-bol) (point-at-eol))
-        (helm-pos-header-line-p)
-        (eobp))))
+    (if (and (helm-pos-multiline-p) (null at-point))
+        (null (helm-get-next-candidate-separator-pos))
+      (forward-line (if at-point 0 1))
+      (or (eq (point-at-bol) (point-at-eol))
+          (helm-pos-header-line-p)
+          (eobp)))))
 
 (defun helm-edit-current-selection-internal (func)
   (with-helm-window
