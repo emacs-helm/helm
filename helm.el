@@ -3083,6 +3083,7 @@ If action buffer is selected, back to the helm buffer."
     (set (make-local-variable 'helm-sources)
          `(((name . "Actions")
             (volatile)
+            (nomark)
             (candidates . ,actions)
             (candidate-transformer
              . (lambda (candidates)
@@ -3473,7 +3474,17 @@ If action buffer is displayed, kill it."
 
 (defun helm-get-next-candidate-separator-pos ()
   "Return the position of the next candidate separator from point."
-  (next-single-property-change (point) 'helm-candidate-separator))
+  (let ((hp (helm-get-next-header-pos)))
+    (helm-aif (next-single-property-change (point) 'helm-candidate-separator)
+        (or
+         ;; Be sure we don't catch
+         ;; the separator of next source.
+         (and hp (< it hp) it)
+         ;; The separator found is in next source
+         ;; we are at last cand, so use the header pos.
+         (and hp (< hp it) hp)
+         ;; A single source, just try next separator.
+         it))))
 
 (defun helm-get-previous-candidate-separator-pos ()
   "Return the position of the previous candidate separator from point."
@@ -3562,10 +3573,12 @@ to a list of forms.\n\n")
 (defun helm-end-of-source-p (&optional at-point)
   "Return non--nil if we are at eob or end of source."
   (save-excursion
-    (forward-line (if at-point 0 1))
-    (or (eq (point-at-bol) (point-at-eol))
-        (helm-pos-header-line-p)
-        (eobp))))
+    (if (and (helm-pos-multiline-p) (null at-point))
+        (null (helm-get-next-candidate-separator-pos))
+      (forward-line (if at-point 0 1))
+      (or (eq (point-at-bol) (point-at-eol))
+          (helm-pos-header-line-p)
+          (eobp)))))
 
 (defun helm-edit-current-selection-internal (func)
   (with-helm-window
@@ -4265,9 +4278,10 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
 
 (defun helm-make-visible-mark ()
   (let ((o (make-overlay (point-at-bol)
-                         (if (helm-pos-multiline-p)
-                             (helm-get-next-candidate-separator-pos)
-                           (1+ (point-at-eol))))))
+                          (if (helm-pos-multiline-p)
+                              (or (helm-get-next-candidate-separator-pos)
+                                  (point-max))
+                            (1+ (point-at-eol))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
@@ -4329,7 +4343,12 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                                ;; that tag prefix (i.e on tramp)
                                (not (file-exists-p cand))))
                     (helm-make-visible-mark))))
-              (forward-line 1) (end-of-line))))
+              (if (helm-pos-multiline-p)
+                  (progn
+                    (goto-char (or (helm-get-next-candidate-separator-pos) (point-max)))
+                    (forward-line 1))
+                (forward-line 1))
+              (end-of-line))))
         (helm-mark-current-line)
         (message "%s candidates marked" (length helm-marked-candidates))))))
 
@@ -4373,7 +4392,7 @@ Only useful for debugging."
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
 When key WITH-WILDCARD is specified try to expand a wilcard if some."
-  (with-current-buffer (helm-buffer-get)
+  (with-current-buffer helm-buffer
     (cl-loop with current-src = (helm-get-current-source)
           for (source . real) in
           (or (reverse helm-marked-candidates)
