@@ -165,6 +165,28 @@ Return nil if DIR is not an existing directory."
                 concat (if p (concat "/" i) (concat i "/")) into root
                 finally return (file-equal-p (file-truename root) f2)))))))
 
+;;; Add compatibility for `funcall-interactively' that will be shipped with emacs-24.5.
+;;  Function from S.Monnier, see emacs bug#17446.
+;;
+(unless (fboundp 'funcall-interactively)
+  (defun funcall-interactively (fun &rest args)
+    (setq fun (indirect-function fun))
+    (call-interactively
+     (cond
+       ((consp fun)
+        (mapcar (lambda (x)
+                  (if (eq (car-safe x) 'interactive)
+                      `(interactive ',args) x))
+                fun))
+       ((byte-code-function-p fun)
+        (apply #'make-byte-code
+               (aref fun 0)
+               (aref fun 1)
+               (aref fun 2)
+               (aref fun 3)
+               (aref fun 4)
+               (aref fun 5)
+               args))))))
 
 ;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
