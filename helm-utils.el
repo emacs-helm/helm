@@ -165,6 +165,9 @@ Return nil if DIR is not an existing directory."
                 concat (if p (concat "/" i) (concat i "/")) into root
                 finally return (file-equal-p (file-truename root) f2)))))))
 
+;;; Add compatibility for `funcall-interactively' that will be shipped with emacs-24.5.
+;;  Function from S.Monnier, see emacs bug#17446.
+;;
 (unless (fboundp 'funcall-interactively)
   (defun funcall-interactively (fun &rest args)
     (setq fun (indirect-function fun))
