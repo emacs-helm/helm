@@ -3166,7 +3166,7 @@ Possible value of DIRECTION are 'next or 'previous."
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g \"Buffers\" otherwise
 it is \"Candidate\(s\)\" by default."
-  (with-helm-alive-p
+  (when helm-alive-p
     (unless (helm-empty-source-p)
       (propertize
        (format "[%s %s]"
