@@ -3166,12 +3166,13 @@ Possible value of DIRECTION are 'next or 'previous."
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g \"Buffers\" otherwise
 it is \"Candidate\(s\)\" by default."
-  (unless (helm-empty-source-p)
-    (propertize
-     (format "[%s %s]"
-             (helm-get-candidate-number 'in-current-source)
-             (or name "Candidate(s)"))
-     'face 'helm-candidate-number)))
+  (with-helm-alive-p
+    (unless (helm-empty-source-p)
+      (propertize
+       (format "[%s %s]"
+               (helm-get-candidate-number 'in-current-source)
+               (or name "Candidate(s)"))
+       'face 'helm-candidate-number))))
 
 (cl-defun helm-move-selection-common (&key where direction)
   "Move the selection marker to a new position.
