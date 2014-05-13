@@ -543,6 +543,12 @@ This happen when using `helm-next/previous-line'."
   "Face for action lines in the helm action buffer."
   :group 'helm)
 
+(defface helm-prefarg
+    '((((background dark)) :foreground "green")
+      (((background light)) :foreground "red"))
+  "Face for showing prefix arg in mode-line."
+  :group 'helm)
+
 
 ;;; Variables.
 ;;
@@ -3143,7 +3149,7 @@ Possible value of DIRECTION are 'next or 'previous."
                                                                   current-prefix-arg))))
                                (unless (= arg 1)
                                  (propertize (format "[prefarg:%s] " arg)
-                                             'face '((:foreground "green")))))))
+                                             'face 'helm-prefarg)))))
                     (:eval (helm-show-candidate-number
                             (when (listp helm-mode-line-string)
                               (car-safe helm-mode-line-string))))
