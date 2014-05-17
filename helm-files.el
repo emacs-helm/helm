@@ -1184,7 +1184,8 @@ or hitting C-z on \"..\"."
   "When candidate is an incomplete file name move to first real candidate."
   (helm-aif (and (helm-file-completion-source-p)
                  (helm-get-selection))
-      (unless (or (string-match helm-tramp-file-name-regexp it)
+      (unless (or (and (string-match helm-tramp-file-name-regexp it)
+                       (not (file-remote-p it nil t)))
                   (file-exists-p it))
         (helm-next-line))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
