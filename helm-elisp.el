@@ -613,20 +613,53 @@ First call indent, second complete symbol, third complete fname."
       (coerce . helm-symbolify))
   "Variable.")
 
-(defun helm-sexp--eval-1 (cand)
-  (let ((sexp (read cand)))
-    (condition-case err
-        (apply #'funcall-interactively (car sexp)
-               (mapcar (lambda (e) (eval e t)) (cdr sexp)))
-      (error (message "Evaluating gave an error: %S" err)
-             nil))))
+(defun helm-btf--usable ()
+  "Return t if current version of `backtrace-frame' accept 2 arguments."
+  (condition-case nil
+      (and (backtrace-frame 1 'condition-case) t)
+    (wrong-number-of-arguments nil)))
 
-(defun helm-sexp-eval (candidate)
-  (helm-run-after-quit #'helm-sexp--eval-1 candidate))
+(if (helm-btf--usable)        ; Check if BTF accept more than one arg.
+    ;; Emacs 24.4.
+    (dont-compile
+      (defvar helm-sexp--last-sexp nil)
+      ;; This wont work compiled.
+      (defun helm-sexp-eval-1 ()
+        (interactive)
+        (unwind-protect
+             (progn
+               ;; Trick called-interactively-p into thinking that `cand' is
+               ;; an interactive call, See `repeat-complex-command'.
+               (add-hook 'called-interactively-p-functions
+                         #'helm-complex-command-history--called-interactively-skip)
+               (eval (read helm-sexp--last-sexp)))
+          (remove-hook 'called-interactively-p-functions
+                       #'helm-complex-command-history--called-interactively-skip)))
+
+      (defun helm-complex-command-history--called-interactively-skip (i _frame1 frame2)
+        (and (eq 'eval (cadr frame2))
+             (eq 'helm-sexp-eval-1
+                 (cadr (backtrace-frame (+ i 2) #'called-interactively-p)))
+             1))
+      
+      (defun helm-sexp-eval (_candidate)
+        (call-interactively #'helm-sexp-eval-1)))
+  ;; Emacs 24.3
+  (defun helm-sexp-eval (cand)
+    (let ((sexp (read cand)))
+      (condition-case err
+          (if (> (length (remove nil sexp)) 1)
+              (eval sexp)
+            (apply 'call-interactively sexp))
+        (error (message "Evaluating gave an error: %S" err)
+               nil)))))
 
 (define-helm-type-attribute 'sexp
     '((action
-       ("Eval" . helm-sexp-eval)
+       ("Eval" . (lambda (candidate)
+                   (and (boundp 'helm-sexp--last-sexp)
+                        (setq helm-sexp--last-sexp candidate))
+                   (helm-run-after-quit 'helm-sexp-eval candidate)))
        ("Edit and eval" .
         (lambda (cand)
           (minibuffer-with-setup-hook
