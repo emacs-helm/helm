@@ -613,13 +613,16 @@ First call indent, second complete symbol, third complete fname."
       (coerce . helm-symbolify))
   "Variable.")
 
-(defun helm-sexp-eval (cand)
+(defun helm-sexp--eval-1 (cand)
   (let ((sexp (read cand)))
     (condition-case err
         (apply #'funcall-interactively (car sexp)
                (mapcar (lambda (e) (eval e t)) (cdr sexp)))
       (error (message "Evaluating gave an error: %S" err)
              nil))))
+
+(defun helm-sexp-eval (candidate)
+  (helm-run-after-quit #'helm-sexp--eval-1 candidate))
 
 (define-helm-type-attribute 'sexp
     '((action
