@@ -613,13 +613,13 @@ First call indent, second complete symbol, third complete fname."
       (coerce . helm-symbolify))
   "Variable.")
 
-(defun helm-btf--usable ()
+(defun helm-btf--usable-p ()
   "Return t if current version of `backtrace-frame' accept 2 arguments."
   (condition-case nil
       (and (backtrace-frame 1 'condition-case) t)
     (wrong-number-of-arguments nil)))
 
-(if (helm-btf--usable)        ; Check if BTF accept more than one arg.
+(if (helm-btf--usable-p)        ; Check if BTF accept more than one arg.
     ;; Emacs 24.4.
     (dont-compile
       (defvar helm-sexp--last-sexp nil)
