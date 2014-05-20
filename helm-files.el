@@ -1511,7 +1511,8 @@ If FNAME is a valid directory name,return FNAME unchanged."
                        thereis (string-match m fname))))
     ;; Always regexp-quote base directory name to handle
     ;; crap dirnames such e.g bookmark+
-    (cond ((and dir-p tramp-p (string-match ":\\'" fname))
+    (cond ((or (and dir-p tramp-p (string-match ":\\'" fname))
+               (string= fname ""))
            ;; Use full FNAME on e.g "/ssh:host:".
            (regexp-quote fname))
           ;; Prefixing BN with a space call match-plugin completion.
