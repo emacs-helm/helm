@@ -1681,7 +1681,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (let ((old-overriding-local-map overriding-terminal-local-map)
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
           ;; This is not needed in emacs-24.3+
-          (cursor-in-echo-area (not (and (<= 24 emacs-major-version) (<= 3 emacs-minor-version))))
+          (cursor-in-echo-area (not (version< emacs-version "24.3")))
           (non-essential t)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input

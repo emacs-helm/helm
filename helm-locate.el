@@ -248,7 +248,8 @@ See also `helm-locate'."
                          (:eval (propertize
                                  (format "[Locate Process Finish- (%s results)]"
                                          (max (1- (count-lines
-                                                   (point-min) (point-max))) 0))
+                                                   (point-min) (point-max)))
+                                              0))
                                  'face 'helm-grep-finish))))
                  (force-mode-line-update))
              (helm-log "Error: Locate %s"
