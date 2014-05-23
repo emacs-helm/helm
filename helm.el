@@ -1680,8 +1680,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    any-buffer any-keymap any-default)
     (let ((old-overriding-local-map overriding-terminal-local-map)
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
-          ;; This is not needed in emacs-24.3+
-          (cursor-in-echo-area (not (version< emacs-version "24.3")))
+          ;; Apart this bug in <=24.2, this is needed for
+          ;; messages in minibuffer on top of helm prompt. 
+          (cursor-in-echo-area t)
           (non-essential t)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input
