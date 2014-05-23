@@ -308,8 +308,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
             (or (string= (helm-grep-command) helm-ack-grep-executable)
                 (string= (helm-grep-command t) helm-ack-grep-executable))))))
 
-(defun helm-grep-init (only-files &optional include zgrep)
-  "Start an asynchronous grep process in ONLY-FILES list."
+(defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
   (let* ((default-directory (or helm-default-directory
                                 (expand-file-name helm-ff-default-directory)))
          (fnargs            (helm-grep-prepare-candidates only-files))
@@ -341,18 +340,21 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (smartcase         (if (helm-grep-use-ack-p) ""
                               (unless (let ((case-fold-search nil))
                                         (string-match-p
-                                         "[A-Z]" helm-pattern)) "i")))
-         (cmd-line          (format-spec
-                             helm-grep-default-command
-                             (delq nil
-                                   (list (unless zgrep
-                                           (if types
-                                               (cons ?e types)
-                                             (cons ?e exclude)))
-                                         (cons ?c (or smartcase ""))
-                                         (cons ?p (shell-quote-argument
-                                                   helm-pattern))
-                                         (cons ?f fnargs)))))
+                                         "[A-Z]" helm-pattern)) "i"))))
+    (format-spec
+     helm-grep-default-command
+     (delq nil
+           (list (unless zgrep
+                   (if types
+                       (cons ?e types)
+                     (cons ?e exclude)))
+                 (cons ?c (or smartcase ""))
+                 (cons ?p (shell-quote-argument helm-pattern))
+                 (cons ?f fnargs))))))
+
+(defun helm-grep-init (cmd-line)
+  "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
+  (let* ((zgrep (string-match "\\`zgrep" cmd-line))
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
          (tramp-verbose helm-tramp-verbose))
@@ -422,9 +424,10 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 
 (defun helm-grep-collect-candidates ()
   (funcall helm-grep-default-function
-           helm-grep-last-targets
-           helm-grep-include-files
-           helm-grep-use-zgrep))
+           (helm-grep--prepare-cmd-line
+            helm-grep-last-targets
+            helm-grep-include-files
+            helm-grep-use-zgrep)))
 
 
 ;;; Actions
