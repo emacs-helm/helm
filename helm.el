@@ -1683,6 +1683,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
           ;; Apart this bug in <=24.2, this is needed for
           ;; messages in minibuffer on top of helm prompt. 
           (cursor-in-echo-area t)
+          pre-redisplay-function
           (non-essential t)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input
