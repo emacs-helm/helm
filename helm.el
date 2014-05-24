@@ -1683,7 +1683,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
           ;; Apart this bug in <=24.2, this is needed for
           ;; messages in minibuffer on top of helm prompt. 
           (cursor-in-echo-area t)
-          pre-redisplay-function
+          ;pre-redisplay-function
           (non-essential t)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input
@@ -3153,8 +3153,7 @@ Possible value of DIRECTION are 'next or 'previous."
                                  (propertize (format "[prefarg:%s] " arg)
                                              'face 'helm-prefarg)))))
                     (:eval (helm-show-candidate-number
-                            (when (listp helm-mode-line-string)
-                              (car-safe helm-mode-line-string))))
+                            (car-safe helm-mode-line-string)))
                     " " helm-mode-line-string-real " -%-")
               helm-mode-line-string-real
               (substitute-command-keys (if (listp helm-mode-line-string)
