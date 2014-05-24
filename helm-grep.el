@@ -413,7 +413,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                             (helm-grep-command))))
                                        (max (1- (count-lines
                                                  (point-min)
-                                                 (point-max))) 0))
+                                                 (point-max)))
+                                            0))
                                       'face 'helm-grep-finish))))
                       (force-mode-line-update)))
                    ;; Catch error output in log.
