@@ -181,7 +181,7 @@ See `helm-locate-with-db' and `helm-locate'."
   (unless helm-locate-command
     (setq helm-locate-command
           (cl-case system-type
-            (gnu/linux "locate %s -e -A --regex %s")
+            (gnu/linux "locate %s -e -r %s")
             (berkeley-unix "locate %s %s")
             (windows-nt "es %s %s")
             (t "locate %s %s")))))
