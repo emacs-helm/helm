@@ -396,8 +396,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
               (setq helm-ff-auto-update--state
                     helm-ff-auto-update-flag)
               (with-helm-temp-hook 'helm-after-initialize-hook
-                (with-helm-buffer  
-                  (set (make-local-variable 'helm-in-file-completion-p) t))))) 
+                (with-helm-buffer
+                  (set (make-local-variable 'helm-in-file-completion-p) t)))))
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer . helm-ff-sort-candidates)
     (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
@@ -2575,7 +2575,10 @@ Colorize only symlinks, directories and files."
                         helm-pattern)))
     (filtered-candidate-transformer . (lambda (candidates _source)
                                         (cl-loop for cand in (cdr candidates)
-                                              collect (ansi-color-apply cand))))
+                                              collect (replace-regexp-in-string
+                                               "^[[:space:]]*file://"
+                                               ""
+                                               (ansi-color-apply cand)))))
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
      helm-transform-file-load-el
