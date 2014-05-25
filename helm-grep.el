@@ -205,7 +205,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET")      'helm-grep-mode-jump)
     (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
-    (define-key map (kbd "q")        'helm-grep-mode-quit)
     (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
     (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
@@ -672,11 +671,6 @@ Special commands:
 (defun helm-gm-precedent-file ()
   (interactive)
   (helm-goto-next-or-prec-file -1))
-
-;;;###autoload
-(defun helm-grep-mode-quit ()
-  (interactive)
-  (view-mode 1) (View-quit))
 
 ;;;###autoload
 (defun helm-grep-mode-jump ()
