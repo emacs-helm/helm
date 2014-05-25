@@ -610,6 +610,8 @@ If N is positive go forward otherwise go backward."
             do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
+      (set (make-local-variable 'helm-grep-last-cmd-line)
+           helm-grep-last-cmd-line)
       (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
@@ -624,11 +626,37 @@ If N is positive go forward otherwise go backward."
 
 ;;;###autoload
 (define-derived-mode helm-grep-mode
-    text-mode "helm-grep"
+    special-mode "helm-grep"
     "Major mode to provide actions in helm grep saved buffer.
 
 Special commands:
-\\{helm-grep-mode-map}")
+\\{helm-grep-mode-map}"
+    (set (make-local-variable 'revert-buffer-function)
+         #'helm-grep-mode--revert-buffer-function))
+
+(defun helm-grep-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
+  (goto-char (point-min))
+  (re-search-forward "^Grep Results for" nil t)
+  (forward-line 0)
+  (when (re-search-forward "^$" nil t)
+    (forward-line 1))
+  (let ((inhibit-read-only t))
+    (delete-region (point) (point-max)))
+  (message "Reverting buffer...")
+  (set-process-sentinel
+   (start-file-process-shell-command
+    "hgrep"  (generate-new-buffer "*hgrep revert*") helm-grep-last-cmd-line)
+   (lambda (process event)
+     (when (string= event "finished\n")
+       (with-current-buffer (current-buffer)
+         (let ((inhibit-read-only t))
+           (save-excursion
+             (cl-loop for line in (with-current-buffer (process-buffer process)
+                                    (prog1 (split-string (buffer-string) "\n")
+                                      (kill-buffer)))
+                      when (string-match helm-grep-split-line-regexp line)
+                      do (insert (car (helm-grep-filter-one-by-one line)) "\n"))))
+         (message "Reverting buffer done"))))))
 
 ;;;###autoload
 (defun helm-gm-next-file ()
