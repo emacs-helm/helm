@@ -1680,7 +1680,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    any-buffer any-keymap any-default)
     (let ((old-overriding-local-map overriding-terminal-local-map)
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
-          ;; This is not needed in emacs-24.3+
+          ;; Apart this bug in <=24.2, this is needed for
+          ;; messages in minibuffer on top of helm prompt. 
           (cursor-in-echo-area t)
           (non-essential t)
           (old--cua cua-mode)
@@ -3151,8 +3152,7 @@ Possible value of DIRECTION are 'next or 'previous."
                                  (propertize (format "[prefarg:%s] " arg)
                                              'face 'helm-prefarg)))))
                     (:eval (helm-show-candidate-number
-                            (when (listp helm-mode-line-string)
-                              (car-safe helm-mode-line-string))))
+                            (car-safe helm-mode-line-string)))
                     " " helm-mode-line-string-real " -%-")
               helm-mode-line-string-real
               (substitute-command-keys (if (listp helm-mode-line-string)
@@ -3162,7 +3162,8 @@ Possible value of DIRECTION are 'next or 'previous."
     ;; Setup header-line.
     (let* ((hlstr (helm-interpret-value
                    (and (listp source)
-                        (assoc-default 'header-line source)) source))
+                        (assoc-default 'header-line source))
+                   source))
            (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
       (setq header-line-format
             (propertize (concat " " hlstr hlend) 'face 'helm-header))))

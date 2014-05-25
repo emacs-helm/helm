@@ -107,6 +107,12 @@ the opposite of \"locate\" command."
   "Generic Keymap for files.")
 
 
+(defface helm-locate-finish
+    '((t (:foreground "Green")))
+  "Face used in mode line when locate process is finish."
+  :group 'helm-locate)
+
+
 (defun helm-ff-find-locatedb (&optional from-ff)
   "Try to find if a local locatedb file is available.
 The search is done in `helm-ff-default-directory' or
@@ -175,7 +181,7 @@ See `helm-locate-with-db' and `helm-locate'."
   (unless helm-locate-command
     (setq helm-locate-command
           (cl-case system-type
-            (gnu/linux "locate %s -e -A --regex %s")
+            (gnu/linux "locate %s -e -r %s")
             (berkeley-unix "locate %s %s")
             (windows-nt "es %s %s")
             (t "locate %s %s")))))
@@ -248,8 +254,9 @@ See also `helm-locate'."
                          (:eval (propertize
                                  (format "[Locate Process Finish- (%s results)]"
                                          (max (1- (count-lines
-                                                   (point-min) (point-max))) 0))
-                                 'face 'helm-grep-finish))))
+                                                   (point-min) (point-max)))
+                                              0))
+                                 'face 'helm-locate-finish))))
                  (force-mode-line-update))
              (helm-log "Error: Locate %s"
                        (replace-regexp-in-string "\n" "" event))))))))
