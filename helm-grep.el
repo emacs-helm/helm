@@ -656,7 +656,11 @@ Special commands:
                                     (prog1 (split-string (buffer-string) "\n")
                                       (kill-buffer)))
                       when (string-match helm-grep-split-line-regexp line)
-                      do (insert (car (helm-grep-filter-one-by-one line)) "\n"))))
+                      do (insert (propertize
+                                  (car (helm-grep-filter-one-by-one line))
+                                  ;; needed for wgrep.
+                                  'helm-realvalue line)
+                                 "\n"))))
          (message "Reverting buffer done"))))))
 
 ;;;###autoload
