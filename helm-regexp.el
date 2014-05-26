@@ -52,6 +52,7 @@
     (define-key map (kbd "C-c ?")    'helm-moccur-help)
     (define-key map (kbd "C-c o")    'helm-moccur-run-goto-line-ow)
     (define-key map (kbd "C-c C-o")  'helm-moccur-run-goto-line-of)
+    (define-key map (kbd "C-x C-s")  'helm-moccur-run-save-buffer)
     (when helm-moccur-use-ioccur-style-keys
       (define-key map (kbd "<right>")  'helm-moccur-run-persistent-action)
       (define-key map (kbd "<left>")   'helm-moccur-run-default-action))
@@ -325,6 +326,93 @@ Same as `helm-moccur-goto-line' but go in new frame."
         :input input
         :truncate-lines t))
 
+;;;###autoload
+(defun helm-moccur-run-save-buffer ()
+  "Run grep save results action from `helm-do-grep-1'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-moccur-save-results)))
+
+
+;;; helm-moccur-mode
+;;
+;;
+(defun helm-moccur-save-results (_candidate)
+  (helm-moccur-save-results-1))
+
+(defun helm-moccur-save-results-1 ()
+  "Save helm moccur results in a `helm-moccur-mode' buffer."
+  (let ((buf "*hmoccur*")
+        new-buf)
+    (when (get-buffer buf)
+      (setq new-buf (read-string "OccurBufferName: " buf))
+      (cl-loop for b in (helm-buffer-list)
+            when (and (string= new-buf b)
+                      (not (y-or-n-p
+                            (format "Buffer `%s' already exists overwrite? "
+                                    new-buf))))
+            do (setq new-buf (read-string "OccurBufferName: " "*hmoccur ")))
+      (setq buf new-buf))
+    (with-current-buffer (get-buffer-create buf)
+      (make-local-variable 'helm-multi-occur-buffer-list)
+      (setq buffer-read-only t)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert "-*- mode: helm-moccur -*-\n\n"
+                (format "Moccur Results for `%s':\n\n" helm-pattern))
+        (save-excursion
+          (insert (with-current-buffer helm-buffer
+                    (goto-char (point-min)) (forward-line 1)
+                    (buffer-substring (point) (point-max))))))
+      (helm-moccur-mode) (pop-to-buffer buf))
+    (message "Helm Moccur Results saved in `%s' buffer" buf)))
+
+;;;###autoload
+(define-derived-mode helm-moccur-mode
+    special-mode "helm-moccur"
+    "Major mode to provide actions in helm moccur saved buffer.
+
+Special commands:
+\\{helm-moccur-mode-map}"
+    (set (make-local-variable 'revert-buffer-function)
+         #'helm-moccur-mode--revert-buffer-function))
+
+(defun helm-moccur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
+  (goto-char (point-min))
+  (let (pattern)
+    (when (re-search-forward "^Moccur Results for `\\(.*\\)'" nil t)
+      (setq pattern (match-string 1))
+      (forward-line 0)
+      (when (re-search-forward "^$" nil t)
+        (forward-line 1))
+      (let ((inhibit-read-only t)
+            (buffer (current-buffer))
+            (buflst (buffer-local-value 'helm-multi-occur-buffer-list (current-buffer))))
+        (delete-region (point) (point-max))
+        (message "Reverting buffer...")
+        (with-temp-buffer
+          (insert
+           "\n"
+           (cl-loop for buf in buflst
+                    for bufstr = (with-current-buffer buf (buffer-string))
+                    do (add-text-properties
+                        0 (length bufstr)
+                        `(buffer-name ,(buffer-name (get-buffer buf)))
+                        bufstr)
+                    concat bufstr)
+           "\n")
+          (goto-char (point-min))
+          (cl-loop while (re-search-forward pattern nil t)
+                   for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
+                   when line
+                   do (with-current-buffer buffer
+                        (save-excursion
+                          (insert
+                           (car (helm-moccur-filter-one-by-one line))
+                           "\n")))))
+        (message "Reverting buffer done")))))
+
+
 (defun helm-display-to-real-numbered-line (candidate)
   "This is used to display a line in occur style in helm sources.
 e.g \"    12:some_text\".

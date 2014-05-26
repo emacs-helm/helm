@@ -902,8 +902,8 @@ Preconfigured `helm' for gentoo linux.
 
 ;;;***
 
-;;;### (autoloads nil "helm-grep" "helm-grep.el" (21377 63131 443870
-;;;;;;  77000))
+;;;### (autoloads nil "helm-grep" "helm-grep.el" (21377 64625 507857
+;;;;;;  186000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-goto-precedent-file "helm-grep" "\
@@ -985,8 +985,8 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads nil "helm-help" "helm-help.el" (21348 31379 558320
-;;;;;;  219000))
+;;;### (autoloads nil "helm-help" "helm-help.el" (21377 63443 811867
+;;;;;;  382000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1450,8 +1450,8 @@ Preconfigured helm to show org headlines.
 
 ;;;***
 
-;;;### (autoloads nil "helm-regexp" "helm-regexp.el" (21344 43164
-;;;;;;  331972 969000))
+;;;### (autoloads nil "helm-regexp" "helm-regexp.el" (21378 8011
+;;;;;;  663780 204000))
 ;;; Generated autoloads from helm-regexp.el
 
 (defvar helm-occur-match-plugin-mode t "\
@@ -1467,6 +1467,19 @@ or call the function `helm-occur-match-plugin-mode'.")
 Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'.
 
 \(fn &optional ARG)" t nil)
+
+(autoload 'helm-moccur-run-save-buffer "helm-regexp" "\
+Run grep save results action from `helm-do-grep-1'.
+
+\(fn)" t nil)
+
+(autoload 'helm-moccur-mode "helm-regexp" "\
+Major mode to provide actions in helm moccur saved buffer.
+
+Special commands:
+\\{helm-moccur-mode-map}
+
+\(fn)" t nil)
 
 (autoload 'helm-regexp "helm-regexp" "\
 Preconfigured helm to build regexps.
@@ -1704,7 +1717,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21377 63344 532617 934000))
+;;;;;;  (21378 8353 565077 549000))
 
 ;;;***
 
