@@ -325,6 +325,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
         :input input
+        :multi-occur-buffer-list helm-multi-occur-buffer-list
         :truncate-lines t))
 
 (defun helm-display-to-real-numbered-line (candidate)
@@ -406,6 +407,7 @@ the center of window, otherwise at the top of window.")
         :history 'helm-grep-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
                         (format "%s:%d:" (buffer-name) (line-number-at-pos (point))))
+        :multi-occur-buffer-list helm-multi-occur-buffer-list
         :truncate-lines t))
 
 ;;;###autoload
