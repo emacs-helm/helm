@@ -410,7 +410,9 @@ Special commands:
                      when line
                      do (with-current-buffer buffer
                           (insert
-                           (car (helm-moccur-filter-one-by-one line))
+                           (propertize
+                            (car (helm-moccur-filter-one-by-one line))
+                            'helm-real-value line)
                            "\n")))))
         (message "Reverting buffer done")))))
 
