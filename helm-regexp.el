@@ -159,12 +159,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defvar helm-multi-occur-buffer-list nil)
 
 (defun helm-moccur-init ()
-  "Create the initial helm multi occur buffer with BUFFERS list."
-  (set (make-local-variable 'helm-multi-occur-buffer-list)
-       (if helm-moccur-always-search-in-current
-           (cons helm-current-buffer
-                 (remove helm-current-buffer helm-multi-occur-buffer-list))
-         helm-multi-occur-buffer-list))
+  "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
       'global
     (cl-loop for buf in helm-multi-occur-buffer-list
@@ -319,7 +314,13 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-source-moccur' with BUFFERS list."
-  (setq helm-multi-occur-buffer-list buffers)
+  (setq helm-multi-occur-buffer-list
+        (if helm-moccur-always-search-in-current
+            (cons
+             ;; will become helm-current-buffer later.
+             (buffer-name (current-buffer))
+             (remove helm-current-buffer helm-multi-occur-buffer-list))
+         buffers))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
