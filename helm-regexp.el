@@ -424,7 +424,7 @@ the center of window, otherwise at the top of window.")
           :buffer "*helm occur*"
           :history 'helm-grep-history
           :input input
-          :resume 'noresume
+          :multi-occur-buffer-list helm-multi-occur-buffer-list
           :truncate-lines t)))
 
 ;;;###autoload
