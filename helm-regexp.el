@@ -389,26 +389,26 @@ Special commands:
         (forward-line 1))
       (let ((inhibit-read-only t)
             (buffer (current-buffer))
-            (buflst (buffer-local-value 'helm-multi-occur-buffer-list (current-buffer))))
+            (buflst helm-multi-occur-buffer-list))
         (delete-region (point) (point-max))
         (message "Reverting buffer...")
-        (with-temp-buffer
-          (insert
-           "\n"
-           (cl-loop for buf in buflst
-                    for bufstr = (with-current-buffer buf (buffer-string))
-                    do (add-text-properties
-                        0 (length bufstr)
-                        `(buffer-name ,(buffer-name (get-buffer buf)))
-                        bufstr)
-                    concat bufstr)
-           "\n")
-          (goto-char (point-min))
-          (cl-loop while (re-search-forward pattern nil t)
-                   for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
-                   when line
-                   do (with-current-buffer buffer
-                        (save-excursion
+        (save-excursion
+          (with-temp-buffer
+            (insert
+             "\n"
+             (cl-loop for buf in buflst
+                      for bufstr = (with-current-buffer buf (buffer-string))
+                      do (add-text-properties
+                          0 (length bufstr)
+                          `(buffer-name ,(buffer-name (get-buffer buf)))
+                          bufstr)
+                      concat bufstr)
+             "\n")
+            (goto-char (point-min))
+            (cl-loop while (re-search-forward pattern nil t)
+                     for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
+                     when line
+                     do (with-current-buffer buffer
                           (insert
                            (car (helm-moccur-filter-one-by-one line))
                            "\n")))))
