@@ -356,7 +356,6 @@ Same as `helm-moccur-goto-line' but go in new frame."
             do (setq new-buf (read-string "OccurBufferName: " "*hmoccur ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (make-local-variable 'helm-multi-occur-buffer-list)
       (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
@@ -376,6 +375,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 Special commands:
 \\{helm-moccur-mode-map}"
+    (set (make-local-variable 'helm-multi-occur-buffer-list)
+         (with-helm-buffer helm-multi-occur-buffer-list))
     (set (make-local-variable 'revert-buffer-function)
          #'helm-moccur-mode--revert-buffer-function))
 
