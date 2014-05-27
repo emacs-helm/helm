@@ -357,7 +357,6 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
          (tramp-verbose helm-tramp-verbose))
-    (setq helm-grep-last-cmd-line cmd-line)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
@@ -423,11 +422,12 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        (replace-regexp-in-string "\n" "" event))))))))))
 
 (defun helm-grep-collect-candidates ()
-  (funcall helm-grep-default-function
-           (helm-grep--prepare-cmd-line
-            helm-grep-last-targets
-            helm-grep-include-files
-            helm-grep-use-zgrep)))
+  (let ((cmd-line (helm-grep--prepare-cmd-line
+                   helm-grep-last-targets
+                   helm-grep-include-files
+                   helm-grep-use-zgrep)))
+    (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
+    (funcall helm-grep-default-function cmd-line)))
 
 
 ;;; Actions
@@ -610,8 +610,6 @@ If N is positive go forward otherwise go backward."
             do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
-      (set (make-local-variable 'helm-grep-last-cmd-line)
-           helm-grep-last-cmd-line)
       (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
@@ -631,6 +629,8 @@ If N is positive go forward otherwise go backward."
 
 Special commands:
 \\{helm-grep-mode-map}"
+    (set (make-local-variable 'helm-grep-last-cmd-line)
+         (with-helm-buffer helm-grep-last-cmd-line))
     (set (make-local-variable 'revert-buffer-function)
          #'helm-grep-mode--revert-buffer-function))
 
