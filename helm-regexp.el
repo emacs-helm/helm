@@ -339,6 +339,26 @@ Same as `helm-moccur-goto-line' but go in new frame."
 ;;; helm-moccur-mode
 ;;
 ;;
+(defvar helm-moccur-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET")      'helm-moccur-mode-goto-line)
+    (define-key map (kbd "C-o")      'helm-moccur-mode-goto-line-ow)
+    (define-key map (kbd "<C-down>") 'undefined)
+    (define-key map (kbd "<C-up>")   'undefined)
+    (define-key map (kbd "<M-down>") 'helm-gm-next-file)
+    (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
+    map))
+
+(defun helm-moccur-mode-goto-line ()
+  (interactive)
+  (helm-moccur-goto-line
+   (buffer-substring (point-at-bol) (point-at-eol))))
+
+(defun helm-moccur-mode-goto-line-ow ()
+  (interactive)
+  (helm-moccur-goto-line-ow
+   (buffer-substring (point-at-bol) (point-at-eol))))
+
 (defun helm-moccur-save-results (_candidate)
   (helm-moccur-save-results-1))
 
