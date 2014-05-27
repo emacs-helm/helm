@@ -2566,19 +2566,60 @@ Colorize only symlinks, directories and files."
 ;;; External searching file tools.
 ;;
 ;; Tracker desktop search
+(defun helm-source-tracker-transformer (candidates _source)
+  (helm-log "%S" candidates)
+  (cl-mapcan
+   (lambda (cand)
+     (if (not (stringp cand)) cand    ; Already a (DISPLAY. REAL) cell
+       ;; Single candidates CAND arrive in form of:
+       ;; "  file:///path/to/foo
+       ;;   ...foo snippet..."
+       ;; or, if CANDIDATES was passed to helm by being the first packet
+       ;; received by 'helm-output-filter:
+       ;; "Results:
+       ;;   file:///path/to/foo
+       ;;   ...foo snippet..."
+       (let* ((lines (split-string cand "\n"))
+              (len (length lines))
+              (lines (if (< len 3) lines (cdr lines))) ; trim "Results:" header
+              (uri (when (stringp (car lines))
+                     (ansi-color-apply (car lines))))
+              (snippet (when (stringp (cadr lines))
+                         (ansi-color-apply (cadr lines))))
+              (prefix "^[[:space:]]*file://")
+              (path (and (string-match-p prefix uri) ; only continue if actual uri
+                       (replace-regexp-in-string prefix "" uri))))
+         (if (not (stringp path)) nil      ; no effective path so drop the candidate
+           ;; Problem with wrong paths on correctly displayed
+           ;; candidates when the candidate list gets long:
+
+           ;; There are contiguous chunks of the list where the displayed
+           ;; candidates in the buffer have their effective paths set to another
+           ;; candidates effective path or (infrequently) to their own display
+           ;; value. However, 'helm-log shows 'helm-source-tracker-transformer
+           ;; returns correct candidates in form of (DISPLAY. REAL) cells at all
+           ;; times.
+
+           ;; Putting the 'helm-realvalue property here helps to partially solve
+           ;; the issue.
+           (put-text-property 0 (length path) 'helm-realvalue path path)
+           (let ((cand (list (cons (concat path "\n" snippet) path))))
+             (helm-log "%S" cand)
+             cand)))))
+   candidates))
+
 (defvar helm-source-tracker-search
   `((name . "Tracker Search")
     (candidates-process
      . (lambda ()
          (start-process "tracker-search-process" nil
                         "tracker-search"
+                        "--limit=512"
                         helm-pattern)))
-    (filtered-candidate-transformer . (lambda (candidates _source)
-                                        (cl-loop for cand in (cdr candidates)
-                                              collect (replace-regexp-in-string
-                                               "^[[:space:]]*file://"
-                                               ""
-                                               (ansi-color-apply cand)))))
+    (filtered-candidate-transformer . helm-source-tracker-transformer)
+    (source-candidate-seperator . "\n\n") ; pass raw candidates in one piece
+    (multiline)
+    (keymap . ,helm-generic-files-map)
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
      helm-transform-file-load-el
