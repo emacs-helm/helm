@@ -20,6 +20,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-regexp)
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
