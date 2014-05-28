@@ -2583,7 +2583,7 @@ Colorize only symlinks, directories and files."
        (let ((cand (ansi-color-apply cand))
              (uri-prefix "^[[:space:]]*file://")
              (snippet-prefix "^[[:space:]]*\\.\\.\\."))
-         (if (string-match-p "^Results:" cand) (list (cons "foo" "bar")) ; drop "Results:"
+         (unless (string-match-p "^Results:" cand) ; drop "Results:"
            ;; save correct path if we have one, snippet comes in the next CAND
            (when (string-match-p uri-prefix cand)
              (setq helm-source-tracker-cand-incomplete
