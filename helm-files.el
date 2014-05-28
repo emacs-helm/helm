@@ -2594,6 +2594,7 @@ Colorize only symlinks, directories and files."
              (unless (or (null path)
                         (string= "" path)
                         (not (string-match-p snippet-prefix snippet)))
+               ;; https://github.com/emacs-helm/helm/issues/529
                ;; Same thing for this approach:
                ;; Putting on the 'helm-realvalue property here helps to
                ;; partially solve the issue with the 'multiline attribute.
