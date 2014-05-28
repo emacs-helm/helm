@@ -438,58 +438,9 @@ Special commands:
         (message "Reverting buffer done")))))
 
 
-(defun helm-display-to-real-numbered-line (candidate)
-  "This is used to display a line in occur style in helm sources.
-e.g \"    12:some_text\".
-It is used with type attribute 'line'."
-  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
-      (list (string-to-number (match-string 1 candidate))
-            (match-string 2 candidate))
-    (error "Line number not found")))
-
-
-;;; Type attributes
+;;; Predefined commands
 ;;
 ;;
-(define-helm-type-attribute 'line
-    '((display-to-real . helm-display-to-real-numbered-line)
-      (action ("Go to Line" . helm-action-line-goto)))
-  "LINENO:CONTENT string, eg. \"  16:foo\".
-
-Optional `target-file' attribute is a name of target file.
-
-Optional `before-jump-hook' attribute is a function with no
-arguments which is called before jumping to position.
-
-Optional `after-jump-hook' attribute is a function with no
-arguments which is called after jumping to position.
-
-If `adjust' attribute is specified, searches the line whose
-content is CONTENT near the LINENO.
-
-If `recenter' attribute is specified, the line is displayed at
-the center of window, otherwise at the top of window.")
-
-(define-helm-type-attribute 'file-line
-    `((filtered-candidate-transformer helm-filtered-candidate-transformer-file-line)
-      (multiline)
-      (action ("Go to" . helm-action-file-line-goto)))
-  "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
-
-Optional `default-directory' attribute is a default-directory
-FILENAME is interpreted.
-
-Optional `before-jump-hook' attribute is a function with no
-arguments which is called before jumping to position.
-
-Optional `after-jump-hook' attribute is a function with no
-arguments which is called after jumping to position.
-
-If `adjust' attribute is specified, searches the line whose
-content is CONTENT near the LINENO.
-
-If `recenter' attribute is specified, the line is displayed at
-the center of window, otherwise at the top of window.")
 
 ;;;###autoload
 (defun helm-regexp ()
