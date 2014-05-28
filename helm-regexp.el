@@ -52,7 +52,7 @@
     (define-key map (kbd "C-c ?")    'helm-moccur-help)
     (define-key map (kbd "C-c o")    'helm-moccur-run-goto-line-ow)
     (define-key map (kbd "C-c C-o")  'helm-moccur-run-goto-line-of)
-    (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
+    (define-key map (kbd "C-x C-s")  'helm-moccur-run-save-buffer)
     (when helm-moccur-use-ioccur-style-keys
       (define-key map (kbd "<right>")  'helm-moccur-run-persistent-action)
       (define-key map (kbd "<left>")   'helm-moccur-run-default-action))
@@ -159,12 +159,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defvar helm-multi-occur-buffer-list nil)
 
 (defun helm-moccur-init ()
-  "Create the initial helm multi occur buffer with BUFFERS list."
-  (set (make-local-variable 'helm-multi-occur-buffer-list)
-       (if helm-moccur-always-search-in-current
-           (cons helm-current-buffer
-                 (remove helm-current-buffer helm-multi-occur-buffer-list))
-         helm-multi-occur-buffer-list))
+  "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
       'global
     (cl-loop for buf in helm-multi-occur-buffer-list
@@ -319,65 +314,133 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-source-moccur' with BUFFERS list."
-  (setq helm-multi-occur-buffer-list buffers)
+  (setq helm-multi-occur-buffer-list
+        (if helm-moccur-always-search-in-current
+            (cons
+             ;; will become helm-current-buffer later.
+             (buffer-name (current-buffer))
+             (remove helm-current-buffer helm-multi-occur-buffer-list))
+         buffers))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
         :input input
+        :multi-occur-buffer-list helm-multi-occur-buffer-list
         :truncate-lines t))
 
-(defun helm-display-to-real-numbered-line (candidate)
-  "This is used to display a line in occur style in helm sources.
-e.g \"    12:some_text\".
-It is used with type attribute 'line'."
-  (if (string-match "^ *\\([0-9]+\\):\\(.*\\)$" candidate)
-      (list (string-to-number (match-string 1 candidate))
-            (match-string 2 candidate))
-    (error "Line number not found")))
+;;;###autoload
+(defun helm-moccur-run-save-buffer ()
+  "Run grep save results action from `helm-do-grep-1'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-moccur-save-results)))
 
 
-;;; Type attributes
+;;; helm-moccur-mode
 ;;
 ;;
-(define-helm-type-attribute 'line
-    '((display-to-real . helm-display-to-real-numbered-line)
-      (action ("Go to Line" . helm-action-line-goto)))
-  "LINENO:CONTENT string, eg. \"  16:foo\".
+(defvar helm-moccur-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET")      'helm-moccur-mode-goto-line)
+    (define-key map (kbd "C-o")      'helm-moccur-mode-goto-line-ow)
+    (define-key map (kbd "<C-down>") 'undefined)
+    (define-key map (kbd "<C-up>")   'undefined)
+    (define-key map (kbd "<M-down>") 'helm-gm-next-file)
+    (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
+    map))
 
-Optional `target-file' attribute is a name of target file.
+(defun helm-moccur-mode-goto-line ()
+  (interactive)
+  (helm-moccur-goto-line
+   (buffer-substring (point-at-bol) (point-at-eol))))
 
-Optional `before-jump-hook' attribute is a function with no
-arguments which is called before jumping to position.
+(defun helm-moccur-mode-goto-line-ow ()
+  (interactive)
+  (helm-moccur-goto-line-ow
+   (buffer-substring (point-at-bol) (point-at-eol))))
 
-Optional `after-jump-hook' attribute is a function with no
-arguments which is called after jumping to position.
+(defun helm-moccur-save-results (_candidate)
+  (helm-moccur-save-results-1))
 
-If `adjust' attribute is specified, searches the line whose
-content is CONTENT near the LINENO.
+(defun helm-moccur-save-results-1 ()
+  "Save helm moccur results in a `helm-moccur-mode' buffer."
+  (let ((buf "*hmoccur*")
+        new-buf)
+    (when (get-buffer buf)
+      (setq new-buf (read-string "OccurBufferName: " buf))
+      (cl-loop for b in (helm-buffer-list)
+            when (and (string= new-buf b)
+                      (not (y-or-n-p
+                            (format "Buffer `%s' already exists overwrite? "
+                                    new-buf))))
+            do (setq new-buf (read-string "OccurBufferName: " "*hmoccur ")))
+      (setq buf new-buf))
+    (with-current-buffer (get-buffer-create buf)
+      (setq buffer-read-only t)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert "-*- mode: helm-moccur -*-\n\n"
+                (format "Moccur Results for `%s':\n\n" helm-pattern))
+        (save-excursion
+          (insert (with-current-buffer helm-buffer
+                    (goto-char (point-min)) (forward-line 1)
+                    (buffer-substring (point) (point-max))))))
+      (helm-moccur-mode) (pop-to-buffer buf))
+    (message "Helm Moccur Results saved in `%s' buffer" buf)))
 
-If `recenter' attribute is specified, the line is displayed at
-the center of window, otherwise at the top of window.")
+;;;###autoload
+(define-derived-mode helm-moccur-mode
+    special-mode "helm-moccur"
+    "Major mode to provide actions in helm moccur saved buffer.
 
-(define-helm-type-attribute 'file-line
-    `((filtered-candidate-transformer helm-filtered-candidate-transformer-file-line)
-      (multiline)
-      (action ("Go to" . helm-action-file-line-goto)))
-  "FILENAME:LINENO:CONTENT string, eg. \"~/.emacs:16:;; comment\".
+Special commands:
+\\{helm-moccur-mode-map}"
+    (set (make-local-variable 'helm-multi-occur-buffer-list)
+         (with-helm-buffer helm-multi-occur-buffer-list))
+    (set (make-local-variable 'revert-buffer-function)
+         #'helm-moccur-mode--revert-buffer-function))
 
-Optional `default-directory' attribute is a default-directory
-FILENAME is interpreted.
+(defun helm-moccur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
+  (goto-char (point-min))
+  (let (pattern)
+    (when (re-search-forward "^Moccur Results for `\\(.*\\)'" nil t)
+      (setq pattern (match-string 1))
+      (forward-line 0)
+      (when (re-search-forward "^$" nil t)
+        (forward-line 1))
+      (let ((inhibit-read-only t)
+            (buffer (current-buffer))
+            (buflst helm-multi-occur-buffer-list))
+        (delete-region (point) (point-max))
+        (message "Reverting buffer...")
+        (save-excursion
+          (with-temp-buffer
+            (insert
+             "\n"
+             (cl-loop for buf in buflst
+                      for bufstr = (with-current-buffer buf (buffer-string))
+                      do (add-text-properties
+                          0 (length bufstr)
+                          `(buffer-name ,(buffer-name (get-buffer buf)))
+                          bufstr)
+                      concat bufstr)
+             "\n")
+            (goto-char (point-min))
+            (cl-loop while (re-search-forward pattern nil t)
+                     for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
+                     when line
+                     do (with-current-buffer buffer
+                          (insert
+                           (propertize
+                            (car (helm-moccur-filter-one-by-one line))
+                            'helm-real-value line)
+                           "\n")))))
+        (message "Reverting buffer done")))))
 
-Optional `before-jump-hook' attribute is a function with no
-arguments which is called before jumping to position.
-
-Optional `after-jump-hook' attribute is a function with no
-arguments which is called after jumping to position.
-
-If `adjust' attribute is specified, searches the line whose
-content is CONTENT near the LINENO.
-
-If `recenter' attribute is specified, the line is displayed at
-the center of window, otherwise at the top of window.")
+
+;;; Predefined commands
+;;
+;;
 
 ;;;###autoload
 (defun helm-regexp ()
@@ -405,6 +468,7 @@ the center of window, otherwise at the top of window.")
         :history 'helm-grep-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
                         (format "%s:%d:" (buffer-name) (line-number-at-pos (point))))
+        :multi-occur-buffer-list helm-multi-occur-buffer-list
         :truncate-lines t))
 
 ;;;###autoload
@@ -421,6 +485,7 @@ the center of window, otherwise at the top of window.")
           :buffer "*helm occur*"
           :history 'helm-grep-history
           :input input
+          :multi-occur-buffer-list helm-multi-occur-buffer-list
           :truncate-lines t)))
 
 ;;;###autoload

@@ -656,7 +656,6 @@ is called once for each file like this:
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-moccur-run-goto-line-ow]\t\t->Goto line in other window.
 \\[helm-moccur-run-goto-line-of]\t\t->Goto line in new frame.
-\\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
 \\[helm-moccur-help]\t\t->Show this help.
 \n== Helm Map ==
 \\{helm-map}")

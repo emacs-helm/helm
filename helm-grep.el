@@ -205,7 +205,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET")      'helm-grep-mode-jump)
     (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
-    (define-key map (kbd "q")        'helm-grep-mode-quit)
     (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
     (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
@@ -358,7 +357,6 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
          (tramp-verbose helm-tramp-verbose))
-    (setq helm-grep-last-cmd-line cmd-line)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
@@ -424,11 +422,12 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        (replace-regexp-in-string "\n" "" event))))))))))
 
 (defun helm-grep-collect-candidates ()
-  (funcall helm-grep-default-function
-           (helm-grep--prepare-cmd-line
-            helm-grep-last-targets
-            helm-grep-include-files
-            helm-grep-use-zgrep)))
+  (let ((cmd-line (helm-grep--prepare-cmd-line
+                   helm-grep-last-targets
+                   helm-grep-include-files
+                   helm-grep-use-zgrep)))
+    (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
+    (funcall helm-grep-default-function cmd-line)))
 
 
 ;;; Actions
@@ -502,7 +501,9 @@ With a prefix arg record CANDIDATE in `mark-ring'."
 (defun helm-goto-next-or-prec-file (n &optional type)
   "Go to next or precedent candidate file in helm grep/etags buffers.
 If N is positive go forward otherwise go backward."
-  (let* ((sel (if (eq major-mode 'helm-grep-mode)
+  (let* ((allow-mode (or (eq major-mode 'helm-grep-mode)
+                         (eq major-mode 'helm-moccur-mode)))
+         (sel (if allow-mode
                   (buffer-substring (point-at-bol) (point-at-eol))
                 (helm-get-selection nil t)))
          (current-line-list  (if (eq type 'etags)
@@ -511,7 +512,7 @@ If N is positive go forward otherwise go backward."
          (current-fname      (nth 0 current-line-list))
          (bob-or-eof         (if (eq n 1) 'eobp 'bobp))
          (mark-maybe #'(lambda ()
-                         (if (eq major-mode 'helm-grep-mode)
+                         (if allow-mode
                              (ignore)
                            (helm-mark-current-line)))))
     (catch 'break
@@ -598,7 +599,7 @@ If N is positive go forward otherwise go backward."
   (helm-grep-action candidate 'grep))
 
 (defun helm-grep-save-results-1 ()
-  "Save helm grep result in a `grep-mode' buffer."
+  "Save helm grep result in a `helm-grep-mode' buffer."
   (let ((buf "*hgrep*")
         new-buf)
     (when (get-buffer buf)
@@ -625,11 +626,43 @@ If N is positive go forward otherwise go backward."
 
 ;;;###autoload
 (define-derived-mode helm-grep-mode
-    text-mode "helm-grep"
+    special-mode "helm-grep"
     "Major mode to provide actions in helm grep saved buffer.
 
 Special commands:
-\\{helm-grep-mode-map}")
+\\{helm-grep-mode-map}"
+    (set (make-local-variable 'helm-grep-last-cmd-line)
+         (with-helm-buffer helm-grep-last-cmd-line))
+    (set (make-local-variable 'revert-buffer-function)
+         #'helm-grep-mode--revert-buffer-function))
+
+(defun helm-grep-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
+  (goto-char (point-min))
+  (re-search-forward "^Grep Results for" nil t)
+  (forward-line 0)
+  (when (re-search-forward "^$" nil t)
+    (forward-line 1))
+  (let ((inhibit-read-only t))
+    (delete-region (point) (point-max)))
+  (message "Reverting buffer...")
+  (set-process-sentinel
+   (start-file-process-shell-command
+    "hgrep"  (generate-new-buffer "*hgrep revert*") helm-grep-last-cmd-line)
+   (lambda (process event)
+     (when (string= event "finished\n")
+       (with-current-buffer (current-buffer)
+         (let ((inhibit-read-only t))
+           (save-excursion
+             (cl-loop for line in (with-current-buffer (process-buffer process)
+                                    (prog1 (split-string (buffer-string) "\n")
+                                      (kill-buffer)))
+                      when (string-match helm-grep-split-line-regexp line)
+                      do (insert (propertize
+                                  (car (helm-grep-filter-one-by-one line))
+                                  ;; needed for wgrep.
+                                  'helm-realvalue line)
+                                 "\n"))))
+         (message "Reverting buffer done"))))))
 
 ;;;###autoload
 (defun helm-gm-next-file ()
@@ -640,11 +673,6 @@ Special commands:
 (defun helm-gm-precedent-file ()
   (interactive)
   (helm-goto-next-or-prec-file -1))
-
-;;;###autoload
-(defun helm-grep-mode-quit ()
-  (interactive)
-  (view-mode 1) (View-quit))
 
 ;;;###autoload
 (defun helm-grep-mode-jump ()
