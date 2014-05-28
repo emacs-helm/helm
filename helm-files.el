@@ -2566,46 +2566,43 @@ Colorize only symlinks, directories and files."
 ;;; External searching file tools.
 ;;
 ;; Tracker desktop search
+(defvar helm-source-tracker-cand-incomplete nil "Contains incomplete candidate")
 (defun helm-source-tracker-transformer (candidates _source)
-  (helm-log "%S" candidates)
+  (helm-log "received: %S" candidates)
   (cl-mapcan
    (lambda (cand)
      (if (not (stringp cand)) cand    ; Already a (DISPLAY. REAL) cell
        ;; Single candidates CAND arrive in form of:
-       ;; "  file:///path/to/foo
-       ;;   ...foo snippet..."
-       ;; or, if CANDIDATES was passed to helm by being the first packet
-       ;; received by 'helm-output-filter:
-       ;; "Results:
-       ;;   file:///path/to/foo
-       ;;   ...foo snippet..."
-       (let* ((lines (split-string cand "\n"))
-              (len (length lines))
-              (lines (if (< len 3) lines (cdr lines))) ; trim "Results:" header
-              (uri (when (stringp (car lines))
-                     (ansi-color-apply (car lines))))
-              (snippet (when (stringp (cadr lines))
-                         (ansi-color-apply (cadr lines))))
-              (prefix "^[[:space:]]*file://")
-              (path (and (string-match-p prefix uri) ; only continue if actual uri
-                       (replace-regexp-in-string prefix "" uri))))
-         (if (not (stringp path)) nil      ; no effective path so drop the candidate
-           ;; Problem with wrong paths on correctly displayed
-           ;; candidates when the candidate list gets long:
-
-           ;; There are contiguous chunks of the list where the displayed
-           ;; candidates in the buffer have their effective paths set to another
-           ;; candidates effective path or (infrequently) to their own display
-           ;; value. However, 'helm-log shows 'helm-source-tracker-transformer
-           ;; returns correct candidates in form of (DISPLAY. REAL) cells at all
-           ;; times.
-
-           ;; Putting the 'helm-realvalue property here helps to partially solve
-           ;; the issue.
-           (put-text-property 0 (length path) 'helm-realvalue path path)
-           (let ((cand (list (cons (concat path "\n" snippet) path))))
-             (helm-log "%S" cand)
-             cand)))))
+       ;; "  file:///path/to/foo"
+       ;; or
+       ;; "  ...foo snippet..."
+       ;; Exception: if CANDIDATES was passed to helm by being the first packet
+       ;; received by 'helm-output-filter the first CAND contains:
+       ;; "Results:"
+       ;; as outputted by the tracker-search program
+       (let ((cand (ansi-color-apply cand))
+             (uri-prefix "^[[:space:]]*file://")
+             (snippet-prefix "^[[:space:]]*\\.\\.\\."))
+         (if (string-match-p "^Results:" cand) (list (cons "foo" "bar")) ; drop "Results:"
+           ;; save correct path if we have one, snippet comes in the next CAND
+           (when (string-match-p uri-prefix cand)
+             (setq helm-source-tracker-cand-incomplete
+                   (replace-regexp-in-string uri-prefix "" cand)))
+           (let ((path helm-source-tracker-cand-incomplete)
+                 (snippet cand))
+             ;; only build candidate if we have a snippet and a correct path
+             (unless (or (null path)
+                        (string= "" path)
+                        (not (string-match-p snippet-prefix snippet)))
+               ;; Same thing for this approach:
+               ;; Putting on the 'helm-realvalue property here helps to
+               ;; partially solve the issue with the 'multiline attribute.
+               ;(put-text-property 0 (length path) 'helm-realvalue path path)
+               (let ((cand (list (cons (concat path "\n" snippet) path))))
+                 ;; set variable to nil to wait for the next path
+                 (setq helm-source-tracker-cand-incomplete nil)
+                 (helm-log "built: %S" cand)
+                 cand)))))))
    candidates))
 
 (defvar helm-source-tracker-search
@@ -2617,8 +2614,7 @@ Colorize only symlinks, directories and files."
                         "--limit=512"
                         helm-pattern)))
     (filtered-candidate-transformer . helm-source-tracker-transformer)
-    (source-candidate-seperator . "\n\n") ; pass raw candidates in one piece
-    (multiline)
+    ;(multiline)
     (keymap . ,helm-generic-files-map)
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer

@@ -2895,7 +2895,7 @@ after the source name by overlay."
   (helm-output-filter-1 (assoc process helm-async-processes) output-string))
 
 (defun helm-output-filter-1 (process-assoc output-string)
-  (helm-log "%S" output-string)
+  (helm-log-eval output-string)
   (with-current-buffer helm-buffer
     (let ((source (cdr process-assoc)))
       (save-excursion
@@ -2913,11 +2913,7 @@ after the source name by overlay."
 (defun helm-output-filter--process-source (process output-string source limit)
   (cl-dolist (candidate (helm-transform-candidates
                          (helm-output-filter--collect-candidates
-                          (split-string output-string
-                                        (or (assoc-default
-                                            'source-candidate-seperator
-                                            source)
-                                           "\n"))
+                          (split-string output-string "\n")
                           (assoc 'incomplete-line source)
                           source)
                          source t))
