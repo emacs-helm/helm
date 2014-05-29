@@ -2580,30 +2580,25 @@ Colorize only symlinks, directories and files."
        ;; received by 'helm-output-filter the first CAND contains:
        ;; "Results:"
        ;; as outputted by the tracker-search program
-       (let ((cand (ansi-color-apply cand))
-             (uri-prefix "^[[:space:]]*file://")
-             (snippet-prefix "^[[:space:]]*\\.\\.\\."))
-         (unless (string-match-p "^Results:" cand) ; drop "Results:"
-           ;; save correct path if we have one, snippet comes in the next CAND
-           (when (string-match-p uri-prefix cand)
-             (setq helm-source-tracker-cand-incomplete
-                   (replace-regexp-in-string uri-prefix "" cand)))
-           (let ((path helm-source-tracker-cand-incomplete)
-                 (snippet cand))
-             ;; only build candidate if we have a snippet and a correct path
-             (unless (or (null path)
-                        (string= "" path)
-                        (not (string-match-p snippet-prefix snippet)))
-               ;; https://github.com/emacs-helm/helm/issues/529
-               ;; Same thing for this approach:
-               ;; Putting on the 'helm-realvalue property here helps to
-               ;; partially solve the issue with the 'multiline attribute.
-               ;(put-text-property 0 (length path) 'helm-realvalue path path)
-               (let ((cand (list (cons (concat path "\n" snippet) path))))
-                 ;; set variable to nil to wait for the next path
-                 (setq helm-source-tracker-cand-incomplete nil)
-                 (helm-log "built: %S" cand)
-                 cand)))))))
+       (when (string-match "\\`[[:space:]]*file://" cand)
+         (setq helm-source-tracker-cand-incomplete ; save path
+               (replace-match "" t t cand)))
+       (let ((path helm-source-tracker-cand-incomplete)
+             (snippet cand))
+         (unless (or (null path) ; build candidate if path and snippet are correct
+                    (string= "" path)
+                    (not (string-match-p "\\`[[:space:]]*\\.\\.\\." snippet)))
+           ;; https://github.com/emacs-helm/helm/issues/529
+           ;; Putting on the 'helm-realvalue property here helps to
+           ;; partially solve the issue with the 'multiline attribute.
+           ;;(put-text-property 0 (length path) 'helm-realvalue path path)
+           (let* ((highlighted-path (caar (helm-highlight-files (list path))))
+                  (cand (list (cons
+                               (concat highlighted-path "\n" snippet)
+                               path))))
+             (setq helm-source-tracker-cand-incomplete nil)
+             (helm-log "built: %S" cand)
+             cand)))))
    candidates))
 
 (defvar helm-source-tracker-search
@@ -2612,10 +2607,11 @@ Colorize only symlinks, directories and files."
      . (lambda ()
          (start-process "tracker-search-process" nil
                         "tracker-search"
+                        "--disable-color"
                         "--limit=512"
                         helm-pattern)))
     (filtered-candidate-transformer . helm-source-tracker-transformer)
-    ;(multiline)
+    ;;(multiline) ; https://github.com/emacs-helm/helm/issues/529
     (keymap . ,helm-generic-files-map)
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
