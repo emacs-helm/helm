@@ -2601,12 +2601,6 @@ with the tracker desktop search.")
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
-;; Picklist
-(defvar helm-source-picklist
-  '((name . "Picklist")
-    (candidates . (lambda () (mapcar 'car picklist-list)))
-    (type . file)))
-
 
 ;;; Findutils
 ;;
