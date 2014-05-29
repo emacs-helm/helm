@@ -1511,30 +1511,32 @@ If FNAME is a valid directory name,return FNAME unchanged."
                        thereis (string-match m fname))))
     ;; Always regexp-quote base directory name to handle
     ;; crap dirnames such e.g bookmark+
-    (cond ((or (and dir-p tramp-p (string-match ":\\'" fname))
-               (string= fname ""))
-           ;; Use full FNAME on e.g "/ssh:host:".
-           (regexp-quote fname))
-          ;; Prefixing BN with a space call match-plugin completion.
-          ;; This allow showing all files/dirs matching BN (Issue #518).
-          ;; FIXME: some match-plugin methods may not work here.
-          (dir-p (concat (regexp-quote bd) " " bn))
-          ((or (not (helm-ff-smart-completion-p))
-               (string-match "\\s-" bn)) ; Fall back to match-plugin.
-           (concat (regexp-quote bd) bn))
-          ((or (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
-               (string-match "/$" fname)     ; Allow mkdir.
-               (string-match helm-ff-url-regexp fname)
-               (and (string= helm-ff-default-directory "/") tramp-p))
-           ;; Don't treat wildcards ("*") as regexp char.
-           ;; (e.g ./foo/*.el => ./foo/[*].el)
-           (concat (regexp-quote bd)
-                   (replace-regexp-in-string "[*]" "[*]" bn)))
-          (t
-           (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
-                        (helm--mapconcat-candidate bn)
-                      (concat ".*" bn)))
-           (concat (regexp-quote bd) bn)))))
+    (cond
+      ((or (and dir-p tramp-p (string-match ":\\'" fname))
+           (string= fname "")
+           (and dir-p (< (length bn) 2)))
+       ;; Use full FNAME on e.g "/ssh:host:".
+       (regexp-quote fname))
+      ;; Prefixing BN with a space call match-plugin completion.
+      ;; This allow showing all files/dirs matching BN (Issue #518).
+      ;; FIXME: some match-plugin methods may not work here.
+      (dir-p (concat (regexp-quote bd) " " bn))
+      ((or (not (helm-ff-smart-completion-p))
+           (string-match "\\s-" bn))    ; Fall back to match-plugin.
+       (concat (regexp-quote bd) bn))
+      ((or (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
+           (string-match "/$" fname)     ; Allow mkdir.
+           (string-match helm-ff-url-regexp fname)
+           (and (string= helm-ff-default-directory "/") tramp-p))
+       ;; Don't treat wildcards ("*") as regexp char.
+       ;; (e.g ./foo/*.el => ./foo/[*].el)
+       (concat (regexp-quote bd)
+               (replace-regexp-in-string "[*]" "[*]" bn)))
+      (t
+       (setq bn (if (> (length bn) 2) ; wait 3nd char before concating.
+                    (helm--mapconcat-candidate bn)
+                  (concat ".*" bn)))
+       (concat (regexp-quote bd) bn)))))
 
 (defun helm-dir-is-dot (dir)
   (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
@@ -2630,12 +2632,6 @@ with the tracker desktop search.")
     (requires-pattern . 3))
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
-
-;; Picklist
-(defvar helm-source-picklist
-  '((name . "Picklist")
-    (candidates . (lambda () (mapcar 'car picklist-list)))
-    (type . file)))
 
 
 ;;; Findutils
