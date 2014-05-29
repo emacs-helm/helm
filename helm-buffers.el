@@ -405,7 +405,7 @@ with name matching pattern."
                       (cl-loop for i in (cdr split) always
                             (helm-buffer--match-pattern i cand))))
                 ((and (string-match "\\`/" helm-pattern) buf-fname)
-                 (and (match-string ; Exact match for this. 
+                 (and (string-match ; Exact match for this. 
                        (substring (car split) 1) buf-fname)
                       (cl-loop for i in (cdr split) always
                             (helm-buffer--match-pattern i cand))))
