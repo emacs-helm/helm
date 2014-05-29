@@ -161,7 +161,7 @@ Only buffer names are fuzzy matched when this is enabled,
     (candidates . helm-buffers-list-cache)
     (no-matchplugin)
     (type . buffer)
-    (match helm-buffer-match-major-mode)
+    (match helm-buffers-list--match-fn)
     (persistent-action . helm-buffers-list-persistent-action)
     (keymap . ,helm-buffer-map)
     (volatile)
@@ -374,7 +374,7 @@ Should be called after others transformers i.e (boring buffers)."
                          candidate))
     (string-match (funcall fun pattern) candidate))))
 
-(defun helm-buffer-match-major-mode (candidate)
+(defun helm-buffers-list--match-fn (candidate)
   "Match maybe buffer by major-mode.
 If you give a major-mode or partial major-mode,
 it will list all buffers of this major-mode and/or buffers with name
@@ -385,7 +385,8 @@ before space matching pattern after space.
 If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
-         (buf  (get-buffer cand)))
+         (buf  (get-buffer cand))
+         (buf-fname (buffer-file-name buf)))
     (when buf
       (with-current-buffer buf
         (let ((mjm   (format-mode-line mode-name))
@@ -401,6 +402,11 @@ with name matching pattern."
                       (helm-buffers-match-inside cand (cdr split))))
                 ((string-match "\\`\\*" helm-pattern)
                  (and (helm-buffer--match-mjm (car split) mjm)
+                      (cl-loop for i in (cdr split) always
+                            (helm-buffer--match-pattern i cand))))
+                ((and (string-match "\\`/" helm-pattern) buf-fname)
+                 (and (match-string ; Exact match for this. 
+                       (substring (car split) 1) buf-fname)
                       (cl-loop for i in (cdr split) always
                             (helm-buffer--match-pattern i cand))))
                 ((string-match "\\s-" helm-pattern)
