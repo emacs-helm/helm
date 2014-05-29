@@ -2574,13 +2574,15 @@ Colorize only symlinks, directories and files."
      . (lambda ()
          (start-process "tracker-search-process" nil
                         "tracker-search"
+                        "--disable-color"
+                        "--disable-snippets"
                         helm-pattern)))
-    (filtered-candidate-transformer . (lambda (candidates _source)
-                                        (cl-loop for cand in (cdr candidates)
-                                              collect (replace-regexp-in-string
-                                               "^[[:space:]]*file://"
-                                               ""
-                                               (ansi-color-apply cand)))))
+    (filtered-candidate-transformer
+     . ((lambda (candidates _source)
+          (cl-loop for cand in candidates
+                when (string-match "\\`[[:space:]]*file://" cand)
+                collect (replace-match "" nil t cand)))
+        (lambda (candidates _source) (helm-highlight-files candidates))))
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
      helm-transform-file-load-el
