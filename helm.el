@@ -1019,7 +1019,7 @@ if SRC is omitted, use current source."
   "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
 If ATTRIBUTE-NAME doesn't exists in source it is created with value VALUE.
 If ALTER-TYPE is non--nil alter the value of ATTRIBUTE-NAME in `helm-attributes'
-if it exists.
+if it exists. 
 If SRC is omitted, use current source.
 If operation succeed, return value, otherwise nil."
   (let ((from-type (helm-get-attribute-from-source-type attribute-name src))
@@ -1618,7 +1618,7 @@ to 10 as session local variable."
             (prog1
                 (message "Aborting an helm session running in background")
               ;; helm-alive-p will be reset in unwind-protect forms.
-              (helm-keyboard-quit))))
+              (helm-keyboard-quit)))) 
       (if (keywordp (car plist))
           ;; Recursion: [1] Call `helm' on itself with plist args converted
           ;; to simple args will end up to [2] and call `helm-internal' with
@@ -1681,7 +1681,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (let ((old-overriding-local-map overriding-terminal-local-map)
           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
           ;; Apart this bug in <=24.2, this is needed for
-          ;; messages in minibuffer on top of helm prompt.
+          ;; messages in minibuffer on top of helm prompt. 
           (cursor-in-echo-area t)
           (non-essential t)
           (old--cua cua-mode)
@@ -2120,7 +2120,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
            (hist       (or any-history
-                           ;; Needed for resuming.
+                           ;; Needed for resuming. 
                            (assoc-default 'history src)))
            (timer nil)
            (first-src (car helm-sources))
@@ -2392,7 +2392,7 @@ Helm plug-ins are realized by this function."
 Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
          (candidate-cache (gethash name helm-candidate-cache)))
-    (helm-aif candidate-cache
+    (helm-aif candidate-cache 
         (prog1 it (helm-log "Use cached candidates"))
       (helm-log "No cached candidates, calculate candidates")
       (let ((candidates (helm-get-candidates source)))
@@ -3800,7 +3800,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                           limit search-from-end
                                           start-point match-part-fn source)
   (let (buffer-read-only
-        matches
+        matches 
         newmatches
         (case-fold-search (helm-set-case-fold-search)))
     (helm-search-from-candidate-buffer-internal
@@ -4133,7 +4133,7 @@ In this case you have to add this new attribute to your source.
 When `helm-full-frame' or SPLIT-ONEWINDOW are non--nil,
 and `helm-buffer' is displayed in only one window,
 the helm window is splitted to display
-`helm-select-persistent-action-window' in other window
+`helm-select-persistent-action-window' in other window 
 and keep its visibility."
   (interactive)
   (helm-log "executing persistent-action")

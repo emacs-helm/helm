@@ -2571,37 +2571,27 @@ Colorize only symlinks, directories and files."
 (defvar helm-source-tracker-cand-incomplete nil "Contains incomplete candidate")
 (defun helm-source-tracker-transformer (candidates _source)
   (helm-log "received: %S" candidates)
-  (cl-mapcan
-   (lambda (cand)
-     (if (not (stringp cand)) cand    ; Already a (DISPLAY. REAL) cell
-       ;; Single candidates CAND arrive in form of:
-       ;; "  file:///path/to/foo"
-       ;; or
-       ;; "  ...foo snippet..."
-       ;; Exception: if CANDIDATES was passed to helm by being the first packet
-       ;; received by 'helm-output-filter the first CAND contains:
-       ;; "Results:"
-       ;; as outputted by the tracker-search program
-       (when (string-match "\\`[[:space:]]*file://" cand)
-         (setq helm-source-tracker-cand-incomplete ; save path
-               (replace-match "" t t cand)))
-       (let ((path helm-source-tracker-cand-incomplete)
-             (snippet cand))
-         (unless (or (null path) ; build candidate if path and snippet are correct
-                    (string= "" path)
-                    (not (string-match-p "\\`[[:space:]]*\\.\\.\\." snippet)))
-           ;; https://github.com/emacs-helm/helm/issues/529
-           ;; Putting on the 'helm-realvalue property here helps to
-           ;; partially solve the issue with the 'multiline attribute.
-           ;;(put-text-property 0 (length path) 'helm-realvalue path path)
-           (let* ((highlighted-path (caar (helm-highlight-files (list path))))
-                  (cand (list (cons
-                               (concat highlighted-path "\n" snippet)
-                               path))))
-             (setq helm-source-tracker-cand-incomplete nil)
-             (helm-log "built: %S" cand)
-             cand)))))
-   candidates))
+  (cl-loop for cand in candidates
+           for path = (when (stringp helm-source-tracker-cand-incomplete)
+                        (caar (helm-highlight-files
+                               (list helm-source-tracker-cand-incomplete))))
+           for built = (if (not (stringp cand)) cand
+                         (let ((snippet cand))
+                           (unless (or (null path)
+                                      (string= "" path)
+                                      (not (string-match-p
+                                          "\\`[[:space:]]*\\.\\.\\."
+                                          snippet)))
+                             (let ((complete-candidate
+                                    (cons (concat path "\n" snippet) path)))
+                               (setq helm-source-tracker-cand-incomplete nil)
+                               (helm-log "built: %S" complete-candidate)
+                               complete-candidate))))
+           when (and (stringp cand)
+                   (string-match "\\`[[:space:]]*file://" cand))
+           do (setq helm-source-tracker-cand-incomplete ; save path
+                    (replace-match "" t t cand)) end
+           collect built))
 
 (defvar helm-source-tracker-search
   `((name . "Tracker Search")
