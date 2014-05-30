@@ -391,29 +391,46 @@ with name matching pattern."
       (with-current-buffer buf
         (let ((mjm   (format-mode-line mode-name))
               (split (split-string helm-pattern)))
-          (cond ((string-match "^@" helm-pattern)
+          (cond ((string-match "^@" helm-pattern) ; match inside.
                  (or (helm-buffers-match-inside cand split)
                      (helm-buffer--match-pattern helm-pattern cand)))
+                ;; Continue showing buffer after mjm matching and a space.
                 ((string-match "\\`\\*.*\\s-$" helm-pattern)
                  (helm-buffer--match-mjm (car split) mjm))
-                ((string-match "\\s-[@]" helm-pattern)
+                ((and (string-match "\\s-[@]" helm-pattern) (cdr split))
                  (and (or (helm-buffer--match-mjm (car split) mjm)
-                          (string-match (car split) cand))
+                          (helm-buffer--match-pattern (car split) cand))
                       (helm-buffers-match-inside cand (cdr split))))
-                ((string-match "\\`\\*" helm-pattern)
+                ;; Continue showing buffers after entering @ after a space.
+                ((string-match "\\s-[@]" helm-pattern)
+                 (or (helm-buffer--match-mjm (car split) mjm)
+                     (helm-buffer--match-pattern (car split) cand)))
+                ;; Match on major-mode and multiple patterns.
+                ((and (string-match "\\`\\*" helm-pattern) (cdr split))
                  (and (helm-buffer--match-mjm (car split) mjm)
                       (cl-loop for i in (cdr split) always
                             (helm-buffer--match-pattern i cand))))
-                ((and (string-match "\\`/" helm-pattern) buf-fname)
-                 (and (string-match ; Exact match for this. 
+                ;; Match only on major-mode.
+                ((string-match "\\`\\*" helm-pattern)
+                 (helm-buffer--match-mjm (car split) mjm))
+                ;; Match on buffer-file-name and multiple patterns.
+                ((and (string-match "\\`/" helm-pattern) buf-fname (cdr split))
+                 ;; Exact match for this is better to match end of dir [1]. 
+                 (and (string-match
                        (substring (car split) 1) buf-fname)
                       (cl-loop for i in (cdr split) always
                             (helm-buffer--match-pattern i cand))))
+                ;; Match only on buffer-file-name.
+                ((and (string-match "\\`/" helm-pattern) buf-fname)
+                 ;; [1] same.
+                 (string-match
+                       (substring (car split) 1) buf-fname))
+                ;; Normal string matching on multiple patterns.
                 ((string-match "\\s-" helm-pattern)
                  (cl-loop for i in split always
                        (helm-buffer--match-pattern i cand)))
-                (t (or (helm-buffer--match-mjm helm-pattern mjm)
-                       (helm-buffer--match-pattern helm-pattern cand)))))))))
+                ;; Normal string matching.
+                (t (helm-buffer--match-pattern helm-pattern cand))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
   (cl-loop for i in lst always
