@@ -399,11 +399,21 @@ with name matching pattern."
                  (helm-buffer--match-mjm (car split) mjm))
                 ((and (string-match "\\s-[@]" helm-pattern) (cdr split))
                  (and (or (helm-buffer--match-mjm (car split) mjm)
+                          (and buf-fname
+                               (string-match "\\`/" helm-pattern)
+                               (string-match
+                                (substring (car split) 1)
+                                (helm-basedir buf-fname)))
                           (helm-buffer--match-pattern (car split) cand))
                       (helm-buffers-match-inside cand (cdr split))))
                 ;; Continue showing buffers after entering @ after a space.
                 ((string-match "\\s-[@]" helm-pattern)
                  (or (helm-buffer--match-mjm (car split) mjm)
+                     (and buf-fname
+                          (string-match "\\`/" helm-pattern)
+                          (string-match
+                           (substring (car split) 1)
+                           (helm-basedir buf-fname)))
                      (helm-buffer--match-pattern (car split) cand)))
                 ;; Match on major-mode and multiple patterns.
                 ((and (string-match "\\`\\*" helm-pattern) (cdr split))
