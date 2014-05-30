@@ -413,18 +413,18 @@ with name matching pattern."
                 ;; Match only on major-mode.
                 ((string-match "\\`\\*" helm-pattern)
                  (helm-buffer--match-mjm (car split) mjm))
-                ;; Match on buffer-file-name and multiple patterns.
+                ;; Match on dir of buffer-file-name and multiple patterns.
                 ((and (string-match "\\`/" helm-pattern) buf-fname (cdr split))
                  ;; Exact match for this is better to match end of dir [1]. 
                  (and (string-match
-                       (substring (car split) 1) buf-fname)
+                       (substring (car split) 1) (helm-basedir buf-fname))
                       (cl-loop for i in (cdr split) always
                             (helm-buffer--match-pattern i cand))))
-                ;; Match only on buffer-file-name.
+                ;; Match only on dir of buffer-file-name.
                 ((and (string-match "\\`/" helm-pattern) buf-fname)
                  ;; [1] same.
                  (string-match
-                       (substring (car split) 1) buf-fname))
+                  (substring (car split) 1) (helm-basedir buf-fname)))
                 ;; Normal string matching on multiple patterns.
                 ((string-match "\\s-" helm-pattern)
                  (cl-loop for i in split always

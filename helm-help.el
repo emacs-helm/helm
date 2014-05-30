@@ -171,9 +171,9 @@ If you enter a space and a pattern prefixed by \"@\" helm will search for text m
 this pattern INSIDE the buffer (i.e not in the name of buffer).
 NOTE that if you enter your pattern prefixed with \"@\" but escaped, helm will search a buffer
 matching \"@pattern\" but will not search inside.
-If you prefix the beginning of pattern with \"/\" the match will occur on `buffer-file-name',
-it is interesting to narrow down to one directory for example, subsequent string entered
-after a space will match on buffer-name only.
+If you prefix the beginning of pattern with \"/\" the match will occur on directory name
+of buffer, it is interesting to narrow down to one directory for example, subsequent string
+entered after a space will match on buffer-name only.
 Note that negation is not supported for matching on buffer-file-name.
 
 Note that if `helm-buffers-fuzzy-matching' is non--nil you will have
