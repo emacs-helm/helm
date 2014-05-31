@@ -2249,17 +2249,11 @@ It will override `helm-map' with the local map of current source.
 If no map is found in current source do nothing (keep previous map)."
   (with-helm-buffer
     (helm-aif (assoc-default 'keymap (helm-get-current-source))
-        ;; Don't add our keymap to `overriding-terminal-local-map'
-        ;; if it is already there, this prevent `set-transient-map'
-        ;; to remove itself from `pre-command-hook'
-        ;; and we endup with a `pre-command-hook' full of clearfun.
-        ;; See definition of `set-transient-map' and emacs bug#17642.
-        (unless (eq it (cadr overriding-terminal-local-map))
-          ;; Fix #466; we use here set-transient-map
-          ;; to not overhide other minor-mode-map's.
-          (if (fboundp 'set-transient-map)
-              (set-transient-map it)
-              (set-temporary-overlay-map it))))))
+        ;; Fix #466; we use here set-transient-map
+        ;; to not overhide other minor-mode-map's.
+        (if (fboundp 'set-transient-map)
+            (set-transient-map it)
+            (set-temporary-overlay-map it)))))
 
 
 ;; Core: clean up
