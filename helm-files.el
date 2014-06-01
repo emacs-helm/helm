@@ -1520,7 +1520,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
       ;; Prefixing BN with a space call match-plugin completion.
       ;; This allow showing all files/dirs matching BN (Issue #518).
       ;; FIXME: some match-plugin methods may not work here.
-      (dir-p (concat (regexp-quote bd) " " bn))
+      (dir-p (concat (regexp-quote bd) " " (regexp-quote bn)))
       ((or (not (helm-ff-smart-completion-p))
            (string-match "\\s-" bn))    ; Fall back to match-plugin.
        (concat (regexp-quote bd) bn))
