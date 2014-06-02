@@ -135,7 +135,7 @@ and `helm-read-file-map' for this take effect."
 
 (defcustom helm-ff-smart-completion t
   "Try to complete filenames smarter when non--nil.
-See `helm-ff-transform-fname-for-completion' for more info."
+See `helm-ff--transform-pattern-for-completion' for more info."
   :group 'helm-files
   :type 'boolean)
 
@@ -1425,7 +1425,7 @@ purpose."
     ;; `helm-ff-tramp-hostnames'.
     (unless (or (string= path "Invalid tramp file name")
                 invalid-basedir) ; Leave  helm-pattern unchanged.
-      (setq helm-pattern (helm-ff-transform-fname-for-completion path)))
+      (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")
               (expand-file-name "/") ; Expand to "/" or "c:/"
@@ -1493,7 +1493,7 @@ systems."
   (and helm-ff-smart-completion
        (not (memq helm-mp-matching-method '(multi1 multi3p)))))
 
-(defun helm-ff-transform-fname-for-completion (fname)
+(defun helm-ff--transform-pattern-for-completion (pattern)
   "Maybe return FNAME with it's basename modified as a regexp.
 This happen only when `helm-ff-smart-completion' is enabled.
 This provide a similar behavior as `ido-enable-flex-matching'.
@@ -1503,20 +1503,20 @@ When FNAME contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
 If FNAME is a valid directory name,return FNAME unchanged."
   ;; handle bad filenames containing a backslash.
-  (setq fname (helm-ff-handle-backslash fname))
-  (let ((bn      (helm-basename fname))
-        (bd      (or (helm-basedir fname) ""))
-        (dir-p   (file-directory-p fname))
+  (setq pattern (helm-ff-handle-backslash pattern))
+  (let ((bn      (helm-basename pattern))
+        (bd      (or (helm-basedir pattern) ""))
+        (dir-p   (file-directory-p pattern))
         (tramp-p (cl-loop for (m . f) in tramp-methods
-                       thereis (string-match m fname))))
+                       thereis (string-match m pattern))))
     ;; Always regexp-quote base directory name to handle
     ;; crap dirnames such e.g bookmark+
     (cond
-      ((or (and dir-p tramp-p (string-match ":\\'" fname))
-           (string= fname "")
+      ((or (and dir-p tramp-p (string-match ":\\'" pattern))
+           (string= pattern "")
            (and dir-p (< (length bn) 2)))
        ;; Use full FNAME on e.g "/ssh:host:".
-       (regexp-quote fname))
+       (regexp-quote pattern))
       ;; Prefixing BN with a space call match-plugin completion.
       ;; This allow showing all files/dirs matching BN (Issue #518).
       ;; FIXME: some match-plugin methods may not work here.
@@ -1525,8 +1525,8 @@ If FNAME is a valid directory name,return FNAME unchanged."
            (string-match "\\s-" bn))    ; Fall back to match-plugin.
        (concat (regexp-quote bd) bn))
       ((or (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
-           (string-match "/$" fname)     ; Allow mkdir.
-           (string-match helm-ff-url-regexp fname)
+           (string-match "/$" pattern)     ; Allow mkdir.
+           (string-match helm-ff-url-regexp pattern)
            (and (string= helm-ff-default-directory "/") tramp-p))
        ;; Don't treat wildcards ("*") as regexp char.
        ;; (e.g ./foo/*.el => ./foo/[*].el)
