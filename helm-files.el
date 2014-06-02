@@ -1350,7 +1350,7 @@ purpose."
     ;; so be sure pattern is a string for safety (Issue #476).
     (unless pattern (setq pattern ""))
     (cond ((string= pattern "") "")
-          ((string-match pattern "\\`[.]\\{1,2\\}/\\'")
+          ((string-match "\\`[.]\\{1,2\\}/\\'" pattern)
            (expand-file-name pattern))
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
            (expand-file-name default-directory))
