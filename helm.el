@@ -2123,6 +2123,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                            ;; Needed for resuming. 
                            (assoc-default 'history src)))
            (timer nil)
+           blink-matching-paren
            (first-src (car helm-sources))
            (source-delayed-p (or (assq 'delayed src)
                                  (assq 'delayed (if (symbolp first-src)

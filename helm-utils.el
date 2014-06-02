@@ -350,7 +350,7 @@ e.g helm.el$
                    (cond ((string= c ".")
                           (concat "[^" c "]*" (concat "[" c "]")))
                          ((string= c "$") c)
-                         (t (concat "[^" c "]*" c))))
+                         (t (concat "[^" c "]*" (regexp-quote c)))))
                  ls ""))))
 
 (defun helm-skip-entries (seq regexp-list)
