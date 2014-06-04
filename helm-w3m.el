@@ -20,7 +20,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
-(require 'helm-adaptative)
+(require 'helm-adaptive)
 ;; Some users have the emacs-w3m library in load-path
 ;; without having the w3m executable :-;
 ;; So check if w3m program is present before trying to load

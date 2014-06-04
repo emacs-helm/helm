@@ -213,7 +213,7 @@ So far, F can only be a symbol, not a lambda expression.")
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21377 35219 633085 808000))
+;;;### (autoloads nil "helm" "helm.el" (21389 27771 578570 149000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -550,11 +550,11 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-adaptative" "helm-adaptative.el" (21341
-;;;;;;  6020 970577 405000))
-;;; Generated autoloads from helm-adaptative.el
+;;;### (autoloads nil "helm-adaptive" "helm-adaptive.el" (21391 32114
+;;;;;;  704792 306000))
+;;; Generated autoloads from helm-adaptive.el
 
-(autoload 'helm-reset-adaptative-history "helm-adaptative" "\
+(autoload 'helm-reset-adaptive-history "helm-adaptive" "\
 Delete all `helm-adaptive-history' and his file.
 Useful when you have a old or corrupted `helm-adaptive-history-file'.
 
@@ -589,8 +589,8 @@ http://bbdb.sourceforge.net/
 
 ;;;***
 
-;;;### (autoloads nil "helm-bookmark" "helm-bookmark.el" (21347 37401
-;;;;;;  174575 489000))
+;;;### (autoloads nil "helm-bookmark" "helm-bookmark.el" (21391 32114
+;;;;;;  572792 305000))
 ;;; Generated autoloads from helm-bookmark.el
 
 (autoload 'helm-bookmarks "helm-bookmark" "\
@@ -612,8 +612,8 @@ only if external library addressbook-bookmark.el is available.
 
 ;;;***
 
-;;;### (autoloads nil "helm-buffers" "helm-buffers.el" (21344 1497
-;;;;;;  507745 546000))
+;;;### (autoloads nil "helm-buffers" "helm-buffers.el" (21390 11843
+;;;;;;  451854 203000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffers-list "helm-buffers" "\
@@ -812,8 +812,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads nil "helm-files" "helm-files.el" (21377 35219 629085
-;;;;;;  808000))
+;;;### (autoloads nil "helm-files" "helm-files.el" (21388 55356 457425
+;;;;;;  84000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-browse-project "helm-files" "\
@@ -854,8 +854,8 @@ Preconfigured `helm' for `recentf'.
 
 ;;;***
 
-;;;### (autoloads nil "helm-firefox" "helm-firefox.el" (21341 6020
-;;;;;;  974577 405000))
+;;;### (autoloads nil "helm-firefox" "helm-firefox.el" (21391 32115
+;;;;;;  92792 309000))
 ;;; Generated autoloads from helm-firefox.el
 
 (autoload 'helm-firefox-bookmarks "helm-firefox" "\
@@ -902,8 +902,8 @@ Preconfigured `helm' for gentoo linux.
 
 ;;;***
 
-;;;### (autoloads nil "helm-grep" "helm-grep.el" (21377 64625 507857
-;;;;;;  186000))
+;;;### (autoloads nil "helm-grep" "helm-grep.el" (21391 32112 576792
+;;;;;;  288000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-goto-precedent-file "helm-grep" "\
@@ -985,8 +985,8 @@ Preconfigured helm for pdfgrep.
 
 ;;;***
 
-;;;### (autoloads nil "helm-help" "helm-help.el" (21377 63443 811867
-;;;;;;  382000))
+;;;### (autoloads nil "helm-help" "helm-help.el" (21384 8202 697556
+;;;;;;  961000))
 ;;; Generated autoloads from helm-help.el
 
 (defvar helm-mode-line-string "\\<helm-map>\\[helm-help]:Help \\[helm-select-action]:Act \\[helm-exit-minibuffer]/\\[helm-select-2nd-action-or-end-of-line]/\\[helm-select-3rd-action]:NthAct" "\
@@ -1175,8 +1175,8 @@ With a prefix-arg insert symbol at point.
 
 ;;;***
 
-;;;### (autoloads nil "helm-locate" "helm-locate.el" (21377 35219
-;;;;;;  629085 808000))
+;;;### (autoloads nil "helm-locate" "helm-locate.el" (21389 23393
+;;;;;;  946533 423000))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate-read-file-name "helm-locate" "\
@@ -1450,8 +1450,8 @@ Preconfigured helm to show org headlines.
 
 ;;;***
 
-;;;### (autoloads nil "helm-regexp" "helm-regexp.el" (21378 8011
-;;;;;;  663780 204000))
+;;;### (autoloads nil "helm-regexp" "helm-regexp.el" (21381 59483
+;;;;;;  908433 446000))
 ;;; Generated autoloads from helm-regexp.el
 
 (defvar helm-occur-match-plugin-mode t "\
@@ -1634,8 +1634,8 @@ This function aggregates three sources of tag files:
 
 ;;;***
 
-;;;### (autoloads nil "helm-utils" "helm-utils.el" (21368 35531 916376
-;;;;;;  419000))
+;;;### (autoloads nil "helm-utils" "helm-utils.el" (21387 64491 50619
+;;;;;;  473000))
 ;;; Generated autoloads from helm-utils.el
 
 (autoload 'helm-show-all-in-this-source-only "helm-utils" "\
@@ -1670,8 +1670,8 @@ grabs the entire symbol.
 
 ;;;***
 
-;;;### (autoloads nil "helm-w3m" "helm-w3m.el" (21341 6020 982577
-;;;;;;  405000))
+;;;### (autoloads nil "helm-w3m" "helm-w3m.el" (21391 32115 180792
+;;;;;;  310000))
 ;;; Generated autoloads from helm-w3m.el
 
 (autoload 'helm-w3m-bookmarks "helm-w3m" "\
@@ -1717,7 +1717,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21378 8353 565077 549000))
+;;;;;;  (21391 33503 377215 931000))
 
 ;;;***
 

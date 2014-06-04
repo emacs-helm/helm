@@ -741,7 +741,7 @@ Special commands:
 (defun helm-grep-read-ack-type ()
   "Select types for the '--type' argument of ack-grep."
   (require 'helm-mode)
-  (require 'helm-adaptative)
+  (require 'helm-adaptive)
   (setq helm-grep-ack-types-cache (helm-grep-hack-types))
   (let ((types (helm-comp-read
                 "Types: " helm-grep-ack-types-cache

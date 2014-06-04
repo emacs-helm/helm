@@ -21,7 +21,7 @@
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-info)
-(require 'helm-adaptative)
+(require 'helm-adaptive)
 
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
 

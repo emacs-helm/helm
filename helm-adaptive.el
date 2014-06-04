@@ -1,4 +1,4 @@
-;;; helm-adaptative.el --- Adaptive Sorting of Candidates. -*- lexical-binding: t -*-
+;;; helm-adaptive.el --- Adaptive Sorting of Candidates. -*- lexical-binding: t -*-
 
 ;; Original Author: Tamas Patrovics
 
@@ -49,21 +49,21 @@ selection.")
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
 
-(defun helm-adaptative-done-reset ()
+(defun helm-adaptive-done-reset ()
   (setq helm-adaptive-done nil))
 
-(define-minor-mode helm-adaptative-mode
-    "Toggle adaptative sorting in all sources."
+(define-minor-mode helm-adaptive-mode
+    "Toggle adaptive sorting in all sources."
   :group 'helm-adapt
-  :require 'helm-adaptative
+  :require 'helm-adaptive
   :global t
-  (if helm-adaptative-mode
+  (if helm-adaptive-mode
       (progn
         (unless helm-adaptive-history
-          (helm-adaptative-maybe-load-history))
+          (helm-adaptive-maybe-load-history))
         (add-hook 'kill-emacs-hook 'helm-adaptive-save-history)
         ;; Should run at beginning of `helm-initial-setup'.
-        (add-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
+        (add-hook 'helm-before-initialize-hook 'helm-adaptive-done-reset)
         ;; Should run at beginning of `helm-exit-minibuffer'.
         (add-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
         ;; Should run at beginning of `helm-select-action'.
@@ -71,13 +71,13 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
     (helm-adaptive-save-history)
     (setq helm-adaptive-history nil)
     (remove-hook 'kill-emacs-hook 'helm-adaptive-save-history)
-    (remove-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
+    (remove-hook 'helm-before-initialize-hook 'helm-adaptive-done-reset)
     (remove-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
     (remove-hook 'helm-select-action-hook 'helm-adaptive-store-selection)))
 
-(defun helm-adapt-use-adaptative-p (&optional source-name)
-  "Return current source only if it use adaptative history, nil otherwise."
-  (when helm-adaptative-mode
+(defun helm-adapt-use-adaptive-p (&optional source-name)
+  "Return current source only if it use adaptive history, nil otherwise."
+  (when helm-adaptive-mode
     (let* ((source (or source-name (helm-get-current-source)))
            (adapt-source (or (assoc-default 'filtered-candidate-transformer
                                             (assoc (assoc-default 'type source)
@@ -95,7 +95,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
   "Store history information for the selected candidate."
   (unless helm-adaptive-done
     (setq helm-adaptive-done t)
-    (let ((source (helm-adapt-use-adaptative-p)))
+    (let ((source (helm-adapt-use-adaptive-p)))
       (when source
         (let* ((source-name (or (assoc-default 'type source)
                                 (assoc-default 'name source)))
@@ -146,7 +146,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
               (setcdr selection-info
                       (cl-subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
 
-(defun helm-adaptative-maybe-load-history ()
+(defun helm-adaptive-maybe-load-history ()
   "Load `helm-adaptive-history-file' which contain `helm-adaptive-history'.
 Returns nil if `helm-adaptive-history-file' doesn't exist."
   (when (file-readable-p helm-adaptive-history-file)
@@ -209,7 +209,7 @@ This is a filtered candidate transformer you can use with the
                                                   :test 'helm-adaptive-compare))
                       finally return (append sorted candidates)))
             (message "Your `%s' is maybe corrupted or too old, \
-you should reinitialize it with `helm-reset-adaptative-history'"
+you should reinitialize it with `helm-reset-adaptive-history'"
                      helm-adaptive-history-file)
             (sit-for 1)
             candidates))
@@ -217,7 +217,7 @@ you should reinitialize it with `helm-reset-adaptative-history'"
       candidates)))
 
 ;;;###autoload
-(defun helm-reset-adaptative-history ()
+(defun helm-reset-adaptive-history ()
   "Delete all `helm-adaptive-history' and his file.
 Useful when you have a old or corrupted `helm-adaptive-history-file'."
   (interactive)
@@ -232,7 +232,7 @@ candidate can be in (DISPLAY . REAL) format."
          (if (listp y) (cdr y) y)))
 
 
-(provide 'helm-adaptative)
+(provide 'helm-adaptive)
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions obsolete)
@@ -240,4 +240,4 @@ candidate can be in (DISPLAY . REAL) format."
 ;; indent-tabs-mode: nil
 ;; End:
 
-;;; helm-adaptative.el ends here
+;;; helm-adaptive.el ends here
