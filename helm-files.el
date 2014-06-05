@@ -2568,6 +2568,31 @@ Colorize only symlinks, directories and files."
 ;;; External searching file tools.
 ;;
 ;; Tracker desktop search
+(defvar helm-source-tracker-cand-incomplete nil "Contains incomplete candidate")
+(defun helm-source-tracker-transformer (candidates _source)
+  (helm-log "received: %S" candidates)
+  (cl-loop for cand in candidates
+           for path = (when (stringp helm-source-tracker-cand-incomplete)
+                        (caar (helm-highlight-files
+                               (list helm-source-tracker-cand-incomplete))))
+           for built = (if (not (stringp cand)) cand
+                         (let ((snippet cand))
+                           (unless (or (null path)
+                                      (string= "" path)
+                                      (not (string-match-p
+                                          "\\`[[:space:]]*\\.\\.\\."
+                                          snippet)))
+                             (let ((complete-candidate
+                                    (cons (concat path "\n" snippet) path)))
+                               (setq helm-source-tracker-cand-incomplete nil)
+                               (helm-log "built: %S" complete-candidate)
+                               complete-candidate))))
+           when (and (stringp cand)
+                   (string-match "\\`[[:space:]]*file://" cand))
+           do (setq helm-source-tracker-cand-incomplete ; save path
+                    (replace-match "" t t cand)) end
+           collect built))
+
 (defvar helm-source-tracker-search
   `((name . "Tracker Search")
     (candidates-process
@@ -2575,14 +2600,11 @@ Colorize only symlinks, directories and files."
          (start-process "tracker-search-process" nil
                         "tracker-search"
                         "--disable-color"
-                        "--disable-snippets"
+                        "--limit=512"
                         helm-pattern)))
-    (filtered-candidate-transformer
-     . ((lambda (candidates _source)
-          (cl-loop for cand in candidates
-                when (string-match "\\`[[:space:]]*file://" cand)
-                collect (replace-match "" nil t cand)))
-        (lambda (candidates _source) (helm-highlight-files candidates))))
+    (filtered-candidate-transformer . helm-source-tracker-transformer)
+    ;;(multiline) ; https://github.com/emacs-helm/helm/issues/529
+    (keymap . ,helm-generic-files-map)
     (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
     (action-transformer
      helm-transform-file-load-el
