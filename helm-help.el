@@ -329,7 +329,7 @@ Italic     => A non--file buffer.
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \\[helm-ff-rotate-left-persistent]\t\t->Rotate Image Left.
 \\[helm-ff-rotate-right-persistent]\t\t->Rotate Image Right.
-\\[helm-find-files-down-one-level]\t\t->Go down precedent directory.
+\\[helm-find-files-up-one-level]\t\t->Go down precedent directory.
 \\[helm-ff-run-switch-to-history]\t\t->Switch to last visited directories history.
 \\[helm-ff-file-name-history]\t\t->Switch to file name history.
 \\[helm-ff-properties-persistent]\t\t->Show file properties in a tooltip.
@@ -406,7 +406,7 @@ By default `helm-read-file-name' use the persistent actions of `helm-find-files'
 
 \nSpecific commands for helm-read-file-name:
 \\<helm-read-file-map>
-\\[helm-find-files-down-one-level]\t\t->Go down precedent directory.
+\\[helm-find-files-up-one-level]\t\t->Go down precedent directory.
 \\[helm-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
 \\[helm-ff-file-name-history]\t\t->File name history.

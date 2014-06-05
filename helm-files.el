@@ -322,15 +322,15 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")           'helm-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
-    (define-key map (kbd "C-.")           'helm-find-files-down-one-level)
-    (define-key map (kbd "C-l")           'helm-find-files-down-one-level)
+    (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-h C-b")       'helm-send-bug-report-from-helm)
     (define-key map (kbd "C-x @")         'helm-ff-run-find-file-as-root)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   nil nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
-      (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
+      (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
     (delq nil map))
   "Keymap for `helm-find-files'.")
@@ -340,15 +340,15 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
-    (define-key map (kbd "C-.")           'helm-find-files-down-one-level)
-    (define-key map (kbd "C-l")           'helm-find-files-down-one-level)
+    (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c ?")         'helm-read-file-name-help)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   nil nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
-      (define-key map (kbd "<left>")      'helm-find-files-down-one-level)
+      (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action)
       (define-key map (kbd "C-o")         nil)
       (define-key map (kbd "<M-left>")    'helm-previous-source)
@@ -365,7 +365,7 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
 
 
 ;; Internal.
-(defvar helm-find-files-doc-header " (`C-l': Go to precedent level)"
+(defvar helm-find-files-doc-header " (`C-l': Go up one level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 (defvar helm-ff-auto-update-flag nil
   "Internal, flag to turn on/off auto-update in `helm-find-files'.
@@ -1139,9 +1139,9 @@ You should not modify this yourself unless you know what you do.")
         (cl-loop for i in helm-file-completion-sources
               thereis (string= cur-source i)))))
 
-(defun helm-find-files-down-one-level (arg)
-  "Go down one level like unix command `cd ..'.
-If prefix numeric arg is given go ARG level down."
+(defun helm-find-files-up-one-level (arg)
+  "Go up one level like unix command `cd ..'.
+If prefix numeric arg is given go ARG level up."
   (interactive "p")
   (with-helm-alive-p
     (when (and (helm-file-completion-source-p)
@@ -1149,7 +1149,7 @@ If prefix numeric arg is given go ARG level down."
       (with-helm-window
         (when helm-follow-mode
           (helm-follow-mode -1) (message nil)))
-      ;; When going to precedent level we want to be at the line
+      ;; When going up one level we want to be at the line
       ;; corresponding to actual directory, so store this info
       ;; in `helm-ff-last-expanded'.
       (let ((cur-cand (helm-get-selection))
@@ -1167,7 +1167,7 @@ If prefix numeric arg is given go ARG level down."
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
-This happen after using `helm-find-files-down-one-level',
+This happen after using `helm-find-files-up-one-level',
 or hitting C-z on \"..\"."
   (when helm-ff-last-expanded
     (let ((presel (if helm-ff-transformer-show-only-basename
