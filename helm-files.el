@@ -679,14 +679,20 @@ will not be loaded first time you use this."
               (eshell-command (format "%s %s" command mapfiles))))
 
         ;; Run eshell-command on EACH marked files.
-        (cl-loop for i in cand-list
-              for files = (format "'%s'" i)
+        ;; To work with tramp handler we have to call
+        ;; COMMAND on basename of each file, using
+        ;; its basedir as `default-directory'.
+        (cl-loop for f in cand-list
+              for dir = (helm-basedir f)
+              for file = (format "'%s'" (if (file-remote-p dir)
+                                            (helm-basename f) f))
               for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                             ;; [1] This allow to enter other args AFTER filename
                             ;; i.e <command %s some_more_args>
-                            (format command files)
-                          (format "%s %s" command files))
-              do (eshell-command com))))))
+                            (format command file)
+                          (format "%s %s" command file))
+              do (let ((default-directory (file-name-as-directory dir)))
+                   (eshell-command com)))))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
   "Run `eshell-command' on CANDIDATE or marked candidates.
