@@ -557,14 +557,14 @@ Return nil on valid file name remote or not."
     (when (and meth (<= (length split) 2))
       (cadr split))))
 
-(defun helm-file-human-size (size)
+(cl-defun helm-file-human-size (size &optional (kbsize helm-default-kbsize))
   "Return a string showing SIZE of a file in human readable form.
 SIZE can be an integer or a float depending it's value.
 `file-attributes' will take care of that to avoid overflow error.
-KBSIZE if a floating point number, default value is 1024.0."
-  (let ((M (cons "M" (/ size (expt helm-default-kbsize 2))))
-        (G (cons "G" (/ size (expt helm-default-kbsize 3))))
-        (K (cons "K" (/ size helm-default-kbsize)))
+KBSIZE if a floating point number, defaulting to `helm-default-kbsize'."
+  (let ((M (cons "M" (/ size (expt kbsize 2))))
+        (G (cons "G" (/ size (expt kbsize 3))))
+        (K (cons "K" (/ size kbsize)))
         (B (cons "B" size)))
     (cl-loop with result = B
           for (a . b) in
