@@ -691,7 +691,7 @@ will not be loaded first time you use this."
                             ;; i.e <command %s some_more_args>
                             (format command file)
                           (format "%s %s" command file))
-              do (let ((default-directory (file-name-as-directory dir)))
+              do (let ((default-directory dir))
                    (eshell-command com)))))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
