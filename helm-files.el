@@ -1541,7 +1541,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
        (concat (regexp-quote bd)
                (replace-regexp-in-string "[*]" "[*]" bn)))
       (t
-       (setq bn (if (> (length bn) 1) ; wait 2nd char before concating.
+       (setq bn (if (>= (length bn) 3) ; wait 3nd char before concating.
                     (helm--mapconcat-candidate bn)
                   (concat ".*" (regexp-quote bn))))
        (concat (regexp-quote bd) bn)))))
