@@ -670,9 +670,11 @@ will not be loaded first time you use this."
                      ;; If command is an alias be sure it accept
                      ;; more than one arg i.e $*.
                      (string-match "\\$\\*$" alias-value)))
-               (> (length cand-list) 1))
+               (cdr cand-list))
 
           ;; Run eshell-command with ALL marked files as arguments.
+          ;; This wont work on remote files, because tramp handlers depends
+          ;; on `default-directory' (limitation).
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                 (eshell-command (format command mapfiles)) ; See [1]
