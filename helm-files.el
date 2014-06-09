@@ -1170,8 +1170,7 @@ If prefix numeric arg is given go ARG level up."
               ((and cur-cand (file-exists-p cur-cand))
                (setq helm-ff-last-expanded cur-cand)))
         (helm-set-pattern new-pattern helm-suspend-update-flag)
-        (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))
-        (helm-check-minibuffer-input)))))
+        (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))))))
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
