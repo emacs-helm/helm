@@ -2761,6 +2761,9 @@ is done on whole `helm-buffer' and not on current source."
 ;; Putting this in a hook allow users to disable it.
 (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
 
+;; Reset cursor-type after running a helm nested session.
+(add-hook 'helm-after-update-hook (lambda () (setq cursor-type nil)))
+
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
   (let ((len (string-width
