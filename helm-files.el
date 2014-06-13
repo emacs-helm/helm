@@ -2735,7 +2735,7 @@ This is the starting point for nearly all actions you can do on files."
                             (if helm-ff-transformer-show-only-basename
                                 (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
-    (helm-find-files-1 input (and presel (regexp-quote presel)))))
+    (helm-find-files-1 input (and presel (concat "^" (regexp-quote presel))))))
 
 ;;;###autoload
 (defun helm-for-files ()
