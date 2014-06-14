@@ -297,9 +297,8 @@ With a numeric prefix arg show only the ARG number of candidates."
   (with-helm-window
     (with-helm-default-directory helm-default-directory
         (let ((helm-candidate-number-limit (and (> arg 1) arg)))
-          (save-window-excursion
-            (helm-set-source-filter
-             (list (assoc-default 'name (helm-get-current-source)))))))))
+          (helm-set-source-filter
+           (list (assoc-default 'name (helm-get-current-source))))))))
 
 ;;;###autoload
 (defun helm-display-all-sources ()
