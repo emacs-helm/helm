@@ -380,6 +380,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "Same as `ffap-url-regexp' but match earlier possible url.")
 (defvar helm-tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):")
 (defvar helm-marked-buffer-name "*helm marked*")
+(defvar helm-ff--auto-update-state nil)
+(defvar helm-ff--deleting-char-backward nil)
 
 
 ;;; Helm-find-files
@@ -392,6 +394,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)
+              (setq helm-ff--auto-update-state
+                    helm-ff-auto-update-flag)
               (with-helm-temp-hook 'helm-after-initialize-hook
                 (with-helm-buffer
                   (set (make-local-variable 'helm-in-file-completion-p) t)))))
@@ -827,6 +831,7 @@ See `helm-ff-serial-rename-1'."
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
+  (setq helm-ff--auto-update-state helm-ff-auto-update-flag)
   (message "[Auto expansion %s]"
            (if helm-ff-auto-update-flag "enabled" "disabled")))
 
@@ -836,16 +841,17 @@ See `helm-ff-serial-rename-1'."
     (helm-attrset 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
     (helm-execute-persistent-action 'toggle-auto-update)))
 
-(defvar helm-ff--deleting-char-backward nil)
 (defun helm-ff-delete-char-backward ()
   "Disable helm find files auto update and delete char backward."
   (interactive)
+  (setq helm-ff-auto-update-flag nil)
   (setq helm-ff--deleting-char-backward t)
   (call-interactively
    (lookup-key (current-global-map)
                (read-kbd-macro "DEL"))))
 
 (defun helm-ff-delete-char-backward--exit-fn ()
+  (setq helm-ff-auto-update-flag helm-ff--auto-update-state)
   (setq helm-ff--deleting-char-backward nil))
 
 (defun helm-ff-run-switch-to-history ()
