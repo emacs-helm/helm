@@ -1432,6 +1432,12 @@ purpose."
     ;; `helm-ff-tramp-hostnames'.
     (unless (or (string= path "Invalid tramp file name")
                 invalid-basedir) ; Leave  helm-pattern unchanged.
+      (setq helm-ff-auto-update-flag
+            ;; Unless auto update is disabled at startup or
+            ;; interactively, start auto updating only at third char.
+            (unless (or (null helm-ff-auto-update-initial-value)
+                        (null helm-ff-auto-update--state))
+              (>= (length (helm-basename path)) 3)))
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")
@@ -1540,7 +1546,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
        (concat (regexp-quote bd)
                (replace-regexp-in-string "[*]" "[*]" bn)))
       (t
-       (setq bn (if (>= (length bn) 3) ; wait 3nd char before concating.
+       (setq bn (if (>= (length bn) 2) ; wait 2nd char before concating.
                     (helm--mapconcat-candidate bn)
                   (concat ".*" (regexp-quote bn))))
        (concat (regexp-quote bd) bn)))))
