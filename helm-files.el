@@ -370,7 +370,6 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
 (defvar helm-ff-auto-update-flag nil
   "Internal, flag to turn on/off auto-update in `helm-find-files'.
 Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
-(defvar helm-ff-auto-update--state nil)
 (defvar helm-ff-last-expanded nil
   "Store last expanded directory or file.")
 (defvar helm-ff-default-directory nil)
@@ -393,8 +392,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (init . (lambda ()
               (setq helm-ff-auto-update-flag
                     helm-ff-auto-update-initial-value)
-              (setq helm-ff-auto-update--state
-                    helm-ff-auto-update-flag)
               (with-helm-temp-hook 'helm-after-initialize-hook
                 (with-helm-buffer
                   (set (make-local-variable 'helm-in-file-completion-p) t)))))
@@ -830,7 +827,6 @@ See `helm-ff-serial-rename-1'."
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
-  (setq helm-ff-auto-update--state helm-ff-auto-update-flag)
   (message "[Auto expansion %s]"
            (if helm-ff-auto-update-flag "enabled" "disabled")))
 
@@ -840,16 +836,17 @@ See `helm-ff-serial-rename-1'."
     (helm-attrset 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
     (helm-execute-persistent-action 'toggle-auto-update)))
 
+(defvar helm-ff--deleting-char-backward nil)
 (defun helm-ff-delete-char-backward ()
   "Disable helm find files auto update and delete char backward."
   (interactive)
-  (setq helm-ff-auto-update-flag nil)
+  (setq helm-ff--deleting-char-backward t)
   (call-interactively
    (lookup-key (current-global-map)
                (read-kbd-macro "DEL"))))
 
 (defun helm-ff-delete-char-backward--exit-fn ()
-  (setq helm-ff-auto-update-flag helm-ff-auto-update--state))
+  (setq helm-ff--deleting-char-backward nil))
 
 (defun helm-ff-run-switch-to-history ()
   "Run Switch to history action from `helm-source-find-files'."
@@ -1205,6 +1202,7 @@ or hitting C-z on \"..\"."
 When only one candidate is remaining and it is a directory,
 expand to this directory."
   (when (and helm-ff-auto-update-flag
+             (null helm-ff--deleting-char-backward)
              (helm-file-completion-source-p)
              ;; Issue #295
              ;; File predicates are returning t
@@ -1402,13 +1400,7 @@ purpose."
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
          (dir-p         (file-accessible-directory-p path))
-         (path-name-dir (if (and dir-p
-                                 ;; Don't add the "/" at the end
-                                 ;; of path when `helm-ff-auto-update-flag'
-                                 ;; is enabled.
-                                 helm-ff-auto-update-flag)
-                            (file-name-as-directory (expand-file-name path))
-                          (file-name-directory (expand-file-name path))))
+         path-name-dir
          invalid-basedir
          non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
@@ -1432,13 +1424,22 @@ purpose."
     ;; `helm-ff-tramp-hostnames'.
     (unless (or (string= path "Invalid tramp file name")
                 invalid-basedir) ; Leave  helm-pattern unchanged.
-      (setq helm-ff-auto-update-flag
+      (setq helm-ff-auto-update-flag ; [1]
             ;; Unless auto update is disabled at startup or
             ;; interactively, start auto updating only at third char.
             (unless (or (null helm-ff-auto-update-initial-value)
-                        (null helm-ff-auto-update--state))
+                        ;; But don't enable auto update when
+                        ;; deleting backward.
+                        helm-ff--deleting-char-backward)
               (>= (length (helm-basename path)) 3)))
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
+    ;; This have to be set after [1] to allow deleting char backward.
+    (setq path-name-dir (if (and dir-p
+                                 ;; Add the final "/" to path
+                                 ;; when `helm-ff-auto-update-flag' is enabled.
+                                 helm-ff-auto-update-flag)
+                            (file-name-as-directory (expand-file-name path))
+                          (file-name-directory (expand-file-name path))))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")
               (expand-file-name "/") ; Expand to "/" or "c:/"
