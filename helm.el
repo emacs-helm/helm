@@ -2623,15 +2623,18 @@ and `helm-pattern'."
   (when matches
     (helm-insert-header-from-source source)
     (if (not (assq 'multiline source))
-        (mapc #'(lambda (m)
-                  (helm-insert-match m 'insert source))
-              matches)
-      (let ((start (point)) separate)
+        (cl-loop for m in matches
+                 for count from 1
+                 do (helm-insert-match m 'insert source count)) 
+      (let ((start (point))
+            (count 0)
+            separate)
         (cl-dolist (match matches)
+          (cl-incf count)
           (if separate
               (helm-insert-candidate-separator)
             (setq separate t))
-          (helm-insert-match match 'insert source))
+          (helm-insert-match match 'insert source count))
         (put-text-property start (point) 'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
@@ -2832,7 +2835,7 @@ if specified."
   "Remove SOURCE from `helm-candidate-cache'."
   (remhash (assoc-default 'name source) helm-candidate-cache))
 
-(defun helm-insert-match (match insert-function source)
+(defun helm-insert-match (match insert-function source &optional num)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION for SOURCE.
 If MATCH is a list then insert the string intended to appear on the display
 and store the real value in a text property."
@@ -2852,6 +2855,8 @@ and store the real value in a text property."
         (and realvalue
              (put-text-property start (point-at-eol)
                                 'helm-realvalue realvalue)))
+      (when num
+        (put-text-property start (point-at-eol) 'helm-cand-num num))
       (when helm-source-in-each-line-flag
         (put-text-property start (point-at-eol) 'helm-source source))
       (funcall insert-function "\n"))))
@@ -2915,23 +2920,25 @@ after the source name by overlay."
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--process-source (process output-string source limit)
-  (cl-dolist (candidate (helm-transform-candidates
-                         (helm-output-filter--collect-candidates
-                          (split-string output-string "\n")
-                          (assoc 'incomplete-line source)
-                          source)
-                         source t))
-    (when candidate ; filter-one-by-one may return nil candidates.
-      (if (assq 'multiline source)
-          (let ((start (point)))
-            (helm-insert-candidate-separator)
-            (helm-insert-match candidate 'insert-before-markers source)
-            (put-text-property start (point) 'helm-multiline t))
-        (helm-insert-match candidate 'insert-before-markers source))
-      (cl-incf (cdr (assoc 'item-count source)))
-      (when (>= (assoc-default 'item-count source) limit)
-        (helm-kill-async-process process)
-        (cl-return)))))
+  (let ((count 0))
+    (cl-dolist (candidate (helm-transform-candidates
+                           (helm-output-filter--collect-candidates
+                            (split-string output-string "\n")
+                            (assoc 'incomplete-line source)
+                            source)
+                           source t))
+      (cl-incf count)
+      (when candidate   ; filter-one-by-one may return nil candidates.
+        (if (assq 'multiline source)
+            (let ((start (point)))
+              (helm-insert-candidate-separator)
+              (helm-insert-match candidate 'insert-before-markers source count)
+              (put-text-property start (point) 'helm-multiline t))
+            (helm-insert-match candidate 'insert-before-markers source count))
+        (cl-incf (cdr (assoc 'item-count source)))
+        (when (>= (assoc-default 'item-count source) limit)
+          (helm-kill-async-process process)
+          (cl-return))))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info source)
   "Collect LINES maybe completing the truncated first and last lines."
@@ -3148,7 +3155,8 @@ Possible value of DIRECTION are 'next or 'previous."
     (if helm-mode-line-string
         (setq mode-line-format
               `(" " mode-line-buffer-identification " "
-                    (line-number-mode "L%l") " " ,follow
+                    (:eval (format "L%s" (helm-candidate-number-at-point)))
+                    " " ,follow
                     (:eval (when ,helm--mode-line-display-prefarg
                              (let ((arg (prefix-numeric-value (or prefix-arg
                                                                   current-prefix-arg))))
@@ -3317,55 +3325,63 @@ Key arg DIRECTION can be one of:
           (goto-char (helm-get-next-header-pos)))
       (error (helm-log "%S" err)))))
 
-;;;###autoload
+(defun helm-candidate-number-at-point ()
+  (with-helm-buffer
+    (get-text-property (point) 'helm-cand-num)))
+
+(defun helm--next-or-previous-line (direction &optional arg)
+  ;; Be sure to not use this in non--interactives calls.
+  (let ((helm-move-to-line-cycle-in-source
+         (and helm-move-to-line-cycle-in-source arg)))
+    (if (and arg (> arg 1))
+        (cl-loop with pos = (helm-candidate-number-at-point)
+                 with cand-num = (helm-get-candidate-number t)
+                 with iter = (min arg (- cand-num pos))
+                 for count from 1
+                 while (<= count iter)
+                 do
+                 (helm-move-selection-common :where 'line :direction direction))
+        (helm-move-selection-common :where 'line :direction direction))))
+
 (defun helm-previous-line (&optional arg)
-  "Move selection to the previous line."
+  "Move selection to the ARG previous line(s).
+Same behavior than `helm-next-line' when called with a numeric prefix arg."
   (interactive "p")
-  ;; Be sure to not use this in non--interactives calls.
-  (let ((helm-move-to-line-cycle-in-source
-         (and helm-move-to-line-cycle-in-source arg)))
-    (helm-move-selection-common :where 'line :direction 'previous)))
+  (helm--next-or-previous-line 'previous arg))
 
-;;;###autoload
 (defun helm-next-line (&optional arg)
-  "Move selection to the next line."
+  "Move selection to the next ARG line(s).
+When a numeric prefix arg is given and this numeric arg
+is > to the number of candidates, move to last candidate of
+current source (i.e don't move to next source if some)."
   (interactive "p")
-  ;; Be sure to not use this in non--interactives calls.
-  (let ((helm-move-to-line-cycle-in-source
-         (and helm-move-to-line-cycle-in-source arg)))
-    (helm-move-selection-common :where 'line :direction 'next)))
+  (helm--next-or-previous-line 'next arg))
 
-;;;###autoload
 (defun helm-previous-page ()
   "Move selection back with a pageful."
   (interactive)
   (helm-move-selection-common :where 'page :direction 'previous))
 
-;;;###autoload
 (defun helm-next-page ()
   "Move selection forward with a pageful."
   (interactive)
   (helm-move-selection-common :where 'page :direction 'next))
 
-;;;###autoload
 (defun helm-beginning-of-buffer ()
   "Move selection at the top."
   (interactive)
   (helm-move-selection-common :where 'edge :direction 'previous))
 
-;;;###autoload
 (defun helm-end-of-buffer ()
   "Move selection at the bottom."
   (interactive)
   (helm-move-selection-common :where 'edge :direction 'next))
 
-;;;###autoload
 (defun helm-previous-source ()
   "Move selection to the previous source."
   (interactive)
   (helm-move-selection-common :where 'source :direction 'previous))
 
-;;;###autoload
 (defun helm-next-source ()
   "Move selection to the next source."
   (interactive)
