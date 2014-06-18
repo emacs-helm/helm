@@ -384,7 +384,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                                   'face 'helm-grep-cmd-line)))
                       (setq mode-line-format
                             '(" " mode-line-buffer-identification " "
-                              (line-number-mode "%l") " "
+                              (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                               (:eval (propertize
                                       (format
                                        "[%s process finished - (no results)] "
@@ -399,7 +399,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                     (with-helm-window
                       (setq mode-line-format
                             '(" " mode-line-buffer-identification " "
-                              (line-number-mode "%l") " "
+                              (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                               (:eval (propertize
                                       (format
                                        "[%s process finished - (%s results)] "
@@ -1070,7 +1070,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                (with-helm-window
                  (setq mode-line-format
                        '(" " mode-line-buffer-identification " "
-                         (line-number-mode "%l") " "
+                         (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                          (:eval (propertize
                                  (format "[Pdfgrep Process Finish - %s result(s)] "
                                          (max (1- (count-lines
