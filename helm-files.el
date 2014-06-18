@@ -1438,7 +1438,7 @@ purpose."
                         ;; But don't enable auto update when
                         ;; deleting backward.
                         helm-ff--deleting-char-backward)
-              (>= (length (helm-basename path)) 3)))
+              (or (>= (length (helm-basename path)) 3) dir-p)))
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
     ;; This have to be set after [1] to allow deleting char backward.
     (setq path-name-dir (if (and dir-p
@@ -1535,7 +1535,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
     (cond
       ((or (and dir-p tramp-p (string-match ":\\'" pattern))
            (string= pattern "")
-           (and dir-p (< (length bn) 2)))
+           (and dir-p (<= (length bn) 2)))
        ;; Use full FNAME on e.g "/ssh:host:".
        (regexp-quote pattern))
       ;; Prefixing BN with a space call match-plugin completion.
