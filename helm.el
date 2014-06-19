@@ -1707,9 +1707,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-display-buffer helm-buffer)
                    (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                    (helm-log "show prompt")
-                   (helm-read-pattern-maybe
-                    any-prompt any-input any-preselect
-                    any-resume any-keymap any-default any-history))
+                   (unwind-protect
+                        (helm-read-pattern-maybe
+                         any-prompt any-input any-preselect
+                         any-resume any-keymap any-default any-history)
+                     (helm-cleanup)))
                  (prog1
                      (unless helm-quit (helm-execute-selection-action))
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
@@ -2187,8 +2189,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
                                             nil hist tap t))
-                 (when timer (cancel-timer timer) (setq timer nil))
-                 (helm-cleanup))))))))
+                 (when timer (cancel-timer timer) (setq timer nil)))))))))
 
 (defun helm-exit-or-quit-maybe ()
   "Exit and run default action if only one candidate, quit if no candidates.
