@@ -1702,22 +1702,16 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                      helm-quit
                      (helm-buffer (or any-buffer helm-buffer)))
                  (with-helm-restore-variables
-                   (helm-initialize any-resume any-input
-                                    any-default any-sources)
+                   (helm-initialize
+                    any-resume any-input any-default any-sources)
                    (helm-display-buffer helm-buffer)
                    (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                    (helm-log "show prompt")
-                   (unwind-protect
-                        (helm-read-pattern-maybe
-                         any-prompt any-input any-preselect
-                         any-resume any-keymap any-default
-                         (when (and any-history (symbolp any-history))
-                           any-history))
-                     (helm-cleanup)))
-                 (prog1 (unless helm-quit
-                          (with-helm-temp-hook 'helm-cleanup-hook
-                            (setq overriding-terminal-local-map old-overriding-local-map))
-                          (helm-execute-selection-action))
+                   (helm-read-pattern-maybe
+                    any-prompt any-input any-preselect
+                    any-resume any-keymap any-default any-history))
+                 (prog1
+                     (unless helm-quit (helm-execute-selection-action))
                    (helm-log (concat "[End session] " (make-string 41 ?-)))))
              (quit
               (helm-restore-position-on-quit)
@@ -2119,7 +2113,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
   (with-current-buffer (helm-buffer-get)
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
-           (hist       (or any-history
+           (hist       (or (and any-history (symbolp any-history) any-history)
                            ;; Needed for resuming. 
                            (assoc-default 'history src)))
            (timer nil)
@@ -2193,7 +2187,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
                                             nil hist tap t))
-                 (when timer (cancel-timer timer) (setq timer nil)))))))))
+                 (when timer (cancel-timer timer) (setq timer nil))
+                 (helm-cleanup))))))))
 
 (defun helm-exit-or-quit-maybe ()
   "Exit and run default action if only one candidate, quit if no candidates.
