@@ -1401,7 +1401,7 @@ Return the result of last function call."
           do (setq result (apply fn args)) finally return result)))
 
 (defun helm-funcall-foreach (sym &optional sources)
-  "Call the function SYM for each source if any."
+  "Call the associated function to SYM for each source if any."
   (let ((sources (or sources (helm-get-sources))))
     (cl-dolist (source sources)
       (helm-aif (assoc-default sym source)
