@@ -178,7 +178,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "C-g")        'helm-keyboard-quit)
     (define-key map (kbd "<right>")    'helm-next-source)
     (define-key map (kbd "<left>")     'helm-previous-source)
-    (define-key map (kbd "<RET>")      'helm-exit-minibuffer)
+    (define-key map (kbd "<RET>")      'helm-maybe-exit-minibuffer)
     (define-key map (kbd "C-i")        'helm-select-action)
     (define-key map (kbd "C-z")        'helm-execute-persistent-action)
     (define-key map (kbd "C-e")        'helm-select-2nd-action-or-end-of-line)
@@ -901,7 +901,8 @@ Otherwise make a list with one element."
   "Return the actual command in action.
 Like `this-command' but return the real command,
 not `exit-minibuffer' or unwanted functions."
-  (cl-loop with bl = '(helm-exit-minibuffer
+  (cl-loop with bl = '(helm-maybe-exit-minibuffer
+                       helm-exit-minibuffer
                        exit-minibuffer)
         for count from 1 to 50
         for btf = (backtrace-frame count)
@@ -3464,17 +3465,25 @@ don't exit and send message 'no match'."
     (setq minibuffer-completion-confirm
           helm-minibuffer-confirm-state)))
 
-;;;###autoload
+(defun helm--updating-p ()
+  ;; helm timer is between two cycles.
+  (not (string= (minibuffer-contents) helm-pattern)))
+
+(defun helm-maybe-exit-minibuffer ()
+  (interactive)
+  (if (helm--updating-p)
+      (progn (message "[Display not ready]")
+             (sit-for 0.5) (message nil))
+      (helm-exit-minibuffer)))
+
 (defun helm-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
-  (interactive)
   (unless helm-current-prefix-arg
     (setq helm-current-prefix-arg current-prefix-arg))
   (setq helm-exit-status 0)
   (helm-log-run-hook 'helm-exit-minibuffer-hook)
   (exit-minibuffer))
 
-;;;###autoload
 (defun helm-keyboard-quit ()
   "Quit minibuffer in helm.
 If action buffer is displayed, kill it."
