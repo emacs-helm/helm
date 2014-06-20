@@ -1507,6 +1507,7 @@ This is used in transformers to modify candidates list."
   '(:sources :input :prompt :resume
     :preselect :buffer :keymap :default :history))
 
+;;;###autoload
 (defun helm (&rest plist)
   "Main function to execute helm sources.
 
@@ -1735,7 +1736,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
 ;;; Helm resume
 ;;
 ;;
-;;;###autoload
 (defun helm-resume (arg)
   "Resurrect previously invoked `helm'.
 Called with a prefix arg, allow choosing among all existing
@@ -1771,7 +1771,6 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
          :resume t
          :buffer any-buffer))))
 
-;;;###autoload
 (defun helm-resume-previous-session-after-quit (arg)
   "Resume previous helm session within running helm."
   (interactive "p")
@@ -1779,7 +1778,6 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
       (helm-run-after-quit `(lambda () (helm-resume (nth ,arg helm-buffers))))
     (message "No previous helm sessions to resume yet!")))
 
-;;;###autoload
 (defun helm-resume-list-buffers-after-quit ()
   "List resumable helm buffers within running helm."
   (interactive)
@@ -2207,7 +2205,6 @@ This function is handling `helm-execute-action-at-once-if-one' and
                 (funcall helm-quit-if-no-candidate))
            (keyboard-quit)))))
 
-;;;###autoload
 (defun helm-toggle-suspend-update ()
   "Enable or disable update of display in helm.
 This can be useful for e.g writing quietly a complex regexp."
@@ -2797,7 +2794,6 @@ is done on whole `helm-buffer' and not on current source."
     (save-excursion (helm-log-run-hook 'helm-update-hook)))
   (helm-next-line))
 
-;;;###autoload
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
 The difference with `helm-update' is this function is reevaling
@@ -3065,7 +3061,6 @@ Coerce source with coerce function."
       (cdar action)
     action))
 
-;;;###autoload
 (defun helm-select-action ()
   "Select an action for the currently selected candidate.
 If action buffer is selected, back to the helm buffer."
@@ -3429,7 +3424,6 @@ to mark candidates."
     (setq helm-selection-point (overlay-start helm-selection-overlay)))
   (helm-follow-execute-persistent-action-maybe))
 
-;;;###autoload
 (defun helm-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting helm.
 It is similar to `minibuffer-complete-and-exit' adapted to helm.
@@ -3536,7 +3530,6 @@ If action buffer is displayed, kill it."
 ;;; Debugging
 ;;
 ;;
-;;;###autoload
 (defun helm-debug-output ()
   "Show all helm-related variables at this time."
   (interactive)
@@ -3577,7 +3570,6 @@ to a list of forms.\n\n")
     (forward-line 0) ; Avoid scrolling right on long lines.
     (helm-mark-current-line)))
 
-;;;###autoload
 (defun helm-delete-current-selection ()
   "Delete the currently selected item."
   (interactive)
@@ -3649,7 +3641,6 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
 That is what completion commands operate on."
   (buffer-substring (field-beginning) (point)))
 
-;;;###autoload
 (defun helm-delete-minibuffer-contents (&optional arg)
   "Delete minibuffer contents.
 When called with a prefix arg or when
@@ -3973,7 +3964,7 @@ Arg DATA can be either a list or a plain string."
 
 ;;; Resplit helm window
 ;;
-;;;###autoload
+;;
 (defun helm-toggle-resplit-window ()
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
@@ -4018,19 +4009,16 @@ If N is positive enlarge, if negative narrow."
       (with-helm-window
         (enlarge-window n horizontal-p)))))
 
-;;;###autoload
 (defun helm-narrow-window ()
   "Narrow helm window."
   (interactive)
   (helm-enlarge-window-1 -1))
 
-;;;###autoload
 (defun helm-enlarge-window ()
   "Enlarge helm window."
   (interactive)
   (helm-enlarge-window-1 1))
 
-;;;###autoload
 (defun helm-swap-windows ()
   "Swap window holding `helm-buffer' with other window."
   (interactive)
@@ -4109,25 +4097,21 @@ Possible values are 'left 'right 'below or 'above."
         (t
          (error "Error in `helm-select-nth-action'"))))
 
-;;;###autoload
 (defun helm-select-2nd-action ()
   "Select the 2nd action for the currently selected candidate."
   (interactive)
   (helm-select-nth-action 1))
 
-;;;###autoload
 (defun helm-select-3rd-action ()
   "Select the 3rd action for the currently selected candidate."
   (interactive)
   (helm-select-nth-action 2))
 
-;;;###autoload
 (defun helm-select-4th-action ()
   "Select the 4th action for the currently selected candidate."
   (interactive)
   (helm-select-nth-action 3))
 
-;;;###autoload
 (defun helm-select-2nd-action-or-end-of-line ()
   "Select the 2nd action for the currently selected candidate.
 This happen when point is at the end of minibuffer.
@@ -4148,7 +4132,6 @@ Make `pop-to-buffer' and `display-buffer' display in the same window."
 (defun helm-initialize-persistent-action ()
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
-;;;###autoload
 (cl-defun helm-execute-persistent-action
     (&optional (attr 'persistent-action) split-onewindow)
   "Perform the associated action ATTR without quitting helm.
@@ -4262,25 +4245,21 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
   (with-selected-window (helm-persistent-action-display-window)
     (funcall command scroll-amount)))
 
-;;;###autoload
 (defun helm-scroll-other-window ()
   "Scroll other window (not *Helm* window) upward."
   (interactive)
   (helm-other-window-base 'scroll-up))
 
-;;;###autoload
 (defun helm-scroll-other-window-down ()
   "Scroll other window (not *Helm* window) downward."
   (interactive)
   (helm-other-window-base 'scroll-down))
 
-;;;###autoload
 (defun helm-recenter-top-bottom-other-window ()
   "`recenter-top-bottom' in other window (not *Helm* window)."
   (interactive)
   (helm-other-window-base 'recenter-top-bottom 'noscroll))
 
-;;;###autoload
 (defun helm-reposition-window-other-window ()
   "`helm-reposition-window' in other window (not *Helm* window)."
   (interactive)
@@ -4323,7 +4302,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
   (push (cons (helm-get-current-source) (helm-get-selection))
         helm-marked-candidates))
 
-;;;###autoload
 (defun helm-toggle-visible-mark ()
   "Toggle helm visible mark at point."
   (interactive)
@@ -4337,7 +4315,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (unless (helm-end-of-source-p)
           (helm-next-line))))))
 
-;;;###autoload
 (defun helm-mark-all ()
   "Mark all visible unmarked candidates in current source."
   (interactive)
@@ -4385,7 +4362,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (helm-mark-current-line)
         (message "%s candidates marked" (length helm-marked-candidates))))))
 
-;;;###autoload
 (defun helm-unmark-all ()
   "Unmark all candidates in all sources of current helm session."
   (interactive)
@@ -4397,7 +4373,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
       (helm-mark-current-line)
       (message "%s candidates unmarked" len))))
 
-;;;###autoload
 (defun helm-toggle-all-marks ()
   "Toggle all marks.
 Mark all visible candidates of current source or unmark all candidates
@@ -4409,7 +4384,6 @@ visible or invisible in all sources of current helm session"
         (helm-unmark-all)
       (helm-mark-all))))
 
-;;;###autoload
 (defun helm-display-all-visible-marks ()
   "Show all `helm' visible marks strings.
 Only useful for debugging."
@@ -4486,7 +4460,6 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
                   if (< curpos pt) return i))
           points))))
 
-;;;###autoload
 (defun helm-next-visible-mark (&optional prev)
   "Move next helm visible mark.
 If PREV is non-nil move to precedent."
@@ -4499,14 +4472,13 @@ If PREV is non-nil move to precedent."
                   prev)))
     (helm-mark-current-line)))
 
-;;;###autoload
 (defun helm-prev-visible-mark ()
   "Move previous helm visible mark."
   (interactive)
   (helm-next-visible-mark t))
 
-;; Utility: Selection Paste
-;;;###autoload
+;;; Utility: Selection Paste
+;;
 (defun helm-yank-selection (arg)
   "Set minibuffer contents to current display selection.
 With a prefix arg set to real value of current selection."
@@ -4515,7 +4487,6 @@ With a prefix arg set to real value of current selection."
     (kill-new str)
     (helm-set-pattern str)))
 
-;;;###autoload
 (defun helm-kill-selection-and-quit (arg)
   "Store current selection to kill ring.
 With a prefix arg set to real value of current selection."
@@ -4530,7 +4501,6 @@ With a prefix arg set to real value of current selection."
 ;;; Follow-mode: Automatical execution of persistent-action
 ;;
 ;;
-;;;###autoload
 (defun helm-follow-mode (&optional arg)
   "Execute persistent action everytime the cursor is moved when enabled.
 The mode is enabled for the current source only, you will have to turn it
