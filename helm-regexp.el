@@ -203,8 +203,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
           when (save-excursion
                  (re-search-forward reg (point-at-eol) t))
           collect (match-beginning 0) into pos-ls
-          finally (unless (null pos-ls)
-                    (goto-char (apply #'min pos-ls))))
+          finally (when pos-ls (goto-char (apply #'min pos-ls))))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
