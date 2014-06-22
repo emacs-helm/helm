@@ -418,7 +418,11 @@ Special commands:
             (insert
              "\n"
              (cl-loop for buf in buflst
-                      for bufstr = (with-current-buffer buf (buffer-string))
+                      for bufstr = (or (and (buffer-live-p (get-buffer buf))
+                                            (with-current-buffer buf
+                                              (buffer-string)))
+                                       "")
+                      unless (string= bufstr "")
                       do (add-text-properties
                           0 (length bufstr)
                           `(buffer-name ,(buffer-name (get-buffer buf)))
