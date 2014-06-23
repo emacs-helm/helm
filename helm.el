@@ -3150,8 +3150,8 @@ Possible value of DIRECTION are 'next or 'previous."
                     (:eval (format "L%d" (helm-candidate-number-at-point)))
                     " " ,follow
                     (:eval (when ,helm--mode-line-display-prefarg
-                             (let ((arg (prefix-numeric-value (or prefix-arg
-                                                                  current-prefix-arg))))
+                             (let ((arg (prefix-numeric-value
+                                         (or prefix-arg current-prefix-arg))))
                                (unless (= arg 1)
                                  (propertize (format "[prefarg:%s] " arg)
                                              'face 'helm-prefarg)))))
