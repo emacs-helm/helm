@@ -3147,7 +3147,7 @@ Possible value of DIRECTION are 'next or 'previous."
     (if helm-mode-line-string
         (setq mode-line-format
               `(" " mode-line-buffer-identification " "
-                    (:eval (format "L%s" (helm-candidate-number-at-point)))
+                    (:eval (format "L%d" (helm-candidate-number-at-point)))
                     " " ,follow
                     (:eval (when ,helm--mode-line-display-prefarg
                              (let ((arg (prefix-numeric-value (or prefix-arg
@@ -3319,7 +3319,7 @@ Key arg DIRECTION can be one of:
 
 (defun helm-candidate-number-at-point ()
   (with-helm-buffer
-    (get-text-property (point) 'helm-cand-num)))
+    (or (get-text-property (point) 'helm-cand-num) 1)))
 
 (defun helm--next-or-previous-line (direction &optional arg)
   ;; Be sure to not use this in non--interactives calls.
