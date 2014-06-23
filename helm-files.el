@@ -1564,9 +1564,10 @@ If FNAME is a valid directory name,return FNAME unchanged."
 
 (defun helm-ff-save-history ()
   "Store the last value of `helm-ff-default-directory' in `helm-ff-history'.
-Note that only directories are saved here."
+Note that only existing directories are saved here."
   (when (and helm-ff-default-directory
-             (helm-file-completion-source-p))
+             (helm-file-completion-source-p)
+             (file-directory-p helm-ff-default-directory))
     (set-text-properties 0 (length helm-ff-default-directory)
                          nil helm-ff-default-directory)
     (push helm-ff-default-directory helm-ff-history)))
