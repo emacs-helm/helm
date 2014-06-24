@@ -1441,10 +1441,9 @@ purpose."
               (or (>= (length (helm-basename path)) 3) dir-p)))
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
     ;; This have to be set after [1] to allow deleting char backward.
-    (setq path-name-dir (if (and dir-p
-                                 ;; Add the final "/" to path
-                                 ;; when `helm-ff-auto-update-flag' is enabled.
-                                 helm-ff-auto-update-flag)
+    (setq path-name-dir (if (and dir-p helm-ff-auto-update-flag)
+                            ;; Add the final "/" to path
+                            ;; when `helm-ff-auto-update-flag' is enabled.
                             (file-name-as-directory (expand-file-name path))
                           (file-name-directory (expand-file-name path))))
     (setq helm-ff-default-directory
@@ -1515,14 +1514,14 @@ systems."
        (not (memq helm-mp-matching-method '(multi1 multi3p)))))
 
 (defun helm-ff--transform-pattern-for-completion (pattern)
-  "Maybe return FNAME with it's basename modified as a regexp.
+  "Maybe return PATTERN with it's basename modified as a regexp.
 This happen only when `helm-ff-smart-completion' is enabled.
 This provide a similar behavior as `ido-enable-flex-matching'.
 See also `helm--mapconcat-candidate'.
-If FNAME is an url returns it unmodified.
-When FNAME contain a space fallback to match-plugin.
+If PATTERN is an url returns it unmodified.
+When PATTERN contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
-If FNAME is a valid directory name,return FNAME unchanged."
+If PATTERN is a valid directory name,return PATTERN unchanged."
   ;; handle bad filenames containing a backslash.
   (setq pattern (helm-ff-handle-backslash pattern))
   (let ((bn      (helm-basename pattern))
@@ -1536,7 +1535,7 @@ If FNAME is a valid directory name,return FNAME unchanged."
       ((or (and dir-p tramp-p (string-match ":\\'" pattern))
            (string= pattern "")
            (and dir-p (<= (length bn) 2)))
-       ;; Use full FNAME on e.g "/ssh:host:".
+       ;; Use full PATTERN on e.g "/ssh:host:".
        (regexp-quote pattern))
       ;; Prefixing BN with a space call match-plugin completion.
       ;; This allow showing all files/dirs matching BN (Issue #518).
