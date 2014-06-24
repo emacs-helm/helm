@@ -2216,25 +2216,30 @@ This can be useful for e.g writing quietly a complex regexp."
                "Helm update suspended!"
              "Helm update reenabled!")))
 
+(defvar helm--reading-passwd nil)
 (defadvice tramp-read-passwd (around disable-helm-update)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (setq overriding-terminal-local-map nil)
+  (setq helm--reading-passwd t)
   (let (stimers)
     (unwind-protect
          (progn
            (setq stimers (with-timeout-suspend))
            ad-do-it)
       (with-timeout-unsuspend stimers)
+      (setq helm--reading-passwd nil)
       (setq helm-suspend-update-flag nil))))
 
 (defun helm--advice-tramp-read-passwd (old--fn &rest args)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (setq overriding-terminal-local-map nil)
+  (setq helm--reading-passwd t)
   (unwind-protect
        ;; No need to suspend timer in emacs-24.4
        (apply old--fn args)
+    (setq helm--reading-passwd nil)
     (setq helm-suspend-update-flag nil)))
 
 (defun helm--maybe-update-keymap ()
@@ -3465,7 +3470,8 @@ don't exit and send message 'no match'."
 
 (defun helm-maybe-exit-minibuffer ()
   (interactive)
-  (if (helm--updating-p)
+  (if (and (helm--updating-p)
+           (null helm--reading-passwd))
       (progn (message "[Display not ready]")
              (sit-for 0.5) (message nil))
       (helm-exit-minibuffer)))
