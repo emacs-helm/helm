@@ -1441,11 +1441,12 @@ purpose."
               (or (>= (length (helm-basename path)) 3) dir-p)))
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
     ;; This have to be set after [1] to allow deleting char backward.
-    (setq path-name-dir (if (and dir-p helm-ff-auto-update-flag)
+    (setq path-name-dir (expand-file-name
+                         (if (and dir-p helm-ff-auto-update-flag)
                             ;; Add the final "/" to path
                             ;; when `helm-ff-auto-update-flag' is enabled.
-                            (file-name-as-directory (expand-file-name path))
-                          (file-name-directory (expand-file-name path))))
+                            (file-name-as-directory path)
+                          (file-name-directory path))))
     (setq helm-ff-default-directory
           (if (string= helm-pattern "")
               (expand-file-name "/") ; Expand to "/" or "c:/"
