@@ -1808,7 +1808,8 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
   (helm :sources any-sources :buffer any-buffer))
 
 (defun helm-nest (&rest same-as-helm)
-  "Allow calling `helm' whithin a running helm session."
+  "Allow calling `helm' whithin a running helm session.
+Arguments SAME-AS-HELM are the same as `helm', which see."
   (with-helm-window
     (let ((orig-helm-current-buffer helm-current-buffer)
           (orig-helm-buffer helm-buffer)
@@ -1834,7 +1835,7 @@ Call `helm' with only ANY-SOURCES and ANY-BUFFER as args."
           (unless (helm-empty-buffer-p) (helm-mark-current-line t))
           (setq helm-last-frame-or-window-configuration
                 orig-helm-last-frame-or-window-configuration)
-          (setq cursor-type t)
+          (setq cursor-type nil)
           (setq helm-current-buffer orig-helm-current-buffer)
           (setq helm-onewindow-p orig-one-window-p))))))
 
