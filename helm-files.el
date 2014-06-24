@@ -1534,7 +1534,11 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
     (cond
       ((or (and dir-p tramp-p (string-match ":\\'" pattern))
            (string= pattern "")
-           (and dir-p (<= (length bn) 2)))
+           (and dir-p (<= (length bn) 2))
+           ;; Fix Issue #541 when BD have a subdir similar
+           ;; to BN, don't switch to match plugin
+           ;; which will match both.
+           (and dir-p (string-match (regexp-quote bn) bd)))
        ;; Use full PATTERN on e.g "/ssh:host:".
        (regexp-quote pattern))
       ;; Prefixing BN with a space call match-plugin completion.
