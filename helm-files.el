@@ -1206,18 +1206,22 @@ or hitting C-z on \"..\"."
 (defun helm-ff-update-when-only-one-matched ()
   "Expand to directory when sole completion.
 When only one candidate is remaining and it is a directory,
-expand to this directory."
-  (when (and helm-ff-auto-update-flag
-             (null helm-ff--deleting-char-backward)
-             (helm-file-completion-source-p)
-             ;; Issue #295
-             ;; File predicates are returning t
-             ;; with paths like //home/foo.
-             ;; So check it is not the case by regexp
-             ;; to allow user to do C-a / to start e.g
-             ;; entering a tramp method e.g /sudo::.
-             (not (string-match "\\`//" helm-pattern))
-             (not (helm-ff-invalid-tramp-name-p)))
+expand to this directory.
+This happen only when `helm-ff-auto-update-flag' is non--nil
+or when `helm-pattern' is equal to \"~/\"."
+  (when (or (and helm-ff-auto-update-flag
+                 (null helm-ff--deleting-char-backward)
+                 (helm-file-completion-source-p)
+                 ;; Issue #295
+                 ;; File predicates are returning t
+                 ;; with paths like //home/foo.
+                 ;; So check it is not the case by regexp
+                 ;; to allow user to do C-a / to start e.g
+                 ;; entering a tramp method e.g /sudo::.
+                 (not (string-match "\\`//" helm-pattern))
+                 (not (helm-ff-invalid-tramp-name-p)))
+            ;; Fix issue #542.
+            (string= helm-pattern "~/"))
     (let* ((history-p   (string= (assoc-default
                                   'name (helm-get-current-source))
                                  "Read File Name History"))
