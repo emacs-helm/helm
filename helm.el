@@ -3458,7 +3458,7 @@ don't exit and send message 'no match'."
            (minibuffer-message " [No match]"))
           (t
            (setq helm-minibuffer-confirm-state nil)
-           (helm-exit-minibuffer)))))
+           (helm-maybe-exit-minibuffer)))))
 (add-hook 'helm-after-update-hook 'helm-confirm-and-exit-hook)
 
 (defun helm-confirm-and-exit-hook ()
