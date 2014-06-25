@@ -59,7 +59,7 @@ See docstring of `bbdb-create-internal' for more info on address entries."
                                      :default ""))
         while (not (string= loc "[Exit when no more]"))
         for count from 1
-        for phone-number = (read-string (format "Phone number (%s): " loc))
+        for phone-number = (helm-read-string (format "Phone number (%s): " loc))
         collect (vector loc phone-number) into phone-list
         do (setq loc-list (remove loc loc-list))
         finally return phone-list))
@@ -73,7 +73,7 @@ If COUNT is non--nil add a number after each prompt."
         for n from 1
         do (when count
              (setq bbdb--prompt (concat bbdb--prompt (int-to-string n) ": ")))
-        collect (setq elm (read-string bbdb--prompt)) into lis
+        collect (setq elm (helm-read-string bbdb--prompt)) into lis
         finally return (remove "" lis)))
 
 (defun helm-bbdb-read-address ()
@@ -92,10 +92,10 @@ See docstring of `bbdb-create-internal' for more info on address entries."
         for count from 1
         ;; Create vector
         for lines =  (helm-read-repeat-string "Line" t)
-        for city = (read-string "City: ")
-        for state = (read-string "State: ")
-        for zip = (read-string "ZipCode: ")
-        for country = (read-string "Country: ")
+        for city = (helm-read-string "City: ")
+        for state = (helm-read-string "State: ")
+        for zip = (helm-read-string "ZipCode: ")
+        for country = (helm-read-string "Country: ")
         collect (vector loc lines city state zip country) into address-list
         do (setq loc-list (remove loc loc-list))
         finally return address-list))

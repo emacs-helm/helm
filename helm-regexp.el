@@ -367,13 +367,13 @@ Same as `helm-moccur-goto-line' but go in new frame."
   (let ((buf "*hmoccur*")
         new-buf)
     (when (get-buffer buf)
-      (setq new-buf (read-string "OccurBufferName: " buf))
+      (setq new-buf (helm-read-string "OccurBufferName: " buf))
       (cl-loop for b in (helm-buffer-list)
             when (and (string= new-buf b)
                       (not (y-or-n-p
                             (format "Buffer `%s' already exists overwrite? "
                                     new-buf))))
-            do (setq new-buf (read-string "OccurBufferName: " "*hmoccur ")))
+            do (setq new-buf (helm-read-string "OccurBufferName: " "*hmoccur ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)

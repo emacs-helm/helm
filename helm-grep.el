@@ -603,13 +603,13 @@ If N is positive go forward otherwise go backward."
   (let ((buf "*hgrep*")
         new-buf)
     (when (get-buffer buf)
-      (setq new-buf (read-string "GrepBufferName: " buf))
+      (setq new-buf (helm-read-string "GrepBufferName: " buf))
       (cl-loop for b in (helm-buffer-list)
             when (and (string= new-buf b)
                       (not (y-or-n-p
                             (format "Buffer `%s' already exists overwrite? "
                                     new-buf))))
-            do (setq new-buf (read-string "GrepBufferName: " "*hgrep ")))
+            do (setq new-buf (helm-read-string "GrepBufferName: " "*hgrep ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)

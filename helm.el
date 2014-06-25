@@ -2217,30 +2217,30 @@ This can be useful for e.g writing quietly a complex regexp."
                "Helm update suspended!"
              "Helm update reenabled!")))
 
-(defvar helm--reading-passwd nil)
+(defvar helm--reading-passwd-or-string nil)
 (defadvice tramp-read-passwd (around disable-helm-update)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (setq overriding-terminal-local-map nil)
-  (setq helm--reading-passwd t)
+  (setq helm--reading-passwd-or-string t)
   (let (stimers)
     (unwind-protect
          (progn
            (setq stimers (with-timeout-suspend))
            ad-do-it)
       (with-timeout-unsuspend stimers)
-      (setq helm--reading-passwd nil)
+      (setq helm--reading-passwd-or-string nil)
       (setq helm-suspend-update-flag nil))))
 
 (defun helm--advice-tramp-read-passwd (old--fn &rest args)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (setq overriding-terminal-local-map nil)
-  (setq helm--reading-passwd t)
+  (setq helm--reading-passwd-or-string t)
   (unwind-protect
        ;; No need to suspend timer in emacs-24.4
        (apply old--fn args)
-    (setq helm--reading-passwd nil)
+    (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
 
 (defun helm--maybe-update-keymap ()
@@ -3465,6 +3465,12 @@ don't exit and send message 'no match'."
     (setq minibuffer-completion-confirm
           helm-minibuffer-confirm-state)))
 
+(defun helm-read-string (prompt &optional initial-input history
+                                  default-value inherit-input-method)
+  (let ((helm--reading-passwd-or-string t))
+    (read-string
+     prompt initial-input history default-value inherit-input-method)))
+
 (defun helm--updating-p ()
   ;; helm timer is between two cycles.
   (not (string= (minibuffer-contents) helm-pattern)))
@@ -3472,7 +3478,7 @@ don't exit and send message 'no match'."
 (defun helm-maybe-exit-minibuffer ()
   (interactive)
   (if (and (helm--updating-p)
-           (null helm--reading-passwd))
+           (null helm--reading-passwd-or-string))
       (progn (message "[Display not ready]")
              (sit-for 0.5) (message nil))
       (helm-exit-minibuffer)))

@@ -721,15 +721,15 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 See `helm-ff-serial-rename-1'."
   (let* ((cands     (helm-marked-candidates :with-wildcard t))
          (def-name  (car cands))
-         (name      (read-string "NewName: "
-                                 (replace-regexp-in-string
-                                  "[0-9]+$" ""
-                                  (helm-basename
-                                   def-name
-                                   (file-name-extension def-name)))))
+         (name      (helm-read-string "NewName: "
+                                      (replace-regexp-in-string
+                                       "[0-9]+$" ""
+                                       (helm-basename
+                                        def-name
+                                        (file-name-extension def-name)))))
          (start     (read-number "StartAtNumber: "))
-         (extension (read-string "Extension: "
-                                 (file-name-extension (car cands))))
+         (extension (helm-read-string "Extension: "
+                                      (file-name-extension (car cands))))
          (dir       (expand-file-name
                      (helm-read-file-name
                       "Serial Rename to directory: "
@@ -1045,7 +1045,7 @@ Same as `dired-do-print' but for helm."
                            (helm-comp-read
                             "Printer: " helm-ff-printer-list)
                          printer-name))
-         (command (read-string
+         (command (helm-read-string
                    (format "Print *%s File(s):\n%s with: "
                            len
                            (mapconcat
