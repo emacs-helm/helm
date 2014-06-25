@@ -3230,18 +3230,21 @@ Key arg DIRECTION can be one of:
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
 
+(defun helm-move--beginning-of-multiline-candidate ()
+  (let ((header-pos (helm-get-previous-header-pos))
+        (separator-pos (helm-get-previous-candidate-separator-pos)))
+    (when header-pos
+      (goto-char (if (or (null separator-pos)
+                         (< separator-pos header-pos))
+                     header-pos
+                     separator-pos))
+      (forward-line 1))))
+
 (defun helm-move--previous-multi-line-fn ()
   (forward-line -1)
   (unless (helm-pos-header-line-p)
     (helm-skip-header-and-separator-line 'previous)
-    (let ((header-pos (helm-get-previous-header-pos))
-          (separator-pos (helm-get-previous-candidate-separator-pos)))
-      (when header-pos
-        (goto-char (if (or (null separator-pos)
-                           (< separator-pos header-pos))
-                       header-pos
-                     separator-pos))
-        (forward-line 1)))))
+    (helm-move--beginning-of-multiline-candidate)))
 
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
@@ -3581,6 +3584,8 @@ to a list of forms.\n\n")
         (or (re-search-forward candidate-or-regexp nil t)
             (goto-char start))))
     (forward-line 0) ; Avoid scrolling right on long lines.
+    (when (helm-pos-multiline-p)
+      (helm-move--beginning-of-multiline-candidate))
     (helm-mark-current-line)))
 
 (defun helm-delete-current-selection ()
