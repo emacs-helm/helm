@@ -3441,24 +3441,28 @@ send in minibuffer confirm message and exit on next hit.
 If `minibuffer-completion-confirm' value is t,
 don't exit and send message 'no match'."
   (interactive)
-  (let* ((empty-buffer-p (with-current-buffer helm-buffer
-                           (eq (point-min) (point-max))))
-         (unknown (and (not empty-buffer-p)
-                       (string= (get-text-property
-                                 0 'display (helm-get-selection nil 'withprop))
-                                "[?]"))))
-    (cond ((and (or empty-buffer-p unknown)
-                (eq minibuffer-completion-confirm 'confirm))
-           (setq helm-minibuffer-confirm-state
-                 'confirm)
-           (setq minibuffer-completion-confirm nil)
-           (minibuffer-message " [confirm]"))
-          ((and (or empty-buffer-p unknown)
-                (eq minibuffer-completion-confirm t))
-           (minibuffer-message " [No match]"))
-          (t
-           (setq helm-minibuffer-confirm-state nil)
-           (helm-maybe-exit-minibuffer)))))
+  (if (and (helm--updating-p)
+           (null helm--reading-passwd-or-string))
+      (progn (message "[Display not ready]")
+             (sit-for 0.5) (message nil))
+      (let* ((empty-buffer-p (with-current-buffer helm-buffer
+                               (eq (point-min) (point-max))))
+             (unknown (and (not empty-buffer-p)
+                           (string= (get-text-property
+                                     0 'display (helm-get-selection nil 'withprop))
+                                    "[?]"))))
+        (cond ((and (or empty-buffer-p unknown)
+                    (eq minibuffer-completion-confirm 'confirm))
+               (setq helm-minibuffer-confirm-state
+                     'confirm)
+               (setq minibuffer-completion-confirm nil)
+               (minibuffer-message " [confirm]"))
+              ((and (or empty-buffer-p unknown)
+                    (eq minibuffer-completion-confirm t))
+               (minibuffer-message " [No match]"))
+              (t
+               (setq helm-minibuffer-confirm-state nil)
+               (helm-exit-minibuffer))))))
 (add-hook 'helm-after-update-hook 'helm-confirm-and-exit-hook)
 
 (defun helm-confirm-and-exit-hook ()
