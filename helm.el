@@ -3480,7 +3480,7 @@ don't exit and send message 'no match'."
 
 (defun helm--updating-p ()
   ;; helm timer is between two cycles.
-  (not (string= (minibuffer-contents) helm-pattern)))
+  (not (equal (minibuffer-contents) helm-pattern)))
 
 (defun helm-maybe-exit-minibuffer ()
   (interactive)
