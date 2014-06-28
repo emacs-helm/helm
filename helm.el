@@ -2300,6 +2300,7 @@ If no map is found in current source do nothing (keep previous map)."
                               (minibuffer-window))
       (helm-check-new-input (minibuffer-contents)))))
 
+(defvar helm--in-update nil)
 (defun helm-check-new-input (input)
   "Check INPUT string and update the helm buffer if necessary."
   ;; First time minibuffer is entered
@@ -2318,7 +2319,10 @@ If no map is found in current source do nothing (keep previous map)."
     (unless (helm-action-window)
       (setq helm-input helm-pattern))
     (helm-log-eval helm-pattern helm-input)
+    (setq helm--in-update t)
     (helm-update)))
+
+(add-hook 'helm-after-update-hook (lambda () (setq helm--in-update nil)))
 
 
 ;;; Core: source compiler
@@ -3474,13 +3478,15 @@ don't exit and send message 'no match'."
 
 (defun helm-read-string (prompt &optional initial-input history
                                   default-value inherit-input-method)
+  "Same as `read-string' but for reading string from a helm session."
   (let ((helm--reading-passwd-or-string t))
     (read-string
      prompt initial-input history default-value inherit-input-method)))
 
 (defun helm--updating-p ()
   ;; helm timer is between two cycles.
-  (not (equal (minibuffer-contents) helm-pattern)))
+  (or (not (equal (minibuffer-contents) helm-pattern))
+      helm--in-update))
 
 (defun helm-maybe-exit-minibuffer ()
   (interactive)
