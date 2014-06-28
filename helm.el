@@ -313,6 +313,11 @@ Be sure to know what you are doing when modifying this."
   :group 'helm
   :type 'float)
 
+(defcustom helm-exit-idle-delay 0.3
+  "Be idle for this many seconds before exiting minibuffer and running action."
+  :group 'helm
+  :type 'float)
+
 (defcustom helm-full-frame nil
   "Use current window to show the candidates.
 If t then Helm doesn't pop up a new window."
@@ -756,6 +761,8 @@ when `helm' is keyboard-quitted.")
 (defvar helm--mode-line-display-prefarg nil)
 (defvar helm--temp-follow-flag nil
   "[INTERNAL] A simple flag to notify persistent action we are following.")
+(defvar helm--reading-passwd-or-string nil)
+(defvar helm--in-update nil)
 
 
 ;; Utility: logging
@@ -2217,7 +2224,6 @@ This can be useful for e.g writing quietly a complex regexp."
                "Helm update suspended!"
              "Helm update reenabled!")))
 
-(defvar helm--reading-passwd-or-string nil)
 (defadvice tramp-read-passwd (around disable-helm-update)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
@@ -2300,7 +2306,6 @@ If no map is found in current source do nothing (keep previous map)."
                               (minibuffer-window))
       (helm-check-new-input (minibuffer-contents)))))
 
-(defvar helm--in-update nil)
 (defun helm-check-new-input (input)
   "Check INPUT string and update the helm buffer if necessary."
   ;; First time minibuffer is entered
@@ -2322,7 +2327,12 @@ If no map is found in current source do nothing (keep previous map)."
     (setq helm--in-update t)
     (helm-update)))
 
-(add-hook 'helm-after-update-hook (lambda () (setq helm--in-update nil)))
+(defun helm--reset-update-flag ()
+  (run-with-idle-timer
+   helm-exit-idle-delay nil
+   (lambda () (setq helm--in-update nil))))
+
+(add-hook 'helm-after-update-hook #'helm--reset-update-flag)
 
 
 ;;; Core: source compiler
