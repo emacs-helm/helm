@@ -1443,21 +1443,21 @@ purpose."
                         ;; deleting backward.
                         helm-ff--deleting-char-backward)
               (or (>= (length (helm-basename path)) 3) dir-p)))
-      (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
-    ;; This have to be set after [1] to allow deleting char backward.
-    (setq path-name-dir (expand-file-name
-                         (if (and dir-p helm-ff-auto-update-flag)
-                            ;; Add the final "/" to path
-                            ;; when `helm-ff-auto-update-flag' is enabled.
-                            (file-name-as-directory path)
-                          (file-name-directory path))))
-    (setq helm-ff-default-directory
-          (if (string= helm-pattern "")
-              (expand-file-name "/") ; Expand to "/" or "c:/"
-            ;; If path is an url *default-directory have to be nil.
-            (unless (or (string-match helm-ff-url-regexp path)
-                        (and ffap-url-regexp (string-match ffap-url-regexp path)))
-              path-name-dir)))
+      (setq helm-pattern (helm-ff--transform-pattern-for-completion path))
+      ;; This have to be set after [1] to allow deleting char backward.
+      (setq path-name-dir (expand-file-name
+                           (if (and dir-p helm-ff-auto-update-flag)
+                               ;; Add the final "/" to path
+                               ;; when `helm-ff-auto-update-flag' is enabled.
+                               (file-name-as-directory path)
+                               (file-name-directory path))))
+      (setq helm-ff-default-directory
+            (if (string= helm-pattern "")
+                (expand-file-name "/") ; Expand to "/" or "c:/"
+                ;; If path is an url *default-directory have to be nil.
+                (unless (or (string-match helm-ff-url-regexp path)
+                            (and ffap-url-regexp (string-match ffap-url-regexp path)))
+                  path-name-dir))))
     (cond ((string= path "Invalid tramp file name")
            (or (helm-ff-tramp-hostnames) ; Hostnames completion.
                (prog2
