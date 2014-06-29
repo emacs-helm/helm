@@ -2933,25 +2933,25 @@ after the source name by overlay."
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--process-source (process output-string source limit)
-  (let ((count 0))
-    (cl-dolist (candidate (helm-transform-candidates
-                           (helm-output-filter--collect-candidates
-                            (split-string output-string "\n")
-                            (assoc 'incomplete-line source)
-                            source)
-                           source t))
-      (cl-incf count)
-      (when candidate   ; filter-one-by-one may return nil candidates.
-        (if (assq 'multiline source)
-            (let ((start (point)))
-              (helm-insert-candidate-separator)
-              (helm-insert-match candidate 'insert-before-markers source count)
-              (put-text-property start (point) 'helm-multiline t))
-            (helm-insert-match candidate 'insert-before-markers source count))
-        (cl-incf (cdr (assoc 'item-count source)))
-        (when (>= (assoc-default 'item-count source) limit)
-          (helm-kill-async-process process)
-          (cl-return))))))
+  (cl-dolist (candidate (helm-transform-candidates
+                         (helm-output-filter--collect-candidates
+                          (split-string output-string "\n")
+                          (assoc 'incomplete-line source)
+                          source)
+                         source t))
+    (when candidate     ; filter-one-by-one may return nil candidates.
+      (if (assq 'multiline source)
+          (let ((start (point)))
+            (helm-insert-candidate-separator)
+            (helm-insert-match candidate 'insert-before-markers source
+                               (1+ (cdr (assoc 'item-count source))))
+            (put-text-property start (point) 'helm-multiline t))
+          (helm-insert-match candidate 'insert-before-markers source
+                             (1+ (cdr (assoc 'item-count source)))))
+      (cl-incf (cdr (assoc 'item-count source)))
+      (when (>= (assoc-default 'item-count source) limit)
+        (helm-kill-async-process process)
+        (cl-return)))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info source)
   "Collect LINES maybe completing the truncated first and last lines."
