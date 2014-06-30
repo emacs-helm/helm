@@ -49,7 +49,7 @@
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c ?") 'helm-imenu-help)
     (when helm-imenu-lynx-style-map
-      (define-key map (kbd "<left>")  'helm-exit-minibuffer)
+      (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
       (define-key map (kbd "<right>") 'helm-execute-persistent-action))
     (delq nil map)))
 

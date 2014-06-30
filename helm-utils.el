@@ -882,7 +882,7 @@ directory, open this directory."
 (defun helm-quit-and-execute-action (action)
   "Quit current helm session and execute ACTION."
   (setq helm-saved-action action)
-  (helm-exit-minibuffer))
+  (helm-maybe-exit-minibuffer))
 
 ;; Yank text at point.
 ;;

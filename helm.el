@@ -4124,7 +4124,7 @@ Possible values are 'left 'right 'below or 'above."
   (unless helm-saved-selection
     (error "Nothing is selected"))
   (setq helm-saved-action (helm-get-nth-action n (helm-get-action)))
-  (helm-exit-minibuffer))
+  (helm-maybe-exit-minibuffer))
 
 (defun helm-get-nth-action (n action)
   (cond ((and (zerop n) (functionp action))

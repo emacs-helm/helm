@@ -36,7 +36,7 @@
 \\<helm-map>\
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "Help string displayed in mode-line in `helm'.
@@ -842,7 +842,7 @@ the amount of prefix args entered.
 \\[helm-buffer-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-source-buffers-list'"))
@@ -863,7 +863,7 @@ with shift: Kill"))
 \\[helm-buffers-ido-virtual-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
     "String displayed in mode-line in `helm-source-buffers-list'"))
@@ -874,7 +874,7 @@ with shift: Kill"))
 \\[helm-ff-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-source-find-files'")
@@ -886,7 +886,7 @@ with shift: Kill"))
 \\[helm-cr-empty-string]:Empty \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-source-find-files'.")
@@ -897,7 +897,7 @@ with shift: Kill"))
 \\[helm-generic-file-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend"
@@ -909,7 +909,7 @@ with shift: Kill"))
 \\[helm-grep-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend"
@@ -921,7 +921,7 @@ with shift: Kill"))
 \\[helm-pdfgrep-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend"
@@ -933,7 +933,7 @@ with shift: Kill"))
 \\[helm-etags-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-etags-select'.")
@@ -944,7 +944,7 @@ with shift: Kill"))
 \\[helm-ucs-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct"
   "String displayed in mode-line in `helm-ucs'.")
@@ -956,7 +956,7 @@ with shift: Kill"))
 \\[helm-bookmark-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
   "String displayed in mode-line in `helm-source-buffers-list'")
@@ -969,7 +969,7 @@ with shift: Kill"))
 \\[helm-occur-run-query-replace-regexp]:Query replace regexp \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -980,7 +980,7 @@ with shift: Kill"))
 \\[helm-moccur-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -992,7 +992,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct")
 
@@ -1002,7 +1002,7 @@ with shift: Kill"))
 \\[helm-top-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -1013,7 +1013,7 @@ with shift: Kill"))
 \\[helm-apt-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -1024,7 +1024,7 @@ with shift: Kill"))
 \\[helm-el-package-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -1035,7 +1035,7 @@ with shift: Kill"))
 \\[helm-M-x-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -1046,7 +1046,7 @@ with shift: Kill"))
 \\[helm-imenu-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
@@ -1057,7 +1057,7 @@ with shift: Kill"))
 \\[helm-semantic-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
-\\[helm-exit-minibuffer]/\
+\\[helm-maybe-exit-minibuffer]/\
 \\[helm-select-2nd-action-or-end-of-line]/\
 \\[helm-select-3rd-action]:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
