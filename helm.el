@@ -314,7 +314,9 @@ Be sure to know what you are doing when modifying this."
   :type 'float)
 
 (defcustom helm-exit-idle-delay 0.3
-  "Be idle for this many seconds before exiting minibuffer and running action."
+  "Be idle for this many seconds before exiting minibuffer while helm is updating.
+Note that this does nothing when helm-buffer is up to date
+\(i.e exit without delay in this condition\)."
   :group 'helm
   :type 'float)
 
