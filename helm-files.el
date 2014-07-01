@@ -1410,19 +1410,18 @@ purpose."
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
          (dir-p         (file-accessible-directory-p path))
-         path-name-dir
+         basedir
          invalid-basedir
          non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     (set-text-properties 0 (length path) nil path)
     ;; Issue #118 allow creation of newdir+newfile.
-    ;; Check if base directory of PATH is valid.
     (unless (or
              ;; A tramp file name not completed.
              (string= path "Invalid tramp file name")
              ;; An empty pattern
              (string= path "")
-             ;; An existing directory
+             ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  (file-directory-p it)))
       ;; basedir is invalid, that's mean user is starting
@@ -1433,8 +1432,8 @@ purpose."
     ;; like that the actual value (e.g /ssh:) is passed to
     ;; `helm-ff-tramp-hostnames'.
     (unless (or (string= path "Invalid tramp file name")
-                invalid-basedir) ; Leave  helm-pattern unchanged.
-      (setq helm-ff-auto-update-flag ; [1]
+                invalid-basedir)      ; Leave  helm-pattern unchanged.
+      (setq helm-ff-auto-update-flag  ; [1]
             ;; Unless auto update is disabled at startup or
             ;; interactively, start auto updating only at third char.
             (unless (or (null helm-ff-auto-update-initial-value)
@@ -1445,19 +1444,20 @@ purpose."
               (or (>= (length (helm-basename path)) 3) dir-p)))
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path))
       ;; This have to be set after [1] to allow deleting char backward.
-      (setq path-name-dir (expand-file-name
-                           (if (and dir-p helm-ff-auto-update-flag)
-                               ;; Add the final "/" to path
-                               ;; when `helm-ff-auto-update-flag' is enabled.
-                               (file-name-as-directory path)
-                               (file-name-directory path))))
+      (setq basedir (expand-file-name
+                     (if (and dir-p helm-ff-auto-update-flag)
+                         ;; Add the final "/" to path
+                         ;; when `helm-ff-auto-update-flag' is enabled.
+                         (file-name-as-directory path)
+                         (file-name-directory path))))
       (setq helm-ff-default-directory
             (if (string= helm-pattern "")
-                (expand-file-name "/") ; Expand to "/" or "c:/"
+                (expand-file-name "/")  ; Expand to "/" or "c:/"
                 ;; If path is an url *default-directory have to be nil.
                 (unless (or (string-match helm-ff-url-regexp path)
-                            (and ffap-url-regexp (string-match ffap-url-regexp path)))
-                  path-name-dir))))
+                            (and ffap-url-regexp
+                                 (string-match ffap-url-regexp path)))
+                  basedir))))
     (cond ((string= path "Invalid tramp file name")
            (or (helm-ff-tramp-hostnames) ; Hostnames completion.
                (prog2
@@ -1490,7 +1490,7 @@ purpose."
                                  ;; if it is a directory.
                                  dir-p)
                        (list path))
-                     (helm-ff-directory-files path-name-dir t))))))
+                     (helm-ff-directory-files basedir t))))))
 
 (defsubst helm-ff-directory-files (directory &optional full)
   "List contents of DIRECTORY.
