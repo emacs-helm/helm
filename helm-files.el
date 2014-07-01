@@ -1423,8 +1423,10 @@ purpose."
              (string= path "")
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
+                 ;; If PATH is a valid directory IT=PATH,
+                 ;; else IT=basedir of PATH.
                  (file-directory-p it)))
-      ;; basedir is invalid, that's mean user is starting
+      ;; BASEDIR is invalid, that's mean user is starting
       ;; to write a non--existing path in minibuffer
       ;; probably to create a 'new_dir' or a 'new_dir+new_file'.
       (setq invalid-basedir t))
@@ -2306,6 +2308,13 @@ Ask to kill buffers associated with that file, too."
                       "Mkdir: Unable to create directory `%s': file exists."
                       (helm-basename dirfname))
                    (make-directory dir 'parent)))
+               (when helm-ff
+                 ;; Allow having this new dir in history
+                 ;; to be able to retrieve it immediately
+                 ;; if we want to e.g copy a file from somewhere in it.
+                 (setq helm-ff-default-directory
+                       (file-name-as-directory dir))
+                 (push helm-ff-default-directory helm-ff-history))
                (or (and helm-ff (helm-find-files-1 dir)) t)))))
     (if (> (length marked) 1)
         ;; Open all marked files in background and display
