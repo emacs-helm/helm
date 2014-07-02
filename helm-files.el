@@ -2315,11 +2315,12 @@ Ask to kill buffers associated with that file, too."
                  (setq helm-ff-default-directory
                        (file-name-as-directory dir))
                  (push helm-ff-default-directory helm-ff-history))
-               (or (and helm-ff (helm-find-files-1 dir)) t)))))
+               (or (and helm-ff (helm-find-files-1 dir)) t))))
+        (helm--reading-passwd-or-string t))
     (if (> (length marked) 1)
         ;; Open all marked files in background and display
         ;; the first one.
-        (let ((helm--reading-passwd-or-string t))
+        (progn
           (mapc 'find-file-noselect (cdr marked))
           (find-file (car marked)))
       (if (and (not (file-exists-p candidate))
@@ -2336,8 +2337,7 @@ Ask to kill buffers associated with that file, too."
           (if (or (and dir (file-directory-p dir)) url-p)
               (find-file-at-point (car marked))
             (and (funcall make-dir-fn dir)
-                 (let ((helm--reading-passwd-or-string t))
-                   (find-file-at-point candidate)))))))))
+                 (find-file-at-point candidate))))))))
 
 (defun helm-shadow-boring-files (files)
   "Files matching `helm-boring-file-regexp' will be
