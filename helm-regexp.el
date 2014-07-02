@@ -360,9 +360,6 @@ Same as `helm-moccur-goto-line' but go in new frame."
    (buffer-substring (point-at-bol) (point-at-eol))))
 
 (defun helm-moccur-save-results (_candidate)
-  (helm-moccur-save-results-1))
-
-(defun helm-moccur-save-results-1 ()
   "Save helm moccur results in a `helm-moccur-mode' buffer."
   (let ((buf "*hmoccur*")
         new-buf)
