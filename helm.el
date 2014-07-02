@@ -911,6 +911,7 @@ Otherwise make a list with one element."
 Like `this-command' but return the real command,
 not `exit-minibuffer' or unwanted functions."
   (cl-loop with bl = '(helm-maybe-exit-minibuffer
+                       helm-confirm-and-exit-minibuffer
                        helm-exit-minibuffer
                        exit-minibuffer)
         for count from 1 to 50
