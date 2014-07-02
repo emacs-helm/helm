@@ -46,7 +46,7 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'float)
 
-(defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring) 
+(defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
 This hook run when jumping from `helm-goto-line', `helm-etags-default-action',
 and `helm-imenu-default-action'.")
