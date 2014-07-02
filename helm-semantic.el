@@ -74,6 +74,7 @@
           (t))))))
 
 (defun helm-semantic-default-action (_candidate &optional persistent)
+  (helm-save-current-pos-to-mark-ring)
   ;; By default, helm doesn't pass on the text properties of the selection.
   ;; Fix this.
   (helm-log-run-hook 'helm-goto-line-before-hook)

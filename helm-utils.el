@@ -268,6 +268,7 @@ Default is `helm-current-buffer'."
 (defun helm-goto-line (lineno &optional noanim)
   "Goto LINENO opening only outline headline if needed.
 Animation is used unless NOANIM is non--nil."
+  (helm-save-current-pos-to-mark-ring)
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (goto-char (point-min))
   (helm-goto-char (point-at-bol lineno))
@@ -282,8 +283,7 @@ To use this add it to `helm-goto-line-before-hook'."
       (point-to-register helm-save-pos-before-jump-register))))
 
 (defun helm-save-current-pos-to-mark-ring ()
-  "Save current buffer position to mark ring.
-To use this add it to `helm-goto-line-before-hook'."
+  "Save current buffer position to mark ring."
   (with-helm-current-buffer
     (unless helm-in-persistent-action
       (set-marker (mark-marker) (point))

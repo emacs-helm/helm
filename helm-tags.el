@@ -268,6 +268,7 @@ If no entry in cache, create one."
 (defun helm-etags-action-goto (switcher candidate)
   "Helm default action to jump to an etags entry in other window."
   (require 'etags)
+  (helm-save-current-pos-to-mark-ring)
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (let* ((split (helm-etags-split-line candidate))
          (fname (cl-loop for tagf being the hash-keys of helm-etags-cache
