@@ -842,7 +842,8 @@ directory, open this directory."
       (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))))
 
 (defun helm-find-many-files (_ignore)
-  (mapc 'find-file (helm-marked-candidates)))
+  (let ((helm--reading-passwd-or-string t))
+    (mapc 'find-file (helm-marked-candidates))))
 
 (defun helm-goto-line-with-adjustment (line line-content)
   (let ((startpos)
