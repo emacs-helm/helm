@@ -1706,7 +1706,8 @@ This is called normally on third hit of \
 in `helm-find-files-persistent-action'."
   (let* ((buf      (get-file-buffer candidate))
          (buf-name (buffer-name buf))
-         (win (get-buffer-window buf)))
+         (win (get-buffer-window buf))
+         (helm--reading-passwd-or-string t))
     (if (and buf win
              (not (eq buf (get-buffer helm-current-buffer)))
              (not (buffer-modified-p buf)))
