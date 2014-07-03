@@ -189,10 +189,10 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         (cons (concat (propertize
                        " " 'display
                        (propertize "[?]" 'face 'helm-ff-prefix))
-                      cand)
-              cand)
+                      c)
+              c)
         into lst
-        else collect cand into lst
+        else collect c into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
 ;;;###autoload
