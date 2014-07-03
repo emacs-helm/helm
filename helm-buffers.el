@@ -175,9 +175,9 @@ Only buffer names are fuzzy matched when this is enabled,
     (dummy)
     (action . (lambda (candidate)
                 (let ((mjm (and helm-current-prefix-arg
-                                (intern (helm-comp-read
-                                         "Major-mode: "
-                                         helm-buffers-favorite-modes))))
+                                (intern-soft (helm-comp-read
+                                              "Major-mode: "
+                                              helm-buffers-favorite-modes))))
                       (buffer (get-buffer-create candidate)))
                   (if mjm
                       (with-current-buffer buffer (funcall mjm))
