@@ -686,15 +686,16 @@ will not be loaded first time you use this."
         ;; COMMAND on basename of each file, using
         ;; its basedir as `default-directory'.
         (cl-loop for f in cand-list
-              for dir = (helm-basedir f)
-              for file = (format "'%s'" (if (file-remote-p dir)
+              for dir = (and (not (string-match ffap-url-regexp f))
+                             (helm-basedir f))
+              for file = (format "'%s'" (if (and dir (file-remote-p dir))
                                             (helm-basename f) f))
               for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                             ;; [1] This allow to enter other args AFTER filename
                             ;; i.e <command %s some_more_args>
                             (format command file)
                           (format "%s %s" command file))
-              do (let ((default-directory dir))
+              do (let ((default-directory (or dir default-directory)))
                    (eshell-command com)))))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
