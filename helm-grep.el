@@ -185,7 +185,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
     (when helm-grep-use-ioccur-style-keys
-      (define-key map (kbd "<right>")  'helm-grep-run-persistent-action)
+      (define-key map (kbd "<right>")  'helm-execute-persistent-action)
       (define-key map (kbd "<left>")  'helm-grep-run-default-action))
     (define-key map (kbd "C-c ?")    'helm-grep-help)
     (delq nil map))
@@ -558,13 +558,6 @@ If N is positive go forward otherwise go backward."
                  'etags)))
     (with-helm-window
       (helm-goto-next-or-prec-file 1 etagp))))
-
-(defun helm-grep-run-persistent-action ()
-  "Run grep persistent action from `helm-do-grep-1'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-attrset 'jump-persistent 'helm-grep-persistent-action)
-    (helm-execute-persistent-action 'jump-persistent)))
 
 (defun helm-grep-run-default-action ()
   "Run grep default action from `helm-do-grep-1'."

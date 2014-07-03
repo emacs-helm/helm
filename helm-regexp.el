@@ -54,7 +54,7 @@
     (define-key map (kbd "C-c C-o")  'helm-moccur-run-goto-line-of)
     (define-key map (kbd "C-x C-s")  'helm-moccur-run-save-buffer)
     (when helm-moccur-use-ioccur-style-keys
-      (define-key map (kbd "<right>")  'helm-moccur-run-persistent-action)
+      (define-key map (kbd "<right>")  'helm-execute-persistent-action)
       (define-key map (kbd "<left>")   'helm-moccur-run-default-action))
     (delq nil map))
   "Keymap used in Moccur source.")
@@ -211,11 +211,6 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 (defun helm-moccur-persistent-action (candidate)
   (helm-moccur-goto-line candidate)
   (helm-highlight-current-line))
-
-(defun helm-moccur-run-persistent-action ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-execute-persistent-action)))
 
 (defun helm-moccur-goto-line (candidate)
   "From multi occur, switch to buffer and go to nth 1 CANDIDATE line."
