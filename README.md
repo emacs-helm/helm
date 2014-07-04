@@ -94,7 +94,20 @@ discover some of the commands provided by helm.
 
 ### Advanced usage
 
-Helm is capable of a lot.
+Helm is capable of a lot. Here is a demo of `helm-buffers-list`:
+
+![helm-buffers-list](doc/helm-buffers-list.gif)
+
+The demo starts when you see `Eval: START` in the minibuffer.
+
+- All the C buffers are selected using the regexp `*C`. In the demo, I also select Tcl buffers with `*Tcl` and then switched back to C buffers with `*C`.
+- I only want to have buffers that contains only the string "crash". To do that, I add a space, then add the pattern `@crash`.
+- After the initial search pattern, I hand over the current matching buffers to `helm-moccur` - `moccur` with Helm interface. 
+- Candidates can be filtered gradually by adding more pattern, i.e. I added `memory` to filtered down to buffers that contain the string "memory" among the buffers that are containing "crash".
+
+As you can see, as you filtered out, the number of candidates decreases, as displayed in the modeline. At the end, there were 12 buffers remained as the result of filtering, down from the total 253 buffers.
+
+You can read [this guide](http://tuhdo.github.io/helm-intro.html) to quickly get started with Helm.
 
 You can find all the gory details on the [Helm Wiki](https://github.com/emacs-helm/helm/wiki).
 
