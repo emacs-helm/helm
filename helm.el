@@ -673,6 +673,19 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
     helm-compile-source--candidates-in-buffer)
   "Functions to compile elements of `helm-sources' (plug-in).")
 
+(defvar helm-mode-line-string "\
+\\<helm-map>\
+\\[helm-help]:Help \
+\\[helm-select-action]:Act \
+\\[helm-maybe-exit-minibuffer]/\
+\\[helm-select-2nd-action-or-end-of-line]/\
+\\[helm-select-3rd-action]:NthAct"
+  "Help string displayed in mode-line in `helm'.
+It can be a string or a list of two args, in this case,
+first arg is a string that will be used as name for candidates number,
+second arg any string to display in mode line.
+If nil, use default `mode-line-format'.")
+
 
 ;;; Internal Variables
 ;;
@@ -755,7 +768,7 @@ when `helm' is keyboard-quitted.")
   "Used to store window or frame configuration when helm start.")
 (defvar helm-onewindow-p nil)
 (defvar helm-types nil)
-(defvar helm-mode-line-string-real nil) ; The string to display in mode-line.
+(defvar helm--mode-line-string-real nil) ; The string to display in mode-line.
 (defvar helm-persistent-action-display-window nil)
 (defvar helm-marked-candidates nil
   "Marked candadates.  List of \(source . real\) pair.")
@@ -3177,8 +3190,8 @@ Possible value of DIRECTION are 'next or 'previous."
                                              'face 'helm-prefarg)))))
                     (:eval (helm-show-candidate-number
                             (car-safe helm-mode-line-string)))
-                    " " helm-mode-line-string-real " -%-")
-              helm-mode-line-string-real
+                    " " helm--mode-line-string-real " -%-")
+              helm--mode-line-string-real
               (substitute-command-keys (if (listp helm-mode-line-string)
                                            (cadr helm-mode-line-string)
                                          helm-mode-line-string)))

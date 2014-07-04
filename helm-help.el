@@ -28,24 +28,6 @@
   :group 'helm-help)
 
 
-;;; Embeded documentation.
-;;
-;;
-;;;###autoload
-(defvar helm-mode-line-string "\
-\\<helm-map>\
-\\[helm-help]:Help \
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
-  "Help string displayed in mode-line in `helm'.
-It can be a string or a list of two args, in this case,
-first arg is a string that will be used as name for candidates number,
-second arg any string to display in mode line.
-If nil, use default `mode-line-format'.")
-
-
 ;;; Global help message - Used by `helm-help'
 ;;
 ;;
