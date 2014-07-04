@@ -371,9 +371,9 @@ Should be called after others transformers i.e (boring buffers)."
               (when (and (not (helm-this-visible-mark))
                          (eq (get-text-property 0 'type cand) type))
                 (helm-make-visible-mark)))
-            (forward-line 1) (end-of-line)))
-        (helm-mark-current-line)
-        (message "%s candidates marked" (length helm-marked-candidates))))))
+            (forward-line 1) (end-of-line))))
+      (helm-mark-current-line)
+      (message "%s candidates marked" (length helm-marked-candidates)))))
 
 (defun helm-buffers-mark-similar-buffers ()
     "Mark All buffers that have same property `type' than current.
