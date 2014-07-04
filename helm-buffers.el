@@ -351,10 +351,7 @@ Should be called after others transformers i.e (boring buffers)."
           #'(lambda (s1 s2)
               (< (string-width s1) (string-width s2))))))
 
-(defun helm-buffers-mark-similar-buffers ()
-  "Mark All buffers that have same property `type' than current.
-i.e same color."
-  (interactive)
+(defun helm--buffers-mark-similar-buffers-1 ()
   (with-helm-window
     (let ((type (get-text-property
                  0 'type (helm-get-selection nil 'withprop))))
@@ -377,6 +374,16 @@ i.e same color."
             (forward-line 1) (end-of-line)))
         (helm-mark-current-line)
         (message "%s candidates marked" (length helm-marked-candidates))))))
+
+(defun helm-buffers-mark-similar-buffers ()
+    "Mark All buffers that have same property `type' than current.
+i.e same color."
+  (interactive)
+  (let ((marked (helm-marked-candidates)))
+    (if (and (>= (length marked) 1)
+             (with-helm-window helm-visible-mark-overlays))
+        (helm-unmark-all)
+      (helm-buffers-mark-similar-buffers-1))))
 
 
 ;;; match functions
