@@ -235,6 +235,7 @@ Italic     => A non--file buffer.
 \\[helm-mark-all]\t\t->Mark all.
 \\[helm-toggle-buffers-details]\t\t->Toggle details.
 \\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers.
+\\[helm-buffers-mark-similar-buffers]\t\t->Mark all buffers with same type (color) than current.
 \\[helm-buffer-help]\t\t->Display this help.
 \n== Helm Map ==
 \\{helm-map}")
