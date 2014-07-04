@@ -123,6 +123,7 @@ Only buffer names are fuzzy matched when this is enabled,
     (define-key map (kbd "M-a")       'helm-mark-all)
     (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
     (define-key map (kbd "C-c a")     'helm-buffers-toggle-show-hidden-buffers)
+    (define-key map (kbd "<C-M-SPC>") 'helm-buffers-mark-similar-buffers)
     map)
   "Keymap for buffer sources in helm.")
 
@@ -233,12 +234,13 @@ See `ido-make-buffer-list' for more infos."
 
 (defun helm-buffer--show-details (buf-name prefix help-echo
                                   size mode dir face1 face2
-                                  proc details)
+                                  proc details type)
   (append
    (list
     (concat prefix
             (propertize buf-name 'face face1
-                        'help-echo help-echo)))
+                        'help-echo help-echo
+                        'type type)))
    (and details
         (list size mode
               (propertize
@@ -265,33 +267,33 @@ See `ido-make-buffer-list' for more infos."
        (rassoc buf dired-buffers)
        (helm-buffer--show-details
         name name-prefix dir size mode dir
-        'helm-buffer-directory 'helm-buffer-process nil details))
+        'helm-buffer-directory 'helm-buffer-process nil details 'dired))
       ;; A buffer file modified somewhere outside of emacs.=>red
       ((and file-name (file-exists-p file-name)
             (not (verify-visited-file-modtime buf)))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'helm-buffer-saved-out 'helm-buffer-process nil details))
+        'helm-buffer-saved-out 'helm-buffer-process nil details 'modout))
       ;; A new buffer file not already saved on disk.=>indianred2
       ((and file-name (not (verify-visited-file-modtime buf)))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'helm-buffer-not-saved 'helm-buffer-process nil details))
+        'helm-buffer-not-saved 'helm-buffer-process nil details 'notsaved))
       ;; A buffer file modified and not saved on disk.=>orange
       ((and file-name (buffer-modified-p buf))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'helm-ff-symlink 'helm-buffer-process nil details))
+        'helm-ff-symlink 'helm-buffer-process nil details 'mod))
       ;; A buffer file not modified and saved on disk.=>green
       (file-name
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
-        'font-lock-type-face 'helm-buffer-process nil details))
+        'font-lock-type-face 'helm-buffer-process nil details 'filebuf))
       ;; Any non--file buffer.=>grey italic
       (t
        (helm-buffer--show-details
         name (and proc name-prefix) dir size mode dir
-        'italic 'helm-buffer-process proc details)))))
+        'italic 'helm-buffer-process proc details 'nofile)))))
 
 (defun helm-highlight-buffers (buffers _source)
   "Transformer function to highlight BUFFERS list.
@@ -348,6 +350,31 @@ Should be called after others transformers i.e (boring buffers)."
     (sort candidates
           #'(lambda (s1 s2)
               (< (string-width s1) (string-width s2))))))
+
+(defun helm-buffers-mark-similar-buffers ()
+  "Mark All buffers that have same property `type' than current.
+i.e same color."
+  (interactive)
+  (with-helm-window
+    (let ((type (get-text-property
+                 0 'type (helm-get-selection nil 'withprop))))
+      (save-excursion
+        (goto-char (helm-get-previous-header-pos))
+        (helm-next-line)
+        (let* ((next-head (helm-get-next-header-pos))
+               (end       (and next-head
+                               (save-excursion
+                                 (goto-char next-head)
+                                 (forward-line -1)
+                                 (point))))
+               (maxpoint  (or end (point-max))))
+          (while (< (point) maxpoint)
+            (helm-mark-current-line)
+            (let ((cand (helm-get-selection nil 'withprop)))
+              (when (and (not (helm-this-visible-mark))
+                         (eq (get-text-property 0 'type cand) type))
+                (helm-make-visible-mark)))
+            (forward-line 1) (end-of-line)))))))
 
 
 ;;; match functions
