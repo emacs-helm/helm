@@ -141,6 +141,8 @@ text to be displayed in BUFNAME."
 
 Completion:
 
+- Major-mode:
+
 You can enter a partial name of major-mode (e.g lisp, sh) to narrow down buffers.
 To specify the major-mode, prefix it with \"*\" e.g \"*lisp\".
 If you want to match all buffers but the ones with a specific major-mode (negation),
@@ -148,21 +150,31 @@ prefix the major-mode with \"!\" e.g \"*!lisp\".
 If you want to specify more than one major-mode, separate them with \",\",
 e.g \"*!lisp,!sh,!fun\" will list all buffers but the ones in lisp-mode, sh-mode and
 fundamental-mode.
+
 Enter then a space and a pattern to narrow down to buffers matching this pattern.
+
+- Search inside buffers:
+
 If you enter a space and a pattern prefixed by \"@\" helm will search for text matching
 this pattern INSIDE the buffer (i.e not in the name of buffer).
 NOTE that if you enter your pattern prefixed with \"@\" but escaped, helm will search a buffer
 matching \"@pattern\" but will not search inside.
+
+- Search by directory name:
+
 If you prefix the beginning of pattern with \"/\" the match will occur on directory name
 of buffer, it is interesting to narrow down to one directory for example, subsequent string
 entered after a space will match on buffer-name only.
 Note that negation is not supported for matching on buffer-file-name.
+You can't cumulate both major-mode matching AND directory matching, choose one or the other.
+ 
+- Fuzzy matching:
 
 Note that if `helm-buffers-fuzzy-matching' is non--nil you will have
-fuzzy matching on buffer names (not on buffer-file-name matching and major-mode though).
+fuzzy matching on buffer names (not on directory name matching and major-mode though).
+A pattern starting with \"^\" will disable fuzzy matching and will match by exact regexp.
 
-
-e.g
+- Examples:
 
 if I enter in pattern prompt:
 \"*lisp ^helm @moc\"
@@ -183,12 +195,12 @@ if I enter in pattern prompt:
 helm will narrow down to buffers that are in any \"helm\" subdirectory and matching w3.
 
 
-Creating buffers
+- Creating buffers
 
 When creating a new buffer use \\[universal-argument] to choose a mode for your buffer in a list.
 This list is customizable, see `helm-buffers-favorite-modes'.
 
-Killing buffers
+- Killing buffers
 
 You have a command to kill buffer(s) and quit emacs and a command to kill buffers one by one
 \(no marked\) without quitting helm.
@@ -196,7 +208,7 @@ You can run this persistent kill buffer command either with the regular
 `helm-execute-persistent-action' called with a prefix arg (C-u C-z) or with its specific command
 `helm-buffer-run-kill-persistent' see binding below.
 
-Meaning of colors and prefixes for buffers:
+- Meaning of colors and prefixes for buffers:
 
 Remote buffers are prefixed with '@'.
 Red        => Buffer have its file modified on disk by an external process.
