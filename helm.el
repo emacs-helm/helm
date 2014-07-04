@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'helm-config)
 
 
 ;;; Multi keys
