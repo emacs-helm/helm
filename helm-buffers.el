@@ -366,7 +366,8 @@ Should be called after others transformers i.e (boring buffers)."
                                   thereis (numberp i))))))))
 
 (defun helm-buffer--match-pattern (pattern candidate)
-  (let ((fun (if helm-buffers-fuzzy-matching
+  (let ((fun (if (and helm-buffers-fuzzy-matching
+                      (not (string-match "\\`\\^" pattern)))
                  #'helm--mapconcat-candidate
                #'identity)))
   (if (string-match "\\`!" pattern)
