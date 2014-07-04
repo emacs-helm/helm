@@ -374,7 +374,9 @@ i.e same color."
               (when (and (not (helm-this-visible-mark))
                          (eq (get-text-property 0 'type cand) type))
                 (helm-make-visible-mark)))
-            (forward-line 1) (end-of-line)))))))
+            (forward-line 1) (end-of-line)))
+        (helm-mark-current-line)
+        (message "%s candidates marked" (length helm-marked-candidates))))))
 
 
 ;;; match functions
