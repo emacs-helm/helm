@@ -465,11 +465,13 @@ Return an alist with elements like (data . number_results)."
 
 (defvar helm-browse-url-chromium-program "chromium-browser")
 (defvar helm-browse-url-uzbl-program "uzbl-browser")
+(defvar helm-browse-url-conkeror-program "conkeror")
 (defvar helm-browse-url-default-browser-alist
   `((,(or (and (boundp 'w3m-command) w3m-command)
           "/usr/bin/w3m") . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
     (,helm-browse-url-chromium-program . helm-browse-url-chromium)
+    (,helm-browse-url-conkeror-program . helm-browse-url-conkeror)
     (,helm-browse-url-uzbl-program . helm-browse-url-uzbl)
     (,browse-url-kde-program . browse-url-kde)
     (,browse-url-gnome-moz-program . browse-url-gnome-moz)
@@ -481,11 +483,11 @@ Return an alist with elements like (data . number_results)."
     ("emacs" . eww-browse-url))
   "*Alist of \(executable . function\) to try to find a suitable url browser.")
 
-(cl-defun helm-generic-browser (url name &rest args)
+(cl-defun helm-generic-browser (url cmd-name &rest args)
   "Browse URL with NAME browser."
-  (let ((proc (concat name " " url)))
-    (message "Starting %s..." name)
-    (apply 'start-process proc nil name
+  (let ((proc (concat cmd-name " " url)))
+    (message "Starting %s..." cmd-name)
+    (apply 'start-process proc nil cmd-name
            (append args (list url)))
     (set-process-sentinel
      (get-process proc)
@@ -493,7 +495,7 @@ Return an alist with elements like (data . number_results)."
          (when (string= event "finished\n")
            (message "%s process %s" process event))))))
 
-(defun helm-browse-url-chromium (url)
+(defun helm-browse-url-chromium (url &optional _ignore)
   "Browse URL with google chrome browser."
   (interactive "sURL: ")
   (helm-generic-browser
@@ -503,6 +505,11 @@ Return an alist with elements like (data . number_results)."
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
   (helm-generic-browser url helm-browse-url-uzbl-program "-u"))
+
+(defun helm-browse-url-conkeror (url &optional _ignore)
+  "Browse URL with conkeror browser."
+  (interactive "sURL: ")
+  (helm-generic-browser url helm-browse-url-conkeror-program))
 
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
