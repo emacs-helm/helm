@@ -181,8 +181,6 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "<RET>")      'helm-maybe-exit-minibuffer)
     (define-key map (kbd "C-i")        'helm-select-action)
     (define-key map (kbd "C-z")        'helm-execute-persistent-action)
-    (define-key map (kbd "C-e")        'helm-select-2nd-action-or-end-of-line)
-    (define-key map (kbd "C-j")        'helm-select-3rd-action)
     (define-key map (kbd "C-o")        'helm-next-source)
     (define-key map (kbd "C-l")        'helm-recenter-top-bottom-other-window)
     (define-key map (kbd "M-C-l")      'helm-reposition-window-other-window)
@@ -252,6 +250,12 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "C-h h")      'undefined)
     (cl-dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
+    ;; Bind all actions from 1 to 9 to their corresponding nth.
+    (cl-loop for n from 1 to 9 do
+             (define-key map (kbd (format "C-%s" n))
+               `(lambda ()
+                  (interactive)
+                  (helm-select-nth-action ,n))))
     map)
   "Keymap for helm.")
 
@@ -678,8 +682,7 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
   "Help string displayed in mode-line in `helm'.
 It can be a string or a list of two args, in this case,
 first arg is a string that will be used as name for candidates number,
@@ -1444,7 +1447,7 @@ Return the result of last function call."
   "Return candidates number in `helm-buffer'.
 If IN-CURRENT-SOURCE is provided return number of candidates
 in the source where point is."
-  (with-current-buffer helm-buffer
+  (with-current-buffer (helm-buffer-get)
     (if (or (helm-empty-buffer-p)
             (helm-empty-source-p))
         0
@@ -3105,6 +3108,7 @@ If action buffer is selected, back to the helm buffer."
            (set-window-buffer (get-buffer-window helm-action-buffer)
                               helm-buffer)
            (kill-buffer helm-action-buffer)
+           (helm-display-mode-line (helm-get-current-source))
            (helm-set-pattern helm-input 'noupdate))
           (helm-saved-selection
            (setq helm-saved-current-source (helm-get-current-source))
@@ -3128,6 +3132,7 @@ If action buffer is selected, back to the helm buffer."
             (volatile)
             (nomark)
             (candidates . ,actions)
+            (mode-line . ("Action(s)" "TAB:BackToCands RET:RunAction"))
             (candidate-transformer
              . (lambda (candidates)
                  (cl-loop for (i . j) in candidates
@@ -4151,30 +4156,6 @@ Possible values are 'left 'right 'below or 'above."
          (error "Sole action"))
         (t
          (error "Error in `helm-select-nth-action'"))))
-
-(defun helm-select-2nd-action ()
-  "Select the 2nd action for the currently selected candidate."
-  (interactive)
-  (helm-select-nth-action 1))
-
-(defun helm-select-3rd-action ()
-  "Select the 3rd action for the currently selected candidate."
-  (interactive)
-  (helm-select-nth-action 2))
-
-(defun helm-select-4th-action ()
-  "Select the 4th action for the currently selected candidate."
-  (interactive)
-  (helm-select-nth-action 3))
-
-(defun helm-select-2nd-action-or-end-of-line ()
-  "Select the 2nd action for the currently selected candidate.
-This happen when point is at the end of minibuffer.
-Otherwise goto the end of minibuffer."
-  (interactive)
-  (if (eolp)
-      (helm-select-nth-action 1)
-    (end-of-line)))
 
 ;; Utility: Persistent Action
 (defmacro with-helm-display-same-window (&rest body)

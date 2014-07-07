@@ -56,11 +56,11 @@ Tab, C-i : Show action list
 Left : Previous Source
 Right, C-o : Next Source
 C-k : Delete pattern
-C-z : Persistent Action (Execute action with helm session kept)
+C-j or C-z: Persistent Action (Execute action with helm session kept)
 
-== Shortcuts For 2nd/3rd Action ==
-\\[helm-select-2nd-action-or-end-of-line] : Execute 2nd Action (if the minibuffer cursor is at end of line)
-\\[helm-select-3rd-action] : Execute 3rd Action
+== Shortcuts For nth Action ==
+
+C-1/9: Execute nth 1 to 9 Action.
 
 == Visible Marks ==
 Visible marks store candidate. Some actions uses marked candidates.
@@ -838,8 +838,7 @@ the amount of prefix args entered.
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
     "String displayed in mode-line in `helm-source-buffers-list'"))
 
 ;;;###autoload
@@ -859,8 +858,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
     "String displayed in mode-line in `helm-source-buffers-list'"))
 
 ;;;###autoload
@@ -870,8 +868,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
   "String displayed in mode-line in `helm-source-find-files'")
 
 ;;;###autoload
@@ -882,8 +879,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
   "String displayed in mode-line in `helm-source-find-files'.")
 
 ;;;###autoload
@@ -893,8 +889,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend"
   "String displayed in mode-line in Locate.")
 
@@ -905,8 +900,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend"
   "String displayed in mode-line in `helm-do-grep'.")
 
@@ -917,8 +911,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend"
   "String displayed in mode-line in `helm-do-pdfgrep'.")
 
@@ -929,8 +922,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
   "String displayed in mode-line in `helm-etags-select'.")
 
 ;;;###autoload
@@ -940,8 +932,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct"
+C-1/C-2/C-n:NthAct"
   "String displayed in mode-line in `helm-ucs'.")
 
 ;;;###autoload
@@ -952,8 +943,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct")
+C-1/C-2/C-n:NthAct")
   "String displayed in mode-line in `helm-source-buffers-list'")
 
 ;;;###autoload
@@ -965,8 +955,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -976,8 +965,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -988,8 +976,7 @@ with shift: Kill"))
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct")
+C-1/C-2/C-n:NthAct")
 
 ;;;###autoload
 (defvar helm-top-mode-line "\
@@ -998,8 +985,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -1009,8 +995,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -1020,8 +1005,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -1031,8 +1015,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -1042,8 +1025,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 ;;;###autoload
@@ -1053,8 +1035,7 @@ with shift: Kill"))
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-\\[helm-select-2nd-action-or-end-of-line]/\
-\\[helm-select-3rd-action]:NthAct \
+C-1/C-2/C-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend")
 
 
