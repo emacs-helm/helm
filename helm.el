@@ -181,6 +181,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "<RET>")      'helm-maybe-exit-minibuffer)
     (define-key map (kbd "C-i")        'helm-select-action)
     (define-key map (kbd "C-z")        'helm-execute-persistent-action)
+    (define-key map (kbd "C-j")        'helm-execute-persistent-action)
     (define-key map (kbd "C-o")        'helm-next-source)
     (define-key map (kbd "C-l")        'helm-recenter-top-bottom-other-window)
     (define-key map (kbd "M-C-l")      'helm-reposition-window-other-window)
@@ -250,9 +251,9 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "C-h h")      'undefined)
     (cl-dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
-    ;; Bind all actions from 1 to 9 to their corresponding nth.
-    (cl-loop for n from 1 to 9 do
-             (define-key map (kbd (format "C-%s" n))
+    ;; Bind all actions from 1 to 9 to their corresponding nth index.
+    (cl-loop for n from 1 to 12 do
+             (define-key map (kbd (format "<f%s>" n))
                `(lambda ()
                   (interactive)
                   (helm-select-nth-action ,n))))
@@ -682,7 +683,7 @@ It is disabled by default because `helm-debug-buffer' grows quickly.")
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-C-1/C-2/C-n:NthAct"
+f1/f2/f-n:NthAct"
   "Help string displayed in mode-line in `helm'.
 It can be a string or a list of two args, in this case,
 first arg is a string that will be used as name for candidates number,
