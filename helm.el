@@ -252,8 +252,8 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (cl-dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
     ;; Bind all actions from 1 to 12 to their corresponding nth index.
-    (cl-loop for n from 1 to 12 do
-             (define-key map (kbd (format "<f%s>" n))
+    (cl-loop for n from 0 to 12 do
+             (define-key map (kbd (format "<f%s>" (1+ n)))
                `(lambda ()
                   (interactive)
                   (helm-select-nth-action ,n))))
@@ -3133,12 +3133,18 @@ If action buffer is selected, back to the helm buffer."
             (volatile)
             (nomark)
             (candidates . ,actions)
-            (mode-line . ("Action(s)" "TAB:BackToCands RET:RunAction"))
+            (mode-line . ("Action(s)" "TAB:BackToCands RET/f1/f2/fn:NthAct"))
             (candidate-transformer
              . (lambda (candidates)
                  (cl-loop for (i . j) in candidates
-                       collect
-                       (cons (propertize i 'face 'helm-action) j))))
+                          for count from 1
+                          collect
+                          (cons (concat (cond ((> count 12)
+                                               "      ")
+                                              ((< count 10)
+                                               (format "[f%s]  " count))
+                                              (t (format "[f%s] " count)))
+                                        (propertize i 'face 'helm-action)) j))))
             (candidate-number-limit))))
     (set (make-local-variable 'helm-source-filter) nil)
     (set (make-local-variable 'helm-selection-overlay) nil)
@@ -4144,8 +4150,12 @@ Possible values are 'left 'right 'below or 'above."
   (setq helm-saved-selection (helm-get-selection))
   (unless helm-saved-selection
     (error "Nothing is selected"))
-  (setq helm-saved-action (helm-get-nth-action
-                           n (helm-get-actions-from-current-source)))
+  (setq helm-saved-action
+        (helm-get-nth-action
+         n
+         (if (get-buffer-window helm-action-buffer 'visible)
+             (assoc-default 'candidates (helm-get-current-source))
+             (helm-get-actions-from-current-source))))
   (helm-maybe-exit-minibuffer))
 
 (defun helm-get-nth-action (n action)
