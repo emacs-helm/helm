@@ -116,7 +116,7 @@ So when helm starts, you have to remember:
 
 -   Use persistent actions with
 
-        C-z
+        C-j
 
 -   Mark candidate with
 
@@ -206,23 +206,23 @@ Example:
 
 
 Inside the `helm-find-files` buffer, you can move your selected row up
-or down with C-n C-p or arrow keys. When a row is selected, `C-z` performs the
+or down with C-n C-p or arrow keys. When a row is selected, `C-j` performs the
 default action, which is different depending on the context.
 
-When you are on a file, `C-z` will show only this file-name in the
-helm buffer. On a directory, `C-z` will step down into this directory
-to continue searching in it. On a symlink, `C-z` will expand to the
+When you are on a file, `C-j` will show only this file-name in the
+helm buffer. On a directory, `C-j` will step down into this directory
+to continue searching in it. On a symlink, `C-j` will expand to the
 true name of symlink (moving your mouse cursor over a symlink will
 also show the true name).
 
 So it is quite easy to navigate in your files with helm-find-files.
 
 C-. will navigate to the root of current dir or to precedent level of
-dir. A common operation is to hit C-z and then return immediately where
+dir. A common operation is to hit C-j and then return immediately where
 you were with C-. instead of erasing minibuffer input with DEL. On
 non-graphic displays, it is bound to C-l. If `helm-ff-lynx-style-map`
 is non–nil, you will be able to use `left` instead of C-l and `right`
-instead of C-z.
+instead of C-j.
 
 ## Jump with nth commands
 
@@ -247,7 +247,7 @@ TAB, you have some convenients shortcuts to quickly run actions. Use C-c
  You can turn helm-find-files in a nice
 image-viewer.
 
-Navigate to your image directory, then type C-u C-z on first image. Now
+Navigate to your image directory, then type C-u C-j on first image. Now
 turn on `follow-mode` with C-c C-f. You can now navigate in your image
 directory with arrow up and down or C-n C-p. Don`t forget also to use
 C-t to split you windows vertically if needed.
@@ -450,7 +450,7 @@ If you have installed avfs (See: http://sourceforge.net/projects/avf)
 you can browse archives in your directory .avfs once it is mounted with
 `mountavfs`.
 
-Just move on the archive filename and press C-z (persistent action) and
+Just move on the archive filename and press C-j (persistent action) and
 you will see in helm buffer the subdirectories of archive, just navigate
 inside as usual.
 
@@ -575,8 +575,8 @@ needed.
 
 ## Grep persistent action
 
- As always, C-z will bring you in the buffer corresponding to the file
-you are grepping. Well nothing new, but using C-u C-z will record this
+ As always, C-j will bring you in the buffer corresponding to the file
+you are grepping. Well nothing new, but using C-u C-j will record this
 place in the mark-ring. So if you want to come back later to these
 places, there is no need to grep again, you will find all these places
 in the mark-ring. Accessing the mark-ring in Emacs is really
@@ -611,7 +611,7 @@ Features:
 
 -   You can use prefix arguments during M-x session and they are shown in `mode-line`.
 
--   C-z is a toggle documentation for this command
+-   C-j is a toggle documentation for this command
 
 -   The key binding of command are shown.
 

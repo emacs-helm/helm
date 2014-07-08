@@ -163,7 +163,7 @@ This set `ffap-newfile-prompt'."
 
 (defcustom helm-ff-avfs-directory "~/.avfs"
   "The default avfs directory, usually '~/.avfs'.
-When this is set you will be able to expand archive filenames with `C-z'
+When this is set you will be able to expand archive filenames with `C-j'
 inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
   :type  'string
@@ -1179,7 +1179,7 @@ If prefix numeric arg is given go ARG level up."
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
 This happen after using `helm-find-files-up-one-level',
-or hitting C-z on \"..\"."
+or hitting C-j on \"..\"."
   (when helm-ff-last-expanded
     (let ((presel (if helm-ff-transformer-show-only-basename
                       (helm-basename
@@ -1928,7 +1928,7 @@ This affect directly file CANDIDATE."
 If CANDIDATE is not a directory expand CANDIDATE filename.
 If CANDIDATE is alone, open file CANDIDATE filename.
 That's mean:
-First hit on C-z expand CANDIDATE second hit open file.
+First hit on C-j expand CANDIDATE second hit open file.
 If a prefix arg is given or `helm-follow-mode' is on open file."
   (let* ((follow        (or (buffer-local-value
                              'helm-follow-mode
@@ -1968,7 +1968,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; A regular file, expand it, (cl-first hit)
           ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
            (funcall insert-in-minibuffer new-pattern))
-          ;; An image file and it is the second hit on C-z,
+          ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           ((string-match (image-file-name-regexp) candidate)
            (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
