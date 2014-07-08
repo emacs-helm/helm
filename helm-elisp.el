@@ -487,7 +487,7 @@ First call indent, second complete symbol, third complete fname."
     (persistent-action . helm-advice-persistent-action)
     (nomark)
     (multiline)
-    (persistent-help . "Describe function / C-u C-z: Toggle advice")))
+    (persistent-help . "Describe function / C-u C-j: Toggle advice")))
 
 (defun helm-advice-candidates ()
   (cl-loop for (fname) in ad-advised-functions

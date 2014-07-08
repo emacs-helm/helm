@@ -180,6 +180,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "<left>")     'helm-previous-source)
     (define-key map (kbd "<RET>")      'helm-maybe-exit-minibuffer)
     (define-key map (kbd "C-i")        'helm-select-action)
+    (define-key map (kbd "C-j")        'helm-execute-persistent-action)
     (define-key map (kbd "C-z")        'helm-execute-persistent-action)
     (define-key map (kbd "C-j")        'helm-execute-persistent-action)
     (define-key map (kbd "C-o")        'helm-next-source)
