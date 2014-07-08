@@ -255,7 +255,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
              (define-key map (kbd (format "C-%s" n))
                `(lambda ()
                   (interactive)
-                  (helm-select-nth-action ,n))))
+                  (helm-select-nth-action ,(1- n)))))
     map)
   "Keymap for helm.")
 
