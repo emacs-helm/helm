@@ -251,7 +251,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "C-h h")      'undefined)
     (cl-dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
-    ;; Bind all actions from 1 to 9 to their corresponding nth index.
+    ;; Bind all actions from 1 to 12 to their corresponding nth index.
     (cl-loop for n from 1 to 12 do
              (define-key map (kbd (format "<f%s>" n))
                `(lambda ()
