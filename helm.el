@@ -1270,7 +1270,7 @@ with its properties."
           (helm-log-eval selection)
           selection)))))
 
-(defun helm-get-action ()
+(defun helm-get-actions-from-current-source ()
   "Return the associated action for the selected candidate.
 It is a function symbol \(sole action\) or list
 of \(action-display . function\)."
@@ -3072,7 +3072,7 @@ If PRESERVE-SAVED-ACTION is non--nil save action."
                     helm-saved-action
                     (if (get-buffer helm-action-buffer)
                         (helm-get-selection helm-action-buffer)
-                      (helm-get-action)))))
+                      (helm-get-actions-from-current-source)))))
   (let ((source (or helm-saved-current-source
                     (helm-get-current-source)))
         non-essential)
@@ -3113,7 +3113,7 @@ If action buffer is selected, back to the helm buffer."
            (helm-set-pattern helm-input 'noupdate))
           (helm-saved-selection
            (setq helm-saved-current-source (helm-get-current-source))
-           (let ((actions (helm-get-action)))
+           (let ((actions (helm-get-actions-from-current-source)))
              (if (functionp actions)
                  (message "Sole action: %s" actions)
                (helm-show-action-buffer actions)
@@ -4144,7 +4144,7 @@ Possible values are 'left 'right 'below or 'above."
   (setq helm-saved-selection (helm-get-selection))
   (unless helm-saved-selection
     (error "Nothing is selected"))
-  (setq helm-saved-action (helm-get-nth-action n (helm-get-action)))
+  (setq helm-saved-action (helm-get-nth-action n (helm-get-actions-from-current-source)))
   (helm-maybe-exit-minibuffer))
 
 (defun helm-get-nth-action (n action)
@@ -4201,7 +4201,7 @@ and keep its visibility."
         (helm-log-eval (current-buffer))
         (let ((helm-in-persistent-action t))
           (with-helm-display-same-window
-            (helm-execute-selection-action-1 nil (or fn (helm-get-action)) t)
+            (helm-execute-selection-action-1 nil (or fn (helm-get-actions-from-current-source)) t)
             (helm-log-run-hook 'helm-after-persistent-action-hook))
           ;; A typical case is when a persistent action delete
           ;; the buffer already displayed in
