@@ -2014,7 +2014,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (when any-input (setq helm-input any-input
                         helm-pattern any-input))
   ;; If a `resume' attribute is present `helm-funcall-foreach'
-  ;; run its function.
+  ;; will run its function.
   (when (helm-resume-p any-resume)
     (helm-funcall-foreach 'resume))
   (helm-log "end initialization"))
