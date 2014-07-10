@@ -2011,8 +2011,12 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (unless (eq any-resume 'noresume)
     (helm-recent-push helm-buffer 'helm-buffers)
     (setq helm-last-buffer helm-buffer))
-  (when any-input (setq helm-input any-input helm-pattern any-input))
-  (and (helm-resume-p any-resume) (helm-funcall-foreach 'resume))
+  (when any-input (setq helm-input any-input
+                        helm-pattern any-input))
+  ;; If a `resume' attribute is present `helm-funcall-foreach'
+  ;; run its function.
+  (when (helm-resume-p any-resume)
+    (helm-funcall-foreach 'resume))
   (helm-log "end initialization"))
 
 (defun helm-initialize-overlays (buffer)

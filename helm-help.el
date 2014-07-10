@@ -1370,8 +1370,11 @@ HELM-ATTRIBUTE should be a symbol."
 
 (helm-document-attribute
     'resume "optional"
-  "  Function called with no parameters when `helm-resume' is
-  started.")
+  "  Function called with no parameters at end of initialization
+  when `helm-resume' is started.
+  If this function try to do something against `helm-buffer', \(e.g updating,
+  searching etc...\) probably you should run it in a timer to ensure
+  `helm-buffer' is ready.")
 
 (helm-document-attribute 'keymap "optional"
   "  Specific keymap for this source.
