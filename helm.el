@@ -743,6 +743,7 @@ See `helm-log-save-maybe' for more info.")
   "The name of the last helm session log file.")
 (defvar helm-follow-mode nil)
 (defvar helm--let-variables nil)
+(defvar helm--local-variables nil)
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
 (defvar helm-selection-point nil)
@@ -1411,14 +1412,14 @@ to VALUE by `helm-create-helm-buffer'."
        (funcall bodyfunc)
     (setq helm--let-variables nil)))
 
-(defun helm--set-local-variable (var value)
+(defun helm-set-local-variable (var value)
   "Bind VAR locally in `helm-buffer' to VALUE."
   (if (helm-alive-p)
       (with-helm-buffer
         (set (make-local-variable var) value))
-      (setq helm--let-variables
+      (setq helm--local-variables
             (append (list (cons var value))
-                    helm--let-variables))))
+                    helm--local-variables))))
 
 
 ;; Core: tools
@@ -2133,7 +2134,8 @@ It is intended to use this only in `helm-initial-setup'."
       (set (make-local-variable 'helm-marked-candidates) nil)
       (helm-initialize-persistent-action)
       (helm-log-eval helm-display-function helm--let-variables)
-      (cl-loop for (var . val) in helm--let-variables
+      (cl-loop for (var . val) in (append helm--local-variables
+                                          helm--let-variables)
             do (set (make-local-variable var) val))
       (setq truncate-lines helm-truncate-lines) ; already local.
       (setq cursor-type nil)
