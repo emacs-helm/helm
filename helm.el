@@ -1413,9 +1413,12 @@ to VALUE by `helm-create-helm-buffer'."
 
 (defun helm--set-local-variable (var value)
   "Bind VAR locally in `helm-buffer' to VALUE."
-  (setq helm--let-variables
-        (append (list (cons var value))
-                helm--let-variables)))
+  (if (helm-alive-p)
+      (with-helm-buffer
+        (set (make-local-variable var) value))
+      (setq helm--let-variables
+            (append (list (cons var value))
+                    helm--let-variables))))
 
 
 ;; Core: tools
