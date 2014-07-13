@@ -306,6 +306,7 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
+    (define-key map (kbd "M-%")           'helm-ff-run-query-replace-in-marked)
     (define-key map (kbd "C-=")           'helm-ff-run-ediff-file)
     (define-key map (kbd "C-c =")         'helm-ff-run-ediff-merge-file)
     (define-key map (kbd "M-p")           'helm-ff-run-switch-to-history)
@@ -860,9 +861,15 @@ See `helm-ff-serial-rename-1'."
   (with-current-buffer (window-buffer (minibuffer-window))
     (delete-minibuffer-contents)))
 
+;; The action.
 (defun helm-ff-query-replace-in-marked (_candidate)
   (let ((marked (helm-marked-candidates)))
     (helm-run-after-quit #'helm-ff-query-replace-in-marked-1 marked)))
+
+;; The command for `helm-find-files-map'.
+(defun helm-ff-run-query-replace-in-marked ()
+  (interactive)
+  (helm-ff-query-replace-in-marked nil))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
