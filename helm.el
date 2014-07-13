@@ -2136,7 +2136,8 @@ It is intended to use this only in `helm-initial-setup'."
       (helm-log-eval helm-display-function helm--let-variables)
       (cl-loop for (var . val) in (append helm--local-variables
                                           helm--let-variables)
-            do (set (make-local-variable var) val))
+            do (set (make-local-variable var) val)
+            finally (setq helm--local-variables nil))
       (setq truncate-lines helm-truncate-lines) ; already local.
       (setq cursor-type nil)
       (setq mode-name "Helm"))
