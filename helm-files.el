@@ -831,13 +831,12 @@ other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
 
-(defun helm-ff-query-replace-in-marked (_candidate)
-  (let ((marked (helm-marked-candidates))
-        (regexp (helm-read-string "Replace: "))
-        (str    (helm-read-string "With: ")))
+(defun helm-ff-query-replace-in-marked-1 (candidates)
+  (let ((regexp (read-string "Replace: "))
+        (str    (read-string "With: ")))
     (cl-loop with query = "y"
              with count = 0
-             for old in marked
+             for old in candidates
              for new = (concat (helm-basedir old)
                                (replace-regexp-in-string
                                 regexp str
@@ -845,13 +844,17 @@ See `helm-ff-serial-rename-1'."
              unless (string= old new)
              do (progn
                   (unless (string= query "!")
-                    (setq query (helm-read-string
+                    (setq query (read-string
                                  (format "Replace `%s' by `%s' (!,y,n): "
                                          old new))))
                   (unless (string= query "n")
                     (rename-file old new)
                     (cl-incf count)))
              finally (message "%d Files renamed" count))))
+
+(defun helm-ff-query-replace-in-marked (_candidate)
+  (let ((marked (helm-marked-candidates)))
+    (helm-run-after-quit #'helm-ff-query-replace-in-marked-1 marked)))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
