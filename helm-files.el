@@ -832,25 +832,33 @@ See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
 
 (defun helm-ff-query-replace-in-marked-1 (candidates)
-  (let ((regexp (read-string "Replace: "))
-        (str    (read-string "With: ")))
-    (cl-loop with query = "y"
-             with count = 0
-             for old in candidates
-             for new = (concat (helm-basedir old)
-                               (replace-regexp-in-string
-                                regexp str
-                                (helm-basename old)))
-             unless (string= old new)
-             do (progn
-                  (unless (string= query "!")
-                    (setq query (read-string
-                                 (format "Replace `%s' by `%s' (!,y,n): "
-                                         old new))))
-                  (unless (string= query "n")
-                    (rename-file old new)
-                    (cl-incf count)))
-             finally (message "%d Files renamed" count))))
+  (with-helm-display-marked-candidates
+    helm-marked-buffer-name
+    (mapcar 'helm-basename candidates)
+    (let* ((regexp (read-string "Replace regexp in files: "))
+           (str    (read-string (format "Replace regexp `%s' with: " regexp))))
+      (cl-loop with query = "y"
+               with count = 0
+               for old in candidates
+               for new = (concat (helm-basedir old)
+                                 (replace-regexp-in-string
+                                  regexp str
+                                  (helm-basename old)))
+               unless (string= old new)
+               do (progn
+                    (unless (string= query "!")
+                      (setq query (read-string
+                                   (format "Replace `%s' by `%s' (!,y,n): "
+                                           old new))))
+                    (unless (string= query "n")
+                      (rename-file old new)
+                      (cl-incf count)))
+               finally (message "%d Files renamed" count))))
+  ;; This fix the emacs bug where "Emacs-Lisp:" is sent
+  ;; in minibuffer (not the echo area).
+  (sit-for 0.1)
+  (with-current-buffer (window-buffer (minibuffer-window))
+    (delete-minibuffer-contents)))
 
 (defun helm-ff-query-replace-in-marked (_candidate)
   (let ((marked (helm-marked-candidates)))
