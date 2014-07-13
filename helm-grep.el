@@ -888,7 +888,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
      :default-directory helm-ff-default-directory
      :keymap helm-grep-map ; [1]
      :history 'helm-grep-history
-     :truncate-lines t)))
+     :truncate-lines t
+     :allow-nest t)))
 
 
 ;;; zgrep
