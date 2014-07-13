@@ -750,9 +750,7 @@ Keys description:
                                       helm-ff-auto-update-initial-value)
                                 (setq helm-ff-auto-update--state
                                       helm-ff-auto-update-flag)
-                                (with-helm-temp-hook 'helm-after-initialize-hook
-                                  (with-helm-buffer  
-                                    (set (make-local-variable 'helm-in-file-completion-p) t)))))
+                                (helm-set-local-variable 'helm-in-file-completion-p t)))
                       (mode-line . ,mode-line)
                       (candidates
                        . (lambda ()

@@ -123,12 +123,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
           (and helm-turn-on-show-completion
                (append (list 'helm-show-completion)
                        helm-move-selection-after-hook))))
-     (with-helm-temp-hook 'helm-after-initialize-hook
-       (with-helm-buffer
-         (set (make-local-variable 'helm-display-function)
-              (if helm-show-completion-use-special-display
-                  'helm-show-completion-display-function
-                'helm-default-display-buffer))))
+     (helm-set-local-variable 'helm-in-file-completion-p t)
      (unwind-protect
           (progn
             (helm-show-completion-init-overlay ,beg ,end)

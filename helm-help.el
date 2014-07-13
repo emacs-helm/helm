@@ -305,7 +305,7 @@ Italic     => A non--file buffer.
 \\[helm-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
 \\[helm-ff-run-etags]\t\t->Run Etags (C-u use thing-at-point `C-u C-u' reload cache)
 \\[helm-ff-run-rename-file]\t\t->Rename File (C-u Follow).
-\\[helm-ff-run-query-replace-in-marked]\t\t->Query replace in marked files.
+\\[helm-ff-run-query-replace-in-marked]\t\t->Query replace on marked files.
 \\[helm-ff-run-copy-file]\t\t->Copy File (C-u Follow).
 \\[helm-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
 \\[helm-ff-run-load-file]\t\t->Load File.
@@ -330,7 +330,7 @@ Italic     => A non--file buffer.
 \\[helm-ff-file-name-history]\t\t->Switch to file name history.
 \\[helm-ff-properties-persistent]\t\t->Show file properties in a tooltip.
 \\[helm-mark-all]\t\t->Mark all visibles candidates.
-\\[helm-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
+\\[helm-ff-run-toggle-auto-update]\t\t->Toggle auto expansion of directories.
 \\[helm-unmark-all]\t\t->Unmark all candidates, visibles and invisibles.
 \\[helm-ff-run-gnus-attach-files]\t\t->Gnus attach files to message buffer.
 \\[helm-ff-run-print-file]\t\t->Print file, (C-u to refresh printers list).
