@@ -735,7 +735,8 @@ Special commands:
   "Select types for the '--type' argument of ack-grep."
   (require 'helm-mode)
   (require 'helm-adaptive)
-  (setq helm-grep-ack-types-cache (helm-grep-hack-types))
+  (setq helm-grep-ack-types-cache (nconc (list (cons "*" nil))
+                                         (helm-grep-hack-types)))
   (let ((types (helm-comp-read
                 "Types: " helm-grep-ack-types-cache
                 :name "*Ack-grep types*"
@@ -744,7 +745,10 @@ Special commands:
                 :fc-transformer '(helm-adaptive-sort
                                   helm-grep-ack-types-transformer)
                 :buffer "*helm ack-types*")))
-    (mapconcat #'(lambda (type) (concat "--type=" type)) types " ")))
+    (mapconcat #'(lambda (type) (if (string-equal type "*")
+                               ""
+                             (concat "--type=" type)))
+               types " ")))
 
 
 ;;; grep extensions
