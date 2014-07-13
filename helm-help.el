@@ -305,6 +305,7 @@ Italic     => A non--file buffer.
 \\[helm-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
 \\[helm-ff-run-etags]\t\t->Run Etags (C-u use thing-at-point `C-u C-u' reload cache)
 \\[helm-ff-run-rename-file]\t\t->Rename File (C-u Follow).
+\\[helm-ff-run-query-replace-in-marked]\t\t->Query replace in marked files.
 \\[helm-ff-run-copy-file]\t\t->Copy File (C-u Follow).
 \\[helm-ff-run-byte-compile-file]\t\t->Byte Compile File (C-u Load).
 \\[helm-ff-run-load-file]\t\t->Load File.
