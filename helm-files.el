@@ -306,7 +306,7 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
-    (define-key map (kbd "M-%")           'helm-ff-run-query-replace-in-marked)
+    (define-key map (kbd "M-%")           'helm-ff-run-query-replace-on-marked)
     (define-key map (kbd "C-=")           'helm-ff-run-ediff-file)
     (define-key map (kbd "C-c =")         'helm-ff-run-ediff-merge-file)
     (define-key map (kbd "M-p")           'helm-ff-run-switch-to-history)
@@ -418,7 +418,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                  '("Find file in Elscreen"  . helm-elscreen-find-file))
            ("View file" . view-file)
            ("Checksum File" . helm-ff-checksum)
-           ("Query replace on marked" . helm-ff-query-replace-in-marked)
+           ("Query replace on marked" . helm-ff-query-replace-on-marked)
            ("Serial rename files" . helm-ff-serial-rename)
            ("Serial rename by symlinking files" . helm-ff-serial-rename-by-symlink)
            ("Serial rename by copying files" . helm-ff-serial-rename-by-copying)
@@ -830,7 +830,7 @@ other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
 
-(defun helm-ff-query-replace-in-marked-1 (candidates)
+(defun helm-ff-query-replace-on-marked-1 (candidates)
   (with-helm-display-marked-candidates
     helm-marked-buffer-name
     (mapcar 'helm-basename candidates)
@@ -860,14 +860,14 @@ See `helm-ff-serial-rename-1'."
     (delete-minibuffer-contents)))
 
 ;; The action.
-(defun helm-ff-query-replace-in-marked (_candidate)
+(defun helm-ff-query-replace-on-marked (_candidate)
   (let ((marked (helm-marked-candidates)))
-    (helm-run-after-quit #'helm-ff-query-replace-in-marked-1 marked)))
+    (helm-run-after-quit #'helm-ff-query-replace-on-marked-1 marked)))
 
 ;; The command for `helm-find-files-map'.
-(defun helm-ff-run-query-replace-in-marked ()
+(defun helm-ff-run-query-replace-on-marked ()
   (interactive)
-  (helm-ff-query-replace-in-marked nil))
+  (helm-ff-query-replace-on-marked nil))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
