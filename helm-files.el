@@ -397,7 +397,9 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
                     helm-ff-auto-update-initial-value)
               (setq helm-ff--auto-update-state
                     helm-ff-auto-update-flag)
-              (helm-set-local-variable 'helm-in-file-completion-p t)))
+              (with-helm-temp-hook 'helm-after-initialize-hook
+                (with-helm-buffer
+                  (set (make-local-variable 'helm-in-file-completion-p) t)))))
     (candidates . helm-find-files-get-candidates)
     (filtered-candidate-transformer . helm-ff-sort-candidates)
     (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
