@@ -843,6 +843,9 @@ See `helm-ff-serial-rename-1'."
                                  (replace-regexp-in-string
                                   regexp str
                                   (helm-basename old)))
+               ;; If `regexp' is not matched in `old'
+               ;; `replace-regexp-in-string' will
+               ;; return `old' unmodified.
                unless (string= old new)
                do (progn
                     (unless (string= query "!")
