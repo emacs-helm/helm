@@ -839,24 +839,19 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
       (setq helm-ff-default-directory default-directory))
     ;; We need to store these vars locally
     ;; to pass infos later to `helm-resume'.
-    (with-helm-temp-hook 'helm-after-initialize-hook
-      (with-helm-buffer
-        (set (make-local-variable 'helm-zgrep-recurse-flag)
-             (and recurse zgrep))
-        (set (make-local-variable 'helm-grep-last-targets) targets)
-        (set (make-local-variable 'helm-grep-include-files)
-             (or include-files types))
-        (set (make-local-variable 'helm-grep-in-recurse) recurse)
-        (set (make-local-variable 'helm-grep-use-zgrep) zgrep)
-        (set (make-local-variable 'helm-grep-last-default-directory)
-             helm-ff-default-directory)
-        (set (make-local-variable 'helm-grep-default-command)
-             (cond (helm-grep-use-zgrep helm-default-zgrep-command)
-                   (helm-grep-in-recurse helm-grep-default-recurse-command)
-                   ;; When resuming the local value of
-                   ;; `helm-grep-default-command' is used, only git-grep
-                   ;; should need this.
-                   (t helm-grep-default-command)))))
+    (helm-set-local-variable 'helm-zgrep-recurse-flag (and recurse zgrep))
+    (helm-set-local-variable 'helm-grep-last-targets targets)
+    (helm-set-local-variable 'helm-grep-include-files (or include-files types))
+    (helm-set-local-variable 'helm-grep-in-recurse recurse)
+    (helm-set-local-variable 'helm-grep-use-zgrep zgrep)
+    (helm-set-local-variable 'helm-grep-last-default-directory helm-ff-default-directory)
+    (helm-set-local-variable 'helm-grep-default-command
+                             (cond (helm-grep-use-zgrep helm-default-zgrep-command)
+                                   (helm-grep-in-recurse helm-grep-default-recurse-command)
+                                   ;; When resuming the local value of
+                                   ;; `helm-grep-default-command' is used, only git-grep
+                                   ;; should need this.
+                                   (t helm-grep-default-command)))
     ;; Setup the source.
     (setq helm-source-grep
           `((name . ,(if zgrep "Zgrep" (capitalize (if recurse

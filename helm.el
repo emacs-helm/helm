@@ -743,6 +743,7 @@ See `helm-log-save-maybe' for more info.")
   "The name of the last helm session log file.")
 (defvar helm-follow-mode nil)
 (defvar helm--let-variables nil)
+(defvar helm--local-variables nil)
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
 (defvar helm-selection-point nil)
@@ -1410,6 +1411,12 @@ to VALUE by `helm-create-helm-buffer'."
   (unwind-protect
        (funcall bodyfunc)
     (setq helm--let-variables nil)))
+
+(defun helm-set-local-variable (var value)
+  "Bind VAR locally in `helm-buffer' to VALUE."
+  (setq helm--local-variables
+        (append (list (cons var value))
+                helm--local-variables)))
 
 
 ;; Core: tools
@@ -2100,6 +2107,10 @@ It is intended to use this only in `helm-initial-setup'."
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
+  (cl-loop for (var . val) in helm--local-variables
+           do (with-helm-buffer
+                (set (make-local-variable var) val))
+           finally (setq helm--local-variables nil))
   (helm-log-run-hook 'helm-after-initialize-hook))
 
 (defun helm-create-helm-buffer ()
