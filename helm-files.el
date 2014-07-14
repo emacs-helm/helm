@@ -846,9 +846,19 @@ See `helm-ff-serial-rename-1'."
                unless (string= old new)
                do (progn
                     (unless (string= query "!")
-                      (setq query (read-string
-                                   (format "Replace `%s' by `%s' (!,y,n): "
-                                           old new))))
+                      (while (not (member
+                                   (setq query
+                                         (string
+                                          (read-key
+                                           (propertize
+                                            (format
+                                             "Replace `%s' by `%s' (!,y,n,q)"
+                                             old new)
+                                            'face 'minibuffer-prompt))))
+                                   '("y" "!" "n" "q")))
+                        (message "Please answer by y,n,! or q") (sit-for 1)))
+                    (when (string= query "q")
+                      (cl-return (message "Operation aborted")))
                     (unless (string= query "n")
                       (rename-file old new)
                       (cl-incf count)))
