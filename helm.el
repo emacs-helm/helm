@@ -742,7 +742,7 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-last-log-file nil
   "The name of the last helm session log file.")
 (defvar helm-follow-mode nil)
-(defvar helm--let-variables nil)
+(defvar helm--local-variables nil)
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
 (defvar helm-selection-point nil)
@@ -1642,7 +1642,7 @@ to 10 as session local variable."
           ;; with normal arguments (the non--arguments-keys removed)
           ;; will end up in [1].
           (progn
-            (setq helm--let-variables (helm-parse-keys plist))
+            (setq helm--local-variables (helm-parse-keys plist))
             (apply fn (mapcar #'(lambda (key) (plist-get plist key))
                               helm-argument-keys)))
         (apply fn plist))))) ; [1] fn == helm-internal.
@@ -2112,10 +2112,10 @@ It is intended to use this only in `helm-initial-setup'."
       (set (make-local-variable 'default-directory) root-dir)
       (set (make-local-variable 'helm-marked-candidates) nil)
       (helm-initialize-persistent-action)
-      (helm-log-eval helm-display-function helm--let-variables)
-      (cl-loop for (var . val) in helm--let-variables
+      (helm-log-eval helm-display-function helm--local-variables)
+      (cl-loop for (var . val) in helm--local-variables
                do (set (make-local-variable var) val)
-               finally (setq helm--let-variables nil))
+               finally (setq helm--local-variables nil))
       (setq truncate-lines helm-truncate-lines) ; already local.
       (setq cursor-type nil)
       (setq mode-name "Helm"))
