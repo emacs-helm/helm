@@ -846,8 +846,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     (helm-set-local-variable 'helm-grep-use-zgrep zgrep)
     (helm-set-local-variable 'helm-grep-last-default-directory helm-ff-default-directory)
     (helm-set-local-variable 'helm-grep-default-command
-                             (cond (helm-grep-use-zgrep helm-default-zgrep-command)
-                                   (helm-grep-in-recurse helm-grep-default-recurse-command)
+                             (cond (zgrep helm-default-zgrep-command)
+                                   (recurse helm-grep-default-recurse-command)
                                    ;; When resuming the local value of
                                    ;; `helm-grep-default-command' is used, only git-grep
                                    ;; should need this.
@@ -885,7 +885,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     (helm
      :sources '(helm-source-grep)
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
-     :default-directory helm-grep-last-default-directory
+     :default-directory helm-ff-default-directory
      :keymap helm-grep-map ; [1]
      :history 'helm-grep-history
      :truncate-lines t)))
