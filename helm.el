@@ -742,7 +742,6 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-last-log-file nil
   "The name of the last helm session log file.")
 (defvar helm-follow-mode nil)
-(defvar helm--let-variables nil)
 (defvar helm--local-variables nil)
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
@@ -1400,24 +1399,6 @@ of a source is deleted without updating the source."
                 (helm-pos-header-line-p))
               (bobp))))))
 
-(defun helm--let-internal (binding bodyfunc)
-  "Set BINDING to helm buffer-local variables and Evaluate BODYFUNC.
-BINDING is a list of (VARNAME . VALUE) pair.
-The BINDING list should be created with `helm-parse-keys' when `helm'
-is called.
-Each KEYS VARNAME of elements of BINDING will be bound locally
-to VALUE by `helm-create-helm-buffer'."
-  (setq helm--let-variables binding)
-  (unwind-protect
-       (funcall bodyfunc)
-    (setq helm--let-variables nil)))
-
-(defun helm-set-local-variable (var value)
-  "Bind VAR locally in `helm-buffer' to VALUE."
-  (setq helm--local-variables
-        (append (list (cons var value))
-                helm--local-variables)))
-
 
 ;; Core: tools
 (defun helm-current-line-contents ()
@@ -1649,23 +1630,22 @@ to 10 as session local variable."
             ;; A helm session is normally running.
             (error "Error: Trying to run helm within a running helm session")
           ;; A helm session is already running and user jump somewhere else
-          ;; without desactivating it: weird.
+          ;; without desactivating it.
           (with-helm-buffer
             (prog1
                 (message "Aborting an helm session running in background")
-              ;; helm-alive-p will be reset in unwind-protect forms.
+              ;; `helm-alive-p' will be reset in unwind-protect forms.
               (helm-keyboard-quit)))) 
       (if (keywordp (car plist))
-          ;; Recursion: [1] Call `helm' on itself with plist args converted
-          ;; to simple args will end up to [2] and call `helm-internal' with
-          ;; simple args.
-          ;; (`helm--let-internal' is not exited until recursion finish)
-          (helm--let-internal
-           (helm-parse-keys plist)
-           (lambda () ; [1]
-             (apply fn (mapcar #'(lambda (key) (plist-get plist key))
-                               helm-argument-keys))))
-        (apply fn plist))))) ; [2]
+          ;; Parse `plist' and move not regular `helm-argument-keys'
+          ;; to `helm--local-variables', then calling helm on itself
+          ;; with normal arguments (the non--arguments-keys removed)
+          ;; will end up in [1].
+          (progn
+            (setq helm--local-variables (helm-parse-keys plist))
+            (apply fn (mapcar #'(lambda (key) (plist-get plist key))
+                              helm-argument-keys)))
+        (apply fn plist))))) ; [1] fn == helm-internal.
 
 (defun helm-alive-p ()
   "Check if `helm' is alive.
@@ -1678,24 +1658,26 @@ the `helm-buffer' is visible, and cursor is in minibuffer."
 
 (defun helm-parse-keys (keys)
   "Parse the KEYS arguments of `helm'.
-Return only the keys that are not in `helm-argument-keys'.
-It is used to set local variables via `helm--let-internal'.
+Return only the keys that are not in `helm-argument-keys',
+prefix them with \"helm\" and convert them to alist.
 This allow to add arguments that are not part of `helm-argument-keys',
-but are valid helm attributes.
-i.e :candidate-number-limit will be bound to `helm-candidate-number-limit'
-in source."
-  ;; (helm-parse-keys '(:sources ((name . "test")
-  ;;                                  (candidates . (a b c)))
-  ;;                        :buffer "toto"
-  ;;                        :candidate-number-limit 4))
-  ;; ==> ((helm-candidate-number-limit . 4))
+but are valid helm variables.
+e.g :candidate-number-limit will be bound to `helm-candidate-number-limit'
+in source.
+
+  (helm-parse-keys '(:sources ((name . \"test\")
+                                   (candidates . (a b c)))
+                     :buffer \"toto\"
+                     :candidate-number-limit 4))
+  ==> ((helm-candidate-number-limit . 4))."
+  
   (cl-loop for (key value) on keys by #'cddr
-        for symname = (substring (symbol-name key) 1)
-        for sym = (intern (if (string-match "^helm-" symname)
-                              symname
-                            (concat "helm-" symname)))
-        unless (memq key helm-argument-keys)
-        collect (cons sym value)))
+           for symname = (substring (symbol-name key) 1)
+           for sym = (intern (if (string-match "^helm-" symname)
+                                 symname
+                                 (concat "helm-" symname)))
+           unless (memq key helm-argument-keys)
+           collect (cons sym value)))
 
 ;;; Core: entry point helper
 (defun helm-internal (&optional
@@ -2134,9 +2116,10 @@ It is intended to use this only in `helm-initial-setup'."
       (set (make-local-variable 'default-directory) root-dir)
       (set (make-local-variable 'helm-marked-candidates) nil)
       (helm-initialize-persistent-action)
-      (helm-log-eval helm-display-function helm--let-variables)
-      (cl-loop for (var . val) in helm--let-variables
-               do (set (make-local-variable var) val))
+      (helm-log-eval helm-display-function helm--local-variables)
+      (cl-loop for (var . val) in helm--local-variables
+               do (set (make-local-variable var) val)
+               finally (setq helm--local-variables nil))
       (setq truncate-lines helm-truncate-lines) ; already local.
       (setq cursor-type nil)
       (setq mode-name "Helm"))
