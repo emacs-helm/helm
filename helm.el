@@ -1378,6 +1378,12 @@ Otherwise, return VALUE itself."
         (t
          value)))
 
+(defun helm-set-local-variable (var value)
+  "Bind VAR locally in `helm-buffer' to VALUE."
+  (setq helm--local-variables
+        (append (list (cons var value))
+                helm--local-variables)))
+
 
 ;; Core: API helper
 (cl-defun helm-empty-buffer-p (&optional (buffer helm-buffer))
@@ -1642,7 +1648,8 @@ to 10 as session local variable."
           ;; with normal arguments (the non--arguments-keys removed)
           ;; will end up in [1].
           (progn
-            (setq helm--local-variables (helm-parse-keys plist))
+            (setq helm--local-variables (append (helm-parse-keys plist)
+                                                helm--local-variables))
             (apply fn (mapcar #'(lambda (key) (plist-get plist key))
                               helm-argument-keys)))
         (apply fn plist))))) ; [1] fn == helm-internal.
@@ -2089,10 +2096,6 @@ It is intended to use this only in `helm-initial-setup'."
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
-  (cl-loop for (var . val) in helm--local-variables
-           do (with-helm-buffer
-                (set (make-local-variable var) val))
-           finally (setq helm--local-variables nil))
   (helm-log-run-hook 'helm-after-initialize-hook))
 
 (defun helm-create-helm-buffer ()
