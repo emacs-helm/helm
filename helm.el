@@ -1648,8 +1648,12 @@ to 10 as session local variable."
           ;; with normal arguments (the non--arguments-keys removed)
           ;; will end up in [1].
           (progn
-            (setq helm--local-variables (append (helm-parse-keys plist)
-                                                helm--local-variables))
+            (setq helm--local-variables
+                  (append helm--local-variables
+                          ;; Vars passed by keyword on helm call
+                          ;; take precedence on same vars
+                          ;; that may have been passed before helm call.
+                          (helm-parse-keys plist)))
             (apply fn (mapcar #'(lambda (key) (plist-get plist key))
                               helm-argument-keys)))
         (apply fn plist))))) ; [1] fn == helm-internal.
