@@ -1638,7 +1638,7 @@ to 10 as session local variable."
               (helm-keyboard-quit)))) 
       (if (keywordp (car plist))
           ;; Parse `plist' and move not regular `helm-argument-keys'
-          ;; to `helm--local-variables', then call helm on itself
+          ;; to `helm--local-variables', then calling helm on itself
           ;; with normal arguments (the non--arguments-keys removed)
           ;; will end up in [1].
           (progn
