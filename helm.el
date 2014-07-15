@@ -1679,7 +1679,7 @@ e.g :candidate-number-limit will be bound to `helm-candidate-number-limit'
 in source.
 
   (helm-parse-keys '(:sources ((name . \"test\")
-                                   (candidates . (a b c)))
+                               (candidates . (a b c)))
                      :buffer \"toto\"
                      :candidate-number-limit 4))
   ==> ((helm-candidate-number-limit . 4))."
