@@ -1379,7 +1379,9 @@ Otherwise, return VALUE itself."
          value)))
 
 (defun helm-set-local-variable (var value)
-  "Bind VAR locally in `helm-buffer' to VALUE."
+  "Bind VAR locally in `helm-buffer' to VALUE.
+Use this to set local vars before calling helm.
+When `helm-buffer' is current use `make-local-variable' as usual."
   (setq helm--local-variables
         (append (list (cons var value))
                 helm--local-variables)))
