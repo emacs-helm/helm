@@ -157,7 +157,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 
 ;; Internal
 (defvar helm-multi-occur-buffer-list nil)
-
+(defvar helm-multi-occur-buffer-tick nil)
 (defun helm-moccur-init ()
   "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
@@ -281,12 +281,25 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (persistent-action . helm-moccur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)
+    (resume . helm-moccur-resume-fn)
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-moccur-map)
     (history . ,'helm-grep-history)
     (requires-pattern . 2))
   "Helm source for multi occur.")
+
+(defun helm-moccur-resume-fn ()
+  (with-helm-buffer
+    (let (new-tick-ls)
+      (unless (cl-loop for b in helm-multi-occur-buffer-list
+                       for new-tick = (buffer-modified-tick (get-buffer b))
+                       do (push new-tick new-tick-ls)
+                       for tick in helm-multi-occur-buffer-tick
+                       always (= tick new-tick))
+        (when (y-or-n-p "Helm occur Buffer outdated, update? ")
+          (run-with-idle-timer 0.1 nil #'helm-force-update)
+          (setq helm-multi-occur-buffer-tick (reverse new-tick-ls)))))))
 
 (defun helm-moccur-filter-one-by-one (candidate)
   "`filter-one-by-one' function for `helm-source-moccur'."
@@ -317,7 +330,11 @@ Same as `helm-moccur-goto-line' but go in new frame."
                    (remove helm-current-buffer helm-multi-occur-buffer-list))
                   buffers)))
     (helm-attrset 'moccur-buffers bufs helm-source-moccur)
-    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs))
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
+    (helm-set-local-variable
+     'helm-multi-occur-buffer-tick
+     (cl-loop for b in bufs
+              collect (buffer-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
@@ -461,7 +478,11 @@ Special commands:
   (helm-occur-init-source)
   (let ((bufs (list (buffer-name (current-buffer)))))
     (helm-attrset 'moccur-buffers bufs helm-source-occur)
-    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs))
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
+    (helm-set-local-variable
+     'helm-multi-occur-buffer-tick
+     (cl-loop for b in bufs
+              collect (buffer-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
         :history 'helm-grep-history
@@ -481,6 +502,10 @@ Special commands:
     (helm-occur-init-source)
     (helm-attrset 'moccur-buffers bufs helm-source-occur)
     (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
+    (helm-set-local-variable
+     'helm-multi-occur-buffer-tick
+     (cl-loop for b in bufs
+              collect (buffer-modified-tick (get-buffer b))))
     (helm :sources 'helm-source-occur
           :buffer "*helm occur*"
           :history 'helm-grep-history
