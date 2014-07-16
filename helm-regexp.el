@@ -485,7 +485,6 @@ Special commands:
           :buffer "*helm occur*"
           :history 'helm-grep-history
           :input input
-          :multi-occur-buffer-list helm-multi-occur-buffer-list
           :truncate-lines t)))
 
 ;;;###autoload
