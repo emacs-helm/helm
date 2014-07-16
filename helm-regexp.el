@@ -289,6 +289,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (requires-pattern . 2))
   "Helm source for multi occur.")
 
+(defvar helm-moccur-auto-update-on-resume t)
+
 (defun helm-moccur-resume-fn ()
   (with-helm-buffer
     (let (new-tick-ls)
@@ -297,9 +299,24 @@ Same as `helm-moccur-goto-line' but go in new frame."
                        do (push new-tick new-tick-ls)
                        for tick in helm-multi-occur-buffer-tick
                        always (= tick new-tick))
-        (when (y-or-n-p "Helm occur Buffer outdated, update? ")
-          (run-with-idle-timer 0.1 nil #'helm-force-update)
-          (setq helm-multi-occur-buffer-tick (reverse new-tick-ls)))))))
+        (helm-aif helm-moccur-auto-update-on-resume
+            (when (or (eq it 'noask)
+                      (y-or-n-p "Helm (m)occur Buffer outdated, update? "))
+              (run-with-idle-timer 0.1 nil (lambda ()
+                                             (with-helm-buffer
+                                               (helm-force-update)
+                                               (message "Helm (m)occur Buffer have been udated")
+                                               (sit-for 1) (message nil))))
+              (setq helm-multi-occur-buffer-tick (reverse new-tick-ls)))
+          (run-with-idle-timer 0.1 nil (lambda ()
+                                         (with-helm-buffer
+                                           (let ((ov (make-overlay (point-min) (point-max))))
+                                             (overlay-put ov 'face '((:background "DimGray")))
+                                             (sit-for 0.3) (delete-overlay ov)
+                                             (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
+          (with-helm-after-update-hook
+            (setq helm-multi-occur-buffer-tick (reverse new-tick-ls))
+            (message "Helm (m)occur Buffer have been udated")))))))
 
 (defun helm-moccur-filter-one-by-one (candidate)
   "`filter-one-by-one' function for `helm-source-moccur'."
