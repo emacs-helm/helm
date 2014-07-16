@@ -162,13 +162,14 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
       'global
-    (cl-loop for buf in helm-multi-occur-buffer-list
-          for bufstr = (with-current-buffer buf (buffer-string))
-          do (add-text-properties
-              0 (length bufstr)
-              `(buffer-name ,(buffer-name (get-buffer buf)))
-              bufstr)
-          concat bufstr)))
+    (cl-loop with buffers = (helm-attr 'moccur-buffers)
+             for buf in buffers
+             for bufstr = (with-current-buffer buf (buffer-string))
+             do (add-text-properties
+                 0 (length bufstr)
+                 `(buffer-name ,(buffer-name (get-buffer buf)))
+                 bufstr)
+             concat bufstr)))
 
 (defun helm-moccur-get-line (beg end)
   "Format line for `helm-source-moccur'."
@@ -309,18 +310,18 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Main function to call `helm-source-moccur' with BUFFERS list."
-  (setq helm-multi-occur-buffer-list
-        (if helm-moccur-always-search-in-current
-            (cons
-             ;; will become helm-current-buffer later.
-             (buffer-name (current-buffer))
-             (remove helm-current-buffer helm-multi-occur-buffer-list))
-         buffers))
+  (let ((bufs (if helm-moccur-always-search-in-current
+                  (cons
+                   ;; will become helm-current-buffer later.
+                   (buffer-name (current-buffer))
+                   (remove helm-current-buffer helm-multi-occur-buffer-list))
+                  buffers)))
+    (helm-attrset 'moccur-buffers bufs helm-source-moccur)
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
         :input input
-        :multi-occur-buffer-list helm-multi-occur-buffer-list
         :truncate-lines t))
 
 ;;;###autoload
@@ -457,14 +458,15 @@ Special commands:
 (defun helm-occur ()
   "Preconfigured helm for Occur."
   (interactive)
-  (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
   (helm-occur-init-source)
+  (let ((bufs (list (buffer-name (current-buffer)))))
+    (helm-attrset 'moccur-buffers bufs helm-source-occur)
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs))
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
         :history 'helm-grep-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
                         (format "%s:%d:" (buffer-name) (line-number-at-pos (point))))
-        :multi-occur-buffer-list helm-multi-occur-buffer-list
         :truncate-lines t))
 
 ;;;###autoload
