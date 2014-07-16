@@ -475,10 +475,12 @@ Special commands:
   (interactive)
   (let ((input (if isearch-regexp
                    isearch-string
-                 (regexp-quote isearch-string))))
+                 (regexp-quote isearch-string)))
+        (bufs (list (buffer-name (current-buffer)))))
     (isearch-exit)
-    (setq helm-multi-occur-buffer-list (list (buffer-name (current-buffer))))
     (helm-occur-init-source)
+    (helm-attrset 'moccur-buffers bufs helm-source-occur)
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
     (helm :sources 'helm-source-occur
           :buffer "*helm occur*"
           :history 'helm-grep-history
