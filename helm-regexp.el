@@ -281,12 +281,21 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (persistent-action . helm-moccur-persistent-action)
     (persistent-help . "Go to line")
     (recenter)
+    (resume . helm-moccur-resume-fn)
     (candidate-number-limit . 9999)
     (mode-line . helm-moccur-mode-line)
     (keymap . ,helm-moccur-map)
     (history . ,'helm-grep-history)
     (requires-pattern . 2))
   "Helm source for multi occur.")
+
+(defun helm-moccur-resume-fn ()
+  (with-helm-buffer
+    (set (make-local-variable 'helm-multi-occur-buffer-list)
+         (cl-loop for b in helm-multi-occur-buffer-list
+                  when (buffer-live-p (get-buffer b))
+                  collect b))
+    (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)))
 
 (defun helm-moccur-filter-one-by-one (candidate)
   "`filter-one-by-one' function for `helm-source-moccur'."
