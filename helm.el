@@ -1378,12 +1378,16 @@ Otherwise, return VALUE itself."
         (t
          value)))
 
-(defun helm-set-local-variable (var value)
-  "Bind VAR locally in `helm-buffer' to VALUE.
+(defun helm-set-local-variable (&rest args)
+  "Bind each pair in ARGS locally to `helm-buffer'.
 Use this to set local vars before calling helm.
-When `helm-buffer' is current use `make-local-variable' as usual."
+Usage: helm-set-local-variable [VAR VALUE]...
+Just like `setq' except that the vars are not set sequentially.
+IOW Don't use VALUE of previous VAR to eval the VALUE of next VAR.
+When helm is alive use `make-local-variable' as usual on `helm-buffer'."
   (setq helm--local-variables
-        (append (list (cons var value))
+        (append (cl-loop for i on args by #'cddr
+                         collect (cons (car i) (cadr i)))
                 helm--local-variables)))
 
 
