@@ -316,6 +316,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
     (unless (eq helm-moccur-auto-update-on-resume 'never)
       (let (new-tick-ls)
+        ;; FIXME update ticks when killed buffers.
         (unless (cl-loop for b in helm-multi-occur-buffer-list
                          for new-tick = (buffer-chars-modified-tick (get-buffer b))
                          do (push new-tick new-tick-ls)
