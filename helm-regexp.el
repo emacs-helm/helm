@@ -310,9 +310,14 @@ Same as `helm-moccur-goto-line' but go in new frame."
 (defun helm-moccur-resume-fn ()
   (unless (eq helm-moccur-auto-update-on-resume 'never)
     (with-helm-buffer
+      (set (make-local-variable 'helm-multi-occur-buffer-list)
+           (cl-loop for b in helm-multi-occur-buffer-list
+                    when (buffer-live-p (get-buffer b))
+                    collect b))
+      (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
       (let (new-tick-ls)
         (unless (cl-loop for b in helm-multi-occur-buffer-list
-                         for new-tick = (buffer-modified-tick (get-buffer b))
+                         for new-tick = (buffer-chars-modified-tick (get-buffer b))
                          do (push new-tick new-tick-ls)
                          for tick in helm-multi-occur-buffer-tick
                          always (= tick new-tick))
@@ -368,7 +373,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (helm-set-local-variable
      'helm-multi-occur-buffer-tick
      (cl-loop for b in bufs
-              collect (buffer-modified-tick (get-buffer b)))))
+              collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
@@ -516,7 +521,7 @@ Special commands:
     (helm-set-local-variable
      'helm-multi-occur-buffer-tick
      (cl-loop for b in bufs
-              collect (buffer-modified-tick (get-buffer b)))))
+              collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
         :history 'helm-grep-history
@@ -539,7 +544,7 @@ Special commands:
     (helm-set-local-variable
      'helm-multi-occur-buffer-tick
      (cl-loop for b in bufs
-              collect (buffer-modified-tick (get-buffer b))))
+              collect (buffer-chars-modified-tick (get-buffer b))))
     (helm :sources 'helm-source-occur
           :buffer "*helm occur*"
           :history 'helm-grep-history
