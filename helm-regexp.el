@@ -332,7 +332,11 @@ Same as `helm-moccur-goto-line' but go in new frame."
                 (setq helm-multi-occur-buffer-tick (reverse new-tick-ls)))
             (run-with-idle-timer 0.1 nil (lambda ()
                                            (with-helm-buffer
-                                             (let ((ov (make-overlay (point-min) (point-max))))
+                                             (let ((ov (make-overlay (save-excursion
+                                                                       (goto-char (point-min))
+                                                                       (forward-line 1)
+                                                                       (point))
+                                                                     (point-max))))
                                                (overlay-put ov 'face 'helm-resume-need-update)
                                                (sit-for 0.3) (delete-overlay ov)
                                                (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
