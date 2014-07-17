@@ -308,13 +308,13 @@ Same as `helm-moccur-goto-line' but go in new frame."
   "Helm source for multi occur.")
 
 (defun helm-moccur-resume-fn ()
-  (unless (eq helm-moccur-auto-update-on-resume 'never)
-    (with-helm-buffer
-      (set (make-local-variable 'helm-multi-occur-buffer-list)
-           (cl-loop for b in helm-multi-occur-buffer-list
-                    when (buffer-live-p (get-buffer b))
-                    collect b))
-      (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
+  (with-helm-buffer
+    (set (make-local-variable 'helm-multi-occur-buffer-list)
+         (cl-loop for b in helm-multi-occur-buffer-list
+                  when (buffer-live-p (get-buffer b))
+                  collect b))
+    (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
+    (unless (eq helm-moccur-auto-update-on-resume 'never)
       (let (new-tick-ls)
         (unless (cl-loop for b in helm-multi-occur-buffer-list
                          for new-tick = (buffer-chars-modified-tick (get-buffer b))
