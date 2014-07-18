@@ -562,7 +562,8 @@ First call indent, second complete symbol, third complete fname."
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
         when (file-directory-p dir)
-        append (directory-files dir t (regexp-opt (get-load-suffixes)))
+        append (directory-files dir t (concat (regexp-opt (get-load-suffixes))
+                                              "\\'"))
         into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
