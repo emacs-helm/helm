@@ -309,19 +309,26 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 (defun helm-moccur-resume-fn ()
   (with-helm-buffer
-    (set (make-local-variable 'helm-multi-occur-buffer-list)
-         (cl-loop for b in helm-multi-occur-buffer-list
-                  when (buffer-live-p (get-buffer b))
-                  collect b))
-    (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
-    (unless (eq helm-moccur-auto-update-on-resume 'never)
-      (let (new-tick-ls)
-        ;; FIXME update ticks when killed buffers.
-        (unless (cl-loop for b in helm-multi-occur-buffer-list
-                         for new-tick = (buffer-chars-modified-tick (get-buffer b))
-                         do (push new-tick new-tick-ls)
-                         for tick in helm-multi-occur-buffer-tick
-                         always (= tick new-tick))
+    (let (new-tick-ls buffer-is-modified)
+      (set (make-local-variable 'helm-multi-occur-buffer-list)
+           (cl-loop for b in helm-multi-occur-buffer-list
+                    when (buffer-live-p (get-buffer b))
+                    collect b))
+      (setq buffer-is-modified (/= (length helm-multi-occur-buffer-list)
+                                   (length (helm-attr 'moccur-buffers))))
+      (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
+      (setq new-tick-ls (cl-loop for b in helm-multi-occur-buffer-list
+                                 collect (buffer-chars-modified-tick (get-buffer b))))
+      (when buffer-is-modified
+        (setq helm-multi-occur-buffer-tick new-tick-ls))
+      (cl-assert (> (length helm-multi-occur-buffer-list) 0) nil
+                 "helm-resume error: helm-(m)occur buffer list is empty")
+      (unless (eq helm-moccur-auto-update-on-resume 'never)
+        (when (or buffer-is-modified
+                  (cl-loop for b in helm-multi-occur-buffer-list
+                           for new-tick = (buffer-chars-modified-tick (get-buffer b))
+                           for tick in helm-multi-occur-buffer-tick
+                           thereis (/= tick new-tick)))
           (helm-aif helm-moccur-auto-update-on-resume
               (when (or (eq it 'noask)
                         (y-or-n-p "Helm (m)occur Buffer outdated, update? "))
@@ -330,7 +337,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
                                                  (helm-force-update)
                                                  (message "Helm (m)occur Buffer have been udated")
                                                  (sit-for 1) (message nil))))
-                (setq helm-multi-occur-buffer-tick (reverse new-tick-ls)))
+                (unless buffer-is-modified (setq helm-multi-occur-buffer-tick new-tick-ls)))
             (run-with-idle-timer 0.1 nil (lambda ()
                                            (with-helm-buffer
                                              (let ((ov (make-overlay (save-excursion
@@ -341,9 +348,10 @@ Same as `helm-moccur-goto-line' but go in new frame."
                                                (overlay-put ov 'face 'helm-resume-need-update)
                                                (sit-for 0.3) (delete-overlay ov)
                                                (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
-            (with-helm-after-update-hook
-              (setq helm-multi-occur-buffer-tick (reverse new-tick-ls))
-              (message "Helm (m)occur Buffer have been udated"))))))))
+            (unless buffer-is-modified
+              (with-helm-after-update-hook
+                (setq helm-multi-occur-buffer-tick new-tick-ls)
+                (message "Helm (m)occur Buffer have been udated")))))))))
 
 (defun helm-moccur-filter-one-by-one (candidate)
   "`filter-one-by-one' function for `helm-source-moccur'."
