@@ -834,7 +834,7 @@ See `helm-ff-serial-rename-1'."
   (with-helm-display-marked-candidates
     helm-marked-buffer-name
     (mapcar 'helm-basename candidates)
-    (let* ((regexp (read-string "Replace regexp in files: "))
+    (let* ((regexp (read-string "Replace regexp on filename(s): "))
            (str    (read-string (format "Replace regexp `%s' with: " regexp))))
       (cl-loop with query = "y"
                with count = 0
@@ -855,7 +855,7 @@ See `helm-ff-serial-rename-1'."
                                           (read-key
                                            (propertize
                                             (format
-                                             "Replace `%s' by `%s' (!,y,n,q)"
+                                             "Replace `%s' by `%s' [!,y,n,q]"
                                              old new)
                                             'face 'minibuffer-prompt))))
                                    '("y" "!" "n" "q")))
