@@ -36,10 +36,28 @@
   :group 'helm-regexp
   :type 'boolean)
 
+(defcustom helm-moccur-auto-update-on-resume nil
+  "Allow auto updating helm-(m)occur buffer when outdated.
+noask => Always update without asking
+nil   => Don't update but signal buffer needs update
+never => Never update and do not signal buffer needs update
+Any other non--nil value update after confirmation."
+  :group 'helm-regexp
+  :type '(radio :tag "Allow auto updating helm-(m)occur buffer when outdated."
+          (const :tag "Always update without asking" noask)
+          (const :tag "Never update and do not signal buffer needs update" never)
+          (const :tag "Don't update but signal buffer needs update" nil)
+          (const :tag "Update after confirmation" t)))
+
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
   "Face used to highlight moccur buffer names."
+  :group 'helm-regexp)
+
+(defface helm-resume-need-update
+    '((t (:background "red")))
+  "Face used to flash moccur buffer when it needs update."
   :group 'helm-regexp)
 
 
@@ -157,7 +175,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 
 ;; Internal
 (defvar helm-multi-occur-buffer-list nil)
-
+(defvar helm-multi-occur-buffer-tick nil)
 (defun helm-moccur-init ()
   "Create the initial helm multi occur buffer."
   (helm-init-candidates-in-buffer
@@ -291,11 +309,49 @@ Same as `helm-moccur-goto-line' but go in new frame."
 
 (defun helm-moccur-resume-fn ()
   (with-helm-buffer
-    (set (make-local-variable 'helm-multi-occur-buffer-list)
-         (cl-loop for b in helm-multi-occur-buffer-list
-                  when (buffer-live-p (get-buffer b))
-                  collect b))
-    (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)))
+    (let (new-tick-ls buffer-is-modified)
+      (set (make-local-variable 'helm-multi-occur-buffer-list)
+           (cl-loop for b in helm-multi-occur-buffer-list
+                    when (buffer-live-p (get-buffer b))
+                    collect b))
+      (setq buffer-is-modified (/= (length helm-multi-occur-buffer-list)
+                                   (length (helm-attr 'moccur-buffers))))
+      (helm-attrset 'moccur-buffers helm-multi-occur-buffer-list)
+      (setq new-tick-ls (cl-loop for b in helm-multi-occur-buffer-list
+                                 collect (buffer-chars-modified-tick (get-buffer b))))
+      (when buffer-is-modified
+        (setq helm-multi-occur-buffer-tick new-tick-ls))
+      (cl-assert (> (length helm-multi-occur-buffer-list) 0) nil
+                 "helm-resume error: helm-(m)occur buffer list is empty")
+      (unless (eq helm-moccur-auto-update-on-resume 'never)
+        (when (or buffer-is-modified
+                  (cl-loop for b in helm-multi-occur-buffer-list
+                           for new-tick = (buffer-chars-modified-tick (get-buffer b))
+                           for tick in helm-multi-occur-buffer-tick
+                           thereis (/= tick new-tick)))
+          (helm-aif helm-moccur-auto-update-on-resume
+              (when (or (eq it 'noask)
+                        (y-or-n-p "Helm (m)occur Buffer outdated, update? "))
+                (run-with-idle-timer 0.1 nil (lambda ()
+                                               (with-helm-buffer
+                                                 (helm-force-update)
+                                                 (message "Helm (m)occur Buffer have been udated")
+                                                 (sit-for 1) (message nil))))
+                (unless buffer-is-modified (setq helm-multi-occur-buffer-tick new-tick-ls)))
+            (run-with-idle-timer 0.1 nil (lambda ()
+                                           (with-helm-buffer
+                                             (let ((ov (make-overlay (save-excursion
+                                                                       (goto-char (point-min))
+                                                                       (forward-line 1)
+                                                                       (point))
+                                                                     (point-max))))
+                                               (overlay-put ov 'face 'helm-resume-need-update)
+                                               (sit-for 0.3) (delete-overlay ov)
+                                               (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
+            (unless buffer-is-modified
+              (with-helm-after-update-hook
+                (setq helm-multi-occur-buffer-tick new-tick-ls)
+                (message "Helm (m)occur Buffer have been udated")))))))))
 
 (defun helm-moccur-filter-one-by-one (candidate)
   "`filter-one-by-one' function for `helm-source-moccur'."
@@ -326,7 +382,11 @@ Same as `helm-moccur-goto-line' but go in new frame."
                    (remove helm-current-buffer helm-multi-occur-buffer-list))
                   buffers)))
     (helm-attrset 'moccur-buffers bufs helm-source-moccur)
-    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs))
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
+    (helm-set-local-variable
+     'helm-multi-occur-buffer-tick
+     (cl-loop for b in bufs
+              collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
@@ -470,7 +530,11 @@ Special commands:
   (helm-occur-init-source)
   (let ((bufs (list (buffer-name (current-buffer)))))
     (helm-attrset 'moccur-buffers bufs helm-source-occur)
-    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs))
+    (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
+    (helm-set-local-variable
+     'helm-multi-occur-buffer-tick
+     (cl-loop for b in bufs
+              collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
         :history 'helm-grep-history
@@ -490,6 +554,10 @@ Special commands:
     (helm-occur-init-source)
     (helm-attrset 'moccur-buffers bufs helm-source-occur)
     (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
+    (helm-set-local-variable
+     'helm-multi-occur-buffer-tick
+     (cl-loop for b in bufs
+              collect (buffer-chars-modified-tick (get-buffer b))))
     (helm :sources 'helm-source-occur
           :buffer "*helm occur*"
           :history 'helm-grep-history
