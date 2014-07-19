@@ -1545,7 +1545,7 @@ Keywords supported:
 :sources :input :prompt :resume :preselect
 :buffer :keymap :default :history :allow-nest
 
-Extra keywords are supported and can be added, see below.
+Extra LOCAL-VARS keywords are supported, see below.
 
 PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
 \(&optional sources input prompt resume
