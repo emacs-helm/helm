@@ -1532,6 +1532,7 @@ This is used in transformers to modify candidates list."
 
 
 ;; Core: entry point
+;; `:allow-nest' is not in this list because it is treated before.
 (defconst helm-argument-keys
   '(:sources :input :prompt :resume
     :preselect :buffer :keymap :default :history))
@@ -1634,7 +1635,7 @@ means starting helm session with `helm-source-buffers'
 source in *buffers* buffer and set variable `helm-candidate-number-limit'
 to 10 as session local variable.
 
-\(fn &key sources input prompt resume preselect buffer keymap default history local-vars...)"
+\(fn &key sources input prompt resume preselect buffer keymap default history allow-nest local-vars...)"
   (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
                        (and helm-alive-p (memq 'allow-nest plist)))
                    #'helm-nest)
