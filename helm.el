@@ -3177,19 +3177,21 @@ Possible value of DIRECTION are 'next or 'previous.
 Same as `helm-skip-header-and-separator-line' but ensure
 point is moved to the right place when at bop or eob."
   (helm-skip-header-and-separator-line direction)
-  (and (bobp) (forward-line 1))     ; skip first header.
-  (and (eobp) (forward-line -1)))   ; avoid last empty line.
-
+  (and (bobp) (forward-line 1))     ; Skip first header.
+  (and (eobp) (forward-line -1)))   ; Avoid last empty line.
 
 (defun helm-skip-header-and-separator-line (direction)
   "Skip source header or candidate separator when going to next/previous line.
 Possible value of DIRECTION are 'next or 'previous."
-  (while (and (not (bobp))
+  (let ((fn (cl-ecase direction
+              (next 'eobp)
+              (previous 'bobp))))
+  (while (and (not (funcall fn))
               (or (helm-pos-header-line-p)
                   (helm-pos-candidate-separator-p)))
     (forward-line (if (and (eq direction 'previous)
                            (not (eq (point-at-bol) (point-min))))
-                      -1 1))))
+                      -1 1)))))
 
 (defun helm-display-mode-line (source &optional force)
   "Setup mode-line and header-line for `helm-buffer'."
@@ -3274,6 +3276,8 @@ Key arg DIRECTION can be one of:
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
         (helm-skip-noncandidate-line direction)
+        (when (helm-pos-multiline-p)
+          (helm-move--beginning-of-multiline-candidate))
         (helm-display-source-at-screen-top-maybe where)
         (when (helm-get-previous-header-pos)
           (helm-mark-current-line))
