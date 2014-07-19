@@ -1381,10 +1381,12 @@ Otherwise, return VALUE itself."
 (defun helm-set-local-variable (&rest args)
   "Bind each pair in ARGS locally to `helm-buffer'.
 Use this to set local vars before calling helm.
-Usage: helm-set-local-variable [VAR VALUE]...
+Usage: helm-set-local-variable ([VAR VALUE]...)
 Just like `setq' except that the vars are not set sequentially.
 IOW Don't use VALUE of previous VAR to eval the VALUE of next VAR.
-When helm is alive use `make-local-variable' as usual on `helm-buffer'."
+When helm is alive use `make-local-variable' as usual on `helm-buffer'.
+
+\(fn VAR VALUE...)"
   (setq helm--local-variables
         (append (cl-loop for i on args by #'cddr
                          collect (cons (car i) (cadr i)))
@@ -1630,7 +1632,9 @@ The `helm-' prefix can be omitted.  For example,
 
 means starting helm session with `helm-source-buffers'
 source in *buffers* buffer and set variable `helm-candidate-number-limit'
-to 10 as session local variable."
+to 10 as session local variable.
+
+\(fn &key sources input prompt resume preselect buffer keymap default history local-vars...)"
   (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
                        (and helm-alive-p (memq 'allow-nest plist)))
                    #'helm-nest)
