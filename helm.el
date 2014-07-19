@@ -3279,7 +3279,8 @@ Key arg DIRECTION can be one of:
       (with-helm-window
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
-        (helm-skip-noncandidate-line direction)
+        (and (memq direction '(next previous))
+             (helm-skip-noncandidate-line direction))
         (when (helm-pos-multiline-p)
           (helm-move--beginning-of-multiline-candidate))
         (helm-display-source-at-screen-top-maybe where)
