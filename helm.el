@@ -121,7 +121,7 @@ to use once started.
 e.g:
 
 \(helm-define-key-with-subkeys global-map
-      \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk ((?p 'git-gutter:previous-hunk))\)
+      \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk ((?p . 'git-gutter:previous-hunk))\)
 
 
 In this example, `C-x v n' will run `git-gutter:next-hunk' subsequent hit on \"n\"
