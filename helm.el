@@ -1378,7 +1378,7 @@ Just like `setq' except that the vars are not set sequentially.
 IOW Don't use VALUE of previous VAR to eval the VALUE of next VAR.
 When helm is alive use `make-local-variable' as usual on `helm-buffer'.
 
-\(fn VAR VALUE...)"
+\(fn VAR VALUE ...)"
   (setq helm--local-variables
         (append (cl-loop for i on args by #'cddr
                          collect (cons (car i) (cadr i)))
