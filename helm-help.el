@@ -64,11 +64,7 @@ C-j or C-z: Persistent Action (Execute action with helm session kept)
 
 == Shortcuts For nth Action ==
 
-<<<<<<< HEAD
 f1-12: Execute nth 1 to 12 Action(s).
-=======
-f1/12: Execute nth 1 to 9 Action.
->>>>>>> 2e555f2e59799f63fe578c271b739d23a9bf790c
 
 == Visible Marks ==
 Visible marks store candidate. Some actions uses marked candidates.
