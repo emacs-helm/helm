@@ -41,6 +41,10 @@ Narrow the list by typing some pattern,
 Multiple patterns are allowed by splitting by space.
 Select with natural Emacs operations, choose with RET.
 
+== Help ==
+C-h m : Run this generic help for helm.
+C-c ? : Run specific helm help for current source.
+
 == Basic Operations ==
 C-p, Up: Previous Line
 C-n, Down : Next Line
@@ -55,12 +59,12 @@ M-PageDown, C-M-v : Next Page (other-window)
 Tab, C-i : Show action list
 Left : Previous Source
 Right, C-o : Next Source
-C-k : Delete pattern
+C-k : Delete pattern (with prefix arg delete from point to end)
 C-j or C-z: Persistent Action (Execute action with helm session kept)
 
 == Shortcuts For nth Action ==
 
-C-1/9: Execute nth 1 to 9 Action.
+f1-12: Execute nth 1 to 12 Action(s).
 
 == Visible Marks ==
 Visible marks store candidate. Some actions uses marked candidates.
@@ -70,13 +74,15 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-next-visible-mark] : Next Mark
 
 == Miscellaneous Commands ==
-\\[helm-toggle-resplit-window] : Toggle vertical/horizontal split helm window
-\\[helm-quit-and-find-file] : Drop into `find-file'
-\\[helm-delete-current-selection] : Delete Selected Item (visually)
-\\[helm-kill-selection-and-quit] : Set Item Into the kill-ring And Quit
-\\[helm-yank-selection] : Yank Selected Item Into Pattern
-\\[helm-follow-mode] : Toggle Automatical Execution Of Persistent Action
-\\[helm-force-update] : Recalculate And Redisplay Candidates
+\\[helm-toggle-resplit-window] : Toggle vertical/horizontal split helm window.
+\\[helm-quit-and-find-file] : Drop into `find-file'.
+\\[helm-delete-current-selection] : Delete selected item (visually).
+\\[helm-kill-selection-and-quit] : Kill display value of candidate and quit (with prefix arg kill the real value).
+\\[helm-yank-selection] : Yank selection into pattern.
+\\[helm-follow-mode] : Toggle automatical execution of persistent action.
+\\[helm-follow-action-forward] : Run persistent action and goto next line.
+\\[helm-follow-action-backward] : Run persistent action and goto previous line.
+\\[helm-force-update] : Recalculate and redisplay candidates.
 
 == Global Commands ==
 \\<global-map>\\[helm-resume] revives last `helm' session.
