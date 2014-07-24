@@ -771,7 +771,7 @@ These extensions will be added to command line with --include arg of grep."
         finally return (delq nil (append ext-list glob-list))))
 
 (defun helm-grep-get-file-extensions (files)
-  "Try to return a list of file extensions to pass to include arg of grep."
+  "Try to return a list of file extensions to pass to '--include' arg of grep."
   (let* ((all-exts (helm-grep-guess-extensions
                     (mapcar 'expand-file-name files)))
          (extensions (helm-comp-read "Search Only in: " all-exts
@@ -779,14 +779,13 @@ These extensions will be added to command line with --include arg of grep."
                                      :fc-transformer 'helm-adaptive-sort
                                      :buffer "*helm grep exts*"
                                      :name "*helm grep extensions*")))
-    (if (listp extensions) ; Otherwise it is empty string returned by C-RET.
-        ;; If extensions is a list of one string containing spaces,
-        ;; assume user entered more than one glob separated by space(s) and
-        ;; split this string to pass it later to mapconcat.
-        ;; e.g '("*.el *.py")
-        (cl-loop for i in extensions
-              append (split-string-and-unquote i " "))
-      (list "*"))))
+    (when (listp extensions) ; Otherwise it is empty string returned by C-RET.
+      ;; If extensions is a list of one string containing spaces,
+      ;; assume user entered more than one glob separated by space(s) and
+      ;; split this string to pass it later to mapconcat.
+      ;; e.g '("*.el *.py")
+      (cl-loop for i in extensions
+               append (split-string-and-unquote i " ")))))
 
 
 ;;; Set up source
@@ -822,6 +821,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                           exts) " ")))
          (types (and (not include-files)
                      (not zgrep)
+                     (helm-grep-use-ack-p :where 'recursive)
                      recurse
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
