@@ -1629,7 +1629,7 @@ means starting helm session with `helm-source-buffers'
 source in *buffers* buffer and set variable `helm-candidate-number-limit'
 to 10 as session local variable.
 
-\(fn &key SOURCES INPUT PROMPT RESUME PRESELECT BUFFER KEYMAP DEFAULT HISTORY ALLOW-NEST LOCAL-VARS ...)"
+\(fn &key SOURCES INPUT PROMPT RESUME PRESELECT BUFFER KEYMAP DEFAULT HISTORY ALLOW-NEST OTHER-LOCAL-VARS)"
   (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
                        (and helm-alive-p (memq 'allow-nest plist)))
                    #'helm-nest)
@@ -4564,8 +4564,10 @@ With a prefix arg set to real value of current selection."
     (helm-set-pattern str)))
 
 (defun helm-kill-selection-and-quit (arg)
-  "Store current selection to kill ring.
-With a prefix arg set to real value of current selection."
+  "Store display value of current selection to kill ring.
+With a prefix arg set to real value of current selection.
+Display value is what you see in `helm-buffer' and real value
+is what is used to perform actions."
   (interactive "P")
   (helm-run-after-quit
    (lambda (sel)
