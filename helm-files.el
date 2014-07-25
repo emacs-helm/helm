@@ -88,7 +88,13 @@
   :group 'helm)
 
 (defcustom helm-boring-file-regexp-list
-  '("\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "~$")
+  (nconc
+   (mapcar (lambda (ext)
+             ;; match as extension or directory
+             (concat "\\." ext "\\(?:$\\|/\\)"))
+           '("git" "hg" "svn" "CVS" "_darcs" "la" "o"))
+   '("~\\(?:$\\|/\\)"))
+
   "The regexp list matching boring files."
   :group 'helm-files
   :type  '(repeat (choice regexp)))
