@@ -88,7 +88,12 @@
   :group 'helm)
 
 (defcustom helm-boring-file-regexp-list
-  '("\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "~$")
+  (mapcar (lambda (f)
+            (concat
+             (rx-to-string
+              (replace-regexp-in-string
+               "/$" "" f) t) "$"))
+          completion-ignored-extensions)
   "The regexp list matching boring files."
   :group 'helm-files
   :type  '(repeat (choice regexp)))
@@ -213,14 +218,16 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :type 'boolean)
 
 (defcustom helm-ff-skip-boring-files nil
-  "Non--nil to skip boring files in `helm-find-files'."
+  "Non--nil to skip files matching regexps in `helm-boring-file-regexp-list'.
+This take effect in `helm-find-files' and file completion used by `helm-mode'
+i.e `helm-read-file-name'."
   :group 'helm-files
-  :type 'boolean)
+  :type  'boolean)
 
 (defcustom helm-findutils-skip-boring-files t
-  "Ignore files matching regexps in `helm-boring-file-regexp-list'."
+  "Ignore files matching regexps in `completion-ignored-extensions'."
   :group 'helm-files
-  :type 'boolean)
+  :type  'boolean)
 
 (defcustom helm-findutils-find-program "find"
   "The program used for the Unix shell command 'find'."
@@ -2727,11 +2734,7 @@ utility mdfind.")
     (header-name . (lambda (name)
                      (concat name " in [" helm-default-directory "]")))
     (candidates-process . helm-find-shell-command-fn)
-    (filtered-candidate-transformer . ((lambda (candidates _source)
-                                         (if helm-findutils-skip-boring-files
-                                             (helm-skip-boring-files candidates)
-                                           candidates))
-                                       helm-findutils-transformer))
+    (filtered-candidate-transformer . helm-findutils-transformer)
     (action-transformer helm-transform-file-load-el)
     (action . ,(cdr (helm-inherit-attribute-from-source
                      'action helm-source-locate)))
@@ -2751,13 +2754,19 @@ utility mdfind.")
   "Asynchronously fetch candidates for `helm-find'."
   (let ((case-fold-search (helm-set-case-fold-search helm-pattern)))
     (with-helm-default-directory (helm-default-directory)
-        (let (process-connection-type)
+        (let* (process-connection-type
+               (pattern (mapconcat 'identity (split-string helm-pattern) "*"))
+               (ignored-files (when helm-findutils-skip-boring-files
+                                (mapcar (lambda (f)
+                                          (if (string-match "/$" f)
+                                              (replace-match "" nil t f) f))
+                                        completion-ignored-extensions)))
+               (cmd (find-cmd (and ignored-files
+                                   `(prune (name ,@ignored-files)))
+                              `(and (name ,(concat "*" pattern "*"))
+                                    (type "f")))))
           (prog1
-              (apply #'start-file-process
-                     "hfind" helm-buffer helm-findutils-find-program
-                     (list "."
-                           (if case-fold-search "-iname" "-name")
-                           (concat "*" helm-pattern "*") "-type" "f"))
+              (start-file-process-shell-command "hfind" helm-buffer cmd)
             (set-process-sentinel
              (get-process "hfind")
              #'(lambda (process event)
