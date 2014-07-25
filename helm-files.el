@@ -2765,7 +2765,8 @@ utility mdfind.")
                (cmd (find-cmd (and ignored-files
                                    `(prune (name ,@ignored-files)))
                               `(and (name ,(concat "*" pattern "*"))
-                                    (type "f")))))
+                                    (or (type "d")
+                                        (type "f"))))))
           (prog1
               (start-file-process-shell-command "hfind" helm-buffer cmd)
             (set-process-sentinel
