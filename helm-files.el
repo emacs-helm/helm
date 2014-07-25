@@ -2767,7 +2767,7 @@ utility mdfind.")
                               `(and (name ,(concat "*" pattern "*"))
                                     (type "d" "f"))))
                (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
-          (helm-log "Find command: \n" cmd)
+          (helm-log "Find command: %s\n" cmd)
           (prog1 proc
             (set-process-sentinel
              proc
