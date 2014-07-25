@@ -2752,6 +2752,7 @@ utility mdfind.")
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."
+  (require 'find-cmd)
   (let ((case-fold-search (helm-set-case-fold-search helm-pattern)))
     (with-helm-default-directory (helm-default-directory)
         (let* (process-connection-type
