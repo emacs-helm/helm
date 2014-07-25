@@ -2766,11 +2766,11 @@ utility mdfind.")
                                    `(prune (name ,@ignored-files)))
                               `(and (name ,(concat "*" pattern "*"))
                                     (or (type "d")
-                                        (type "f"))))))
-          (prog1
-              (start-file-process-shell-command "hfind" helm-buffer cmd)
+                                        (type "f")))))
+               (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
+          (prog1 proc
             (set-process-sentinel
-             (get-process "hfind")
+             proc
              #'(lambda (process event)
                  (helm-process-deferred-sentinel-hook
                   process event (helm-default-directory)))))))))
