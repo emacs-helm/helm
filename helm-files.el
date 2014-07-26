@@ -2744,11 +2744,16 @@ utility mdfind.")
 
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates
+           for type = (car (file-attributes i))    
         for abs = (expand-file-name i helm-default-directory)
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (string-match "[.]\\{1,2\\}$" i)))
                        (helm-basename i) abs)
-        collect (cons (propertize disp 'face 'helm-ff-file) abs)))
+        collect (cond ((eq t type)
+                       (cons (propertize disp 'face 'helm-ff-directory) abs))
+                      ((stringp type)
+                       (cons (propertize disp 'face 'helm-ff-symlink) abs))
+                      (t (cons (propertize disp 'face 'helm-ff-file) abs)))))
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'."
@@ -2757,13 +2762,17 @@ utility mdfind.")
     (with-helm-default-directory (helm-default-directory)
         (let* (process-connection-type
                (pattern (mapconcat 'identity (split-string helm-pattern) "*"))
+               (ignored-dirs ())
                (ignored-files (when helm-findutils-skip-boring-files
-                                (mapcar (lambda (f)
-                                          (if (string-match "/$" f)
-                                              (replace-match "" nil t f) f))
-                                        completion-ignored-extensions)))
-               (cmd (find-cmd (and ignored-files
-                                   `(prune (name ,@ignored-files)))
+                                (cl-loop for f in completion-ignored-extensions
+                                         if (string-match "/$" f)
+                                         do (push (replace-match "" nil t f)
+                                                  ignored-dirs)
+                                         else collect (concat "*" f))))
+               (cmd (find-cmd (and ignored-dirs
+                                   `(prune (name ,@ignored-dirs)))
+                              (and ignored-files
+                                   `(not (name ,@ignored-files)))
                               `(and (name ,(concat "*" pattern "*"))
                                     (type "d" "f"))))
                (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
