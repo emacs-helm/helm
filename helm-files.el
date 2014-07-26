@@ -2769,11 +2769,12 @@ utility mdfind.")
                                          do (push (replace-match "" nil t f)
                                                   ignored-dirs)
                                          else collect (concat "*" f))))
+               (name-or-iname (if case-fold-search 'iname 'name))
                (cmd (find-cmd (and ignored-dirs
                                    `(prune (name ,@ignored-dirs)))
                               (and ignored-files
                                    `(not (name ,@ignored-files)))
-                              `(and (name ,(concat "*" pattern "*"))
+                              `(and (,name-or-iname ,(concat "*" pattern "*"))
                                     (type "d" "f"))))
                (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
           (helm-log "Find command:\n%s" cmd)
