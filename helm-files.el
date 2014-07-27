@@ -2769,7 +2769,7 @@ utility mdfind.")
                                          do (push (replace-match "" nil t f)
                                                   ignored-dirs)
                                          else collect (concat "*" f))))
-               (name-or-iname (if case-fold-search 'iname 'name))
+               (name-or-iname (if case-fold-search 'ipath 'path))
                (cmd (find-cmd (and ignored-dirs
                                    `(prune (name ,@ignored-dirs)))
                               (and ignored-files
