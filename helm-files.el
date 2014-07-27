@@ -234,6 +234,12 @@ i.e `helm-read-file-name'."
   :group 'helm-files
   :type 'string)
 
+(defcustom helm-findutils-search-full-path nil
+  "Search in full path with shell command find when non--nil.
+I.e use the -path/ipath arguments of find instead of -name/iname."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-files-save-history-extra-sources '("Find" "Locate")
   "Extras source that save candidate to `file-name-history'."
   :group 'helm-files
@@ -2740,6 +2746,7 @@ utility mdfind.")
                      'action helm-source-locate)))
     (mode-line  . helm-generic-file-mode-line-string)
     (keymap . ,helm-generic-files-map)
+    (candidate-number-limit . 9999)
     (requires-pattern . 3)))
 
 (defun helm-findutils-transformer (candidates _source)
@@ -2769,7 +2776,10 @@ utility mdfind.")
                                          do (push (replace-match "" nil t f)
                                                   ignored-dirs)
                                          else collect (concat "*" f))))
-               (name-or-iname (if case-fold-search 'ipath 'path))
+               (path-or-name (if helm-findutils-search-full-path
+                                 '(ipath path) '(iname name)))
+               (name-or-iname (if case-fold-search
+                                  (car path-or-name) (cadr path-or-name)))
                (cmd (find-cmd (and ignored-dirs
                                    `(prune (name ,@ignored-dirs)))
                               (and ignored-files
