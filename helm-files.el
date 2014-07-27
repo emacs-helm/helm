@@ -1741,20 +1741,21 @@ Note that only existing directories are saved here."
 (defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting."
   (let ((marked (helm-marked-candidates)))
-    (save-selected-window
-      (cl-loop for c in marked do
-            (progn (helm-preselect (if (and helm-ff-transformer-show-only-basename
-                                            (not (helm-ff-dot-file-p c)))
-                                       (helm-basename c) c))
-                   (when (y-or-n-p (format "Really Delete file `%s'? " c))
-                     (helm-delete-file c helm-ff-signal-error-on-dot-files
-                                       'synchro)
-                     (helm-delete-current-selection)
-                     (message nil)))))
-    (with-helm-buffer
-      (setq helm-marked-candidates nil
-            helm-visible-mark-overlays nil))
-    (helm-force-update)))
+    (unwind-protect
+         (save-selected-window
+           (cl-loop for c in marked do
+                    (progn (helm-preselect (if (and helm-ff-transformer-show-only-basename
+                                                    (not (helm-ff-dot-file-p c)))
+                                               (helm-basename c) c))
+                           (when (y-or-n-p (format "Really Delete file `%s'? " c))
+                             (helm-delete-file c helm-ff-signal-error-on-dot-files
+                                               'synchro)
+                             (helm-delete-current-selection)
+                             (message nil)))))
+      (with-helm-buffer
+        (setq helm-marked-candidates nil
+              helm-visible-mark-overlays nil))
+      (helm-force-update))))
 
 (defun helm-ff-kill-buffer-fname (candidate)
   (let ((buf (get-file-buffer candidate)))
@@ -2320,8 +2321,7 @@ Ask to kill buffers associated with that file, too."
              (helm-ff-dot-file-p file))
     (error "Error: Cannot operate on `.' or `..'"))
   (let ((buffers (helm-file-buffers file)))
-    (if (or (< emacs-major-version 24)
-            synchro)
+    (if (or (< emacs-major-version 24) synchro)
         ;; `dired-delete-file' in Emacs versions < 24
         ;; doesn't support delete-by-moving-to-trash
         ;; so use `delete-directory' and `delete-file'
