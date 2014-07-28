@@ -875,26 +875,36 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
 ;; after insertion (otherwise cursor stay at beginning of insertion)
 ;; Activate deactivate them by hook because they may not work outside
 ;; of helm (Issue #338).
-(defadvice next-history-element (around delay)
+(defadvice next-history-element (around helm-delay-next-history-element)
   (interactive "p")
   (or (zerop n)
       (run-with-timer
-       0.01 nil `(lambda ()
-                   (goto-history-element (- minibuffer-history-position ,n))))))
+       0.01 nil
+       `(lambda ()
+          (condition-case _err
+              (goto-history-element (- minibuffer-history-position ,n))
+            (user-error (message "End of history; no default available")
+                        (sit-for 0.5) (message nil)))))))
 
-(defadvice previous-history-element (around delay)
+(defadvice previous-history-element (around helm-delay-previous-history-element)
   (interactive "p")
   (or (zerop n)
       (run-with-timer
-       0.01 nil `(lambda ()
-                   (goto-history-element (+ minibuffer-history-position ,n))))))
+       0.01 nil
+       `(lambda ()
+          (condition-case _err
+              (goto-history-element (+ minibuffer-history-position ,n))
+            (user-error (message "Beginning of history; no preceding item")
+                        (sit-for 0.5) (message nil)))))))
 
-(add-hook 'helm-before-initialize-hook (lambda ()
-                                         (ad-activate 'next-history-element)
-                                         (ad-activate 'previous-history-element)))
-(add-hook 'helm-cleanup-hook (lambda ()
-                               (ad-deactivate 'next-history-element)
-                               (ad-deactivate 'previous-history-element)))
+(add-hook 'helm-before-initialize-hook
+          (lambda ()
+            (ad-activate 'next-history-element)
+            (ad-activate 'previous-history-element)))
+(add-hook 'helm-cleanup-hook
+          (lambda ()
+            (ad-deactivate 'next-history-element)
+            (ad-deactivate 'previous-history-element)))
 
 
 ;; Programming Tools
