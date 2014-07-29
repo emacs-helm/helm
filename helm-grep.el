@@ -292,20 +292,28 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
             (mapconcat 'shell-quote-argument all-files " ")))))
 
 (defun helm-grep-command (&optional recursive)
-  (let ((com (car (split-string (if recursive
-                                    helm-grep-default-recurse-command
-                                  helm-grep-default-command) " "))))
-    (if (string= com "git") "git-grep" com)))
+  (let* ((com (if recursive
+                  helm-grep-default-recurse-command
+                  helm-grep-default-command))
+         (exe (and com (car (split-string com " ")))))
+    (if (and exe (string= exe "git")) "git-grep" exe)))
 
 (cl-defun helm-grep-use-ack-p (&key where)
-  (cl-case where
-    (default (string= (helm-grep-command) helm-ack-grep-executable))
-    (recursive (string= (helm-grep-command t) helm-ack-grep-executable))
-    (strict (and (string= (helm-grep-command t) helm-ack-grep-executable)
-                 (string= (helm-grep-command) helm-ack-grep-executable)))
-    (t (and (not (string= (helm-grep-command) "git-grep"))
-            (or (string= (helm-grep-command) helm-ack-grep-executable)
-                (string= (helm-grep-command t) helm-ack-grep-executable))))))
+  (let ((rec-com (helm-grep-command t))
+        (norm-com (helm-grep-command)))
+    (cl-case where
+      (default   (and norm-com
+                      (string= norm-com helm-ack-grep-executable)))
+      (recursive (and rec-com
+                      (string= rec-com helm-ack-grep-executable)))
+      (strict    (and norm-com rec-com
+                      (string= rec-com helm-ack-grep-executable)
+                      (string= norm-com helm-ack-grep-executable)))
+      (t         (and (not (and norm-com (string= norm-com "git-grep")))
+                      (or (and norm-com
+                               (string= norm-com helm-ack-grep-executable))
+                          (and rec-com
+                               (string= rec-com helm-ack-grep-executable))))))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
   (let* ((default-directory (or helm-default-directory
@@ -821,8 +829,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                           exts) " ")))
          (types (and (not include-files)
                      (not zgrep)
-                     (helm-grep-use-ack-p :where 'recursive)
                      recurse
+                     (helm-grep-use-ack-p :where 'recursive)
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-grep-default-command)
