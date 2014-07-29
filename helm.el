@@ -871,8 +871,16 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
        (message "Helm issued errors: %s"
                 (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
+;; [FIXME] It seem it is no more needed to have cursor at end of
+;;         insertion, so I keep the advices fo now but don't activate
+;;         them, need to clarify why I needed that IIRC it was
+;;         a problem with keybinding not activated.
+
 ;; These advices are needed to fix cursor position in minibuffer
-;; after insertion (otherwise cursor stay at beginning of insertion)
+;; after insertion, otherwise cursor stay at beginning of insertion.
+;; Using a timer ensure `minibuffer-temporary-goal-position' is set
+;; to nil in `goto-history-element' because `last-command'
+;; will be one of `next-history-element' or `previous-history-element'.
 ;; Activate deactivate them by hook because they may not work outside
 ;; of helm (Issue #338).
 (defadvice next-history-element (around helm-delay-next-history-element)
@@ -897,14 +905,18 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
             (user-error (message "Beginning of history; no preceding item")
                         (sit-for 0.5) (message nil)))))))
 
-(add-hook 'helm-before-initialize-hook
-          (lambda ()
-            (ad-activate 'next-history-element)
-            (ad-activate 'previous-history-element)))
-(add-hook 'helm-cleanup-hook
-          (lambda ()
-            (ad-deactivate 'next-history-element)
-            (ad-deactivate 'previous-history-element)))
+;; (add-hook 'helm-before-initialize-hook
+;;           (lambda ()
+;;             (ad-enable-advice 'next-history-element 'around
+;;                               'helm-delay-next-history-element)
+;;             (ad-enable-advice 'previous-history-element 'around
+;;                               'helm-delay-previous-history-element)))
+;; (add-hook 'helm-cleanup-hook
+;;           (lambda ()
+;;             (ad-disable-advice 'next-history-element 'around
+;;                                'helm-delay-next-history-element)
+;;             (ad-disable-advice 'previous-history-element 'around
+;;                                'helm-delay-previous-history-element)))
 
 
 ;; Programming Tools
