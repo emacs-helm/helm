@@ -21,6 +21,7 @@
 (require 'helm-utils)
 (require 'helm-info)
 (require 'helm-eval)
+(require 'helm-files)
 (require 'advice)
 
 
