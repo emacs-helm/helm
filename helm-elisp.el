@@ -543,6 +543,7 @@ First call indent, second complete symbol, third complete fname."
   `((name . "Elisp libraries (Scan)")
     (init . (helm-locate-library-scan-init))
     (candidates-in-buffer)
+    (candidate-number-limit . 9999)
     (keymap . ,helm-generic-files-map)
     (type . file)))
 
