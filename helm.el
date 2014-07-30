@@ -2643,7 +2643,7 @@ and `helm-pattern'."
 (defun helm-set-case-fold-search-1 (pattern)
   (cl-case helm-case-fold-search
     (smart (let ((case-fold-search nil))
-             (if (string-match "[A-Z]" pattern) nil t)))
+             (if (string-match "[[:upper:]]" pattern) nil t)))
     (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns limit source)

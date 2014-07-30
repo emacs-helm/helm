@@ -31,7 +31,7 @@
     (headline
      ,@(mapcar
         (lambda (num)
-          (format "^\\*\\{%d\\} \\(.+?\\)\\([ \t]*:[a-zA-Z0-9_@:]+:\\)?[ \t]*$"
+          (format "^\\*\\{%d\\} \\(.+?\\)\\([ \t]*:[[:lower:][:upper:]0-9_@:]+:\\)?[ \t]*$"
                   num))
         (number-sequence 1 8)))
     (condition . (eq major-mode 'org-mode))
@@ -123,7 +123,7 @@ See http://orgmode.org for the latest version.")
                     (append
                      (mapcar
                       (lambda (x)
-                        (string-match "^#\\+\\(\\([A-Z_]+:?\\).*\\)" x)
+                        (string-match "^#\\+\\(\\([[:upper:]_]+:?\\).*\\)" x)
                         (cons (match-string 2 x) (match-string 1 x)))
                       (org-split-string (org-get-current-options) "\n"))
                      (mapcar 'list org-additional-option-like-keywords)))

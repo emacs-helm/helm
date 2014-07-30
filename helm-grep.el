@@ -229,7 +229,7 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defvar helm-pdfgrep-targets nil)
 (defvar helm-grep-last-cmd-line nil)
-(defvar helm-grep-split-line-regexp "^\\([a-zA-Z]?:?.*?\\):\\([0-9]+\\):\\(.*\\)")
+(defvar helm-grep-split-line-regexp "^\\([[:lower:][:upper:]]?:?.*?\\):\\([0-9]+\\):\\(.*\\)")
 
 
 ;;; Init
@@ -347,7 +347,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (smartcase         (if (helm-grep-use-ack-p) ""
                               (unless (let ((case-fold-search nil))
                                         (string-match-p
-                                         "[A-Z]" helm-pattern)) "i"))))
+                                         "[[:upper:]]" helm-pattern)) "i"))))
     (format-spec
      helm-grep-default-command
      (delq nil

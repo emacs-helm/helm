@@ -1364,7 +1364,7 @@ or when `helm-pattern' is equal to \"~/\"."
 
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
-On windows system substitute from start up to \"/[a-z]:/\"."
+On windows system substitute from start up to \"/[[:lower:]]:/\"."
   (with-temp-buffer
     (insert fname)
     (goto-char (point-min))
@@ -2078,7 +2078,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                    (string-match-p "^[^\~]" guess)))))
         (set-text-properties 0 (length candidate) nil candidate)
         (if (and guess (not (string= guess ""))
-                 (string-match-p "^\\(~/\\|/\\|[a-zA-Z]:/\\)" guess))
+                 (string-match-p "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)" guess))
             (progn
               (delete-region beg end)
               (insert (if full-path-p

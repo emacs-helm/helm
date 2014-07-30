@@ -230,7 +230,7 @@ If no entry in cache, create one."
                            (cons f (helm-etags-mtime f))))))))))
 
 (defun helm-etags-split-line (line)
-  (let ((regexp "\\`\\([a-zA-Z]?:?.*?\\): \\(.*\\)"))
+  (let ((regexp "\\`\\([[:lower:][:upper:]]?:?.*?\\): \\(.*\\)"))
     (when (string-match regexp line)
       (cl-loop for n from 1 to 2 collect (match-string n line)))))
 

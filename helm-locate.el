@@ -231,7 +231,7 @@ See also `helm-locate'."
          (format helm-locate-command
                  (cl-case helm-locate-case-fold-search
                    (smart (let ((case-fold-search nil))
-                            (if (string-match "[A-Z]" helm-pattern)
+                            (if (string-match "[[:upper:]]" helm-pattern)
                                 case-sensitive-flag
                               ignore-case-flag)))
                    (t (if helm-locate-case-fold-search
