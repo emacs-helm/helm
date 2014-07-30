@@ -540,19 +540,12 @@ First call indent, second complete symbol, third complete fname."
 ;;
 ;;
 (defvar helm-source-locate-library
-  '((name . "Elisp libraries (Scan)")
+  `((name . "Elisp libraries (Scan)")
     (init . (helm-locate-library-scan-init))
     (candidates-in-buffer)
-    (nomark)
-    (action . (("Find library"
-                . (lambda (candidate)
-                    (find-file (find-library-name candidate))))
-               ("Find library other window"
-                . (lambda (candidate)
-                    (find-file-other-window
-                     (find-library-name candidate))))
-               ("Load library"
-                . (lambda (candidate) (load-library candidate)))))))
+    (candidate-number-limit . 9999)
+    (keymap . ,helm-generic-files-map)
+    (type . file)))
 
 (defun helm-locate-library-scan-init ()
   "Init helm buffer status."
