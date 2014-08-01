@@ -496,7 +496,8 @@ with name matching pattern."
 If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
-        (bufs   (helm-marked-candidates)))
+        (bufs   (helm-marked-candidates))
+        (helm--reading-passwd-or-string t))
     (cl-loop with replace = (query-replace-read-from prompt regexp-flag)
           with tostring = (unless (consp replace)
                             (query-replace-read-to
