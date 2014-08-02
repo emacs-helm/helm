@@ -478,8 +478,15 @@ find/xargs.
 It supports wildcards and respects the variables `grep-find-ignored-files`
 and `grep-find-ignored-directories`.
 
-It has full tramp integration. (you can grep file on a remote host or
-in su/sudo methods).
+It works with `tramp` (you can grep file on a remote host or
+in su/sudo methods) BUT (read carefully):
+
+Tramp support badly multiples processes launched in a short delay of time (less than 5s actually)
+so I recommend that you suspend helm updating with `C-!` while you write your regexp, once done
+hit again `C-!` to restart helm updating.
+
+If you don't do that it will work, but slowly and you may expect failures.
+
 
 -   NOTE: When using it recursively, `grep-find-ignored-files` is not
     used unless you don`t specify the only extensions of files where you
