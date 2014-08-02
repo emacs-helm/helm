@@ -495,7 +495,10 @@ This version should accept the `--exclude-dir` option.
 
     Install it from homebrew with:
 
-         brew install grep
+         brew tap homebrew/dupes
+         brew install homebrew/dupes/grep
+   
+    You should also set `helm-grep-default-command` to use `ggrep` instead of `grep`.
 
 ## Helm do grep
 
