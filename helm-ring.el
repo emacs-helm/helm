@@ -245,7 +245,8 @@ replace with STR as yanked string."
           ((and (consp val) (window-configuration-p (car val)))
            (list "window configuration."
                  'jump-to-register))
-          ((and (consp val) (frame-configuration-p (car val)))
+          ((or (and (vectorp val) (eq 'registerv (aref val 0))) ; Emacs-24.4.
+               (and (consp val) (frame-configuration-p (car val))))
            (list "frame configuration."
                  'jump-to-register))
           ((and (consp val) (eq (car val) 'file))
