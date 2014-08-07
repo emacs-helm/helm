@@ -245,7 +245,13 @@ replace with STR as yanked string."
           ((and (consp val) (window-configuration-p (car val)))
            (list "window configuration."
                  'jump-to-register))
-          ((or (and (vectorp val) (eq 'registerv (aref val 0))) ; Emacs-24.4.
+          ((and (vectorp val)
+                (fboundp 'undo-tree-register-data-p)
+                (undo-tree-register-data-p (elt val 1)))
+           (list
+            "Undo-tree entry."
+            'undo-tree-restore-state-from-register))
+          ((or (and (vectorp val) (eq 'registerv (aref val 0)))
                (and (consp val) (frame-configuration-p (car val))))
            (list "frame configuration."
                  'jump-to-register))
@@ -278,10 +284,6 @@ replace with STR as yanked string."
             'insert-register
             'append-to-register
             'prepend-to-register))
-          ((vectorp val)
-           (list
-            "Undo-tree entry."
-            'undo-tree-restore-state-from-register))
           (t
            "GARBAGE!"))
         collect (cons (format "Register %3s:\n %s" key (car string-actions))
