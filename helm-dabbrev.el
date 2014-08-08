@@ -216,6 +216,8 @@ but the initial search for all candidates in buffer(s)."
               (helm-init-candidates-in-buffer 'global
                 helm-dabbrev--cache)))
     (candidates-in-buffer)
+    (persistent-action . (lambda (_candidate) (ignore)))
+    (persistent-help . "DoNothing")
     (keymap . ,helm-dabbrev-map)
     (action . helm-dabbrev-default-action)))
 

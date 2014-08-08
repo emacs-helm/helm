@@ -73,6 +73,8 @@ If nil or zero (disabled), don't truncate candidate, show all."
                              (cl-loop for cand in (helm-marked-candidates)
                                    do (setq kill-ring
                                             (delete cand kill-ring)))))))
+    (persistent-action . (lambda (_candidate) (ignore)))
+    (persistent-help . "DoNothing")
     (keymap . ,helm-kill-ring-map)
     (last-command)
     (migemo)
