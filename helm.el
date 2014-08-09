@@ -215,6 +215,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "C-c C-d")    'helm-delete-current-selection)
     (define-key map (kbd "C-c C-y")    'helm-yank-selection)
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
+    (define-key map (kbd "C-c C-i")    'helm-copy-to-buffer)
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
     (define-key map (kbd "C-c C-u")    'helm-force-update)
     (define-key map (kbd "M-p")        'previous-history-element)
@@ -4606,6 +4607,14 @@ is what is used to perform actions."
      (kill-new sel)
      (message "Killed: %s" sel))
    (helm-get-selection nil (not arg))))
+
+(defun helm-copy-to-buffer ()
+  "Copy selection or marked candidates to `helm-current-buffer'."
+  (interactive)
+  (with-helm-buffer
+    (cl-loop for cand in (helm-marked-candidates)
+             do (with-helm-current-buffer
+                  (insert cand "\n")))))
 
 
 ;;; Follow-mode: Automatical execution of persistent-action
