@@ -4439,7 +4439,8 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                             (cand   (helm-get-selection))
                             (bn     (and (helm-file-completion-source-p)
                                          (helm-basename cand)))
-                            (src    (assoc-default 'name (helm-get-current-source))))
+                            (src-name    (assoc-default 'name
+                                                   (helm-get-current-source))))
                        (when (and (not (helm-this-visible-mark))
                                   (not (or (string= prefix "[?]")
                                            (string= prefix "[@]"))))
@@ -4447,21 +4448,26 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                          ;; autosave files/links and non--existent file.
                          (unless
                              (and (or (helm-file-completion-source-p)
-                                      (equal src "Files from Current Directory"))
-                                  (or (string-match "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
-                                      ;; We need to test here when not using a transformer
-                                      ;; that tag prefix (i.e on tramp)
+                                      (string=
+                                       src-name "Files from Current Directory"))
+                                  (or (string-match
+                                       "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
+                                      ;; We need to test here when not using
+                                      ;; a transformer that tag prefix
+                                      ;; (i.e on tramp).
                                       (not (file-exists-p cand))))
                            (helm-make-visible-mark))))
                      (if (helm-pos-multiline-p)
                          (progn
-                           (goto-char (or (helm-get-next-candidate-separator-pos) (point-max)))
+                           (goto-char
+                            (or (helm-get-next-candidate-separator-pos)
+                                (point-max)))
                            (forward-line 1))
                          (forward-line 1))
                      (end-of-line))))
                (helm-mark-current-line)
                (message "%s candidates marked" (length helm-marked-candidates)))
-        (helm-follow-mode follow)))))
+        (helm-follow-mode follow) (message nil)))))
 
 (defun helm-unmark-all ()
   "Unmark all candidates in all sources of current helm session."
