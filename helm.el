@@ -2335,6 +2335,11 @@ If no map is found in current source do nothing (keep previous map)."
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
+  ;; When running helm from a dedicated frame
+  ;; with no minibuffer, helm will run in the main frame
+  ;; which have a minibuffer, so be sure to disable
+  ;; the `no-other-window' prop there.
+  (helm-prevent-switching-other-window :enabled nil)
   (helm-log-run-hook 'helm-cleanup-hook)
   (helm-frame-or-window-configuration 'restore)
   ;; [1] now bury-buffer from underlying windows otherwise,
