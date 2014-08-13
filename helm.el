@@ -4119,7 +4119,7 @@ Arg DATA can be either a list or a plain string."
               helm-buffer)))
          (setq helm--window-side-state (helm--get-window-side-state)))
     (when helm-prevent-escaping-from-minibuffer
-      (helm-prevent-switching-other-window :enabled nil))))
+      (helm-prevent-switching-other-window :enabled t))))
 
 ;; Utility: Resize helm window.
 (defun helm-enlarge-window-1 (n)
