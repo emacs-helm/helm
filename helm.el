@@ -157,6 +157,43 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
              (and ,exit-fn (funcall ,exit-fn)))))))
 
 
+;;; Source creation
+;;
+;;
+(defclass helm-source ()
+  ((name       :initarg :name
+               :initform ""
+               :type (or null string))
+   
+   (init       :initarg :init
+               :initform nil
+               :type (or list symbol))
+   
+   (candidates :initarg :candidates
+               :initform nil
+               :type (or list symbol))
+   
+   (action     :initarg :action
+               :initform 'identity
+               :type (or list symbol))
+
+   (type       :initarg :type
+               :initform nil
+               :type symbol)))
+
+(defmethod helm--create-source ((object helm-source))
+  (cl-loop for s in (object-slots object)
+           for slot = (class-slot-initarg 'helm-source s)
+           for slot-val = (slot-value object slot)
+           when slot-val
+           collect (cons s slot-val)))
+
+(defun helm-define-source (name &rest args)
+  (let ((source (apply #'make-instance 'helm-source name args)))
+    (oset source :name name)
+    (helm--create-source source)))
+
+
 ;;; Keymap
 ;;
 ;;
