@@ -161,32 +161,89 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 ;;
 ;;
 (defclass helm-source ()
-  ((name       :initarg :name
-               :initform ""
-               :type (or null string))
+  ((name                           :initarg :name
+                                   :initform ""
+                                   :type (or null string))
    
-   (init       :initarg :init
-               :initform nil
-               :type (or list symbol))
+   (init                           :initarg :init
+                                   :initform nil
+                                   :type (or list symbol))
    
-   (candidates :initarg :candidates
-               :initform nil
-               :type (or list symbol))
-   
-   (action     :initarg :action
-               :initform 'identity
-               :type (or list symbol))
+   (candidates                     :initarg :candidates
+                                   :initform nil
+                                   :type (or list symbol))
 
-   (type       :initarg :type
-               :initform nil
-               :type symbol)))
+   (match                          :initarg :match
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (search                         :initarg :search
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (volatile                       :initarg :volatile
+                                   :initform nil
+                                   :type (member nil t))
+
+   (candidates-in-buffer           :initarg :candidates-in-buffer
+                                   :initform nil
+                                   :type (or null symbol))
+
+   (get-line                       :initarg :get-line
+                                   :initform nil
+                                   :type (or list symbol))
+   
+   (action                         :initarg :action
+                                   :initform 'identity
+                                   :type (or list symbol))
+
+   (persistent-action              :initarg :persistent-action
+                                   :initform 'identity
+                                   :type (or list symbol))
+
+   (persistent-help                :initarg :persistent-help
+                                   :initform ""
+                                   :type string)
+
+   (type                           :initarg :type
+                                   :initform nil
+                                   :type symbol)
+
+   (multiline                      :initarg :multiline
+                                   :initform nil
+                                   :type (member nil t))
+   
+   (requires-pattern               :init-arg :requires-pattern
+                                   :initform nil
+                                   :type (or null integer))
+
+   (candidate-transformer          :initarg :candidate-transformer
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (filtered-candidate-transformer :initarg :filtered-candidate-transformer
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (filter-one-by-one              :initarg :filter-one-by-one
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (action-transformer             :initarg :action-transformer
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (pattern-transformer            :initarg :pattern-transformer
+                                   :initform nil
+                                   :type (or list symbol))
+   ))
 
 (defmethod helm--create-source ((object helm-source))
   (cl-loop for s in (object-slots object)
            for slot = (class-slot-initarg 'helm-source s)
            for slot-val = (slot-value object slot)
            when slot-val
-           collect (cons s slot-val)))
+           collect (cons s (unless (eq t slot-val) slot-val))))
 
 (defun helm-define-source (name &rest args)
   (let ((source (apply #'make-instance 'helm-source name args)))
