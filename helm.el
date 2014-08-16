@@ -164,14 +164,26 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
   ((name                           :initarg :name
                                    :initform ""
                                    :type (or null string))
+
+   (header-name                    :initarg :header-name
+                                   :initform nil
+                                   :type (or list symbol))
    
    (init                           :initarg :init
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (update                         :initarg :update
                                    :initform nil
                                    :type (or list symbol))
    
    (candidates                     :initarg :candidates
                                    :initform nil
                                    :type (or list symbol))
+
+   (candidates-process             :initarg :candidates-process
+                                   :initform nil
+                                   :type (or null symbol))
 
    (match                          :initarg :match
                                    :initform nil
@@ -185,6 +197,10 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :initform nil
                                    :type (member nil t))
 
+   (delayed                        :initarg :delayed
+                                   :initform nil
+                                   :type (or null integer))
+
    (candidates-in-buffer           :initarg :candidates-in-buffer
                                    :initform nil
                                    :type (or null symbol))
@@ -192,6 +208,10 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
    (get-line                       :initarg :get-line
                                    :initform nil
                                    :type (or list symbol))
+
+   (keymap                         :initarg :keymap
+                                   :initform nil
+                                   :type list)
    
    (action                         :initarg :action
                                    :initform 'identity
@@ -236,7 +256,66 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
    (pattern-transformer            :initarg :pattern-transformer
                                    :initform nil
                                    :type (or list symbol))
-   ))
+
+   (candidate-number-limit         :initarg :candidate-number-limit
+                                   :initform nil
+                                   :type (or null integer))
+
+   (nomark                         :initarg :nomark
+                                   :initform nil
+                                   :type (member nil t))
+   
+   (nohighlight                    :initarg :nomark
+                                   :initform nil
+                                   :type (member nil t))
+   
+   (no-matchplugin                 :initarg :nomark
+                                   :initform nil
+                                   :type (member nil t))
+
+   (allow-dups                     :initarg :nomark
+                                   :initform nil
+                                   :type (member nil t))
+
+   (recenter                       :initarg :recenter
+                                   :initform nil
+                                   :type (member nil t)))
+   
+   (coerce                         :initarg :coerce
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (dummy                          :initarg :dummy
+                                   :initform nil
+                                   :type (member nil t))
+
+   (mode-line                      :initarg :mode-line
+                                   :initform nil
+                                   :type (or null string symbol))
+
+   (resume                         :initarg :resume
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (match-part                     :initarg :match-part
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (match-strict                   :initarg :match-part
+                                   :initform nil
+                                   :type (or list symbol))
+
+   (follow                         :initarg :follow
+                                   :initform nil
+                                   :type (or null integer))
+
+   (follow-delay                   :initarg :follow-delay
+                                   :initform nil
+                                   :type (or null integer))
+
+   (candidates-file                :initarg :candidates-file
+                                   :initform nil
+                                   :type (or null string)))
 
 (defmethod helm--create-source ((object helm-source))
   (cl-loop for s in (object-slots object)
