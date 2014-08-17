@@ -163,51 +163,51 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 (defclass helm-source ()
   ((name                           :initarg :name
                                    :initform ""
-                                   :type (or null string))
+                                   :custom string)
 
    (header-name                    :initarg :header-name
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
    
    (init                           :initarg :init
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (update                         :initarg :update
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
    
    (candidates                     :initarg :candidates
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom (choice function list))
 
    (candidates-process             :initarg :candidates-process
                                    :initform nil
-                                   :type (or null symbol))
+                                   :custom function)
 
    (match                          :initarg :match
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (search                         :initarg :search
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (volatile                       :initarg :volatile
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
 
    (delayed                        :initarg :delayed
                                    :initform nil
-                                   :type (or null integer))
+                                   :custom (choice null integer))
 
    (candidates-in-buffer           :initarg :candidates-in-buffer
                                    :initform nil
-                                   :type (or null symbol))
+                                   :custom (choice boolean function))
 
    (get-line                       :initarg :get-line
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (keymap                         :initarg :keymap
                                    :initform nil
@@ -215,15 +215,16 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
    
    (action                         :initarg :action
                                    :initform 'identity
-                                   :type (or list symbol))
+                                   :custom (alist :key-type string
+                                                  :value-type function))
 
    (persistent-action              :initarg :persistent-action
-                                   :initform 'identity
-                                   :type (or list symbol))
+                                   :initform nil
+                                   :custom function)
 
    (persistent-help                :initarg :persistent-help
-                                   :initform ""
-                                   :type string)
+                                   :initform nil
+                                   :custom string)
 
    (type                           :initarg :type
                                    :initform nil
@@ -231,91 +232,91 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 
    (multiline                      :initarg :multiline
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
    
    (requires-pattern               :init-arg :requires-pattern
                                    :initform nil
-                                   :type (or null integer))
+                                   :custom integer)
 
    (candidate-transformer          :initarg :candidate-transformer
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (filtered-candidate-transformer :initarg :filtered-candidate-transformer
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (filter-one-by-one              :initarg :filter-one-by-one
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (action-transformer             :initarg :action-transformer
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (pattern-transformer            :initarg :pattern-transformer
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (candidate-number-limit         :initarg :candidate-number-limit
                                    :initform nil
-                                   :type (or null integer))
+                                   :custom integer)
 
    (nomark                         :initarg :nomark
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
    
    (nohighlight                    :initarg :nomark
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
    
    (no-matchplugin                 :initarg :nomark
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
 
    (allow-dups                     :initarg :nomark
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
 
    (recenter                       :initarg :recenter
                                    :initform nil
-                                   :type (member nil t)))
+                                   :custom boolean))
    
    (coerce                         :initarg :coerce
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (dummy                          :initarg :dummy
                                    :initform nil
-                                   :type (member nil t))
+                                   :custom boolean)
 
    (mode-line                      :initarg :mode-line
                                    :initform nil
-                                   :type (or null string symbol))
+                                   :custom (choice string symbol))
 
    (resume                         :initarg :resume
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (match-part                     :initarg :match-part
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (match-strict                   :initarg :match-part
                                    :initform nil
-                                   :type (or list symbol))
+                                   :custom function)
 
    (follow                         :initarg :follow
                                    :initform nil
-                                   :type (or null integer))
+                                   :custom integer)
 
    (follow-delay                   :initarg :follow-delay
                                    :initform nil
-                                   :type (or null integer))
+                                   :custom integer)
 
    (candidates-file                :initarg :candidates-file
                                    :initform nil
-                                   :type (or null string)))
+                                   :custom file))
 
 (defmethod helm--create-source ((object helm-source))
   (cl-loop for s in (object-slots object)
