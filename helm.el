@@ -281,7 +281,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 
    (recenter                       :initarg :recenter
                                    :initform nil
-                                   :custom boolean))
+                                   :custom boolean)
    
    (coerce                         :initarg :coerce
                                    :initform nil
@@ -293,7 +293,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 
    (mode-line                      :initarg :mode-line
                                    :initform nil
-                                   :custom (choice string symbol))
+                                   :custom (choice string sexp))
 
    (resume                         :initarg :resume
                                    :initform nil
@@ -317,7 +317,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 
    (candidates-file                :initarg :candidates-file
                                    :initform nil
-                                   :custom file))
+                                   :custom file)))
 
 (defmethod helm--create-source ((object helm-source))
   (cl-loop for s in (object-slots object)
