@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'eieio)
 
 
 ;;; Multi keys
