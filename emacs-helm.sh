@@ -23,7 +23,6 @@
 # Run it from this directory.
 
 TMP="/tmp/helm-cfg.el"
-LOADPATH=$(readlink -f $0 | xargs dirname)
 EMACS=emacs
 
 case $1 in
@@ -62,7 +61,7 @@ cat > $TMP <<EOF
                             (menu-bar-lines . 0)
                             (fullscreen . nil)))
 (blink-cursor-mode -1)
-(add-to-list 'load-path (expand-file-name "$LOADPATH"))
+(add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (require 'helm-config)
 (helm-mode 1)
 (define-key global-map [remap find-file] 'helm-find-files)
