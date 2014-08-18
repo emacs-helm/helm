@@ -212,7 +212,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 
    (keymap                         :initarg :keymap
                                    :initform nil
-                                   :type list)
+                                   :custom sexp)
    
    (action                         :initarg :action
                                    :initform 'identity
