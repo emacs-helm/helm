@@ -213,7 +213,7 @@ So far, F can only be a symbol, not a lambda expression.")
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21464 47958 567939 782000))
+;;;### (autoloads nil "helm" "helm.el" (21491 21542 126742 871000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -442,26 +442,12 @@ only if external library addressbook-bookmark.el is available.
 
 ;;;***
 
-;;;### (autoloads nil "helm-buffers" "helm-buffers.el" (21435 58357
-;;;;;;  591422 470000))
+;;;### (autoloads nil "helm-buffers" "helm-buffers.el" (21467 40972
+;;;;;;  796530 601000))
 ;;; Generated autoloads from helm-buffers.el
 
 (autoload 'helm-buffers-list "helm-buffers" "\
 Preconfigured `helm' to list buffers.
-
-\(fn)" t nil)
-
-;;;***
-
-;;;### (autoloads nil "helm-call-tree" "helm-call-tree.el" (21341
-;;;;;;  6020 974577 405000))
-;;; Generated autoloads from helm-call-tree.el
-
-(autoload 'helm-simple-call-tree "helm-call-tree" "\
-Preconfigured `helm' for simple-call-tree. List function relationships.
-
-Needs simple-call-tree.el.
-http://www.emacswiki.org/cgi-bin/wiki/download/simple-call-tree.el
 
 \(fn)" t nil)
 
@@ -495,8 +481,8 @@ You can get help on each command by persistent action.
 
 ;;;***
 
-;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (21341 6020
-;;;;;;  974577 405000))
+;;;### (autoloads nil "helm-dabbrev" "helm-dabbrev.el" (21476 22057
+;;;;;;  108361 564000))
 ;;; Generated autoloads from helm-dabbrev.el
 
 (autoload 'helm-dabbrev "helm-dabbrev" "\
@@ -642,8 +628,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads nil "helm-files" "helm-files.el" (21464 47958 303939
-;;;;;;  780000))
+;;;### (autoloads nil "helm-files" "helm-files.el" (21479 8167 343399
+;;;;;;  603000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-browse-project "helm-files" "\
@@ -732,8 +718,8 @@ Preconfigured `helm' for gentoo linux.
 
 ;;;***
 
-;;;### (autoloads nil "helm-grep" "helm-grep.el" (21464 47958 343939
-;;;;;;  781000))
+;;;### (autoloads nil "helm-grep" "helm-grep.el" (21491 21542 122742
+;;;;;;  871000))
 ;;; Generated autoloads from helm-grep.el
 
 (autoload 'helm-goto-precedent-file "helm-grep" "\
@@ -998,8 +984,8 @@ With a prefix-arg insert symbol at point.
 
 ;;;***
 
-;;;### (autoloads nil "helm-locate" "helm-locate.el" (21464 47958
-;;;;;;  387939 781000))
+;;;### (autoloads nil "helm-locate" "helm-locate.el" (21465 2636
+;;;;;;  786724 786000))
 ;;; Generated autoloads from helm-locate.el
 
 (autoload 'helm-locate-read-file-name "helm-locate" "\
@@ -1257,8 +1243,8 @@ Preconfigured `helm' for Wikipedia lookup with Wikipedia suggest.
 
 ;;;***
 
-;;;### (autoloads nil "helm-org" "helm-org.el" (21464 47958 427939
-;;;;;;  781000))
+;;;### (autoloads nil "helm-org" "helm-org.el" (21465 2636 786724
+;;;;;;  786000))
 ;;; Generated autoloads from helm-org.el
 
 (autoload 'helm-org-keywords "helm-org" "\
@@ -1343,8 +1329,8 @@ The prefix arg can be set before calling
 
 ;;;***
 
-;;;### (autoloads nil "helm-ring" "helm-ring.el" (21341 6020 978577
-;;;;;;  405000))
+;;;### (autoloads nil "helm-ring" "helm-ring.el" (21476 22057 108361
+;;;;;;  564000))
 ;;; Generated autoloads from helm-ring.el
 
 (autoload 'helm-mark-ring "helm-ring" "\
@@ -1438,8 +1424,8 @@ Preconfigured `helm' for emacs process.
 
 ;;;***
 
-;;;### (autoloads nil "helm-tags" "helm-tags.el" (21464 47958 527939
-;;;;;;  782000))
+;;;### (autoloads nil "helm-tags" "helm-tags.el" (21465 2636 786724
+;;;;;;  786000))
 ;;; Generated autoloads from helm-tags.el
 
 (autoload 'helm-etags-select "helm-tags" "\
@@ -1540,7 +1526,7 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21465 418 463922 118000))
+;;;;;;  (21491 22623 748067 127000))
 
 ;;;***
 
