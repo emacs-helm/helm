@@ -235,7 +235,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :initform nil
                                    :custom boolean)
    
-   (requires-pattern               :init-arg :requires-pattern
+   (requires-pattern               :initarg :requires-pattern
                                    :initform nil
                                    :custom integer)
 
@@ -267,21 +267,25 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :initform nil
                                    :custom boolean)
    
-   (nohighlight                    :initarg :nomark
+   (nohighlight                    :initarg :nohighlight
                                    :initform nil
                                    :custom boolean)
    
-   (no-matchplugin                 :initarg :nomark
+   (no-matchplugin                 :initarg :no-matchplugin
                                    :initform nil
                                    :custom boolean)
 
-   (allow-dups                     :initarg :nomark
+   (allow-dups                     :initarg :allow-dups
                                    :initform nil
                                    :custom boolean)
 
    (recenter                       :initarg :recenter
                                    :initform nil
                                    :custom boolean)
+
+   (history                        :initarg :history
+                                   :initform nil
+                                   :custom symbol)
    
    (coerce                         :initarg :coerce
                                    :initform nil
