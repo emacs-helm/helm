@@ -2320,7 +2320,8 @@ Ask to kill buffers associated with that file, too."
   (when (and error-if-dot-file-p
              (helm-ff-dot-file-p file))
     (error "Error: Cannot operate on `.' or `..'"))
-  (let ((buffers (helm-file-buffers file)))
+  (let ((buffers (helm-file-buffers file))
+        (helm--reading-passwd-or-string t))
     (if (or (< emacs-major-version 24) synchro)
         ;; `dired-delete-file' in Emacs versions < 24
         ;; doesn't support delete-by-moving-to-trash
