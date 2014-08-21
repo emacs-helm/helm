@@ -162,11 +162,11 @@ but the initial search for all candidates in buffer(s)."
                                     ;; e.g text or message mode,
                                     ;; remove them [1].
                                     (replace-regexp-in-string
-                                     "[`']" "" (substring-no-properties it))))
+                                     "[']\\'" "" (substring-no-properties it))))
                        (match-2 (helm-aif (thing-at-point 'filename)
                                     ;; Same as in [1].
                                     (replace-regexp-in-string
-                                     "[`']" "" (substring-no-properties it))))
+                                     "[']\\'" "" (substring-no-properties it))))
                        (lst (if (string= match-1 match-2)
                                 (list match-1)
                               (list match-1 match-2))))
