@@ -159,8 +159,11 @@ but the initial search for all candidates in buffer(s)."
                 (let* ((match-1 (helm-aif (thing-at-point 'symbol)
                                     ;; `thing-at-point' returns
                                     ;; the quote outside of e-lisp mode,
-                                    ;; e.g text or message mode,
-                                    ;; remove them [1].
+                                    ;; e.g in message mode,
+                                    ;; `foo' => foo'
+                                    ;; but in e-lisp like modes:
+                                    ;; `foo' => foo
+                                    ;; so remove it [1].
                                     (replace-regexp-in-string
                                      "[']\\'" "" (substring-no-properties it))))
                        (match-2 (helm-aif (thing-at-point 'filename)
