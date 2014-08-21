@@ -1339,7 +1339,7 @@ or when `helm-pattern' is equal to \"~/\"."
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home/user directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~.*/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
@@ -1369,7 +1369,7 @@ On windows system substitute from start up to \"/[[:lower:]]:/\"."
     (insert fname)
     (goto-char (point-min))
     (skip-chars-forward "//") ;; Avoid infloop in UNC paths Issue #424
-    (if (re-search-forward "~/\\|//\\|/[[:alpha:]]:/" nil t)
+    (if (re-search-forward "~.*/\\|//\\|/[[:alpha:]]:/" nil t)
         (let ((match (match-string 0)))
           (goto-char (if (or (string= match "//")
                              (string-match-p "/[[:alpha:]]:/" match))
