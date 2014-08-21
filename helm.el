@@ -330,7 +330,7 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
 
-(defun helm-define-source (name &rest args)
+(defun helm-make-source (name &rest args)
   (let ((source (apply #'make-instance 'helm-source name args)))
     (oset source :name name)
     (helm--create-source source)))
