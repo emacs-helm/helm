@@ -1383,8 +1383,9 @@ On windows system substitute from start up to \"/[[:lower:]]:/\"."
 
 (defun helm-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
-  (dired (file-name-directory file))
-  (dired-goto-file file))
+  (let ((target (expand-file-name (substitute-in-file-name file))))
+    (dired (file-name-directory target))
+    (dired-goto-file target)))
 
 (defun helm-create-tramp-name (fname)
   "Build filename for `helm-pattern' like /su:: or /sudo::."
@@ -2403,7 +2404,8 @@ Ask to kill buffers associated with that file, too."
         ;; ask for creating it.
         (let ((dir (file-name-directory candidate)))
           (if (or (and dir (file-directory-p dir)) url-p)
-              (find-file-at-point (car marked))
+              (find-file-at-point (substitute-in-file-name
+                                   (car marked)))
             (and (funcall make-dir-fn dir)
                  (find-file-at-point candidate))))))))
 
