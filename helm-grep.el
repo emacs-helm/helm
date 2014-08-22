@@ -141,7 +141,8 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 ;;
 ;;
 (defface helm-grep-match
-    '((t (:inherit match)))
+  '((((background light)) :foreground "#b00000")
+    (((background dark))  :foreground "gold1"))
   "Face used to highlight grep matches."
   :group 'helm-grep)
 
