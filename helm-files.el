@@ -1365,27 +1365,32 @@ or when `helm-pattern' is equal to \"~/\"."
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
 On windows system substitute from start up to \"/[[:lower:]]:/\"."
-  (with-temp-buffer
-    (insert fname)
-    (goto-char (point-min))
-    (skip-chars-forward "//") ;; Avoid infloop in UNC paths Issue #424
-    (if (re-search-forward "~.*/\\|//\\|/[[:alpha:]]:/" nil t)
-        (let ((match (match-string 0)))
-          (goto-char (if (or (string= match "//")
-                             (string-match-p "/[[:alpha:]]:/" match))
-                         (1+ (match-beginning 0))
-                       (match-beginning 0)))
-          (buffer-substring-no-properties (point) (point-at-eol)))
-      fname)))
+  (if (and ffap-url-regexp
+           (string-match-p ffap-url-regexp fname))
+      fname
+      (with-temp-buffer
+        (insert fname)
+        (goto-char (point-min))
+        (skip-chars-forward "/") ;; Avoid infloop in UNC paths Issue #424
+        (if (re-search-forward "~.*/\\|//\\|/[[:alpha:]]:/" nil t)
+            (let ((match (match-string 0)))
+              (goto-char (if (or (string= match "//")
+                                 (string-match-p "/[[:alpha:]]:/" match))
+                             (1+ (match-beginning 0))
+                             (match-beginning 0)))
+              (buffer-substring-no-properties (point) (point-at-eol)))
+            fname))))
 
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 (add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
 
 (defun helm-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
-  (let ((target (expand-file-name (substitute-in-file-name file))))
-    (dired (file-name-directory target))
-    (dired-goto-file target)))
+  (unless (and ffap-url-regexp
+               (string-match-p ffap-url-regexp file))
+    (let ((target (expand-file-name (helm-substitute-in-filename file))))
+      (dired (file-name-directory target))
+      (dired-goto-file target))))
 
 (defun helm-create-tramp-name (fname)
   "Build filename for `helm-pattern' like /su:: or /sudo::."
@@ -2404,7 +2409,7 @@ Ask to kill buffers associated with that file, too."
         ;; ask for creating it.
         (let ((dir (file-name-directory candidate)))
           (if (or (and dir (file-directory-p dir)) url-p)
-              (find-file-at-point (substitute-in-file-name
+              (find-file-at-point (helm-substitute-in-filename
                                    (car marked)))
             (and (funcall make-dir-fn dir)
                  (find-file-at-point candidate))))))))
