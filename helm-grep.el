@@ -863,34 +863,33 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                    (t helm-grep-default-command)))
     ;; Setup the source.
     (setq helm-source-grep
-          (helm-make-source
-           (if zgrep "Zgrep"
-               (capitalize (if recurse
-                               (helm-grep-command t)
-                               (helm-grep-command))))
-           :header-name (lambda (name) (concat name "(C-c ? Help)"))
-           :candidates-process 'helm-grep-collect-candidates
-           :filter-one-by-one 'helm-grep-filter-one-by-one
-           :candidate-number-limit 9999
-           :no-matchplugin t
-           :nohighlight t
-           :mode-line 'helm-grep-mode-line-string
-           ;; We need to specify keymap here and as :keymap arg [1]
-           ;; to make it available in further resuming.
-           :keymap helm-grep-map
-           :history 'helm-grep-history
-           :action (delq
-                    nil
-                    `(("Find File" . helm-grep-action)
-                      ("Find file other frame" . helm-grep-other-frame)
-                      ,(and (locate-library "elscreen")
-                            '("Find file in Elscreen"
-                              . helm-grep-jump-elscreen))
-                      ("Save results in grep buffer" . helm-grep-save-results)
-                      ("Find file other window" . helm-grep-other-window)))
-           :persistent-action 'helm-grep-persistent-action
-           :persistent-help "Jump to line (`C-u' Record in mark ring)"
-           :requires-pattern 2))
+          `((name . ,(if zgrep "Zgrep" (capitalize (if recurse
+                                                       (helm-grep-command t)
+                                                     (helm-grep-command)))))
+            (header-name . (lambda (name)
+                             (concat name "(C-c ? Help)")))
+            (candidates-process . helm-grep-collect-candidates)
+            (filter-one-by-one . helm-grep-filter-one-by-one)
+            (candidate-number-limit . 9999)
+            (no-matchplugin)
+            (nohighlight)
+            (mode-line . helm-grep-mode-line-string)
+            ;; We need to specify keymap here and as :keymap arg [1]
+            ;; to make it available in further resuming.
+            (keymap . ,helm-grep-map)
+            (history . ,'helm-grep-history)
+            (action . ,(delq
+                        nil
+                        `(("Find File" . helm-grep-action)
+                          ("Find file other frame" . helm-grep-other-frame)
+                          ,(and (locate-library "elscreen")
+                                '("Find file in Elscreen"
+                                  . helm-grep-jump-elscreen))
+                          ("Save results in grep buffer" . helm-grep-save-results)
+                          ("Find file other window" . helm-grep-other-window))))
+            (persistent-action . helm-grep-persistent-action)
+            (persistent-help . "Jump to line (`C-u' Record in mark ring)")
+            (requires-pattern . 2)))
     (and follow (helm-attrset 'follow follow helm-source-grep))
     (helm
      :sources '(helm-source-grep)
@@ -899,6 +898,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
      :keymap helm-grep-map ; [1]
      :history 'helm-grep-history
      :truncate-lines t)))
+
 
 
 ;;; zgrep
