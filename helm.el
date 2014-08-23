@@ -710,8 +710,7 @@ If nil, use default `mode-line-format'.")
 (defvar helm-saved-selection nil
   "Value of the currently selected object when the action list is shown.")
 (defvar helm-sources nil
-  "[INTERNAL] Value of current sources in used, a list.")
-(defvar helm-delayed-init-executed nil)
+  "[INTERNAL] Value of current sources in use, a list.")
 (defvar helm-buffer "*helm*"
   "Buffer showing completions.")
 (defvar helm-current-buffer nil
@@ -2100,7 +2099,6 @@ It is intended to use this only in `helm-initial-setup'."
   (helm-log-run-hook 'helm-before-initialize-hook)
   (setq helm-current-prefix-arg nil)
   (setq helm-suspend-update-flag nil)
-  (setq helm-delayed-init-executed nil)
   (setq helm-current-buffer (helm--current-buffer))
   (setq helm-buffer-file-name buffer-file-name)
   (setq helm-issued-errors nil)
@@ -2419,19 +2417,9 @@ Helm plug-ins are realized by this function."
 
 
 ;; Core: all candidates
-(defun helm-process-delayed-init (source)
-  "Initialize delayed SOURCE."
-  (let ((name (assoc-default 'name source)))
-    (unless (member name helm-delayed-init-executed)
-      (helm-aif (assoc-default 'delayed-init source)
-          (with-current-buffer helm-current-buffer
-            (helm-funcall-with-source source it)
-            (cl-dolist (_f (if (functionp it) (list it) it))
-              (add-to-list 'helm-delayed-init-executed name)))))))
 
 (defun helm-get-candidates (source)
   "Retrieve and return the list of candidates from SOURCE."
-  (helm-process-delayed-init source)
   (let* (inhibit-quit
          (candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
