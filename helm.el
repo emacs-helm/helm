@@ -299,6 +299,10 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :initform nil
                                    :custom (choice string sexp))
 
+   (header-line                    :initarg :header-line
+                                   :initform nil
+                                   :custom (choice string sexp))
+
    (resume                         :initarg :resume
                                    :initform nil
                                    :custom function)
