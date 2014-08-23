@@ -320,7 +320,6 @@ The function must return a process.")
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
 
-;;;###autoload
 (defun helm-make-source (name &rest args)
   "Build a `helm' source named NAME with ARGS.
 Argument NAME is a string which define the source name, so no need to use

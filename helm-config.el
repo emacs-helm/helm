@@ -213,7 +213,7 @@ So far, F can only be a symbol, not a lambda expression.")
 ;;; Start of automatically extracted autoloads.
 
 
-;;;### (autoloads nil "helm" "helm.el" (21496 25458 607398 525000))
+;;;### (autoloads nil "helm" "helm.el" (21496 26992 547411 393000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -628,8 +628,8 @@ You can set your own list of commands with
 
 ;;;***
 
-;;;### (autoloads nil "helm-files" "helm-files.el" (21496 12909 655293
-;;;;;;  247000))
+;;;### (autoloads nil "helm-files" "helm-files.el" (21496 26980 391411
+;;;;;;  291000))
 ;;; Generated autoloads from helm-files.el
 
 (autoload 'helm-browse-project "helm-files" "\
@@ -1383,25 +1383,6 @@ Fill in the symbol at point by default.
 
 ;;;***
 
-;;;### (autoloads nil "helm-source" "helm-source.el" (21496 25489
-;;;;;;  583398 785000))
-;;; Generated autoloads from helm-source.el
-
-(autoload 'helm-make-source "helm-source" "\
-Build a `helm' source named NAME with ARGS.
-Argument NAME is a string which define the source name, so no need to use
-the keyword :name in your source, NAME will be used instead.
-Arguments ARGS are keyword value pairs as defined in `helm-source' which see.
-
-Example:
-
-\(helm :sources (helm-make-source \"test\" :candidates '(a b c d))
-      :buffer \"*helm test*\").
-
-\(fn NAME &rest ARGS)" nil nil)
-
-;;;***
-
 ;;;### (autoloads nil "helm-sys" "helm-sys.el" (21341 6020 978577
 ;;;;;;  405000))
 ;;; Generated autoloads from helm-sys.el
@@ -1544,8 +1525,8 @@ http://www.emacswiki.org/emacs/download/yaoddmuse.el
 
 ;;;***
 
-;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el")
-;;;;;;  (21496 25523 451760 278000))
+;;;### (autoloads nil nil ("helm-aliases.el" "helm-pkg.el" "helm-plugin.el"
+;;;;;;  "helm-source.el") (21496 27492 204168 19000))
 
 ;;;***
 
